@@ -168,9 +168,7 @@ class EpubExport < ActiveRecord::Base
 
   def convert_to_epub
     begin
-      set_locale
-      file_paths = super
-      I18n.locale = :en
+      file_paths = I18n.with_locale(set_locale) { super }
     rescue => e
       mark_as_failed(e)
       raise e
@@ -212,7 +210,7 @@ class EpubExport < ActiveRecord::Base
   private
 
   def set_locale
-    I18n.locale = infer_locale(
+    infer_locale(
       context: course,
       user:,
       root_account: course.root_account

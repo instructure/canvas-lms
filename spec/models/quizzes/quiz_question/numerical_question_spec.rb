@@ -39,9 +39,10 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
 
     it "works in french" do
-      I18n.locale = "fr"
-      expect(question.i18n_decimal("1 234,56")).to eq BigDecimal("1234.56")
-      expect(question.i18n_decimal("1234,56")).to eq BigDecimal("1234.56")
+      I18n.with_locale(:fr) do
+        expect(question.i18n_decimal("1 234,56")).to eq BigDecimal("1234.56")
+        expect(question.i18n_decimal("1234,56")).to eq BigDecimal("1234.56")
+      end
     end
 
     it "works for inputs of type Integer" do

@@ -1521,9 +1521,9 @@ describe Account do
     it "does not create a duplicate manual courses account when locale changes" do
       acct = Account.default
       sub1 = acct.manually_created_courses_account
-      I18n.locale = "es"
-      sub2 = acct.manually_created_courses_account
-      I18n.locale = "en"
+      sub2 = I18n.with_locale(:es) do
+        acct.manually_created_courses_account
+      end
       expect(sub1.id).to eq sub2.id
     end
 

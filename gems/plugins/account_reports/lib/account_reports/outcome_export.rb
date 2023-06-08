@@ -135,26 +135,27 @@ module AccountReports
     end
 
     def export_outcomes(csv, headers, include_ratings)
-      I18n.locale = account.default_locale if account.default_locale.present?
-      outcomes = outcome_scope
-      friendly_descriptions = resolve_friendly_descriptions(account, nil, outcomes.map(&:id)).to_h { |description| [description.learning_outcome_id, description.description] }
-      outcomes.find_each do |row|
-        outcome_model = row.learning_outcome_content
-        outcome = row.attributes.dup
-        outcome["object_type"] = "outcome"
-        criterion = outcome_model.rubric_criterion
-        outcome["mastery_points"] = I18n.n(criterion[:mastery_points])
-        outcome["friendly_description"] = friendly_descriptions[row.id]
-        csv_row = headers.map { |h| outcome[h] }
-        ratings = criterion[:ratings]
-        if ratings.present? && include_ratings
-          csv_row += ratings.flat_map do |r|
-            r.values_at(:points, :description).tap do |p|
-              p[0] = I18n.n(p[0]) if p[0]
+      I18n.with_locale(account.default_locale) do
+        outcomes = outcome_scope
+        friendly_descriptions = resolve_friendly_descriptions(account, nil, outcomes.map(&:id)).to_h { |description| [description.learning_outcome_id, description.description] }
+        outcomes.find_each do |row|
+          outcome_model = row.learning_outcome_content
+          outcome = row.attributes.dup
+          outcome["object_type"] = "outcome"
+          criterion = outcome_model.rubric_criterion
+          outcome["mastery_points"] = I18n.n(criterion[:mastery_points])
+          outcome["friendly_description"] = friendly_descriptions[row.id]
+          csv_row = headers.map { |h| outcome[h] }
+          ratings = criterion[:ratings]
+          if ratings.present? && include_ratings
+            csv_row += ratings.flat_map do |r|
+              r.values_at(:points, :description).tap do |p|
+                p[0] = I18n.n(p[0]) if p[0]
+              end
             end
           end
+          csv << csv_row
         end
-        csv << csv_row
       end
     end
   end

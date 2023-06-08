@@ -48,9 +48,7 @@ class WebZipExport < EpubExport
 
   def convert_to_offline_web_zip
     begin
-      set_locale
-      file_path = super(cache_key)
-      I18n.locale = :en
+      file_path = I18n.with_locale(set_locale) { super(cache_key) }
 
       create_attachment_from_path!(file_path)
     rescue => e

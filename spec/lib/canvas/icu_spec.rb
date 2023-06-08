@@ -94,13 +94,10 @@ describe Canvas::ICU do
       )
 
       # Spanish sorts it as a separate letter
-      begin
-        original_locale, I18n.locale = I18n.locale, :es
+      I18n.with_locale(:es) do
         expect(collate(%w[ana aña añb anb])).to eq(
           %w[ana anb aña añb]
         )
-      ensure
-        I18n.locale = original_locale
       end
 
       # Punctuation is not ignored (commas separating surnames)

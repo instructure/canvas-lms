@@ -311,8 +311,6 @@ Rails/FindById:
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/I18nLocaleAssignment:
-  Severity: convention
 Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:

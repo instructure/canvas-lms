@@ -100,16 +100,18 @@ class OutcomeImport < ApplicationRecord
   end
 
   def run
+    file = nil
     root_account.shard.activate do
       job_started!
-      I18n.locale = locale if locale.present?
-      file = attachment.open
+      I18n.with_locale(locale) do
+        file = attachment.open
 
-      Outcomes::CSVImporter.new(self, file).run do |status|
-        status[:errors].each do |row, error|
-          add_error row, error
+        Outcomes::CSVImporter.new(self, file).run do |status|
+          status[:errors].each do |row, error|
+            add_error row, error
+          end
+          update!(progress: status[:progress])
         end
-        update!(progress: status[:progress])
       end
 
       job_completed!
