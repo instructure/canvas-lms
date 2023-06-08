@@ -52,7 +52,9 @@ export const assignmentRow = (
       <Table.Cell textAlign="start">
         <Flex direction="column">
           <Flex.Item>
-            <a href={assignment.htmlUrl}>{assignment.name}</a>
+            <a data-testid="assignment-link" href={assignment.htmlUrl}>
+              {assignment.name}
+            </a>
           </Flex.Item>
           <Flex.Item>
             <Text size="small">{assignment.assignmentGroup.name}</Text>

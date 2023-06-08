@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../helpers/gradebook_common"
-require_relative "./gradebook_student_common"
 require_relative "../setup/gradebook_setup"
 require_relative "../pages/student_grades_page"
 
