@@ -717,18 +717,6 @@ describe('RCEWrapper', () => {
       expect(options.plugins.indexOf('instructure_record')).toEqual(-1)
     })
 
-    it('includes instructure_studio_media_options in plugins if feature enabled', () => {
-      const wrapper = createBasicElement({features: {rce_show_studio_media_options: true}})
-      const options = wrapper.wrapOptions({})
-      expect(options.plugins).toContain('instructure_studio_media_options')
-    })
-
-    it('does not include instructure_studio_media_options in plugins if feature disabled', () => {
-      const wrapper = createBasicElement({features: {rce_show_studio_media_options: false}})
-      const options = wrapper.wrapOptions({})
-      expect(options.plugins).not.toContain('instructure_studio_media_options')
-    })
-
     it('instructure_rce_external_tools if enabled and rcs available', () => {
       for (const rcsAvailable in [true, false]) {
         for (const flagEnabled in [true, false]) {

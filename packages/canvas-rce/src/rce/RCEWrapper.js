@@ -319,7 +319,6 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements = false,
       rce_new_external_tool_dialog_in_canvas = false,
       explicit_latex_typesetting = false,
-      rce_show_studio_media_options = false,
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
     } = this.props.features
@@ -329,7 +328,6 @@ class RCEWrapper extends React.Component {
       rce_ux_improvements,
       rce_new_external_tool_dialog_in_canvas,
       explicit_latex_typesetting,
-      rce_show_studio_media_options,
       rce_transform_loaded_content,
       media_links_use_attachment_id,
     }
@@ -1448,10 +1446,6 @@ class RCEWrapper extends React.Component {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
 
-    if (this.props.features?.rce_show_studio_media_options) {
-      canvasPlugins.push('instructure_studio_media_options')
-    }
-
     const pastePlugins = rcsExists ? ['instructure_paste', 'paste'] : ['paste']
 
     if (
@@ -1623,6 +1617,7 @@ class RCEWrapper extends React.Component {
           'a11y_checker',
           'wordcount',
           'instructure_wordcount',
+          'instructure_studio_media_options',
           ...pastePlugins,
           ...canvasPlugins,
         ],

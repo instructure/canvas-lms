@@ -72,11 +72,9 @@ ContentItem.fromJSON = function (obj) {
 
 const TinyMCEPayloadGenerators = {
   iframe(tinyMCEContentItem) {
-    const studioAttributes =
-      ENV?.FEATURES?.rce_show_studio_media_options &&
-      isStudioContentItemCustomJson(tinyMCEContentItem?.custom)
-        ? studioAttributesFrom(tinyMCEContentItem.custom)
-        : {}
+    const studioAttributes = isStudioContentItemCustomJson(tinyMCEContentItem?.custom)
+      ? studioAttributesFrom(tinyMCEContentItem.custom)
+      : {}
 
     return $('<div/>')
       .append(
