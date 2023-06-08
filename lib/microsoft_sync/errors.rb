@@ -54,15 +54,11 @@ module MicrosoftSync
         }
 
         if error.is_a?(MicrosoftSync::Errors::PublicError)
-          locale_was = I18n.locale
-          # force passthrough call to I18n() in public_message() to return original value,
-          # will be localized in deserialize_and_localize()
-          I18n.locale = :en
-          begin
+          I18n.with_locale(:en) do
+            # force passthrough call to I18n() in public_message() to return original value,
+            # will be localized in deserialize_and_localize()
             result[:public_message] = error.class.public_message
             result[:public_interpolated_values] = error.public_interpolated_values
-          ensure
-            I18n.locale = locale_was
           end
         end
 

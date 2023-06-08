@@ -316,8 +316,6 @@ module PostgreSQLAdapterExtensions
   end
 
   def create_icu_collations
-    original_locale = I18n.locale
-
     collation = "und-u-kn-true"
     unless icu_collations.find { |_schema, extant_collation| extant_collation == collation }
       update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
@@ -326,17 +324,17 @@ module PostgreSQLAdapterExtensions
     I18n.available_locales.each do |locale|
       next if locale.to_s.include?("-x-")
 
-      I18n.locale = locale
-      next if Canvas::ICU.collator.rules.empty?
+      I18n.with_locale(locale) do
+        next if Canvas::ICU.collator.rules.empty?
 
-      collation = "#{locale}-u-kn-true"
-      next if icu_collations.find { |_schema, extant_collation| extant_collation == collation }
+        collation = "#{locale}-u-kn-true"
+        next if icu_collations.find { |_schema, extant_collation| extant_collation == collation }
 
-      update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+        update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+      end
     end
   ensure
     @collations = nil
-    I18n.locale = original_locale
   end
 
   class AbortExceptionMatcher

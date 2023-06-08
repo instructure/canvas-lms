@@ -42,14 +42,14 @@ class GradebookExporter
   end
 
   def to_csv
-    I18n.locale = @options[:locale] || infer_locale(
+    I18n.with_locale(@options[:locale] || infer_locale(
       context: @course,
       user: @user,
       root_account: @course.root_account
-    )
-
-    @options = CSVWithI18n.csv_i18n_settings(@user, @options)
-    csv_data
+    )) do
+      @options = CSVWithI18n.csv_i18n_settings(@user, @options)
+      csv_data
+    end
   end
 
   private

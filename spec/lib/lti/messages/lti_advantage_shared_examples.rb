@@ -133,7 +133,6 @@ RSpec.shared_context "lti_advantage_shared_examples" do
     end
 
     it "adds private claims" do
-      allow(I18n).to receive(:locale).and_return("en")
       expect(jws["locale"]).to eq "en"
     end
 

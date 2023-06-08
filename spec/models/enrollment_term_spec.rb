@@ -96,14 +96,14 @@ describe EnrollmentTerm do
     }
 
     I18n.backend.stub(translations) do
-      I18n.locale = "en-BACKW"
-
-      expect(term.name).to eq "mreT tluafeD"
-      expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
-      term.name = "mreT tluafeD"
-      term.save!
-      expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
-      expect(term.name).to eq "mreT tluafeD"
+      I18n.with_locale(:"en-BACKW") do
+        expect(term.name).to eq "mreT tluafeD"
+        expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
+        term.name = "mreT tluafeD"
+        term.save!
+        expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
+        expect(term.name).to eq "mreT tluafeD"
+      end
     end
   end
 

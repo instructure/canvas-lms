@@ -224,15 +224,16 @@ describe Outcomes::CSVImporter do
     end
 
     it "can import a file with i18n decimal numbers" do
-      I18n.locale = "fr"
-      uuid = SecureRandom.uuid
-      import_fake_csv([
-                        headers + ["ratings"],
-                        outcome_row(vendor_guid: uuid) + [" 123 456,5678 ", "bon nombre"]
-                      ]) { nil }
+      I18n.with_locale(:fr) do
+        uuid = SecureRandom.uuid
+        import_fake_csv([
+                          headers + ["ratings"],
+                          outcome_row(vendor_guid: uuid) + [" 123 456,5678 ", "bon nombre"]
+                        ]) { nil }
 
-      outcome = LearningOutcome.find_by(vendor_guid: uuid)
-      expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(123_456.5678)
+        outcome = LearningOutcome.find_by(vendor_guid: uuid)
+        expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(123_456.5678)
+      end
     end
 
     it "automatically detects column separator from header" do

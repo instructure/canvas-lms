@@ -284,7 +284,8 @@ describe InfoController do
       # users, accounts, context etc.
       Account.default
       get "help_links"
-      expect(I18n.locale.to_s).to eq "es"
+
+      expect(response.parsed_body.find { |x| x["text"] == "Busque en las guías de Canvas" }).not_to be_nil
     end
 
     it "filters the links based on the current user's role" do

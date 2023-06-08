@@ -747,6 +747,9 @@ class ApplicationController < ActionController::Base
     assign_localizer
     yield if block_given?
   ensure
+    # this resets any locale set in set_locale_with_localizer (implicitly called
+    # on any translation call)
+    I18n.locale = I18n.default_locale # rubocop:disable Rails/I18nLocaleAssignment
     I18n.localizer = nil
   end
 

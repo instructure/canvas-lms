@@ -23,10 +23,6 @@ describe "locale_selection" do
     allow(I18n).to receive(:available_locales).and_return(%i[en es fr])
   end
 
-  after do
-    I18n.locale = I18n.default_locale
-  end
-
   it "sets the locale when authenticated" do
     course_with_teacher(active_all: true, user: user_with_pseudonym)
     user_session(@user, @pseudonym)
@@ -34,16 +30,19 @@ describe "locale_selection" do
     @pseudonym.reload
     @domain_root_account = Account.default
 
+    allow(I18n).to receive(:locale=)
     get dashboard_url
     expect(response).to be_successful
-    expect(I18n.locale).to be(:es)
+    expect(I18n).to have_received(:locale=).with("es").at_least(:once)
   end
 
   it "sets the locale when not authenticated" do
     account = Account.default
     account.update_attribute :default_locale, "fr"
+
+    allow(I18n).to receive(:locale=)
     get canvas_login_url
     expect(response).to be_successful
-    expect(I18n.locale).to be(:fr)
+    expect(I18n).to have_received(:locale=).with("fr").at_least(:once)
   end
 end
