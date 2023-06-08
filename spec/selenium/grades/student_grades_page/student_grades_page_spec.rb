@@ -227,5 +227,15 @@ describe "gradebook - logged in as a student" do
       expect(fj(future_assignment_selector).text).to include "GRADED\nA\nYour grade has been updated"
       expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
     end
+
+    it "displays N/A in the total sidebar when no asignments have been graded" do
+      course_with_teacher(name: "Dedicated Teacher", active_course: true, active_user: true)
+      course_with_student(course: @course, name: "Hardworking Student", active_all: true)
+      @course.assignments.create!(due_at: 1.week.from_now, title: "Current Assignment", grading_type: "points", points_possible: 10)
+      user_session(@student)
+      get "/courses/#{@course.id}/grades/#{@student.id}"
+
+      expect(f(".final_grade").text).to eq("Total: N/A")
+    end
   end
 end
