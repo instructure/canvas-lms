@@ -20,13 +20,13 @@ import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 
-import {GradebookOptions, SortableAssignment, SortableStudent} from '../../types'
+import {GradebookOptions, SortableAssignment, SortableStudent} from '../../../types'
 import {View} from '@instructure/ui-view'
-import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
+import {useCurrentStudentInfo} from '../../hooks/useCurrentStudentInfo'
 import {
   useAssignmentDropdownOptions,
   useUserDropdownOptions,
-} from '../hooks/useContentDropdownOptions'
+} from '../../hooks/useContentDropdownOptions'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 

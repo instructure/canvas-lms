@@ -20,8 +20,8 @@ import React, {useMemo} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
-import {AssignmentConnection, GradebookOptions, SubmissionConnection} from '../../types'
-import {computeAssignmentDetailText} from '../../utils/gradebookUtils'
+import {AssignmentConnection, GradebookOptions, SubmissionConnection} from '../../../types'
+import {computeAssignmentDetailText} from '../../../utils/gradebookUtils'
 import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
