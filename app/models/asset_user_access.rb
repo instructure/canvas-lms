@@ -338,10 +338,13 @@ class AssetUserAccess < ActiveRecord::Base
   def self.delete_old_records
     batch_size = Setting.get("asset_user_accesses_delete_batch_size", "10000").to_i
     batch_sleep = Setting.get("asset_user_accesses_delete_batch_sleep", "0").to_f
-    AssetUserAccess.connection.with_max_update_limit(batch_size) do
-      while where(last_access: ..expiration_date).limit(batch_size).delete_all > 0
-        sleep(batch_sleep) if batch_sleep > 0 # rubocop:disable Lint/NoSleep
+    loop do
+      count = AssetUserAccess.connection.with_max_update_limit(batch_size) do
+        where(last_access: ..expiration_date).limit(batch_size).delete_all
       end
+      break if count.zero?
+
+      sleep(batch_sleep) if batch_sleep > 0 # rubocop:disable Lint/NoSleep
     end
   end
 
