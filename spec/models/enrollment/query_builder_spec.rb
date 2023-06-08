@@ -32,7 +32,7 @@ describe "Enrollment::QueryBuilder" do
       course_ids = create_records(Course, matrix.map do |_e_state, c_state, _type|
         {
           name: "Course",
-          account_id: account_id,
+          account_id:,
           workflow_state: c_state,
           root_account_id: account_id,
           enrollment_term_id: term_id,
@@ -55,7 +55,7 @@ describe "Enrollment::QueryBuilder" do
         {
           user_id: user.id,
           course_id: course_ids[i],
-          type: type,
+          type:,
           workflow_state: e_state,
           course_section_id: section_ids[i],
           role_id: Role.get_built_in_role(type, root_account_id: account_id).id,

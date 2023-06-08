@@ -53,7 +53,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     verify_allowed_extensions!(submission.assignment, attachments)
 
     submission_draft = SubmissionDraft.where(
-      submission: submission,
+      submission:,
       submission_attempt: input[:attempt] || (submission.attempt + 1)
     ).first_or_create!
 
@@ -88,7 +88,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
 
     submission_draft.save!
 
-    { submission_draft: submission_draft }
+    { submission_draft: }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
   rescue ActiveRecord::RecordInvalid => e

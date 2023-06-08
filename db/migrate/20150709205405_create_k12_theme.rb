@@ -30,7 +30,7 @@ class CreateK12Theme < ActiveRecord::Migration[4.2]
       "ic-brand-global-nav-bgd" => "#4A90E2",
       "ic-brand-global-nav-logo-bgd" => "#3B73B4"
     }
-    bc = BrandConfig.new(variables: variables)
+    bc = BrandConfig.new(variables:)
     bc.name = NAME
     bc.share = true
     bc.save!

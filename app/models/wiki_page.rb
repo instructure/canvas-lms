@@ -75,7 +75,7 @@ class WikiPage < ActiveRecord::Base
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where.not(Ignore.where(asset_type: "WikiPage", user_id: user, purpose: purpose).where("asset_id=wiki_pages.id").arel.exists)
+    where.not(Ignore.where(asset_type: "WikiPage", user_id: user, purpose:).where("asset_id=wiki_pages.id").arel.exists)
   }
   scope :todo_date_between, ->(starting, ending) { where(todo_date: starting...ending) }
   scope :for_courses_and_groups, lambda { |course_ids, group_ids|
@@ -134,7 +134,7 @@ class WikiPage < ActiveRecord::Base
       end
     end
 
-    if context.wiki_pages.not_deleted.where(title: self.title).where.not(id: id).first
+    if context.wiki_pages.not_deleted.where(title: self.title).where.not(id:).first
       if /-\d+\z/.match?(self.title)
         # A page with this title already exists and the title ends in -<some number>.
         # This has potential to conflict with our handling of duplicate title names.
@@ -147,7 +147,7 @@ class WikiPage < ActiveRecord::Base
         mod = "-#{n}"
         new_title = self.title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-        break unless context.wiki_pages.not_deleted.where(title: new_title).where.not(id: id).exists?
+        break unless context.wiki_pages.not_deleted.where(title: new_title).where.not(id:).exists?
       end
 
       self.title = new_title
@@ -506,14 +506,14 @@ class WikiPage < ActiveRecord::Base
     result = WikiPage.new({
                             title: opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title),
                             wiki_id: self.wiki_id,
-                            context_id: context_id,
-                            context_type: context_type,
-                            body: body,
+                            context_id:,
+                            context_type:,
+                            body:,
                             workflow_state: "unpublished",
-                            user_id: user_id,
-                            protected_editing: protected_editing,
-                            editing_roles: editing_roles,
-                            todo_date: todo_date
+                            user_id:,
+                            protected_editing:,
+                            editing_roles:,
+                            todo_date:
                           })
     if assignment && opts_with_default[:duplicate_assignment]
       result.assignment = assignment.duplicate({

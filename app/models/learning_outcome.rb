@@ -125,7 +125,7 @@ class LearningOutcome < ActiveRecord::Base
       else
         errors.add(:calculation_int, t(
                                        "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
-                                       calculation_int: calculation_int,
+                                       calculation_int:,
                                        valid_calculation_ints_min: valid_ints.min,
                                        valid_calculation_ints_max: valid_ints.max
                                      ))
@@ -457,7 +457,7 @@ class LearningOutcome < ActiveRecord::Base
     alignments.find_or_create_by(
       content: asset,
       tag_type: "learning_outcome",
-      context: context
+      context:
     ) do |_a|
       InstStatsd::Statsd.increment("learning_outcome.align", tags: { type: asset.class.name })
     end

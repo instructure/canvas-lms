@@ -32,11 +32,11 @@ module Api::V1
           date_hash[:graders].each { |grader| compress(grader, :assignments) }
         end
 
-      day_hash.map { |date, hash| hash.merge(date: date) }.sort_by { |a| a[:date] }.reverse
+      day_hash.map { |date, hash| hash.merge(date:) }.sort_by { |a| a[:date] }.reverse
     end
 
     def json_for_date(date, course, api_context)
-      submissions_set(course, api_context, date: date)
+      submissions_set(course, api_context, date:)
         .each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }
         .each_value { |grader| compress(grader, :assignments) }
         .values
@@ -87,9 +87,9 @@ module Api::V1
           course,
           version,
           api_context,
-          submission: submission,
-          assignment: assignment,
-          student: student
+          submission:,
+          assignment:,
+          student:
         )
         json_versions << json_version
       end
@@ -97,7 +97,7 @@ module Api::V1
 
     def submissions_for(course, api_context, date, grader_id, assignment_id)
       assignment = ::Assignment.find(assignment_id)
-      options = { date: date, assignment_id: assignment_id, grader_id: grader_id }
+      options = { date:, assignment_id:, grader_id: }
       submissions = submissions_set(course, api_context, options)
 
       # load all versions for the given submissions and back-populate their
@@ -107,7 +107,7 @@ module Api::V1
       versions.each { |version| version.versionable = submission_index[version.versionable_id] }
 
       # convert them all to json and then group by submission
-      versions = versions_json(course, versions, api_context, assignment: assignment)
+      versions = versions_json(course, versions, api_context, assignment:)
       versions_hash = versions.group_by { |version| version[:id] }
 
       # populate previous_* and new_* keys and convert hash to array of objects
@@ -127,7 +127,7 @@ module Api::V1
           prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :id))
         end.reverse
 
-        memo << { submission_id: submission_id, versions: filtered_versions }
+        memo << { submission_id:, versions: filtered_versions }
       end
     end
 
@@ -149,7 +149,7 @@ module Api::V1
       end
 
       if (assignment_id = options[:assignment_id])
-        collection = collection.where(assignment_id: assignment_id)
+        collection = collection.where(assignment_id:)
       end
 
       if (grader_id = options[:grader_id])
@@ -157,7 +157,7 @@ module Api::V1
                        # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
                        collection.where("submissions.grader_id<=0")
                      else
-                       collection.where(grader_id: grader_id)
+                       collection.where(grader_id:)
                      end
       end
 

@@ -70,7 +70,7 @@ module Lti
             reg_info = RegistrationRequestService.retrieve_registration_password(context, reg_key) if reg_key
             if reg_info.present?
               render_new_tool_proxy(
-                context: context,
+                context:,
                 tool_proxy_guid: reg_key,
                 dev_key: developer_key,
                 registration_url: reg_info[:registration_url]
@@ -83,7 +83,7 @@ module Lti
           secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
           if secret.present? && oauth_authenticated_request?(secret[:reg_password])
             render_new_tool_proxy(
-              context: context,
+              context:,
               tool_proxy_guid: oauth_consumer_key,
               registration_url: secret[:registration_url]
             ) and return
@@ -133,7 +133,7 @@ module Lti
         end
 
         tp.save
-        render json: json, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
+        render json:, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
       rescue JSON::ParserError
         render json: { error: "Invalid request" }, status: :bad_request
       end
@@ -144,10 +144,10 @@ module Lti
         tp_service = ToolProxyService.new
         tool_proxy = tp_service.process_tool_proxy_json(
           json: request.body.read,
-          context: context,
+          context:,
           guid: tool_proxy_guid,
           developer_key: dev_key,
-          registration_url: registration_url
+          registration_url:
         )
         json = {
           "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolProxyId",
@@ -156,7 +156,7 @@ module Lti
           "tool_proxy_guid" => tool_proxy.guid
         }
         json["tc_half_shared_secret"] = tp_service.tc_half_secret if tp_service.tc_half_secret
-        render json: json, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
+        render json:, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
       end
 
       def payload
@@ -172,8 +172,8 @@ module Lti
         profile = Lti::ToolConsumerProfileCreator.new(
           @context,
           tcp_url,
-          tcp_uuid: tcp_uuid,
-          developer_key: developer_key
+          tcp_uuid:,
+          developer_key:
         ).create
         tp_validator = ::IMS::LTI::Services::ToolProxyValidator.new(::IMS::LTI::Models::ToolProxy.from_json(payload))
         tp_validator.tool_consumer_profile = profile

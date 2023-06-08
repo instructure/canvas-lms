@@ -518,7 +518,7 @@ describe ContentMigration do
       att = Attachment.create!(filename: "first.jpg", display_name: "first.jpg", uploaded_data: StringIO.new("first"), folder: root, context: @copy_from)
       att2 = Attachment.create!(filename: "test.jpg", display_name: "test.jpg", uploaded_data: StringIO.new("second"), folder: root, context: @copy_from)
       att3 = Attachment.create!(filename: "testing.jpg", display_name: "testing.jpg", uploaded_data: StringIO.new("test this"), folder: root, context: @copy_from)
-      att4 = Attachment.create!(filename: "sub_test.jpg", display_name: "sub_test.jpg", uploaded_data: StringIO.new("sub_folder"), folder: folder, context: @copy_from)
+      att4 = Attachment.create!(filename: "sub_test.jpg", display_name: "sub_test.jpg", uploaded_data: StringIO.new("sub_folder"), folder:, context: @copy_from)
       qtext = <<~HTML.strip
         sad file ref: <img src="%s">
         File ref:<img src="/courses/%s/files/%s/download">
@@ -1151,7 +1151,7 @@ describe ContentMigration do
         account.save!
         due_at = 1.hour.from_now.round
         assignment_override_model(quiz: @quiz_plain, set_type: "Noop", set_id: 1, title: "Tag 3")
-        assignment_override_model(quiz: @quiz_assigned, set_type: "Noop", set_id: 1, title: "Tag 4", due_at: due_at)
+        assignment_override_model(quiz: @quiz_assigned, set_type: "Noop", set_id: 1, title: "Tag 4", due_at:)
         run_course_copy
         to_quiz_plain = @copy_to.quizzes.where(migration_id: mig_id(@quiz_plain)).first
         to_quiz_assigned = @copy_to.quizzes.where(migration_id: mig_id(@quiz_assigned)).first

@@ -158,7 +158,7 @@ describe Gradebook::FinalGradeOverrides do
     end
 
     describe ".process_bulk_update" do
-      let(:grade_change_records) { Auditors::ActiveRecord::GradeChangeRecord.where(course: course) }
+      let(:grade_change_records) { Auditors::ActiveRecord::GradeChangeRecord.where(course:) }
 
       def run(updates: override_updates, grading_period: nil, updating_user: teacher, progress: nil)
         course.recompute_student_scores(run_immediately: true)
@@ -180,7 +180,7 @@ describe Gradebook::FinalGradeOverrides do
       end
 
       it "updates scores for the specific grading period if one is given" do
-        run(grading_period: grading_period)
+        run(grading_period:)
 
         student1_enrollment = student.enrollments.first
         student2_enrollment = multiple_enrollment_student.enrollments.first
@@ -199,7 +199,7 @@ describe Gradebook::FinalGradeOverrides do
       it "does not update grading periods other than the one requested" do
         student1_enrollment = student.enrollments.first
 
-        run(grading_period: grading_period)
+        run(grading_period:)
         expect(student1_enrollment.override_score({ grading_period_id: other_grading_period.id })).to be_nil
       end
 
@@ -217,7 +217,7 @@ describe Gradebook::FinalGradeOverrides do
           expect(grade_change_records.count).to eq 2
           expect(grade_change_records.where(grader: teacher).count).to eq 2
 
-          student1_records = grade_change_records.where(student: student)
+          student1_records = grade_change_records.where(student:)
           expect(student1_records.count).to eq 1
           student1_course_record = student1_records.find_by(grading_period_id: nil)
           expect(student1_course_record.score_after).to eq 70.0
@@ -239,7 +239,7 @@ describe Gradebook::FinalGradeOverrides do
         some_other_student = User.create!
         updates = [{ student_id: some_other_student.id, override_score: 100.0 }]
 
-        run(updates: updates)
+        run(updates:)
         expect(grade_change_records).to be_empty
       end
 
@@ -266,7 +266,7 @@ describe Gradebook::FinalGradeOverrides do
             { student_id: section2_student.id, override_score: 70.0 }
           ]
 
-          run(updates: updates, updating_user: section1_ta)
+          run(updates:, updating_user: section1_ta)
 
           section1_student_enrollment = section1_student.enrollments.first
           section2_student_enrollment = section2_student.enrollments.first
@@ -287,7 +287,7 @@ describe Gradebook::FinalGradeOverrides do
 
           updates = [{ student_id: section2_student.id, override_score: 70.0 }]
 
-          run(updates: updates, updating_user: section1_ta)
+          run(updates:, updating_user: section1_ta)
 
           student2_enrollments = section2_student.enrollments
           aggregate_failures do
@@ -298,18 +298,18 @@ describe Gradebook::FinalGradeOverrides do
       end
 
       describe "error handling" do
-        let(:progress) { Progress.create!(course: course, tag: "override_grade_update") }
+        let(:progress) { Progress.create!(course:, tag: "override_grade_update") }
 
         it "notes an error of type invalid_student_id for invalid student IDs" do
           updates = [{ student_id: "fred", override_score: 100.0 }]
-          run(updates: updates, progress: progress)
+          run(updates:, progress:)
 
           expect(progress.results[:errors]).to contain_exactly({ student_id: "fred", error: :invalid_student_id })
         end
 
         it "notes an error of type failed_to_update when a score value cannot be saved" do
           updates = [{ student_id: student.id, override_score: "asdfasdfasdf" }]
-          run(updates: updates, progress: progress)
+          run(updates:, progress:)
 
           expect(progress.results[:errors]).to contain_exactly({ student_id: student.id, error: :failed_to_update })
         end
@@ -323,7 +323,7 @@ describe Gradebook::FinalGradeOverrides do
           )
 
           updates = [{ student_id: student.id, override_score: 80.0 }]
-          run(grading_period: other_grading_period, updates: updates, progress: progress)
+          run(grading_period: other_grading_period, updates:, progress:)
 
           expect(progress.results[:errors]).to contain_exactly({ student_id: student.id, error: :failed_to_update })
         end

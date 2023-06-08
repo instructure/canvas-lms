@@ -174,9 +174,9 @@ describe UsersController do
       role = custom_account_role("custom", account: @account)
       RoleOverride.create!(context: @account,
                            permission: "read_roster",
-                           role: role,
+                           role:,
                            enabled: true)
-      @account.account_users.create!(user: user_factory, role: role)
+      @account.account_users.create!(user: user_factory, role:)
       user_session(@user)
 
       get "/users/#{@student.id}"
@@ -189,9 +189,9 @@ describe UsersController do
       role = custom_account_role("custom", account: @account)
       RoleOverride.create!(context: @account,
                            permission: "read_roster",
-                           role: role,
+                           role:,
                            enabled: true)
-      @account.account_users.create!(user: user_factory, role: role)
+      @account.account_users.create!(user: user_factory, role:)
       user_session(@user)
 
       get "/courses/#{@course.id}/users/#{@student.id}"
@@ -322,7 +322,7 @@ describe UsersController do
       @first_course = @course
       course_with_student(user: @student, active_all: true)
       role = custom_account_role("grade viewer", account: Account.default)
-      account_admin_user_with_role_changes(role: role, role_changes: { view_all_grades: true })
+      account_admin_user_with_role_changes(role:, role_changes: { view_all_grades: true })
       user_session(@user)
 
       get "/users/#{@student.id}/grades"
@@ -375,7 +375,7 @@ describe UsersController do
 
     before do
       account = Account.create!
-      course_with_student(active_all: true, account: account)
+      course_with_student(active_all: true, account:)
       user_session(@student)
     end
 

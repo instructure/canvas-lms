@@ -290,7 +290,7 @@ describe "assignments sync to sis" do
         let(:assignment_id) { @assignment.assignment.id }
         let(:type) { @course.quizzes }
         let(:assignment_group) { @course.assignment_groups.create!(name: "default") }
-        let(:params) { { title: assignment_name, assignment_group: assignment_group } }
+        let(:params) { { title: assignment_name, assignment_group: } }
 
         it "when there are no overrides" do
           create_assignment(set_date)

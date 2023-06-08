@@ -46,12 +46,12 @@ describe Mutations::SetFriendlyDescription do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   def exec(attrs = {})
     attrs = attrs.reverse_merge({
-                                  description: description,
+                                  description:,
                                   outcome_id: outcome.id,
                                   context_id: context.id,
                                   context_type: context.class.name,
@@ -60,7 +60,7 @@ describe Mutations::SetFriendlyDescription do
     execute_query(mutation_str(**attrs), ctx)
   end
 
-  let(:ctx) { { current_user: current_user } }
+  let(:ctx) { { current_user: } }
   let(:description) { "This is a friendly Description" }
   let(:outcome) { outcome_model }
   let(:context) { @course }

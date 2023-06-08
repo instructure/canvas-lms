@@ -29,22 +29,22 @@ module CoursePacesCommonPageObject
   def create_assignment(course, assignment_title, description, points_possible, publish_status)
     course.assignments.create!(
       title: assignment_title,
-      description: description,
-      points_possible: points_possible,
+      description:,
+      points_possible:,
       submission_types: "online_text_entry",
       workflow_state: publish_status
     )
   end
 
   def create_course_module(module_title, workflow_state = "active")
-    @course.context_modules.create!(name: module_title, workflow_state: workflow_state)
+    @course.context_modules.create!(name: module_title, workflow_state:)
   end
 
   def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
     course.assignments.create!(
       title: assignment_title,
       grading_type: "points",
-      points_possible: points_possible,
+      points_possible:,
       due_at: assignment_due_at,
       submission_types: "online_text_entry"
     )
@@ -55,8 +55,8 @@ module CoursePacesCommonPageObject
     course.discussion_topics.create!(user: @teacher,
                                      title: discussion_title,
                                      message: "Discussion topic message",
-                                     assignment: assignment,
-                                     workflow_state: workflow_state)
+                                     assignment:,
+                                     workflow_state:)
   end
 
   def create_quiz(course, quiz_title)
@@ -107,12 +107,12 @@ module CoursePacesCommonPageObject
   end
 
   def create_section_pace(section)
-    course_section_pace = section_pace_model(section: section)
+    course_section_pace = section_pace_model(section:)
     course_section_pace.publish
   end
 
   def create_student_pace(student_enrollment)
-    student_pace = student_enrollment_pace_model(student_enrollment: student_enrollment)
+    student_pace = student_enrollment_pace_model(student_enrollment:)
     student_pace.publish
   end
 

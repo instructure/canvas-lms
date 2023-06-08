@@ -59,9 +59,9 @@ module RequestContext
       session_id = ActionDispatch::Request.new(env).cookie_jar[:log_session_id]
       meta_headers = +""
       Thread.current[:context] = {
-        request_id: request_id,
-        session_id: session_id,
-        meta_headers: meta_headers,
+        request_id:,
+        session_id:,
+        meta_headers:,
       }
 
       # logged here to get as close to the beginning of the request being

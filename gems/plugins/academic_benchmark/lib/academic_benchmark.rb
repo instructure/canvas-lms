@@ -136,10 +136,10 @@ module AcademicBenchmark
     ensure_ab_credentials
 
     AcademicBenchmark.queue_migration_for(
-      authority: authority,
-      publication: publication,
+      authority:,
+      publication:,
       user: authorized?,
-      options: options
+      options:
     ).first
   end
 

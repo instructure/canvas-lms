@@ -33,7 +33,7 @@ module Lti::MembershipService
 
       it "returns a CourseGroupCollator instance when group role is supplied and context is a Course" do
         role = [::IMS::LIS::ContextType::URNs::Group, ::IMS::LIS::Roles::Context::URNs::TeachingAssistant]
-        collator = MembershipCollatorFactory.collator_instance(@course, @teacher, { role: role })
+        collator = MembershipCollatorFactory.collator_instance(@course, @teacher, { role: })
         expect(collator.class).to eq Lti::MembershipService::CourseGroupCollator
       end
 

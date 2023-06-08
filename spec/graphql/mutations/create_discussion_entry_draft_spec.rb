@@ -67,7 +67,7 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
     result = CanvasSchema.execute(
       mutation_str(**opts),
       context: {
-        current_user: current_user,
+        current_user:,
         request: ActionDispatch::TestRequest.create
       }
     )
@@ -114,7 +114,7 @@ RSpec.describe Mutations::CreateDiscussionEntryDraft do
   end
 
   it "updates existing root_entry draft on new parent_entry" do
-    draft_id = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "hello", parent: parent).first
+    draft_id = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: "hello", parent:).first
     result = run_mutation(discussion_topic_id: @topic.id, message: "threaded reply", parent_entry_id: sub.id)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "createDiscussionEntryDraft", "errors")).to be_nil

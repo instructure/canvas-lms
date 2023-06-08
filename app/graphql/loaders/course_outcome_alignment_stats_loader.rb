@@ -121,7 +121,7 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
     bank.assessment_questions.preload(:quiz_questions).reduce(0) do |acc, q|
       quiz_ids, artifact_assignment_ids = Quizzes::Quiz
                                           .active
-                                          .where(context: context, id: q.quiz_questions.active.pluck(:quiz_id))
+                                          .where(context:, id: q.quiz_questions.active.pluck(:quiz_id))
                                           .pluck(:id, :assignment_id)
                                           .reduce([[], []]) { |(acc1, acc2), (val1, val2)| [acc1 << val1, acc2 << val2] }
       @artifacts_with_alignments_ids.merge(artifact_assignment_ids)

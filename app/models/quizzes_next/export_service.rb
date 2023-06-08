@@ -29,7 +29,7 @@ module QuizzesNext
           selected_assignment_ids = opts[:exported_assets].filter_map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }
           return unless selected_assignment_ids.any?
         end
-        assignments = QuizzesNext::Service.active_lti_assignments_for_course(course, selected_assignment_ids: selected_assignment_ids)
+        assignments = QuizzesNext::Service.active_lti_assignments_for_course(course, selected_assignment_ids:)
         return if assignments.empty?
 
         {

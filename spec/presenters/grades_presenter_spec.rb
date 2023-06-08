@@ -177,7 +177,7 @@ describe GradesPresenter do
     let(:course) { double("course") }
 
     let(:attrs) do
-      { student?: false, instructor?: false, course_id: 1, state_based_on_date: :active, course: course, is_a?: false }
+      { student?: false, instructor?: false, course_id: 1, state_based_on_date: :active, course:, is_a?: false }
     end
 
     let(:observed_enrollment) { double("observerd_enrollment", attrs.merge(is_a?: true, associated_user_id: 1)) }

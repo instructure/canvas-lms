@@ -110,7 +110,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
 
       map[student_id] = {
         provisional_grade_id: provisional_grade.id,
-        selection: selection,
+        selection:,
         submission: provisional_grade.submission
       }
     end
@@ -144,7 +144,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
       Submission.where(id: changed_submission_ids).touch_all
     end
 
-    render json: json
+    render json:
   end
 
   # @API Show provisional grade status for a student
@@ -202,7 +202,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
       json.delete(:student_id)
       json[:anonymous_id] = submission.anonymous_id
     end
-    render json: json
+    render json:
   end
 
   # @API Publish provisional grades for an assignment

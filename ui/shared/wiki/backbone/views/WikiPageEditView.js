@@ -26,6 +26,7 @@ import WikiPageReloadView from './WikiPageReloadView'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import '@canvas/datetime'
+import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 
 const I18n = useI18nScope('pages')
 
@@ -172,6 +173,16 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     if (this.toJSON().todo_date == null) {
       this.$studentTodoAtContainer.hide()
+    }
+
+    if (window.ENV.FEATURES.permanent_page_links) {
+      renderWikiPageTitle({
+        defaultValue: this.model.get('title'),
+        isContentLocked: !!this.lockedItems.content,
+        canEdit: this.toJSON().CAN.EDIT_TITLE,
+        viewElement: this.$el,
+        validationCallback: this.validateFormData,
+      })
     }
 
     RichContentEditor.loadNewEditor(this.$wikiPageBody, {focus: true, manageParent: true})
@@ -322,7 +333,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       page_data.assignment = this.model.createAssignment({set_assignment: '0'})
     }
     page_data.set_assignment = page_data.assignment.get('set_assignment')
-    page_data.student_planner_checkbox = this.$studentPlannerCheckbox.is(':checked')
+    page_data.student_planner_checkbox = this.$studentPlannerCheckbox?.is(':checked')
     if (page_data.student_planner_checkbox) {
       page_data.student_todo_at = this.studentTodoAtDateValue
     } else {

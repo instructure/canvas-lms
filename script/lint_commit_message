@@ -22,7 +22,7 @@ def comment(severity, line, message, link_to_guidelines: false)
     end
 
     # NOTE: add 6 to all line numbers, cuz parent/author/commit/dates/etc
-    payload = { path: "/COMMIT_MSG", position: (line || 1) + 6, severity: severity, message: message }
+    payload = { path: "/COMMIT_MSG", position: (line || 1) + 6, severity:, message: }
     `gergich comment #{Shellwords.escape(payload.to_json)}`
     warn "line #{line}: [#{severity}]: #{message}"
   elsif line
@@ -123,8 +123,8 @@ if touches_db_migrate_file
 end
 
 gh_issue = (commit_message =~ /(?:refs|fixes|closes|resolves|references) gh-\d+/i)
-SAFE_PARTS_REGEX = /UTF-8/.freeze
-TICKET_REGEX = /([A-Z]+-[0-9]+)/.freeze
+SAFE_PARTS_REGEX = /UTF-8/
+TICKET_REGEX = /([A-Z]+-[0-9]+)/
 
 issue_ids = JiraRefParser.scan_message_for_issue_ids(commit_message)
 if issue_ids.empty? && !gh_issue

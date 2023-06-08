@@ -276,7 +276,7 @@ describe EventStream::IndexStrategy::Cassandra do
           expect(@database).to receive(:execute).once
                                                 .with(/AND ordered_id < \?/, anything, anything, bookmark[1], anything)
                                                 .and_return(@query)
-          @pager.paginate(per_page: 1, page: page)
+          @pager.paginate(per_page: 1, page:)
         end
       end
 

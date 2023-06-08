@@ -92,7 +92,7 @@ describe NotificationMessageCreator do
       communication_channel(@user, { username: "a@example.com", active_cc: true })
 
       due_at = Time.zone.parse("2014-06-06 11:59:59")
-      assignment_model(course: @course, due_at: due_at)
+      assignment_model(course: @course, due_at:)
 
       notification = Notification.create!(name: "Assignment Created", category: "Due Date")
 
@@ -164,7 +164,7 @@ describe NotificationMessageCreator do
       notification_set(notification_opts: { category: "Announcement" })
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { course_id: @course.id, root_account_id: @course.root_account_id }
-      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
+      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data:).create_message
       expect(messages).to be_empty
     end
 
@@ -172,7 +172,7 @@ describe NotificationMessageCreator do
       notification_set(notification_opts: { category: "Announcement" })
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { root_account_id: @course.root_account_id }
-      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
+      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data:).create_message
       expect(messages.length).to be(1)
     end
 
@@ -188,7 +188,7 @@ describe NotificationMessageCreator do
       notification_set(notification_opts: { category: "Registration" })
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { course_id: @course.id, root_account_id: @course.root_account_id }
-      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
+      messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data:).create_message
       expect(messages.length).to be(1)
     end
 
@@ -338,7 +338,7 @@ describe NotificationMessageCreator do
       end
 
       it "does not use default policy on default channel when other policy exists" do
-        notification_policy_model(notification: notification, communication_channel: @communication_channel, frequency: "immediately")
+        notification_policy_model(notification:, communication_channel: @communication_channel, frequency: "immediately")
         expect { NotificationMessageCreator.new(notification, @assignment, to_list: @user).create_message }.not_to change(DelayedMessage, :count)
       end
 
@@ -677,7 +677,7 @@ describe NotificationMessageCreator do
       allow_any_instance_of(Message).to receive(:get_template).and_return("template")
       @shard1.activate do
         account = Account.create!
-        user_with_pseudonym(active_all: 1, account: account)
+        user_with_pseudonym(active_all: 1, account:)
         messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user).create_message
         expect(messages.length).to be >= 1
         messages.each { |m| expect(m.shard).to eq @shard1 }

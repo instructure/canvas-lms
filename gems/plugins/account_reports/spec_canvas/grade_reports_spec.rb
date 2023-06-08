@@ -1296,7 +1296,7 @@ describe "Default Account Reports" do
       it "returns empty score values when a score for a grading period/enrollment is missing" do
         enrollment = Enrollment.find_by(course: @course3, user: @user2)
         past_grading_period = GradingPeriod.find_by(title: "Past")
-        Score.find_by(enrollment: enrollment, grading_period: past_grading_period).destroy!
+        Score.find_by(enrollment:, grading_period: past_grading_period).destroy!
 
         reports = read_report("mgp_grade_export_csv",
                               params: { enrollment_term_id: @default_term.id },

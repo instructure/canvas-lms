@@ -29,9 +29,9 @@ class Setting < Switchman::UnshardedRecord
   end
 
   def self.get(name, default, expires_in: nil, set_if_nx: false)
-    cache.fetch(name, expires_in: expires_in) do
+    cache.fetch(name, expires_in:) do
       if @skip_cache && expires_in
-        obj = Setting.find_by(name: name)
+        obj = Setting.find_by(name:)
         Setting.set(name, default) if !obj && set_if_nx
         next obj ? obj.value&.to_s : default&.to_s
       end
@@ -64,7 +64,7 @@ class Setting < Switchman::UnshardedRecord
 
   # Note that after calling this, you should send SIGHUP to all running Canvas processes
   def self.set(name, value, secret: nil)
-    s = Setting.where(name: name).first_or_initialize
+    s = Setting.where(name:).first_or_initialize
     s.value = value&.to_s
     s.secret = secret unless secret.nil?
     s.save!
@@ -91,7 +91,7 @@ class Setting < Switchman::UnshardedRecord
 
   def self.remove(name)
     cache.delete(name)
-    Setting.where(name: name).delete_all
+    Setting.where(name:).delete_all
     @all_settings = nil
     MultiCache.delete("all_settings")
   end

@@ -114,10 +114,10 @@ class RubricAssociationsController < ApplicationController
     @association = RubricAssociation.generate(@current_user, @rubric, @context, association_params)
     json_res = {
       rubric: @rubric.as_json(methods: :criteria, include_root: false, permissions: { user: @current_user,
-                                                                                      session: session }),
+                                                                                      session: }),
       rubric_association: @association.as_json(include_root: false,
                                                include: %i[rubric_assessments assessment_requests],
-                                               permissions: { user: @current_user, session: session })
+                                               permissions: { user: @current_user, session: })
     }
     render json: json_res
   end

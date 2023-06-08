@@ -28,7 +28,7 @@ class RequestError < RuntimeError
   def error_json
     {
       status: (Rack::Utils::SYMBOL_TO_STATUS_CODE.key(response_status) || :internal_server_error).to_s,
-      message: message
+      message:
     }
   end
 end

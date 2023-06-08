@@ -264,7 +264,7 @@ describe DiscussionTopicsController do
       )
       group_topic.save!
       group_id = group_topic.child_topics.first.group.id
-      get "index", params: { group_id: group_id }, format: :json
+      get "index", params: { group_id: }, format: :json
       expect(response).to be_successful
       parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
@@ -537,7 +537,7 @@ describe DiscussionTopicsController do
 
       let!(:discussion) do
         course.discussion_topics.create!(
-          user: user,
+          user:,
           title: "Lego",
           message: "What upcoming set are you most excited for?"
         )
@@ -1433,7 +1433,7 @@ describe DiscussionTopicsController do
     it "creates a topic with a todo date" do
       user_session(@teacher)
       todo_date = 1.day.from_now.in_time_zone("America/New_York")
-      post "create", params: { course_id: @course.id, todo_date: todo_date, title: "Discussion 1" }, format: "json"
+      post "create", params: { course_id: @course.id, todo_date:, title: "Discussion 1" }, format: "json"
       expect(response.parsed_body["todo_date"]).to eq todo_date.in_time_zone("UTC").iso8601
     end
 
@@ -1781,7 +1781,7 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       params = topic_params(@course, { is_announcement: true })
       params.delete(:locked)
-      post("create", params: params, format: :json)
+      post("create", params:, format: :json)
       expect(response).to be_successful
       expect(DiscussionTopic.last.locked).to be_truthy
     end
@@ -1790,7 +1790,7 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       params = topic_params(@course, { is_announcement: false })
       params.delete(:locked)
-      post("create", params: params, format: :json)
+      post("create", params:, format: :json)
       expect(response).to be_successful
       expect(DiscussionTopic.last.locked).to be_falsy
     end
@@ -1987,7 +1987,7 @@ describe DiscussionTopicsController do
       @course.enroll_teacher(@teacher, section: section2, allow_multiple_enrollments: true).accept(true)
 
       group_category = @course.group_categories.create(name: "gc")
-      group = @course.groups.create!(group_category: group_category)
+      group = @course.groups.create!(group_category:)
       topic = DiscussionTopic.create!(context: group,
                                       title: "Test Topic",
                                       delayed_post_at: "2013-01-01T00:00:00UTC",
@@ -2025,7 +2025,7 @@ describe DiscussionTopicsController do
     it "Allows an admin to update a section-specific discussion" do
       account = @course.root_account
       section = @course.course_sections.create!(name: "Section")
-      admin = account_admin_user(account: account, role: admin_role, active_user: true)
+      admin = account_admin_user(account:, role: admin_role, active_user: true)
       user_session(admin)
       topic = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher)
       put("update", params: {

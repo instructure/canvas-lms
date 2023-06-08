@@ -124,7 +124,7 @@ describe GradebookUserIds do
     student_in_course(
       course: @course,
       user: @student1,
-      section: section,
+      section:,
       active_all: true,
       allow_multiple_enrollments: true
     )
@@ -261,7 +261,7 @@ describe GradebookUserIds do
     student_in_course(
       course: @course,
       user: @student1,
-      section: section,
+      section:,
       active_all: true,
       allow_multiple_enrollments: true
     )

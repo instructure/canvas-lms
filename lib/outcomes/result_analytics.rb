@@ -148,7 +148,7 @@ module Outcomes
     #
     # Returns a Rollup.
     def aggregate_outcome_results_rollup(results, context, stat = "mean")
-      rollups = outcome_results_rollups(results: results, context: context)
+      rollups = outcome_results_rollups(results:, context:)
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
       aggregate_results = outcome_results.map do |scores|
@@ -156,7 +156,7 @@ module Outcomes
       end
       opts = { aggregate_score: true, aggregate_stat: stat, **mastery_scale_opts(context) }
       aggregate_rollups = aggregate_results.map do |result|
-        RollupScore.new(outcome_results: result, opts: opts)
+        RollupScore.new(outcome_results: result, opts:)
       end
       Rollup.new(context, aggregate_rollups)
     end
@@ -172,7 +172,7 @@ module Outcomes
       filtered_results = user_results.reject { |r| r.score.nil? }
       opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
-        RollupScore.new(outcome_results: outcome_results, opts: opts)
+        RollupScore.new(outcome_results:, opts:)
       end
     end
 

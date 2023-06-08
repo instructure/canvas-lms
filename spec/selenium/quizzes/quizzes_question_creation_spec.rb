@@ -469,7 +469,7 @@ describe "quizzes question creation" do
     end
 
     def create_quiz_question(question_data)
-      @quiz.quiz_questions.create!(question_data: question_data)
+      @quiz.quiz_questions.create!(question_data:)
 
       @quiz.generate_quiz_data
       @quiz.workflow_state = "available"

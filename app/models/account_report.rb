@@ -102,7 +102,7 @@ class AccountReport < ActiveRecord::Base
   end
 
   def run_report(type = nil)
-    parameters["locale"] = infer_locale(user: user, root_account: account)
+    parameters["locale"] = infer_locale(user:, root_account: account)
     self.report_type ||= type
     if AccountReport.available_reports[self.report_type]
       begin

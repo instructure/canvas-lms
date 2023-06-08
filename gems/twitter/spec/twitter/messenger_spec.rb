@@ -34,7 +34,7 @@ describe Twitter::Messenger do
 
   describe "#deliver" do
     let(:user) { double(:user_services) }
-    let(:message) { double(body: "body", url: "url", user: user, id: 0, main_link: "") }
+    let(:message) { double(body: "body", url: "url", user:, id: 0, main_link: "") }
     let(:connection_mock) { double }
 
     context "with a twitter service" do

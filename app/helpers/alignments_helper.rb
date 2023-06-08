@@ -28,7 +28,7 @@ module AlignmentsHelper
             })
   end
 
-  def outcome_alignment_tag(context, outcome, alignment = nil, &block)
+  def outcome_alignment_tag(context, outcome, alignment = nil, &)
     options = {
       id: "alignment_#{alignment.try(:id) || "blank"}",
       class: [
@@ -46,7 +46,7 @@ module AlignmentsHelper
     }
     options[:style] = hidden unless alignment
 
-    content_tag(:li, options, &block)
+    content_tag(:li, options, &)
   end
 
   def outcome_alignment_url(context, outcome, alignment = nil)

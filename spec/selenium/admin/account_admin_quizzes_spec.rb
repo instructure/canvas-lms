@@ -29,7 +29,7 @@ describe "quizzes" do
       quiz.unpublish!
 
       role = custom_account_role("other admin", account: Account.default)
-      account_admin_user_with_role_changes(role: role, role_changes: { read_course_content: true })
+      account_admin_user_with_role_changes(role:, role_changes: { read_course_content: true })
 
       user_with_pseudonym(user: @admin)
       user_session(@admin)

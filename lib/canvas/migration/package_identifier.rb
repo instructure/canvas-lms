@@ -24,7 +24,7 @@ module Canvas::Migration
     include Canvas::Migration::XMLHelper
     attr_reader :type, :converter
 
-    COMMON_CARTRIDGE_REGEX = /IMS(?: Thin)? Common Cartridge/i.freeze
+    COMMON_CARTRIDGE_REGEX = /IMS(?: Thin)? Common Cartridge/i
 
     def initialize(archive)
       @archive = archive

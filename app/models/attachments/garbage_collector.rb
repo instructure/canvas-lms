@@ -33,14 +33,14 @@ class Attachments::GarbageCollector
       to_delete_scope.where(root_attachment_id: nil).find_ids_in_batches(batch_size: 500) do |ids_batch|
         non_type_children = Attachment.where(root_attachment_id: ids_batch)
                                       .not_deleted
-                                      .where.not(context_type: context_type)
+                                      .where.not(context_type:)
                                       .where.not(root_attachment_id: nil) # postgres is being weird
                                       .order([:root_attachment_id, :id])
                                       .select("distinct on (attachments.root_attachment_id) attachments.*")
                                       .group_by(&:root_attachment_id)
         same_type_children_fields = Attachment.where(root_attachment_id: ids_batch)
                                               .not_deleted
-                                              .where(context_type: context_type)
+                                              .where(context_type:)
                                               .where.not(root_attachment_id: nil) # postgres is being weird
                                               .select(:id, :created_at, :root_attachment_id)
                                               .group_by(&:root_attachment_id)
@@ -118,7 +118,7 @@ class Attachments::GarbageCollector
     private
 
     def to_delete_scope
-      scope = Attachment.where(context_type: context_type)
+      scope = Attachment.where(context_type:)
                         .where.not(file_state: "deleted")
       if context_type == "ContentExport"
         scope = scope.where.not("EXISTS (
@@ -134,7 +134,7 @@ class Attachments::GarbageCollector
 
     def deleted_scope
       Attachment.where(
-        context_type: context_type,
+        context_type:,
         workflow_state: "deleted",
         file_state: "deleted"
       )
@@ -159,7 +159,7 @@ class Attachments::GarbageCollector
   # file exports now go through the content export flow.
   class FolderContextType < ByContextType
     def initialize(dry_run: false)
-      super(context_type: "Folder", older_than: nil, restore_state: "zipped", dry_run: dry_run)
+      super(context_type: "Folder", older_than: nil, restore_state: "zipped", dry_run:)
     end
   end
 
@@ -175,7 +175,7 @@ class Attachments::GarbageCollector
   # which is why we use the join conditions below
   class ContentExportContextType < ByContextType
     def initialize(older_than: ContentExport.expire_days.days.ago, dry_run: false)
-      super(context_type: "ContentExport", older_than: older_than, dry_run: dry_run)
+      super(context_type: "ContentExport", older_than:, dry_run:)
     end
 
     def delete_rows
@@ -200,7 +200,7 @@ class Attachments::GarbageCollector
   # - context_type='ContentExport'
   class ContentExportAndMigrationContextType < ByContextType
     def initialize(older_than: ContentMigration.expire_days.days.ago, dry_run: false)
-      super(context_type: ["ContentExport", "ContentMigration"], older_than: older_than, dry_run: dry_run)
+      super(context_type: ["ContentExport", "ContentMigration"], older_than:, dry_run:)
     end
 
     def delete_rows

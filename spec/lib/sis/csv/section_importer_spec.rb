@@ -710,8 +710,8 @@ describe SIS::CSV::SectionImporter do
       "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
     )
 
-    def with_section(&block)
-      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&block)
+    def with_section(&)
+      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&)
     end
 
     def check_section_crosslisted(sis_id)
@@ -783,8 +783,8 @@ describe SIS::CSV::SectionImporter do
       "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
     )
 
-    def with_section(&block)
-      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&block)
+    def with_section(&)
+      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&)
     end
 
     def check_section_crosslisted(sis_id)

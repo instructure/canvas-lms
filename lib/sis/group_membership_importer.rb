@@ -65,7 +65,7 @@ module SIS
         # can't query group.group_memberships, since that excludes deleted memberships
         group_membership = GroupMembership.where(group_id: group, user_id: user)
                                           .order(Arel.sql("CASE WHEN workflow_state = 'accepted' THEN 0 ELSE 1 END")).take
-        group_membership ||= group.group_memberships.build(user: user)
+        group_membership ||= group.group_memberships.build(user:)
 
         group_membership.sis_batch_id = @batch.id
 

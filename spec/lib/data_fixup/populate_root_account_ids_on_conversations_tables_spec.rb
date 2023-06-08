@@ -38,24 +38,24 @@ describe DataFixup::PopulateRootAccountIdsOnConversationsTables do
   end
 
   def check_conversation_messages(conversation, ids)
-    cm1 = ConversationMessage.create!(conversation: conversation)
-    cm2 = ConversationMessage.create!(conversation: conversation)
+    cm1 = ConversationMessage.create!(conversation:)
+    cm2 = ConversationMessage.create!(conversation:)
     reset_root_account_ids(cm1, cm2)
     DataFixup::PopulateRootAccountIdsOnConversationsTables.run(conversation.id, conversation.id)
     check_root_account_ids(ids, cm1, cm2)
   end
 
   def check_conversation_participants(conversation, ids)
-    cp1 = ConversationParticipant.create!(conversation: conversation, user: @user1)
-    cp2 = ConversationParticipant.create!(conversation: conversation, user: @user2)
+    cp1 = ConversationParticipant.create!(conversation:, user: @user1)
+    cp2 = ConversationParticipant.create!(conversation:, user: @user2)
     reset_root_account_ids(cp1, cp2)
     DataFixup::PopulateRootAccountIdsOnConversationsTables.run(conversation.id, conversation.id)
     check_root_account_ids(ids, cp1, cp2)
   end
 
   def check_conversation_message_participants(conversation, ids)
-    cm1 = ConversationMessage.create!(conversation: conversation)
-    cm2 = ConversationMessage.create!(conversation: conversation)
+    cm1 = ConversationMessage.create!(conversation:)
+    cm2 = ConversationMessage.create!(conversation:)
     cmp1 = ConversationMessageParticipant.create!(conversation_message: cm1, user: @user1)
     cmp2 = ConversationMessageParticipant.create!(conversation_message: cm2, user: @user2)
     reset_root_account_ids(cm1, cm2, cmp1, cmp2)

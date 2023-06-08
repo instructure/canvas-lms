@@ -57,7 +57,7 @@ const getItemDetailsFromPlannable = apiResponse => {
     details.onlineMeetingURL = plannable.online_meeting_url
   }
 
-  if (plannable_type === 'assignment') {
+  if (plannable.restrict_quantitative_data) {
     details.restrict_quantitative_data = plannable.restrict_quantitative_data
   }
 
@@ -209,14 +209,23 @@ export function transformApiToInternalGrade(apiResult) {
   // Grades are the same across all enrollments, just look at first one
   const courseId = apiResult.id
   const hasGradingPeriods = apiResult.has_grading_periods
+  const restrictQuantitativeData = apiResult.restrict_quantitative_data
   const enrollment = apiResult.enrollments[0]
   let score = enrollment.computed_current_score
   let grade = enrollment.computed_current_grade
+  const scoreThasWasCoercedToLetterGrade = enrollment.computed_current_letter_grade
   if (hasGradingPeriods) {
     score = enrollment.current_period_computed_current_score
     grade = enrollment.current_period_computed_current_grade
   }
-  return {courseId, hasGradingPeriods, grade, score}
+  return {
+    courseId,
+    hasGradingPeriods,
+    grade,
+    score,
+    restrictQuantitativeData,
+    scoreThasWasCoercedToLetterGrade,
+  }
 }
 
 export function getContextCodesFromState({courses = []}) {

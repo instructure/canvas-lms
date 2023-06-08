@@ -37,7 +37,7 @@ describe AccountNotification do
   it "finds announcements only if user has a role in the list of roles to which the announcement is restricted" do
     @announcement.destroy
     role_ids = [teacher_role, admin_role].map(&:id)
-    account_notification(role_ids: role_ids, message: "Announcement 1")
+    account_notification(role_ids:, message: "Announcement 1")
     @a1 = @announcement
     account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
     @a2 = @announcement
@@ -57,7 +57,7 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
     expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
 
-    account_notification(account: Account.site_admin, role_ids: role_ids, message: "Announcement 1")
+    account_notification(account: Account.site_admin, role_ids:, message: "Announcement 1")
     @a4 = @announcement
     account_notification(account: Account.site_admin, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
     @a5 = @announcement
@@ -109,7 +109,7 @@ describe AccountNotification do
   it "sorts" do
     @announcement.destroy
     role_ids = ["TeacherEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: Account.default.id).id }
-    account_notification(role_ids: role_ids, message: "Announcement 1")
+    account_notification(role_ids:, message: "Announcement 1")
     @a1 = @announcement
     account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
     @a2 = @announcement
@@ -422,9 +422,9 @@ describe AccountNotification do
 
         # just make something for every account
         @accounts.each do |k, account|
-          @account_admins[k] = account_admin_user(active_all: true, account: account)
-          @custom_admins[k] = account_admin_user(active_all: true, account: account, role: @custom_admin_role)
-          @courses[k] = course_factory(active_all: true, account: account)
+          @account_admins[k] = account_admin_user(active_all: true, account:)
+          @custom_admins[k] = account_admin_user(active_all: true, account:, role: @custom_admin_role)
+          @courses[k] = course_factory(active_all: true, account:)
           @teachers[k] = @courses[k].teachers.first
           @students[k] = student_in_course(active_all: true, course: @courses[k]).user
           @users[k] = [@account_admins[k], @custom_admins[k], @teachers[k], @students[k]]
@@ -696,16 +696,16 @@ describe AccountNotification do
       it "finds notifications on cross-sharded sub-accounts properly" do
         # and perhaps more importantly, don't find notifications for accounts the user doesn't belong in
         id = 1
-        while [Shard.default, @shard2].any? { |s| s.activate { Account.where(id: id).exists? } } # make sure this id is free
+        while [Shard.default, @shard2].any? { |s| s.activate { Account.where(id:).exists? } } # make sure this id is free
           id += 1 #
         end
 
-        @tricky_sub_acc = @account1.sub_accounts.create!(id: id) # create it with the id
+        @tricky_sub_acc = @account1.sub_accounts.create!(id:) # create it with the id
         # they don't belong to this sub-account so they shouldn't see this notification
         @not_visible = account_notification(account: @tricky_sub_acc)
 
         @shard2.activate do
-          @shard2_subaccount = @shard2_account.sub_accounts.create!(id: id) # create with same local id
+          @shard2_subaccount = @shard2_account.sub_accounts.create!(id:) # create with same local id
           @shard2_course2 = course_with_student(account: @shard2_subaccount, user: @user, active_all: true)
           @visible = account_notification(account: @shard2_subaccount, role_ids: [student_role.id])
         end

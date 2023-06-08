@@ -188,7 +188,7 @@ module HtmlTextHelper
         given_attributes = options[:attributes][element] || []
         final_attributes[element] = basic_attributes | given_attributes
       end
-      output = Sanitize.clean(html, elements: elements, attributes: final_attributes)
+      output = Sanitize.clean(html, elements:, attributes: final_attributes)
     else
       output = Sanitize.clean(html, config)
     end

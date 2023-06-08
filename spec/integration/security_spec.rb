@@ -254,7 +254,7 @@ describe "security" do
       it "works for an out-of-shard user" do
         @shard1.activate do
           account = Account.create!
-          user_with_pseudonym(account: account)
+          user_with_pseudonym(account:)
         end
         token = SessionPersistenceToken.generate(@pseudonym)
         get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
@@ -539,7 +539,7 @@ describe "security" do
 
     def remove_permission(permission, role)
       Account.default.role_overrides.create!(permission: permission.to_s,
-                                             role: role,
+                                             role:,
                                              enabled: false)
     end
 

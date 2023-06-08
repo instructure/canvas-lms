@@ -40,7 +40,7 @@ describe UserMerge do
     it "logs who did the user merge" do
       merger = user_model
       mergeme = UserMerge.from(user2)
-      mergeme.into(user1, merger: merger, source: "this spec")
+      mergeme.into(user1, merger:, source: "this spec")
       expect(mergeme.merge_data.items.where(item_type: "logs").take.item).to eq "{:merger_id=>#{merger.id}, :source=>\"this spec\"}"
     end
 
@@ -475,7 +475,7 @@ describe UserMerge do
       enrollment3 = course1.enroll_student(user1,
                                            enrollment_state: "invited",
                                            allow_multiple_enrollments: true,
-                                           section: section)
+                                           section:)
       enrollment4 = course1.enroll_teacher(user1)
 
       UserMerge.from(user1).into(user2)
@@ -869,7 +869,7 @@ describe UserMerge do
     it "moves past_lti_id to the new user on other shard" do
       @shard1.activate do
         account = Account.create!
-        @user1 = user_with_pseudonym(username: "user1@example.com", active_all: 1, account: account)
+        @user1 = user_with_pseudonym(username: "user1@example.com", active_all: 1, account:)
         Lti::Asset.opaque_identifier_for(@user1)
       end
       course = course_factory(active_all: true)
@@ -962,7 +962,7 @@ describe UserMerge do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
-        @shard_course = course_factory(account: account)
+        @shard_course = course_factory(account:)
         @user2.preferences[:custom_colors] = { "course_#{@course.id}" => "#254284" }
       end
       course = course_factory
@@ -977,7 +977,7 @@ describe UserMerge do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
-        @shard_course = course_factory(account: account)
+        @shard_course = course_factory(account:)
       end
       course = course_factory
       user1 = user_model
@@ -993,7 +993,7 @@ describe UserMerge do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
-        @shard_course = course_factory(account: account)
+        @shard_course = course_factory(account:)
         @user2.preferences[:course_nicknames] = { @shard_course.id => "Marketing" }
       end
       course = course_factory
@@ -1008,7 +1008,7 @@ describe UserMerge do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
-        @shard_course = course_factory(account: account)
+        @shard_course = course_factory(account:)
         @user2.set_preference(:course_nicknames, @shard_course.id, "Marketing")
       end
       course = course_factory
@@ -1025,7 +1025,7 @@ describe UserMerge do
       @shard1.activate do
         @user2 = user_model
         account = Account.create!
-        @shard_course = course_factory(account: account)
+        @shard_course = course_factory(account:)
         @shard_course.enroll_user(@user2)
         group = account.groups.create!
         @fav = Favorite.create!(user: @user2, context: @shard_course)
@@ -1088,7 +1088,7 @@ describe UserMerge do
       cc1 = @cc
       @shard1.activate do
         account = Account.create!
-        @user2 = user_with_pseudonym(username: "user2@example.com", active_all: 1, account: account)
+        @user2 = user_with_pseudonym(username: "user2@example.com", active_all: 1, account:)
         @p2 = @pseudonym
       end
 
@@ -1125,7 +1125,7 @@ describe UserMerge do
 
       @shard2.activate do
         account = Account.create!
-        @user2 = user_with_pseudonym(username: "user2@example.com", active_all: 1, account: account)
+        @user2 = user_with_pseudonym(username: "user2@example.com", active_all: 1, account:)
         @p3 = @pseudonym
         UserMerge.from(user1).into(@user2)
       end

@@ -75,15 +75,13 @@ class LatePolicy < ActiveRecord::Base
   end
 
   def late_policy_attributes_changed?
-    (
-      %w[
-        late_submission_deduction_enabled
-        late_submission_deduction
-        late_submission_interval
-        late_submission_minimum_percent_enabled
-        late_submission_minimum_percent
-        missing_submission_deduction_enabled
-      ] & saved_changes.keys
-    ).present?
+    %w[
+      late_submission_deduction_enabled
+      late_submission_deduction
+      late_submission_interval
+      late_submission_minimum_percent_enabled
+      late_submission_minimum_percent
+      missing_submission_deduction_enabled
+    ].intersect?(saved_changes.keys)
   end
 end

@@ -490,10 +490,12 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>What level of user information to send to the external tool.</p>
+<p>What level of user information to send to the external tool. Setting this to "name_only" will include fields that contain the user's name and sourcedid in the launch claims. "email_only" will include only the user's email. "public" includes all fields from "name_only", "email_only", and fields like the user's picture. "anonymous" will not include any of these fields. Note that the "sub" claim containing the user's ID is always included.</p>
 
         <p class="param-values">
-          <span class="allowed">Allowed values:</span> <code class="enum">anonymous</code>, <code class="enum">public</code>
+          <span class="allowed">Allowed values:</span>
+          <code class="enum">anonymous</code>, <code class="enum">public</code>
+          <code class="enum">name_only</code>, <code class="enum">email_only</code>
         </p>
 
       </td>
@@ -639,13 +641,12 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-        <p>Allows role-based access control based on the built-in Canvas user roles AND the custom roles that you may have created in Canvas. This parameter can be a comma-separated string of one or more required permissions. As expected, if "required_permissions" is included in the configuration, the user will need to have the role listed (or all the roles listed, if multiple) to access the tool. To learn more about roles and to see the roles available for this parameter visit the <a href="roles.html" target="blank">Roles API docs</a>. 
+        <p>Allows role-based access control based on the built-in Canvas user roles AND the custom roles that you may have created in Canvas. This parameter can be a comma-separated string of one or more required permissions. As expected, if "required_permissions" is included in the configuration, the user will need to have the role listed (or all the roles listed, if multiple) to access the tool. To learn more about roles and to see the roles available for this parameter visit the <a href="roles.html" target="blank">Roles API docs</a>.
         </p>
 
 
       </td>
     </tr>
-
 
 <!-- environments -->
 

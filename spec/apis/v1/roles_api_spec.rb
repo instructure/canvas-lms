@@ -42,7 +42,7 @@ describe "Roles API", type: :request do
 
       permission = settings.delete(:permission) || @permission
 
-      parameters = { role: role, permissions: { permission => settings } }
+      parameters = { role:, permissions: { permission => settings } }
       parameters[:base_role_type] = base_role_type if base_role_type.present?
 
       json = api_call(:post,
@@ -196,7 +196,7 @@ describe "Roles API", type: :request do
       base_role_type = "TeacherEnrollment"
 
       expect(@account.roles).to be_empty
-      json = api_call_with_settings(base_role_type: base_role_type, explicit: "1", enabled: "1")
+      json = api_call_with_settings(base_role_type:, explicit: "1", enabled: "1")
       @account.reload
 
       expect(@account.available_account_roles.map(&:name)).to_not include(@role_name)

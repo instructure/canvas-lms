@@ -44,7 +44,7 @@ class Mutations::CreateLearningOutcomeGroup < Mutations::BaseMutation
   private
 
   def get_group(id)
-    LearningOutcomeGroup.active.find_by(id: id).tap do |group|
+    LearningOutcomeGroup.active.find_by(id:).tap do |group|
       raise GraphQL::ExecutionError, I18n.t("Group not found") unless group
     end
   end

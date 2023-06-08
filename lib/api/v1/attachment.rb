@@ -358,12 +358,12 @@ module Api::V1::Attachment
       end
 
       json = InstFS.upload_preflight_json(
-        context: context,
+        context:,
         root_account: context.try(:root_account) || @domain_root_account,
         user: actual_user,
         acting_as: current_user,
         access_token: @access_token,
-        folder: folder,
+        folder:,
         filename: infer_upload_filename(params),
         content_type: infer_upload_content_type(params, "unknown/unknown"),
         on_duplicate: infer_on_duplicate(params),
@@ -372,7 +372,7 @@ module Api::V1::Attachment
         target_url: params[:url],
         progress_json: progress_json_result,
         include_param: params[:success_include],
-        additional_capture_params: additional_capture_params
+        additional_capture_params:
       )
     else
       @attachment = create_new_attachment(context, params, current_user, opts, folder)
@@ -382,7 +382,7 @@ module Api::V1::Attachment
         progress.reset!
 
         executor = Services::SubmitHomeworkService.create_clone_url_executor(
-          params[:url], on_duplicate, opts[:check_quota], progress: progress
+          params[:url], on_duplicate, opts[:check_quota], progress:
         )
 
         Services::SubmitHomeworkService.submit_job(
@@ -395,15 +395,15 @@ module Api::V1::Attachment
         quota_exemption = @attachment.quota_exemption_key unless opts[:check_quota]
         json = @attachment.ajax_upload_params(
           api_v1_files_create_url(
-            on_duplicate: on_duplicate,
-            quota_exemption: quota_exemption,
+            on_duplicate:,
+            quota_exemption:,
             success_include: params[:success_include]
           ),
           api_v1_files_create_success_url(
             @attachment,
             uuid: @attachment.uuid,
-            on_duplicate: on_duplicate,
-            quota_exemption: quota_exemption,
+            on_duplicate:,
+            quota_exemption:,
             include: params[:success_include]
           ),
           ssl: request.ssl?,
@@ -417,13 +417,13 @@ module Api::V1::Attachment
     # return json and the attachment if the attachment is to be precreated
     if opts[:precreate_attachment] && opts[:return_json]
       {
-        json: json,
+        json:,
         attachment: @attachment
       }
     elsif opts[:return_json]
       json
     else
-      render json: json
+      render json:
     end
   end
 

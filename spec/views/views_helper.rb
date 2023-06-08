@@ -82,7 +82,7 @@ module LtiLayoutSpecHelper
   def self.create_tool(tool_id = "A brand new tool")
     dev_key = DeveloperKey.create
     course = Course.create
-    ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: tool_id)
+    ContextExternalTool.create(developer_key: dev_key, context: course, tool_id:)
   end
 
   def self.create_request

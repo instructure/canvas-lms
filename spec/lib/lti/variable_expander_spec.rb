@@ -21,16 +21,16 @@
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.create!(lti_guid: "test-lti-guid") }
-    let(:account) { Account.new(root_account: root_account, name: "Test Account") }
-    let(:course) { Course.new(account: account, course_code: "CS 124", sis_source_id: "1234") }
+    let(:account) { Account.new(root_account:, name: "Test Account") }
+    let(:course) { Course.new(account:, course_code: "CS 124", sis_source_id: "1234") }
     let(:group_category) { course.group_categories.new(name: "Category") }
-    let(:group) { course.groups.new(name: "Group", group_category: group_category) }
+    let(:group) { course.groups.new(name: "Group", group_category:) }
     let(:user) { User.new }
     let(:assignment) { Assignment.new }
     let(:collaboration) do
       ExternalToolCollaboration.new(
         title: "my collab",
-        user: user,
+        user:,
         url: "http://www.example.com"
       )
     end
@@ -93,8 +93,8 @@ module Lti
     let(:submission) { submission_model }
     let(:resource_link_id) { SecureRandom.uuid }
     let(:originality_report) do
-      OriginalityReport.create!(attachment: attachment,
-                                submission: submission,
+      OriginalityReport.create!(attachment:,
+                                submission:,
                                 link_id: resource_link_id)
     end
     let(:editor_contents) { "<p>This is the contents of the editor</p>" }
@@ -110,10 +110,10 @@ module Lti
     let(:variable_expander_opts) do
       {
         current_user: user,
-        tool: tool,
-        originality_report: originality_report,
-        editor_contents: editor_contents,
-        editor_selection: editor_selection
+        tool:,
+        originality_report:,
+        editor_contents:,
+        editor_selection:
       }
     end
 
@@ -141,7 +141,7 @@ module Lti
       course.enroll_user(user, "StudentEnrollment", sis_pseudonym_id: login.id, enrollment_state: "active")
 
       exp_hash = { test: "$Canvas.user.sisSourceId" }
-      variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+      variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
       variable_expander.expand_variables!(exp_hash)
       expect(exp_hash[:test]).to eq "sis id2!"
     end
@@ -242,7 +242,7 @@ module Lti
         let(:placement) { "test" }
 
         let(:variable_expander_opts) do
-          super().merge({ placement: placement })
+          super().merge({ placement: })
         end
 
         before do
@@ -260,7 +260,7 @@ module Lti
       context "when launch_url is provided" do
         let(:launch_url) { "launch" }
         let(:variable_expander_opts) do
-          super().merge({ launch_url: launch_url })
+          super().merge({ launch_url: })
         end
 
         before do
@@ -342,7 +342,7 @@ module Lti
       end
 
       it "includes CourseSection.sourcedId when in enabled capability" do
-        variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+        variable_expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
         expanded = variable_expander.enabled_capability_params(enabled_capability)
         expect(expanded.keys).to include "lis_course_section_sourcedid"
       end
@@ -439,8 +439,8 @@ module Lti
             account,
             controller,
             current_user: user,
-            tool: tool,
-            assignment: assignment
+            tool:,
+            assignment:
           )
 
           variable_expander.expand_variables!(exp_hash)
@@ -453,8 +453,8 @@ module Lti
             account,
             controller,
             current_user: user,
-            tool: tool,
-            assignment: assignment
+            tool:,
+            assignment:
           )
 
           variable_expander.expand_variables!(exp_hash)
@@ -501,8 +501,8 @@ module Lti
                                                  account,
                                                  controller,
                                                  current_user: user,
-                                                 tool: tool,
-                                                 assignment: assignment)
+                                                 tool:,
+                                                 assignment:)
         assignment.update(context: course)
         exp_hash = { test: "$com.instructure.Assignment.lti.id" }
         variable_expander.expand_variables!(exp_hash)
@@ -515,7 +515,7 @@ module Lti
                                                  account,
                                                  controller,
                                                  current_user: user,
-                                                 tool: tool,
+                                                 tool:,
                                                  launch: Lti::Launch.new)
         exp_hash = { test: "$com.instructure.PostMessageToken" }
         variable_expander.expand_variables!(exp_hash)
@@ -528,7 +528,7 @@ module Lti
                                                  account,
                                                  controller,
                                                  current_user: user,
-                                                 tool: tool,
+                                                 tool:,
                                                  post_message_token: pm_token_override)
         exp_hash = { test: "$com.instructure.PostMessageToken" }
         variable_expander.expand_variables!(exp_hash)
@@ -537,13 +537,13 @@ module Lti
 
       it "has a substitution for com.instructure.Assignment.lti.id when secure params are present" do
         lti_assignment_id = SecureRandom.uuid
-        secure_params = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)
+        secure_params = Canvas::Security.create_jwt(lti_assignment_id:)
         variable_expander = VariableExpander.new(root_account,
                                                  account,
                                                  controller,
                                                  current_user: user,
-                                                 tool: tool,
-                                                 secure_params: secure_params)
+                                                 tool:,
+                                                 secure_params:)
         exp_hash = { test: "$com.instructure.Assignment.lti.id" }
         variable_expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq lti_assignment_id
@@ -583,10 +583,10 @@ module Lti
         let(:course) { course_model }
         let(:assignment) { assignment_model(context: course) }
         let(:expansion) { "$com.instructure.Assignment.allowedFileExtensions" }
-        let(:variable_expander_opts) { super().merge(context: course, assignment: assignment) }
+        let(:variable_expander_opts) { super().merge(context: course, assignment:) }
 
         it "expands when an assignment with online_upload submission type and extensions is present" do
-          assignment.update!(allowed_extensions: allowed_extensions, submission_types: "online_upload")
+          assignment.update!(allowed_extensions:, submission_types: "online_upload")
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq allowed_extensions
         end
@@ -861,7 +861,7 @@ module Lti
       end
 
       context "context is a group" do
-        let(:variable_expander) { VariableExpander.new(root_account, group, controller, current_user: user, tool: tool) }
+        let(:variable_expander) { VariableExpander.new(root_account, group, controller, current_user: user, tool:) }
 
         it "has substitution for $ToolProxyBinding.memberships.url when context is a group" do
           exp_hash = { test: "$ToolProxyBinding.memberships.url" }
@@ -891,7 +891,7 @@ module Lti
         let(:group_category) { GroupCategory.create!(name: "test", context: assignment_course) }
         let(:new_assignment) { assignment_model(course: assignment_course) }
         let(:assignment_course) do
-          c = course_model(account: account)
+          c = course_model(account:)
           c.save!
           c
         end
@@ -901,14 +901,14 @@ module Lti
             account,
             controller,
             current_user: user,
-            tool: tool,
+            tool:,
             assignment: new_assignment
           )
         end
 
         before do
           group.update!(users: [user])
-          new_assignment.update!(group_category: group_category)
+          new_assignment.update!(group_category:)
         end
 
         shared_examples "a safe expansion when assignment is blank" do
@@ -919,7 +919,7 @@ module Lti
               account,
               controller,
               current_user: user,
-              tool: tool
+              tool:
             )
           end
 
@@ -938,7 +938,7 @@ module Lti
               account,
               controller,
               current_user: user,
-              tool: tool
+              tool:
             )
           end
 
@@ -987,7 +987,7 @@ module Lti
       end
 
       context "context is a course" do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:) }
 
         it "has substitution for $ToolProxyBinding.memberships.url when context is a course" do
           exp_hash = { test: "$ToolProxyBinding.memberships.url" }
@@ -1158,8 +1158,8 @@ module Lti
           before do
             # AR complains if you don't save the course to the database first.
             course.save!
-            enrolled_section = add_section("section one", { course: course })
-            add_section("section two", { course: course })
+            enrolled_section = add_section("section one", { course: })
+            add_section("section two", { course: })
             create_enrollment(course, user, { section: enrolled_section })
           end
 
@@ -1262,7 +1262,7 @@ module Lti
             it { is_expected.to eq("service-jwt") }
 
             context "when controller is not set" do
-              let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool: tool) }
+              let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool:) }
 
               it { is_expected.to eq("") }
             end
@@ -1337,7 +1337,7 @@ module Lti
         let(:student_b) { user_factory }
         let(:student_c) { user_factory }
         let(:observer) { user_factory }
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: observer, tool: tool) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: observer, tool:) }
         let(:context) do
           c = variable_expander.context
           c.save!
@@ -1381,13 +1381,13 @@ module Lti
       end
 
       context "context is a course and there is a user" do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:) }
         let(:user) { user_factory }
 
         it "has substitution for com.instructure.User.sectionNames" do
           course.save!
-          first_section = add_section("Section 1, M-T", { course: course })
-          second_section = add_section("Section 2, W-Th", { course: course })
+          first_section = add_section("Section 1, M-T", { course: })
+          second_section = add_section("Section 2, W-Th", { course: })
           create_enrollment(course, user, { section: first_section })
           create_enrollment(course, user, { section: second_section })
           exp_hash = { test: "$com.instructure.User.sectionNames" }
@@ -1488,7 +1488,7 @@ module Lti
         it "has substitution for $Canvas.externalTool.global_id" do
           course.save!
           tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
-          expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+          expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
           exp_hash = { test: "$Canvas.externalTool.global_id" }
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq tool.global_id
@@ -1509,7 +1509,7 @@ module Lti
                                                                  :api_v1_context_external_tools_update_url,
                                                                  tool.id,
                                                                  include_host: true).and_return("url")
-          expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+          expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
           exp_hash = { test: "$Canvas.externalTool.url" }
           expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "url"
@@ -1562,7 +1562,7 @@ module Lti
             consumer_key: "key",
             shared_secret: "secret",
             url: "https://www.tool.com/launch",
-            developer_key: developer_key,
+            developer_key:,
             lti_version: "1.3"
           )
         end
@@ -1572,7 +1572,7 @@ module Lti
         context "when the assignment has external_tool as a submission_type" do
           let(:assignment) do
             opts = {
-              course: course,
+              course:,
               external_tool_tag_attributes: {
                 url: tool.url,
                 content_type: "ContextExternalTool",
@@ -1605,7 +1605,7 @@ module Lti
               root_account,
               course,
               controller,
-              assignment: assignment
+              assignment:
             )
           end
 
@@ -1654,7 +1654,7 @@ module Lti
               root_account,
               course,
               controller,
-              assignment: assignment
+              assignment:
             )
           end
 
@@ -1697,7 +1697,7 @@ module Lti
       end
 
       context "context is a course with an assignment" do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, tool: tool, collaboration: collaboration) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, tool:, collaboration:) }
 
         it "has substitution for $Canvas.api.collaborationMembers.url" do
           allow(collaboration).to receive(:id).and_return(1)
@@ -1709,7 +1709,7 @@ module Lti
       end
 
       context "context is a course with an assignment and a user" do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool, assignment: assignment) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:) }
 
         it "has substitution for $Canvas.assignment.id" do
           allow(assignment).to receive(:id).and_return(2015)
@@ -1835,7 +1835,7 @@ module Lti
             course.save
             assignment.context = course
             assignment.save
-            submission = submission_model(user: user, assignment: assignment)
+            submission = submission_model(user:, assignment:)
             submission.attempt = 2
             submission.save
           end
@@ -2022,7 +2022,7 @@ module Lti
 
         it "has substitution for $vnd.instructure.User.uuid and uses Past uuid" do
           allow(user).to receive(:uuid).and_return("N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3")
-          UserPastLtiId.create!(user: user, context: account, user_lti_id: "old_lti_id", user_lti_context_id: "old_lti_id", user_uuid: "old_uuid")
+          UserPastLtiId.create!(user:, context: account, user_lti_id: "old_lti_id", user_lti_context_id: "old_lti_id", user_uuid: "old_uuid")
 
           exp_hash = { test: "$vnd.instructure.User.uuid" }
           variable_expander.expand_variables!(exp_hash)
@@ -2183,7 +2183,7 @@ module Lti
             ur.legal_copyright = "legit"
             ur
           end
-          let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, attachment: attachment) }
+          let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool:, attachment:) }
 
           it "has substitution for $Canvas.file.media.id when a media object is present" do
             exp_hash = { test: "$Canvas.file.media.id" }
@@ -2305,7 +2305,7 @@ module Lti
       it "has substitution for $Canvas.membership.permissions" do
         course_with_student(active_all: true)
         exp_hash = { test: "$Canvas.membership.permissions<moderate_forum,read_forum,create_forum>" }
-        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool:)
 
         expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq "read_forum,create_forum"
@@ -2314,7 +2314,7 @@ module Lti
       it "substitutes $Canvas.membership.permissions inside substring" do
         course_with_student(active_all: true)
         exp_hash = { test: "string stuff: ${Canvas.membership.permissions<moderate_forum,create_forum,read_forum>}" }
-        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool: tool)
+        expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool:)
 
         expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq "string stuff: create_forum,read_forum"
@@ -2403,7 +2403,7 @@ module Lti
             let(:group_category) { GroupCategory.create!(name: "test", context: assignment_course) }
             let(:new_assignment) { assignment_model(course: assignment_course) }
             let(:assignment_course) do
-              c = course_model(account: account)
+              c = course_model(account:)
               c.save!
               c
             end
@@ -2413,14 +2413,14 @@ module Lti
                 account,
                 controller,
                 current_user: user,
-                tool: tool,
+                tool:,
                 assignment: new_assignment
               )
             end
 
             before do
               group.update!(users: [user])
-              new_assignment.update!(group_category: group_category)
+              new_assignment.update!(group_category:)
             end
 
             describe "com.instructure.Group.id" do
@@ -2435,7 +2435,7 @@ module Lti
           end
 
           context "context is a course" do
-            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:) }
 
             it "has substitution for $Canvas.course.id" do
               allow(course).to receive(:id).and_return(123)
@@ -2494,13 +2494,13 @@ module Lti
           end
 
           context "context is a course and there is a user" do
-            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:) }
             let(:user) { user_factory }
 
             it "has substitution for $Canvas.externalTool.global_id" do
               course.save!
               tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool", use_1_3: true)
-              expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+              expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
               exp_hash = { test: "$Canvas.externalTool.global_id" }
               expander.expand_variables!(exp_hash)
               expect(exp_hash[:test]).to eq tool.global_id.to_s
@@ -2508,7 +2508,7 @@ module Lti
           end
 
           context "context is a course with an assignment and a user" do
-            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool, assignment: assignment) }
+            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool:, assignment:) }
 
             it "has substitution for $Canvas.assignment.id" do
               allow(assignment).to receive(:id).and_return(2015)
@@ -2553,7 +2553,7 @@ module Lti
                 course.save
                 assignment.context = course
                 assignment.save
-                submission = submission_model(user: user, assignment: assignment)
+                submission = submission_model(user:, assignment:)
                 submission.attempt = 2
                 submission.save
               end
@@ -2610,7 +2610,7 @@ module Lti
                 ur.legal_copyright = "legit"
                 ur
               end
-              let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, attachment: attachment) }
+              let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool:, attachment:) }
 
               it "has substitution for $Canvas.file.media.duration" do
                 exp_hash = { test: "$Canvas.file.media.duration" }

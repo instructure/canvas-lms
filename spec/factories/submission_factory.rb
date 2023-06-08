@@ -33,7 +33,7 @@ module Factories
   def bare_submission_model(assignment, user, opts = {})
     opts = (opts.presence || { submission_type: "online_text_entry", body: "o hai" })
            .merge(workflow_state: "submitted", updated_at: Time.now.utc)
-    submission = assignment.submissions.find_by!(user: user)
+    submission = assignment.submissions.find_by!(user:)
     submission.update_columns(opts)
     submission
   end
@@ -51,6 +51,6 @@ module Factories
     @student = opts.delete(:user) || @user = create_users(1, return_type: :record).first
     @course.enroll_student(@student, section: opts[:section], enrollment_state: :active) if enroll_user
     assignment.reload # it caches the course pre-student enrollment
-    @submission = Submission.where(user: @student, assignment: assignment).first or raise "Submission not created"
+    @submission = Submission.where(user: @student, assignment:).first or raise "Submission not created"
   end
 end

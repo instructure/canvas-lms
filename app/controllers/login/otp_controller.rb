@@ -59,7 +59,7 @@ class Login::OtpController < ApplicationController
     if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :phone_number)
       path = "#{params[:otp_login][:phone_number].gsub(/[^\d]/, "")}@#{params[:otp_login][:carrier]}"
       cc = @current_user.communication_channels.sms.by_path(path).first
-      cc ||= @current_user.communication_channels.sms.create!(path: path)
+      cc ||= @current_user.communication_channels.sms.create!(path:)
       if cc.retired?
         cc.workflow_state = "unconfirmed"
         cc.save!

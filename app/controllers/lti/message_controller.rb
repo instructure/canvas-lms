@@ -61,7 +61,7 @@ module Lti
         @lti_launch.resource_url = message.launch_url
         @lti_launch.link_text = mh.resource_handler.name
         @lti_launch.launch_type = message.launch_presentation_document_target
-        @lti_launch.params = launch_params(tool_proxy: tp, message: message, private_key: tp.shared_secret)
+        @lti_launch.params = launch_params(tool_proxy: tp, message:, private_key: tp.shared_secret)
         render Lti::AppUtil.display_template("borderless") and return
       end
       not_found
@@ -125,7 +125,7 @@ module Lti
       if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == "lti_jwt_message_security" }
         message.roles = message.roles.split(",") if message.roles
         message.launch_url = Addressable::URI.escape(message.launch_url)
-        { jwt: message.to_jwt(private_key: private_key, originating_domain: request.host, algorithm: :HS256) }
+        { jwt: message.to_jwt(private_key:, originating_domain: request.host, algorithm: :HS256) }
       else
         # Signature is based on base string (POST&url&encodedparams) and secret
         # (no oauth token, so the HMAC secret is "secret&", where secret is the
@@ -178,7 +178,7 @@ module Lti
           launch_url: launch_url(lti_link&.resource_url, message_handler),
           oauth_consumer_key: tool_proxy.guid,
           lti_version: ::IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
-          resource_link_id: resource_link_id
+          resource_link_id:
         }
         launch_attrs[:ext_lti_assignment_id] = lti_assignment_id if lti_assignment_id.present?
 
@@ -190,7 +190,7 @@ module Lti
         variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy,
                                                                              originality_report: lti_link&.originality_report,
                                                                              launch: @lti_launch,
-                                                                             assignment: assignment))
+                                                                             assignment:))
         launch_attrs.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
         message = ::IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_attrs)
@@ -204,7 +204,7 @@ module Lti
 
         message.add_custom_params(custom_params(message_handler.parameters, variable_expander))
         message.add_custom_params(ToolSetting.custom_settings(tool_proxy.id, @context, message.resource_link_id))
-        @lti_launch.params = launch_params(tool_proxy: tool_proxy, message: message, private_key: tool_proxy.shared_secret)
+        @lti_launch.params = launch_params(tool_proxy:, message:, private_key: tool_proxy.shared_secret)
 
         log_asset_access(tool_proxy, "external_tools", "external_tools")
 
@@ -255,19 +255,19 @@ module Lti
       default_opts = {
         current_user: @current_user,
         current_pseudonym: @current_pseudonym,
-        assignment: assignment
+        assignment:
       }
       VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
     end
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
       params = %w[LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url]
-      if parameters && (parameters.filter_map { |p| p["variable"] } & params).any?
+      if parameters&.filter_map { |p| p["variable"] }&.intersect?(params)
         link = ToolSetting.where(
           tool_proxy_id: tool_proxy.id,
           context_id: @context.id,
           context_type: @context.class.name,
-          resource_link_id: resource_link_id,
+          resource_link_id:,
           product_code: tool_proxy.product_family.product_code,
           vendor_code: tool_proxy.product_family.vendor_code
         ).first_or_create

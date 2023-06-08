@@ -83,7 +83,7 @@ RSpec.describe LatePolicyController do
 
   before do
     request.accept = "application/json"
-    course_with_teacher_logged_in(course: course)
+    course_with_teacher_logged_in(course:)
   end
 
   describe "GET #show" do

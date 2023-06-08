@@ -147,9 +147,9 @@ describe "Submissions Comment API", type: :request do
                      action: "annotation_notification",
                      format: "json",
                      course_id: @course.to_param,
-                     assignment_id: assignment_id,
+                     assignment_id:,
                      user_id: @student.to_param },
-                   { author_id: author_id })
+                   { author_id: })
     end
 
     it "sends notification to teacher for student annotation" do

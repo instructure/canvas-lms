@@ -25,7 +25,7 @@ describe CollaborationsHelper do
 
   describe "collaboration" do
     it "renders the collaborations" do
-      expect(helper).to receive(:render).with("collaborations/collaboration", include(collaboration: collab, user: user))
+      expect(helper).to receive(:render).with("collaborations/collaboration", include(collaboration: collab, user:))
       helper.collaboration(collab, user, false)
     end
 
@@ -86,13 +86,13 @@ describe CollaborationsHelper do
   describe "#collaboration_links" do
     it "returns collaboration links if the user has permissions" do
       allow(collab).to receive(:grants_any_right?).and_return(true)
-      expect(helper).to receive(:render).with("collaborations/collaboration_links", collaboration: collab, user: user)
+      expect(helper).to receive(:render).with("collaborations/collaboration_links", collaboration: collab, user:)
       helper.collaboration_links(collab, user)
     end
 
     it "doesn't return collaboration links if the user doesn't have permission" do
       allow(collab).to receive(:grants_any_right?).and_return(false)
-      expect(helper).not_to receive(:render).with("collaborations/collaboration_links", collaboration: collab, user: user)
+      expect(helper).not_to receive(:render).with("collaborations/collaboration_links", collaboration: collab, user:)
       helper.collaboration_links(collab, user)
     end
   end

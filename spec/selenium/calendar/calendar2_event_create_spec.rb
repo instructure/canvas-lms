@@ -518,8 +518,8 @@ describe "calendar2" do
         # events will be in a different DST state than now
         [now + 3.months, now + 6.months, now + 9.months].each do |start_at|
           end_at = start_at + 1.hour
-          event = CalendarEvent.create!(context: @course, start_at: start_at, end_at: end_at)
-          child_event = event.child_events.create!(context: @course.default_section, start_at: start_at, end_at: end_at)
+          event = CalendarEvent.create!(context: @course, start_at:, end_at:)
+          child_event = event.child_events.create!(context: @course.default_section, start_at:, end_at:)
           get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
           wait_for_new_page_load { f("#editCalendarEventFull").submit }
           expect(child_event.reload.start_at).to eq(start_at)
@@ -531,7 +531,7 @@ describe "calendar2" do
         @user.time_zone = "America/Denver"
         @user.save!
         start_at = DateTime.parse("2022-03-01 1:00pm -0600")
-        event = CalendarEvent.create!(context: @course, start_at: start_at)
+        event = CalendarEvent.create!(context: @course, start_at:)
         get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
         expect(f("#more_options_start_time").attribute(:value)).to eq("12:00pm")
         replace_content(f("[name=\"start_date\"]"), "2022-03-14")

@@ -51,7 +51,7 @@ describe Lti::Messages::ResourceLinkRequest do
           url: "http://www.example.com/launch"
         )
       end
-      let(:opts) { super().merge(resource_link: resource_link) }
+      let(:opts) { super().merge(resource_link:) }
 
       it "uses resource link uuid for rlid claim" do
         expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "id")).to eq resource_link.resource_link_uuid
@@ -394,10 +394,10 @@ describe Lti::Messages::ResourceLinkRequest do
     Lti::Messages::ResourceLinkRequest.new(
       tool: tool_override || tool,
       context: course,
-      user: user,
-      expander: expander,
-      return_url: return_url,
-      opts: opts
+      user:,
+      expander:,
+      return_url:,
+      opts:
     )
   end
 

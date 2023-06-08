@@ -43,7 +43,7 @@ module ContextModuleProgressions
       GuardRail.activate(:primary) do
         ContextModuleProgression.unique_constraint_retry do |retry_count|
           progression = mod.context_module_progressions.where(user_id: user).first if retry_count > 0
-          progression || mod.context_module_progressions.create!(user: user)
+          progression || mod.context_module_progressions.create!(user:)
         end
       end
     end

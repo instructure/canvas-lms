@@ -35,7 +35,7 @@ describe BasicLTI::Sourcedid do
       }
     )
   end
-  let(:user) { course_with_student(course: course).user }
+  let(:user) { course_with_student(course:).user }
 
   before do
     fake_lti_secrets = {

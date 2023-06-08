@@ -62,7 +62,7 @@ module Lti
         oauth_callback: "about:blank"
       }
 
-      params[:user_id] = Lti::Asset.opaque_identifier_for(user, context: context) if user
+      params[:user_id] = Lti::Asset.opaque_identifier_for(user, context:) if user
       params
     end
 
@@ -74,10 +74,10 @@ module Lti
       params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
                                           .merge(message_params(content_item_return_url))
                                           .merge(data: data_hash_jwt(resource_url, content_item_id))
-                                          .merge(placement_params(placement, assignment: assignment))
+                                          .merge(placement_params(placement, assignment:))
                                           .merge(expanded_variables)
 
-      params[:ext_lti_assignment_id] = lti_assignment_id(assignment: assignment)
+      params[:ext_lti_assignment_id] = lti_assignment_id(assignment:)
 
       Lti::Security.signed_post_params(
         params,
@@ -97,7 +97,7 @@ module Lti
         # required params
         lti_message_type: "ContentItemSelectionRequest",
         lti_version: "LTI-1p0",
-        content_item_return_url: content_item_return_url,
+        content_item_return_url:,
         context_title: @context.name,
         # optional params
         accept_multiple: false

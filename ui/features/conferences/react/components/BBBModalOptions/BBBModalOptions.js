@@ -29,7 +29,7 @@ import {Flex} from '@instructure/ui-flex'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tabs} from '@instructure/ui-tabs'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {DateTimeInput} from '@instructure/ui-forms'
+import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
 import {View} from '@instructure/ui-view'
@@ -188,12 +188,12 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                       props.onStartDateChange(newValue)
                     }}
                     layout="columns"
-                    dateLabel={I18n.t('Start Date')}
-                    timeLabel={I18n.t('Start Time')}
+                    dateRenderLabel={I18n.t('Start Date')}
+                    timeRenderLabel={I18n.t('Start Time')}
                     value={props.startDate}
                     invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                    dateNextLabel={I18n.t('Next Month')}
-                    datePreviousLabel={I18n.t('Previous Month')}
+                    nextMonthLabel={I18n.t('Next Month')}
+                    prevMonthLabel={I18n.t('Previous Month')}
                     description={
                       <ScreenReaderContent>
                         {I18n.t('Start Date for Conference')}
@@ -209,12 +209,12 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                       props.onEndDateChange(newValue)
                     }}
                     layout="columns"
-                    dateLabel={I18n.t('End Date')}
-                    timeLabel={I18n.t('End Time')}
+                    dateRenderLabel={I18n.t('End Date')}
+                    timeRenderLabel={I18n.t('End Time')}
                     value={props.endDate}
                     invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                    dateNextLabel={I18n.t('Next Month')}
-                    datePreviousLabel={I18n.t('Previous Month')}
+                    nextMonthLabel={I18n.t('Next Month')}
+                    prevMonthLabel={I18n.t('Previous Month')}
                     description={
                       <ScreenReaderContent>{I18n.t('End Date for Conference')}</ScreenReaderContent>
                     }

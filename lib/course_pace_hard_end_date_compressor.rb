@@ -65,7 +65,7 @@ class CoursePaceHardEndDateCompressor
       start_date_of_item_group,
       end_date,
       course_pace.exclude_weekends,
-      blackout_dates: blackout_dates
+      blackout_dates:
     )
 
     # If the course pace hasn't been committed yet we are grouping the items by their module_item_id since the item.id is
@@ -81,7 +81,7 @@ class CoursePaceHardEndDateCompressor
       start_date_of_item_group,
       (start_date_of_item_group > final_item_due_date) ? start_date_of_item_group : final_item_due_date,
       course_pace.exclude_weekends,
-      blackout_dates: blackout_dates
+      blackout_dates:
     )
 
     # This is the percentage that we should modify the plan by, so it hits our specified end date
@@ -104,7 +104,7 @@ class CoursePaceHardEndDateCompressor
         new_due_dates[key],
         course_pace.exclude_weekends,
         inclusive_end: false,
-        blackout_dates: blackout_dates
+        blackout_dates:
       )
       adjusted_durations = shift_durations_down(rounded_durations, days_over)
       items = update_item_durations(items, adjusted_durations, save)

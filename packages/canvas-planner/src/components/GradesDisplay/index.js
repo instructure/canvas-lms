@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {themeable} from '@instructure/ui-themeable'
+import React, {Component} from 'react'
 import {bool, string, arrayOf, shape} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -25,39 +24,40 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {courseShape} from '../plannerPropTypes'
+import buildStyle from './style'
 import formatMessage from '../../format-message'
 import ErrorAlert from '../ErrorAlert'
 
-import styles from './styles.css'
-import theme from './theme'
+export default class GradesDisplay extends Component {
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
+  }
 
-export class GradesDisplay extends React.Component {
   static propTypes = {
     loading: bool,
     loadingError: string,
-    courses: arrayOf(shape(courseShape)).isRequired
+    courses: arrayOf(shape(courseShape)).isRequired,
   }
 
   static defaultProps = {
-    loading: false
+    loading: false,
   }
 
-  scoreString(score) {
+  scoreString = (score, useThisCoercedLetterGradeInstead = null) => {
     const fixedScore = parseFloat(score)
     // eslint-disable-next-line no-restricted-globals
     if (isNaN(fixedScore)) return formatMessage('No Grade')
-    return `${fixedScore.toFixed(2)}%`
+    return useThisCoercedLetterGradeInstead || `${fixedScore.toFixed(2)}%`
   }
 
-  renderSpinner() {
-    return (
-      <View as="div" textAlign="center" margin="0 0 large 0">
-        <Spinner renderTitle={() => formatMessage('Grades are loading')} size="small" />
-      </View>
-    )
-  }
+  renderSpinner = () => (
+    <View as="div" textAlign="center" margin="0 0 large 0">
+      <Spinner renderTitle={() => formatMessage('Grades are loading')} size="small" />
+    </View>
+  )
 
-  renderCaveat() {
+  renderCaveat = () => {
     if (this.props.loading) return
     if (this.props.courses.some(course => course.hasGradingPeriods)) {
       return (
@@ -70,30 +70,32 @@ export class GradesDisplay extends React.Component {
     }
   }
 
-  renderGrades() {
+  renderGrades = () => {
     if (this.props.loadingError) return
     return this.props.courses.map(course => {
       const courseNameStyles = {
         borderBottom: `solid thin`,
-        borderBottomColor: course.color
+        borderBottomColor: course.color,
       }
 
       return (
         <View key={course.id} as="div" margin="0 0 large 0">
-          <div className={styles.course} style={courseNameStyles}>
+          <div className={this.style.classNames.course} style={courseNameStyles}>
             <Link isWithinText={false} size="small" href={`${course.href}/grades`}>
               <Text transform="uppercase">{course.shortName}</Text>
             </Link>
           </div>
-          <Text as="div" size="large" weight="light">
-            {this.scoreString(course.score)}
+          <Text as="div" size="large" weight="light" data-testid="my-grades-score">
+            {course.restrictQuantitativeData
+              ? this.scoreString(course.score, course.scoreThasWasCoercedToLetterGrade)
+              : this.scoreString(course.score)}
           </Text>
         </View>
       )
     })
   }
 
-  renderError() {
+  renderError = () => {
     if (this.props.loadingError) {
       return (
         <ErrorAlert error={this.props.loadingError}>
@@ -103,8 +105,9 @@ export class GradesDisplay extends React.Component {
     }
   }
 
-  render() {
-    return (
+  render = () => (
+    <>
+      <style>{this.style.css}</style>
       <View>
         {this.renderError()}
         <View textAlign="center">
@@ -117,8 +120,6 @@ export class GradesDisplay extends React.Component {
         {this.props.loading ? this.renderSpinner() : this.renderGrades()}
         {this.renderCaveat()}
       </View>
-    )
-  }
+    </>
+  )
 }
-
-export default themeable(theme, styles)(GradesDisplay)

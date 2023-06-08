@@ -67,3 +67,15 @@ $fonts: (
     }
   }
 }
+
+/*
+ * Explicitly use Zapf Dingbats for the small set of characters in Balsamiq Sans that don't match
+ * the standard glyphs. This shouldn't be necessary, but both Chrome and Safari won't render
+ * the font correctly in some cases without this explicit definition.
+ */
+@font-face {
+  font-family: "Balsamiq Sans";
+  src: local("Zapf Dingbats");
+  font-display: swap;
+  unicode-range: U+2768-2775;
+}

@@ -157,7 +157,7 @@ describe ApplicationHelper do
       end
 
       it "builds a whole time tag with a useful title showing the timezone offset if theres a context" do
-        tag = friendly_datetime(Time.now, context: context)
+        tag = friendly_datetime(Time.now, context:)
         expect(tag).to match(%r{^<time.*</time>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at 1:12am/)
@@ -165,7 +165,7 @@ describe ApplicationHelper do
       end
 
       it "can produce an alternate tag type" do
-        tag = friendly_datetime(Time.now, context: context, tag_type: :span)
+        tag = friendly_datetime(Time.now, context:, tag_type: :span)
         expect(tag).to match(%r{^<span.*</span>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at 1:12am/)
@@ -173,7 +173,7 @@ describe ApplicationHelper do
       end
 
       it "produces no tooltip for a nil datetime" do
-        tag = friendly_datetime(nil, context: context)
+        tag = friendly_datetime(nil, context:)
         expect(tag).to eq "<time></time>"
       end
     end
@@ -480,7 +480,7 @@ describe ApplicationHelper do
 
     it "overrides default help link with the configured support url" do
       support_url = "http://instructure.com"
-      Account.default.update_attribute(:settings, { support_url: support_url })
+      Account.default.update_attribute(:settings, { support_url: })
       helper.instance_variable_set(:@domain_root_account, Account.default)
 
       expect(helper.support_url).to eq support_url
@@ -1207,16 +1207,16 @@ describe ApplicationHelper do
 
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; "
         expect(headers).to_not have_key("Content-Security-Policy-Report-Only")
-        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
+        expect(js_env[:csp]).to eq "frame-src 'self' localhost root_account.test root_account2.test blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost root_account.test root_account2.test; object-src 'self' localhost root_account.test root_account2.test; "
       end
 
       it "includes the report URI" do
         allow(helper).to receive(:csp_report_uri).and_return("; report-uri https://somewhere/")
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy-Report-Only"]).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/; "
+        expect(headers["Content-Security-Policy-Report-Only"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
       end
 
       it "includes the report URI when active" do
@@ -1224,7 +1224,7 @@ describe ApplicationHelper do
         account.enable_csp!
         helper.add_csp_for_root
         helper.include_custom_meta_tags
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' localhost root_account.test root_account2.test; report-uri https://somewhere/; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: localhost root_account.test root_account2.test; report-uri https://somewhere/; "
       end
 
       it "includes canvadocs domain if enabled" do
@@ -1233,7 +1233,7 @@ describe ApplicationHelper do
         allow(Canvadocs).to receive(:enabled?).and_return(true)
         allow(Canvadocs).to receive(:config).and_return("base_url" => "https://canvadocs.instructure.com/1")
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' canvadocs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: canvadocs.instructure.com localhost root_account.test root_account2.test; "
       end
 
       it "includes inst_fs domain if enabled" do
@@ -1242,7 +1242,7 @@ describe ApplicationHelper do
         allow(InstFS).to receive(:enabled?).and_return(true)
         allow(InstFS).to receive(:app_host).and_return("https://inst_fs.instructure.com")
         helper.add_csp_for_root
-        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' inst_fs.instructure.com localhost root_account.test root_account2.test; "
+        expect(headers["Content-Security-Policy"]).to eq "frame-src 'self' blob: inst_fs.instructure.com localhost root_account.test root_account2.test; "
       end
     end
   end

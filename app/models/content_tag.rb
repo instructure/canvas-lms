@@ -382,7 +382,7 @@ class ContentTag < ActiveRecord::Base
       # and there are no other links to the same outcome in the same context...
       outcome = content
       other_link = ContentTag.learning_outcome_links.active
-                             .where(context_type: context_type, context_id: context_id, content_id: outcome)
+                             .where(context_type:, context_id:, content_id: outcome)
                              .where.not(id: self).take
       unless other_link
         # and there are alignments to the outcome (in the link's context for
@@ -540,13 +540,13 @@ class ContentTag < ActiveRecord::Base
     content.respond_to?(:rubric_association) && !!content.rubric_association&.active?
   end
 
-  scope :for_tagged_url, ->(url, tag) { where(url: url, tag: tag) }
+  scope :for_tagged_url, ->(url, tag) { where(url:, tag:) }
   scope :for_context, lambda { |context|
     case context
     when Account
-      where(context: context).union(for_associated_courses(context))
+      where(context:).union(for_associated_courses(context))
     else
-      where(context: context)
+      where(context:)
     end
   }
   scope :for_associated_courses, lambda { |account|
@@ -743,7 +743,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def delete_outcome_friendly_description
-    OutcomeFriendlyDescription.active.find_by(context: context, learning_outcome_id: content_id)&.destroy
+    OutcomeFriendlyDescription.active.find_by(context:, learning_outcome_id: content_id)&.destroy
   end
 
   def update_course_pace_module_items

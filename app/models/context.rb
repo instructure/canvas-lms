@@ -222,9 +222,9 @@ module Context
     if context && klass == ContextExternalTool
       res = klass.find_external_tool_by_id(id, context)
     elsif context && (klass.column_names & ["context_id", "context_type"]).length == 2
-      res = klass.where(context: context, id: id).first
+      res = klass.where(context:, id:).first
     else
-      res = klass.find_by(id: id)
+      res = klass.find_by(id:)
       res = nil if context && res.respond_to?(:context_id) && res.context_id != context.id
     end
     res
@@ -283,7 +283,7 @@ module Context
                  elsif resource_link_lookup_uuid
                    Lti::ResourceLink.where(
                      lookup_uuid: resource_link_lookup_uuid,
-                     context: context
+                     context:
                    ).active.take&.current_external_tool(context)
                  end
       elsif params[:id]

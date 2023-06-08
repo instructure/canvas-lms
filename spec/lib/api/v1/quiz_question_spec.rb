@@ -37,7 +37,7 @@ describe Api::V1::QuizQuestion do
 
     let(:answers) { [] }
     let(:question_data) { { "answers" => answers } }
-    let(:question) { Quizzes::QuizQuestion.new(question_data: question_data) }
+    let(:question) { Quizzes::QuizQuestion.new(question_data:) }
     let(:user) { User.new }
     let(:session) { nil }
     let(:context) { nil }
@@ -94,7 +94,7 @@ describe Api::V1::QuizQuestion do
     subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
 
     let(:answers) { [] }
-    let(:question) { Quizzes::QuizQuestion.new(question_data: question_data) }
+    let(:question) { Quizzes::QuizQuestion.new(question_data:) }
     let(:user) { User.new }
     let(:session) { nil }
 
@@ -140,7 +140,7 @@ describe Api::V1::QuizQuestion do
   describe "regrade_option" do
     let(:account) { Account.create! }
     let(:user) { User.create }
-    let(:course) { Course.create!(account: account) }
+    let(:course) { Course.create!(account:) }
     let(:quiz) do
       quiz = course.quizzes.create!(title: "Quiz")
       quiz.publish!

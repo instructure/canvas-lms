@@ -114,7 +114,7 @@ module Factories
     student = opts.fetch(:user) { user_factory }
     enrollment = section.course.enroll_user(student,
                                             "StudentEnrollment",
-                                            section: section,
+                                            section:,
                                             force_update: true,
                                             allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     student.save!
@@ -125,7 +125,7 @@ module Factories
 
   def ta_in_section(section, opts = {})
     ta = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(ta, "TaEnrollment", section: section, force_update: true)
+    enrollment = section.course.enroll_user(ta, "TaEnrollment", section:, force_update: true)
     ta.save!
     enrollment.limit_privileges_to_course_section = true unless opts[:full_course_permissions]
     enrollment.workflow_state = "active"
@@ -138,9 +138,9 @@ module Factories
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     enrollment = section.course.enroll_user(teacher,
                                             "TeacherEnrollment",
-                                            section: section,
+                                            section:,
                                             force_update: true,
-                                            limit_privileges_to_course_section: limit_privileges_to_course_section,
+                                            limit_privileges_to_course_section:,
                                             allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     teacher.save!
     enrollment.workflow_state = "active"
@@ -163,7 +163,7 @@ module Factories
     name_prefix = options[:name_prefix] || "user"
     records = Array.new(records) { |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Integer)
     now = Time.now.utc
-    records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered", created_at: now, updated_at: now).merge(record) }
+    records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered", created_at: now, updated_at: now, uuid: CanvasSlug.generate_securish_uuid).merge(record) }
     @__create_user_count += records.size
     create_records(User, records, options[:return_type])
   end
@@ -177,6 +177,6 @@ module Factories
   end
 
   def add_linked_observer(student, observer, root_account: nil)
-    UserObservationLink.create_or_restore(student: student, observer: observer, root_account: root_account || Account.default)
+    UserObservationLink.create_or_restore(student:, observer:, root_account: root_account || Account.default)
   end
 end

@@ -51,17 +51,17 @@ def teacher_in_course(user, course_name)
     account: @root_account,
     active_course: 1,
     active_enrollment: 1,
-    course_name: course_name,
+    course_name:,
     course_code: SecureRandom.alphanumeric(10),
-    user: user
+    user:
   )
 end
 
 def student_in_course(user, course)
   course_with_student(
     active_all: 1,
-    course: course,
-    user: user
+    course:,
+    user:
   )
 end
 
@@ -119,7 +119,7 @@ def create_assignment(course, title, points_possible = 10)
   course.assignments.create!(
     title: "#{title} #{SecureRandom.alphanumeric(10)}",
     description: "General Assignment",
-    points_possible: points_possible,
+    points_possible:,
     submission_types: "online_text_entry",
     workflow_state: "published"
   )
@@ -132,7 +132,7 @@ def create_discussion(course, creator, workflow_state = "published")
     title: "Discussion Topic #{SecureRandom.alphanumeric(10)}",
     message: "Discussion topic message",
     assignment: discussion_assignment,
-    workflow_state: workflow_state
+    workflow_state:
   )
 end
 
@@ -177,7 +177,7 @@ def create_wiki_page(course)
 end
 
 def create_module(course, workflow_state = "active")
-  course.context_modules.create!(name: "Module #{SecureRandom.alphanumeric(10)}", workflow_state: workflow_state)
+  course.context_modules.create!(name: "Module #{SecureRandom.alphanumeric(10)}", workflow_state:)
 end
 
 def create_outcome(course, outcome_description, outcome__short_description = "Another Outcome")

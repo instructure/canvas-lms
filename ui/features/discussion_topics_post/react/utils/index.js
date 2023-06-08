@@ -303,6 +303,7 @@ export const buildQuotedReply = (nodes, previewId) => {
   nodes.every(reply => {
     if (reply._id === previewId) {
       preview = {
+        id: previewId,
         author: {shortName: getDisplayName(reply)},
         createdAt: reply.createdAt,
         previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),

@@ -24,7 +24,7 @@ module Api::V1::AccountCalendar
   ACCOUNT_ATTRIBUTES = %w[id name parent_account_id root_account_id].freeze
 
   def account_calendars_json(accounts, user, session, include: [])
-    accounts.map { |account| account_calendar_json(account, user, session, include: include) }
+    accounts.map { |account| account_calendar_json(account, user, session, include:) }
   end
 
   def account_calendar_json(account, user, session, include: [])

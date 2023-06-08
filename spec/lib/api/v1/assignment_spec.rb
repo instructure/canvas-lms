@@ -82,7 +82,7 @@ describe "Api::V1::Assignment" do
     end
 
     it "includes an associated planner override when flag is passed" do
-      po = planner_override_model(user: user, plannable: assignment)
+      po = planner_override_model(user:, plannable: assignment)
       json = api.assignment_json(assignment,
                                  user,
                                  session,
@@ -324,7 +324,7 @@ describe "Api::V1::Assignment" do
     it "includes all assignment overrides fields when an assignment_override exists" do
       assignment.assignment_overrides.create(workflow_state: "active")
       overrides = assignment.assignment_overrides
-      json = api.assignment_json(assignment, user, session, { overrides: overrides })
+      json = api.assignment_json(assignment, user, session, { overrides: })
       expect(json).to be_a(Hash)
       expect(json["overrides"].first.keys.sort).to eq %w[assignment_id id title student_ids].sort
     end
@@ -806,7 +806,7 @@ describe "Api::V1::Assignment" do
 
   describe "update with the 'duplicated_successfully' parameter" do
     let(:user) { user_model }
-    let(:assignment) { assignment_model(workflow_state: workflow_state, duplicate_of: original_assignment) }
+    let(:assignment) { assignment_model(workflow_state:, duplicate_of: original_assignment) }
 
     let(:assignment_update_params) do
       ActionController::Parameters.new(

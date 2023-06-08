@@ -44,8 +44,8 @@ module Lti
     end
 
     def self.by_resource_codes(vendor_code:, product_code:, resource_type_code:, context:)
-      product_families = ProductFamily.where(vendor_code: vendor_code,
-                                             product_code: product_code)
+      product_families = ProductFamily.where(vendor_code:,
+                                             product_code:)
       possible_handlers = ResourceHandler.by_product_family(product_families, context)
       possible_handlers.select { |rh| rh.resource_type_code == resource_type_code }
     end

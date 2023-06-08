@@ -137,7 +137,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     if request.get?
       @quiz = require_quiz
       user_id = @current_user&.id
-      redirect_to course_quiz_take_url(@context, @quiz, user_id: user_id)
+      redirect_to course_quiz_take_url(@context, @quiz, user_id:)
     else
       backup
     end

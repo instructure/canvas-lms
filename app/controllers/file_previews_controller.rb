@@ -51,7 +51,7 @@ class FilePreviewsController < ApplicationController
       # google docs
       elsif GoogleDocsPreview.previewable?(@domain_root_account, @file)
         url = GoogleDocsPreview.url_for(@file)
-        redirect_to("//docs.google.com/viewer?" + { embedded: true, url: url }.to_query)
+        redirect_to("//docs.google.com/viewer?" + { embedded: true, url: }.to_query)
       # images
       elsif @file.content_type&.start_with?("image/")
         render template: "file_previews/img_preview", layout: false

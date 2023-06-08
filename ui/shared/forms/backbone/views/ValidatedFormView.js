@@ -168,11 +168,17 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
       .value()
     first_error = assignmentFieldErrors[0] || dateOverrideErrors[0]
     this.findField(first_error).focus()
+    let errorsToShow = errors
+    if (this.constructor.name === 'WikiPageEditView' && window.ENV.FEATURES.permanent_page_links) {
+      // Let the IntsUI TextInput component show the title errors
+      const {title, ...newErrors} = errors
+      errorsToShow = newErrors
+    }
     // short timeout to ensure alerts are properly read after focus change
     return window.setTimeout(
       (function (_this) {
         return function () {
-          _this.showErrors(errors)
+          _this.showErrors(errorsToShow)
           return null
         }
       })(this),

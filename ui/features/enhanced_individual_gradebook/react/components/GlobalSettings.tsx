@@ -16,14 +16,88 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-
+import React, {useState, useRef, useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
+import {ApiCallStatus, GradebookOptions, GradebookSortOrder, SectionConnection} from '../../types'
+import {Link} from '@instructure/ui-link'
+import {Button} from '@instructure/ui-buttons'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
+import {IconDownloadLine, IconUploadLine} from '@instructure/ui-icons'
+import DateHelper from '@canvas/datetime/dateHelper'
+import {useExportGradebook} from '../hooks/useExportGradebook'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
-export default function GlobalSettings() {
+type DropDownOption<T> = {
+  value: T
+  text: string
+}
+
+const assignmentSortOptions: DropDownOption<GradebookSortOrder>[] = [
+  {value: GradebookSortOrder.AssignmentGroup, text: I18n.t('By Assignment Group and Position')},
+  {value: GradebookSortOrder.Alphabetical, text: I18n.t('Alphabetically')},
+  {value: GradebookSortOrder.DueDate, text: I18n.t('By Due Date')},
+]
+
+type Props = {
+  sections: SectionConnection[]
+  gradebookOptions: GradebookOptions
+  onSortChange: (sortType: GradebookSortOrder) => void
+  onSectionChange: (sectionId?: string) => void
+}
+
+export default function GlobalSettings({
+  sections,
+  gradebookOptions,
+  onSortChange,
+  onSectionChange,
+}: Props) {
+  const [lastGeneratedCsvLink, setLastGeneratedCsvLink] = useState<string | null | undefined>(
+    gradebookOptions?.lastGeneratedCsvAttachmentUrl
+  )
+  const [lastGeneratedCsvLinkText, setLastGeneratedCsvLinkText] = useState<
+    string | null | undefined
+  >(gradebookOptions.gradebookCsvProgress?.progress.updated_at)
+  const linkRef = useRef<HTMLAnchorElement | null>(null)
+  const {exportGradebook, attachmentStatus, attachmentError, attachment} = useExportGradebook()
+  useEffect(() => {
+    if (attachmentStatus === ApiCallStatus.FAILED) {
+      showFlashError('Failed to export gradebook')(attachmentError)
+    }
+    if (attachmentStatus === ApiCallStatus.COMPLETED && linkRef?.current && attachment?.url) {
+      setLastGeneratedCsvLink(attachment.url)
+      setLastGeneratedCsvLinkText(attachment.updated_at)
+    }
+  }, [attachmentStatus, attachmentError, attachment])
+
+  useEffect(() => {
+    if (lastGeneratedCsvLink && attachmentStatus === ApiCallStatus.COMPLETED) {
+      linkRef.current?.click()
+    }
+  }, [lastGeneratedCsvLink, attachmentStatus])
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const sortType = event.target.value as GradebookSortOrder
+    onSortChange(sortType)
+  }
+
+  const handleSectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const index = event.target.selectedIndex
+    const sectionId = index !== 0 ? event.target.value : undefined
+    onSectionChange(sectionId)
+  }
+
+  const exportGradebookCsv = async () => {
+    await exportGradebook(gradebookOptions.userId, gradebookOptions.exportGradebookCsvUrl)
+  }
+
+  const downloadText = (date: string) => {
+    const formattedDate = DateHelper.formatDatetimeForDisplay(date)
+    return I18n.t('Download Scores Generated on %{date}', {date: formattedDate})
+  }
+
   return (
     <>
       <View as="div" className="row-fluid">
@@ -39,10 +113,13 @@ export default function GlobalSettings() {
           </label>
         </View>
         <View as="div" className="span8">
-          {/* TODO: Get Sections */}
-          <select id="section_select" className="section_select">
-            <option value="all">{I18n.t('All Sections')}</option>
-            <option value="1">Section 1</option>
+          <select id="section_select" className="section_select" onChange={handleSectionChange}>
+            <option value="-1">{I18n.t('All Sections')}</option>
+            {sections.map(section => (
+              <option key={section.id} value={section.id}>
+                {section.name}
+              </option>
+            ))}
           </select>
         </View>
       </View>
@@ -54,12 +131,17 @@ export default function GlobalSettings() {
           </label>
         </View>
         <View as="div" className="span8">
-          <select id="sort_select" className="section_select" defaultValue="alpha">
-            <option value="assignment_group">
-              {I18n.t('assignment_order_assignment_groups', 'By Assignment Group and Position')}
-            </option>
-            <option value="alpha">{I18n.t('assignment_order_alpha', 'Alphabetically')}</option>
-            <option value="due_date">{I18n.t('assignment_order_due_date', 'By Due Date')}</option>
+          <select
+            id="sort_select"
+            className="section_select"
+            defaultValue={gradebookOptions.sortOrder}
+            onChange={handleSortChange}
+          >
+            {assignmentSortOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.text}
+              </option>
+            ))}
           </select>
         </View>
       </div>
@@ -137,6 +219,15 @@ export default function GlobalSettings() {
               </label>
             </View>
           {{/unless}} */}
+          <div
+            className="checkbox"
+            style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
+          >
+            <label className="checkbox" htmlFor="show_total_as_points">
+              <input type="checkbox" id="show_total_as_points" name="show_total_as_points" />
+              {I18n.t('Show Totals as Points on Student Grade Page')}
+            </label>
+          </div>
         </View>
       </View>
 
@@ -146,24 +237,41 @@ export default function GlobalSettings() {
         </View>
         <View as="div" className="span8">
           <View as="div" className="pad-box bottom-only">
-            <button type="button" className="btn" id="gradebook-export">
-              <i className="icon-download" />
+            <Button
+              color="secondary"
+              renderIcon={IconDownloadLine}
+              id="gradebook-export"
+              interaction={attachmentStatus === ApiCallStatus.PENDING ? 'disabled' : 'enabled'}
+              onClick={exportGradebookCsv}
+            >
               {I18n.t('Download Current Scores (.csv)')}
-            </button>
-            {/* {{#if lastGeneratedCsvAttachmentUrl}}
-              <a aria-label="{{unbound lastGeneratedCsvLabel}}" href="{{unbound lastGeneratedCsvAttachmentUrl}}" id="last-exported-gradebook">
-                {{unbound lastGeneratedCsvLabel}}
-              </a>
-            {{/if}} */}
+            </Button>
+            {attachmentStatus !== ApiCallStatus.PENDING &&
+              lastGeneratedCsvLink &&
+              lastGeneratedCsvLinkText &&
+              gradebookOptions?.gradebookCsvProgress && (
+                <Link
+                  elementRef={e => (linkRef.current = e)}
+                  href={lastGeneratedCsvLink}
+                  isWithinText={false}
+                  margin="0 xx-small"
+                >
+                  {downloadText(lastGeneratedCsvLinkText)}
+                </Link>
+              )}
           </View>
 
           <View as="div" className="pad-box bottom-only">
-            <a id="upload" className="btn" href="{{unbound uploadCsvUrl}}">
-              <i className="icon-upload" />
+            <Button
+              href={`${gradebookOptions.contextUrl}/gradebook_upload/new`}
+              color="secondary"
+              renderIcon={IconUploadLine}
+              id="upload"
+            >
               {I18n.t('Upload Scores (.csv)')}
-            </a>
+            </Button>
           </View>
-          {/* <iframe style="display:none" id="gradebook-export-iframe"></iframe> */}
+
           <View as="div" className="pad-box bottom-only">
             <View as="div">
               {/* {{#if publishToSisEnabled}}
@@ -173,7 +281,9 @@ export default function GlobalSettings() {
               {{/if}} */}
             </View>
             <View as="div">
-              <a href="{{ unbound gradingHistoryUrl }}">{I18n.t('View Gradebook History')}</a>
+              <Link href={`${gradebookOptions.contextUrl}/gradebook/history`} isWithinText={false}>
+                {I18n.t('View Gradebook History')}
+              </Link>
             </View>
           </View>
         </View>

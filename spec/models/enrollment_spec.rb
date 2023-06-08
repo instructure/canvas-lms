@@ -351,7 +351,7 @@ describe Enrollment do
       # Create a new assignment while the student has no enrollment, to prove
       # that scores are being recalculated on enrollment, rather than copied.
       @course.assignments.create!(points_possible: 10)
-      new_enrollment = @course.enroll_student(student, allow_multiple_enrollments: true, section: section)
+      new_enrollment = @course.enroll_student(student, allow_multiple_enrollments: true, section:)
       expect(new_enrollment.scores.find_by!(course_score: true).final_score).to be 50.0
     end
   end
@@ -1307,10 +1307,10 @@ describe Enrollment do
 
     it "grants read rights to account members with the ability to read_roster" do
       role = Role.get_built_in_role("AccountMembership", root_account_id: Account.default.id)
-      user = account_admin_user(role: role)
+      user = account_admin_user(role:)
       RoleOverride.create!(context: Account.default,
                            permission: :read_roster,
-                           role: role,
+                           role:,
                            enabled: true)
       @enrollment.save
 
@@ -2740,7 +2740,7 @@ describe Enrollment do
         it "uses the right shard to find the enrollments" do
           @shard1.activate do
             account = Account.create!
-            course_with_student(active_all: true, account: account)
+            course_with_student(active_all: true, account:)
           end
 
           @shard2.activate do
@@ -2760,7 +2760,7 @@ describe Enrollment do
           @enrollment1 = @course.enroll_user(@user)
           @shard1.activate do
             account = Account.create!
-            course_factory(active_all: true, account: account)
+            course_factory(active_all: true, account:)
             user_factory
             @user.update_attribute(:workflow_state, "creation_pending")
             communication_channel(@user, { username: "jt@instructure.com" })
@@ -3576,7 +3576,7 @@ describe Enrollment do
     let(:enrollment_type) { "StudentEnrollment" }
 
     before do
-      MicrosoftSync::Group.create!(course: course)
+      MicrosoftSync::Group.create!(course:)
     end
 
     # enroll user without running callbacks like update_user_account_associations,

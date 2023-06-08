@@ -370,7 +370,7 @@ class ConferencesController < ApplicationController
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
-            render json: WebConference.find(@conference.id).as_json(permissions: { user: @current_user, session: session },
+            render json: WebConference.find(@conference.id).as_json(permissions: { user: @current_user, session: },
                                                                     url: named_context_url(@context, :context_conference_url, @conference))
           end
         else
@@ -410,7 +410,7 @@ class ConferencesController < ApplicationController
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
-            render json: @conference.as_json(permissions: { user: @current_user, session: session },
+            render json: @conference.as_json(permissions: { user: @current_user, session: },
                                              url: named_context_url(@context, :context_conference_url, @conference))
           end
         else
@@ -471,7 +471,7 @@ class ConferencesController < ApplicationController
       end
 
       if @conference.close
-        render json: @conference.as_json(permissions: { user: @current_user, session: session },
+        render json: @conference.as_json(permissions: { user: @current_user, session: },
                                          url: named_context_url(@context, :context_conference_url, @conference))
       else
         render json: @conference.errors

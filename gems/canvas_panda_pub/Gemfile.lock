@@ -41,7 +41,7 @@ GEM
       rexml
     diff-lcs (1.5.0)
     hashdiff (1.0.1)
-    i18n (1.13.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     json-jwt (1.13.0)
       activesupport (>= 4.2)

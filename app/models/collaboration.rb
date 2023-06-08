@@ -234,7 +234,7 @@ class Collaboration < ActiveRecord::Base
   def include_author_as_collaborator
     return unless user.present?
 
-    author = collaborators.where(user_id: user_id).first
+    author = collaborators.where(user_id:).first
 
     unless author
       collaborator = Collaborator.new(collaboration: self)

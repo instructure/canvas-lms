@@ -58,8 +58,8 @@ class MissingPolicyApplicator
       submissions = Submission.active.where(id: submissions)
 
       submissions.update_all(
-        score: score,
-        grade: grade,
+        score:,
+        grade:,
         graded_at: now,
         grader_id: nil,
         posted_at: assignment.post_manually? ? nil : now,

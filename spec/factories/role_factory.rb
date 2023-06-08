@@ -20,7 +20,7 @@
 module Factories
   def custom_role(base, name, opts = {})
     account = opts[:account] || @account
-    role = account.roles.where(name: name).first_or_initialize
+    role = account.roles.where(name:).first_or_initialize
     role.base_role_type = base
     role.save!
     role
@@ -51,26 +51,26 @@ module Factories
   end
 
   def student_role(root_account_id: Account.default.id)
-    Role.get_built_in_role("StudentEnrollment", root_account_id: root_account_id)
+    Role.get_built_in_role("StudentEnrollment", root_account_id:)
   end
 
   def teacher_role(root_account_id: Account.default.id)
-    Role.get_built_in_role("TeacherEnrollment", root_account_id: root_account_id)
+    Role.get_built_in_role("TeacherEnrollment", root_account_id:)
   end
 
   def ta_role(root_account_id: Account.default.id)
-    Role.get_built_in_role("TaEnrollment", root_account_id: root_account_id)
+    Role.get_built_in_role("TaEnrollment", root_account_id:)
   end
 
   def designer_role(root_account_id: Account.default.id)
-    Role.get_built_in_role("DesignerEnrollment", root_account_id: root_account_id)
+    Role.get_built_in_role("DesignerEnrollment", root_account_id:)
   end
 
   def observer_role(root_account_id: Account.default.id)
-    Role.get_built_in_role("ObserverEnrollment", root_account_id: root_account_id)
+    Role.get_built_in_role("ObserverEnrollment", root_account_id:)
   end
 
   def admin_role(root_account_id: Account.default.id)
-    Role.get_built_in_role("AccountAdmin", root_account_id: root_account_id)
+    Role.get_built_in_role("AccountAdmin", root_account_id:)
   end
 end

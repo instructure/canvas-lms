@@ -100,10 +100,10 @@ class GradeCalculator
     grading_period_id = compute_score_opts.delete(:grading_period_id)
     grading_period = periods.find_by(id: grading_period_id) if grading_period_id
     opts = compute_score_opts.reverse_merge(
-      grading_period: grading_period,
-      assignments: assignments,
-      groups: groups,
-      periods: periods
+      grading_period:,
+      assignments:,
+      groups:,
+      periods:
     )
     user_ids.sort.in_groups_of(100, false) do |user_ids_group|
       GradeCalculator.new(user_ids_group, course, **opts).compute_and_save_scores
@@ -358,9 +358,9 @@ class GradeCalculator
       ignore_muted: @ignore_muted,
       ignore_unposted_anonymous: @ignore_unposted_anonymous,
       periods: grading_periods_for_course,
-      effective_due_dates: effective_due_dates,
-      enrollments: enrollments,
-      submissions: submissions,
+      effective_due_dates:,
+      enrollments:,
+      submissions:,
       only_update_course_gp_metadata: @only_update_course_gp_metadata,
       only_update_points: @only_update_points
     )
@@ -375,7 +375,7 @@ class GradeCalculator
   def calculate_grading_period_scores
     grading_periods_for_course.each do |grading_period|
       # update this grading period score
-      compute_branch(grading_period: grading_period)
+      compute_branch(grading_period:)
     end
 
     # delete any grading period scores that are no longer relevant
@@ -524,7 +524,7 @@ class GradeCalculator
   def update_values_for(column, updates: {}, key: :grade)
     return unless column
 
-    actual_updates = user_specific_updates(updates: updates, default_value: "excluded.#{column}", key: key)
+    actual_updates = user_specific_updates(updates:, default_value: "excluded.#{column}", key:)
 
     "#{column} = CASE excluded.enrollment_id #{actual_updates} END"
   end
@@ -532,7 +532,7 @@ class GradeCalculator
   def insert_values_for(column, updates: {}, key: :grade)
     return unless column
 
-    actual_updates = user_specific_updates(updates: updates, default_value: "NULL", key: key)
+    actual_updates = user_specific_updates(updates:, default_value: "NULL", key:)
 
     "CASE enrollments.id #{actual_updates} END :: float AS #{column}"
   end
@@ -818,8 +818,8 @@ class GradeCalculator
       {
         id: group.id,
         global_id: group.global_id,
-        score: score,
-        possible: possible,
+        score:,
+        possible:,
         weight: group.group_weight,
         grade: ((score.to_f / possible * 100).round(2).to_f if possible > 0),
         dropped: dropped_submissions
@@ -947,11 +947,11 @@ class GradeCalculator
     kept
   end
 
-  def big_f(q, submissions, cant_drop, keep, &sort_blk)
+  def big_f(q, submissions, cant_drop, keep, &)
     kept = submissions.map do |s|
       rated_score = s[:score] - (q * s[:total])
       [rated_score, s]
-    end.sort(&sort_blk).first(keep)
+    end.sort(&).first(keep)
 
     q_kept = kept.reduce(0) { |sum, (rated_score, _)| sum + rated_score }
     q_cant_drop = cant_drop.reduce(0) { |sum, s| sum + (s[:score] - (q * s[:total])) }
@@ -1020,7 +1020,7 @@ class GradeCalculator
       {
         grade: rounded_grade,
         total: rounded_grade,
-        dropped: dropped
+        dropped:
       }
     else
       total, possible = group_sums.reduce([0, 0]) { |(m, n), gs| [m + gs[:score], n + gs[:possible]] }
@@ -1030,13 +1030,13 @@ class GradeCalculator
           grade: final_grade.round(2).to_f,
           total: total.to_f,
           possible: possible.to_f,
-          dropped: dropped
+          dropped:
         }
       else
         {
           grade: nil,
           total: total.to_f,
-          dropped: dropped
+          dropped:
         }
       end
     end

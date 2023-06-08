@@ -92,11 +92,11 @@ describe Mutations::UpdateAssignment do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   def create_module_and_add_assignment(name)
-    course_module1 = @course.context_modules.create!(name: name)
+    course_module1 = @course.context_modules.create!(name:)
     course_module1.add_item(id: @assignment_id, type: "assignment")
     course_module1
   end
@@ -531,7 +531,7 @@ describe Mutations::UpdateAssignment do
       }
     GQL
     context = { current_user: @teacher, request: ActionDispatch::TestRequest.create }
-    result = CanvasSchema.execute(mutation_command, context: context)
+    result = CanvasSchema.execute(mutation_command, context:)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "changeName", "errors")).to be_nil
     expect(result.dig("data", "changeName", "assignment", "name")).to eq "Example Assignment (deleted)"
@@ -581,7 +581,7 @@ describe Mutations::UpdateAssignment do
       }
     GQL
     context = { current_user: @teacher, request: ActionDispatch::TestRequest.create, session: {} }
-    result = CanvasSchema.execute(mutation_command, context: context)
+    result = CanvasSchema.execute(mutation_command, context:)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateAssignment", "assignment")).to be_nil
     expect(result.dig("data", "updateAssignment", "errors")).to_not be_nil

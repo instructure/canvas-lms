@@ -111,7 +111,7 @@ module Lti
 
           if request.headers["accept"].include?("application/vnd.ims.lti.v2.toolsettings+json")
             @content_type = "application/vnd.ims.lti.v2.toolsettings+json"
-            ::IMS::LTI::Models::ToolSettingContainer.new(graph: graph)
+            ::IMS::LTI::Models::ToolSettingContainer.new(graph:)
           elsif bubble == "distinct" && request.headers["accept"].include?("application/vnd.ims.lti.v2.toolsettings.simple+json")
             @content_type = "application/vnd.ims.lti.v2.toolsettings.simple+json"
             custom = {}
@@ -132,7 +132,7 @@ module Lti
         url = show_lti_tool_settings_url(tool_setting.id)
         custom = tool_setting.custom || {}
         custom.delete_if { |k, _| distinct.include? k } if distinct
-        ::IMS::LTI::Models::ToolSetting.new(custom: custom, type: type, id: url)
+        ::IMS::LTI::Models::ToolSetting.new(custom:, type:, id: url)
       end
 
       def custom_settings(type, json)
@@ -181,7 +181,7 @@ module Lti
 
                  tool_proxy.tool_settings.find_by(
                    context: @context,
-                   resource_link_id: resource_link_id
+                   resource_link_id:
                  )
                end
           raise ActiveRecord::RecordNotFound if ts.blank?

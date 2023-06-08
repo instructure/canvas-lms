@@ -369,7 +369,7 @@ describe "dashboard" do
     it "does not show an unpublished assignment for an unpublished course", priority: "2" do
       name = "venkman"
       due_date = Time.zone.now.utc + 2.days
-      assignment = @course.assignments.create(name: name,
+      assignment = @course.assignments.create(name:,
                                               submission_types: "online",
                                               due_at: due_date,
                                               lock_at: 1.week.from_now,

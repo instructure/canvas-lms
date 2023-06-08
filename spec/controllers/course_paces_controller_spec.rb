@@ -709,7 +709,7 @@ describe CoursePacesController do
       course_pace_params = @valid_params.merge(
         start_date: "2021-11-01",
         end_date: "2021-11-06",
-        course_pace_module_items_attributes: course_pace_module_items_attributes
+        course_pace_module_items_attributes:
       )
       post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params }
       expect(response).to be_successful

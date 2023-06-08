@@ -560,16 +560,16 @@ describe "Feature Flags API", type: :request do
         before :once do
           role = custom_account_role("AccountManager", account: t_site_admin)
           t_site_admin.role_overrides.create!(permission: "manage_feature_flags",
-                                              role: role,
+                                              role:,
                                               enabled: true,
                                               applies_to_self: false,
                                               applies_to_descendants: true)
           t_site_admin.role_overrides.create!(permission: "view_feature_flags",
-                                              role: role,
+                                              role:,
                                               enabled: true,
                                               applies_to_self: true,
                                               applies_to_descendants: true)
-          @site_admin_member = site_admin_user(role: role)
+          @site_admin_member = site_admin_user(role:)
         end
 
         it "views a hidden feature" do

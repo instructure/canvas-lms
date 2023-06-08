@@ -185,7 +185,7 @@ describe CanvasPartman::Concerns::Partitioned do
     describe "creating records" do
       it "fails if the target partition does not exist" do
         expect do
-          Trail.create!(zoo: zoo)
+          Trail.create!(zoo:)
         end.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
       end
 
@@ -193,7 +193,7 @@ describe CanvasPartman::Concerns::Partitioned do
         subject.create_partition(zoo.id)
         subject.create_partition(zoo.id + 5)
 
-        Trail.create!(zoo: zoo)
+        Trail.create!(zoo:)
 
         expect(Trail.count).to eq 1
 

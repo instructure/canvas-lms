@@ -303,8 +303,8 @@ class RubricsApiController < ApplicationController
       render json: rubric_json(rubric,
                                @current_user,
                                session,
-                               assessments: assessments,
-                               associations: associations,
+                               assessments:,
+                               associations:,
                                style: params[:style])
     end
   end

@@ -96,7 +96,7 @@ GEM
     globalid (1.1.0)
       activesupport (>= 5.0)
     hashdiff (1.0.1)
-    i18n (1.13.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     inst_statsd (2.2.0)
       aroi (>= 0.0.7)

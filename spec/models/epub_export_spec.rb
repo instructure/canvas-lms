@@ -74,7 +74,7 @@ describe EpubExport do
     let_once(:epub_export) do
       @course.epub_exports.create({
                                     user: @student,
-                                    content_export: content_export
+                                    content_export:
                                   })
     end
 
@@ -96,7 +96,7 @@ describe EpubExport do
     let_once(:epub_export) do
       @course.epub_exports.create({
                                     user: @student,
-                                    content_export: content_export
+                                    content_export:
                                   })
     end
 
@@ -164,7 +164,7 @@ describe EpubExport do
     let_once(:epub_export) do
       @course.epub_exports.create({
                                     user: @student,
-                                    content_export: content_export
+                                    content_export:
                                   })
     end
 
@@ -273,7 +273,7 @@ describe EpubExport do
     let_once(:epub_export) do
       @course.epub_exports.create({
                                     user: @student,
-                                    content_export: content_export
+                                    content_export:
                                   })
     end
 

@@ -71,9 +71,6 @@
     "all_day_fb42c4fc": {
         "message": "Tot el dia"
     },
-    "all_items_loaded_aa256183": {
-        "message": "Tots els elements carregats"
-    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
@@ -1207,6 +1204,9 @@
     },
     "icon_size_9353edea": {
         "message": "Mida de la icona"
+    },
+    "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+        "message": "Si es deixa el camp buit, el text de l’enllaç es mostrarà com al nom de l’enllaç de l’assignatura"
     },
     "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
         "message": "Si calen drets d''ús, el fitxer no es publicarà fins que s’hagi activat a la pàgina Fitxers."

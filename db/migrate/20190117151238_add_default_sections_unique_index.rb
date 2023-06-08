@@ -25,7 +25,7 @@ class AddDefaultSectionsUniqueIndex < ActiveRecord::Migration[5.1]
     course_ids_to_fix = CourseSection.active.group(:course_id).where(default_section: true)
                                      .having("COUNT(*) > 1").pluck(:course_id)
     course_ids_to_fix.each do |course_id|
-      CourseSection.where(course_id: course_id, default_section: true)
+      CourseSection.where(course_id:, default_section: true)
                    .order(:id).offset(1).update_all(default_section: false)
     end
     add_index :course_sections,

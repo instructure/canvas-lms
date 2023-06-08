@@ -157,10 +157,10 @@ module Types
     def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false)
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
-        course_ids: course_ids,
-        order_by: order_by,
-        current_only: current_only,
-        exclude_concluded: exclude_concluded
+        course_ids:,
+        order_by:,
+        current_only:,
+        exclude_concluded:
       ).load(object.id).then do |enrollments|
         (enrollments || []).select do |enrollment|
           object == context[:current_user] ||
@@ -261,8 +261,8 @@ module Types
       )
 
       collections = search_contexts_and_users(
-        search: search,
-        context: context,
+        search:,
+        context:,
         synthetic_contexts: true,
         messageable_only: true,
         base_url: self.context[:request].base_url
@@ -306,11 +306,11 @@ module Types
 
       # Setting this global variable is required for helper functions to run correctly
       @current_user = object
-      normalized_recipient_ids = normalize_recipients(recipients: recipient_ids, context_code: context_code).map(&:id)
+      normalized_recipient_ids = normalize_recipients(recipients: recipient_ids, context_code:).map(&:id)
       course_observers_observing_recipients_ids = course_context.enrollments.not_fake.active_by_date.of_observer_type.where(associated_user_id: normalized_recipient_ids).distinct.pluck(:user_id)
 
       # Normalize recipients should remove any observers that the current user is not able to message
-      normalize_recipients(recipients: course_observers_observing_recipients_ids, context_code: context_code)
+      normalize_recipients(recipients: course_observers_observing_recipients_ids, context_code:)
     end
 
     # TODO: deprecate this
@@ -460,7 +460,7 @@ module Types
       # contains a discussionRoles field
       return if course_id.nil?
 
-      Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(object)
+      Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(object)
     end
   end
 end

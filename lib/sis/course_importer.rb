@@ -134,7 +134,7 @@ module SIS
             end
           end
 
-          course_dates_stuck = !(course.stuck_sis_fields & [:start_at, :conclude_at]).empty?
+          course_dates_stuck = !!course.stuck_sis_fields.intersect?([:start_at, :conclude_at])
           unless course_dates_stuck
             if start_date == "<delete>" && end_date == "<delete>"
               course.restrict_enrollments_to_course_dates = false
@@ -185,10 +185,10 @@ module SIS
             end
           end
 
-          update_enrollments = !course.new_record? && !(course.changes.keys & %w[workflow_state name course_code]).empty?
+          update_enrollments = !course.new_record? && !!course.changes.keys.intersect?(%w[workflow_state name course_code])
 
           # republish course paces if necessary
-          if !course.new_record? && course.account.feature_enabled?(:course_paces) && (course.changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
+          if !course.new_record? && course.account.feature_enabled?(:course_paces) && course.changes.keys.intersect?(%w[start_at conclude_at restrict_enrollments_to_course_dates])
             course.course_paces.find_each(&:create_publish_progress)
           end
 
@@ -219,7 +219,7 @@ module SIS
               templated_course.name = course.name if !templated_course.stuck_sis_fields.include?(:name) && !course_name_stuck
               templated_course.course_code = course.course_code if !templated_course.stuck_sis_fields.include?(:course_code) && !course_course_code_stuck
               templated_course.enrollment_term = course.enrollment_term if !templated_course.stuck_sis_fields.include?(:enrollment_term_id) && !course_enrollment_term_id_stuck
-              if (templated_course.stuck_sis_fields & %i[start_at conclude_at restrict_enrollments_to_course_dates]).empty? && !course_dates_stuck
+              if !templated_course.stuck_sis_fields.intersect?(%i[start_at conclude_at restrict_enrollments_to_course_dates]) && !course_dates_stuck
                 templated_course.start_at = course.start_at
                 templated_course.conclude_at = course.conclude_at
                 templated_course.restrict_enrollments_to_course_dates = course.restrict_enrollments_to_course_dates

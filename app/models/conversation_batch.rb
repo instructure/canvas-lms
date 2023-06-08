@@ -45,8 +45,8 @@ class ConversationBatch < ActiveRecord::Base
       self.user = user_map[user_id]
       existing_conversations = Conversation.find_all_private_conversations(user,
                                                                            recipient_ids.map { |id| user_map[id] },
-                                                                           context_type: context_type,
-                                                                           context_id: context_id)
+                                                                           context_type:,
+                                                                           context_id:)
       update_attribute :workflow_state, "sending"
 
       ModelCache.with_cache(conversations: existing_conversations, users: { id: user_map }) do
@@ -57,13 +57,13 @@ class ConversationBatch < ActiveRecord::Base
             is_group = group?
             conversation = user.initiate_conversation([user_map[id]],
                                                       !is_group,
-                                                      subject: subject,
-                                                      context_type: context_type,
-                                                      context_id: context_id)
+                                                      subject:,
+                                                      context_type:,
+                                                      context_id:)
             @conversations << conversation
             message = root_conversation_message.clone
             message.generate_user_note = generate_user_note
-            conversation.add_message(message, update_for_sender: false, tags: tags, cc_author: should_cc_author)
+            conversation.add_message(message, update_for_sender: false, tags:, cc_author: should_cc_author)
             conversation_message_ids << message.id
 
             should_cc_author = false

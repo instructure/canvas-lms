@@ -116,12 +116,12 @@ describe GroupsController do
     it "does not 500 for admins that can view but cannot manage groups" do
       a = Account.default
       role = custom_account_role("groups-view-only", account: a)
-      a.role_overrides.create! role: role, permission: "manage_groups", enabled: false
-      a.role_overrides.create! role: role, permission: "read_roster", enabled: true
-      a.role_overrides.create! role: role, permission: "view_group_pages", enabled: true
+      a.role_overrides.create! role:, permission: "manage_groups", enabled: false
+      a.role_overrides.create! role:, permission: "read_roster", enabled: true
+      a.role_overrides.create! role:, permission: "view_group_pages", enabled: true
 
       my_admin = User.create!(name: "my admin")
-      a.account_users.create!(user: my_admin, role: role)
+      a.account_users.create!(user: my_admin, role:)
 
       course_with_teacher(active_all: true)
       user_session(my_admin)
@@ -692,7 +692,7 @@ describe GroupsController do
     it "fails when group[group_category_id] doesn't exist" do
       user_session(@teacher)
       group_category = @course.group_categories.create(name: "some category")
-      @group = @course.groups.create!(name: "some group", group_category: group_category)
+      @group = @course.groups.create!(name: "some group", group_category:)
       put "update", params: { course_id: @course.id, id: @group.id, group: { group_category_id: 11_235 } }
       expect(response).not_to be_successful
     end
@@ -1043,7 +1043,7 @@ describe GroupsController do
   describe "POST create_file" do
     let(:course) { Course.create! }
     let(:group_category) { course.group_categories.create!(name: "just a category") }
-    let(:group) { course.groups.create!(name: "just a group", group_category: group_category) }
+    let(:group) { course.groups.create!(name: "just a group", group_category:) }
     let(:assignment) { course.assignments.create!(title: "hi", submission_types: "online_upload") }
 
     context "as a teacher" do

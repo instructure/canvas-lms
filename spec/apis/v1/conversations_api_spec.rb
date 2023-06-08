@@ -41,7 +41,7 @@ describe ConversationsController, type: :request do
   def student_in_course(options = {})
     section = options.delete(:section)
     u = User.create(options)
-    enrollment = @course.enroll_user(u, "StudentEnrollment", section: section)
+    enrollment = @course.enroll_user(u, "StudentEnrollment", section:)
     enrollment.workflow_state = "active"
     enrollment.save
     u
@@ -51,7 +51,7 @@ describe ConversationsController, type: :request do
     section = options.delete(:section)
     associated_user = options.delete(:associated_user)
     u = User.create(options)
-    enrollment = @course.enroll_user(u, "ObserverEnrollment", section: section)
+    enrollment = @course.enroll_user(u, "ObserverEnrollment", section:)
     enrollment.associated_user = associated_user
     enrollment.workflow_state = "active"
     enrollment.save
@@ -297,7 +297,7 @@ describe ConversationsController, type: :request do
         @user = @me
         json = api_call(:get,
                         "/api/v1/conversations.json?filter=#{filter}",
-                        { controller: "conversations", action: "index", format: "json", filter: filter })
+                        { controller: "conversations", action: "index", format: "json", filter: })
         expect(json.size).to eq @conversations.size
         expect(json.pluck("id").sort).to eq @conversations.map(&:conversation_id).sort
       end
@@ -306,7 +306,7 @@ describe ConversationsController, type: :request do
         before :once do
           Shard.default.activate do
             account = Account.create!
-            course_with_teacher(account: account, active_course: true, active_enrollment: true, user: @me)
+            course_with_teacher(account:, active_course: true, active_enrollment: true, user: @me)
             @course.update_attribute(:name, "another course")
             @alex = student_in_course(name: "alex")
             @buster = student_in_course(name: "buster")
@@ -333,7 +333,7 @@ describe ConversationsController, type: :request do
         before :once do
           @shard1.activate do
             account = Account.create!
-            course_with_teacher(account: account, active_course: true, active_enrollment: true, user: @me)
+            course_with_teacher(account:, active_course: true, active_enrollment: true, user: @me)
             @course.update_attribute(:name, "the course 2")
             @alex = student_in_course(name: "alex")
             @buster = student_in_course(name: "buster")
@@ -364,7 +364,7 @@ describe ConversationsController, type: :request do
         before :once do
           Shard.default.activate do
             account = Account.create!
-            course_with_teacher(account: account, active_course: true, active_enrollment: true, user: @me)
+            course_with_teacher(account:, active_course: true, active_enrollment: true, user: @me)
             @course.update_attribute(:name, "another course")
             @alex = student_in_course(name: "alex")
           end
@@ -385,7 +385,7 @@ describe ConversationsController, type: :request do
         before :once do
           @shard1.activate do
             account = Account.create!
-            course_with_teacher(account: account, active_course: true, active_enrollment: true)
+            course_with_teacher(account:, active_course: true, active_enrollment: true)
             @course.update_attribute(:name, "the course 2")
             @alex = student_in_course(name: "alex")
             @me = @teacher
@@ -2247,7 +2247,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "mark_as_read", conversation_ids: conversation_ids })
+                      { event: "mark_as_read", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2260,7 +2260,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "mark_as_unread", conversation_ids: conversation_ids })
+                      { event: "mark_as_unread", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2275,7 +2275,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "star", conversation_ids: conversation_ids })
+                      { event: "star", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2290,7 +2290,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "unstar", conversation_ids: conversation_ids })
+                      { event: "unstar", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2312,7 +2312,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "archive", conversation_ids: conversation_ids })
+                      { event: "archive", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2334,7 +2334,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "mark_as_read", conversation_ids: conversation_ids })
+                      { event: "mark_as_read", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2351,7 +2351,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "mark_as_unread", conversation_ids: conversation_ids })
+                      { event: "mark_as_unread", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2362,7 +2362,7 @@ describe ConversationsController, type: :request do
       json = api_call(:put,
                       "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
-                      { event: "destroy", conversation_ids: conversation_ids })
+                      { event: "destroy", conversation_ids: })
       run_jobs
       progress = Progress.find(json["id"])
       expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
@@ -2376,7 +2376,7 @@ describe ConversationsController, type: :request do
         json = api_call(:put,
                         "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
-                        { event: "NONSENSE", conversation_ids: conversation_ids },
+                        { event: "NONSENSE", conversation_ids: },
                         {},
                         { expected_status: 400 })
 
@@ -2387,7 +2387,7 @@ describe ConversationsController, type: :request do
         json = api_call(:put,
                         "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
-                        { conversation_ids: conversation_ids },
+                        { conversation_ids: },
                         {},
                         { expected_status: 400 })
 
@@ -2410,7 +2410,7 @@ describe ConversationsController, type: :request do
         json = api_call(:put,
                         "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
-                        { event: "mark_as_read", conversation_ids: conversation_ids },
+                        { event: "mark_as_read", conversation_ids: },
                         {},
                         { expected_status: 400 })
         expect(json["message"]).to include "exceeded"
@@ -2422,7 +2422,7 @@ describe ConversationsController, type: :request do
         json = api_call(:put,
                         "/api/v1/conversations",
                         { controller: "conversations", action: "batch_update", format: "json" },
-                        { event: "mark_as_read", conversation_ids: conversation_ids })
+                        { event: "mark_as_read", conversation_ids: })
         progress = Progress.find(json["id"])
         expect(progress).to be_present
         expect(progress).to be_queued
@@ -2440,7 +2440,7 @@ describe ConversationsController, type: :request do
           json = api_call(:put,
                           "/api/v1/conversations",
                           { controller: "conversations", action: "batch_update", format: "json" },
-                          { event: "mark_as_read", conversation_ids: conversation_ids })
+                          { event: "mark_as_read", conversation_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_completed
@@ -2459,7 +2459,7 @@ describe ConversationsController, type: :request do
           json = api_call(:put,
                           "/api/v1/conversations",
                           { controller: "conversations", action: "batch_update", format: "json" },
-                          { event: "mark_as_read", conversation_ids: conversation_ids })
+                          { event: "mark_as_read", conversation_ids: })
 
           run_jobs
           progress = Progress.find(json["id"])
@@ -2478,7 +2478,7 @@ describe ConversationsController, type: :request do
           json = api_call(:put,
                           "/api/v1/conversations",
                           { controller: "conversations", action: "batch_update", format: "json" },
-                          { event: "mark_as_read", conversation_ids: conversation_ids })
+                          { event: "mark_as_read", conversation_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress).to be_failed

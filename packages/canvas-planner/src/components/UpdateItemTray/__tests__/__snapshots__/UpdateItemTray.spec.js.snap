@@ -51,9 +51,10 @@ exports[`renders the item to update if provided 1`] = `
         value="Planner Item"
       />
       <DateTimeInput
-        dateLabel="Date"
-        dateNextLabel="Next Month"
-        datePreviousLabel="Previous Month"
+        allowNonStepInput={true}
+        colSpacing="medium"
+        dateFormat="LL"
+        dateRenderLabel="Date"
         description={
           <ScreenReaderContent
             as="span"
@@ -61,16 +62,18 @@ exports[`renders the item to update if provided 1`] = `
             The date and time this to do is due
           </ScreenReaderContent>
         }
-        disabled={false}
         invalidDateTimeMessage={[Function]}
+        isRequired={false}
         layout="stacked"
         locale="en"
-        messageFormat="LLL"
+        messageFormat="LLLL"
         messages={Array []}
+        nextMonthLabel="Next Month"
         onChange={[Function]}
-        readOnly={false}
+        prevMonthLabel="Previous Month"
         required={true}
-        timeLabel="Time"
+        rowSpacing="small"
+        timeRenderLabel="Time"
         timeStep={30}
         timezone="Asia/Tokyo"
         value="2017-04-25T08:49:00.000Z"
@@ -236,9 +239,10 @@ exports[`updates state when new note is passed in 1`] = `
         value="Planner Item 1"
       />
       <DateTimeInput
-        dateLabel="Date"
-        dateNextLabel="Next Month"
-        datePreviousLabel="Previous Month"
+        allowNonStepInput={true}
+        colSpacing="medium"
+        dateFormat="LL"
+        dateRenderLabel="Date"
         description={
           <ScreenReaderContent
             as="span"
@@ -246,16 +250,18 @@ exports[`updates state when new note is passed in 1`] = `
             The date and time this to do is due
           </ScreenReaderContent>
         }
-        disabled={false}
         invalidDateTimeMessage={[Function]}
+        isRequired={false}
         layout="stacked"
         locale="en"
-        messageFormat="LLL"
+        messageFormat="LLLL"
         messages={Array []}
+        nextMonthLabel="Next Month"
         onChange={[Function]}
-        readOnly={false}
+        prevMonthLabel="Previous Month"
         required={true}
-        timeLabel="Time"
+        rowSpacing="small"
+        timeRenderLabel="Time"
         timeStep={30}
         timezone="Asia/Tokyo"
         value="2017-04-28T11:00:00.000Z"
@@ -429,9 +435,10 @@ exports[`updates state when new note is passed in 2`] = `
         value="Planner Item 2"
       />
       <DateTimeInput
-        dateLabel="Date"
-        dateNextLabel="Next Month"
-        datePreviousLabel="Previous Month"
+        allowNonStepInput={true}
+        colSpacing="medium"
+        dateFormat="LL"
+        dateRenderLabel="Date"
         description={
           <ScreenReaderContent
             as="span"
@@ -439,16 +446,18 @@ exports[`updates state when new note is passed in 2`] = `
             The date and time this to do is due
           </ScreenReaderContent>
         }
-        disabled={false}
         invalidDateTimeMessage={[Function]}
+        isRequired={false}
         layout="stacked"
         locale="en"
-        messageFormat="LLL"
+        messageFormat="LLLL"
         messages={Array []}
+        nextMonthLabel="Next Month"
         onChange={[Function]}
-        readOnly={false}
+        prevMonthLabel="Previous Month"
         required={true}
-        timeLabel="Time"
+        rowSpacing="small"
+        timeRenderLabel="Time"
         timeStep={30}
         timezone="Asia/Tokyo"
         value="2017-04-28T11:00:00.000Z"

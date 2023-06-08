@@ -202,7 +202,7 @@ class MediaObject < ActiveRecord::Base
   # typically call this in a delayed job, since it has to contact kaltura
   def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && by_media_id(media_id).none?
-      create!(**create_opts.merge(media_id: media_id))
+      create!(**create_opts.merge(media_id:))
     end
   end
 
@@ -345,7 +345,7 @@ class MediaObject < ActiveRecord::Base
 
     self.attachment = Folder.media_folder(context).attachments
                             .create(
-                              context: context,
+                              context:,
                               display_name: guaranteed_title,
                               filename: guaranteed_title,
                               content_type: media_type,
@@ -383,9 +383,9 @@ class MediaObject < ActiveRecord::Base
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
-  scope :by_media_id, ->(media_id) { where(media_id: media_id).or(where(old_media_id: media_id).where.not(old_media_id: nil)) }
+  scope :by_media_id, ->(media_id) { where(media_id:).or(where(old_media_id: media_id).where.not(old_media_id: nil)) }
 
-  scope :by_media_type, ->(media_type) { where(media_type: media_type) }
+  scope :by_media_type, ->(media_type) { where(media_type:) }
 
   workflow do
     state :active

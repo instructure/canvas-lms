@@ -242,7 +242,7 @@ describe "Wiki Pages" do
       @course.save!
 
       title = "foo"
-      @course.wiki_pages.create!(title: title, body: "bar")
+      @course.wiki_pages.create!(title:, body: "bar")
 
       get "/courses/#{@course.id}/pages/#{title}"
       expect(f("#wiki_page_show")).not_to be_nil
@@ -293,7 +293,7 @@ describe "Wiki Pages" do
     it "displays wiki content", priority: "1" do
       @coures = public_course
       title = "foo"
-      public_course.wiki_pages.create!(title: title, body: "bar")
+      public_course.wiki_pages.create!(title:, body: "bar")
 
       get "/courses/#{public_course.id}/wiki/#{title}"
       expect(f(".user_content")).not_to be_nil

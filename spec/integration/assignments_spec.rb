@@ -471,7 +471,7 @@ describe "assignments_2 feature flag and parameter" do
       expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: false))
       assignment = @course.assignments.create(
         title: "some assignment",
-        description: description
+        description:
       )
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
     end
@@ -483,9 +483,9 @@ describe "assignments_2 feature flag and parameter" do
         is_public: true
       )
       assignment = assignment_model(
-        course: course,
+        course:,
         submission_types: "online_url",
-        description: description
+        description:
       )
       get "/courses/#{course.id}/assignments/#{assignment.id}"
     end

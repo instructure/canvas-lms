@@ -78,12 +78,12 @@ module Autoextend
       @list = list
     end
 
-    def tsort_each_node(&block)
-      @list.each(&block)
+    def tsort_each_node(&)
+      @list.each(&)
     end
 
-    def tsort_each_child(node, &block)
-      node.after.map { |after_module| @list.find { |ext| ext.module_name == after_module } }.each(&block)
+    def tsort_each_child(node, &)
+      node.after.map { |after_module| @list.find { |ext| ext.module_name == after_module } }.each(&)
     end
   end
 end

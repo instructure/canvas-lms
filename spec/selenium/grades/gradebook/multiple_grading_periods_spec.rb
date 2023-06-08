@@ -110,7 +110,7 @@ describe "interaction with grading periods" do
 
   context "grading schemes" do
     let(:account) { Account.default }
-    let(:admin) { account_admin_user(account: account) }
+    let(:admin) { account_admin_user(account:) }
     let(:test_course) { account.courses.create!(name: "New Course") }
 
     it "disables adding during edit mode on course page", priority: "1" do

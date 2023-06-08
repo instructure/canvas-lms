@@ -27,9 +27,9 @@ describe "concluded/unconcluded" do
   before do
     username = "nobody@example.com"
     password = "asdfasdf"
-    u = user_with_pseudonym active_user: true,
-                            username: username,
-                            password: password
+    u = user_with_pseudonym(active_user: true,
+                            username:,
+                            password:)
     u.save!
     @e = course_with_teacher active_course: true,
                              user: u,

@@ -155,7 +155,7 @@ module GradebooksHelper
   end
 
   def ungraded_submission_display(submission_type, is_new_quizzes: false)
-    sub_score = ungraded_submission_icon_attributes_for(submission_type, is_new_quizzes: is_new_quizzes)
+    sub_score = ungraded_submission_icon_attributes_for(submission_type, is_new_quizzes:)
     if sub_score
       screenreadable_icon(sub_score, %w[submission_icon])
     else

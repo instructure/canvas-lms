@@ -26,13 +26,13 @@ module Lti
       include_context "deep_linking_spec_helper"
 
       describe "#deep_linking_response" do
-        subject { post :deep_linking_response, params: params }
+        subject { post :deep_linking_response, params: }
 
         let(:placement) { "editor_button" }
-        let(:return_url_params) { { placement: placement, content_item_id: 123 } }
+        let(:return_url_params) { { placement:, content_item_id: 123 } }
         let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
-        let(:course) { course_model(account: account) }
+        let(:course) { course_model(account:) }
 
         let(:context_external_tool) do
           ContextExternalTool.create!(
@@ -41,7 +41,7 @@ module Lti
             name: "test tool",
             shared_secret: "secret",
             consumer_key: "key",
-            developer_key: developer_key,
+            developer_key:,
             lti_version: "1.3"
           )
         end
@@ -56,13 +56,13 @@ module Lti
           expect(controller).to receive(:js_env).with({ deep_linking_use_window_parent: true })
           expect(controller).to receive(:js_env).with({
                                                         deep_link_response: {
-                                                          placement: placement,
-                                                          content_items: content_items,
+                                                          placement:,
+                                                          content_items:,
                                                           service_id: 123,
-                                                          msg: msg,
-                                                          log: log,
-                                                          errormsg: errormsg,
-                                                          errorlog: errorlog,
+                                                          msg:,
+                                                          log:,
+                                                          errormsg:,
+                                                          errorlog:,
                                                           ltiEndpoint: Rails.application.routes.url_helpers.polymorphic_url(
                                                             [:retrieve, account, :external_tools],
                                                             host: "test.host"
@@ -76,7 +76,7 @@ module Lti
         end
 
         context "when returning from a non-internal service" do
-          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+          let(:return_url_params) { { placement:, parent_frame_context: context_external_tool.id } }
 
           it "does not change the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
             subject
@@ -88,11 +88,11 @@ module Lti
         context "when returning from an internal service" do
           before do
             developer_key.update!(internal_service: true)
-            u = course_with_teacher(course: course, user: user_model, active_all: true).user
+            u = course_with_teacher(course:, user: user_model, active_all: true).user
             user_session(u)
           end
 
-          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+          let(:return_url_params) { { placement:, parent_frame_context: context_external_tool.id } }
 
           it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in js_env" do
             subject
@@ -101,10 +101,10 @@ module Lti
         end
 
         it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
-          let(:return_url_params) { { placement: placement, parent_frame_context: pfc_tool.id } }
+          let(:return_url_params) { { placement:, parent_frame_context: pfc_tool.id } }
           let(:pfc_tool_context) do
             # Need to enroll user to make sure user can access pfc tool
-            enrollment = course_with_teacher(course: course, user: user_model, active_all: true)
+            enrollment = course_with_teacher(course:, user: user_model, active_all: true)
             user_session(enrollment.user)
             enrollment.course
           end
@@ -143,7 +143,7 @@ module Lti
               context: account,
               opts: {
                 url: "http://tool.url/login",
-                developer_key: developer_key
+                developer_key:
               }
             )
           end
@@ -175,7 +175,7 @@ module Lti
           end
 
           context "when context is a course" do
-            let(:course) { course_model(account: account) }
+            let(:course) { course_model(account:) }
             let(:params) { { JWT: deep_linking_jwt, course_id: course.id, data: data_token } }
 
             it_behaves_like "creates resource links in context" do
@@ -184,7 +184,7 @@ module Lti
           end
 
           context "when context is a group" do
-            let(:group) { group_model(context: course_model(account: account)) }
+            let(:group) { group_model(context: course_model(account:)) }
             let(:params) { { JWT: deep_linking_jwt, group_id: group.id, data: data_token } }
 
             it_behaves_like "creates resource links in context" do
@@ -403,7 +403,7 @@ module Lti
         end
 
         context "content_item claim message" do
-          let(:course) { course_model(account: account) }
+          let(:course) { course_model(account:) }
           let(:developer_key) do
             key = DeveloperKey.create!(account: course.account)
             key.generate_rsa_keypair!
@@ -420,7 +420,7 @@ module Lti
               name: "test tool",
               shared_secret: "secret",
               consumer_key: "key",
-              developer_key: developer_key,
+              developer_key:,
               lti_version: "1.3"
             )
           end
@@ -749,7 +749,7 @@ module Lti
           context "when content items that contain line items are received" do
             let(:content_items) { [content_item] }
             let(:content_item) do
-              { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: lineItem }
+              { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: }
             end
             let(:lineItem) do
               { scoreMaximum: 10 }
@@ -805,7 +805,7 @@ module Lti
               context "when title is present in content item" do
                 let(:title) { "hello" }
                 let(:content_item) do
-                  super().merge({ title: title })
+                  super().merge({ title: })
                 end
 
                 it "includes title in response" do
@@ -816,7 +816,7 @@ module Lti
 
               context "when label is present in line item" do
                 let(:label) { "will not work" }
-                let(:lineItem) { { label: label } }
+                let(:lineItem) { { label: } }
 
                 it "includes label as title in response" do
                   subject
@@ -992,7 +992,7 @@ module Lti
             end
 
             context "when on the edit assignment page" do
-              let(:assignment) { assignment_model(course: course, workflow_state: "published") }
+              let(:assignment) { assignment_model(course:, workflow_state: "published") }
               let(:return_url_params) { super().merge({ placement: "assignment_selection", assignment_id: assignment.id }) }
               let(:content_items) do
                 [

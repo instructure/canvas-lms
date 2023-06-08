@@ -959,7 +959,7 @@ describe Types::UserType do
       it "returns comments across shards" do
         @shard1.activate do
           account = Account.create!(name: "new shard account")
-          @course2 = course_factory(account: account)
+          @course2 = course_factory(account:)
           @course2.enroll_user(@teacher)
           @comment2 = comment_bank_item_model(user: @teacher, context: @course2, comment: "shard 2 comment")
         end
@@ -1012,7 +1012,7 @@ describe Types::UserType do
 
       @custom_teacher = user_factory(name: "blah")
       role = custom_teacher_role("CustomTeacher", account: @course.account)
-      @course.enroll_user(@custom_teacher, "TeacherEnrollment", role: role)
+      @course.enroll_user(@custom_teacher, "TeacherEnrollment", role:)
 
       @teacher_with_duplicate_roles = user_factory(name: "blah")
       @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment")
@@ -1112,10 +1112,10 @@ describe Types::UserType do
       course_2 = Course.create! name: "TEST 2"
 
       # these 'course_with_user' will  reassign @course
-      @teacher = course_with_user("TeacherEnrollment", course: course, name: "Mr Teacher", active_all: true).user
+      @teacher = course_with_user("TeacherEnrollment", course:, name: "Mr Teacher", active_all: true).user
       @teacher = course_with_user("TeacherEnrollment", course: course_2, user: @teacher, active_all: true).user
-      @student = course_with_user("StudentEnrollment", course: course, name: "Mr Student 1", active_all: true).user
-      @student_2 = course_with_user("StudentEnrollment", course: course, name: "Mr Student 2", active_all: true).user
+      @student = course_with_user("StudentEnrollment", course:, name: "Mr Student 1", active_all: true).user
+      @student_2 = course_with_user("StudentEnrollment", course:, name: "Mr Student 2", active_all: true).user
       @student_2 = course_with_user("StudentEnrollment", course: course_2, user: @student_2, active_all: true).user
 
       @course = course

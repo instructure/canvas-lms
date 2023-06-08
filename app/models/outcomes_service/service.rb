@@ -51,8 +51,8 @@ module OutcomesService
           domain = settings[domain_key]
           payload = {
             host: domain,
-            consumer_key: consumer_key,
-            scope: scope,
+            consumer_key:,
+            scope:,
             exp: expiration
           }.merge(overrides)
           JWT.encode(payload, jwt_secret, "HS512")
@@ -65,7 +65,7 @@ module OutcomesService
           feature_flag_url,
           headers_for(root_account, "features.manage"),
           form_data: {
-            feature_flag: feature_flag
+            feature_flag:
           }
         )
         return unless response && response.code != "204"
@@ -81,7 +81,7 @@ module OutcomesService
 
       def headers_for(context, scope, overrides = {})
         {
-          "Authorization" => OutcomesService::Service.jwt(context, scope, overrides: overrides)
+          "Authorization" => OutcomesService::Service.jwt(context, scope, overrides:)
         }
       end
 

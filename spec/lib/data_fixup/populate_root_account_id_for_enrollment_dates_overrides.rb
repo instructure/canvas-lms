@@ -22,7 +22,7 @@ describe DataFixup::PopulateRootAccountIdForEnrollmentDatesOverrides do
 
   describe(".run") do
     it "updates the root_account_id" do
-      course_with_teacher(account: account, active_all: true)
+      course_with_teacher(account:, active_all: true)
       term = @course.enrollment_term
       override = term.enrollment_dates_overrides.create!(
         enrollment_type: "TeacherEnrollment",

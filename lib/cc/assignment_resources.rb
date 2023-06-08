@@ -29,14 +29,14 @@ module CC
         title = assignment.title || I18n.t("course_exports.unknown_titles.assignment", "Unknown assignment")
 
         unless assignment.can_copy?(@user)
-          add_error(I18n.t("course_exports.errors.assignment_is_locked", "The assignment \"%{title}\" could not be copied because it is locked.", title: title))
+          add_error(I18n.t("course_exports.errors.assignment_is_locked", "The assignment \"%{title}\" could not be copied because it is locked.", title:))
           next
         end
 
         begin
           add_assignment(assignment)
         rescue
-          add_error(I18n.t("course_exports.errors.assignment", "The assignment \"%{title}\" failed to export", title: title), $!)
+          add_error(I18n.t("course_exports.errors.assignment", "The assignment \"%{title}\" failed to export", title:), $!)
         end
       end
     end

@@ -89,6 +89,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "kicks off a sis import via multipart attachment" do
+    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(double("Delayed::Job", id: 123))
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: "sis_imports_api",
@@ -137,6 +138,8 @@ describe SisImportsApiController, type: :request do
     run_jobs
     expect(User.count).to eq @user_count + 1
     expect(User.last.name).to eq "Jamie Kennedy"
+    expect(batch.reload.job_ids).to eq([123])
+    expect(batch.parallel_importers.last.job_ids).to eq([123])
 
     json = api_call(:get,
                     "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",

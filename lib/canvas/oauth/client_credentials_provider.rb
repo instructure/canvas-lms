@@ -24,8 +24,8 @@ module Canvas::OAuth
     def initialize(client_id, host, scopes = nil, protocol = "http://")
       super(client_id, nil, scopes || [])
       @expected_aud = Rails.application.routes.url_helpers.oauth2_token_url(
-        host: host,
-        protocol: protocol
+        host:,
+        protocol:
       )
     end
 
@@ -64,7 +64,7 @@ module Canvas::OAuth
         iat: timestamp,
         exp: timestamp + ttl,
         jti: SecureRandom.uuid,
-        scopes: scopes
+        scopes:
       }
       if key.account_id
         # if developer key is account scoped, add namespaced custom claim about

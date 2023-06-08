@@ -35,8 +35,8 @@ module Api::V1::ExternalTools
     json = api_json(tool,
                     user,
                     session,
-                    only: only,
-                    methods: methods)
+                    only:,
+                    methods:)
     json["url"] = tool.url_with_environment_overrides(tool.url, include_launch_url: true)
     json["domain"] = tool.domain_with_environment_overrides
     json["is_rce_favorite"] = tool.is_rce_favorite_in_context?(context) if tool.can_be_rce_favorite?

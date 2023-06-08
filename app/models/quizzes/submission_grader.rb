@@ -71,7 +71,7 @@ module Quizzes
       # let's just write the options here in case we decide to do individual
       # submissions asynchronously later.
       options = {
-        quiz: quiz,
+        quiz:,
         # Leave version_number out for now as we may be passing the version
         # and we're not starting it as a delayed job
         # version_number: quiz.version_number,

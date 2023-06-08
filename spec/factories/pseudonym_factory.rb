@@ -51,7 +51,7 @@ module Factories
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = (opts[:account] ? opts[:account].root_account : Account.default)
-    @pseudonym = account.pseudonyms.build(user: user, unique_id: username, password: password, password_confirmation: password)
+    @pseudonym = account.pseudonyms.build(user:, unique_id: username, password:, password_confirmation: password)
     @pseudonym.sis_user_id = opts[:sis_user_id]
     @pseudonym.integration_id = opts[:integration_id]
     @pseudonym.save_without_session_maintenance

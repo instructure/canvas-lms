@@ -46,10 +46,11 @@ describe('OverrideSummary', () => {
     const due = `Due: ${tz.format(dueAt, I18n.t('#date.formats.full'))}`
     expect(getAllByText(due)[0]).toBeInTheDocument()
 
-    const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
-    const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.short'))}`
-    expect(getAllByText(unlock)[0]).toBeInTheDocument()
-    expect(getAllByText(lock)[0]).toBeInTheDocument()
+    const dates = `${tz.format(unlockAt, I18n.t('#date.formats.short'))} to ${tz.format(
+      lockAt,
+      I18n.t('#date.formats.short')
+    )}`
+    expect(getAllByText(dates)[0]).toBeInTheDocument()
 
     expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
   })

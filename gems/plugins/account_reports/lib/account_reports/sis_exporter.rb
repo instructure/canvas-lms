@@ -55,7 +55,7 @@ module AccountReports
       add_extra_text(I18n.t(
                        "account_reports.sis_exporter.reports",
                        "Reports: %{files}",
-                       files: files
+                       files:
                      ))
 
       case @reports.length

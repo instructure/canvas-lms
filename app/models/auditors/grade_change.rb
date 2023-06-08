@@ -186,9 +186,9 @@ class Auditors::GradeChange
 
       submission.shard.activate do
         @submission_version = SubmissionVersion.where(
-          context_type: context_type,
-          context_id: context_id,
-          version_id: version_id
+          context_type:,
+          context_id:,
+          version_id:
         ).first
       end
 

@@ -28,7 +28,7 @@ module Api::V1::Tab
   end
 
   def tabs_available_json(context, user, session, _includes = [], precalculated_permissions: nil)
-    json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map do |tab|
+    json = context_tabs(context, user, session:, precalculated_permissions:).map do |tab|
       tab_json(tab.with_indifferent_access, context, user, session)
     end
     json.sort! { |x, y| x["position"] <=> y["position"] }
@@ -47,7 +47,7 @@ module Api::V1::Tab
     hash[:type] = (tab[:external] && "external") || "internal"
     if tab[:external] && tab[:args] && tab[:args].length > 1
       launch_type = context.is_a?(Account) ? "account_navigation" : "course_navigation"
-      hash[:url] = sessionless_launch_url(context, id: tab[:args][1], launch_type: launch_type)
+      hash[:url] = sessionless_launch_url(context, id: tab[:args][1], launch_type:)
     end
     api_json(hash, user, session)
   end
@@ -101,9 +101,9 @@ module Api::V1::Tab
     opts = {
       include_external: true,
       api: true,
-      precalculated_permissions: precalculated_permissions,
-      root_account: root_account,
-      session: session,
+      precalculated_permissions:,
+      root_account:,
+      session:,
       course_subject_tabs: params["include"]&.include?("course_subject_tabs")
     }
 

@@ -196,7 +196,7 @@ module SeleniumExtensions
         return yield if timeout == 0
 
         prevent_nested_waiting(method) do
-          Selenium::WebDriver::Wait.new(timeout: timeout, ignore: ignore).until(&block)
+          Selenium::WebDriver::Wait.new(timeout:, ignore:).until(&block)
         end
       rescue Selenium::WebDriver::Error::TimeoutError
         false

@@ -72,8 +72,8 @@ describe CommMessagesApiController, type: :request do
                             action: "index",
                             format: "json",
                             user_id: @test_user.to_param,
-                            start_time: start_time,
-                            end_time: end_time
+                            start_time:,
+                            end_time:
                           })
           expect(json.length).to eq 1
           expect(json.first["id"]).to eq m2.id

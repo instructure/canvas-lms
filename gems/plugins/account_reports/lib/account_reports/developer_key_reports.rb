@@ -75,7 +75,7 @@ module AccountReports
     end
 
     def account_dev_keys
-      dev_key_scope.where(account: account)
+      dev_key_scope.where(account:)
     end
 
     def visible_site_admin_keys

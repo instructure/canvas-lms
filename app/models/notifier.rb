@@ -27,8 +27,8 @@ class Notifier
     messages ||= DelayedNotification.new(
       asset: record,
       notification: messages,
-      recipient_keys: recipient_keys,
-      data: data
+      recipient_keys:,
+      data:
     )
 
     if Rails.env.test?

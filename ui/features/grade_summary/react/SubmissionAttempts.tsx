@@ -25,10 +25,11 @@ import {IconDiscussionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import canvas from '@instructure/ui-themes'
-import {Attachment, SubmissionComment} from '../../../api.d'
+import {Attachment, SubmissionComment, MediaSource, MediaTrack} from '../../../api.d'
 import useStore from './stores'
 import {Badge} from '@instructure/ui-badge'
 import {Link} from '@instructure/ui-link'
+import {MediaPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 
 const I18n = useI18nScope('grade_summary')
@@ -36,7 +37,7 @@ const I18n = useI18nScope('grade_summary')
 type AttachmentProps = Pick<Attachment, 'id' | 'mime_class' | 'display_name' | 'url'>
 type SubmissionCommentProps = Pick<
   SubmissionComment,
-  'id' | 'comment' | 'author_name' | 'is_read' | 'display_updated_at'
+  'id' | 'comment' | 'author_name' | 'is_read' | 'display_updated_at' | 'media_object'
 > & {attachments: AttachmentProps[]}
 
 export type SubmissionAttemptsProps = {
@@ -92,57 +93,83 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
 
   return (
     <>
-      {comments.map((comment, i) => (
-        <Flex as="div" direction="column" key={comment.id} data-testid="submission-comment">
-          <div
-            style={{
-              margin: `${spacing.small}`,
-              ...(i > 0 && {
-                borderTop: `${borders.widthSmall} solid ${colors.borderMedium}`,
-                paddingTop: `${spacing.small}`,
-              }),
-            }}
-          >
-            <Text weight="bold" size="small">
-              {I18n.t('%{display_updated_at}', {display_updated_at: comment.display_updated_at})}
-            </Text>
-            {!comment.is_read && (
+      {comments.map((comment, i) => {
+        let mediaTracks: MediaTrack[] = null
+        let mediaSources: MediaSource[] = null
+        const mediaObject = comment.media_object
+        if (mediaObject) {
+          mediaSources = mediaObject.media_sources.map(mediaSource => {
+            mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
+            mediaSource.src = mediaSource.url
+            return mediaSource
+          })
+          mediaTracks = mediaObject.media_tracks.map(track => {
+            return {
+              id: track.id,
+              src: `/media_objects/${mediaObject.id}/media_tracks/${track.id}`,
+              label: track.locale,
+              type: track.kind,
+              language: track.locale,
+            }
+          })
+        }
+        return (
+          <Flex as="div" direction="column" key={comment.id} data-testid="submission-comment">
+            <div
+              style={{
+                margin: `${spacing.small}`,
+                ...(i > 0 && {
+                  borderTop: `${borders.widthSmall} solid ${colors.borderMedium}`,
+                  paddingTop: `${spacing.small}`,
+                }),
+              }}
+            >
+              <Text weight="bold" size="small">
+                {I18n.t('%{display_updated_at}', {display_updated_at: comment.display_updated_at})}
+              </Text>
+              {!comment.is_read && (
+                <View
+                  as="span"
+                  position="absolute"
+                  insetInlineEnd="1.5rem"
+                  data-testid="submission-comment-unread"
+                >
+                  <Badge type="notification" standalone={true} placement="end center" />
+                </View>
+              )}
+            </div>
+            <View as="div" margin="0 medium 0 small">
+              <Text size="small">{I18n.t('%{comment}', {comment: comment.comment})}</Text>
+            </View>
+            {comment.attachments?.map(attachment => (
               <View
-                as="span"
-                position="absolute"
-                insetInlineEnd="1.5rem"
-                data-testid="submission-comment-unread"
+                as="div"
+                margin="0 medium 0 small"
+                key={attachment.id}
+                data-testid={`attachment-${attachment.id}`}
               >
-                <Badge type="notification" standalone={true} placement="end center" />
+                <Link
+                  href={attachment.url}
+                  isWithinText={false}
+                  renderIcon={getIconByType(attachment.mime_class)}
+                >
+                  {attachment.display_name}
+                </Link>
+              </View>
+            ))}
+            {mediaObject && (
+              <View data-testid="submission-comment-media" as="span">
+                <MediaPlayer tracks={mediaTracks} sources={mediaSources} />
               </View>
             )}
-          </div>
-          <View as="div" margin="0 medium 0 small">
-            <Text size="small">{I18n.t('%{comment}', {comment: comment.comment})}</Text>
-          </View>
-          {comment.attachments?.map(attachment => (
-            <View
-              as="div"
-              margin="0 medium 0 small"
-              key={attachment.id}
-              data-testid={`attachment-${attachment.id}`}
-            >
-              <Link
-                href={attachment.url}
-                isWithinText={false}
-                renderIcon={getIconByType(attachment.mime_class)}
-              >
-                {attachment.display_name}
-              </Link>
+            <View as="div" textAlign="end" margin="0 medium 0 0">
+              <Text weight="bold" size="small" data-testid="submission-comment-author">
+                - {I18n.t('%{display_name}', {display_name: comment.author_name})}
+              </Text>
             </View>
-          ))}
-          <View as="div" textAlign="end" margin="0 medium 0 0">
-            <Text weight="bold" size="small" data-testid="submission-comment-author">
-              - {I18n.t('%{display_name}', {display_name: comment.author_name})}
-            </Text>
-          </View>
-        </Flex>
-      ))}
+          </Flex>
+        )
+      })}
     </>
   )
 }

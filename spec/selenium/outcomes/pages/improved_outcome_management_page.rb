@@ -374,7 +374,7 @@ module ImprovedOutcomeManagementPage
   end
 
   def select_outcome_group_with_text(text, timeout = 2)
-    wait_for(method: nil, timeout: timeout) { tree_browser.present? }
+    wait_for(method: nil, timeout:) { tree_browser.present? }
     tree_browser_outcome_groups.find { |group| group.text.split("\n")[0] == text }
   end
 

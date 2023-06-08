@@ -31,7 +31,7 @@ module CanvasI18nFallbacks
     ((?:-[a-wy-z](?:-[a-z0-9]{2,8})*)*)        # optional extensions
     (-x(?:-[a-z0-9]{1,8})+)*                   # optional private use
     $
-  /ix.freeze
+  /ix
 
   # This fallback order is more intelligent than simply lopping off
   # elements from the end. For instance, in Canvas we use the private
@@ -226,22 +226,22 @@ module NumberLocalizer
         strip_insignificant_zeros = true
       end
       return ActiveSupport::NumberHelper.number_to_percentage(number,
-                                                              precision: precision,
-                                                              strip_insignificant_zeros: strip_insignificant_zeros)
+                                                              precision:,
+                                                              strip_insignificant_zeros:)
     end
 
     if precision.nil?
       return ActiveSupport::NumberHelper.number_to_delimited(number)
     end
 
-    ActiveSupport::NumberHelper.number_to_rounded(number, precision: precision)
+    ActiveSupport::NumberHelper.number_to_rounded(number, precision:)
   end
 
   def form_proper_noun_singular_genitive(noun)
     if I18n.locale.to_s.start_with?("de") && %(s ß x z).include?(noun.last)
       "#{noun}'"
     else
-      I18n.t("#proper_noun_singular_genitive", "%{noun}'s", noun: noun)
+      I18n.t("#proper_noun_singular_genitive", "%{noun}'s", noun:)
     end
   end
 end

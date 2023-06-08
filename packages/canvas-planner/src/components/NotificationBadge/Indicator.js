@@ -25,17 +25,17 @@ export default class Indicator extends Component {
   static propTypes = {
     title: string.isRequired,
     variant: string.isRequired,
-    indicatorRef: func
+    indicatorRef: func,
   }
 
   static defaultProps = {
-    indicatorRef: () => {}
+    indicatorRef: () => {},
   }
 
   render() {
     return (
       <div ref={this.props.indicatorRef}>
-        <Badge standalone type="notification" variant={this.props.variant} />
+        <Badge standalone={true} type="notification" variant={this.props.variant} />
         <ScreenReaderContent>{this.props.title}</ScreenReaderContent>
       </div>
     )

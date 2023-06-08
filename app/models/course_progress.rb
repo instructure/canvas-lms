@@ -149,10 +149,10 @@ class CourseProgress
   def to_json(*)
     if course.module_based? && course.user_is_student?(user, include_all: true)
       {
-        requirement_count: requirement_count,
-        requirement_completed_count: requirement_completed_count,
+        requirement_count:,
+        requirement_completed_count:,
         next_requirement_url: current_requirement_url,
-        completed_at: completed_at
+        completed_at:
       }
     else
       { error:

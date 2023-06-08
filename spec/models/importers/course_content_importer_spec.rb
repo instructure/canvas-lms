@@ -416,7 +416,7 @@ describe Course do
   describe "shift_date_options" do
     it "defaults options[:time_zone] to the root account's time zone" do
       account = Account.default.sub_accounts.create!
-      course_with_teacher(account: account)
+      course_with_teacher(account:)
       @course.root_account.default_time_zone = "America/New_York"
       @course.start_at = 1.month.ago
       @course.conclude_at = 1.month.from_now
@@ -724,7 +724,7 @@ def from_file_path(path, course)
   list = path.split("/").reject(&:empty?)
   filename = list.pop
   folder = Folder.assert_path(list.join("/"), course)
-  file = folder.file_attachments.build(display_name: filename, filename: filename, content_type: "text/plain")
+  file = folder.file_attachments.build(display_name: filename, filename:, content_type: "text/plain")
   file.uploaded_data = StringIO.new("fake data")
   file.context = course
   file.save!

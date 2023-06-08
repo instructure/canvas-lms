@@ -23,8 +23,8 @@ describe "DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
     RoleOverride.create!(
       context: @account,
       permission: permission.to_s,
-      role: role,
-      enabled: enabled
+      role:,
+      enabled:
     )
   end
 

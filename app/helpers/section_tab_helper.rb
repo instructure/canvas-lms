@@ -105,7 +105,7 @@ module SectionTabHelper
         context.tabs_available(
           current_user,
           {
-            session: session,
+            session:,
             root_account: domain_root_account,
             precalculated_permissions: @precalculated_permissions
           }

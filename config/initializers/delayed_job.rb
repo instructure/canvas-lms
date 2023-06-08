@@ -105,7 +105,7 @@ Rails.application.config.after_initialize do
       aws_config[:credentials] ||= Canvas::AwsCredentialProvider.new("jobs_autoscaling_creds", config["vault_credential_path"])
       aws_config[:region] ||= ApplicationController.region
       actions << JobsAutoscaling::AwsAction.new(asg_name: config[:asg_name],
-                                                aws_config: aws_config,
+                                                aws_config:,
                                                 instance_id: ApplicationController.instance_id)
     end
     autoscaler = JobsAutoscaling::Monitor.new(action: actions)
@@ -242,7 +242,7 @@ end
 module CanvasDelayedMessageSending
   def delay_if_production(sender: nil, **kwargs)
     sender ||= __calculate_sender_for_delay
-    delay(sender: sender, **kwargs.merge(synchronous: !Rails.env.production?))
+    delay(sender:, **kwargs.merge(synchronous: !Rails.env.production?))
   end
 end
 Object.include CanvasDelayedMessageSending

@@ -65,7 +65,7 @@ module Lti::IMS::Providers
     private
 
     def group_role?(enrollment_types)
-      (enrollment_types & [:group_leader, :group_member]).present?
+      enrollment_types.intersect?([:group_leader, :group_member])
     end
 
     def to_memberships(enrollments)

@@ -24,6 +24,7 @@ import * as fakeSource from '../../../../rcs/fake'
 import initialState from '../../../../sidebar/store/initialState'
 import sidebarHandlers from '../../../../sidebar/containers/sidebarHandlers'
 import CanvasContentTray from '../CanvasContentTray'
+import {LinkDisplay} from '../LinkDisplay'
 
 jest.useFakeTimers()
 jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
@@ -43,6 +44,9 @@ jest.mock('../../../../bridge', () => {
   original.default.insertLink = jest.fn()
   return original
 })
+jest.mock('../LinkDisplay', () => ({
+  LinkDisplay: jest.fn(() => <div data-testid="LinkDisplay" />),
+}))
 
 const storeInitialState = {
   ...initialState({
@@ -102,6 +106,19 @@ describe('RCE Plugins > CanvasContentTray', () => {
     return getTray().getAttribute('aria-label')
   }
 
+  it('clears search string on tray close', async () => {
+    const mockOnChangeSearchString = jest.fn()
+    renderComponent(
+      getProps({storeProps: {...storeInitialState, onChangeSearchString: mockOnChangeSearchString}})
+    )
+    await showTrayForPlugin('links')
+    const closeButton = component.getByTestId('CloseButton_ContentTray').querySelector('button')
+    closeButton.focus()
+    closeButton.click()
+    await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
+    expect(mockOnChangeSearchString).toHaveBeenLastCalledWith('')
+  })
+
   describe('Edit Course Links Tray', () => {
     beforeEach(async () => {
       renderComponent()
@@ -133,6 +150,17 @@ describe('RCE Plugins > CanvasContentTray', () => {
           type: 'wikiPages',
           published: true,
         })
+      })
+    })
+
+    it('sets placeholder to the current link title', async () => {
+      renderComponent()
+      await showTrayForPlugin('course_link_edit')
+      await waitFor(() => {
+        expect(LinkDisplay).toHaveBeenCalledWith(
+          expect.objectContaining({placeholderText: 'some filename'}),
+          {}
+        )
       })
     })
   })

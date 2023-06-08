@@ -114,20 +114,20 @@ describe OutcomesServiceAuthoritativeResultsHelper do
 
     LearningOutcomeResult.create!(
       learning_outcome: @outcome,
-      user: user,
+      user:,
       context: @course,
       alignment: @alignment,
       artifact: submission,
       associated_asset: @assignment,
       association_type: "RubricAssociation",
       association_id: @rubric_association.id,
-      title: title,
-      score: score,
-      possible: possible,
-      mastery: mastery,
+      title:,
+      score:,
+      possible:,
+      mastery:,
       created_at: submitted_at,
       updated_at: submitted_at,
-      submitted_at: submitted_at,
+      submitted_at:,
       assessed_at: submitted_at
     )
   end
@@ -282,7 +282,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
 
     it "properly calculates results when method is n# of scores for mastery" do
       def create_from_scores(scores, calculation_int)
-        outcome = create_outcome({ calculation_method: "n_mastery", calculation_int: calculation_int })
+        outcome = create_outcome({ calculation_method: "n_mastery", calculation_int: })
 
         assignments = []
         scores.each do |r|
@@ -370,7 +370,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       create_learning_outcome_result @students[2], 2.0
       results = convert_to_learning_outcome_results(authoritative_results_from_db, @course, outcomes, @students, assignments)
 
-      rollups = outcome_results_rollups(results: results, users: @students)
+      rollups = outcome_results_rollups(results:, users: @students)
       os_rollups = outcome_service_results_rollups(results)
 
       os_rollups.each_with_index do |r, i|

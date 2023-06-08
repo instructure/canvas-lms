@@ -107,8 +107,8 @@ describe TermsApiController, type: :request do
 
       it "orders by end_at second" do
         start_at = 1.day.ago
-        @term1.update(start_at: start_at, end_at: 6.days.from_now)
-        @term2.update(start_at: start_at, end_at: 5.days.from_now)
+        @term1.update(start_at:, end_at: 6.days.from_now)
+        @term2.update(start_at:, end_at: 5.days.from_now)
 
         json = get_terms
         expect(json.first["name"]).to eq @term1.name
@@ -118,8 +118,8 @@ describe TermsApiController, type: :request do
       it "orders by id last" do
         start_at = 1.day.ago
         end_at = 5.days.from_now
-        @term1.update(start_at: start_at, end_at: end_at)
-        @term2.update(start_at: start_at, end_at: end_at)
+        @term1.update(start_at:, end_at:)
+        @term2.update(start_at:, end_at:)
 
         json = get_terms
         expect(json.first["name"]).to eq @term1.name
@@ -198,7 +198,7 @@ describe TermsApiController, type: :request do
 
       it "allows account admins without manage_account_settings to view" do
         role = custom_account_role("custom")
-        account_admin_user_with_role_changes(account: @account, role: role)
+        account_admin_user_with_role_changes(account: @account, role:)
         res = get_terms.pluck("name")
         expect(res).to match_array([@term1.name, @term2.name])
       end
@@ -277,7 +277,7 @@ describe TermsApiController, type: :request do
 
       it "allows account admins without manage_account_settings to view" do
         role = custom_account_role("custom")
-        account_admin_user_with_role_changes(account: @account, role: role)
+        account_admin_user_with_role_changes(account: @account, role:)
         res = get_term
         expect(res["id"]).to eq @term.id
       end

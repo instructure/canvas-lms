@@ -22,7 +22,7 @@ require_relative "../spec_helper"
 describe CustomGradebookColumn do
   describe "root account ID" do
     let_once(:root_account) { Account.create! }
-    let_once(:subaccount) { Account.create(root_account: root_account) }
+    let_once(:subaccount) { Account.create(root_account:) }
     let_once(:course) { Course.create!(account: subaccount) }
 
     it "is set to the owning course's root account ID" do

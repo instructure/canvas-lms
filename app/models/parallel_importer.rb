@@ -22,6 +22,7 @@ class ParallelImporter < ActiveRecord::Base
   belongs_to :sis_batch
   belongs_to :attachment
   has_many :sis_batch_errors, inverse_of: :parallel_importer
+  include CaptureJobIds
 
   scope :running, -> { where(workflow_state: "running") }
   scope :completed, -> { where(workflow_state: "completed") }
@@ -39,6 +40,7 @@ class ParallelImporter < ActiveRecord::Base
   end
 
   def start
+    capture_job_id
     if workflow_state == "retry"
       update!(started_at: Time.now.utc)
     else

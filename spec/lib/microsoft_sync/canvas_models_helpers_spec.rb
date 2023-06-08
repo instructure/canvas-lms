@@ -26,8 +26,8 @@ describe MicrosoftSync::CanvasModelsHelpers do
     subject { described_class.max_enrollment_members_reached?(course) }
 
     before do
-      2.times { student_in_course(course: course, active_enrollment: true) }
-      student_in_course(course: course).update! workflow_state: "completed"
+      2.times { student_in_course(course:, active_enrollment: true) }
+      student_in_course(course:).update! workflow_state: "completed"
     end
 
     context "when the max number of members has been surpassed (not including inactive users)" do
@@ -47,8 +47,8 @@ describe MicrosoftSync::CanvasModelsHelpers do
     subject { described_class.max_enrollment_owners_reached?(course) }
 
     before do
-      3.times { teacher_in_course(course: course, active_enrollment: true) }
-      teacher_in_course(course: course).update! workflow_state: "invited"
+      3.times { teacher_in_course(course:, active_enrollment: true) }
+      teacher_in_course(course:).update! workflow_state: "invited"
     end
 
     context "when the max number of owners has been surpassed" do

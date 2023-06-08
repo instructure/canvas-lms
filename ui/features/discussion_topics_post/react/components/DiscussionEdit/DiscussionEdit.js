@@ -41,9 +41,7 @@ const I18n = useI18nScope('discussion_posts')
 export const DiscussionEdit = props => {
   const rceRef = useRef()
   const [rceContent, setRceContent] = useState(false)
-  const [includeReplyPreview, setIncludeReplyPreview] = useState(
-    !!props.quotedEntry?.previewMessage
-  )
+  const [includeQuotedReply, setIncludeQuotedReply] = useState(!!props.quotedEntry?.previewMessage)
   const textAreaId = useRef(`message-body-${nanoid()}`) // for VICE-3279 change `message-body-${nanoid()}` to `message-body-${props.rceIdentifier}`
   const [draftTimeout, setDraftTimeout] = useState(null)
   const [awaitingChanges, setAwaitingChanges] = useState(false)
@@ -118,9 +116,9 @@ export const DiscussionEdit = props => {
               label={I18n.t('Include quoted reply in message')}
               variant="toggle"
               value="medium"
-              checked={includeReplyPreview}
+              checked={includeQuotedReply}
               onChange={() => {
-                setIncludeReplyPreview(!includeReplyPreview)
+                setIncludeQuotedReply(!includeQuotedReply)
               }}
             />
           </View>
@@ -223,7 +221,7 @@ export const DiscussionEdit = props => {
                         )
                         props.onSubmit(
                           rceContent,
-                          includeReplyPreview,
+                          includeQuotedReply ? props.quotedEntry.id : null,
                           attachment,
                           anonymousAuthorState
                         )

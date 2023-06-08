@@ -29,7 +29,7 @@ module Factories
     time = Time.zone.now
     submission = lti_result_submission(li_result_overrides, user, li)
     # If submissionscore was updated, a Lti::Result will already exist
-    li = Lti::Result.find_or_initialize_by(line_item: li, submission: submission, user: user)
+    li = Lti::Result.find_or_initialize_by(line_item: li, submission:, user:)
     li.assign_attributes(
       activity_progress: li_result_overrides.fetch(:activity_progress, "Completed"),
       grading_progress: li_result_overrides.fetch(:grading_progress, "FullyGraded"),
@@ -47,7 +47,7 @@ module Factories
 
   def lti_result_line_item(li_result_overrides, course)
     assignment_opts = {
-      course: course,
+      course:,
       points_possible: li_result_overrides.fetch(:result_maximum, 10),
       submission_types: li_result_overrides[:tool] ? "external_tool" : nil,
       external_tool_tag_attributes: if li_result_overrides[:tool]
@@ -79,8 +79,8 @@ module Factories
   def lti_result_submission(li_result_overrides, user, li)
     return unless li.assignment_line_item?
 
-    submission = li.assignment.submissions.find_by(user: user) ||
-                 graded_submission_model({ assignment: li.assignment, user: user })
+    submission = li.assignment.submissions.find_by(user:) ||
+                 graded_submission_model({ assignment: li.assignment, user: })
     submission.update(score: li_result_overrides[:result_score]) if li_result_overrides[:result_score]
     submission
   end

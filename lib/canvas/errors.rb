@@ -36,8 +36,8 @@ module Canvas
     # lib/canvas/errors/*.rb that need the existing module structure,
     # so method_missing works better at the moment.
     class << self
-      def method_missing(m, *args, &block)
-        CanvasErrors.send(m, *args, &block)
+      def method_missing(m, *args, &)
+        CanvasErrors.send(m, *args, &)
       end
     end
 

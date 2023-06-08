@@ -82,7 +82,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
 
     let(:site_admin_access_token) do
       user.shard.activate do
-        AccessToken.create!(developer_key: site_admin_key, user: user)
+        AccessToken.create!(developer_key: site_admin_key, user:)
       end
     end
 
@@ -101,7 +101,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
   end
 
   context "with local keys" do
-    let!(:local_access_token) { AccessToken.create!(developer_key: local_key, user: user) }
+    let!(:local_access_token) { AccessToken.create!(developer_key: local_key, user:) }
     let!(:local_key) { DeveloperKey.create!(account: root_account) }
 
     let(:root_account) { Account.root_accounts.first }

@@ -91,7 +91,7 @@ module Lti
         data_jwt: [
           {
             attribute: "?data=JWT",
-            type: type,
+            type:,
             message: ERROR_TYPES[type]
           }
         ]

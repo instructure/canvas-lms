@@ -82,7 +82,7 @@ class BrandConfig < ActiveRecord::Base
 
   def self.find_cached_by_md5(shard_id, md5)
     MultiCache.fetch(cache_key_for_md5(shard_id, md5)) do
-      BrandConfig.shard(Shard.lookup(shard_id)).find_by(md5: md5)
+      BrandConfig.shard(Shard.lookup(shard_id)).find_by(md5:)
     end
   end
 
@@ -134,7 +134,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def dup?
-    BrandConfig.where(md5: md5).exists?
+    BrandConfig.where(md5:).exists?
   end
 
   def save_unless_dup!
@@ -248,7 +248,7 @@ class BrandConfig < ActiveRecord::Base
     return unless md5
 
     unused_brand_config = BrandConfig
-                          .where(md5: md5)
+                          .where(md5:)
                           .where.not(Account.where("brand_config_md5=brand_configs.md5").arel.exists)
                           .where.not(SharedBrandConfig.where("brand_config_md5=brand_configs.md5").arel.exists)
                           .first

@@ -124,8 +124,8 @@ module NewCourseSearchPage
     wait_for_ajaximations
   end
 
-  def wait_for_spinner(&block)
-    wait_for_transient_element('svg[role="img"] circle', &block)
+  def wait_for_spinner(&)
+    wait_for_transient_element('svg[role="img"] circle', &)
     wait_for_ajaximations
   end
 end

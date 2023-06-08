@@ -33,7 +33,7 @@ module Factories
 
   def group_assignment_discussion(opts = {})
     course = opts[:course] || course_model(reusable: true)
-    assignment_model(course: course, submission_types: "discussion_topic", title: "Group Assignment Discussion")
+    assignment_model(course:, submission_types: "discussion_topic", title: "Group Assignment Discussion")
 
     @root_topic = DiscussionTopic.where(assignment_id: @assignment).first
     @group_category = course.group_categories.create(name: "Project Group")
@@ -78,8 +78,8 @@ module Factories
   def group_discussion_assignment
     course = @course || course_factory(active_all: true)
     group_category = course.group_categories.create!(name: "category")
-    @group1 = course.groups.create!(name: "group 1", group_category: group_category)
-    @group2 = course.groups.create!(name: "group 2", group_category: group_category)
+    @group1 = course.groups.create!(name: "group 1", group_category:)
+    @group2 = course.groups.create!(name: "group 2", group_category:)
 
     @topic = course.discussion_topics.build(title: "topic")
     @topic.group_category = group_category
@@ -95,9 +95,9 @@ module Factories
   def group_discussion_with_deleted_group
     course = @course || course_factory(active_all: true)
     group_category = course.group_categories.create!(name: "category")
-    @group1 = course.groups.create!(name: "group 1", group_category: group_category)
-    @group2 = course.groups.create!(name: "group 2", group_category: group_category)
-    @group3 = course.groups.create!(name: "group 3", group_category: group_category)
+    @group1 = course.groups.create!(name: "group 1", group_category:)
+    @group2 = course.groups.create!(name: "group 2", group_category:)
+    @group3 = course.groups.create!(name: "group 3", group_category:)
 
     @topic = course.discussion_topics.build(title: "topic")
     @topic.group_category = group_category

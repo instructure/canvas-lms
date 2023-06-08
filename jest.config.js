@@ -37,6 +37,7 @@ module.exports = {
     'decimal.js/decimal.mjs': 'decimal.js/decimal.js',
     // https://github.com/ai/nanoid/issues/363
     '^nanoid(/(.*)|$)': 'nanoid$1',
+    '\\.(css)$': '<rootDir>/jest/styleMock.js',
   },
   roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],

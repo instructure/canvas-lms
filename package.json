@@ -38,6 +38,7 @@
     "@instructure/ui-calendar": "^7",
     "@instructure/ui-checkbox": "^7",
     "@instructure/ui-date-input": "^7",
+    "@instructure/ui-date-time-input": "8",
     "@instructure/ui-decorator": "^7",
     "@instructure/ui-drawer-layout": "7",
     "@instructure/ui-editable": "^7",

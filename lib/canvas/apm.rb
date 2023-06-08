@@ -124,7 +124,7 @@ module Canvas
           # to make sure we don't analyze _everything_
           # which would be very expensive
           c.analytics_enabled = analytics_enabled?
-          c.tracer sampler: sampler, debug: debug_mode
+          c.tracer sampler:, debug: debug_mode
           c.use :aws
           c.use :faraday
           c.use :graphql
@@ -182,11 +182,11 @@ module Canvas
       #
       # see available "Options" to be passed on here:
       # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
-      def trace(resource_name, opts = {}, &block)
+      def trace(resource_name, opts = {}, &)
         opts[:service] = opts.fetch(:service, "canvas_custom")
         opts[:resource] = resource_name
         opts[:span_type] = opts.fetch(:span_type, "canvas_ruby")
-        tracer.trace("application.code", opts, &block)
+        tracer.trace("application.code", opts, &)
       end
     end
   end

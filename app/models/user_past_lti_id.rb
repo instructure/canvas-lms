@@ -67,7 +67,7 @@ class UserPastLtiId < ActiveRecord::Base
   def self.uuid_for_user_in_context(user, context)
     if user && context
       context.shard.activate do
-        user.past_lti_ids.where(context: context).take&.user_uuid || user.uuid
+        user.past_lti_ids.where(context:).take&.user_uuid || user.uuid
       end
     else
       user.uuid

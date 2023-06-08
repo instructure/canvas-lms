@@ -123,7 +123,7 @@ describe "account" do
 
   describe "user details view" do
     def create_sub_account(name = "sub_account", parent_account = Account.default)
-      Account.create(name: name, parent_account: parent_account)
+      Account.create(name:, parent_account:)
     end
 
     it "is able to view user details from parent account" do

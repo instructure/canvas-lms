@@ -87,7 +87,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   end
 
   def self.user_ids_without_mappings(user_ids, root_account_id)
-    existing_mappings = where(root_account_id: root_account_id, user_id: user_ids)
+    existing_mappings = where(root_account_id:, user_id: user_ids)
     user_ids - existing_mappings.pluck(:user_id)
   end
 
@@ -114,8 +114,8 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
         root_account_id: root_account.id,
         created_at: now,
         updated_at: now,
-        user_id: user_id,
-        aad_id: aad_id,
+        user_id:,
+        aad_id:,
         needs_updating: false
       }
     end
@@ -180,7 +180,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
                       acct.settings[:microsoft_sync_login_attribute] == "email"
 
           GuardRail.activate(:primary) do
-            where(user: user, root_account: acct)
+            where(user:, root_account: acct)
               .update_all(updated_at: Time.now, needs_updating: true)
           end
         end
@@ -190,7 +190,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   def self.delete_if_needs_updating(root_account_id, user_ids)
     user_ids.each_slice(1000) do |batch|
-      where(root_account_id: root_account_id, user_id: batch, needs_updating: true).delete_all
+      where(root_account_id:, user_id: batch, needs_updating: true).delete_all
     end
   end
 end

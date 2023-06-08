@@ -440,7 +440,7 @@ describe LiveEventsObserver do
           title: "content",
           context: course,
           tag_type: "context_module",
-          context_module: context_module
+          context_module:
         )
       end
 
@@ -450,7 +450,7 @@ describe LiveEventsObserver do
           title: "content",
           context: course,
           tag_type: "context_module",
-          context_module: context_module
+          context_module:
         )
         expect(Canvas::LiveEvents).to receive(:module_item_updated).with(content_tag)
         content_tag.update_attribute(:position, 11)
@@ -492,7 +492,7 @@ describe LiveEventsObserver do
           title: "content",
           context: course,
           tag_type: "learning_outcome",
-          context_module: context_module
+          context_module:
         )
         content_tag.update_attribute(:position, 11)
       end
@@ -621,7 +621,7 @@ describe LiveEventsObserver do
     it "posts update events when the migration completes" do
       course_model
       master_template = MasterCourses::MasterTemplate.create!(course: @course)
-      master_migration = MasterCourses::MasterMigration.create!(master_template: master_template)
+      master_migration = MasterCourses::MasterMigration.create!(master_template:)
       expect(Canvas::LiveEvents).to receive(:master_migration_completed).once
       master_migration.update(workflow_state: "completed")
     end
@@ -629,7 +629,7 @@ describe LiveEventsObserver do
     it "does not post update events when the migration updates for other reasons" do
       course_model
       master_template = MasterCourses::MasterTemplate.create!(course: @course)
-      master_migration = MasterCourses::MasterMigration.create!(master_template: master_template)
+      master_migration = MasterCourses::MasterMigration.create!(master_template:)
       expect(Canvas::LiveEvents).not_to receive(:master_migration_completed)
       master_migration.update(workflow_state: "exports_failed")
     end

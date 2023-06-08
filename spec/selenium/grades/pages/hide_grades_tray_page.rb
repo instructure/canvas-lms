@@ -57,7 +57,7 @@ module HideGradesTray
 
   def self.select_section(section_name)
     specific_sections_toggle.click
-    section_checkbox(section_name: section_name).click
+    section_checkbox(section_name:).click
   end
 
   def self.hide_grades

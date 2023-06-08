@@ -487,6 +487,12 @@ td.center-text {
   }
 }
 
+.disabled-warning {
+  &:not(.shown) {
+    display: none;
+  }
+}
+
 #csp_options {
   margin-top: 10px;
 }

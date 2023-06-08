@@ -93,7 +93,8 @@ describe SIS::CSV::XlistImporter do
         "C002,S001,active"
       )
       expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id)).to eq [Account.where(sis_source_id: "A004").first.id, @account.id]
-      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, Account.where(sis_source_id: "A004").first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts(include_crosslisted_courses: false).map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts(include_crosslisted_courses: true).map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, Account.where(sis_source_id: "A004").first.id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,deleted"

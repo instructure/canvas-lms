@@ -712,10 +712,12 @@ export default AssignmentListItemView = (function () {
         if (json.restrict_quantitative_data && gradingType !== 'pass_fail') {
           gradingType = 'letter_grade'
 
-          if (json.pointsPossible === 0 && json.submission.score <= 0) {
-            grade = null
+          if (json.pointsPossible === 0 && json.submission.score < 0) {
+            grade = json.submission.score
           } else if (json.pointsPossible === 0 && json.submission.score > 0) {
             grade = scoreToGrade(100, ENV.grading_scheme)
+          } else if (json.pointsPossible === 0 && json.submission.score === 0) {
+            grade = 'complete'
           } else {
             grade = scoreToGrade(
               scoreToPercentage(json.submission.score, json.pointsPossible),

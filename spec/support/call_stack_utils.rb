@@ -29,7 +29,7 @@ module CallStackUtils
     super exception.class, exception.message, exception.backtrace
   end
 
-  APP_IGNORE_REGEX = %r{/spec/(support|selenium/test_setup/)}.freeze
+  APP_IGNORE_REGEX = %r{/spec/(support|selenium/test_setup/)}
   def self.prune_backtrace!(bt)
     line_regex = RSpec.configuration.in_project_source_dir_regex
     # remove things until we get to the frd error cause

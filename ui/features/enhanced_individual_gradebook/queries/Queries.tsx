@@ -28,6 +28,13 @@ export const GRADEBOOK_QUERY = gql`
             name
             sortableName
           }
+          courseSectionId
+        }
+      }
+      sectionsConnection {
+        nodes {
+          id: _id
+          name
         }
       }
       submissionsConnection {
@@ -54,11 +61,11 @@ export const GRADEBOOK_QUERY = gql`
               anonymizeStudents
               gradingType
               id: _id
-              muted
               name
               omitFromFinalGrade
               pointsPossible
               submissionTypes
+              dueAt
             }
           }
         }
@@ -73,7 +80,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
       usersConnection(
         filter: {
           enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
-          enrollmentStates: active
+          enrollmentStates: [active, invited]
           userIds: $userIds
         }
       ) {
@@ -95,7 +102,10 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           name
         }
       }
-      submissionsConnection(studentIds: $userIds) {
+      submissionsConnection(
+        studentIds: $userIds
+        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+      ) {
         nodes {
           grade
           id: _id
@@ -107,6 +117,10 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           state
           proxySubmitter
           excused
+          late
+          latePolicyStatus
+          missing
+          userId
         }
       }
     }

@@ -50,7 +50,7 @@ describe AssessmentRequest do
       @notification_name = "Peer Review Invitation"
       notification = Notification.create!(name: @notification_name, category: "Invitation")
       NotificationPolicy.create!(
-        notification: notification,
+        notification:,
         communication_channel: @student.communication_channel,
         frequency: "immediately"
       )
@@ -84,7 +84,7 @@ describe AssessmentRequest do
       @notification_name = "Rubric Assessment Submission Reminder"
       notification = Notification.create!(name: @notification_name, category: "Invitation")
       NotificationPolicy.create!(
-        notification: notification,
+        notification:,
         communication_channel: @student.communication_channel,
         frequency: "immediately"
       )

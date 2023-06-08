@@ -46,7 +46,7 @@ module IncomingMail
         Rails.cache.fetch(["incoming_mail_reply_from", context, incoming_message.message_id].cache_key, expires_in: 7.days) do
           context.reply_from({
                                purpose: "general",
-                               user: user,
+                               user:,
                                subject: IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
                                html: html_body,
                                text: body
@@ -107,7 +107,7 @@ module IncomingMail
       ndr_body = case error
                  when IncomingMail::Errors::ReplyToDeletedDiscussion
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.reply_to_deleted_discussion")
-                   I18n.t(<<~TEXT, subject: subject).gsub(/^ +/, "")
+                   I18n.t(<<~TEXT, subject:).gsub(/^ +/, "")
                      The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,
@@ -115,7 +115,7 @@ module IncomingMail
                    TEXT
                  when IncomingMail::Errors::ReplyToLockedTopic
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.reply_to_locked_topic")
-                   I18n.t("lib.incoming_message_processor.locked_topic.body", <<~TEXT, subject: subject).gsub(/^ +/, "")
+                   I18n.t("lib.incoming_message_processor.locked_topic.body", <<~TEXT, subject:).gsub(/^ +/, "")
                      The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,
@@ -123,7 +123,7 @@ module IncomingMail
                    TEXT
                  when IncomingMail::Errors::UnknownSender
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.unknown_sender")
-                   I18n.t(<<~TEXT, subject: subject, link: I18n.t(:"community.guides_home")).gsub(/^ +/, "")
+                   I18n.t(<<~TEXT, subject:, link: I18n.t(:"community.guides_home")).gsub(/^ +/, "")
                      The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}].
 
                      Thank you,
@@ -131,7 +131,7 @@ module IncomingMail
                    TEXT
                  when IncomingMail::Errors::UserSuspended
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.user_suspended")
-                   I18n.t(<<~TEXT, subject: subject).gsub(/^ +/, "")
+                   I18n.t(<<~TEXT, subject:).gsub(/^ +/, "")
                      The message you sent with the subject line "%{subject}" was not delivered because your account has been suspended.
 
                      Thank you,
@@ -141,7 +141,7 @@ module IncomingMail
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.catch_all")
                    error_info = { tags: { type: :message_processing_error_catch_all }, ref: get_ref_uuid }
                    Canvas::Errors.capture(error, error_info, :error)
-                   I18n.t("lib.incoming_message_processor.failure_message.body", <<~TEXT, subject: subject, ref: error_info[:ref]).gsub(/^ +/, "")
+                   I18n.t("lib.incoming_message_processor.failure_message.body", <<~TEXT, subject:, ref: error_info[:ref]).gsub(/^ +/, "")
                      The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,

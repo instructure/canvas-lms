@@ -346,7 +346,7 @@ describe NotificationPolicy do
       notification = Notification.create!(name: "Panda Express", subject: "Test", category: "Whatever")
 
       NotificationPolicy.create(notification: course_type_notification, communication_channel: channel, frequency: "immediately")
-      NotificationPolicy.create(notification: notification, communication_channel: channel, frequency: "daily")
+      NotificationPolicy.create(notification:, communication_channel: channel, frequency: "daily")
       NotificationPolicy.create(communication_channel: channel, frequency: "daily")
 
       policies = NotificationPolicy.find_all_for(channel, context_type: "Course")

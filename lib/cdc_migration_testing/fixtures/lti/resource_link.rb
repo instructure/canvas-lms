@@ -25,14 +25,14 @@ module CdcFixtures
 
     Lti::ResourceLink.new(
       id: 1,
-      resource_link_uuid: resource_link_uuid,
+      resource_link_uuid:,
       context_external_tool_id: 1,
       workflow_state: "active",
       root_account_id: 1,
       context_id: 1,
       context_type: "Course",
       custom: {},
-      lookup_uuid: lookup_uuid
+      lookup_uuid:
     )
   end
 end

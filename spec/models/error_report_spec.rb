@@ -24,7 +24,7 @@ describe ErrorReport do
       message = "he" +
                 255.chr +
                 "llo"
-      data = { extra: { message: message } }
+      data = { extra: { message: } }
       expect { described_class.log_exception_from_canvas_errors("my error", data) }
         .to_not raise_error
     end

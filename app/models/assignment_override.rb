@@ -103,8 +103,8 @@ class AssignmentOverride < ActiveRecord::Base
     course = assignment&.context || quiz&.context || quiz&.assignment&.context
     return true unless course&.grading_periods?
 
-    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_before_last_save, course: course)
-    grading_period = GradingPeriod.for_date_in_course(date: due_at, course: course)
+    grading_period_was = GradingPeriod.for_date_in_course(date: due_at_before_last_save, course:)
+    grading_period = GradingPeriod.for_date_in_course(date: due_at, course:)
     return true if grading_period_was&.id == grading_period&.id
 
     students = applies_to_students.map(&:id)
@@ -161,8 +161,8 @@ class AssignmentOverride < ActiveRecord::Base
         context_type: self.class.name,
         context_id: id,
         alert_type: :due_date_reminder,
-        due_at: due_at,
-        root_account_id: root_account_id
+        due_at:,
+        root_account_id:
       )
     end
   end
@@ -277,7 +277,7 @@ class AssignmentOverride < ActiveRecord::Base
   def self.preload_for_nonactive_enrollment(section_overrides, course, user)
     return section_overrides if user.blank? || section_overrides.empty?
 
-    enrollment_state_by_section_id = course.enrollments.where(user: user).pluck(:course_section_id, :workflow_state).to_h
+    enrollment_state_by_section_id = course.enrollments.where(user:).pluck(:course_section_id, :workflow_state).to_h
     section_overrides.each do |override|
       next unless override.set_type == "CourseSection"
 
@@ -359,15 +359,15 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def as_hash
-    { title: title,
-      due_at: due_at,
-      id: id,
-      all_day: all_day,
-      set_type: set_type,
-      set_id: set_id,
-      all_day_date: all_day_date,
-      lock_at: lock_at,
-      unlock_at: unlock_at,
+    { title:,
+      due_at:,
+      id:,
+      all_day:,
+      set_type:,
+      set_id:,
+      all_day_date:,
+      lock_at:,
+      unlock_at:,
       override: self }
   end
 

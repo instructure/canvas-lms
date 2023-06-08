@@ -83,7 +83,7 @@ describe "Announcements API", type: :request do
       json = api_call_as_user @teacher,
                               :get,
                               "/api/v1/announcements",
-                              @params.merge(context_codes: context_codes),
+                              @params.merge(context_codes:),
                               {},
                               {},
                               { expected_status: 200 }
@@ -106,8 +106,8 @@ describe "Announcements API", type: :request do
                               :get,
                               "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                            start_date: start_date,
-                                            end_date: end_date))
+                                            start_date:,
+                                            end_date:))
 
       all_anns = @anns.map { |e| [e["context_code"], e["id"]] }
       all_anns.push(["course_#{@course1.id}", @ann1.id], ["course_#{@course2.id}", @ann2.id])
@@ -122,8 +122,8 @@ describe "Announcements API", type: :request do
                        :get,
                        "/api/v1/announcements",
                        @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                     start_date: start_date,
-                                     end_date: end_date),
+                                     start_date:,
+                                     end_date:),
                        {},
                        {},
                        { expected_status: 400 })
@@ -135,8 +135,8 @@ describe "Announcements API", type: :request do
                               :get,
                               "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                            start_date: start_date,
-                                            end_date: end_date))
+                                            start_date:,
+                                            end_date:))
       expect(json.pluck("id")).to eq [@ann2.id]
     end
 
@@ -147,8 +147,8 @@ describe "Announcements API", type: :request do
                               :get,
                               "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                            start_date: start_date,
-                                            end_date: end_date,
+                                            start_date:,
+                                            end_date:,
                                             per_page: 1))
       expect(json.length).to eq 1
       next_link = response.headers["Link"].split(",").detect { |link| link.include?('rel="next"') }
@@ -174,8 +174,8 @@ describe "Announcements API", type: :request do
                                 :get,
                                 "/api/v1/announcements",
                                 @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                              start_date: start_date,
-                                              end_date: end_date,
+                                              start_date:,
+                                              end_date:,
                                               active_only: true))
         expect(json.length).to eq 6
         expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
@@ -190,8 +190,8 @@ describe "Announcements API", type: :request do
                                 :get,
                                 "/api/v1/announcements",
                                 @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                              start_date: start_date,
-                                              end_date: end_date,
+                                              start_date:,
+                                              end_date:,
                                               active_only: true))
         expect(json.length).to eq 6
         expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
@@ -204,8 +204,8 @@ describe "Announcements API", type: :request do
                                 :get,
                                 "/api/v1/announcements",
                                 @params.merge(context_codes: ["course_#{@course2.id}"],
-                                              start_date: start_date,
-                                              end_date: end_date,
+                                              start_date:,
+                                              end_date:,
                                               active_only: true))
         expect(json).to be_empty
       end
@@ -277,8 +277,8 @@ describe "Announcements API", type: :request do
                               :get,
                               "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                            start_date: start_date,
-                                            end_date: end_date))
+                                            start_date:,
+                                            end_date:))
       expect(json.length).to eq 6
       expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
     end
@@ -291,8 +291,8 @@ describe "Announcements API", type: :request do
                               :get,
                               "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                            start_date: start_date,
-                                            end_date: end_date))
+                                            start_date:,
+                                            end_date:))
       expect(json.length).to eq 6
       expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
     end
@@ -306,8 +306,8 @@ describe "Announcements API", type: :request do
                               :get,
                               "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
-                                            start_date: start_date,
-                                            end_date: end_date))
+                                            start_date:,
+                                            end_date:))
       expect(json.length).to eq 6
       expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
     end
@@ -319,8 +319,8 @@ describe "Announcements API", type: :request do
                               :get,
                               "/api/v1/announcements",
                               @params.merge(context_codes: ["course_#{@course2.id}"],
-                                            start_date: start_date,
-                                            end_date: end_date))
+                                            start_date:,
+                                            end_date:))
       expect(json).to be_empty
     end
   end

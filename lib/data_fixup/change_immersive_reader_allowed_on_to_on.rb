@@ -21,7 +21,7 @@ module DataFixup::ChangeImmersiveReaderAllowedOnToOn
   def self.run
     # Site Admin has the flag as STATE_DEFAULT_OFF, but just in case, ignore it here.
     root_accounts_scope = if Shard.current.default?
-                            Account.root_accounts.active.where.not(id: Account.site_admin.id)
+                            Account.root_accounts.active.where.not(id: Account.site_admin&.id)
                           else
                             Account.root_accounts.active
                           end

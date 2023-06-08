@@ -196,6 +196,6 @@ class DeveloperKeysController < ApplicationController
 
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
-    InstStatsd::Statsd.increment("canvas.developer_keys_controller.request_error", tags: { action: action_name, code: code })
+    InstStatsd::Statsd.increment("canvas.developer_keys_controller.request_error", tags: { action: action_name, code: })
   end
 end

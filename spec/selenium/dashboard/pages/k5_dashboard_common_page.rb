@@ -58,20 +58,20 @@ module K5DashboardCommonPageObject
   def create_assignment(course, assignment_title, description, points_possible)
     course.assignments.create!(
       title: assignment_title,
-      description: description,
-      points_possible: points_possible,
+      description:,
+      points_possible:,
       submission_types: "online_text_entry",
       workflow_state: "published"
     )
   end
 
   def create_calendar_event(course, calendar_event_title, start_at)
-    course.calendar_events.create!(title: calendar_event_title, start_at: start_at)
+    course.calendar_events.create!(title: calendar_event_title, start_at:)
   end
 
   def create_course_module(workflow_state = "active")
     @module_title = "Course Module"
-    @course_module = @subject_course.context_modules.create!(name: @module_title, workflow_state: workflow_state)
+    @course_module = @subject_course.context_modules.create!(name: @module_title, workflow_state:)
     @module_assignment_title = "General Assignment"
     assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
     @course_module.add_item(id: assignment.id, type: "assignment")
@@ -81,7 +81,7 @@ module K5DashboardCommonPageObject
     course.assignments.create!(
       title: assignment_title,
       grading_type: "points",
-      points_possible: points_possible,
+      points_possible:,
       due_at: assignment_due_at,
       submission_types: "online_text_entry"
     )
@@ -144,7 +144,7 @@ module K5DashboardCommonPageObject
   end
 
   def new_announcement(course, title, message)
-    course.announcements.create!(title: title, message: message)
+    course.announcements.create!(title:, message:)
   end
 
   def student_setup

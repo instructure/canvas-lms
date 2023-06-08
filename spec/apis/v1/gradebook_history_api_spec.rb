@@ -82,7 +82,7 @@ describe GradebookHistoryApiController, type: :request do
                                 action: "day_details",
                                 format: "json",
                                 course_id: @course.id.to_s,
-                                date: date
+                                date:
                               })
 
       expect(json.first["name"]).to eq "Grader"

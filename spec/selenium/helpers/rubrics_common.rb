@@ -47,14 +47,14 @@ module RubricsCommon
 
   def assignment_with_rubric(points, title = "new rubric")
     @assignment = create_assignment_with_points(points)
-    rubric_model(title: title,
+    rubric_model(title:,
                  data:
                                         [{
                                           description: "Some criterion",
-                                          points: points,
+                                          points:,
                                           id: "crit1",
                                           ratings:
-                                                 [{ description: "Good", points: points, id: "rat1", criterion_id: "crit1" }]
+                                                 [{ description: "Good", points:, id: "rat1", criterion_id: "crit1" }]
                                         }],
                  description: "new rubric description")
     @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: false)
@@ -64,16 +64,16 @@ module RubricsCommon
     @assignment = create_assignment_with_points(points)
     @rubric = @course.rubrics.build
     rubric_params = {
-      title: title,
+      title:,
       hide_score_total: false,
       criteria: {
         "0" => {
-          points: points,
+          points:,
           description: "no outcome row",
           long_description: "non outcome criterion",
           ratings: {
             "0" => {
-              points: points,
+              points:,
               description: "Amazing",
             },
             "1" => {

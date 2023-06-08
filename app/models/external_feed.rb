@@ -50,7 +50,7 @@ class ExternalFeed < ActiveRecord::Base
 
   def display_name(short = true)
     short_url = (url || "").split("/")[0, 3].join("/")
-    title || (short ? t(:short_feed_title, "%{short_url} feed", short_url: short_url) : url)
+    title || (short ? t(:short_feed_title, "%{short_url} feed", short_url:) : url)
   end
 
   def header_match=(str)
@@ -106,7 +106,7 @@ class ExternalFeed < ActiveRecord::Base
       end
       uuid ||= Digest::SHA256.hexdigest("#{item.title}#{item.date.strftime("%Y-%m-%d")}")
 
-      entry = external_feed_entries.where(uuid: uuid).first
+      entry = external_feed_entries.where(uuid:).first
       entry ||= external_feed_entries.where(url: item.link).first
       description = entry&.message
       if description.blank?
@@ -133,14 +133,14 @@ class ExternalFeed < ActiveRecord::Base
         source_name: feed.channel.title,
         source_url: feed.channel.link,
         posted_at: Time.parse(date.to_s),
-        user: user,
+        user:,
         url: item.link,
-        uuid: uuid
+        uuid:
       )
       return entry if entry.save
     when :atom
       uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime("%Y-%m-%d")}")
-      entry = external_feed_entries.where(uuid: uuid).first
+      entry = external_feed_entries.where(uuid:).first
       entry ||= external_feed_entries.where(url: item.links.alternate.to_s).first
       author = item.authors.first || OpenObject.new
       description = entry&.message
@@ -171,11 +171,11 @@ class ExternalFeed < ActiveRecord::Base
         source_url: feed.links.alternate.to_s,
         posted_at: item.published,
         url: item.links.alternate.to_s,
-        user: user,
+        user:,
         author_name: author.name,
         author_url: author.uri,
         author_email: author.email,
-        uuid: uuid
+        uuid:
       )
       return entry if entry.save
     end

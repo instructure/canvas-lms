@@ -699,7 +699,7 @@ class CoursesController < ApplicationController
     target_user = api_find(@context.users, params[:user_id])
     if @context.grants_right?(@current_user, session, :view_all_grades) || target_user.grants_right?(@current_user, session, :read)
       json = CourseProgress.new(@context, target_user, read_only: true).to_json
-      render json: json, status: json.key?(:error) ? :bad_request : :ok
+      render json:, status: json.key?(:error) ? :bad_request : :ok
     else
       render_unauthorized_action
     end
@@ -1261,7 +1261,7 @@ class CoursesController < ApplicationController
     scope.joins(enrollments: :course)
          .merge(Enrollment.active.of_admin_type)
          .merge(Course.active)
-         .where(courses: { root_account_id: root_account_id })
+         .where(courses: { root_account_id: })
   end
 
   def name_scope(scope)
@@ -2053,7 +2053,7 @@ class CoursesController < ApplicationController
 
     if session[:claimed_course_uuids].include?(@context.uuid)
       session[:claimed_enrollment_uuids].each do |uuid|
-        e = @context.enrollments.where(uuid: uuid).first
+        e = @context.enrollments.where(uuid:).first
         @pending_teacher = e.user if e
       end
     end
@@ -2268,11 +2268,13 @@ class CoursesController < ApplicationController
           set_js_assignment_data
           js_env(SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context))
           js_env(
+            SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
             QUIZ_LTI_ENABLED: @context.feature_enabled?(:quizzes_next) &&
               !@context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
               @context.quiz_lti_tool.present?,
             FLAGS: {
               newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
+              show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
             }
           )
           js_env(COURSE_HOME: true)
@@ -2380,7 +2382,7 @@ class CoursesController < ApplicationController
               read_announcements: @context.grants_right?(@current_user, session, :read_announcements)
             },
             STUDENT_PLANNER_ENABLED: planner_enabled?,
-            TABS: @context.tabs_available(@current_user, course_subject_tabs: true, session: session),
+            TABS: @context.tabs_available(@current_user, course_subject_tabs: true, session:),
             OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
             TAB_CONTENT_ONLY: embed_mode,
             SHOW_IMMERSIVE_READER: show_immersive_reader?,
@@ -2595,7 +2597,7 @@ class CoursesController < ApplicationController
               "role_id" => e.role_id,
               "already_enrolled" => e.already_enrolled } }
         end
-        render json: json
+        render json:
       else
         render json: "", status: :bad_request
       end
@@ -3231,6 +3233,16 @@ class CoursesController < ApplicationController
         visibility_configuration(params[:course])
       end
 
+      if params[:course][:homeroom_course].present? && value_to_boolean(params[:course][:homeroom_course]) && @course.enable_course_paces
+        homeroom_message = t("Homeroom Course cannot be used with Course Pacing")
+        @course.errors.add(:homeroom_course, homeroom_message)
+      end
+
+      if params[:course][:enable_course_paces].present? && value_to_boolean(params[:course][:enable_course_paces]) && @course.homeroom_course
+        pacing_message = t("Course Pacing cannot be used with Homeroom Course")
+        @course.errors.add(:enable_course_paces, pacing_message)
+      end
+
       changes = changed_settings(@course.changes, @course.settings, old_settings)
       changes.delete(:start_at) if changes.dig(:start_at, 0)&.to_s == changes.dig(:start_at, 1)&.to_s
       changes.delete(:conclude_at) if changes.dig(:conclude_at, 0)&.to_s == changes.dig(:conclude_at, 1)&.to_s
@@ -3828,7 +3840,7 @@ class CoursesController < ApplicationController
 
   def retrieve_observed_enrollments(enrollments, active_by_date: false)
     observer_enrolls = enrollments.select(&:assigned_observer?)
-    ObserverEnrollment.observed_enrollments_for_enrollments(observer_enrolls, active_by_date: active_by_date)
+    ObserverEnrollment.observed_enrollments_for_enrollments(observer_enrolls, active_by_date:)
   end
 
   def courses_for_user(user, paginate_url: api_v1_courses_url)
@@ -3958,7 +3970,7 @@ class CoursesController < ApplicationController
 
     ActiveRecord::Associations.preload(enrollments, preloads) unless preloads.empty?
     if includes.include?("course_progress")
-      progressions = ContextModuleProgression.joins(:context_module).where(user: user, context_modules: { course: courses }).select("context_module_progressions.*, context_modules.context_id AS course_id").to_a.group_by { |cmp| cmp["course_id"] }
+      progressions = ContextModuleProgression.joins(:context_module).where(user:, context_modules: { course: courses }).select("context_module_progressions.*, context_modules.context_id AS course_id").to_a.group_by { |cmp| cmp["course_id"] }
     end
 
     permissions_to_precalculate = [:read_sis, :manage_sis]

@@ -88,7 +88,7 @@ class ServicesApiController < ApplicationController
       ks: res,
       subp_id: CanvasKaltura::ClientV3.config["subpartner_id"],
       partner_id: CanvasKaltura::ClientV3.config["partner_id"],
-      uid: uid,
+      uid:,
       serverTime: Time.zone.now.to_i
     }
     if value_to_boolean(params[:include_upload_config])

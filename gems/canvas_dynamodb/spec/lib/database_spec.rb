@@ -38,7 +38,7 @@ describe CanvasDynamoDB::Database do
   let(:db) do
     fingerprint = "asdf"
     prefix = "sdfa"
-    CanvasDynamoDB::Database.new(fingerprint, prefix: prefix, client_opts: {}, logger: logger_cls.new)
+    CanvasDynamoDB::Database.new(fingerprint, prefix:, client_opts: {}, logger: logger_cls.new)
   end
 
   describe "#get_item" do

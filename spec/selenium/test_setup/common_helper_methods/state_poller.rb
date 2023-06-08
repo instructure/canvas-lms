@@ -35,7 +35,7 @@ module StatePoller
         wait = next_wait(wait)
       end
       spent = f3(Time.now.to_f - start)
-      { got: got, spent: spent }
+      { got:, spent: }
     end
 
     private

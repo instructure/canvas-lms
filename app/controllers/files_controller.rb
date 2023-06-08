@@ -426,8 +426,8 @@ class FilesController < ApplicationController
             manage_files_edit: context.grants_right?(@current_user, session, :manage_files_edit),
             manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
           },
-          file_menu_tools: file_menu_tools,
-          file_index_menu_tools: file_index_menu_tools
+          file_menu_tools:,
+          file_index_menu_tools:
         }
       end
 
@@ -551,7 +551,7 @@ class FilesController < ApplicationController
       json.merge!(
         doc_preview_json(@attachment, locked_for_user: json[:locked_for_user])
       )
-      render json: json
+      render json:
     end
   end
 
@@ -718,7 +718,7 @@ class FilesController < ApplicationController
             # so we know the user session has been set there and relative files from the html will work
             query = URI.parse(request.url).query
             return_url = request.url + (query.present? ? "&" : "?") + "fd_cookie_set=1"
-            redirect_to safe_domain_file_url(attachment, return_url: return_url)
+            redirect_to safe_domain_file_url(attachment, return_url:)
           else
             render :show
           end
@@ -770,7 +770,7 @@ class FilesController < ApplicationController
           log_asset_access(attachment, "files", "files")
         end
 
-        render json: json
+        render json:
       end
     end
   end
@@ -826,7 +826,7 @@ class FilesController < ApplicationController
 
       stream = @attachment.open
       json = { body: stream.read.force_encoding(Encoding::ASCII_8BIT) }
-      render json: json
+      render json:
     end
   end
 
@@ -862,9 +862,9 @@ class FilesController < ApplicationController
     end
 
     render_or_redirect_to_stored_file(
-      attachment: attachment,
+      attachment:,
       verifier: params[:verifier],
-      inline: inline
+      inline:
     )
   end
   protected :send_stored_file
@@ -1172,7 +1172,7 @@ class FilesController < ApplicationController
 
     # render as_text for IE, otherwise it'll prompt
     # to download the JSON response
-    render json: json, as_text: in_app?
+    render json:, as_text: in_app?
   end
 
   def api_file_status
@@ -1222,7 +1222,7 @@ class FilesController < ApplicationController
           @attachment.move_to_bottom if @folder_id_changed
           flash[:notice] = t "notices.updated", "File was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_files_url) }
-          format.json { render json: @attachment.as_json(methods: %i[readable_size mime_class currently_locked], permissions: { user: @current_user, session: session }), status: :ok }
+          format.json { render json: @attachment.as_json(methods: %i[readable_size mime_class currently_locked], permissions: { user: @current_user, session: }), status: :ok }
         else
           format.html { render :edit }
           format.json { render json: @attachment.errors, status: :bad_request }
@@ -1319,7 +1319,7 @@ class FilesController < ApplicationController
       @folders.first&.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
       @folder.reload
-      render json: @folder.subcontent.map { |f| f.as_json(methods: :readable_size, permissions: { user: @current_user, session: session }) }
+      render json: @folder.subcontent.map { |f| f.as_json(methods: :readable_size, permissions: { user: @current_user, session: }) }
     end
   end
 

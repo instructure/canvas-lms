@@ -498,9 +498,9 @@ describe "submissions/show" do
             )
           end
           let(:moderated_submission) { moderated_assignment.submission_for_student(student) }
-          let(:first_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
+          let(:first_ta) { course_with_user("TaEnrollment", course:, active_all: true).user }
           let(:second_ta) do
-            course_with_user("TaEnrollment", course: course, active_all: true).user
+            course_with_user("TaEnrollment", course:, active_all: true).user
           end
 
           before do
@@ -708,7 +708,7 @@ describe "submissions/show" do
     it "does not show assessment instructions when the assignment has a rubric" do
       rubric_association =
         rubric_association_model(association_object: assignment, purpose: "grading")
-      assessment_request.update!(rubric_association: rubric_association)
+      assessment_request.update!(rubric_association:)
 
       render "submissions/show"
       html = Nokogiri::HTML5.fragment(response.body)

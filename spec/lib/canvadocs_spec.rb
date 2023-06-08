@@ -47,7 +47,7 @@ describe Canvadocs do
     end
 
     context "when passed an attachment" do
-      let(:session_params) { Canvadocs.user_session_params(@current_user, attachment: attachment) }
+      let(:session_params) { Canvadocs.user_session_params(@current_user, attachment:) }
 
       # We don't really want this behaviour long term, but that's the
       # difference between sending an attachment and sending in the
@@ -392,7 +392,7 @@ describe Canvadocs do
           end
 
           before do
-            assignment.update!(moderated_grading: true, final_grader: final_grader, grader_count: 1)
+            assignment.update!(moderated_grading: true, final_grader:, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
             course.enroll_ta(provisional_grader).accept(true)
             assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
@@ -523,7 +523,7 @@ describe Canvadocs do
     end
 
     context "when passed a submission" do
-      let(:session_params) { Canvadocs.user_session_params(@current_user, submission: submission) }
+      let(:session_params) { Canvadocs.user_session_params(@current_user, submission:) }
 
       describe "parameters describing the current user" do
         it "includes the short name of the current user with commas removed" do
@@ -687,7 +687,7 @@ describe Canvadocs do
           end
 
           before do
-            assignment.update!(moderated_grading: true, final_grader: final_grader, grader_count: 1)
+            assignment.update!(moderated_grading: true, final_grader:, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: "qqqqq")
             course.enroll_ta(provisional_grader).accept(true)
             assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: "wwwww")
@@ -839,7 +839,7 @@ describe Canvadocs do
               Timecop.freeze(10.minutes.from_now(submission.submitted_at)) do
                 assignment.submit_homework(submission.user, body: "hi", submission_type: "online_text_entry")
                 submission.reload
-                params = Canvadocs.user_session_params(@current_user, submission: submission, attempt: 1)
+                params = Canvadocs.user_session_params(@current_user, submission:, attempt: 1)
                 expect(params[:user_filter]).to be_empty
               end
             end

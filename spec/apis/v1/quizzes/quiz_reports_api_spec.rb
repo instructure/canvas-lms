@@ -193,7 +193,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
         api_create({
                      quiz_reports: [{
-                       report_type: report_type
+                       report_type:
                      }]
                    },
                    { jsonapi: true })
@@ -210,7 +210,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
         api_create({
                      quiz_reports: [{
-                       report_type: report_type
+                       report_type:
                      }]
                    },
                    { jsonapi: true, raw: true })

@@ -27,7 +27,7 @@ module Lti
 
     let(:account) { Account.create }
     let(:resource_handler) do
-      ResourceHandler.create(resource_type_code: "code", name: "resource name", tool_proxy: tool_proxy)
+      ResourceHandler.create(resource_type_code: "code", name: "resource name", tool_proxy:)
     end
 
     describe "#launch_definitions" do
@@ -47,7 +47,7 @@ module Lti
             url: "https://www.test.tool.com",
             consumer_key: "key",
             shared_secret: "secret",
-            settings: settings
+            settings:
           )
         end
 
@@ -251,8 +251,8 @@ module Lti
           placements = %w[assignment_selection link_selection resource_selection]
           collection = described_class.bookmarked_collection(account, placements)
           per_page = 3
-          page1 = collection.paginate(per_page: per_page)
-          page2 = collection.paginate(page: page1.next_page, per_page: per_page)
+          page1 = collection.paginate(per_page:)
+          page2 = collection.paginate(page: page1.next_page, per_page:)
           expect(page1.count).to eq 3
           expect(page2.count).to eq 3
           expect(page1.first).to_not eq page2.first

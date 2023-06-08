@@ -194,7 +194,7 @@ module Types
 
     field :assessment_requests_for_current_user, [AssessmentRequestType], null: true
     def assessment_requests_for_current_user
-      Loaders::AssessmentRequestLoader.for(current_user: current_user).load(assignment)
+      Loaders::AssessmentRequestLoader.for(current_user:).load(assignment)
     end
 
     field :moderated_grading, AssignmentModeratedGrading, null: true
@@ -231,7 +231,6 @@ module Types
     field :expects_external_submission, Boolean, method: :expects_external_submission?, null: true
     field :non_digital_submission, Boolean, method: :non_digital_submission?, null: true
     field :allow_google_docs_submission, Boolean, method: :allow_google_docs_submission?, null: true
-    field :muted, Boolean, method: :muted?, null: true
 
     field :due_date_required, Boolean, method: :due_date_required?, null: true
     field :can_unpublish, Boolean, method: :can_unpublish?, null: true
@@ -321,7 +320,7 @@ module Types
                                               context: assignment.context,
                                               user: current_user,
                                               in_app: context[:in_app],
-                                              preloaded_attachments: preloaded_attachments)
+                                              preloaded_attachments:)
         end
       end
     end

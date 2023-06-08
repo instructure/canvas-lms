@@ -75,9 +75,32 @@ describe "student planner" do
       validate_pill("Submitted")
     end
 
-    it "shows points possible for assignments only when restrict_quantitative_data? is falsy for user" do
+    it "shows points possible for graded items only when restrict_quantitative_data? is falsy for user" do
       @assignment.points_possible = 150
       @assignment.save!
+      gd_assignment = @course.assignments.create({ name: "my gd", due_at: 1.day.from_now, points_possible: "150" })
+      gd = @course.discussion_topics.create!(
+        user: @teacher,
+        title: "graded discussion topic",
+        message: "assignment topic message",
+        assignment: gd_assignment
+      )
+      my_quiz = quiz_model(course: @course)
+      my_quiz.generate_quiz_data
+      my_quiz.due_at = 1.day.from_now
+      my_quiz.save!
+      my_quiz.quiz_questions.create!(
+        question_data: {
+          name: "Quiz Questions",
+          question_type: "essay",
+          question_text: "your essay",
+          points_possible: 1
+        }
+      )
+      my_quiz.generate_quiz_data
+      my_quiz.workflow_state = "available"
+      my_quiz.save!
+
       # truthy feature flag
       Account.default.enable_feature! :restrict_quantitative_data
 
@@ -86,14 +109,16 @@ describe "student planner" do
       Account.default.save!
 
       go_to_list_view
-      expect(fj(".PlannerItem-styles__score:contains('150')")).to be_present
+      expect(fj("div.planner-item:contains('#{@assignment.name}') .PlannerItem-styles__score").text).to eq "150 PTS"
+      expect(fj("div.planner-item:contains('#{gd.title}') .PlannerItem-styles__score").text).to eq "150 PTS"
+      expect(fj("div.planner-item:contains('#{my_quiz.title}') .PlannerItem-styles__score").text).to eq "1 PTS"
 
       # now truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
 
       go_to_list_view
-      expect(f("body")).not_to contain_jqcss(".PlannerItem-styles__score:contains('150')")
+      expect(f("body")).not_to contain_jqcss(".PlannerItem-styles__score")
     end
 
     it "shows new grades tag for assignments that are graded", priority: "1" do

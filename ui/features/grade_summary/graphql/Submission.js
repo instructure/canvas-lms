@@ -66,7 +66,7 @@ export const Submission = {
     _id = '1',
     gradingStatus = 'graded',
 
-    grade = 'A',
+    grade = 'A-',
     score = 90,
     gradingPeriodId = '1',
     hideGradeFromStudent = false,

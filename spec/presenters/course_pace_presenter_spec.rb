@@ -92,7 +92,7 @@ describe CoursePacePresenter do
     it "returns necessary data if the course pace is only instantiated" do
       course_pace = @course.course_paces.new
       @course.context_module_tags.each do |module_item|
-        course_pace.course_pace_module_items.new module_item: module_item, duration: 0
+        course_pace.course_pace_module_items.new module_item:, duration: 0
       end
       formatted_plan = CoursePacePresenter.new(course_pace).as_json
 

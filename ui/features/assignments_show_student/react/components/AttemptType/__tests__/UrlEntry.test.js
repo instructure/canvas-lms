@@ -204,7 +204,7 @@ describe('UrlEntry', () => {
         </MockedProvider>
       )
 
-      expect(getByText('Please enter a valid url (e.g. http://example.com)')).toBeInTheDocument()
+      expect(getByText('Please enter a valid url (e.g. https://example.com)')).toBeInTheDocument()
     })
 
     it('renders the preview button when the url is considered valid', async () => {

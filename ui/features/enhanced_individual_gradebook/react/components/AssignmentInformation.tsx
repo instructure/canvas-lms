@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
@@ -37,6 +37,14 @@ export default function AssignmentInformation({
   gradebookOptions,
   submissions = [],
 }: Props) {
+  const {gradedSubmissions, scores} = useMemo(
+    () => ({
+      gradedSubmissions: submissions.filter(s => s.score !== null && s.score !== undefined),
+      scores: submissions.map(s => s.score ?? 0),
+    }),
+    [submissions]
+  )
+
   if (!assignment) {
     return (
       <View as="div">
@@ -53,9 +61,6 @@ export default function AssignmentInformation({
       </View>
     )
   }
-
-  const gradedSubmissions = submissions.filter(s => s.score !== null && s.score !== undefined)
-  const scores = gradedSubmissions.map(s => s.score)
 
   return (
     <View as="div">
@@ -163,21 +168,6 @@ type AssignmentActionsProps = {
 function AssignmentActions({assignment, gradebookOptions}: AssignmentActionsProps) {
   return (
     <>
-      <div
-        className="checkbox"
-        style={{padding: '12px', margin: '10px 0px', background: '#eee', borderRadius: '5px'}}
-      >
-        <label className="checkbox" htmlFor="muted-checkbox">
-          {I18n.t('Muted?')}
-          <input
-            id="muted-checkbox"
-            type="checkbox"
-            aria-label="Click to unmute."
-            checked={assignment.muted}
-            readOnly={true}
-          />
-        </label>
-      </div>
       {!gradebookOptions.anonymizeStudents && (
         <View as="div" className="pad-box no-sides">
           <Button color="secondary">{I18n.t('Message students who...')}</Button>

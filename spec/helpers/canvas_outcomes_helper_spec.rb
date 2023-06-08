@@ -526,7 +526,7 @@ describe CanvasOutcomesHelper do
           metadata = "{\"question_metadata\":[{\"quiz_item_id\":\"#{id}\",\"quiz_item_title\":\"Question #{id}\",\"points\":\"#{points}\",\"points_possible\":\"3.0\"}]}"
           if json_to_hash_with_symbol_keys
             metadata = JSON.parse(metadata).deep_symbolize_keys
-            { id: id, metadata: metadata }
+            { id:, metadata: }
           else
             { "id" => id, "metadata" => metadata }
           end

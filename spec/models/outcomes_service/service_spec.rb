@@ -22,7 +22,7 @@ require_relative "../../spec_helper"
 
 describe OutcomesService::Service do
   let(:root_account) { account_model }
-  let(:course) { course_model(root_account: root_account) }
+  let(:course) { course_model(root_account:) }
 
   context "without settings" do
     describe ".url" do

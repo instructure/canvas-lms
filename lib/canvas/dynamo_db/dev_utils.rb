@@ -38,7 +38,7 @@ module Canvas
           raise "DynamoDB should not be initialized this way in a real environment!!!"
         end
 
-        canvas_ddb = ddb || Canvas::DynamoDB::DatabaseBuilder.from_config(category, credentials: credentials)
+        canvas_ddb = ddb || Canvas::DynamoDB::DatabaseBuilder.from_config(category, credentials:)
         dynamodb = canvas_ddb.client
         local_table_name = canvas_ddb.prefixed_table_name(table_name)
         exists = begin

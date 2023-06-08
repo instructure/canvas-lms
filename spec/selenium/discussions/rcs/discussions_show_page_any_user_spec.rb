@@ -26,9 +26,9 @@ describe "discussions" do
   include DiscussionsCommon
 
   let(:course) { course_model.tap(&:offer!) }
-  let(:student) { student_in_course(course: course, name: "student", active_all: true).user }
-  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
-  let(:somebody) { student_in_course(course: course, name: "somebody", active_all: true).user }
+  let(:student) { student_in_course(course:, name: "student", active_all: true).user }
+  let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
+  let(:somebody) { student_in_course(course:, name: "somebody", active_all: true).user }
   let(:student_topic) { course.discussion_topics.create!(user: student, title: "student topic title", message: "student topic message") }
   let(:somebody_topic) { course.discussion_topics.create!(user: somebody, title: "somebody topic title", message: "somebody topic message") }
   let(:side_comment_topic) do

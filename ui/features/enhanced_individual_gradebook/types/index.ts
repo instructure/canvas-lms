@@ -16,5 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './gradebook'
-export * from './queries'
+export * from './gradebook.d'
+export * from './queries.d'

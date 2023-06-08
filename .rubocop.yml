@@ -13,7 +13,7 @@ inherit_gem:
   - rubocop-rspec.yml
 
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
 
 Bundler:
   Severity: error
@@ -90,6 +90,8 @@ Performance/MethodObjectAsBlock:
 
 Rails:
   Severity: error
+  Exclude:
+    - "bin/**/*"
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:
@@ -249,7 +251,9 @@ Naming/ClassAndModuleCamelCase:
 Naming/ConstantName:
   Severity: convention
 Naming/MemoizedInstanceVariableName:
+  EnforcedStyleForLeadingUnderscores: optional
   Severity: convention
+  AutoCorrect: false
 Naming/MethodName:
   Severity: convention
 Naming/MethodParameterName:

@@ -96,7 +96,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     globalid (1.1.0)
       activesupport (>= 5.0)
-    i18n (1.13.0)
+    i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     loofah (2.20.0)
       crass (~> 1.0.2)

@@ -58,9 +58,9 @@ describe Lti::ExternalToolTab do
       consumer_key: "asdf",
       shared_secret: "hjkl",
       name: "external tool",
-      course_navigation: course_navigation,
-      account_navigation: account_navigation,
-      user_navigation: user_navigation
+      course_navigation:,
+      account_navigation:,
+      user_navigation:
     )
     allow(tool).to receive(:id).and_return(2)
     tool
@@ -123,8 +123,8 @@ describe Lti::ExternalToolTab do
       consumer_key: "asdf",
       shared_secret: "hjkl",
       name: "Tool2",
-      course_navigation: course_navigation,
-      account_navigation: account_navigation
+      course_navigation:,
+      account_navigation:
     )
     allow(tool2).to receive(:id).and_return(9)
     subject = described_class.new(context, nil, [tool2, tool])

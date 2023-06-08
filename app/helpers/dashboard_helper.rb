@@ -143,7 +143,7 @@ module DashboardHelper
   def todo_ignore_api_url(activity_type, item, force_permanent = false)
     permanent = (!todo_ignore_dropdown_type?(activity_type) || force_permanent) ? 1 : nil
 
-    api_v1_users_todo_ignore_url(item.asset_string, activity_type, { permanent: permanent })
+    api_v1_users_todo_ignore_url(item.asset_string, activity_type, { permanent: })
   end
 
   def todo_link_classes(activity_type)

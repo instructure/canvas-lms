@@ -22,28 +22,28 @@ if Qti.migration_executable
   describe "Converting Angel CC QTI" do
     it "converts multiple choice" do
       manifest_node = get_manifest_node("multiple_choice")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::MULTIPLE_CHOICE
     end
 
     it "converts true false" do
       manifest_node = get_manifest_node("true_false")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::TRUE_FALSE
     end
 
     it "converts multiple response" do
       manifest_node = get_manifest_node("multiple_answer")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::MULTIPLE_ANSWER
     end
 
     it "converts essay" do
       manifest_node = get_manifest_node("essay")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: angel_question_dir)
       expect(hash).to eq AngelExpected::ESSAY
     end
 

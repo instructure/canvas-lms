@@ -43,6 +43,18 @@ describe GradebooksController do
       before do
         user_session(@student)
         @assignment = @course.assignments.create!(title: "Example Assignment")
+        @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
+        @mock_kaltura = double("CanvasKaltura::ClientV3")
+        allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
+        allow(@mock_kaltura).to receive(:startSession).and_return(nil)
+        @media_sources = [{
+          height: "240",
+          width: "336",
+          content_type: "video/mp4",
+          url: "https://kaltura.example.com/some/url",
+        }]
+        @media_track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "English").as_json["media_track"]
+        allow(@mock_kaltura).to receive(:media_sources).and_return(@media_sources)
       end
 
       it "includes muted assignments" do
@@ -86,13 +98,14 @@ describe GradebooksController do
         comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher, attachments: [attachment])
         comment_2 = submission_to_comment.add_comment(comment: "another student comment", author: @teacher, attachments: [attachment, attachment2])
         comment_3 = submission_to_comment.add_comment(comment: "an anonymous comment", author: other_student)
+        comment_4 = submission_to_comment.add_comment(media_comment_id: "m-someid", media_comment_type: "video", author: @student)
         comment_1.mark_read!(@student)
 
         get "grade_summary", params: { course_id: @course.id, id: @student.id }
         submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
         aggregate_failures do
           expect(submission[:score]).to be 10.0
-          expect(submission[:submission_comments].length).to be 3
+          expect(submission[:submission_comments].length).to be 4
 
           submission_comment_1 = submission[:submission_comments].first
           expect(submission_comment_1).to include({
@@ -141,6 +154,36 @@ describe GradebooksController do
                                                     "display_updated_at" => datetime_string(comment_3["updated_at"]),
                                                     "is_read" => false,
                                                     "attachments" => []
+                                                  })
+          submission_comment_4 = submission[:submission_comments].fourth
+          expect(submission_comment_4).to include({
+                                                    "comment" => comment_4["comment"],
+                                                    "attempt" => comment_4["attempt"],
+                                                    "author_name" => comment_4["author_name"],
+                                                    "display_updated_at" => datetime_string(comment_4["updated_at"]),
+                                                    "is_read" => false,
+                                                    "attachments" => [],
+                                                    "media_object" => {
+                                                      "id" => @media_object.media_id,
+                                                      "title" => @media_object.title,
+                                                      "media_sources" => [
+                                                        {
+                                                          "height" => @media_sources.first[:height],
+                                                          "width" => @media_sources.first[:width],
+                                                          "content_type" => @media_sources.first[:content_type],
+                                                          "url" => @media_sources.first[:url]
+                                                        }
+                                                      ],
+                                                      "media_tracks" => [
+                                                        {
+                                                          "id" => @media_track["id"],
+                                                          "locale" => @media_track["locale"],
+                                                          "content" => @media_track["content"],
+                                                          "kind" => @media_track["kind"],
+                                                        }
+                                                      ]
+
+                                                    }
                                                   })
         end
       end
@@ -440,7 +483,7 @@ describe GradebooksController do
             start_date: 1.day.ago,
             end_date: 1.day.from_now
           )
-          @student_enrollment.scores.find_by(grading_period: grading_period).update!(override_score: 84)
+          @student_enrollment.scores.find_by(grading_period:).update!(override_score: 84)
           user_session(@teacher)
           get :grade_summary, params: { course_id: @course.id, id: @student.id }
           expect(assigns[:js_env][:effective_final_score]).to eq 84
@@ -468,7 +511,7 @@ describe GradebooksController do
       let!(:assignment3) do
         assignment_group = @course.assignment_groups.create!(position: 2)
         @course.assignments.create!(
-          assignment_group: assignment_group, title: "Carrot", due_at: 2.days.from_now, position: 1
+          assignment_group:, title: "Carrot", due_at: 2.days.from_now, position: 1
         )
       end
       let(:assignment_ids) { assigns[:presenter].assignments.select { |a| a.instance_of?(Assignment) }.map(&:id) }
@@ -820,7 +863,7 @@ describe GradebooksController do
             mark_as_missing: false,
             only_apply_to_past_due: false
           )
-          @progress = Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(course: @course, grader: @teacher, options: options)
+          @progress = Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(course: @course, grader: @teacher, options:)
         end
 
         describe "FF disabled" do
@@ -2259,7 +2302,7 @@ describe GradebooksController do
 
           it "marks not-yet-graded students as missing when passed dont_overwrite_grades param" do
             params = post_params.merge(dont_overwrite_grades: true)
-            expect { post(:update_submission, params: params, format: :json) }.to change {
+            expect { post(:update_submission, params:, format: :json) }.to change {
               @submission.reload.missing?
             }.from(false).to(true)
           end
@@ -2267,7 +2310,7 @@ describe GradebooksController do
           it "does not modify already-graded students when passed dont_overwrite_grades param" do
             @assignment.grade_student(@student, grade: 2, grader: @teacher)
             params = post_params.merge(dont_overwrite_grades: true)
-            expect { post(:update_submission, params: params, format: :json) }.not_to change {
+            expect { post(:update_submission, params:, format: :json) }.not_to change {
               @submission.reload.missing?
             }.from(false)
           end
@@ -3463,7 +3506,7 @@ describe GradebooksController do
 
     def make_request(**additional_params)
       params = additional_params.reverse_merge({ course_id: @course.id, assignment_ids: ["1", "2"], student_ids: ["11", "22"] })
-      put :apply_score_to_ungraded_submissions, params: params, format: :json
+      put :apply_score_to_ungraded_submissions, params:, format: :json
       response.parsed_body
     end
 

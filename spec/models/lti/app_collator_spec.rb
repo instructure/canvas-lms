@@ -41,8 +41,8 @@ module Lti
 
         collection = subject.bookmarked_collection
         per_page = 3
-        page1 = collection.paginate(per_page: per_page)
-        page2 = collection.paginate(page: page1.next_page, per_page: per_page)
+        page1 = collection.paginate(per_page:)
+        page2 = collection.paginate(page: page1.next_page, per_page:)
         expect(page1.count).to eq 3
         expect(page2.count).to eq 3
         expect(page1.first).to_not eq page2.first

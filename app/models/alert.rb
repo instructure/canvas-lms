@@ -81,10 +81,10 @@ class Alert < ActiveRecord::Base
       end
     end
     {
-      id: id,
+      id:,
       criteria: criteria.map { |c| c.as_json(include_root: false) },
       recipients: converted_recipients,
-      repetition: repetition
+      repetition:
     }.with_indifferent_access
   end
 

@@ -66,7 +66,7 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
 
   def build_entry(association, message, topic, is_anonymous_author)
     message = Api::Html::Content.process_incoming(message, host: context[:request].host, port: context[:request].port)
-    entry = association.build(message: message, user: current_user, discussion_topic: topic, is_anonymous_author: is_anonymous_author)
+    entry = association.build(message:, user: current_user, discussion_topic: topic, is_anonymous_author:)
     raise InsufficientPermissionsError unless entry.grants_right?(current_user, session, :create)
 
     entry

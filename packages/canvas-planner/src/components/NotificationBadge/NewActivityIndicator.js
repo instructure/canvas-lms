@@ -31,12 +31,12 @@ export class NewActivityIndicator extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     animatableIndex: number,
-    getFocusable: func
+    getFocusable: func,
   }
 
   static defaultProps = {
     registerAnimatable: () => {},
-    deregisterAnimatable: () => {}
+    deregisterAnimatable: () => {},
   }
 
   UNSAFE_componentWillMount() {

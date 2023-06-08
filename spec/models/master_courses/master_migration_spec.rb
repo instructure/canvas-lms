@@ -594,7 +594,7 @@ describe MasterCourses::MasterMigration do
       qq1 = quiz.quiz_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question" })
       qq2 = quiz.quiz_questions.create!(question_data: { "question_name" => "test question 2", "question_type" => "essay_question" })
       qgroup = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qq3 = qgroup.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qq3 = qgroup.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
@@ -655,9 +655,9 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!
       qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qgroup1.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qgroup1.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       qgroup2 = quiz.quiz_groups.create!(name: "group2", pick_count: 1)
-      qq2 = qgroup2.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qq2 = qgroup2.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
@@ -719,7 +719,7 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!
       qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qgroup1.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qgroup1.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       qgroup1.save
       Timecop.freeze(2.minutes.from_now) do
         @template.content_tag_for(quiz).update_attribute(:restrictions, { content: true })
@@ -815,7 +815,7 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!
       qgroup = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qgroup.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qgroup.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
@@ -1302,7 +1302,7 @@ describe MasterCourses::MasterMigration do
         @template.add_child_course!(@copy_to)
 
         media_id = "m-you_know_what_you_did"
-        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id: media_id)
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
         media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
 
         run_master_migration
@@ -1323,7 +1323,7 @@ describe MasterCourses::MasterMigration do
         @template.add_child_course!(@copy_to)
 
         media_id = "m-you_know_what_you_did"
-        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id: media_id)
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
         copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
 
         run_master_migration
@@ -1341,7 +1341,7 @@ describe MasterCourses::MasterMigration do
         @template.add_child_course!(@copy_to)
 
         media_id = "m-you_know_what_you_did"
-        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id: media_id)
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
         copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
 
         run_master_migration
@@ -1368,7 +1368,7 @@ describe MasterCourses::MasterMigration do
         @template.add_child_course!(@copy_to)
 
         media_id = "m-you_know_what_you_did"
-        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id: media_id)
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
         media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
 
         run_master_migration
@@ -2360,7 +2360,7 @@ describe MasterCourses::MasterMigration do
       sub2 = @template.add_child_course!(@copy_to2)
 
       group_category = @copy_from.group_categories.create!(name: "a set")
-      topic = @copy_from.discussion_topics.create!(title: "a group dis", group_category: group_category)
+      topic = @copy_from.discussion_topics.create!(title: "a group dis", group_category:)
 
       run_master_migration
 

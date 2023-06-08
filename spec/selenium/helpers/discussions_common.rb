@@ -25,7 +25,7 @@ module DiscussionsCommon
   end
 
   def create_and_go_to_topic(title = "new topic", discussion_type = "side_comment", is_locked = false)
-    @topic = @course.discussion_topics.create!(title: title, discussion_type: discussion_type)
+    @topic = @course.discussion_topics.create!(title:, discussion_type:)
     if is_locked
       @topic.lock
       @topic.reload
@@ -35,7 +35,7 @@ module DiscussionsCommon
   end
 
   def create_discussion(discussion_name, discussion_type)
-    @course.discussion_topics.create!(title: discussion_name, discussion_type: discussion_type)
+    @course.discussion_topics.create!(title: discussion_name, discussion_type:)
   end
 
   def edit_topic(discussion_name, message)
@@ -195,7 +195,7 @@ module DiscussionsCommon
   def topic_for_filtering(opts = {})
     name = "#{opts[:graded] ? "graded" : "ungraded"} #{opts[:read] ? "read" : "unread"} topic"
     if opts[:graded]
-      a = course.assignments.create!(name: name + " assignment", submission_types: "discussion_topic", assignment_group: assignment_group)
+      a = course.assignments.create!(name: name + " assignment", submission_types: "discussion_topic", assignment_group:)
       dt = a.discussion_topic
       dt.title = name + " title"
       dt.save!

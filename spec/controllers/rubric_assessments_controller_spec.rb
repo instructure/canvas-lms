@@ -224,7 +224,7 @@ describe RubricAssessmentsController do
           course_id: course.id.to_s,
           id: "",
           provisional: true,
-          rubric_assessment: { user_id: assessor.id.to_s, assessment_type: assessment_type },
+          rubric_assessment: { user_id: assessor.id.to_s, assessment_type: },
           rubric_association_id: rubric_association.id.to_s
         }
       end
@@ -330,7 +330,7 @@ describe RubricAssessmentsController do
           rubric_association_id: rubric_association.id.to_s
         }
 
-        put(:update, params: params)
+        put(:update, params:)
         expect(response).not_to be_successful
       end
     end
@@ -344,7 +344,7 @@ describe RubricAssessmentsController do
       @course.enroll_student(assessor)
       assessor_asset = @rubric_association.association_object.find_or_create_submission(assessor)
       user_asset = @rubric_association.association_object.find_or_create_submission(assessor)
-      @assessment_request = @rubric_association.assessment_requests.create!(user: @user, asset: user_asset, assessor: assessor, assessor_asset: assessor_asset)
+      @assessment_request = @rubric_association.assessment_requests.create!(user: @user, asset: user_asset, assessor:, assessor_asset:)
     end
 
     it "requires authorization" do

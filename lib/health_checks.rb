@@ -35,7 +35,7 @@ module HealthChecks
                   .transform_values { |v| execute_deep_check(v) }
                   .transform_values { |v| component_check(v, true) }
 
-      { critical: critical, secondary: secondary }
+      { critical:, secondary: }
     end
 
     def send_to_statsd(result = nil, additional_tags = {})
@@ -45,8 +45,8 @@ module HealthChecks
         check_values.each do |check_name, check_results|
           tags = { type: check_type, key: check_name, **additional_tags }
 
-          InstStatsd::Statsd.timing("canvas.health_checks.response_time_ms", check_results[:time], tags: tags)
-          InstStatsd::Statsd.gauge("canvas.health_checks.status", check_results[:status] ? 1 : 0, tags: tags)
+          InstStatsd::Statsd.timing("canvas.health_checks.response_time_ms", check_results[:time], tags:)
+          InstStatsd::Statsd.gauge("canvas.health_checks.status", check_results[:status] ? 1 : 0, tags:)
         end
       end
     end
@@ -215,7 +215,7 @@ module HealthChecks
           Canvas::Errors.capture_exception(exception_type, e, :error)
         end
 
-      { status: status, message: message, time: response_time_ms }
+      { status:, message:, time: response_time_ms }
     end
   end
 end

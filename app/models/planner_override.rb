@@ -41,7 +41,7 @@ class PlannerOverride < ActiveRecord::Base
   scope :active, -> { where workflow_state: "active" }
   scope :deleted, -> { where workflow_state: "deleted" }
   scope :not_deleted, -> { where.not deleted }
-  scope :for_user, ->(user) { where user: user }
+  scope :for_user, ->(user) { where user: }
 
   workflow do
     state :active do

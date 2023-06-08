@@ -46,7 +46,7 @@ describe Mutations::DeleteOutcomeProficiency do
       }
     GQL
     context = { current_user: user_executing, deleted_models: {}, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   it "deletes an outcome proficency with legacy id" do

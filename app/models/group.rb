@@ -346,7 +346,7 @@ class Group < ActiveRecord::Base
   def add_user(user, new_record_state = nil, moderator = nil)
     return nil unless user
 
-    attrs = { user: user, moderator: !!moderator }
+    attrs = { user:, moderator: !!moderator }
     new_record_state ||= { "invitation_only" => "invited",
                            "parent_context_request" => "requested",
                            "parent_context_auto_join" => "accepted" }[join_level]
@@ -382,7 +382,7 @@ class Group < ActiveRecord::Base
 
   def broadcast_data
     if context_type == "Course"
-      { course_id: context_id, root_account_id: root_account_id }
+      { course_id: context_id, root_account_id: }
     else
       {}
     end
@@ -427,7 +427,7 @@ class Group < ActiveRecord::Base
       moderator: false,
       created_at: current_time,
       updated_at: current_time,
-      root_account_id: root_account_id
+      root_account_id:
     }.merge(options)
     GroupMembership.bulk_insert(users.map do |user|
       options.merge({ user_id: user.id, uuid: CanvasSlug.generate_securish_uuid })

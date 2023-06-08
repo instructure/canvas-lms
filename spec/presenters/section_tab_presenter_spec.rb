@@ -94,7 +94,7 @@ describe SectionTabPresenter do
       let(:tab) do
         {
           href: :course_basic_lti_launch_request_path,
-          args: args
+          args:
         }
       end
 

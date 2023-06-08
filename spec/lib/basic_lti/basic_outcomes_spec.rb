@@ -180,7 +180,7 @@ describe BasicLTI::BasicOutcomes do
     it "throws 'Tool is invalid' if the tool doesn't match" do
       t = @course.context_external_tools
                  .create(name: "b", url: "http://google.com", consumer_key: "12345", shared_secret: "secret")
-      expect { described_class.decode_source_id(tool, gen_source_id(t: t)) }
+      expect { described_class.decode_source_id(tool, gen_source_id(t:)) }
         .to raise_error(BasicLTI::Errors::InvalidSourceId, "Tool is invalid")
     end
 
@@ -776,7 +776,7 @@ describe BasicLTI::BasicOutcomes do
         submission = assignment.submit_homework(
           @user,
           {
-            submission_type: submission_type,
+            submission_type:,
             body: "sample text",
             grade: "92%"
           }
@@ -967,21 +967,21 @@ describe BasicLTI::BasicOutcomes do
     it "invokes the block when the grader_id is in the tool id range" do
       submission.grader_id = -100
       expect do |b|
-        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: :taco, &b)
+        lti_response.ensure_score_update_possible(submission:, prioritize_non_tool_grade: :taco, &b)
       end.to yield_control
     end
 
     it "does not invoke the block when the grader_id is in the user id range and prioritize_non_tool_grade is true" do
       submission.grader_id = 100
       expect do |b|
-        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: true, &b)
+        lti_response.ensure_score_update_possible(submission:, prioritize_non_tool_grade: true, &b)
       end.not_to yield_control
     end
 
     it "invokes the block when the grader_id is in the user id range and prioritize_non_tool_grade is false" do
       submission.grader_id = 100
       expect do |b|
-        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: false, &b)
+        lti_response.ensure_score_update_possible(submission:, prioritize_non_tool_grade: false, &b)
       end.to yield_control
     end
   end

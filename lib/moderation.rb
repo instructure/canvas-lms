@@ -27,7 +27,7 @@ module Moderation
     to_add_ids = student_ids - already_moderated_ids
 
     to_add_ids.each do |student_id|
-      assignment.moderated_grading_selections.create! student_id: student_id
+      assignment.moderated_grading_selections.create! student_id:
     end
 
     # Delete selections not in Student IDs but in the context of students to be considered

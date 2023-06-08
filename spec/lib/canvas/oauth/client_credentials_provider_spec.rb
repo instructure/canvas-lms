@@ -76,9 +76,9 @@ module Canvas::OAuth
       {
         iss: "someiss",
         sub: dev_key.id,
-        aud: aud,
-        iat: iat,
-        exp: exp,
+        aud:,
+        iat:,
+        exp:,
         jti: SecureRandom.uuid
       }
     end

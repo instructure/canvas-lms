@@ -287,7 +287,7 @@ class ContextModulesApiController < ApplicationController
       return render(json: { message: "no modules found" }, status: :not_found) if modules.empty?
 
       batch_update_params = {
-        event: event,
+        event:,
         module_ids: modules.pluck(:id),
         skip_content_tags: value_to_boolean(params[:skip_content_tags])
       }
@@ -302,7 +302,7 @@ class ContextModulesApiController < ApplicationController
       else
         completed_ids = @context.batch_update_context_modules(**batch_update_params)
       end
-      render json: { completed: completed_ids, progress: progress }
+      render json: { completed: completed_ids, progress: }
     end
   end
 
@@ -438,7 +438,7 @@ class ContextModulesApiController < ApplicationController
         json = module_json(@module, @current_user, session, nil)
         json["relock_warning"] = true if relock_warning || @module.relock_warning?
         json["publish_warning"] = publish_warning.present?
-        render json: json
+        render json:
       else
         render json: @module.errors, status: :bad_request
       end

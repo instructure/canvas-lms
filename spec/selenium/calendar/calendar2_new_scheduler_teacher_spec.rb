@@ -43,7 +43,7 @@ describe "scheduler" do
 
     it "shows correct title when editing an appointment group", priority: "1" do
       title = "Ultimate AG"
-      create_appointment_group title: title
+      create_appointment_group(title:)
       get "/calendar"
       # navigate to the next month for end of month
       f(".navigate_next").click unless Time.now.utc.month == (Time.now.utc + 1.day).month
@@ -111,7 +111,7 @@ describe "scheduler" do
 
     it "linkifies links in appointment group description but not when editing description in modal" do
       description = "Submit document at http://google.com/submit"
-      create_appointment_group(title: "Peer review session", description: description)
+      create_appointment_group(title: "Peer review session", description:)
       get "/calendar"
       # navigate to the next month for end of month
       f(".navigate_next").click unless Time.now.utc.month == (Time.now.utc + 1.day).month

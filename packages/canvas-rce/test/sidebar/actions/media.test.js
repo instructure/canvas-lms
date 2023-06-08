@@ -179,6 +179,7 @@ describe('Media actions', () => {
       })(dispatch, getState)
       assert(updateSpy.called)
       assert.deepEqual(updateSpy.getCalls()[0].args[1], {
+        attachment_id: undefined,
         media_object_id: 'moid',
         title: 'title',
       })
@@ -206,6 +207,7 @@ describe('Media actions', () => {
       })(dispatch, getState)
       assert(updateSpy.called)
       assert.deepEqual(updateSpy.getCalls()[0].args[1], {
+        attachment_id: '123',
         media_object_id: 'moid',
         title: 'title',
       })

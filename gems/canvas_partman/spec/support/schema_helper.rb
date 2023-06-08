@@ -19,8 +19,8 @@
 
 module CanvasPartmanTest::SchemaHelper
   class << self
-    def create_table(table_name, opts = {}, &block)
-      ActiveRecord::Migration.create_table table_name, **opts, &block
+    def create_table(table_name, opts = {}, &)
+      ActiveRecord::Migration.create_table(table_name, **opts, &)
     end
 
     def table_exists?(table_name)

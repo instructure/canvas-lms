@@ -33,7 +33,7 @@ describe DiscussionEntryParticipant do
 
     it "throws error on regular create" do
       user = user_model
-      expect { @entry.discussion_entry_participants.create!(user: user, workflow_state: "read") }
+      expect { @entry.discussion_entry_participants.create!(user:, workflow_state: "read") }
         .to raise_error(ActiveRecord::RecordInvalid)
     end
 

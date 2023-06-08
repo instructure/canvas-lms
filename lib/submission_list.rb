@@ -95,14 +95,14 @@ class SubmissionList
 
   class << self
     # Shortcut for SubmissionList.each(course) { ... }
-    def each(course, &block)
+    def each(course, &)
       sl = new(course)
-      sl.each(&block)
+      sl.each(&)
     end
 
-    def each_day(course, &block)
+    def each_day(course, &)
       sl = new(course)
-      sl.each_day(&block)
+      sl.each_day(&)
     end
 
     def days(course)
@@ -132,13 +132,13 @@ class SubmissionList
   end
 
   # An iterator on a sorted and filtered list of submission versions.
-  def each(&block)
-    submission_entries.each(&block)
+  def each(&)
+    submission_entries.each(&)
   end
 
   # An iterator on the day only, not each submission
-  def each_day(&block)
-    list.each(&block)
+  def each_day(&)
+    list.each(&)
   end
 
   # An array of days with an array of grader open structs for that day and course.
@@ -237,7 +237,7 @@ class SubmissionList
 
       hash[submission.id] = OpenObject.new(grade: translate_grade(submission),
                                            graded_at: submission.graded_at,
-                                           grader: grader)
+                                           grader:)
     end
   end
 

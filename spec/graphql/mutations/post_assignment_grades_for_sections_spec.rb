@@ -57,7 +57,7 @@ describe Mutations::PostAssignmentGradesForSections do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   before do
@@ -95,7 +95,7 @@ describe Mutations::PostAssignmentGradesForSections do
     it "returns an error when the section is not part of the course" do
       unrelated_section = Course.create!.course_sections.create!
       section_ids = [unrelated_section.id, section1.id]
-      result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: section_ids), context)
+      result = execute_query(mutation_str(assignment_id: assignment.id, section_ids:), context)
       expected_error = "Invalid section ids"
       expect(result.dig("errors", 0, "message")).to eql expected_error
     end
@@ -260,7 +260,7 @@ describe Mutations::PostAssignmentGradesForSections do
       let(:submissions_posted_messages) do
         Message.where(
           communication_channel: teacher.email_channel,
-          notification: notification
+          notification:
         )
       end
 

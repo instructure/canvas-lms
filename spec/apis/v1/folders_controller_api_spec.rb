@@ -1078,16 +1078,16 @@ describe "Folders API", type: :request do
   describe "#list_all_folders" do
     def make_folders_in_context(context, duplicatenames: false)
       @root = Folder.root_folders(context).first
-      @f1 = @root.sub_folders.create!(name: "folder1", context: context, position: 1)
-      @f2 = @root.sub_folders.create!(name: "folder2", context: context, position: 2)
-      @f3 = @f2.sub_folders.create!(name: "folder2.1", context: context, position: 3)
-      @f4 = @f3.sub_folders.create!(name: "folder2.1.1", context: context, position: 4)
-      @f5 = @f4.sub_folders.create!(name: "folderlocked", context: context, position: 5, locked: true)
-      @f6 = @f5.sub_folders.create!(name: "folderhidden", context: context, position: 6, hidden: true)
+      @f1 = @root.sub_folders.create!(name: "folder1", context:, position: 1)
+      @f2 = @root.sub_folders.create!(name: "folder2", context:, position: 2)
+      @f3 = @f2.sub_folders.create!(name: "folder2.1", context:, position: 3)
+      @f4 = @f3.sub_folders.create!(name: "folder2.1.1", context:, position: 4)
+      @f5 = @f4.sub_folders.create!(name: "folderlocked", context:, position: 5, locked: true)
+      @f6 = @f5.sub_folders.create!(name: "folderhidden", context:, position: 6, hidden: true)
       if duplicatenames
-        @f7 = @f2.sub_folders.create!(name: "folder1", context: context, position: 7)
-        @f8 = @f3.sub_folders.create!(name: "folder1", context: context, position: 8)
-        @f9 = @f4.sub_folders.create!(name: "folder1", context: context, position: 9)
+        @f7 = @f2.sub_folders.create!(name: "folder1", context:, position: 7)
+        @f8 = @f3.sub_folders.create!(name: "folder1", context:, position: 8)
+        @f9 = @f4.sub_folders.create!(name: "folder1", context:, position: 9)
       end
     end
 

@@ -65,7 +65,7 @@ describe Attachments::Verification do
                                                           },
                                                           expires).and_return("thetoken")
 
-      verifier = v.verifier_for_user(nil, context: course.asset_string, expires: expires)
+      verifier = v.verifier_for_user(nil, context: course.asset_string, expires:)
       expect(verifier).to eq("thetoken")
     end
   end

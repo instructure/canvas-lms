@@ -46,7 +46,7 @@ describe GradingPeriodsController do
 
   def login_admin
     user = User.create!
-    root_account.account_users.create!(user: user)
+    root_account.account_users.create!(user:)
     user_session(user)
   end
 

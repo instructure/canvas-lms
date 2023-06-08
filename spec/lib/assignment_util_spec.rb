@@ -202,7 +202,7 @@ describe AssignmentUtil do
     end
 
     it "alerts students who have not submitted" do
-      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[@student])
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment:, submission: submission_for[@student])
 
       described_class.process_due_date_reminder("Assignment", assignment.id)
     end
@@ -245,9 +245,9 @@ describe AssignmentUtil do
       student_in_course(active_all: true, section: section_b).student
       create_section_override_for_assignment(assignment, course_section: section_b)
 
-      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[section_a_user_1])
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment:, submission: submission_for[section_a_user_1])
 
-      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[section_a_user_2])
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment:, submission: submission_for[section_a_user_2])
 
       described_class.process_due_date_reminder(section_a_ao.class.name, section_a_ao.id)
     end

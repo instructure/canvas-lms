@@ -59,7 +59,7 @@ target="_blank">account navigation</a>:
   - Building helper libraries for campus-specific customizations
   - Leveraging single sign-on for access to other systems, like SIS
 
-Adding a link/tab to the <a href="file.navigation_tools.html#user_navigation
+Adding a link/tab to the <a href="file.navigation_tools.html#user_navigation"
 target="_blank">
 user profile navigation</a>:
 
@@ -69,7 +69,7 @@ user profile navigation</a>:
   - Linking to an external user profile
 
 Selecting content to add to a variety of locations as <a
-href="file.deep_linking.html" target="_blank">LTI deep links</a>:
+href="file.content_item.html" target="_blank">LTI deep links</a>:
 
   Example use cases might include:
 

@@ -370,6 +370,9 @@ describe "student planner" do
         expect(element_value_for_attr(date_input, "value")).to eq(day)
       end
 
+      # date input needs to be blurred in order to trigger state update
+      date_input.send_keys(:tab)
+
       todo_save_button.click
       @student_to_do.reload
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
@@ -384,7 +387,7 @@ describe "student planner" do
       fj("button:contains('15')").click
       title_input.send_keys("the title")
       time_input.click
-      fj("li[role=option]:contains('9:00 AM')").click
+      fj("span[role=option]:contains('9:00 AM')").click
 
       todo_save_button.click
       expect(ff(".planner-item").last).to include_text "DUE: 9:00 AM"
@@ -608,6 +611,42 @@ describe "student planner" do
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         expect(get_value('input[name="todo_date"]')).to eq format_date_for_view(Time.zone.today, "%b %-d, %Y, 11:59 PM")
       end
+    end
+  end
+
+  context "My Grades tray" do
+    before :once do
+      @course2 = course_factory(active_all: true)
+      @course2.enroll_student(@student1).accept!
+      @course2_assignment = @course2.assignments.create!(name: "Course 2 Assignment", points_possible: 20, submission_types: "online_text_entry")
+      @course2_assignment.grade_student(@student1, grader: @teacher, score: 14)
+    end
+
+    it "shows effective grades for student courses" do
+      user_session(@student1)
+      go_to_list_view
+      fj("button:contains('Show My Grades')").click
+      shown_grades = ff("[data-testid='my-grades-score']")
+      expect(shown_grades.map(&:text)).to eq ["No Grade", "70.00%"]
+    end
+
+    it "shows letter grades when user is quantitative data restricted" do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+
+      user_session(@student1)
+      go_to_list_view
+      fj("button:contains('Show My Grades')").click
+      shown_grades = ff("[data-testid='my-grades-score']")
+      expect(shown_grades.map(&:text)).to eq ["No Grade", "C-"]
     end
   end
 

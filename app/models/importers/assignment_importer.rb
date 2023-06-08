@@ -397,14 +397,14 @@ module Importers
           context_type: context.class.name
         )
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-          context: context, vendor_code: vendor_code, product_code: product_code
+          context:, vendor_code:, product_code:
         )
 
         if active_proxies.blank?
           migration.add_warning(I18n.t(
                                   "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
-                                  vendor_code: vendor_code,
-                                  product_code: product_code
+                                  vendor_code:,
+                                  product_code:
                                 ))
         else
           item.lti_context_id ||= SecureRandom.uuid

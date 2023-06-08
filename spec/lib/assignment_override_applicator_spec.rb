@@ -680,7 +680,7 @@ describe AssignmentOverrideApplicator do
 
         it "does not include section overrides for sections without an enrollment" do
           assignment = create_assignment(course: @course, due_at: 5.days.from_now)
-          override = assignment_override_model(assignment: assignment)
+          override = assignment_override_model(assignment:)
           override.set = @course.course_sections.create!
           override.save!
           overrides = AssignmentOverrideApplicator.section_overrides(assignment, @student)
@@ -866,7 +866,7 @@ describe AssignmentOverrideApplicator do
             section = @course.course_sections.create! name: "title"
             @course.enroll_user(@student,
                                 "StudentEnrollment",
-                                section: section,
+                                section:,
                                 enrollment_state: "active",
                                 allow_multiple_enrollments: true)
             override = quiz.assignment_overrides.build
@@ -897,7 +897,7 @@ describe AssignmentOverrideApplicator do
             section = @course.course_sections.create! name: "title"
             @course.enroll_user(@student,
                                 "StudentEnrollment",
-                                section: section,
+                                section:,
                                 enrollment_state: "active",
                                 allow_multiple_enrollments: true)
             override = quiz.assignment_overrides.build

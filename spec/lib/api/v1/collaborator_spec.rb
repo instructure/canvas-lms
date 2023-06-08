@@ -27,7 +27,7 @@ describe Api::V1::Collaborator do
     let(:collaboration) { collaboration_model }
 
     context "group collaborator" do
-      let(:collaborator) { Collaborator.create(collaboration: collaboration, group: group) }
+      let(:collaborator) { Collaborator.create(collaboration:, group:) }
 
       it "serializes" do
         json = collaborator_json(collaborator, user, nil, context: group)
@@ -51,7 +51,7 @@ describe Api::V1::Collaborator do
     end
 
     context "user collaborator" do
-      let(:collaborator) { Collaborator.create(collaboration: collaboration, user: user) }
+      let(:collaborator) { Collaborator.create(collaboration:, user:) }
 
       it "serializes" do
         json = collaborator_json(collaborator, user, nil, context: group)

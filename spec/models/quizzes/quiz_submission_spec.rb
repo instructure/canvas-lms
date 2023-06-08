@@ -311,7 +311,7 @@ describe Quizzes::QuizSubmission do
                                                  "question_#{qq2.id}_marked" => false
                                                })
 
-        expect(quiz_submission.events.where(event_type: event_type).count).to eq 1
+        expect(quiz_submission.events.where(event_type:).count).to eq 1
       end
 
       context "with cant_go_back true" do
@@ -596,6 +596,15 @@ describe Quizzes::QuizSubmission do
         expect(@quiz_submission.submission.workflow_state).to eql "pending_review"
       end
 
+      it "marks the submission as resubmitted if it needs grading and is not the first attempt" do
+        @essay_quiz = assignment_quiz([{ question_data: { :name => "question 1", :points_possible => 1, "question_type" => "essay_question" } }])
+        @essay_quiz_submission1 = graded_submission(@essay_quiz, @user)
+        @essay_quiz_submission2 = graded_submission(@essay_quiz, @user)
+        expect(@quiz_submission.submission.grade_matches_current_submission).to be_truthy
+        expect(@essay_quiz_submission1.submission.grade_matches_current_submission).to be_truthy
+        expect(@essay_quiz_submission2.submission.grade_matches_current_submission).to be_falsey
+      end
+
       def grade_question(score)
         @quiz_submission.update_scores({
                                          "context_id" => @course.id,
@@ -733,7 +742,7 @@ describe Quizzes::QuizSubmission do
           workflow_state: "available",
           scoring_policy: "keep_highest",
           due_at: 5.days.from_now,
-          lock_at: lock_at
+          lock_at:
         )
         quiz
       end
@@ -1679,7 +1688,7 @@ describe Quizzes::QuizSubmission do
       Timecop.freeze do
         quiz = @course.quizzes.create(due_at: 5.minutes.from_now, quiz_type: "assignment")
         qs = Quizzes::QuizSubmission.create(
-          finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
+          finished_at: Time.zone.now, user: @user, quiz:, workflow_state: :complete
         )
 
         expect(qs.submission.seconds_late).to be 0
@@ -1690,7 +1699,7 @@ describe Quizzes::QuizSubmission do
       Timecop.freeze do
         quiz = @course.quizzes.create(due_at: 5.minutes.ago, quiz_type: "assignment")
         qs = Quizzes::QuizSubmission.create(
-          finished_at: Time.zone.now, user: @user, quiz: quiz, workflow_state: :complete
+          finished_at: Time.zone.now, user: @user, quiz:, workflow_state: :complete
         )
 
         expected_seconds_late = (60.seconds.ago - 5.minutes.ago.change(usec: 0)).to_i

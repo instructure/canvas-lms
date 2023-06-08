@@ -303,7 +303,7 @@ describe "gradebooks/grade_summary" do
     let(:course) { Course.create! }
     let(:site_admin) { site_admin_user }
     let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
-    let(:student) { student_in_course(course: course, active_all: true).user }
+    let(:student) { student_in_course(course:, active_all: true).user }
     let(:attachment) { attachment_model(context: student, content_type: "text/plain") }
     let(:state) { "acceptable" }
 
@@ -346,7 +346,7 @@ describe "gradebooks/grade_summary" do
             web_overlap: 5.0,
             publication_overlap: 0.0,
             student_overlap: 0.0,
-            state: state
+            state:
           }
         }
       end
@@ -555,7 +555,7 @@ describe "gradebooks/grade_summary" do
 
       it "displays an updated plagiarism indicator when the assignment uses Turnitin" do
         allow(presenter).to receive(:turnitin_enabled?).and_return(true)
-        submission.update!(turnitin_data: turnitin_data)
+        submission.update!(turnitin_data:)
 
         render "gradebooks/grade_summary"
         expect(response).to have_tag(icon_css_query)

@@ -56,7 +56,7 @@ describe "differentiated_assignments" do
 
   def group_assignment_with_true_only_visible_to_overrides(opts = {})
     group_category = opts[:group_category] || @course.group_categories.first
-    make_assignment({ date: nil, ovto: true, group_category: group_category })
+    make_assignment({ date: nil, ovto: true, group_category: })
   end
 
   def student_in_course_with_adhoc_override(assignment, opts = {})

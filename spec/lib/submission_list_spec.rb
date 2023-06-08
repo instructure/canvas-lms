@@ -288,8 +288,8 @@ describe SubmissionList do
 
     context "when the grade is not blank" do
       let!(:grade_assignment) do
-        assignment.grade_student student, { grade: 5, grader: grader }
-        assignment.grade_student student, { grade: 3, grader: grader }
+        assignment.grade_student(student, { grade: 5, grader: })
+        assignment.grade_student student, { grade: 3, grader: }
       end
 
       it "remembers the 'Before' grade" do
@@ -307,9 +307,9 @@ describe SubmissionList do
 
     context "when the grade is blank" do
       let!(:grade_assignment) do
-        assignment.grade_student student, { grade: 6, grader: grader }
-        assignment.grade_student student, { grade: 7, grader: grader }
-        assignment.grade_student student, { grade: "", grader: grader }
+        assignment.grade_student(student, { grade: 6, grader: })
+        assignment.grade_student(student, { grade: 7, grader: })
+        assignment.grade_student student, { grade: "", grader: }
       end
 
       it "remembers the 'Before' grade" do

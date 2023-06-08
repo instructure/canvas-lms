@@ -290,7 +290,7 @@ describe AssignmentsApiController, type: :request do
           before do
             @shard1.activate do
               account = Account.create!
-              @cs_course = Course.create!(account: account)
+              @cs_course = Course.create!(account:)
               @cs_course.workflow_state = "available"
               @cs_course.save!
               @cs_course.assignments.create name: "assignment1"
@@ -667,7 +667,7 @@ describe AssignmentsApiController, type: :request do
                    action: "index",
                    format: "json",
                    course_id: @course.id.to_s,
-                   bucket: bucket }.merge(opts))
+                   bucket: }.merge(opts))
       end
 
       def assert_call_gets_assignments(bucket, assignments)
@@ -1884,7 +1884,7 @@ describe AssignmentsApiController, type: :request do
       it 'sets the assignment "resource_map" to a value indicating a map is needed when past imports exist' do
         allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
         master_template = MasterCourses::MasterTemplate.create!(course: @course)
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: new_course)
+        MasterCourses::ChildSubscription.create!(master_template:, child_course: new_course)
         expect_any_instance_of(Assignment).to receive(:resource_map=)
 
         subject
@@ -1893,7 +1893,7 @@ describe AssignmentsApiController, type: :request do
       it 'does not set the "resource_map" when the assignment is not a quiz_lti' do
         allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(false)
         master_template = MasterCourses::MasterTemplate.create!(course: @course)
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: new_course)
+        MasterCourses::ChildSubscription.create!(master_template:, child_course: new_course)
         expect_any_instance_of(Assignment).not_to receive(:resource_map=)
 
         subject
@@ -2220,7 +2220,7 @@ describe AssignmentsApiController, type: :request do
 
     it "sets the lti_context_id if provided" do
       lti_assignment_id = SecureRandom.uuid
-      jwt = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)
+      jwt = Canvas::Security.create_jwt(lti_assignment_id:)
 
       api_create_assignment_in_course(@course, { "description" => "description",
                                                  "secure_params" => jwt })
@@ -2231,7 +2231,7 @@ describe AssignmentsApiController, type: :request do
 
     it "does not allow creating an assignment with the same lti_context_id" do
       lti_assignment_id = SecureRandom.uuid
-      jwt = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)
+      jwt = Canvas::Security.create_jwt(lti_assignment_id:)
 
       api_create_assignment_in_course(@course, { "description" => "description",
                                                  "secure_params" => jwt })
@@ -2333,7 +2333,7 @@ describe AssignmentsApiController, type: :request do
     context "LTI 2.x" do
       include_context "lti2_spec_helper"
 
-      let(:teacher) { teacher_in_course(course: course) }
+      let(:teacher) { teacher_in_course(course:) }
 
       it "checks for tool installation in entire account chain" do
         user_session teacher
@@ -2371,7 +2371,7 @@ describe AssignmentsApiController, type: :request do
           a
         end
         let(:update_response) do
-          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: params
+          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params:
         end
         let(:lookups) { assignment.assignment_configuration_tool_lookups }
 
@@ -2446,9 +2446,9 @@ describe AssignmentsApiController, type: :request do
           let(:context) { raise "Override in spec" }
 
           it "sets the tool correctly" do
-            tool_proxy.update(context: context)
+            tool_proxy.update(context:)
             allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
-            Lti::ToolProxyBinding.create(context: context, tool_proxy: tool_proxy)
+            Lti::ToolProxyBinding.create(context:, tool_proxy:)
             api_create_assignment_in_course(
               @course,
               {
@@ -2523,12 +2523,12 @@ describe AssignmentsApiController, type: :request do
       let(:assignment_params) do
         {
           submission_types: ["external_tool"],
-          external_tool_tag_attributes: external_tool_tag_attributes
+          external_tool_tag_attributes:
         }
       end
 
       context "with custom_params" do
-        let(:external_tool_tag_attributes) { super().merge({ custom_params: custom_params }) }
+        let(:external_tool_tag_attributes) { super().merge({ custom_params: }) }
         let(:custom_params) do
           {
             "context_id" => "$Context.id"
@@ -2592,7 +2592,7 @@ describe AssignmentsApiController, type: :request do
             {
               content_id: tool.id,
               content_type: "context_external_tool",
-              custom_params: custom_params,
+              custom_params:,
               external_data: "",
               new_tab: "0",
               url: "http://example.com/launch"
@@ -2864,7 +2864,7 @@ describe AssignmentsApiController, type: :request do
 
         api_params = {
           controller: "assignments_api",
-          action: action,
+          action:,
           format: "json",
           course_id: @course.id.to_s
         }
@@ -3056,7 +3056,7 @@ describe AssignmentsApiController, type: :request do
         Assignment.where(id: assignment).update_all(created_at: 5.hours.ago)
 
         notification = Notification.create!(name: "Assignment Due Date Changed")
-        @student.email_channel.notification_policies.create!(notification: notification, frequency: "immediately")
+        @student.email_channel.notification_policies.create!(notification:, frequency: "immediately")
 
         @user = @teacher
         api_call(:put,
@@ -3205,7 +3205,7 @@ describe AssignmentsApiController, type: :request do
             assignment: create_assignment_json(@group, @group_category).merge(params)
           },
           {},
-          { expected_status: expected_status }
+          { expected_status: }
         )
       end
 
@@ -3499,7 +3499,7 @@ describe AssignmentsApiController, type: :request do
 
       it "succeeds if grading_standard_id is provided but it matches current grading_standard_id" do
         grading_standard = grading_standard_for(@course)
-        @assignment.update!(grading_standard: grading_standard)
+        @assignment.update!(grading_standard:)
         api_update_assignment_call(@course, @assignment, { grading_standard_id: grading_standard.id })
         expect(response).to be_successful
       end
@@ -3511,7 +3511,7 @@ describe AssignmentsApiController, type: :request do
 
       it "returns unauthorized if attempting to change grading_standard_id" do
         grading_standard = grading_standard_for(@course)
-        @assignment.update!(grading_standard: grading_standard)
+        @assignment.update!(grading_standard:)
         api_update_assignment_call(@course, @assignment, { grading_standard_id: nil })
         expect(response).to be_unauthorized
       end
@@ -4939,7 +4939,7 @@ describe AssignmentsApiController, type: :request do
           },
           { assignment: params },
           {},
-          { expected_status: expected_status }
+          { expected_status: }
         )
       end
 
@@ -5250,7 +5250,7 @@ describe AssignmentsApiController, type: :request do
     context "assignment that uses LTI 1.3" do
       let(:course) do
         course = course_factory
-        course_with_teacher_logged_in({ user: user_factory, course: course })
+        course_with_teacher_logged_in({ user: user_factory, course: })
         course
       end
       let(:assignment) do
@@ -5284,12 +5284,12 @@ describe AssignmentsApiController, type: :request do
       let(:assignment_params) do
         {
           submission_types: ["external_tool"],
-          external_tool_tag_attributes: external_tool_tag_attributes
+          external_tool_tag_attributes:
         }
       end
 
       context "that uses custom parameters" do
-        let(:external_tool_tag_attributes) { super().merge({ custom_params: custom_params }) }
+        let(:external_tool_tag_attributes) { super().merge({ custom_params: }) }
         let(:custom_params) { { "hello" => "there" } }
 
         it "saves the new custom params" do
@@ -6558,7 +6558,7 @@ describe AssignmentsApiController, type: :request do
       subject { @assignment }
 
       let(:params) do
-        ActionController::Parameters.new(duplicated_successfully: duplicated_successfully)
+        ActionController::Parameters.new(duplicated_successfully:)
       end
 
       before do
@@ -6594,7 +6594,7 @@ describe AssignmentsApiController, type: :request do
       subject { @assignment }
 
       let(:params) do
-        ActionController::Parameters.new(cc_imported_successfully: cc_imported_successfully)
+        ActionController::Parameters.new(cc_imported_successfully:)
       end
 
       before do
@@ -6771,7 +6771,7 @@ describe AssignmentsApiController, type: :request do
 
   context "when called with parameter calculate_grades" do
     let(:course) { Account.default.courses.create!(workflow_state: "available") }
-    let(:teacher) { course_with_teacher(course: course, active_all: true).user }
+    let(:teacher) { course_with_teacher(course:, active_all: true).user }
 
     it "calls DueDateCacher with update_grades: false when passed calculate_grades: false" do
       update_grade_value = nil
@@ -7315,7 +7315,7 @@ def api_bulk_update(course, data, expected_status: 200, expected_result: "comple
                     course_id: course.to_param },
                   { _json: data },
                   {},
-                  { expected_status: expected_status })
+                  { expected_status: })
   return json unless response.status == 200
 
   progress = Progress.find(json["id"])

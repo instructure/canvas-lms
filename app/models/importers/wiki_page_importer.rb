@@ -46,7 +46,7 @@ module Importers
       wikis.each do |wiki|
         unless wiki
           message = "There was a nil wiki page imported for ContentMigration:#{migration.id}"
-          Canvas::Errors.capture(:content_migration, message: message)
+          Canvas::Errors.capture(:content_migration, message:)
           next
         end
         next unless wiki_page_migration?(migration, wiki)

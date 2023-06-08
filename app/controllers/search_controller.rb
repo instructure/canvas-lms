@@ -128,7 +128,7 @@ class SearchController < ApplicationController
 
       permissions = params[:permissions] || []
       permissions << :send_messages if params[:messageable_only]
-      load_all_contexts context: search_context, permissions: permissions
+      load_all_contexts(context: search_context, permissions:)
 
       params[:per_page] = nil if params[:per_page].to_i <= 0
 

@@ -27,7 +27,7 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
         Role
         .joins(:role_overrides)
         .where.not(workflow_state: "deleted")
-        .where(base_role_type: base_role_type)
+        .where(base_role_type:)
         .where(
           "role_overrides.permission = ? OR role_overrides.permission = ?",
           "manage_courses",

@@ -80,7 +80,7 @@ module I18nTasks
     end
 
     def lookup(locale, key)
-      ::I18n.translate!(key.to_sym, locale: locale, raise: true)
+      ::I18n.translate!(key.to_sym, locale:, raise: true)
     rescue ::I18n::MissingTranslationData
       nil
     end

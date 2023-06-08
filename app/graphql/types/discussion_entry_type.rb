@@ -49,8 +49,8 @@ module Types
               object.message,
               context: topic.context,
               in_app: true,
-              request: request,
-              preloaded_attachments: preloaded_attachments,
+              request:,
+              preloaded_attachments:,
               user: current_user,
               options: { rewrite_api_urls: true }
             )
@@ -90,7 +90,7 @@ module Types
               user
             else
               course_id = topic.course.id if course_id.nil?
-              Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
+              Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(user).then do |roles|
                 if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (topic.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                   user
                 end
@@ -135,7 +135,7 @@ module Types
             if !topic.anonymous? || !user
               user
             else
-              Loaders::CourseRoleLoader.for(course_id: course_id, role_types: role_types, built_in_only: built_in_only).load(user).then do |roles|
+              Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(user).then do |roles|
                 if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment") || (topic.anonymous_state == "partial_anonymity" && !object.is_anonymous_author)
                   user
                 end
@@ -150,7 +150,7 @@ module Types
     def root_entry_participant_counts
       return nil unless object.root_entry_id.nil?
 
-      Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
+      Loaders::DiscussionEntryCountsLoader.for(current_user:).load(object)
     end
 
     field :discussion_topic, Types::DiscussionType, null: false
@@ -166,18 +166,18 @@ module Types
     end
     def discussion_subentries_connection(sort_order: :asc, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
       Loaders::DiscussionEntryLoader.for(
-        current_user: current_user,
-        sort_order: sort_order,
-        relative_entry_id: relative_entry_id,
-        before_relative_entry: before_relative_entry,
-        include_relative_entry: include_relative_entry
+        current_user:,
+        sort_order:,
+        relative_entry_id:,
+        before_relative_entry:,
+        include_relative_entry:
       ).load(object)
     end
 
     field :entry_participant, Types::EntryParticipantType, null: true
     def entry_participant
       Loaders::EntryParticipantLoader.for(
-        current_user: current_user
+        current_user:
       ).load(object)
     end
 
@@ -205,7 +205,7 @@ module Types
     def permissions
       load_association(:discussion_topic).then do
         {
-          loader: Loaders::PermissionsLoader.for(object, current_user: current_user, session: session),
+          loader: Loaders::PermissionsLoader.for(object, current_user:, session:),
           discussion_entry: object
         }
       end

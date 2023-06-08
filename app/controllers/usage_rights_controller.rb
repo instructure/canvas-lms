@@ -172,7 +172,7 @@ class UsageRightsController < ApplicationController
 
     count = @context.attachments.not_deleted.where(id: file_ids).update_all(update_attrs)
     result = usage_rights ? usage_rights_json(usage_rights, @current_user) : {}
-    result[:message] = I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count: count)
+    result[:message] = I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count:)
     result[:file_ids] = file_ids
     render json: result
   end

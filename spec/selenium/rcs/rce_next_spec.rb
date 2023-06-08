@@ -319,7 +319,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       it "clicks on sidebar quizzes page to create link in body" do
         title = "Quiz-Title"
-        @quiz = @course.quizzes.create!(workflow_state: "available", title: title)
+        @quiz = @course.quizzes.create!(workflow_state: "available", title:)
 
         visit_front_page_edit(@course)
 
@@ -336,7 +336,7 @@ describe "RCE next tests", ignore_js_errors: true do
       it "clicks on sidebar announcements page to create link in body" do
         title = "Announcement-Title"
         message = "Announcement 1 detail"
-        @announcement = @course.announcements.create!(title: title, message: message)
+        @announcement = @course.announcements.create!(title:, message:)
 
         visit_front_page_edit(@course)
 
@@ -355,7 +355,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       it "clicks on sidebar discussions page to create link in body" do
         title = "Discussion-Title"
-        @discussion = @course.discussion_topics.create!(title: title)
+        @discussion = @course.discussion_topics.create!(title:)
 
         visit_front_page_edit(@course)
 
@@ -557,7 +557,7 @@ describe "RCE next tests", ignore_js_errors: true do
         title = "Assignment-Title"
         due_at = 3.days.from_now
         @assignment =
-          @course.assignments.create!(name: title, workflow_state: "published", due_at: due_at)
+          @course.assignments.create!(name: title, workflow_state: "published", due_at:)
 
         visit_new_announcement_page(@course)
 
@@ -579,7 +579,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         it "still allows inserting course links" do
           title = "Discussion-Title"
-          @discussion = @course.discussion_topics.create!(title: title)
+          @discussion = @course.discussion_topics.create!(title:)
 
           visit_front_page_edit(@course)
 

@@ -39,8 +39,8 @@ describe "user_content post processing" do
     @course.wiki_pages.create!(title: page_title, body: page_content)
   end
 
-  def wait_for_loading_image(&block)
-    wait_for_transient_element(".loading_image_holder", &block)
+  def wait_for_loading_image(&)
+    wait_for_transient_element(".loading_image_holder", &)
   end
 
   describe "file downloads" do

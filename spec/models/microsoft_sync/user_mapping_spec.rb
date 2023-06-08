@@ -29,7 +29,7 @@ describe MicrosoftSync::UserMapping do
   describe ".find_enrolled_user_ids_without_mappings" do
     let(:course) { course_with_teacher.course }
     let(:users) do
-      [course.enrollments.first.user, *n_students_in_course(3, course: course)]
+      [course.enrollments.first.user, *n_students_in_course(3, course:)]
     end
 
     %w[active creation_pending].each do |state|
@@ -42,7 +42,7 @@ describe MicrosoftSync::UserMapping do
         let(:calls_results) do
           results = []
           described_class.find_enrolled_user_ids_without_mappings(
-            course: course, batch_size: 2
+            course:, batch_size: 2
           ) do |ids|
             results << ids
           end
@@ -65,7 +65,7 @@ describe MicrosoftSync::UserMapping do
         course.enrollments.where(user: users.first).take.update!(workflow_state: state)
         calls_results = []
         described_class.find_enrolled_user_ids_without_mappings(
-          course: course, batch_size: 2
+          course:, batch_size: 2
         ) do |ids|
           calls_results << ids
         end
@@ -327,12 +327,12 @@ describe MicrosoftSync::UserMapping do
         um1 = @shard1.activate do
           acct1 = make_microsoft_enabled_account
           user = student_in_course(active_all: true, course: course_model(account: acct1)).user
-          described_class.create! root_account: acct1, user: user, aad_id: "foo"
+          described_class.create! root_account: acct1, user:, aad_id: "foo"
         end
         um2 = @shard2.activate do
           acct2 = make_microsoft_enabled_account
           course_model(account: acct2).enroll_user(user)
-          described_class.create! root_account: acct2, user: user, aad_id: "bar"
+          described_class.create! root_account: acct2, user:, aad_id: "bar"
         end
 
         expect do
@@ -350,7 +350,7 @@ describe MicrosoftSync::UserMapping do
 
       accts.each do |acct|
         users.each_with_index do |user, index|
-          described_class.create!(root_account: acct, user: user, needs_updating: index != 2)
+          described_class.create!(root_account: acct, user:, needs_updating: index != 2)
         end
       end
 

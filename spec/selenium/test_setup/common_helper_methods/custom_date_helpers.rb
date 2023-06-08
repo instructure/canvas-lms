@@ -23,7 +23,7 @@ module CustomDateHelpers
   # Formatted output: Mmm d, e.g. 'Jan 1'
   def format_date_for_view(date, format = nil)
     if format
-      I18n.l(date.to_date, format: format)
+      I18n.l(date.to_date, format:)
     else
       date_string(date, :no_words)
     end

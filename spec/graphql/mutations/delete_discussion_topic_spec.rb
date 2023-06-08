@@ -42,7 +42,7 @@ describe Mutations::DeleteDiscussionTopic do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   it "destroys the discussion entry and returns id" do

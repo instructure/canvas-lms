@@ -87,7 +87,7 @@ describe "Outcome Groups API", type: :request do
   end
 
   def assess_with(outcome, context, user = nil)
-    assignment = assignment_model(context: context)
+    assignment = assignment_model(context:)
     rubric = add_or_get_rubric(outcome)
     user ||= user_factory(active_all: true)
     context.enroll_student(user) unless context.student_enrollments.where(user_id: user.id).exists?
@@ -95,7 +95,7 @@ describe "Outcome Groups API", type: :request do
     assignment.reload
     submission = assignment.grade_student(user, grade: "10", grader: @teacher).first
     a.assess({
-               user: user,
+               user:,
                assessor: user,
                artifact: submission,
                assessment: {
@@ -108,7 +108,7 @@ describe "Outcome Groups API", type: :request do
              })
     result = outcome.learning_outcome_results.first
     assessment = a.assess({
-                            user: user,
+                            user:,
                             assessor: user,
                             artifact: submission,
                             assessment: {
@@ -121,7 +121,7 @@ describe "Outcome Groups API", type: :request do
                           })
     result.reload
     rubric.reload
-    { assignment: assignment, assessment: assessment, rubric: rubric }
+    { assignment:, assessment:, rubric: }
   end
 
   describe "redirect" do
@@ -1004,7 +1004,7 @@ describe "Outcome Groups API", type: :request do
 
     it "returns additional information when 'full' arg passed" do
       description = "some really cool description"
-      create_outcome(description: description)
+      create_outcome(description:)
 
       json = api_call(:get,
                       "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
@@ -1038,7 +1038,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "orders links by outcome title" do
-      @links = %w[B A C].map { |title| create_outcome(title: title) }
+      @links = %w[B A C].map { |title| create_outcome(title:) }
       json = api_call(:get,
                       "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                       controller: "outcome_groups_api",
@@ -1864,7 +1864,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "orders subgroups by title" do
-      @subgroups = %w[B A C].map { |title| create_subgroup(title: title) }
+      @subgroups = %w[B A C].map { |title| create_subgroup(title:) }
       json = api_call(:get,
                       "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                       controller: "outcome_groups_api",

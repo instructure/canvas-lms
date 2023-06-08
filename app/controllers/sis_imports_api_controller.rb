@@ -519,7 +519,7 @@ class SisImportsApiController < ApplicationController
   #   objects that are deleted during the batch mode cleanup process.
   #
   # @argument override_sis_stickiness [Boolean]
-  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   Default is false. If true, any fields containing “sticky” or UI changes will be overridden.
   #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @argument add_sis_stickiness [Boolean]
@@ -756,7 +756,7 @@ class SisImportsApiController < ApplicationController
         return render json: "cannot set both undelete_only and unconclude_only", status: :bad_request
       end
 
-      progress = @batch.restore_states_later(batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only)
+      progress = @batch.restore_states_later(batch_mode:, undelete_only:, unconclude_only:)
       render json: progress_json(progress, @current_user, session)
     end
   end

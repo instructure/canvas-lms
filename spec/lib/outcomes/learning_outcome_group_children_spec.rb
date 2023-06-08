@@ -28,24 +28,24 @@ describe Outcomes::LearningOutcomeGroupChildren do
   let!(:global_outcome1) { outcome_model(outcome_group: global_group, title: "G Outcome 1") }
   let!(:global_outcome2) { outcome_model(outcome_group: global_group, title: "G Outcome 2") }
   let!(:g0) { context.root_outcome_group }
-  let!(:g1) { outcome_group_model(context: context, outcome_group_id: g0, title: "Group 1.1") }
-  let!(:g2) { outcome_group_model(context: context, outcome_group_id: g0, title: "Group 1.2") }
-  let!(:g3) { outcome_group_model(context: context, outcome_group_id: g1, title: "Group 2.1") }
-  let!(:g4) { outcome_group_model(context: context, outcome_group_id: g1, title: "Group 2.2") }
-  let!(:g5) { outcome_group_model(context: context, outcome_group_id: g2, title: "Group 3") }
-  let!(:g6) { outcome_group_model(context: context, outcome_group_id: g3, title: "Group 4") }
-  let!(:o0) { outcome_model(context: context, outcome_group: g0, title: "Outcome 1", short_description: "Outcome 1") }
-  let!(:o1) { outcome_model(context: context, outcome_group: g1, title: "Outcome 2.1", short_description: "Outcome 2.1") }
-  let!(:o2) { outcome_model(context: context, outcome_group: g1, title: "Outcome 2.2", short_description: "Outcome 2.2") }
-  let!(:o3) { outcome_model(context: context, outcome_group: g2, title: "Outcome 3", short_description: "Outcome 3") }
-  let!(:o4) { outcome_model(context: context, outcome_group: g3, title: "Outcome 4.1", short_description: "Outcome 4.1") }
-  let!(:o5) { outcome_model(context: context, outcome_group: g3, title: "Outcome 4.2", short_description: "Outcome 4.2") }
-  let!(:o6) { outcome_model(context: context, outcome_group: g3, title: "Outcome 4.3", short_description: "Outcome 4.3") }
-  let!(:o7) { outcome_model(context: context, outcome_group: g4, title: "Outcome 5", short_description: "Outcome 5") }
-  let!(:o8) { outcome_model(context: context, outcome_group: g5, title: "Outcome 6", short_description: "Outcome 6") }
-  let!(:o9) { outcome_model(context: context, outcome_group: g6, title: "Outcome 7.1", short_description: "Outcome 7.1") }
-  let!(:o10) { outcome_model(context: context, outcome_group: g6, title: "Outcome 7.2", short_description: "Outcome 7.2") }
-  let!(:o11) { outcome_model(context: context, outcome_group: g6, title: "Outcome 7.3 mathematic", short_description: "Outcome 7.3 mathematic") }
+  let!(:g1) { outcome_group_model(context:, outcome_group_id: g0, title: "Group 1.1") }
+  let!(:g2) { outcome_group_model(context:, outcome_group_id: g0, title: "Group 1.2") }
+  let!(:g3) { outcome_group_model(context:, outcome_group_id: g1, title: "Group 2.1") }
+  let!(:g4) { outcome_group_model(context:, outcome_group_id: g1, title: "Group 2.2") }
+  let!(:g5) { outcome_group_model(context:, outcome_group_id: g2, title: "Group 3") }
+  let!(:g6) { outcome_group_model(context:, outcome_group_id: g3, title: "Group 4") }
+  let!(:o0) { outcome_model(context:, outcome_group: g0, title: "Outcome 1", short_description: "Outcome 1") }
+  let!(:o1) { outcome_model(context:, outcome_group: g1, title: "Outcome 2.1", short_description: "Outcome 2.1") }
+  let!(:o2) { outcome_model(context:, outcome_group: g1, title: "Outcome 2.2", short_description: "Outcome 2.2") }
+  let!(:o3) { outcome_model(context:, outcome_group: g2, title: "Outcome 3", short_description: "Outcome 3") }
+  let!(:o4) { outcome_model(context:, outcome_group: g3, title: "Outcome 4.1", short_description: "Outcome 4.1") }
+  let!(:o5) { outcome_model(context:, outcome_group: g3, title: "Outcome 4.2", short_description: "Outcome 4.2") }
+  let!(:o6) { outcome_model(context:, outcome_group: g3, title: "Outcome 4.3", short_description: "Outcome 4.3") }
+  let!(:o7) { outcome_model(context:, outcome_group: g4, title: "Outcome 5", short_description: "Outcome 5") }
+  let!(:o8) { outcome_model(context:, outcome_group: g5, title: "Outcome 6", short_description: "Outcome 6") }
+  let!(:o9) { outcome_model(context:, outcome_group: g6, title: "Outcome 7.1", short_description: "Outcome 7.1") }
+  let!(:o10) { outcome_model(context:, outcome_group: g6, title: "Outcome 7.2", short_description: "Outcome 7.2") }
+  let!(:o11) { outcome_model(context:, outcome_group: g6, title: "Outcome 7.3 mathematic", short_description: "Outcome 7.3 mathematic") }
   let!(:course) { course_model name: "course", account: context, workflow_state: "created" }
   let!(:cg0) { course.root_outcome_group }
   let!(:cg1) { outcome_group_model(context: course, outcome_group_id: cg0, title: "Course Group 1") }
@@ -365,27 +365,27 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context "search" do
       before do
         outcome_model(
-          context: context,
+          context:,
           outcome_group: g1,
           title: "LA.1.1.1.1",
           description: "Talk about personal experiences and familiar events."
         )
         outcome_model(
-          context: context,
+          context:,
           outcome_group: g1,
           title: "LA.1.1.1",
           description: "continue to apply phonic knowledge and skills as the route to decode words until " \
                        "automatic decoding has become embedded and reading is fluent"
         )
         outcome_model(
-          context: context,
+          context:,
           outcome_group: g1,
           title: "LA.2.2.1.2",
           description: "Explain anticipated meaning, recognize relationships, and draw conclusions; self-correct " \
                        "understanding using a variety of strategies [including rereading for story sense]."
         )
         outcome_model(
-          context: context,
+          context:,
           outcome_group: g1,
           title: "FO.3",
           description: "apply their growing knowledge of root words, prefixes and suffixes (etymology and morphology) " \
@@ -393,14 +393,14 @@ describe Outcomes::LearningOutcomeGroupChildren do
                        "ds they meet"
         )
         outcome_model(
-          context: context,
+          context:,
           outcome_group: g1,
           title: "HT.ML.1.1",
           description: "<p>Pellentesque&nbsp;habitant morbi tristique senectus et netus et malesuada fames ac turpis e" \
                        "gestas.</p>"
         )
         outcome_model(
-          context: context,
+          context:,
           outcome_group: g1,
           title: "HT.ML.1.2",
           description: "<p>This is <b>awesome</b>.</p>"
@@ -457,13 +457,13 @@ describe Outcomes::LearningOutcomeGroupChildren do
           account.save!
 
           outcome_model(
-            context: context,
+            context:,
             outcome_group: g1,
             title: "will bring",
             description: "<p>Um texto <b>portugues</b>.</p>"
           )
           outcome_model(
-            context: context,
+            context:,
             outcome_group: g1,
             title: "won't bring",
             description: "<p>Um animal bonito.</p>"
@@ -521,13 +521,13 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
         it "filters outcomes normally" do
           outcome_model(
-            context: context,
+            context:,
             outcome_group: g1,
             title: "will bring",
             description: "<p>Um texto <b>portugues</b>.</p>"
           )
           outcome_model(
-            context: context,
+            context:,
             outcome_group: g1,
             title: "will bring too",
             description: "<p>Um animal bonito.</p>"
@@ -632,8 +632,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       it "clears the cache" do
         enable_cache do
           expect(subject.total_outcomes(g0.id)).to eq 12
-          new_group = outcome_group_model(context: context, outcome_group_id: g0)
-          outcome_model(context: context, outcome_group: new_group)
+          new_group = outcome_group_model(context:, outcome_group_id: g0)
+          outcome_model(context:, outcome_group: new_group)
           expect(described_class.new(context).total_outcomes(g0.id)).to eq 13
         end
       end
@@ -653,8 +653,8 @@ describe Outcomes::LearningOutcomeGroupChildren do
       it "clears the cache" do
         enable_cache do
           expect(subject.total_outcomes(g0.id)).to eq 12
-          outcome_group = outcome_group_model(context: context)
-          outcome_model(context: context, outcome_group: outcome_group)
+          outcome_group = outcome_group_model(context:)
+          outcome_model(context:, outcome_group:)
           g1.adopt_outcome_group(outcome_group)
           expect(described_class.new(context).total_outcomes(g0.id)).to eq 13
         end
@@ -676,7 +676,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
       it "clears the cache" do
         enable_cache do
           expect(subject.total_outcomes(g1.id)).to eq 9
-          outcome = LearningOutcome.create!(title: "test outcome", context: context)
+          outcome = LearningOutcome.create!(title: "test outcome", context:)
           g1.add_outcome(outcome)
           expect(described_class.new(context).total_outcomes(g1.id)).to eq 10
         end
@@ -686,7 +686,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context "when an outcome is destroyed" do
       it "clears the cache" do
         enable_cache do
-          outcome = LearningOutcome.create!(title: "test outcome", context: context)
+          outcome = LearningOutcome.create!(title: "test outcome", context:)
           g1.add_outcome(outcome)
           expect(described_class.new(context).total_outcomes(g1.id)).to eq 10
           outcome.destroy
@@ -721,7 +721,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context "when a child_outcome_link is destroyed" do
       it "clears the cache" do
         enable_cache do
-          outcome = LearningOutcome.create!(title: "test outcome", context: context)
+          outcome = LearningOutcome.create!(title: "test outcome", context:)
           child_outcome_link = g1.add_outcome(outcome)
           expect(described_class.new(context).total_outcomes(g1.id)).to eq 10
           child_outcome_link.destroy

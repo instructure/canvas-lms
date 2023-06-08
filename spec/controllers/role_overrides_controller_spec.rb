@@ -22,7 +22,7 @@ describe RoleOverridesController do
   let(:parent_account) { Account.default }
 
   before do
-    @account = account_model(parent_account: parent_account)
+    @account = account_model(parent_account:)
     account_admin_user(account: @account)
     user_session(@admin)
   end
@@ -107,7 +107,7 @@ describe RoleOverridesController do
     end
 
     def update_permissions(permissions)
-      put("update", params: { account_id: @account.id, id: @role.id, permissions: permissions })
+      put("update", params: { account_id: @account.id, id: @role.id, permissions: })
     end
 
     it "lets you update a permission" do

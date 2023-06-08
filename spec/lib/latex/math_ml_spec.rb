@@ -19,7 +19,7 @@
 
 describe Latex::MathMl do
   subject(:math_ml) do
-    Latex::MathMl.new(latex: latex)
+    Latex::MathMl.new(latex:)
   end
 
   let(:latex) do

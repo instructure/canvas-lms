@@ -200,7 +200,7 @@ describe Login::SamlController do
 
   it "doesn't allow deleted users" do
     account = account_with_saml
-    user_with_pseudonym(active_all: 1, account: account)
+    user_with_pseudonym(active_all: 1, account:)
     @user.update!(workflow_state: "deleted")
 
     response = SAML2::Response.new
@@ -326,7 +326,7 @@ describe Login::SamlController do
 
   it "skips JIT user provisioning for suspended pseudonyms" do
     account = account_with_saml
-    user = user_with_pseudonym(active_all: 1, account: account)
+    user = user_with_pseudonym(active_all: 1, account:)
     user.pseudonyms.last.update!(workflow_state: "suspended")
 
     ap = account.authentication_providers.first
@@ -356,7 +356,7 @@ describe Login::SamlController do
 
   it "updates federated attributes" do
     account = account_with_saml
-    user_with_pseudonym(active_all: 1, account: account)
+    user_with_pseudonym(active_all: 1, account:)
 
     ap = account.authentication_providers.first
     ap.federated_attributes = { "display_name" => "eduPersonNickname" }
@@ -410,7 +410,7 @@ describe Login::SamlController do
   context "with relay state" do
     before do
       account = account_with_saml
-      user_with_pseudonym(active_all: 1, account: account)
+      user_with_pseudonym(active_all: 1, account:)
       allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
       allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
       session[:return_to] = "/courses/1"

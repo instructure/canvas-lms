@@ -59,7 +59,7 @@ module RollupScoreAggregatorHelper
   def retrieve_scores(results)
     results.map do |result|
       score = quiz_score?(result) ? scaled_score_from_result(result) : result_score(result)
-      { score: score, result: result }
+      { score:, result: }
     end
   end
 

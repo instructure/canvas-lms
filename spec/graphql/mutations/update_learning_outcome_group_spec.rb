@@ -64,7 +64,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   context "Mutation" do

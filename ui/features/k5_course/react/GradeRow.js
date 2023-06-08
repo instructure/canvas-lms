@@ -141,7 +141,15 @@ export const GradeRow = ({
         )
       default:
         // Handles 'percent', 'letter_grade'
-        return notGraded ? notGradedContent() : <Text>{grade}</Text>
+        return notGraded ? (
+          notGradedContent()
+        ) : grade === 'complete' ? (
+          <AccessibleContent alt={I18n.t('Complete')}>
+            <IconCheckDarkSolid />
+          </AccessibleContent>
+        ) : (
+          <Text>{grade}</Text>
+        )
     }
   }
 

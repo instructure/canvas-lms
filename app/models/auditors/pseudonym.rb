@@ -66,7 +66,7 @@ class Auditors::Pseudonym
 
     event_record = nil
     pseudonym.shard.activate do
-      event_record = Auditors::Pseudonym::Record.generate(pseudonym, performing_user, action: action)
+      event_record = Auditors::Pseudonym::Record.generate(pseudonym, performing_user, action:)
       Auditors::Pseudonym::Stream.insert(event_record)
     end
     event_record

@@ -50,7 +50,7 @@ module Canvas
 
   def self.cache_store_config_for(cluster)
     yaml_config = ConfigFile.load("cache_store", cluster)
-    consul_config = YAML.safe_load(DynamicSettings.find(tree: :private, cluster: cluster)["cache_store.yml"] || "{}") || {}
+    consul_config = YAML.safe_load(DynamicSettings.find(tree: :private, cluster:)["cache_store.yml"] || "{}") || {}
     consul_config = consul_config.with_indifferent_access if consul_config.is_a?(Hash)
 
     consul_config.presence || yaml_config
@@ -124,7 +124,7 @@ module Canvas
         error_class: ex.class,
         error_message: ex.message,
         error_backtrace: ex.backtrace,
-        tries: tries,
+        tries:,
         message: "Retrying service call!"
       }.to_json
     end
@@ -135,7 +135,7 @@ module Canvas
     on_retry: DEFAULT_RETRY_CALLBACK,
     tries: 3,
   }.freeze
-  def self.retriable(opts = {}, &block)
+  def self.retriable(opts = {}, &)
     if opts[:on_retry]
       original_callback = opts[:on_retry]
       opts[:on_retry] = lambda do |ex, tries|
@@ -144,7 +144,7 @@ module Canvas
       end
     end
     options = DEFAULT_RETRIABLE_OPTIONS.merge(opts)
-    Retriable.retriable(options, &block)
+    Retriable.retriable(options, &)
   end
 
   def self.installation_uuid
@@ -175,17 +175,17 @@ module Canvas
   #
   # all the configurable params have service-specific Settings with fallback to
   # generic Settings.
-  def self.timeout_protection(service_name, options = {}, &block)
+  def self.timeout_protection(service_name, options = {}, &)
     timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get("service_generic_timeout", 15.seconds.to_s)).to_f
 
     if Canvas.redis_enabled?
       if timeout_protection_method(service_name) == "percentage"
-        percent_short_circuit_timeout(Canvas.redis, service_name, timeout, &block)
+        percent_short_circuit_timeout(Canvas.redis, service_name, timeout, &)
       else
-        short_circuit_timeout(Canvas.redis, service_name, timeout, &block)
+        short_circuit_timeout(Canvas.redis, service_name, timeout, &)
       end
     else
-      Timeout.timeout(timeout, &block)
+      Timeout.timeout(timeout, &)
     end
   rescue TimeoutCutoff, Timeout::Error => e
     log_message = if e.is_a?(TimeoutCutoff)
@@ -205,7 +205,7 @@ module Canvas
      Setting.get("service_generic_cutoff", 3.to_s)).to_i
   end
 
-  def self.short_circuit_timeout(redis, service_name, timeout, &block)
+  def self.short_circuit_timeout(redis, service_name, timeout, &)
     redis_key = "service:timeouts:#{service_name}:error_count"
     cutoff = timeout_protection_cutoff(service_name)
 
@@ -215,7 +215,7 @@ module Canvas
     end
 
     begin
-      Timeout.timeout(timeout, &block)
+      Timeout.timeout(timeout, &)
     rescue Timeout::Error
       error_ttl = timeout_protection_error_ttl(service_name)
       redis.incrby(redis_key, 1)
@@ -239,7 +239,7 @@ module Canvas
      Setting.get("service_generic_min_samples", 100.to_s)).to_i
   end
 
-  def self.percent_short_circuit_timeout(redis, service_name, timeout, &block)
+  def self.percent_short_circuit_timeout(redis, service_name, timeout, &)
     redis_key = "service:timeouts:#{service_name}:percent_counter"
     cutoff = timeout_protection_failure_rate_cutoff(service_name)
 
@@ -266,7 +266,7 @@ module Canvas
 
     begin
       counter.increment_count
-      Timeout.timeout(timeout, &block)
+      Timeout.timeout(timeout, &)
     rescue Timeout::Error
       counter.increment_failure
       raise

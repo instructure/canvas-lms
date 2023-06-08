@@ -59,7 +59,7 @@ module CC::Exporter::Epub
       @_templates ||= {
         title: cartridge_json[:title],
         files: cartridge_json[:files],
-        toc: toc,
+        toc:,
         syllabus: create_universal_template(:syllabus),
         announcements: create_universal_template(:announcements)
       }.tap do |hash|

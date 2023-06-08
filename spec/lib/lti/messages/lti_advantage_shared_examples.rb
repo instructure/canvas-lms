@@ -48,16 +48,16 @@ RSpec.shared_context "lti_advantage_shared_examples" do
       controller,
       {
         current_user: user,
-        tool: tool,
-        assignment: assignment,
-        collaboration: collaboration
+        tool:,
+        assignment:,
+        collaboration:
       }
     )
   end
   let(:collaboration) { nil }
   let(:assignment) do
     assignment_model(
-      course: course,
+      course:,
       submission_types: "external_tool",
       external_tool_tag_attributes: { content: tool, url: tool.url }
     )

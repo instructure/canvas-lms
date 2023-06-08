@@ -34,7 +34,7 @@ RSpec.describe Lti::IMS::LineItemsSerializer do
   end
   let(:assignment) do
     opts = {
-      course: course,
+      course:,
       submission_types: "external_tool",
       external_tool_tag_attributes: {
         url: tool.url,
@@ -52,8 +52,8 @@ RSpec.describe Lti::IMS::LineItemsSerializer do
   end
   let(:line_item) do
     line_item_model(
-      assignment: assignment,
-      resource_link: resource_link,
+      assignment:,
+      resource_link:,
       label: "label",
       tag: "tag",
       score_maximum: 60,

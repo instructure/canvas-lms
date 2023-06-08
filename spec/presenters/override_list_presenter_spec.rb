@@ -33,8 +33,8 @@ describe OverrideListPresenter do
 
   let(:course) { course_factory(active_all: true) }
   let(:assignment) { course.assignments.create!(title: "Testing") }
-  let(:user) { student_in_course(course: course, name: "Testing").user }
-  let(:second_user) { student_in_course(course: course, name: "Testing 2").user }
+  let(:user) { student_in_course(course:, name: "Testing").user }
+  let(:second_user) { student_in_course(course:, name: "Testing 2").user }
   let(:overridden_assignment) { assignment }
   let(:presenter) { OverrideListPresenter.new assignment, user }
 
@@ -159,8 +159,8 @@ describe OverrideListPresenter do
     context "for ADHOC overrides" do
       before do
         override = assignment.assignment_overrides.create!(due_at: 1.week.from_now)
-        override.assignment_override_students.create!(user: user, assignment: assignment)
-        override.assignment_override_students.create!(user: second_user, assignment: assignment)
+        override.assignment_override_students.create!(user:, assignment:)
+        override.assignment_override_students.create!(user: second_user, assignment:)
         override.save!
 
         @due_date = presenter.assignment.dates_hash_visible_to(user).first
@@ -187,7 +187,7 @@ describe OverrideListPresenter do
 
       it "does not double-count students that have multiple enrollments in the course" do
         section = course.course_sections.create!
-        course.enroll_student(user, section: section, enrollment_state: "active", allow_multiple_enrollments: true)
+        course.enroll_student(user, section:, enrollment_state: "active", allow_multiple_enrollments: true)
         expect(presenter.due_for(@due_date)).to eql("2 students")
       end
     end

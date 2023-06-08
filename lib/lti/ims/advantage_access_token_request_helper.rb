@@ -50,7 +50,7 @@ module Lti
             begin
               token = AdvantageAccessToken.new(raw_jwt_str)
               token.validate!(expected_audience(request))
-              { token: token }
+              { token: }
             rescue Lti::IMS::AdvantageErrors::AdvantageClientError => e
               # otherwise it's a system error, so we want normal error trapping and rendering to kick in
               { error: e }

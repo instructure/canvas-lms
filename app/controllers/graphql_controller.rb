@@ -55,8 +55,8 @@ class GraphQLController < ApplicationController
     context = {
       current_user: @current_user,
       real_current_user: @real_current_user,
-      session: session,
-      request: request,
+      session:,
+      request:,
       domain_root_account: @domain_root_account,
       access_token: @access_token,
       in_app: in_app?,
@@ -72,7 +72,7 @@ class GraphQLController < ApplicationController
 
     overall_timeout = Setting.get("graphql_overall_timeout", "60").to_i.seconds
     Timeout.timeout(overall_timeout) do
-      schema.execute(query, variables: variables, context: context)
+      schema.execute(query, variables:, context:)
     end
   end
 

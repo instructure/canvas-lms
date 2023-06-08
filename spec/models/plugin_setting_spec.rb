@@ -94,7 +94,7 @@ describe PluginSetting do
     RequestCache.enable do
       enable_cache do
         name = "plugin_setting_test"
-        s = PluginSetting.create!(name: name, settings: { bar: "qwerty" })
+        s = PluginSetting.create!(name:, settings: { bar: "qwerty" })
         expect(MultiCache.cache).to receive(:fetch_multi).once.and_return(s)
         PluginSetting.cached_plugin_setting(name) # sets the cache
         PluginSetting.cached_plugin_setting(name) # 2nd lookup

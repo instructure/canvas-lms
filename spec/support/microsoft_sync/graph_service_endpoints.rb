@@ -22,7 +22,7 @@ RSpec.shared_context "microsoft_sync_graph_service_endpoints" do
 
   def json_response(status, body, extra_headers = {})
     {
-      status: status,
+      status:,
       body: body.to_json,
       headers: extra_headers.merge("Content-type" => "application/json")
     }

@@ -128,7 +128,7 @@ class AccountUser < ActiveRecord::Base
     # account/role to make things significantly faster.
     account_users.distinct.pluck(:account_id, :role_id).each_with_object({}) do |obj, hash|
       account_id, role_id = obj
-      account_user = account_users.where(account_id: account_id, role_id: role_id).first
+      account_user = account_users.where(account_id:, role_id:).first
 
       # Create and destory are granted by the same conditions, no reason to do two
       # grants_right? checks here.

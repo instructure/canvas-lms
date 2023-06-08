@@ -286,7 +286,7 @@ describe Rubric do
           ]
         }
       ]
-      rubric = rubric_model({ context: @course, data: data })
+      rubric = rubric_model({ context: @course, data: })
       expect(rubric.data.first[:points]).to be(0.5)
       expect(rubric.data.first[:ratings].first[:points]).to be(0.5)
     end
@@ -316,7 +316,7 @@ describe Rubric do
       }
 
       rubric = rubric_model({ context: @course })
-      rubric.update_criteria({ criteria: criteria })
+      rubric.update_criteria({ criteria: })
       expect(rubric.points_possible).to eq 0.6667
     end
   end
@@ -505,7 +505,7 @@ describe Rubric do
           expect do
             rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           end.to change {
-            AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment: assignment).count
+            AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment:).count
           }.by(1)
         end
 
@@ -720,13 +720,13 @@ describe Rubric do
       rubric = attributes.include?(:aligned) ? outcome_with_rubric(opts) : rubric_model(opts)
       association = nil
 
-      if (attributes & [:assessed, :associated]).present?
+      if attributes.intersect?([:assessed, :associated])
         (opts[:association_count] || 1).times do
           assignment = assignment_model(course: @course)
-          association = rubric_association_model(**opts, rubric: rubric, association_object: assignment, purpose: "grading")
+          association = rubric_association_model(**opts, rubric:, association_object: assignment, purpose: "grading")
 
           if attributes.include? :assessed
-            rubric_assessment_model(**opts, rubric: rubric, rubric_association: association)
+            rubric_assessment_model(**opts, rubric:, rubric_association: association)
           end
         end
       end

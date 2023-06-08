@@ -80,7 +80,7 @@ describe "blueprint courses quizzes" do
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
-      @original_quiz.quiz_questions.create! question_data: question_data
+      @original_quiz.quiz_questions.create!(question_data:)
       @tag = @template.create_content_tag_for!(@original_quiz)
 
       course_with_teacher(active_all: true)
@@ -89,7 +89,7 @@ describe "blueprint courses quizzes" do
       @quiz_copy = @copy_to.quizzes.new(title: "blah", description: "bloo", due_at: due_date) # just create a copy directly instead of doing a real migration
       @quiz_copy.migration_id = @tag.migration_id
       @quiz_copy.save!
-      @quiz_copy.quiz_questions.create! question_data: question_data
+      @quiz_copy.quiz_questions.create!(question_data:)
       @quiz_copy.save!
     end
 
@@ -216,7 +216,7 @@ describe "blueprint courses quizzes" do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
       original_group = @original_quiz.quiz_groups.create! name: "Eh", pick_count: 1, question_points: 10
-      original_group.quiz_questions.create! quiz: @original_quiz, question_data: question_data
+      original_group.quiz_questions.create!(quiz: @original_quiz, question_data:)
       @tag = @template.create_content_tag_for!(@original_quiz)
 
       course_with_teacher(active_all: true)
@@ -226,7 +226,7 @@ describe "blueprint courses quizzes" do
       @quiz_copy.migration_id = @tag.migration_id
       @quiz_copy.save!
       copy_group = @quiz_copy.quiz_groups.create! name: "Eh", pick_count: 1, question_points: 10
-      copy_group.quiz_questions.create! quiz: @quiz_copy, question_data: question_data
+      copy_group.quiz_questions.create! quiz: @quiz_copy, question_data:
     end
 
     before do

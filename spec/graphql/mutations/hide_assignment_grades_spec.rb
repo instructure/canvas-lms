@@ -53,7 +53,7 @@ describe Mutations::HideAssignmentGrades do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   context "when user has grade permission" do

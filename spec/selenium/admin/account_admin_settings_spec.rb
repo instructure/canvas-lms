@@ -133,7 +133,7 @@ describe "root account basic settings" do
         end
 
         before do
-          account_admin_user(account: account)
+          account_admin_user(account:)
           user_session(@admin)
         end
 

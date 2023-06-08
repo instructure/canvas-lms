@@ -101,9 +101,9 @@ describe GradebookHistoryApiController do
 
   describe "GET assignment" do
     let(:date) { @submission1.graded_at.strftime("%Y-%m-%d") }
-    let(:params) { { course_id: @course.id, date: date, grader_id: @grader.id, assignment_id: @assignment1.id } }
+    let(:params) { { course_id: @course.id, date:, grader_id: @grader.id, assignment_id: @assignment1.id } }
 
-    before { get("submissions", params: params, format: "json") }
+    before { get("submissions", params:, format: "json") }
 
     it "lists submissions" do
       expect(json_body.first["submission_id"]).to eq @submission1.id

@@ -99,7 +99,7 @@ module Canvadocs
     def session(document_id, opts = {})
       raw_body = api_call(:post,
                           "sessions",
-                          opts.merge(document_id: document_id))
+                          opts.merge(document_id:))
       JSON.parse(raw_body)
     end
 
@@ -226,7 +226,7 @@ module Canvadocs
       return {} if attachment.nil?
 
       submission = Submission.find_by(
-        id: AttachmentAssociation.where(context_type: "Submission", attachment: attachment).select(:context_id)
+        id: AttachmentAssociation.where(context_type: "Submission", attachment:).select(:context_id)
       )
       return {} if submission.nil?
     end
@@ -373,7 +373,7 @@ module Canvadocs
         name = canvadocs_user_name(filter_user)
       end
 
-      { id: id, type: type, role: role, name: name }
+      { id:, type:, role:, name: }
     end
   end
 end

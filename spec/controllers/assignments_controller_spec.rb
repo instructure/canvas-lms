@@ -546,7 +546,7 @@ describe AssignmentsController do
 
     context "with public course" do
       let(:course) { course_factory(active_all: true, is_public: true) }
-      let(:assignment) { assignment_model(course: course, submission_types: "online_url") }
+      let(:assignment) { assignment_model(course:, submission_types: "online_url") }
 
       it "doesn't fail on a public course with a nil user" do
         get "show", params: { course_id: course.id, id: assignment.id }
@@ -685,7 +685,7 @@ describe AssignmentsController do
           expect do
             subject
           end.to change {
-            Lti::LineItem.where(assignment: assignment).count
+            Lti::LineItem.where(assignment:).count
           }.from(0).to(1)
         end
       end
@@ -702,7 +702,7 @@ describe AssignmentsController do
         user_session(@student)
 
         AssignmentConfigurationToolLookup.create!(
-          assignment: assignment,
+          assignment:,
           tool: message_handler,
           tool_type: "Lti::MessageHandler",
           tool_id: message_handler.id
@@ -1568,7 +1568,7 @@ describe AssignmentsController do
           def enable_vericite!(comments: "vericite comments")
             plugin = Canvas::Plugin.find(:vericite)
             plugin_setting = PluginSetting.find_by(name: plugin.id) || PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
-            plugin_setting.posted_settings = { comments: comments }
+            plugin_setting.posted_settings = { comments: }
             plugin_setting.save!
           end
 
@@ -1890,7 +1890,7 @@ describe AssignmentsController do
     it "sets the lti_context_id if provided" do
       user_session(@student)
       lti_context_id = SecureRandom.uuid
-      jwt = Canvas::Security.create_jwt(lti_context_id: lti_context_id)
+      jwt = Canvas::Security.create_jwt(lti_context_id:)
       post "create", params: { course_id: @course.id, assignment: { title: "some assignment", secure_params: jwt } }
       expect(assigns[:assignment].lti_context_id).to eq lti_context_id
     end
@@ -2530,13 +2530,13 @@ describe AssignmentsController do
     it "passes errors through to Canvas::Errors" do
       allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       expect(Canvas::Errors).to receive(:capture_exception)
-      get "list_google_docs", params: params, format: "json"
+      get "list_google_docs", params:, format: "json"
       expect(response).to have_http_status(:ok)
     end
 
     it "gives appropriate error code to connection errors" do
       allow(connection).to receive(:list_with_extension_filter).and_raise(GoogleDrive::ConnectionException)
-      get "list_google_docs", params: params, format: "json"
+      get "list_google_docs", params:, format: "json"
       expect(response).to have_http_status(:gateway_timeout)
       expect(response.body).to include("Unable to connect to Google Drive")
     end

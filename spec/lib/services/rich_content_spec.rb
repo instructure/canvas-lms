@@ -47,7 +47,7 @@ module Services
                                                                       user,
                                                                       include(workflows: [:rich_content, :ui],
                                                                               context: ctx)).and_return(jwt)
-        env = described_class.env_for(user: user, domain: domain, context: ctx)
+        env = described_class.env_for(user:, domain:, context: ctx)
         expect(env[:JWT]).to eql(jwt)
       end
 
@@ -61,13 +61,13 @@ module Services
           user,
           include(real_user: masq_user)
         ).and_return(jwt)
-        env = described_class.env_for(user: user, domain: domain, real_user: masq_user)
+        env = described_class.env_for(user:, domain:, real_user: masq_user)
         expect(env[:JWT]).to eql(jwt)
       end
 
       it "does not allow file uploading without context" do
         user = double("user", global_id: "global id")
-        env = described_class.env_for(user: user)
+        env = described_class.env_for(user:)
         expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(false)
       end
 
@@ -75,8 +75,8 @@ module Services
         user = double("user", global_id: "global id")
         context1 = double("allowed_context", grants_right?: true)
         context2 = double("forbidden_context", grants_right?: false)
-        env1 = described_class.env_for(user: user, context: context1)
-        env2 = described_class.env_for(user: user, context: context2)
+        env1 = described_class.env_for(user:, context: context1)
+        env2 = described_class.env_for(user:, context: context2)
         expect(env1[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(true)
         expect(env2[:RICH_CONTENT_CAN_UPLOAD_FILES]).to be(false)
       end
@@ -89,7 +89,7 @@ module Services
 
       describe "RICH_CONTENT_CAN_EDIT_FILES" do
         context "when the user can edit context files" do
-          subject { described_class.env_for(user: user, context: context)[:RICH_CONTENT_CAN_EDIT_FILES] }
+          subject { described_class.env_for(user:, context:)[:RICH_CONTENT_CAN_EDIT_FILES] }
 
           let(:user) { double("user", global_id: "some-global-id") }
           let(:context) { double("allowed_context", grants_right?: true) }
@@ -98,7 +98,7 @@ module Services
         end
 
         context "when the user cannot edit context files" do
-          subject { described_class.env_for(user: user, context: context)[:RICH_CONTENT_CAN_EDIT_FILES] }
+          subject { described_class.env_for(user:, context:)[:RICH_CONTENT_CAN_EDIT_FILES] }
 
           let(:user) { double("user", global_id: "some-global-id") }
           let(:context) { double("allowed_context", grants_right?: false) }

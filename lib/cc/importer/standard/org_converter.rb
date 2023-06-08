@@ -80,20 +80,20 @@ module CC::Importer::Standard
         case resource[:type]
         when /assessment\z/
           item = {
-            indent: indent,
+            indent:,
             linked_resource_type: "ASSESSMENT",
             linked_resource_id: resource[:migration_id],
             linked_resource_title: get_node_val(item_node, "title"),
           }
         when /\Aassignment/
           item = {
-            indent: indent,
+            indent:,
             linked_resource_type: "ASSIGNMENT",
             linked_resource_id: resource[:migration_id],
             linked_resource_title: get_node_val(item_node, "title"),
           }
         when /\Aimswl/
-          item = { indent: indent, linked_resource_type: "URL" }
+          item = { indent:, linked_resource_type: "URL" }
           item[:linked_resource_title] = get_node_val(item_node, "title")
           title, item[:url] = get_weblink_title_and_url(resource)
           item[:linked_resource_title] ||= title
@@ -101,14 +101,14 @@ module CC::Importer::Standard
         when /\Aimsbasiclti/
           item = if (asmnt = find_assignment(resource[:migration_id]))
                    {
-                     indent: indent,
+                     indent:,
                      linked_resource_type: "ASSIGNMENT",
                      linked_resource_id: asmnt[:migration_id],
                      linked_resource_title: get_node_val(item_node, "title")
                    }
                  else
                    {
-                     indent: indent,
+                     indent:,
                      linked_resource_type: "CONTEXTEXTERNALTOOL",
                      linked_resource_id: resource[:migration_id],
                      linked_resource_title: get_node_val(item_node, "title"),
@@ -117,13 +117,13 @@ module CC::Importer::Standard
                  end
         when /\Aimsdt/
           item = {
-            indent: indent,
+            indent:,
             linked_resource_type: "DISCUSSION",
             linked_resource_id: resource[:migration_id],
             linked_resource_title: get_node_val(item_node, "title")
           }
         when /webcontent|learning-application-resource\z/
-          item = { indent: indent }
+          item = { indent: }
           item[:linked_resource_id] = item_node["identifierref"]
           item[:linked_resource_title] = get_node_val(item_node, "title")
 

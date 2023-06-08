@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {useQuery} from 'react-apollo'
 import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import userSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
 
 import {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
@@ -29,13 +30,22 @@ import GlobalSettings from './GlobalSettings'
 import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
-  AssignmentConnection,
+  AssignmentSortContext,
+  GradebookOptions,
   GradebookQueryResponse,
+  GradebookSortOrder,
+  GradebookUserSubmissionDetails,
+  SectionConnection,
+  SortableAssignment,
+  SortableStudent,
   SubmissionConnection,
-  UserConnection,
 } from '../../types'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
-import {mapAssignmentGroupQueryResults} from '../../utils/gradebookUtils'
+import {
+  mapAssignmentGroupQueryResults,
+  mapEnrollmentsToSortableStudents,
+} from '../../utils/gradebookUtils'
+import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -43,15 +53,20 @@ const STUDENT_SEARCH_PARAM = 'student'
 const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 
 export default function EnhancedIndividualGradebook() {
+  const [sections, setSections] = useState<SectionConnection[]>([])
   const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
-  const [students, setStudents] = useState<UserConnection[]>([])
-  const [assignments, setAssignments] = useState<AssignmentConnection[]>([])
+  const [students, setStudents] = useState<SortableStudent[]>()
+  const [assignments, setAssignments] = useState<SortableAssignment[]>()
 
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
     studentIdQueryParam
+  )
+  const {currentStudent, studentSubmissions, updateSubmissionDetails} = useCurrentStudentInfo(
+    courseId,
+    selectedStudentId
   )
 
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
@@ -60,10 +75,24 @@ export default function EnhancedIndividualGradebook() {
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
     assignmentIdQueryParam
   )
-  const selectedAssignment = assignments.find(assignment => assignment.id === selectedAssignmentId)
+  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
   const submissionsForSelectedAssignment = submissions.filter(
     submission => submission.assignmentId === selectedAssignmentId
   )
+
+  const defaultAssignmentSort: GradebookSortOrder =
+    userSettings.contextGet<AssignmentSortContext>('sort_grade_columns_by')?.sortType ??
+    GradebookSortOrder.Alphabetical
+  const defaultGradebookOptions: GradebookOptions = {
+    sortOrder: defaultAssignmentSort,
+    exportGradebookCsvUrl: ENV.GRADEBOOK_OPTIONS?.export_gradebook_csv_url,
+    lastGeneratedCsvAttachmentUrl: ENV.GRADEBOOK_OPTIONS?.attachment_url,
+    gradebookCsvProgress: ENV.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
+    contextUrl: ENV.GRADEBOOK_OPTIONS?.context_url,
+    userId: ENV.current_user_id,
+  }
+  const [gradebookOptions, setGradebookOptions] =
+    useState<GradebookOptions>(defaultGradebookOptions)
 
   const {data, error} = useQuery<GradebookQueryResponse>(GRADEBOOK_QUERY, {
     variables: {courseId},
@@ -77,7 +106,12 @@ export default function EnhancedIndividualGradebook() {
     }
 
     if (data?.course) {
-      const {assignmentGroupsConnection, enrollmentsConnection, submissionsConnection} = data.course
+      const {
+        assignmentGroupsConnection,
+        enrollmentsConnection,
+        sectionsConnection,
+        submissionsConnection,
+      } = data.course
 
       const {mappedAssignmentGroupMap, mappedAssignments} = mapAssignmentGroupQueryResults(
         assignmentGroupsConnection.nodes
@@ -86,9 +120,10 @@ export default function EnhancedIndividualGradebook() {
       setAssignmentGroupMap(mappedAssignmentGroupMap)
       setAssignments(mappedAssignments)
       setSubmissions(submissionsConnection.nodes)
+      setSections(sectionsConnection.nodes)
 
-      const studentEnrollments = enrollmentsConnection.nodes.map(enrollment => enrollment.user)
-      const sortableStudents = studentEnrollments.sort((a, b) => {
+      const mappedEnrollments = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
+      const sortableStudents = mappedEnrollments.sort((a, b) => {
         return a.sortableName.localeCompare(b.sortableName)
       })
       setStudents(sortableStudents)
@@ -115,6 +150,23 @@ export default function EnhancedIndividualGradebook() {
     setSearchParams(searchParams)
   }
 
+  const handleSubmissionSaved = useCallback(
+    (newSubmission: GradebookUserSubmissionDetails) => {
+      setSubmissions(prevSubmissions => {
+        const index = prevSubmissions.findIndex(s => s.id === newSubmission.id)
+        if (index > -1) {
+          prevSubmissions[index] = newSubmission
+        } else {
+          prevSubmissions.push(newSubmission)
+        }
+        return [...prevSubmissions]
+      })
+
+      updateSubmissionDetails(newSubmission)
+    },
+    [updateSubmissionDetails]
+  )
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -126,15 +178,29 @@ export default function EnhancedIndividualGradebook() {
         </View>
       </View>
 
-      <GlobalSettings />
+      <GlobalSettings
+        sections={sections}
+        gradebookOptions={gradebookOptions}
+        onSortChange={sortType => {
+          userSettings.contextSet('sort_grade_columns_by', {sortType})
+          const newGradebookOptions = {...gradebookOptions, sortOrder: sortType}
+          setGradebookOptions(newGradebookOptions)
+        }}
+        onSectionChange={sectionId => {
+          const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
+          setGradebookOptions(newGradebookOptions)
+        }}
+      />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <ContentSelection
+        courseId={courseId}
         assignments={assignments}
         students={students}
         selectedStudentId={selectedStudentId}
         selectedAssignmentId={selectedAssignmentId}
+        gradebookOptions={gradebookOptions}
         onStudentChange={handleStudentChange}
         onAssignmentChange={handleAssignmentChange}
       />
@@ -145,23 +211,24 @@ export default function EnhancedIndividualGradebook() {
         assignment={selectedAssignment}
         courseId={courseId}
         studentId={selectedStudentId}
-        gradebookOptions={{}}
+        gradebookOptions={gradebookOptions}
+        onSubmissionSaved={handleSubmissionSaved}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <StudentInformation
-        courseId={courseId}
-        studentId={selectedStudentId}
+        student={currentStudent}
+        submissions={studentSubmissions}
         assignmentGroupMap={assignmentGroupMap}
-        gradebookOptions={{}} // TODO: Empty object for now for default functionality
+        gradebookOptions={gradebookOptions}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <AssignmentInformation
         assignment={selectedAssignment}
-        gradebookOptions={{}}
+        gradebookOptions={gradebookOptions}
         submissions={submissionsForSelectedAssignment}
       />
 

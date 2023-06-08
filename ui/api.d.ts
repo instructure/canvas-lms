@@ -462,6 +462,32 @@ export type UserSubmissionGroup = {
   section_id: string
   submissions: Submission[]
 }
+export type MediaTrack = {
+  id: string
+  locale: string
+  content: string
+  kind: string
+  src?: string
+  label?: string
+  language?: string
+  type?: string
+}
+
+export type MediaSource = {
+  height: string
+  url: string
+  content_type: string
+  width: string
+  label?: string
+  src?: string
+}
+export type MediaObject = {
+  id: string
+  media_type?: string
+  title?: string
+  media_sources: MediaSource[]
+  media_tracks: MediaTrack[]
+}
 
 export type SubmissionComment = Readonly<{
   anonymous_id: string
@@ -480,6 +506,7 @@ export type SubmissionComment = Readonly<{
   is_read?: boolean
   media_comment_id: string
   media_comment_type: string
+  media_object?: MediaObject
   publishable: boolean
   submission_comment: SubmissionComment
   updated_at: string

@@ -42,9 +42,9 @@ module Lti
         # without placements, an empty array will be returned.
         collection = if placements == ["global_navigation"]
                        # We allow global_navigation to pull all the launch_definitions, even if they are not explicitly visible to user.
-                       AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session: session, only_visible: false })
+                       AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session:, only_visible: false })
                      else
-                       AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session: session, only_visible: true })
+                       AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session:, only_visible: true })
                      end
         pagination_args = { max_per_page: 100 }
         respond_to do |format|
@@ -72,7 +72,7 @@ module Lti
     end
 
     def reregistration_url_builder(context, tool_proxy_id)
-      polymorphic_url([context, :tool_proxy_reregistration], tool_proxy_id: tool_proxy_id)
+      polymorphic_url([context, :tool_proxy_reregistration], tool_proxy_id:)
     end
 
     def authorized_for_launch_definitions(context, user, placements)

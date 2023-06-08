@@ -16,14 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
-import {themeable} from '@instructure/ui-themeable'
 import classnames from 'classnames'
 import {partition} from 'lodash'
 import {arrayOf, bool, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
-import styles from './styles.css'
-import theme from './theme'
 import PlannerItem from '../PlannerItem'
 // eslint-disable-next-line import/no-named-as-default
 import CompletedItemsFacade from '../CompletedItemsFacade'
@@ -35,6 +32,7 @@ import {
   showPillForOverdueStatus,
 } from '../../utilities/statusUtils'
 import {animatable} from '../../dynamic-ui'
+import buildStyle from './style'
 
 export class Grouping extends Component {
   static propTypes = {
@@ -67,18 +65,18 @@ export class Grouping extends Component {
 
   constructor(props) {
     super(props)
-
+    this.style = buildStyle()
     this.state = {
       showCompletedItems: false,
       badgeMap: this.setupItemBadgeMap(props.items),
     }
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     this.props.registerAnimatable('group', this, this.props.animatableIndex, this.itemUniqueIds())
   }
 
-  UNSAFE_componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps = newProps => {
     this.props.deregisterAnimatable('group', this, this.itemUniqueIds())
     this.props.registerAnimatable(
       'group',
@@ -88,15 +86,15 @@ export class Grouping extends Component {
     )
   }
 
-  componentWillUnmount() {
+  componentWillUnmount = () => {
     this.props.deregisterAnimatable('group', this, this.itemUniqueIds())
   }
 
-  itemUniqueIds(props = this.props) {
+  itemUniqueIds = (props = this.props) => {
     return props.items.map(item => item.uniqueId)
   }
 
-  setupItemBadgeMap(items) {
+  setupItemBadgeMap = items => {
     const mapping = {}
     items.forEach(item => {
       const badges = getBadgesForItem(item)
@@ -113,7 +111,7 @@ export class Grouping extends Component {
     return this.groupingLink
   }
 
-  getScrollable() {
+  getScrollable = () => {
     return this.groupingLink || this.plannerNoteHero
   }
 
@@ -131,15 +129,15 @@ export class Grouping extends Component {
     )
   }
 
-  getLayout() {
+  getLayout = () => {
     return this.props.responsiveSize
   }
 
-  showNotificationBadgeOnItem() {
+  showNotificationBadgeOnItem = () => {
     return this.getLayout() !== 'large' && !this.props.simplifiedControls
   }
 
-  renderItemsAndFacade(items) {
+  renderItemsAndFacade = items => {
     const [completedItems, otherItems] = partition(items, item => item.completed && !item.show)
     let itemsToRender = otherItems
     if (this.state.showCompletedItems) {
@@ -153,9 +151,9 @@ export class Grouping extends Component {
     return componentsToRender
   }
 
-  renderItems(items) {
+  renderItems = items => {
     return items.map((item, itemIndex) => (
-      <li className={styles.item} key={item.uniqueId}>
+      <li className={this.style.classNames.item} key={item.uniqueId}>
         <PlannerItem
           color={this.props.color}
           completed={item.completed}
@@ -196,7 +194,7 @@ export class Grouping extends Component {
     ))
   }
 
-  renderFacade(completedItems, animatableIndex) {
+  renderFacade = (completedItems, animatableIndex) => {
     if (!this.state.showCompletedItems && completedItems.length > 0) {
       const theDay = completedItems[0].date.clone()
       theDay.startOf('day')
@@ -217,7 +215,7 @@ export class Grouping extends Component {
       }
 
       return (
-        <li className={styles.item} key="completed">
+        <li className={this.style.classNames.item} key="completed">
           <CompletedItemsFacade
             onClick={this.handleFacadeClick}
             itemCount={completedItems.length}
@@ -238,11 +236,11 @@ export class Grouping extends Component {
     return null
   }
 
-  renderToDoText() {
+  renderToDoText = () => {
     return formatMessage('To Do')
   }
 
-  renderNotificationBadge() {
+  renderNotificationBadge = () => {
     // narrower layout puts the indicator next to the actual items
     if (this.getLayout() !== 'large' || this.props.simplifiedControls) {
       return null
@@ -272,24 +270,28 @@ export class Grouping extends Component {
   }
 
   // I wouldn't have broken the background and title apart, but wrapping them in a container span breaks styling
-  renderGroupLinkBackground() {
+  renderGroupLinkBackground = () => {
     const clazz = classnames({
-      [styles.overlay]: true,
-      [styles.withImage]: this.props.image_url,
+      [this.style.classNames.overlay]: true,
+      [this.style.classNames.withImage]: this.props.image_url,
     })
     const style = this.getLayout() === 'large' ? {backgroundColor: this.props.color} : null
     return <span className={clazz} style={style} />
   }
 
-  renderGroupLinkTitle() {
-    return <span className={styles.title}>{this.props.title || this.renderToDoText()}</span>
+  renderGroupLinkTitle = () => {
+    return (
+      <span className={this.style.classNames.title}>
+        {this.props.title || this.renderToDoText()}
+      </span>
+    )
   }
 
-  renderGroupLink() {
+  renderGroupLink = () => {
     if (this.props.singleCourseView) return null
     if (!this.props.title || this.props.items[0].readOnly || this.props.url === undefined) {
       return (
-        <span className={styles.hero} ref={elt => (this.plannerNoteHero = elt)}>
+        <span className={this.style.classNames.hero} ref={elt => (this.plannerNoteHero = elt)}>
           {this.renderGroupLinkBackground()}
           {this.renderGroupLinkTitle()}
         </span>
@@ -301,7 +303,7 @@ export class Grouping extends Component {
       <a
         href={this.props.url || '#'}
         ref={this.groupingLinkRef}
-        className={`${styles.hero} ${styles.heroHover}`}
+        className={`${this.style.classNames.hero} ${this.style.classNames.heroHover}`}
         style={style}
       >
         {this.renderGroupLinkBackground()}
@@ -310,20 +312,26 @@ export class Grouping extends Component {
     )
   }
 
-  render() {
-    return (
-      <div className={classnames(styles.root, styles[this.getLayout()], 'planner-grouping')}>
+  render = () => (
+    <>
+      <style>{this.style.css}</style>
+      <div
+        className={classnames(
+          this.style.classNames.root,
+          this.style.classNames[this.getLayout()],
+          'planner-grouping'
+        )}
+      >
         {this.renderNotificationBadge()}
         {this.renderGroupLink()}
-        <ol className={styles.items} style={{borderColor: this.props.color}}>
+        <ol className={this.style.classNames.items} style={{borderColor: this.props.color}}>
           {this.renderItemsAndFacade(this.props.items)}
         </ol>
       </div>
-    )
-  }
+    </>
+  )
 }
 
-const ThemeableGrouping = themeable(theme, styles)(Grouping)
-const AnimatableGrouping = animatable(ThemeableGrouping)
-AnimatableGrouping.theme = ThemeableGrouping.theme
+const AnimatableGrouping = animatable(Grouping)
+AnimatableGrouping.theme = Grouping.theme
 export default AnimatableGrouping

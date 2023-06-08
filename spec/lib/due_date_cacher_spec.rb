@@ -441,7 +441,7 @@ describe DueDateCacher do
       before do
         @shard1.activate do
           account = Account.create!
-          course_with_student(account: account, active_all: true)
+          course_with_student(account:, active_all: true)
           assignment_model(course: @course)
         end
       end
@@ -608,7 +608,7 @@ describe DueDateCacher do
       it "assigns the correct workflow state to the submission" do
         @shard2.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account)
+          course_with_student(active_all: true, account:)
 
           @quiz = @course.quizzes.create!
           @quiz.workflow_state = "available"
@@ -633,7 +633,7 @@ describe DueDateCacher do
         Account.site_admin.enable_feature!(:new_quiz_deleted_workflow_restore_pending_review_state)
 
         account = Account.create!
-        course_with_student(active_all: true, account: account)
+        course_with_student(active_all: true, account:)
         @new_quiz = new_quizzes_assignment(course: @course, title: "Some New Quiz")
         @new_quiz.workflow_state = "available"
         @new_quiz.save!
@@ -1322,11 +1322,11 @@ describe DueDateCacher do
             due_at: original_due_at
           )
         end
-        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment:, event_type:).last }
 
         before do
           Assignment.suspend_due_date_caching do
-            assignment.update!(due_at: due_at)
+            assignment.update!(due_at:)
           end
         end
 
@@ -1334,7 +1334,7 @@ describe DueDateCacher do
           expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
           end.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+            AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
@@ -1351,11 +1351,11 @@ describe DueDateCacher do
 
       context "when a due date is added to an auditable assignment" do
         let!(:assignment) { course.assignments.create!(title: "zzz", anonymous_grading: true) }
-        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment:, event_type:).last }
 
         before do
           Assignment.suspend_due_date_caching do
-            assignment.update!(due_at: due_at)
+            assignment.update!(due_at:)
           end
         end
 
@@ -1363,7 +1363,7 @@ describe DueDateCacher do
           expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
           end.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+            AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
@@ -1380,7 +1380,7 @@ describe DueDateCacher do
 
       context "when a due date is removed from an auditable assignment" do
         let!(:assignment) { course.assignments.create!(title: "z!", anonymous_grading: true, due_at: original_due_at) }
-        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment:, event_type:).last }
 
         before do
           Assignment.suspend_due_date_caching do
@@ -1392,7 +1392,7 @@ describe DueDateCacher do
           expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
           end.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+            AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
@@ -1412,14 +1412,14 @@ describe DueDateCacher do
         Assignment.suspend_due_date_caching do
           assignment = course.assignments.create!(
             title: "zzz",
-            due_at: due_at
+            due_at:
           )
         end
 
         expect do
           DueDateCacher.recompute(assignment, executing_user: teacher)
         end.not_to change {
-          AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
+          AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
         }
       end
     end
@@ -1433,7 +1433,7 @@ describe DueDateCacher do
       expect do
         DueDateCacher.recompute(assignment)
       end.not_to change {
-        AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
+        AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
       }
     end
   end

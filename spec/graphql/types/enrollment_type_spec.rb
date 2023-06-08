@@ -119,6 +119,7 @@ describe Types::EnrollmentType do
       expect(
         enrollment_type.resolve("section { _id }")
       ).to eq enrollment.course_section.id.to_s
+      expect(enrollment_type.resolve("courseSectionId")).to eq enrollment.course_section.id.to_s
     end
   end
 

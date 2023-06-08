@@ -29,8 +29,8 @@ module CanvasPartman
       attr_accessor :base_class
     end
 
-    def with_each_partition(&block)
-      find_partition_tables.each(&block)
+    def with_each_partition(&)
+      find_partition_tables.each(&)
     end
 
     # Bind the migration to apply only on a certain partition table. Routines

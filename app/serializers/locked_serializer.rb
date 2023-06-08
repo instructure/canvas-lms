@@ -47,7 +47,7 @@ module LockedSerializer
     @_locked_for_hash = (
       if scope && object.respond_to?(:locked_for?)
         context = object.try(:context)
-        object.locked_for?(scope, check_policies: true, context: context)
+        object.locked_for?(scope, check_policies: true, context:)
       else
         false
       end

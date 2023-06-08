@@ -91,9 +91,9 @@ describe Quizzes::QuizOutcomeResultBuilder do
         @outcome2.align(@bank2, @bank2.context, mastery_score: 0.5)
 
         @a1 = @bank.assessment_questions.create!(question_data: question_data(true))
-        @a3 = @bank.assessment_questions.create!(question_data: question_data)
-        @a2 = @bank2.assessment_questions.create!(question_data: question_data)
-        @a4 = @bank2.assessment_questions.create!(question_data: question_data)
+        @a3 = @bank.assessment_questions.create!(question_data:)
+        @a2 = @bank2.assessment_questions.create!(question_data:)
+        @a4 = @bank2.assessment_questions.create!(question_data:)
         @q1 = @quiz.quiz_questions.create!(assessment_question: @a1, question_data: @a1.question_data)
         @q3 = @quiz.quiz_questions.create!(assessment_question: @a3, question_data: @a3.question_data)
         @q2 = @quiz.quiz_questions.create!(assessment_question: @a2, question_data: @a2.question_data)
@@ -149,7 +149,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
 
     def answer_and_grade(sub, correct = false)
       answer_a_question(@q1, sub)
-      answer_a_question(@q2, sub, correct: correct)
+      answer_a_question(@q2, sub, correct:)
       Quizzes::SubmissionGrader.new(sub).grade_submission
     end
 

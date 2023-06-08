@@ -96,7 +96,7 @@ module Gradebook
       def select_grade_from_menu(student, assignment, grade, menu_selector)
         grading_cell(student, assignment).click
 
-        button = grading_cell_menu_button(student, assignment, menu_selector: menu_selector)
+        button = grading_cell_menu_button(student, assignment, menu_selector:)
         button.click
 
         grade_item = ff("ul[aria-labelledby='#{button.attribute("id")}'] li").detect do |element|

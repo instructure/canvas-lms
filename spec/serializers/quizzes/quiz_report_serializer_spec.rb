@@ -23,9 +23,9 @@ shared_examples_for "QuizReportSerializer Associations" do
     statistics.reload
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
-                                                     controller: controller,
+                                                     controller:,
                                                      scope: user,
-                                                     session: session,
+                                                     session:,
                                                      includes: ["file"]
                                                    })
 
@@ -38,9 +38,9 @@ shared_examples_for "QuizReportSerializer Associations" do
     statistics.generate_csv_in_background
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
-                                                     controller: controller,
+                                                     controller:,
                                                      scope: user,
-                                                     session: session,
+                                                     session:,
                                                      includes: ["progress"]
                                                    })
 
@@ -53,9 +53,9 @@ end
 describe Quizzes::QuizReportSerializer do
   subject do
     Quizzes::QuizReportSerializer.new(statistics, {
-                                        controller: controller,
+                                        controller:,
                                         scope: user,
-                                        session: session
+                                        session:
                                       })
   end
 

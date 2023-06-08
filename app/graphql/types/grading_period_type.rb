@@ -40,5 +40,8 @@ module Types
       used to calculate how much the assignments in this grading period
       contribute to the overall grade
     MD
+    def weight
+      object.grading_period_group.weighted ? object.weight.to_f : nil
+    end
   end
 end

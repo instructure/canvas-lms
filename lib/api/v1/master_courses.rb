@@ -68,11 +68,11 @@ module Api::V1::MasterCourses
 
     json = {
       asset_id: asset.id,
-      asset_type: asset_type,
-      asset_name: asset_name,
+      asset_type:,
+      asset_name:,
       change_type: action.to_s,
       html_url: url,
-      locked: locked
+      locked:
     }
     json[:exceptions] = exceptions[migration_id] || [] unless migration_id.nil?
     json

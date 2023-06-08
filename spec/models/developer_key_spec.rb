@@ -77,11 +77,11 @@ describe DeveloperKey do
     end
 
     it "validates when public jwk is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk: public_jwk) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk:) }.to_not raise_error
     end
 
     it "validates when public jwk url is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url: public_jwk_url) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url:) }.to_not raise_error
     end
   end
 
@@ -97,7 +97,7 @@ describe DeveloperKey do
         tool = ContextExternalTool.create!(
           name: "shard 1 tool",
           workflow_state: "public",
-          developer_key: developer_key,
+          developer_key:,
           context: shard_1_account,
           url: "https://www.test.com",
           consumer_key: "key",
@@ -118,7 +118,7 @@ describe DeveloperKey do
         tool = ContextExternalTool.create!(
           name: "shard 2 tool",
           workflow_state: "public",
-          developer_key: developer_key,
+          developer_key:,
           context: shard_2_account,
           url: "https://www.test.com",
           consumer_key: "key",
@@ -392,7 +392,7 @@ describe DeveloperKey do
 
   describe "usable_in_context?" do
     let(:account) { account_model }
-    let(:developer_key) { DeveloperKey.create!(account: account) }
+    let(:developer_key) { DeveloperKey.create!(account:) }
 
     shared_examples_for "a boolean indicating the key is usable in context" do
       subject { developer_key.usable_in_context?(context) }
@@ -426,7 +426,7 @@ describe DeveloperKey do
 
     context "when the context is a course" do
       it_behaves_like "a boolean indicating the key is usable in context" do
-        let(:context) { course_model(account: account) }
+        let(:context) { course_model(account:) }
       end
     end
   end
@@ -736,8 +736,8 @@ describe DeveloperKey do
 
     context "when not site admin" do
       it "creates a binding on save" do
-        key = DeveloperKey.create!(account: account)
-        expect(key.developer_key_account_bindings.find_by(account: account)).to be_present
+        key = DeveloperKey.create!(account:)
+        expect(key.developer_key_account_bindings.find_by(account:)).to be_present
       end
 
       describe "destroy_external_tools!" do
@@ -765,7 +765,7 @@ describe DeveloperKey do
           end
 
           context "when tools are installed at the course level" do
-            let(:course) { course_model(account: account) }
+            let(:course) { course_model(account:) }
             let(:course_tool) do
               t = tool_configuration.new_external_tool(course)
               t.save!
@@ -802,7 +802,7 @@ describe DeveloperKey do
 
           let(:account) { nil }
 
-          before { developer_key_not_saved.update!(account: account) }
+          before { developer_key_not_saved.update!(account:) }
 
           it { is_expected.to eq Account.site_admin }
         end
@@ -1196,7 +1196,7 @@ describe DeveloperKey do
           site_admin_key = nil
 
           Account.site_admin.shard.activate do
-            site_admin_key = DeveloperKey.create!(vendor_code: vendor_code)
+            site_admin_key = DeveloperKey.create!(vendor_code:)
           end
 
           not_site_admin_shard.activate do
@@ -1205,7 +1205,7 @@ describe DeveloperKey do
         end
 
         it "finds keys in the current shard" do
-          local_key = DeveloperKey.create!(vendor_code: vendor_code, account: account_model)
+          local_key = DeveloperKey.create!(vendor_code:, account: account_model)
           expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include local_key
         end
       end

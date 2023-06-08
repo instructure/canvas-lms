@@ -195,7 +195,7 @@ class DeveloperKey < ActiveRecord::Base
 
       unless @sns[region].present?
         settings = Rails.application.credentials.sns_creds
-        @sns[region] = Aws::SNS::Client.new(settings.merge(region: region)) if settings
+        @sns[region] = Aws::SNS::Client.new(settings.merge(region:)) if settings
       end
       @sns[region]
     end
@@ -215,7 +215,7 @@ class DeveloperKey < ActiveRecord::Base
 
     def by_cached_vendor_code(vendor_code)
       MultiCache.fetch("developer_keys/#{vendor_code}") do
-        DeveloperKey.shard([Shard.current, Account.site_admin.shard].uniq).where(vendor_code: vendor_code).to_a
+        DeveloperKey.shard([Shard.current, Account.site_admin.shard].uniq).where(vendor_code:).to_a
       end
     end
   end
@@ -424,11 +424,11 @@ class DeveloperKey < ActiveRecord::Base
     stat_prefix = "developer_key.manage_external_tools"
     stat_prefix += ".error" if exception
 
-    tags = { method: method }
+    tags = { method: }
     latency = (Time.zone.now.to_i - start_time) * 1000 # ms for DD
 
-    InstStatsd::Statsd.increment("#{stat_prefix}.count", tags: tags)
-    InstStatsd::Statsd.timing("#{stat_prefix}.latency", latency, tags: tags)
+    InstStatsd::Statsd.increment("#{stat_prefix}.count", tags:)
+    InstStatsd::Statsd.timing("#{stat_prefix}.latency", latency, tags:)
 
     if exception
       Canvas::Errors.capture_exception(:developer_keys, exception, :error)

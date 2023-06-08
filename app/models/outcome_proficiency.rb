@@ -111,14 +111,14 @@ class OutcomeProficiency < ApplicationRecord
   end
 
   def self.find_or_create_default!(context)
-    proficiency = OutcomeProficiency.find_by(context: context)
+    proficiency = OutcomeProficiency.find_by(context:)
     if proficiency&.workflow_state == "active"
       return proficiency
     end
 
     GuardRail.activate(:primary) do
       OutcomeProficiency.transaction do
-        proficiency ||= OutcomeProficiency.new(context: context)
+        proficiency ||= OutcomeProficiency.new(context:)
         proficiency.workflow_state = "active"
         proficiency.replace_ratings(default_ratings)
         proficiency.save!
@@ -200,7 +200,7 @@ class OutcomeProficiency < ApplicationRecord
         Rubric.where(context: context.associated_courses)
       ]
     else
-      [Rubric.where(context: context)]
+      [Rubric.where(context:)]
     end
   end
 end

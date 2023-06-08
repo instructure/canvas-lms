@@ -155,7 +155,7 @@ class ContentSharesController < ApplicationController
     return render(json: { message: "Unable to export content" }, status: :bad_request) unless export.id
 
     name = Context.asset_name(content)
-    sender_share = @current_user.sent_content_shares.create(content_export: export, name: name, read_state: "read")
+    sender_share = @current_user.sent_content_shares.create(content_export: export, name:, read_state: "read")
     create_receiver_shares(sender_share, @receivers)
     render json: content_share_json(sender_share, @current_user, session), status: :created
   end
