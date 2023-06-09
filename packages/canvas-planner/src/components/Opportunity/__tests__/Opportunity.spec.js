@@ -33,7 +33,7 @@ function defaultProps(options = {}) {
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
     animatableIndex: 1,
-    ...options
+    ...options,
   }
 }
 

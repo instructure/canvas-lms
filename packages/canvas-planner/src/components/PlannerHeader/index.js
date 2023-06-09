@@ -17,7 +17,6 @@
  */
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {themeable} from '@instructure/ui-themeable'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
@@ -44,15 +43,13 @@ import {
   clearUpdateTodo,
   startLoadingGradesSaga,
   scrollToToday,
-  scrollToNewActivity
+  scrollToNewActivity,
 } from '../../actions'
-
-import styles from './styles.css'
-import theme from './theme'
 import formatMessage from '../../format-message'
 import {notifier} from '../../dynamic-ui'
 import {getFirstLoadedMoment} from '../../utilities/dateUtils'
 import {observedUserId} from '../../utilities/apiUtils'
+import buildStyle from './style'
 
 export class PlannerHeader extends Component {
   static propTypes = {
@@ -78,17 +75,17 @@ export class PlannerHeader extends Component {
       PropTypes.arrayOf(
         PropTypes.oneOfType([
           /* date */ PropTypes.string,
-          PropTypes.arrayOf(/* items */ PropTypes.object)
+          PropTypes.arrayOf(/* items */ PropTypes.object),
         ])
       )
     ),
     ui: PropTypes.shape({
-      naiAboveScreen: PropTypes.bool
+      naiAboveScreen: PropTypes.bool,
     }),
     todo: PropTypes.shape({
       updateTodoItem: PropTypes.shape({
-        title: PropTypes.string
-      })
+        title: PropTypes.string,
+      }),
     }),
     stickyZIndex: PropTypes.number,
     loading: PropTypes.shape({
@@ -104,19 +101,19 @@ export class PlannerHeader extends Component {
       seekingNewActivity: PropTypes.bool,
       loadingGrades: PropTypes.bool,
       gradesLoaded: PropTypes.bool,
-      gradesLoadingError: PropTypes.string
+      gradesLoadingError: PropTypes.string,
     }).isRequired,
     ariaHideElement: PropTypes.instanceOf(Element).isRequired,
     auxElement: PropTypes.instanceOf(Element).isRequired,
     stickyButtonId: PropTypes.string.isRequired,
-    responsiveSize: sizeShape
+    responsiveSize: sizeShape,
   }
 
   static defaultProps = {
     triggerDynamicUiUpdates: () => {},
     preTriggerDynamicUiUpdates: () => {},
     stickyZIndex: 0,
-    responsiveSize: 'large'
+    responsiveSize: 'large',
   }
 
   constructor(props) {
@@ -131,8 +128,9 @@ export class PlannerHeader extends Component {
       dismissedOpportunities,
       trayOpen: false,
       gradesTrayOpen: false,
-      opportunitiesOpen: false
+      opportunitiesOpen: false,
     }
+    this.style = buildStyle()
   }
 
   loadNextOpportunitiesIfNeeded(props) {
@@ -238,7 +236,7 @@ export class PlannerHeader extends Component {
     ) {
       this.props.startLoadingGradesSaga()
     }
-    this.setState({gradesTrayOpen: !this.state.gradesTrayOpen})
+    this.setState(prevState => ({gradesTrayOpen: !prevState.gradesTrayOpen}))
   }
 
   handleTodayClick = () => {
@@ -407,103 +405,105 @@ export class PlannerHeader extends Component {
     }
 
     return (
-      <div className={`${styles.root} PlannerHeader`} data-testid="PlannerHeader">
-        {this.renderToday(buttonMargin)}
-        {!this.props.isObserving && (
+      <>
+        <style>{this.style.css}</style>
+        <div className={`${this.style.classNames.root} PlannerHeader`} data-testid="PlannerHeader">
+          {this.renderToday(buttonMargin)}
+          {!this.props.isObserving && (
+            <IconButton
+              renderIcon={IconPlusLine}
+              screenReaderLabel={formatMessage('Add To Do')}
+              withBorder={false}
+              withBackground={false}
+              margin={buttonMargin}
+              onClick={this.handleToggleTray}
+              ref={b => {
+                this.addNoteBtn = b
+              }}
+            />
+          )}
           <IconButton
-            renderIcon={IconPlusLine}
-            screenReaderLabel={formatMessage('Add To Do')}
+            renderIcon={IconGradebookLine}
+            screenReaderLabel={formatMessage('Show My Grades')}
             withBorder={false}
             withBackground={false}
             margin={buttonMargin}
-            onClick={this.handleToggleTray}
-            ref={b => {
-              this.addNoteBtn = b
-            }}
+            onClick={this.toggleGradesTray}
           />
-        )}
-        <IconButton
-          renderIcon={IconGradebookLine}
-          screenReaderLabel={formatMessage('Show My Grades')}
-          withBorder={false}
-          withBackground={false}
-          margin={buttonMargin}
-          onClick={this.toggleGradesTray}
-        />
-        <Popover
-          onHideContent={this.closeOpportunitiesDropdown}
-          isShowingContent={this.state.opportunitiesOpen}
-          on="click"
-          renderTrigger={this.renderOpportunitiesButton(buttonMargin)}
-          withArrow={withArrow}
-          positionTarget={positionTarget}
-          constrain="window"
-          placement={placement}
-          offsetY={offsetY}
-        >
-          <Opportunities
-            togglePopover={this.closeOpportunitiesDropdown}
-            newOpportunities={this.state.newOpportunities}
-            dismissedOpportunities={this.state.dismissedOpportunities}
-            courses={this.props.courses}
-            timeZone={this.props.timeZone}
-            dismiss={this.props.dismissOpportunity}
-            maxHeight={verticalRoom}
-            isObserving={this.props.isObserving}
-          />
-        </Popover>
-        <Tray
-          open={this.state.trayOpen}
-          label={this.getTrayLabel()}
-          placement="end"
-          shouldContainFocus
-          shouldReturnFocus={false}
-          onDismiss={this.handleCloseTray}
-        >
-          <CloseButton
-            placement="start"
-            onClick={this.handleCloseTray}
-            screenReaderLabel={formatMessage('Close')}
-          />
-          <UpdateItemTray
-            locale={this.props.locale}
-            timeZone={this.props.timeZone}
-            noteItem={this.props.todo.updateTodoItem}
-            onSavePlannerItem={this.handleSavePlannerItem}
-            onDeletePlannerItem={this.handleDeletePlannerItem}
-            courses={this.props.courses}
-          />
-        </Tray>
-        <Tray
-          label={formatMessage('My Grades')}
-          open={this.state.gradesTrayOpen}
-          placement="end"
-          shouldContainFocus
-          shouldReturnFocus
-          onDismiss={this.toggleGradesTray}
-        >
-          <View as="div" padding="large large medium">
+          <Popover
+            onHideContent={this.closeOpportunitiesDropdown}
+            isShowingContent={this.state.opportunitiesOpen}
+            on="click"
+            renderTrigger={this.renderOpportunitiesButton(buttonMargin)}
+            withArrow={withArrow}
+            positionTarget={positionTarget}
+            constrain="window"
+            placement={placement}
+            offsetY={offsetY}
+          >
+            <Opportunities
+              togglePopover={this.closeOpportunitiesDropdown}
+              newOpportunities={this.state.newOpportunities}
+              dismissedOpportunities={this.state.dismissedOpportunities}
+              courses={this.props.courses}
+              timeZone={this.props.timeZone}
+              dismiss={this.props.dismissOpportunity}
+              maxHeight={verticalRoom}
+              isObserving={this.props.isObserving}
+            />
+          </Popover>
+          <Tray
+            open={this.state.trayOpen}
+            label={this.getTrayLabel()}
+            placement="end"
+            shouldContainFocus={true}
+            shouldReturnFocus={false}
+            onDismiss={this.handleCloseTray}
+          >
             <CloseButton
               placement="start"
-              onClick={this.toggleGradesTray}
+              onClick={this.handleCloseTray}
               screenReaderLabel={formatMessage('Close')}
             />
-            <GradesDisplay
+            <UpdateItemTray
+              locale={this.props.locale}
+              timeZone={this.props.timeZone}
+              noteItem={this.props.todo.updateTodoItem}
+              onSavePlannerItem={this.handleSavePlannerItem}
+              onDeletePlannerItem={this.handleDeletePlannerItem}
               courses={this.props.courses}
-              loading={this.props.loading.loadingGrades}
-              loadingError={this.props.loading.gradesLoadingError}
             />
-          </View>
-        </Tray>
-        {this.renderNewActivity()}
-      </div>
+          </Tray>
+          <Tray
+            label={formatMessage('My Grades')}
+            open={this.state.gradesTrayOpen}
+            placement="end"
+            shouldContainFocus={true}
+            shouldReturnFocus={true}
+            onDismiss={this.toggleGradesTray}
+          >
+            <View as="div" padding="large large medium">
+              <CloseButton
+                placement="start"
+                onClick={this.toggleGradesTray}
+                screenReaderLabel={formatMessage('Close')}
+              />
+              <GradesDisplay
+                courses={this.props.courses}
+                loading={this.props.loading.loadingGrades}
+                loadingError={this.props.loading.gradesLoadingError}
+              />
+            </View>
+          </Tray>
+          {this.renderNewActivity()}
+        </div>
+      </>
     )
   }
 }
 
 export const ResponsivePlannerHeader = responsiviser()(PlannerHeader)
-export const ThemedPlannerHeader = themeable(theme, styles)(ResponsivePlannerHeader)
-export const NotifierPlannerHeader = notifier(ThemedPlannerHeader)
+export const NotifierPlannerHeader = notifier(ResponsivePlannerHeader)
 
 const mapStateToProps = ({
   opportunities,
@@ -515,7 +515,7 @@ const mapStateToProps = ({
   ui,
   firstNewActivityDate,
   selectedObservee,
-  currentUser
+  currentUser,
 }) => ({
   opportunities,
   loading,
@@ -525,7 +525,7 @@ const mapStateToProps = ({
   timeZone,
   ui,
   firstNewActivityDate,
-  isObserving: !!observedUserId({selectedObservee, currentUser})
+  isObserving: !!observedUserId({selectedObservee, currentUser}),
 })
 const mapDispatchToProps = {
   savePlannerItem,
@@ -537,7 +537,7 @@ const mapDispatchToProps = {
   clearUpdateTodo,
   startLoadingGradesSaga,
   scrollToToday,
-  scrollToNewActivity
+  scrollToNewActivity,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader)
