@@ -67,6 +67,7 @@ export const submissionsParams = {
     'points_deducted',
     'posted_at',
     'proxy_submitter',
+    'proxy_submitter_id',
     'redo_request',
     'score',
     'seconds_late',
