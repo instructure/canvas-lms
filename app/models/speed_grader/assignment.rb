@@ -311,6 +311,7 @@ module SpeedGrader
             )
 
           json[:proxy_submitter] = sub.proxy_submitter&.short_name
+          json[:proxy_submitter_id] = sub.proxy_submitter_id
 
           # We get the attachments this way to avoid loading the
           # attachments again via the submission method that creates a
@@ -370,6 +371,7 @@ module SpeedGrader
                     version_json["submission"]["turnitin_data"].merge!(version.originality_data)
                     version_json["submission"]["proxy_submitter"] =
                       version.proxy_submitter&.short_name
+                    version_json["submission"]["proxy_submitter_id"] = version.proxy_submitter_id
 
                     # Fill in the parent's anonymous ID if this version was serialized
                     # without it
