@@ -54,7 +54,7 @@ module CustomValidations
 
   def self.included(klass)
     if klass < ActiveRecord::Base
-      klass.send :extend, ClassMethods
+      klass.extend ClassMethods
     end
   end
 end

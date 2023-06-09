@@ -773,7 +773,7 @@ RSpec.configure do |config|
 
       # make sure we have all the backends
       BACKENDS.each do |backend|
-        base.send(:include, backend) unless base.ancestors.include?(backend)
+        base.include(backend) unless base.ancestors.include?(backend)
       end
       # remove the duplicate callbacks added by multiple backends
       base.before_update.uniq!
