@@ -66,6 +66,17 @@ module Types
       end
     end
 
+    field :html_url, UrlType, null: true do
+      argument :course_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+    end
+    def html_url(course_id:)
+      GraphQLHelpers::UrlHelpers.course_user_url(
+        course_id:,
+        id: object.id,
+        host: context[:request].host_with_port
+      )
+    end
+
     field :email, String, null: true
 
     def email

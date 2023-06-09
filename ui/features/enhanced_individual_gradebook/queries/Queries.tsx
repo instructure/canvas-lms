@@ -121,6 +121,28 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           latePolicyStatus
           missing
           userId
+          commentsConnection {
+            nodes {
+              id: _id
+              comment
+              mediaObject {
+                id: _id
+              }
+              attachments {
+                id: _id
+                displayName
+                mimeClass
+                url
+              }
+              author {
+                name
+                id: _id
+                avatarUrl
+                htmlUrl(courseId: $courseId)
+              }
+              updatedAt
+            }
+          }
         }
       }
     }

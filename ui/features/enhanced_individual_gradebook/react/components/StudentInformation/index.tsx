@@ -158,7 +158,8 @@ export default function StudentInformation({
             {I18n.t('Final Grade:')}
             <View as="span" className="total-grade">
               {' '}
-              {finalGradePercent}% ({gradeToDisplay.score} / {gradeToDisplay.possible} points)
+              {Number.isNaN(Number(finalGradePercent)) ? '-' : finalGradePercent}% (
+              {gradeToDisplay.score} / {gradeToDisplay.possible} points)
             </View>
           </View>
         </View>

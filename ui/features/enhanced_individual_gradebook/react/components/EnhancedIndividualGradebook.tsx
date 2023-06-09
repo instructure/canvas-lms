@@ -209,8 +209,8 @@ export default function EnhancedIndividualGradebook() {
 
       <GradingResults
         assignment={selectedAssignment}
-        courseId={courseId}
-        studentId={selectedStudentId}
+        currentStudent={currentStudent}
+        studentSubmissions={studentSubmissions}
         gradebookOptions={gradebookOptions}
         onSubmissionSaved={handleSubmissionSaved}
       />
