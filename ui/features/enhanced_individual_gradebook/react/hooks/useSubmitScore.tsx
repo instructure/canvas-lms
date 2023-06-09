@@ -59,6 +59,8 @@ export const useSubmitScore = () => {
         return
       }
 
+      setSubmitScoreStatus(ApiCallStatus.PENDING)
+
       if (gradingType === 'points' || gradingType === 'percent') {
         const formattedGrade = numberHelper.parse(delocalizedGrade?.replace(/%/g, '')).toString()
 
@@ -75,7 +77,6 @@ export const useSubmitScore = () => {
         },
       }
 
-      setSubmitScoreStatus(ApiCallStatus.PENDING)
       const {data, status} = await axios.put<Submission>(url ?? '', requestBody)
 
       if (status === 200) {

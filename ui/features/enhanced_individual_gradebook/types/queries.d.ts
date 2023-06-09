@@ -77,6 +77,27 @@ export type SubmissionConnection = {
   grade?: string | null
 }
 
+export type CommentConnection = {
+  id: string
+  comment: string
+  mediaObject: {
+    id: string
+  }
+  attachments: {
+    id: string
+    displayName: string
+    mimeClass: string
+    url: string
+  }[]
+  author: {
+    avatarUrl: string
+    id: string
+    name: string
+    htmlUrl: string
+  }
+  updatedAt: string
+}
+
 export type GradebookQueryResponse = {
   course: {
     enrollmentsConnection: {
@@ -121,6 +142,9 @@ export type GradebookUserSubmissionDetails = {
   latePolicyStatus?: string
   missing: boolean
   userId: string
+  commentsConnection: {
+    nodes: CommentConnection[]
+  }
 }
 
 export type GradebookStudentQueryResponse = {
