@@ -129,8 +129,8 @@ module StickySisFields
 
   def self.included(klass)
     if klass < ActiveRecord::Base
-      klass.send :extend, ClassMethods
-      klass.prepend(InstanceMethods)
+      klass.extend ClassMethods
+      klass.prepend InstanceMethods
       klass.cattr_accessor :sticky_sis_fields
       klass.cattr_accessor :sis_stickiness_options
       klass.before_save :set_sis_stickiness

@@ -84,7 +84,7 @@ module CanvasCrummy
 
     def self.included(receiver) # :nodoc:
       receiver.extend ClassMethods
-      receiver.send :include, InstanceMethods
+      receiver.include InstanceMethods
     end
   end
 end

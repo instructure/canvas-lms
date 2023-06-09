@@ -321,8 +321,8 @@ module SimplyVersioned
   end
 
   def self.included(receiver)
-    receiver.extend         ClassMethods
-    receiver.send :include, InstanceMethods
+    receiver.extend ClassMethods
+    receiver.include InstanceMethods
   end
 end
 

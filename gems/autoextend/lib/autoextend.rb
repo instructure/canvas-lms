@@ -60,7 +60,7 @@ module Autoextend
     #   Autoextend.hook(:User, :"MyUserExtension::ClassMethods", singleton: true)
     #
     #   Autoextend.hook(:User) do |klass|
-    #     klass.send(:include, MyUserExtension)
+    #     klass.include MyUserExtension
     #   end
     #
     # If User is already defined, it will immediately include
