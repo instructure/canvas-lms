@@ -59,6 +59,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Ak" },
   "angle_c5b4ec50": { "message": "Ang" },
+  "announcement_fb4cb645": { "message": "Anons" },
   "announcement_list_da155734": { "message": "Lis Anons" },
   "announcements_a4b8ed4a": { "message": "Anons" },
   "apply_781a2546": { "message": "Aplike" },
@@ -74,6 +75,7 @@ const locale = {
   "arrows_464a3e54": { "message": "Flèch" },
   "art_icon_8e1daad": { "message": "Ikòn la" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "Fòma ap konsève" },
+  "assignment_976578a8": { "message": "Sesyon" },
   "assignments_1e02582c": { "message": "Sesyon" },
   "asterisk_82255584": { "message": "Asterisk" },
   "attributes_963ba262": { "message": "Atribi" },
@@ -239,6 +241,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Direksyonalite" },
   "directly_edit_latex_b7e9235b": { "message": "Chanje LaTex Dirèkteman" },
   "disable_preview_222bdf72": { "message": "Dezaktive Apèsi" },
+  "discussion_6719c51d": { "message": "Diskisyon" },
   "discussions_a5f96392": { "message": "Diskisyon" },
   "discussions_index_6c36ced": { "message": "Endis Diskisyon" },
   "disjoint_union_e74351a8": { "message": "Inyon Disosye" },
@@ -672,6 +675,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p }  pa yon pwotokòl valid ki ta dwe ftp, http, https, mailto, skype, tel oswa sote li"
   },
+  "page_50c4823d": { "message": "Paj" },
   "pages_e5414c2c": { "message": "Paj" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
   "paragraph_starting_with_start_a59923f8": {
@@ -729,6 +733,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Pumpkin" },
   "purple_7678a9fc": { "message": "Mov" },
   "quaternions_877024e0": { "message": "Kwatènè" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quiz" },
   "rational_numbers_80ddaa4a": { "message": "Nonm Rasyonèl" },
   "real_numbers_7c99df94": { "message": "Nonm Reyèl" },

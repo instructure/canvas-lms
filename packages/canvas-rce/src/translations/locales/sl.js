@@ -62,6 +62,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "In" },
   "angle_c5b4ec50": { "message": "Kot" },
+  "announcement_fb4cb645": { "message": "Obvestilo" },
   "announcement_list_da155734": { "message": "Seznam obvestil" },
   "announcements_a4b8ed4a": { "message": "Obvestila" },
   "apply_781a2546": { "message": "Uporabi" },
@@ -81,6 +82,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Razmerje med širino in višino bo ohranjeno."
   },
+  "assignment_976578a8": { "message": "Naloga" },
   "assignments_1e02582c": { "message": "Naloge:" },
   "asterisk_82255584": { "message": "Zvezdica" },
   "attributes_963ba262": { "message": "Lastnosti" },
@@ -264,6 +266,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Usmerjenost" },
   "directly_edit_latex_b7e9235b": { "message": "Neposredno urejanje LaTeX" },
   "disable_preview_222bdf72": { "message": "Onemogoči predogled" },
+  "discussion_6719c51d": { "message": "Razprava" },
   "discussions_a5f96392": { "message": "Razprave" },
   "discussions_index_6c36ced": { "message": "Kazalo razprav" },
   "disjoint_union_e74351a8": { "message": "Nepovezan spoj" },
@@ -711,6 +714,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } ni veljaven protokol; ta mora biti ftp, http, https, mailto, skype, tel ali pa ga izpustite"
   },
+  "page_50c4823d": { "message": "Stran" },
   "pages_e5414c2c": { "message": "Strani" },
   "paragraph_5e5ad8eb": { "message": "Odstavek" },
   "paragraph_starting_with_start_a59923f8": {
@@ -772,6 +776,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Buča" },
   "purple_7678a9fc": { "message": "Škrlatno" },
   "quaternions_877024e0": { "message": "Kvaternioni" },
+  "quiz_e0dcce8f": { "message": "Kviz" },
   "quizzes_7e598f57": { "message": "Kvizi" },
   "rational_numbers_80ddaa4a": { "message": "Racionalne števila" },
   "real_numbers_7c99df94": { "message": "Realna števila" },

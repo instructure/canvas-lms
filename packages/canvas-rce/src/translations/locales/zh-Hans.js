@@ -58,6 +58,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "和" },
   "angle_c5b4ec50": { "message": "角度" },
+  "announcement_fb4cb645": { "message": "公告" },
   "announcement_list_da155734": { "message": "公告列表" },
   "announcements_a4b8ed4a": { "message": "公告" },
   "apply_781a2546": { "message": "申请" },
@@ -73,6 +74,7 @@ const locale = {
   "arrows_464a3e54": { "message": "箭头" },
   "art_icon_8e1daad": { "message": "艺术图标" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "保留长宽比" },
+  "assignment_976578a8": { "message": "作业" },
   "assignments_1e02582c": { "message": "作业" },
   "asterisk_82255584": { "message": "星号" },
   "attributes_963ba262": { "message": "属性" },
@@ -232,6 +234,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "方向" },
   "directly_edit_latex_b7e9235b": { "message": "直接编辑 LaTeX" },
   "disable_preview_222bdf72": { "message": "禁用预览" },
+  "discussion_6719c51d": { "message": "讨论" },
   "discussions_a5f96392": { "message": "讨论" },
   "discussions_index_6c36ced": { "message": "讨论索引" },
   "disjoint_union_e74351a8": { "message": "不交并" },
@@ -623,6 +626,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } 不是有效的协议，必须是 ftp、http、https、mailto、skype、tel 或可以忽略"
   },
+  "page_50c4823d": { "message": "页面" },
   "pages_e5414c2c": { "message": "页面" },
   "paragraph_5e5ad8eb": { "message": "段落" },
   "paragraph_starting_with_start_a59923f8": {
@@ -678,6 +682,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "南瓜" },
   "purple_7678a9fc": { "message": "紫色" },
   "quaternions_877024e0": { "message": "四元数" },
+  "quiz_e0dcce8f": { "message": "测验" },
   "quizzes_7e598f57": { "message": "测验" },
   "rational_numbers_80ddaa4a": { "message": "有理数" },
   "real_numbers_7c99df94": { "message": "实数" },
