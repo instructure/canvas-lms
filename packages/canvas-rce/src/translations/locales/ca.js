@@ -64,6 +64,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "I" },
   "angle_c5b4ec50": { "message": "Angle" },
+  "announcement_fb4cb645": { "message": "Anunci" },
   "announcement_list_da155734": { "message": "Llista d''anuncis" },
   "announcements_a4b8ed4a": { "message": "Anuncis" },
   "apply_781a2546": { "message": "Aplica" },
@@ -81,6 +82,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "La relació d''aspecte es mantindrà"
   },
+  "assignment_976578a8": { "message": "Activitat" },
   "assignments_1e02582c": { "message": "Activitats" },
   "asterisk_82255584": { "message": "Asterisc" },
   "attributes_963ba262": { "message": "Atributs" },
@@ -268,6 +270,7 @@ const locale = {
   "disable_preview_222bdf72": {
     "message": "Desactiva la visualització prèvia"
   },
+  "discussion_6719c51d": { "message": "Fòrum" },
   "discussions_a5f96392": { "message": "Fòrums" },
   "discussions_index_6c36ced": { "message": "Índex dels fòrums" },
   "disjoint_union_e74351a8": { "message": "Unió desarticulada" },
@@ -737,6 +740,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } no és un protocol vàlid, que ha de ser ftp, http, https, mailto, skype, tel o es pot ometre."
   },
+  "page_50c4823d": { "message": "Pàgina" },
   "pages_e5414c2c": { "message": "Pàgines" },
   "paragraph_5e5ad8eb": { "message": "Paràgraf" },
   "paragraph_starting_with_start_a59923f8": {
@@ -800,6 +804,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Carabassa" },
   "purple_7678a9fc": { "message": "Porpra" },
   "quaternions_877024e0": { "message": "Quaternions" },
+  "quiz_e0dcce8f": { "message": "Prova" },
   "quizzes_7e598f57": { "message": "Proves" },
   "rational_numbers_80ddaa4a": { "message": "Números racionals" },
   "real_numbers_7c99df94": { "message": "Números reals" },

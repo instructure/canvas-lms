@@ -62,6 +62,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "E" },
   "angle_c5b4ec50": { "message": "Angolo" },
+  "announcement_fb4cb645": { "message": "Annuncio" },
   "announcement_list_da155734": { "message": "Elenco annuncio" },
   "announcements_a4b8ed4a": { "message": "Annunci" },
   "apply_781a2546": { "message": "Applica" },
@@ -79,6 +80,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Le proporzioni verranno mantenute"
   },
+  "assignment_976578a8": { "message": "Compito" },
   "assignments_1e02582c": { "message": "Compiti" },
   "asterisk_82255584": { "message": "Asterisco" },
   "attributes_963ba262": { "message": "Attributi" },
@@ -266,6 +268,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Direzionalità" },
   "directly_edit_latex_b7e9235b": { "message": "Modifica direttamente LaTeX" },
   "disable_preview_222bdf72": { "message": "Disabilita anteprima" },
+  "discussion_6719c51d": { "message": "Discussione" },
   "discussions_a5f96392": { "message": "Discussioni" },
   "discussions_index_6c36ced": { "message": "Indice discussioni" },
   "disjoint_union_e74351a8": { "message": "Unione non contigua" },
@@ -727,6 +730,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } Non è un protocollo valido che deve essere ftp, http, https, mailto, skype, tel oppure può essere omesso"
   },
+  "page_50c4823d": { "message": "Pagina" },
   "pages_e5414c2c": { "message": "Pagine" },
   "paragraph_5e5ad8eb": { "message": "Paragrafo" },
   "paragraph_starting_with_start_a59923f8": {
@@ -786,6 +790,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Zucca" },
   "purple_7678a9fc": { "message": "Viola" },
   "quaternions_877024e0": { "message": "Quaternioni" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quiz" },
   "rational_numbers_80ddaa4a": { "message": "Numeri razionali" },
   "real_numbers_7c99df94": { "message": "Numeri reali" },

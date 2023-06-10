@@ -64,6 +64,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Ja" },
   "angle_c5b4ec50": { "message": "Kulma" },
+  "announcement_fb4cb645": { "message": "Ilmoitus" },
   "announcement_list_da155734": { "message": "Ilmoitusluettelo" },
   "announcements_a4b8ed4a": { "message": "Ilmoitukset" },
   "apply_781a2546": { "message": "Käytä" },
@@ -81,6 +82,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Kuvasuhde säilytetään"
   },
+  "assignment_976578a8": { "message": "Tehtävä" },
   "assignments_1e02582c": { "message": "Tehtävät" },
   "asterisk_82255584": { "message": "Tähtimerkki" },
   "attributes_963ba262": { "message": "Määritteet" },
@@ -264,6 +266,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Suuntaisuus" },
   "directly_edit_latex_b7e9235b": { "message": "Muokkaa LaTeX:iä suoraan" },
   "disable_preview_222bdf72": { "message": "Poista esikatselu käytöstä" },
+  "discussion_6719c51d": { "message": "Keskustelu" },
   "discussions_a5f96392": { "message": "Keskustelut" },
   "discussions_index_6c36ced": { "message": "Keskustelujen indeksi" },
   "disjoint_union_e74351a8": { "message": "Erillinen liitto" },
@@ -719,6 +722,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } ei ole voimassa oleva protokolla. Sen täytyy olla ftp, http, https, mailto, skype, tel tai se saatetaan poistaa"
   },
+  "page_50c4823d": { "message": "Sivu" },
   "pages_e5414c2c": { "message": "Sivut" },
   "paragraph_5e5ad8eb": { "message": "Kappale" },
   "paragraph_starting_with_start_a59923f8": {
@@ -778,6 +782,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Kurpitsa" },
   "purple_7678a9fc": { "message": "Violetti" },
   "quaternions_877024e0": { "message": "Kvaterniot" },
+  "quiz_e0dcce8f": { "message": "Tietovisa" },
   "quizzes_7e598f57": { "message": "Tietovisat" },
   "rational_numbers_80ddaa4a": { "message": "Rationaaliset luvut" },
   "real_numbers_7c99df94": { "message": "Oikeat numerot" },

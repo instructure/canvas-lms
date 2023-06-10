@@ -62,6 +62,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Und" },
   "angle_c5b4ec50": { "message": "Winkel" },
+  "announcement_fb4cb645": { "message": "Ankündigung" },
   "announcement_list_da155734": { "message": "Ankündigungsliste" },
   "announcements_a4b8ed4a": { "message": "Ankündigungen" },
   "apply_781a2546": { "message": "Anwenden" },
@@ -79,6 +80,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Seitenverhältnis wird beibehalten"
   },
+  "assignment_976578a8": { "message": "Aufgabe" },
   "assignments_1e02582c": { "message": "Aufgaben" },
   "asterisk_82255584": { "message": "Sternchen" },
   "attributes_963ba262": { "message": "Attribute" },
@@ -252,6 +254,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Schreibrichtung" },
   "directly_edit_latex_b7e9235b": { "message": "LaTeX direkt bearbeiten" },
   "disable_preview_222bdf72": { "message": "Vorschau deaktivieren" },
+  "discussion_6719c51d": { "message": "Diskussion" },
   "discussions_a5f96392": { "message": "Diskussionen" },
   "discussions_index_6c36ced": { "message": "Diskussionsindex" },
   "disjoint_union_e74351a8": { "message": "Disjunkte Vereinigung" },
@@ -705,6 +708,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } Ist kein gültiges Protokoll. Es muss ftp, http, https, mailto, skype oder tel sein oder weggelassen werden."
   },
+  "page_50c4823d": { "message": "Seite" },
   "pages_e5414c2c": { "message": "Seiten" },
   "paragraph_5e5ad8eb": { "message": "Absatz" },
   "paragraph_starting_with_start_a59923f8": {
@@ -766,6 +770,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Kürbis" },
   "purple_7678a9fc": { "message": "Violett" },
   "quaternions_877024e0": { "message": "Quaternionen" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quizze" },
   "rational_numbers_80ddaa4a": { "message": "Rationale Zahlen" },
   "real_numbers_7c99df94": { "message": "Reelle Zahlen" },

@@ -62,6 +62,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Och" },
   "angle_c5b4ec50": { "message": "Vinkel" },
+  "announcement_fb4cb645": { "message": "Anslag" },
   "announcement_list_da155734": { "message": "Anslagslista" },
   "announcements_a4b8ed4a": { "message": "Anslag" },
   "apply_781a2546": { "message": "Tillämpa" },
@@ -79,6 +80,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bildförhållande kommer att behållas"
   },
+  "assignment_976578a8": { "message": "Uppgift" },
   "assignments_1e02582c": { "message": "Uppgifter" },
   "asterisk_82255584": { "message": "Asterisk" },
   "attributes_963ba262": { "message": "Attribut" },
@@ -258,6 +260,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Textens riktning" },
   "directly_edit_latex_b7e9235b": { "message": "Direktredigera LaTeX" },
   "disable_preview_222bdf72": { "message": "Inaktivera förhandsvisning" },
+  "discussion_6719c51d": { "message": "Diskussion" },
   "discussions_a5f96392": { "message": "Diskussioner" },
   "discussions_index_6c36ced": { "message": "Diskussionsindex" },
   "disjoint_union_e74351a8": { "message": "Upplöst union" },
@@ -709,6 +712,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } är inte ett giltigt protokoll. Protokollet måste vara ftp, http, https, mailto, skype, tel eller så kan det utelämnas"
   },
+  "page_50c4823d": { "message": "Sida" },
   "pages_e5414c2c": { "message": "Sidor" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
   "paragraph_starting_with_start_a59923f8": {
@@ -768,6 +772,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Pumpa" },
   "purple_7678a9fc": { "message": "Lila" },
   "quaternions_877024e0": { "message": "Kvarternion" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quiz" },
   "rational_numbers_80ddaa4a": { "message": "Rationellt tal" },
   "real_numbers_7c99df94": { "message": "Reella tal" },

@@ -60,6 +60,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "および" },
   "angle_c5b4ec50": { "message": "角度" },
+  "announcement_fb4cb645": { "message": "発表" },
   "announcement_list_da155734": { "message": "アナウンス リスト" },
   "announcements_a4b8ed4a": { "message": "発表" },
   "apply_781a2546": { "message": "適用" },
@@ -77,6 +78,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "アスペクト比は維持されます"
   },
+  "assignment_976578a8": { "message": "課題" },
   "assignments_1e02582c": { "message": "課題" },
   "asterisk_82255584": { "message": "アスタリスク" },
   "attributes_963ba262": { "message": "属性" },
@@ -258,6 +260,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "方向性" },
   "directly_edit_latex_b7e9235b": { "message": "ディレクトリ編集 LaTeX" },
   "disable_preview_222bdf72": { "message": "プレビューを無効にする" },
+  "discussion_6719c51d": { "message": "ディスカッション" },
   "discussions_a5f96392": { "message": "ディスカッション" },
   "discussions_index_6c36ced": { "message": "ディスカッションのインデックス" },
   "disjoint_union_e74351a8": { "message": "不連続ユニオン" },
@@ -687,6 +690,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p }は、ftp, http, https, mailto, skype, telであるか、省略可能である有効なプロトコルではありません。"
   },
+  "page_50c4823d": { "message": "ページ" },
   "pages_e5414c2c": { "message": "ページ" },
   "paragraph_5e5ad8eb": { "message": "段落" },
   "paragraph_starting_with_start_a59923f8": {
@@ -746,6 +750,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "かぼちゃ" },
   "purple_7678a9fc": { "message": "パープル" },
   "quaternions_877024e0": { "message": "四元数" },
+  "quiz_e0dcce8f": { "message": "小テスト" },
   "quizzes_7e598f57": { "message": "小テスト" },
   "rational_numbers_80ddaa4a": { "message": "有理数" },
   "real_numbers_7c99df94": { "message": "実数" },

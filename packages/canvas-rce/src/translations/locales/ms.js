@@ -59,6 +59,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Dan" },
   "angle_c5b4ec50": { "message": "Sudut" },
+  "announcement_fb4cb645": { "message": "Pengumuman" },
   "announcement_list_da155734": { "message": "Senarai Pengumuman" },
   "announcements_a4b8ed4a": { "message": "Pengumuman" },
   "apply_781a2546": { "message": "Gunakan" },
@@ -76,6 +77,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Nisbah aspek akan dikekalkan"
   },
+  "assignment_976578a8": { "message": "Tugasan" },
   "assignments_1e02582c": { "message": "Tugasan" },
   "asterisk_82255584": { "message": "Simbol berbentuk bintang" },
   "attributes_963ba262": { "message": "Atribut" },
@@ -253,6 +255,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Kearahan" },
   "directly_edit_latex_b7e9235b": { "message": "Edit LaTeX secara terus" },
   "disable_preview_222bdf72": { "message": "Nyahdayakan Pratonton" },
+  "discussion_6719c51d": { "message": "Perbincangan" },
   "discussions_a5f96392": { "message": "Perbincangan" },
   "discussions_index_6c36ced": { "message": "Indeks Perbincangan" },
   "disjoint_union_e74351a8": { "message": "Buka Cantuman Penyambung" },
@@ -700,6 +703,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } bukan protokol sah yang mesti terdiri daripada ftp, http, mailto, skype, tel atau boleh ditinggalkan."
   },
+  "page_50c4823d": { "message": "Halaman" },
   "pages_e5414c2c": { "message": "Halaman" },
   "paragraph_5e5ad8eb": { "message": "Perenggan" },
   "paragraph_starting_with_start_a59923f8": {
@@ -757,6 +761,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Labu" },
   "purple_7678a9fc": { "message": "Ungu" },
   "quaternions_877024e0": { "message": "Kuarternion" },
+  "quiz_e0dcce8f": { "message": "Kuiz" },
   "quizzes_7e598f57": { "message": "Kuiz" },
   "rational_numbers_80ddaa4a": { "message": "Nombor Rasional" },
   "real_numbers_7c99df94": { "message": "Nombor Sebenar" },

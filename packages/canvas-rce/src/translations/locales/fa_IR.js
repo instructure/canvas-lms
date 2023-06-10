@@ -28,6 +28,7 @@ const locale = {
     "message": "برای یک  درخواست شبکه خطا رخ داده است"
   },
   "and_7fcc2911": { "message": "و " },
+  "announcement_fb4cb645": { "message": "اطلاعیه" },
   "announcement_list_da155734": { "message": "فهرست اطلاعیه" },
   "announcements_a4b8ed4a": { "message": "اطلاعیه ها" },
   "apply_781a2546": { "message": "اعمال" },
@@ -39,6 +40,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "نسبت ابعاد حفظ خواهد شد"
   },
+  "assignment_976578a8": { "message": "تکلیف" },
   "assignments_1e02582c": { "message": "تکلیف ها" },
   "attributes_963ba262": { "message": "ویژگی ها" },
   "available_folders_694d0436": { "message": "پوشه های موجود" },
@@ -85,6 +87,7 @@ const locale = {
   "description_436c48d7": { "message": "شرح" },
   "details_98a31b68": { "message": "اطلاعات" },
   "dimensions_45ddb7b7": { "message": "ابعاد" },
+  "discussion_6719c51d": { "message": "بحث" },
   "discussions_a5f96392": { "message": "بحث ها" },
   "discussions_index_6c36ced": { "message": "فهرست بحث ها" },
   "done_54e3d4b6": { "message": "انجام شد" },
@@ -167,6 +170,7 @@ const locale = {
   "operators_a2ef9a93": { "message": "عملگرها" },
   "or_9b70ccaa": { "message": "یا" },
   "orange_81386a62": { "message": "نارنجی" },
+  "page_50c4823d": { "message": "صفحه" },
   "pages_e5414c2c": { "message": "صفحه ها" },
   "pause_12af3bb4": { "message": "مکث" },
   "people_b4ebb13c": { "message": "افراد" },
@@ -183,6 +187,7 @@ const locale = {
   "published_c944a23d": { "message": "منتشر شده" },
   "pumpkin_904428d5": { "message": "کدوتنبل" },
   "purple_7678a9fc": { "message": "ارغوانی" },
+  "quiz_e0dcce8f": { "message": "آزمون" },
   "quizzes_7e598f57": { "message": "آزمون ها" },
   "record_7c9448b": { "message": "ضبط کردن" },
   "recording_98da6bda": { "message": "در حال ضبط" },

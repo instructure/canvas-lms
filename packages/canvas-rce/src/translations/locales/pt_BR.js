@@ -64,6 +64,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "E" },
   "angle_c5b4ec50": { "message": "Ângulo" },
+  "announcement_fb4cb645": { "message": "Aviso" },
   "announcement_list_da155734": { "message": "Lista de aviso" },
   "announcements_a4b8ed4a": { "message": "Avisos" },
   "apply_781a2546": { "message": "Aplicar" },
@@ -81,6 +82,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Proporção do aspecto será preservado"
   },
+  "assignment_976578a8": { "message": "Tarefa" },
   "assignments_1e02582c": { "message": "Tarefas" },
   "asterisk_82255584": { "message": "Asterisco" },
   "attributes_963ba262": { "message": "Atributos" },
@@ -260,6 +262,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Direcionalidade" },
   "directly_edit_latex_b7e9235b": { "message": "Editar diretamente LaTeX" },
   "disable_preview_222bdf72": { "message": "Desativar visualização" },
+  "discussion_6719c51d": { "message": "Fórum" },
   "discussions_a5f96392": { "message": "Fóruns" },
   "discussions_index_6c36ced": { "message": "Índice de fóruns" },
   "disjoint_union_e74351a8": { "message": "União disjunta" },
@@ -721,6 +724,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } não é um protocolo válido que deve ser ftp, http, https, mailto, skype, tel ou pode ser omitido"
   },
+  "page_50c4823d": { "message": "Página" },
   "pages_e5414c2c": { "message": "Páginas" },
   "paragraph_5e5ad8eb": { "message": "Parágrafo" },
   "paragraph_starting_with_start_a59923f8": {
@@ -782,6 +786,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Abóbora" },
   "purple_7678a9fc": { "message": "Roxo" },
   "quaternions_877024e0": { "message": "Quaternions" },
+  "quiz_e0dcce8f": { "message": "Teste" },
   "quizzes_7e598f57": { "message": "Testes" },
   "rational_numbers_80ddaa4a": { "message": "Números racionais" },
   "real_numbers_7c99df94": { "message": "Numeros reais" },
