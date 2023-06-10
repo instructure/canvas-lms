@@ -39,6 +39,7 @@
   },
   "and_7fcc2911": { "message": "Oraz" },
   "angle_c5b4ec50": { "message": "Kąt" },
+  "announcement_fb4cb645": { "message": "Ogłoszenie" },
   "announcement_list_da155734": { "message": "Lista ogłoszeń" },
   "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
   "apply_781a2546": { "message": "Zastosuj" },
@@ -56,6 +57,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Współczynnik proporcji zostanie zachowany"
   },
+  "assignment_976578a8": { "message": "Zadanie" },
   "assignments_1e02582c": { "message": "Zadania" },
   "asterisk_82255584": { "message": "Gwiazdka" },
   "attributes_963ba262": { "message": "Właściwości" },
@@ -233,6 +235,7 @@
   "directionality_26ae9e08": { "message": "Kierunkowość" },
   "directly_edit_latex_b7e9235b": { "message": "Edytuj bezpośrednio w LaTeX" },
   "disable_preview_222bdf72": { "message": "Wyłącz podgląd" },
+  "discussion_6719c51d": { "message": "Dyskusja" },
   "discussions_a5f96392": { "message": "Dyskusje" },
   "discussions_index_6c36ced": { "message": "Spis dyskusji" },
   "disjoint_union_e74351a8": { "message": "Suma rozłączna" },
@@ -684,6 +687,7 @@
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } nie jest prawidłowym protokołem; wymagany jest  ftp, http, https, mailto, skype, tel lub można go pominąć"
   },
+  "page_50c4823d": { "message": "Strona" },
   "pages_e5414c2c": { "message": "Strony" },
   "paragraph_5e5ad8eb": { "message": "Akapit" },
   "paragraph_starting_with_start_a59923f8": {
@@ -745,6 +749,7 @@
   "pumpkin_904428d5": { "message": "Dynia" },
   "purple_7678a9fc": { "message": "Fioletowy" },
   "quaternions_877024e0": { "message": "Kwaterniony" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Testy" },
   "rational_numbers_80ddaa4a": { "message": "Liczby wymierne" },
   "real_numbers_7c99df94": { "message": "Liczby rzeczywiste" },

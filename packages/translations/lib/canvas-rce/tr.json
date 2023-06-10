@@ -23,6 +23,7 @@
     "message": "Medya dosyası yüklenirken hata oluştu."
   },
   "and_7fcc2911": { "message": "Ve" },
+  "announcement_fb4cb645": { "message": "Duyuru" },
   "announcement_list_da155734": { "message": "Duyuru Listesi" },
   "announcements_a4b8ed4a": { "message": "Duyurular" },
   "apply_781a2546": { "message": "Uygula" },
@@ -34,6 +35,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Genişleme oranı korumalıdır"
   },
+  "assignment_976578a8": { "message": "Ödev" },
   "assignments_1e02582c": { "message": "Ödevler" },
   "attributes_963ba262": { "message": "Özellikler" },
   "audio_player_for_title_20cc70d": { "message": "{ title } ses oynatıcı" },
@@ -96,6 +98,7 @@
   "description_436c48d7": { "message": "Açıklama" },
   "details_98a31b68": { "message": "Ayrıntılar" },
   "dimensions_45ddb7b7": { "message": "Tanımlamalar" },
+  "discussion_6719c51d": { "message": "Tartışma" },
   "discussions_a5f96392": { "message": "Tartışmalar" },
   "discussions_index_6c36ced": { "message": "Tartışma Başlıkları" },
   "display_options_315aba85": { "message": "Gösterim Seçenekleri" },
@@ -181,6 +184,7 @@
   "none_3b5e34d2": { "message": "Yok" },
   "operators_a2ef9a93": { "message": "Operatörler" },
   "orange_81386a62": { "message": "Turuncu" },
+  "page_50c4823d": { "message": "Sayfa" },
   "pages_e5414c2c": { "message": "Sayfalar" },
   "people_b4ebb13c": { "message": "Katılımcılar" },
   "percentage_34ab7c2c": { "message": "Yüzde" },
@@ -189,6 +193,7 @@
   "preview_53003fd2": { "message": "Önizleme" },
   "published_c944a23d": { "message": "yayınlandı" },
   "purple_7678a9fc": { "message": "Mor" },
+  "quiz_e0dcce8f": { "message": "Kısa Sınav" },
   "quizzes_7e598f57": { "message": "Kısa sınavlar" },
   "record_7c9448b": { "message": "Kayıt" },
   "recording_98da6bda": { "message": "Kaydediliyor" },

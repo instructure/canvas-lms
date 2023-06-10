@@ -43,6 +43,7 @@
   },
   "and_7fcc2911": { "message": "Y" },
   "angle_c5b4ec50": { "message": "Ángulo" },
+  "announcement_fb4cb645": { "message": "Anuncio" },
   "announcement_list_da155734": { "message": "Lista de anuncios" },
   "announcements_a4b8ed4a": { "message": "Anuncios" },
   "apply_781a2546": { "message": "Aplicar" },
@@ -60,6 +61,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Se conservará la relación de aspecto"
   },
+  "assignment_976578a8": { "message": "Actividad" },
   "assignments_1e02582c": { "message": "Actividades" },
   "asterisk_82255584": { "message": "Asterisco" },
   "attributes_963ba262": { "message": "Atributos" },
@@ -249,6 +251,7 @@
   "directionality_26ae9e08": { "message": "Direccionalidad" },
   "directly_edit_latex_b7e9235b": { "message": "Editar directamente LaTeX" },
   "disable_preview_222bdf72": { "message": "Deshabilitar vista previa" },
+  "discussion_6719c51d": { "message": "Foro de discusión" },
   "discussions_a5f96392": { "message": "Foros de discusión" },
   "discussions_index_6c36ced": { "message": "Índice de foros de discusión" },
   "disjoint_union_e74351a8": { "message": "Unión disjunta" },
@@ -718,6 +721,7 @@
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } no es un protocolo válido, que debe ser ftp, http, https, mailto, skype, tel, o puede omitirse"
   },
+  "page_50c4823d": { "message": "Página" },
   "pages_e5414c2c": { "message": "Páginas" },
   "paragraph_5e5ad8eb": { "message": "Párrafo" },
   "paragraph_starting_with_start_a59923f8": {
@@ -777,6 +781,7 @@
   "pumpkin_904428d5": { "message": "Calabaza" },
   "purple_7678a9fc": { "message": "Morado" },
   "quaternions_877024e0": { "message": "Cuaterniones" },
+  "quiz_e0dcce8f": { "message": "Prueba" },
   "quizzes_7e598f57": { "message": "Pruebas" },
   "rational_numbers_80ddaa4a": { "message": "Números racionales" },
   "real_numbers_7c99df94": { "message": "Números reales" },

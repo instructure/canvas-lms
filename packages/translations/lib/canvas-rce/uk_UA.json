@@ -9,6 +9,7 @@
   "an_error_occurred_making_a_network_request_d1bda348": {
     "message": "Сталася помилка при виконанні запиту мережі"
   },
+  "announcement_fb4cb645": { "message": "Оголошення" },
   "announcement_list_da155734": { "message": "Список оголошень" },
   "announcements_a4b8ed4a": { "message": "Оголошення" },
   "apply_781a2546": { "message": "Застосувати" },
@@ -20,6 +21,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Співвідношення сторін збережеться"
   },
+  "assignment_976578a8": { "message": "Завдання" },
   "assignments_1e02582c": { "message": "Завдання" },
   "attributes_963ba262": { "message": "Атрибути" },
   "basic_554cdc0a": { "message": "Базовий" },
@@ -72,6 +74,7 @@
   "description_436c48d7": { "message": "Опис" },
   "details_98a31b68": { "message": "Подробиці" },
   "dimensions_45ddb7b7": { "message": "Розміри" },
+  "discussion_6719c51d": { "message": "Обговорення" },
   "discussions_a5f96392": { "message": "Обговорення" },
   "discussions_index_6c36ced": { "message": "Індекс обговорення" },
   "documents_81393201": { "message": "Документи" },
@@ -149,6 +152,7 @@
   },
   "operators_a2ef9a93": { "message": "Оператори" },
   "orange_81386a62": { "message": "Помаранчевий" },
+  "page_50c4823d": { "message": "Сторінка" },
   "pages_e5414c2c": { "message": "Сторінки" },
   "people_b4ebb13c": { "message": "Люди" },
   "percentage_34ab7c2c": { "message": "Відсоток" },
@@ -157,6 +161,7 @@
   "preview_53003fd2": { "message": "Попередній перегляд" },
   "published_c944a23d": { "message": "опубліковано" },
   "purple_7678a9fc": { "message": "Фіолетовий" },
+  "quiz_e0dcce8f": { "message": "Контрольна робота" },
   "quizzes_7e598f57": { "message": "Контрольні Роботи" },
   "record_7c9448b": { "message": "Записати" },
   "record_upload_media_5fdce166": { "message": "Запис/завантаження медіа" },
