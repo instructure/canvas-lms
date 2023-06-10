@@ -28,6 +28,7 @@
   },
   "and_7fcc2911": { "message": "És" },
   "angle_c5b4ec50": { "message": "Szög" },
+  "announcement_fb4cb645": { "message": "Hirdetmény" },
   "announcement_list_da155734": { "message": "Hirdetménylista" },
   "announcements_a4b8ed4a": { "message": "Hirdetmények" },
   "apply_781a2546": { "message": "Alkalmazás" },
@@ -45,6 +46,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Képarány megtartása"
   },
+  "assignment_976578a8": { "message": "Feladat" },
   "assignments_1e02582c": { "message": "Feladatok" },
   "asterisk_82255584": { "message": "Csillag" },
   "attributes_963ba262": { "message": "Attribútumok" },
@@ -201,6 +203,7 @@
     "message": "Közvetlenül szerkesztheti a LaTeX-et"
   },
   "disable_preview_222bdf72": { "message": "Előnézet letiltása" },
+  "discussion_6719c51d": { "message": "Fórum" },
   "discussions_a5f96392": { "message": "Fórumok" },
   "discussions_index_6c36ced": { "message": "Fórumok indexe" },
   "disjoint_union_e74351a8": { "message": "Diszjunkt únió" },
@@ -550,6 +553,7 @@
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } nem egy érvényes protokoll; lehet ftp, http, https, mailto, skype, tel, vagy esetleg elhagyható"
   },
+  "page_50c4823d": { "message": "Oldal" },
   "pages_e5414c2c": { "message": "Oldalak" },
   "paragraph_5e5ad8eb": { "message": "Bekezdés" },
   "parallel_d55d6e38": { "message": "Párhuzamos" },
@@ -601,6 +605,7 @@
   "pumpkin_904428d5": { "message": "Sütőtök" },
   "purple_7678a9fc": { "message": "Lila" },
   "quaternions_877024e0": { "message": "Kvaterniók" },
+  "quiz_e0dcce8f": { "message": "Kvíz" },
   "quizzes_7e598f57": { "message": "Kvízek" },
   "rational_numbers_80ddaa4a": { "message": "Racionális számok" },
   "real_numbers_7c99df94": { "message": "Valós számok" },

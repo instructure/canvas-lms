@@ -39,6 +39,7 @@
   },
   "and_7fcc2911": { "message": "Og" },
   "angle_c5b4ec50": { "message": "Horn" },
+  "announcement_fb4cb645": { "message": "Tilkynning" },
   "announcement_list_da155734": { "message": "Tilkynningaskrá" },
   "announcements_a4b8ed4a": { "message": "Tilkynningar" },
   "apply_781a2546": { "message": "Virkja" },
@@ -56,6 +57,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Útlitshlutfall verður varðveitt"
   },
+  "assignment_976578a8": { "message": "Verkefni" },
   "assignments_1e02582c": { "message": "Verkefni" },
   "asterisk_82255584": { "message": "Stjarna" },
   "attributes_963ba262": { "message": "Eiginleikar" },
@@ -229,6 +231,7 @@
   "directionality_26ae9e08": { "message": "Lestrarátt" },
   "directly_edit_latex_b7e9235b": { "message": "Breyta LaTeX beint" },
   "disable_preview_222bdf72": { "message": "Afvirkja forskoðun" },
+  "discussion_6719c51d": { "message": "Umræða" },
   "discussions_a5f96392": { "message": "Umræður" },
   "discussions_index_6c36ced": { "message": "Umræðuskrá" },
   "disjoint_union_e74351a8": { "message": "Ósamræmt samband" },
@@ -668,6 +671,7 @@
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } er ekki gild samskiptaregla, hún verður að vera ftp, http, https, mailto, skype, tel eða henni verður sleppt. "
   },
+  "page_50c4823d": { "message": "Síða" },
   "pages_e5414c2c": { "message": "Síður" },
   "paragraph_5e5ad8eb": { "message": "Málsgrein" },
   "paragraph_starting_with_start_a59923f8": {
@@ -725,6 +729,7 @@
   "pumpkin_904428d5": { "message": "Grasker" },
   "purple_7678a9fc": { "message": "Fjólublár" },
   "quaternions_877024e0": { "message": "Fertölur" },
+  "quiz_e0dcce8f": { "message": "Próf" },
   "quizzes_7e598f57": { "message": "Próf" },
   "rational_numbers_80ddaa4a": { "message": "Rökréttar tölur" },
   "real_numbers_7c99df94": { "message": "Raunverulegar tölur" },

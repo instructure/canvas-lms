@@ -41,6 +41,7 @@
   },
   "and_7fcc2911": { "message": "A" },
   "angle_c5b4ec50": { "message": "Ongl" },
+  "announcement_fb4cb645": { "message": "Cyhoeddiad" },
   "announcement_list_da155734": { "message": "Rhestr Cyhoeddiadau" },
   "announcements_a4b8ed4a": { "message": "Cyhoeddiadau" },
   "apply_781a2546": { "message": "Rhoi ar waith" },
@@ -58,6 +59,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bydd y gymhareb agwedd yn cael ei chadw"
   },
+  "assignment_976578a8": { "message": "Aseiniad" },
   "assignments_1e02582c": { "message": "Aseiniadau" },
   "asterisk_82255584": { "message": "Seren" },
   "attributes_963ba262": { "message": "Priodoleddau" },
@@ -239,6 +241,7 @@
   "directionality_26ae9e08": { "message": "Cyfeirioldeb" },
   "directly_edit_latex_b7e9235b": { "message": "Golygu LaTeX yn Uniongyrchol" },
   "disable_preview_222bdf72": { "message": "Analluogi Rhagolwg" },
+  "discussion_6719c51d": { "message": "Trafodaeth" },
   "discussions_a5f96392": { "message": "Trafodaethau" },
   "discussions_index_6c36ced": { "message": "Mynegai Trafodaethau" },
   "disjoint_union_e74351a8": { "message": "Uniad Arwahan" },
@@ -694,6 +697,7 @@
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "Dydy { p } ddim yn brotocol dilys, rhaid iddo fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
   },
+  "page_50c4823d": { "message": "Tudalen" },
   "pages_e5414c2c": { "message": "Tudalennau" },
   "paragraph_5e5ad8eb": { "message": "Paragraff" },
   "paragraph_starting_with_start_a59923f8": {
@@ -753,6 +757,7 @@
   "pumpkin_904428d5": { "message": "Pumpkin" },
   "purple_7678a9fc": { "message": "Porffor" },
   "quaternions_877024e0": { "message": "Cwaternion" },
+  "quiz_e0dcce8f": { "message": "Cwis" },
   "quizzes_7e598f57": { "message": "Cwisiau" },
   "rational_numbers_80ddaa4a": { "message": "Rhifau Rhesymegol" },
   "real_numbers_7c99df94": { "message": "Rhifau Go Iawn" },

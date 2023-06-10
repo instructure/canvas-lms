@@ -39,6 +39,7 @@
   },
   "and_7fcc2911": { "message": "Og" },
   "angle_c5b4ec50": { "message": "Vinkel" },
+  "announcement_fb4cb645": { "message": "Kunngjøring" },
   "announcement_list_da155734": { "message": "Kunngjøringsliste" },
   "announcements_a4b8ed4a": { "message": "Kunngjøringer" },
   "apply_781a2546": { "message": "Bruk" },
@@ -56,6 +57,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Dimensjonene vil bli bevart"
   },
+  "assignment_976578a8": { "message": "Oppgave" },
   "assignments_1e02582c": { "message": "Oppgaver" },
   "asterisk_82255584": { "message": "Stjerne" },
   "attributes_963ba262": { "message": "Attributter" },
@@ -229,6 +231,7 @@
   "directionality_26ae9e08": { "message": "Retning" },
   "directly_edit_latex_b7e9235b": { "message": "Rediger LaTex direkte" },
   "disable_preview_222bdf72": { "message": "Deaktiver forhåndsvisning" },
+  "discussion_6719c51d": { "message": "Diskusjon" },
   "discussions_a5f96392": { "message": "Diskusjoner" },
   "discussions_index_6c36ced": { "message": "Diskusjonsindeks" },
   "disjoint_union_e74351a8": { "message": "Usammenhengende union" },
@@ -678,6 +681,7 @@
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } er ikke en gyldig protokoll som må være ftp, http, https, mailto, skype, tel eller kan utelates"
   },
+  "page_50c4823d": { "message": "Side" },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },
   "paragraph_starting_with_start_a59923f8": {
@@ -735,6 +739,7 @@
   "pumpkin_904428d5": { "message": "Gresskar" },
   "purple_7678a9fc": { "message": "Lilla" },
   "quaternions_877024e0": { "message": "Kvaternioner" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quizer" },
   "rational_numbers_80ddaa4a": { "message": "Rasjonelle tall" },
   "real_numbers_7c99df94": { "message": "Reelle tall" },
