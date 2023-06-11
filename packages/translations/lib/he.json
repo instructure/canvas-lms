@@ -476,6 +476,9 @@
     "missing_items_for_title_516511f8": {
         "message": "חסרים פריטים ל { title }"
     },
+    "module_90d9fd32": {
+        "message": "מודול"
+    },
     "modules_c4325335": {
         "message": "מודולים"
     },
@@ -488,6 +491,9 @@
     "name_1aed4a1b": {
         "message": "שם"
     },
+    "navigation_ee9af92d": {
+        "message": "ניווט"
+    },
     "new_13daf639": {
         "message": "חדש"
     },
@@ -499,6 +505,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "הזדמנויות חדשות"
+    },
+    "new_quiz_34aacba6": {
+        "message": "בוחן חדש"
     },
     "next_40e12421": {
         "message": "הבא"

@@ -1436,6 +1436,9 @@
     "missing_items_for_title_516511f8": {
         "message": "Hiányzó elem ehhez: { title }"
     },
+    "module_90d9fd32": {
+        "message": "Modul"
+    },
     "modules_c4325335": {
         "message": "Modulok"
     },
@@ -1478,6 +1481,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigáljon a menün vagy eszköztáron át"
     },
+    "navigation_ee9af92d": {
+        "message": "Navigáció"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Beágyazott nagyobb, mint"
     },
@@ -1495,6 +1501,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Új lehetőségek"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Új kvíz"
     },
     "next_40e12421": {
         "message": "Következő"

@@ -311,6 +311,9 @@
     "missing_1a256b3b": {
         "message": "Απομένει"
     },
+    "module_90d9fd32": {
+        "message": "Ενότητα"
+    },
     "modules_c4325335": {
         "message": "Ενότητες"
     },
@@ -320,8 +323,14 @@
     "name_1aed4a1b": {
         "message": "Όνομα"
     },
+    "navigation_ee9af92d": {
+        "message": "Πλοήγηση"
+    },
     "new_13daf639": {
         "message": "Νέο"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Νέο Κουίζ"
     },
     "next_40e12421": {
         "message": "Επόμενο"
