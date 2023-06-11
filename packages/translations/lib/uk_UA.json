@@ -512,6 +512,9 @@
     "missing_items_for_title_516511f8": {
         "message": "Відсутні елементи для { title }"
     },
+    "module_90d9fd32": {
+        "message": "Розділ"
+    },
     "modules_c4325335": {
         "message": "Розділи"
     },
@@ -524,6 +527,9 @@
     "name_1aed4a1b": {
         "message": "Ім''я"
     },
+    "navigation_ee9af92d": {
+        "message": "Навігація"
+    },
     "new_13daf639": {
         "message": "Новий"
     },
@@ -535,6 +541,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Нові можливості"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Нова контрольна робота"
     },
     "next_40e12421": {
         "message": "Далі"

@@ -299,6 +299,9 @@
     "misc_3b692ea7": {
         "message": "Այլ"
     },
+    "module_90d9fd32": {
+        "message": "Մոդուլ"
+    },
     "modules_c4325335": {
         "message": "Մոդուլներ"
     },
@@ -308,8 +311,14 @@
     "name_1aed4a1b": {
         "message": "Անուն"
     },
+    "navigation_ee9af92d": {
+        "message": "Նավարկում"
+    },
     "new_13daf639": {
         "message": "Նոր"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Նոր թեստ"
     },
     "next_40e12421": {
         "message": "Հաջորդը"

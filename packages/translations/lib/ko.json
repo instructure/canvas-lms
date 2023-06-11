@@ -239,6 +239,9 @@
     "misc_3b692ea7": {
         "message": "기타"
     },
+    "module_90d9fd32": {
+        "message": "모듈"
+    },
     "modules_c4325335": {
         "message": "모듈"
     },
@@ -248,8 +251,14 @@
     "name_1aed4a1b": {
         "message": "이름"
     },
+    "navigation_ee9af92d": {
+        "message": "탐색"
+    },
     "new_13daf639": {
         "message": "새 항목"
+    },
+    "new_quiz_34aacba6": {
+        "message": "새 퀴즈"
     },
     "next_40e12421": {
         "message": "다음"

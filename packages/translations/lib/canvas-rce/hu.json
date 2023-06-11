@@ -483,6 +483,7 @@
   "minus_plus_3461f637": { "message": "Mínusz/Plusz" },
   "misc_3b692ea7": { "message": "Egyéb" },
   "miscellaneous_e9818229": { "message": "Egyéb" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Modulok" },
   "mu_37223b8b": { "message": "Mu" },
   "multi_color_image_63d7372f": { "message": "Többszínű kép" },
@@ -500,8 +501,10 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigáljon a menün vagy eszköztáron át"
   },
+  "navigation_ee9af92d": { "message": "Navigáció" },
   "nested_greater_than_d852e60d": { "message": "Beágyazott nagyobb, mint" },
   "nested_less_than_27d17e58": { "message": "Beágyazott kevesebb, mint" },
+  "new_quiz_34aacba6": { "message": "Új kvíz" },
   "next_40e12421": { "message": "Következő" },
   "no_changes_to_save_d29f6e91": { "message": "Nincs mentendő módosítás." },
   "no_e16d9132": { "message": "Nem" },
