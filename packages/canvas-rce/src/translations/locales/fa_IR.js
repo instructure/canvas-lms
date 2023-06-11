@@ -152,9 +152,12 @@ const locale = {
   "minimize_file_preview_da911944": { "message": "کمینه کردن پیش نمایش فایل" },
   "minimize_video_20aa554b": { "message": "کمینه کردن تصویر" },
   "misc_3b692ea7": { "message": "متفرقه" },
+  "module_90d9fd32": { "message": "ماژول" },
   "modules_c4325335": { "message": "ماژول ها" },
   "my_files_2f621040": { "message": "فایل های من" },
   "name_1aed4a1b": { "message": "نام" },
+  "navigation_ee9af92d": { "message": "پیمایش" },
+  "new_quiz_34aacba6": { "message": "آزمون جدید" },
   "next_40e12421": { "message": "بعدی" },
   "no_e16d9132": { "message": "خیر" },
   "no_preview_is_available_for_this_file_f940114a": {

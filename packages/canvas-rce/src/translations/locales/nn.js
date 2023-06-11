@@ -585,6 +585,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Pluss" },
   "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Diverse" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Modular" },
   "mu_37223b8b": { "message": "Mu" },
   "multi_color_image_63d7372f": { "message": "Fleirfargebilde" },
@@ -602,8 +603,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gjennom menyen eller verktøylinja"
   },
+  "navigation_ee9af92d": { "message": "Navigasjon" },
   "nested_greater_than_d852e60d": { "message": "Nøsta større enn" },
   "nested_less_than_27d17e58": { "message": "Nøsta mindre enn" },
+  "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Neste" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ingen problem med tilgjengeligheit funne"

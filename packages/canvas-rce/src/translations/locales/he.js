@@ -131,9 +131,12 @@ const locale = {
   },
   "minimize_video_20aa554b": { "message": "מיזעור וידאו" },
   "misc_3b692ea7": { "message": "אחר" },
+  "module_90d9fd32": { "message": "מודול" },
   "modules_c4325335": { "message": "מודולים" },
   "my_files_2f621040": { "message": "הקבצים שלי" },
   "name_1aed4a1b": { "message": "שם" },
+  "navigation_ee9af92d": { "message": "ניווט" },
+  "new_quiz_34aacba6": { "message": "בוחן חדש" },
   "next_40e12421": { "message": "הבא" },
   "no_e16d9132": { "message": "לא" },
   "no_preview_is_available_for_this_file_f940114a": {
