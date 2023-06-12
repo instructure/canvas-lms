@@ -62,6 +62,8 @@ import {
   getTotal,
   sortAssignments,
   filteredAssignments,
+  getAssignmentPositionInModuleItems,
+  getAssignmentSortKey,
 } from '../utils'
 
 const createAssignment = (score, pointsPossible) => {
@@ -186,6 +188,256 @@ describe('util', () => {
           assignments[2],
           assignments[1],
           assignments[3],
+        ])
+      })
+    })
+
+    describe('by module', () => {
+      it('getAssignmentPositionInModuleItems should return the position of the assignment in the module items', () => {
+        const moduleItems = [
+          {
+            _id: '6',
+            content: {
+              name: 'B3',
+              _id: '21',
+            },
+          },
+          {
+            _id: '8',
+            content: {
+              name: 'B1',
+              _id: '23',
+            },
+          },
+          {
+            _id: '7',
+            content: {
+              name: 'B2',
+              _id: '22',
+            },
+          },
+        ]
+
+        expect(getAssignmentPositionInModuleItems('21', moduleItems)).toBe(1)
+        expect(getAssignmentPositionInModuleItems('22', moduleItems)).toBe(3)
+        expect(getAssignmentPositionInModuleItems('23', moduleItems)).toBe(2)
+      })
+
+      it('getAssignmentSortKey should return the appropriate sort key for the assignment', () => {
+        const assignment1 = Assignment.mock({
+          _id: '22',
+          modules: [
+            {
+              _id: '7',
+              name: 'C - Third',
+              __typename: 'Module',
+              position: 1,
+              moduleItems: [
+                {
+                  _id: '6',
+                  content: {
+                    name: 'B3',
+                    _id: '21',
+                  },
+                },
+                {
+                  _id: '8',
+                  content: {
+                    name: 'B1',
+                    _id: '23',
+                  },
+                },
+                {
+                  _id: '7',
+                  content: {
+                    name: 'B2',
+                    _id: '22',
+                  },
+                },
+              ],
+            },
+          ],
+        })
+
+        const assignment2 = Assignment.mock({
+          _id: '21',
+          modules: [
+            {
+              _id: '7',
+              name: 'C - Third',
+              __typename: 'Module',
+              position: 3,
+              moduleItems: [
+                {
+                  _id: '6',
+                  content: {
+                    name: 'B3',
+                    _id: '21',
+                  },
+                },
+                {
+                  _id: '8',
+                  content: {
+                    name: 'B1',
+                    _id: '23',
+                  },
+                },
+                {
+                  _id: '7',
+                  content: {
+                    name: 'B2',
+                    _id: '22',
+                  },
+                },
+              ],
+            },
+          ],
+        })
+
+        expect(getAssignmentSortKey(assignment1)).toBe(100003)
+        expect(getAssignmentSortKey(assignment2)).toBe(300001)
+      })
+
+      it('should sort assignments by first module item ascending and put the ones without module at the end', () => {
+        const assignments = [
+          Assignment.mock({
+            _id: '21',
+            modules: [
+              {
+                _id: '1',
+                position: 3,
+                name: 'Module C',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'C3',
+                      _id: '23',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C2',
+                      _id: '22',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C1',
+                      _id: '21',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '23',
+            modules: [
+              {
+                _id: '1',
+                position: 3,
+                name: 'Module C',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'C3',
+                      _id: '23',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C2',
+                      _id: '22',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C1',
+                      _id: '21',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '22',
+            modules: [
+              {
+                _id: '1',
+                position: 3,
+                name: 'Module C',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'C3',
+                      _id: '23',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C2',
+                      _id: '22',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C1',
+                      _id: '21',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '24',
+            modules: [
+              {
+                _id: '1',
+                position: 1,
+                name: 'Module A',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'A1',
+                      _id: '24',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '25',
+            modules: [
+              {
+                _id: '1',
+                position: 2,
+                name: 'Module B',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'B1',
+                      _id: '25',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({modules: []}),
+        ]
+
+        const sortedAssignments = sortAssignments(ASSIGNMENT_SORT_OPTIONS.MODULE, assignments)
+
+        expect(sortedAssignments).toEqual([
+          assignments[3],
+          assignments[4],
+          assignments[1],
+          assignments[2],
+          assignments[0],
+          assignments[5],
         ])
       })
     })

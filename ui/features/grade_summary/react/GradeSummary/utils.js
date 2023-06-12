@@ -40,6 +40,24 @@ export const filteredAssignments = data => {
   )
 }
 
+export const getAssignmentPositionInModuleItems = (assignmentId, moduleItems) => {
+  return (
+    moduleItems?.findIndex(moduleItem => {
+      return moduleItem?.content?._id === assignmentId
+    }) + 1
+  )
+}
+
+export const getAssignmentSortKey = assignment => {
+  const assignmentId = assignment?._id
+  const firstModule = assignment?.modules[0]
+
+  return (
+    firstModule?.position * 100000 +
+    getAssignmentPositionInModuleItems(assignmentId, firstModule?.moduleItems)
+  )
+}
+
 export const sortAssignments = (sortBy, assignments) => {
   if (sortBy === ASSIGNMENT_SORT_OPTIONS.NAME) {
     assignments = [...assignments]?.sort((a, b) => a?.name?.localeCompare(b?.name))
@@ -53,6 +71,13 @@ export const sortAssignments = (sortBy, assignments) => {
     assignments = [...assignments]?.sort((a, b) =>
       a?.assignmentGroup?.name?.localeCompare(b?.assignmentGroup?.name)
     )
+  } else if (sortBy === ASSIGNMENT_SORT_OPTIONS.MODULE) {
+    const assignmentsWithModules = assignments
+      ?.filter(a => a?.modules?.length > 0)
+      ?.sort((a, b) => getAssignmentSortKey(a) - getAssignmentSortKey(b))
+    const assignmentsWithoutModules = assignments?.filter(a => a?.modules?.length === 0)
+
+    assignments = [...assignmentsWithModules, ...assignmentsWithoutModules]
   }
   return assignments
 }

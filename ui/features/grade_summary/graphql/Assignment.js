@@ -17,7 +17,7 @@
  */
 
 import gql from 'graphql-tag'
-import {arrayOf, float, string} from 'prop-types'
+import {arrayOf, float, string, number} from 'prop-types'
 
 import {Submission} from './Submission'
 
@@ -40,6 +40,19 @@ export const Assignment = {
           ...Submission
         }
       }
+      modules {
+        _id
+        name
+        position
+        moduleItems {
+          content {
+            ... on Assignment {
+              _id
+              name
+            }
+          }
+        }
+      }
     }
     ${Submission.fragment}
   `,
@@ -57,6 +70,17 @@ export const Assignment = {
     submissionsConnection: arrayOf({
       nodes: arrayOf(Submission.shape),
     }),
+    modules: arrayOf({
+      _id: string,
+      name: string,
+      position: number,
+      moduleItems: arrayOf({
+        content: {
+          _id: string,
+          name: string,
+        },
+      }),
+    }),
   },
   mock: ({
     _id = '1',
@@ -72,6 +96,21 @@ export const Assignment = {
     submissionsConnection = {
       nodes: [Submission.mock()],
     },
+    modules = [
+      {
+        _id: '1',
+        name: 'Module A',
+        position: 1,
+        moduleItems: [
+          {
+            content: {
+              _id: '1',
+              name: 'Assignment 1',
+            },
+          },
+        ],
+      },
+    ],
   } = {}) => ({
     _id,
     dueAt,
@@ -81,5 +120,6 @@ export const Assignment = {
     gradingType,
     assignmentGroup,
     submissionsConnection,
+    modules,
   }),
 }
