@@ -24,6 +24,8 @@ describe Types::DiscussionEntryType do
   let_once(:discussion_entry) { create_valid_discussion_entry }
   let(:parent) { discussion_entry.discussion_topic.discussion_entries.create!(message: "parent_entry", parent_id: discussion_entry.id, user: @teacher) }
   let(:sub_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry", parent_id: parent.id, user: @teacher) }
+  # The parent id is set differently depeding on the discussion feature being used. The following entry is how an inline thread would create a reply to the sub_entry
+  let(:inline_reply_to_third_level_entry) { discussion_entry.discussion_topic.discussion_entries.create!(message: "reply to 3rd level sub_entry", parent_id: sub_entry.parent_entry.id, user: @teacher) }
   let(:discussion_entry_type) { GraphQLTypeTester.new(discussion_entry, current_user: @teacher) }
   let(:discussion_sub_entry_type) { GraphQLTypeTester.new(sub_entry, current_user: @teacher) }
   let(:permissions) do
@@ -114,6 +116,39 @@ describe Types::DiscussionEntryType do
   end
 
   describe "quoted entry" do
+    it "returns the quoted_entry if reply_preview is false but quoted_entry is populated" do
+      message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
+      parent.message = message * 5 # something longer than the default 150 chars
+      parent.save
+      type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+      sub_entry.update!(include_reply_preview: false)
+      sub_entry.quoted_entry = parent
+      sub_entry.save
+
+      # Create a new subentry and set it as the quoted entry
+      expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
+      expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
+      expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
+      expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
+    end
+
+    it "returns the quoted_entry over parent_entry if quoted_entry is populated and include_reply_preview is true" do
+      message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
+      parent.message = message * 5 # something longer than the default 150 chars
+      parent.save
+      type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+      sub_entry.update!(include_reply_preview: true)
+      sub_entry.quoted_entry = inline_reply_to_third_level_entry
+      sub_entry.save
+
+      # Create a new subentry and set it as the quoted entry
+      expect(inline_reply_to_third_level_entry.depth).to eq 3
+      expect(type.resolve("quotedEntry { author { shortName } }")).to eq inline_reply_to_third_level_entry.user.short_name
+      expect(type.resolve("quotedEntry { createdAt }")).to eq inline_reply_to_third_level_entry.created_at.iso8601
+      expect(type.resolve("quotedEntry { previewMessage }")).to eq inline_reply_to_third_level_entry.summary(500)
+      expect(type.resolve("quotedEntry { _id }")).to eq inline_reply_to_third_level_entry.id.to_s
+    end
+
     context "split screen view" do
       before do
         allow(Account.site_admin).to receive(:feature_enabled?).with(:split_screen_view).and_return(true)
