@@ -20,6 +20,7 @@ export const ASSIGNMENT_SORT_OPTIONS = {
   ASSIGNMENT_GROUP: 'Assignment Group',
   DUE_DATE: 'Due Date',
   NAME: 'Name',
+  MODULE: 'Module',
 }
 
 export const ASSIGNMENT_NOT_APPLICABLE = 'N/A'
