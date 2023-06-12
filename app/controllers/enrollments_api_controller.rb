@@ -448,12 +448,31 @@ class EnrollmentsApiController < ApplicationController
       end
 
       if params[:sis_user_id].present?
-        pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
-        enrollments = if value_to_boolean(params[:created_for_sis_id])
-                        enrollments.where(sis_pseudonym: pseudonyms)
-                      else
-                        enrollments.where(user_id: pseudonyms.pluck(:user_id))
-                      end
+        enrollments =
+          if value_to_boolean(params[:created_for_sis_id])
+            pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
+            enrollments.where(sis_pseudonym: pseudonyms)
+          else
+            # include inactive enrollment states by default unless state param is specified
+            filter_params = params[:state].present? ? { enrollment_state: params[:state] } : { include_inactive_enrollments: true }
+
+            user_ids = Set.new
+            sis_user_ids = Array.wrap(params[:sis_user_id])
+            sis_user_ids.each do |sis_id|
+              sis_id = sis_id.to_s
+              users = UserSearch.for_user_in_context(sis_id,
+                                                     @context,
+                                                     @current_user,
+                                                     session,
+                                                     filter_params)
+              users.find_each do |user|
+                if user.pseudonyms.shard(user).active.where(sis_user_id: sis_id).exists?
+                  user_ids << user.id
+                end
+              end
+            end
+            enrollments.where(user_id: user_ids)
+          end
       end
 
       if params[:sis_section_id].present?
@@ -491,14 +510,16 @@ class EnrollmentsApiController < ApplicationController
         if use_bookmarking?
           enrollments = enrollments.select("users.sortable_name AS sortable_name")
           bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
-                                                                  { type: { skip_collation: true }, sortable_name: { type: :string, null: false } }, :id)
+                                                                  { type: { skip_collation: true }, sortable_name: { type: :string, null: false } },
+                                                                  :id)
           ShardedBookmarkedCollection.build(bookmarker, enrollments, always_use_bookmarks: true)
         else
           enrollments.order(:type, User.sortable_name_order_by_clause("users"), :id)
         end
       enrollments = Api.paginate(
         collection,
-        self, send("api_v1_#{endpoint_scope}_enrollments_url")
+        self,
+        send("api_v1_#{endpoint_scope}_enrollments_url")
       )
 
       ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
@@ -508,8 +529,11 @@ class EnrollmentsApiController < ApplicationController
       user_json_preloads(enrollments.map(&:user), false, { group_memberships: include_group_ids })
 
       render json: enrollments.map { |e|
-        enrollment_json(e, @current_user, session, includes: includes,
-                                                   opts: { grading_period: grading_period })
+        enrollment_json(e,
+                        @current_user,
+                        session,
+                        includes:,
+                        opts: { grading_period: })
       }
     end
   end
@@ -846,12 +870,15 @@ class EnrollmentsApiController < ApplicationController
     end
   end
 
-  # @API Adds last attended date to student enrollment in course
+  # @API Add last attended date
+  # Add last attended date to student enrollment in course
+  #
+  # @argument date [Date]
+  #   The last attended date of a student enrollment in a course.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/:course_id/user/:user_id/last_attended"
   #     -X PUT => date="Thu%20Dec%2021%202017%2000:00:00%20GMT-0700%20(MST)
-  #
   #
   # @returns Enrollment
   def last_attended
@@ -861,7 +888,7 @@ class EnrollmentsApiController < ApplicationController
     if date
       enrollments = Enrollment.where(course_id: params[:course_id], user_id: params[:user_id])
       enrollments.update_all(last_attended_at: date)
-      render json: { date: date }
+      render json: { date: }
     else
       render json: { message: "Invalid date time input" }, status: :bad_request
     end
@@ -1005,15 +1032,15 @@ class EnrollmentsApiController < ApplicationController
 
   def enrollment_states_for_state_param
     states = Array(params[:state]).uniq
-    states.concat(%w[active invited]) if states.delete "current_and_invited"
-    states.concat(%w[active invited creation_pending pending_active pending_invited]) if states.delete "current_and_future"
-    states.concat(%w[active completed]) if states.delete "current_and_concluded"
+    states.push("active", "invited") if states.delete "current_and_invited"
+    states.push("active", "invited", "creation_pending", "pending_active", "pending_invited") if states.delete "current_and_future"
+    states.push("active", "completed") if states.delete "current_and_concluded"
     states.uniq
   end
 
   def check_sis_permissions(sis_context)
     sis_filters = %w[sis_account_id sis_course_id sis_section_id sis_user_id]
-    if (params.keys & sis_filters).present? && !sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
+    if params.keys.intersect?(sis_filters) && !sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
       return false
     end
 

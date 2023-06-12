@@ -23,9 +23,9 @@ import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
-import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView.coffee'
-import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView.coffee'
-import SisButtonView from '@canvas/sis/backbone/views/SisButtonView.coffee'
+import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
+import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
 import template from '../../jst/QuizItemView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
@@ -250,6 +250,7 @@ export default class ItemView extends Backbone.View {
   }
 
   updatePublishState() {
+    this.$('.speed-grader-link-container')?.toggleClass('hidden', !this.model.get('published'))
     return this.$('.ig-row').toggleClass('ig-published', this.model.get('published'))
   }
 
@@ -363,8 +364,7 @@ export default class ItemView extends Backbone.View {
       this.model.get('can_update') &&
       !this.isStudent() &&
       ENV.FLAGS &&
-      ENV.FLAGS.quiz_lti_enabled &&
-      ENV.FLAGS.new_quizzes_skip_to_build_module_button
+      ENV.FLAGS.quiz_lti_enabled
     base.quizzesRespondusEnabled =
       this.isStudent() &&
       this.model.get('require_lockdown_browser') &&
@@ -374,10 +374,17 @@ export default class ItemView extends Backbone.View {
       this.model.get('is_master_course_child_content') &&
       this.model.get('restricted_by_master_course')
 
+    base.courseId = ENV.context_asset_string.split('_')[1]
+    base.showSpeedGraderLinkFlag = ENV.FLAGS?.show_additional_speed_grader_link
+    base.showSpeedGraderLink = ENV.SHOW_SPEED_GRADER_LINK
+
+    // publishing and unpublishing the underlying model does not rerender this view.
+    // this sets initial value, then it keeps up with class toggling behavior on updatePublishState()
+    base.initialUnpublishedState = !this.model.get('published')
+
     base.DIRECT_SHARE_ENABLED = ENV.FLAGS && ENV.FLAGS.DIRECT_SHARE_ENABLED
     base.canOpenManageOptions =
       this.canManage() || this.canDuplicate() || this.canDelete() || base.DIRECT_SHARE_ENABLED
-
     return base
   }
 }

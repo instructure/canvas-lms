@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -24,15 +25,15 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {
   IconArrowEndLine,
+  IconAssignmentLine,
   IconCalendarClockLine,
   IconClockLine,
-  IconAssignmentLine,
 } from '@instructure/ui-icons'
 
 import {
-  coursePaceTimezone,
   coursePaceDateFormatter,
   coursePaceDateShortFormatter,
+  coursePaceTimezone,
 } from '../../shared/api/backend_serializer'
 import {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
@@ -68,7 +69,7 @@ interface PassedProps {
   readonly appliedPace: Pace
 }
 
-export const PaceModalStats: React.FC<PassedProps> = ({
+export const PaceModalStats = ({
   coursePace,
   assignments,
   paceDuration,
@@ -78,7 +79,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   compression,
   responsiveSize,
   appliedPace,
-}) => {
+}: PassedProps) => {
   const [dateFormatter, setDateFormat] = useState(coursePaceDateFormatter)
   const [shrink, setShrink] = useState(responsiveSize !== 'large')
   const enrollmentType = coursePace.context_type === 'Enrollment'
@@ -128,6 +129,7 @@ export const PaceModalStats: React.FC<PassedProps> = ({
   useEffect(() => {
     const isSmallScreen = responsiveSize !== 'large'
     const dateFormat = isSmallScreen ? coursePaceDateShortFormatter : coursePaceDateFormatter
+    // @ts-expect-error
     setDateFormat(dateFormat)
     setShrink(isSmallScreen)
   }, [responsiveSize])

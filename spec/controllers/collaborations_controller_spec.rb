@@ -49,7 +49,7 @@ describe CollaborationsController do
       get "index", params: { course_id: @course.id }
 
       expect(response).to be_successful
-      expect(assigns(:user_has_google_drive)).to eq true
+      expect(assigns(:user_has_google_drive)).to be true
     end
 
     it "handles users without google authorized" do
@@ -59,7 +59,7 @@ describe CollaborationsController do
       get "index", params: { course_id: @course.id }
 
       expect(response).to be_successful
-      expect(assigns(:user_has_google_drive)).to eq false
+      expect(assigns(:user_has_google_drive)).to be false
     end
 
     it "handles users that need to upgrade to google_drive" do
@@ -271,7 +271,7 @@ describe CollaborationsController do
       it "rejects access properly" do
         get "show", params: { course_id: @course.id, id: collaboration.id }
 
-        expect(response.status).to eq 302
+        expect(response).to have_http_status :found
         expect(response.headers["Location"]).to match(/login/)
       end
     end
@@ -331,12 +331,12 @@ describe CollaborationsController do
 
       context "with the deep linking extension" do
         subject do
-          post :create, params: params
+          post(:create, params:)
           Collaboration.find(assigns[:collaboration].id)
         end
 
         let(:teacher) { @teacher }
-        let(:student) { student_in_course(course: course, active_all: true).user }
+        let(:student) { student_in_course(course:, active_all: true).user }
         let(:course) { @course }
         let(:params) { { course_id: course.id, contentItems: [content_item].to_json } }
         let(:content_item) do
@@ -354,7 +354,7 @@ describe CollaborationsController do
         before { user_session(teacher) }
 
         context "with a group set" do
-          let(:group) { group_model(course: course) }
+          let(:group) { group_model(course:) }
           let(:content_item) do
             super().merge(
               Collaboration::DEEP_LINKING_EXTENSION => {

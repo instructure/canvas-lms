@@ -272,16 +272,15 @@ module ImprovedOutcomeManagementPage
   end
 
   def enable_improved_outcomes_management(account)
-    account.enable_feature!(:account_level_mastery_scales)
     account.enable_feature!(:improved_outcomes_management)
+  end
+
+  def enable_account_level_mastery_scales(account)
+    account.enable_feature!(:account_level_mastery_scales)
   end
 
   def enable_friendly_description
     Account.site_admin.enable_feature!(:outcomes_friendly_description)
-  end
-
-  def enable_alignment_summary(account)
-    account.enable_feature!(:outcome_alignment_summary)
   end
 
   def open_find_modal
@@ -375,7 +374,7 @@ module ImprovedOutcomeManagementPage
   end
 
   def select_outcome_group_with_text(text, timeout = 2)
-    wait_for(method: nil, timeout: timeout) { tree_browser.present? }
+    wait_for(method: nil, timeout:) { tree_browser.present? }
     tree_browser_outcome_groups.find { |group| group.text.split("\n")[0] == text }
   end
 

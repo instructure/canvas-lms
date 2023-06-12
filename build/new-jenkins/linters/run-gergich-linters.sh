@@ -36,12 +36,13 @@ gergich capture i18nliner 'bin/rails i18n:check'
 # purposely don't run under bundler; they shell out and use bundler as necessary
 ruby script/brakeman
 
-IFS=',' read -ra PRIVATE_PLUGINS_ARR <<< "$PRIVATE_PLUGINS"
+read -ra PRIVATE_PLUGINS_ARR <<< "$PRIVATE_PLUGINS"
 
 if [[ ! "${PRIVATE_PLUGINS[*]}" =~ "$GERRIT_PROJECT" ]]; then
   ruby script/tatl_tael
 fi
 
+ruby script/tsc & TSC_PID=$!
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
@@ -51,5 +52,6 @@ node ui-build/tools/component-info.mjs -i -v -g
 
 bin/rails css:styleguide doc:api
 
+wait $TSC_PID
 gergich status
 echo "LINTER OK!"

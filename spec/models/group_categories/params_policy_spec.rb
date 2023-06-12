@@ -21,8 +21,14 @@ require_relative "../../spec_helper"
 require_relative "../../support/boolean_translator"
 
 module GroupCategories
-  MockGroupCategory = Struct.new(:name, :self_signup, :auto_leader,
-                                 :group_limit, :create_group_count, :create_group_member_count, :assign_unassigned_members, :group_by_section)
+  MockGroupCategory = Struct.new(:name,
+                                 :self_signup,
+                                 :auto_leader,
+                                 :group_limit,
+                                 :create_group_count,
+                                 :create_group_member_count,
+                                 :assign_unassigned_members,
+                                 :group_by_section)
 
   describe ParamsPolicy do
     let(:populate_options) do
@@ -57,7 +63,7 @@ module GroupCategories
       it "can null out an existing autoleader value" do
         category.auto_leader = "FIRST"
         policy.populate_with({ enable_auto_leader: "0", auto_leader_type: "RANDOM" }, populate_options)
-        expect(category.auto_leader).to be(nil)
+        expect(category.auto_leader).to be_nil
       end
 
       it "lets you override the name" do

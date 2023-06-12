@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -16,11 +17,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type JQuery from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
+import type {SpeedGrader} from './speed_grader.d'
 
 const I18n = useI18nScope('speed_grader_helpers')
 
@@ -38,31 +41,31 @@ export const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT =
   'speed_grader_assessment_audit_button_mount_point'
 export const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
-export function setupIsModerated({moderated_grading}) {
+export function setupIsModerated({moderated_grading}: {moderated_grading: boolean}) {
   return moderated_grading
 }
 
-export function setupIsAnonymous({anonymize_students}) {
-  return anonymize_students
+export function setupIsAnonymous({anonymize_students}: {anonymize_students: boolean}) {
+  return Boolean(anonymize_students)
 }
 
-export function setupAnonymousGraders({anonymize_graders}) {
-  return anonymize_graders
+export function setupAnonymousGraders({anonymize_graders}: {anonymize_graders: boolean}) {
+  return Boolean(anonymize_graders)
 }
 
-export function setupAnonymizableId(isAnonymous) {
+export function setupAnonymizableId(isAnonymous: boolean) {
   return isAnonymous ? 'anonymous_id' : 'id'
 }
 
-export function setupAnonymizableStudentId(isAnonymous) {
+export function setupAnonymizableStudentId(isAnonymous: boolean) {
   return isAnonymous ? 'anonymous_id' : 'student_id'
 }
 
-export function setupAnonymizableUserId(isAnonymous) {
+export function setupAnonymizableUserId(isAnonymous: boolean) {
   return isAnonymous ? 'anonymous_id' : 'user_id'
 }
 
-export function setupAnonymizableAuthorId(isAnonymous) {
+export function setupAnonymizableAuthorId(isAnonymous: boolean) {
   return isAnonymous ? 'anonymous_id' : 'author_id'
 }
 
@@ -81,7 +84,25 @@ export function extractStudentIdFromHash(hashString: string, anonymizableStudent
   return studentId
 }
 
-export const configureRecognition = (recognition, messages) => {
+export const configureRecognition = (
+  recognition: {
+    continuous: boolean
+    interimResults: boolean
+    lang: string
+    onstart: () => void
+    onresult: (event: {resultIndex: number; results: any[]}) => void
+    onaudiostart: (event: any) => void
+    onaudioend: (event: any) => void
+    onend: (event: any) => void
+    onerror: (event: {error: string}) => void
+  },
+  messages: {
+    recording: string
+    recording_expired: string
+    mic_blocked: string
+    no_speech: string
+  }
+) => {
   recognition.continuous = true
   recognition.interimResults = true
   const lang = window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE
@@ -136,7 +157,7 @@ export const configureRecognition = (recognition, messages) => {
   }
 
   // xsslint safeString.function linebreak
-  function linebreak(transcript) {
+  function linebreak(transcript: string) {
     return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')
   }
 }
@@ -157,7 +178,12 @@ export function buildAlertMessage() {
   return {__html: alertMessage}
 }
 
-export function initKeyCodes($window, $grade, $add_a_comment_textarea, EG) {
+export function initKeyCodes(
+  $window: JQuery,
+  $grade: JQuery,
+  $add_a_comment_textarea: JQuery,
+  EG: SpeedGrader
+) {
   if (ENV.disable_keyboard_shortcuts) {
     return
   }
@@ -184,7 +210,10 @@ export function initKeyCodes($window, $grade, $add_a_comment_textarea, EG) {
   })
 }
 
-export function renderStatusMenu(component, mountPoint) {
+export function renderStatusMenu(
+  component: React.DOMElement<React.DOMAttributes<Element>, Element>,
+  mountPoint: Element
+) {
   const unmountPoint =
     mountPoint.id === SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
       ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
@@ -193,7 +222,7 @@ export function renderStatusMenu(component, mountPoint) {
   ReactDOM.render(component, mountPoint)
 }
 
-export function plagiarismResubmitButton(hasOriginalityScore, buttonContainer) {
+export function plagiarismResubmitButton(hasOriginalityScore: boolean, buttonContainer: JQuery) {
   if (hasOriginalityScore) {
     buttonContainer.hide()
   } else {

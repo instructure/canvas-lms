@@ -96,7 +96,7 @@ describe Course do
       before do
         @shard1.activate do
           account = Account.create!
-          course_with_student(account: account, active_all: true)
+          course_with_student(account:, active_all: true)
           assignment_model(course: @course)
         end
       end
@@ -1386,7 +1386,7 @@ describe Course do
           grading_period = Factories::GradingPeriodHelper.new.create_for_group(
             @gp_group,
             start_date: 20.days.ago(@now),
-            end_date: end_date,
+            end_date:,
             close_date: 10.days.ago(@now)
           )
           override = @assignment2.assignment_overrides.create!(
@@ -1815,7 +1815,7 @@ describe Course do
         expect(@test_course).to receive(:grading_periods?).and_return false
         edd = EffectiveDueDates.for_course(@test_course)
         expect(edd).not_to receive(:to_hash)
-        expect(edd.any_in_closed_grading_period?).to eq(false)
+        expect(edd.any_in_closed_grading_period?).to be(false)
       end
 
       context "with grading periods" do
@@ -1827,7 +1827,7 @@ describe Course do
           override.assignment_override_students.create!(user: @student2)
 
           edd = EffectiveDueDates.for_course(@test_course)
-          expect(edd.any_in_closed_grading_period?).to eq(true)
+          expect(edd.any_in_closed_grading_period?).to be(true)
         end
 
         it "returns false if no student in any assignments has a due date in a closed grading period" do
@@ -1838,7 +1838,7 @@ describe Course do
           override.assignment_override_students.create!(user: @student2)
 
           edd = EffectiveDueDates.for_course(@test_course)
-          expect(edd.any_in_closed_grading_period?).to eq(false)
+          expect(edd.any_in_closed_grading_period?).to be(false)
         end
 
         it "memoizes the result" do
@@ -1892,13 +1892,13 @@ describe Course do
         expect(@test_course).to receive(:grading_periods?).and_return false
         edd = EffectiveDueDates.for_course(@test_course)
         expect(edd).not_to receive(:to_hash)
-        expect(edd.in_closed_grading_period?(@assignment2)).to eq(false)
+        expect(edd.in_closed_grading_period?(@assignment2)).to be(false)
       end
 
       it "returns false if assignment id is nil" do
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
         expect(edd).not_to receive(:to_hash)
-        expect(edd.in_closed_grading_period?(nil)).to eq(false)
+        expect(edd.in_closed_grading_period?(nil)).to be(false)
       end
 
       context "with grading periods" do
@@ -1913,15 +1913,15 @@ describe Course do
         end
 
         it "returns true if any students in the given assignment have a due date in a closed grading period" do
-          expect(@edd.in_closed_grading_period?(@assignment2)).to eq(true)
+          expect(@edd.in_closed_grading_period?(@assignment2)).to be(true)
         end
 
         it "accepts assignment id as the argument" do
-          expect(@edd.in_closed_grading_period?(@assignment2.id)).to eq(true)
+          expect(@edd.in_closed_grading_period?(@assignment2.id)).to be(true)
         end
 
         it "returns false if no student in the given assignment has a due date in a closed grading period" do
-          expect(@edd.in_closed_grading_period?(@assignment1)).to eq(false)
+          expect(@edd.in_closed_grading_period?(@assignment1)).to be(false)
         end
 
         it "returns true if the specified student has a due date for this assignment" do

@@ -35,7 +35,7 @@ module Services
 
       describe ".available?" do
         it "returns false if the service is not configured" do
-          expect(LiveEventsSubscriptionService.available?).to eq false
+          expect(LiveEventsSubscriptionService.available?).to be false
         end
       end
     end
@@ -47,12 +47,10 @@ module Services
           .and_return({
                         "app-host" => "http://example.com",
                       })
-        allow(DynamicSettings).to receive(:find)
-          .with("canvas")
-          .and_return({
-                        "signing-secret" => "astringthatisactually32byteslong",
-                        "encryption-secret" => "astringthatisactually32byteslong"
-                      })
+
+        allow(Rails.application.credentials).to receive(:dig).and_call_original
+        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret).and_return("astringthatisactually32byteslong")
+        allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return("astringthatisactually32byteslong")
       end
 
       let(:developer_key) do
@@ -96,7 +94,7 @@ module Services
 
       describe ".available?" do
         it "returns true if the service is configured" do
-          expect(LiveEventsSubscriptionService.available?).to eq true
+          expect(LiveEventsSubscriptionService.available?).to be true
         end
       end
 

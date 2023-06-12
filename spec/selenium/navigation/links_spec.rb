@@ -105,7 +105,6 @@ describe "links", priority: "2" do
   describe "account links" do
     before :once do
       @account = Account.default
-      Account.site_admin.enable_feature! :account_calendar_events
       account_admin_user(account: @account, user: @user)
     end
 
@@ -164,7 +163,7 @@ describe "links", priority: "2" do
 
       it "navigates to main content from skip_to_link" do
         driver.action.send_keys(:tab).perform
-        expect(check_element_has_focus(f("a#skip_navigation_link"))).to eq(true)
+        expect(check_element_has_focus(f("a#skip_navigation_link"))).to be(true)
         driver.action.send_keys(:enter).perform
         expect(driver.switch_to.active_element.attribute("id")).to eq("content")
       end

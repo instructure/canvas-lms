@@ -215,12 +215,12 @@ class UserObserveesController < ApplicationController
   #
   # @returns User
   def show_observer
-    scope = student.as_student_observation_links.where(observer: observer)
+    scope = student.as_student_observation_links.where(observer:)
     raise ActiveRecord::RecordNotFound unless scope.exists?
 
     json = user_json(observer, @current_user, session)
     add_linked_root_account_ids_to_user_json([json])
-    render json: json
+    render json:
   end
 
   # @API Add an observee
@@ -262,9 +262,9 @@ class UserObserveesController < ApplicationController
   # @returns User
   def destroy
     scope = if observer == @current_user
-              observer.as_observer_observation_links.where(student: student)
+              observer.as_observer_observation_links.where(student:)
             else
-              observer.as_observer_observation_links.where(student: student).for_root_accounts(@accounts_with_observer_permissions)
+              observer.as_observer_observation_links.where(student:).for_root_accounts(@accounts_with_observer_permissions)
             end
     raise ActiveRecord::RecordNotFound unless scope.exists?
 
@@ -296,7 +296,7 @@ class UserObserveesController < ApplicationController
     updated = false
     root_accounts.each do |root_account|
       unless has_observation_link?(root_account)
-        UserObservationLink.create_or_restore(student: student, observer: observer, root_account: root_account)
+        UserObservationLink.create_or_restore(student:, observer:, root_account:)
         updated = true
       end
     end
@@ -304,7 +304,7 @@ class UserObserveesController < ApplicationController
   end
 
   def has_observation_link?(root_account = nil)
-    scope = observer.as_observer_observation_links.where(student: student)
+    scope = observer.as_observer_observation_links.where(student:)
     scope = scope.for_root_accounts(root_account) if root_account
     scope.exists?
   end
@@ -372,17 +372,17 @@ class UserObserveesController < ApplicationController
   def render_student_json
     json = user_json(student, @current_user, session)
     add_linked_root_account_ids_to_user_json([json])
-    render json: json
+    render json:
   end
 
   def add_linked_root_account_ids_to_user_json(user_rows)
     user_rows = Array(user_rows)
     ra_id_map = {}
     if ["observers", "show_observer"].include?(params[:action])
-      scope = student.as_student_observation_links.where(observer: user_rows.map { |r| r["id"] })
+      scope = student.as_student_observation_links.where(observer: user_rows.pluck("id"))
       column = :observer_id
     else
-      scope = observer.as_observer_observation_links.where(student: user_rows.map { |r| r["id"] })
+      scope = observer.as_observer_observation_links.where(student: user_rows.pluck("id"))
       column = :user_id
     end
 

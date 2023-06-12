@@ -31,31 +31,56 @@ describe CoursePacing::PaceContextsService do
 
     context "for type 'section'" do
       let!(:default_section) { course.default_section }
-      let!(:section_one) { add_section("Section One", course: course) }
-      let!(:inactive_section) { add_section("Section Two", course: course) }
+      let!(:section_one) { add_section("Section One", course:) }
+      let!(:inactive_section) { add_section("Section Two", course:) }
 
       before { inactive_section.destroy! }
 
       it "returns an array of the active sections" do
         expect(subject.contexts_of_type("section")).to match_array [default_section, section_one]
       end
+
+      it "returns specific sections" do
+        params = { contexts: [default_section.id] }
+        filtered_contexts = subject.contexts_of_type("section", params:)
+        expect(filtered_contexts).to match_array [default_section]
+        expect(filtered_contexts).not_to include section_one
+      end
     end
 
     context "for type 'student_enrollment'" do
       let(:student) { user_model(name: "Foo Bar") }
       let(:student_two) { user_model(name: "Bar Foo") }
+      let(:student_three) { user_model(name: "Bar") }
       let(:fake_student) { user_model(name: "Fake Student") }
       let!(:enrollment) { course.enroll_student(student, enrollment_state: "active") }
       let!(:enrollment_two) { course.enroll_student(student_two, enrollment_state: "active") }
+      let!(:enrollment_three) { course.enroll_student(student_three) }
       let!(:fake_enrollment) { course.enroll_user(fake_student, "StudentViewEnrollment") }
 
       it "returns an array of the student enrollments" do
-        expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
+        expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two, enrollment_three]
         expect(subject.contexts_of_type("student_enrollment")).not_to include fake_enrollment
       end
 
+      it "returns specific student enrollments" do
+        params = { contexts: [enrollment_two.id] }
+        filtered_contexts = subject.contexts_of_type("student_enrollment", params:)
+        expect(filtered_contexts).to match_array [enrollment_two]
+        expect(filtered_contexts).not_to include enrollment
+      end
+
+      it "returns active and invited enrollments for unpublished courses" do
+        enrollment_three.update! workflow_state: "invited"
+        enrollment_two.update! workflow_state: "creation_pending"
+
+        expect(course).to be_unpublished
+        expect(enrollment_three.reload.state).to be(:invited)
+        expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two, enrollment_three]
+      end
+
       context "when a user has multiple enrollment sources in a course" do
-        let(:section_one) { add_section("Section One", course: course) }
+        let(:section_one) { add_section("Section One", course:) }
 
         before do
           Timecop.freeze(2.weeks.ago) do
@@ -64,7 +89,7 @@ describe CoursePacing::PaceContextsService do
         end
 
         it "returns only the most recently created enrollment" do
-          expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two]
+          expect(subject.contexts_of_type("student_enrollment")).to match_array [enrollment, enrollment_two, enrollment_three]
         end
       end
     end

@@ -27,8 +27,14 @@ describe Outcomes::ResultAnalytics do
     title = args[:title] || "name, o1"
     outcome = args[:outcome] || create_outcome(args)
     user = args[:user] || User.new(id: 10, name: "a")
-    LearningOutcomeResult.new(user: user, learning_outcome: outcome, score: score, title: title, submitted_at:
-    args[:submitted_time], assessed_at: args[:assessed_time], hide_points: args[:hide_points])
+    LearningOutcomeResult.new(user:,
+                              learning_outcome: outcome,
+                              score:,
+                              title:,
+                              submitted_at:
+    args[:submitted_time],
+                              assessed_at: args[:assessed_time],
+                              hide_points: args[:hide_points])
   end
 
   def create_outcome(args)
@@ -37,14 +43,14 @@ describe Outcomes::ResultAnalytics do
     id = args[:id] || 80
     method = args[:method] || "highest"
     criterion = args[:criterion] || LearningOutcome.default_rubric_criterion
-    LearningOutcome.new(id: id, calculation_method: method, calculation_int: args[:calc_int], rubric_criterion: criterion)
+    LearningOutcome.new(id:, calculation_method: method, calculation_int: args[:calc_int], rubric_criterion: criterion)
   end
 
   def create_quiz_outcome_results(outcome, title, *results)
     defaults = {
       user: User.new(id: 10, name: "a"),
       learning_outcome: outcome,
-      title: title,
+      title:,
       assessed_at: time,
       artifact_type: "Quizzes::QuizSubmission",
       association_type: "Quizzes::Quiz",
@@ -78,24 +84,24 @@ describe Outcomes::ResultAnalytics do
       outcome_ids = @outcomes.pluck(:id).join(",")
       uuids = "#{@students[0].uuid},#{@students[1].uuid},#{@students[2].uuid}"
       expect(ra).to receive(:get_lmgb_results).with(@course, quiz.id.to_s, "canvas.assignment.quizzes", outcome_ids, uuids).and_return(nil)
-      opts = { context: @course, users: @students, outcomes: @outcomes }
-      ra.send(:find_outcomes_service_outcome_results, @teacher, opts)
+      opts = { context: @course, users: @students, outcomes: @outcomes, assignments: [@assignment] }
+      ra.send(:find_outcomes_service_outcome_results, opts)
     end
 
     it "returns nil if session user is a student and there are more than 1 users sent in the opts" do
-      opts = { context: @course, users: @students, outcomes: @outcomes }
-      results = ra.find_outcomes_service_outcome_results(@student, opts)
-      expect(results).to eq nil
+      opts = { context: @course, users: @students, outcomes: @outcomes, assignments: [@assignment] }
+      results = ra.find_outcomes_service_outcome_results(opts)
+      expect(results).to be_nil
     end
 
-    describe "#handle_outcome_service_results" do
+    describe "#handle_outcomes_service_results" do
       it "logs warning and returns nil if results are nil" do
         allow(Rails.logger).to receive(:warn)
         expect(Rails.logger).to receive(:warn).with(
           "No Outcome Service outcome results found for context: #{@course.uuid}"
         ).once
-        results = ra.handle_outcome_service_results(nil, @course)
-        expect(results).to eq nil
+        results = ra.handle_outcomes_service_results(nil, @course, @students, @outcomes, [@assignment])
+        expect(results).to be_nil
       end
 
       it "logs warning and returns nil if results are empty" do
@@ -103,8 +109,8 @@ describe Outcomes::ResultAnalytics do
         expect(Rails.logger).to receive(:warn).with(
           "No Outcome Service outcome results found for context: #{@course.uuid}"
         ).once
-        results = ra.handle_outcome_service_results({}, @course)
-        expect(results).to eq nil
+        results = ra.handle_outcomes_service_results({}, @course, @students, @outcomes, [@assignment])
+        expect(results).to be_nil
       end
 
       it "calls resolve_outcome_results" do
@@ -119,8 +125,8 @@ describe Outcomes::ResultAnalytics do
             attempts: {}
           }
         ]
-        expect(ra).to receive(:resolve_outcome_results).with(os_results)
-        ra.send(:handle_outcome_service_results, os_results, @course)
+        expect(ra).to receive(:resolve_outcome_results).with(os_results, @course, @students, @outcomes, [@assignment])
+        ra.send(:handle_outcomes_service_results, os_results, @course, @students, @outcomes, [@assignment])
       end
     end
   end
@@ -160,7 +166,7 @@ describe Outcomes::ResultAnalytics do
       LearningOutcomeResult.create!(
         context: @course,
         learning_outcome: @outcome,
-        user: user,
+        user:,
         alignment: @alignment,
         association_type: "RubricAssociation",
         association_id: @rubric_association.id,
@@ -204,10 +210,11 @@ describe Outcomes::ResultAnalytics do
     end
 
     it "orders results by user sortable name" do
-      results = ra.find_outcome_results(@teacher, users: @students << @student,
-                                                  context: @course,
-                                                  outcomes: [@outcome],
-                                                  include_hidden: true)
+      results = ra.find_outcome_results(@teacher,
+                                        users: @students << @student,
+                                        context: @course,
+                                        outcomes: [@outcome],
+                                        include_hidden: true)
 
       sortable_names = results.collect { |r| r.user.sortable_name }
       expect(sortable_names).to eq ["Alpha, User", "Beta, User", "Gamma, User", "User", "User"]
@@ -337,7 +344,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(3.0, { user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-      rollups = ra.outcome_results_rollups(results: results, users: users)
+      rollups = ra.outcome_results_rollups(results:, users:)
       rollup_scores = ra.rollup_user_results(results).map(&:outcome_results).flatten
       rollups.each.with_index do |rollup, _|
         expect(rollup.scores.map(&:outcome_results).flatten).to eq(rollup_scores.find_all { |score| score.user.id == rollup.context.id })
@@ -352,7 +359,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(4.0, { method: "decaying_average", user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 20, name: "b"), User.new(id: 30, name: "b")]
-      rollups = ra.outcome_results_rollups(results: results, users: users)
+      rollups = ra.outcome_results_rollups(results:, users:)
       scores_by_user = [4.35, 2.35]
       expect(rollups.flat_map(&:scores).map(&:score)).to eq scores_by_user
     end
@@ -362,7 +369,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(5.0, { user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-      rollups = ra.outcome_results_rollups(results: results, users: users, excludes: ["missing_user_rollups"])
+      rollups = ra.outcome_results_rollups(results:, users:, excludes: ["missing_user_rollups"])
       expect(rollups.length).to eq 1
     end
 
@@ -446,7 +453,7 @@ describe Outcomes::ResultAnalytics do
       it "overrides the aggregate score calculation when feature flag enabled and Account method set" do
         account = Account.create!(outcome_calculation_method: OutcomeCalculationMethod.new(calculation_method: "latest"))
         account.root_account.set_feature_flag!(:account_level_mastery_scales, "on")
-        course = Course.create(account: account)
+        course = Course.create(account:)
         aggregate_result = ra.aggregate_outcome_results_rollup(lower_results, course)
         expect(aggregate_result.size).to eq 2
         expect(aggregate_result.scores.map(&:score)).to eq [11.25, 27.0]
@@ -501,12 +508,14 @@ describe Outcomes::ResultAnalytics do
       o1 = LearningOutcome.new(id: 80, calculation_method: "decaying_average", calculation_int: 65)
       o2 = LearningOutcome.new(id: 81, calculation_method: "n_mastery", calculation_int: 3)
       q_results1 = create_quiz_outcome_results(
-        o1, "name, o1",
+        o1,
+        "name, o1",
         { score: 7.0, percent: 0.4, possible: 1.0, association_id: 1 },
         { score: 12.0, assessed_at: time - 1.day, percent: 0.9, possible: 1.0, association_id: 2 }
       )
       q_results2 = create_quiz_outcome_results(
-        o2, "name, o2",
+        o2,
+        "name, o2",
         { score: 30.0, percent: 0.2, possible: 1.0, association_id: 1 },
         { score: 75.0, percent: 0.5, possible: 1.0, association_id: 2 },
         { score: 120.0, percent: 0.8, possible: 1.0, association_id: 3 }
@@ -527,9 +536,12 @@ describe Outcomes::ResultAnalytics do
 
     it "falls back to using mastery score if points possible is 0 or nil" do
       fake_context = User.new(id: 42, name: "fake")
-      o = LearningOutcome.new(id: 81, calculation_method: "latest", calculation_int: nil,
+      o = LearningOutcome.new(id: 81,
+                              calculation_method: "latest",
+                              calculation_int: nil,
                               rubric_criterion: { mastery_points: 3.0, points_possible: 0.0 })
-      q_results = create_quiz_outcome_results(o, "name, o",
+      q_results = create_quiz_outcome_results(o,
+                                              "name, o",
                                               { score: 10.0, percent: 0.7, possible: 1.0, association_id: 1 })
       aggregate_result = ra.aggregate_outcome_results_rollup([q_results].flatten, fake_context)
       expect(aggregate_result.scores.map(&:score)).to eq [2.1]
@@ -548,7 +560,7 @@ describe Outcomes::ResultAnalytics do
         outcome_from_score(3.0, { user: User.new(id: 20, name: "b") })
       ]
       users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-      rollups = ra.outcome_results_rollups(results: results, users: users)
+      rollups = ra.outcome_results_rollups(results:, users:)
       percents = ra.rating_percents(rollups)
       expect(percents).to eq({ 80 => [50, 50, 0] })
     end
@@ -570,7 +582,7 @@ describe Outcomes::ResultAnalytics do
             outcome_from_score(2.0, { user: User.new(id: 21, name: "c") })
           ]
           users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-          rollups = ra.outcome_results_rollups(results: results, users: users)
+          rollups = ra.outcome_results_rollups(results:, users:)
           percents = ra.rating_percents(rollups, context: @course)
           expect(percents).to eq({ 80 => [67, 0, 33, 0, 0] })
         end
@@ -588,7 +600,7 @@ describe Outcomes::ResultAnalytics do
             outcome_from_score(2.0, { user: User.new(id: 21, name: "c") })
           ]
           users = [User.new(id: 10, name: "a"), User.new(id: 30, name: "c")]
-          rollups = ra.outcome_results_rollups(results: results, users: users)
+          rollups = ra.outcome_results_rollups(results:, users:)
           percents = ra.rating_percents(rollups, context: @course)
           expect(percents).to eq({ 80 => [33, 33, 33] })
         end
@@ -601,14 +613,17 @@ describe Outcomes::ResultAnalytics do
       o1 = LearningOutcome.new(id: 80, calculation_method: "decaying_average", calculation_int: 65)
       o2 = LearningOutcome.new(id: 81, calculation_method: "n_mastery", calculation_int: 3)
       o3 = LearningOutcome.new(id: 82, calculation_method: "n_mastery", calculation_int: 3)
-      res1 = create_quiz_outcome_results(o1, "name, o1",
+      res1 = create_quiz_outcome_results(o1,
+                                         "name, o1",
                                          { score: 7.0, percent: 0.4, possible: 1.0, association_id: 1 },
                                          { score: 12.0, assessed_at: time - 1.day, percent: 0.9, possible: 1.0, association_id: 2 })
-      res2 = create_quiz_outcome_results(o2, "name, o2",
+      res2 = create_quiz_outcome_results(o2,
+                                         "name, o2",
                                          { score: 30.0, percent: 0.2, possible: 1.0, association_id: 1 },
                                          { score: 75.0, percent: 0.5, possible: 1.0, association_id: 2 },
                                          { score: 120.0, percent: 0.8, possible: 1.0, association_id: 3 })
-      res3 = create_quiz_outcome_results(o3, "name, o3",
+      res3 = create_quiz_outcome_results(o3,
+                                         "name, o3",
                                          { score: 90.0, percent: 0.2, possible: 1.0, association_id: 1 },
                                          { score: 75.0, percent: 0.7, possible: 1.0, association_id: 2 },
                                          { score: 120.0, percent: 0.8, possible: 1.0, association_id: 3 },
@@ -630,17 +645,21 @@ describe Outcomes::ResultAnalytics do
         artifact_type: "RubricAssessment",
         association_type: "Assignment"
       }
-      res1 = create_quiz_outcome_results(o1, "name, o1",
+      res1 = create_quiz_outcome_results(o1,
+                                         "name, o1",
                                          { percent: 0.6, possible: 1.0, association_id: 1 },
                                          { assessed_at: time - 1.day, percent: 0.7, possible: 1.0, association_id: 2 },
                                          { assessed_at: time - 2.days, percent: 0.4, possible: 1.0, association_id: 3 })
-      res2 = create_quiz_outcome_results(o2, "name, o2",
+      res2 = create_quiz_outcome_results(o2,
+                                         "name, o2",
                                          { percent: 0.6, possible: 2.0, association_id: 1 },
                                          { assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 2 })
-      res3 = create_quiz_outcome_results(o3, "name, o3",
+      res3 = create_quiz_outcome_results(o3,
+                                         "name, o3",
                                          { percent: 0.6, possible: 1.0, association_id: 1 },
                                          { assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 1 }.merge(assignment_params))
-      res4 = create_quiz_outcome_results(o4, "name, o4",
+      res4 = create_quiz_outcome_results(o4,
+                                         "name, o4",
                                          { percent: 0.6, possible: 2.0, association_id: 1 },
                                          { assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 1 }.merge(assignment_params))
       results = [res1, res2, res3, res4].flatten
@@ -658,7 +677,8 @@ describe Outcomes::ResultAnalytics do
       # quiz 1 results should be 2.83 (0.6 * 0.333 * 5) + (0.7 * 0.333 * 5) + (0.4 * 0.333 * 5)
       # quiz 2 result should be 3.17 (0.5 * 0.333 * 5) + (0.8 * 0.333 * 5) + (0.6 * 0.333 * 5)
       # should evaluate as (3.17 + 3.17 + 3.17 + 2.83 + 2.83) / 5 * 0.35 + (2.83 * 0.65)
-      res1 = create_quiz_outcome_results(o1, "name, o1",
+      res1 = create_quiz_outcome_results(o1,
+                                         "name, o1",
                                          { percent: 0.6, possible: 1.0, association_id: 1 },
                                          { percent: 0.7, possible: 1.0, association_id: 1 },
                                          { percent: 0.4, possible: 1.0, association_id: 1 },
@@ -670,7 +690,8 @@ describe Outcomes::ResultAnalytics do
       # quiz 1 results should be 1.55 (0.6 * 0.3 * 5) + (0.1 * 0.5 * 5) + (0.4 * 0.2 * 5)
       # quiz 2 results should be 2.95 (0.5 * 0.5 * 5) + (0.8 * 0.2 * 5) + (0.6 * 0.3 * 5)
       # should evaluate as (2.95 + 2.95 + 2.95 + 1.55 + 1.55) / 5 * 0.35 + (1.55 * 0.65)
-      res2 = create_quiz_outcome_results(o2, "name, o2",
+      res2 = create_quiz_outcome_results(o2,
+                                         "name, o2",
                                          { percent: 0.6, possible: 3.0, association_id: 1 },
                                          { percent: 0.1, possible: 5.0, association_id: 1 },
                                          { percent: 0.4, possible: 2.0, association_id: 1 },
@@ -681,7 +702,8 @@ describe Outcomes::ResultAnalytics do
       # res 3 reflects a situation where only one quiz has been evaluated
       # quiz 1 results should be 3.3 (0.6 * 0.4 * 5) + (0.7 * 0.6 * 5)
       # should evaluate as 3.3 / 1 * 0.35 + (3.3 * 0.65)
-      res3 = create_quiz_outcome_results(o3, "name, o3",
+      res3 = create_quiz_outcome_results(o3,
+                                         "name, o3",
                                          { percent: 0.6, possible: 2.0, association_id: 1 },
                                          { percent: 0.7, possible: 3.0, association_id: 1 })
       results = [res1, res2, res3].flatten
@@ -695,7 +717,8 @@ describe Outcomes::ResultAnalytics do
 
       # quiz 1 results should be 2.83 (0.6 * 0.333 * 5) + (0.7 * 0.333 * 5) + (0.4 * 0.333 * 5)
       # quiz 2 result should be 3.17 (0.5 * 0.333 * 5) + (0.8 * 0.333 * 5) + (0.6 * 0.333 * 5)
-      res1 = create_quiz_outcome_results(o1, "name, o1",
+      res1 = create_quiz_outcome_results(o1,
+                                         "name, o1",
                                          { percent: 0.6, possible: 1.0, association_id: 1 },
                                          { percent: 0.7, possible: 1.0, association_id: 1 },
                                          { percent: 0.4, possible: 1.0, association_id: 1 },
@@ -705,7 +728,8 @@ describe Outcomes::ResultAnalytics do
 
       # quiz 1 results should be 1.55 (0.6 * 0.3 * 5) + (0.1 * 0.5 * 5) + (0.4 * 0.2 * 5)
       # quiz 2 results should be 2.95 (0.5 * 0.5 * 5) + (0.8 * 0.2 * 5) + (0.6 * 0.3 * 5)
-      res2 = create_quiz_outcome_results(o2, "name, o2",
+      res2 = create_quiz_outcome_results(o2,
+                                         "name, o2",
                                          { percent: 0.6, possible: 3.0, association_id: 1 },
                                          { percent: 0.1, possible: 5.0, association_id: 1 },
                                          { percent: 0.4, possible: 2.0, association_id: 1 },
@@ -720,7 +744,8 @@ describe Outcomes::ResultAnalytics do
     it "does not use aggregate score when calculation method is 'highest'" do
       o = LearningOutcome.new(id: 80, calculation_method: "highest", calculation_int: nil, rubric_criterion: { points_possible: 5, mastery_points: 5 })
 
-      res = create_quiz_outcome_results(o, "name, o1",
+      res = create_quiz_outcome_results(o,
+                                        "name, o1",
                                         { percent: 0.6, possible: 1.0, association_id: 1 },
                                         { percent: 0.7, possible: 1.0, association_id: 1 },
                                         { percent: 0.4, possible: 1.0, association_id: 1 },
@@ -736,7 +761,8 @@ describe Outcomes::ResultAnalytics do
     it "does not use aggregate score when calculation method is 'n_mastery'" do
       o = LearningOutcome.new(id: 80, calculation_method: "n_mastery", calculation_int: 3)
 
-      res = create_quiz_outcome_results(o, "name, o1",
+      res = create_quiz_outcome_results(o,
+                                        "name, o1",
                                         { percent: 0.6, possible: 1.0, association_id: 1 },
                                         { percent: 0.7, possible: 1.0, association_id: 1 },
                                         { percent: 0.4, possible: 1.0, association_id: 1 },

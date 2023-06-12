@@ -56,7 +56,6 @@ export default function (ed, document, type) {
             editor={ed}
             editing={type === EDIT_ICON_MAKER}
             onUnmount={handleUnmount}
-            rcsConfig={trayProps}
             canvasOrigin={bridge.canvasOrigin}
           />
         )}

@@ -33,6 +33,9 @@ module ScheduledPublication
         # setting a publish_at date in the future unpublishes the page
         self.workflow_state = "unpublished"
         @schedule_publication = true
+      elsif publish_at.nil?
+        self.workflow_state = "unpublished"
+        @schedule_publication = false
       else
         # setting a publish_at date in the past publishes the page
         self.workflow_state = "active"

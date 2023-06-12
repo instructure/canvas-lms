@@ -74,7 +74,7 @@ module Utils
 
       it "returns nil for nil" do
         presenter = TimePresenter.new(nil)
-        expect(presenter.as_string).to be(nil)
+        expect(presenter.as_string).to be_nil
       end
 
       it "can accept a zone override" do

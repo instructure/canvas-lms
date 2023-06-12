@@ -72,7 +72,7 @@ describe Quizzes::SubmissionGrader do
     describe "#grade_submission" do
       let(:submission_data) { { "question_1" => "1658", "question_2" => "1658", "question_3" => "1658" } }
       let(:quiz_data) { multiple_choice_multiple_question_data(3, { "points_possible" => 1.3 }) }
-      let(:quiz_submission) { Quizzes::QuizSubmission.new(quiz_id: @quiz.id, user_id: @user1.id, submission_data: submission_data, quiz_data: quiz_data) }
+      let(:quiz_submission) { Quizzes::QuizSubmission.new(quiz_id: @quiz.id, user_id: @user1.id, submission_data:, quiz_data:) }
       let(:float_rounding) { 1.3 + 1.3 + 1.3 }
       let(:actual_score) { 3.9 }
 
@@ -194,7 +194,9 @@ describe Quizzes::SubmissionGrader do
                                                                })
         expect(user_answer.delete(:points)).to be_within(0.01).of(41.67)
         expect(user_answer).to eq({
-                                    question_id: 1, correct: "partial", text: "",
+                                    question_id: 1,
+                                    correct: "partial",
+                                    text: "",
                                     answer_7396: "3562",
                                     answer_6081: "3855",
                                     answer_4224: "1397",
@@ -214,7 +216,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "blah" => "foo"
                                                                })
         expect(user_answer).to eq({
-                                    question_id: 1, correct: false, points: 0, text: "",
+                                    question_id: 1,
+                                    correct: false,
+                                    points: 0,
+                                    text: "",
                                     answer_7396: "3562",
                                     answer_6081: "3855",
                                     answer_4224: "1397",
@@ -230,7 +235,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "question_1_answer_4224" => "8513",
                                                                })
         expect(user_answer).to eq({
-                                    question_id: 1, correct: false, points: 0, text: "",
+                                    question_id: 1,
+                                    correct: false,
+                                    points: 0,
+                                    text: "",
                                     answer_7396: "3562",
                                     answer_6081: "1500",
                                     answer_4224: "8513",
@@ -248,7 +256,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "question_1_answer_7399" => "6069",
                                                                })
         expect(user_answer).to eq({
-                                    question_id: 1, correct: true, points: 50, text: "",
+                                    question_id: 1,
+                                    correct: true,
+                                    points: 50,
+                                    text: "",
                                     answer_7396: "6061",
                                     answer_6081: "3855",
                                     answer_4224: "1397",
@@ -267,7 +278,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "question_1_answer_7399" => "6069",
                                                                })
         expect(user_answer).to eq({
-                                    question_id: 1, correct: true, points: 50, text: "",
+                                    question_id: 1,
+                                    correct: true,
+                                    points: 50,
+                                    text: "",
                                     answer_7396: "6061",
                                     answer_6081: "3855",
                                     answer_4224: "1397",
@@ -278,7 +292,10 @@ describe Quizzes::SubmissionGrader do
 
         # no answer shouldn't be treated as a blank string, breaking undefined_if_blank
         expect(Quizzes::SubmissionGrader.score_question(q, { "undefined_if_blank" => "1" })).to eq({
-                                                                                                     question_id: 1, correct: "undefined", points: 0, text: "",
+                                                                                                     question_id: 1,
+                                                                                                     correct: "undefined",
+                                                                                                     points: 0,
+                                                                                                     text: "",
                                                                                                      answer_7396: "",
                                                                                                      answer_6081: "",
                                                                                                      answer_4224: "",
@@ -385,7 +402,10 @@ describe Quizzes::SubmissionGrader do
                                                           "question_1_answer_9701" => "1",
                                                           "question_1_answer_7381" => "0",
                                                         })).to eq({
-                                                                    question_id: 1, correct: true, points: 50, text: "",
+                                                                    question_id: 1,
+                                                                    correct: true,
+                                                                    points: 50,
+                                                                    text: "",
                                                                     answer_9761: "1",
                                                                     answer_3079: "0",
                                                                     answer_5194: "1",
@@ -411,7 +431,9 @@ describe Quizzes::SubmissionGrader do
                                                                })
         expect(user_answer.delete(:points)).to be_within(0.01).of(41.67)
         expect(user_answer).to eq({
-                                    question_id: 1, correct: "partial", text: "",
+                                    question_id: 1,
+                                    correct: "partial",
+                                    text: "",
                                     answer_9761: "1",
                                     answer_3079: "0",
                                     answer_5194: "1",
@@ -435,7 +457,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "question_1_answer_7381" => "0",
                                                                })
         expect(user_answer).to eq({
-                                    question_id: 1, correct: false, points: 0, text: "",
+                                    question_id: 1,
+                                    correct: false,
+                                    points: 0,
+                                    text: "",
                                     answer_9761: "1",
                                     answer_3079: "0",
                                     answer_5194: "1",
@@ -461,7 +486,9 @@ describe Quizzes::SubmissionGrader do
                                                                })
         expect(user_answer.delete(:points)).to be_within(0.01).of(25.0)
         expect(user_answer).to eq({
-                                    question_id: 1, correct: "partial", text: "",
+                                    question_id: 1,
+                                    correct: "partial",
+                                    text: "",
                                     answer_9761: "1",
                                     answer_3079: "0",
                                     answer_5194: "0",
@@ -486,7 +513,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "question_1_answer_7381" => "1",
                                                                })
         expect(user_answer).to eq({
-                                    question_id: 1, correct: false, points: 0, text: "",
+                                    question_id: 1,
+                                    correct: false,
+                                    points: 0,
+                                    text: "",
                                     answer_9761: "0",
                                     answer_3079: "1",
                                     answer_5194: "0",
@@ -513,7 +543,9 @@ describe Quizzes::SubmissionGrader do
                                                                })
         expect(user_answer.delete(:points)).to be_within(0.01).of(31.83)
         expect(user_answer).to eq({
-                                    question_id: 1, correct: "partial", text: "",
+                                    question_id: 1,
+                                    correct: "partial",
+                                    text: "",
                                     answer_9761: "1",
                                     answer_3079: "0",
                                     answer_5194: "0",
@@ -536,7 +568,9 @@ describe Quizzes::SubmissionGrader do
         user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5" => "6994", "question_1630873_3f507e80e33ef092a02948a064433ec5" => "5988", "question_1630873_78635a3709b540a59678c806b102d038" => "9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab" => "1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537" => "4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d" => "7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816" => "6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840" => "3353", "question_1630873_69d0969351d989767d7096f28daf7461" => "3390" })
         expect(user_answer.delete(:points)).to be_within(0.01).of(0.44)
         expect(user_answer).to eq({
-                                    question_id: 1_630_873, correct: "partial", text: "",
+                                    question_id: 1_630_873,
+                                    correct: "partial",
+                                    text: "",
                                     answer_for_structure1: 4390,
                                     answer_id_for_structure1: 4390,
                                     answer_for_event1: 3390,
@@ -559,7 +593,10 @@ describe Quizzes::SubmissionGrader do
 
         user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5" => "1883", "question_1630873_3f507e80e33ef092a02948a064433ec5" => "5988", "question_1630873_78635a3709b540a59678c806b102d038" => "878", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab" => "9570", "question_1630873_02c8346333761ffe9bbddee7b1c5a537" => "1522", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d" => "9532", "question_1630873_94239fc44b4f8aaf36bd3596768f4816" => "1228", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840" => "599", "question_1630873_69d0969351d989767d7096f28daf7461" => "5498" })
         expect(user_answer).to eq({
-                                    question_id: 1_630_873, correct: false, points: 0, text: "",
+                                    question_id: 1_630_873,
+                                    correct: false,
+                                    points: 0,
+                                    text: "",
                                     answer_for_structure1: 1522,
                                     answer_id_for_structure1: 1522,
                                     answer_for_event1: 5498,
@@ -582,7 +619,10 @@ describe Quizzes::SubmissionGrader do
 
         user_answer = Quizzes::SubmissionGrader.score_question(q, { "question_1630873_4e6185159bea49c4d29047379b400ad5" => "6994", "question_1630873_3f507e80e33ef092a02948a064433ec5" => "7676", "question_1630873_78635a3709b540a59678c806b102d038" => "9908", "question_1630873_657b11f1c17376f178c4d80c4c25d0ab" => "1121", "question_1630873_02c8346333761ffe9bbddee7b1c5a537" => "4390", "question_1630873_1865cbc77c83d7571ed8b3a108d11d3d" => "7604", "question_1630873_94239fc44b4f8aaf36bd3596768f4816" => "6955", "question_1630873_cd073d17d0d9558fb2be7d7bf9a1c840" => "3353", "question_1630873_69d0969351d989767d7096f28daf7461" => "3390" })
         expect(user_answer).to eq({
-                                    question_id: 1_630_873, correct: true, points: 0.5, text: "",
+                                    question_id: 1_630_873,
+                                    correct: true,
+                                    points: 0.5,
+                                    text: "",
                                     answer_for_structure1: 4390,
                                     answer_id_for_structure1: 4390,
                                     answer_for_event1: 3390,
@@ -615,7 +655,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "question_1_ce36b05cfdedbc990a188907fc29d37b" => "old",
                                                                })
         expect(user_answer).to eq(
-          { question_id: 1, correct: true, points: 50.0, text: "",
+          { question_id: 1,
+            correct: true,
+            points: 50.0,
+            text: "",
             answer_for_answer1: "control",
             answer_id_for_answer1: 3950,
             answer_for_answer2: "patrol",
@@ -640,7 +683,9 @@ describe Quizzes::SubmissionGrader do
                                                                })
         expect(user_answer.delete(:points)).to be_within(0.1).of(41.6)
         expect(user_answer).to eq(
-          { question_id: 1, correct: "partial", text: "",
+          { question_id: 1,
+            correct: "partial",
+            text: "",
             answer_for_answer1: "control",
             answer_id_for_answer1: 3950,
             answer_for_answer2: "patrol",
@@ -663,7 +708,10 @@ describe Quizzes::SubmissionGrader do
                                                                  "question_1_ce36b05cfdedbc990a188907fc29d37b" => "oh well",
                                                                })
         expect(user_answer).to eq(
-          { question_id: 1, correct: false, points: 0, text: "",
+          { question_id: 1,
+            correct: false,
+            points: 0,
+            text: "",
             answer_for_answer1: "",
             answer_id_for_answer1: nil,
             answer_for_answer2: "0",
@@ -681,14 +729,20 @@ describe Quizzes::SubmissionGrader do
         # one blank to fill in
         user_answer = Quizzes::SubmissionGrader.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => " DUmB \n " })
         expect(user_answer).to eq(
-          { question_id: 2, correct: true, points: 3.75, text: "",
+          { question_id: 2,
+            correct: true,
+            points: 3.75,
+            text: "",
             answer_for_myblank: " DUmB \n ",
             answer_id_for_myblank: 1235, }
         )
 
         user_answer = Quizzes::SubmissionGrader.score_question(fill_in_multiple_blanks_question_one_blank_data, { "question_2_10ca8479f89652b254a5c6ec90ab9ab8" => "wut" })
         expect(user_answer).to eq(
-          { question_id: 2, correct: false, points: 0, text: "",
+          { question_id: 2,
+            correct: false,
+            points: 0,
+            text: "",
             answer_for_myblank: "wut",
             answer_id_for_myblank: nil, }
         )

@@ -261,6 +261,22 @@ describe "people" do
       expect(f(".groups-with-count")).to include_text("Groups (#{group_count})")
     end
 
+    it "errors if the user tries to set the limit group members to 1" do
+      get "/courses/#{@course.id}/users"
+      expect_new_page_load do
+        f("#people-options .Button").click
+        fln("View User Groups").click
+      end
+      open_student_group_dialog
+      replace_and_proceed f("#new-group-set-name"), "new group"
+      fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
+      force_click('[data-testid="initial-group-count"]')
+      f('[data-testid="group-member-limit"]').send_keys("1")
+      f(%(button[data-testid="group-set-save"])).click
+      wait_for_ajaximations
+      expect(fj("span:contains('If you are going to define a limit group members, it must be greater than 1.')")).to be_truthy
+    end
+
     it "tests group structure functionality" do
       get "/courses/#{@course.id}/users"
       enroll_more_students
@@ -430,7 +446,7 @@ describe "people" do
     context "without view all grades permissions" do
       before do
         ["view_all_grades", "manage_grades"].each do |permission|
-          RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: ta_role)
+          RoleOverride.create!(permission:, enabled: false, context: @course.account, role: ta_role)
         end
       end
 

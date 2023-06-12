@@ -39,15 +39,15 @@ module Factories
     data = options[:data] || {}
     user ||= User.create!(name: "some user")
 
-    cc_path_type = path_type == :summary ? :email : path_type
+    cc_path_type = (path_type == :summary) ? :email : path_type
     @cc = user.communication_channels.of_type(cc_path_type.to_s).first
     @cc ||= user.communication_channels.create!(path_type: cc_path_type.to_s,
                                                 path: "generate_message@example.com")
     @message = Message.new(notification: @notification,
                            context: asset,
-                           user: user,
+                           user:,
                            communication_channel: @cc,
-                           data: data)
+                           data:)
     @message.delayed_messages = []
     @message.parse!(path_type.to_s)
     @message

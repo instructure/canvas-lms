@@ -79,7 +79,7 @@ module GroupCategories
       it "is nil with auto_leading disabled from form submission of an existing record" do
         raw_args = { auto_leader: "first", enable_auto_leader: "0" }
         params = build_params(raw_args)
-        expect(params.auto_leader).to be(nil)
+        expect(params.auto_leader).to be_nil
       end
 
       it "passes through valid values when auto leading is enabled" do
@@ -116,7 +116,7 @@ module GroupCategories
 
         it "nils out the param if disabled from the form" do
           params = build_params(enable_auto_leader: false, auto_leader_type: "FIRST", auto_leader: "random")
-          expect(params.auto_leader).to be(nil)
+          expect(params.auto_leader).to be_nil
         end
 
         it "uses the form value if form is enabled" do
@@ -129,7 +129,8 @@ module GroupCategories
     describe "#create_group_count" do
       it "passes through the count param when self signup is enabled" do
         params = build_params(enable_self_signup: true,
-                              restrict_self_signup: false, create_group_count: "3")
+                              restrict_self_signup: false,
+                              create_group_count: "3")
         expect(params.create_group_count).to eq 3
       end
 
@@ -185,13 +186,17 @@ module GroupCategories
 
       it "is false if create_group_count is empty" do
         params = build_params(enable_self_signup: false,
-                              split_groups: "1", create_group_count: nil, split_group_count: nil)
+                              split_groups: "1",
+                              create_group_count: nil,
+                              split_group_count: nil)
         expect(params.assign_unassigned_members).to be(false)
       end
 
       it "is true without self signup and with a split count" do
         params = build_params(enable_self_signup: false,
-                              split_groups: "1", create_group_count: nil, split_group_count: "3")
+                              split_groups: "1",
+                              create_group_count: nil,
+                              split_group_count: "3")
         expect(params.assign_unassigned_members).to be(true)
       end
     end

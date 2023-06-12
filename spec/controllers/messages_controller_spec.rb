@@ -27,15 +27,15 @@ describe MessagesController do
 
       it "is able to access the page" do
         post "create", params: { user_id: @user.to_param }
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       it "is able to send messages" do
         secure_id, message_id = ["secure_id", 42]
         expect_any_instance_of(IncomingMailProcessor::IncomingMessageProcessor).to receive(:process_single)
           .with(anything, "#{secure_id}-#{message_id}")
-        post "create", params: { secure_id: secure_id,
-                                 message_id: message_id,
+        post "create", params: { secure_id:,
+                                 message_id:,
                                  subject: "subject",
                                  message: "message",
                                  from: "test@example.com",
@@ -51,7 +51,7 @@ describe MessagesController do
 
       it "receives a redirect" do
         post "create", params: { user_id: @user.to_param }
-        expect(response.code).to eq "302"
+        expect(response).to have_http_status :found
       end
     end
   end

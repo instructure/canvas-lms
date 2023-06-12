@@ -40,7 +40,7 @@ FactoryBot.define do
         create_list(
           :scoring_range_with_assignments,
           evaluator.scoring_range_count,
-          rule: rule,
+          rule:,
           assignment_set_count: evaluator.assignment_set_count,
           assignment_count: evaluator.assignment_count
         ) do |range|

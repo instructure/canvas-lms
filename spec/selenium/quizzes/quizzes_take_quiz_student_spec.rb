@@ -35,7 +35,7 @@ describe "taking a quiz" do
     context "when the quiz is past due" do
       let(:quiz_past_due) do
         quiz_past_due = quiz_create(course: @course)
-        quiz_past_due.due_at = default_time_for_due_date(Time.zone.now - 2.days)
+        quiz_past_due.due_at = default_time_for_due_date(2.days.ago)
         quiz_past_due.save!
         quiz_past_due.reload
       end
@@ -75,7 +75,7 @@ describe "taking a quiz" do
         def verify_no_access_code_reprompts_during_oqaat_quiz
           take_and_answer_quiz(
             submit: false,
-            access_code: access_code,
+            access_code:,
             quiz: oqaat_quiz
           )
 
@@ -123,7 +123,7 @@ describe "taking a quiz" do
         def start_and_exit_quiz
           take_and_answer_quiz(
             submit: false,
-            access_code: access_code,
+            access_code:,
             quiz: quiz_with_unlimited_attempts
           )
 

@@ -32,7 +32,7 @@ describe "speed grader - quiz submissions" do
     student_in_course
     2.times do |i|
       qs = @quiz.generate_submission(@student)
-      opts = i == 0 ? { finished_at: (Time.zone.today - 7) + 30.minutes } : {}
+      opts = (i == 0) ? { finished_at: (Time.zone.today - 7) + 30.minutes } : {}
       Quizzes::SubmissionGrader.new(qs).grade_submission(opts)
     end
   end
@@ -90,7 +90,7 @@ describe "speed grader - quiz submissions" do
       question_data: {
         name: "first question",
         question_type: "multiple_answers_question",
-        answers: answers,
+        answers:,
         points_possible: 4
       }
     )
@@ -163,7 +163,8 @@ describe "speed grader - quiz submissions" do
   end
 
   it "properly displays student quiz results when the teacher also " \
-     "has a student enrollment", priority: "2" do
+     "has a student enrollment",
+     priority: "2" do
     @course.enroll_student(@teacher).accept!
 
     @quiz.quiz_questions.create!(quiz: @quiz, question_data: {

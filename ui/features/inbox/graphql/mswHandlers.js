@@ -119,6 +119,14 @@ export const handlers = [
       ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes =
         [ConversationMessage.mock({body: 'Course scoped conversation message'})]
+    } else if (req.variables.scope === 'null_nodes') {
+      data.legacyNode.conversationsConnection.nodes[0].conversation = Conversation.mock({
+        contextId: null,
+        contextType: null,
+        contextName: null,
+        subject: null,
+        conversationMessagesConnection: {nodes: []},
+      })
     } else {
       data.legacyNode.conversationsConnection.nodes = [
         {
@@ -177,7 +185,7 @@ export const handlers = [
             _id: '2697',
             id: 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjk3',
             createdAt: '2021-03-16T12:09:23-06:00',
-            body: 'this is a message for the inbox',
+            body: 'this is a message for the inbox that is longer than the 90 characters that should be the max text length before truncation',
             author: User.mock({_id: '1', name: 'Charles Xavier'}),
             recipients: [User.mock({_id: '1', name: 'Charels Xavier'})],
           }),
@@ -356,7 +364,15 @@ export const handlers = [
         id: 'VXNlci05',
         email: 'hmccoy@xavierschool.com',
         favoriteGroupsConnection: {
-          nodes: [Group.mock()],
+          nodes: [
+            Group.mock(),
+            Group.mock({
+              _id: '339',
+              contextName: 'concluded_group',
+              assetString: 'group_339',
+              canMessage: false,
+            }),
+          ],
           __typename: 'GroupConnection',
         },
         favoriteCoursesConnection: {
@@ -377,6 +393,21 @@ export const handlers = [
               _id: '197',
               contextName: 'Fighting Magneto 202',
               assetString: 'course_197',
+            }),
+            concluded: true,
+          }),
+          Enrollment.mock({
+            course: Course.mock({
+              _id: '198',
+              contextName: 'Flying The Blackbird',
+              assetString: 'course_198',
+            }),
+          }),
+          Enrollment.mock({
+            course: Course.mock({
+              _id: '198',
+              contextName: 'Flying The Blackbird',
+              assetString: 'course_198',
             }),
           }),
           Enrollment.mock({

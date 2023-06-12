@@ -19,6 +19,7 @@
  */
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
+loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
 pipeline {
   agent none
@@ -37,10 +38,10 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode(configuration.nodeLabel()) {
+          protectedNode(nodeLabel()) {
             stage('Setup') {
               // always pull from gerrit refspec to test the changed docker dev code
-              checkoutRepo('canvas-lms', env.GERRIT_REFSPEC, 1)
+              checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: env.GERRIT_REFSPEC, depth: 1)
               sh '''#!/bin/bash
               cat <<EOF > docker-compose.local.jenkins.yml
 version: '2.3'
@@ -68,11 +69,11 @@ EOF
             stage('Copy App Directory') {
               sh """#!/bin/bash
                  set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-                 CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.getString('ruby')})"
+                 CONTAINER="\$(docker create instructure/ruby-passenger:${configuration.ruby()})"
                  docker cp ./ "\$CONTAINER:/usr/src/app/"
                  docker start \$CONTAINER
                  docker exec -i --user root \$CONTAINER chown -R docker:docker /usr/src/app/
-                 docker commit \$CONTAINER "local/ruby-passenger:${configuration.getString('ruby')}"
+                 docker commit \$CONTAINER "local/ruby-passenger:${configuration.ruby()}"
                """
             }
 
@@ -82,7 +83,6 @@ EOF
                 source script/common/canvas/build_helpers.sh
 
                 build_images
-                check_gemfile
                 docker_compose_up
                 build_assets
               '''

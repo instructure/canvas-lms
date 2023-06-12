@@ -43,9 +43,9 @@ class ContentParticipationCount < ActiveRecord::Base
             opts["unread_count"] = unread_count
           end
           participant ||= context.content_participation_counts.build({
-                                                                       user: user,
+                                                                       user:,
                                                                        content_type: type,
-                                                                       unread_count: unread_count,
+                                                                       unread_count:,
                                                                      })
         end
         participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
@@ -67,7 +67,7 @@ class ContentParticipationCount < ActiveRecord::Base
       unread_count = participant.unread_count(refresh: false) + offset.to_i
     end
 
-    participant.unread_count = unread_count > 0 ? unread_count : 0
+    participant.unread_count = (unread_count > 0) ? unread_count : 0
   end
   private_class_method :set_unread_count
 
@@ -87,7 +87,8 @@ class ContentParticipationCount < ActiveRecord::Base
 
     GuardRail.activate(:secondary) do
       potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
-                                                          batch_object: user, batched_keys: :submissions) do
+                                                          batch_object: user,
+                                                          batched_keys: [:submissions, :potential_unread_submission_ids]) do
         submission_conditions = sanitize_sql_for_conditions([<<~SQL.squish, user.id, context.class.to_s, context.id])
           submissions.user_id = ? AND
           assignments.context_type = ? AND
@@ -97,17 +98,17 @@ class ContentParticipationCount < ActiveRecord::Base
         SQL
 
         muted_condition = " AND (assignments.muted IS NULL OR NOT assignments.muted)"
-        posted_at_condition = " AND submissions.posted_at IS NOT NULL"
+        posted_at_condition = " AND (submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE)"
         visibility_feedback_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
         submission_conditions << (visibility_feedback_enabled ? posted_at_condition : muted_condition)
 
         subs_with_grades = Submission.active.graded
-                                     .joins(:assignment)
+                                     .joins(assignment: [:post_policy])
                                      .where(submission_conditions)
                                      .where.not(submissions: { score: nil })
                                      .pluck(:id)
         subs_with_comments = Submission.active
-                                       .joins(:assignment, :submission_comments)
+                                       .joins(:submission_comments, assignment: [:post_policy])
                                        .where(submission_conditions)
                                        .where(<<~SQL.squish, user).pluck(:id)
                                          (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
@@ -116,7 +117,7 @@ class ContentParticipationCount < ActiveRecord::Base
                                          AND submission_comments.author_id <> ?
                                        SQL
         subs_with_assessments = Submission.active
-                                          .joins(:assignment, :rubric_assessments)
+                                          .joins(:rubric_assessments, assignment: [:post_policy])
                                           .where(submission_conditions)
                                           .where.not(rubric_assessments: { data: nil })
                                           .pluck(:id)

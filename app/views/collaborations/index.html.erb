@@ -21,10 +21,9 @@
 <% js_bundle :collaborations %>
 
 <% provide :right_side do %>
-  <p><%= mt :description_rs, <<-HEREDOC, :google_url => "http://docs.google.com"
-Free online web tools like [Google Docs](%{google_url}) are an excellent place for students to work on group projects or papers, take shared notes, etc.
-Teacher *or* students can set up group collaborations.
-HEREDOC
+  <p><%= t 'collaborations.explanation',
+"Free online web tools are an excellent place for students to work on group projects or papers, take shared notes, etc.
+Teachers or students can set up group collaborations."
      %>
   </p>
 <% end %>

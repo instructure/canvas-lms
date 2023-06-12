@@ -73,7 +73,8 @@ class CanvadocSessionsController < ApplicationController
   # This API can only be accessed when another endpoint provides a signed URL.
   # It will simply redirect you to the 3rd party document preview.
   def show
-    blob = extract_blob(params[:hmac], params[:blob],
+    blob = extract_blob(params[:hmac],
+                        params[:blob],
                         "user_id" => @current_user.try(:global_id),
                         "type" => "canvadoc")
     attachment = Attachment.find(blob["attachment_id"])
@@ -89,7 +90,7 @@ class CanvadocSessionsController < ApplicationController
       submission_id = blob["submission_id"]
       if submission_id
         submission = Submission.preload(:assignment).find(submission_id)
-        options = { submission: submission }
+        options = { submission: }
 
         if blob["annotation_context"]
           attempt = submission.canvadocs_annotation_contexts.find_by(launch_id: blob["annotation_context"])&.submission_attempt
@@ -98,7 +99,7 @@ class CanvadocSessionsController < ApplicationController
 
         user_session_params = Canvadocs.user_session_params(@current_user, **options)
       else
-        user_session_params = Canvadocs.user_session_params(@current_user, attachment: attachment)
+        user_session_params = Canvadocs.user_session_params(@current_user, attachment:)
       end
 
       if opts[:enable_annotations]

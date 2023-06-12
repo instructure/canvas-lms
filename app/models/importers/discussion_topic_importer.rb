@@ -54,7 +54,7 @@ module Importers
         next unless context && can_import_topic?(topic, migration)
 
         begin
-          import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context, migration)
+          import_from_migration(topic.merge(topic_entries_to_import:), context, migration)
         rescue
           migration.add_import_warning(t("#migration.discussion_topic_type", "Discussion Topic"), topic[:title], $!)
         end
@@ -97,9 +97,17 @@ module Importers
     def run
       return unless options.importable?
 
-      %i[migration_id title discussion_type position pinned
-         require_initial_post allow_rating only_graders_can_rate
-         sort_by_rating anonymous_state is_anonymous_author].each do |attr|
+      %i[migration_id
+         title
+         discussion_type
+         position
+         pinned
+         require_initial_post
+         allow_rating
+         only_graders_can_rate
+         sort_by_rating
+         anonymous_state
+         is_anonymous_author].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
 
         item.send("#{attr}=", options[attr])
@@ -181,10 +189,14 @@ module Importers
         Importers::AssignmentImporter.import_from_migration(options[:assignment], context, migration)
       elsif options[:grading]
         Importers::AssignmentImporter.import_from_migration({
-                                                              grading: options[:grading], migration_id: options[:migration_id],
-                                                              submission_format: "discussion_topic", due_date: options.due_date,
+                                                              grading: options[:grading],
+                                                              migration_id: options[:migration_id],
+                                                              submission_format: "discussion_topic",
+                                                              due_date: options.due_date,
                                                               title: options[:grading][:title]
-                                                            }, context, migration)
+                                                            },
+                                                            context,
+                                                            migration)
       end
     end
 

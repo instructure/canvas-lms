@@ -83,7 +83,8 @@ module SimplyVersioned
       options.reverse_merge!(DEFAULTS)
       options[:exclude] = Array(options[:exclude]).map(&:to_s)
 
-      has_many :versions, -> { order("number DESC") },
+      has_many :versions,
+               -> { order("number DESC") },
                class_name: "SimplyVersioned::Version",
                as: :versionable,
                dependent: :destroy,
@@ -91,7 +92,8 @@ module SimplyVersioned
                extend: VersionsProxyMethods
       # INSTRUCTURE: Added to allow quick access to the most recent version
       # See 'current_version' below for the common use of current_version_unidirectional
-      has_one :current_version_unidirectional, -> { order("number DESC") },
+      has_one :current_version_unidirectional,
+              -> { order("number DESC") },
               class_name: "SimplyVersioned::Version",
               as: :versionable
       # INSTRUCTURE: Lets us ignore certain things when deciding whether to store a new version
@@ -170,8 +172,8 @@ module SimplyVersioned
       end
     end
 
-    def without_versioning(&block)
-      with_versioning(false, &block)
+    def without_versioning(&)
+      with_versioning(false, &)
     end
 
     def unversioned?
@@ -251,7 +253,7 @@ module SimplyVersioned
     # Anything that returns a Version should have its versionable pre-
     # populated. This is basically a way of getting around the fact that
     # ActiveRecord doesn't have a polymorphic :inverse_of option.
-    def method_missing(method, *a, &b)
+    def method_missing(method, *a, &)
       case method
       when :minimum, :maximum, :exists?, :all, :find_all, :each
         populate_versionables(super)
@@ -280,7 +282,7 @@ module SimplyVersioned
 
     # Get the Version instance corresponding to this models for the specified version number.
     def get_version(number)
-      populate_versionable where(number: number).first
+      populate_versionable where(number:).first
     end
     alias_method :get, :get_version
 
@@ -319,8 +321,8 @@ module SimplyVersioned
   end
 
   def self.included(receiver)
-    receiver.extend         ClassMethods
-    receiver.send :include, InstanceMethods
+    receiver.extend ClassMethods
+    receiver.include InstanceMethods
   end
 end
 

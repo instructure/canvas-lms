@@ -38,7 +38,7 @@ describe Types::QueryType do
       CanvasSchema.execute(
         "{ allCourses { _id } }",
         context: { current_user: teacher }
-      ).dig("data", "allCourses").map { |c| c["_id"] }
+      ).dig("data", "allCourses").pluck("_id")
     ).to match_array [test_course_1, test_course_2].map(&:to_param)
   end
 
@@ -74,7 +74,7 @@ describe Types::QueryType do
 
   context "sisId" do
     let_once(:generic_sis_id) { "di_ecruos_sis" }
-    let_once(:course) { Course.create!(name: "TEST", sis_source_id: generic_sis_id, account: account) }
+    let_once(:course) { Course.create!(name: "TEST", sis_source_id: generic_sis_id, account:) }
     let_once(:account) do
       acct = Account.default.sub_accounts.create!(name: "sub")
       acct.update!(sis_source_id: generic_sis_id)

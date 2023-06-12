@@ -193,11 +193,11 @@ describe CalendarEvent do
         @event.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
-        expect(res.dtstart.tz_utc).to eq true
+        expect(res.dtstart.tz_utc).to be true
         expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtend.tz_utc).to eq true
+        expect(res.dtend.tz_utc).to be true
         expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtstamp.tz_utc).to eq true
+        expect(res.dtstamp.tz_utc).to be true
         expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
       end
 
@@ -208,11 +208,11 @@ describe CalendarEvent do
         @event.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics(in_own_calendar: false)
         expect(res).not_to be_nil
-        expect(res.dtstart.tz_utc).to eq true
+        expect(res.dtstart.tz_utc).to be true
         expect(res.dtstart.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtend.tz_utc).to eq true
+        expect(res.dtend.tz_utc).to be true
         expect(res.dtend.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:00pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
-        expect(res.dtend.tz_utc).to eq true
+        expect(res.dtend.tz_utc).to be true
         expect(res.dtstamp.strftime("%Y-%m-%dT%H:%M:%S")).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone("UTC").strftime("%Y-%m-%dT%H:%M:00")
       end
 
@@ -223,7 +223,7 @@ describe CalendarEvent do
 
       it "returns string dates for all_day events" do
         calendar_event_model(start_at: "Sep 3 2008 12:00am")
-        expect(@event.all_day).to eql(true)
+        expect(@event.all_day).to be(true)
         expect(@event.end_at).to eql(@event.start_at)
         res = @event.to_ics
         expect(res.include?("DTSTART;VALUE=DATE:20080903")).not_to be_nil
@@ -635,7 +635,9 @@ describe CalendarEvent do
     end
 
     it "allows multiple participants in an appointment, up to the limit" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course], participants_per_appointment: 2,
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
+                                   participants_per_appointment: 2,
                                    new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
       ag.publish!
       appointment = ag.appointments.first
@@ -690,13 +692,13 @@ describe CalendarEvent do
       appointment = ag.appointments.first
       appointment.participants_per_appointment = 3
       appointment.save!
-      expect(appointment.participants_per_appointment).to eql 3
+      expect(appointment.participants_per_appointment).to be 3
 
       appointment.participants_per_appointment = 2
       appointment.save!
       expect(appointment.read_attribute(:participants_per_limit)).to be_nil
       expect(appointment.override_participants_per_appointment?).to be_falsey
-      expect(appointment.participants_per_appointment).to eql 2
+      expect(appointment.participants_per_appointment).to be 2
     end
 
     it "does not let participants exceed max_appointments_per_participant" do
@@ -716,7 +718,9 @@ describe CalendarEvent do
     end
 
     it "cancels existing reservations if cancel_existing = true and the appointment is in the future" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course], max_appointments_per_participant: 1,
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
+                                   max_appointments_per_participant: 1,
                                    new_appointments: [[1.hour.from_now, 2.hours.from_now], [3.hours.from_now, 4.hours.from_now]])
       ag.publish!
       appointment = ag.appointments.first
@@ -728,7 +732,9 @@ describe CalendarEvent do
     end
 
     it "refuses to cancel existing reservations if cancel_existing = true and the appointment is in the past" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course], max_appointments_per_participant: 1,
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
+                                   max_appointments_per_participant: 1,
                                    new_appointments: [[2.hours.ago, 1.hour.ago], [1.hour.from_now, 2.hours.from_now]])
       ag.publish!
       appointment = ag.appointments.first
@@ -740,7 +746,8 @@ describe CalendarEvent do
     end
 
     it "saves comments with appointment" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course],
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
                                    max_appointments_per_participant: 1,
                                    new_appointments: [["2012-01-01 12:00:00",
                                                        "2012-01-01 13:00:00"],
@@ -754,7 +761,8 @@ describe CalendarEvent do
     end
 
     it "enforces the section" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course.course_sections.create],
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course.course_sections.create],
                                    new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       ag.publish!
       appointment = ag.appointments.first
@@ -770,7 +778,9 @@ describe CalendarEvent do
       c2 = group_category(name: "bar")
       g2 = c2.groups.create(context: @course)
 
-      ag = AppointmentGroup.create(title: "test", contexts: [@course], sub_context_codes: [c1.asset_string],
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
+                                   sub_context_codes: [c1.asset_string],
                                    new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       appointment = ag.appointments.first
       ag.publish!
@@ -803,7 +813,9 @@ describe CalendarEvent do
     end
 
     it "unlocks the appointment when the last reservation is canceled" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course], participants_per_appointment: 2,
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
+                                   participants_per_appointment: 2,
                                    new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
       appointment = ag.appointments.first
       student_in_course(course: @course, active_all: true)
@@ -820,7 +832,9 @@ describe CalendarEvent do
     end
 
     it "copies the group attributes to the initial appointments" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course], description: "hello world",
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
+                                   description: "hello world",
                                    new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       e = ag.appointments.first
       expect(e.title).to eql "test"
@@ -862,16 +876,18 @@ describe CalendarEvent do
     end
 
     it "allows a user to re-reserve a slot after canceling" do
-      ag = AppointmentGroup.create(title: "test", contexts: [@course], participants_per_appointment: 1,
+      ag = AppointmentGroup.create(title: "test",
+                                   contexts: [@course],
+                                   participants_per_appointment: 1,
                                    new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
       appointment = ag.appointments.first
 
       r1 = appointment.reserve_for(@student1, @student1).reload
-      expect(ag.reload.available_slots).to eql 0
+      expect(ag.reload.available_slots).to be 0
       r1.destroy
-      expect(ag.reload.available_slots).to eql 1
+      expect(ag.reload.available_slots).to be 1
       expect { appointment.reserve_for(@student1, @student1) }.not_to raise_error
-      expect(ag.reload.available_slots).to eql 0
+      expect(ag.reload.available_slots).to be 0
     end
 
     it "always allows editing the description on an appointment" do
@@ -1023,7 +1039,7 @@ describe CalendarEvent do
         ]
         e1.reload
         events2 = e1.child_events.sort_by(&:id)
-        expect(events2.size).to eql 2
+        expect(events2.size).to be 2
 
         expect(events1.first.reload).to eql events2.first
         expect(events1.last.reload).to be_deleted
@@ -1179,7 +1195,7 @@ describe CalendarEvent do
   context "web_conference" do
     before(:once) do
       %w[big_blue_button wimba].each do |name|
-        plugin = PluginSetting.create!(name: name)
+        plugin = PluginSetting.create!(name:)
         plugin.update_attribute(:settings, { key: "value" })
       end
     end
@@ -1190,7 +1206,7 @@ describe CalendarEvent do
     let_once(:group2) { group(context: course) }
 
     def conference(context:, user: @user, type: "BigBlueButton")
-      WebConference.create!(context: context, user: user, conference_type: type)
+      WebConference.create!(context:, user:, conference_type: type)
     end
 
     before do
@@ -1206,7 +1222,7 @@ describe CalendarEvent do
       event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course)
       expect(event.web_conference.id).to eq WebConference.last.id
       event.destroy!
-      expect(event.web_conference).to eq nil
+      expect(event.web_conference).to be_nil
     end
 
     context "after_save callbacks" do
@@ -1218,15 +1234,15 @@ describe CalendarEvent do
 
       it "keeps date of conference in sync with event" do
         event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course)
-        start_at = Time.zone.now + 3.days
-        event.reload.update! start_at: start_at
+        start_at = 3.days.from_now
+        event.reload.update!(start_at:)
         expect(event.web_conference.reload.user_settings[:scheduled_date]).to eq start_at
       end
 
       it "does not fail when conference does not support scheduled_date" do
         event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course, type: "Wimba")
-        start_at = Time.zone.now + 3.days
-        event.reload.update! start_at: start_at
+        start_at = 3.days.from_now
+        event.reload.update!(start_at:)
         expect(event.reload.start_at).to eq start_at
         expect(event.web_conference.reload.user_settings).not_to have_key(:scheduled_date)
       end
@@ -1258,13 +1274,13 @@ describe CalendarEvent do
 
     context "when event has course section context" do
       it "can have a conference from the course" do
-        section = add_section("foo", course: course)
+        section = add_section("foo", course:)
         event = section.calendar_events.build title: "Foo", web_conference: conference(context: course)
         expect(event).to be_valid
       end
 
       it "can not have have a conference from a different course" do
-        section = add_section("foo", course: course)
+        section = add_section("foo", course:)
         event = section.calendar_events.build title: "Foo", web_conference: conference(context: course2)
         expect(event).not_to be_valid
       end

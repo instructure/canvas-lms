@@ -38,8 +38,12 @@ describe Polling::PollSessionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
-                  { controller: "polling/poll_sessions", action: "index", format: "json",
-                    poll_id: @poll.id.to_s }, data, header)
+                  { controller: "polling/poll_sessions",
+                    action: "index",
+                    format: "json",
+                    poll_id: @poll.id.to_s },
+                  data,
+                  header)
     end
 
     it "returns all existing poll sessions" do
@@ -92,9 +96,12 @@ describe Polling::PollSessionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
-                  { controller: "polling/poll_sessions", action: "show", format: "json",
+                  { controller: "polling/poll_sessions",
+                    action: "show",
+                    format: "json",
                     poll_id: @poll.id.to_s,
-                    id: @poll_session.id.to_s }, data)
+                    id: @poll_session.id.to_s },
+                  data)
     end
 
     it "retrieves the poll session specified" do
@@ -158,7 +165,7 @@ describe Polling::PollSessionsController, type: :request do
 
         get_show(true)
 
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         @poll_session.reload
         expect(@poll_session.poll_submissions.size).to be_zero
       end
@@ -253,9 +260,13 @@ describe Polling::PollSessionsController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
-                  { controller: "polling/poll_sessions", action: "create", format: "json",
+                  { controller: "polling/poll_sessions",
+                    action: "create",
+                    format: "json",
                     poll_id: @poll.id.to_s },
-                  { poll_sessions: [params] }, {}, {})
+                  { poll_sessions: [params] },
+                  {},
+                  {})
     end
 
     context "as a teacher" do
@@ -276,7 +287,7 @@ describe Polling::PollSessionsController, type: :request do
       it "returns an error if the supplied course section is invalid" do
         post_create({ course_section_id: @section.id + 666, course_id: @course.id }, true)
 
-        expect(response.code).to eq "404"
+        expect(response).to have_http_status :not_found
         expect(response.body).to match(/The specified resource does not exist/)
       end
     end
@@ -293,10 +304,14 @@ describe Polling::PollSessionsController, type: :request do
 
       helper.call(:put,
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
-                  { controller: "polling/poll_sessions", action: "update", format: "json",
+                  { controller: "polling/poll_sessions",
+                    action: "update",
+                    format: "json",
                     poll_id: @poll.id.to_s,
                     id: @poll_session.id.to_s },
-                  { poll_sessions: [params] }, {}, {})
+                  { poll_sessions: [params] },
+                  {},
+                  {})
     end
 
     context "as a teacher" do
@@ -332,7 +347,7 @@ describe Polling::PollSessionsController, type: :request do
         put_update({ course_section_id: section.id }, true)
 
         @poll_session.reload
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(@poll_session.course_section.id).not_to eq section.id
         expect(@poll_session.course_section.id).to eq original_id
       end
@@ -348,10 +363,14 @@ describe Polling::PollSessionsController, type: :request do
     def get_open
       raw_api_call(:get,
                    "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/open",
-                   { controller: "polling/poll_sessions", action: "open", format: "json",
+                   { controller: "polling/poll_sessions",
+                     action: "open",
+                     format: "json",
                      poll_id: @poll.id.to_s,
                      id: @poll_session.id.to_s },
-                   {}, {}, {})
+                   {},
+                   {},
+                   {})
     end
 
     context "as a teacher" do
@@ -375,7 +394,7 @@ describe Polling::PollSessionsController, type: :request do
 
           get_open
 
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
           @poll_session.reload
           expect(@poll_session.is_published).not_to be_truthy
         end
@@ -392,7 +411,7 @@ describe Polling::PollSessionsController, type: :request do
         get_open
 
         @poll_session.reload
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(@poll_session.is_published).not_to be_truthy
       end
     end
@@ -408,10 +427,14 @@ describe Polling::PollSessionsController, type: :request do
     def get_close
       raw_api_call(:get,
                    "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/close",
-                   { controller: "polling/poll_sessions", action: "close", format: "json",
+                   { controller: "polling/poll_sessions",
+                     action: "close",
+                     format: "json",
                      poll_id: @poll.id.to_s,
                      id: @poll_session.id.to_s },
-                   {}, {}, {})
+                   {},
+                   {},
+                   {})
     end
 
     context "as a teacher" do
@@ -431,7 +454,7 @@ describe Polling::PollSessionsController, type: :request do
 
           get_close
 
-          expect(response.code).to eq "401"
+          expect(response).to have_http_status :unauthorized
           @poll_session.reload
           expect(@poll_session.is_published).not_to be_falsey
         end
@@ -445,7 +468,7 @@ describe Polling::PollSessionsController, type: :request do
         get_close
 
         @poll_session.reload
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(@poll_session.is_published).to be_truthy
       end
     end
@@ -465,7 +488,8 @@ describe Polling::PollSessionsController, type: :request do
       api_call(:get,
                "/api/v1/poll_sessions/opened",
                { controller: "polling/poll_sessions", action: "opened", format: "json" },
-               {}, headers)
+               {},
+               headers)
     end
 
     it "returns all poll sessions available to the current user that are published" do
@@ -536,7 +560,8 @@ describe Polling::PollSessionsController, type: :request do
       api_call(:get,
                "/api/v1/poll_sessions/closed",
                { controller: "polling/poll_sessions", action: "closed", format: "json" },
-               {}, headers)
+               {},
+               headers)
     end
 
     it "returns all poll sessions available to the current user that are closed" do

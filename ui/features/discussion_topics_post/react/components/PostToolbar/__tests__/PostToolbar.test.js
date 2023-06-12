@@ -53,15 +53,15 @@ describe('PostToolbar', () => {
   describe('info text', () => {
     it('displays if provided', () => {
       const {queryAllByText} = setup({repliesCount: 1})
-      expect(queryAllByText('1 reply').length).toBe(2)
+      expect(queryAllByText('1 Reply').length).toBe(2)
     })
     it('not displayed if replies = 0', () => {
       const {queryAllByText} = setup({repliesCount: 0})
-      expect(queryAllByText('0 reply').length).toBe(0)
+      expect(queryAllByText('0 Reply').length).toBe(0)
     })
     it('correct pluralization displayed', () => {
       const {queryAllByText} = setup({repliesCount: 2})
-      expect(queryAllByText('2 replies').length).toBe(2)
+      expect(queryAllByText('2 Replies').length).toBe(2)
     })
   })
 

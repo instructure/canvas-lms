@@ -453,7 +453,7 @@ class CalendarEventsApiController < ApplicationController
           sub = subs.max_by(&:submitted_at) if subs
           event_json(event, user, session, { include: includes, excludes: params[:excludes], submission: sub })
         end
-        render json: json
+        render json:
       else
         render json: { errors: @errors.as_json }, status: :bad_request
       end
@@ -565,9 +565,10 @@ class CalendarEventsApiController < ApplicationController
         if dup_options[:count] > RECURRING_EVENT_LIMIT
           InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", dup_options[:count])
           return render json: {
-            message: t("only a maximum of %{limit} events can be created",
-                       limit: RECURRING_EVENT_LIMIT)
-          }, status: :bad_request
+                          message: t("only a maximum of %{limit} events can be created",
+                                     limit: RECURRING_EVENT_LIMIT)
+                        },
+                        status: :bad_request
         elsif dup_options[:count] > 0
           InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dup_options[:count])
           events += create_event_and_duplicates(dup_options)
@@ -593,8 +594,10 @@ class CalendarEventsApiController < ApplicationController
           render json: event_json(
             original_event,
             @current_user,
-            session, { duplicates: events, include: includes(["web_conference", "series_natural_language"]) }
-          ), status: :created
+            session,
+            { duplicates: events, include: includes(["web_conference", "series_natural_language"]) }
+          ),
+                 status: :created
         end
       end
     end
@@ -645,7 +648,8 @@ class CalendarEventsApiController < ApplicationController
         end
         raise CalendarEvent::ReservationError, "invalid participant" unless participant
 
-        reservation = @event.reserve_for(participant, @current_user,
+        reservation = @event.reserve_for(participant,
+                                         @current_user,
                                          cancel_existing: value_to_boolean(params[:cancel_existing]),
                                          comments: params["comments"])
         render json: event_json(reservation, @current_user, session)
@@ -672,7 +676,7 @@ class CalendarEventsApiController < ApplicationController
       json = participants.map do |user|
         user_display_json(user)
       end
-      render json: json
+      render json:
     end
   end
 
@@ -856,7 +860,7 @@ class CalendarEventsApiController < ApplicationController
     json = events.map do |event|
       event_json(event, @current_user, session)
     end
-    render json: json
+    render json:
   end
 
   # updating event data in a series has some tricky bits
@@ -919,8 +923,8 @@ class CalendarEventsApiController < ApplicationController
       return
     end
 
-    all_events = find_which_series_events(target_event: target_event, which: "all", for_update: true)
-    events = which == "following" ? all_events.where("start_at >= ?", target_event.start_at) : all_events
+    all_events = find_which_series_events(target_event:, which: "all", for_update: true)
+    events = (which == "following") ? all_events.where("start_at >= ?", target_event.start_at) : all_events
     if events.blank?
       # i don't believe we can get here, but cya
       render json: { message: t("No events were found to update") }, status: :bad_request
@@ -1017,7 +1021,7 @@ class CalendarEventsApiController < ApplicationController
     if error
       status = error[:status] || :bad_request
       error.delete(:status)
-      return render json: error, status: status
+      return render json: error, status:
     end
 
     target_event.context.touch
@@ -1030,7 +1034,7 @@ class CalendarEventsApiController < ApplicationController
         { include: includes(["web_conference", "series_natural_language"]) }
       )
     end
-    render json: json
+    render json:
   end
 
   def find_which_series_events(target_event:, which:, for_update:)
@@ -1052,7 +1056,7 @@ class CalendarEventsApiController < ApplicationController
                .where.not(workflow_state: workflow_state_not)
                .order(:id)
     else
-      render json: { error: t("Invalid parameter which='%{which}'", which: which) }, status: :bad_request
+      render json: { error: t("Invalid parameter which='%{which}'", which:) }, status: :bad_request
     end
     events
   end
@@ -1104,10 +1108,12 @@ class CalendarEventsApiController < ApplicationController
           next if event_context.nil?
 
           appointment_user = event_context.users.find { |user| user.id == appointment.user_id }
-          unless appointment_user.nil?
-            appointments.push({ user: appointment_user.name, comments: appointment.comments,
-                                parent_id: appointment.parent_calendar_event_id, course_name: event_context.name })
-          end
+          next if appointment_user.nil?
+
+          appointments.push({ user: appointment_user.name,
+                              comments: appointment.comments,
+                              parent_id: appointment.parent_calendar_event_id,
+                              course_name: event_context.name })
         end
         @events.concat appointment_groups
       end
@@ -1117,7 +1123,7 @@ class CalendarEventsApiController < ApplicationController
       get_all_pertinent_contexts
       GuardRail.activate(:secondary) do
         @contexts.each do |context|
-          @assignments = context.assignments.active.to_a if context.respond_to?("assignments")
+          @assignments = context.assignments.active.to_a if context.respond_to?(:assignments)
           # no overrides to apply without a current user
           @events.concat context.calendar_events.active.to_a
           @events.concat @assignments || []
@@ -1157,9 +1163,9 @@ class CalendarEventsApiController < ApplicationController
         @events.each do |event|
           ics_event =
             if event.is_a?(CalendarEvent)
-              event.to_ics(in_own_calendar: false, preloaded_attachments: preloaded_attachments, user: @current_user, user_events: appointments)
+              event.to_ics(in_own_calendar: false, preloaded_attachments:, user: @current_user, user_events: appointments)
             else
-              event.to_ics(in_own_calendar: false, preloaded_attachments: preloaded_attachments, user: @current_user)
+              event.to_ics(in_own_calendar: false, preloaded_attachments:, user: @current_user)
             end
           calendar.add_event(ics_event) if ics_event
         end
@@ -1174,7 +1180,7 @@ class CalendarEventsApiController < ApplicationController
           f.id = calendar_url_for(@context)
         end
         @events.each do |e|
-          feed.entries << e.to_atom
+          feed.entries << e.to_atom(exclude_description: !!e.try(:locked_for?, @current_user))
         end
         render plain: feed.to_xml
       end
@@ -1293,7 +1299,7 @@ class CalendarEventsApiController < ApplicationController
       updated_section_ids = []
       timetable_data.each do |section_id, timetables|
         timetable_data[section_id] = Array(timetables)
-        section = section_id == "all" ? nil : api_find(@context.active_course_sections, section_id)
+        section = (section_id == "all") ? nil : api_find(@context.active_course_sections, section_id)
         updated_section_ids << section.id if section
 
         builder = Courses::TimetableEventBuilder.new(course: @context, course_section: section)
@@ -1453,16 +1459,16 @@ class CalendarEventsApiController < ApplicationController
       @end_date = @start_date.end_of_day if @end_date < @start_date
     end
 
-    @type ||= params[:type] == "assignment" ? :assignment : :event
+    @type ||= (params[:type] == "assignment") ? :assignment : :event
 
     @context ||= user
-    include_accounts = Account.site_admin.feature_enabled?(:account_calendar_events)
+
     # only get pertinent contexts if there is a user
     if user
       joined_codes = codes&.join(",")
       get_all_pertinent_contexts(
         include_groups: true,
-        include_accounts: include_accounts,
+        include_accounts: true,
         cross_shard: true,
         only_contexts: joined_codes,
         include_contexts: joined_codes
@@ -1480,7 +1486,7 @@ class CalendarEventsApiController < ApplicationController
         context = Context.find_by_asset_string(c)
         @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
         @contexts.push context if context.is_a?(Course) && (context.is_public || context.public_syllabus || @public_to_auth)
-        @contexts.push context if include_accounts && context.is_a?(Account) && user.associated_accounts.active.where(id: context.id, account_calendar_visible: true).exists?
+        @contexts.push context if context.is_a?(Account) && user.associated_accounts.active.where(id: context.id, account_calendar_visible: true).exists?
       end
 
       # filter the contexts to only the requested contexts
@@ -1530,7 +1536,7 @@ class CalendarEventsApiController < ApplicationController
       if exclude_submission_types.any?
         scope = scope.where.not(submission_types: exclude_submission_types)
       elsif submission_types.any?
-        scope = scope.where(submission_types: submission_types)
+        scope = scope.where(submission_types:)
       end
       scope = scope.send(*date_scope_and_args(:due_between_with_overrides)) unless @all_events
       scope = scope.with_important_dates if @important_dates
@@ -1646,7 +1652,7 @@ class CalendarEventsApiController < ApplicationController
         assignments << assignment unless @important_dates && assignment.important_dates && assignment.due_at.nil?
       else
         dates_list = assignment.all_dates_visible_to(user,
-                                                     courses_user_has_been_enrolled_in: courses_user_has_been_enrolled_in)
+                                                     courses_user_has_been_enrolled_in:)
 
         if dates_list.empty?
           assignments << assignment
@@ -1840,13 +1846,14 @@ class CalendarEventsApiController < ApplicationController
     begin
       rr = RRule::Rule.new(
         rrule,
-        dtstart: dtstart,
-        tzid: tzid
+        dtstart:,
+        tzid:
       )
     rescue => e
       render json: {
-        message: t("Failed parsing the event's recurrence rule: %{e}", e: e)
-      }, status: :bad_request
+               message: t("Failed parsing the event's recurrence rule: %{e}", e:)
+             },
+             status: :bad_request
       return nil
     end
     # If RRULE generates a lot of events, rr.count can take a very long time to compute.
@@ -1854,9 +1861,10 @@ class CalendarEventsApiController < ApplicationController
     if rr.all(limit: RECURRING_EVENT_LIMIT + 1).length > RECURRING_EVENT_LIMIT
       InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", rr.count)
       render json: {
-        message: t("A maximum of %{limit} events may be created",
-                   limit: RECURRING_EVENT_LIMIT)
-      }, status: :bad_request
+               message: t("A maximum of %{limit} events may be created",
+                          limit: RECURRING_EVENT_LIMIT)
+             },
+             status: :bad_request
       return nil
     end
     rr

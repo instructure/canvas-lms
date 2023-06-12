@@ -23,8 +23,10 @@ module SIS
     def process(messages)
       i = Work.new(@batch, @root_account, @logger, messages)
 
-      Enrollment.suspend_callbacks(:set_update_cached_due_dates, :add_to_favorites_later,
-                                   :recache_course_grade_distribution, :update_user_account_associations_if_necessary) do
+      Enrollment.suspend_callbacks(:set_update_cached_due_dates,
+                                   :add_to_favorites_later,
+                                   :recache_course_grade_distribution,
+                                   :update_user_account_associations_if_necessary) do
         User.skip_updating_account_associations do
           Enrollment.process_as_sis(@sis_options) do
             yield i
@@ -37,6 +39,14 @@ module SIS
 
       i.enrollments_to_update_sis_batch_ids.uniq.sort.in_groups_of(1000, false) do |batch|
         Enrollment.where(id: batch).update_all(sis_batch_id: @batch.id)
+        # update observer enrollments linked to the above if they have a sis_batch_id
+        Shard.partition_by_shard(batch) do |shard_enrollment_ids|
+          Enrollment.where.not(sis_batch_id: nil)
+                    .joins("INNER JOIN #{Enrollment.quoted_table_name} AS se ON enrollments.associated_user_id=se.user_id AND enrollments.course_section_id=se.course_section_id")
+                    .where(se: { id: shard_enrollment_ids })
+                    .in_batches(of: 10_000)
+                    .update_all(sis_batch_id: @batch.id)
+        end
       end
       # We batch these up at the end because we don't want to keep touching the same course over and over,
       # and to avoid hitting other callbacks for the course (especially broadcast_policy)
@@ -81,10 +91,17 @@ module SIS
     end
 
     class Work
-      attr_accessor :enrollments_to_update_sis_batch_ids, :courses_to_touch_ids,
-                    :incrementally_update_account_associations_user_ids, :update_account_association_user_ids,
-                    :account_chain_cache, :users_to_touch_ids, :success_count, :courses_to_recache_due_dates,
-                    :enrollments_to_add_to_favorites, :roll_back_data, :enrollments_to_delete
+      attr_accessor :enrollments_to_update_sis_batch_ids,
+                    :courses_to_touch_ids,
+                    :incrementally_update_account_associations_user_ids,
+                    :update_account_association_user_ids,
+                    :account_chain_cache,
+                    :users_to_touch_ids,
+                    :success_count,
+                    :courses_to_recache_due_dates,
+                    :enrollments_to_add_to_favorites,
+                    :roll_back_data,
+                    :enrollments_to_delete
 
       def initialize(batch, root_account, logger, messages)
         @batch = batch
@@ -246,7 +263,7 @@ module SIS
           end
 
           if %w[StudentEnrollment ObserverEnrollment].include?(type) && MasterCourses::MasterTemplate.is_master_course?(@course)
-            message = "#{type == "StudentEnrollment" ? "Student" : "Observer"} enrollment for \"#{enrollment_info.user_id}\" not allowed in blueprint course \"#{@course.sis_course_id}\""
+            message = "#{(type == "StudentEnrollment") ? "Student" : "Observer"} enrollment for \"#{enrollment_info.user_id}\" not allowed in blueprint course \"#{@course.sis_course_id}\""
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
@@ -264,8 +281,8 @@ module SIS
             end
           end
           enrollment = @section.all_enrollments.where(user_id: user,
-                                                      type: type,
-                                                      associated_user_id: associated_user_id,
+                                                      type:,
+                                                      associated_user_id:,
                                                       role_id: role).take
 
           enrollment ||= Enrollment.typed_enrollment(type).new
@@ -282,7 +299,7 @@ module SIS
 
           next if enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
 
-          if (enrollment.stuck_sis_fields & [:start_at, :end_at]).empty?
+          unless enrollment.stuck_sis_fields.intersect?([:start_at, :end_at])
             enrollment.start_at = enrollment_info.start_date
             enrollment.end_at = enrollment_info.end_date
           end
@@ -381,7 +398,7 @@ module SIS
           # if any matching enrollment for the same user in the same course
           # exists, we will mark the enrollment as deleted, but if it is the
           # last enrollment it gets marked as completed
-          if @course.enrollments.active.where(user: user, associated_user_id: associated_user_id, role: role).where.not(id: enrollment.id).exists?
+          if @course.enrollments.active.where(user:, associated_user_id:, role:).where.not(id: enrollment.id).exists?
             all_done = deleted_status(enrollment)
           else
             completed_status(enrollment)
@@ -398,7 +415,7 @@ module SIS
 
       def completed_status(enrollment)
         enrollment.workflow_state = "completed"
-        enrollment.completed_at ||= Time.zone.now
+        enrollment.completed_at = Time.zone.now
       end
 
       def deleted_status(enrollment)

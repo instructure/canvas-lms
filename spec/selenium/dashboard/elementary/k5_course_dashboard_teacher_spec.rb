@@ -166,7 +166,7 @@ describe "teacher k5 course dashboard" do
   end
 
   context "course color selection" do
-    it "allows for available color to be selected", ignore_js_errors: true, custom_timeout: 30 do
+    it "allows for available color to be selected", custom_timeout: 30, ignore_js_errors: true do
       get "/courses/#{@subject_course.id}/settings"
       visit_course_details_tab
 

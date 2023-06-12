@@ -25,7 +25,7 @@ class SisPseudonym
     raise ArgumentError("context must respond to .root_account") unless root_account&.root_account? || context.respond_to?(:root_account)
 
     sis_pseudonym =
-      new(user, context, type, require_sis, include_deleted, root_account, in_region: in_region, include_all_pseudonyms: include_all_pseudonyms)
+      new(user, context, type, require_sis, include_deleted, root_account, in_region:, include_all_pseudonyms:)
     include_all_pseudonyms ? sis_pseudonym.all_pseudonyms : sis_pseudonym.pseudonym
   end
 
@@ -97,10 +97,10 @@ class SisPseudonym
 
     if include_deleted
       if user.all_pseudonyms_loaded?
-        return pick_user_pseudonym(user.all_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
+        return pick_user_pseudonym(user.all_pseudonyms, (type == :trusted) ? root_account.trusted_account_ids : nil)
       end
     elsif user.all_active_pseudonyms_loaded?
-      return pick_user_pseudonym(user.all_active_pseudonyms, type == :trusted ? root_account.trusted_account_ids : nil)
+      return pick_user_pseudonym(user.all_active_pseudonyms, (type == :trusted) ? root_account.trusted_account_ids : nil)
     end
 
     trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted

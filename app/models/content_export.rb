@@ -144,7 +144,7 @@ class ContentExport < ActiveRecord::Base
       when ZIP
         export_zip(opts)
       when USER_DATA
-        export_user_data(opts)
+        export_user_data(**opts)
       when QUIZZES2
         return unless context.feature_enabled?(:quizzes_next)
 
@@ -199,6 +199,8 @@ class ContentExport < ActiveRecord::Base
       if @cc_exporter.export
         self.progress = 100
         job_progress.try :complete!
+        duration = Time.now - created_at
+        InstStatsd::Statsd.timing("content_migrations.export_duration", duration, tags: { export_type:, selective_export: selective_export? })
         self.workflow_state = if for_course_copy?
                                 "exported_for_course_copy"
                               else
@@ -292,7 +294,7 @@ class ContentExport < ActiveRecord::Base
 
         update(
           export_type: QTI,
-          selected_content: selected_content
+          selected_content:
         )
       else
         update(export_type: QTI)
@@ -318,6 +320,10 @@ class ContentExport < ActiveRecord::Base
     ensure
       save
     end
+  end
+
+  def disable_content_rewriting?
+    quizzes_next? && NewQuizzesFeaturesHelper.disable_content_rewriting?(context)
   end
 
   def export_quizzes2
@@ -408,7 +414,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def error_message
-    settings[:errors] ? settings[:errors].last : nil
+    settings[:errors]&.last
   end
 
   def error_messages
@@ -597,14 +603,18 @@ class ContentExport < ActiveRecord::Base
   scope :course_copy, -> { where(export_type: COURSE_COPY) }
   scope :running, -> { where(workflow_state: ["created", "exporting"]) }
   scope :admin, lambda { |user|
-    where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?", [
+    where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?",
+          [
             ZIP, USER_DATA
-          ], user)
+          ],
+          user)
   }
   scope :non_admin, lambda { |user|
-    where("content_exports.export_type IN (?) AND content_exports.user_id=?", [
+    where("content_exports.export_type IN (?) AND content_exports.user_id=?",
+          [
             ZIP, USER_DATA
-          ], user)
+          ],
+          user)
   }
   scope :without_epub, -> { eager_load(:epub_export).where(epub_exports: { id: nil }) }
   scope :expired, lambda {

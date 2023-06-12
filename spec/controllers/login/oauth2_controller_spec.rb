@@ -55,7 +55,7 @@ describe Login::OAuth2Controller do
 
       expect_any_instantiation_of(aac).not_to receive(:get_token)
       Timecop.travel(15.minutes) do
-        get :create, params: { state: state }
+        get :create, params: { state: }
         expect(response).to redirect_to(login_url)
         expect(flash[:delegated_message]).to eq "It took too long to login. Please try again"
       end
@@ -66,7 +66,7 @@ describe Login::OAuth2Controller do
 
       get :create, params: { state: "" }
       expect(response).not_to be_successful
-      expect(session[:sentinel]).to eq true
+      expect(session[:sentinel]).to be true
     end
 
     it "works" do

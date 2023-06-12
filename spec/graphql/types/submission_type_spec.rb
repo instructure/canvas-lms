@@ -28,11 +28,14 @@ describe Types::SubmissionType do
   end
 
   let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @teacher) }
+  let(:submission_type_peer_review) { GraphQLTypeTester.new(@submission, current_user: @student) }
 
   it "works" do
     expect(submission_type.resolve("user { _id }")).to eq @student.id.to_s
-    expect(submission_type.resolve("excused")).to eq false
+    expect(submission_type.resolve("userId")).to eq @student.id.to_s
+    expect(submission_type.resolve("excused")).to be false
     expect(submission_type.resolve("assignment { _id }")).to eq @assignment.id.to_s
+    expect(submission_type.resolve("assignmentId")).to eq @assignment.id.to_s
   end
 
   it "requires read permission" do
@@ -43,9 +46,9 @@ describe Types::SubmissionType do
   describe "posted" do
     it "returns the posted status of the submission" do
       @submission.update!(posted_at: nil)
-      expect(submission_type.resolve("posted")).to eq false
+      expect(submission_type.resolve("posted")).to be false
       @submission.update!(posted_at: Time.zone.now)
-      expect(submission_type.resolve("posted")).to eq true
+      expect(submission_type.resolve("posted")).to be true
     end
   end
 
@@ -67,6 +70,30 @@ describe Types::SubmissionType do
       @submission.update!(posted_at: now)
       posted_at = Time.zone.parse(submission_type.resolve("postedAt"))
       expect(posted_at).to eq now
+    end
+  end
+
+  describe "hide_grade_from_student" do
+    it "returns true for hide_grade_from_student" do
+      @assignment.mute!
+      expect(submission_type.resolve("hideGradeFromStudent")).to be true
+    end
+
+    it "returns false for hide_grade_from_student" do
+      expect(submission_type.resolve("hideGradeFromStudent")).to be false
+    end
+  end
+
+  describe "grading period id" do
+    it "returns the grading period id" do
+      grading_period_group = GradingPeriodGroup.create!(title: "foo", course_id: @course.id)
+      grading_period = GradingPeriod.create!(title: "foo", start_date: 1.day.ago, end_date: 1.day.from_now, grading_period_group_id: grading_period_group.id)
+      assignment = @course.assignments.create! name: "asdf", points_possible: 10
+      submission = assignment.grade_student(@student, score: 8, grader: @teacher).first
+      submission.update!(grading_period_id: grading_period.id)
+      submission_type = GraphQLTypeTester.new(submission, current_user: @teacher)
+
+      expect(submission_type.resolve("gradingPeriodId")).to eq grading_period.id.to_s
     end
   end
 
@@ -179,7 +206,7 @@ describe Types::SubmissionType do
 
       context "when the quiz is not posted" do
         it "returns nil for users who cannot read the grade" do
-          expect(submission_type_for_student.resolve("body")).to be nil
+          expect(submission_type_for_student.resolve("body")).to be_nil
         end
 
         it "returns a value for users who can read the grade" do
@@ -239,7 +266,6 @@ describe Types::SubmissionType do
 
   describe "submission comments" do
     before(:once) do
-      student_in_course(active_all: true)
       @submission.update_column(:attempt, 2) # bypass infer_values callback
       @comment1 = @submission.add_comment(author: @teacher, comment: "test1", attempt: 1)
       @comment2 = @submission.add_comment(author: @teacher, comment: "test2", attempt: 2)
@@ -271,17 +297,24 @@ describe Types::SubmissionType do
       ).to eq [@comment1.id.to_s]
     end
 
-    it "will show alll comments for all attempts if all_comments is true" do
+    it "will show all comments for all attempts if all_comments is true" do
       expect(
         submission_type.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}")
       ).to eq [@comment1.id.to_s, @comment2.id.to_s]
+    end
+
+    it "will only show comments written by the reviewer if peerReview is true" do
+      comment3 = @submission.add_comment(author: @student, comment: "test3", attempt: 2)
+      expect(
+        submission_type_peer_review.resolve("commentsConnection(filter: {peerReview: true}) { nodes { _id }}")
+      ).to eq [comment3.id.to_s]
     end
 
     it "will combine comments for attempt nil, 0, and 1" do
       @comment0 = @submission.add_comment(author: @teacher, comment: "test1", attempt: 0)
       @commentNil = @submission.add_comment(author: @teacher, comment: "test1", attempt: nil)
 
-      (0..1).each do |i|
+      2.times do |i|
         expect(
           submission_type.resolve("commentsConnection(filter: {forAttempt: #{i}}) { nodes { _id }}")
         ).to eq [@comment1.id.to_s, @comment0.id.to_s, @commentNil.id.to_s]
@@ -299,7 +332,38 @@ describe Types::SubmissionType do
       other_course_student = student_in_course(course: course_factory).user
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
-      ).to be nil
+      ).to be_nil
+    end
+
+    context "grants_rights check" do
+      before(:once) do
+        @assignment.update_attribute(:peer_reviews, true)
+        @student2 = User.create!
+        @student3 = User.create!
+        @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+        @course.enroll_user(@student3, "StudentEnrollment", enrollment_state: "active")
+        @peer_review_submission = @assignment.submit_homework(@student, body: "Attempt 1", submitted_at: 2.hours.ago)
+        @assignment.submit_homework(@student2, body: "test", submitted_at: 1.hour.ago)
+        @assignment.submit_homework(@student3, body: "test", submitted_at: 1.hour.ago)
+        @assignment.assign_peer_review(@student2, @student)
+        @assignment.assign_peer_review(@student3, @student)
+        @peer_review_submission.add_comment(author: @student3, comment: "this comment shouldnt be seen")
+      end
+
+      let(:resolver) { GraphQLTypeTester.new(@peer_review_submission, current_user: @student2) }
+
+      it "returns no comments when student2 has no comments" do
+        expect(
+          resolver.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}", current_user: @student2)
+        ).to eq []
+      end
+
+      it "only returns comments for student2" do
+        student_2_comment = @peer_review_submission.add_comment(author: @student2, comment: "this is a student comment")
+        expect(
+          resolver.resolve("commentsConnection(filter: {allComments: true}) { nodes { _id }}", current_user: @student2)
+        ).to eq [student_2_comment.id.to_s]
+      end
     end
   end
 
@@ -448,7 +512,7 @@ describe Types::SubmissionType do
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
     it "returns late" do
-      expect(submission_type.resolve("late")).to eq true
+      expect(submission_type.resolve("late")).to be true
     end
   end
 
@@ -466,7 +530,7 @@ describe Types::SubmissionType do
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
     it "returns missing" do
-      expect(submission_type.resolve("missing")).to eq true
+      expect(submission_type.resolve("missing")).to be true
     end
   end
 
@@ -481,7 +545,7 @@ describe Types::SubmissionType do
     let(:submission_type) { GraphQLTypeTester.new(@submission1, current_user: @teacher) }
 
     it "returns gradeMatchesCurrentSubmission" do
-      expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to eq false
+      expect(submission_type.resolve("gradeMatchesCurrentSubmission")).to be false
     end
   end
 

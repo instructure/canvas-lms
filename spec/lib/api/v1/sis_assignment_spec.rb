@@ -89,8 +89,9 @@ describe Api::V1::SisAssignment do
       sis_source_id = "my super unique goo-id"
       integration_data = { "something" => "else", "foo" => { "bar" => "baz" } }
       assignment_group = AssignmentGroup.new(name: ag_name,
-                                             sis_source_id: sis_source_id,
-                                             integration_data: integration_data, group_weight: 8.7)
+                                             sis_source_id:,
+                                             integration_data:,
+                                             group_weight: 8.7)
       allow(assignment_1).to receive(:assignment_group).and_return(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
@@ -103,8 +104,9 @@ describe Api::V1::SisAssignment do
       ag_name = "too much tuna"
       sis_source_id = "some super cool id"
       assignment_group = AssignmentGroup.new(name: ag_name,
-                                             sis_source_id: sis_source_id,
-                                             integration_data: nil, group_weight: 8.7)
+                                             sis_source_id:,
+                                             integration_data: nil,
+                                             group_weight: 8.7)
       allow(assignment_1).to receive(:assignment_group).and_return(assignment_group)
       result = subject.sis_assignments_json([assignment_1])
       expect(result[0]["assignment_group"]["name"]).to eq(ag_name)
@@ -118,7 +120,7 @@ describe Api::V1::SisAssignment do
       assignment_1[:grading_type] = "points"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]["include_in_final_grade"]).to eq(false)
+      expect(result[0]["include_in_final_grade"]).to be(false)
     end
 
     it "returns false for include_in_final_grade when grading_type is not_graded" do
@@ -126,7 +128,7 @@ describe Api::V1::SisAssignment do
       assignment_1[:grading_type] = "not_graded"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]["include_in_final_grade"]).to eq(false)
+      expect(result[0]["include_in_final_grade"]).to be(false)
     end
 
     it "returns true for include_in_final_grade when appropriate" do
@@ -134,7 +136,7 @@ describe Api::V1::SisAssignment do
       assignment_1[:grading_type] = "points"
       assignments = [assignment_1]
       result = subject.sis_assignments_json(assignments)
-      expect(result[0]["include_in_final_grade"]).to eq(true)
+      expect(result[0]["include_in_final_grade"]).to be(true)
     end
 
     it "returns an empty hash for 0 assignments" do
@@ -188,14 +190,14 @@ describe Api::V1::SisAssignment do
 
       result = generator.sis_assignments_json(assignments)
 
-      expect(result[0]["due_at"]).to eq nil
+      expect(result[0]["due_at"]).to be_nil
     end
 
     context "mastery paths overrides" do
       it "uses a mastery paths due date as the course due date" do
         due_at = Time.zone.parse("2017-02-08 22:11:10")
         assignment_1.update(due_at: nil)
-        create_mastery_paths_override_for_assignment(assignment_1, due_at: due_at)
+        create_mastery_paths_override_for_assignment(assignment_1, due_at:)
         assignments = Assignment.where(id: assignment_1.id)
                                 .preload(:active_assignment_overrides)
 
@@ -224,12 +226,12 @@ describe Api::V1::SisAssignment do
       let(:course) { assignment_1.course }
 
       before do
-        @student1 = student_in_course(course: course, workflow_state: "active").user
-        @student2 = student_in_course(course: course, workflow_state: "active").user
+        @student1 = student_in_course(course:, workflow_state: "active").user
+        @student2 = student_in_course(course:, workflow_state: "active").user
         managed_pseudonym(@student2, sis_user_id: "SIS_ID_2", account: Account.default)
 
         due_at = Time.zone.parse("2017-02-08 22:11:10")
-        @override = create_adhoc_override_for_assignment(assignment_1, [@student1, @student2], due_at: due_at)
+        @override = create_adhoc_override_for_assignment(assignment_1, [@student1, @student2], due_at:)
       end
 
       it "adds student assignment override information" do
@@ -274,7 +276,7 @@ describe Api::V1::SisAssignment do
       end
 
       it "provides an empty list when there are no overrides" do
-        assignment_2 = assignment_model(course: course)
+        assignment_2 = assignment_model(course:)
         assignments = Assignment.where(id: assignment_2.id)
                                 .preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
 

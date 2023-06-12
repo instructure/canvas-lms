@@ -55,7 +55,7 @@ class Login::SamlController < ApplicationController
       flash[:delegated_message] = if @domain_root_account.auth_discovery_url
                                     t("Canvas did not recognize your identity provider")
                                   elsif response.issuer
-                                    t("Canvas is not configured to receive logins from %{issuer}.", issuer: issuer)
+                                    t("Canvas is not configured to receive logins from %{issuer}.", issuer:)
                                   else
                                     t("The institution you logged in from is not configured on this account.")
                                   end
@@ -125,14 +125,16 @@ class Login::SamlController < ApplicationController
 
     reset_session_for_login
 
-    pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac)
+    pseudonym =
+      @domain_root_account.pseudonyms.for_auth_configuration(unique_id, aac, include_suspended: true)
+
     if !pseudonym && aac.jit_provisioning?
       pseudonym = aac.provision_user(unique_id, provider_attributes)
-    elsif pseudonym
+    elsif pseudonym && !pseudonym.suspended?
       aac.apply_federated_attributes(pseudonym, provider_attributes)
     end
 
-    if pseudonym && (user = pseudonym.login_assertions_for_user)
+    if pseudonym && !pseudonym.suspended? && (user = pseudonym.login_assertions_for_user)
       # Successful login and we have a user
       @domain_root_account.pseudonyms.scoping do
         PseudonymSession.create!(pseudonym, false)
@@ -329,8 +331,8 @@ class Login::SamlController < ApplicationController
       private_key = AuthenticationProvider::SAML.private_key
       private_key = nil if aac.sig_alg.nil?
       forward_url = SAML2::Bindings::HTTPRedirect.encode(logout_response,
-                                                         relay_state: relay_state,
-                                                         private_key: private_key,
+                                                         relay_state:,
+                                                         private_key:,
                                                          sig_alg: aac.sig_alg)
 
       redirect_to(forward_url)

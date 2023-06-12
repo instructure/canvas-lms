@@ -78,7 +78,7 @@ QUnit.module('Course Sidebar component', {
 test('renders the closed CourseSidebar component', () => {
   const tree = enzyme.mount(connect())
   const node = tree.find('button')
-  equal(node.text().trim(), 'Open sidebar')
+  equal(node.text().trim(), 'Open Blueprint Sidebar')
   tree.unmount()
 })
 

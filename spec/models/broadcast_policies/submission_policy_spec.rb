@@ -30,6 +30,7 @@ module BroadcastPolicies
       double("Assignment").tap do |a|
         allow(a).to receive(:context).and_return(course)
         allow(a).to receive(:published?).and_return(true)
+        allow(a).to receive(:deleted?).and_return(false)
         allow(a).to receive(:context_id).and_return(course.id)
         allow(a).to receive(:quiz_lti?).and_return(false)
       end
@@ -100,6 +101,8 @@ module BroadcastPolicies
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:late?).and_return false } }
+
+      specify { wont_send_when { allow(assignment).to receive(:deleted?).and_return(true) } }
     end
 
     describe "#should_dispatch_assignment_submitted?" do
@@ -135,7 +138,7 @@ module BroadcastPolicies
             )
           end
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "and the submissions does not transition from 'unsubmitted' -> 'submitted'" do
@@ -148,7 +151,7 @@ module BroadcastPolicies
             )
           end
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
       end
     end
@@ -183,7 +186,7 @@ module BroadcastPolicies
         context "when no changes were made to the URL" do
           before { allow(submission).to receive(:saved_change_to_url?).and_return(false) }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "when a change was made to the URL" do
@@ -205,7 +208,7 @@ module BroadcastPolicies
               )
             end
 
-            it { is_expected.to eq false }
+            it { is_expected.to be false }
           end
 
           context "and the submission is a re-submission" do
@@ -224,7 +227,7 @@ module BroadcastPolicies
                 )
               end
 
-              it { is_expected.to eq false }
+              it { is_expected.to be false }
             end
 
             context "and the URL has not been used in submission history" do
@@ -236,7 +239,7 @@ module BroadcastPolicies
                 )
               end
 
-              it { is_expected.to eq true }
+              it { is_expected.to be true }
             end
           end
         end

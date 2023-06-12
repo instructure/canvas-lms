@@ -69,10 +69,10 @@ describe "outcomes" do
         it "validates default values", priority: "1" do
           expect(f("#calculation_method")).to have_value("decaying_average")
           expect(f("#calculation_int")).to have_value("65")
-          expect(f("#calculation_int_example")).to include_text("Most recent result counts as 65%"\
-                                                                " of mastery weight, average of all other results count"\
-                                                                " as 35% of weight. If there is only one result, the single score"\
-                                                                " will be returned.")
+          expect(f("#calculation_int_example")).to include_text("Most recent result counts as 65% " \
+                                                                "of mastery weight, average of all other results count " \
+                                                                "as 35% of weight. If there is only one result, the single score " \
+                                                                "will be returned.")
         end
 
         it "validates decaying average_range", priority: "2" do
@@ -101,9 +101,9 @@ describe "outcomes" do
           click_option("#calculation_method", "n Number of Times")
           expect(f("#calculation_int")).to have_value("5")
           expect(f("#mastery_points")).to have_value("3")
-          expect(f("#calculation_int_example")).to include_text("Must achieve mastery at least 5 times."\
-                                                                " Scores above mastery will be averaged"\
-                                                                " to calculate final score")
+          expect(f("#calculation_int_example")).to include_text("Must achieve mastery at least 5 times. " \
+                                                                "Scores above mastery will be averaged " \
+                                                                "to calculate final score")
         end
 
         it "validates n mastery_range", priority: "2" do
@@ -173,7 +173,7 @@ describe "outcomes" do
     context "actions" do
       it "does not render an HTML-escaped title in outcome directory while editing", priority: "2" do
         title = "escape & me <<->> if you dare"
-        @context = who_to_login == "teacher" ? @course : account
+        @context = (who_to_login == "teacher") ? @course : account
         outcome_model
         get outcome_url
         wait_for_ajaximations
@@ -215,6 +215,7 @@ describe "outcomes" do
     describe "with improved_outcome_management enabled" do
       before do
         enable_improved_outcomes_management(Account.default)
+        enable_account_level_mastery_scales(Account.default)
       end
 
       it "creates an initial outcome in the course level as a teacher" do
@@ -253,7 +254,7 @@ describe "outcomes" do
         individual_outcome_kabob_menu(0).click
         click_remove_outcome_button
         click_confirm_remove_button
-        expect(no_outcomes_billboard.present?).to eq(true)
+        expect(no_outcomes_billboard.present?).to be(true)
       end
 
       it "moves an outcome into a newly created outcome group as a teacher" do
@@ -378,7 +379,7 @@ describe "outcomes" do
           ratings = outcome.data[:rubric_criterion][:ratings]
           mastery_points = outcome.data[:rubric_criterion][:mastery_points]
           points_possible = outcome.data[:rubric_criterion][:points_possible]
-          expect(outcome.nil?).to eq(false)
+          expect(outcome.nil?).to be(false)
           expect(ratings.length).to eq(5)
           expect(ratings[0][:description]).to eq("Exceeds Mastery")
           expect(ratings[0][:points]).to eq(4)
@@ -457,9 +458,8 @@ describe "outcomes" do
         end
       end
 
-      describe "with alignment_summary enabled" do
+      context "alignment summary tab" do
         before do
-          enable_alignment_summary(Account.default)
           context_outcome(@course, 3)
           @assignment = assignment_model(course: @course)
           @aligned_outcome = LearningOutcome.find_by(context: @course, short_description: "outcome 0")

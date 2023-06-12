@@ -84,7 +84,7 @@ RSpec.describe "Outcomes Service - POST Content Export", :pact do
 
     before do
       # We need to create a wiki_page because the export won't begin without an existing artifact
-      wiki_page_model(course: course)
+      wiki_page_model(course:)
       outcomes.given("a provisioned outcomes service account with existing outcomes and artifacts")
               .upon_receiving("a request to create content exports")
               .with(

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DaySubCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection.coffee'
+import DaySubCollection from '@canvas/day-substitution/backbone/collections/DaySubstitutionCollection'
 
 QUnit.module('DaySubstitutionCollection')
 

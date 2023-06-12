@@ -111,7 +111,7 @@ RSpec.describe "Outcomes Service - POST Content Import", :pact do
       }
     end
     let!(:course) { course_factory(active_course: true) }
-    let(:wiki_page) { wiki_page_model(course: course) }
+    let(:wiki_page) { wiki_page_model(course:) }
     let!(:content_migration) { ContentMigration.new }
     let(:imported_content) do
       {

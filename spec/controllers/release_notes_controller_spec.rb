@@ -60,7 +60,7 @@ describe ReleaseNotesController do
     it "returns the object without langs by default" do
       the_note = note
       get "index"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.first["id"]).to eq(the_note.id)
       expect(res.first["langs"]).to be_nil
     end
@@ -68,7 +68,7 @@ describe ReleaseNotesController do
     it "returns the object with langs with includes[]=langs" do
       the_note = note
       get "index", params: { includes: ["langs"] }
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res.first["id"]).to eq(the_note.id)
       expect(res.first.dig("langs", "en")&.with_indifferent_access).to eq(note["en"].with_indifferent_access)
     end
@@ -76,19 +76,21 @@ describe ReleaseNotesController do
 
   describe "create" do
     it "creates a note with the expected values" do
-      post "create", params: {
-        target_roles: ["user"],
-        show_ats: { "test" => show_at },
-        published: true,
-        langs: {
-          en: {
-            title: "A great title",
-            description: "A great description",
-            url: "https://example.com/note1"
-          }
-        }
-      }, as: :json
-      res = JSON.parse(response.body)
+      post "create",
+           params: {
+             target_roles: ["user"],
+             show_ats: { "test" => show_at },
+             published: true,
+             langs: {
+               en: {
+                 title: "A great title",
+                 description: "A great description",
+                 url: "https://example.com/note1"
+               }
+             }
+           },
+           as: :json
+      res = response.parsed_body
       the_note = ReleaseNote.find(res["id"])
       expect(the_note.target_roles).to eq(["user"])
       expect(the_note.show_ats["test"]).to eq(show_at)
@@ -103,19 +105,21 @@ describe ReleaseNotesController do
     it "updates an existing note in the expected way" do
       the_note = ReleaseNote.find(note.id)
       expect(the_note.target_roles).to_not be_nil
-      put "update", params: {
-        id: the_note.id,
-        target_roles: ["user"],
-        show_ats: { "test" => show_at + 35.minutes },
-        published: true,
-        langs: {
-          en: {
-            title: "A great title",
-            description: "A great description",
-            url: "https://example.com/note1"
-          }
-        }
-      }, as: :json
+      put "update",
+          params: {
+            id: the_note.id,
+            target_roles: ["user"],
+            show_ats: { "test" => show_at + 35.minutes },
+            published: true,
+            langs: {
+              en: {
+                title: "A great title",
+                description: "A great description",
+                url: "https://example.com/note1"
+              }
+            }
+          },
+          as: :json
       the_note = ReleaseNote.find(note.id)
       expect(the_note.target_roles).to eq(["user"])
       expect(the_note.show_ats["test"]).to eq(show_at + 35.minutes)
@@ -129,14 +133,14 @@ describe ReleaseNotesController do
       the_note = ReleaseNote.find(note.id)
       expect(the_note.target_roles).to_not be_nil
       put "update", params: { id: the_note.id }
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res["id"]).to eq(the_note.id)
     end
 
     it "returns 404 for non-existant notes" do
       put "update", params: { id: SecureRandom.uuid, target_roles: ["user"] }
-      expect(response.status).to eq(404)
+      expect(response).to have_http_status(:not_found)
     end
   end
 
@@ -150,17 +154,17 @@ describe ReleaseNotesController do
 
     it "returns 404 for non-existant notes" do
       delete "destroy", params: { id: SecureRandom.uuid }
-      expect(response.status).to eq(404)
+      expect(response).to have_http_status(:not_found)
     end
   end
 
   describe "publish" do
     it "publishes an unpublished note" do
       the_note = ReleaseNote.find(note.id)
-      expect(the_note.published).to eq(false)
+      expect(the_note.published).to be(false)
       put "publish", params: { id: the_note.id }
       the_note = ReleaseNote.find(note.id)
-      expect(the_note.published).to eq(true)
+      expect(the_note.published).to be(true)
     end
   end
 
@@ -170,10 +174,10 @@ describe ReleaseNotesController do
       the_note.published = true
       the_note.save
 
-      expect(the_note.published).to eq(true)
+      expect(the_note.published).to be(true)
       delete "unpublish", params: { id: the_note.id }
       the_note = ReleaseNote.find(note.id)
-      expect(the_note.published).to eq(false)
+      expect(the_note.published).to be(false)
     end
   end
 
@@ -190,8 +194,8 @@ describe ReleaseNotesController do
     it "returns english notes by default" do
       I18n.locale = :ar
       get "latest"
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res.length).to eq(1)
 
       json_note = res[0]
@@ -205,8 +209,8 @@ describe ReleaseNotesController do
     it "returns localized notes when available" do
       @user.update_attribute :locale, "es"
       get "latest"
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res.length).to eq(1)
 
       json_note = res[0]
@@ -223,16 +227,16 @@ describe ReleaseNotesController do
       the_note.save
 
       get "latest"
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res.length).to eq(0)
 
       the_note.published = true
       the_note.save
 
       get "latest"
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res.length).to eq(1)
     end
 
@@ -242,24 +246,24 @@ describe ReleaseNotesController do
       the_note.save
 
       get "latest"
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res.length).to eq(0)
 
       the_note.set_show_at("test", Time.now.utc.change(usec: 0) - 1.hour)
       the_note.save
 
       get "latest"
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res.length).to eq(1)
     end
 
     it "does not return notes that do not apply to the current user's roles" do
       user_session(account_admin_user)
       get "latest"
-      expect(response.status).to eq(200)
-      res = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      res = response.parsed_body
       expect(res.length).to eq(0)
     end
 
@@ -270,22 +274,19 @@ describe ReleaseNotesController do
         # The second spanish request shouldn't call the method at all though
         expect(ReleaseNote).to receive(:latest).exactly(@user.roles(@student_enrollment.root_account).length * 2).times.and_call_original
         get "latest"
-        subject.send(:clear_ivars)
         get "latest"
         @user.update_attribute :locale, "en"
-        subject.send(:clear_ivars)
         get "latest"
       end
     end
 
     it "clears the new flag after the first request" do
       get "latest"
-      res = JSON.parse(response.body)
-      expect(res[0]["new"]).to eq(true)
-      subject.send(:clear_ivars)
+      res = response.parsed_body
+      expect(res[0]["new"]).to be(true)
       get "latest"
-      res = JSON.parse(response.body)
-      expect(res[0]["new"]).to eq(false)
+      res = response.parsed_body
+      expect(res[0]["new"]).to be(false)
     end
   end
 
@@ -301,15 +302,14 @@ describe ReleaseNotesController do
 
     it "includes all notes if the user has seen none" do
       get "unread_count"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res["unread_count"]).to eq(1)
     end
 
     it "includes no notes if the user has seen them all" do
       get "latest"
-      subject.send(:clear_ivars)
       get "unread_count"
-      res = JSON.parse(response.body)
+      res = response.parsed_body
       expect(res["unread_count"]).to eq(0)
     end
   end

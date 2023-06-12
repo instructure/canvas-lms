@@ -41,13 +41,16 @@ class SubmissionsBaseController < ApplicationController
       format.html do
         rubric_association = @assignment&.rubric_association
         rubric_association_json = rubric_association&.as_json
+        unless rubric_association_json.nil?
+          rubric_association_json["rubric_association"]["hide_points"] = rubric_association.hide_points(@current_user)
+        end
         rubric = rubric_association&.rubric
         js_env({
                  nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
                  outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
                  rubric: rubric ? rubric_json(rubric, @current_user, session, style: "full") : nil,
                  rubricAssociation: rubric_association_json ? rubric_association_json["rubric_association"] : nil,
-                 outcome_proficiency: outcome_proficiency,
+                 outcome_proficiency:,
                  media_comment_asset_string: @current_user.asset_string,
                  EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
                  EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list]
@@ -83,7 +86,7 @@ class SubmissionsBaseController < ApplicationController
                     except: submission_json_exclusions,
                     permissions: {
                       user: @current_user,
-                      session: session,
+                      session:,
                       include_permissions: false
                     }
                   })
@@ -93,7 +96,7 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def update
-    permissions = { user: @current_user, session: session, include_permissions: false }
+    permissions = { user: @current_user, session:, include_permissions: false }
     provisional = @assignment.moderated_grading? && params[:submission][:provisional]
     submission_json_exclusions = []
 
@@ -111,7 +114,7 @@ class SubmissionsBaseController < ApplicationController
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
 
-      render json: @submission.as_json(except: submission_json_exclusions, permissions: permissions)
+      render json: @submission.as_json(except: submission_json_exclusions, permissions:)
       return
     end
 
@@ -142,7 +145,7 @@ class SubmissionsBaseController < ApplicationController
           assessment_request: @request,
           group_comment: params[:submission][:group_comment],
           hidden: @submission.hide_grade_from_student? && admin_in_context,
-          provisional: provisional,
+          provisional:,
           final: params[:submission][:final],
           draft_comment: Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
         }
@@ -170,7 +173,7 @@ class SubmissionsBaseController < ApplicationController
 
           json_args = Submission.json_serialization_full_parameters({
                                                                       except: [:quiz_submission, :submission_history]
-                                                                    }).merge(except: submission_json_exclusions, permissions: permissions)
+                                                                    }).merge(except: submission_json_exclusions, permissions:)
           json_args[:methods] << :provisional_grade_id if provisional
 
           submissions_json = @submissions.map do |submission|
@@ -209,11 +212,12 @@ class SubmissionsBaseController < ApplicationController
       render_unauthorized_action
     elsif @assignment.locked_for?(@submission.user)
       render json: {
-        errors: {
-          message: "Assignment is locked for student.",
-          error_code: "ASSIGNMENT_LOCKED"
-        }
-      }, status: :unprocessable_entity
+               errors: {
+                 message: "Assignment is locked for student.",
+                 error_code: "ASSIGNMENT_LOCKED"
+               }
+             },
+             status: :unprocessable_entity
     else
       @submission.update!(redo_request: true)
       head :no_content
@@ -243,7 +247,7 @@ class SubmissionsBaseController < ApplicationController
   private
 
   def update_student_entered_score(score)
-    new_score = score.present? && score != "null" ? score.to_f.round(2) : nil
+    new_score = (score.present? && score != "null") ? score.to_f.round(2) : nil
     # TODO: fix this by making the callback optional
     # intentionally skipping callbacks here to fix a bug where entering a
     # what-if grade for a quiz can put the submission back in a 'pending review' state
@@ -257,7 +261,7 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def legacy_plagiarism_report(submission, asset_string, type)
-    plag_data = type == "vericite" ? submission.vericite_data : submission.turnitin_data
+    plag_data = (type == "vericite") ? submission.vericite_data : submission.turnitin_data
 
     if plag_data.dig(asset_string, :report_url).present?
       polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display: "borderless")

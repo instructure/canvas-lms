@@ -40,7 +40,7 @@ describe LtiApiController, type: :request do
   def api_path(token = nil, callback = nil)
     token ||= Lti::LogoutService.create_token(@tool, @pseudonym)
     callback ||= "http://logout.notify.example.com"
-    "/api/lti/v1/logout_service/#{token}?#{{ callback: callback }.to_query}"
+    "/api/lti/v1/logout_service/#{token}?#{{ callback: }.to_query}"
   end
 
   def make_call(opts = {})
@@ -71,7 +71,7 @@ describe LtiApiController, type: :request do
 
   it "rejects an invalid secret" do
     make_call("secret" => "not secret")
-    expect(response.status).to eql 401
+    expect(response).to have_http_status :unauthorized
     expect(response.body).to match(/Invalid authorization header/)
   end
 
@@ -80,7 +80,7 @@ describe LtiApiController, type: :request do
     # falsify the pseudonym to try and get notified when somebody else logs out
     token_parts[1] = (token_parts[1].to_i + 1).to_s
     make_call("path" => api_path(token_parts.join("-")))
-    expect(response.status).to eql 401
+    expect(response).to have_http_status :unauthorized
     expect(response.body).to match(/Invalid logout service token/)
   end
 
@@ -89,7 +89,7 @@ describe LtiApiController, type: :request do
       Lti::LogoutService.create_token(@tool, @pseudonym)
     end
     make_call("path" => api_path(token))
-    expect(response.status).to eql 401
+    expect(response).to have_http_status :unauthorized
     expect(response.body).to match(/Logout service token has expired/)
   end
 
@@ -112,7 +112,7 @@ describe LtiApiController, type: :request do
       make_call("path" => api_path(token, "http://logout.notify.example.com/123"))
       expect(response).to be_successful
       make_call("path" => api_path(token, "http://logout.notify.example.com/456"))
-      expect(response.status).to eql 401
+      expect(response).to have_http_status :unauthorized
       expect(response.body).to match(/Logout service token has already been used/)
     end
   end

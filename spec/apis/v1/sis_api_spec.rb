@@ -69,7 +69,7 @@ describe SisApiController, type: :request do
 
       it "requires :bulk_sis_grade_export feature to be enabled or post_grades tool to be installed" do
         get "/api/sis/accounts/#{context.id}/assignments", params: { account_id: context.id }
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json_parse).to include("code" => "not_enabled")
       end
 
@@ -127,7 +127,7 @@ describe SisApiController, type: :request do
           expect(response).to be_successful
 
           result = json_parse
-          expect(result.map { |h| h["course_id"] }).to match_array [course1.id, course2.id, course4.id]
+          expect(result.pluck("course_id")).to match_array [course1.id, course2.id, course4.id]
         end
 
         it "returns courses concluding after ends_after" do
@@ -151,7 +151,7 @@ describe SisApiController, type: :request do
           expect(response).to be_successful
 
           result = json_parse
-          expect(result.map { |h| h["course_id"] }).to match_array [course1.id, course2.id, course4.id]
+          expect(result.pluck("course_id")).to match_array [course1.id, course2.id, course4.id]
         end
 
         it "accepts a sis_id as the account id" do
@@ -162,7 +162,7 @@ describe SisApiController, type: :request do
           expect(response).to be_successful
 
           result = json_parse
-          assignment_ids = result.map { |a| a["id"] }
+          assignment_ids = result.pluck("id")
 
           expect(result.size).to eq(4)
           expect(assignment_ids).to include assignment8.id
@@ -189,7 +189,7 @@ describe SisApiController, type: :request do
 
       it "requires the course to be published" do
         get "/api/sis/courses/#{@course.id}/assignments", params: { course_id: @course.id }
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(json_parse).to include("code" => "unpublished_course")
       end
     end
@@ -297,7 +297,7 @@ describe SisApiController, type: :request do
         it "does not return inactive sections" do
           get "/api/sis/courses/#{@course.id}/assignments", params: { course_id: @course.id, per_page: 2, page: 3 }
           result_json = json_parse
-          section_ids = result_json[0]["sections"].map { |s| s["id"] }
+          section_ids = result_json[0]["sections"].pluck("id")
           expect(section_ids).not_to include(inactive_section8.id)
         end
 
@@ -309,7 +309,7 @@ describe SisApiController, type: :request do
           expect(response).to be_successful
 
           result = json_parse
-          assignment_ids = result.map { |a| a["id"] }
+          assignment_ids = result.pluck("id")
 
           expect(result.size).to eq(5)
           expect(assignment_ids).to include assignment4.id

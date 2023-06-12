@@ -115,17 +115,29 @@ module InstFS
       false
     end
 
-    def upload_preflight_json(context:, root_account:, user:, acting_as:, access_token:, folder:, filename:,
-                              content_type:, quota_exempt:, on_duplicate:, capture_url:, target_url: nil,
-                              progress_json: nil, include_param: nil, additional_capture_params: {})
+    def upload_preflight_json(context:,
+                              root_account:,
+                              user:,
+                              acting_as:,
+                              access_token:,
+                              folder:,
+                              filename:,
+                              content_type:,
+                              quota_exempt:,
+                              on_duplicate:,
+                              capture_url:,
+                              target_url: nil,
+                              progress_json: nil,
+                              include_param: nil,
+                              additional_capture_params: {})
       raise ArgumentError unless !!target_url == !!progress_json # these params must both be present or both absent
 
       token = upload_jwt(
-        user: user,
-        acting_as: acting_as,
-        access_token: access_token,
-        root_account: root_account,
-        capture_url: capture_url,
+        user:,
+        acting_as:,
+        access_token:,
+        root_account:,
+        capture_url:,
         capture_params: additional_capture_params.merge(
           context_type: context.class.to_s,
           context_id: context.global_id.to_s,
@@ -133,15 +145,15 @@ module InstFS
           folder_id: folder&.global_id&.to_s,
           root_account_id: root_account.global_id.to_s,
           quota_exempt: !!quota_exempt,
-          on_duplicate: on_duplicate,
+          on_duplicate:,
           progress_id: progress_json && progress_json[:id],
           include: include_param
         )
       )
 
       upload_params = {
-        filename: filename,
-        content_type: content_type
+        filename:,
+        content_type:
       }
       if target_url
         upload_params[:target_url] = target_url
@@ -151,7 +163,7 @@ module InstFS
         file_param: target_url ? nil : "file",
         progress: progress_json,
         upload_url: upload_url(token),
-        upload_params: upload_params
+        upload_params:
       }
     end
 
@@ -232,7 +244,7 @@ module InstFS
         }]
       }.to_json
 
-      response = CanvasHttp.post(export_references_url, body: body, content_type: "application/json")
+      response = CanvasHttp.post(export_references_url, body:, content_type: "application/json")
       raise InstFS::ExportReferenceError, "received code \"#{response.code}\" from service, with message \"#{response.body}\"" unless response.code.to_i == 200
 
       json_response = JSON.parse(response.body)
@@ -303,7 +315,7 @@ module InstFS
     end
 
     def upload_url(token = nil)
-      query_string = { token: token } if token
+      query_string = { token: } if token
       service_url("/files", query_string)
     end
 
@@ -375,9 +387,9 @@ module InstFS
             end
 
       claims = {
-        iat: iat,
+        iat:,
         user_id: options[:user]&.global_id&.to_s,
-        resource: resource,
+        resource:,
         jti: SecureRandom.uuid,
         host: options[:oauth_host]
       }
@@ -399,8 +411,8 @@ module InstFS
         iat: Time.now.utc.to_i,
         user_id: user.global_id.to_s,
         resource: "/files",
-        capture_url: capture_url,
-        capture_params: capture_params
+        capture_url:,
+        capture_params:
       }
       unless acting_as == user
         claims[:acting_as_user_id] = acting_as.global_id.to_s
@@ -416,7 +428,8 @@ module InstFS
                     user_id: nil,
                     host: "canvas",
                     resource: "/files",
-                  }, expires_in)
+                  },
+                  expires_in)
     end
 
     def session_jwt(user, host)
@@ -424,9 +437,10 @@ module InstFS
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
-                    host: host,
+                    host:,
                     resource: "/session/ensure"
-                  }, expires_in)
+                  },
+                  expires_in)
     end
 
     def logout_jwt(user)
@@ -435,7 +449,8 @@ module InstFS
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
                     resource: "/session"
-                  }, expires_in)
+                  },
+                  expires_in)
     end
 
     def export_references_jwt
@@ -443,7 +458,8 @@ module InstFS
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/references"
-                  }, expires_in)
+                  },
+                  expires_in)
     end
 
     def duplicate_file_jwt(instfs_uuid)
@@ -451,7 +467,8 @@ module InstFS
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}/duplicate"
-                  }, expires_in)
+                  },
+                  expires_in)
     end
 
     def delete_file_jwt(instfs_uuid)
@@ -459,7 +476,8 @@ module InstFS
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}"
-                  }, expires_in)
+                  },
+                  expires_in)
     end
 
     def parse_original_url(url)

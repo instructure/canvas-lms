@@ -45,7 +45,8 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
       Quizzes::QuizQuestion.find_ids_in_ranges do |min_id, max_id|
         Quizzes::QuizQuestion.where(id: min_id..max_id)
                              .where("updated_at > ? AND question_data LIKE ? AND (assessment_question_id IS NOT NULL OR migration_id IS NOT NULL)",
-                                    date, "%assessment_questions%").pluck(Arel.sql("id, question_data as qd")).each do |id, data|
+                                    date,
+                                    "%assessment_questions%").pluck(Arel.sql("id, question_data as qd")).each do |id, data|
           updates = links_to_change(data)
           qq_updates[id] = updates if updates.any?
         end
@@ -58,7 +59,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
         sql.sub!("replace(quiz_data", "replace(replace(quiz_data, ?, ?)")
       end
       update_sql = User.send(:sanitize_sql, [sql] + updates.to_a.flatten + [Time.now.utc])
-      Quizzes::Quiz.where(id: id).update_all(update_sql)
+      Quizzes::Quiz.where(id:).update_all(update_sql)
     end
 
     qq_updates.each do |id, updates|
@@ -67,7 +68,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
         sql.sub!("replace(question_data", "replace(replace(question_data, ?, ?)")
       end
       update_sql = User.send(:sanitize_sql, [sql] + updates.to_a.flatten + [Time.now.utc])
-      Quizzes::QuizQuestion.where(id: id).update_all(update_sql)
+      Quizzes::QuizQuestion.where(id:).update_all(update_sql)
     end
   end
 end

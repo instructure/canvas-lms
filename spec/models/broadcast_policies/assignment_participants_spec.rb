@@ -34,7 +34,7 @@ describe BroadcastPolicies::AssignmentParticipants do
     end
 
     it "excludes students in concluded sections" do
-      @section = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+      @section = @course.course_sections.create!(end_at: 1.day.ago)
       create_enrollment @course, @student, section: @section
       expect(subject.to).not_to include(@ended_section_user)
     end

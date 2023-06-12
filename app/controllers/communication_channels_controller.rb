@@ -98,7 +98,8 @@ class CommunicationChannelsController < ApplicationController
     @user = api_find(User, params[:user_id])
     return unless authorized_action(@user, @current_user, :read)
 
-    channels = Api.paginate(@user.communication_channels.unretired, self,
+    channels = Api.paginate(@user.communication_channels.unretired,
+                            self,
                             api_v1_communication_channels_url).map do |cc|
       communication_channel_json(cc, @current_user, session)
     end
@@ -117,7 +118,7 @@ class CommunicationChannelsController < ApplicationController
   #   The type of communication channel.
   #
   #   In order to enable push notification support, the server must be
-  #   properly configured (via sns.yml) to communicate with Amazon
+  #   properly configured (via `sns_creds` in Vault) to communicate with Amazon
   #   Simple Notification Services, and the developer key used to create
   #   the access token from this request must have an SNS ARN configured on
   #   it.
@@ -300,13 +301,14 @@ class CommunicationChannelsController < ApplicationController
               p.user = user
               (account_to_pseudonyms_hash[p.account] ||= []) << p
             end
-            @merge_opportunities << [user, account_to_pseudonyms_hash.each_value.map do |pseudonyms|
-              pseudonyms.detect(&:sis_user_id) || pseudonyms.min_by(&:position)
-            end]
+            @merge_opportunities << [user,
+                                     account_to_pseudonyms_hash.each_value.map do |pseudonyms|
+                                       pseudonyms.detect(&:sis_user_id) || pseudonyms.min_by(&:position)
+                                     end]
             @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
         end
-        @merge_opportunities.sort_by! { |a| [a.first == @current_user ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
+        @merge_opportunities.sort_by! { |a| [(a.first == @current_user) ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.first.name)] }
       else
         @merge_opportunities = []
       end
@@ -394,11 +396,12 @@ class CommunicationChannelsController < ApplicationController
             ps_errors = @pseudonym.errors.as_json[:errors]
             ps_errors.delete(:password_confirmation) unless params[:pseudonym][:password_confirmation]
             return render json: {
-              errors: {
-                user: @user.errors.as_json[:errors],
-                pseudonym: ps_errors
-              }
-            }, status: :bad_request
+                            errors: {
+                              user: @user.errors.as_json[:errors],
+                              pseudonym: ps_errors
+                            }
+                          },
+                          status: :bad_request
           end
 
           # They may have switched e-mail address when they logged in; create a CC if so
@@ -599,12 +602,12 @@ class CommunicationChannelsController < ApplicationController
   protected
 
   def account
-    @account ||= params[:account_id] == "self" ? @domain_root_account : Account.find(params[:account_id])
+    @account ||= (params[:account_id] == "self") ? @domain_root_account : Account.find(params[:account_id])
   end
 
   def bulk_action_args
     args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type, :order).to_unsafe_h.symbolize_keys
-    args.merge!({ account: account })
+    args.merge!({ account: })
   end
 
   def generate_bulk_report

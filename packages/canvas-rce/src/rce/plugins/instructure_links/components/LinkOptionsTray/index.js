@@ -226,7 +226,7 @@ export default function LinkOptionsTray(props) {
               textAlign="end"
             >
               <Button
-                disabled={(showText && !text) || !(url && isValidURL)}
+                disabled={(showText && text.trim().length === 0) || !(url && isValidURL)}
                 onClick={handleSave}
                 color="primary"
               >

@@ -63,7 +63,7 @@ describe CustomData do
   context "#delete_data" do
     it "deletes values" do
       @custom_data.set_data(nil, { "a" => 1, "b" => 2, "c" => 3 })
-      expect(@custom_data.delete_data("a")).to eql 1
+      expect(@custom_data.delete_data("a")).to be 1
       expect(@custom_data.get_data(nil)).to eql({ "b" => 2, "c" => 3 })
     end
 

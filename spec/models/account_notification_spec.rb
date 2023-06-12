@@ -37,7 +37,7 @@ describe AccountNotification do
   it "finds announcements only if user has a role in the list of roles to which the announcement is restricted" do
     @announcement.destroy
     role_ids = [teacher_role, admin_role].map(&:id)
-    account_notification(role_ids: role_ids, message: "Announcement 1")
+    account_notification(role_ids:, message: "Announcement 1")
     @a1 = @announcement
     account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
     @a2 = @announcement
@@ -57,7 +57,7 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@student, @account).map(&:id).sort).to eq [@a3.id]
     expect(AccountNotification.for_user_and_account(@unenrolled, @account).map(&:id).sort).to eq [@a2.id, @a3.id]
 
-    account_notification(account: Account.site_admin, role_ids: role_ids, message: "Announcement 1")
+    account_notification(account: Account.site_admin, role_ids:, message: "Announcement 1")
     @a4 = @announcement
     account_notification(account: Account.site_admin, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
     @a5 = @announcement
@@ -73,43 +73,43 @@ describe AccountNotification do
   describe "current announcements" do
     it "returns true if time matches end_at" do
       Timecop.freeze do
-        @announcement.update(start_at: Time.zone.now - 1.minute)
+        @announcement.update(start_at: 1.minute.ago)
         @announcement.update(end_at: Time.zone.now)
-        expect(@announcement.current).to eq true
+        expect(@announcement.current).to be true
       end
     end
 
     it "returns true if announcement is current" do
-      @announcement.update(start_at: Time.zone.now - 1.minute)
-      @announcement.update(end_at: Time.zone.now + 1.minute)
-      expect(@announcement.current).to eq true
+      @announcement.update(start_at: 1.minute.ago)
+      @announcement.update(end_at: 1.minute.from_now)
+      expect(@announcement.current).to be true
     end
 
     it "returns false if announcement is past" do
-      @announcement.update(start_at: Time.zone.now - 2.minutes)
-      @announcement.update(end_at: Time.zone.now - 1.minute)
-      expect(@announcement.current).to eq false
+      @announcement.update(start_at: 2.minutes.ago)
+      @announcement.update(end_at: 1.minute.ago)
+      expect(@announcement.current).to be false
     end
   end
 
   describe "past announcements" do
     it "returns true if announcement is past" do
-      @announcement.update(start_at: Time.zone.now - 2.minutes)
-      @announcement.update(end_at: Time.zone.now - 1.minute)
-      expect(@announcement.past).to eq true
+      @announcement.update(start_at: 2.minutes.ago)
+      @announcement.update(end_at: 1.minute.ago)
+      expect(@announcement.past).to be true
     end
 
     it "returns false if announcement is current" do
-      @announcement.update(start_at: Time.zone.now - 1.minute)
-      @announcement.update(end_at: Time.zone.now + 1.minute)
-      expect(@announcement.past).to eq false
+      @announcement.update(start_at: 1.minute.ago)
+      @announcement.update(end_at: 1.minute.from_now)
+      expect(@announcement.past).to be false
     end
   end
 
   it "sorts" do
     @announcement.destroy
     role_ids = ["TeacherEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: Account.default.id).id }
-    account_notification(role_ids: role_ids, message: "Announcement 1")
+    account_notification(role_ids:, message: "Announcement 1")
     @a1 = @announcement
     account_notification(account: @account, role_ids: [nil], message: "Announcement 2") # students not currently taking a course
     @a2 = @announcement
@@ -299,7 +299,8 @@ describe AccountNotification do
 
       other_sub_account = Account.default.sub_accounts.create!
       course_with_student(user: @user, account: other_sub_account, active_all: true)
-      other_sub_announcement = sub_account_notification(subject: "blah", account: other_sub_account,
+      other_sub_announcement = sub_account_notification(subject: "blah",
+                                                        account: other_sub_account,
                                                         role_ids: [teacher_role.id])
       # should not show to user because they're not a teacher in this subaccount
 
@@ -309,7 +310,8 @@ describe AccountNotification do
     it "still shows to roles nested within the sub-accounts" do
       sub_sub_account = @sub_account.sub_accounts.create!
       course_with_teacher(user: @user, account: sub_sub_account, active_all: true)
-      sub_announcement = sub_account_notification(subject: "blah", account: @sub_account,
+      sub_announcement = sub_account_notification(subject: "blah",
+                                                  account: @sub_account,
                                                   role_ids: [teacher_role.id])
 
       expect(AccountNotification.for_user_and_account(@user, Account.default)).to include(sub_announcement)
@@ -330,23 +332,23 @@ describe AccountNotification do
 
     describe "display_for_user?" do
       it "selects each mod value once throughout the cycle" do
-        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-04-02"))).to eq false
-        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-04-02"))).to eq false
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to eq true
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-04-02"))).to be false
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-04-02"))).to be false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to be true
 
-        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-05-05"))).to eq true
-        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-05-05"))).to eq false
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-05-05"))).to eq false
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-05-05"))).to be true
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-05-05"))).to be false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-05-05"))).to be false
 
-        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-06-04"))).to eq false
-        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-06-04"))).to eq true
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-06-04"))).to eq false
+        expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse("2012-06-04"))).to be false
+        expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse("2012-06-04"))).to be true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-06-04"))).to be false
       end
 
       it "shifts the mod values each new cycle" do
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to eq true
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-07-02"))).to eq false
-        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-09-02"))).to eq true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-04-02"))).to be true
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-07-02"))).to be false
+        expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse("2012-09-02"))).to be true
       end
     end
 
@@ -420,9 +422,9 @@ describe AccountNotification do
 
         # just make something for every account
         @accounts.each do |k, account|
-          @account_admins[k] = account_admin_user(active_all: true, account: account)
-          @custom_admins[k] = account_admin_user(active_all: true, account: account, role: @custom_admin_role)
-          @courses[k] = course_factory(active_all: true, account: account)
+          @account_admins[k] = account_admin_user(active_all: true, account:)
+          @custom_admins[k] = account_admin_user(active_all: true, account:, role: @custom_admin_role)
+          @courses[k] = course_factory(active_all: true, account:)
           @teachers[k] = @courses[k].teachers.first
           @students[k] = student_in_course(active_all: true, course: @courses[k]).user
           @users[k] = [@account_admins[k], @custom_admins[k], @teachers[k], @students[k]]
@@ -527,8 +529,10 @@ describe AccountNotification do
       end
 
       it "queues a job to send_message when announcement starts" do
-        an = account_notification(account: Account.default, send_message: true,
-                                  start_at: 1.day.from_now, end_at: 2.days.from_now)
+        an = account_notification(account: Account.default,
+                                  send_message: true,
+                                  start_at: 1.day.from_now,
+                                  end_at: 2.days.from_now)
         job = Delayed::Job.where(tag: "AccountNotification#broadcast_messages").last
         expect(job.singleton).to include(an.global_id.to_s)
         expect(job.run_at.to_i).to eq an.start_at.to_i
@@ -538,7 +542,7 @@ describe AccountNotification do
         an = account_notification(account: Account.default)
         an.messages_sent_at = 1.day.ago
         an.send_message = true
-        expect { an.save! }.to change(Delayed::Job, :count).by(0)
+        expect { an.save! }.not_to change(Delayed::Job, :count)
       end
     end
 
@@ -692,16 +696,16 @@ describe AccountNotification do
       it "finds notifications on cross-sharded sub-accounts properly" do
         # and perhaps more importantly, don't find notifications for accounts the user doesn't belong in
         id = 1
-        while [Shard.default, @shard2].any? { |s| s.activate { Account.where(id: id).exists? } } # make sure this id is free
+        while [Shard.default, @shard2].any? { |s| s.activate { Account.where(id:).exists? } } # make sure this id is free
           id += 1 #
         end
 
-        @tricky_sub_acc = @account1.sub_accounts.create!(id: id) # create it with the id
+        @tricky_sub_acc = @account1.sub_accounts.create!(id:) # create it with the id
         # they don't belong to this sub-account so they shouldn't see this notification
         @not_visible = account_notification(account: @tricky_sub_acc)
 
         @shard2.activate do
-          @shard2_subaccount = @shard2_account.sub_accounts.create!(id: id) # create with same local id
+          @shard2_subaccount = @shard2_account.sub_accounts.create!(id:) # create with same local id
           @shard2_course2 = course_with_student(account: @shard2_subaccount, user: @user, active_all: true)
           @visible = account_notification(account: @shard2_subaccount, role_ids: [student_role.id])
         end

@@ -38,7 +38,7 @@ class AssignmentsController < ApplicationController
   add_crumb(
     proc { t "#crumbs.assignments", "Assignments" },
     except: %i[destroy syllabus index new edit]
-  ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
+  ) { |c| c.send :course_assignments_path, c.instance_variable_get(:@context) }
   before_action(except: [:new, :edit]) { |c| c.active_tab = "assignments" }
   before_action(only: [:new, :edit]) { |c| setup_active_tab(c) }
   before_action :normalize_title_param, only: [:new, :edit]
@@ -78,11 +78,12 @@ class AssignmentsController < ApplicationController
           QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
           MODERATED_GRADING_GRADER_LIMIT: Course::MODERATED_GRADING_GRADER_LIMIT,
+          SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
           FLAGS: {
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
-            new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
-            new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
-          }
+            show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
+          },
+          grading_scheme: @context.grading_standard_or_default.data
         }
 
         set_default_tool_env!(@context, hash)
@@ -136,14 +137,16 @@ class AssignmentsController < ApplicationController
                  end
 
     peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
-    peer_review_available = submission.present? && @assignment.submitted?(submission: submission) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
+    peer_review_available = submission.present? && @assignment.submitted?(submission:) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
 
     js_env({
              a2_student_view: render_a2_student_view?,
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
-             peer_review_available: peer_review_available,
+             peer_review_available:,
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
-             originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2)
+             originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
+             restrict_quantitative_data: @assignment.restrict_quantitative_data?(@current_user),
+             grading_scheme: @context.grading_standard_or_default.data
            })
 
     if peer_review_mode_enabled
@@ -416,6 +419,8 @@ class AssignmentsController < ApplicationController
         user_has_google_drive
 
         @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
+        @can_link_to_speed_grader = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.can_view_speed_grader?(@current_user)
+
         @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
@@ -431,10 +436,11 @@ class AssignmentsController < ApplicationController
         mastery_scales_js_env
 
         render locals: {
-          eula_url: tool_eula_url,
-          show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user),
-          show_confetti: params[:confetti] == "true" && @domain_root_account&.feature_enabled?(:confetti_for_assignments)
-        }, stream: can_stream_template?
+                 eula_url: tool_eula_url,
+                 show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user),
+                 show_confetti: params[:confetti] == "true" && @domain_root_account&.feature_enabled?(:confetti_for_assignments)
+               },
+               stream: can_stream_template?
       end
     end
   end
@@ -460,7 +466,7 @@ class AssignmentsController < ApplicationController
 
   def downloadable_submissions?(current_user, context, assignment)
     types = %w[online_upload online_url online_text_entry]
-    return unless (assignment.submission_types.split(",") & types).any? && current_user
+    return unless assignment.submission_types.split(",").intersect?(types) && current_user
 
     student_ids =
       if assignment.grade_as_group?
@@ -594,8 +600,10 @@ class AssignmentsController < ApplicationController
       @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
     )
     @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
-      @context, type: :course_home_sub_navigation,
-                root_account: @domain_root_account, current_user: @current_user
+      @context,
+      type: :course_home_sub_navigation,
+      root_account: @domain_root_account,
+      current_user: @current_user
     ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
@@ -615,9 +623,7 @@ class AssignmentsController < ApplicationController
       set_tutorial_js_env
 
       log_asset_access(["syllabus", @context], "syllabus", "other")
-      respond_to do |format|
-        format.html
-      end
+      respond_to(&:html)
     end
   end
 
@@ -669,7 +675,7 @@ class AssignmentsController < ApplicationController
           if @assignment.save
             flash[:notice] = t "notices.created", "Assignment was successfully created."
             format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-            format.json { render json: @assignment.as_json(permissions: { user: @current_user, session: session }), status: :created }
+            format.json { render json: @assignment.as_json(permissions: { user: @current_user, session: }), status: :created }
           else
             format.html { render :new }
             format.json { render json: @assignment.errors, status: :bad_request }
@@ -767,7 +773,11 @@ class AssignmentsController < ApplicationController
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         VALID_DATE_RANGE: CourseDateRange.new(@context),
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED:
-          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button)
+          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button),
+        HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED:
+          Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option),
+        GRADING_SCHEME_UPDATES_ENABLED:
+          Account.site_admin.feature_enabled?(:grading_scheme_updates)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
@@ -789,6 +799,7 @@ class AssignmentsController < ApplicationController
       hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil
       hash[:SELECTED_CONFIG_TOOL_TYPE] = selected_tool ? selected_tool.class.to_s : nil
       hash[:REPORT_VISIBILITY_SETTING] = @assignment.turnitin_settings[:originality_report_visibility]
+      hash[:SHOW_SPEED_GRADER_LINK] = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.published? && @assignment.can_view_speed_grader?(@current_user)
 
       if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
@@ -800,7 +811,8 @@ class AssignmentsController < ApplicationController
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
-      hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection, @context,
+      hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection,
+                                                                             @context,
                                                                              %i[base_title external_url selection_width selection_height])
 
       append_sis_data(hash)
@@ -819,6 +831,7 @@ class AssignmentsController < ApplicationController
       end
 
       hash[:USAGE_RIGHTS_REQUIRED] = @context.try(:usage_rights_required?)
+      hash[:restrict_quantitative_data] = @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
 
       js_env(hash)
       conditional_release_js_env(@assignment)
@@ -945,7 +958,7 @@ class AssignmentsController < ApplicationController
         title: @assignment.title
       },
       CURRENT_USER: {
-        can_view_grader_identities: can_view_grader_identities,
+        can_view_grader_identities:,
         can_view_student_identities: @assignment.can_view_student_names?(@current_user),
         grader_id: current_grader_id,
         id: @current_user.id
@@ -964,15 +977,43 @@ class AssignmentsController < ApplicationController
 
   def strong_assignment_params
     params.require(:assignment)
-          .permit(:title, :name, :description, :due_at, :points_possible,
-                  :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-                  :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
-                  :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
-                  :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-                  :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
-                  :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
-                  :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
-                  :omit_from_final_grade, :intra_group_peer_reviews, :important_dates,
+          .permit(:title,
+                  :name,
+                  :description,
+                  :due_at,
+                  :points_possible,
+                  :grading_type,
+                  :submission_types,
+                  :assignment_group,
+                  :unlock_at,
+                  :lock_at,
+                  :group_category,
+                  :group_category_id,
+                  :peer_review_count,
+                  :anonymous_peer_reviews,
+                  :peer_reviews_due_at,
+                  :peer_reviews_assign_at,
+                  :grading_standard_id,
+                  :peer_reviews,
+                  :automatic_peer_reviews,
+                  :grade_group_students_individually,
+                  :notify_of_update,
+                  :time_zone_edited,
+                  :turnitin_enabled,
+                  :vericite_enabled,
+                  :context,
+                  :position,
+                  :external_tool_tag_attributes,
+                  :freeze_on_copy,
+                  :only_visible_to_overrides,
+                  :post_to_sis,
+                  :sis_assignment_id,
+                  :integration_id,
+                  :moderated_grading,
+                  :omit_from_final_grade,
+                  :hide_in_gradebook,
+                  :intra_group_peer_reviews,
+                  :important_dates,
                   allowed_extensions: strong_anything,
                   turnitin_settings: strong_anything,
                   integration_data: strong_anything)
@@ -1053,7 +1094,7 @@ class AssignmentsController < ApplicationController
   end
 
   def on_quizzes_page?
-    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) && \
+    @context.root_account.feature_enabled?(:newquizzes_on_quiz_page) &&
       @context.feature_enabled?(:quizzes_next) && @context.quiz_lti_tool.present?
   end
 

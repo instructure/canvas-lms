@@ -67,8 +67,8 @@ module CoursePacesDateHelpers
         end.flatten
 
       {
-        work_week: work_week,
-        holidays: holidays,
+        work_week:,
+        holidays:,
       }
     end
   end

@@ -40,10 +40,10 @@ module UserLearningObjectScopes
   def ignore_item!(asset, purpose, permanent = false)
     begin
       # more likely this doesn't exist, so try the create first
-      asset.ignores.create!(user: self, purpose: purpose, permanent: permanent)
+      asset.ignores.create!(user: self, purpose:, permanent:)
     rescue ActiveRecord::RecordNotUnique
       asset.shard.activate do
-        ignore = asset.ignores.where(user_id: self, purpose: purpose).first
+        ignore = asset.ignores.where(user_id: self, purpose:).first
         ignore.permanent = permanent
         ignore.save!
       end
@@ -52,12 +52,16 @@ module UserLearningObjectScopes
   end
 
   def assignments_visible_in_course(course)
-    return course.active_assignments if course.grants_any_right?(self, :read_as_admin, :manage_grades,
+    return course.active_assignments if course.grants_any_right?(self,
+                                                                 :read_as_admin,
+                                                                 :manage_grades,
                                                                  *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
     published_visible_assignments = course.active_assignments.published
     DifferentiableAssignment.scope_filter(published_visible_assignments,
-                                          self, course, is_teacher: false)
+                                          self,
+                                          course,
+                                          is_teacher: false)
   end
 
   # everything is relative to the user's shard
@@ -99,16 +103,27 @@ module UserLearningObjectScopes
   end
 
   def objects_needing(
-    object_type, purpose, participation_type, params, expires_in,
-    limit: ULOS_DEFAULT_LIMIT, scope_only: false,
-    course_ids: nil, group_ids: nil, contexts: nil, include_concluded: false,
-    include_ignored: false, include_ungraded: false
+    object_type,
+    purpose,
+    participation_type,
+    params,
+    expires_in,
+    limit: ULOS_DEFAULT_LIMIT,
+    scope_only: false,
+    course_ids: nil,
+    group_ids: nil,
+    contexts: nil,
+    include_concluded: false,
+    include_ignored: false,
+    include_ungraded: false
   )
     original_shard = Shard.current
     shard.activate do
       course_ids = course_ids_for_todo_lists(participation_type,
-                                             course_ids: course_ids, contexts: contexts, include_concluded: include_concluded)
-      group_ids = group_ids_for_todo_lists(group_ids: group_ids, contexts: contexts)
+                                             course_ids:,
+                                             contexts:,
+                                             include_concluded:)
+      group_ids = group_ids_for_todo_lists(group_ids:, contexts:)
       ids_by_shard = Hash.new({ course_ids: [], group_ids: [] })
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         ids_by_shard[Shard.current] = { course_ids: shard_course_ids, group_ids: [] }
@@ -126,26 +141,34 @@ module UserLearningObjectScopes
           shard_group_ids = ids_by_shard.dig(original_shard, :group_ids)
           if shard_course_ids.present? || shard_group_ids.present?
             return yield(*arguments_for_objects_needing(
-              object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
-              include_ignored: include_ignored,
-              include_ungraded: include_ungraded
+              object_type,
+              purpose,
+              shard_course_ids,
+              shard_group_ids,
+              participation_type,
+              include_ignored:,
+              include_ungraded:
             ))
           end
           return object_type.constantize.none # fallback
         end
       else
-        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join("/"))
-        params_cache_key = Digest::MD5.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
+        course_ids_cache_key = Digest::SHA256.hexdigest(course_ids.sort.join("/"))
+        params_cache_key = Digest::SHA256.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
 
-        Rails.cache.fetch_with_batched_keys(cache_key, expires_in: expires_in, batch_object: self, batched_keys: :todo_list) do
+        Rails.cache.fetch_with_batched_keys(cache_key, expires_in:, batch_object: self, batched_keys: :todo_list) do
           result = GuardRail.activate(:secondary) do
             ids_by_shard.flat_map do |shard, shard_hash|
               shard.activate do
                 yield(*arguments_for_objects_needing(
-                  object_type, purpose, shard_hash[:course_ids], shard_hash[:group_ids], participation_type,
-                  include_ignored: include_ignored,
-                  include_ungraded: include_ungraded
+                  object_type,
+                  purpose,
+                  shard_hash[:course_ids],
+                  shard_hash[:group_ids],
+                  participation_type,
+                  include_ignored:,
+                  include_ungraded:
                 ))
               end
             end
@@ -158,7 +181,11 @@ module UserLearningObjectScopes
   end
 
   def arguments_for_objects_needing(
-    object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
+    object_type,
+    purpose,
+    shard_course_ids,
+    shard_group_ids,
+    participation_type,
     include_ignored: false,
     include_ungraded: false
   )
@@ -166,7 +193,7 @@ module UserLearningObjectScopes
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
     scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
     if object_type == "Assignment"
-      scope = participation_type == :student ? scope.published : scope.active
+      scope = (participation_type == :student) ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
     end
     [scope, shard_course_ids, shard_group_ids]
@@ -182,10 +209,21 @@ module UserLearningObjectScopes
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing("Assignment", purpose, :student, params, cache_timeout,
-                    limit: limit, **opts) do |assignment_scope|
+    objects_needing("Assignment",
+                    purpose,
+                    :student,
+                    params,
+                    cache_timeout,
+                    limit:,
+                    **opts) do |assignment_scope|
       assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
-      assignments = assignments.visible_to_students_in_course_with_da(id, opts[:course_ids]) if opts[:course_ids].present?
+
+      if opts[:course_ids].present?
+        active_enrollment_course_ids = Enrollment.where(Enrollment.active_student_conditions)
+                                                 .where(user_id: id, course_id: opts[:course_ids]).pluck(:course_id)
+        assignments = assignments.visible_to_students_in_course_with_da(id, active_enrollment_course_ids)
+      end
+
       assignments = assignments.need_submitting_info(id, limit) if purpose == "submitting"
       assignments = assignments.having_submissions_for_user(id) if purpose == "submitted"
       if purpose == "submitting"
@@ -208,7 +246,7 @@ module UserLearningObjectScopes
     assignments = assignments_for_student("submitting", **params)
     return assignments if scope_only
 
-    select_available_assignments(assignments, include_concluded: include_concluded)
+    select_available_assignments(assignments, include_concluded:)
   end
 
   def submitted_assignments(
@@ -220,7 +258,7 @@ module UserLearningObjectScopes
     assignments = assignments_for_student("submitted", **params)
     return assignments if scope_only
 
-    select_available_assignments(assignments, include_concluded: include_concluded)
+    select_available_assignments(assignments, include_concluded:)
   end
 
   def ungraded_quizzes(
@@ -244,7 +282,7 @@ module UserLearningObjectScopes
       quizzes = quizzes.need_submitting_info(id, limit) if needing_submitting
       return quizzes if scope_only
 
-      select_available_assignments(quizzes, include_concluded: include_concluded)
+      select_available_assignments(quizzes, include_concluded:)
     end
   end
 
@@ -307,10 +345,12 @@ module UserLearningObjectScopes
               .where(grader_enrollments: { workflow_state: "active", user_id: self, type: ["TeacherEnrollment", "TaEnrollment"] })
               .where("grader_enrollments.limit_privileges_to_course_section = 'f'
         OR grader_enrollments.course_section_id = enrollments.course_section_id")
-              .where("NOT EXISTS (?)",
-                     Ignore.where(asset_type: "Assignment",
-                                  user_id: self,
-                                  purpose: "grading").where("asset_id=submissions.assignment_id")).count
+              .where.not(
+                Ignore.where(asset_type: "Assignment",
+                             user_id: self,
+                             purpose: "grading").where("asset_id=submissions.assignment_id")
+                           .arel.exists
+              ).count
   end
 
   def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
@@ -331,7 +371,7 @@ module UserLearningObjectScopes
                                         .where("student_enrollments.user_id=submissions_needing_grading.user_id AND student_enrollments.workflow_state='active'")
                                         .where("(enrollments.limit_privileges_to_course_section='f' OR student_enrollments.course_section_id=enrollments.course_section_id)")
         as = assignment_scope.joins("INNER JOIN (#{submissions_needing_grading.to_sql}) AS submissions_needing_grading ON assignments.id=submissions_needing_grading.assignment_id")
-                             .where("EXISTS(?)", student_enrollments)
+                             .where(student_enrollments.arel.exists)
       else
         as = assignment_scope
              .where("EXISTS (#{grader_visible_submissions_sql})")

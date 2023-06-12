@@ -49,7 +49,7 @@ class Mutations::SetFriendlyDescription < Mutations::BaseMutation
     validate!(context, outcome)
 
     friendly_description = OutcomeFriendlyDescription.find_or_initialize_by(
-      context: context,
+      context:,
       learning_outcome: outcome
     )
 
@@ -94,7 +94,7 @@ class Mutations::SetFriendlyDescription < Mutations::BaseMutation
       unless context
         raise GraphQL::ExecutionError, I18n.t(
           "No such context for %{context_type}#%{context_id}",
-          context_type: context_type,
+          context_type:,
           context_id: context_id.to_s
         )
       end

@@ -106,14 +106,14 @@ describe LtiOutbound::ToolLaunch do
 
   let(:tool_launch) do
     LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",
-                                tool: tool,
-                                user: user,
-                                account: account,
+                                tool:,
+                                user:,
+                                account:,
                                 context: course,
                                 link_code: "123456",
                                 return_url: "http://www.google.com",
                                 outgoing_email_address: "outgoing_email_address",
-                                variable_expander: variable_expander,
+                                variable_expander:,
                                 include_module_context: true)
   end
 
@@ -169,14 +169,14 @@ describe LtiOutbound::ToolLaunch do
     describe "selected_html" do
       it "gets escaped and assigned to the key text if passed in" do
         tool_launch = LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",
-                                                  tool: tool,
-                                                  user: user,
-                                                  account: account,
+                                                  tool:,
+                                                  user:,
+                                                  account:,
                                                   context: course,
                                                   link_code: "123456",
                                                   return_url: "http://www.google.com",
                                                   selected_html: "<div>something</div>",
-                                                  variable_expander: variable_expander)
+                                                  variable_expander:)
 
         hash = tool_launch.generate
 
@@ -185,13 +185,13 @@ describe LtiOutbound::ToolLaunch do
 
       it "does not include the key if missing" do
         tool_launch = LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",
-                                                  tool: tool,
-                                                  user: user,
-                                                  account: account,
+                                                  tool:,
+                                                  user:,
+                                                  account:,
                                                   context: course,
                                                   link_code: "123456",
                                                   return_url: "http://www.google.com",
-                                                  variable_expander: variable_expander)
+                                                  variable_expander:)
 
         hash = tool_launch.generate
 
@@ -209,13 +209,13 @@ describe LtiOutbound::ToolLaunch do
 
     it "adds account info in launch data for account navigation" do
       hash = LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",
-                                         tool: tool,
-                                         user: user,
-                                         account: account,
+                                         tool:,
+                                         user:,
+                                         account:,
                                          context: account,
                                          link_code: "123456",
                                          return_url: "http://www.google.com",
-                                         variable_expander: variable_expander).generate
+                                         variable_expander:).generate
       expect(hash["custom_canvas_account_id"]).to eq "$Canvas.account.id"
       expect(hash["custom_canvas_account_sis_id"]).to eq "$Canvas.account.sisSourceId"
       expect(hash["custom_canvas_user_login_id"]).to eq "$Canvas.user.loginId"
@@ -223,13 +223,13 @@ describe LtiOutbound::ToolLaunch do
 
     it "adds account and user info in launch data for user profile launch" do
       hash = LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",
-                                         tool: tool,
-                                         user: user,
+                                         tool:,
+                                         user:,
                                          account: consumer_instance,
                                          context: user,
                                          link_code: "123456",
                                          return_url: "http://www.google.com",
-                                         variable_expander: variable_expander).generate
+                                         variable_expander:).generate
       expect(hash["custom_canvas_account_id"]).to eq "$Canvas.account.id"
       expect(hash["custom_canvas_account_sis_id"]).to eq "$Canvas.account.sisSourceId"
       expect(hash["lis_person_sourcedid"]).to eq "$Person.sourcedId"
@@ -239,13 +239,13 @@ describe LtiOutbound::ToolLaunch do
 
     it "does not allow overwriting other parameters from the URI query string" do
       hash = LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com?user_id=ATTEMPT_TO_SET_DATA&oauth_callback=ATTEMPT_TO_SET_DATA",
-                                         tool: tool,
-                                         user: user,
-                                         account: account,
+                                         tool:,
+                                         user:,
+                                         account:,
                                          context: course,
                                          link_code: "123456",
                                          return_url: "http://www.google.com",
-                                         variable_expander: variable_expander).generate
+                                         variable_expander:).generate
       expect(hash["user_id"]).to eq "user_opaque_identifier"
       expect(hash["oauth_callback"]).to eq "about:blank"
     end
@@ -265,7 +265,7 @@ describe LtiOutbound::ToolLaunch do
       expect(hash["custom_bob"]).to eql("bob")
       expect(hash["custom_fred"]).to eql("fred")
       expect(hash["custom_john"]).to eql("john")
-      expect(hash["custom___taa____"]).to eql(123)
+      expect(hash["custom___taa____"]).to be(123)
       expect(hash).to_not have_key '@$TAA$#$#'
       expect(hash).to_not have_key "john"
     end
@@ -285,15 +285,15 @@ describe LtiOutbound::ToolLaunch do
       let(:tool_launch) do
         LtiOutbound::ToolLaunch.new(
           url: "http://www.yahoo.com",
-          tool: tool,
-          user: user,
-          account: account,
+          tool:,
+          user:,
+          account:,
           context: course,
           link_code: "123456",
           return_url: "http://www.google.com",
           outgoing_email_address: "outgoing_email_address",
-          variable_expander: variable_expander,
-          link_params: link_params
+          variable_expander:,
+          link_params:
         )
       end
 
@@ -329,9 +329,9 @@ describe LtiOutbound::ToolLaunch do
     it "includes email if email_only" do
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY
       hash = tool_launch.generate
-      expect(hash["lis_person_name_given"]).to eq nil
-      expect(hash["lis_person_name_family"]).to eq nil
-      expect(hash["lis_person_name_full"]).to eq nil
+      expect(hash["lis_person_name_given"]).to be_nil
+      expect(hash["lis_person_name_family"]).to be_nil
+      expect(hash["lis_person_name_full"]).to be_nil
       expect(hash["lis_person_contact_email_primary"]).to eq "nobody@example.com"
     end
 
@@ -355,30 +355,32 @@ describe LtiOutbound::ToolLaunch do
     it "gets the correct width and height based on resource type" do
       tool.settings = { editor_button: { selection_width: 1000, selection_height: 300, icon_url: "www.example.com/icon", url: "www.example.com" } }
       hash = LtiOutbound::ToolLaunch.new(url: "http://www.yahoo.com",
-                                         tool: tool,
-                                         user: user,
-                                         account: account,
+                                         tool:,
+                                         user:,
+                                         account:,
                                          context: course,
                                          link_code: "123456",
                                          return_url: "http://www.yahoo.com",
                                          resource_type: "editor_button",
-                                         variable_expander: variable_expander).generate
+                                         variable_expander:).generate
       expect(hash["launch_presentation_width"]).to eq 1000
       expect(hash["launch_presentation_height"]).to eq 300
     end
 
     it "does not copy query params to POST body if disable_lti_post_only feature flag is set" do
-      tool.settings = { editor_button: { selection_width: 1000, selection_height: 300,
-                                         icon_url: "www.example.com/icon", url: "www.example.com" } }
+      tool.settings = { editor_button: { selection_width: 1000,
+                                         selection_height: 300,
+                                         icon_url: "www.example.com/icon",
+                                         url: "www.example.com" } }
       hash = LtiOutbound::ToolLaunch.new(url: "http://www.instructure.com?first=weston&last=dransfield",
-                                         tool: tool,
-                                         user: user,
-                                         account: account,
+                                         tool:,
+                                         user:,
+                                         account:,
                                          context: course,
                                          link_code: "123456",
                                          return_url: "http://www.yahoo.com",
                                          resource_type: "editor_button",
-                                         variable_expander: variable_expander,
+                                         variable_expander:,
                                          disable_lti_post_only: true).generate
       expect(hash).not_to have_key("first")
     end
@@ -449,7 +451,7 @@ describe LtiOutbound::ToolLaunch do
 
       hash = tool_launch.generate
 
-      expect(hash["ext_content_file_extensions"]).to eq nil
+      expect(hash["ext_content_file_extensions"]).to be_nil
     end
   end
 end

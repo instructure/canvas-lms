@@ -30,7 +30,7 @@ module EpubExports
       unless @_offline_export
         @_offline_export = course.send(export_type.to_s.pluralize).visible_to(user).running.first
         @_offline_export ||= course.send(export_type.to_s.pluralize).build({
-                                                                             user: user
+                                                                             user:
                                                                            })
       end
       @_offline_export

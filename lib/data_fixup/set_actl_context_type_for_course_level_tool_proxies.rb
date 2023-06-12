@@ -67,7 +67,7 @@ module DataFixup::SetActlContextTypeForCourseLevelToolProxies
     def context_ids_with_tool(context_type)
       Lti::ToolProxy.active.where(
         product_family_id: product_family.id,
-        context_type: context_type
+        context_type:
       ).pluck(:context_id)
     end
 

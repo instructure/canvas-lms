@@ -138,7 +138,7 @@
           <p><%= t('Download the complete list of errors and warnings here.') %>
           <%= link_to "<i class='icon-download'></i>".html_safe,
                       file_download_url(@last_batch.errors_attachment,
-                                        verifier: @last_batch.errors_attachment.uuid,
+                                        verifier: sis_import_error_attachment_token(@last_batch),
                                         download: '1',
                                         download_frd: '1'),
                       'aria-label' => t('Download errors_attchment'),
@@ -154,7 +154,7 @@
           <p><%= t('Download the complete list of errors and warnings here.') %>
             <%= link_to "<i class='icon-download'></i>".html_safe,
                         file_download_url(@last_batch.errors_attachment,
-                                          verifier: @last_batch.errors_attachment.uuid,
+                                          verifier: sis_import_error_attachment_token(@last_batch),
                                           download: '1',
                                           download_frd: '1'),
                         'aria-label' => t('Download errors_attchment'),

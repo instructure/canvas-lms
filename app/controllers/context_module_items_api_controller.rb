@@ -281,6 +281,7 @@ class ContextModuleItemsApiController < ApplicationController
       if includes.include?("mastery_paths")
         opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, session)
       end
+      opts[:can_view_published] = @context.grants_right?((@student || @current_user), session, :read_as_admin)
       render json: items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
   end
@@ -307,7 +308,8 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       get_module_item
       prog = @student ? @module.evaluate_for(@student) : nil
-      render json: module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]))
+      opts = { can_view_published: @context.grants_right?((@student || @current_user), session, :read_as_admin) }
+      render json: module_item_json(@item, @student || @current_user, session, @module, prog, Array(params[:include]), opts)
     end
   end
 
@@ -738,7 +740,7 @@ class ContextModuleItemsApiController < ApplicationController
           assignment_id: new_tag.assignment.try(:id),
           is_duplicate_able: new_tag.duplicate_able?
         )
-        render json: json
+        render json:
       else
         render status: :bad_request, json: { message: t("Item cannot be duplicated") }
       end

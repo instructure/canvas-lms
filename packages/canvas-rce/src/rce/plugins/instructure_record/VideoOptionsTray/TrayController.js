@@ -22,6 +22,8 @@ import ReactDOM from 'react-dom'
 import bridge from '../../../../bridge'
 import {asVideoElement, findMediaPlayerIframe} from '../../shared/ContentSelection'
 import VideoOptionsTray from '.'
+import {isStudioEmbeddedMedia, parseStudioOptions} from '../../shared/StudioLtiSupportUtils'
+import RCEGlobals from '../../../RCEGlobals'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
 
@@ -117,16 +119,23 @@ export default class TrayController {
         this._editor.selection.select(link)
         this.$videoContainer = null
       }
+
+      const data = {
+        media_object_id: videoOptions.media_object_id,
+        title: videoOptions.titleText,
+        subtitles: videoOptions.subtitles,
+      }
+
+      if (RCEGlobals.getFeatures().media_links_use_attachment_id) {
+        data.attachment_id = videoOptions.attachment_id
+      }
+
       // If the video just edited came from a file uploaded to canvas
       // and not notorious, we probably don't have a media_object_id.
       // If not, we can't update the MediaObject in the canvas db.
       if (videoOptions.media_object_id && videoOptions.media_object_id !== 'undefined') {
         videoOptions
-          .updateMediaObject({
-            media_object_id: videoOptions.media_object_id,
-            title: videoOptions.titleText,
-            subtitles: videoOptions.subtitles,
-          })
+          .updateMediaObject(data)
           .then(_r => {
             if (this.$videoContainer && videoOptions.displayAs === 'embed') {
               this.$videoContainer.contentWindow.postMessage(
@@ -145,7 +154,7 @@ export default class TrayController {
 
   _dismissTray() {
     if (this.$videoContainer) {
-      this._editor.selection.select(this.$videoContainer)
+      this._editor?.selection?.select(this.$videoContainer)
     }
     this._shouldOpen = false
     this._renderTray()
@@ -183,6 +192,11 @@ export default class TrayController {
         onRequestClose={() => this._dismissTray()}
         open={this._shouldOpen}
         trayProps={trayProps}
+        studioOptions={
+          isStudioEmbeddedMedia(this.$videoContainer)
+            ? parseStudioOptions(this.$videoContainer)
+            : null
+        }
       />
     )
     ReactDOM.render(element, this.$container)

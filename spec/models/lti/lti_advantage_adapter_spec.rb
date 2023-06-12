@@ -32,7 +32,7 @@ describe Lti::LtiAdvantageAdapter do
     allow(controller).to receive(:params)
     controller
   end
-  let(:expander_opts) { { current_user: user, tool: tool, controller: controller_double } }
+  let(:expander_opts) { { current_user: user, tool:, controller: controller_double } }
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -41,14 +41,16 @@ describe Lti::LtiAdvantageAdapter do
       expander_opts
     )
   end
+  let(:include_storage_target) { true }
   let(:adapter) do
     Lti::LtiAdvantageAdapter.new(
-      tool: tool,
-      user: user,
+      tool:,
+      user:,
       context: course,
-      return_url: return_url,
-      expander: expander,
-      opts: opts
+      return_url:,
+      expander:,
+      include_storage_target:,
+      opts:
     )
   end
   let(:tool) do
@@ -69,7 +71,7 @@ describe Lti::LtiAdvantageAdapter do
   let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
   let(:assignment) do
     assignment_model(
-      course: course,
+      course:,
       submission_types: "external_tool",
       external_tool_tag_attributes: { content: tool }
     )
@@ -104,7 +106,7 @@ describe Lti::LtiAdvantageAdapter do
         {
           resource_type: "course_navigation",
           domain: "test.com",
-          launch_url: launch_url
+          launch_url:
         }
       end
 
@@ -125,39 +127,52 @@ describe Lti::LtiAdvantageAdapter do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end
 
-    context "when lti_platform_storage flag is disabled" do
-      before do
-        Account.site_admin.disable_feature! :lti_platform_storage
-      end
-
-      it "creates a login message" do
-        expect(login_message.keys).to match_array %w[
-          iss
-          login_hint
-          target_link_uri
-          lti_message_hint
-          canvas_region
-          client_id
-          lti_storage_target
-        ]
-      end
+    it "creates a login message" do
+      expect(login_message.keys).to match_array %w[
+        iss
+        login_hint
+        target_link_uri
+        lti_message_hint
+        canvas_region
+        canvas_environment
+        client_id
+        deployment_id
+        lti_storage_target
+      ]
     end
 
-    context "when lti_platform_storage flag is enabled" do
-      before do
-        Account.site_admin.enable_feature! :lti_platform_storage
+    context "lti_storage_target parameter" do
+      context "when include_storage_target parameter is not provided" do
+        let(:adapter) do
+          Lti::LtiAdvantageAdapter.new(
+            tool:,
+            user:,
+            context: course,
+            return_url:,
+            expander:,
+            opts:
+          )
+        end
+
+        it "is included" do
+          expect(login_message.keys).to include("lti_storage_target")
+        end
       end
 
-      it "creates a login message" do
-        expect(login_message.keys).to match_array %w[
-          iss
-          login_hint
-          target_link_uri
-          lti_message_hint
-          canvas_region
-          client_id
-          lti_storage_target
-        ]
+      context "when include_storage_target parameter is true" do
+        let(:include_storage_target) { true }
+
+        it "is included" do
+          expect(login_message.keys).to include("lti_storage_target")
+        end
+      end
+
+      context "when include_storage_target parameter is false" do
+        let(:include_storage_target) { false }
+
+        it "is not included" do
+          expect(login_message.keys).not_to include("lti_storage_target")
+        end
       end
     end
 
@@ -171,6 +186,30 @@ describe Lti::LtiAdvantageAdapter do
 
     it 'sets the "canvas_region" to "not_configured"' do
       expect(login_message["canvas_region"]).to eq "not_configured"
+    end
+
+    it 'sets the "canvas_environment" to "prod"' do
+      expect(login_message["canvas_environment"]).to eq "prod"
+    end
+
+    context "when in beta" do
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      end
+
+      it 'sets "canvas_enviroment" to "beta"' do
+        expect(login_message["canvas_environment"]).to eq "beta"
+      end
+    end
+
+    context "when in test" do
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("test")
+      end
+
+      it 'sets "canvas_enviroment" to "test"' do
+        expect(login_message["canvas_environment"]).to eq "test"
+      end
     end
 
     it "accepts a student_id parameter" do
@@ -205,6 +244,10 @@ describe Lti::LtiAdvantageAdapter do
 
     it "sets the client_id to the developer key global id" do
       expect(login_message["client_id"]).to eq tool.global_developer_key_id
+    end
+
+    it "includes the deployment_id" do
+      expect(login_message["deployment_id"]).to eq tool.deployment_id
     end
 
     context "when the user has a past lti context id" do
@@ -249,7 +292,7 @@ describe Lti::LtiAdvantageAdapter do
 
     context 'when a "launch_url" is set in the options hash' do
       let(:launch_url) { "https://www.cool-took.com/launch?with_query_params=true" }
-      let(:opts) { { launch_url: launch_url } }
+      let(:opts) { { launch_url: } }
 
       it("uses the launch_url as the target_link_uri") do
         expect(login_message["target_link_uri"]).to eq launch_url
@@ -275,7 +318,7 @@ describe Lti::LtiAdvantageAdapter do
     context "when the oidc_initiation_url is set" do
       let(:oidc_initiation_url) { "https://www.test.com/oidc/login" }
 
-      before { tool.developer_key.update!(oidc_initiation_url: oidc_initiation_url) }
+      before { tool.developer_key.update!(oidc_initiation_url:) }
 
       it "uses the oidc login uri" do
         expect(adapter.launch_url).to eq oidc_initiation_url

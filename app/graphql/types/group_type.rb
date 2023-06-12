@@ -35,6 +35,11 @@ module Types
 
     field :members_count, Integer, null: true
 
+    field :can_message, Boolean, null: false
+    def can_message
+      group.grants_right?(current_user, :send_messages)
+    end
+
     field :members_connection, GroupMembershipType.connection_type, null: true
     def members_connection
       if group.grants_right?(current_user, :read_roster)
@@ -43,7 +48,8 @@ module Types
     end
 
     field :member, GroupMembershipType, null: true do
-      argument :user_id, ID,
+      argument :user_id,
+               ID,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User"),
                required: true
     end

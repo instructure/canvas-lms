@@ -153,6 +153,8 @@ class LatePolicyController < ApplicationController
   #   }
   #
   def create
+    increment_request_cost(200)
+
     raise RecordAlreadyExists if course.late_policy.present?
 
     late_policy = course.build_late_policy(late_policy_params)
@@ -190,6 +192,8 @@ class LatePolicyController < ApplicationController
   #   The minimum grade a submissions can have in percentage points.
   #
   def update
+    increment_request_cost(200)
+
     raise ActiveRecord::RecordNotFound if course.late_policy.blank?
 
     if course.late_policy.update(late_policy_params)
@@ -232,7 +236,7 @@ class LatePolicyController < ApplicationController
   def record_already_exists
     status = :bad_request
     message = "only one late policy per course is allowed"
-    render json: { status: status, errors: [{ message: message }] }, status: status
+    render json: { status:, errors: [{ message: }] }, status:
   end
 
   class RecordAlreadyExists < ActiveRecord::ActiveRecordError; end

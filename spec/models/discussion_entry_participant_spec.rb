@@ -33,7 +33,7 @@ describe DiscussionEntryParticipant do
 
     it "throws error on regular create" do
       user = user_model
-      expect { @entry.discussion_entry_participants.create!(user: user, workflow_state: "read") }
+      expect { @entry.discussion_entry_participants.create!(user:, workflow_state: "read") }
         .to raise_error(ActiveRecord::RecordInvalid)
     end
 
@@ -97,7 +97,7 @@ describe DiscussionEntryParticipant do
 
         @entry.change_read_state("unread", student_2)
         participant_2.reload
-        expect(participant_2.read_at).to be(nil)
+        expect(participant_2.read_at).to be_nil
       ensure
         Timecop.return
         Timecop.safe_mode = true

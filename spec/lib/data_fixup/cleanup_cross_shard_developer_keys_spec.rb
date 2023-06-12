@@ -55,8 +55,12 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
     user_model.update(workflow_state: "deleted")
     at = AccessToken.create!(user: @user, developer_key: @dk)
     dkab = DeveloperKeyAccountBinding.create!(developer_key: @dk, account: account_model)
-    cet = ContextExternalTool.create!(developer_key: @dk, account: Account.default, name: "hi",
-                                      consumer_key: "do", shared_secret: "you", url: "https://knowwherethebathroomis.com")
+    cet = ContextExternalTool.create!(developer_key: @dk,
+                                      account: Account.default,
+                                      name: "hi",
+                                      consumer_key: "do",
+                                      shared_secret: "you",
+                                      url: "https://knowwherethebathroomis.com")
     cetp = ContextExternalToolPlacement.create!(context_external_tool: cet, placement_type: "course_navigation")
 
     DataFixup::CleanupCrossShardDeveloperKeys.run
@@ -78,7 +82,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
 
     let(:site_admin_access_token) do
       user.shard.activate do
-        AccessToken.create!(developer_key: site_admin_key, user: user)
+        AccessToken.create!(developer_key: site_admin_key, user:)
       end
     end
 
@@ -97,7 +101,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
   end
 
   context "with local keys" do
-    let!(:local_access_token) { AccessToken.create!(developer_key: local_key, user: user) }
+    let!(:local_access_token) { AccessToken.create!(developer_key: local_key, user:) }
     let!(:local_key) { DeveloperKey.create!(account: root_account) }
 
     let(:root_account) { Account.root_accounts.first }

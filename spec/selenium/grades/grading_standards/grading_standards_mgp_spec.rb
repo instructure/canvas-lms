@@ -35,14 +35,14 @@ describe "grading periods account page" do
     it "adds grading period set", priority: "1" do
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.add_grading_period_set(name: "Set Name!", term: "Default Term")
-      expect(grading_standards_page.grading_period_set_displayed?("Set Name!")).to eq(true)
-      expect(grading_standards_page.add_grading_period_link_displayed?).to eq(true)
+      expect(grading_standards_page.grading_period_set_displayed?("Set Name!")).to be(true)
+      expect(grading_standards_page.add_grading_period_link_displayed?).to be(true)
     end
 
     it "enable wieghted grading on grading period set", priority: "1" do
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.add_grading_period_set(name: "Set Name!", term: "Default Term", weighted: true)
-      expect(grading_standards_page.weight_field_in_grading_period?).to eq(true)
+      expect(grading_standards_page.weight_field_in_grading_period?).to be(true)
     end
 
     it "enable show total column on grading period set", priority: "1" do
@@ -56,7 +56,7 @@ describe "grading periods account page" do
       set = backend_group_helper.create_for_account(Account.default)
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.delete_first_grading_period_set(false)
-      expect(grading_standards_page.grading_period_set_displayed?(set.title)).to eq(true)
+      expect(grading_standards_page.grading_period_set_displayed?(set.title)).to be(true)
       grading_standards_page.delete_first_grading_period_set(true)
       expect(grading_standards_page.grading_periods_tab).not_to contain_css(grading_standards_page.grading_period_set_title_css)
     end
@@ -65,21 +65,21 @@ describe "grading periods account page" do
       backend_group_helper.create_for_account(Account.default)
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.edit_first_grading_period_set("Edited Title")
-      expect(grading_standards_page.grading_period_set_displayed?("Edited Title")).to eq(true)
+      expect(grading_standards_page.grading_period_set_displayed?("Edited Title")).to be(true)
     end
 
     it "adds grading period", priority: "1" do
       backend_group_helper.create_for_account(Account.default)
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.add_grading_period("New Period")
-      expect(grading_standards_page.grading_period_displayed?("New Period")).to eq(true)
+      expect(grading_standards_page.grading_period_displayed?("New Period")).to be(true)
     end
 
     it "edits grading period", priority: "1" do
       backend_period_helper.create_with_group_for_account(Account.default, title: "New Period")
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.edit_first_grading_period("Edited Title")
-      expect(grading_standards_page.grading_period_displayed?("Edited Title")).to eq(true)
+      expect(grading_standards_page.grading_period_displayed?("Edited Title")).to be(true)
     end
 
     it "deletes grading period", priority: "1" do
@@ -87,7 +87,7 @@ describe "grading periods account page" do
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.expand_first_set
       grading_standards_page.delete_first_grading_period(false)
-      expect(grading_standards_page.grading_period_displayed?("New Period")).to eq(true)
+      expect(grading_standards_page.grading_period_displayed?("New Period")).to be(true)
       grading_standards_page.delete_first_grading_period(true)
       expect(grading_standards_page.grading_period_list).not_to contain_css(grading_standards_page.period_css)
     end
@@ -119,23 +119,23 @@ describe "grading periods account page" do
 
       it "term dropdown filters grading period sets", priority: "1" do
         grading_standards_page.select_term_filter(term_name_1)
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to eq(true)
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to eq(false)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to be(true)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to be(false)
 
         grading_standards_page.select_term_filter(term_name_2)
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to eq(true)
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to eq(false)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to be(true)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to be(false)
 
         grading_standards_page.select_term_filter("All Terms")
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to eq(true)
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to eq(true)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to be(true)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to be(true)
       end
 
       it "search grading periods", priority: "1" do
         grading_standards_page.visit(Account.default.id)
         grading_standards_page.search_grading_periods("another")
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to eq(false)
-        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to eq(true)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_1)).to be(false)
+        expect(grading_standards_page.grading_period_set_displayed?(group_name_2)).to be(true)
       end
     end
   end

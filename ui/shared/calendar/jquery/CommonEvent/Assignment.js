@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import CommonEvent from './CommonEvent'
-import fcUtil from '../fcUtil.coffee'
+import fcUtil from '../fcUtil'
 import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/datetime'

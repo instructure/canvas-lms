@@ -24,8 +24,11 @@ describe Courses::TimetableEventBuilder do
     let(:builder) { described_class.new(course: course_factory) }
 
     it "requires valid start and end times" do
-      tt_hash = { weekdays: "monday", start_time: "hoopyfrood", end_time: "42 oclock",
-                  course_start_at: 1.day.from_now, course_end_at: 1.week.from_now }
+      tt_hash = { weekdays: "monday",
+                  start_time: "hoopyfrood",
+                  end_time: "42 oclock",
+                  course_start_at: 1.day.from_now,
+                  course_end_at: 1.week.from_now }
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to match_array(["invalid start time(s)", "invalid end time(s)"])
     end
@@ -106,8 +109,8 @@ describe Courses::TimetableEventBuilder do
       start_at = 1.day.from_now
       end_at = 1.day.from_now + 2.hours
       event_hashes = [
-        { start_at: start_at, end_at: end_at },
-        { start_at: start_at, end_at: end_at }
+        { start_at:, end_at: },
+        { start_at:, end_at: }
       ]
       builder.process_and_validate_event_hashes(event_hashes)
       expect(builder.errors).to eq ["events (or codes) are not unique"]

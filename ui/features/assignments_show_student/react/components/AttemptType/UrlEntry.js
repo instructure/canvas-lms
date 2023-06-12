@@ -39,7 +39,7 @@ import {TextInput} from '@instructure/ui-text-input'
 const I18n = useI18nScope('assignments_2_url_entry')
 
 const ERROR_MESSAGE = [
-  {text: I18n.t('Please enter a valid url (e.g. http://example.com)'), type: 'error'},
+  {text: I18n.t('Please enter a valid url (e.g. https://example.com)'), type: 'error'},
 ]
 
 class UrlEntry extends React.Component {
@@ -172,7 +172,7 @@ class UrlEntry extends React.Component {
                         <ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>
                       }
                       type="url"
-                      placeholder={I18n.t('http://')}
+                      placeholder={I18n.t('https://')}
                       value={this.state.url}
                       onBlur={this.handleBlur}
                       onChange={this.handleChange}

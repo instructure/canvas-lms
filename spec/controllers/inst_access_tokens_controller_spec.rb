@@ -28,20 +28,20 @@ describe InstAccessTokensController do
     it "requires being logged in" do
       post "create"
       expect(response).to be_redirect
-      expect(response.status).to eq(302)
+      expect(response).to have_http_status(:found)
     end
 
     context "with valid user session" do
       before { user_session(user) }
 
       let(:deserialized_token) do
-        token = JSON.parse(response.body)["token"]
+        token = response.parsed_body["token"]
         decrypt_and_deserialize_token(token)
       end
 
       it "generates an InstAccess token for the requesting user" do
         post "create", format: "json"
-        expect(response.status).to eq(201)
+        expect(response).to have_http_status(:created)
         expect(deserialized_token.user_uuid).to eq(user.uuid)
       end
 
@@ -61,7 +61,7 @@ describe InstAccessTokensController do
       token = InstAccess::Token.for_user(user_uuid: user.uuid, account_uuid: user.account.uuid).to_unencrypted_token_string
       request.headers["Authorization"] = "Bearer #{token}"
       get "create", format: "json"
-      expect(response.status).to eq(403)
+      expect(response).to have_http_status(:forbidden)
       expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
 
@@ -72,7 +72,7 @@ describe InstAccessTokensController do
         token = build_wrapped_token(user.global_id)
         @request.headers["Authorization"] = "Bearer #{token}"
         get "create", format: "json"
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:forbidden)
         expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
       end
     end

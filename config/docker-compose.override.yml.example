@@ -50,6 +50,7 @@ services:
       # AR_QUERY_TRACE: 'true'
       # AR_QUERY_TRACE_TYPE: 'all' # 'all', 'write', or 'read'
       # AR_QUERY_TRACE_LINES: 10
+      # N_PLUS_ONE_DETECTION: 'true'
 
   postgres:
     volumes:

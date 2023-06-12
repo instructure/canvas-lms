@@ -54,19 +54,19 @@ module MicrosoftSync
         body = {
           scope: "https://graph.microsoft.com/.default",
           grant_type: "client_credentials",
-          client_id: client_id,
-          client_secret: client_secret,
+          client_id:,
+          client_secret:,
         }
 
         response = Canvas.timeout_protection("microsoft_sync_login", raise_on_timeout: true) do
-          HTTParty.post(login_url(tenant), body: body, headers: headers)
+          HTTParty.post(login_url(tenant), body:, headers:)
         end
 
         unless (200..299).cover?(response.code)
           # Probably the key itself is bad. As of 3/2021, it seems like if the tenant
           # hasn't granted permission, we get a token but then a 401 from the Graph API
           raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
-            service: "login", tenant: tenant, response: response
+            service: "login", tenant:, response:
           )
         end
 
@@ -102,7 +102,8 @@ module MicrosoftSync
         # into fetch() above because we don't know it at that point.
         if expiry && expiry != CACHE_DEFAULT_EXPIRY
           Rails.cache.write(
-            cache_key, new_value,
+            cache_key,
+            new_value,
             expires_in: expiry - CACHE_EXPIRY_BUFFER - CACHE_RACE_CONDITION_TTL,
             race_condition_ttl: CACHE_RACE_CONDITION_TTL
           )

@@ -470,14 +470,14 @@ describe SIS::CSV::EnrollmentImporter do
     user1 = Pseudonym.where(sis_user_id: "user_1").first.user
     user2 = Pseudonym.where(sis_user_id: "user_2").first.user
     user3 = Pseudonym.where(sis_user_id: "user_3").first.user
-    expect(course.enrollments.where(user_id: user1).first.limit_privileges_to_course_section).to eq true
-    expect(course.enrollments.where(user_id: user2).first.limit_privileges_to_course_section).to eq false
-    expect(course.enrollments.where(user_id: user3).first.limit_privileges_to_course_section).to eq false
+    expect(course.enrollments.where(user_id: user1).first.limit_privileges_to_course_section).to be true
+    expect(course.enrollments.where(user_id: user2).first.limit_privileges_to_course_section).to be false
+    expect(course.enrollments.where(user_id: user3).first.limit_privileges_to_course_section).to be false
     process_csv_data_cleanly(
       "course_id,user_id,role,section_id,status,limit_section_privileges",
       "test_1,user_1,student,,active,"
     )
-    expect(course.enrollments.where(user_id: user1).first.limit_privileges_to_course_section).to eq true
+    expect(course.enrollments.where(user_id: user1).first.limit_privileges_to_course_section).to be true
   end
 
   it "allows one user to observe multiple students" do
@@ -634,6 +634,8 @@ describe SIS::CSV::EnrollmentImporter do
   end
 
   it "only queues up one recache_grade_distribution job per course" do
+    skip unless Object.const_defined?(:CachedGradeDistribution)
+
     Course.create!(account: @account, sis_source_id: "C001", workflow_state: "available")
     user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
     user_with_managed_pseudonym(account: @account, sis_user_id: "U002")

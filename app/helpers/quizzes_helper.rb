@@ -21,7 +21,7 @@
 require "nokogiri"
 
 module QuizzesHelper
-  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/.freeze
+  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
 
   def needs_unpublished_warning?(quiz = @quiz)
     return false unless can_publish(quiz)
@@ -522,7 +522,7 @@ module QuizzesHelper
 
   def score_out_of_points_possible(score, points_possible, options = {})
     options.reverse_merge!({ precision: 2 })
-    score_html = \
+    score_html =
       if options[:id] || options[:class] || options[:style]
         content_tag("span",
                     render_score(score, options[:precision]),
@@ -551,7 +551,7 @@ module QuizzesHelper
 
   def take_quiz_url
     user_id = @current_user&.id
-    course_quiz_take_path(@context, @quiz, user_id: user_id)
+    course_quiz_take_path(@context, @quiz, user_id:)
   end
 
   def link_to_take_or_retake_poll(opts = {})
@@ -688,7 +688,7 @@ module QuizzesHelper
     end
 
     if !is_correct_answer && show_correct_answers
-      titles << I18n.t(:user_selected_wrong, "The correct answer was %{correct_answer_text}.", correct_answer_text: correct_answer_text)
+      titles << I18n.t(:user_selected_wrong, "The correct answer was %{correct_answer_text}.", correct_answer_text:)
     end
 
     titles = titles.map { |title| h(title) }
@@ -713,7 +713,7 @@ module QuizzesHelper
   end
 
   def points_possible_display(quiz = @quiz)
-    quiz.quiz_type == "survey" ? "" : render_score(quiz.points_possible)
+    (quiz.quiz_type == "survey") ? "" : render_score(quiz.points_possible)
   end
 
   def label_for_question_type(question_type)

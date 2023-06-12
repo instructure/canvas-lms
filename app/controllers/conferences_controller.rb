@@ -236,14 +236,14 @@ class ConferencesController < ApplicationController
 
     courses_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.enrollments) do |enrollments_scope|
       conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
-                                      .where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
+                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order("created_at DESC, id DESC")
     end
 
     groups_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.groups) do |groups_scope|
       conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
-                                      .where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
+                                      .where(WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id).arel.exists)
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order("created_at DESC, id DESC")
     end
@@ -364,12 +364,13 @@ class ConferencesController < ApplicationController
             calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
             calendar_event&.save
           end
+          user_ids = member_ids
           @conference.add_initiator(@current_user)
-          @conference.invite_users_from_context(member_ids)
+          (user_ids.count > WebConference.max_invitees_sync_size) ? @conference.delay.invite_users_from_context(user_ids) : @conference.invite_users_from_context(user_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
-            render json: WebConference.find(@conference.id).as_json(permissions: { user: @current_user, session: session },
+            render json: WebConference.find(@conference.id).as_json(permissions: { user: @current_user, session: },
                                                                     url: named_context_url(@context, :context_conference_url, @conference))
           end
         else
@@ -409,7 +410,7 @@ class ConferencesController < ApplicationController
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
-            render json: @conference.as_json(permissions: { user: @current_user, session: session },
+            render json: @conference.as_json(permissions: { user: @current_user, session: },
                                              url: named_context_url(@context, :context_conference_url, @conference))
           end
         else
@@ -470,7 +471,7 @@ class ConferencesController < ApplicationController
       end
 
       if @conference.close
-        render json: @conference.as_json(permissions: { user: @current_user, session: session },
+        render json: @conference.as_json(permissions: { user: @current_user, session: },
                                          url: named_context_url(@context, :context_conference_url, @conference))
       else
         render json: @conference.errors

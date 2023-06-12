@@ -54,7 +54,7 @@ describe WikiPagesApiController, type: :request do
         }
         path[:url_or_id] = "new-page" if @http_verb == :put
         params = { wiki_page: wiki_params }
-        api_call_as_user(user, @http_verb, @url, path, params, {}, { expected_status: expected_status })
+        api_call_as_user(user, @http_verb, @url, path, params, {}, { expected_status: })
       end
 
       context "with a title containing charaters from the Katakana script" do
@@ -183,7 +183,7 @@ describe WikiPagesApiController, type: :request do
         course_id: @course.id.to_s,
         url_or_id: @page.url,
       }
-      api_call_as_user(user, :delete, url, path, {}, {}, { expected_status: expected_status })
+      api_call_as_user(user, :delete, url, path, {}, {}, { expected_status: })
     end
 
     it "allows you to destroy a wiki page if you have the manage_wiki_delete permission" do
@@ -220,7 +220,7 @@ describe WikiPagesApiController, type: :request do
         course_id: @course.id.to_s,
         url_or_id: @page.url,
       }
-      api_call_as_user(user, :get, url, path, {}, {}, { expected_status: expected_status })
+      api_call_as_user(user, :get, url, path, {}, {}, { expected_status: })
     end
 
     it "works for teachers" do
@@ -254,7 +254,8 @@ describe WikiPagesApiController, type: :request do
     end
 
     it "returns unauthorized if not a teacher" do
-      api_call_as_user(@student, :post,
+      api_call_as_user(@student,
+                       :post,
                        "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
                        { controller: "wiki_pages_api",
                          action: "duplicate",
@@ -267,7 +268,8 @@ describe WikiPagesApiController, type: :request do
     end
 
     it "can duplicate wiki non-assignment if teacher" do
-      json = api_call_as_user(@teacher, :post,
+      json = api_call_as_user(@teacher,
+                              :post,
                               "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
                               { controller: "wiki_pages_api",
                                 action: "duplicate",
@@ -282,7 +284,8 @@ describe WikiPagesApiController, type: :request do
 
     it "can duplicate wiki assignment if teacher" do
       wiki_page_assignment_model({ title: "Assignment Wiki" })
-      json = api_call_as_user(@teacher, :post,
+      json = api_call_as_user(@teacher,
+                              :post,
                               "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
                               { controller: "wiki_pages_api",
                                 action: "duplicate",

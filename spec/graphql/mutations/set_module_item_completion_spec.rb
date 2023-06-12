@@ -75,7 +75,7 @@ describe Mutations::SetModuleItemCompletion do
 
     describe "returned values" do
       it "returns the ID of the module item in the moduleItem field" do
-        result = CanvasSchema.execute(mutation_str, context: context)
+        result = CanvasSchema.execute(mutation_str, context:)
         expect(result.dig("data", "setModuleItemCompletion", "moduleItem", "_id")).to eq module1_assignment_item.id.to_s
       end
     end
@@ -83,7 +83,7 @@ describe Mutations::SetModuleItemCompletion do
     describe "model changes" do
       context "when 'done' is set to true" do
         it "marks the progression as done for the specified module and item if the requirement is mark-as-done" do
-          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id), context: context)
+          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id), context:)
 
           module1_progression = module1.context_module_progressions.find_by!(user: student)
           expect(module1_progression).to be_finished_item(module1_assignment_item)
@@ -93,14 +93,14 @@ describe Mutations::SetModuleItemCompletion do
           module1.completion_requirements = [{ id: module1_assignment_item.id, type: "must_read" }]
           module1.save!
 
-          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id), context: context)
+          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id), context:)
 
           module1_progression = module1.context_module_progressions.find_by!(user: student)
           expect(module1_progression).not_to be_finished_item(module1_assignment_item)
         end
 
         it "does not update the item in other modules" do
-          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id), context: context)
+          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id), context:)
 
           module2_progression = module2.context_module_progressions.find_by!(user: student)
           expect(module2_progression).not_to be_finished_item(module2_assignment_item)
@@ -113,14 +113,14 @@ describe Mutations::SetModuleItemCompletion do
         end
 
         it "marks the progression as undone for the specified module and item" do
-          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id, done: false), context: context)
+          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id, done: false), context:)
 
           module1_progression = module1.context_module_progressions.find_by!(user: student)
           expect(module1_progression).not_to be_finished_item(module1_assignment_item)
         end
 
         it "does not affect the item as stored in other modules" do
-          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id, done: false), context: context)
+          CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id, done: false), context:)
 
           module2_progression = module2.context_module_progressions.find_by!(user: student)
           expect(module2_progression).to be_finished_item(module2_assignment_item)
@@ -130,17 +130,17 @@ describe Mutations::SetModuleItemCompletion do
 
     describe "error handling" do
       it "returns an error if no module matches the given module ID" do
-        result = CanvasSchema.execute(mutation_str(module_id: 0), context: context)
+        result = CanvasSchema.execute(mutation_str(module_id: 0), context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
 
       it "returns an error if no module item matches the given item ID" do
-        result = CanvasSchema.execute(mutation_str(item_id: 0), context: context)
+        result = CanvasSchema.execute(mutation_str(item_id: 0), context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
 
       it "returns an error if the given module does not contain the given item" do
-        result = CanvasSchema.execute(mutation_str(module_id: unrelated_module.id), context: context)
+        result = CanvasSchema.execute(mutation_str(module_id: unrelated_module.id), context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
 
@@ -151,14 +151,14 @@ describe Mutations::SetModuleItemCompletion do
 
         student.context_module_progressions.create!(context_module: locked_module, workflow_state: "locked")
 
-        result = CanvasSchema.execute(mutation_str(module_id: unrelated_module.id), context: context)
+        result = CanvasSchema.execute(mutation_str(module_id: unrelated_module.id), context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
 
       it "returns an error if marking as not-done and no progression object is found" do
         module1.context_module_progressions.find_by(user: student).destroy
 
-        result = CanvasSchema.execute(mutation_str(module_id: module1.id, done: false), context: context)
+        result = CanvasSchema.execute(mutation_str(module_id: module1.id, done: false), context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
     end
@@ -172,7 +172,7 @@ describe Mutations::SetModuleItemCompletion do
 
     it "does not return data pertaining to the module item" do
       result = CanvasSchema.execute(mutation_str, context: { current_user: student })
-      expect(result.dig("data", "setModuleItemCompletion")).to be nil
+      expect(result.dig("data", "setModuleItemCompletion")).to be_nil
     end
   end
 end

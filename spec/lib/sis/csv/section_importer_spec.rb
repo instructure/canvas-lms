@@ -119,7 +119,7 @@ describe SIS::CSV::SectionImporter do
     )
     section.reload
     expect(section).to be_active
-    expect(section.default_section).to eq false
+    expect(section.default_section).to be false
   end
 
   it "creates rollback data" do
@@ -217,8 +217,8 @@ describe SIS::CSV::SectionImporter do
     s1 = course.course_sections.where(sis_source_id: "S001").first
     expect(s1).not_to be_nil
     expect(s1.name).to eq "Sec1"
-    expect(s1.start_at.to_s(:db)).to eq "2011-01-05 00:00:00"
-    expect(s1.end_at.to_s(:db)).to eq "2011-04-14 00:00:00"
+    expect(s1.start_at.to_fs(:db)).to eq "2011-01-05 00:00:00"
+    expect(s1.end_at.to_fs(:db)).to eq "2011-04-14 00:00:00"
 
     s2 = course.course_sections.where(sis_source_id: "S002").first
     expect(s2).not_to be_nil
@@ -710,8 +710,8 @@ describe SIS::CSV::SectionImporter do
       "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
     )
 
-    def with_section(&block)
-      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&block)
+    def with_section(&)
+      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&)
     end
 
     def check_section_crosslisted(sis_id)
@@ -783,8 +783,8 @@ describe SIS::CSV::SectionImporter do
       "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
     )
 
-    def with_section(&block)
-      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&block)
+    def with_section(&)
+      CourseSection.where(root_account_id: @account, sis_source_id: "S001").first.tap(&)
     end
 
     def check_section_crosslisted(sis_id)

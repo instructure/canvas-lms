@@ -72,7 +72,7 @@ describe GradingPeriodGroup do
       @group.update_columns(weighted: false)
       expect { @group.recompute_scores_for_each_term(true) }.to change {
                                                                   [@first_course, @second_course].map do |course|
-                                                                    Enrollment.find_by(course: course, user: @student).computed_current_score
+                                                                    Enrollment.find_by(course:, user: @student).computed_current_score
                                                                   end
                                                                 }.from([0.0, 0.0]).to([80.0, 80.0])
     end
@@ -91,7 +91,7 @@ describe GradingPeriodGroup do
       ids = [@second_course.enrollment_term_id]
       expect { @group.recompute_scores_for_each_term(true, term_ids: ids) }.to change {
         [@first_course, @second_course].map do |course|
-          Enrollment.find_by(course: course, user: @student).computed_current_score
+          Enrollment.find_by(course:, user: @student).computed_current_score
         end
       }.from([0.0, 0.0]).to([0.0, 80.0])
     end
@@ -122,7 +122,7 @@ describe GradingPeriodGroup do
       it "fetches sets on a root account" do
         set = account.grading_period_groups.create!(valid_attributes)
         sets = GradingPeriodGroup.for(account)
-        expect(sets.count).to eql 1
+        expect(sets.count).to be 1
         expect(sets).to include set
       end
 
@@ -130,7 +130,7 @@ describe GradingPeriodGroup do
         set = account.grading_period_groups.create!(valid_attributes)
         sub_account = account.sub_accounts.create!
         sets = GradingPeriodGroup.for(sub_account)
-        expect(sets.count).to eql 1
+        expect(sets.count).to be 1
         expect(sets).to include set
       end
     end
@@ -248,7 +248,7 @@ describe GradingPeriodGroup do
   it_behaves_like "soft deletion" do
     subject { course.grading_period_groups }
 
-    let(:course) { Course.create!(account: account) }
+    let(:course) { Course.create!(account:) }
     let(:creation_arguments) { { title: "A title" } }
   end
 
@@ -325,7 +325,8 @@ describe GradingPeriodGroup do
         end
 
         it "can read but NOT create, update, not delete root-account " \
-           "grading period groups", priority: "1" do
+           "grading period groups",
+           priority: "1" do
           expect(@root_account_group
             .rights_status(@sub_account_admin, *permissions)).to eq({
                                                                       read: true,
@@ -349,7 +350,8 @@ describe GradingPeriodGroup do
 
       context "teacher" do
         it "can read but NOT create, update, nor delete root-account " \
-           "grading period groups", priority: "1" do
+           "grading period groups",
+           priority: "1" do
           expect(@root_account_group
             .rights_status(@teacher, *permissions)).to eq({
                                                             read: true,

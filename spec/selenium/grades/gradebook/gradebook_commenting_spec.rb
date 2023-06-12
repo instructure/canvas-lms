@@ -51,7 +51,7 @@ describe "Gradebook" do
   it "lets you post a group comment to a group assignment", priority: "1" do
     group_assignment = @course.assignments.create!({
                                                      title: "group assignment",
-                                                     due_at: (Time.zone.now + 1.week),
+                                                     due_at: 1.week.from_now,
                                                      points_possible: @assignment_3_points,
                                                      submission_types: "online_text_entry",
                                                      assignment_group: @group,

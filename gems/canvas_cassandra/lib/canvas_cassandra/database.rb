@@ -18,7 +18,7 @@
 #
 module CanvasCassandra
   class Database
-    CONSISTENCY_CLAUSE = /%CONSISTENCY% ?/.freeze
+    CONSISTENCY_CLAUSE = /%CONSISTENCY% ?/
 
     def initialize(fingerprint, servers, opts, logger)
       thrift_opts = {}
@@ -163,7 +163,7 @@ module CanvasCassandra
     #   { "colname" => [oldvalue, newvalue] }
     def update_record(table_name, primary_key_attrs, changes, ttl_seconds = nil, execute_options: {})
       batch do
-        do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
+        do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options:)
       end
     end
 
@@ -172,7 +172,7 @@ module CanvasCassandra
     # records for them
     def insert_record(table_name, primary_key_attrs, changes, ttl_seconds = nil, execute_options: {})
       changes = changes.reject { |_k, v| v.is_a?(Array) ? v.last.nil? : v.nil? }
-      update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
+      update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options:)
     end
 
     def select_value(query, *args)
@@ -182,11 +182,11 @@ module CanvasCassandra
 
     def tables
       if @db.connection.describe_version >= "20.1.0" && @db.execute("SELECT cql_version FROM system.local").first["cql_version"] >= "3.4.4"
-        @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row|
+        @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row| # rubocop:disable Rails/Pluck
           row["table_name"]
         end
       elsif @db.use_cql3?
-        @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", keyspace).map do |row|
+        @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", keyspace).map do |row| # rubocop:disable Rails/Pluck
           row["columnfamily_name"]
         end
       else
@@ -254,7 +254,7 @@ module CanvasCassandra
         end.join(", ")
         statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
-        args.concat [execute_options]
+        args.push execute_options
         update(statement, *args)
       end
 
@@ -263,7 +263,7 @@ module CanvasCassandra
         delete_cql = deletes.map(&:first).join(", ")
         statement = "DELETE #{delete_cql} FROM #{table_name} WHERE #{where_clause}"
         args.concat where_args
-        args.concat [execute_options]
+        args.push execute_options
         update(statement, *args)
       end
     end

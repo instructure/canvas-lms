@@ -21,10 +21,14 @@ import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphq
 import {MockedProvider} from '@apollo/react-testing'
 import {initializeReaderButton} from '../../../../../shared/immersive-reader/ImmersiveReader'
 import React from 'react'
+import StudentViewContext from '../Context'
 import StudentContent from '../StudentContent'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import {RUBRIC_QUERY, SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 jest.mock('../AttemptSelect')
 
@@ -459,12 +463,14 @@ describe('Assignment Student Content View', () => {
     it('takes into account extra attempts awarded to the student', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 3},
-        Submission: {extraAttempts: 2},
+        Submission: {attempt: 1, extraAttempts: 1},
       })
       const {getByText} = render(
-        <MockedProvider>
-          <StudentContent {...props} />
-        </MockedProvider>
+        <StudentViewContext.Provider value={{latestSubmission: {extraAttempts: 2}}}>
+          <MockedProvider>
+            <StudentContent {...props} />
+          </MockedProvider>
+        </StudentViewContext.Provider>
       )
       expect(getByText('5 Attempts Allowed')).toBeInTheDocument()
     })
@@ -497,7 +503,9 @@ describe('Assignment Student Content View', () => {
         </MockedProvider>
       )
       // Reason why this is showing up twice is once for screenreader content and again for regular content
-      expect(getAllByText('Available: Jul 11, 2016 7:00pm')).toHaveLength(2)
+      expect(getAllByText('Available: Jul 11, 2016 7:00pm until Nov 11, 2016 7:00pm')).toHaveLength(
+        2
+      )
     })
   })
 

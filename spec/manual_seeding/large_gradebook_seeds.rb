@@ -89,7 +89,7 @@ module CreateHelpers
   end
 
   def self.create_course(name: "CS 101", teacher:, account: ACCOUNT)
-    course = account.courses.create!(name: name, workflow_state: "available")
+    course = account.courses.create!(name:, workflow_state: "available")
     puts "creating course: '#{course.name}', id: #{course.id}, account: #{account.name}".red
     puts "taught by: '#{teacher.name}', id: #{teacher.id}".green
     course.enroll_teacher(teacher, enrollment_state: "active", workflow_state: "available")
@@ -98,7 +98,7 @@ module CreateHelpers
 
   def self.enroll_students(users: [], course:, section:, type: "student")
     users.each do |user|
-      course.enroll_student(user, section: section, allow_multiple_enrollments: true, enrollment_state: "active")
+      course.enroll_student(user, section:, allow_multiple_enrollments: true, enrollment_state: "active")
       puts "Enrolling '#{user&.name}' as a #{type} in '#{course&.name}' - 'Section #{section&.name}'".blue
     end
   end
@@ -117,10 +117,10 @@ opts.on_tail("-h", "--help", "Show this message") do
   exit
 end
 opts.parse(ARGV)
-student_count = generate_for == :speedgrader ? 50 : 400
-assignment_count = generate_for == :speedgrader ? 50 : 200
+student_count = (generate_for == :speedgrader) ? 50 : 400
+assignment_count = (generate_for == :speedgrader) ? 50 : 200
 
-puts generate_for == :speedgrader ? "Speedgrader".yellow : "Gradebook".yellow
+puts((generate_for == :speedgrader) ? "Speedgrader".yellow : "Gradebook".yellow)
 puts "Student Count = #{student_count}".red
 puts "Assignment Count = #{assignment_count}".red
 
@@ -131,10 +131,10 @@ teacher.transaction do
   teacher.workflow_state = "registered"
   teacher.save!
 
-  course = CreateHelpers.create_course name: theme.course, teacher: teacher, account: ACCOUNT
-  students = CreateHelpers.create_users theme: theme, count: student_count
+  course = CreateHelpers.create_course name: theme.course, teacher:, account: ACCOUNT
+  students = CreateHelpers.create_users theme:, count: student_count
 
-  CreateHelpers.enroll_students users: students, course: course, section: course.course_sections.first
+  CreateHelpers.enroll_students users: students, course:, section: course.course_sections.first
 
   due_ats = [1.year.ago, 8.months.ago, 2.months.ago, 1.month.from_now, 5.months.from_now]
   assignment_count.times do

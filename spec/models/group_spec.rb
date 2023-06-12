@@ -64,7 +64,7 @@ describe Group do
     course_with_student(active_all: true)
     group_model(group_category: @communities, is_public: true)
     group.add_user(@student)
-    expect(@group.inactive?).to eq false
+    expect(@group.inactive?).to be false
   end
 
   it "identifies a destroyed course as not active" do
@@ -73,7 +73,7 @@ describe Group do
     group.add_user(@student)
     @group.context = @course
     @course.destroy!
-    expect(@group.inactive?).to eq true
+    expect(@group.inactive?).to be true
   end
 
   it "identifies a concluded course as not active" do
@@ -82,7 +82,7 @@ describe Group do
     group.add_user(@student)
     @group.context = @course
     @course.complete!
-    expect(@group.inactive?).to eq true
+    expect(@group.inactive?).to be true
   end
 
   it "identifies an account group as not active correctly" do
@@ -90,14 +90,14 @@ describe Group do
     group_model(group_category: @communities, is_public: true, context: @account)
     group.add_user(@student)
     @group.context.destroy
-    expect(@group.inactive?).to eq true
+    expect(@group.inactive?).to be true
   end
 
   it "identifies an account group as active" do
     @account = account_model
     group_model(group_category: @communities, is_public: true, context: @account)
     group.add_user(@student)
-    expect(@group.inactive?).to eq false
+    expect(@group.inactive?).to be false
   end
 
   it "sets the root_account_id for GroupMemberships when bulk adding users" do
@@ -105,7 +105,7 @@ describe Group do
     group_model(group_category: @communities, is_public: true, context: @account)
     @group.bulk_add_users_to_group([@user])
     @group.group_memberships.each do |gm|
-      expect(gm.root_account_id).not_to be nil
+      expect(gm.root_account_id).not_to be_nil
     end
   end
 
@@ -135,10 +135,10 @@ describe Group do
       context = course_model
       group_category = context.group_categories.create(name: "worldCup")
       other_category = context.group_categories.create(name: "other category")
-      group1 = Group.create!(name: "group1", group_category: group_category, context: context)
-      group2 = Group.create!(name: "group2", group_category: group_category, context: context)
-      group3 = Group.create!(name: "group3", group_category: group_category, context: context)
-      group4 = Group.create!(name: "group4", group_category: other_category, context: context)
+      group1 = Group.create!(name: "group1", group_category:, context:)
+      group2 = Group.create!(name: "group2", group_category:, context:)
+      group3 = Group.create!(name: "group3", group_category:, context:)
+      group4 = Group.create!(name: "group4", group_category: other_category, context:)
       expect(group1.peer_groups.length).to eq 2
       expect(group1.peer_groups).to be_include(group2)
       expect(group1.peer_groups).to be_include(group3)
@@ -149,8 +149,8 @@ describe Group do
     it "does not find peer groups for student organized groups" do
       context = course_model
       group_category = GroupCategory.student_organized_for(context)
-      group1 = Group.create!(name: "group1", group_category: group_category, context: context)
-      Group.create!(name: "group2", group_category: group_category, context: context)
+      group1 = Group.create!(name: "group1", group_category:, context:)
+      Group.create!(name: "group2", group_category:, context:)
       expect(group1.peer_groups).to be_empty
     end
   end
@@ -190,8 +190,8 @@ describe Group do
     it "removes that user from peer groups" do
       context = course_model
       group_category = context.group_categories.create!(name: "worldCup")
-      group1 = Group.create!(name: "group1", group_category: group_category, context: context)
-      group2 = Group.create!(name: "group2", group_category: group_category, context: context)
+      group1 = Group.create!(name: "group1", group_category:, context:)
+      group2 = Group.create!(name: "group2", group_category:, context:)
       user_model
       pseudonym_model(user_id: @user.id)
       group1.add_user(@user)
@@ -211,9 +211,9 @@ describe Group do
         "parent_context_request" => "requested",
         "parent_context_auto_join" => "accepted"
       }.each do |join_level, workflow_state|
-        group = group_model(join_level: join_level, group_category: @communities)
+        group = group_model(join_level:, group_category: @communities)
         group.add_user(@user)
-        expect(group.group_memberships.where(workflow_state: workflow_state, user_id: @user).first).not_to be_nil
+        expect(group.group_memberships.where(workflow_state:, user_id: @user).first).not_to be_nil
       end
     end
 
@@ -225,14 +225,14 @@ describe Group do
 
       %w[invited requested accepted].each do |workflow_state|
         @group.add_user(@user, workflow_state)
-        expect(@group.group_memberships.where(workflow_state: workflow_state, user_id: @user).first).not_to be_nil
+        expect(@group.group_memberships.where(workflow_state:, user_id: @user).first).not_to be_nil
       end
     end
 
     it "allows specifying that the user should be a moderator" do
       user_model
       @membership = @group.add_user(@user, "accepted", true)
-      expect(@membership.moderator).to eq true
+      expect(@membership.moderator).to be true
     end
 
     it "changes the workflow_state of an already active user" do
@@ -371,9 +371,9 @@ describe Group do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group1 = @course.groups.create(group_category: group_category, join_level: "parent_context_auto_join")
-      group2 = @course.groups.create(group_category: group_category, join_level: "parent_context_request")
-      group3 = @course.groups.create(group_category: group_category, join_level: "invitation_only")
+      group1 = @course.groups.create(group_category:, join_level: "parent_context_auto_join")
+      group2 = @course.groups.create(group_category:, join_level: "parent_context_request")
+      group3 = @course.groups.create(group_category:, join_level: "invitation_only")
       expect([group1, group2, group3].map(&:auto_accept?)).to eq [true, false, false]
     end
 
@@ -394,9 +394,9 @@ describe Group do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group1 = @course.groups.create(group_category: group_category, join_level: "parent_context_auto_join")
-      group2 = @course.groups.create(group_category: group_category, join_level: "parent_context_request")
-      group3 = @course.groups.create(group_category: group_category, join_level: "invitation_only")
+      group1 = @course.groups.create(group_category:, join_level: "parent_context_auto_join")
+      group2 = @course.groups.create(group_category:, join_level: "parent_context_request")
+      group3 = @course.groups.create(group_category:, join_level: "invitation_only")
       expect([group1, group2, group3].map(&:allow_join_request?)).to eq [true, true, false]
     end
 
@@ -419,17 +419,17 @@ describe Group do
       group_category = GroupCategory.student_organized_for(@course)
       group_category.configure_self_signup(true, false)
       group_category.save!
-      group1 = @course.groups.create(group_category: group_category)
+      group1 = @course.groups.create(group_category:)
       expect(group1.allow_self_signup?(@student)).to be_truthy
 
       group_category.configure_self_signup(true, true)
       group_category.save!
-      group2 = @course.groups.create(group_category: group_category)
+      group2 = @course.groups.create(group_category:)
       expect(group2.allow_self_signup?(@student)).to be_truthy
 
       group_category.configure_self_signup(false, false)
       group_category.save!
-      group3 = @course.groups.create(group_category: group_category)
+      group3 = @course.groups.create(group_category:)
       expect(group3.allow_self_signup?(@student)).to be_falsey
     end
 
@@ -441,7 +441,7 @@ describe Group do
       group_category = GroupCategory.student_organized_for(@course)
       group_category.configure_self_signup(true, true)
       group_category.save!
-      group1 = @course.groups.create(group_category: group_category)
+      group1 = @course.groups.create(group_category:)
       expect(group1.allow_self_signup?(@student)).to be_truthy
       group1.add_user(@student)
       group1.reload
@@ -551,7 +551,7 @@ describe Group do
 
       group_category = GroupCategory.student_organized_for(@course)
 
-      group = @course.groups.create!(group_category: group_category)
+      group = @course.groups.create!(group_category:)
       gm = group.invite_user(@student)
       expect(gm).to be_accepted
     end
@@ -563,7 +563,7 @@ describe Group do
 
       group_category = GroupCategory.student_organized_for(@course)
 
-      group = @course.groups.create!(group_category: group_category, join_level: "parent_context_auto_join")
+      group = @course.groups.create!(group_category:, join_level: "parent_context_auto_join")
       gm = group.request_user(@student)
       expect(gm).to be_accepted
     end
@@ -575,7 +575,7 @@ describe Group do
     expect(group.group_category).to eq GroupCategory.student_organized_for(@course)
 
     group_category = @course.group_categories.create(name: "random category")
-    group = @course.groups.create(group_category: group_category)
+    group = @course.groups.create(group_category:)
     expect(group.group_category).to eq group_category
   end
 
@@ -857,8 +857,8 @@ describe Group do
   describe "#favorite_for_user?" do
     before do
       context = course_model
-      @group_fave = Group.create!(name: "group1", context: context)
-      @group_not_fave = Group.create!(name: "group2", context: context)
+      @group_fave = Group.create!(name: "group1", context:)
+      @group_not_fave = Group.create!(name: "group2", context:)
       @group_fave.add_user(@user)
       @group_not_fave.add_user(@user)
       @user.favorites.build(context: @group_fave)
@@ -866,11 +866,11 @@ describe Group do
     end
 
     it "returns true if a user has a course set as a favorite" do
-      expect(@group_fave.favorite_for_user?(@user)).to eql(true)
+      expect(@group_fave.favorite_for_user?(@user)).to be(true)
     end
 
     it "returns false if a user has not set a group to be a favorite" do
-      expect(@group_not_fave.favorite_for_user?(@user)).to eql(false)
+      expect(@group_not_fave.favorite_for_user?(@user)).to be(false)
     end
   end
 
@@ -893,7 +893,7 @@ describe Group do
   describe "participating_users_in_context" do
     before :once do
       context = course_model
-      @group = Group.create(name: "group1", context: context)
+      @group = Group.create(name: "group1", context:)
       @group.add_user(@user)
       @user.enrollments.first.deactivate
     end

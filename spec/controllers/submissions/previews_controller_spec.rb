@@ -67,12 +67,12 @@ describe Submissions::PreviewsController do
             assignment_id: @quiz.assignment.id,
             id: @student.id,
             preview: true,
-            version: version
+            version:
           }
           expect(response).to redirect_to(course_quiz_history_url(@context, @quiz, {
                                                                     headless: 1,
                                                                     user_id: @student.id,
-                                                                    version: version
+                                                                    version:
                                                                   }))
         end
       end

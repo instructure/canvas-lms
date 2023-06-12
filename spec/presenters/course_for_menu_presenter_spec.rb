@@ -24,7 +24,7 @@ describe CourseForMenuPresenter do
   include K5Common
 
   let_once(:account) { Account.default }
-  let_once(:course) { Course.create!(account: account) }
+  let_once(:course) { Course.create!(account:) }
   let_once(:user) { User.create! }
 
   let(:dashboard_card_tabs) { UsersController::DASHBOARD_CARD_TABS }
@@ -80,17 +80,17 @@ describe CourseForMenuPresenter do
 
     it "sets isFavorited to true if course is favorited" do
       course.enroll_student(user)
-      Favorite.create!(user: user, context: course)
+      Favorite.create!(user:, context: course)
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
-      expect(h[:isFavorited]).to eq true
+      expect(h[:isFavorited]).to be true
     end
 
     it "sets isFavorited to false if course is unfavorited" do
       course.enroll_student(user)
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
-      expect(h[:isFavorited]).to eq false
+      expect(h[:isFavorited]).to be false
     end
 
     it "sets the published value" do
@@ -121,6 +121,25 @@ describe CourseForMenuPresenter do
       end
     end
 
+    context "useClassicFont" do
+      before :once do
+        Account.site_admin.enable_feature! :k5_font_selection
+        @account = course.account
+        toggle_k5_setting(@account)
+      end
+
+      it "is true when the course's account has use_classic_font?" do
+        toggle_classic_font_setting(@account)
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:useClassicFont]).to be_truthy
+      end
+
+      it "is false if the course's account does not have use_classic_font?" do
+        h = CourseForMenuPresenter.new(course, user, account).to_h
+        expect(h[:useClassicFont]).to be_falsey
+      end
+    end
+
     context "with `homeroom_course` setting enabled" do
       before do
         course.update! homeroom_course: true
@@ -129,7 +148,7 @@ describe CourseForMenuPresenter do
       it "sets `isHomeroom` to `true`" do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
-        expect(h[:isHomeroom]).to eq true
+        expect(h[:isHomeroom]).to be true
       end
     end
 
@@ -162,7 +181,7 @@ describe CourseForMenuPresenter do
       it "returns nil when no position is set" do
         cs_presenter = CourseForMenuPresenter.new(course, user, account)
         h = cs_presenter.to_h
-        expect(h[:position]).to eq nil
+        expect(h[:position]).to be_nil
       end
     end
 

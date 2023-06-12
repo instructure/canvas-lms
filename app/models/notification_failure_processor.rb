@@ -100,12 +100,13 @@ class NotificationFailureProcessor
     return @notification_failure_queue if defined?(@notification_failure_queue)
 
     conf = Canvas::AWS.validate_v2_config(config, "notification_failures.yml").dup
-    conf.except!(*POLL_PARAMS)
+    conf[:credentials] ||= Canvas::AwsCredentialProvider.new("notification_failures_creds", conf[:vault_credential_path])
+    conf.except!(*POLL_PARAMS, :vault_credential_path)
     conf.delete(:iteration_high_water)
     conf.delete(:initial_timeout) # old, no longer supported poll param
     queue_name = conf.delete(:notification_failure_queue_name)
     sqs = Aws::SQS::Client.new(conf)
-    queue_url = sqs.get_queue_url(queue_name: queue_name).queue_url
+    queue_url = sqs.get_queue_url(queue_name:).queue_url
     @notification_failure_queue = Aws::SQS::QueuePoller.new(queue_url, client: sqs)
   end
 end

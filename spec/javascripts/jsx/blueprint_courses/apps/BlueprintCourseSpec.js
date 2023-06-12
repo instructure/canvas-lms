@@ -17,7 +17,7 @@
  */
 
 import BlueprintCourse from 'ui/features/blueprint_course_master/react/apps/BlueprintCourse'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import getSampleData from '../getSampleData'
 
 let blueprint = null

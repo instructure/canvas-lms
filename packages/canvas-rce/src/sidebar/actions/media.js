@@ -81,20 +81,26 @@ export function fetchInitialMedia() {
 }
 
 // update the media object.
-export function updateMediaObject({media_object_id, title, subtitles}) {
+export function updateMediaObject({media_object_id, attachment_id, title, subtitles}) {
   return (dispatch, getState) => {
     const state = getState()
-    const moupdate = state.source.updateMediaObject(state, {media_object_id, title}).catch(e => {
-      alertHandler.handleAlert({
-        text: formatMessage(
-          'Though your video will have the correct title in the browser, we failed to update it in the database.'
-        ),
-        variant: 'error',
+    const moUpdate = state.source
+      .updateMediaObject(state, {media_object_id, title, attachment_id})
+      .catch(e => {
+        alertHandler.handleAlert({
+          text: formatMessage(
+            'Though your video will have the correct title in the browser, we failed to update it in the database.'
+          ),
+          variant: 'error',
+        })
+        throw e
       })
-      throw e
-    })
 
-    const ccupdate = state.source.updateClosedCaptions(state, {media_object_id, subtitles})
-    return Promise.all([moupdate, ccupdate])
+    const ccData = {media_object_id, subtitles}
+    if (attachment_id) {
+      ccData.attachment_id = attachment_id
+    }
+    const ccUpdate = state.source.updateClosedCaptions(state, ccData)
+    return Promise.all([moUpdate, ccUpdate])
   }
 }

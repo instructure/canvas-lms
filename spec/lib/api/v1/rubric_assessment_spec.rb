@@ -33,7 +33,7 @@ describe "Api::V1::RubricAssessment" do
         {
           description: "Some criterion",
           points: 10,
-          id: id,
+          id:,
           ratings: [
             { description: "Good", points: 10, id: "rat1", criterion_id: id },
             { description: "Medium", points: 5, id: "rat2", criterion_id: id },

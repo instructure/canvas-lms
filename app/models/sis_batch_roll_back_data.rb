@@ -19,25 +19,40 @@
 #
 class SisBatchRollBackData < ActiveRecord::Base
   belongs_to :sis_batch, inverse_of: :roll_back_data
-  belongs_to :context, polymorphic: %i[abstract_course account account_user
-                                       communication_channel course
-                                       course_section enrollment enrollment_term
-                                       group group_category group_membership
-                                       pseudonym user_observer]
+  belongs_to :context, polymorphic: %i[abstract_course
+                                       account
+                                       account_user
+                                       communication_channel
+                                       course
+                                       course_section
+                                       enrollment
+                                       enrollment_term
+                                       group
+                                       group_category
+                                       group_membership
+                                       pseudonym
+                                       user_observer]
 
   scope :expired_data, -> { where("created_at < ?", 30.days.ago) }
   scope :active, -> { where(workflow_state: "active") }
   scope :restored, -> { where(workflow_state: "restored") }
 
-  RESTORE_ORDER = %w[Account EnrollmentTerm AbstractCourse Course CourseSection
-                     GroupCategory Group Pseudonym CommunicationChannel
-                     Enrollment GroupMembership UserObserver AccountUser].freeze
+  RESTORE_ORDER = %w[Account
+                     EnrollmentTerm
+                     AbstractCourse
+                     Course
+                     CourseSection
+                     GroupCategory
+                     Group
+                     Pseudonym
+                     CommunicationChannel
+                     Enrollment
+                     GroupMembership
+                     UserObserver
+                     AccountUser].freeze
 
   def self.cleanup_expired_data
-    return unless expired_data.exists?
-
-    until expired_data.limit(10_000).delete_all < 10_000
-    end
+    expired_data.in_batches(of: 10_000).delete_all
   end
 
   def self.build_data(sis_batch:, context:, batch_mode_delete: false)
@@ -46,12 +61,12 @@ class SisBatchRollBackData < ActiveRecord::Base
     old_state = (context.id_before_last_save.nil? ? "non-existent" : context.workflow_state_before_last_save)
     sis_batch.shard.activate do
       SisBatchRollBackData.new(sis_batch_id: sis_batch.id,
-                               context: context,
+                               context:,
                                previous_workflow_state: old_state,
                                updated_workflow_state: context.workflow_state,
                                created_at: Time.zone.now,
                                updated_at: Time.zone.now,
-                               batch_mode_delete: batch_mode_delete,
+                               batch_mode_delete:,
                                workflow_state: "active")
     end
   end
@@ -63,12 +78,12 @@ class SisBatchRollBackData < ActiveRecord::Base
     contexts.each do |context|
       sis_batch.shard.activate do
         data << SisBatchRollBackData.new(sis_batch_id: sis_batch.id,
-                                         context: context,
+                                         context:,
                                          previous_workflow_state: context.workflow_state,
                                          updated_workflow_state: updated_state,
                                          created_at: Time.zone.now,
                                          updated_at: Time.zone.now,
-                                         batch_mode_delete: batch_mode_delete,
+                                         batch_mode_delete:,
                                          workflow_state: "active")
       end
     end

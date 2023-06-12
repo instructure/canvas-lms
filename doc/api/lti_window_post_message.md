@@ -17,12 +17,13 @@ should be passed in postMessage calls if it's present.
 
 ### Message Recipient
 
-If the LTI tool is launched in a iframe, as is most common, then postMessages should be sent to
-`window.top`. Usually `window.parent` should suffice, but there are some situations where that may
-not refer to the Canvas window. `window.top` refers to the topmost parent window, which should always
-be Canvas. However, if the tool is launched in a new tab, window, or popup, then postMessages
-should be directed to `window.opener`. The examples will use `window.top`, but in practice it's best
-to use `window.top || window.opener`.
+**Note: Previous versions of this documentation recommended always sending messages to `window.top`.**
+**This is no longer recommended, as tools should target the parent window they are embedded in.**
+
+If the LTI tool is launched in a iframe, as is most common, then postMessages should be sent to the window
+embedding the LTI tool (usually accessible by `window.parent`). However, if the tool is launched in a new tab,
+window, or popup, then postMessages should be directed to `window.opener`. The examples will use `window.parent`,
+but in practice, the target recipient can sometimes also be `window.opener`.
 
 The LTI Platform Storage messages (`lti.get_data` and `lti.put_data`) should be sent to either the
 direct parent frame, or to a named frame that will be present in `window.parent.frames`. If this
@@ -35,6 +36,13 @@ This is also defined in the [Platform Storage spec](https://www.imsglobal.org/sp
 Most message handlers will respond with a postMessage with a subject that matches the intial subject,
 with `.response` appended. If an error occurs during message handling, the response postMessage will
 contain an `error` property with a `code` and a `message`.
+
+Sample code for receiving the response messages:
+```js
+window.addEventListener('message', function(event) {
+    // Process response
+});
+```
 
 Messages sent by a tool that has been launched from a Canvas mobile app will not receive any response messages.
 
@@ -64,7 +72,7 @@ Returning postMessage includes the following properties:
   - frame: (optional) the named frame on the parent window to which postMessages should be sent
 
 ```js
-window.top.postMessage({subject: 'lti.capabilities'}, '*')
+window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 ```
 
 ## lti.put_data
@@ -175,7 +183,7 @@ Launches the tool that sent the event in a full-window context (ie not inside a 
 - data.launchOptions.height: for launchType: popup, defines the popup window's height. Defaults to 600.
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
     subject: 'requestFullWindowLaunch',
     data: {
@@ -201,7 +209,7 @@ Opens and closes the course navigation sidebar, giving more space for the tool t
 - subject: "toggleCourseNavigationMenu"
 
 ```js
-window.top.postMessage({subject: 'toggleCourseNavigationMenu'}, '*')
+window.parent.postMessage({subject: 'toggleCourseNavigationMenu'}, '*')
 ```
 
 ## lti.resourceImported
@@ -215,7 +223,7 @@ apps tray. Used on wiki pages.
 - subject: "lti.resourceImported"
 
 ```js
-window.top.postMessage({subject: 'lti.resourceImported'}, '*')
+window.parent.postMessage({subject: 'lti.resourceImported'}, '*')
 ```
 
 ## lti.hideRightSideWrapper
@@ -227,7 +235,7 @@ Tells Canvas to remove the right side nav in the assignments view.
 - subject: "lti.hideRightSideWrapper"
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
     subject: 'lti.hideRightSideWrapper',
   },
@@ -249,7 +257,7 @@ Tells Canvas to change the height of the iframe containing the tool.
 - token: postMessage token, discussed above.
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
     subject: 'lti.frameResize',
     height: 400,
@@ -277,7 +285,7 @@ Returning postMessage includes the following properties:
 - scrollY: the number of px that the iframe is scrolled vertically
 
 ```js
-window.top.postMessage({subject: 'lti.fetchWindowSize'}, '*')
+window.parent.postMessage({subject: 'lti.fetchWindowSize'}, '*')
 ```
 
 ## lti.showModuleNavigation
@@ -290,9 +298,9 @@ Toggles the module navigation footer based on the message's content.
 - show: Boolean, whether to show or hide the footer
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
-    subject: 'lti.frameResize',
+    subject: 'lti.showModuleNavigation',
     show: true,
   },
   '*'
@@ -308,7 +316,7 @@ Scrolls the iframe all the way to the top of its container.
 - subject: "lti.scrollToTop"
 
 ```js
-window.top.postMessage({subject: 'lti.scrollToTop'}, '*')
+window.parent.postMessage({subject: 'lti.scrollToTop'}, '*')
 ```
 
 ## lti.setUnloadMessage
@@ -322,7 +330,7 @@ Sets a message to be shown in a browser dialog before page closes (ie
 - message: The message to be shown in the dialog
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
     subject: 'lti.setUnloadMessage',
     message: 'Are you sure you want to leave this app?',
@@ -340,7 +348,7 @@ Required properties
 - subject: "lti.removeUnloadMessage"
 
 ```js
-window.top.postMessage({subject: 'lti.removeUnloadMessage'}, '*')
+window.parent.postMessage({subject: 'lti.removeUnloadMessage'}, '*')
 ```
 
 ## lti.screenReaderAlert
@@ -353,7 +361,7 @@ Shows an alert for screen readers.
 - body: The contents of the alert.
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
     subject: 'lti.screenReaderAlert',
     body: 'An alert just for screen readers',
@@ -379,7 +387,7 @@ tool that sent the message.
   supply the tool name or default to "External Tool".
 
 ```js
-window.top.postMessage(
+window.parent.postMessage(
   {
     subject: 'lti.showAlert',
     alertType: 'warning',
@@ -405,5 +413,5 @@ Returning postMessage includes the following properties:
 - scrollY: the number of px that the iframe is scrolled vertically
 
 ```js
-window.top.postMessage({subject: 'lti.enableScrollEvents'}, '*')
+window.parent.postMessage({subject: 'lti.enableScrollEvents'}, '*')
 ```

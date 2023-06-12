@@ -53,14 +53,14 @@ class UserObservationLink < ActiveRecord::Base
     shard = cross_shard_record ? observer.shard : student.shard
     result = shard.activate do
       unique_constraint_retry do
-        if (uo = where(student: student, observer: observer).for_root_accounts(root_account).take)
+        if (uo = where(student:, observer:).for_root_accounts(root_account).take)
           if uo.workflow_state == "deleted"
             uo.workflow_state = "active"
             uo.sis_batch_id = nil
             uo.save!
           end
         else
-          uo = create!(student: student, observer: observer, root_account: root_account)
+          uo = create!(student:, observer:, root_account:)
         end
         uo
       end
@@ -68,7 +68,7 @@ class UserObservationLink < ActiveRecord::Base
 
     if result.primary_record?
       # create the cross_shard_record
-      create_or_restore(student: student, observer: observer, root_account: root_account, cross_shard_record: true) if result.cross_shard?
+      create_or_restore(student:, observer:, root_account:, cross_shard_record: true) if result.cross_shard?
 
       result.create_linked_enrollments
       result.student.touch
@@ -150,7 +150,7 @@ class UserObservationLink < ActiveRecord::Base
   def primary_record
     if cross_shard? && !primary_record?
       Shard.shard_for(user_id).activate do
-        self.class.where(user_id: user_id, observer_id: observer_id, root_account_id: root_account_id).take!
+        self.class.where(user_id:, observer_id:, root_account_id:).take!
       end
     else
       self
@@ -162,7 +162,7 @@ class UserObservationLink < ActiveRecord::Base
       self
     else
       Shard.shard_for(observer_id).activate do
-        self.class.where(user_id: user_id, observer_id: observer_id, root_account_id: root_account_id).take!
+        self.class.where(user_id:, observer_id:, root_account_id:).take!
       end
     end
   end

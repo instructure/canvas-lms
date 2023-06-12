@@ -22,57 +22,20 @@ require_relative "../views_helper"
 
 describe "shared/_select_content_dialog" do
   it "indicates plural file upload" do
+    assign(:combined_active_quizzes, [])
     course_with_teacher
     view_context
     render partial: "shared/select_content_dialog"
     page = Nokogiri(response.body)
     file_select = page.css("#file_select_label")
-    expect(file_select.inner_text).to match(/New File\(s\)\./)
+    expect(file_select.inner_text).to match(/Create File\(s\)\./)
   end
 
-  describe "with new_quizzes_modules_support disabled" do
+  describe "new quizzes" do
     before do
       course_with_teacher
       view_context
-      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
-    end
-
-    it "only renders classic quizzes when Quiz is selected" do
-      @course.quizzes.create!(title: "A")
-      @course.quizzes.create!(title: "C")
-      new_quizzes_assignment(course: @course, title: "B")
-      render partial: "shared/select_content_dialog"
-      page = Nokogiri(response.body)
-      options = page.css("#quizs_select .module_item_select option").map(&:text)
-      expect(options).to eq(["[ New Quiz ]", "A", "C"])
-    end
-
-    it "renders New Quizzes as Assignments" do
-      new_quizzes_assignment(course: @course, title: "Some New Quiz")
-      render partial: "shared/select_content_dialog"
-      page = Nokogiri(response.body)
-      options = page.css("#assignments_select .module_item_select option").map(&:text)
-      expect(options).to eq(["[ New Assignment ]", "Some New Quiz"])
-    end
-
-    it "does not render radios for quiz engine selection" do
-      assign(:combined_active_quizzes, [])
-      render partial: "shared/select_content_dialog"
-      page = Nokogiri(response.body)
-      expect(page.at_css('#quizs_select .new input[type="radio"]')).to be_nil
-    end
-  end
-
-  describe "with new_quizzes_modules_support enabled" do
-    before do
-      course_with_teacher
-      view_context
-      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
       allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_enabled?).and_return(true)
-    end
-
-    after do
-      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
     end
 
     it "renders classic quizzes and new quizzes together when Quiz is selected" do
@@ -191,6 +154,7 @@ describe "shared/_select_content_dialog" do
   end
 
   it "includes unpublished wiki pages" do
+    assign(:combined_active_quizzes, [])
     course_with_teacher
     published_page = @course.wiki_pages.build title: "published_page"
     published_page.workflow_state = "active"
@@ -209,6 +173,7 @@ describe "shared/_select_content_dialog" do
     @account = Account.default
     course_with_ta account: @account, active_all: true
     existing_quiz = @course.quizzes.create! title: "existing quiz"
+    assign(:combined_active_quizzes, [[existing_quiz.id, "existing quiz", "quiz"]])
     @account.role_overrides.create! role: ta_role, permission: "manage_assignments", enabled: false
     view_context
     render partial: "shared/select_content_dialog"
@@ -219,6 +184,7 @@ describe "shared/_select_content_dialog" do
   end
 
   it "offers to create assignments if the user has permission" do
+    assign(:combined_active_quizzes, [])
     @account = Account.default
     course_with_ta account: @account, active_all: true
     view_context
@@ -228,6 +194,7 @@ describe "shared/_select_content_dialog" do
   end
 
   it "creates new topics in unpublished state if draft state is enabled" do
+    assign(:combined_active_quizzes, [])
     course_with_teacher(active_all: true)
     view_context
     render partial: "shared/select_content_dialog"
@@ -244,28 +211,35 @@ describe "shared/_select_content_dialog" do
     end
 
     it "sorts wiki pages by name" do
+      assign(:combined_active_quizzes, [])
       a = @course.wiki_pages.create!(title: "A")
       c = @course.wiki_pages.create!(title: "C")
       b = @course.wiki_pages.create!(title: "B")
       render partial: "shared/select_content_dialog"
       page = Nokogiri(response.body)
       options = page.css("#wiki_pages_select option").map { |option| [option.text, option.attribute("value").to_s] }
-      expect(options).to eq([["[ New Page ]", "new"], ["A", a.id.to_s], ["B", b.id.to_s], ["C", c.id.to_s]])
+      expect(options).to eq([["[ Create Page ]", "new"], ["A", a.id.to_s], ["B", b.id.to_s], ["C", c.id.to_s]])
     end
 
     it "sorts quizzes and the quiz assignment group selector by name" do
       a = @course.quizzes.create!(title: "A")
       c = @course.quizzes.create!(title: "C")
       b = @course.quizzes.create!(title: "B")
+      assign(:combined_active_quizzes, [
+               [a.id, "A", "quiz"],
+               [b.id, "B", "quiz"],
+               [c.id, "C", "quiz"]
+             ])
       render partial: "shared/select_content_dialog"
       page = Nokogiri(response.body)
       options = page.css("#quizs_select .module_item_select option").map { |option| [option.text, option.attribute("value").to_s] }
-      expect(options).to eq([["[ New Quiz ]", "new"], ["A", "quiz_#{a.id}"], ["B", "quiz_#{b.id}"], ["C", "quiz_#{c.id}"]])
+      expect(options).to eq([["[ Create Quiz ]", "new"], ["A ", "quiz_#{a.id}"], ["B ", "quiz_#{b.id}"], ["C ", "quiz_#{c.id}"]])
       groups = page.css('select[name="quiz[assignment_group_id]"] option').map { |option| [option.text, option.attribute("value").to_s] }
       expect(groups).to eq([["group A", @groupA.id.to_s], ["group B", @groupB.id.to_s]])
     end
 
     it "sorts assignments by name within assignment groups, which are also sorted by name" do
+      assign(:combined_active_quizzes, [])
       bb = @course.assignments.create!(title: "B", assignment_group: @groupB)
       aa = @course.assignments.create!(title: "A", assignment_group: @groupA)
       ac = @course.assignments.create!(title: "C", assignment_group: @groupA)
@@ -283,13 +257,14 @@ describe "shared/_select_content_dialog" do
     end
 
     it "sorts discussion topics by name" do
+      assign(:combined_active_quizzes, [])
       a = @course.discussion_topics.create!(title: "A")
       c = @course.discussion_topics.create!(title: "C")
       b = @course.discussion_topics.create!(title: "B")
       render partial: "shared/select_content_dialog"
       page = Nokogiri(response.body)
       options = page.css("#discussion_topics_select option").map { |option| [option.text, option.attribute("value").to_s] }
-      expect(options).to eq([["[ New Topic ]", "new"], ["A", a.id.to_s], ["B", b.id.to_s], ["C", c.id.to_s]])
+      expect(options).to eq([["[ Create Topic ]", "new"], ["A", a.id.to_s], ["B", b.id.to_s], ["C", c.id.to_s]])
     end
   end
 end

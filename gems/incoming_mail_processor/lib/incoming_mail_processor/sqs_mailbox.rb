@@ -36,17 +36,14 @@ module IncomingMailProcessor
     end
 
     def connect
-      @sqs = Aws::SQS::Client.new(config.slice(:access_key_id,
-                                               :secret_access_key,
-                                               :endpoint,
-                                               :region))
+      @sqs = Aws::SQS::Client.new(config.slice(:credentials, :endpoint, :region))
       @queue_url = @sqs.get_queue_url(queue_name: config[:incoming_mail_queue_name]).queue_url
       @incoming_mail_queue = Aws::SQS::QueuePoller.new(@queue_url, client: @sqs)
     end
 
     def disconnect; end
 
-    def each_message(**)
+    def each_message(*)
       start_time = Time.now
       iteration_high_water = config[:iteration_high_water] || 300
       @incoming_mail_queue.before_request do |_stats|
@@ -89,7 +86,7 @@ module IncomingMailProcessor
       sqs_body = JSON.parse(msg.body)
       sns_body = JSON.parse(sqs_body["Message"])
       key = sns_body["mail"]["messageId"]
-      s3 = Aws::S3::Resource.new(access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key],
+      s3 = Aws::S3::Resource.new(credentials: config[:credentials],
                                  region: config[:region] || "us-east-1")
       obj = s3.bucket(config[:incoming_mail_bucket]).object(key)
       obj.get.body.read

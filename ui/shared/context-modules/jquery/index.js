@@ -24,11 +24,10 @@ import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import ContextModulesView from '../backbone/views/context_modules.coffee' /* handles the publish/unpublish state */
+import ContextModulesView from '../backbone/views/context_modules' /* handles the publish/unpublish state */
 import RelockModulesDialog from '../backbone/views/RelockModulesDialog'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import vddTooltipView from '../jst/_vddTooltip.handlebars'
@@ -56,7 +55,7 @@ import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import mathml from 'mathml'
+import {Mathml} from '@instructure/canvas-rce'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {
@@ -69,7 +68,12 @@ import {
   setExpandAllButton,
   updateProgressionState,
 } from './utils'
-import ContextModulesPublishIcon from '@canvas/context-modules-publish-icon/ContextModulesPublishIcon'
+import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
+import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
+import {underscoreString} from '@canvas/convert-case'
+import {selectContentDialog} from '@canvas/select-content-dialog'
+
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('context_modulespublic')
 
@@ -513,7 +517,7 @@ window.modules = (function () {
         return $('<div/>')
       }
       data.id = data.id || 'new'
-      data.type = data.type || data['item[type]'] || $.underscore(data.content_type)
+      data.type = data.type || data['item[type]'] || underscoreString(data.content_type)
       data.title = data.title || data['item[title]']
       data.new_tab = data.new_tab ? '1' : '0'
       data.graded = data.graded ? '1' : '0'
@@ -532,6 +536,22 @@ window.modules = (function () {
         $item = $('#context_module_item_blank').clone(true).removeAttr('id')
         modules.evaluateItemCyoe($item, data)
       }
+      const speedGraderId = `${data.type}-${data.content_id}`
+      const $speedGrader = $item.find('#speed-grader-container-blank')
+      $speedGrader.attr('id', 'speed-grader-container-' + speedGraderId)
+
+      const isPublished = data.published
+      const isAssignmentOrQuiz =
+        data.content_type === 'Assignment' || data.content_type === 'Quizzes::Quiz'
+      const isPublishedGradedDiscussion =
+        isPublished && data.graded === '1' && data.content_type === 'DiscussionTopic'
+
+      const $speedGraderLinkContainer = $item.find('.speed-grader-link-container')
+
+      if ((isPublished && isAssignmentOrQuiz) || isPublishedGradedDiscussion) {
+        $speedGraderLinkContainer.removeClass('hidden')
+      }
+
       $item.addClass(data.type + '_' + data.id)
       $item.addClass(data.quiz_lti ? 'lti-quiz' : data.type)
       if (data.is_duplicate_able) {
@@ -542,7 +562,7 @@ window.modules = (function () {
       $item.fillTemplateData({
         data,
         id: 'context_module_item_' + data.id,
-        hrefValues: ['id', 'context_module_id', 'content_id'],
+        hrefValues: ['id', 'context_module_id', 'content_id', 'content_type', 'assignment_id'],
       })
       for (let idx = 0; idx < 10; idx++) {
         $item.removeClass('indent_' + idx)
@@ -830,6 +850,24 @@ const newPillMessage = function ($module, requirement_count) {
   }
 }
 
+const updatePublishMenuDisabledState = function (disabled) {
+  // Update the top level publish menu to reflect the new module
+  const publishMenu = document.getElementById('context-modules-publish-menu')
+  if (publishMenu) {
+    const $publishMenu = $(publishMenu)
+    $publishMenu.data('disabled', disabled)
+    ReactDOM.render(
+      <ContextModulesPublishMenu
+        courseId={$publishMenu.data('courseId')}
+        runningProgressId={$publishMenu.data('progressId')}
+        disabled={disabled}
+      />,
+      publishMenu
+    )
+  }
+}
+modules.updatePublishMenuDisabledState = updatePublishMenuDisabledState
+
 modules.initModuleManagement = function (duplicate) {
   const moduleItems = {}
 
@@ -992,6 +1030,7 @@ modules.initModuleManagement = function (duplicate) {
       $('#no_context_modules_message').slideUp()
       $('#expand_collapse_all').show()
       setExpandAllButton()
+      const published = data.context_module.workflow_state === 'published'
       const $publishIcon = $module.find('.publish-icon')
       // new module, setup publish icon and other stuff
       if (!$publishIcon.data('id')) {
@@ -1007,28 +1046,23 @@ modules.initModuleManagement = function (duplicate) {
           moduleType: 'module',
           id: data.context_module.id,
           courseId: data.context_module.context_id,
-          published: data.context_module.workflow_state === 'published',
+          published,
           publishable: true,
         }
         const view = initPublishButton($publishIcon, publishData)
         overrideModel(moduleItems, relock_modules_dialog, view.model, view)
-
-        if (window.ENV?.FEATURES?.module_publish_menu) {
-          const publishMenu = $module.find('.module-publish-icon')[0]
-          // Make sure the data attributes on publishMenu are correct. When a new module is created it copies from the
-          // template and may not have the correct data attributes.
-          publishMenu.dataset.courseId = data.context_module.context_id
-          publishMenu.dataset.moduleId = data.context_module.id
-          publishMenu.dataset.published = data.context_module.workflow_state === 'published'
-          ReactDOM.render(
-            <ContextModulesPublishIcon
-              courseId={data.context_module.context_id}
-              moduleId={data.context_module.id}
-              published={data.context_module.workflow_state === 'published'}
-            />,
-            publishMenu
-          )
-        }
+      }
+      if (window.ENV?.FEATURES?.module_publish_menu) {
+        const isPublishing =
+          document.querySelector('#context-modules-publish-menu').dataset['data-progress-id'] !==
+          undefined
+        updatePublishMenuDisabledState(isPublishing)
+        renderContextModulesPublishIcon(
+          data.context_module.context_id,
+          data.context_module.id,
+          published,
+          isPublishing
+        )
       }
       relock_modules_dialog.renderIfNeeded(data.context_module)
       $module.triggerHandler('update', data)
@@ -1045,7 +1079,10 @@ modules.initModuleManagement = function (duplicate) {
         )
       }
 
-      if (window.ENV?.FEATURES?.new_math_equation_handling) {
+      if (window.ENV?.FEATURES?.explicit_latex_typesetting === false) {
+        // new_math_equation_handling is always true for modules
+        // application_controller.rb:660
+        const mathml = new Mathml({new_math_equation_handling: true}, {locale: ENV?.locale || 'en'})
         if (mathml.isMathMLOnPage()) {
           if (mathml.isMathJaxLoaded()) {
             mathml.reloadElement('content')
@@ -1151,6 +1188,7 @@ modules.initModuleManagement = function (duplicate) {
     $('.requirement-count-radio').show()
     $('#context_module_requirement_count_').change()
   })
+
   $('#completion_criterion_option .id').change(function () {
     const $option = $(this).parents('.completion_criterion_option')
     const data = $('#context_module_item_' + $(this).val()).getTemplateData({
@@ -1174,6 +1212,7 @@ modules.initModuleManagement = function (duplicate) {
     $option.find('.type').val($option.find('.type option.' + data.criterion_type + ':first').val())
     $option.find('.type').change()
   })
+
   $('#completion_criterion_option .type').change(function () {
     const $option = $(this).parents('.completion_criterion_option')
 
@@ -1232,7 +1271,7 @@ modules.initModuleManagement = function (duplicate) {
     })
   })
 
-  $('.duplicate_module_link').live('click', function (event) {
+  $(document).on('click', '.duplicate_module_link', function (event) {
     event.preventDefault()
     const duplicateRequestUrl = $(this).attr('href')
     const duplicatedModuleElement = $(this).parents('.context_module')
@@ -1294,7 +1333,7 @@ modules.initModuleManagement = function (duplicate) {
       .catch(showFlashError(I18n.t('Error duplicating module')))
   })
 
-  $('.delete_module_link').live('click', function (event) {
+  $(document).on('click', '.delete_module_link', function (event) {
     event.preventDefault()
     $(this)
       .parents('.context_module')
@@ -1328,6 +1367,9 @@ modules.initModuleManagement = function (duplicate) {
             const $contextModules = $('#context_modules .context_module')
             if (!$contextModules.length) {
               $('#expand_collapse_all').hide()
+              if (window.ENV?.FEATURES?.module_publish_menu) {
+                updatePublishMenuDisabledState(true)
+              }
             }
           })
           $.flashMessage(
@@ -1338,41 +1380,47 @@ modules.initModuleManagement = function (duplicate) {
         },
       })
   })
-  $('.outdent_item_link,.indent_item_link').live('click', function (event, elem, activeElem) {
-    event.preventDefault()
-    const $elem = $(elem)
-    const elemID =
-      $elem && $elem.attr('id') ? '#' + $elem.attr('id') : elem && '.' + $elem.attr('class')
-    const $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger')
-    const do_indent = $(this).hasClass('indent_item_link')
-    const $item = $(this).parents('.context_module_item')
-    let indent = modules.currentIndent($item)
-    indent = Math.max(Math.min(indent + (do_indent ? 1 : -1), 5), 0)
-    $item.loadingImage({image_size: 'small'})
-    $.ajaxJSON(
-      $(this).attr('href'),
-      'PUT',
-      {'content_tag[indent]': indent},
-      data => {
-        $item.loadingImage('remove')
-        const $module = $('#context_module_' + data.content_tag.context_module_id)
-        modules.addItemToModule($module, data.content_tag)
-        $module.find('.context_module_items.ui-sortable').sortable('refresh')
-        modules.updateAssignmentData()
-      },
-      _data => {}
-    ).done(() => {
-      if (elemID) {
-        setTimeout(() => {
-          const $activeElemClass = '.' + $(activeElem).attr('class').split(' ').join('.')
-          $(elemID).find($activeElemClass).focus()
-        }, 0)
-      } else {
-        $cogLink.focus()
-      }
-    })
-  })
-  $('.edit_item_link').live('click', function (event) {
+
+  $(document).on(
+    'click',
+    '.outdent_item_link,.indent_item_link',
+    function (event, elem, activeElem) {
+      event.preventDefault()
+      const $elem = $(elem)
+      const elemID =
+        $elem && $elem.attr('id') ? '#' + $elem.attr('id') : elem && '.' + $elem.attr('class')
+      const $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger')
+      const do_indent = $(this).hasClass('indent_item_link')
+      const $item = $(this).parents('.context_module_item')
+      let indent = modules.currentIndent($item)
+      indent = Math.max(Math.min(indent + (do_indent ? 1 : -1), 5), 0)
+      $item.loadingImage({image_size: 'small'})
+      $.ajaxJSON(
+        $(this).attr('href'),
+        'PUT',
+        {'content_tag[indent]': indent},
+        data => {
+          $item.loadingImage('remove')
+          const $module = $('#context_module_' + data.content_tag.context_module_id)
+          modules.addItemToModule($module, data.content_tag)
+          $module.find('.context_module_items.ui-sortable').sortable('refresh')
+          modules.updateAssignmentData()
+        },
+        _data => {}
+      ).done(() => {
+        if (elemID) {
+          setTimeout(() => {
+            const $activeElemClass = '.' + $(activeElem).attr('class').split(' ').join('.')
+            $(elemID).find($activeElemClass).focus()
+          }, 0)
+        } else {
+          $cogLink.focus()
+        }
+      })
+    }
+  )
+
+  $(document).on('click', '.edit_item_link', function (event) {
     event.preventDefault()
     const $cogLink = $(this).closest('.cog-menu-container').children('.al-trigger')
     const $item = $(this).parents('.context_module_item')
@@ -1402,9 +1450,11 @@ modules.initModuleManagement = function (duplicate) {
       })
       .fixDialogButtons()
   })
+
   $('#edit_item_form .cancel_button').click(_event => {
     $('#edit_item_form').dialog('close')
   })
+
   $('#edit_item_form').formSubmit({
     beforeSubmit(data) {
       if (data['content_tag[title]'] == '') {
@@ -1433,7 +1483,7 @@ modules.initModuleManagement = function (duplicate) {
     },
   })
 
-  $('.delete_item_link').live('click', function (event) {
+  $(document).on('click', '.delete_item_link', function (event) {
     event.preventDefault()
     const $currentCogLink = $(this).closest('.cog-menu-container').children('.al-trigger')
     // Get the previous cog item to focus after delete
@@ -1627,12 +1677,12 @@ modules.initModuleManagement = function (duplicate) {
     $(event.currentTarget).addClass('screenreader-only')
   })
 
-  $('.edit_module_link').live('click', function (event) {
+  $(document).on('click', '.edit_module_link', function (event) {
     event.preventDefault()
     modules.editModule($(this).parents('.context_module'))
   })
 
-  $('.add_module_link').live('click', event => {
+  $(document).on('click', '.add_module_link', event => {
     event.preventDefault()
     modules.addModule()
   })
@@ -1663,24 +1713,24 @@ modules.initModuleManagement = function (duplicate) {
       })
       return
     }
-    if (INST && INST.selectContentDialog) {
-      const id = $(this).parents('.context_module').find('.header').attr('id')
-      const name = $(this).parents('.context_module').find('.name').attr('title')
-      const options = {for_modules: true, context_module_id: id}
-      const midSizeModal = window.matchMedia('(min-width: 500px)').matches
-      const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
-      const responsiveWidth = fullSizeModal ? 770 : midSizeModal ? 500 : 320
-      options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
-      options.holder_name = name
-      options.height = 550
-      options.width = responsiveWidth
-      options.dialog_title = I18n.t('titles.add_item', 'Add Item to %{module}', {module: name})
-      options.close = function () {
-        $trigger.focus()
-      }
-      options.submit = generate_submit(id)
-      INST.selectContentDialog(options)
+
+    const id = $(this).parents('.context_module').find('.header').attr('id')
+    const name = $(this).parents('.context_module').find('.name').attr('title')
+    const options = {for_modules: true, context_module_id: id}
+    const midSizeModal = window.matchMedia('(min-width: 500px)').matches
+    const fullSizeModal = window.matchMedia('(min-width: 770px)').matches
+    const responsiveWidth = fullSizeModal ? 770 : midSizeModal ? 500 : 320
+    options.select_button_text = I18n.t('buttons.add_item', 'Add Item')
+    options.holder_name = name
+    options.height = 550
+    options.width = responsiveWidth
+    options.dialog_title = I18n.t('titles.add_item', 'Add Item to %{module}', {module: name})
+    options.close = function () {
+      $trigger.focus()
     }
+
+    options.submit = generate_submit(id)
+    selectContentDialog(options)
   })
 
   function generate_submit(id, focusLink = true) {
@@ -1728,7 +1778,7 @@ modules.initModuleManagement = function (duplicate) {
     }
   }
 
-  $('.duplicate_item_link').live('click', function (event) {
+  $(document).on('click', '.duplicate_item_link', function (event) {
     event.preventDefault()
 
     const $module = $(this).closest('.context_module')
@@ -1765,7 +1815,7 @@ modules.initModuleManagement = function (duplicate) {
     $('#add_module_prerequisite_dialog').dialog('close')
   })
 
-  $('.delete_prerequisite_link').live('click', function (event) {
+  $(document).on('click', '.delete_prerequisite_link', function (event) {
     event.preventDefault()
     const $criterion = $(this).parents('.criterion')
     const prereqs = []
@@ -1822,7 +1872,7 @@ modules.initModuleManagement = function (duplicate) {
       }
     )
   })
-  $('.context_module .add_prerequisite_link').live('click', function (event) {
+  $(document).on('click', '.context_module .add_prerequisite_link', function (event) {
     event.preventDefault()
     const module = $(this)
       .parents('.context_module')
@@ -1907,7 +1957,7 @@ modules.initModuleManagement = function (duplicate) {
     overrideModel(moduleItems, relock_modules_dialog, view.model, view)
   }
 
-  const initNewItemDirectShare = ($item, data) => {
+  function initNewItemDirectShare($item, data) {
     const $copyToMenuItem = $item.find('.module_item_copy_to')
     if ($copyToMenuItem.length === 0) return // feature not enabled, probably
     const $sendToMenuItem = $item.find('.module_item_send_to')
@@ -1937,6 +1987,16 @@ modules.initModuleManagement = function (duplicate) {
     }
   })
 
+  if (duplicate && duplicate.length) {
+    const modulePublishIcon = duplicate[0].querySelector('.module-publish-icon')
+    if (modulePublishIcon) {
+      const courseId = modulePublishIcon.getAttribute('data-course-id')
+      const moduleId = modulePublishIcon.getAttribute('data-module-id')
+      const published = modulePublishIcon.getAttribute('data-published') === 'true'
+      renderContextModulesPublishIcon(courseId, moduleId, false, published)
+    }
+  }
+
   $('.module-publish-link').each((i, element) => {
     const $el = $(element)
     const model = new Publishable(
@@ -1946,6 +2006,12 @@ modules.initModuleManagement = function (duplicate) {
     const view = new PublishButtonView({model, el: $el})
     view.render()
   })
+  // I tried deferring the rendering of ContextModulesPuyblishMenu
+  // and ContextModulesPublishIcons until here,
+  // after the models and views were all setup, but it made
+  // the UI janky. Let them get rendered early, the tell
+  // ContextModulesPublishMenu everything is ready.
+  window.dispatchEvent(new Event('module-publish-models-ready'))
 }
 
 function toggleModuleCollapse(event) {
@@ -2063,12 +2129,12 @@ $(document).ready(function () {
 
   $('.datetime_field').datetime_field()
 
-  $('.context_module').live('mouseover', function () {
+  $(document).on('mouseover', '.context_module', function () {
     $('.context_module_hover').removeClass('context_module_hover')
     $(this).addClass('context_module_hover')
   })
 
-  $('.context_module_item').live('mouseover focus', function () {
+  $(document).on('mouseover focus', '.context_module_item', function () {
     $('.context_module_item_hover').removeClass('context_module_item_hover')
     $(this).addClass('context_module_item_hover')
   })
@@ -2447,7 +2513,7 @@ $(document).ready(function () {
     )
   }
 
-  $('.module_copy_to').live('click', event => {
+  $(document).on('click', '.module_copy_to', event => {
     event.preventDefault()
     const moduleId = $(event.target).closest('.context_module').data('module-id').toString()
     const selection = {modules: [moduleId]}
@@ -2455,7 +2521,7 @@ $(document).ready(function () {
     renderCopyToTray(true, selection, returnFocusTo)
   })
 
-  $('.module_send_to').live('click', event => {
+  $(document).on('click', '.module_send_to', event => {
     event.preventDefault()
     const moduleId = $(event.target).closest('.context_module').data('module-id').toString()
     const selection = {content_type: 'module', content_id: moduleId}
@@ -2463,7 +2529,7 @@ $(document).ready(function () {
     renderSendToTray(true, selection, returnFocusTo)
   })
 
-  $('.module_item_copy_to').live('click', event => {
+  $(document).on('click', '.module_item_copy_to', event => {
     event.preventDefault()
     const select_id = $(event.target).data('select-id')
     const select_class = $(event.target).data('select-class')
@@ -2472,7 +2538,7 @@ $(document).ready(function () {
     renderCopyToTray(true, selection, returnFocusTo)
   })
 
-  $('.module_item_send_to').live('click', event => {
+  $(document).on('click', '.module_item_send_to', event => {
     event.preventDefault()
     const content_id = $(event.target).data('content-id')
     const content_type = $(event.target).data('content-type')

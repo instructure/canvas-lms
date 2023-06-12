@@ -86,7 +86,7 @@ module DynamicSettings
       # Within a given request, no reason to talk to redis/consul multiple times for the same key in the same tree
       # The TTL is only relevant for the underlying cache-within a request we don't exceed the ttl boundary
       DynamicSettings.request_cache.cache(CACHE_KEY_PREFIX + full_key(key)) do
-        fetch_without_request_cache(key, ttl: ttl, **kwargs)
+        fetch_without_request_cache(key, ttl:, **kwargs)
       end
     end
     alias_method :[], :fetch
@@ -101,11 +101,11 @@ module DynamicSettings
     def for_prefix(prefix_extension, default_ttl: @default_ttl)
       self.class.new(
         "#{@prefix}/#{prefix_extension}",
-        tree: tree,
-        service: service,
-        environment: environment,
-        cluster: cluster,
-        default_ttl: default_ttl,
+        tree:,
+        service:,
+        environment:,
+        cluster:,
+        default_ttl:,
         data_center: @data_center
       )
     end
@@ -117,12 +117,12 @@ module DynamicSettings
     # @param global [boolean] Is it a global key?
     # @return Consul txn response
     def set_keys(kvs, global: false)
-      opts = @data_center.present? && global ? { dc: @data_center } : {}
+      opts = (@data_center.present? && global) ? { dc: @data_center } : {}
       value = kvs.map do |k, v|
         {
           "KV" => {
             "Verb" => "set",
-            "Key" => full_key(k, global: global),
+            "Key" => full_key(k, global:),
             "Value" => v,
           }
         }
@@ -198,7 +198,6 @@ module DynamicSettings
           end
           return result if result
         end
-        DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
         nil
       rescue Diplomat::KeyNotFound, Diplomat::UnknownStatus, Diplomat::PathNotFound, Errno::ECONNREFUSED => e
         if cache.respond_to?(:fetch_without_expiration)
@@ -249,7 +248,7 @@ module DynamicSettings
       timing = format("CONSUL (%.2fms)", ms)
       status = "OK"
       unless error.nil?
-        status = error.is_a?(Diplomat::KeyNotFound) && error.message == full_key ? "NOT_FOUND" : "ERROR"
+        status = (error.is_a?(Diplomat::KeyNotFound) && error.message == full_key) ? "NOT_FOUND" : "ERROR"
       end
       DynamicSettings.logger.debug("  #{timing} get (#{full_key}) -> status:#{status}") if @query_logging
       return nil if status == "NOT_FOUND"
@@ -270,11 +269,11 @@ module DynamicSettings
       else
         key_array << cluster
       end
-      key_array.concat([prefix, key]).compact.join("/")
+      key_array.push(prefix, key).compact.join("/")
     end
 
     def populate_cache(subtree, ttl)
-      cache.write_set(subtree.map { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }.to_h, ttl: ttl)
+      cache.write_set(subtree.to_h { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }, ttl:)
     end
   end
 end

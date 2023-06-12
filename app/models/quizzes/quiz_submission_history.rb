@@ -42,7 +42,7 @@ class Quizzes::QuizSubmissionHistory
   def version_models
     last_versions.map do |version|
       model = version.model
-      model&.attempt == @submission.attempt ? @submission : model
+      (model&.attempt == @submission.attempt) ? @submission : model
     end
   end
 
@@ -66,7 +66,7 @@ class Quizzes::QuizSubmissionHistory
 
   def build_attempts(quiz_submission)
     attempts = quiz_submission_attempts(quiz_submission).map do |num, versions|
-      Quizzes::QuizSubmissionAttempt.new(number: num, versions: versions)
+      Quizzes::QuizSubmissionAttempt.new(number: num, versions:)
     end
     attempts.sort_by(&:number)
   end

@@ -22,19 +22,29 @@ class MediaObject < ActiveRecord::Base
   include Workflow
   include SearchTermHelper
   belongs_to :user
-  belongs_to :context, polymorphic:
-    [:course, :group, :conversation_message, :account, :assignment,
-     :assessment_question, { context_user: "User" }], exhaustive: false
+  belongs_to :context,
+             polymorphic:
+                 [:course,
+                  :group,
+                  :conversation_message,
+                  :account,
+                  :assignment,
+                  :assessment_question,
+                  { context_user: "User" }],
+             exhaustive: false
   belongs_to :attachment
   belongs_to :root_account, class_name: "Account"
 
   validates :media_id, :workflow_state, presence: true
-  has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
+  has_many :media_tracks, ->(media_object) { where(attachment_id: [nil, media_object.attachment_id]).order(:locale) }, dependent: :destroy, inverse_of: :media_object
+  has_many :attachments_by_media_id, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :media_object_by_media_id
+  before_create :create_attachment
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
   serialize :data
 
   attr_accessor :podcast_associated_asset
+  attr_accessor :current_attachment
 
   def user_entered_title=(val)
     @push_user_title = true
@@ -79,13 +89,13 @@ class MediaObject < ActiveRecord::Base
 
     given do |user|
       context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
-        ((self.user && self.user == user) || context&.grants_right?(user, :manage_course_content_add))
+        (attachment.present? ? attachment.grants_right?(user, :update) : context&.grants_right?(user, :manage_course_content_add))
     end
     can :add_captions
 
     given do |user|
       context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
-        ((self.user && self.user == user) || context&.grants_right?(user, :manage_course_content_delete))
+        (attachment.present? ? attachment.grants_right?(user, :update) : context&.grants_right?(user, :manage_course_content_delete))
     end
     can :delete_captions
   end
@@ -192,7 +202,7 @@ class MediaObject < ActiveRecord::Base
   # typically call this in a delayed job, since it has to contact kaltura
   def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && by_media_id(media_id).none?
-      create!(**create_opts.merge(media_id: media_id))
+      create!(**create_opts.merge(media_id:))
     end
   end
 
@@ -221,10 +231,12 @@ class MediaObject < ActiveRecord::Base
       if attempt < 10
         delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
       else
-        Canvas::Errors.capture(:media_object_failure, {
+        Canvas::Errors.capture(:media_object_failure,
+                               {
                                  message: "Kaltura flavor retrieval failed",
                                  object: inspect.to_s,
-                               }, :warn)
+                               },
+                               :warn)
       end
     end
   end
@@ -258,7 +270,7 @@ class MediaObject < ActiveRecord::Base
     end
     self.total_size = [max_size || 0, assets.sum { |a| (a[:size] || 0).to_i }].max
     save
-    ensure_attachment
+    ensure_attachment_media_info
     data
   end
 
@@ -315,45 +327,54 @@ class MediaObject < ActiveRecord::Base
   end
 
   def viewed!
-    delay.updated_viewed_at_and_retrieve_details(Time.now) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
+    # in the delayed job, current_attachment gets reset
+    # so we pass it in here and then set it again in the next method
+    delay.updated_viewed_at_and_retrieve_details(Time.now, current_attachment) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
     true
   end
 
-  def updated_viewed_at_and_retrieve_details(time)
+  def updated_viewed_at_and_retrieve_details(time, current_attachment = nil)
+    self.current_attachment = current_attachment if current_attachment
     self.data[:last_viewed_at] = [time, self.data[:last_viewed_at]].compact.max
     retrieve_details
   end
 
-  def destroy_without_destroying_attachment
-    self.workflow_state = "deleted"
-    self.attachment_id = nil
-    save!
-  end
-
-  def ensure_attachment
-    return if attachment_id
+  def create_attachment
+    return if current_attachment || attachment_id || Attachment.find_by(media_entry_id: media_id)
     return unless %w[Account Course Group User].include?(context_type)
 
+    self.attachment = Folder.media_folder(context).attachments
+                            .create(
+                              context:,
+                              display_name: guaranteed_title,
+                              filename: guaranteed_title,
+                              content_type: media_type,
+                              media_entry_id: media_id,
+                              # in case teachers don't mean for this to be visible to students in the files section
+                              file_state: "hidden",
+                              workflow_state: "pending_upload"
+                            )
+  end
+
+  def ensure_attachment_media_info
+    create_attachment
+    return unless (current_attachment || attachment_id) && attachment.workflow_state == "pending_upload"
+
+    # if there are multiple attachments attached to the media_object, we need to update the right one
+    updated_attachment = current_attachment || attachment
+
+    file_state = updated_attachment.file_state
     sources = media_sources
     return unless sources.present?
-
-    attachment = build_attachment({
-                                    "context" => context,
-                                    "display_name" => title,
-                                    "filename" => title,
-                                    "content_type" => media_type,
-                                    "media_entry_id" => media_id,
-                                    "workflow_state" => "processed",
-                                    "folder_id" => Folder.media_folder(context).id
-                                  })
 
     url = self.data[:download_url]
     url = sources.find { |s| s[:isOriginal] == "1" }&.dig(:url) if url.blank?
     url = sources.min_by { |a| a[:bitrate].to_i }&.dig(:url) if url.blank?
 
-    attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
-    attachment.file_state = "hidden" # in case teachers don't mean for this to be visible to students in the files section
-    attachment.save!
+    updated_attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura
+    updated_attachment.file_state = file_state
+    updated_attachment.workflow_state = "processed"
+    updated_attachment.save!
   end
 
   def deleted?
@@ -362,9 +383,9 @@ class MediaObject < ActiveRecord::Base
 
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
-  scope :by_media_id, ->(media_id) { where(media_id: media_id).or(where(old_media_id: media_id).where.not(old_media_id: nil)) }
+  scope :by_media_id, ->(media_id) { where(media_id:).or(where(old_media_id: media_id).where.not(old_media_id: nil)) }
 
-  scope :by_media_type, ->(media_type) { where(media_type: media_type) }
+  scope :by_media_type, ->(media_type) { where(media_type:) }
 
   workflow do
     state :active

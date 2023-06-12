@@ -69,7 +69,8 @@ export const AddressBook = ({
   limitTagCount,
   headerText,
   width,
-  open,
+  isMenuOpen,
+  setIsMenuOpen,
   onUserFilterSelect,
   fetchMoreMenuData,
   hasMoreMenuData,
@@ -85,7 +86,6 @@ export const AddressBook = ({
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
   const popoverInstanceId = useRef(`address-book-menu-${nanoid()}`)
-  const [isMenuOpen, setIsMenuOpen] = useState(open)
   const [selectedItem, setSelectedItem] = useState(null)
   const [selectedMenuItems, setSelectedMenuItems] = useState([])
   const [isLimitReached, setLimitReached] = useState(false)
@@ -93,15 +93,19 @@ export const AddressBook = ({
   const menuRef = useRef(null)
   const userID = ENV.current_user_id?.toString()
   const [focusType, setFocusType] = useState(KEYBOARD_FOCUS_TYPE) // Options are 'keyboard' and 'mouse'
-  const backButtonArray = isSubMenu
-    ? [{id: 'backButton', name: I18n.t('Back'), itemType: BACK_BUTTON_TYPE}]
-    : []
+  const isCourseHomeMenu =
+    activeCourseFilter?.contextID &&
+    currentFilter.context?.contextID === activeCourseFilter?.contextID
+  const backButtonArray =
+    isSubMenu && !isCourseHomeMenu
+      ? [{id: 'backButton', name: I18n.t('Back'), itemType: BACK_BUTTON_TYPE}]
+      : []
   const headerArray = headerText
     ? [{id: 'headerText', name: headerText, focusSkip: true, itemType: HEADER_TEXT_TYPE}]
     : []
   const homeMenu = [
     {id: 'subMenuCourse', name: I18n.t('Courses'), itemType: SUBMENU_TYPE},
-    {id: 'subMenuStudents', name: I18n.t('Students'), itemType: SUBMENU_TYPE},
+    {id: 'subMenuUsers', name: I18n.t('Users'), itemType: SUBMENU_TYPE},
   ]
   const [data, setData] = useState([
     ...backButtonArray,
@@ -199,7 +203,7 @@ export const AddressBook = ({
       textInputRef?.current?.setAttribute('disabled', true)
       setIsMenuOpen(false)
     }
-  }, [selectedMenuItems, limitTagCount, textInputRef])
+  }, [selectedMenuItems, limitTagCount, textInputRef, setIsMenuOpen])
 
   // set initial recipients from props
   useEffect(() => {
@@ -691,7 +695,8 @@ AddressBook.propTypes = {
   /**
    * Bool which determines if addressbook is open
    */
-  open: PropTypes.bool,
+  isMenuOpen: PropTypes.bool,
+  setIsMenuOpen: PropTypes.func,
   /**
    * use State function to set user filter for conversations
    */

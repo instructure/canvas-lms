@@ -103,7 +103,7 @@ describe "speed grader submissions" do
     end
 
     it "displays submission late notice message", priority: "1" do
-      @assignment.due_at = Time.zone.now - 2.days
+      @assignment.due_at = 2.days.ago
       @assignment.save!
       student_submission
 
@@ -435,7 +435,7 @@ describe "speed grader submissions" do
         let!(:group) do
           group = submission_one.assignment.course.groups.create!(name: "group one")
           group.add_user(submission_one.user)
-          submission_one.update!(group: group)
+          submission_one.update!(group:)
           group
         end
 

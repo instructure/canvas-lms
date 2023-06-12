@@ -108,8 +108,8 @@ describe "Speedgrader" do
           Speedgrader.visit(@course.id, @quiz.assignment_id)
           Speedgrader.wait_for_grade_input
         end
-        Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment"\
-                           " #{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
+        Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment " \
+                           "#{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
         expect(page_load_time.real).to be > 0.0
       end
 
@@ -807,7 +807,7 @@ describe "Speedgrader" do
       seed_groups 1, 1
       scores = [5, 7, 10]
 
-      (0..2).each do |i|
+      3.times do |i|
         @testgroup[0].add_user @students[i]
       end
 
@@ -956,7 +956,7 @@ describe "Speedgrader" do
 
     it "list all students", priority: "1" do
       Speedgrader.click_students_dropdown
-      (0..2).each { |num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name) }
+      3.times { |num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name) }
     end
 
     it "list alias when hide student name is selected", priority: "2" do
@@ -988,7 +988,7 @@ describe "Speedgrader" do
         student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name: "li")
 
         graded = %w[resubmitted graded not_submitted]
-        (0..2).each { |num| expect(student_options[num]).to have_class(graded[num]) }
+        3.times { |num| expect(student_options[num]).to have_class(graded[num]) }
       end
     end
   end
@@ -1053,6 +1053,44 @@ describe "Speedgrader" do
       Speedgrader.click_submissions_to_view
       Speedgrader.select_option_submission_to_view("0")
       expect(Speedgrader.submission_file_name.text).to eq @attachment.filename
+    end
+
+    it "identifies the proxy submitter in the submission dropdown" do
+      Timecop.freeze(1.hour.ago) { submit_with_attachment }
+      resubmit_with_text
+      Account.site_admin.enable_feature!(:proxy_file_uploads)
+      teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      RoleOverride.create!(
+        permission: "proxy_assignment_submission",
+        enabled: true,
+        role: teacher_role,
+        account: @course.root_account
+      )
+      file_attachment = attachment_model(content_type: "application/pdf", context: @students.first)
+      submission = @assignment_for_course.submit_homework(@students.first, submission_type: "online_upload", attachments: [file_attachment])
+      @teacher.update!(short_name: "Test Teacher")
+      submission.update!(proxy_submitter: @teacher)
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment_for_course.id)
+      expect(Speedgrader.submission_to_view_dropdown).to include_text("(Test Teacher)")
+    end
+
+    it "identifies the proxy submitter in the submission details tray with only a single submission" do
+      Account.site_admin.enable_feature!(:proxy_file_uploads)
+      teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      RoleOverride.create!(
+        permission: "proxy_assignment_submission",
+        enabled: true,
+        role: teacher_role,
+        account: @course.root_account
+      )
+      file_attachment = attachment_model(content_type: "application/pdf", context: @students.first)
+      submission = @assignment_for_course.submit_homework(@students.first, submission_type: "online_upload", attachments: [file_attachment])
+      @teacher.update!(short_name: "Test Teacher")
+      submission.update!(proxy_submitter: @teacher)
+      user_session(@teacher)
+      Speedgrader.visit(@course.id, @assignment_for_course.id)
+      expect(Speedgrader.submitter_info).to include_text("by Test Teacher")
     end
   end
 

@@ -85,6 +85,9 @@
   &.publish-icon-unpublish { color: $ic-color-icon-disabled; }
   &.publish-icon-published { color: $ic-color-success; }
   .publish-text { display: none; }
+  &.disabled {
+    opacity: .5;
+  }
 }
 
 .published-status {

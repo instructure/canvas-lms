@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -21,6 +22,7 @@ import sinon from 'sinon'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
+import type {FinalGradeOverrideMap} from '../grading.d'
 
 describe('Gradebook FinalGradeOverrideApi', () => {
   let server
@@ -68,24 +70,32 @@ describe('Gradebook FinalGradeOverrideApi', () => {
     })
 
     it('camel-cases .finalGradeOverrides in the response data', async () => {
-      const data = await getFinalGradeOverrides()
+      const data = (await getFinalGradeOverrides()) as {
+        finalGradeOverrides: FinalGradeOverrideMap
+      }
       expect(Object.keys(data)).toEqual(['finalGradeOverrides'])
     })
 
     it('camel-cases keys in each student override datum', async () => {
-      const {finalGradeOverrides} = await getFinalGradeOverrides()
+      const {finalGradeOverrides} = (await getFinalGradeOverrides()) as {
+        finalGradeOverrides: FinalGradeOverrideMap
+      }
       expect(Object.keys(finalGradeOverrides[1101])).toEqual(['courseGrade', 'gradingPeriodGrades'])
     })
 
     it('ignores an excluded course grade', async () => {
       delete responseData.final_grade_overrides[1101].course_grade
-      const {finalGradeOverrides} = await getFinalGradeOverrides()
+      const {finalGradeOverrides} = (await getFinalGradeOverrides()) as {
+        finalGradeOverrides: FinalGradeOverrideMap
+      }
       expect(Object.keys(finalGradeOverrides[1101])).toEqual(['gradingPeriodGrades'])
     })
 
     it('ignores excluded grading period grades', async () => {
       delete responseData.final_grade_overrides[1101].grading_period_grades
-      const {finalGradeOverrides} = await getFinalGradeOverrides()
+      const {finalGradeOverrides} = (await getFinalGradeOverrides()) as {
+        finalGradeOverrides: FinalGradeOverrideMap
+      }
       expect(Object.keys(finalGradeOverrides[1101])).toEqual(['courseGrade'])
     })
 
@@ -98,16 +108,19 @@ describe('Gradebook FinalGradeOverrideApi', () => {
       })
 
       afterEach(() => {
+        // @ts-ignore
         FlashAlert.showFlashAlert.restore()
       })
 
       it('shows a flash alert', async () => {
         await getFinalGradeOverrides()
+        // @ts-ignore
         expect(FlashAlert.showFlashAlert.callCount).toBe(1)
       })
 
       it('flashes an error', async () => {
         await getFinalGradeOverrides()
+        // @ts-ignore
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         expect(type).toBe('error')
       })

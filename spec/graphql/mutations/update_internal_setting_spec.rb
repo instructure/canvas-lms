@@ -45,7 +45,7 @@ describe Mutations::UpdateInternalSetting do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   it "updates and returns the internal setting" do
@@ -59,7 +59,7 @@ describe Mutations::UpdateInternalSetting do
     expect(internal_setting_result["id"]).to eq CanvasSchema.id_from_object(internal_setting, Types::InternalSettingType, nil)
     expect(internal_setting_result["name"]).to eq internal_setting.name
     expect(internal_setting_result["value"]).to eq "new_value"
-    expect(internal_setting_result["secret"]).to eq false
+    expect(internal_setting_result["secret"]).to be false
 
     expect(Setting.find(internal_setting.id).value).to eq "new_value"
   end

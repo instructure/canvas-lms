@@ -19,7 +19,7 @@
 #
 require_relative "../spec_helper"
 
-describe QuizMigrationAlert, type: :model do
+describe QuizMigrationAlert do
   describe "associations" do
     it { is_expected.to belong_to(:user).required }
     it { is_expected.to belong_to(:course).required }

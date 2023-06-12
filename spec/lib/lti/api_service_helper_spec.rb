@@ -39,20 +39,25 @@ module Lti
       body = StringIO.new
       body.write("abc123")
       body.rewind
-      allow(m).to receive_messages(body: body)
+      allow(m).to receive_messages(body:)
       m
     end
     let(:course) { Course.create }
     let(:root_account) { Account.create }
     let(:product_family) do
-      Lti::ProductFamily.create!(vendor_code: "a", product_code: "b", vendor_name: "c", root_account: root_account)
+      Lti::ProductFamily.create!(vendor_code: "a", product_code: "b", vendor_name: "c", root_account:)
     end
 
     before do
       @tool_proxy = ToolProxy.create!(
-        guid: "key", shared_secret: "secret", product_version: 1,
-        lti_version: "LTIv2p0", workflow_state: "active", raw_data: "{}",
-        product_family: product_family, context: course
+        guid: "key",
+        shared_secret: "secret",
+        product_version: 1,
+        lti_version: "LTIv2p0",
+        workflow_state: "active",
+        raw_data: "{}",
+        product_family:,
+        context: course
       )
       allow(OAuth::Helper).to receive_messages(parse_header: {})
     end

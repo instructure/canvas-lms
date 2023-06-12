@@ -48,7 +48,7 @@ describe "i18n js" do
 
       (I18n.available_locales - [:en]).each do |locale|
         driver.execute_script("I18n.locale = '#{locale}'")
-        rb_value = I18n.t("dashboard.confirm.close", "fake en default", locale: locale)
+        rb_value = I18n.t("dashboard.confirm.close", "fake en default", locale:)
         js_value = driver.execute_script("return I18n.scoped('dashboard').t('confirm.close', 'fake en default');")
         expect(js_value).to eq(rb_value)
       end

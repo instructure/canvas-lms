@@ -22,12 +22,12 @@ module RuboCop
     module Specs
       class NoNoSuchElementError < Cop
         MSG = "Avoid using Selenium::WebDriver::Error::NoSuchElementError.\n" \
-              "Our finders (f/fj and ff/ffj) will wait up to the implicit wait" \
-              " (just like find_element, etc), and will raise a" \
-              " Selenium::WebDriver::Error::NoSuchElementError" \
-              " (just like find_element, etc).\n" \
-              "Look through custom_selenium_rspec_matchers.rb, particularly" \
-              " contain_css and contain_jqcss."
+              "Our finders (f/fj and ff/ffj) will wait up to the implicit wait " \
+              "(just like find_element, etc), and will raise a " \
+              "Selenium::WebDriver::Error::NoSuchElementError " \
+              "(just like find_element, etc).\n" \
+              "Look through custom_selenium_rspec_matchers.rb, particularly " \
+              "contain_css and contain_jqcss."
 
         BAD_CONST = "Selenium::WebDriver::Error::NoSuchElementError"
         BAD_CONST_MATCHER = BAD_CONST.split("::")

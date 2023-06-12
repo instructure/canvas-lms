@@ -34,7 +34,7 @@ describe DataFixup::Lti::RemoveUse13FromToolSettings do
 
   it "removes use_1_3 from settings" do
     subject
-    tools.each { |t| expect(t.reload.settings.key?(:use_1_3)).to eq false }
+    tools.each { |t| expect(t.reload.settings.key?(:use_1_3)).to be false }
   end
 
   it "ignores 1.1 tools" do

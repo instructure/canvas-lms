@@ -83,7 +83,7 @@ module UserContent
   end
 
   def self.latex_to_mathml(latex)
-    Latex.to_math_ml(latex: latex)
+    Latex.to_math_ml(latex:)
   end
 
   Node = Struct.new(:width, :height, :node_string, :node_hmac)
@@ -117,8 +117,8 @@ module UserContent
     end
   end
 
-  def self.find_equation_images(html, &block)
-    html.css("img.equation_image").each(&block)
+  def self.find_equation_images(html, &)
+    html.css("img.equation_image").each(&)
   end
 
   # TODO: try and discover the motivation behind the "huhs"

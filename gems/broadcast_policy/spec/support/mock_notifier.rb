@@ -26,11 +26,11 @@ class MockNotifier
 
   def send_notification(record, dispatch, notification, recipients, data = nil)
     @messages << {
-      record: record,
-      dispatch: dispatch,
-      notification: notification,
-      recipients: recipients,
-      data: data
+      record:,
+      dispatch:,
+      notification:,
+      recipients:,
+      data:
     }
   end
 end

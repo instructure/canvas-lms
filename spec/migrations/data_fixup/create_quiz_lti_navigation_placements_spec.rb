@@ -38,28 +38,28 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       # create 2 Quiz LTI tools on 2 different accounts
       2.times do
         ContextExternalTool.create!(
-          context: account_model(root_account: root_account, parent_account: root_account),
+          context: account_model(root_account:, parent_account: root_account),
           consumer_key: "key",
           shared_secret: "secret",
           name: "Quizzes 2",
           tool_id: "Quizzes 2",
           url: "http://www.tool.com/launch",
-          developer_key: developer_key,
-          root_account: root_account
+          developer_key:,
+          root_account:
         )
       end
     end
 
     let_once(:some_tool) do
       ContextExternalTool.create!(
-        context: account_model(root_account: root_account, parent_account: root_account),
+        context: account_model(root_account:, parent_account: root_account),
         consumer_key: "key",
         shared_secret: "secret",
         name: "Some tool",
         tool_id: "Some tool",
         url: "http://www.tool.com/launch",
-        developer_key: developer_key,
-        root_account: root_account
+        developer_key:,
+        root_account:
       )
     end
 
@@ -108,7 +108,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
     it "does not create navigation placements for tools that are not Quiz LTI" do
       some_tool = ContextExternalTool.find_by(tool_id: "Some tool")
 
-      expect(some_tool.quiz_lti?).to eq false
+      expect(some_tool.quiz_lti?).to be false
       expect do
         DataFixup::CreateQuizLtiNavigationPlacements.run
         some_tool.reload

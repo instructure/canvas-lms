@@ -35,7 +35,7 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {ConnectedRSSFeedList} from './RSSFeedList'
 
 import actions from '../actions'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 
 const I18n = useI18nScope('announcements_v2')
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -85,7 +86,7 @@ interface PassedProps {
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
 
-export const Footer: React.FC<ComponentProps> = ({
+export const Footer = ({
   autoSaving,
   pacePublishing,
   blackoutDatesSyncing,
@@ -106,7 +107,7 @@ export const Footer: React.FC<ComponentProps> = ({
   isUnpublishedNewPace,
   paceName,
   blueprintLocked,
-}) => {
+}: ComponentProps) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
   const useRedesign = window.ENV.FEATURES.course_paces_redesign
   const userIsMasquerading = window.ENV.IS_MASQUERADING

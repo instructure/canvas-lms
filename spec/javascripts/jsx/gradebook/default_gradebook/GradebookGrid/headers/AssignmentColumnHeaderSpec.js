@@ -162,8 +162,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         onSelect() {},
       },
 
-      showUnpostedMenuItem: true,
-
       sortBySetting: {
         direction: 'ascending',
         disabled: false,
@@ -172,7 +170,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         onSortByGradeDescending() {},
         onSortByLate() {},
         onSortByMissing() {},
-        onSortByUnposted() {},
         settingKey: 'grade',
       },
 
@@ -674,70 +671,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
             mountAndOpenOptionsMenu()
             getSortByOption('Late').click()
             strictEqual(props.sortBySetting.onSortByLate.callCount, 0)
-          }
-        )
-      })
-    })
-
-    QUnit.module('"Unposted" option', () => {
-      test('is selected when sorting by unposted', () => {
-        props.sortBySetting.settingKey = 'unposted'
-        mountAndOpenOptionsMenu()
-        strictEqual(getSortByOption('Unposted').getAttribute('aria-checked'), 'true')
-      })
-
-      test('is not selected when sorting by a different setting', () => {
-        props.sortBySetting.settingKey = 'grade'
-        props.sortBySetting.direction = 'ascending'
-        mountAndOpenOptionsMenu()
-        strictEqual(getSortByOption('Unposted').getAttribute('aria-checked'), 'false')
-      })
-
-      test('is not selected when isSortColumn is false', () => {
-        props.sortBySetting.isSortColumn = false
-        mountAndOpenOptionsMenu()
-        strictEqual(getSortByOption('Unposted').getAttribute('aria-checked'), 'false')
-      })
-
-      test('is optionally disabled', () => {
-        props.sortBySetting.disabled = true
-        mountAndOpenOptionsMenu()
-        strictEqual(getSortByOption('Unposted').getAttribute('aria-disabled'), 'true')
-      })
-
-      test('is optionally excluded', () => {
-        props.showUnpostedMenuItem = false
-        mountAndOpenOptionsMenu()
-        notOk(getSortByOption('Unposted'))
-      })
-
-      QUnit.module('when clicked', contextHooks => {
-        contextHooks.beforeEach(() => {
-          props.sortBySetting.onSortByUnposted = sinon.stub()
-        })
-
-        test('calls the .sortBySetting.onSortByUnposted callback', () => {
-          mountAndOpenOptionsMenu()
-          getSortByOption('Unposted').click()
-          strictEqual(props.sortBySetting.onSortByUnposted.callCount, 1)
-        })
-
-        test('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu()
-          getSortByOption('Unposted').focus()
-          getSortByOption('Unposted').click()
-          strictEqual(document.activeElement, getOptionsMenuTrigger())
-        })
-
-        // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .sortBySetting.onSortByUnposted callback when already selected',
-          () => {
-            props.sortBySetting.settingKey = 'grade'
-            props.sortBySetting.direction = 'ascending'
-            mountAndOpenOptionsMenu()
-            getSortByOption('Unposted').click()
-            strictEqual(props.sortBySetting.onSortByUnposted.callCount, 0)
           }
         )
       })

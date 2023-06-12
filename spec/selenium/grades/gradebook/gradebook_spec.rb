@@ -239,7 +239,7 @@ describe "Gradebook" do
     gc = group_category
     graded_assignment = @course.assignments.create!({
                                                       title: "group assignment 1",
-                                                      due_at: (Time.zone.now + 1.week),
+                                                      due_at: 1.week.from_now,
                                                       points_possible: 10,
                                                       submission_types: "online_text_entry",
                                                       assignment_group: @group,
@@ -248,7 +248,7 @@ describe "Gradebook" do
                                                     })
     group_assignment = @course.assignments.create!({
                                                      title: "group assignment 2",
-                                                     due_at: (Time.zone.now + 1.week),
+                                                     due_at: 1.week.from_now,
                                                      points_possible: 0,
                                                      submission_types: "not_graded",
                                                      assignment_group: @group,
@@ -270,7 +270,7 @@ describe "Gradebook" do
   it "hides assignment mute warning in total column for 'not_graded', muted assignments" do
     assignment = @course.assignments.create!({
                                                title: "Non Graded Assignment",
-                                               due_at: (Time.zone.now + 1.week),
+                                               due_at: 1.week.from_now,
                                                points_possible: 10,
                                                submission_types: "not_graded"
                                              })
@@ -399,7 +399,8 @@ describe "Gradebook" do
     it 'displays the "needs grading" icon for file_upload questions', priority: "1" do
       file_submission.attachments.create!({
                                             filename: "doc.doc",
-                                            display_name: "doc.doc", user: @user,
+                                            display_name: "doc.doc",
+                                            user: @user,
                                             uploaded_data: dummy_io
                                           })
       file_submission.complete!

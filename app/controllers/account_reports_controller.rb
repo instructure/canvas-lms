@@ -238,7 +238,7 @@ class AccountReportsController < ApplicationController
           title: value.title,
           parameters: nil,
           report: key,
-          last_run: last_run
+          last_run:
         }
         parameters = {}
 
@@ -297,7 +297,7 @@ class AccountReportsController < ApplicationController
       raise ActiveRecord::RecordNotFound unless available_reports.include? params[:report]
 
       parameters = params[:parameters]&.to_unsafe_h
-      report = @account.account_reports.build(user: @current_user, report_type: params[:report], parameters: parameters)
+      report = @account.account_reports.build(user: @current_user, report_type: params[:report], parameters:)
       report.workflow_state = :created
       report.progress = 0
       report.save

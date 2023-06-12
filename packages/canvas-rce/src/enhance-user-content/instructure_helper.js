@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'escape-html'
 import formatMessage from '../format-message'
 import {showFlashAlert} from '../common/FlashAlert'
 import {isPreviewable, loadDocPreview, removeLoadingImage, showLoadingImage} from './doc_previews'
@@ -58,6 +57,8 @@ export function isExternalLink(element, canvasOrigin = window.location.origin) {
 }
 
 export function showFilePreview(event, opts = {}) {
+  event.stopPropagation()
+
   const {canvasOrigin, disableGooglePreviews} = {...opts}
   let target = null
   if (event.target?.href) {
@@ -88,7 +89,7 @@ export function showFilePreviewInOverlay(event, canvasOrigin) {
   } else if (event.currentTarget?.href) {
     target = event.currentTarget
   }
-  const matches = target?.href.match(/\/files\/(\d+)/)
+  const matches = target?.href.match(/\/files\/(\d+~\d+|\d+)/)
   if (matches) {
     if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
       // if any modifier keys are pressed, do the browser default thing
@@ -168,7 +169,7 @@ export function showFilePreviewInline(event, canvasOrigin, disableGooglePreviews
         $minimizeLink.setAttribute('href', '#')
         $minimizeLink.setAttribute('style', 'font-size: 0.8em;')
         $minimizeLink.setAttribute('class', 'hide_file_preview_link')
-        $minimizeLink.innerHTML = htmlEscape(formatMessage('Minimize File Preview'))
+        $minimizeLink.textContent = formatMessage('Minimize File Preview')
         $minimizeLink.addEventListener('click', event2 => {
           event2.preventDefault()
           resetInlinePreview($link, $div)

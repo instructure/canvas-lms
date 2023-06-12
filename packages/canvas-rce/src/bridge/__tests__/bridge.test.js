@@ -205,6 +205,38 @@ describe('Editor/Sidebar bridge', () => {
         Bridge.insertImagePlaceholder({})
         expect(Bridge.getEditor().insertImagePlaceholder).not.toHaveBeenCalled()
       })
+
+      it('defaults to link title if no text is given', () => {
+        Bridge.focusEditor(editor)
+        Bridge.insertLink({
+          text: '',
+          title: 'some link',
+        })
+        expect(editor.insertLink).toHaveBeenCalledWith({
+          selectionDetails: {
+            node: 'some-node',
+            range: 'some-range',
+          },
+          text: 'some link',
+          title: 'some link',
+        })
+      })
+
+      it('defaults to link title if only spaces are given', () => {
+        Bridge.focusEditor(editor)
+        Bridge.insertLink({
+          text: '   ',
+          title: 'some link',
+        })
+        expect(editor.insertLink).toHaveBeenCalledWith({
+          selectionDetails: {
+            node: 'some-node',
+            range: 'some-range',
+          },
+          text: 'some link',
+          title: 'some link',
+        })
+      })
     })
 
     describe('insertFileLink', () => {

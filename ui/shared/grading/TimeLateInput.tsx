@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -24,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {NumberInput} from '@instructure/ui-number-input'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import round from 'round'
+import round from '@canvas/round'
 import NumberHelper from '@canvas/i18n/numberHelper'
 
 const I18n = useI18nScope('speed_grader')
@@ -42,14 +43,17 @@ function defaultDurationLate(interval, secondsLate) {
 }
 
 export default function TimeLateInput(props) {
-  const numberInputLabel =
-    props.lateSubmissionInterval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
-  const numberInputText =
-    props.lateSubmissionInterval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
-
   const [numberInputValue, setNumberInputValue] = useState(
     defaultDurationLate(props.lateSubmissionInterval, props.secondsLate)
   )
+
+  const numberInputLabel =
+    props.lateSubmissionInterval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
+
+  const numberInputText =
+    props.lateSubmissionInterval === 'day'
+      ? I18n.t('late_input.days', {one: 'Day', other: 'Days'}, {count: numberInputValue})
+      : I18n.t('late_input.hours', {one: 'Hour', other: 'Hours'}, {count: numberInputValue})
 
   if (!props.visible) {
     return null
@@ -86,6 +90,7 @@ export default function TimeLateInput(props) {
             interaction={props.disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
+            // @ts-ignore
             locale={props.locale}
             min="0"
             onBlur={handleNumberInputBlur}

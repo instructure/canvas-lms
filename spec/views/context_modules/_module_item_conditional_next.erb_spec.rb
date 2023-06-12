@@ -30,7 +30,7 @@ describe "context_modules/_module_item_conditional_next" do
 
   it "shows mastery path selection" do
     render partial: "context_modules/module_item_conditional_next", locals: {
-      module_item: module_item,
+      module_item:,
       item_data: { mastery_paths: { locked: true } }
     }
     expect(rendered).to match(/until .* is graded/)
@@ -38,7 +38,7 @@ describe "context_modules/_module_item_conditional_next" do
 
   it "shows mastery path locked" do
     render partial: "context_modules/module_item_conditional_next", locals: {
-      module_item: module_item,
+      module_item:,
       item_data: {
         mastery_paths: {
           awaiting_choice: true,
@@ -51,7 +51,7 @@ describe "context_modules/_module_item_conditional_next" do
 
   it "shows mastery path still processing" do
     render partial: "context_modules/module_item_conditional_next", locals: {
-      module_item: module_item,
+      module_item:,
       item_data: { mastery_paths: { still_processing: true } }
     }
     expect(rendered).to match("until mastery path is processed")

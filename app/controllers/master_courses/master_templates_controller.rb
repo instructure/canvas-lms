@@ -283,9 +283,9 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     preload_teachers(courses)
     json = courses.map do |course|
-      course_summary_json(course, can_read_sis: can_read_sis, include_teachers: true)
+      course_summary_json(course, can_read_sis:, include_teachers: true)
     end
-    render json: json
+    render json:
   end
 
   # @API Update associated courses
@@ -316,7 +316,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       # since (for now) we're only allowed to associate courses derived from it
       ids_to_add = api_find_all(Course, Array(params[:course_ids_to_add])).pluck(:id)
       ids_to_remove = api_find_all(Course, Array(params[:course_ids_to_remove])).pluck(:id)
-      if (ids_to_add & ids_to_remove).any?
+      if ids_to_add.intersect?(ids_to_remove)
         return render json: { message: "cannot add and remove a course at the same time" }, status: :bad_request
       end
 
@@ -448,7 +448,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     mc_tag = @template.content_tag_for(item)
     if value_to_boolean(params[:restricted])
-      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
+      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
       mc_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
       mc_tag.use_default_restrictions = !custom_restrictions
     else
@@ -478,6 +478,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     items = []
     GuardRail.activate(:secondary) do
       MasterCourses::CONTENT_TYPES_FOR_UNSYNCED_CHANGES.each do |klass|
+        next if klass == "MediaTrack" && !Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+
         item_scope = case klass
                      when "Attachment"
                        @course.attachments
@@ -487,12 +489,25 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                        @course.discussion_topics.only_discussion_topics
                      when "CoursePace"
                        @course.course_paces
+                     when "ContentTag"
+                       # OUT-5483: We only want ContentTags for account-level outcomes that have been deleted from the blueprint course
+                       ContentTag.joins("INNER JOIN #{LearningOutcome.quoted_table_name} ON #{ContentTag.quoted_table_name}.content_id=#{LearningOutcome.quoted_table_name}.id")
+                                 .where("#{ContentTag.quoted_table_name}.context_id=? AND #{ContentTag.quoted_table_name}.context_type=? AND #{ContentTag.quoted_table_name}.content_type=?
+                                  AND #{ContentTag.quoted_table_name}.workflow_state=? AND #{LearningOutcome.quoted_table_name}.context_type=?",
+                                        @course.id,
+                                        "Course",
+                                        "LearningOutcome",
+                                        "deleted",
+                                        "Account")
+                     when "MediaTrack"
+                       MediaTrack.where(attachment: @course.attachments)
                      else
                        klass.constantize.where(context_id: @course, context_type: "Course")
                      end
 
         remaining_count = max_records - items.size
-        items += item_scope.where("updated_at>?", cutoff_time).order(:id).limit(remaining_count).to_a
+        condition = (klass == "ContentTag") ? "#{ContentTag.quoted_table_name}.updated_at>?" : "updated_at>?"
+        items += item_scope.where(condition, cutoff_time).order(:id).limit(remaining_count).to_a
         break if items.size >= max_records
       end
       @template.load_tags!(items) # only load the tags we need
@@ -506,6 +521,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                else
                  :updated
                end
+      asset = asset.is_a?(ContentTag) ? LearningOutcome.find(asset.content_id) : asset
       tag = @template.cached_content_tag_for(asset)
       locked = !!tag&.restrictions&.values&.any?
       changed_asset_json(asset, action, locked)
@@ -608,9 +624,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     migrations = Api.paginate(migrations, self, api_v1_course_blueprint_imports_url)
     ActiveRecord::Associations.preload(migrations, :user)
     render json: migrations.map { |migration|
-                   master_migration_json(migration.master_migration, @current_user,
-                                         session, child_migration: migration,
-                                                  subscription: @subscription)
+                   master_migration_json(migration.master_migration,
+                                         @current_user,
+                                         session,
+                                         child_migration: migration,
+                                         subscription: @subscription)
                  }
   end
 
@@ -629,8 +647,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     migration = @course.content_migrations
                        .where(migration_type: "master_course_import", child_subscription_id: @subscription)
                        .find(params[:id])
-    render json: master_migration_json(migration.master_migration, @current_user, session,
-                                       child_migration: migration, subscription: @subscription)
+    render json: master_migration_json(migration.master_migration,
+                                       @current_user,
+                                       session,
+                                       child_migration: migration,
+                                       subscription: @subscription)
   end
 
   # @API Get import details
@@ -730,8 +751,11 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       tags.each do |tag|
         next if %w[AssignmentGroup ContentTag].include?(tag.content_type) # these are noise, since they're touched with each assignment
 
-        changes << changed_asset_json(tag.content, action, restricted_ids.include?(tag.migration_id),
-                                      tag.migration_id, exceptions)
+        changes << changed_asset_json(tag.content,
+                                      action,
+                                      restricted_ids.include?(tag.migration_id),
+                                      tag.migration_id,
+                                      exceptions)
       end
     end
     changes << changed_syllabus_json(@course, exceptions) if updated_syllabus

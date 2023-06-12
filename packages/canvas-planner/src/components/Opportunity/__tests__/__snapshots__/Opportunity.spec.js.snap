@@ -1,278 +1,569 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the base component correctly 1`] = `
-<div
-  className="Opportunity-styles__root"
->
+<Fragment>
+  <style>
+    
+  .Opportunity-styles__root {
+    position: relative;
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    color: #2D3B45;
+    background: #FFFFFF;
+    padding: undefined;
+    box-sizing: border-box;
+    line-height: 1.25;
+  }
+  
+  .Opportunity-styles__oppNameAndTitle {
+    max-width: 16.5rem;
+  }
+  
+  .Opportunity-styles__oppName {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex: 1;
+    padding-top: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+    color: #8B969E;
+    font-size: 0.875rem;
+    margin-right: 1.75rem;
+  }
+  
+  .Opportunity-styles__title {
+    margin-bottom: 0.5rem;
+  }
+  
+  .Opportunity-styles__close {
+    position: absolute;
+    top: 0;
+    offset-inline-end: 0;
+  }
+  [dir="ltr"] .Opportunity-styles__close {
+    right: 0;
+  }
+  [dir="rtl"] .Opportunity-styles__close {
+    left: 0;
+  }
+  
+  .Opportunity-styles__oppName,
+  .Opportunity-styles__title {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .Opportunity-styles__footer {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-inline-end: 0.5rem;
+  }
+  
+  .Opportunity-styles__status {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex-grow: 1;
+    padding-inline-end: 0.75rem;
+  }
+  
+  .Opportunity-styles__points {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex-shrink: 0;
+    text-align: end;
+    color: #8B969E;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    line-height: 1.125;
+  }
+  
+  .Opportunity-styles__pointsNumber {
+    display: block;
+    font-size: 1.375rem;
+  }
+  
+  .Opportunity-styles__due {
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: #8B969E;
+  }
+  
+  .Opportunity-styles__dueText {
+    font-weight: 700;
+  }
+  
+  </style>
   <div
-    className="Opportunity-styles__oppNameAndTitle"
+    className="Opportunity-styles__root"
   >
     <div
-      className="Opportunity-styles__oppName"
+      className="Opportunity-styles__oppNameAndTitle"
     >
-      course about stuff
-    </div>
-    <div
-      className="Opportunity-styles__title"
-    >
-      <Link
-        color="link"
-        elementRef={[Function]}
-        href="http://www.non_default_url.com"
-        iconPlacement="start"
-        isWithinText={false}
-        theme={
-          Object {
-            "mediumHeight": "normal",
-            "mediumPaddingHorizontal": "0",
-          }
-        }
-      >
-        this is a description about the opportunity
-      </Link>
-    </div>
-  </div>
-  <div
-    className="Opportunity-styles__footer"
-  >
-    <div
-      className="Opportunity-styles__status"
-    >
-      <Pill
-        color="danger"
-      >
-        Missing
-      </Pill>
       <div
-        className="Opportunity-styles__due"
+        className="Opportunity-styles__oppName"
       >
-        <span
-          className="Opportunity-styles__dueText"
+        course about stuff
+      </div>
+      <div
+        className="Opportunity-styles__title"
+      >
+        <Link
+          color="link"
+          elementRef={[Function]}
+          href="http://www.non_default_url.com"
+          iconPlacement="start"
+          isWithinText={false}
+          theme={
+            Object {
+              "mediumHeight": "normal",
+              "mediumPaddingHorizontal": "0",
+            }
+          }
         >
-          Due:
-        </span>
-         
-        March 9, 2017 at 1:40 PM
+          this is a description about the opportunity
+        </Link>
       </div>
     </div>
     <div
-      className="Opportunity-styles__points"
+      className="Opportunity-styles__footer"
     >
-      <ScreenReaderContent
-        as="span"
+      <div
+        className="Opportunity-styles__status"
       >
-        20 points
-      </ScreenReaderContent>
-      <PresentationContent
-        as="span"
-      >
-        <span
-          className="Opportunity-styles__pointsNumber"
+        <Pill
+          color="danger"
         >
-          20
-        </span>
-        points
-      </PresentationContent>
+          Missing
+        </Pill>
+        <div
+          className="Opportunity-styles__due"
+        >
+          <span
+            className="Opportunity-styles__dueText"
+          >
+            Due:
+          </span>
+           
+          March 9, 2017 at 1:40 PM
+        </div>
+      </div>
+      <div
+        className="Opportunity-styles__points"
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          20 points
+        </ScreenReaderContent>
+        <PresentationContent
+          as="span"
+        >
+          <span
+            className="Opportunity-styles__pointsNumber"
+          >
+            20
+          </span>
+          points
+        </PresentationContent>
+      </div>
+    </div>
+    <div
+      className="Opportunity-styles__close"
+    >
+      <IconButton
+        as="button"
+        color="secondary"
+        cursor="pointer"
+        elementRef={[Function]}
+        margin="0"
+        onClick={[Function]}
+        renderIcon={[Function]}
+        screenReaderLabel="Dismiss this is a description about the opportunity"
+        shape="rectangle"
+        size="small"
+        type="button"
+        withBackground={false}
+        withBorder={false}
+      />
     </div>
   </div>
-  <div
-    className="Opportunity-styles__close"
-  >
-    <IconButton
-      as="button"
-      color="secondary"
-      cursor="pointer"
-      elementRef={[Function]}
-      margin="0"
-      onClick={[Function]}
-      renderIcon={[Function]}
-      screenReaderLabel="Dismiss this is a description about the opportunity"
-      shape="rectangle"
-      size="small"
-      type="button"
-      withBackground={false}
-      withBorder={false}
-    />
-  </div>
-</div>
+</Fragment>
 `;
 
 exports[`renders the base component correctly with 0 points 1`] = `
-<div
-  className="Opportunity-styles__root"
->
+<Fragment>
+  <style>
+    
+  .Opportunity-styles__root {
+    position: relative;
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    color: #2D3B45;
+    background: #FFFFFF;
+    padding: undefined;
+    box-sizing: border-box;
+    line-height: 1.25;
+  }
+  
+  .Opportunity-styles__oppNameAndTitle {
+    max-width: 16.5rem;
+  }
+  
+  .Opportunity-styles__oppName {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex: 1;
+    padding-top: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+    color: #8B969E;
+    font-size: 0.875rem;
+    margin-right: 1.75rem;
+  }
+  
+  .Opportunity-styles__title {
+    margin-bottom: 0.5rem;
+  }
+  
+  .Opportunity-styles__close {
+    position: absolute;
+    top: 0;
+    offset-inline-end: 0;
+  }
+  [dir="ltr"] .Opportunity-styles__close {
+    right: 0;
+  }
+  [dir="rtl"] .Opportunity-styles__close {
+    left: 0;
+  }
+  
+  .Opportunity-styles__oppName,
+  .Opportunity-styles__title {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .Opportunity-styles__footer {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-inline-end: 0.5rem;
+  }
+  
+  .Opportunity-styles__status {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex-grow: 1;
+    padding-inline-end: 0.75rem;
+  }
+  
+  .Opportunity-styles__points {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex-shrink: 0;
+    text-align: end;
+    color: #8B969E;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    line-height: 1.125;
+  }
+  
+  .Opportunity-styles__pointsNumber {
+    display: block;
+    font-size: 1.375rem;
+  }
+  
+  .Opportunity-styles__due {
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: #8B969E;
+  }
+  
+  .Opportunity-styles__dueText {
+    font-weight: 700;
+  }
+  
+  </style>
   <div
-    className="Opportunity-styles__oppNameAndTitle"
+    className="Opportunity-styles__root"
   >
     <div
-      className="Opportunity-styles__oppName"
+      className="Opportunity-styles__oppNameAndTitle"
     >
-      course about stuff
-    </div>
-    <div
-      className="Opportunity-styles__title"
-    >
-      <Link
-        color="link"
-        elementRef={[Function]}
-        href="http://www.non_default_url.com"
-        iconPlacement="start"
-        isWithinText={false}
-        theme={
-          Object {
-            "mediumHeight": "normal",
-            "mediumPaddingHorizontal": "0",
-          }
-        }
-      >
-        this is a description about the opportunity
-      </Link>
-    </div>
-  </div>
-  <div
-    className="Opportunity-styles__footer"
-  >
-    <div
-      className="Opportunity-styles__status"
-    >
-      <Pill
-        color="danger"
-      >
-        Missing
-      </Pill>
       <div
-        className="Opportunity-styles__due"
+        className="Opportunity-styles__oppName"
       >
-        <span
-          className="Opportunity-styles__dueText"
+        course about stuff
+      </div>
+      <div
+        className="Opportunity-styles__title"
+      >
+        <Link
+          color="link"
+          elementRef={[Function]}
+          href="http://www.non_default_url.com"
+          iconPlacement="start"
+          isWithinText={false}
+          theme={
+            Object {
+              "mediumHeight": "normal",
+              "mediumPaddingHorizontal": "0",
+            }
+          }
         >
-          Due:
-        </span>
-         
-        March 9, 2017 at 1:40 PM
+          this is a description about the opportunity
+        </Link>
       </div>
     </div>
     <div
-      className="Opportunity-styles__points"
+      className="Opportunity-styles__footer"
     >
-      <ScreenReaderContent
-        as="span"
+      <div
+        className="Opportunity-styles__status"
       >
-        0 points
-      </ScreenReaderContent>
-      <PresentationContent
-        as="span"
-      >
-        <span
-          className="Opportunity-styles__pointsNumber"
+        <Pill
+          color="danger"
         >
-          0
-        </span>
-        points
-      </PresentationContent>
+          Missing
+        </Pill>
+        <div
+          className="Opportunity-styles__due"
+        >
+          <span
+            className="Opportunity-styles__dueText"
+          >
+            Due:
+          </span>
+           
+          March 9, 2017 at 1:40 PM
+        </div>
+      </div>
+      <div
+        className="Opportunity-styles__points"
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          0 points
+        </ScreenReaderContent>
+        <PresentationContent
+          as="span"
+        >
+          <span
+            className="Opportunity-styles__pointsNumber"
+          >
+            0
+          </span>
+          points
+        </PresentationContent>
+      </div>
+    </div>
+    <div
+      className="Opportunity-styles__close"
+    >
+      <IconButton
+        as="button"
+        color="secondary"
+        cursor="pointer"
+        elementRef={[Function]}
+        margin="0"
+        onClick={[Function]}
+        renderIcon={[Function]}
+        screenReaderLabel="Dismiss this is a description about the opportunity"
+        shape="rectangle"
+        size="small"
+        type="button"
+        withBackground={false}
+        withBorder={false}
+      />
     </div>
   </div>
-  <div
-    className="Opportunity-styles__close"
-  >
-    <IconButton
-      as="button"
-      color="secondary"
-      cursor="pointer"
-      elementRef={[Function]}
-      margin="0"
-      onClick={[Function]}
-      renderIcon={[Function]}
-      screenReaderLabel="Dismiss this is a description about the opportunity"
-      shape="rectangle"
-      size="small"
-      type="button"
-      withBackground={false}
-      withBorder={false}
-    />
-  </div>
-</div>
+</Fragment>
 `;
 
 exports[`renders the base component correctly without points 1`] = `
-<div
-  className="Opportunity-styles__root"
->
+<Fragment>
+  <style>
+    
+  .Opportunity-styles__root {
+    position: relative;
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    color: #2D3B45;
+    background: #FFFFFF;
+    padding: undefined;
+    box-sizing: border-box;
+    line-height: 1.25;
+  }
+  
+  .Opportunity-styles__oppNameAndTitle {
+    max-width: 16.5rem;
+  }
+  
+  .Opportunity-styles__oppName {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex: 1;
+    padding-top: 0.375rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+    color: #8B969E;
+    font-size: 0.875rem;
+    margin-right: 1.75rem;
+  }
+  
+  .Opportunity-styles__title {
+    margin-bottom: 0.5rem;
+  }
+  
+  .Opportunity-styles__close {
+    position: absolute;
+    top: 0;
+    offset-inline-end: 0;
+  }
+  [dir="ltr"] .Opportunity-styles__close {
+    right: 0;
+  }
+  [dir="rtl"] .Opportunity-styles__close {
+    left: 0;
+  }
+  
+  .Opportunity-styles__oppName,
+  .Opportunity-styles__title {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  .Opportunity-styles__footer {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-inline-end: 0.5rem;
+  }
+  
+  .Opportunity-styles__status {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex-grow: 1;
+    padding-inline-end: 0.75rem;
+  }
+  
+  .Opportunity-styles__points {
+    box-sizing: border-box;
+    min-width: 1px;
+    flex-shrink: 0;
+    text-align: end;
+    color: #8B969E;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    line-height: 1.125;
+  }
+  
+  .Opportunity-styles__pointsNumber {
+    display: block;
+    font-size: 1.375rem;
+  }
+  
+  .Opportunity-styles__due {
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: #8B969E;
+  }
+  
+  .Opportunity-styles__dueText {
+    font-weight: 700;
+  }
+  
+  </style>
   <div
-    className="Opportunity-styles__oppNameAndTitle"
+    className="Opportunity-styles__root"
   >
     <div
-      className="Opportunity-styles__oppName"
+      className="Opportunity-styles__oppNameAndTitle"
     >
-      course about stuff
-    </div>
-    <div
-      className="Opportunity-styles__title"
-    >
-      <Link
-        color="link"
-        elementRef={[Function]}
-        href="http://www.non_default_url.com"
-        iconPlacement="start"
-        isWithinText={false}
-        theme={
-          Object {
-            "mediumHeight": "normal",
-            "mediumPaddingHorizontal": "0",
-          }
-        }
-      >
-        this is a description about the opportunity
-      </Link>
-    </div>
-  </div>
-  <div
-    className="Opportunity-styles__footer"
-  >
-    <div
-      className="Opportunity-styles__status"
-    >
-      <Pill
-        color="danger"
-      >
-        Missing
-      </Pill>
       <div
-        className="Opportunity-styles__due"
+        className="Opportunity-styles__oppName"
       >
-        <span
-          className="Opportunity-styles__dueText"
+        course about stuff
+      </div>
+      <div
+        className="Opportunity-styles__title"
+      >
+        <Link
+          color="link"
+          elementRef={[Function]}
+          href="http://www.non_default_url.com"
+          iconPlacement="start"
+          isWithinText={false}
+          theme={
+            Object {
+              "mediumHeight": "normal",
+              "mediumPaddingHorizontal": "0",
+            }
+          }
         >
-          Due:
-        </span>
-         
-        March 9, 2017 at 1:40 PM
+          this is a description about the opportunity
+        </Link>
       </div>
     </div>
-    <ScreenReaderContent
-      as="span"
+    <div
+      className="Opportunity-styles__footer"
     >
-      There are no points associated with this item
-    </ScreenReaderContent>
+      <div
+        className="Opportunity-styles__status"
+      >
+        <Pill
+          color="danger"
+        >
+          Missing
+        </Pill>
+        <div
+          className="Opportunity-styles__due"
+        >
+          <span
+            className="Opportunity-styles__dueText"
+          >
+            Due:
+          </span>
+           
+          March 9, 2017 at 1:40 PM
+        </div>
+      </div>
+      <ScreenReaderContent
+        as="span"
+      >
+        There are no points associated with this item
+      </ScreenReaderContent>
+    </div>
+    <div
+      className="Opportunity-styles__close"
+    >
+      <IconButton
+        as="button"
+        color="secondary"
+        cursor="pointer"
+        elementRef={[Function]}
+        margin="0"
+        onClick={[Function]}
+        renderIcon={[Function]}
+        screenReaderLabel="Dismiss this is a description about the opportunity"
+        shape="rectangle"
+        size="small"
+        type="button"
+        withBackground={false}
+        withBorder={false}
+      />
+    </div>
   </div>
-  <div
-    className="Opportunity-styles__close"
-  >
-    <IconButton
-      as="button"
-      color="secondary"
-      cursor="pointer"
-      elementRef={[Function]}
-      margin="0"
-      onClick={[Function]}
-      renderIcon={[Function]}
-      screenReaderLabel="Dismiss this is a description about the opportunity"
-      shape="rectangle"
-      size="small"
-      type="button"
-      withBackground={false}
-      withBorder={false}
-    />
-  </div>
-</div>
+</Fragment>
 `;

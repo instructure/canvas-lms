@@ -45,13 +45,13 @@ module Factories
 
   def pseudonym(user, opts = {})
     @spec_pseudonym_count ||= 0
-    username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
+    username = opts[:username] || ((@spec_pseudonym_count > 0) ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
     opts[:username] ||= username
     @spec_pseudonym_count += 1 if /nobody(\+\d+)?@example.com/.match?(username)
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = (opts[:account] ? opts[:account].root_account : Account.default)
-    @pseudonym = account.pseudonyms.build(user: user, unique_id: username, password: password, password_confirmation: password)
+    @pseudonym = account.pseudonyms.build(user:, unique_id: username, password:, password_confirmation: password)
     @pseudonym.sis_user_id = opts[:sis_user_id]
     @pseudonym.integration_id = opts[:integration_id]
     @pseudonym.save_without_session_maintenance

@@ -52,7 +52,7 @@ describe.skip "speed grader EVAL-2664" do
         driver.navigate.refresh
         alert_shown = alert_present?
         dismiss_alert
-        expect(alert_shown).to eq(true)
+        expect(alert_shown).to be(true)
       end
     end
 
@@ -134,7 +134,7 @@ describe.skip "speed grader EVAL-2664" do
         # add comment
         Speedgrader.add_comment_and_submit("grader comment")
         # make sure avatar shows up for user comment
-        expect(Speedgrader.avatar_comment).to have_attribute("style", "display: inline\;")
+        expect(Speedgrader.avatar_comment).to have_attribute("style", "display: inline;")
       end
 
       context "Hide Student names checked" do
@@ -447,8 +447,11 @@ describe.skip "speed grader EVAL-2664" do
         add_user_to_group(@student_2, @testgroup[0])
 
         @group_comment_1 = "group comment from student 1"
-        @assignment.submit_homework(@student_1, submission_type: "online_url", url: "http://instructure.com",
-                                                comment: @group_comment_1, group_comment: true)
+        @assignment.submit_homework(@student_1,
+                                    submission_type: "online_url",
+                                    url: "http://instructure.com",
+                                    comment: @group_comment_1,
+                                    group_comment: true)
 
         @private_comment_1 = "private comment from student 1"
         @assignment.submit_homework(@student_1, comment: @private_comment_1)

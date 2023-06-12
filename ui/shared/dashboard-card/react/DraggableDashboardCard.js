@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {DropTarget, DragSource} from 'react-dnd'
-import compose from 'compose'
+import {flowRight as compose} from 'lodash'
 import ItemTypes from './Types'
 
 const cardSource = {

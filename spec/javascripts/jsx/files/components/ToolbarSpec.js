@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import Toolbar from 'ui/features/files/react/components/Toolbar'
 import Folder from '@canvas/files/backbone/models/Folder'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 
 let file = null
 let courseFolder = null

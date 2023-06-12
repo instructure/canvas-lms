@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import htmlEscape from 'html-escape'
 import {truncateText} from '@canvas/util/TextHelper'
-import round from 'round'
+import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData */
 import 'jqueryui/dialog'

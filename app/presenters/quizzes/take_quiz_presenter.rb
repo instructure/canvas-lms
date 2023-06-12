@@ -171,7 +171,7 @@ class Quizzes::TakeQuizPresenter
   def next_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-                                                                                next_question_path: next_question_path
+                                                                                next_question_path:
                                                                               })
     )
   end
@@ -216,7 +216,7 @@ class Quizzes::TakeQuizPresenter
   def resolve_answers(dataset = submission_data)
     # get all the question status-entries and group them by the question id
     answers = dataset.keys.group_by do |k|
-      k =~ /question_(\d+)/ ? $1.to_i : :irrelevant
+      (k =~ /question_(\d+)/) ? $1.to_i : :irrelevant
     end
 
     # remove any non-question keys we've collected

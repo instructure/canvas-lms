@@ -34,7 +34,7 @@ module Quizzes::QuizQuestion::AnswerParsers
           name = variable.fetch_with_enforced_length(:name)
 
           answer_params[:variables] << {
-            name: name,
+            name:,
             value: format_value(variable.fetch_any(:value).to_f, @scale_lookup_dictionary[name])
           }
         end
@@ -73,7 +73,7 @@ module Quizzes::QuizQuestion::AnswerParsers
           name: var_name,
           min: variable.fetch_any(:min).to_f,
           max: variable.fetch_any(:max).to_f,
-          scale: scale
+          scale:
         }
       end
     end

@@ -112,10 +112,12 @@ describe AssessmentQuestion do
       neutral_comments: "meh. #{attachment_tag.call([:neutral_comments])}",
       text_after_answers: "oh btw #{attachment_tag.call([:text_after_answers])}",
       answers: [
-        { weight: 1, text: "A",
+        { weight: 1,
+          text: "A",
           html: "A #{attachment_tag.call([:answers, 0, :html])}",
           comments_html: "yeppers #{attachment_tag.call([:answers, 0, :comments_html])}" },
-        { weight: 1, text: "B",
+        { weight: 1,
+          text: "B",
           html: "B #{attachment_tag.call([:answers, 1, :html])}",
           comments_html: "yeppers #{attachment_tag.call([:answers, 1, :comments_html])}" }
       ]
@@ -133,7 +135,7 @@ describe AssessmentQuestion do
       expect(matches.length).to eq ary.length
       matches.each_with_index do |match, index|
         a = ary[index]
-        expect(match).to eq "/assessment_questions/#{@question.id}/files/#{a.id}/download\?verifier=#{a.uuid}"
+        expect(match).to eq "/assessment_questions/#{@question.id}/files/#{a.id}/download?verifier=#{a.uuid}"
       end
     end
 
@@ -162,7 +164,7 @@ describe AssessmentQuestion do
     data[:points_possible] = "50"
     question.form_question_data = data
     question.save
-    expect(question.question_data.class).to eq HashWithIndifferentAccess
+    expect(question.question_data.class).to eq ActiveSupport::HashWithIndifferentAccess
     expect(question.question_data[:points_possible]).to eq 50
     expect(question.question_data[:answers][0][:weight]).to eq 100
     expect(question.question_data[:answers][0][:id]).not_to be_nil
@@ -181,10 +183,10 @@ describe AssessmentQuestion do
     }
 
     question = @bank.assessment_questions.create!(question_data: data)
-    expect(question.question_data.class).to eq HashWithIndifferentAccess
+    expect(question.question_data.class).to eq ActiveSupport::HashWithIndifferentAccess
 
     question.question_data = data
-    expect(question.question_data.class).to eq HashWithIndifferentAccess
+    expect(question.question_data.class).to eq ActiveSupport::HashWithIndifferentAccess
 
     data = question.question_data
     data[:name] = "new name"

@@ -68,7 +68,7 @@ module Lti
       AssetUserAccess.log(user, course, code: tool.asset_string, group_code: "external_tools", category: "external_tools")
 
       if PageView.page_views_enabled?
-        PageView.new(user: user, context: course, account: course.account).tap do |p|
+        PageView.new(user:, context: course, account: course.account).tap do |p|
           p.request_id = SecureRandom.uuid
           p.url = opts[:url]
           # TODO: override 10m cap?

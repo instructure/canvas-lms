@@ -2,5 +2,8 @@
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
     "message": "{ count, plural,\n  other {}\n}"
   },
-  "icon_215a1dc6": { "message": "Biểu tượng" }
+  "description_436c48d7": { "message": "Mô tả" },
+  "icon_215a1dc6": { "message": "Biểu tượng" },
+  "insert_math_equation_57c6e767": { "message": "Insert Math Equation" },
+  "next_40e12421": { "message": "Kế tiếp" }
 }

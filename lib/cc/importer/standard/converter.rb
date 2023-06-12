@@ -30,7 +30,7 @@ module CC::Importer::Standard
     include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
-    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/.freeze
+    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
 
     attr_accessor :resources
 
@@ -111,8 +111,10 @@ module CC::Importer::Standard
         if full_path && File.exist?(full_path)
           # try to make it work even if the file wasn't technically included in the manifest :/
           mig_id = Digest::MD5.hexdigest(path)
-          file = { path_name: path, migration_id: mig_id,
-                   file_name: File.basename(path), type: "FILE_TYPE" }
+          file = { path_name: path,
+                   migration_id: mig_id,
+                   file_name: File.basename(path),
+                   type: "FILE_TYPE" }
           add_course_file(file)
         end
       end
@@ -158,7 +160,7 @@ module CC::Importer::Standard
       add_file(file)
     end
 
-    FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/.freeze
+    FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
     def replace_urls(html, resource_dir = nil)
       return "" if html.blank?
 

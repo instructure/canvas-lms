@@ -57,7 +57,7 @@ class AnnouncementsController < ApplicationController
 
   def index
     return unless authorized_action(@context, @current_user, :read)
-    return if @context.class.const_defined?("TAB_ANNOUNCEMENTS") && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
+    return if @context.class.const_defined?(:TAB_ANNOUNCEMENTS) && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
 
     redirect_to named_context_url(@context, :context_url) if @context.is_a?(Course) && @context.elementary_homeroom_course?
 

@@ -80,9 +80,9 @@ class PageView < ActiveRecord::Base
 
   def token
     CanvasSecurity::PageViewJwt.generate({
-                                           request_id: request_id,
+                                           request_id:,
                                            user_id: Shard.global_id_for(user_id),
-                                           created_at: created_at
+                                           created_at:
                                          })
   end
 
@@ -92,7 +92,7 @@ class PageView < ActiveRecord::Base
   end
 
   def ensure_account
-    self.account_id ||= (context_type == "Account" ? context_id : context.account_id) rescue nil
+    self.account_id ||= ((context_type == "Account") ? context_id : context.account_id) rescue nil
     self.account_id ||= (context.is_a?(Account) ? context : context.account) if context
   end
 
@@ -292,7 +292,9 @@ class PageView < ActiveRecord::Base
 
   def self.pv4_client
     ConfigFile.cache_object("pv4") do |config|
-      Pv4Client.new(config["uri"], config["access_token"])
+      creds = Rails.application.credentials.pv4_creds
+
+      Pv4Client.new(config["uri"], creds&.dig(Rails.env.to_sym, :access_token))
     end
   end
 
@@ -327,7 +329,7 @@ class PageView < ActiveRecord::Base
   end
 
   class << self
-    def transaction(*args, &block)
+    def transaction(*args, &)
       if PageView.cassandra?
         # Rails 3 autosave associations re-assign the attributes;
         # for sharding to work, the page view's shard has to be
@@ -335,7 +337,7 @@ class PageView < ActiveRecord::Base
         # done by the transaction, which we're skipping. so
         # manually do that here
         if current_scope
-          current_scope.activate(&block)
+          current_scope.activate(&)
         else
           yield
         end

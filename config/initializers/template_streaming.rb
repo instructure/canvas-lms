@@ -96,7 +96,7 @@ module StreamingContentChecks
     val
   end
 end
-ActionView::StreamingFlow.prepend(StreamingContentChecks) unless ::Rails.env.production?
+ActionView::StreamingFlow.prepend(StreamingContentChecks) unless Rails.env.production?
 
 module SkipEmptyTemplateConcats
   def initialize(original_block)

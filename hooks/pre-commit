@@ -4,16 +4,30 @@ if [[ "$SKIP_CANVAS_PRECOMMIT_HOOK" == "1" ]]; then
   exit 0
 fi
 
-SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$(
+  cd -- "$(dirname "$0")" >/dev/null 2>&1
+  pwd -P
+)"
 CANVAS=$(dirname $SCRIPTPATH)
 
-if [ `pwd -P` = $CANVAS ]; then
+if [ $(pwd -P) = $CANVAS ]; then
+  # if .js, .ts, or .tsx files have changed, run eslint
   if [ -f node_modules/.bin/lint-staged ]; then
+    echo 'Running ESLint...'
     yarn run --silent lint:staged
+    if [ $? -ne 0 ]; then
+      echo 'ESLint errors found, aborting commit'
+      exit 1
+    fi
   else
-    echo 'Trying to run lint:staged inside Docker, if you want things quicker yarn install locally.'
-    docker-compose run --rm --no-deps web yarn run lint:staged ||
-    echo 'You should run `yarn` locally or check to make sure docker is running.'
+    echo 'Trying to run lint:staged inside Docker. If you want things quicker yarn install locally.'
+    docker-compose exec -T web yarn run lint:staged ||
+      echo "You should run yarn locally or check to make sure docker is running."
+  fi
+
+  if git diff --cached --name-only | grep -q 'Gemfile\S*.lock'; then
+    echo "Checking lockfiles..."
+    bundle check
   fi
 fi
 

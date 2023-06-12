@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe LatePolicyController, type: :controller do
+RSpec.describe LatePolicyController do
   let(:valid_attributes) do
     {
       missing_submission_deduction_enabled: true,
@@ -83,7 +83,7 @@ RSpec.describe LatePolicyController, type: :controller do
 
   before do
     request.accept = "application/json"
-    course_with_teacher_logged_in(course: course)
+    course_with_teacher_logged_in(course:)
   end
 
   describe "GET #show" do

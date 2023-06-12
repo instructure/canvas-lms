@@ -39,7 +39,8 @@ describe "student planner" do
       @assignment_d = @course.assignments.create!(name: "assignment",
                                                   due_at: Time.zone.now.advance(days: 2),
                                                   points_possible: 5)
-      @discussion = @course.discussion_topics.create!(user: @teacher, title: "Discussion 1",
+      @discussion = @course.discussion_topics.create!(user: @teacher,
+                                                      title: "Discussion 1",
                                                       message: "Graded discussion",
                                                       assignment: @assignment_d)
     end
@@ -80,9 +81,10 @@ describe "student planner" do
 
   context "ungraded discussion" do
     before :once do
-      @ungraded_discussion = @course.discussion_topics.create!(user: @teacher, title: "somebody topic title",
+      @ungraded_discussion = @course.discussion_topics.create!(user: @teacher,
+                                                               title: "somebody topic title",
                                                                message: "somebody topic message",
-                                                               todo_date: Time.zone.now + 2.days)
+                                                               todo_date: 2.days.from_now)
     end
 
     it "shows and navigates to ungraded discussions with todo dates from student planner", priority: "1" do

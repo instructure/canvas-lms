@@ -29,21 +29,21 @@ describe "Rubrics API", type: :request do
   end
 
   def create_rubric(context, opts = {})
-    @rubric = Rubric.new(context: context)
+    @rubric = Rubric.new(context:)
     @rubric.data = [rubric_data_hash(opts)]
     @rubric.save!
     @rubric.update_with_association(nil, {}, context, { association_object: context })
   end
 
   def rubric_association_params_for_assignment(assign)
-    HashWithIndifferentAccess.new({
-                                    hide_score_total: "0",
-                                    purpose: "grading",
-                                    skip_updating_points_possible: false,
-                                    update_if_existing: true,
-                                    use_for_grading: "1",
-                                    association_object: assign
-                                  })
+    ActiveSupport::HashWithIndifferentAccess.new({
+                                                   hide_score_total: "0",
+                                                   purpose: "grading",
+                                                   skip_updating_points_possible: false,
+                                                   update_if_existing: true,
+                                                   use_for_grading: "1",
+                                                   association_object: assign
+                                                 })
   end
 
   def create_rubric_assessment(opts = {})
@@ -54,7 +54,7 @@ describe "Rubrics API", type: :request do
     rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
     RubricAssessment.create!({
                                artifact: submission,
-                               assessment_type: assessment_type,
+                               assessment_type:,
                                assessor: @teacher,
                                rubric: @rubric,
                                user: submission.user,
@@ -252,7 +252,7 @@ describe "Rubrics API", type: :request do
           create_rubric(@course)
           RubricAssociation.generate(@teacher, @rubric, @course, association_object: @account)
           ["grading", "peer_review"].each.with_index do |type, index|
-            create_rubric_assessment({ type: type, comments: "comment #{index}" })
+            create_rubric_assessment({ type:, comments: "comment #{index}" })
           end
         end
 
@@ -368,7 +368,7 @@ describe "Rubrics API", type: :request do
       it "creates a rubric" do
         response = create_rubric_api_call(@course)
         expect(response["rubric"]["user_id"]).to eq @user.id
-        expect(response["rubric_association"]).to eq nil
+        expect(response["rubric_association"]).to be_nil
       end
 
       it "creats a rubric with an association" do
@@ -393,8 +393,8 @@ describe "Rubrics API", type: :request do
           "1" => { points: 100, description: "not good" }
         }
         above = "above 9000"
-        criteria = { "0" => { id: 1, points: points, description: above, long_description: "he's above 9000!", ratings: ratings } }
-        response = update_rubric_api_call(@course, { rubric: { title: new_title, criteria: criteria } })
+        criteria = { "0" => { id: 1, points:, description: above, long_description: "he's above 9000!", ratings: } }
+        response = update_rubric_api_call(@course, { rubric: { title: new_title, criteria: } })
         rubric = response["rubric"]
         expect(rubric["title"]).to eq new_title
         expect(rubric["points_possible"]).to eq points
@@ -425,7 +425,7 @@ describe "Rubrics API", type: :request do
           "1" => { id: 2, points: points1, description: "description", long_description: "long description", ratings: criteria2ratings },
           "2" => { id: 3, points: points2, description: "description", long_description: "long description", ratings: criteria3ratings },
         }
-        response = update_rubric_api_call(@course, { rubric: { criteria: criteria } })
+        response = update_rubric_api_call(@course, { rubric: { criteria: } })
         rubric = response["rubric"]
         expect(rubric["points_possible"]).to eq total_points
         expect(rubric["criteria"][0]["ratings"][0]["points"]).to eq points0
@@ -448,7 +448,7 @@ describe "Rubrics API", type: :request do
         criteria = {
           "0" => { id: 1, points: 9000, learning_outcome_id: outcome.id, description: "description", long_description: "long description", ratings: rating },
         }
-        response = update_rubric_api_call(@course, { rubric: { criteria: criteria } })
+        response = update_rubric_api_call(@course, { rubric: { criteria: } })
         expect(response["rubric"]["criteria"][0]["learning_outcome_id"]).to eq outcome.id
       end
 
@@ -458,7 +458,7 @@ describe "Rubrics API", type: :request do
         use_for_grading = true
         hide_score_total = true
         association_type = "Assignment"
-        response = update_rubric_api_call(@course, { rubric: { title: "new title" }, rubric_association: { use_for_grading: use_for_grading, purpose: purpose, hide_score_total: hide_score_total, association_id: assignment.id, association_type: association_type } })
+        response = update_rubric_api_call(@course, { rubric: { title: "new title" }, rubric_association: { use_for_grading:, purpose:, hide_score_total:, association_id: assignment.id, association_type: } })
         expect(response["rubric_association"]["association_id"]).to eq assignment.id
         expect(response["rubric_association"]["association_type"]).to eq association_type
         expect(response["rubric_association"]["purpose"]).to eq purpose
@@ -534,7 +534,7 @@ describe "Rubrics API", type: :request do
           course_with_teacher active_all: true
           create_rubric(@account)
           ["grading", "peer_review"].each.with_index do |type, index|
-            create_rubric_assessment({ type: type, comments: "comment #{index}" })
+            create_rubric_assessment({ type:, comments: "comment #{index}" })
           end
           @user = account_admin_user
         end

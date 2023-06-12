@@ -71,9 +71,9 @@ module LtiAdvantage::Serializers
           "#{IMS_CLAIM_PREFIX}#{key}"
         elsif DEEP_LINKING_CLAIMS.include?(key)
           "#{DL_CLAIM_PREFIX}#{key}"
-        elsif NAMES_AND_ROLES_SERVICE_CLAIM == key
+        elsif key == NAMES_AND_ROLES_SERVICE_CLAIM
           NRPS_CLAIM_URL
-        elsif ASSIGNMENT_AND_GRADE_SERVICE_CLAIM == key
+        elsif key == ASSIGNMENT_AND_GRADE_SERVICE_CLAIM
           AGS_CLAIM_URL
         else
           key

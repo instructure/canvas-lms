@@ -111,7 +111,7 @@ module CsvDiff
         raise(CsvDiff::Failure, "CSV headers do not match, cannot diff")
       end
 
-      if (a.headers & @key_fields).empty?
+      unless a.headers.intersect?(@key_fields)
         raise(CsvDiff::Failure, "At least one primary key field must be present")
       end
     end
@@ -123,8 +123,9 @@ module CsvDiff
 
     def setup_output(headers)
       @output_file = Tempfile.new(["csv_diff", ".csv"])
-      @output = CSV.open(@output_file, "wb",
-                         headers: headers)
+      @output = CSV.open(@output_file,
+                         "wb",
+                         headers:)
       @output << headers
     end
   end

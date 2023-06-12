@@ -157,7 +157,8 @@ describe "external tool assignments" do
     end
 
     it "shows the tool as selected when editing a saved configured assignment" do
-      assmt = @course.assignments.create!(title: "blah", submission_types: "external_tool",
+      assmt = @course.assignments.create!(title: "blah",
+                                          submission_types: "external_tool",
                                           external_tool_tag_attributes: { content: @t1, url: @t1.url })
       get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
       selected = first_selected_option(f("#assignment_submission_type"))
@@ -202,7 +203,62 @@ describe "external tool assignments" do
       close_button_selector = "//span[@aria-label = 'Launch External Tool']//button[//*[text() = 'Close']]"
       close_button = fxpath(close_button_selector)
       close_button.click
-      expect(element_exists?(close_button_selector, true)).to eq(false)
+      expect(element_exists?(close_button_selector, true)).to be(false)
+    end
+
+    context "when editing an assignment created by an external tool" do
+      let(:dev_key) do
+        key = DeveloperKey.new(account: @course.account)
+        key.generate_rsa_keypair!
+        key.save!
+        key.developer_key_account_bindings.first.update!(
+          workflow_state: "on"
+        )
+        key
+      end
+      let(:tool) do
+        @course.context_external_tools.create!(
+          context: @course.account,
+          consumer_key: "key",
+          shared_secret: "secret",
+          name: "test tool",
+          domain: "https://www.tool.com",
+          url: "https://www.tool.com/launch?deep_link_location=xyz",
+          lti_version: "1.3",
+          workflow_state: "public",
+          developer_key: dev_key
+        )
+      end
+
+      before do
+        tool.submission_type_selection = {
+          enabled: true,
+          placement: "submission_type_selection",
+          message_type: "LtiDeepLinkingRequest",
+          target_link_uri: "http://www.tool.com/launch?placement=submission_type_selection",
+        }
+        tool.assignment_selection = {
+          enabled: true,
+          placement: "assignment_selection",
+          message_type: "LtiDeepLinkingRequest",
+          target_link_uri: "http://www.tool.com/launch?placement=assignment_selection",
+        }
+        tool.save!
+      end
+
+      it "does not reset the tool url" do
+        assignment = @course.assignments.create!(
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { content: tool, url: tool.url },
+          points_possible: "10"
+        )
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        f('label[for="assignment_external_tool_tag_attributes_new_tab"]').click
+        f('button[type="submit"]').click
+
+        expect(assignment.external_tool_tag.url).to eq("https://www.tool.com/launch?deep_link_location=xyz")
+        expect(assignment.lti_resource_links[0].url).to eq("https://www.tool.com/launch?deep_link_location=xyz")
+      end
     end
   end
 end

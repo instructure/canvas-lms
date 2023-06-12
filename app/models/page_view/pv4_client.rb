@@ -29,7 +29,8 @@ class PageView
 
     PRECISION = 3
 
-    def fetch(user_id, start_time: nil,
+    def fetch(user_id,
+              start_time: nil,
               end_time: Time.now.utc,
               last_page_view_id: nil,
               limit: nil)
@@ -42,7 +43,7 @@ class PageView
       params << "&limit=#{limit}" if limit
       response = CanvasHttp.get(
         @uri.merge("users/#{user_id}/page_views?#{params}").to_s,
-        "Authorization" => "Bearer #{@access_token}"
+        { "Authorization" => "Bearer #{@access_token}" }
       )
 
       json = JSON.parse(response.body)
@@ -78,7 +79,7 @@ class PageView
         pager.replace(fetch(user_id,
                             start_time: oldest,
                             end_time: newest,
-                            last_page_view_id: last_page_view_id,
+                            last_page_view_id:,
                             limit: pager.per_page))
         pager.has_more! unless pager.empty?
         pager

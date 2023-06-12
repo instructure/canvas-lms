@@ -17,14 +17,22 @@
  */
 
 import type {
+  Assignment,
+  AssignmentGroup,
   Enrollment,
   GradingType,
-  Override,
+  LatePolicyStatus,
   Submission,
   SubmissionType,
-  UserDueDateMap,
   WorkflowState,
 } from '../../api.d'
+
+export type OriginalityData = {
+  reportUrl: string
+  score: number
+  status: string
+  state: string
+}
 
 export type PartialStudent = {
   id: string
@@ -45,66 +53,33 @@ export type PartialStudent = {
   }
 }
 
-export type SubmissionOriginalityData = {
-  report_url: string
-  similarity_score: number
-  state: string
-  status: string
-}
-
-export type OriginalityData = {
-  reportUrl: string
-  score: number
-  status: string
-  state: string
-}
-
 // TODO: remove the need for this type
 export type CamelizedStudent = {
-  id: string
-  name: string
-  displayName: string
-  sortableName: string
   avatarUrl: string
+  displayName: string
   enrollments: Enrollment[]
-  loaded: boolean
+  id: string
   initialized: boolean
   isConcluded: boolean
+  loaded: boolean
+  name: string
+  sortableName: string
   totalGrade: number
 }
 
-// TODO: remove the need for this
-export type SubmissionComment = {
-  allowedAttempts: number
-  anonymizeStudents: boolean
-  anonymousGrading: boolean
-  assignmentGroupId: string
-  assignmentGroupPosition: number
-  assignmentId: string
-  assignmentVisibility: string[]
-  courseId: string
-  dueDate: string | null
-  effectiveDueDates: UserDueDateMap
-  gradesPublished: boolean
-  gradingStandardId: string | null
-  gradingType: GradingType
-  hidden: boolean
-  htmlUrl: string
-  id: string
-  inClosedGradingPeriod: boolean
-  moderatedGrading: boolean
-  moduleIds: string[]
-  muted: boolean
-  name: string
-  omitFromFinalGrade: boolean
-  onlyVisibleToOverrides: boolean
-  overrides: Override[]
-  pointsPossible: number
-  position: number
-  postManually: boolean
-  published: boolean
-  submissionTypes: string
-  userId: string
+export type SubmissionData = {
+  id?: string
+  dropped: boolean | undefined
+  enteredGrade?: string | null
+  enteredScore?: number | null
+  excused: boolean
+  extended: boolean
+  grade: string | null
+  late: boolean
+  missing: boolean
+  pointsDeducted?: number | null
+  resubmitted: boolean
+  score: number | null
 }
 
 // TODO: remove the need for this
@@ -150,11 +125,14 @@ export type CamelizedSubmission = {
 }
 
 export type CamelizedGradingPeriod = {
-  id: string
-  title: string
-  startDate: Date
+  closeDate: Date
   endDate: Date
+  id: string
   isClosed: boolean
+  isLast: boolean
+  startDate: Date
+  title: string
+  weight: number
 }
 
 export type CamelizedGradingPeriodSet = {
@@ -169,35 +147,53 @@ export type CamelizedGradingPeriodSet = {
   weighted: boolean
 }
 
+export type SerializedGradingPeriod = {
+  close_date: string
+  end_date: string
+  id: string
+  is_closed?: boolean
+  is_last?: boolean | string
+  start_date: string
+  title: string
+  weight: number
+}
+
 export type CamelizedAssignment = {
   allowedAttempts: number
+  anonymousGrading: boolean
   anonymizeStudents: boolean
-  gradingType: GradingType
   courseId: string
   dueAt: string | null
-  htmlUrl: string
-  id: string
-  moderatedGrading: boolean
-  muted: boolean
-  name: string
-  postManually: boolean
-  published: boolean
-  submissionTypes: string
+  gradesPublished: boolean
+  gradingType: GradingType
   groupSet?: {
     currentGroup: {
       _id: string
     }
   }
+  htmlUrl: string
+  id: string
+  moderatedGrading: boolean
+  muted: boolean
+  name: string
+  pointsPossible: number
+  postManually: boolean
+  published: boolean
+  submissionTypes: string[]
 }
 
-export type PlagiarismData = {
+export type SubmissionOriginalityData = {
   status: string
+  provider: string
   similarity_score: number
+  state?: string
+  public_error_message?: string
+  report_url?: string
 }
 
 export type SimilarityEntry = {
   id: string
-  data: PlagiarismData
+  data: SubmissionOriginalityData
 }
 
 export type SubmissionWithOriginalityReport = Submission & {
@@ -209,15 +205,15 @@ export type SubmissionWithOriginalityReport = Submission & {
   }>
   has_originality_report: boolean
   turnitin_data?: {
-    [key: string]: PlagiarismData
+    [key: string]: SubmissionOriginalityData
   }
   vericite_data?: {provider: 'vericite'} & {
-    [key: string]: PlagiarismData
+    [key: string]: SubmissionOriginalityData
   }
 }
 
-export type PlagiarismDataMap = {
-  [key: string]: PlagiarismData
+export type SubmissionOriginalityDataMap = {
+  [key: string]: SubmissionOriginalityData
 }
 
 export type SimilarityType = 'vericite' | 'turnitin' | 'originality_report'
@@ -225,8 +221,8 @@ export type SimilarityType = 'vericite' | 'turnitin' | 'originality_report'
 export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
   attachments: Array<{id: string}>
   hasOriginalityReport: boolean
-  turnitinData?: PlagiarismDataMap
-  vericiteData?: {provider: 'vericite'} & PlagiarismDataMap
+  turnitinData?: SubmissionOriginalityDataMap
+  vericiteData?: {provider: 'vericite'} & SubmissionOriginalityDataMap
 }
 
 export type FinalGradeOverride = {
@@ -238,4 +234,140 @@ export type FinalGradeOverride = {
 
 export type FinalGradeOverrideMap = {
   [userId: string]: FinalGradeOverride
+}
+
+export type GradeType = 'gradingScheme' | 'percent' | 'points' | 'passFail' | 'excused' | 'missing'
+
+export type GradeEntryMode = 'gradingScheme' | 'passFail' | 'percent' | 'points'
+
+export type GradeInput = {
+  enteredAs: GradeType
+  percent: null | number
+  points: number
+  schemeKey: null | string
+}
+
+export type GradeResult = {
+  enteredAs: null | GradeType
+  excused: boolean
+  grade: null | string
+  late_policy_status: null | LatePolicyStatus
+  score: null | number
+  valid: boolean
+}
+
+export type AssignmentGroupGradeMap = {
+  [assignmentGroupId: string]: AssignmentGroupGrade
+}
+
+export type StudentGrade = {
+  score: number
+  possible: number
+  submission: Submission
+  drop?: boolean
+}
+
+export type AggregateGrade = {
+  score: number
+  possible: number
+  submission_count: number
+  submissions: StudentGrade[]
+}
+
+export type AssignmentGroupGrade = {
+  assignmentGroupId: string
+  assignmentGroupWeight: number
+  current: AggregateGrade
+  final: AggregateGrade
+  scoreUnit: 'points' | 'percentage'
+}
+
+export type GradingPeriodGrade = {
+  gradingPeriodId: string
+  gradingPeriodWeight: number
+  assignmentGroups: AssignmentGroupGradeMap
+  scoreUnit: 'points' | 'percentage'
+  final: {
+    score: number
+    possible: number
+    submission_count?: number
+    submissions?: Submission[]
+  }
+  current: {
+    score: number
+    possible: number
+    submission_count?: number
+    submissions?: Submission[]
+  }
+}
+
+export type GradingPeriodGradeMap = {
+  [gradingPeriodId: string]: GradingPeriodGrade
+}
+
+export type FormatGradeOptions = {
+  formatType?: 'points_out_of_fraction'
+  defaultValue?: string
+  gradingType?: string
+  delocalize?: boolean
+  precision?: number
+  pointsPossible?: number
+  score?: number
+  restrict_quantitative_data?: boolean
+  grading_scheme?: GradingScheme[]
+}
+
+export type GradingStandard = [string, number]
+
+export type GradingScheme = {
+  id?: string
+  title?: string
+  data: GradingStandard[]
+}
+
+export type ProvisionalGrade = {
+  anonymous_grader_id?: string
+  grade: string
+  provisional_grade_id: string
+  readonly: boolean
+  scorer_id?: string
+  scorer_name?: string
+  selected?: boolean
+  score: number | null
+  rubric_assessments: RubricAssessment[]
+}
+
+export type RubricAssessment = {
+  id: string
+  assessor_id: string
+  anonymous_assessor_id: string
+  assessment_type: string
+  assessor_name: string
+}
+
+export type SubmissionState =
+  | 'not_gradeable'
+  | 'not_graded'
+  | 'graded'
+  | 'resubmitted'
+  | 'not_submitted'
+
+export type AssignmentGradeCriteria = Pick<
+  Assignment,
+  | 'id'
+  | 'points_possible'
+  | 'submission_types'
+  | 'anonymize_students'
+  | 'omit_from_final_grade'
+  | 'workflow_state'
+>
+export type SubmissionGradeCriteria = Pick<
+  Submission,
+  'score' | 'grade' | 'assignment_id' | 'workflow_state' | 'excused' | 'id'
+>
+
+export type AssignmentGroupCriteriaMap = {
+  [id: string]: Omit<AssignmentGroup, 'assignments'> & {
+    assignments: AssignmentGradeCriteria[]
+  }
 }

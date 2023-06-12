@@ -243,7 +243,7 @@ function warnAboutRolesBeingSwitched() {
 }
 
 function expandQuotedTextWhenClicked() {
-  $('a.show_quoted_text_link').live('click', function (event) {
+  $(document).on('click', 'a.show_quoted_text_link', function (event) {
     const $text = $(this).parents('.quoted_text_holder').children('.quoted_text')
     if ($text.length > 0) {
       event.preventDefault()
@@ -254,7 +254,7 @@ function expandQuotedTextWhenClicked() {
 }
 
 function previewEquellaContentWhenClicked() {
-  $('a.equella_content_link').live('click', function (event) {
+  $(document).on('click', 'a.equella_content_link', function (event) {
     event.preventDefault()
     let $dialog = $('#equella_preview_dialog')
     if (!$dialog.length) {
@@ -309,7 +309,7 @@ function openDialogsWhenClicked() {
   // <a class="dialog_opener" aria-controls="my_dialog" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
   // opens the .my_dialog dialog and passes the options {resizable:false, width: 300}
   // the :not clause is to not allow users access to this functionality in their content.
-  $('.dialog_opener[aria-controls]:not(.user_content *)').live('click', function (event) {
+  $(document).on('click', '.dialog_opener[aria-controls]:not(.user_content *)', function (event) {
     const link = this
     $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
       event.preventDefault()
@@ -604,7 +604,7 @@ function confirmAndDeleteRightSideTodoItemsWhenClicked() {
 
 // this really belongs in enhanced-user-content2/instructure_helper
 // but it uses FilePreview to render the file preview overlay, and
-// that has so many dependencies on things like @canvas/files/backbone/models/File.coffee
+// that has so many dependencies on things like @canvas/files/backbone/models/File.js
 // this it'll be too time consuming to decouple it from canvas in our
 // timeframe. Solve it for now by using postMessage from enhanced-user-content2
 // (which we hope to decouple from canvas) to ask canvas to render the preview

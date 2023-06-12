@@ -22,17 +22,19 @@ module MicrosoftSync
   class GraphService
     class EducationClassesEndpoints < EndpointsBase
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
-      def list(options = {}, &blk)
+      def list(options = {}, &)
         get_paginated_list(
           "education/classes",
           quota: [1, 0],
           special_cases: [
             SpecialCase.new(
-              400, /Education_ObjectType.*does not exist as.*property/,
+              400,
+              /Education_ObjectType.*does not exist as.*property/,
               result: Errors::NotEducationTenant
             )
           ],
-          **options, &blk
+          **options,
+          &
         )
       end
 

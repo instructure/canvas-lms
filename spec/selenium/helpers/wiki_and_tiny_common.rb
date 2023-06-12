@@ -89,7 +89,7 @@ module WikiAndTinyCommon
 
   def create_wiki_page(title, unpublished, edit_roles)
     wiki_page =
-      @course.wiki_pages.create(title: title, editing_roles: edit_roles, notify_of_update: true)
+      @course.wiki_pages.create(title:, editing_roles: edit_roles, notify_of_update: true)
     wiki_page.unpublish! if unpublished
     wiki_page
   end
@@ -118,7 +118,7 @@ module WikiAndTinyCommon
   # only handles by #id's
   def validate_wiki_style_attrib(type, value, selectors)
     in_frame wiki_page_body_ifr_id do
-      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value}\;")
+      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value};")
     end
   end
 

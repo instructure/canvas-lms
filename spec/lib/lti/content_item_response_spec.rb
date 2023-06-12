@@ -125,7 +125,7 @@ describe Lti::ContentItemResponse do
 
   describe "#file" do
     it "returns a file" do
-      file = attachment_model(context: context)
+      file = attachment_model(context:)
       content_item_response = subject({ files: [file.id] })
       expect(content_item_response.file).to eq file
     end
@@ -133,7 +133,7 @@ describe Lti::ContentItemResponse do
 
   describe "#title" do
     it "gets the title for a file" do
-      file = attachment_model(context: context)
+      file = attachment_model(context:)
       content_item_response = subject({ files: [file.id] })
       expect(content_item_response.title).to eq "unknown.example"
     end
@@ -186,7 +186,7 @@ describe Lti::ContentItemResponse do
 
   describe "#content_type" do
     it "gets the files content_type" do
-      file = attachment_model(context: context)
+      file = attachment_model(context:)
       content_item_response = subject({ files: [file.id] })
       expect(content_item_response.content_type).to eq "application/unknown"
     end
@@ -200,7 +200,7 @@ describe Lti::ContentItemResponse do
 
   describe "#url" do
     it "gets the id for a file" do
-      file = attachment_model(context: context)
+      file = attachment_model(context:)
       content_item_response = subject({ files: [file.id] })
       expect(content_item_response.url).to eq "file_download_url"
     end
@@ -234,7 +234,7 @@ describe Lti::ContentItemResponse do
       expect(json["@graph"].first["url"]).to include "api_export_url"
       expect(json["@graph"].first["mediaType"]).to eq "application/vnd.instructure.api.content-exports.quiz"
       expect(json["@graph"].first["title"]).to eq "a quiz"
-      expect(json["@graph"].first["copyAdvice"]).to eq true
+      expect(json["@graph"].first["copyAdvice"]).to be true
     end
   end
 end

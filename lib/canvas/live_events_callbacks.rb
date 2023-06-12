@@ -27,7 +27,7 @@ module Canvas::LiveEventsCallbacks
     when Conversation
       Canvas::LiveEvents.conversation_created(obj)
     when ConversationMessage
-      Canvas::LiveEvents.conversation_message_created(obj)
+      Canvas::LiveEvents.conversation_message_created(obj) unless ConversationBatch.created_as_template?(message: obj)
     when DiscussionEntry
       Canvas::LiveEvents.discussion_entry_created(obj)
     when DiscussionTopic
@@ -127,8 +127,9 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.group_membership_updated(obj)
     when WikiPage
       if changes["title"] || changes["body"]
-        Canvas::LiveEvents.wiki_page_updated(obj, changes["title"] ? changes["title"].first : nil,
-                                             changes["body"] ? changes["body"].first : nil)
+        Canvas::LiveEvents.wiki_page_updated(obj,
+                                             changes["title"]&.first,
+                                             changes["body"]&.first)
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)

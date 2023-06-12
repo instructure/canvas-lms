@@ -36,63 +36,75 @@ describe OutcomesFeaturesHelper do
       end
 
       it "returns true when account_level_mastery_scales FF is enabled" do
-        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq true
+        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to be true
       end
 
       it "returns false when account_level_mastery_scales FF is disabled" do
         @context.root_account.disable_feature!(:account_level_mastery_scales)
-        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq false
+        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to be false
       end
 
       it "returns FF status with Course context as argument" do
-        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq true
+        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to be true
         @context.root_account.disable_feature!(:account_level_mastery_scales)
-        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq false
+        expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to be false
       end
 
       it "returns FF status with Account context as argument" do
-        expect(account_level_mastery_scales_enabled?(@account_outcome.context)).to eq true
+        expect(account_level_mastery_scales_enabled?(@account_outcome.context)).to be true
         @context.root_account.disable_feature!(:account_level_mastery_scales)
-        expect(account_level_mastery_scales_enabled?(@account_outcome.context)).to eq false
+        expect(account_level_mastery_scales_enabled?(@account_outcome.context)).to be false
       end
 
       it "returns FF status with Global/nil context as argument" do
-        expect(account_level_mastery_scales_enabled?(@global_outcome.context)).to eq nil
+        expect(account_level_mastery_scales_enabled?(@global_outcome.context)).to be_nil
         @context.root_account.disable_feature!(:account_level_mastery_scales)
-        expect(account_level_mastery_scales_enabled?(@global_outcome.context)).to eq nil
+        expect(account_level_mastery_scales_enabled?(@global_outcome.context)).to be_nil
       end
     end
 
-    describe "#outcome_alignment_summary_enabled?" do
+    describe "#improved_outcomes_management_enabled?" do
       before do
-        @context.root_account.enable_feature!(:outcome_alignment_summary)
+        @context.root_account.enable_feature!(:improved_outcomes_management)
       end
 
-      it "returns true when outcome_alignment_summary FF is enabled" do
-        expect(outcome_alignment_summary_enabled?(@course_outcome.context)).to eq true
+      it "returns true when improved_outcomes_management FF is enabled" do
+        expect(improved_outcomes_management_enabled?(@course_outcome.context)).to be true
       end
 
-      it "returns false when outcome_alignment_summary FF is disabled" do
-        @context.root_account.disable_feature!(:outcome_alignment_summary)
-        expect(outcome_alignment_summary_enabled?(@course_outcome.context)).to eq false
+      it "returns false when improved_outcomes_management FF is disabled" do
+        @context.root_account.disable_feature!(:improved_outcomes_management)
+        expect(improved_outcomes_management_enabled?(@course_outcome.context)).to be false
       end
 
       it "returns FF status with Course context as argument" do
-        expect(outcome_alignment_summary_enabled?(@course_outcome.context)).to eq true
-        @context.root_account.disable_feature!(:outcome_alignment_summary)
-        expect(outcome_alignment_summary_enabled?(@course_outcome.context)).to eq false
+        expect(improved_outcomes_management_enabled?(@course_outcome.context)).to be true
+        @context.root_account.disable_feature!(:improved_outcomes_management)
+        expect(improved_outcomes_management_enabled?(@course_outcome.context)).to be false
       end
 
       it "returns FF status with Account context as argument" do
-        expect(outcome_alignment_summary_enabled?(@account_outcome.context)).to eq true
-        @context.root_account.disable_feature!(:outcome_alignment_summary)
-        expect(outcome_alignment_summary_enabled?(@account_outcome.context)).to eq false
+        expect(improved_outcomes_management_enabled?(@account_outcome.context)).to be true
+        @context.root_account.disable_feature!(:improved_outcomes_management)
+        expect(improved_outcomes_management_enabled?(@account_outcome.context)).to be false
       end
 
       it "returns FF status with Global/nil context as argument" do
-        expect(outcome_alignment_summary_enabled?(@global_outcome.context)).to eq nil
-        @context.root_account.disable_feature!(:outcome_alignment_summary)
-        expect(outcome_alignment_summary_enabled?(@global_outcome.context)).to eq nil
+        expect(improved_outcomes_management_enabled?(@global_outcome.context)).to be_nil
+        @context.root_account.disable_feature!(:improved_outcomes_management)
+        expect(improved_outcomes_management_enabled?(@global_outcome.context)).to be_nil
+      end
+    end
+
+    describe "#outcome_alignment_summary_with_new_quizzes_enabled?" do
+      it "returns true when outcome_alignment_summary_with_new_quizzes FF is enabled" do
+        @context.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+        expect(outcome_alignment_summary_with_new_quizzes_enabled?(@course_outcome.context)).to be true
+      end
+
+      it "returns false when outcome_alignment_summary_with_new_quizzes FF is disabled" do
+        @context.disable_feature!(:outcome_alignment_summary_with_new_quizzes)
+        expect(outcome_alignment_summary_with_new_quizzes_enabled?(@course_outcome.context)).to be false
       end
     end
   end

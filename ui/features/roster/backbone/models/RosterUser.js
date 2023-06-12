@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import User from '@canvas/users/backbone/models/User.coffee'
+import User from '@canvas/users/backbone/models/User'
 import secondsToTime from '../../util/secondsToTime'
 
 class RosterUser extends User {

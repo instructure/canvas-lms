@@ -260,27 +260,31 @@ CanvasRails::Application.routes.draw do
     resources :assignments do
       get "moderate" => "assignments#show_moderate"
 
-      get "anonymous_submissions/:anonymous_id", to: "submissions/anonymous_previews#show",
-                                                 constraints: lambda { |request|
-                                                                request.query_parameters.key?(:preview) && request.format == :html
-                                                              }
+      get "anonymous_submissions/:anonymous_id",
+          to: "submissions/anonymous_previews#show",
+          constraints: lambda { |request|
+                         request.query_parameters.key?(:preview) && request.format == :html
+                       }
 
-      get "anonymous_submissions/:anonymous_id", to: "submissions/anonymous_downloads#show",
-                                                 constraints: lambda { |request|
-                                                                request.query_parameters.key?(:download)
-                                                              }
+      get "anonymous_submissions/:anonymous_id",
+          to: "submissions/anonymous_downloads#show",
+          constraints: lambda { |request|
+                         request.query_parameters.key?(:download)
+                       }
 
       get "anonymous_submissions/:anonymous_id", to: "anonymous_submissions#show", as: :anonymous_submission
 
-      get "submissions/:id", to: "submissions/previews#show",
-                             constraints: lambda { |request|
-                                            request.query_parameters.key?(:preview) && request.format == :html
-                                          }
+      get "submissions/:id",
+          to: "submissions/previews#show",
+          constraints: lambda { |request|
+                         request.query_parameters.key?(:preview) && request.format == :html
+                       }
 
-      get "submissions/:id", to: "submissions/downloads#show",
-                             constraints: lambda { |request|
-                                            request.query_parameters.key?(:download)
-                                          }
+      get "submissions/:id",
+          to: "submissions/downloads#show",
+          constraints: lambda { |request|
+                         request.query_parameters.key?(:download)
+                       }
 
       put "anonymous_submissions/:anonymous_id", to: "anonymous_submissions#update"
       put "anonymous_submissions/:anonymous_id/reassign", to: "anonymous_submissions#redo_submission"
@@ -331,8 +335,10 @@ CanvasRails::Application.routes.draw do
         get :list_google_docs
       end
 
-      get "lti/resource/:resource_link_id", controller: "lti/message",
-                                            action: "resource", as: :resource_link_id
+      get "lti/resource/:resource_link_id",
+          controller: "lti/message",
+          action: "resource",
+          as: :resource_link_id
     end
 
     resources :grading_standards, only: %i[index create update destroy]
@@ -353,15 +359,23 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get "lti/resource/:resource_link_id", controller: "lti/message",
-                                          action: "resource", as: :resource_link_id
-    get "lti/basic_lti_launch_request/:message_handler_id", controller: "lti/message",
-                                                            action: "basic_lti_launch_request", as: :basic_lti_launch_request
+    get "lti/resource/:resource_link_id",
+        controller: "lti/message",
+        action: "resource",
+        as: :resource_link_id
+    get "lti/basic_lti_launch_request/:message_handler_id",
+        controller: "lti/message",
+        action: "basic_lti_launch_request",
+        as: :basic_lti_launch_request
     post "lti/tool_proxy_registration", controller: "lti/message", action: "registration", as: :tool_proxy_registration
-    get "lti/tool_proxy_reregistration/:tool_proxy_id", controller: "lti/message", action: "reregistration",
-                                                        as: :tool_proxy_reregistration
-    get "lti/registration_return", controller: "lti/message", action: "registration_return",
-                                   as: :registration_return
+    get "lti/tool_proxy_reregistration/:tool_proxy_id",
+        controller: "lti/message",
+        action: "reregistration",
+        as: :tool_proxy_reregistration
+    get "lti/registration_return",
+        controller: "lti/message",
+        action: "registration_return",
+        as: :registration_return
 
     resources :submissions
     resources :calendar_events
@@ -487,21 +501,36 @@ CanvasRails::Application.routes.draw do
     delete "test_student" => "courses#reset_test_student"
     get "content_migrations" => "content_migrations#index"
     get "link_validator" => "courses#link_validator", :as => :link_validator
-  end
 
+    get "grading_schemes" => "grading_schemes_json#detail_list"
+    get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
+    post "grading_schemes" => "grading_schemes_json#create"
+    delete "grading_schemes/:id" => "grading_schemes_json#destroy"
+    put "grading_schemes/:id" => "grading_schemes_json#update"
+    get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
+    get "grading_schemes/:id" => "grading_schemes_json#show"
+  end
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
   resources :page_views, only: :update
   post "media_objects" => "media_objects#create_media_object", :as => :create_media_object
   get "media_objects/:id" => "media_objects#media_object_inline", :as => :media_object
   get "media_objects/:id/redirect" => "media_objects#media_object_redirect", :as => :media_object_redirect
-  get "media_objects/:id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_object_thumbnail
+  get "media_objects/:media_object_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_object_thumbnail
   get "media_objects/:media_object_id/info" => "media_objects#show", :as => :media_object_info
   get "media_objects_iframe/:media_object_id" => "media_objects#iframe_media_player", :as => :media_object_iframe
   get "media_objects_iframe" => "media_objects#iframe_media_player", :as => :media_object_iframe_href
   get "media_objects/:media_object_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_tracks
   post "media_objects/:media_object_id/media_tracks" => "media_tracks#create", :as => :create_media_tracks
-  delete "media_objects/:media_object_id/media_tracks/:media_track_id" => "media_tracks#destroy", :as => :delete_media_tracks
+  delete "media_objects/:media_object_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_tracks
+
+  post "media_attachments" => "media_objects#create_media_object", :as => :create_media_attachment
+  get "media_attachments/:attachment_id/thumbnail" => "media_objects#media_object_thumbnail", :as => :media_attachment_thumbnail
+  get "media_attachments/:attachment_id/info" => "media_objects#show", :as => :media_attachment_info
+  get "media_attachments_iframe/:attachment_id" => "media_objects#iframe_media_player", :as => :media_attachment_iframe
+  get "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#show", :as => :show_media_attachment_tracks
+  post "media_attachments/:attachment_id/media_tracks" => "media_tracks#create", :as => :create_media_attachment_tracks
+  delete "media_attachments/:attachment_id/media_tracks/:id" => "media_tracks#destroy", :as => :delete_media_attachment_tracks
 
   get "external_content/success/:service" => "external_content#success", :as => :external_content_success
   get "external_content/success/:service/:id" => "external_content#success", :as => :external_content_update
@@ -684,15 +713,23 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    get "lti/resource/:resource_link_id", controller: "lti/message",
-                                          action: "resource", as: :resource_link_id
-    get "lti/basic_lti_launch_request/:message_handler_id", controller: "lti/message",
-                                                            action: "basic_lti_launch_request", as: :basic_lti_launch_request
+    get "lti/resource/:resource_link_id",
+        controller: "lti/message",
+        action: "resource",
+        as: :resource_link_id
+    get "lti/basic_lti_launch_request/:message_handler_id",
+        controller: "lti/message",
+        action: "basic_lti_launch_request",
+        as: :basic_lti_launch_request
     post "lti/tool_proxy_registration", controller: "lti/message", action: "registration", as: :tool_proxy_registration
-    get "lti/tool_proxy_reregistration/:tool_proxy_id", controller: "lti/message", action: "reregistration",
-                                                        as: :tool_proxy_reregistration
-    get "lti/registration_return", controller: "lti/message", action: "registration_return",
-                                   as: :registration_return
+    get "lti/tool_proxy_reregistration/:tool_proxy_id",
+        controller: "lti/message",
+        action: "reregistration",
+        as: :tool_proxy_reregistration
+    get "lti/registration_return",
+        controller: "lti/message",
+        action: "registration_return",
+        as: :registration_return
 
     get "outcomes/users/:user_id" => "outcomes#user_outcome_results", :as => :user_outcomes_results
     resources :outcomes do
@@ -742,6 +779,17 @@ CanvasRails::Application.routes.draw do
     get "release_notes" => "release_notes#manage", :as => :release_notes_manage
 
     get "blackout_dates" => "blackout_dates#index"
+
+    get "grading_schemes" => "grading_schemes_json#detail_list"
+    get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
+    post "grading_schemes" => "grading_schemes_json#create"
+    delete "grading_schemes/:id" => "grading_schemes_json#destroy"
+    put "grading_schemes/:id" => "grading_schemes_json#update"
+    get "grading_schemes/default" => "grading_schemes_json#show_default_grading_scheme"
+    get "grading_schemes/:id" => "grading_schemes_json#show"
+
+    get "grading_settings" => "account_grading_settings#index"
+    get "grading_settings/*path" => "account_grading_settings#index"
   end
 
   get "images/users/:user_id" => "users#avatar_image", :as => :avatar_image
@@ -936,7 +984,10 @@ CanvasRails::Application.routes.draw do
 
   get "health_check" => "info#health_check"
   get "health_prognosis" => "info#health_prognosis"
+  # To be used for uptime reporting
   get "readiness" => "info#readiness"
+  # To be used by ALB
+  get "internal/readiness" => "info#readiness"
   get "deep" => "info#deep"
 
   get "web-app-manifest/manifest.json" => "info#web_app_manifest"
@@ -1039,6 +1090,9 @@ CanvasRails::Application.routes.draw do
       get "media_objects", controller: "media_objects", action: :index, as: :media_objects
       get "courses/:course_id/media_objects", controller: "media_objects", action: :index, as: :course_media_objects
       get "groups/:group_id/media_objects", controller: "media_objects", action: :index, as: :group_media_objects
+      get "media_attachments", controller: "media_objects", action: :index, as: :media_attachments
+      get "courses/:course_id/media_attachments", controller: "media_objects", action: :index, as: :course_media_attachments
+      get "groups/:group_id/media_attachments", controller: "media_objects", action: :index, as: :group_media_attachments
       put "accounts/:account_id/courses", action: :batch_update
       post "courses/:course_id/ping", action: :ping, as: "course_ping"
 
@@ -1152,19 +1206,26 @@ CanvasRails::Application.routes.draw do
       get "audit/grade_change/students/:student_id", action: :for_student, as: "audit_grade_change_student"
       get "audit/grade_change/graders/:grader_id", action: :for_grader, as: "audit_grade_change_grader"
       get "audit/grade_change/courses/:course_id/assignments/:assignment_id",
-          action: :for_course_and_other_parameters, as: "audit_grade_change_course_assignment"
+          action: :for_course_and_other_parameters,
+          as: "audit_grade_change_course_assignment"
       get "audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id",
-          action: :for_course_and_other_parameters, as: "audit_grade_change_course_assignment_grader"
+          action: :for_course_and_other_parameters,
+          as: "audit_grade_change_course_assignment_grader"
       get "audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id/students/:student_id",
-          action: :for_course_and_other_parameters, as: "audit_grade_change_course_assignment_grader_student"
+          action: :for_course_and_other_parameters,
+          as: "audit_grade_change_course_assignment_grader_student"
       get "audit/grade_change/courses/:course_id/assignments/:assignment_id/students/:student_id",
-          action: :for_course_and_other_parameters, as: "audit_grade_change_course_assignment_student"
+          action: :for_course_and_other_parameters,
+          as: "audit_grade_change_course_assignment_student"
       get "audit/grade_change/courses/:course_id/graders/:grader_id",
-          action: :for_course_and_other_parameters, as: "audit_grade_change_course_grader"
+          action: :for_course_and_other_parameters,
+          as: "audit_grade_change_course_grader"
       get "audit/grade_change/courses/:course_id/graders/:grader_id/students/:student_id",
-          action: :for_course_and_other_parameters, as: "audit_grade_change_course_grader_student"
+          action: :for_course_and_other_parameters,
+          as: "audit_grade_change_course_grader_student"
       get "audit/grade_change/courses/:course_id/students/:student_id",
-          action: :for_course_and_other_parameters, as: "audit_grade_change_course_student"
+          action: :for_course_and_other_parameters,
+          as: "audit_grade_change_course_student"
       get "audit/grade_change", action: :query, as: "audit_grade_change"
     end
 
@@ -1226,6 +1287,7 @@ CanvasRails::Application.routes.draw do
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read/:item", action: :mark_submission_item_read, as: "#{context}_submission_mark_item_read"
         put "#{context.pluralize}/:#{context}_id/submissions/bulk_mark_read", action: :mark_bulk_submissions_as_read, as: "#{context}_submissions_bulk_mark_read"
+        put "#{context.pluralize}/:#{context}_id/submissions/:user_id/clear_unread", action: :submissions_clear_unread, as: "#{context}_submissions_clear_unread"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :document_annotations_read_state, as: "#{path_prefix}_submission_document_annotations_read_state"
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :mark_document_annotations_read, as: "#{path_prefix}_submission_document_annotations_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :rubric_assessments_read_state, as: "#{path_prefix}_submission_rubric_comments_read_state"
@@ -1248,18 +1310,23 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :anonymous_provisional_grades) do
       get "courses/:course_id/assignments/:assignment_id/anonymous_provisional_grades/status",
-          action: :status, as: "course_assignment_anonymous_provisional_status"
+          action: :status,
+          as: "course_assignment_anonymous_provisional_status"
     end
 
     scope(controller: :provisional_grades) do
       put "courses/:course_id/assignments/:assignment_id/provisional_grades/bulk_select",
-          action: :bulk_select, as: "bulk_select_provisional_grades"
+          action: :bulk_select,
+          as: "bulk_select_provisional_grades"
       get "courses/:course_id/assignments/:assignment_id/provisional_grades/status",
-          action: :status, as: "course_assignment_provisional_status"
+          action: :status,
+          as: "course_assignment_provisional_status"
       post "courses/:course_id/assignments/:assignment_id/provisional_grades/publish",
-           action: :publish, as: "publish_provisional_grades"
+           action: :publish,
+           as: "publish_provisional_grades"
       put "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/select",
-          action: :select, as: "select_provisional_grade"
+          action: :select,
+          as: "select_provisional_grade"
     end
 
     scope(controller: :submission_comments_api) do
@@ -1333,7 +1400,8 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_read, as: "#{context}_discussion_topic_discussion_entry_mark_read"
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/read", action: :mark_entry_unread, as: "#{context}_discussion_topic_discussion_entry_mark_unread"
         post "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/entries/:entry_id/rating",
-             action: :rate_entry, as: "#{context}_discussion_topic_discussion_entry_rate"
+             action: :rate_entry,
+             as: "#{context}_discussion_topic_discussion_entry_rate"
         put "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", action: :subscribe_topic, as: "#{context}_discussion_topic_subscribe"
         delete "#{context.pluralize}/:#{context}_id/discussion_topics/:topic_id/subscribed", action: :unsubscribe_topic, as: "#{context}_discussion_topic_unsubscribe"
       end
@@ -1386,15 +1454,19 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/tool_proxy") do
       %w[course account].each do |context|
-        delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :destroy,
-                                                                         as: "#{context}_delete_tool_proxy"
-        put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :update,
-                                                                      as: "#{context}_update_tool_proxy"
+        delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id",
+               action: :destroy,
+               as: "#{context}_delete_tool_proxy"
+        put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id",
+            action: :update,
+            as: "#{context}_update_tool_proxy"
 
-        delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update", action: :dismiss_update,
-                                                                                as: "#{context}_dismiss_update_tool_proxy"
-        put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update", action: :accept_update,
-                                                                             as: "#{context}_accept_update_tool_proxy"
+        delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update",
+               action: :dismiss_update,
+               as: "#{context}_dismiss_update_tool_proxy"
+        put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update",
+            action: :accept_update,
+            as: "#{context}_accept_update_tool_proxy"
       end
     end
 
@@ -2033,7 +2105,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :outcome_groups_api) do
       %w[global account course].each do |context|
-        prefix = (context == "global" ? context : "#{context}s/:#{context}_id")
+        prefix = ((context == "global") ? context : "#{context}s/:#{context}_id")
         unless context == "global"
           get "#{prefix}/outcome_groups", action: :index, as: "#{context}_outcome_groups"
           get "#{prefix}/outcome_group_links", action: :link_index, as: "#{context}_outcome_group_links"
@@ -2201,13 +2273,15 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/grading_periods", action: :index, as: :course_grading_periods
       get "courses/:course_id/grading_periods/:id", action: :show, as: :course_grading_period
       patch "courses/:course_id/grading_periods/batch_update",
-            action: :batch_update, as: :course_grading_period_batch_update
+            action: :batch_update,
+            as: :course_grading_period_batch_update
       put "courses/:course_id/grading_periods/:id", action: :update, as: :course_grading_period_update
       delete "courses/:course_id/grading_periods/:id", action: :destroy, as: :course_grading_period_destroy
       delete "accounts/:account_id/grading_periods/:id", action: :destroy, as: :account_grading_period_destroy
 
       patch "grading_period_sets/:set_id/grading_periods/batch_update",
-            action: :batch_update, as: :grading_period_set_periods_update
+            action: :batch_update,
+            as: :grading_period_set_periods_update
     end
 
     scope(controller: :usage_rights) do
@@ -2365,16 +2439,18 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :media_objects) do
-      post "media_objects", action: "create_media_object", as: :create_media_object
-    end
-
-    scope(controller: :media_objects) do
       put "media_objects/:media_object_id", action: "update_media_object", as: :update_media_object
+      post "media_objects", action: "create_media_object", as: :create_media_object
+      put "media_attachments/:attachment_id", action: "update_media_object", as: :update_media_attachment
+      post "media_attachments", action: "create_media_object", as: :create_media_attachment
     end
 
     scope(controller: :media_tracks) do
       get "media_objects/:media_object_id/media_tracks", action: "index", as: :list_media_tracks
       put "media_objects/:media_object_id/media_tracks", action: "update", as: :update_media_tracks
+
+      get "media_attachments/:attachment_id/media_tracks", action: "index", as: :list_media_attachment_tracks
+      put "media_attachments/:attachment_id/media_tracks", action: "update", as: :update_media_attachment_tracks
     end
 
     scope(controller: "conditional_release/rules") do
@@ -2548,12 +2624,19 @@ CanvasRails::Application.routes.draw do
       prefix = "#{context}s/:#{context}_id"
 
       post "#{prefix}/authorize", controller: "lti/ims/authorization", action: :authorize, as: "#{context}_lti_oauth2_authorize"
-      get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: "lti/ims/tool_consumer_profile",
-                                                                          action: "show", as: "#{context}_tool_consumer_profile"
-      post "#{prefix}/tool_proxy", controller: "lti/ims/tool_proxy", action: :re_reg,
-                                   as: "re_reg_#{context}_lti_tool_proxy", constraints: Lti::ReRegConstraint.new
-      post "#{prefix}/tool_proxy", controller: "lti/ims/tool_proxy", action: :create,
-                                   as: "create_#{context}_lti_tool_proxy"
+      get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)",
+           controller: "lti/ims/tool_consumer_profile",
+           action: "show",
+           as: "#{context}_tool_consumer_profile"
+      post "#{prefix}/tool_proxy",
+           controller: "lti/ims/tool_proxy",
+           action: :re_reg,
+           as: "re_reg_#{context}_lti_tool_proxy",
+           constraints: Lti::ReRegConstraint.new
+      post "#{prefix}/tool_proxy",
+           controller: "lti/ims/tool_proxy",
+           action: :create,
+           as: "create_#{context}_lti_tool_proxy"
       get "#{prefix}/jwt_token", controller: "external_tools", action: :jwt_token
       get "tool_proxy/:tool_proxy_guid/#{prefix}/tool_setting", controller: "lti/ims/tool_setting", action: :show, as: "show_#{context}_tool_setting"
       get "tool_proxy/:tool_proxy_guid/#{prefix}/resource_link_id/:resource_link_id/tool_setting", controller: "lti/ims/tool_setting", action: :show, as: "show_#{context}_resource_link_id_tool_setting"
@@ -2612,6 +2695,11 @@ CanvasRails::Application.routes.draw do
     # Progress Service (LTI AGS)
     scope(controller: "lti/ims/progress") do
       get "courses/:course_id/progress/:id", action: :show, as: :lti_progress_show
+    end
+
+    # Dynamic Registration Service
+    scope(controller: "lti/ims/dynamic_registration") do
+      get "register", action: :create
     end
 
     # Public JWK Service

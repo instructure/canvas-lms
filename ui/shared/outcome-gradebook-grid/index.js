@@ -21,7 +21,8 @@ import $ from 'jquery'
 import _ from 'underscore'
 import HeaderFilterView from './backbone/views/HeaderFilterView'
 import OutcomeFilterView from './react/OutcomeFilterView'
-import OutcomeColumnView from './backbone/views/OutcomeColumnView.coffee'
+import OutcomeColumnView from './backbone/views/OutcomeColumnView'
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import cellTemplate from './jst/outcome_gradebook_cell.handlebars'
 import studentCellTemplate from './jst/outcome_gradebook_student_cell.handlebars'
 
@@ -29,6 +30,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 const I18n = useI18nScope('gradebookOutcomeGradebookGrid')
+
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
 
 /*
 xsslint safeString.method cellHtml
@@ -195,7 +200,11 @@ const Grid = {
       }
       const student = Grid.Util.lookupStudent(user)
       const sections = Grid.Util.lookupSection(section_list)
-      const section_name = $.toSentence(_.pluck(sections, 'name').sort())
+      const section_name = listFormatter.format(
+        _.pluck(sections, 'name')
+          .filter(x => x)
+          .sort()
+      )
       const courseID = ENV.context_asset_string.split('_')[1]
       const row = {
         student: _.extend(

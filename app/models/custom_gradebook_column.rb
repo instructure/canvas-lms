@@ -27,13 +27,14 @@ class CustomGradebookColumn < ActiveRecord::Base
 
   validates :title, presence: true
 
-  validates :teacher_notes, inclusion: { in: [true, false], message: "teacher_notes must be true or false" }
-  validates :title, length: { maximum: maximum_string_length },
-                    exclusion: {
-                      in: GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES,
-                      message: "cannot use gradebook importer reserved names"
-                    },
-                    allow_nil: true
+  validates :teacher_notes, inclusion: { in: [true, false], message: -> { t("teacher_notes must be true or false") } }
+  validates :title,
+            length: { maximum: maximum_string_length },
+            exclusion: {
+              in: GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES,
+              message: -> { t("cannot use gradebook importer reserved names") }
+            },
+            allow_nil: true
 
   before_create :set_root_account_id
 

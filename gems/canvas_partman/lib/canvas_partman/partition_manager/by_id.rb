@@ -123,7 +123,7 @@ module CanvasPartman
       end
 
       def table_regex
-        @table_regex ||= /^#{Regexp.escape(base_class.table_name)}_(?<index>\d+)$/.freeze
+        @table_regex ||= /^#{Regexp.escape(base_class.table_name)}_(?<index>\d+)$/
       end
 
       def generate_check_constraint(id)

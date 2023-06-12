@@ -24,14 +24,14 @@ describe QuizzesNext::ExportService do
     context "service enabled for context" do
       it "returns true" do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(true)
-        expect(described_class.applies_to_course?(course)).to eq(true)
+        expect(described_class.applies_to_course?(course)).to be(true)
       end
     end
 
     context "service not enabled for context" do
       it "returns false" do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(false)
-        expect(described_class.applies_to_course?(course)).to eq(false)
+        expect(described_class.applies_to_course?(course)).to be(false)
       end
     end
   end
@@ -196,9 +196,10 @@ describe QuizzesNext::ExportService do
 
       before do
         course = course_model
-        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        @master_template = MasterCourses::MasterTemplate.create!(course:)
         @child_course = course_model
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: @child_course)
+        @child_subscription = MasterCourses::ChildSubscription.create!(master_template: @master_template, child_course: @child_course)
+
         allow(@child_course).to receive(:root_account).and_return(root_account)
       end
 
@@ -214,6 +215,28 @@ describe QuizzesNext::ExportService do
         ).once
         described_class.send_imported_content(@child_course, content_migration, basic_import_content)
       end
+
+      it "doesn't mark downstream changes when updating duplicating assignments" do
+        tag = @master_template.create_content_tag_for!(old_assignment2)
+        new_assignment2.migration_id = tag.migration_id
+        new_assignment2.save!
+
+        child_content_tag = MasterCourses::ChildContentTag.create!(
+          child_subscription: @child_subscription,
+          content: new_assignment2
+        )
+
+        basic_import_content[:assignments] << {
+          original_resource_link_id: "link-5678",
+          "$canvas_assignment_id": new_assignment2.id,
+          original_assignment_id: old_assignment2.id
+        }
+
+        allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
+
+        described_class.send_imported_content(new_course, content_migration, basic_import_content)
+        expect(child_content_tag.reload.downstream_changes).to be_empty
+      end
     end
 
     context "when an assignment is imported into a blueprint child course" do
@@ -221,9 +244,9 @@ describe QuizzesNext::ExportService do
 
       before do
         course = course_model
-        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        master_template = MasterCourses::MasterTemplate.create!(course:)
         @child_course = course_model
-        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: @child_course)
+        MasterCourses::ChildSubscription.create!(master_template:, child_course: @child_course)
         allow(@child_course).to receive(:root_account).and_return(root_account)
       end
 

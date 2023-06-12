@@ -31,7 +31,7 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import update from 'immutability-helper'
 
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import actions from '../actions'
 import {ConnectedDiscussionRow, ConnectedDraggableDiscussionRow} from './DiscussionRow'
 import {discussionList} from '../proptypes/discussion'

@@ -2,16 +2,13 @@
   <div class="ig-row__layout">
     <div class="ig-info">
       {{#if recording}}
-        <a class="ig-title element_toggler"
-            href="#"
-            aria-controls="conference-{{id}}"
-            aria-expanded="false"
-            role="button">
-          <i class="icon-mini-arrow-right auto_rotate"></i>
-          {{title}}
-        </a>
+      <a class="ig-title element_toggler" href="#" aria-controls="conference-{{id}}" aria-expanded="false"
+        role="button">
+        <i class="icon-mini-arrow-right auto_rotate"></i>
+        {{title}}
+      </a>
       {{else}}
-        <span class="ig-title">{{title}}</span>
+      <span class="ig-title">{{title}}</span>
       {{/if}}
 
       <div class="ig-details">
@@ -19,94 +16,90 @@
           {{datetimeFormatted ended_at}}
         </div>
         {{#if description}}
-          <div class="ig-details__item ig-details__item--wrap-text">
-            {{description}}
-          </div>
+        <div class="ig-details__item ig-details__item--wrap-text">
+          {{description}}
+        </div>
         {{/if}}
         {{#if recording}}
-          <div class="ig-details__item-recordings ig-details__item-recordings--wrap-text">
+        <div class="ig-details__item-recordings ig-details__item-recordings--wrap-text">
           {{#if multipleRecordings}}
-            {{#t "recordings"}}{{recordingCount}} Recordings{{/t}}
+          {{#t "recordings"}}{{recordingCount}} Recordings{{/t}}
           {{else}}
-            {{#t "recording"}}1 Recording{{/t}}
+          {{#t "recording"}}1 Recording{{/t}}
           {{/if}}
-          </div>
+        </div>
         {{/if}}
       </div>
     </div>
     <div class="ig-admin">
       {{#if permissions.delete}}
-        <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="{{id}}-content-1" href="#">
-          <i class="icon-settings"></i>
-          <i class="icon-mini-arrow-down"></i>
-          <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
-        </a>
-        <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
-          <li role="presentation">
-            <a href="{{ url }}"
-                class="icon-trash  delete_conference_link"
-                id="{{id}}-content-3"
-                role="menuitem"
-                aria-label="{{#t "delete"}}Delete{{/t}}"
-                title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
-            </a>
-          </li>
-        </ul>
+      <a class="al-trigger al-trigger-gray" role="button" aria-haspopup="true" aria-owns="{{id}}-content-1" href="#">
+        <i class="icon-settings"></i>
+        <i class="icon-mini-arrow-down"></i>
+        <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
+      </a>
+      <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false"
+        aria-activedescendant="{{id}}-content-2">
+        <li role="presentation">
+          <a href="{{ url }}" class="icon-trash  delete_conference_link" id="{{id}}-content-3" role="menuitem"
+            aria-label="{{#t " delete"}}Delete{{/t}}" title="{{#t " delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
+          </a>
+        </li>
+      </ul>
       {{/if}}
     </div>
   </div>
 </div>
 
 {{#if recording}}
-  <div class="ig-sublist" data-id="{{id}}" id="conference-{{id}}" style="display: none;">
-    <ul>
-      {{#each recordings}}
-        <li class="recording">
-          <div class="ig-row" data-id="{{recording_id}}" style="text-align: center;">
-            <div class="ig-row__layout">
-              <div class="ig-info">
-                <div class="ig-details">
-                  {{#if ../../isAdobeConnect}}
-                    <a id="adobe-connect-playback-link" href="{{../playback_url}}" target="_blank" class="ig-title"
-                      style="line-height: inherit;" data-id="{{../../recording_id}}" data-format="presentation">
-                      {{title}}
-                    </a>
-                  {{else}}
-                    <span>{{title}}</span>
-                    &nbsp;&nbsp;&nbsp;
-                    {{#each playback_formats}}
-                      {{#if show_to_students}}
-                        <a href="{{url}}" target="_blank" class="ig-title"
-                          style="line-height: inherit;" data-id="{{../recording_id}}" data-format="presentation">
-                          {{#t "type"}}{{type}}{{/t}}
-                        </a>
-                      {{else}}
-                        {{#if ../../../../permissions.manage_recordings}}
-                          <a href="{{url}}" target="_blank" class="ig-title"
-                            style="line-height: inherit;" data-id="{{../../recording_id}}" data-format="presentation">
-                            {{#t "type"}}{{type}}{{/t}}
-                          </a>
-                        {{/if}}
-                      {{/if}}
-                    {{/each}}
-                  {{/if}}
-                  {{dateString created_at}}
-                  &nbsp;&#124;&nbsp;
-                  {{durationToString duration_minutes}}
-                </div>
-              </div>
-              {{#if ../permissions.manage_recordings}}
-                <div class="ig-button" data-id="{{recording_id}}" data-action="delete" data-url="{{../../url}}">
-                  <a href="#"
-                      class="btn btn-small icon-trash delete_recording_link"
-                      title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}
-                  </a>
-                </div>
+<div class="ig-sublist" data-id="{{id}}" id="conference-{{id}}" style="display: none;">
+  <ul>
+    {{#each recordings}}
+    <li class="recording">
+      <div class="ig-row" data-id="{{recording_id}}" style="text-align: center;">
+        <div class="ig-row__layout">
+          <div class="ig-info">
+            <div class="ig-details">
+              {{#if ../../isAdobeConnect}}
+              <a id="adobe-connect-playback-link" href="{{../playback_url}}" target="_blank" class="ig-title"
+                style="line-height: inherit;" data-id="{{../../recording_id}}" data-format="presentation">
+                {{title}}
+              </a>
+              {{else}}
+              <span>{{title}}</span>
+              &nbsp;&nbsp;&nbsp;
+              {{#each playback_formats}}
+              {{#if show_to_students}}
+              <a href="{{url}}" target="_blank" class="ig-title" style="line-height: inherit;"
+                data-id="{{../recording_id}}" data-format="presentation">
+                {{#t "type"}}{{translated_type}}{{/t}}
+              </a>
+              {{else}}
+              {{#if ../../../../permissions.manage_recordings}}
+              <a href="{{url}}" target="_blank" class="ig-title" style="line-height: inherit;"
+                data-id="{{../../recording_id}}" data-format="presentation">
+                {{#t "type"}}{{translated_type}}{{/t}}
+              </a>
               {{/if}}
+              {{/if}}
+              {{/each}}
+              {{/if}}
+              {{dateString created_at}}
+              &nbsp;&#124;&nbsp;
+              {{durationToString duration_minutes}}
             </div>
           </div>
-        </li>
-      {{/each}}
-    </ul>
-  </div>
+          {{#if ../permissions.manage_recordings}}
+          <div class="ig-button" data-id="{{recording_id}}" data-action="delete" data-url="{{../../url}}">
+            <a href="#" class="btn btn-small icon-trash delete_recording_link" title="{{#t " delete"}}Delete{{/t}}">{{#t
+              "delete"}}Delete{{/t}}
+            </a>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </li>
+    {{/each}}
+  </ul>
+</div>
 {{/if}}

@@ -35,7 +35,7 @@ describe Message do
     it "saves an html body if a template exists" do
       expect_any_instance_of(Message).to receive(:apply_html_template).and_return("template")
       user         = user_factory(active_all: true)
-      account_user = AccountUser.create!(account: account_model, user: user)
+      account_user = AccountUser.create!(account: account_model, user:)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).to eq "template"
@@ -46,7 +46,7 @@ describe Message do
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       HTML
       user         = user_factory(active_all: true)
-      account_user = AccountUser.create!(account: account_model, user: user)
+      account_user = AccountUser.create!(account: account_model, user:)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).not_to include "<script>"
@@ -130,14 +130,14 @@ describe Message do
       account.default_time_zone = "Pretoria"
       account.save!
       due_at = Time.zone.parse("2014-06-06 11:59:59")
-      assignment_model(course: @course, due_at: due_at)
+      assignment_model(course: @course, due_at:)
       msg = generate_message(:assignment_created, :email, @assignment)
 
       presenter = Utils::DatetimeRangePresenter.new(due_at, nil, :event, ActiveSupport::TimeZone.new("Pretoria"))
       due_at_string = presenter.as_string(shorten_midnight: false)
 
-      expect(msg.body.include?(due_at_string)).to eq true
-      expect(msg.html_body.include?(due_at_string)).to eq true
+      expect(msg.body.include?(due_at_string)).to be true
+      expect(msg.html_body.include?(due_at_string)).to be true
       Time.zone = original_time_zone
     end
 
@@ -161,7 +161,7 @@ describe Message do
       account = account_model
       account.settings[:email_logo] = "awesomelogo.jpg"
       account.save!
-      @au = AccountUser.create!(account: account, user: user_model)
+      @au = AccountUser.create!(account:, user: user_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include("awesomelogo.jpg")
     end
@@ -349,7 +349,34 @@ describe Message do
       message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
       expect(Mailer).to receive(:create_message).and_raise("450 recipient address rejected")
       expect(ErrorReport).not_to receive(:log_exception)
-      expect(@message.deliver).to eq false
+      expect(@message.deliver).to be false
+    end
+
+    describe "with notification service" do
+      before do
+        message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
+        @user.account.enable_feature!(:notification_service)
+      end
+
+      it "enqueues to sqs when notification service is enabled" do
+        expect(@message).to receive(:enqueue_to_sqs).and_return(true)
+        @message.deliver
+      end
+
+      it "sends each target through the notification service" do
+        expect(Services::NotificationService).to receive(:process).once
+        @message.deliver
+        expect(@message.workflow_state).to eq "sent"
+      end
+
+      it "sets transmission error on error" do
+        error_string = "flagrant error"
+        expect(Services::NotificationService).to receive(:process).and_raise(error_string)
+
+        expect { @message.deliver }.to raise_error(error_string)
+        expect(@message.workflow_state).to eq "staged"
+        expect(@message.transmission_errors).to include(error_string)
+      end
     end
 
     it "completes delivery without a user" do
@@ -396,6 +423,16 @@ describe Message do
       )
     end
 
+    describe "#enqueue_to_sqs" do
+      it "sets transmission error with no targets" do
+        message_model(dispatch_at: Time.now, to: "somebody", workflow_state: "staged", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
+        expect(@message).to receive(:notification_targets).and_return([])
+
+        @message.enqueue_to_sqs
+        expect(@message.workflow_state).to eq "transmission_error"
+      end
+    end
+
     context "push" do
       before :once do
         user_model
@@ -408,9 +445,12 @@ describe Message do
         expect(@user).to receive(:notification_endpoints).and_return([ne])
 
         message_model(notification_name: "Assignment Created",
-                      dispatch_at: Time.now, workflow_state: "staged",
-                      to: "somebody", updated_at: Time.now.utc - 11.minutes,
-                      path_type: "push", user: @user)
+                      dispatch_at: Time.now,
+                      workflow_state: "staged",
+                      to: "somebody",
+                      updated_at: Time.now.utc - 11.minutes,
+                      path_type: "push",
+                      user: @user)
         @message.deliver
       end
 
@@ -421,9 +461,12 @@ describe Message do
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
         message_model(notification_name: "Assignment Created",
-                      dispatch_at: Time.now, workflow_state: "staged",
-                      to: "somebody", updated_at: Time.now.utc - 11.minutes,
-                      path_type: "push", user: @user)
+                      dispatch_at: Time.now,
+                      workflow_state: "staged",
+                      to: "somebody",
+                      updated_at: Time.now.utc - 11.minutes,
+                      path_type: "push",
+                      user: @user)
         @message.deliver
       end
 
@@ -577,7 +620,7 @@ describe Message do
         it "pulls from the asset's context, if possible" do
           assign = assignment_model
           notification = Notification.create(name: "Assignment Changed")
-          message = message_model(context: assign, notification: notification)
+          message = message_model(context: assign, notification:)
           expect(message.from_name).to eq assign.context.name
         end
 
@@ -599,7 +642,7 @@ describe Message do
           assign = assignment_model
           user = user_model(preferences: { course_nicknames: { assign.context.id => "nickname" } })
           notification = Notification.create(name: "Assignment Changed")
-          message = message_model(context: assign, notification: notification, user: user)
+          message = message_model(context: assign, notification:, user:)
           expect(message.from_name).to eq "nickname"
         end
 
@@ -617,7 +660,7 @@ describe Message do
           enroll = @course.enroll_user(user)
           enroll.accept!
           notification = Notification.create(name: "Assignment Group Published")
-          message = message_model(context: ag, notification: notification, user: user)
+          message = message_model(context: ag, notification:, user:)
           expect(message.from_name).to eq "Unnamed Course"
         end
       end
@@ -671,7 +714,7 @@ describe Message do
       account = Account.default
       account.settings[:author_email_in_notifications] = true
       account.save!
-      submission = submission_model(user: user, course: course)
+      submission = submission_model(user:, course:)
       message = Message.create!(context: submission)
       expect(message.author_short_name).to eq user.short_name
       expect(message.author_email_address).to eq user.email
@@ -694,7 +737,7 @@ describe Message do
       account.save!
       message = Message.create!(context: convo_message)
       expect(message.author_short_name).to eq user.short_name
-      expect(message.author_email_address).to eq nil
+      expect(message.author_email_address).to be_nil
       expect(message.author_avatar_url).to match "http://localhost/images/messages/avatar-50.png"
     end
 
@@ -817,7 +860,7 @@ describe Message do
         queued.deliver
         raise "#deliver should have failed because this message does not exist"
       rescue Delayed::RetriableError => e
-        expect(e.cause.is_a?(::Message::QueuedNotFound)).to be_truthy
+        expect(e.cause.is_a?(Message::QueuedNotFound)).to be_truthy
       end
     end
   end
@@ -834,7 +877,7 @@ describe Message do
       root_account = Account.find(0)
       user_account = Account.default
       user = user_model
-      message = Message.new(root_account_id: root_account.id, user: user)
+      message = Message.new(root_account_id: root_account.id, user:)
       expect(message.send(:infer_feature_account)).to eq(user_account)
     end
 

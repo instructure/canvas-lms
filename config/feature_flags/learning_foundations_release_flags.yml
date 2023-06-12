@@ -1,0 +1,213 @@
+---
+buttons_and_icons_root_account:
+  state: allowed
+  applies_to: RootAccount
+  display_name: RCE Icon Maker
+  description: |-
+    Manage a library of custom icons from the RCE.
+  environments:
+    production:
+      state: hidden
+
+rce_ux_improvements:
+  state: hidden
+  display_name: RCE UX Improvements
+  description: Improve and streamline the RCE button and tray UX
+  applies_to: SiteAdmin
+
+rce_new_external_tool_dialog_in_canvas:
+  state: hidden
+  display_name: RCE Use New External Tool Dialog in Canvas
+  description: Use the new external tool dialog when the RCE is running in Canvas. The new dialog is always used in new quizzes.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+explicit_latex_typesetting:
+  state: hidden
+  display_name: Explicit LaTeX Typesetting
+  description: |-
+    Instead of typesetting LaTeX anywhere, only typeset LaTeX where
+    it is explicitly enabled.
+  applies_to: SiteAdmin
+
+rce_transform_loaded_content:
+  state: hidden
+  display_name: Transform RCE Content on Load
+  description: |-
+    Transforms absolute URLs to relative URLs and removes extraneous attributes from RCE content on load.
+    Needed for the RCE to function fully in New Quizzes.
+  applies_to: RootAccount
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+media_links_use_attachment_id:
+  state: hidden
+  display_name: Use Attachment IDs in Media Links
+  description: |-
+    Use attachment ids in media links so that users are always pointed to the correct instance of media
+    instead of the original
+  applies_to: SiteAdmin
+
+assignments_2_student:
+  state: hidden
+  display_name: Assignment Enhancements - Student
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Assignment-Enhancements-Users/gh-p/student_enhancements">\1</a>
+    assignments_2_student_description: This feature enhances the assignment submission and feedback workflow for students. When this flag is enabled, early access to ongoing improvements will be displayed automatically with every release. For full details, please see the *Assignment Enhancements User Group* in the Canvas Community.
+  applies_to: Course
+  root_opt_in: true
+  beta: true
+
+assignments_2_teacher:
+  state: hidden
+  display_name: Assignments 2 Teacher View
+  description: Use the new assignments teacher page
+  applies_to: Course
+  root_opt_in: true
+  environments:
+    production:
+      state: disabled
+
+auto_show_cc:
+  type: setting
+  state: allowed
+  display_name: Auto Show Closed Captions
+  description: |-
+    Automatically show closed captions in the user's current
+    language (if available) when playing canvas media.
+  applies_to: User
+
+confetti_branding:
+  state: 'hidden'
+  display_name: 'Account branding for confetti'
+  description: Applies account branding to confetti splashes
+  applies_to: SiteAdmin
+
+course_paces:
+  state: hidden
+  display_name: 'Course Pacing'
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">\1</a>
+    course_paces_description: |-
+      Course Pacing adds support for rolling enrollments to Canvas;
+      automatically distributing due dates for students with different
+      start dates based on an instructor's defined pace. Learn more and give
+      feedback by joining the *Course Pacing User Group*.
+  applies_to: Account
+  beta: true
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
+create_course_subaccount_picker:
+  state: hidden
+  applies_to: RootAccount
+  display_name: 'Allow sub-account selection when users manually create courses'
+  description: |-
+    Rather than automatically placing manually created courses into the
+    "Manually Created Courses" sub-account, when enabled, this feature allows
+    people who can manually create courses to put those courses into any sub-account
+    where they have enrollments.
+
+calendar_series:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Calendar Series
+  description: |-
+    This flag allows calendar event series to be created from the Canvas Calendar.
+
+account_level_blackout_dates:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Account-level course pacing blackout dates
+  description: |-
+    Allow course pacing blackout dates to be set for accounts instead of just courses.
+
+render_both_to_do_lists:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Render both To Do lists for teachers with student enrollments
+  description: |-
+    Renders both To Do lists on the dashboard sidebar for teachers with student enrollments.
+
+course_paces_for_students:
+  state: hidden
+  display_name: 'Per Student Course Paces'
+  description: Enable unique course paces for students.
+  applies_to: SiteAdmin
+
+course_paces_redesign:
+  state: hidden
+  display_name: 'Course Pacing Redesign'
+  description: Enable the redesigned course pacing user experience.
+  applies_to: SiteAdmin
+
+deprecate_faculty_journal:
+  state: hidden
+  display_name: 'Faculty Journal Deprecation'
+  description: Enable the deprecation of the faculty journal functionality.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+module_publish_menu:
+  state: hidden
+  display_name: 'Module Publish Menu'
+  description: Enable the module publish menus to make mass publishing and unpublishing easier.
+  applies_to: SiteAdmin
+
+k5_font_selection:
+  state: hidden
+  display_name: 'Allow Font Selection in C4E Accounts'
+  description: |-
+    Adds an account setting to select the classic (Lato) or elementary (Balsamiq Sans) font in Canvas for Elementary
+    accounts.
+  applies_to: SiteAdmin
+
+auto_subscribe_account_calendars:
+  state: hidden
+  display_name: 'Allow auto-subscription to account calendars'
+  description: Allow admins to configure subscription preferences on account calendars.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+blueprint_line_item_support:
+  state: hidden
+  display_name: 'Blueprint Resource ID Support'
+  description: Allows blueprint courses to keep track of assignment's resource id changes.
+  applies_to: SiteAdmin
+
+permanent_page_links:
+  state: hidden
+  display_name: 'Permanent Page Links'
+  description: |-
+    When the title to a page is changed, old links to that page will link to the correct page.
+  applies_to: SiteAdmin
+
+account_calendars_planner_support:
+  state: hidden
+  display_name: 'Planner support for account calendars'
+  description: This flag allows events from account calendars to be displayed on the canvas planner.
+  applies_to: SiteAdmin

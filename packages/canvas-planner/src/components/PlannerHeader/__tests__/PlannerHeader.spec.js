@@ -25,7 +25,7 @@ const TZ = 'America/Denver'
 const plannerDays = [
   moment('2018-03-01T14:00:42Z').tz(TZ),
   moment('2018-03-02T14:00:42Z').tz(TZ),
-  moment('2018-03-03T14:00:42Z').tz(TZ)
+  moment('2018-03-03T14:00:42Z').tz(TZ),
 ]
 
 function defaultProps(options) {
@@ -38,7 +38,7 @@ function defaultProps(options) {
           course_id: '1',
           due_at: '2017-03-09T20:40:35Z',
           html_url: 'http://www.non_default_url.com',
-          name: 'learning object title'
+          name: 'learning object title',
         },
         {
           id: '2',
@@ -46,10 +46,10 @@ function defaultProps(options) {
           due_at: '2017-03-09T20:40:35Z',
           html_url: 'http://www.non_default_url.com',
           name: 'learning object title',
-          planner_override: {dismissed: true}
-        }
+          planner_override: {dismissed: true},
+        },
       ],
-      nextUrl: null
+      nextUrl: null,
     },
     days: plannerDays.map(d => [d.format('YYYY-MM-DD'), [{dateBucketMoment: d}]]),
     getInitialOpportunities: () => {},
@@ -78,14 +78,14 @@ function defaultProps(options) {
       seekingNewActivity: false,
       loadingGrades: false,
       gradesLoaded: false,
-      loadingOpportunities: false
+      loadingOpportunities: false,
     },
     ui: {
-      naiAboveScreen: false
+      naiAboveScreen: false,
     },
     todo: {},
     auxElement: document.createElement('div'),
-    ...options
+    ...options,
   }
 }
 
@@ -118,7 +118,7 @@ it('renders the base component correctly with buttons and trays', () => {
 })
 
 it('does not render the Add To Do option when isObserving', () => {
-  const wrapper = mount(<PlannerHeader {...defaultProps()} isObserving />)
+  const wrapper = mount(<PlannerHeader {...defaultProps()} isObserving={true} />)
   const AddToDoButton = wrapper.findWhere(node => {
     return node.type() === 'button' && node.text() === 'Add To Do'
   })
@@ -198,7 +198,7 @@ it('does not call getNextOpportunities when component has loaded all opportuniti
   props.courses = [
     {id: '1', longName: 'Course Long Name', shortName: 'Course Short Name'},
     {id: '2', longName: 'Course Other Long Name', shortName: 'Course Other Name'},
-    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'}
+    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'},
   ]
 
   props.opportunities.items = [
@@ -207,85 +207,85 @@ it('does not call getNextOpportunities when component has loaded all opportuniti
       course_id: '1',
       due_at: '2017-03-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '2',
       course_id: '2',
       due_at: '2017-04-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '3',
       course_id: '3',
       due_at: '2017-05-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '4',
       course_id: '1',
       due_at: '2017-06-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '5',
       course_id: '2',
       due_at: '2017-07-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '6',
       course_id: '3',
       due_at: '2017-08-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '7',
       course_id: '1',
       due_at: '2017-09-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '8',
       course_id: '2',
       due_at: '2017-10-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '9',
       course_id: '1',
       due_at: '2017-15-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '11',
       course_id: '2',
       due_at: '2017-16-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '12',
       course_id: '1',
       due_at: '2017-12-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '10',
       course_id: '2',
       due_at: '2017-17-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
-    }
+      name: 'learning object title',
+    },
   ]
 
   props.loading = {
@@ -297,7 +297,7 @@ it('does not call getNextOpportunities when component has loaded all opportuniti
     firstNewDayKey: null,
     futureNextUrl: null,
     pastNextUrl: null,
-    seekingNewActivity: false
+    seekingNewActivity: false,
   }
 
   props.todo = {}
@@ -315,7 +315,7 @@ it('does call getNextOpportunities when component has 9 opportunities', () => {
   props.courses = [
     {id: '1', longName: 'Course Long Name', shortName: 'Course Short Name'},
     {id: '2', longName: 'Course Other Long Name', shortName: 'Course Other Name'},
-    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'}
+    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'},
   ]
 
   props.opportunities.items = [
@@ -324,64 +324,64 @@ it('does call getNextOpportunities when component has 9 opportunities', () => {
       course_id: '1',
       due_at: '2017-03-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '2',
       course_id: '2',
       due_at: '2017-04-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '3',
       course_id: '3',
       due_at: '2017-05-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '4',
       course_id: '1',
       due_at: '2017-06-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '5',
       course_id: '2',
       due_at: '2017-07-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '6',
       course_id: '3',
       due_at: '2017-08-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '7',
       course_id: '1',
       due_at: '2017-09-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '8',
       course_id: '2',
       due_at: '2017-10-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '9',
       course_id: '1',
       due_at: '2017-15-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
-    }
+      name: 'learning object title',
+    },
   ]
 
   props.loading = {
@@ -392,7 +392,7 @@ it('does call getNextOpportunities when component has 9 opportunities', () => {
     firstNewDayKey: null,
     futureNextUrl: null,
     pastNextUrl: null,
-    seekingNewActivity: false
+    seekingNewActivity: false,
   }
   props.todo = {}
 
@@ -409,7 +409,7 @@ it('opens tray if todo update item props is set', () => {
   props.courses = [
     {id: '1', longName: 'Course Long Name', shortName: 'Course Short Name'},
     {id: '2', longName: 'Course Other Long Name', shortName: 'Course Other Name'},
-    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'}
+    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'},
   ]
 
   props.opportunities.items = [
@@ -418,85 +418,85 @@ it('opens tray if todo update item props is set', () => {
       course_id: '1',
       due_at: '2017-03-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '2',
       course_id: '2',
       due_at: '2017-04-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '3',
       course_id: '3',
       due_at: '2017-05-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '4',
       course_id: '1',
       due_at: '2017-06-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '5',
       course_id: '2',
       due_at: '2017-07-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '6',
       course_id: '3',
       due_at: '2017-08-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '7',
       course_id: '1',
       due_at: '2017-09-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '8',
       course_id: '2',
       due_at: '2017-10-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '9',
       course_id: '1',
       due_at: '2017-15-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '11',
       course_id: '2',
       due_at: '2017-16-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '12',
       course_id: '1',
       due_at: '2017-12-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '10',
       course_id: '2',
       due_at: '2017-17-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
-    }
+      name: 'learning object title',
+    },
   ]
 
   props.getNextOpportunities = mockDispatch
@@ -504,8 +504,8 @@ it('opens tray if todo update item props is set', () => {
 
   props.todo = {
     updateTodoItem: {
-      id: 10
-    }
+      id: 10,
+    },
   }
 
   wrapper.setProps(props)
@@ -513,12 +513,11 @@ it('opens tray if todo update item props is set', () => {
 })
 
 it('shows all opportunities on badge even when we have over 10 items', () => {
-  const mockDispatch = jest.fn()
   const props = defaultProps()
   props.courses = [
     {id: '1', longName: 'Course Long Name', shortName: 'Course Short Name'},
     {id: '2', longName: 'Course Other Long Name', shortName: 'Course Other Name'},
-    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'}
+    {id: '3', longName: 'Course Big Long Name', shortName: 'Course Big Name'},
   ]
 
   props.opportunities.items = [
@@ -527,90 +526,90 @@ it('shows all opportunities on badge even when we have over 10 items', () => {
       course_id: '1',
       due_at: '2017-03-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '2',
       course_id: '2',
       due_at: '2017-04-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '3',
       course_id: '3',
       due_at: '2017-05-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '4',
       course_id: '1',
       due_at: '2017-06-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '5',
       course_id: '2',
       due_at: '2017-07-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '6',
       course_id: '3',
       due_at: '2017-08-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '7',
       course_id: '1',
       due_at: '2017-09-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '8',
       course_id: '2',
       due_at: '2017-10-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '9',
       course_id: '3',
       due_at: '2017-13-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '10',
       course_id: '1',
       due_at: '2017-14-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '11',
       course_id: '2',
       due_at: '2017-15-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
+      name: 'learning object title',
     },
     {
       id: '12',
       course_id: '3',
       due_at: '2017-16-09T20:40:35Z',
       html_url: 'http://www.non_default_url.com',
-      name: 'learning object title'
-    }
+      name: 'learning object title',
+    },
   ]
 
   props.loading = {
     loadingOpportunities: false,
-    allOpportunitiesLoaded: true
+    allOpportunitiesLoaded: true,
   }
 
   const fakeElement = document.createElement('div')
@@ -655,7 +654,7 @@ it('sets the maxHeight on the Opportunities', () => {
   wrapper.instance().opportunitiesHtmlButton = {
     getBoundingClientRect() {
       return {top: 10, height: 20}
-    }
+    },
   }
   // triggers a re-render
   wrapper.setState({opportunitiesOpen: true})

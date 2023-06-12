@@ -32,7 +32,7 @@ module Api::V1::Collaborator
 
       if includes.include?("collaborator_lti_id")
         hash["collaborator_lti_id"] = if collaborator.user
-                                        Lti::Asset.opaque_identifier_for(collaborator.user, context: context)
+                                        Lti::Asset.opaque_identifier_for(collaborator.user, context:)
                                       else
                                         Lti::Asset.opaque_identifier_for(collaborator.group)
                                       end

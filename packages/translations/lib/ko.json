@@ -98,6 +98,9 @@
     "delimiters_4db4840d": {
         "message": "구분자"
     },
+    "description_436c48d7": {
+        "message": "설명"
+    },
     "details_98a31b68": {
         "message": "세부 정보"
     },
@@ -118,6 +121,9 @@
     },
     "done_54e3d4b6": {
         "message": "마침"
+    },
+    "down_5831a426": {
+        "message": "아래로"
     },
     "due_5d7267be": {
         "message": "기한:"
@@ -176,6 +182,9 @@
     "insert_link_6dc23cae": {
         "message": "링크 삽입"
     },
+    "insert_math_equation_57c6e767": {
+        "message": "Insert Math Equation"
+    },
     "invalid_file_type_881cc9b2": {
         "message": "유효하지 않은 파일 유형"
     },
@@ -230,6 +239,9 @@
     "misc_3b692ea7": {
         "message": "기타"
     },
+    "module_90d9fd32": {
+        "message": "모듈"
+    },
     "modules_c4325335": {
         "message": "모듈"
     },
@@ -239,8 +251,17 @@
     "name_1aed4a1b": {
         "message": "이름"
     },
+    "navigation_ee9af92d": {
+        "message": "탐색"
+    },
     "new_13daf639": {
         "message": "새 항목"
+    },
+    "new_quiz_34aacba6": {
+        "message": "새 퀴즈"
+    },
+    "next_40e12421": {
+        "message": "다음"
     },
     "no_e16d9132": {
         "message": "아니요"
@@ -290,6 +311,9 @@
     "record_7c9448b": {
         "message": "녹음/녹화"
     },
+    "recording_98da6bda": {
+        "message": "녹음/녹화"
+    },
     "relationships_6602af70": {
         "message": "관계"
     },
@@ -310,6 +334,9 @@
     },
     "star_8d156e09": {
         "message": "별표 표시"
+    },
+    "start_over_f7552aa9": {
+        "message": "새로 시작"
     },
     "submit_a3cc6859": {
         "message": "제출"
@@ -340,6 +367,9 @@
     },
     "tomorrow_9a6c9a00": {
         "message": "내일"
+    },
+    "up_c553575d": {
+        "message": "위로"
     },
     "upload_file_fd2361b8": {
         "message": "파일 업로드"

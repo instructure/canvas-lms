@@ -24,13 +24,28 @@ module MasterCourses
 
   # probably not be a comprehensive list but oh well
   ALLOWED_CONTENT_TYPES = %w[
-    Announcement AssessmentQuestionBank Assignment AssignmentGroup Attachment CalendarEvent DiscussionTopic
-    ContextExternalTool ContextModule ContentTag LearningOutcome LearningOutcomeGroup CoursePace
-    Quizzes::Quiz Rubric Wiki WikiPage
+    Announcement
+    AssessmentQuestionBank
+    Assignment
+    AssignmentGroup
+    Attachment
+    CalendarEvent
+    CoursePace
+    ContextExternalTool
+    ContextModule
+    ContentTag
+    DiscussionTopic
+    LearningOutcome
+    LearningOutcomeGroup
+    MediaTrack
+    Quizzes::Quiz
+    Rubric
+    Wiki
+    WikiPage
   ].freeze
 
   CONTENT_TYPES_FOR_DELETIONS = (ALLOWED_CONTENT_TYPES - ["Wiki"]).freeze
-  CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ["ContentTag", "Wiki"] + ["Folder"]).freeze
+  CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ["Wiki"] + ["Folder"]).freeze
 
   MIGRATION_ID_PREFIX = "mastercourse_"
 

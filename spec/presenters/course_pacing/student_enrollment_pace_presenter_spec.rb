@@ -21,7 +21,7 @@ describe CoursePacing::StudentEnrollmentPacePresenter do
   let(:course) { course_model }
   let(:student) { user_model(name: "Foo Bar") }
   let(:student_enrollment) { course.enroll_student(student, enrollment_state: "active") }
-  let(:pace) { student_enrollment_pace_model(student_enrollment: student_enrollment) }
+  let(:pace) { student_enrollment_pace_model(student_enrollment:) }
   let(:presenter) { CoursePacing::StudentEnrollmentPacePresenter.new(pace) }
 
   describe "#as_json" do

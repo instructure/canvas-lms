@@ -58,7 +58,7 @@ class SectionTabPresenter
       css_class: tab.css_class,
       icon: tab.icon,
       hidden: hide? || unused?,
-      path: path,
+      path:,
       label: tab.label
     }
   end

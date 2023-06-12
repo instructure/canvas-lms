@@ -20,7 +20,7 @@
 
 require_relative "../../spec_helper"
 
-RSpec.describe Lti::LineItem, type: :model do
+RSpec.describe Lti::LineItem do
   context "when validating" do
     let(:line_item) { line_item_model }
 
@@ -58,19 +58,19 @@ RSpec.describe Lti::LineItem, type: :model do
     let(:assignment) { assignment_model }
 
     it "returns true if the line item was created before all others in the assignment" do
-      line_item_one = line_item_model(assignment: assignment)
-      line_item_two = line_item_model(assignment: assignment)
+      line_item_one = line_item_model(assignment:)
+      line_item_two = line_item_model(assignment:)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
-      expect(line_item_one.assignment_line_item?).to eq true
+      expect(line_item_one.assignment_line_item?).to be true
     end
 
     it "returns false if the line item is not the first in the assignment" do
-      line_item_one = line_item_model(assignment: assignment)
-      line_item_two = line_item_model(assignment: assignment)
+      line_item_one = line_item_model(assignment:)
+      line_item_two = line_item_model(assignment:)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
 
-      expect(line_item_two.assignment_line_item?).to eq false
+      expect(line_item_two.assignment_line_item?).to be false
     end
   end
 
@@ -78,11 +78,11 @@ RSpec.describe Lti::LineItem, type: :model do
     let(:url) { "https://example.com/launch" }
     let(:assignment) do
       a = assignment_model
-      a.external_tool_tag = ContentTag.create!(context: a, url: url)
+      a.external_tool_tag = ContentTag.create!(context: a, url:)
       a.save!
       a
     end
-    let(:line_item) { line_item_model(assignment: assignment) }
+    let(:line_item) { line_item_model(assignment:) }
 
     it "returns hash with extension key" do
       expect(line_item.launch_url_extension).to have_key(Lti::LineItem::AGS_EXT_LAUNCH_URL)
@@ -95,8 +95,8 @@ RSpec.describe Lti::LineItem, type: :model do
 
   context "with lti_link not matching assignment" do
     let(:resource_link) { resource_link_model }
-    let(:line_item) { line_item_model resource_link: resource_link }
-    let(:line_item_two) { line_item_model resource_link: resource_link }
+    let(:line_item) { line_item_model resource_link: }
+    let(:line_item_two) { line_item_model resource_link: }
 
     it "returns true if the line item was created before all others in the resource" do
       line_item
@@ -118,8 +118,8 @@ RSpec.describe Lti::LineItem, type: :model do
     let(:resource_link) { resource_link_model }
 
     it "destroys the assignment if it is the first line item and is not coupled" do
-      line_item_one = line_item_model(assignment: assignment, coupled: false)
-      line_item_two = line_item_model(assignment: assignment)
+      line_item_one = line_item_model(assignment:, coupled: false)
+      line_item_two = line_item_model(assignment:)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
       expect do
         line_item_one.destroy!
@@ -127,8 +127,8 @@ RSpec.describe Lti::LineItem, type: :model do
     end
 
     it "doesn't destroy the assignment if the line item is not the first line item" do
-      line_item_one = line_item_model(assignment: assignment)
-      line_item_two = line_item_model(assignment: assignment, coupled: false)
+      line_item_one = line_item_model(assignment:)
+      line_item_two = line_item_model(assignment:, coupled: false)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
       expect do
         line_item_two.destroy!
@@ -136,8 +136,8 @@ RSpec.describe Lti::LineItem, type: :model do
     end
 
     it "doesn't destroy the assignment if the line item is coupled" do
-      line_item_one = line_item_model(assignment: assignment, coupled: true)
-      line_item_two = line_item_model(assignment: assignment)
+      line_item_one = line_item_model(assignment:, coupled: true)
+      line_item_two = line_item_model(assignment:)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
       expect do
         line_item_one.destroy!

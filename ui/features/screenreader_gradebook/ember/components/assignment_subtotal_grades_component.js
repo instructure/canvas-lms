@@ -17,7 +17,7 @@
 
 import I18n from '@canvas/i18n'
 import Ember from 'ember'
-import round from 'round'
+import round from '@canvas/round'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 

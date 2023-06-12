@@ -218,7 +218,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     return rootEntryDraftMessage
   }
 
-  const podcast_url = document.querySelector("link[id='Discussion Podcast Feed']")
+  const podcast_url =
+    document.querySelector(`link[title='${I18n.t('Discussion Podcast Feed')}' ]`) ||
+    document.querySelector("link[type='application/rss+xml']")
 
   return (
     <Responsive
@@ -244,7 +246,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
           podcastButton: {
             display: 'block',
-            padding: 'small none none',
+            padding: 'small none none none',
             textSize: 'small',
           },
           RCE: {
@@ -271,7 +273,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
           podcastButton: {
             display: 'inline-block',
-            padding: 'small none none small',
+            padding: 'none none none small',
             textSize: 'medium',
           },
           RCE: {
@@ -289,20 +291,21 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                 <Flex.Item>
                   <View
                     as="div"
-                    borderWidth={responsiveProps.border.width}
-                    borderRadius={responsiveProps.border.radius}
+                    borderWidth={responsiveProps?.border?.width}
+                    borderRadius={responsiveProps?.border?.radius}
                     borderStyle="solid"
                     borderColor="primary"
                     padding="xx-small 0 small"
+                    margin="0 0 small 0"
                   >
                     {!props.discussionTopic.availableForUser ? (
                       <LockedDiscussion title={props.discussionTopic.title} />
                     ) : (
-                      <Flex direction="column" padding={responsiveProps.container.padding}>
+                      <Flex direction="column" padding={responsiveProps?.container?.padding}>
                         <Flex.Item
                           shouldShrink={true}
                           shouldGrow={true}
-                          margin={responsiveProps.discussionDetails.margin}
+                          margin={responsiveProps?.discussionDetails?.margin}
                         >
                           <DiscussionDetails
                             discussionTopic={props.discussionTopic}
@@ -434,12 +437,12 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               <>
                                 <View
                                   as="div"
-                                  padding="small none none"
-                                  display={responsiveProps.replyButton.display}
+                                  padding="0"
+                                  display={responsiveProps?.replyButton?.display}
                                 >
                                   <span className="discussion-topic-reply-button">
                                     <Button
-                                      display={responsiveProps.replyButton.display}
+                                      display={responsiveProps?.replyButton?.display}
                                       color="primary"
                                       onClick={() => {
                                         setExpandedReply(!expandedReply)
@@ -464,8 +467,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 {podcast_url?.href && (
                                   <View
                                     as="div"
-                                    padding={responsiveProps.podcastButton.padding}
-                                    display={responsiveProps.podcastButton.display}
+                                    padding={responsiveProps?.podcastButton?.padding}
+                                    display={responsiveProps?.replyButton?.display}
                                   >
                                     <PodcastFeed
                                       linkUrl={podcast_url.href}
@@ -482,8 +485,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           shouldGrow={true}
                           padding={
                             expandedReply
-                              ? responsiveProps.RCE.paddingOpen
-                              : responsiveProps.RCE.paddingClosed
+                              ? responsiveProps?.RCE?.paddingOpen
+                              : responsiveProps?.RCE?.paddingClosed
                           }
                           overflowX="hidden"
                           overflowY="hidden"
@@ -497,13 +500,12 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               onSubmit={(
                                 message,
                                 _includeReplyPreview,
-                                fileId,
+                                file,
                                 anonymousAuthorState
                               ) => {
                                 if (createDiscussionEntry) {
-                                  createDiscussionEntry(message, fileId, anonymousAuthorState)
+                                  createDiscussionEntry(message, file, anonymousAuthorState)
                                   setExpandedReply(false)
-                                  props.onDiscussionReplyPost()
                                 }
                               }}
                               onCancel={() => {
@@ -585,10 +587,6 @@ DiscussionTopicContainer.propTypes = {
    * useState Boolean to toggle highlight
    */
   isHighlighted: PropTypes.bool,
-  /**
-   * Callback to be called when discussion post is submitted
-   */
-  onDiscussionReplyPost: PropTypes.func,
 }
 
 export default DiscussionTopicContainer

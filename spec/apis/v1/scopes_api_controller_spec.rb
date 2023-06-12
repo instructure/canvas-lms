@@ -47,7 +47,7 @@ describe ScopesApiController, type: :request do
 
     context "with admin" do
       before do
-        account_admin_user(account: account)
+        account_admin_user(account:)
         user_with_pseudonym(user: @admin)
       end
 
@@ -95,12 +95,12 @@ describe ScopesApiController, type: :request do
 
     context "with nonadmin" do
       before do
-        user_with_pseudonym(account: account)
+        user_with_pseudonym(account:)
       end
 
       it "returns a 401" do
         api_call(:get, api_url, scope_params)
-        expect(response.code).to eql "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end

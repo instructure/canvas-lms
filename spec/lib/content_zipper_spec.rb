@@ -167,8 +167,10 @@ describe ContentZipper do
 
       @assignment = @course.assignments.create!(anonymous_grading: true, muted: true)
       submission_model(body: "hai this is my answer", assignment: @assignment, user: @student)
-      attachment = Attachment.create!(display_name: "my_download.zip", user: @teacher,
-                                      workflow_state: "to_be_zipped", context: @assignment)
+      attachment = Attachment.create!(display_name: "my_download.zip",
+                                      user: @teacher,
+                                      workflow_state: "to_be_zipped",
+                                      context: @assignment)
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       content = nil
@@ -237,7 +239,7 @@ describe ContentZipper do
 
       assignment = assignment_model(course: @course)
       att = attachment_model(uploaded_data: stub_file_data("test.txt", "asdf", "text/plain"), context: @student)
-      submission_model(user: @student, assignment: assignment, attachments: [att])
+      submission_model(user: @student, assignment:, attachments: [att])
       att.destroy
 
       attachment = Attachment.new(display_name: "my_download.zip")
@@ -255,7 +257,7 @@ describe ContentZipper do
 
       assignment = assignment_model(course: @course)
       att = attachment_model(uploaded_data: stub_file_data("A/V??.txt", "a/v", "text/plain"), context: @student)
-      submission_model(user: @student, assignment: assignment, attachments: [att])
+      submission_model(user: @student, assignment:, attachments: [att])
 
       attachment = Attachment.new(display_name: "my_download.zip")
       attachment.user = @teacher
@@ -320,22 +322,32 @@ describe ContentZipper do
         course_with_student(active_all: true)
         folder = Folder.root_folders(@course).first
         attachment_model(uploaded_data: stub_png_data("hidden.png"),
-                         content_type: "image/png", hidden: true, folder: folder)
+                         content_type: "image/png",
+                         hidden: true,
+                         folder:)
         attachment_model(uploaded_data: stub_png_data("visible.png"),
-                         content_type: "image/png", folder: folder)
+                         content_type: "image/png",
+                         folder:)
         attachment_model(uploaded_data: stub_png_data("locked.png"),
-                         content_type: "image/png", folder: folder, locked: true)
+                         content_type: "image/png",
+                         folder:,
+                         locked: true)
         hidden_folder = folder.sub_folders.create!(context: @course, name: "hidden", hidden: true)
         visible_folder = folder.sub_folders.create!(context: @course, name: "visible")
         locked_folder = folder.sub_folders.create!(context: @course, name: "locked", locked: true)
         attachment_model(uploaded_data: stub_png_data("sub-hidden.png"),
-                         content_type: "image/png", folder: hidden_folder)
+                         content_type: "image/png",
+                         folder: hidden_folder)
         attachment_model(uploaded_data: stub_png_data("sub-vis.png"),
-                         content_type: "image/png", folder: visible_folder)
+                         content_type: "image/png",
+                         folder: visible_folder)
         attachment_model(uploaded_data: stub_png_data("sub-locked.png"),
-                         content_type: "image/png", folder: visible_folder, locked: true)
+                         content_type: "image/png",
+                         folder: visible_folder,
+                         locked: true)
         attachment_model(uploaded_data: stub_png_data("sub-locked-vis.png"),
-                         content_type: "image/png", folder: locked_folder)
+                         content_type: "image/png",
+                         folder: locked_folder)
 
         @attachment = Attachment.new(display_name: "my_download.zip")
         @attachment.workflow_state = "to_be_zipped"
@@ -345,7 +357,7 @@ describe ContentZipper do
       def zipped_files_for_user(user = nil, check_user = true)
         @attachment.user_id = user.id if user
         @attachment.save!
-        ContentZipper.process_attachment(@attachment, user, check_user: check_user)
+        ContentZipper.process_attachment(@attachment, user, check_user:)
         names = []
         @attachment.reload
         Zip::File.foreach(@attachment.full_filename) { |f| names << f.name if f.file? }
@@ -454,7 +466,9 @@ describe ContentZipper do
       course_with_student(active_all: true)
       folder = Folder.root_folders(@course).first
       attachment_model(uploaded_data: stub_png_data("hidden.png"),
-                       content_type: "image/png", folder: folder, display_name: "otherfile.png")
+                       content_type: "image/png",
+                       folder:,
+                       display_name: "otherfile.png")
       attachment = Attachment.new(display_name: "my_download.zip")
       attachment.user_id = @user.id
       attachment.workflow_state = "to_be_zipped"
@@ -484,7 +498,7 @@ describe ContentZipper do
       eportfolio.ensure_defaults
       attachment = eportfolio.attachments.create!(
         display_name: "an_attachment",
-        user: user,
+        user:,
         workflow_state: "to_be_zipped"
       )
       expect do
@@ -497,7 +511,9 @@ describe ContentZipper do
         course_with_student(active_all: true)
         folder = Folder.root_folders(@course).first
         attachment_model(uploaded_data: stub_png_data("hidden.png"),
-                         content_type: "image/png", folder: folder, display_name: "hidden.png")
+                         content_type: "image/png",
+                         folder:,
+                         display_name: "hidden.png")
       end
 
       let(:eportfolio) do
@@ -620,7 +636,7 @@ describe ContentZipper do
       expect(zipper_stub).to receive(:zip!).once
       attachment.context = quiz
       expect(Quizzes::QuizSubmissionZipper).to receive(:new).with(
-        quiz: quiz,
+        quiz:,
         zip_attachment: attachment
       ).and_return zipper_stub
       ContentZipper.process_attachment(attachment, quiz)

@@ -55,7 +55,7 @@ module Api::V1::CommunicationChannel
       ]
     end
 
-    api_json(channel, current_user, session, only: only, methods: methods).tap do |json|
+    api_json(channel, current_user, session, only:, methods:).tap do |json|
       # Rename attributes for mass-consumption
       json[:address] = json.delete(:path_description)
       json[:type] = json.delete(:path_type)

@@ -23,7 +23,7 @@ describe Api::V1::CalendarEvent do
 
   before(:once) do
     %w[big_blue_button wimba].each do |name|
-      plugin = PluginSetting.create!(name: name)
+      plugin = PluginSetting.create!(name:)
       plugin.update_attribute(:settings, { key: "value" })
     end
   end
@@ -31,7 +31,7 @@ describe Api::V1::CalendarEvent do
   let_once(:course) { course_model }
 
   def conference(context:, user: @user, type: "BigBlueButton")
-    WebConference.create!(context: context, user: user, conference_type: type)
+    WebConference.create!(context:, user:, conference_type: type)
   end
 
   def api_user_content(description, context)

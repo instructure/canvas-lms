@@ -31,7 +31,7 @@
 /* eslint-disable import/no-cycle, @typescript-eslint/no-unused-vars, no-var, vars-on-top */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import closedCaptionLanguages from '@instructure/canvas-media'
+import {closedCaptionLanguages} from '@instructure/canvas-media'
 
 const I18n = useI18nScope('mepfeaturetracksinstructure')
 
@@ -507,7 +507,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         .click(e => {
           e.preventDefault()
           import('./UploadMediaTrackForm').then(({default: UploadMediaTrackForm}) => {
-            new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src)
+            new UploadMediaTrackForm(t.options.mediaCommentId, t.media.src, t.options.attachmentId)
           })
         })
       t.adjustLanguageBox()
@@ -767,7 +767,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
   })
 
   mejs.language = {
-    codes: closedCaptionLanguages,
+    codes: closedCaptionLanguages.reduce((result, {id, label}) => ({...result, [id]: label}), {}),
   }
 
   /*

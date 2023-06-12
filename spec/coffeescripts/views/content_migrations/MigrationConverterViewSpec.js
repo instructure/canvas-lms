@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
-import MigrationConverterView from 'ui/features/content_migrations/backbone/views/MigrationConverterView.coffee'
+import MigrationConverterView from 'ui/features/content_migrations/backbone/views/MigrationConverterView'
 
 class SomeBackboneView extends Backbone.View {
   static initClass() {

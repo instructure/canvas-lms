@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -48,7 +49,7 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     }
   }
 
-  bindFlyoutMenu = (ref, name) => {
+  bindFlyoutMenu = (ref, name: string) => {
     if (ref) {
       this[name] = ref
       this.props.addGradebookElement(ref)
@@ -86,7 +87,7 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     this.setState({hasFocus: true}) // eslint-disable-line react/no-unused-state
   }
 
-  onToggle = menuShown => {
+  onToggle = (menuShown: boolean) => {
     const newState = {menuShown}
     let callback
 
@@ -105,7 +106,7 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     this.setState(newState, callback)
   }
 
-  handleMenuKeyDown = event => {
+  handleMenuKeyDown = (event: React.KeyboardEvent) => {
     if (event.which === 9) {
       // Tab
       this.setState({menuShown: false, skipFocusOnClose: true})
@@ -115,7 +116,7 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     return true
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(event: React.KeyboardEvent) {
     if (document.activeElement === this.optionsMenuTrigger) {
       if (event.which === 13) {
         // Enter

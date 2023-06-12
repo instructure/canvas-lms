@@ -98,7 +98,7 @@ RSpec.describe SubmissionComment do
   describe "notifications" do
     before(:once) do
       @student_ended = user_model
-      @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
+      @section_ended = @course.course_sections.create!(end_at: 1.day.ago)
 
       Notification.create!(name: "Submission Comment", category: "TestImmediately")
       Notification.create!(name: "Submission Comment For Teacher")
@@ -180,7 +180,7 @@ RSpec.describe SubmissionComment do
   it "allows valid attachments" do
     a = Attachment.create!(context: @assignment, uploaded_data: default_uploaded_data)
     @comment = @submission.submission_comments.create!(valid_attributes)
-    expect(a.recently_created).to eql(true)
+    expect(a.recently_created).to be(true)
     @comment.reload
     @comment.update(attachments: [a])
     expect(@comment.attachment_ids).to eql(a.id.to_s)
@@ -255,7 +255,7 @@ RSpec.describe SubmissionComment do
     prepare_test_submission
     expect do
       @submission.add_comment(author: @teacher, comment: "some comment", provisional: true)
-    end.to change(StreamItem, :count).by(0)
+    end.not_to change(StreamItem, :count)
   end
 
   it "ensures the media object exists" do
@@ -378,15 +378,15 @@ RSpec.describe SubmissionComment do
     it "is read after submission is commented on by self" do
       expect do
         @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
-      end.to change(ContentParticipation, :count).by(0)
+      end.not_to change(ContentParticipation, :count)
       expect(@submission.read?(@student)).to be_truthy
     end
 
     it "does not set unread state when a provisional comment is made" do
       expect do
         @submission.add_comment(author: @teacher, comment: "wat", provisional: true)
-      end.to change(ContentParticipation, :count).by(0)
-      expect(@submission.read?(@student)).to eq true
+      end.not_to change(ContentParticipation, :count)
+      expect(@submission.read?(@student)).to be true
     end
 
     context "read state when feedback visibility ff is on" do
@@ -405,7 +405,7 @@ RSpec.describe SubmissionComment do
       it "is read after submission is commented on by self" do
         expect do
           @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
-        end.to change(ContentParticipation, :count).by(0)
+        end.not_to change(ContentParticipation, :count)
 
         expect(@submission.read?(@student)).to be_truthy
       end
@@ -422,7 +422,7 @@ RSpec.describe SubmissionComment do
       it "does not set unread state when a provisional comment is made" do
         expect do
           @submission.add_comment(author: @teacher, comment: "wat", provisional: true)
-        end.to change(ContentParticipation, :count).by(0)
+        end.not_to change(ContentParticipation, :count)
 
         expect(@submission.read?(@student)).to be_truthy
       end
@@ -827,6 +827,12 @@ RSpec.describe SubmissionComment do
       expect(ContentParticipation).to receive(:create_or_update)
         .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
+    end
+
+    it "does not update participation for a draft comment" do
+      expect(ContentParticipation).to_not receive(:create_or_update)
+        .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
+      @comment = @submission.add_comment(author: @teacher, comment: "some comment", draft_comment: true)
     end
   end
 

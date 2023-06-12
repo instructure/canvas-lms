@@ -27,7 +27,7 @@ shared_examples_for "an object whose dates are overridable" do
 
   describe "#teacher_due_date_for_display" do
     it "returns nil when differentiated with no due dates" do
-      student_in_course(course: course)
+      student_in_course(course:)
       overridable.update!(due_at: nil, only_visible_to_overrides: true)
       override.update!(set_type: "ADHOC")
       override.assignment_override_students.create(user: @student)
@@ -38,7 +38,7 @@ shared_examples_for "an object whose dates are overridable" do
 
   describe "overridden_for" do
     before do
-      student_in_course(course: course)
+      student_in_course(course:)
     end
 
     context "when there are overrides" do
@@ -71,7 +71,7 @@ shared_examples_for "an object whose dates are overridable" do
 
   describe "assignment overrides_for" do
     before do
-      student_in_course(course: course)
+      student_in_course(course:)
     end
 
     context "with adhoc" do
@@ -232,14 +232,14 @@ shared_examples_for "an object whose dates are overridable" do
       before { override }
 
       it "returns true" do
-        expect(overridable.reload.has_active_overrides?).to eq true
+        expect(overridable.reload.has_active_overrides?).to be true
       end
     end
 
     context "when it has deleted overrides" do
       it "returns false" do
         override.destroy
-        expect(overridable.reload.has_active_overrides?).to eq false
+        expect(overridable.reload.has_active_overrides?).to be false
       end
     end
   end
@@ -274,7 +274,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "as a student" do
       it "only returns active overrides" do
-        course_with_student({ course: course, active_all: true })
+        course_with_student({ course:, active_all: true })
         override.delete
         expect(overridable.all_dates_visible_to(@student).size).to eq 1
       end
@@ -282,8 +282,8 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "as an observer with students" do
       before do
-        course_with_student({ course: course, active_all: true })
-        course_with_observer({ course: course, active_all: true })
+        course_with_student({ course:, active_all: true })
+        course_with_observer({ course:, active_all: true })
         course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
       end
 
@@ -302,7 +302,7 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "as an observer without students" do
       before do
-        course_with_observer({ course: course, active_all: true })
+        course_with_observer({ course:, active_all: true })
         course.enroll_user(@observer, "ObserverEnrollment")
         override.delete
       end
@@ -384,8 +384,8 @@ shared_examples_for "an object whose dates are overridable" do
       expect(a.due_date_hash[:due_at]).to eq due
       expect(a.due_date_hash[:lock_at]).to eq due
       expect(a.due_date_hash[:unlock_at]).to eq due
-      expect(a.due_date_hash[:all_day]).to eq false
-      expect(a.due_date_hash[:all_day_date]).to eq nil
+      expect(a.due_date_hash[:all_day]).to be false
+      expect(a.due_date_hash[:all_day_date]).to be_nil
     end
   end
 
@@ -408,7 +408,7 @@ shared_examples_for "an object whose dates are overridable" do
 
   describe "multiple_due_dates?" do
     before do
-      course_with_student(course: course)
+      course_with_student(course:)
       course.course_sections.create!
       override.set = course.active_course_sections.second
       override.override_due_at(2.days.ago)
@@ -418,13 +418,13 @@ shared_examples_for "an object whose dates are overridable" do
     context "when the object has been overridden" do
       context "and it has multiple due dates" do
         it "returns true" do
-          expect(overridable.overridden_for(@teacher).multiple_due_dates?).to eq true
+          expect(overridable.overridden_for(@teacher).multiple_due_dates?).to be true
         end
       end
 
       context "and it has one due date" do
         it "returns false" do
-          expect(overridable.overridden_for(@student).multiple_due_dates?).to eq false
+          expect(overridable.overridden_for(@student).multiple_due_dates?).to be false
         end
       end
     end
@@ -437,14 +437,14 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when the object has been overridden for a guest" do
       it "returns false" do
-        expect(overridable.overridden_for(nil).multiple_due_dates?).to eq false
+        expect(overridable.overridden_for(nil).multiple_due_dates?).to be false
       end
     end
   end
 
   describe "overridden_for?" do
     before do
-      course_with_student(course: course)
+      course_with_student(course:)
     end
 
     context "when overridden for the user" do
@@ -474,7 +474,7 @@ shared_examples_for "an object whose dates are overridable" do
 
   describe "differentiated_assignments_applies?" do
     before do
-      course_with_student(course: course)
+      course_with_student(course:)
     end
 
     it "returns false when there is no assignment" do

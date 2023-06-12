@@ -68,7 +68,7 @@ describe Quizzes::Quiz do
 
     it "saves show_correct_answers as true if it is set to nil" do
       @quiz.update!(show_correct_answers: nil)
-      expect(@quiz.show_correct_answers).to eq(true)
+      expect(@quiz.show_correct_answers).to be(true)
     end
 
     it "saves boolean attributes as false if they are set to false" do
@@ -92,7 +92,7 @@ describe Quizzes::Quiz do
 
     it "saves show_correct_answers as false if it is set to false" do
       @quiz.update!(show_correct_answers: false)
-      expect(@quiz.show_correct_answers).to eq(false)
+      expect(@quiz.show_correct_answers).to be(false)
     end
 
     it "saves boolean attributes as true if they are set to true" do
@@ -120,7 +120,7 @@ describe Quizzes::Quiz do
 
     it "saves show_correct_answers as true if it is set to true" do
       @quiz.update!(show_correct_answers: true)
-      expect(@quiz.show_correct_answers).to eq(true)
+      expect(@quiz.show_correct_answers).to be(true)
     end
   end
 
@@ -333,23 +333,23 @@ describe Quizzes::Quiz do
     q.infer_times
     expect(q.due_at).to be_an_instance_of ActiveSupport::TimeWithZone
     expect(q.due_at.time_zone).to eq Time.zone
-    expect(q.due_at.hour).to eql 23
-    expect(q.due_at.min).to eql 59
+    expect(q.due_at.hour).to be 23
+    expect(q.due_at.min).to be 59
     expect(q.lock_at.time_zone).to eq Time.zone
-    expect(q.lock_at.hour).to eql 23
-    expect(q.lock_at.min).to eql 59
+    expect(q.lock_at.hour).to be 23
+    expect(q.lock_at.min).to be 59
     # Unlock at should not be fudged so teacher's can say this assignment
     # is available at 12 am.
     expect(q.unlock_at.time_zone).to eq Time.zone
-    expect(q.unlock_at.hour).to eql 0
-    expect(q.unlock_at.min).to eql 0
+    expect(q.unlock_at.hour).to be 0
+    expect(q.unlock_at.min).to be 0
   end
 
   it "does not set the due time to 11:59pm if passed a time of midnight" do
     params = { quiz: { title: "Test Quiz", due_at: "Jan 1 2011 12:00am" } }
     q = @course.quizzes.create!(params[:quiz])
-    expect(q.due_at.hour).to eql 0
-    expect(q.due_at.min).to eql 0
+    expect(q.due_at.hour).to be 0
+    expect(q.due_at.min).to be 0
   end
 
   it "converts a date object to a time and set the time to 11:59pm" do
@@ -358,8 +358,8 @@ describe Quizzes::Quiz do
       quiz = @course.quizzes.create!(params[:quiz])
       expect(quiz.due_at).to be_an_instance_of ActiveSupport::TimeWithZone
       expect(quiz.due_at.zone).to eql Time.zone.now.dst? ? "AKDT" : "AKST"
-      expect(quiz.due_at.hour).to eql 23
-      expect(quiz.due_at.min).to eql 59
+      expect(quiz.due_at.hour).to be 23
+      expect(quiz.due_at.min).to be 59
     end
   end
 
@@ -376,15 +376,15 @@ describe Quizzes::Quiz do
 
   it "initializes with default settings" do
     q = @course.quizzes.create!(title: "new quiz")
-    expect(q.shuffle_answers).to eql(false)
-    expect(q.show_correct_answers).to eql(true)
-    expect(q.allowed_attempts).to eql(1)
+    expect(q.shuffle_answers).to be(false)
+    expect(q.show_correct_answers).to be(true)
+    expect(q.allowed_attempts).to be(1)
     expect(q.scoring_policy).to eql("keep_highest")
   end
 
   it "updates the assignment it is associated with" do
     a = @course.assignments.create!(title: "some assignment", points_possible: 5, only_visible_to_overrides: false)
-    expect(a.points_possible).to eql(5.0)
+    expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10, only_visible_to_overrides: true)
     q.workflow_state = "available"
@@ -440,7 +440,7 @@ describe Quizzes::Quiz do
     Notification.create!(name: "Assignment Changed")
     @course.offer
     a = @course.assignments.create!(title: "some assignment", points_possible: 5)
-    expect(a.points_possible).to eql(5.0)
+    expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     a.update_attribute(:created_at, Time.now - (40 * 60))
     q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
@@ -456,7 +456,7 @@ describe Quizzes::Quiz do
     student_in_course(active_all: true)
     a = @course.assignments.create!(title: "some assignment", points_possible: 5)
     a.unmute!
-    expect(a.points_possible).to eql(5.0)
+    expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     a.update_attribute(:created_at, Time.now - (40 * 60))
     q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
@@ -469,7 +469,7 @@ describe Quizzes::Quiz do
 
   it "deletes the assignment if the quiz is no longer graded" do
     a = @course.assignments.create!(title: "some assignment", points_possible: 5)
-    expect(a.points_possible).to eql(5.0)
+    expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
     q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
     q.workflow_state = "available"
@@ -482,7 +482,7 @@ describe Quizzes::Quiz do
     expect(q.assignment.submission_types).to eql("online_quiz")
     q.quiz_type = "practice_quiz"
     q.save
-    expect(q.assignment_id).to eql(nil)
+    expect(q.assignment_id).to be_nil
   end
 
   it "recomputes course scores when the quiz becomes ungraded" do
@@ -566,8 +566,8 @@ describe Quizzes::Quiz do
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
     q.root_entries(true)
     q.save
-    expect(q.question_count).to eql(0)
-    expect(q.unpublished_question_count).to eql(3)
+    expect(q.question_count).to be(0)
+    expect(q.unpublished_question_count).to be(3)
   end
 
   it "returns an available question count for unpublished questions" do
@@ -576,7 +576,7 @@ describe Quizzes::Quiz do
     q.quiz_questions.create!
     q.save
 
-    expect(q.reload.available_question_count).to eql(2)
+    expect(q.reload.available_question_count).to be(2)
   end
 
   it "returns an available question count for published questions" do
@@ -585,7 +585,7 @@ describe Quizzes::Quiz do
     q.quiz_questions.create!
     q.publish!
 
-    expect(q.reload.available_question_count).to eql(2)
+    expect(q.reload.available_question_count).to be(2)
   end
 
   it "returns processed root entries for each question/group" do
@@ -600,12 +600,12 @@ describe Quizzes::Quiz do
     q.quiz_questions.create!(question_data: { name: "test 3" })
     q.quiz_questions.create!(question_data: { name: "test 4" })
     q.save
-    expect(q.active_quiz_questions.size).to eql(4)
-    expect(q.quiz_groups.length).to eql(1)
-    expect(g.quiz_questions.reload.active.size).to eql(2)
+    expect(q.active_quiz_questions.size).to be(4)
+    expect(q.quiz_groups.length).to be(1)
+    expect(g.quiz_questions.reload.active.size).to be(2)
 
     entries = q.root_entries(true)
-    expect(entries.length).to eql(3)
+    expect(entries.length).to be(3)
     expect(entries[0][:questions]).not_to be_nil
     expect(entries[1][:answers]).not_to be_nil
     expect(entries[2][:answers]).not_to be_nil
@@ -638,7 +638,7 @@ describe Quizzes::Quiz do
     q.save
 
     data = q.stored_questions
-    expect(data.length).to eql(3)
+    expect(data.length).to be(3)
     expect(data[0][:questions]).not_to be_nil
     expect(data[1][:answers]).not_to be_nil
     expect(data[2][:answers]).not_to be_nil
@@ -646,21 +646,29 @@ describe Quizzes::Quiz do
 
   it "shuffles answers for the questions" do
     q = @course.quizzes.create!(title: "new quiz", shuffle_answers: true)
-    q.quiz_questions.create!(question_data: { :name => "test 3", "question_type" => "multiple_choice_question",
-                                              "answers" => [{ "answer_text" => "1" }, { "answer_text" => "2" }, { "answer_text" => "3" }, { "answer_text" => "4" },
-                                                            { "answer_text" => "5" }, { "answer_text" => "6" }, { "answer_text" => "7" }, { "answer_text" => "8" },
-                                                            { "answer_text" => "9" }, { "answer_text" => "10" }] })
+    q.quiz_questions.create!(question_data: { :name => "test 3",
+                                              "question_type" => "multiple_choice_question",
+                                              "answers" => [{ "answer_text" => "1" },
+                                                            { "answer_text" => "2" },
+                                                            { "answer_text" => "3" },
+                                                            { "answer_text" => "4" },
+                                                            { "answer_text" => "5" },
+                                                            { "answer_text" => "6" },
+                                                            { "answer_text" => "7" },
+                                                            { "answer_text" => "8" },
+                                                            { "answer_text" => "9" },
+                                                            { "answer_text" => "10" }] })
     expect(q.quiz_data).to be_nil
     q.generate_quiz_data
     q.save
 
     data = q.stored_questions
-    expect(data.length).to eql(1)
+    expect(data.length).to be(1)
     expect(data[0][:answers]).not_to be_empty
     same = true
     found = []
     data[0][:answers].each { |a| found << a[:text] }
-    expect(found.uniq.length).to eql(10)
+    expect(found.uniq.length).to be(10)
     same = false if data[0][:answers][0][:text] != "1"
     same = false if data[0][:answers][1][:text] != "2"
     same = false if data[0][:answers][2][:text] != "3"
@@ -671,7 +679,7 @@ describe Quizzes::Quiz do
     same = false if data[0][:answers][7][:text] != "8"
     same = false if data[0][:answers][8][:text] != "9"
     same = false if data[0][:answers][9][:text] != "10"
-    expect(same).to eql(false)
+    expect(same).to be(false)
   end
 
   it "shuffles questions for the quiz groups" do
@@ -693,7 +701,7 @@ describe Quizzes::Quiz do
     q.save
 
     data = q.stored_questions
-    expect(data.length).to eql(1)
+    expect(data.length).to be(1)
     data = data[0][:questions]
     same = true
     same = false if data[0][:name] != "test 1"
@@ -706,7 +714,7 @@ describe Quizzes::Quiz do
     same = false if data[7][:name] != "test 8"
     same = false if data[8][:name] != "test 9"
     same = false if data[9][:name] != "test 10"
-    expect(same).to eql(false)
+    expect(same).to be(false)
   end
 
   it "considers the number of questions in a group when determining the question count" do
@@ -721,7 +729,7 @@ describe Quizzes::Quiz do
     q.save
 
     data = q.stored_questions
-    expect(data.length).to eql(3)
+    expect(data.length).to be(3)
     expect(data[0][:questions]).not_to be_nil
     expect(data[1][:answers]).not_to be_nil
     expect(data[2][:answers]).not_to be_nil
@@ -791,8 +799,8 @@ describe Quizzes::Quiz do
       q.save
 
       s = q.generate_submission(u)
-      expect(s.state).to eql(:untaken)
-      expect(s.attempt).to eql(1)
+      expect(s.state).to be(:untaken)
+      expect(s.attempt).to be(1)
       expect(s.quiz_data).not_to be_nil
       expect(s.quiz_version).to eql(q.version_number)
       expect(s.finished_at).to be_nil
@@ -802,7 +810,7 @@ describe Quizzes::Quiz do
     it "sets end_at to lock_at when end_at is nil or after lock_at" do
       lock_at = 1.minute.from_now
       u = User.create!(name: "some user")
-      q = @course.quizzes.create!(title: "some quiz", lock_at: lock_at)
+      q = @course.quizzes.create!(title: "some quiz", lock_at:)
       # [nil, after lock_at]
       [1.minute.ago, 2.minutes.from_now].each do |due_at|
         q.due_at = due_at
@@ -816,7 +824,7 @@ describe Quizzes::Quiz do
     it "does not set end_at to lock_at if a submission is manually unlocked" do
       lock_at = 1.day.ago
       u = User.create!(name: "Fred Colon")
-      q = @course.quizzes.create!(title: "locked yesterday", lock_at: lock_at)
+      q = @course.quizzes.create!(title: "locked yesterday", lock_at:)
       sub = Quizzes::SubmissionManager.new(q).find_or_create_submission(u, nil, "settings_only")
       sub.manually_unlocked = true
       sub.save!
@@ -827,7 +835,7 @@ describe Quizzes::Quiz do
     it "does not set end_at to due_at" do
       due_at = 1.day.from_now
       u = User.create!(name: "Fred Colon")
-      q = @course.quizzes.create!(title: "locked tomorrow", due_at: due_at)
+      q = @course.quizzes.create!(title: "locked tomorrow", due_at:)
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).not_to eq due_at
     end
@@ -866,7 +874,7 @@ describe Quizzes::Quiz do
 
         # Create a special time extension section
         section = @course.course_sections.create!(end_at: 1.day.from_now)
-        student_in_course(course: @course, active_all: true, section: section)
+        student_in_course(course: @course, active_all: true, section:)
 
         @q = @course.quizzes.create!(title: "locked tomorrow")
       end
@@ -919,7 +927,7 @@ describe Quizzes::Quiz do
 
         # Create a special time extension section
         section = @course.course_sections.create!(restrict_enrollments_to_section_dates: true, end_at: @deadline, start_at: @start_at)
-        student_in_course(course: @course, active_all: true, section: section)
+        student_in_course(course: @course, active_all: true, section:)
 
         @q = @course.quizzes.create!(title: "locked tomorrow")
       end
@@ -965,8 +973,8 @@ describe Quizzes::Quiz do
 
       original = quiz.quiz_questions.map { |q| q.question_data["question_text"] }
 
-      selected1 = quiz.generate_submission(u1).questions.map { |q| q["question_text"] }
-      selected2 = quiz.generate_submission(u2).questions.map { |q| q["question_text"] }
+      selected1 = quiz.generate_submission(u1).questions.pluck("question_text")
+      selected2 = quiz.generate_submission(u2).questions.pluck("question_text")
 
       # make sure at least one is shuffled
       is_shuffled1 = (original != selected1)
@@ -997,7 +1005,7 @@ describe Quizzes::Quiz do
     q.assignment_id = nil
     q.quiz_type = "practice_quiz"
     q.save!
-    expect(q.assignment_id).to eql(nil)
+    expect(q.assignment_id).to be_nil
     a.reload
     expect(a).to be_deleted
   end
@@ -1193,7 +1201,7 @@ describe Quizzes::Quiz do
       course = Course.create!
       @quiz = Quizzes::Quiz.create!(context: course)
       @user = User.create!
-      @enrollment = @user.student_enrollments.create!(course: course)
+      @enrollment = @user.student_enrollments.create!(course:)
       @enrollment.update_attribute(:workflow_state, "active")
       @submission = Quizzes::QuizSubmission.create!(quiz: @quiz, user: @user)
       @submission.update_attribute(:workflow_state, "untaken")
@@ -1236,15 +1244,15 @@ describe Quizzes::Quiz do
 
   describe "linking overrides with assignments" do
     let_once(:course) { course_model }
-    let_once(:quiz) { quiz_model(course: course, due_at: 5.days.from_now).reload }
+    let_once(:quiz) { quiz_model(course:, due_at: 5.days.from_now).reload }
     let_once(:override) do
-      override = assignment_override_model(quiz: quiz)
+      override = assignment_override_model(quiz:)
       override.override_due_at(7.days.from_now)
       override.save!
       override
     end
     let_once(:override_student) do
-      student_in_course(course: course)
+      student_in_course(course:)
       override_student = override.assignment_override_students.build
       override_student.user = @student
       override_student.save!
@@ -1340,7 +1348,7 @@ describe Quizzes::Quiz do
     context "changinging quiz points" do
       it "does not allow quiz points higher than allowable by postgres" do
         q = Quizzes::Quiz.new(points_possible: 2_000_000_001)
-        expect(q.valid?).to eq false
+        expect(q.valid?).to be false
         expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
       end
     end
@@ -1603,13 +1611,13 @@ describe Quizzes::Quiz do
       course_with_teacher(course: @course, active_all: true)
       quiz = @course.quizzes.create!
       q = quiz.quiz_questions.create!
-      regrade = Quizzes::QuizRegrade.create!(quiz: quiz, quiz_version: quiz.version_number, user: @teacher)
+      regrade = Quizzes::QuizRegrade.create!(quiz:, quiz_version: quiz.version_number, user: @teacher)
       regrade.quiz_question_regrades.create!(
         quiz_question_id: q.id,
         regrade_option: "current_correct_only"
       )
       expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).with(strand: "quiz:#{quiz.global_id}:regrading").once.and_return(Quizzes::QuizRegrader::Regrader)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with({ quiz: quiz, version_number: quiz.version_number })
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with({ quiz:, version_number: quiz.version_number })
       quiz.save!
     end
 
@@ -1618,6 +1626,18 @@ describe Quizzes::Quiz do
       expect(Quizzes::QuizRegrader::Regrader).not_to receive(:delay)
       quiz = @course.quizzes.create!
       quiz.save!
+    end
+  end
+
+  describe "#teachers" do
+    it "does not include concluded teachers" do
+      course_with_teacher(course: @course, active_all: true)
+      @concluded_teacher = User.create(name: "Mr. Professor")
+      @course.enroll_teacher(@concluded_teacher).accept
+      @concluded_teacher.enrollments.each(&:conclude)
+      quiz = @course.quizzes.create!
+
+      expect(quiz.teachers).to_not include(@concluded_teacher)
     end
   end
 
@@ -1966,29 +1986,29 @@ describe Quizzes::Quiz do
 
     it "doesn't let student read/submit quizzes that are unpublished" do
       @quiz.unpublish!.reload
-      expect(@quiz.grants_right?(@student, :read)).to eq false
-      expect(@quiz.grants_right?(@student, :submit)).to eq false
-      expect(@quiz.grants_right?(@teacher, :read)).to eq true
+      expect(@quiz.grants_right?(@student, :read)).to be false
+      expect(@quiz.grants_right?(@student, :submit)).to be false
+      expect(@quiz.grants_right?(@teacher, :read)).to be true
     end
 
     it "lets admins read quizzes that are unpublished even without management rights" do
       @quiz.unpublish!.reload
       @course.account.role_overrides.create!(role: teacher_role, permission: "manage_assignments", enabled: false)
       @course.account.role_overrides.create!(role: teacher_role, permission: "manage_grades", enabled: false)
-      expect(@quiz.grants_right?(@teacher, :read)).to eq true
+      expect(@quiz.grants_right?(@teacher, :read)).to be true
     end
 
     it "does let students read/submit quizzes that are published" do
       @quiz.publish!
-      expect(@quiz.grants_right?(@student, :read)).to eq true
-      expect(@quiz.grants_right?(@student, :submit)).to eq true
-      expect(@quiz.grants_right?(@teacher, :read)).to eq true
+      expect(@quiz.grants_right?(@student, :read)).to be true
+      expect(@quiz.grants_right?(@student, :submit)).to be true
+      expect(@quiz.grants_right?(@teacher, :read)).to be true
     end
 
     it "doesn't let students submit quizzes that are excused" do
       @quiz.assignment.grade_student(@student, excuse: true, grader: @teacher)
-      expect(@quiz.grants_right?(@student, :submit)).to eq false
-      expect(@quiz.grants_right?(@student, :read)).to eq true
+      expect(@quiz.grants_right?(@student, :submit)).to be false
+      expect(@quiz.grants_right?(@student, :read)).to be true
     end
   end
 
@@ -2035,11 +2055,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is false for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(false)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(false)
         end
       end
 
@@ -2049,11 +2069,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -2063,11 +2083,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -2077,11 +2097,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -2091,11 +2111,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -2109,11 +2129,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is false for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(false)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(false)
         end
       end
 
@@ -2126,11 +2146,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -2145,11 +2165,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
 
@@ -2162,11 +2182,11 @@ describe Quizzes::Quiz do
         end
 
         it "is true for admins" do
-          expect(@quiz.reload.grants_right?(@admin, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@admin, :delete)).to be(true)
         end
 
         it "is true for teachers" do
-          expect(@quiz.reload.grants_right?(@teacher, :delete)).to eql(true)
+          expect(@quiz.reload.grants_right?(@teacher, :delete)).to be(true)
         end
       end
     end
@@ -2394,7 +2414,7 @@ describe Quizzes::Quiz do
           allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_assignments).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :read_as_admin).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_grades).and_return(false)
-          expect(@quiz.grants_right?(@student1, :submit)).to eq true
+          expect(@quiz.grants_right?(@student1, :submit)).to be true
         end
       end
 
@@ -2414,7 +2434,7 @@ describe Quizzes::Quiz do
           allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_assignments).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :read_as_admin).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_grades).and_return(false)
-          expect(@quiz.grants_right?(@student2, :submit)).to eq false
+          expect(@quiz.grants_right?(@student2, :submit)).to be false
         end
       end
 
@@ -2547,7 +2567,7 @@ describe Quizzes::Quiz do
       override.title = "section override"
       override.set = section
       override.save!
-      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq nil
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to be_nil
     end
 
     it "returns nil due date when an override has a nil due date and another override has a due date" do
@@ -2567,7 +2587,7 @@ describe Quizzes::Quiz do
       override2.title = "adhoc override"
       override2.set_type = "ADHOC"
       AssignmentOverrideStudent.create!(user: @student, assignment_override: override2)
-      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq nil
+      expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to be_nil
     end
 
     it "returns latest due date when user has two (or more) overridden due dates" do
@@ -2613,7 +2633,7 @@ describe Quizzes::Quiz do
     end
 
     it "respects limit" do
-      expect(@course.quizzes.need_submitting_info(@student, 1).length).to eql 1
+      expect(@course.quizzes.need_submitting_info(@student, 1).length).to be 1
     end
   end
 

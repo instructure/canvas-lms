@@ -30,10 +30,10 @@ jest.mock('../../utilities/apiUtils', () => ({
   transformApiToInternalItem: jest.fn(response => ({
     ...response,
     newActivity: response.new_activity,
-    transformedToInternal: true
+    transformedToInternal: true,
   })),
   transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true})),
-  observedUserId: jest.requireActual('../../utilities/apiUtils').observedUserId
+  observedUserId: jest.requireActual('../../utilities/apiUtils').observedUserId,
 }))
 
 const getBasicState = () => ({
@@ -42,21 +42,21 @@ const getBasicState = () => ({
   timeZone: 'UTC',
   days: [
     ['2017-05-22', [{id: '42', dateBucketMoment: moment.tz('2017-05-22', 'UTC')}]],
-    ['2017-05-24', [{id: '42', dateBucketMoment: moment.tz('2017-05-24', 'UTC')}]]
+    ['2017-05-24', [{id: '42', dateBucketMoment: moment.tz('2017-05-24', 'UTC')}]],
   ],
   loading: {
     futureNextUrl: null,
-    pastNextUrl: null
+    pastNextUrl: null,
   },
   weeklyDashboard: {
     // copied from weekly-reducers INITIAL_OPTIONS
     weekStart: moment.tz('UTC').startOf('week'),
     weekEnd: moment.tz('UTC').endOf('week'),
     thisWeek: moment.tz('UTC').startOf('week'),
-    weeks: {}
+    weeks: {},
   },
   selectedObservee: null,
-  currentUser: {id: '1'}
+  currentUser: {id: '1'},
 })
 
 describe('api actions', () => {
@@ -66,7 +66,7 @@ describe('api actions', () => {
     alertInitialize({
       visualSuccessCallback() {},
       visualErrorCallback() {},
-      srAlertCallback() {}
+      srAlertCallback() {},
     })
   })
 
@@ -79,7 +79,7 @@ describe('api actions', () => {
       const fromMoment = moment.tz('Asia/Tokyo')
       Actions.sendFetchRequest({
         fromMoment,
-        getState: () => ({loading: {}})
+        getState: () => ({loading: {}}),
       })
       return moxiosWait(request => {
         expect(request.config.url).toBe(
@@ -92,7 +92,7 @@ describe('api actions', () => {
       const fromMoment = moment.tz('Asia/Tokyo')
       Actions.sendFetchRequest({
         fromMoment,
-        getState: () => ({loading: {futureNextUrl: '/next/url'}})
+        getState: () => ({loading: {futureNextUrl: '/next/url'}}),
       })
       return moxiosWait(request => {
         expect(request.config.url).toBe('/next/url')
@@ -104,7 +104,7 @@ describe('api actions', () => {
       Actions.sendFetchRequest({
         fromMoment,
         mode: 'past',
-        getState: () => ({loading: {}})
+        getState: () => ({loading: {}}),
       })
       return moxiosWait(request => {
         expect(request.config.url).toBe(
@@ -120,7 +120,7 @@ describe('api actions', () => {
       Actions.sendFetchRequest({
         fromMoment,
         mode: 'past',
-        getState: () => ({loading: {pastNextUrl: '/past/next/url'}})
+        getState: () => ({loading: {pastNextUrl: '/past/next/url'}}),
       })
       return moxiosWait(request => {
         expect(request.config.url).toBe('/past/next/url')
@@ -133,7 +133,7 @@ describe('api actions', () => {
       return moxiosRespond([{some: 'items'}], fetchPromise).then(result => {
         expect(result).toEqual({
           response: expect.anything(),
-          transformedItems: [{some: 'items', transformedToInternal: true}]
+          transformedItems: [{some: 'items', transformedToInternal: true}],
         })
       })
     })
@@ -157,7 +157,7 @@ describe('api actions', () => {
       return moxiosRespond([{dateBucketMoment: mockMoment}], newActivityPromise).then(() => {
         expect(mockDispatch).toHaveBeenCalledWith(
           expect.objectContaining({
-            type: 'FOUND_FIRST_NEW_ACTIVITY_DATE'
+            type: 'FOUND_FIRST_NEW_ACTIVITY_DATE',
           })
         )
       })
@@ -182,7 +182,7 @@ describe('api actions', () => {
     it('calls the alert method when it fails to get new activity', () => {
       const fakeAlert = jest.fn()
       alertInitialize({
-        visualErrorCallback: fakeAlert
+        visualErrorCallback: fakeAlert,
       })
       const mockDispatch = jest.fn()
       const mockMoment = moment.tz('Asia/Tokyo').startOf('day')
@@ -246,7 +246,7 @@ describe('api actions', () => {
       Actions.loadPastUntilNewActivity()(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith(
         Actions.gettingPastItems({
-          seekingNewActivity: true
+          seekingNewActivity: true,
         })
       )
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingPastUntilNewActivitySaga())
@@ -281,12 +281,12 @@ describe('api actions', () => {
         // the future request
         moxios.stubRequest(/\/api\/v1\/planner\/items\?end_date=/, {
           status: 200,
-          response: [{plannable_date: '2017-05-01T:00:00:00Z'}]
+          response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
         })
         // the past request
         moxios.stubRequest(/\/api\/v1\/planner\/items\?start_date=/, {
           status: 200,
-          response: [{plannable_date: '2017-01-01T:00:00:00Z'}]
+          response: [{plannable_date: '2017-01-01T:00:00:00Z'}],
         })
         moxios.stubRequest(/dashboard_cards/, {response: {data: []}})
 
@@ -297,7 +297,7 @@ describe('api actions', () => {
           Actions.startLoadingWeekSaga({
             weekStart: weeklyState.weekStart,
             weekEnd: weeklyState.weekEnd,
-            isPreload: false
+            isPreload: false,
           })
         )
         const getWayFutureItemThunk = mockDispatch.mock.calls[4][0] // the function returned by getWayFutureItem()
@@ -306,7 +306,7 @@ describe('api actions', () => {
         const futurePromise = getWayFutureItemThunk(mockDispatch, getBasicState).then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
             type: 'GOT_WAY_FUTURE_ITEM_DATE',
-            payload: '2017-05-01T:00:00:00Z'
+            payload: '2017-05-01T:00:00:00Z',
           })
         })
         const getWayPastItemThunk = mockDispatch.mock.calls[5][0]
@@ -314,7 +314,7 @@ describe('api actions', () => {
         const pastPromise = getWayPastItemThunk(mockDispatch, getBasicState).then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
             type: 'GOT_WAY_PAST_ITEM_DATE',
-            payload: '2017-01-01T:00:00:00Z'
+            payload: '2017-01-01T:00:00:00Z',
           })
         })
         /* eslint-enable jest/valid-expect-in-promise */
@@ -329,7 +329,7 @@ describe('api actions', () => {
           Actions.startLoadingWeekSaga({
             weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
             weekEnd: weeklyState.weekEnd.clone().add(-7, 'days'),
-            isPreload: true
+            isPreload: true,
           })
         )
       })
@@ -340,7 +340,7 @@ describe('api actions', () => {
           Actions.startLoadingWeekSaga({
             weekStart: weeklyState.weekStart.clone().add(7, 'days'),
             weekEnd: weeklyState.weekEnd.clone().add(7, 'days'),
-            isPreload: true
+            isPreload: true,
           })
         )
       })
@@ -350,11 +350,11 @@ describe('api actions', () => {
       it('loads previous week items', () => {
         const lastWeek = {
           weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(-7, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(-7, 'days'),
         }
         const twoWeeksAgo = {
           weekStart: weeklyState.weekStart.clone().add(-14, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(-14, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(-14, 'days'),
         }
         const getStateMock = jest
           .fn()
@@ -380,11 +380,11 @@ describe('api actions', () => {
       it('gets previous week from state if available', () => {
         const lastWeek = {
           weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(-7, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(-7, 'days'),
         }
         const twoWeeksAgo = {
           weekStart: weeklyState.weekStart.clone().add(-14, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(-14, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(-14, 'days'),
         }
         const key = lastWeek.weekStart.format()
         const sunday = lastWeek.weekStart.format('YYYY-MM-DD')
@@ -392,7 +392,7 @@ describe('api actions', () => {
         const getStateMock = jest.fn(() => {
           const st = getBasicState()
           st.weeklyDashboard.weeks = {
-            [`${key}`]: lastWeekItems
+            [`${key}`]: lastWeekItems,
           }
           return st
         })
@@ -410,11 +410,11 @@ describe('api actions', () => {
       it('loads next week items', () => {
         const nextWeek = {
           weekStart: weeklyState.weekStart.clone().add(7, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(7, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(7, 'days'),
         }
         const twoWeeksHence = {
           weekStart: weeklyState.weekStart.clone().add(14, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(14, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(14, 'days'),
         }
         const getStateMock = jest
           .fn()
@@ -440,11 +440,11 @@ describe('api actions', () => {
       it('gets next week from state if available', () => {
         const nextWeek = {
           weekStart: weeklyState.weekStart.clone().add(7, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(7, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(7, 'days'),
         }
         const twoWeeksHence = {
           weekStart: weeklyState.weekStart.clone().add(14, 'days'),
-          weekEnd: weeklyState.weekEnd.clone().add(14, 'days')
+          weekEnd: weeklyState.weekEnd.clone().add(14, 'days'),
         }
         const key = nextWeek.weekStart.format()
         const sunday = nextWeek.weekStart.format('YYYY-MM-DD')
@@ -452,7 +452,7 @@ describe('api actions', () => {
         const getStateMock = jest.fn(() => {
           const st = getBasicState()
           st.weeklyDashboard.weeks = {
-            [`${key}`]: nextWeekItems
+            [`${key}`]: nextWeekItems,
           }
           return st
         })
@@ -470,7 +470,7 @@ describe('api actions', () => {
       it('jump to this week', () => {
         const thisWeek = {
           weekStart: weeklyState.weekStart.clone(),
-          weekEnd: weeklyState.weekEnd.clone()
+          weekEnd: weeklyState.weekEnd.clone(),
         }
         const getStateMock = jest.fn().mockImplementation(() => {
           const state = getBasicState()
@@ -479,8 +479,8 @@ describe('api actions', () => {
             weekEnd: thisWeek.weekEnd,
             thisWeek: thisWeek.weekStart,
             weeks: {
-              [thisWeek.weekStart.format()]: thisWeek
-            }
+              [thisWeek.weekStart.format()]: thisWeek,
+            },
           }
           return state
         })
@@ -494,19 +494,19 @@ describe('api actions', () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
-        response: [{plannable_date: '2017-05-01T:00:00:00Z'}]
+        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
       })
 
       const mockUiManager = {
         setStore: jest.fn(),
         handleAction: jest.fn(),
-        uiStateUnchanged: jest.fn()
+        uiStateUnchanged: jest.fn(),
       }
 
       const store = configureStore(mockUiManager, {
         ...getBasicState(),
         courses: [{id: '7', assetString: 'course_7'}],
-        singleCourse: true
+        singleCourse: true,
       })
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
 
@@ -518,61 +518,95 @@ describe('api actions', () => {
       expect(moxios.requests.at(2).url).toMatch(expectedContextCodes)
     })
 
-    it('adds observee id and context codes to request if state contains selected observee', async () => {
+    it('adds observee id, account calendars flag and context codes to request if state contains selected observee', async () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
-        response: [{plannable_date: '2017-05-01T:00:00:00Z'}]
+        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
       })
       moxios.stubRequest(/dashboard_cards/, {
         response: [
           {id: '11', assetString: 'course_11'},
-          {id: '12', assetString: 'course_12'}
-        ]
+          {id: '12', assetString: 'course_12'},
+        ],
       })
 
       const mockUiManager = {
         setStore: jest.fn(),
         handleAction: jest.fn(),
-        uiStateUnchanged: jest.fn()
+        uiStateUnchanged: jest.fn(),
       }
 
       const store = configureStore(mockUiManager, {
         ...getBasicState(),
-        selectedObservee: '35'
+        selectedObservee: '35',
       })
 
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
 
       const expectedParams =
-        /observed_user_id=35&context_codes%5B%5D=course_11&context_codes%5B%5D=course_12/
-      // Fetching current week, far future date, and far past date should all have observee id and context codes
+        /include%5B%5D=account_calendars&per_page=100&observed_user_id=35&context_codes%5B%5D=course_11&context_codes%5B%5D=course_12/
+      const expectedParamsPastRequest =
+        /include%5B%5D=account_calendars&order=asc&per_page=1&observed_user_id=35&context_codes%5B%5D=course_11&context_codes%5B%5D=course_12/
+      const expectedParamsFutureRequest =
+        /include%5B%5D=account_calendars&order=desc&per_page=1&observed_user_id=35&context_codes%5B%5D=course_11&context_codes%5B%5D=course_12/
+      // For multi-course mode, fetching current week, far future date, and far past date should all have observee id
+      // , account calendars flag and context codes
       expect(moxios.requests.count()).toBe(4)
       expect(moxios.requests.at(0).url).toMatch(/dashboard_cards/)
+      expect(moxios.requests.at(1).url).toMatch(expectedParamsFutureRequest)
+      expect(moxios.requests.at(2).url).toMatch(expectedParamsPastRequest)
+      expect(moxios.requests.at(3).url).toMatch(expectedParams)
+    })
+
+    it('does not add the account calendars flag if state contains selected observee in singleCourse mode', async () => {
+      const today = moment.tz('UTC').startOf('day')
+      moxios.stubRequest(/\/api\/v1\/planner\/items/, {
+        status: 200,
+        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
+      })
+
+      const mockUiManager = {
+        setStore: jest.fn(),
+        handleAction: jest.fn(),
+        uiStateUnchanged: jest.fn(),
+      }
+
+      const store = configureStore(mockUiManager, {
+        ...getBasicState(),
+        courses: [{id: '11', assetString: 'course_11'}],
+        selectedObservee: '35',
+        singleCourse: true,
+      })
+
+      await store.dispatch(Actions.getWeeklyPlannerItems(today))
+      const expectedParams = /observed_user_id=35&context_codes%5B%5D=course_11/
+      // For single-course mode, fetching current week, far future date, and far past date should all have observee id and context codes
+      expect(moxios.requests.count()).toBe(3)
+      expect(moxios.requests.at(0).url).toMatch(expectedParams)
       expect(moxios.requests.at(1).url).toMatch(expectedParams)
       expect(moxios.requests.at(2).url).toMatch(expectedParams)
-      expect(moxios.requests.at(3).url).toMatch(expectedParams)
     })
 
     it('does not add observee id if observee id is the current user id', async () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
-        response: [{plannable_date: '2017-05-01T:00:00:00Z'}]
+        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
       })
       moxios.stubRequest(/dashboard_cards/, {
-        response: [{id: '7', assetString: 'course_7'}]
+        response: [{id: '7', assetString: 'course_7'}],
       })
 
       const mockUiManager = {
         setStore: jest.fn(),
         handleAction: jest.fn(),
-        uiStateUnchanged: jest.fn()
+        uiStateUnchanged: jest.fn(),
       }
 
       const store = configureStore(mockUiManager, {
         ...getBasicState(),
-        selectedObservee: '1'
+        selectedObservee: '1',
       })
 
       await store.dispatch(Actions.getWeeklyPlannerItems(today))

@@ -92,7 +92,7 @@ module StreamItemsHelper
   def extract_updated_at(category, item, user)
     case category
     when "Conversation"
-      item.data.conversation_participants.find_by(user: user)&.last_message_at
+      item.data.conversation_participants.find_by(user:)&.last_message_at
     else
       item.data.respond_to?(:updated_at) ? item.data.updated_at : nil
     end
@@ -107,7 +107,8 @@ module StreamItemsHelper
     when "DiscussionEntry"
       polymorphic_path([item.context_type.underscore.to_sym, :discussion_topic],
                        "#{item.context_type.underscore}_id": Shard.short_id_for(item.context_id),
-                       id: Shard.short_id_for(item.data["discussion_topic_id"]))
+                       id: Shard.short_id_for(item.data["discussion_topic_id"]),
+                       entry_id: Shard.short_id_for(item.data["id"]))
     when "Conversation"
       conversation_path(Shard.short_id_for(item.asset_id))
     when "Assignment"
@@ -117,7 +118,7 @@ module StreamItemsHelper
     when "AssessmentRequest"
       submission = item.data.asset
       Submission::ShowPresenter.new(
-        submission: submission,
+        submission:,
         current_user: user,
         assessment_request: item.data
       ).submission_data_url

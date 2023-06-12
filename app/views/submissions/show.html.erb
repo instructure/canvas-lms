@@ -16,6 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 <%
+  # this is superficial and should be fine, since this is only showing data, not saving data
+  entered_grade = @assignment.restrict_quantitative_data?(@current_user) ?
+    @assignment.score_to_grade(@submission.score, nil, true)
+    : @submission.entered_grade
+
   presenter = Submission::ShowPresenter.new(
     submission: @submission,
     current_user: @current_user,
@@ -50,9 +55,10 @@
     :SUBMISSION => {
       assignment_id: @assignment.id,
       # don't leak grades if submission is not posted
+      points_possible: @assignment.points_possible, # score below is useless without points possible
       submission: if @submission.user_can_read_grade?(@current_user, session)
         @submission.attributes.merge(
-          entered_grade: @submission.entered_grade,
+          entered_grade: entered_grade,
           entered_score: @submission.entered_score
         )
       else
@@ -95,12 +101,12 @@
                     <% if @submission.excused? %>
                       <%= t "Excused" %>
                     <% else %>
-                      <%= i18n_grade(round_if_whole(@submission.entered_grade), @submission.grading_type) %>
+                        <%= i18n_grade(round_if_whole(entered_grade), @submission.grading_type) %>
                     <% end %>
                   </span>
                 <% end %>
-                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible %>
-                  <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
+                <% if !@submission.excused? &&  @assignment.grading_type == 'points' && @assignment.points_possible && !@assignment.restrict_quantitative_data?(@current_user) %>
+                    <%= t('/ %{points_possible}', points_possible: I18n.n(round_if_whole @assignment.points_possible))%>
                 <% end %>
               </td>
             </tr>
@@ -182,9 +188,7 @@
              can_do(@assignment.rubric, @current_user, :read)
            )
         %>
-          <% unread_comments =
-               @context.root_account.feature_enabled?(:submission_feedback_indicators) &&
-               @current_user.unread_rubric_assessments?(@submission) %>
+          <% unread_comments = @current_user.unread_rubric_assessments?(@submission) %>
           <div class="submission-details-header__rubric <% if can_do(@assignment, @current_user, :grade) %>submission-details-header__rubric--can-grade<% end %>">
             <a href="#" class="assess_submission_link Button Button--small Button--link" tabindex='0' title="<%= unread_comments ? t('There are unread rubric comments.') : '' %>">
               <i class="icon-rubric" aria-hidden="true"></i><%= t('show_rubric', 'Show Rubric') %>
@@ -315,9 +319,9 @@
       <iframe id="preview_frame" src="<%= presenter.submission_preview_frame_url %>" allowfullscreen="true" allow="<%= Lti::Launch.iframe_allowances.join('; ') %>" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
     <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">
-      <div style="background-color: #fff;">
+      <div style="background-color: #fff; height: 100%">
         <a href="#" class="comments_link" style="display: none; <%= 'font-weight: bold;' unless submission_comments.empty? %>">Comments <% unless submission_comments.empty? %>(<%= submission_comments.length %>)<% end %></a>
-        <div class="comments">
+        <div class="comments" style="height: 100%">
           <button type="button" class="btn button-secondary cancel_comment_button" style="display: none; float: <%= direction('right') %>; margin-<%= direction('right') %>:0 !important;"><%= image_tag("delete_circle.png", :alt => t('Delete')) %></button>
           <div class="comment_list" aria-live="polite" style="padding: 10px; clear:right;">
             <% unless @submission.user_can_read_grade?(@current_user, session) %>

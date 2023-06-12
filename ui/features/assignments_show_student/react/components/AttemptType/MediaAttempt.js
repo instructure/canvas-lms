@@ -38,7 +38,7 @@ import {
   MediaCaptureStrings,
   SelectStrings,
 } from '@canvas/upload-media-translations'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -203,8 +203,8 @@ class MediaAttempt extends React.Component {
           onUploadComplete={this.onComplete}
           onDismiss={this.onDismiss}
           rcsConfig={{
-            contextId: this.props.assignment.env.courseId,
-            contextType: 'course',
+            contextId: ENV.current_user.id,
+            contextType: 'user',
           }}
           open={this.state.mediaModalOpen}
           tabs={this.state.mediaModalTabs}

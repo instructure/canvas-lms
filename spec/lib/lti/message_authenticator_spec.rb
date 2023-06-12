@@ -76,15 +76,30 @@ module Lti
             :oauth_signature => "TL8PLA/V43D21+JkGg8i9Cj+Dqg=",
             "lti_message_type" => "ContentItemSelection",
             "lti_version" => "LTI-1p0",
-            "content_items" => "{\"@graph\":[{\"windowTarget\":\"\",\"text\":\"Arch Linux\",\"title\":\"Its your " \
-                               "computer\",\"url\":\"http://lti-tool-provider-example.dev/messages/blti\"" \
-                               ",\"thumbnail\":{\"height\":128,\"width\":128,\"@id\"" \
-                               ":\"http://www.runeaudio.com/assets/img/banner-archlinux.png\"}" \
-                               ",\"placementAdvice\":{\"displayHeight\":600,\"displayWidth\":800" \
-                               ",\"presentationDocumentTarget\":\"iframe\"},\"mediaType\"" \
-                               ":\"application/vnd.ims.lti.v1.ltilink\",\"@type\":\"LtiLinkItem\",\"@id\"" \
-                               ":\"http://lti-tool-provider-example.dev/messages/blti\"}],\"@context\"" \
-                               ":\"http://purl.imsglobal.org/ctx/lti/v1/ContentItem\"}",
+            "content_items" => <<~JSON.gsub(/\s*\n\s*/, ""),
+              {
+                "@graph":[{
+                  "windowTarget":"",
+                  "text":"Arch Linux",
+                  "title":"Its your computer",
+                  "url":"http://lti-tool-provider-example.dev/messages/blti",
+                  "thumbnail":{
+                    "height":128,
+                    "width":128,
+                    "@id":"http://www.runeaudio.com/assets/img/banner-archlinux.png"
+                  },
+                  "placementAdvice":{
+                    "displayHeight":600,
+                    "displayWidth":800,
+                    "presentationDocumentTarget":"iframe"
+                  },
+                  "mediaType":"application/vnd.ims.lti.v1.ltilink",
+                  "@type":"LtiLinkItem",
+                  "@id":"http://lti-tool-provider-example.dev/messages/blti"
+                }],
+                "@context":"http://purl.imsglobal.org/ctx/lti/v1/ContentItem"
+              }
+            JSON
             "lti_msg" => "",
             "lti_log" => "",
             "lti_errormsg" => "",
@@ -95,7 +110,7 @@ module Lti
         it "validates the message" do
           message_authenticator = MessageAuthenticator.new(launch_url, signed_params)
           Timecop.freeze(Time.at(signed_params[:oauth_timestamp].to_i)) do
-            expect(message_authenticator.valid?).to eq true
+            expect(message_authenticator.valid?).to be true
           end
         end
       end
@@ -150,7 +165,7 @@ module Lti
           message_authenticator = MessageAuthenticator.new(launch_url, signed_params)
           Timecop.freeze(Time.at(signed_params[:oauth_timestamp].to_i)) do
             expect { message_authenticator.valid? }.not_to raise_error
-            expect(message_authenticator.valid?).to eq false
+            expect(message_authenticator.valid?).to be false
           end
         end
       end

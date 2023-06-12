@@ -23,8 +23,8 @@ describe GradeCalculator do
     course_with_student active_all: true
   end
 
-  # We should keep this in sync with GradeCalculatorSpec.coffee
-  context "GradeCalculatorSpec.coffee examples" do
+  # We should keep this in sync with GradeCalculatorSpec.js
+  context "GradeCalculatorSpec.js examples" do
     before do
       @group = @group1 = @course.assignment_groups.create!(name: "group 1")
     end
@@ -191,10 +191,27 @@ describe GradeCalculator do
     end
 
     it "really supports drop_lowest" do
-      set_grades [[30, nil], [30, nil], [30, nil], [31, 31], [21, 21],
-                  [30, 30], [30, 30], [30, 30], [30, 30], [30, 30], [30, 30],
-                  [30, 30], [30, 30], [30, 30], [30, 30], [29.3, 30], [30, 30],
-                  [30, 30], [30, 30], [12, 0], [30, nil]]
+      set_grades [[30, nil],
+                  [30, nil],
+                  [30, nil],
+                  [31, 31],
+                  [21, 21],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [29.3, 30],
+                  [30, 30],
+                  [30, 30],
+                  [30, 30],
+                  [12, 0],
+                  [30, nil]]
       @group.update_attribute(:rules, "drop_lowest:2")
       check_grades(132.12, 132.12)
     end
@@ -268,7 +285,9 @@ describe GradeCalculator do
     end
 
     it "grade dropping should work even in ridiculous circumstances" do
-      set_grades [[nil, 20], [3, 10], [nil, 10],
+      set_grades [[nil, 20],
+                  [3, 10],
+                  [nil, 10],
                   [nil, 999_999_999],
                   [nil, nil]]
 

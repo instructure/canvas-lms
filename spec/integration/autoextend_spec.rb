@@ -44,7 +44,7 @@ describe Autoextend do
                        else
                          extension.block
                        end
-      expect(extension.used).to(eq(true), "expected extension #{extension_name} to hook into #{extension.const_name}")
+      expect(extension.used).to(be(true), "expected extension #{extension_name} to hook into #{extension.const_name}")
     end
   end
 end

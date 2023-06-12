@@ -36,18 +36,18 @@ module Api::V1::GradeChangeEvent
     links[:assignment] = Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current) unless event.override_grade?
 
     json = {
-      id: event.id,
+      id: event.uuid,
       created_at: event.created_at.in_time_zone,
       event_type: event.event_type,
-      grade_before: display_grade(event: event, grade: event.grade_before, score: event.score_before),
-      grade_after: display_grade(event: event, grade: event.grade_after, score: event.score_after),
+      grade_before: display_grade(event:, grade: event.grade_before, score: event.score_before),
+      grade_after: display_grade(event:, grade: event.grade_after, score: event.score_after),
       excused_before: event.excused_before,
       excused_after: event.excused_after,
       graded_anonymously: event.graded_anonymously,
       points_possible_after: event.points_possible_after,
       points_possible_before: event.points_possible_before,
       version_number: event.version_number,
-      links: links
+      links:
     }
 
     json[:grade_current] = event.grade_current if event.grade_current.present?

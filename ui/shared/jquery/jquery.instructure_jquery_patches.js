@@ -62,14 +62,6 @@ $.windowScrollTop = function () {
   const edgeVer = window.navigator.userAgent.match(/Edge\/(\d+)/)
   if (!edgeVer && chromeVer && parseInt(chromeVer[1], 10) > 60) {
     return $('html').scrollTop()
-  } else if ($.browser.safari) {
-    // Safari 13 has changed document.scrollingElement from <body> => <html>.
-    // As a result, it is now reporting $('body').scrollTop() == 0 as the <body>
-    // element no longer has a scrolling area.
-    // $('html').scrollTop() is now returning the scroll position like other
-    // browsers that use <html> as the scrolling element.
-    const safariVer = window.navigator.userAgent.match(/Version\/(\d+).*Safari/)
-    return (safariVer && parseInt(safariVer[1], 10) < 13 ? $('body') : $('html')).scrollTop()
   } else {
     return $('html').scrollTop()
   }

@@ -33,13 +33,13 @@ module Services
     # which of the users does the sender know, and what contexts do they and
     # the sender have in common?
     def self.common_contexts(sender, users, ignore_result = false)
-      recipients(sender: sender, user_ids: users, ignore_result: ignore_result).common_contexts
+      recipients(sender:, user_ids: users, ignore_result:).common_contexts
     end
 
     # which of the users have roles in the context and what are those roles?
     def self.roles_in_context(context, users, ignore_result = false)
       context = context.course if context.is_a?(CourseSection)
-      recipients(context: context, user_ids: users, ignore_result: ignore_result).common_contexts
+      recipients(context:, user_ids: users, ignore_result:).common_contexts
     end
 
     # which users:
@@ -53,7 +53,7 @@ module Services
     #    admin view)
     #
     def self.known_in_context(sender, context, user_ids = nil, ignore_result = false)
-      params = { sender: sender, context: context, ignore_result: ignore_result }
+      params = { sender:, context:, ignore_result: }
       params[:user_ids] = user_ids if user_ids
       response = recipients(params)
       [response.user_ids, response.common_contexts]
@@ -61,7 +61,7 @@ module Services
 
     # how many users does the sender know in each of the contexts?
     def self.count_in_contexts(sender, contexts, ignore_result = false)
-      counts = count_recipients(sender: sender, contexts: contexts, ignore_result: ignore_result)
+      counts = count_recipients(sender:, contexts:, ignore_result:)
       # map back from normalized to argument
       contexts.each do |ctx|
         serialized = serialize_context(ctx)
@@ -145,11 +145,11 @@ module Services
                                  "address_book"
                                end
         Canvas.timeout_protection(timeout_service_name) do
-          response = CanvasHttp.get(url, "Authorization" => "Bearer #{jwt}")
+          response = CanvasHttp.get(url, { "Authorization" => "Bearer #{jwt}" })
           if ![200, 202].include?(response.code.to_i)
             err = CanvasHttp::InvalidResponseCodeError.new(response.code.to_i)
             data = {
-              extra: { url: url, response: response.body },
+              extra: { url:, response: response.body },
               tags: { type: "address_book_fault" }
             }
             Canvas::Errors.capture(err, data, :warn)
@@ -286,7 +286,7 @@ module Services
 
       # extract the next page cursor from the response
       def cursors
-        @response["records"].map { |record| record["cursor"] }
+        @response["records"].pluck("cursor")
       end
     end
   end

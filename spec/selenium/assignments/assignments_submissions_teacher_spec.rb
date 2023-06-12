@@ -87,6 +87,7 @@ describe "submissions" do
     end
 
     it "allows a student view student to submit file upload assignments", priority: "1" do
+      skip("investigate in EVAL-2966")
       @assignment = @course.assignments.create(
         title: "Cool Assignment",
         points_possible: 10,

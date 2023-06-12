@@ -36,7 +36,7 @@ module Types
       argument :context_type, NotificationPreferencesContextType, required: false
     end
     def notification_policies(context_type: nil)
-      NotificationPolicy.find_all_for(object, context_type: context_type)
+      NotificationPolicy.find_all_for(object, context_type:)
     end
 
     field :notification_policy_overrides, [NotificationPolicyType], null: true do

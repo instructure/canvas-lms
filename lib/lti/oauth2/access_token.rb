@@ -27,12 +27,12 @@ module Lti
       attr_reader :aud, :sub, :reg_key, :shard_id
 
       def self.create_jwt(aud:, sub:, reg_key: nil)
-        new(aud: aud, sub: sub, reg_key: reg_key, shard_id: Shard.current.id)
+        new(aud:, sub:, reg_key:, shard_id: Shard.current.id)
       end
 
       def self.from_jwt(aud:, jwt:)
         decoded_jwt = Canvas::Security.decode_jwt(jwt)
-        new(aud: aud, sub: decoded_jwt[:sub], jwt: jwt, shard_id: decoded_jwt[:shard_id])
+        new(aud:, sub: decoded_jwt[:sub], jwt:, shard_id: decoded_jwt[:shard_id])
       rescue Canvas::Security::TokenExpired => e
         raise InvalidTokenError, "token has expired", e.backtrace
       rescue => e
@@ -77,13 +77,13 @@ module Lti
         @_jwt ||= begin
           body = {
             iss: ISS,
-            sub: sub,
+            sub:,
             exp: Setting.get("lti.oauth2.access_token.exp", 1.hour).to_i.seconds.from_now,
-            aud: aud,
+            aud:,
             iat: Time.zone.now.to_i,
             nbf: Setting.get("lti.oauth2.access_token.nbf", 30.seconds).to_i.seconds.ago,
             jti: SecureRandom.uuid,
-            shard_id: shard_id
+            shard_id:
           }
           body[:reg_key] = @reg_key if @reg_key
           Canvas::Security.create_jwt(body)

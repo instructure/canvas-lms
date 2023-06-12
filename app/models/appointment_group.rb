@@ -90,7 +90,7 @@ class AppointmentGroup < ActiveRecord::Base
     @new_appointments = appointments.map do |start_at, end_at|
       next unless start_at && end_at
 
-      a = self.appointments.build(start_at: start_at, end_at: end_at)
+      a = self.appointments.build(start_at:, end_at:)
       a.context = self
       a
     end
@@ -364,8 +364,8 @@ class AppointmentGroup < ActiveRecord::Base
     return false unless participant && participant.class.base_class.name == participant_type
 
     codes = participant.appointment_context_codes
-    return false unless (codes[:primary] & appointment_group_contexts.map(&:context_code)).present?
-    return false unless sub_context_codes.empty? || (codes[:secondary] & sub_context_codes).present?
+    return false unless codes[:primary].intersect?(appointment_group_contexts.map(&:context_code))
+    return false unless sub_context_codes.empty? || codes[:secondary].intersect?(sub_context_codes)
 
     true
   end

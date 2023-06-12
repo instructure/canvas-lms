@@ -2,7 +2,7 @@
 
 shared_examples "comments" do |raw_changes|
   let(:changes) { raw_changes.map { |c| double(c) } }
-  let(:linter) { described_class.new(changes: changes, config: config) }
+  let(:linter) { described_class.new(changes:, config:) }
 
   it "comments" do
     expect(linter.run).to match(hash_including(linter.comment))
@@ -11,7 +11,7 @@ end
 
 shared_examples "comments with msg key" do |raw_changes, msg_key|
   let(:changes) { raw_changes.map { |c| double(c) } }
-  let(:linter) { described_class.new(changes: changes, config: config) }
+  let(:linter) { described_class.new(changes:, config:) }
 
   it "comments" do
     result = linter.run
@@ -22,7 +22,7 @@ end
 
 shared_examples "does not comment" do |raw_changes|
   let(:changes) { raw_changes.map { |c| double(c) } }
-  let(:linter) { described_class.new(changes: changes, config: config) }
+  let(:linter) { described_class.new(changes:, config:) }
 
   it "does not comment" do
     expect(linter.run).to be_nil

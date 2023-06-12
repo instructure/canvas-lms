@@ -32,7 +32,7 @@ module Quizzes::QuizQuestion::AnswerParsers
         weight = fields.fetch_any([:answer_weight, :weight]).to_f
         html = fields.sanitize(fields.fetch_any([:answer_html, :html]))
 
-        answer = Quizzes::QuizQuestion::AnswerGroup::Answer.new(id: id, text: text, html: html, comments: comments, comments_html: comments_html, weight: weight)
+        answer = Quizzes::QuizQuestion::AnswerGroup::Answer.new(id:, text:, html:, comments:, comments_html:, weight:)
         answer_group.taken_ids << answer.set_id(answer_group.taken_ids)
         answer
       end

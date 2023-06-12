@@ -40,11 +40,11 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
   end
 
   def generate_authorize_url(redirect_uri, state)
-    client.auth_code.authorize_url({ redirect_uri: redirect_uri, state: state }.merge(authorize_options))
+    client.auth_code.authorize_url({ redirect_uri:, state: }.merge(authorize_options))
   end
 
   def get_token(code, redirect_uri, _params)
-    client.auth_code.get_token(code, { redirect_uri: redirect_uri }.merge(token_options))
+    client.auth_code.get_token(code, { redirect_uri: }.merge(token_options))
   end
 
   def provider_attributes(_token)
@@ -55,8 +55,8 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
 
   def client_options
     {
-      authorize_url: authorize_url,
-      token_url: token_url
+      authorize_url:,
+      token_url:
     }
   end
 

@@ -17,7 +17,6 @@
  */
 
 import {
-  attributeNamesToRemove,
   transformRceContentForEditing,
   TransformRceContentForEditingOptions,
 } from '../transformContent'
@@ -33,10 +32,33 @@ describe('transformRceContentForEditing', () => {
     expect(transformRceContentForEditing('', defaultOptions)).toEqual('')
   })
 
+  it('should handle a real-world LTI URL', () => {
+    const url =
+      '/courses/961/external_tools/retrieve?display=borderless&amp;url=https%3A%2F%2Faware.instructuremedia.com%2Flti%2Flaunch%3Fcustom_arc_launch_type%3Dembed%26custom_arc_media_id%3D41c61c58-4182-458c-84b4-d0cdc98d331e-21'
+
+    expect(
+      transformRceContentForEditing(
+        `<iframe src="${defaultOptions.origin + url}"></iframe>`,
+        defaultOptions
+      )
+    ).toEqual(`<iframe src="${url}"></iframe>`)
+  })
+
+  it('should handle content with extraneous <html> and <body> elements', () => {
+    expect(
+      transformRceContentForEditing(
+        `<title>this is great</title><body>first body!</body><html><body> and now, lol, second body</body></html><html><html>More stuff </body><a href="http://canvas.com/lol-what?">canvas.com</a>`,
+        defaultOptions
+      )
+    ).toEqual(
+      `<title>this is great</title>first body! and now, lol, second bodyMore stuff <a href="/lol-what?">canvas.com</a>`
+    )
+  })
+
   it('should relativize urls', () => {
     expect(
       transformRceContentForEditing(
-        '<img src="https://canvas.com/image.jpg">' +
+        '<img src="https://canvas.com/image.jpg?something=x">' +
           '<img random="https://canvas.com/image.jpg">' +
           '<img src="https://othercanvas.com/image.jpg">' +
           '<div>' +
@@ -46,7 +68,7 @@ describe('transformRceContentForEditing', () => {
         defaultOptions
       )
     ).toEqual(
-      '<img src="/image.jpg">' +
+      '<img src="/image.jpg?something=x">' +
         '<img random="https://canvas.com/image.jpg">' +
         '<img src="https://othercanvas.com/image.jpg">' +
         '<div>' +
@@ -57,39 +79,55 @@ describe('transformRceContentForEditing', () => {
   })
 
   it('should remove unnecessary attributes', () => {
-    const elements = [
-      {value: 'iframe', shouldTransform: true},
-      {value: 'img', shouldTransform: true, selfClosing: true},
-      {value: 'embed', shouldTransform: true, selfClosing: true},
-    ]
+    const options = {origin: 'http://canvas.com'}
 
-    const attributes = [
-      ...attributeNamesToRemove.map(value => ({
-        value,
-        shouldRemove: true,
-      })),
-      {value: 'random', shouldRemove: false},
-    ]
+    ;['data-api-endpoint', 'data-api-returntype'].forEach(attr => {
+      // Non-self-closing tags
+      ;['iframe', 'div', 'other'].forEach(tag => {
+        expect(
+          transformRceContentForEditing(
+            `<${tag} ${attr}="whatever"></${tag}><div><${tag} ${attr}="whatever"></${tag}></div>`,
+            options
+          )
+        ).toEqual(`<${tag}></${tag}><div><${tag}></${tag}></div>`)
+      })
 
-    elements.forEach(element => {
-      attributes.forEach(attribute => {
-        const elementWithAttribute = element.selfClosing
-          ? `<${element.value} ${attribute.value}="whatever">`
-          : `<${element.value} ${attribute.value}="whatever"></${element.value}>`
-        const withAttributeHtml = `${elementWithAttribute}<div>${elementWithAttribute}</div>`
+      // Self-closing tags
+      ;['embed', 'img'].forEach(tag => {
+        expect(
+          transformRceContentForEditing(
+            `<${tag} ${attr}="whatever"><div><${tag} ${attr}="whatever"></div>`,
+            options
+          )
+        ).toEqual(`<${tag}><div><${tag}></div>`)
+      })
+    })
+  })
 
-        const elementWithoutAttribute = element.selfClosing
-          ? `<${element.value}>`
-          : `<${element.value}></${element.value}>`
-        const withoutAttributeHtml = `${elementWithoutAttribute}<div>${elementWithoutAttribute}</div>`
+  it('should NOT remove other attributes', () => {
+    const options = {origin: 'http://canvas.com'}
 
-        const transformedHtml = transformRceContentForEditing(withAttributeHtml, defaultOptions)
+    ;['alt', 'style', 'title', 'class'].forEach(attr => {
+      // Non-self-closing tags
+      ;['iframe', 'div', 'other'].forEach(tag => {
+        expect(
+          transformRceContentForEditing(
+            `<${tag} ${attr}="whatever"></${tag}><div><${tag} ${attr}="whatever"></${tag}></div>`,
+            options
+          )
+        ).toEqual(
+          `<${tag} ${attr}="whatever"></${tag}><div><${tag} ${attr}="whatever"></${tag}></div>`
+        )
+      })
 
-        if (attribute.shouldRemove) {
-          expect(transformedHtml).toEqual(withoutAttributeHtml)
-        } else {
-          expect(transformedHtml).toEqual(withAttributeHtml)
-        }
+      // Self-closing tags
+      ;['embed', 'img'].forEach(tag => {
+        expect(
+          transformRceContentForEditing(
+            `<${tag} ${attr}="whatever"><div><${tag} ${attr}="whatever"></div>`,
+            options
+          )
+        ).toEqual(`<${tag} ${attr}="whatever"><div><${tag} ${attr}="whatever"></div>`)
       })
     })
   })

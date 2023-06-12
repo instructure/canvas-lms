@@ -61,7 +61,7 @@ class GradebookUploadsController < ApplicationController
         js_env gradebook_env(@progress)
         render :show
       else
-        flash[:error] = t(:no_file_attached, "We did not detect a CSV to "\
+        flash[:error] = t(:no_file_attached, "We did not detect a CSV to " \
                                              "upload. Please select a CSV to upload and submit again.")
         redirect_to action: :new
       end

@@ -84,7 +84,10 @@ module Lti
                            AND lti_tool_proxy_bindings.context_id = x.context_id")
                  .where("(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?)
                          OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))",
-                        context.class.name, context.id, "Account", account_ids)
+                        context.class.name,
+                        context.id,
+                        "Account",
+                        account_ids)
                  .order("lti_tool_proxy_bindings.tool_proxy_id, x.ordering").to_sql
       tools = joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id")
               .select("lti_tool_proxies.*, bindings.enabled AS binding_enabled")
@@ -95,7 +98,7 @@ module Lti
               .order("ordering, lti_tool_proxies.id DESC")
               .where(lti_tool_proxies: { workflow_state: "active" })
               .where("lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?", vendor_code, product_code)
-              .where(lti_resource_handlers: { resource_type_code: resource_type_code })
+              .where(lti_resource_handlers: { resource_type_code: })
       # You can disable a tool_binding somewhere in the account chain, and anything below that that reenables it should be
       # available, but nothing above it, so we're getting rid of anything that is disabled and above
       tools.split { |tool| !tool.binding_enabled }.first
@@ -172,7 +175,7 @@ module Lti
     def matches?(vendor_code:, product_code:, resource_type_code:)
       return false if vendor_code != product_family.vendor_code
       return false if product_code != product_family.product_code
-      return false if resources.where(resource_type_code: resource_type_code).empty?
+      return false if resources.where(resource_type_code:).empty?
 
       true
     end
@@ -186,7 +189,7 @@ module Lti
       # publish tool.
       if subscription_id.blank? && workflow_state == "active" && plagiarism_tool?
         subscription_id = Lti::PlagiarismSubscriptionsHelper.new(self)&.create_subscription
-        update_columns(subscription_id: subscription_id)
+        update_columns(subscription_id:)
       elsif self.subscription_id.present? && workflow_state != "active"
         delete_subscription
       end

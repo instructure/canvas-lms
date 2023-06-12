@@ -35,7 +35,7 @@ module LtiProviderStateHelper
       "iss" => "test",
       "aud" => "http://example.org/login/oauth2/token",
       "sub" => "test",
-      "exp" => (Time.zone.now + 10.minutes).to_i,
+      "exp" => 10.minutes.from_now.to_i,
       "iat" => Time.zone.now.to_i,
       "jti" => "test",
     }
@@ -106,7 +106,7 @@ module LtiProviderStateHelper
         canvas_high_contrast_enabled: "$Canvas.user.prefersHighContrast"
       }
     }
-    tool_config = Lti::ToolConfiguration.create!(developer_key: developer_key, settings: configuration, privacy_level: "public")
+    tool_config = Lti::ToolConfiguration.create!(developer_key:, settings: configuration, privacy_level: "public")
     external_tool = tool_config.new_external_tool(developer_key.account)
     external_tool.save!
   end
@@ -156,14 +156,12 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       allow(Setting).to receive(:get).with("oauth2_jwt_iat_ago_in_seconds", anything).and_return(a_long_time.to_s)
       allow_any_instance_of(Canvas::Security::JwtValidator).to receive(:exp).and_return(true)
 
+      allow(Rails.application.credentials).to receive(:dig).and_call_original
+      allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :signing_secret).and_return("astringthatisactually32byteslong")
+      allow(Rails.application.credentials).to receive(:dig).with(:canvas_security, :encryption_secret).and_return("astringthatisactually32byteslong")
+
       # DynamicSettings is not available on Jenkins -- need to stub it to return these values.
       allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(DynamicSettings).to receive(:find).with("canvas").and_return(
-        {
-          "signing-secret" => "astringthatisactually32byteslong",
-          "encryption-secret" => "astringthatisactually32byteslong"
-        }
-      )
       allow(DynamicSettings).to receive(:find)
         .with("live-events-subscription-service", any_args).and_return({
                                                                          "app-host" => ENV.fetch("SUBSCRIPTION_SERVICE_HOST", "http://les.docker:80")

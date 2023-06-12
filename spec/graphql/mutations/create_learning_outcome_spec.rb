@@ -64,7 +64,7 @@ describe Mutations::CreateLearningOutcome do
       }
     GQL
     context = { current_user: user_executing, domain_root_account: @domain_root_account, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   def variables(args = {})
@@ -280,7 +280,7 @@ describe Mutations::CreateLearningOutcome do
         groupId: #{@course_group.id}
         title: "Spec Learning Outcome via Mutation"
       GQL
-      expect { execute_with_input(query) }.to raise_error("Boom!").and change { LearningOutcome.count }.by(0)
+      expect { execute_with_input(query) }.to raise_error("Boom!").and not_change(LearningOutcome, :count)
     end
   end
 end

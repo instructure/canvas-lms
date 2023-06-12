@@ -21,7 +21,10 @@ import {act, render, waitFor, waitForElementToBeRemoved, fireEvent} from '@testi
 
 import bridge from '../../../../bridge'
 import * as fakeSource from '../../../../rcs/fake'
+import initialState from '../../../../sidebar/store/initialState'
+import sidebarHandlers from '../../../../sidebar/containers/sidebarHandlers'
 import CanvasContentTray from '../CanvasContentTray'
+import {LinkDisplay} from '../LinkDisplay'
 
 jest.useFakeTimers()
 jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
@@ -41,6 +44,21 @@ jest.mock('../../../../bridge', () => {
   original.default.insertLink = jest.fn()
   return original
 })
+jest.mock('../LinkDisplay', () => ({
+  LinkDisplay: jest.fn(() => <div data-testid="LinkDisplay" />),
+}))
+
+const storeInitialState = {
+  ...initialState({
+    contextId: '1201',
+    contextType: 'course',
+    canvasOrigin: 'http://canvas:3000',
+    jwt: 'xyzzy',
+    host: 'http://canvas.rcs:3001',
+    refreshToken: () => {},
+  }),
+  ...sidebarHandlers(() => {}),
+}
 
 describe('RCE Plugins > CanvasContentTray', () => {
   let component
@@ -52,10 +70,12 @@ describe('RCE Plugins > CanvasContentTray', () => {
       bridge,
       editor,
       containingContext: {contextType: 'course', contextId: '1201', userId: '17'},
-      contextId: '1201',
-      contextType: 'course',
+      contextId: storeInitialState.contextId,
+      contextType: storeInitialState.contextType,
       source: fakeSource,
       themeUrl: 'http://localhost/tinymce-theme.swf',
+      storeProps: storeInitialState,
+      canvasOrigin: 'http://canvas:3000',
       ...override,
     }
     return props
@@ -85,6 +105,19 @@ describe('RCE Plugins > CanvasContentTray', () => {
   function getTrayLabel() {
     return getTray().getAttribute('aria-label')
   }
+
+  it('clears search string on tray close', async () => {
+    const mockOnChangeSearchString = jest.fn()
+    renderComponent(
+      getProps({storeProps: {...storeInitialState, onChangeSearchString: mockOnChangeSearchString}})
+    )
+    await showTrayForPlugin('links')
+    const closeButton = component.getByTestId('CloseButton_ContentTray').querySelector('button')
+    closeButton.focus()
+    closeButton.click()
+    await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
+    expect(mockOnChangeSearchString).toHaveBeenLastCalledWith('')
+  })
 
   describe('Edit Course Links Tray', () => {
     beforeEach(async () => {
@@ -117,6 +150,17 @@ describe('RCE Plugins > CanvasContentTray', () => {
           type: 'wikiPages',
           published: true,
         })
+      })
+    })
+
+    it('sets placeholder to the current link title', async () => {
+      renderComponent()
+      await showTrayForPlugin('course_link_edit')
+      await waitFor(() => {
+        expect(LinkDisplay).toHaveBeenCalledWith(
+          expect.objectContaining({placeholderText: 'some filename'}),
+          {}
+        )
       })
     })
   })

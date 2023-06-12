@@ -90,20 +90,6 @@ class AuthenticationProvider < ActiveRecord::Base
     t("Login with %{provider}", provider: display_name)
   end
 
-  # Drop and recreate the authentication_providers view, if it exists.
-  #
-  # to be used from migrations that existed before the table rename. should
-  # only be used from inside a transaction.
-  def self.maybe_recreate_view
-    if (view_exists = connection.view_exists?("authentication_providers"))
-      connection.execute("DROP VIEW #{connection.quote_table_name("authentication_providers")}")
-    end
-    yield
-    if view_exists
-      connection.execute("CREATE VIEW #{connection.quote_table_name("authentication_providers")} AS SELECT * FROM #{connection.quote_table_name("account_authorization_configs")}")
-    end
-  end
-
   scope :active, -> { where("workflow_state <> 'deleted'") }
   belongs_to :account
   include ::Canvas::RootAccountCacher
@@ -270,7 +256,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   rescue ActiveRecord::RecordNotUnique
     self.class.uncached do
-      pseudonyms.active.by_unique_id(unique_id).take!
+      pseudonyms.active_only.by_unique_id(unique_id).take!
     end
   end
 
@@ -278,7 +264,7 @@ class AuthenticationProvider < ActiveRecord::Base
     user = pseudonym.user
 
     canvas_attributes = translate_provider_attributes(provider_attributes,
-                                                      purpose: purpose)
+                                                      purpose:)
     given_name = canvas_attributes.delete("given_name")
     surname = canvas_attributes.delete("surname")
     if given_name || surname
@@ -306,7 +292,7 @@ class AuthenticationProvider < ActiveRecord::Base
         account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
         account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) }
         roles_to_add.each do |role|
-          account.account_users.create!(user: user, role: role)
+          account.account_users.create!(user:, role:)
         end
         account_users_to_delete.each(&:destroy)
         account_users_to_activate.each(&:reactivate)
@@ -406,7 +392,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
     return if self.class.recognized_federated_attributes.nil?
 
-    bad_values = federated_attributes.values.map { |v| v["attribute"] } - self.class.recognized_federated_attributes
+    bad_values = federated_attributes.values.pluck("attribute") - self.class.recognized_federated_attributes
     unless bad_values.empty?
       errors.add(:federated_attributes, "#{bad_values.join(", ")} is not a valid attribute")
     end

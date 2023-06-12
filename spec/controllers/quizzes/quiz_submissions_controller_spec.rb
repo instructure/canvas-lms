@@ -85,8 +85,10 @@ describe Quizzes::QuizSubmissionsController do
       @submission.attempt = 1
       @submission.save!
 
-      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id,
-                               question_128: "bye", validation_token: @submission.validation_token,
+      post "create", params: { course_id: @quiz.context_id,
+                               quiz_id: @quiz.id,
+                               question_128: "bye",
+                               validation_token: @submission.validation_token,
                                attempt: 1 }
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: @submission.id)
       expect(events.size).to be_equal(1)
@@ -169,7 +171,7 @@ describe Quizzes::QuizSubmissionsController do
       Quizzes::QuizSubmission.where(id: submission).update_all(updated_at: 1.hour.ago)
 
       put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test", validation_token: submission.validation_token }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
 
       expect(json).to have_key("time_left")
       expect(json["time_left"]).to be_within(5.0).of(60 * 60)
@@ -181,7 +183,7 @@ describe Quizzes::QuizSubmissionsController do
     it "does not backup if no submission can be found" do
       user_session(@teacher)
       put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test", preview: 1 }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["backup"]).to be_falsey
     end
   end
@@ -236,8 +238,8 @@ describe Quizzes::QuizSubmissionsController do
         )
         user_session(@teacher)
         quiz = course_quiz true
-        expect(quiz.grants_right?(@teacher, :grade)).to eq false
-        expect(quiz.grants_right?(@teacher, :review_grades)).to eq true
+        expect(quiz.grants_right?(@teacher, :grade)).to be false
+        expect(quiz.grants_right?(@teacher, :review_grades)).to be true
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
         expect(ContentZipper).to receive(:process_attachment)
         get "index", params: { quiz_id: quiz.id, zip: "1", course_id: @course }
@@ -253,7 +255,7 @@ describe Quizzes::QuizSubmissionsController do
         request.accept = "application/json"
         post "extensions", params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1 }
         expect(response).to be_successful
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json).to have_key("extra_attempts")
         expect(json["extra_attempts"]).to eq 1
       end
@@ -263,9 +265,9 @@ describe Quizzes::QuizSubmissionsController do
         request.accept = "application/json"
         post "extensions", params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1 }
         expect(response).to be_successful
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json).to have_key("has_seen_results")
-        expect(json["has_seen_results"]).to eq false
+        expect(json["has_seen_results"]).to be false
       end
 
       it "requires a valid user id" do
@@ -281,7 +283,7 @@ describe Quizzes::QuizSubmissionsController do
         request.accept = "application/json"
         post "extensions", params: { quiz_id: quiz.id, course_id: @course, user_id: @student.id, extra_attempts: 12 }
         expect(response).to be_successful
-        json = JSON.parse(response.body)
+        json = response.parsed_body
         expect(json).to have_key("extra_attempts")
         expect(json["extra_attempts"]).to eq 12
       end

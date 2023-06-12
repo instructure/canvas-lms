@@ -67,7 +67,7 @@ describe UserList do
   end
 
   it "processes a list of irregular emails" do
-    ul = UserList.new(%( Shaw "Ryan" <ryankshaw@gmail.com>, \"whoopsies\" <stuff@stuff.stuff>,
+    ul = UserList.new(%( Shaw "Ryan" <ryankshaw@gmail.com>, "whoopsies" <stuff@stuff.stuff>,
           guess what my name has an@sign <blah@gmail.com>, <derp@derp.depr>))
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       ["Shaw \"Ryan\"", "ryankshaw@gmail.com"],
@@ -234,7 +234,8 @@ describe UserList do
 
   it "works with a list of paths" do
     ul = UserList.new(["leonard@example.com", "sheldon@example.com"],
-                      root_account: @account, search_method: :preferred)
+                      root_account: @account,
+                      search_method: :preferred)
     expect(ul.addresses.count).to eq 2
     expect { ul.users }.to change(User, :count).by(2)
   end
@@ -320,7 +321,7 @@ describe UserList do
 
     it "does not find users from untrusted accounts" do
       account = Account.create!
-      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account: account)
+      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account:)
       ul = UserList.new "jt@instructure.com"
       expect(ul.addresses).to eq []
       expect(ul.errors).to eq [{ address: "jt@instructure.com", type: :email, details: :not_found }]
@@ -347,7 +348,7 @@ describe UserList do
     it "finds users from trusted accounts" do
       account = Account.create!
       allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
-      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account: account)
+      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account:)
       ul = UserList.new "jt@instructure.com"
       expect(ul.addresses).to eq [{ address: "jt@instructure.com", type: :pseudonym, user_id: @user.id, name: "JT", shard: Shard.default }]
       expect(ul.errors).to eq []
@@ -358,7 +359,7 @@ describe UserList do
       @user1 = @user
       account = Account.create!
       allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
-      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account: account)
+      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account:)
       ul = UserList.new "jt@instructure.com"
       expect(ul.addresses).to eq [{ address: "jt@instructure.com", type: :pseudonym, user_id: @user1.id, name: "JT", shard: Shard.default }]
       expect(ul.errors).to eq []
@@ -367,7 +368,7 @@ describe UserList do
     it "prefers a user from the current account instead of a trusted account (reverse order)" do
       account = Account.create!
       allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
-      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account: account)
+      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true, account:)
       user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true)
       ul = UserList.new "jt@instructure.com"
       expect(ul.addresses).to eq [{ address: "jt@instructure.com", type: :pseudonym, user_id: @user.id, name: "JT", shard: Shard.default }]
@@ -423,7 +424,7 @@ describe UserList do
 
     it "does not find a user from a different account by SMS" do
       account = Account.create!
-      user_with_pseudonym(name: "JT", active_all: 1, account: account)
+      user_with_pseudonym(name: "JT", active_all: 1, account:)
       communication_channel(@user, { username: "8015555555@txt.att.net", path_type: "sms", active_cc: true })
       ul = UserList.new "(801) 555-5555"
       expect(ul.addresses).to eq []

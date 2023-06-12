@@ -117,7 +117,7 @@ module RespondusSoapEndpoint
 
       Authlogic::Session::Base.controller = AuthlogicAdapter.new(self)
       domain_root_account.pseudonyms.scoping do
-        pseudonym_session = PseudonymSession.new(unique_id: userName, password: password)
+        pseudonym_session = PseudonymSession.new(unique_id: userName, password:)
         pseudonym_session.remote_ip = request.remote_ip
         # don't actually want to create a session, so call `valid?` rather than `save`
         if pseudonym_session.valid?
@@ -501,10 +501,18 @@ Implemented for: Canvas LMS)]
       raise NotImplementedError
     end
 
-    wrap_api_call :identifyServer, :validateAuth, :getServerItems,
-                  :selectServerItem, :publishServerItem, :deleteServerItem,
-                  :replaceServerItem, :retrieveServerItem, :appendServerItem,
-                  :getAttachmentLink, :uploadAttachment, :downloadAttachment
+    wrap_api_call :identifyServer,
+                  :validateAuth,
+                  :getServerItems,
+                  :selectServerItem,
+                  :publishServerItem,
+                  :deleteServerItem,
+                  :replaceServerItem,
+                  :retrieveServerItem,
+                  :appendServerItem,
+                  :getAttachmentLink,
+                  :uploadAttachment,
+                  :downloadAttachment
 
     protected
 
@@ -573,7 +581,7 @@ Implemented for: Canvas LMS)]
       end
 
       migration = ContentMigration.new(context: course,
-                                       user: user)
+                                       user:)
       migration.update_migration_settings(settings)
       if itemType == "qdb"
         # skip creating the quiz, just import the questions into the bank

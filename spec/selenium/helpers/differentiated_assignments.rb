@@ -56,7 +56,7 @@ module DifferentiatedAssignments
     assignment_data = {
       title: "DA assignment",
       points_possible: 10,
-      due_at: Time.zone.now + 2.days,
+      due_at: 2.days.from_now,
       submission_types: "online_text_entry",
       only_visible_to_overrides: true
     }
@@ -96,11 +96,11 @@ module DifferentiatedAssignments
     assignment = @course.assignments.create!(
       title: "DA assignment",
       points_possible: 10,
-      due_at: Time.zone.now + 2.days,
+      due_at: 2.days.from_now,
       submission_types: "online_text_entry",
       only_visible_to_overrides: true
     )
-    @da_discussion = @course.discussion_topics.create!(title: "DA Discussion", assignment: assignment)
+    @da_discussion = @course.discussion_topics.create!(title: "DA Discussion", assignment:)
     @da_discussion
   end
 

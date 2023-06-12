@@ -37,9 +37,13 @@ describe ExternalToolsController, type: :request do
       et = tool_with_everything(@course, allow_membership_service_access: true)
       et.settings = { "prefer_sis_email" => "true" }
       et.save
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
-                      { controller: "external_tools", action: "show", format: "json",
-                        course_id: @course.id.to_s, external_tool_id: et.id.to_s })
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
+                      { controller: "external_tools",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        external_tool_id: et.id.to_s })
       expect(json["prefer_sis_email"]).to eq "true"
     end
 
@@ -47,10 +51,14 @@ describe ExternalToolsController, type: :request do
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
       et = tool_with_everything(@course, allow_membership_service_access: true)
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
-                      { controller: "external_tools", action: "show", format: "json",
-                        course_id: @course.id.to_s, external_tool_id: et.id.to_s })
-      expect(json["allow_membership_service_access"]).to eq true
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/external_tools/#{et.id}.json",
+                      { controller: "external_tools",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        external_tool_id: et.id.to_s })
+      expect(json["allow_membership_service_access"]).to be true
     end
 
     it "returns 404 for not found tool" do
@@ -189,29 +197,15 @@ describe ExternalToolsController, type: :request do
             tag.content_type = "ContextExternalTool"
             tag.save!
             params = { id: tool.id.to_s, launch_type: "assessment", assignment_id: @assignment.id }
-            json = get_sessionless_launch_url(@course, params)
-            expect(json).to include("url")
-
-            # remove the user session (it's supposed to be sessionless, after all), and make the request
-            remove_user_session
-
-            # request/verify the lti launch page
-            get json["url"]
-            expect(response.code).to eq "200"
+            sessionless_launch(@course, params)
+            expect(response).to have_http_status :ok
           end
 
           it "returns sessionless launch URL when default URL is not set and placement URL is" do
             tool.update!(url: nil)
             params = { id: tool.id.to_s, launch_type: "course_navigation" }
-            json = get_sessionless_launch_url(@course, params)
-            expect(json).to include("url")
-
-            # remove the user session (it's supposed to be sessionless, after all), and make the request
-            remove_user_session
-
-            # request/verify the lti launch page
-            get json["url"]
-            expect(response.code).to eq "200"
+            sessionless_launch(@course, params)
+            expect(response).to have_http_status :ok
           end
 
           it "returns sessionless launch URL for an assignment launch no URL is set on the tool" do
@@ -315,6 +309,125 @@ describe ExternalToolsController, type: :request do
       paginate_call(@account)
     end
 
+    describe "with environment-specific overrides" do
+      subject do
+        api_call(:get,
+                 "/api/v1/accounts/#{@account.id}/external_tools/#{tool.id}.json",
+                 { controller: "external_tools",
+                   action: "show",
+                   format: "json",
+                   account_id: @account.id.to_s,
+                   external_tool_id: tool.id.to_s })
+      end
+
+      let(:icon_url) { "https://www.example.com/lti/icon" }
+      let(:tool) do
+        t = tool_with_everything(@account)
+        t.icon_url = icon_url
+        t.domain = "www.example.com"
+        t.settings[:editor_button][:icon_url] = icon_url
+        t.save!
+        t
+      end
+      let(:expected_json) do
+        json = example_json(tool)
+        json["icon_url"] = icon_url
+        json["editor_button"]["icon_url"] = icon_url
+        json
+      end
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(Setting).to receive(:set).with("allow_tc_access_").and_return("true")
+      end
+
+      context "with feature flag enabled" do
+        before do
+          Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+        end
+
+        let(:domain) { "www.example-beta.com" }
+
+        def expect_domain_override(url)
+          expect(url).to include(domain)
+        end
+
+        def expect_no_override(url)
+          expect(url).not_to include(domain)
+        end
+
+        context "with domain override" do
+          let(:override_icon_url) { "https://www.example-beta.com/lti/icon" }
+          let(:tool) do
+            t = super()
+            t.settings[:environments] = {
+              domain:
+            }
+            t.save!
+            t
+          end
+
+          it "overrides base icon_url" do
+            expect_domain_override(subject["icon_url"])
+          end
+
+          it "overrides placement icon_url" do
+            expect_domain_override(subject.dig("editor_button", "icon_url"))
+          end
+
+          it "overrides placement url" do
+            expect_domain_override(subject.dig("editor_button", "url"))
+          end
+
+          it "overrides url" do
+            expect_domain_override(subject["url"])
+          end
+
+          it "overrides domain" do
+            expect_domain_override(subject["domain"])
+          end
+        end
+
+        context "with launch_url override" do
+          let(:override_url) { "https://www.example-beta.com/lti/launch" }
+          let(:tool) do
+            t = super()
+            t.settings[:environments] = {
+              launch_url: override_url
+            }
+            t.save!
+            t
+          end
+
+          it "overrides url" do
+            expect(subject["url"]).to eq override_url
+          end
+
+          it "does not override placement url" do
+            expect_no_override(subject.dig("editor_button", "url"))
+          end
+
+          it "does not override placement icon_url" do
+            expect_no_override(subject.dig("editor_button", "icon_url"))
+          end
+
+          it "does not override icon url" do
+            expect_no_override(subject["icon_url"])
+          end
+
+          it "does not override domain" do
+            expect_no_override(subject["domain"])
+          end
+        end
+      end
+
+      # context "with feature flag disabled" do
+      #   see instructure_misc_plugin/spec_canvas/lib/api/v1/external_tools_api_spec.rb
+      #   (since existing environment overrides are defined there as part of beta refresh)
+      # end
+    end
+
     if Canvas.redis_enabled?
       describe "sessionless launch" do
         let(:tool) { tool_with_everything(@account) }
@@ -367,9 +480,16 @@ describe ExternalToolsController, type: :request do
       end
 
       def add_favorite_tool(account, tool)
-        json = api_call(:post, "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
-                        { controller: "external_tools", action: "add_rce_favorite", format: "json",
-                          account_id: account.id.to_s, id: tool.id.to_s }, {}, {}, { expected_status: 200 })
+        json = api_call(:post,
+                        "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
+                        { controller: "external_tools",
+                          action: "add_rce_favorite",
+                          format: "json",
+                          account_id: account.id.to_s,
+                          id: tool.id.to_s },
+                        {},
+                        {},
+                        { expected_status: 200 })
         account.reload
         json
       end
@@ -377,15 +497,29 @@ describe ExternalToolsController, type: :request do
       it "requires authorization" do
         student_in_course(active_all: true)
         @user = @student
-        api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
-                 { controller: "external_tools", action: "add_rce_favorite", format: "json",
-                   account_id: Account.default.id.to_s, id: @root_tool.id.to_s }, {}, {}, { expected_status: 401 })
+        api_call(:post,
+                 "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+                 { controller: "external_tools",
+                   action: "add_rce_favorite",
+                   format: "json",
+                   account_id: Account.default.id.to_s,
+                   id: @root_tool.id.to_s },
+                 {},
+                 {},
+                 { expected_status: 401 })
       end
 
       it "requires a tool in the context" do
-        api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@sub_tool.id}",
-                 { controller: "external_tools", action: "add_rce_favorite", format: "json",
-                   account_id: Account.default.id.to_s, id: @sub_tool.id.to_s }, {}, {}, { expected_status: 404 })
+        api_call(:post,
+                 "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@sub_tool.id}",
+                 { controller: "external_tools",
+                   action: "add_rce_favorite",
+                   format: "json",
+                   account_id: Account.default.id.to_s,
+                   id: @sub_tool.id.to_s },
+                 {},
+                 {},
+                 { expected_status: 404 })
       end
 
       it "doesn't allow adding too many tools" do
@@ -396,9 +530,16 @@ describe ExternalToolsController, type: :request do
           ra.save!
         end
 
-        json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
-                        { controller: "external_tools", action: "add_rce_favorite", format: "json",
-                          account_id: Account.default.id.to_s, id: @root_tool.id.to_s }, {}, {}, { expected_status: 400 })
+        json = api_call(:post,
+                        "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+                        { controller: "external_tools",
+                          action: "add_rce_favorite",
+                          format: "json",
+                          account_id: Account.default.id.to_s,
+                          id: @root_tool.id.to_s },
+                        {},
+                        {},
+                        { expected_status: 400 })
         expect(json["message"]).to eq "Cannot have more than 2 favorited tools"
       end
 
@@ -432,22 +573,22 @@ describe ExternalToolsController, type: :request do
         @root_tool.update_attribute(:is_rce_favorite, true)
         tool2 = create_editor_tool(Account.default)
         add_favorite_tool(Account.default, tool2)
-        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq true
-        expect(tool2.is_rce_favorite_in_context?(Account.default)).to eq true
+        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be true
+        expect(tool2.is_rce_favorite_in_context?(Account.default)).to be true
       end
 
       it "can add a root account tool as a favorite for a sub-account" do
         add_favorite_tool(@sub_account, @root_tool)
-        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
-        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq false # didn't affect parent account
+        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true
+        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to be false # didn't affect parent account
       end
 
       it "adds to existing favorites for a sub-account inherited from a root account" do
         add_favorite_tool(Account.default, @root_tool)
         add_favorite_tool(@sub_account, @sub_tool)
 
-        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true # now saved directly on sub-account
-        expect(@sub_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
+        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to be true # now saved directly on sub-account
+        expect(@sub_tool.is_rce_favorite_in_context?(@sub_account)).to be true
       end
     end
 
@@ -460,9 +601,16 @@ describe ExternalToolsController, type: :request do
       end
 
       def remove_favorite_tool(account, tool)
-        json = api_call(:delete, "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
-                        { controller: "external_tools", action: "remove_rce_favorite", format: "json",
-                          account_id: account.id.to_s, id: tool.id.to_s }, {}, {}, { expected_status: 200 })
+        json = api_call(:delete,
+                        "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
+                        { controller: "external_tools",
+                          action: "remove_rce_favorite",
+                          format: "json",
+                          account_id: account.id.to_s,
+                          id: tool.id.to_s },
+                        {},
+                        {},
+                        { expected_status: 200 })
         account.reload
         json
       end
@@ -470,9 +618,16 @@ describe ExternalToolsController, type: :request do
       it "requires authorization" do
         student_in_course(active_all: true)
         @user = @student
-        api_call(:delete, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
-                 { controller: "external_tools", action: "remove_rce_favorite", format: "json",
-                   account_id: Account.default.id.to_s, id: @root_tool.id.to_s }, {}, {}, { expected_status: 401 })
+        api_call(:delete,
+                 "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+                 { controller: "external_tools",
+                   action: "remove_rce_favorite",
+                   format: "json",
+                   account_id: Account.default.id.to_s,
+                   id: @root_tool.id.to_s },
+                 {},
+                 {},
+                 { expected_status: 401 })
       end
 
       it "works with existing favorites configured with old column if not specified on account" do
@@ -499,26 +654,38 @@ describe ExternalToolsController, type: :request do
   def show_call(context)
     type = context.class.table_name
     et = tool_with_everything(context)
-    json = api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
-                    { controller: "external_tools", action: "show", format: "json",
-                      "#{type.singularize}_id": context.id.to_s, external_tool_id: et.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
+                    { controller: "external_tools",
+                      action: "show",
+                      format: "json",
+                      "#{type.singularize}_id": context.id.to_s,
+                      external_tool_id: et.id.to_s })
     expect(json).to eq example_json(et)
   end
 
   def not_found_call(context)
     type = context.class.table_name
-    raw_api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools/0.json",
-                 { controller: "external_tools", action: "show", format: "json",
-                   "#{type.singularize}_id": context.id.to_s, external_tool_id: "0" })
+    raw_api_call(:get,
+                 "/api/v1/#{type}/#{context.id}/external_tools/0.json",
+                 { controller: "external_tools",
+                   action: "show",
+                   format: "json",
+                   "#{type.singularize}_id": context.id.to_s,
+                   external_tool_id: "0" })
     assert_status(404)
   end
 
   def group_index_call(group)
     et = tool_with_everything(group.context)
 
-    json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools?include_parents=true",
-                    { controller: "external_tools", action: "index", format: "json",
-                      group_id: group.id.to_s, include_parents: true })
+    json = api_call(:get,
+                    "/api/v1/groups/#{group.id}/external_tools?include_parents=true",
+                    { controller: "external_tools",
+                      action: "index",
+                      format: "json",
+                      group_id: group.id.to_s,
+                      include_parents: true })
 
     expect(json.size).to eq 1
     expect(json.first).to eq example_json(et)
@@ -527,9 +694,14 @@ describe ExternalToolsController, type: :request do
   def group_index_paginate_call(group)
     7.times { tool_with_everything(group.context) }
 
-    json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools",
-                    { controller: "external_tools", action: "index", format: "json",
-                      group_id: group.id.to_s, include_parents: true, per_page: "3" })
+    json = api_call(:get,
+                    "/api/v1/groups/#{group.id}/external_tools",
+                    { controller: "external_tools",
+                      action: "index",
+                      format: "json",
+                      group_id: group.id.to_s,
+                      include_parents: true,
+                      per_page: "3" })
 
     expect(json.length).to eq 3
     links = response.headers["Link"].split(",")
@@ -539,9 +711,15 @@ describe ExternalToolsController, type: :request do
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
 
     # get the last page
-    json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools",
-                    { controller: "external_tools", action: "index", format: "json",
-                      group_id: group.id.to_s, include_parents: true, per_page: "3", page: "3" })
+    json = api_call(:get,
+                    "/api/v1/groups/#{group.id}/external_tools",
+                    { controller: "external_tools",
+                      action: "index",
+                      format: "json",
+                      group_id: group.id.to_s,
+                      include_parents: true,
+                      per_page: "3",
+                      page: "3" })
 
     expect(json.length).to eq 1
     links = response.headers["Link"].split(",")
@@ -555,8 +733,11 @@ describe ExternalToolsController, type: :request do
     type = context.class.table_name
     et = tool_with_everything(context)
 
-    json = api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json",
-                    { controller: "external_tools", action: "index", format: "json",
+    json = api_call(:get,
+                    "/api/v1/#{type}/#{context.id}/external_tools.json",
+                    { controller: "external_tools",
+                      action: "index",
+                      format: "json",
                       "#{type.singularize}_id": context.id.to_s })
 
     expect(json.size).to eq 1
@@ -566,10 +747,14 @@ describe ExternalToolsController, type: :request do
   def index_call_with_placement(context, placement)
     type = context.class.table_name
     tool_with_everything(context).update(name: "tool 1")
-    et_with_placement = tool_with_everything(context, { placement: placement })
+    et_with_placement = tool_with_everything(context, { placement: })
 
-    json = api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json",
-                    { controller: "external_tools", action: "index", format: "json", placement: placement,
+    json = api_call(:get,
+                    "/api/v1/#{type}/#{context.id}/external_tools.json",
+                    { controller: "external_tools",
+                      action: "index",
+                      format: "json",
+                      placement:,
                       "#{type.singularize}_id": context.id.to_s })
 
     expect(json.size).to eq 1
@@ -583,11 +768,15 @@ describe ExternalToolsController, type: :request do
 
     2.times { |i| context.context_external_tools.create!(name: "second_#{i}", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti") }
 
-    json = api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json?search_term=fir",
-                    { controller: "external_tools", action: "index", format: "json",
-                      "#{type.singularize}_id": context.id.to_s, search_term: "fir" })
+    json = api_call(:get,
+                    "/api/v1/#{type}/#{context.id}/external_tools.json?search_term=fir",
+                    { controller: "external_tools",
+                      action: "index",
+                      format: "json",
+                      "#{type.singularize}_id": context.id.to_s,
+                      search_term: "fir" })
 
-    expect(json.map { |h| h["id"] }.sort).to eq ids.sort
+    expect(json.pluck("id").sort).to eq ids.sort
   end
 
   def only_selectables(context)
@@ -595,9 +784,13 @@ describe ExternalToolsController, type: :request do
     context.context_external_tools.create!(name: "first", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti", not_selectable: true)
     not_selectable = context.context_external_tools.create!(name: "second", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti")
 
-    json = api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json?selectable=true",
-                    { controller: "external_tools", action: "index", format: "json",
-                      "#{type.singularize}_id": context.id.to_s, selectable: "true" })
+    json = api_call(:get,
+                    "/api/v1/#{type}/#{context.id}/external_tools.json?selectable=true",
+                    { controller: "external_tools",
+                      action: "index",
+                      format: "json",
+                      "#{type.singularize}_id": context.id.to_s,
+                      selectable: "true" })
 
     expect(json.length).to eq 1
     expect(json.first["id"]).to eq not_selectable.id
@@ -605,9 +798,13 @@ describe ExternalToolsController, type: :request do
 
   def create_call(context)
     type = context.class.table_name
-    json = api_call(:post, "/api/v1/#{type}/#{context.id}/external_tools.json",
-                    { controller: "external_tools", action: "create", format: "json",
-                      "#{type.singularize}_id": context.id.to_s }, post_hash)
+    json = api_call(:post,
+                    "/api/v1/#{type}/#{context.id}/external_tools.json",
+                    { controller: "external_tools",
+                      action: "create",
+                      format: "json",
+                      "#{type.singularize}_id": context.id.to_s },
+                    post_hash)
     expect(context.context_external_tools.count).to eq 1
 
     et = context.context_external_tools.last
@@ -618,9 +815,14 @@ describe ExternalToolsController, type: :request do
     type = context.class.table_name
     et = context.context_external_tools.create!(name: "test", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti")
 
-    json = api_call(:put, "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
-                    { controller: "external_tools", action: "update", format: "json",
-                      "#{type.singularize}_id": context.id.to_s, external_tool_id: et.id.to_s }, post_hash)
+    json = api_call(:put,
+                    "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
+                    { controller: "external_tools",
+                      action: "update",
+                      format: "json",
+                      "#{type.singularize}_id": context.id.to_s,
+                      external_tool_id: et.id.to_s },
+                    post_hash)
     et.reload
     expect(json).to eq example_json(et)
   end
@@ -628,9 +830,13 @@ describe ExternalToolsController, type: :request do
   def destroy_call(context)
     type = context.class.table_name
     et = context.context_external_tools.create!(name: "test", consumer_key: "fakefake", shared_secret: "sofakefake", domain: "example.com")
-    api_call(:delete, "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
-             { controller: "external_tools", action: "destroy", format: "json",
-               "#{type.singularize}_id": context.id.to_s, external_tool_id: et.id.to_s })
+    api_call(:delete,
+             "/api/v1/#{type}/#{context.id}/external_tools/#{et.id}.json",
+             { controller: "external_tools",
+               action: "destroy",
+               format: "json",
+               "#{type.singularize}_id": context.id.to_s,
+               external_tool_id: et.id.to_s })
 
     et.reload
     expect(et.workflow_state).to eq "deleted"
@@ -639,12 +845,15 @@ describe ExternalToolsController, type: :request do
 
   def error_call(context)
     type = context.class.table_name
-    raw_api_call(:post, "/api/v1/#{type}/#{context.id}/external_tools.json",
-                 { controller: "external_tools", action: "create", format: "json",
+    raw_api_call(:post,
+                 "/api/v1/#{type}/#{context.id}/external_tools.json",
+                 { controller: "external_tools",
+                   action: "create",
+                   format: "json",
                    "#{type.singularize}_id": context.id.to_s },
                  {})
     json = JSON.parse response.body
-    expect(response.code).to eq "400"
+    expect(response).to have_http_status :bad_request
     expect(json["errors"]["name"]).not_to be_nil
     expect(json["errors"]["shared_secret"]).not_to be_nil
     expect(json["errors"]["consumer_key"]).not_to be_nil
@@ -654,25 +863,32 @@ describe ExternalToolsController, type: :request do
 
   def unauthorized_call(context)
     type = context.class.table_name
-    raw_api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json",
-                 { controller: "external_tools", action: "index",
-                   format: "json", "#{type.singularize}_id": context.id.to_s })
-    expect(response.code).to eq "401"
+    raw_api_call(:get,
+                 "/api/v1/#{type}/#{context.id}/external_tools.json",
+                 { controller: "external_tools",
+                   action: "index",
+                   format: "json",
+                   "#{type.singularize}_id": context.id.to_s })
+    expect(response).to have_http_status :unauthorized
   end
 
   def authorized_call(context)
     type = context.class.table_name
-    raw_api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json",
-                 { controller: "external_tools", action: "index",
-                   format: "json", "#{type.singularize}_id": context.id.to_s })
-    expect(response.code).to eq "200"
+    raw_api_call(:get,
+                 "/api/v1/#{type}/#{context.id}/external_tools.json",
+                 { controller: "external_tools",
+                   action: "index",
+                   format: "json",
+                   "#{type.singularize}_id": context.id.to_s })
+    expect(response).to have_http_status :ok
   end
 
   def paginate_call(context)
     type = context.class.table_name
     7.times { |i| context.context_external_tools.create!(name: "test_#{i}", consumer_key: "fakefake", shared_secret: "sofakefake", url: "http://www.example.com/ims/lti") }
     expect(context.context_external_tools.count).to eq 7
-    json = api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json?per_page=3",
+    json = api_call(:get,
+                    "/api/v1/#{type}/#{context.id}/external_tools.json?per_page=3",
                     { controller: "external_tools", action: "index", format: "json", "#{type.singularize}_id": context.id.to_s, per_page: "3" })
 
     expect(json.length).to eq 3
@@ -683,7 +899,8 @@ describe ExternalToolsController, type: :request do
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
 
     # get the last page
-    json = api_call(:get, "/api/v1/#{type}/#{context.id}/external_tools.json?page=3&per_page=3",
+    json = api_call(:get,
+                    "/api/v1/#{type}/#{context.id}/external_tools.json?page=3&per_page=3",
                     { controller: "external_tools", action: "index", format: "json", "#{type.singularize}_id": context.id.to_s, per_page: "3", page: "3" })
     expect(json.length).to eq 1
     links = response.headers["Link"].split(",")
@@ -769,6 +986,9 @@ describe ExternalToolsController, type: :request do
 
     # request/verify the lti launch page
     get json["url"]
+
+    # sessionless launches now may include a session_token which logs in and then launches tool
+    get response.location if response.location && response.code.to_i == 302
     response
   end
 
@@ -799,8 +1019,8 @@ describe ExternalToolsController, type: :request do
       "domain" => nil,
       "url" => "http://www.example.com/ims/lti",
       "tool_configuration" => nil,
-      "id" => et ? et.id : nil,
-      "not_selectable" => et ? et.not_selectable : nil,
+      "id" => et&.id,
+      "not_selectable" => et&.not_selectable,
       "workflow_state" => "public",
       "vendor_help_link" => nil,
       "version" => "1.1",

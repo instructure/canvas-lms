@@ -20,8 +20,20 @@
 
 class GradebookImporter
   ASSIGNMENT_PRELOADED_FIELDS = %i[
-    id title points_possible grading_type updated_at context_id context_type group_category_id
-    created_at due_at only_visible_to_overrides moderated_grading grades_published_at final_grader_id
+    id
+    title
+    points_possible
+    grading_type
+    updated_at
+    context_id
+    context_type
+    group_category_id
+    created_at
+    due_at
+    only_visible_to_overrides
+    moderated_grading
+    grades_published_at
+    final_grader_id
   ].freeze
 
   class NegativeId
@@ -49,8 +61,15 @@ class GradebookImporter
     end
   end
 
-  attr_reader :context, :contents, :attachment, :assignments, :students,
-              :submissions, :missing_assignments, :missing_students, :upload
+  attr_reader :context,
+              :contents,
+              :attachment,
+              :assignments,
+              :students,
+              :submissions,
+              :missing_assignments,
+              :missing_students,
+              :upload
 
   def self.create_from(progress, gradebook_upload, user, attachment)
     new(gradebook_upload, attachment, user, progress).parse!
@@ -173,12 +192,12 @@ class GradebookImporter
                                     .select(["submissions.id", :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, "submissions.updated_at"])
                                     .where(assignment_id: assignment_ids, user_id: user_ids)
                                     .map do |submission|
-      is_gradeable = gradeable?(submission: submission, is_admin: is_admin)
+      is_gradeable = gradeable?(submission:, is_admin:)
       score = submission.excused? ? "EX" : submission.score.to_s
       {
         user_id: submission.user_id,
         assignment_id: submission.assignment_id,
-        score: score,
+        score:,
         gradeable: is_gradeable
       }
     end
@@ -211,7 +230,7 @@ class GradebookImporter
         new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
         submission["gradeable"] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
           submission: new_submission,
-          is_admin: is_admin
+          is_admin:
         )
       end
       @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
@@ -312,11 +331,11 @@ class GradebookImporter
       students.each do |student|
         submission = gradebook_importer_assignments.fetch(student.id)[idx]
         if submission["grade"].present? && (submission["grade"].to_s.casecmp("EX") != 0)
-          gradebook_importer_assignments.fetch(student.id)[idx]["grade"] = assignment.score_to_grade(submission["grade"], \
+          gradebook_importer_assignments.fetch(student.id)[idx]["grade"] = assignment.score_to_grade(submission["grade"],
                                                                                                      submission["grade"])
         end
         if submission["original_grade"].present? && (submission["original_grade"] != "EX")
-          gradebook_importer_assignments.fetch(student.id)[idx]["original_grade"] = assignment.score_to_grade(submission["original_grade"],\
+          gradebook_importer_assignments.fetch(student.id)[idx]["original_grade"] = assignment.score_to_grade(submission["original_grade"],
                                                                                                               submission["original_grade"])
         end
         if submission["grade"].to_s.casecmp("EX") == 0
@@ -335,7 +354,7 @@ class GradebookImporter
 
       @parsed_custom_column_data[gradebook_column.id] = {
         title: header_column,
-        index: index,
+        index:,
         read_only: gradebook_column.read_only
       }
     end
@@ -380,7 +399,7 @@ class GradebookImporter
 
     update_column_count row
 
-    return false unless /Section/.match?(last_student_info_column(row))
+    return false unless last_student_info_column(row).include?("Section")
 
     true
   end
@@ -473,7 +492,7 @@ class GradebookImporter
 
       @missing_assignment ||= assignment.new_record?
 
-      { assignment: assignment, header_name: name_and_id } if assignment
+      { assignment:, header_name: name_and_id } if assignment
     end
   end
 
@@ -497,7 +516,7 @@ class GradebookImporter
       return if grading_period.blank?
     end
 
-    OverrideColumnInfo.new(grading_period_id: grading_period&.id, index: index)
+    OverrideColumnInfo.new(grading_period_id: grading_period&.id, index:)
   end
 
   def prevent_new_assignment_creation?(periods, is_admin)
@@ -507,7 +526,7 @@ class GradebookImporter
     GradingPeriod.date_in_closed_grading_period?(
       course: @context,
       date: nil,
-      periods: periods
+      periods:
     )
   end
 
@@ -545,7 +564,7 @@ class GradebookImporter
         student = @all_students.find do |_id, s|
           s.name == name || s.sortable_name == name
         end.try(:last)
-        student ||= User.new(name: name)
+        student ||= User.new(name:)
       end
     end
     student.previous_id = student.id
@@ -626,7 +645,7 @@ class GradebookImporter
 
     {
       grading_periods: GradingPeriod.periods_json(@grading_periods.where(id: grading_period_ids), @user),
-      includes_course_scores: includes_course_scores
+      includes_course_scores:
     }
   end
 
@@ -647,7 +666,7 @@ class GradebookImporter
       nil
     end
 
-    field_counts[";"] > field_counts[","] ? :semicolon : :comma
+    (field_counts[";"] > field_counts[","]) ? :semicolon : :comma
   end
 
   def semicolon_delimited?(csv_file)
@@ -685,7 +704,7 @@ class GradebookImporter
     false # nothing unusual, signal to process as a student row
   end
 
-  def csv_stream(&block)
+  def csv_stream(&)
     csv_file = attachment.open
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
@@ -697,7 +716,7 @@ class GradebookImporter
     # using "foreach" rather than "parse" processes a chunk of the
     # file at a time rather than loading the whole file into memory
     # at once, a boon for memory consumption
-    CSV.foreach(csv_file.path, **csv_parse_options, &block)
+    CSV.foreach(csv_file.path, **csv_parse_options, &)
   end
 
   def add_root_account_to_pseudonym_cache(root_account)
@@ -842,7 +861,7 @@ class GradebookImporter
       if grading_period_id.nil?
         scope_for_period.where(course_score: true)
       else
-        scope_for_period.where(grading_period_id: grading_period_id)
+        scope_for_period.where(grading_period_id:)
       end
     end
 

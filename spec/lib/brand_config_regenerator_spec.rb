@@ -133,8 +133,8 @@ describe BrandConfigRegenerator do
 
     Delayed::Testing.drain
 
-    expect(@child_account.reload.brand_config.parent).to eq(nil)
-    expect(@child_shared_config.reload.brand_config.parent).to eq(nil)
+    expect(@child_account.reload.brand_config.parent).to be_nil
+    expect(@child_shared_config.reload.brand_config.parent).to be_nil
     expect(@child_shared_config.brand_config).to eq(@child_account.brand_config)
 
     expect(@grand_child_account.reload.brand_config.parent).to eq(@child_account.brand_config)

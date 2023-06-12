@@ -32,7 +32,9 @@ describe "Gradebook Export User-level Feature Flags" do
         @feature = @teacher.lookup_feature_flag(:use_semi_colon_field_separators_in_gradebook_exports)
         @transitions = Feature.transitions(
           :use_semi_colon_field_separators_in_gradebook_exports,
-          @teacher, @teacher, @feature.state
+          @teacher,
+          @teacher,
+          @feature.state
         )
       end
 
@@ -51,7 +53,9 @@ describe "Gradebook Export User-level Feature Flags" do
         @feature = @teacher.lookup_feature_flag(:use_semi_colon_field_separators_in_gradebook_exports)
         @transitions = Feature.transitions(
           :use_semi_colon_field_separators_in_gradebook_exports,
-          @teacher, @teacher, @feature.state
+          @teacher,
+          @teacher,
+          @feature.state
         )
       end
 
@@ -80,7 +84,9 @@ describe "Gradebook Export User-level Feature Flags" do
         @feature = @teacher.lookup_feature_flag(:autodetect_field_separators_for_gradebook_exports)
         @transitions = Feature.transitions(
           :autodetect_field_separators_for_gradebook_exports,
-          @teacher, @teacher, @feature.state
+          @teacher,
+          @teacher,
+          @feature.state
         )
       end
 
@@ -99,7 +105,9 @@ describe "Gradebook Export User-level Feature Flags" do
         @feature = @teacher.lookup_feature_flag(:autodetect_field_separators_for_gradebook_exports)
         @transitions = Feature.transitions(
           :autodetect_field_separators_for_gradebook_exports,
-          @teacher, @teacher, @feature.state
+          @teacher,
+          @teacher,
+          @feature.state
         )
       end
 

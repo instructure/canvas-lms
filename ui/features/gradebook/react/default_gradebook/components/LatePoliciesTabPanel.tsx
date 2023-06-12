@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -17,7 +18,6 @@
  */
 
 import React from 'react'
-import {bool, func, number, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
@@ -27,11 +27,11 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox} from '@instructure/ui-checkbox'
-
+import {LatePolicyCamelized, LatePolicyValidationErrors} from '../gradebook.d'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import NumberHelper from '@canvas/i18n/numberHelper'
 
-import Round from 'round'
+import Round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')
@@ -98,37 +98,34 @@ const numberInputWillUpdateMap = {
   },
 }
 
-class LatePoliciesTabPanel extends React.Component {
-  static propTypes = {
-    latePolicy: shape({
-      changes: shape({
-        missingSubmissionDeductionEnabled: bool,
-        missingSubmissionDeduction: number,
-        lateSubmissionDeductionEnabled: bool,
-        lateSubmissionDeduction: number,
-        lateSubmissionInterval: string,
-        lateSubmissionMinimumPercent: number,
-      }).isRequired,
-      validationErrors: shape({
-        missingSubmissionDeduction: string,
-        lateSubmissionDeduction: string,
-        lateSubmissionMinimumPercent: string,
-      }).isRequired,
-      data: shape({
-        missingSubmissionDeductionEnabled: bool,
-        missingSubmissionDeduction: number,
-        lateSubmissionDeductionEnabled: bool,
-        lateSubmissionDeduction: number,
-        lateSubmissionInterval: string,
-        lateSubmissionMinimumPercentEnabled: bool,
-        lateSubmissionMinimumPercent: number,
-      }),
-    }).isRequired,
-    changeLatePolicy: func.isRequired,
-    gradebookIsEditable: bool.isRequired,
-    locale: string.isRequired,
-    showAlert: bool.isRequired,
+type Props = {
+  changeLatePolicy: (latePolicy: {
+    changes: Partial<LatePolicyCamelized>
+    validationErrors: LatePolicyValidationErrors
+    data?: LatePolicyCamelized
+  }) => void
+  gradebookIsEditable: boolean
+  latePolicy: {
+    changes: Partial<LatePolicyCamelized>
+    validationErrors: LatePolicyValidationErrors
+    data?: LatePolicyCamelized
   }
+  locale: string
+  showAlert: boolean
+}
+
+type State = {
+  showAlert: boolean
+}
+
+class LatePoliciesTabPanel extends React.Component<Props, State> {
+  missingSubmissionDeductionInput?: HTMLInputElement | null
+
+  missingSubmissionCheckbox?: HTMLInputElement | null
+
+  lateSubmissionMinimumPercentInput?: HTMLInputElement | null
+
+  lateSubmissionDeductionInput?: HTMLInputElement | null
 
   state = {
     showAlert: this.props.showAlert,
@@ -141,16 +138,16 @@ class LatePoliciesTabPanel extends React.Component {
     'lateSubmissionMinimumPercent',
   ])
 
-  componentDidUpdate(_prevProps, prevState) {
+  componentDidUpdate(_prevProps: Props, prevState: State) {
     if (!prevState.showAlert || this.state.showAlert) {
       return
     }
 
     const inputEnabled = this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')
     if (inputEnabled) {
-      this.missingSubmissionDeductionInput.focus()
+      this.missingSubmissionDeductionInput?.focus()
     } else {
-      this.missingSubmissionCheckbox.focus()
+      this.missingSubmissionCheckbox?.focus()
     }
   }
 
@@ -163,13 +160,16 @@ class LatePoliciesTabPanel extends React.Component {
     return data && data[key]
   }
 
-  changeMissingSubmissionDeductionEnabled = ({target: {checked}}) => {
+  changeMissingSubmissionDeductionEnabled = ({target: {checked}}: {target: {checked: boolean}}) => {
     const changes = this.calculateChanges({missingSubmissionDeductionEnabled: checked})
     this.props.changeLatePolicy({...this.props.latePolicy, changes})
   }
 
-  changeLateSubmissionDeductionEnabled = ({target: {checked}}) => {
-    const updates = {lateSubmissionDeductionEnabled: checked}
+  changeLateSubmissionDeductionEnabled = ({target: {checked}}: {target: {checked: boolean}}) => {
+    const updates: {
+      lateSubmissionDeductionEnabled: boolean
+      lateSubmissionMinimumPercentEnabled?: boolean
+    } = {lateSubmissionDeductionEnabled: checked}
     if (!checked) {
       updates.lateSubmissionMinimumPercentEnabled = false
     } else if (this.getLatePolicyAttribute('lateSubmissionMinimumPercent') > MIN_PERCENTAGE_INPUT) {
@@ -194,6 +194,7 @@ class LatePoliciesTabPanel extends React.Component {
     }
     const decimalDisplayValue = numberInputWillUpdateMap[name](decimal)
 
+    // @ts-expect-error
     this.setState({[`${name}DisplayValue`]: Round(decimalDisplayValue, 2)}, () => {
       const changesData = {[name]: Round(decimal, 2)}
       if (name === 'lateSubmissionMinimumPercent') {
@@ -210,6 +211,7 @@ class LatePoliciesTabPanel extends React.Component {
 
   handleChange = (name, inputDisplayValue) => {
     const nameDisplayValue = `${name}DisplayValue`
+    // @ts-expect-error
     this.setState({[nameDisplayValue]: inputDisplayValue}, () => {
       let decimal = Round(NumberHelper.parse(inputDisplayValue), 2)
       decimal = numberInputWillUpdateMap[name](decimal)
@@ -231,7 +233,7 @@ class LatePoliciesTabPanel extends React.Component {
     const changes = {...this.props.latePolicy.changes}
     Object.keys(changedData).forEach(key => {
       const keyDisplayValue = `${key}DisplayValue`
-      const original = this.props.latePolicy.data[key]
+      const original = this.props.latePolicy.data?.[key]
       const changed = changedData[key]
       const originalAndChangedDiffer = original !== changed
       let hasChanges = originalAndChangedDiffer
@@ -315,6 +317,7 @@ class LatePoliciesTabPanel extends React.Component {
                   <Grid.Col width="auto">
                     <NumberInput
                       id="missing-submission-grade"
+                      // @ts-expect-error
                       locale={this.props.locale}
                       inputRef={m => {
                         this.missingSubmissionDeductionInput = m
@@ -382,6 +385,7 @@ class LatePoliciesTabPanel extends React.Component {
                   <Grid.Col width="auto">
                     <NumberInput
                       id="late-submission-deduction"
+                      // @ts-expect-error
                       locale={this.props.locale}
                       inputRef={l => {
                         this.lateSubmissionDeductionInput = l
@@ -417,9 +421,11 @@ class LatePoliciesTabPanel extends React.Component {
                       onChange={this.changeLateSubmissionInterval}
                       value={data.lateSubmissionInterval}
                     >
+                      {/* @ts-expect-error */}
                       <CanvasSelect.Option key="day" id="day" value="day">
                         {I18n.t('Day')}
                       </CanvasSelect.Option>
+                      {/* @ts-expect-error */}
                       <CanvasSelect.Option key="hour" id="hour" value="hour">
                         {I18n.t('Hour')}
                       </CanvasSelect.Option>
@@ -430,6 +436,7 @@ class LatePoliciesTabPanel extends React.Component {
                   <Grid.Col width="auto">
                     <NumberInput
                       id="late-submission-minimum-percent"
+                      // @ts-expect-error
                       locale={this.props.locale}
                       inputRef={l => {
                         this.lateSubmissionMinimumPercentInput = l

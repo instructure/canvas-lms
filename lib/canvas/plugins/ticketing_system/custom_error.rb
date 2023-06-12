@@ -39,12 +39,12 @@ module Canvas::Plugins::TicketingSystem
     # returns Hash
     def to_document
       {
-        subject: subject,
+        subject:,
         description: comments,
-        report_type: report_type,
+        report_type:,
         error_message: message,
         perceived_severity: user_severity,
-        account_id: account_id,
+        account_id:,
         account_domain: account_domain_value,
         report_origin_url: url,
         reporter: {
@@ -56,7 +56,7 @@ module Canvas::Plugins::TicketingSystem
           environment: http_env
         },
         canvas_details: {
-          request_context_id: request_context_id,
+          request_context_id:,
           error_report_id: id,
           sub_account: sub_account_tag,
         }

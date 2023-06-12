@@ -76,20 +76,22 @@ class Pseudonym < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :unique_id, :workflow_state
 
-  validates :unique_id, format: { with: /\A[[:print:]]+\z/ },
-                        length: { within: 1..MAX_UNIQUE_ID_LENGTH },
-                        uniqueness: {
-                          case_sensitive: false,
-                          scope: %i[account_id workflow_state authentication_provider_id],
-                          if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
-                        }
+  validates :unique_id,
+            format: { with: /\A[[:print:]]+\z/ },
+            length: { within: 1..MAX_UNIQUE_ID_LENGTH },
+            uniqueness: {
+              case_sensitive: false,
+              scope: %i[account_id workflow_state authentication_provider_id],
+              if: ->(p) { (p.unique_id_changed? || p.workflow_state_changed?) && p.active? }
+            }
 
   validates :password,
             confirmation: true,
             if: :require_password?
 
-  validates_each :password, if: :require_password?,
-                 &Canvas::PasswordPolicy.method("validate")
+  validates_each :password,
+                 if: :require_password?,
+                 &Canvas::PasswordPolicy.method(:validate)
   validates :password_confirmation,
             presence: true,
             if: :require_password?
@@ -172,16 +174,22 @@ class Pseudonym < ActiveRecord::Base
   def self.custom_find_by_unique_id(unique_id)
     return unless unique_id
 
-    active_only.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
-                                              AuthenticationProvider.active.where(auth_type: ["canvas", "ldap"])
-                                                .where("authentication_provider_id=authentication_providers.id"))
+    active_only.by_unique_id(unique_id).merge(
+      where(authentication_provider_id: nil)
+        .or(where(AuthenticationProvider
+          .active
+          .where(auth_type: ["canvas", "ldap"])
+          .where("authentication_provider_id=authentication_providers.id")
+          .arel.exists))
+    )
                .order("authentication_provider_id NULLS LAST").first
   end
 
-  def self.for_auth_configuration(unique_id, aac)
+  def self.for_auth_configuration(unique_id, aac, include_suspended: false)
     auth_id = aac.try(:auth_provider_filter)
-    active_only.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
-               .order("authentication_provider_id NULLS LAST").take
+    scope = include_suspended ? active : active_only
+    scope.by_unique_id(unique_id).where(authentication_provider_id: auth_id)
+         .order("authentication_provider_id NULLS LAST").take
   end
 
   def audit_log_update
@@ -269,10 +277,11 @@ class Pseudonym < ActiveRecord::Base
     end
     unless deleted?
       shard.activate do
-        existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id: account_id,
-                                                                         authentication_provider_id: authentication_provider_id).where.not(id: self).exists?
+        existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id:,
+                                                                         authentication_provider_id:).where.not(id: self).exists?
         if existing_pseudo
-          errors.add(:unique_id, :taken,
+          errors.add(:unique_id,
+                     :taken,
                      message: t("ID already in use for this account and authentication provider"))
           throw :abort
         end
@@ -283,19 +292,21 @@ class Pseudonym < ActiveRecord::Base
 
   def verify_unique_sis_user_id
     return true unless sis_user_id
-    return true unless Pseudonym.where.not(id: id).where(account_id: account_id, sis_user_id: sis_user_id).exists?
+    return true unless Pseudonym.where.not(id:).where(account_id:, sis_user_id:).exists?
 
-    errors.add(:sis_user_id, :taken,
+    errors.add(:sis_user_id,
+               :taken,
                message: t("#errors.sis_id_in_use", "SIS ID \"%{sis_id}\" is already in use", sis_id: sis_user_id))
     throw :abort
   end
 
   def verify_unique_integration_id
     return true unless integration_id
-    return true unless Pseudonym.where.not(id: id).where(account_id: account_id, integration_id: integration_id).exists?
+    return true unless Pseudonym.where.not(id:).where(account_id:, integration_id:).exists?
 
-    errors.add(:integration_id, :taken,
-               message: t("Integration ID \"%{integration_id}\" is already in use", integration_id: integration_id))
+    errors.add(:integration_id,
+               :taken,
+               message: t("Integration ID \"%{integration_id}\" is already in use", integration_id:))
     throw :abort
   end
 
@@ -515,18 +526,12 @@ class Pseudonym < ActiveRecord::Base
   end
   alias_method :has_changes_to_save?, :changed?
 
-  if Rails.version < "7.0"
-    def attribute_names_for_partial_writes
-      strip_inferred_authentication_provider(super)
-    end
-  else
-    def attribute_names_for_partial_inserts
-      strip_inferred_authentication_provider(super)
-    end
+  def attribute_names_for_partial_inserts
+    strip_inferred_authentication_provider(super)
+  end
 
-    def attribute_names_for_partial_updates
-      strip_inferred_authentication_provider(super)
-    end
+  def attribute_names_for_partial_updates
+    strip_inferred_authentication_provider(super)
   end
 
   def strip_inferred_authentication_provider(attribute_names)
@@ -555,7 +560,7 @@ class Pseudonym < ActiveRecord::Base
                              type: :ldap,
                              message: "LDAP authentication error",
                              object: inspect.to_s,
-                             unique_id: unique_id,
+                             unique_id:,
                            })
     nil
   end

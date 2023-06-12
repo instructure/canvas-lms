@@ -73,7 +73,7 @@ describe "courses/settings" do
 
     it "does not show to non-sis admin" do
       role = custom_account_role("NoSissy", account: @course.root_account)
-      admin = account_admin_user_with_role_changes(account: @course.root_account, role_changes: { "manage_sis" => false }, role: role)
+      admin = account_admin_user_with_role_changes(account: @course.root_account, role_changes: { "manage_sis" => false }, role:)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -82,7 +82,7 @@ describe "courses/settings" do
 
     it "does not show to subaccount admin" do
       role = custom_account_role("CustomAdmin", account: @course.root_account)
-      admin = account_admin_user_with_role_changes(account: @subaccount, role_changes: { "manage_sis" => true, "manage_courses" => true }, role: role)
+      admin = account_admin_user_with_role_changes(account: @subaccount, role_changes: { "manage_sis" => true, "manage_courses" => true }, role:)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -274,6 +274,15 @@ describe "courses/settings" do
         placeholder_div = doc.at_css("div#course_template_details")
         expect(placeholder_div["data-is-editable"]).to eq "false"
       end
+    end
+  end
+
+  describe "visibility settings" do
+    it "calls Course::CUSTOMIZABLE_PERMISSIONS's get_setting_name to get translated setting name" do
+      expect(Course::CUSTOMIZABLE_PERMISSIONS["syllabus"][:get_setting_name]).to receive(:call).once.and_call_original
+      expect(Course::CUSTOMIZABLE_PERMISSIONS["files"][:get_setting_name]).to receive(:call).once.and_call_original
+      view_context(@course, @user)
+      render
     end
   end
 end

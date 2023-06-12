@@ -1,4 +1,4 @@
-# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
+# syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.5.2
 
 FROM starlord.inscloudgate.net/jenkins/core:focal
 SHELL ["/usr/bin/bash", "-c"]
@@ -10,22 +10,19 @@ RUN --mount=target=/tmp/src \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     config/canvas_rails_switcher.rb \
     Gemfile \
-    Gemfile*.lock.partial \
+    Gemfile*.lock \
     Gemfile.d \
     gems/**/Gemfile \
+    gems/**/Gemfile.lock \
     gems/**/*.gemspec \
     gems/**/gem_version.rb \
     gems/**/version.rb \
     gems/bundler_lockfile_extensions \
     gems/plugins/**/Gemfile.d \
-    engines/**/Gemfile \
-    engines/**/*.gemspec \
-    engines/**/version.rb \
     \
     | tee /tmp/dst/ruby-runner.tar | md5sum > /tmp/dst/ruby-runner.tar.md5 && \
   \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
-    script/fix_inst_esm.js \
     package.json \
     yarn.lock \
     gems/plugins/**/package.json \
@@ -98,31 +95,35 @@ RUN --mount=target=/tmp/src \
     \
     | tee /tmp/dst/webpack-runner-vendor.tar | md5sum > /tmp/dst/webpack-runner-vendor.tar.md5 && \
   \
-  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
-    app/stylesheets \
-    config/brandable_css.yml \
-    config/browsers.yml \
-    gems/plugins/**/app/coffeescripts \
-    gems/plugins/**/app/jsx \
-    gems/plugins/**/app/stylesheets \
-    gems/plugins/**/public \
-    gems/plugins/**/spec_canvas/coffeescripts \
-    jest \
-    packages \
-    public \
-    spec/coffeescripts \
-    spec/javascripts \
-    spec/selenium/helpers/jquery.simulate.js \
-    tmp \
-    ui \
-    ui-build \
-    jest.config.js \
-    karma.conf.js \
-    package.json \
-    tsconfig.json \
-    yarn.lock \
-    \
-    | tee /tmp/dst/js.tar | md5sum > /tmp/dst/js.tar.md5 && \
+  { \
+    if [ -d 'spec' ]; then \
+      tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
+        app/stylesheets \
+        config/brandable_css.yml \
+        config/browsers.yml \
+        gems/plugins/**/app/coffeescripts \
+        gems/plugins/**/app/jsx \
+        gems/plugins/**/app/stylesheets \
+        gems/plugins/**/public \
+        gems/plugins/**/spec_canvas/coffeescripts \
+        jest \
+        packages \
+        public \
+        spec/coffeescripts \
+        spec/javascripts \
+        spec/selenium/helpers/jquery.simulate.js \
+        tmp \
+        ui \
+        ui-build \
+        jest.config.js \
+        karma.conf.js \
+        package.json \
+        tsconfig.json \
+        yarn.lock \
+        \
+        | tee /tmp/dst/js.tar | md5sum > /tmp/dst/js.tar.md5; \
+    fi \
+  } && \
   touch /tmp/dst/environment.sh && \
   echo "RUBY_RUNNER_MD5=$(cat /tmp/dst/ruby-runner.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
   echo "YARN_RUNNER_MD5=$(cat /tmp/dst/yarn-runner.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \

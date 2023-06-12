@@ -3,7 +3,7 @@
 </div>
 
 <div class="form-column-right">
-  <div class="border border-trbl border-round" style="margin-right: 80px">
+  <div class="border border-trbl border-round">
     {{!-- Group Assignment selection --}}
     <label class="checkbox flush" for="has_group_category">
       {{#if inClosedGradingPeriod}}
@@ -12,7 +12,6 @@
           prefix=prefix
           checked=isGroupAssignment
           aria-role="option"
-          aria-checked=ariaChecked
           aria-controls="group_category_options"
           readonly="readonly"
           aria-readonly="true"
@@ -24,7 +23,6 @@
           prefix=prefix
           checked=isGroupAssignment
           aria-role="option"
-          aria-checked=ariaChecked
           aria-controls="group_category_options"
           disabled=hasGroupCategoryDisabled
         }}
@@ -34,9 +32,9 @@
 
     {{!-- Individual grading? --}}
     <div id="group_category_options" style="{{hiddenUnless groupCategoryId}}">
-      <div class="nested">
+      <div class="nested" style="padding-left: 32px;">
         {{#unless hideGradeIndividually}}
-        <label class="checkbox" for="assignment_grade_students_individually">
+        <label style="padding-left: 20px;" class="checkbox" for="assignment_grade_students_individually">
           {{#if inClosedGradingPeriod}}
           {{checkbox "grade_group_students_individually"
                 id="assignment_grade_students_individually"
@@ -62,10 +60,11 @@
 
         {{!-- Group selection --}}
         <div id="assignment_group_category">
-          <label id="assignment_group_category_id_label" for="group_category_id">
+          <label id="assignment_group_category_id_label" for="group_category_id" style="padding-left: 0px;">
             {{#t "group_set"}}Group Set{{/t}}
           </label>
           <select id="assignment_group_category_id"
+            style="margin-left: 0px;"
             name="{{#if nested}}assignment[group_category_id]{{else}}group_category_id{{/if}}"
             {{#if inClosedGradingPeriod}} readonly aria-readonly="true" {{/if}}
             aria-labelledby="assignment_group_category_id_label" {{disabledIf groupCategoryIdDisabled}}>

@@ -27,13 +27,14 @@
 
   cache(['recent_feedback_render3', @current_user&.course_nickname_hash, recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
     assignment = recent_feedback.assignment
+    preserve_grade = ["letter_grade", "pass_fail"].include?(recent_feedback.assignment.grading_type)
     context = recent_feedback.assignment.context
     if recent_feedback.assignment.a2_enabled?
       context_symbol = :context_assignment_url
       context_params = {:id => recent_feedback.assignment_id}
     else
       context_symbol = :context_assignment_submission_url
-      context_params = {:assignment_id => recent_feedback.assignment_id, :id => @current_user.id}
+      context_params = {:assignment_id => recent_feedback.assignment_id, :id => @user&.id || @current_user.id}
     end
     url = context_url(context, context_symbol, context_params)
     grade = readable_grade(recent_feedback)
@@ -67,7 +68,11 @@
         </p>
       <% end %>
       <% if grade %>
-        <p><strong><%= grade %></strong></p>
+        <% if recent_feedback.assignment.restrict_quantitative_data?(@current_user) && !preserve_grade %>
+          <p><strong><%= recent_feedback.assignment.score_to_grade(score, grade, true) %></strong></p>
+        <% else %>
+          <p><strong><%= grade %></strong></p>
+        <% end %>
       <% end %>
       <% if comment_text %>
         <p>"<%= comment_text %>"</p>

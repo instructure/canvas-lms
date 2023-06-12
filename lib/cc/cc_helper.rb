@@ -158,8 +158,8 @@ module CC
       [title, body]
     end
 
-    MEDIAHREF_REGEX = %r{/media_objects_iframe\?mediahref=/}.freeze
-    SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/.freeze
+    MEDIAHREF_REGEX = %r{/media_objects_iframe\?mediahref=/}
+    SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/
     WEB_CONTENT_REFERENCE_REGEX = Regexp.union(
       Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
       Regexp.new(Regexp.escape(CGI.escape(CC::CCHelper::WEB_CONTENT_TOKEN)))
@@ -194,15 +194,16 @@ module CC
             type = object_key
             object_key = nil
           end
-          linked_objects.push({ identifier: object_key, type: type })
+          linked_objects.push({ identifier: object_key, type: })
         end
       end
       linked_objects
     end
 
     require "set"
+
     class HtmlContentExporter
-      attr_reader :used_media_objects, :media_object_flavor, :media_object_infos
+      attr_reader :course, :user, :media_object_flavor, :media_object_infos
       attr_accessor :referenced_files
 
       def initialize(course, user, opts = {})
@@ -217,6 +218,7 @@ module CC
         @for_epub_export = opts[:for_epub_export]
         @key_generator = opts[:key_generator] || CC::CCHelper
         @referenced_files = {}
+        @disable_content_rewriting = !!opts[:disable_content_rewriting] || false
 
         @rewriter.set_handler("file_contents") do |match|
           if match.url =~ %r{/media_objects/(\d_\w+)}
@@ -310,7 +312,21 @@ module CC
         host = HostUrl.context_host(@course)
         port = ConfigFile.load("domain").try(:[], :domain).try(:split, ":").try(:[], 1)
         @url_prefix = "#{protocol}://#{host}"
-        @url_prefix += ":#{port}" if !host.include?(":") && port.present?
+        @url_prefix += ":#{port}" if !host&.include?(":") && port.present?
+      end
+
+      # after LF-232 is stable on master, we should be able to remove this, I think
+      def used_media_objects
+        return @used_media_objects if @ensure_attachments_for_media_objects
+
+        @used_media_objects.each do |obj|
+          unless obj.attachment
+            obj.attachment = Attachment.create!(context: obj.context, media_entry_id: obj.media_id, filename: obj.guaranteed_title, content_type: "unknown/unknown")
+            obj.save!
+          end
+        end
+        @ensure_attachments_for_media_objects = true
+        @used_media_objects
       end
 
       def translate_module_item_query(query)
@@ -321,8 +337,6 @@ module CC
         new_param = "module_item_id=#{@key_generator.create_key(ContentTag.new(id: tag_id))}"
         query.sub(original_param, new_param)
       end
-
-      attr_reader :course, :user
 
       def html_page(html, title, meta_fields = {})
         content = html_content(html)
@@ -337,6 +351,8 @@ module CC
       end
 
       def html_content(html)
+        return html if @disable_content_rewriting
+
         html = @rewriter.translate_content(html)
         return html if html.blank? || @for_course_copy
 
@@ -366,6 +382,9 @@ module CC
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
+          if iframe["src"].match?(%r{/media_attachments_iframe/(\d+)})
+            iframe["data-is-media-attachment"] = true
+          end
           iframe["src"] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
 
@@ -406,11 +425,14 @@ module CC
       end
     end
 
+    def self.kaltura_admin_session
+      client = CanvasKaltura::ClientV3.new
+      client.startSession(CanvasKaltura::SessionType::ADMIN)
+      client
+    end
+
     def self.media_object_info(obj, course: nil, client: nil, flavor: nil)
-      unless client
-        client = CanvasKaltura::ClientV3.new
-        client.startSession(CanvasKaltura::SessionType::ADMIN)
-      end
+      client ||= kaltura_admin_session
       if flavor
         assets = client.flavorAssetGetByEntryId(obj.media_id) || []
         asset = assets.sort_by { |f| f[:size].to_i }.reverse.find { |f| f[:containerFormat] == flavor }
@@ -430,7 +452,7 @@ module CC
                filename += ".#{asset[:fileExt]}" if asset
                File.join(MEDIA_OBJECTS_FOLDER, filename)
              end
-      { asset: asset, path: path }
+      { asset:, path: }
     end
 
     # sub_path is the last part of a file url: /courses/1/files/1(/download)

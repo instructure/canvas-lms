@@ -105,21 +105,13 @@ module LiveEvents
       tags = { event: event_name }
 
       ctx ||= {}
-      if ctx.empty?
-        begin
-          raise "LiveEvent context is empty!"
-        rescue => e
-          LiveEvents.logger.error(([e.message] + e.backtrace).join($INPUT_RECORD_SEPARATOR))
-        end
-      end
-
       attributes = ctx.except(*ATTRIBUTE_BLACKLIST).merge({
-                                                            event_name: event_name,
+                                                            event_name:,
                                                             event_time: time.utc.iso8601(3)
                                                           })
 
       event = {
-        attributes: attributes,
+        attributes:,
         body: payload
       }
 
@@ -131,7 +123,7 @@ module LiveEvents
 
       unless pusher.push(event, partition_key)
         LiveEvents.logger.error("Error queueing job for live event: #{event.to_json}")
-        LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors", tags: tags)
+        LiveEvents&.statsd&.increment("#{statsd_prefix}.queue_full_errors", tags:)
       end
     end
   end

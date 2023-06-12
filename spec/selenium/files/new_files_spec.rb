@@ -51,7 +51,8 @@ describe "better_file_browsing" do
     before(:once) do
       course_with_teacher(active_all: true)
       add_file(fixture_file_upload("example.pdf", "application/pdf"),
-               @course, "example.pdf")
+               @course,
+               "example.pdf")
     end
 
     before do
@@ -311,7 +312,8 @@ describe "better_file_browsing" do
     before(:once) do
       course_with_teacher(active_all: true)
       add_file(fixture_file_upload("a_file.txt", "text/plain"),
-               @course, "a_file.txt")
+               @course,
+               "a_file.txt")
     end
 
     before do
@@ -336,9 +338,11 @@ describe "better_file_browsing" do
     before do
       course_with_teacher_logged_in
       add_file(fixture_file_upload("a_file.txt", "text/plain"),
-               @course, "a_file.txt")
+               @course,
+               "a_file.txt")
       add_file(fixture_file_upload("b_file.txt", "text/plain"),
-               @course, "b_file.txt")
+               @course,
+               "b_file.txt")
       get "/courses/#{@course.id}/files"
     end
 
@@ -348,6 +352,28 @@ describe "better_file_browsing" do
       expect(f(".ef-file-preview-header-filename")).to include_text("b_file.txt")
       ff(".ef-file-preview-container-arrow-link")[1].click
       expect(f(".ef-file-preview-header-filename")).to include_text("a_file.txt")
+    end
+
+    context "with media file" do
+      before do
+        stub_kaltura
+      end
+
+      it "works in the user's files page" do
+        file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @teacher, "292.mp3")
+        get "/files?preview=#{file.id}"
+        wait_for_ajaximations
+        driver.switch_to.frame(ff(".ef-file-preview-frame")[0])
+        expect(ff("#media_preview")[0]).to include_text("Media has been queued for conversion, please try again in a little bit.")
+      end
+
+      it "works in the course's files page" do
+        file = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
+        get "/courses/#{@course.id}/files?preview=#{file.id}"
+        wait_for_ajaximations
+        driver.switch_to.frame(ff(".ef-file-preview-frame")[0])
+        expect(ff("#media_preview")[0]).to include_text("Media has been queued for conversion, please try again in a little bit.")
+      end
     end
   end
 
@@ -371,11 +397,14 @@ describe "better_file_browsing" do
       @course.usage_rights_required = true
       @course.save!
       add_file(fixture_file_upload("a_file.txt", "text/plan"),
-               @course, "a_file.txt")
+               @course,
+               "a_file.txt")
       add_file(fixture_file_upload("amazing_file.txt", "text/plan"),
-               @user, "amazing_file.txt")
+               @user,
+               "amazing_file.txt")
       add_file(fixture_file_upload("a_file.txt", "text/plan"),
-               @user, "a_file.txt")
+               @user,
+               "a_file.txt")
     end
 
     before do

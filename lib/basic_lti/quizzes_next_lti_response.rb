@@ -108,7 +108,7 @@ module BasicLTI
     end
 
     def grade(grading_type)
-      return ((raw_score || percentage_score) > 0 ? "pass" : "fail") if grading_type == "pass_fail" && (raw_score || percentage_score)
+      return (((raw_score || percentage_score) > 0) ? "pass" : "fail") if grading_type == "pass_fail" && (raw_score || percentage_score)
       return raw_score if raw_score.present?
       return nil unless valid_percentage_score?
 

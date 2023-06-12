@@ -33,6 +33,17 @@ export const formatFileSize = (bytes, decimals = 2) => {
   return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`
 }
 
+/*
+ * This is to account for files obtained through both graphql and
+ * through the files API
+ */
+const standardizeToFilesAPI = file => {
+  file.mime_class = file.mime_class || file.mimeClass
+  file.display_name = file.display_name || file.displayName
+  file.thumbnail_url = file.thumbnail_url || file.thumbnailUrl
+  return file
+}
+
 export const getFileThumbnail = (file, iconSize = 'medium') => {
   const iconSizes = {
     'x-small': '1.125rem',
@@ -56,15 +67,4 @@ export const getFileThumbnail = (file, iconSize = 'medium') => {
     )
   }
   return React.cloneElement(getIconByType(file.mime_class), {size})
-}
-
-/*
- * This is to account for files obtained through both graphql and
- * through the files API
- */
-const standardizeToFilesAPI = file => {
-  file.mime_class = file.mime_class || file.mimeClass
-  file.display_name = file.display_name || file.displayName
-  file.thumbnail_url = file.thumbnail_url || file.thumbnailUrl
-  return file
 }

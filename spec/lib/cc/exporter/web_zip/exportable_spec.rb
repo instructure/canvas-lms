@@ -32,8 +32,8 @@ describe "Exportable" do
                  end
 
                  def dist_package_path
-                   Dir.mkdir(@dist_dir) unless Dir.exist?(@dist_dir)
-                   Dir.mkdir(@viewer_dir) unless Dir.exist?(@viewer_dir)
+                   FileUtils.mkdir_p(@dist_dir)
+                   FileUtils.mkdir_p(@viewer_dir)
                    index_file = File.new(@index_file, "w+")
                    index_file.write("<html></html>")
                    index_file.close
@@ -45,10 +45,10 @@ describe "Exportable" do
 
                  def cleanup_files
                    super
-                   File.delete(@index_file) if File.exist?(@index_file)
-                   File.delete(@bundle_file) if File.exist?(@bundle_file)
-                   Dir.delete(@viewer_dir) if Dir.exist?(@viewer_dir)
-                   Dir.delete(@dist_dir) if Dir.exist?(@dist_dir)
+                   FileUtils.rm_f(@index_file)
+                   FileUtils.rm_f(@bundle_file)
+                   FileUtils.rm_f(@viewer_dir)
+                   FileUtils.rm_f(@dist_dir)
                  end
                end)
 
@@ -140,7 +140,7 @@ describe "Exportable" do
           expect(contents["files"][0]["type"]).to eq("file")
           expect(contents["files"][0]["name"]).not_to be_nil
           expect(contents["files"][0]["size"]).not_to be_nil
-          expect(contents["files"][0]["files"]).to eq(nil)
+          expect(contents["files"][0]["files"]).to be_nil
         end
       end
 
@@ -183,7 +183,7 @@ describe "Exportable" do
     end
 
     after do
-      File.delete(zip_path) if File.exist?(zip_path)
+      FileUtils.rm_f(zip_path)
     end
   end
 end

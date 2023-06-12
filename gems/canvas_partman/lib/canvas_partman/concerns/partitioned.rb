@@ -108,8 +108,8 @@ module CanvasPartman::Concerns
       #   each element is a hash that carries the attributes of a
       #   potential record of the current class type
       #
-      def attrs_in_partition_groups(attrs_list, &block)
-        attrs_list.group_by { |a| infer_partition_table_name(a) }.each(&block)
+      def attrs_in_partition_groups(attrs_list, &)
+        attrs_list.group_by { |a| infer_partition_table_name(a) }.each(&)
       end
 
       # :nodoc:
@@ -121,7 +121,7 @@ module CanvasPartman::Concerns
       # Monkey patch the relation we'll use for queries.
       def unscoped
         super.tap do |relation|
-          relation.send :extend, CanvasPartman::DynamicRelation
+          relation.extend CanvasPartman::DynamicRelation
         end
       end
 
@@ -170,7 +170,7 @@ module CanvasPartman::Concerns
 
         if partitioning_strategy == :by_date
           date = attr[1].is_a?(ActiveModel::Attribute) ? attr[1].value : attr[1]
-          date = date.utc if Rails.version < "7.0" ? ActiveRecord::Base.default_timezone == :utc : ActiveRecord.default_timezone == :utc
+          date = date.utc if ActiveRecord.default_timezone == :utc
 
           case partitioning_interval
           when :weeks

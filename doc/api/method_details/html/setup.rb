@@ -42,6 +42,8 @@ def get_routes
   @action = @action.sub(/_with_.*$/, "")
   @routes = ApiRouteSet.api_methods_for_controller_and_action(@controller, @action)
   @route = @routes.first
+  raise "Could not find route for #{object}" unless @route
+
   @controller_path = "app/controllers/#{@route.requirements[:controller]}_controller.rb"
   @controller_path = nil unless Rails.root.join(@controller_path).file?
 end

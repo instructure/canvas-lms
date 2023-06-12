@@ -89,7 +89,7 @@ describe "speed grader" do
       expect(@submission.score).to be_nil
 
       pg = @submission.provisional_grade(@user)
-      expect(pg.score.to_i).to eql 8
+      expect(pg.score.to_i).to be 8
       expect(pg.submission_comments.map(&:comment)).to be_include "srsly"
     end
 

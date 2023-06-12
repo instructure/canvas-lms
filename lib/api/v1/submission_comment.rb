@@ -38,7 +38,7 @@ module Api::V1::SubmissionComment
   def submission_comment_json(submission_comment, user)
     sc_hash = submission_comment.as_json(
       include_root: false,
-      only: %w[id author_id author_name created_at edited_at comment]
+      only: %w[id author_id author_name created_at edited_at comment attempt]
     )
 
     if submission_comment.media_comment?
@@ -81,13 +81,13 @@ module Api::V1::SubmissionComment
       json[:publishable] = comment.publishable_for?(current_user)
       author_id = comment.author_id.to_s
       student_anonymous_ids = student_ids_to_anonymous_ids(
-        assignment: assignment,
-        course: course,
-        current_user: current_user,
-        submissions: submissions
+        assignment:,
+        course:,
+        current_user:,
+        submissions:
       )
 
-      if anonymous_students?(current_user: current_user, assignment: assignment) &&
+      if anonymous_students?(current_user:, assignment:) &&
          student_anonymous_ids.key?(author_id) &&
          comment.author != current_user
 
@@ -95,7 +95,7 @@ module Api::V1::SubmissionComment
         json.delete(:author_name)
         json[:anonymous_id] = student_anonymous_ids[author_id]
         json[:avatar_path] = User.default_avatar_fallback if display_avatars
-      elsif anonymous_graders?(current_user: current_user, assignment: assignment) && assignment.grader_ids_to_anonymous_ids.key?(author_id)
+      elsif anonymous_graders?(current_user:, assignment:) && assignment.grader_ids_to_anonymous_ids.key?(author_id)
         json.delete(:author_id)
         json[:anonymous_id] = assignment.grader_ids_to_anonymous_ids[author_id]
         unless author_id == current_user.id.to_s
@@ -132,13 +132,13 @@ module Api::V1::SubmissionComment
     return @student_ids_to_anonymous_ids if defined? @student_ids_to_anonymous_ids
 
     # ensure each student has membership, even without a submission
-    student_ids = students(current_user: current_user, assignment: assignment, course: course).pluck(:id)
+    student_ids = students(current_user:, assignment:, course:).pluck(:id)
     @student_ids_to_anonymous_ids = student_ids.each_with_object({}) { |student_id, map| map[student_id.to_s] = nil }
     missing_student_ids = student_ids - submissions.map(&:user_id)
     missing_submissions = if missing_student_ids.empty?
                             []
                           else
-                            Submission.where(assignment: assignment, user_id: missing_student_ids)
+                            Submission.where(assignment:, user_id: missing_student_ids)
                           end
 
     (submissions + missing_submissions).each do |submission|
@@ -149,17 +149,17 @@ module Api::V1::SubmissionComment
 
   def students(course:, assignment:, current_user:)
     @students ||= begin
-      includes = gradebook_includes(user: current_user, course: course)
-      assignment.representatives(user: current_user, includes: includes)
+      includes = gradebook_includes(user: current_user, course:)
+      assignment.representatives(user: current_user, includes:)
     end
   end
 
   def other_grader?(user_id:, current_user:, course:, assignment:, submissions:)
     anonymous_ids = student_ids_to_anonymous_ids(
-      current_user: current_user,
-      assignment: assignment,
-      course: course,
-      submissions: submissions
+      current_user:,
+      assignment:,
+      course:,
+      submissions:
     )
     !anonymous_ids.key?(user_id.to_s) && user_id != current_user.id
   end

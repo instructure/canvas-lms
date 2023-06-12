@@ -26,8 +26,8 @@ module RuboCop
       class EnsureSpecExtension < Cop
         include RuboCop::Cop::FileMeta
 
-        MSG = "Spec files need to end with \"_spec.rb\""\
-              " for rspec  to find and run them."
+        MSG = "Spec files need to end with \"_spec.rb\" " \
+              "for rspec  to find and run them."
 
         METHODS = [:context, :describe].freeze
 

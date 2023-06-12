@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
-import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 
 function combine(left, right) {
   return Promise.all([left, right]).then(([files1, files2]) => files1.concat(files2))

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -19,10 +20,16 @@
 import getCookie from '@instructure/get-cookie'
 import parseLinkHeader from 'parse-link-header'
 import {defaultFetchOptions} from '@instructure/js-utils'
-import toQueryString from '@canvas/util/toQueryString'
-import type {QueryParameterMap} from '@canvas/util/toQueryString'
+import {toQueryString} from '@canvas/query-string-encoding'
+import type {QueryParameterRecord} from '@canvas/query-string-encoding'
 
-function constructRelativeUrl({path, params}: {path: string; params: QueryParameterMap}): string {
+function constructRelativeUrl({
+  path,
+  params,
+}: {
+  path: string
+  params: QueryParameterRecord
+}): string {
   const queryString = toQueryString(params)
   if (queryString.length === 0) return path
   return path + '?' + queryString
@@ -37,8 +44,9 @@ export type DoFetchApiOpts = {
   path: string
   method?: string
   headers?: {[k: string]: string}
-  params?: QueryParameterMap
-  body?: unknown
+  params?: QueryParameterRecord
+  // eslint-disable-next-line no-undef
+  body?: BodyInit
   fetchOpts?: RequestInit
 }
 
@@ -69,7 +77,13 @@ export default async function doFetchApi<T = unknown>({
   Object.assign(finalFetchOptions, fetchOpts)
 
   const url = constructRelativeUrl({path, params})
-  const response = await fetch(url, {body, method, ...finalFetchOptions})
+  const response = await fetch(url, {
+    body,
+    method,
+    ...finalFetchOptions,
+    // eslint-disable-next-line no-undef
+    credentials: finalFetchOptions.credentials as RequestCredentials,
+  })
   if (!response.ok) {
     const err = new Error(
       `doFetchApi received a bad response: ${response.status} ${response.statusText}`

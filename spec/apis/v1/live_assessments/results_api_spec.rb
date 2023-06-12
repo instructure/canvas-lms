@@ -42,7 +42,7 @@ describe LiveAssessments::ResultsController, type: :request do
 
   def result_hashes
     [student, another_student].map do |s|
-      { passed: true, assessed_at: assessed_at, links: { user: s.id } }
+      { passed: true, assessed_at:, links: { user: s.id } }
     end
   end
 
@@ -52,7 +52,9 @@ describe LiveAssessments::ResultsController, type: :request do
                        :post,
                        "/api/v1/courses/#{assessment_course.id}/live_assessments/#{assessment.id}/results",
                        { controller: "live_assessments/results", action: "create", format: "json", course_id: assessment_course.id.to_s, assessment_id: assessment.id.to_s },
-                       { results: params }, {}, opts)
+                       { results: params },
+                       {},
+                       opts)
     end
 
     context "as a teacher" do
@@ -64,7 +66,7 @@ describe LiveAssessments::ResultsController, type: :request do
         results.each do |r|
           expect(r.assessor).to eq teacher
           expect(r.assessment).to eq assessment
-          expect(r.passed).to eq true
+          expect(r.passed).to be true
           expect(r.assessed_at.to_i).to eq assessed_at.to_i
         end
         expect(results.map(&:user)).to eq [student, another_student]
@@ -93,13 +95,15 @@ describe LiveAssessments::ResultsController, type: :request do
                        :get,
                        "/api/v1/courses/#{assessment_course.id}/live_assessments/#{assessment.id}/results",
                        { controller: "live_assessments/results", action: "index", format: "json", course_id: assessment_course.id.to_s, assessment_id: assessment.id.to_s },
-                       params, {}, opts)
+                       params,
+                       {},
+                       opts)
     end
 
     context "as a teacher" do
       it "returns all the results for the assessment" do
         [student, another_student].each do |s|
-          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at: assessed_at)
+          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at:)
         end
         index_results({})
         data = json_parse
@@ -108,7 +112,7 @@ describe LiveAssessments::ResultsController, type: :request do
         results.each do |r|
           expect(r["links"]["assessor"]).to eq teacher.id.to_s
           expect(r["links"]["assessment"]).to eq assessment.id.to_s
-          expect(r["passed"]).to eq true
+          expect(r["passed"]).to be true
           expect(Time.parse(r["assessed_at"]).to_i).to eq assessed_at.to_i
         end
         expect(results.map { |h| h["links"]["user"] }).to eq [student.id.to_s, another_student.id.to_s]
@@ -116,7 +120,7 @@ describe LiveAssessments::ResultsController, type: :request do
 
       it "filters the results by user" do
         [student, another_student].each do |s|
-          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at: assessed_at)
+          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at:)
         end
         index_results({ user_id: another_student.id })
         data = json_parse
@@ -125,7 +129,7 @@ describe LiveAssessments::ResultsController, type: :request do
         results.each do |r|
           expect(r["links"]["assessor"]).to eq teacher.id.to_s
           expect(r["links"]["assessment"]).to eq assessment.id.to_s
-          expect(r["passed"]).to eq true
+          expect(r["passed"]).to be true
           expect(Time.parse(r["assessed_at"]).to_i).to eq assessed_at.to_i
         end
         expect(results.map { |h| h["links"]["user"] }).to eq [another_student.id.to_s]

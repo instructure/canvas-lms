@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
-import EditHeaderView from 'ui/features/assignment_edit/backbone/views/EditHeaderView.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
+import EditHeaderView from 'ui/features/assignment_edit/backbone/views/EditHeaderView'
 import editViewTemplate from 'ui/features/assignment_edit/jst/EditView.handlebars'
 import fakeENV from 'helpers/fakeENV'
 import Backbone from '@canvas/backbone'
@@ -104,6 +104,27 @@ test('does not attempt to delete an assignment due in a closed grading period', 
   view.$('.delete_assignment_link').click()
   ok(window.confirm.notCalled)
   ok(view.delete.notCalled)
+})
+
+QUnit.module('EditHeaderView - speed grader link', {
+  setup() {
+    fakeENV.setup()
+    ENV.SHOW_SPEED_GRADER_LINK = true
+  },
+  teardown() {
+    fakeENV.teardown()
+  },
+})
+
+test('shows when assignment is published', () => {
+  const view = editHeaderView({published: true})
+  ok(view.$('.speed-grader-link-container').length)
+})
+
+test('does not show when assignment is not published', () => {
+  ENV.SHOW_SPEED_GRADER_LINK = false
+  const view = editHeaderView({published: false})
+  strictEqual(view.$('.speed-grader-link-container').length, 0)
 })
 
 QUnit.module('EditHeaderView - try deleting assignment', {

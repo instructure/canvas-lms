@@ -20,8 +20,16 @@
 
 class Progress < ActiveRecord::Base
   belongs_to :context, polymorphic:
-      [:content_migration, :course, :account, :group_category, :content_export,
-       :assignment, :attachment, :epub_export, :sis_batch, :course_pace,
+      [:content_migration,
+       :course,
+       :account,
+       :group_category,
+       :content_export,
+       :assignment,
+       :attachment,
+       :epub_export,
+       :sis_batch,
+       :course_pace,
        { context_user: "User", quiz_statistics: "Quizzes::QuizStatistics" }]
   belongs_to :user
   belongs_to :delayed_job, class_name: "::Delayed::Job", optional: true
@@ -101,7 +109,7 @@ class Progress < ActiveRecord::Base
   def process_job(target, method, enqueue_args, *method_args, **kwargs)
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
     method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
-    work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
+    work = Progress::Work.new(self, target, method, args: method_args, kwargs:)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do
         job = Delayed::Job.enqueue(work, **enqueue_args)

@@ -84,7 +84,7 @@ describe "Importing Learning Outcome Groups" do
     log_data = group_data(migration_id: "other-migration-id")
     expect do
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
-    end.to change(@context.learning_outcome_groups, :count).by(0)
+    end.not_to change(@context.learning_outcome_groups, :count)
   end
 
   it "generates a new outcome group when already exists a deleted group with the same name in the same folder" do

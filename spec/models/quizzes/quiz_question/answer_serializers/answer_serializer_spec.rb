@@ -23,7 +23,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
 
     qq = { question_type: "uber_hax_question" }
 
-    expect(ases.serializer_for(qq)).to be_kind_of(Quizzes::QuizQuestion::AnswerSerializers::Unknown)
+    expect(ases.serializer_for(qq)).to be_a(Quizzes::QuizQuestion::AnswerSerializers::Unknown)
 
     stub_const("Quizzes::QuizQuestion::AnswerSerializers::UberHax",
                Class.new(Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer))

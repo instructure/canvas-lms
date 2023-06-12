@@ -26,7 +26,7 @@ describe "quizzes/quizzes/_take_quiz_right_side" do
     view_context
     due_at = 5.days.from_now
     lock_at = 10.days.from_now
-    quiz = assign(:quiz, @course.quizzes.create!(due_at: due_at, lock_at: lock_at))
+    quiz = assign(:quiz, @course.quizzes.create!(due_at:, lock_at:))
     submission = assign(:submission, quiz.generate_submission(@user))
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(quiz, submission, params))
     render partial: "quizzes/quizzes/take_quiz_right_side"

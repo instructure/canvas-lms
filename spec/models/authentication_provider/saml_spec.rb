@@ -59,7 +59,7 @@ describe AuthenticationProvider::SAML do
 
   it "sets requested_authn_context to nil if empty string" do
     @aac = @account.authentication_providers.create!(auth_type: "saml", requested_authn_context: "")
-    expect(@aac.requested_authn_context).to eq nil
+    expect(@aac.requested_authn_context).to be_nil
   end
 
   it "allows requested_authn_context to be set to anything" do

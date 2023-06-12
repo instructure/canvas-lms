@@ -62,13 +62,13 @@ describe PageViewsController do
       pv3 = page_view(@user, "/somewhere/in/app/2", created_at: 3.days.ago)  # 3rd day
       get "index", params: { user_id: @user.id }, format: "csv"
       expect(response).to be_successful
-      dates = CSV.parse(response.body, headers: true).map { |row| row["created_at"] }
+      dates = CSV.parse(response.body, headers: true).pluck("created_at")
       expect(dates).to eq [pv1, pv2, pv3].map(&:created_at).map(&:to_s)
     end
 
     it "errors if end_time is before start_time" do
       get "index", params: { user_id: @user.id, start_time: "2021-07-04", end_time: "2021-07-03" }, format: "csv"
-      expect(response.status).to eq 400
+      expect(response).to have_http_status :bad_request
       expect(response.body).to eq "end_time must be after start_time"
     end
   end
@@ -92,7 +92,7 @@ describe PageViewsController do
 
         user_session(@student)
         put "update", params: { id: pv.token, interaction_seconds: "5", page_view_token: pv.token }, xhr: true
-        expect(response.status).to eq 200
+        expect(response).to have_http_status :ok
       end
     end
   end
@@ -121,8 +121,12 @@ describe PageViewsController do
             limit: 25
           )
           .and_return([])
-        get "index", params: { user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
-                               end_time: "2016-03-15T00:00:00Z", per_page: 25 }, format: :json
+        get "index",
+            params: { user_id: @user.id,
+                      start_time: "2016-03-14T12:25:55Z",
+                      end_time: "2016-03-15T00:00:00Z",
+                      per_page: 25 },
+            format: :json
         expect(response).to be_successful
       end
 
@@ -139,8 +143,11 @@ describe PageViewsController do
             limit: 99
           )
           .and_return([])
-        get "index", params: { user_id: @user.id, start_time: "2016-03-14T12:25:55Z",
-                               end_time: "2016-03-15T00:00:00Z" }, format: :csv
+        get "index",
+            params: { user_id: @user.id,
+                      start_time: "2016-03-14T12:25:55Z",
+                      end_time: "2016-03-15T00:00:00Z" },
+            format: :csv
         expect(response).to be_successful
       end
     end

@@ -26,12 +26,12 @@ describe Lti::Messages::DeepLinkingRequest do
 
   let(:jwt_message) do
     Lti::Messages::DeepLinkingRequest.new(
-      tool: tool,
+      tool:,
       context: course,
-      user: user,
-      expander: expander,
-      return_url: return_url,
-      opts: opts
+      user:,
+      expander:,
+      return_url:,
+      opts:
     )
   end
 
@@ -90,6 +90,19 @@ describe Lti::Messages::DeepLinkingRequest do
         let(:accept_media_types) { "application/vnd.ims.lti.v1.ltilink" }
         let(:auto_create) { true }
         let(:accept_multiple) { false }
+      end
+
+      context "when editing an existing collaboration (expander.collaboration != nil)" do
+        let(:collaboration) do
+          ExternalToolCollaboration.create! context: course, title: "foo", url: "http://notneededhere.example.com"
+        end
+
+        it "includes the content_item_id in the deep linking return URL's data JWT" do
+          expect(Lti::DeepLinkingData).to receive(:jwt_from) do |claims|
+            expect(claims[:content_item_id]).to eq(collaboration.id)
+          end
+          subject
+        end
       end
     end
 

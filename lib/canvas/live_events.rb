@@ -25,29 +25,38 @@ module Canvas::LiveEvents
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)
     LiveEvents.post_event(
-      event_name: event_name,
-      payload: payload,
+      event_name:,
+      payload:,
       time: Time.zone.now,
-      context: context
+      context:
     )
   end
 
-  def self.amended_context(canvas_context)
-    ctx = LiveEvents.get_context || {}
-    return ctx unless canvas_context
+  def self.base_context_attributes(canvas_context, root_account)
+    res = {}
 
-    ctx = ctx.merge({
-                      context_type: canvas_context.class.to_s,
-                      context_id: canvas_context.global_id
-                    })
-    if canvas_context.respond_to?(:root_account)
-      ctx.merge!({
-                   root_account_id: canvas_context.root_account.try(:global_id),
-                   root_account_uuid: canvas_context.root_account.try(:uuid),
-                   root_account_lti_guid: canvas_context.root_account.try(:lti_guid),
-                 })
+    if canvas_context
+      res[:context_type] = canvas_context.class.to_s
+      res[:context_id] = canvas_context.global_id
+      res[:context_account_id] = Context.get_account_or_parent_account_global_id(canvas_context)
+      if canvas_context.respond_to?(:sis_source_id)
+        res[:context_sis_source_id] = canvas_context.sis_source_id
+      end
     end
-    ctx
+
+    if root_account
+      res[:root_account_uuid] = root_account&.uuid
+      res[:root_account_id] = root_account&.global_id
+      res[:root_account_lti_guid] = root_account&.lti_guid
+    end
+
+    res
+  end
+
+  def self.amended_context(canvas_context)
+    (LiveEvents.get_context || {}).merge(
+      base_context_attributes(canvas_context, canvas_context.try(:root_account))
+    )
   end
 
   def self.conversation_created(conversation)
@@ -58,7 +67,8 @@ module Canvas::LiveEvents
   end
 
   def self.conversation_forwarded(conversation)
-    post_event_stringified("conversation_forwarded", {
+    post_event_stringified("conversation_forwarded",
+                           {
                              conversation_id: conversation.id,
                              updated_at: conversation.updated_at
                            },
@@ -229,6 +239,7 @@ module Canvas::LiveEvents
 
     event = {
       assignment_id: assignment.global_id,
+      assignment_id_duplicated_from: assignment.duplicate_of&.global_id&.to_s,
       context_id: assignment.global_context_id,
       context_uuid: assignment.context.uuid,
       context_type: assignment.context_type,
@@ -246,11 +257,14 @@ module Canvas::LiveEvents
       lti_resource_link_id: assignment.lti_resource_link_id,
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
       submission_types: assignment.submission_types,
-      created_on_blueprint_sync: created_on_blueprint_sync || false
+      created_on_blueprint_sync: created_on_blueprint_sync || false,
+      resource_map: assignment.resource_map
     }
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
+    original_domain = assignment.duplicate_of&.root_account&.domain(ApplicationController.test_cluster_name)
+    event[:domain_duplicated_from] = original_domain if original_domain
     if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
       context: assignment.course,
       vendor_code: actl.tool_vendor_code,
@@ -444,7 +458,9 @@ module Canvas::LiveEvents
     data = {
       enrollment_id: enrollment.global_id,
       course_id: enrollment.global_course_id,
+      course_uuid: enrollment.course.uuid,
       user_id: enrollment.global_user_id,
+      user_uuid: enrollment.user.uuid,
       user_name: enrollment.user_name,
       type: enrollment.type,
       created_at: enrollment.created_at,
@@ -504,9 +520,11 @@ module Canvas::LiveEvents
     ctx[:user_account_id] = pseudonym.account.global_id
     ctx[:user_sis_id] = pseudonym.sis_user_id
     ctx[:session_id] = session[:session_id] if session[:session_id]
-    post_event_stringified("logged_in", {
+    post_event_stringified("logged_in",
+                           {
                              redirect_url: session[:return_to]
-                           }, ctx)
+                           },
+                           ctx)
   end
 
   def self.logged_out
@@ -581,7 +599,8 @@ module Canvas::LiveEvents
       SisPseudonym.for(submission.user, submission.assignment.context, type: :trusted, require_sis: false)
     end
 
-    post_event_stringified("grade_change", {
+    post_event_stringified("grade_change",
+                           {
                              submission_id: submission.global_id,
                              assignment_id: submission.global_assignment_id,
                              assignment_name: submission.assignment.name,
@@ -591,13 +610,14 @@ module Canvas::LiveEvents
                              old_score: old_submission.try(:score),
                              points_possible: submission.assignment.points_possible,
                              old_points_possible: old_assignment.points_possible,
-                             grader_id: grader_id,
+                             grader_id:,
                              student_id: submission.global_user_id,
                              student_sis_id: sis_pseudonym&.sis_user_id,
                              user_id: submission.global_user_id,
                              grading_complete: submission.graded?,
                              muted: !submission.posted?
-                           }, amended_context(submission.assignment.context))
+                           },
+                           amended_context(submission.assignment.context))
   end
 
   def self.asset_access(asset, category, role, level, context: nil, context_membership: nil)
@@ -623,10 +643,10 @@ module Canvas::LiveEvents
         asset_name: asset_obj.try(:name) || asset_obj.try(:title),
         asset_type: asset_obj.class.reflection_type_name,
         asset_id: asset_obj.global_id,
-        asset_subtype: asset_subtype,
-        category: category,
-        role: role,
-        level: level
+        asset_subtype:,
+        category:,
+        role:,
+        level:
       }.merge(LiveEvents::EventSerializerProvider.serialize(asset_obj)).merge(enrollment_data),
       amended_context(context)
     )
@@ -669,7 +689,7 @@ module Canvas::LiveEvents
       context_type: context.class.to_s,
       lti_context_id: context.lti_context_id,
       context_uuid: context.uuid,
-      import_quizzes_next: import_quizzes_next,
+      import_quizzes_next:,
       source_course_lti_id: content_migration.source_course&.lti_context_id,
       source_course_uuid: content_migration.source_course&.uuid,
       destination_course_lti_id: context.lti_context_id,
@@ -1074,21 +1094,27 @@ module Canvas::LiveEvents
 
   def self.blueprint_restrictions_updated_data(master_content_tag)
     lti_resource_link_id =
-      master_content_tag.content_type == "Assignment" ? master_content_tag.content.lti_resource_link_id : nil
+      (master_content_tag.content_type == "Assignment") ? master_content_tag.content.lti_resource_link_id : nil
 
     {
       canvas_assignment_id: master_content_tag.content_id,
       canvas_course_id: master_content_tag.master_template.course_id,
       canvas_course_uuid: master_content_tag.master_template.course.uuid,
-      lti_resource_link_id: lti_resource_link_id,
+      lti_resource_link_id:,
       restrictions: master_content_tag.restrictions,
       use_default_restrictions: master_content_tag.use_default_restrictions
     }
   end
 
   def self.heartbeat
+    environment = if ApplicationController.test_cluster?
+                    ApplicationController.test_cluster_name
+                  else
+                    Canvas.environment
+                  end
+
     data = {
-      environment: Canvas.environment,
+      environment:,
       region_code: Canvas.region_code || "not_configured",
       region: Canvas.region || "not_configured"
     }

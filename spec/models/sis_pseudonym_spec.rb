@@ -26,8 +26,8 @@ describe SisPseudonym do
 
   def pseud_params(unique_id, account = Account.default)
     {
-      account: account,
-      unique_id: unique_id,
+      account:,
+      unique_id:,
       password: "asdfasdf",
       password_confirmation: "asdfasdf"
     }
@@ -108,7 +108,7 @@ describe SisPseudonym do
     e.sis_pseudonym_id = @p.id
     e.save!
     section = course1.course_sections.create
-    e2 = course1.enroll_user(u, "StudentEnrollment", enrollment_state: "active", section: section, allow_multiple_enrollments: true)
+    e2 = course1.enroll_user(u, "StudentEnrollment", enrollment_state: "active", section:, allow_multiple_enrollments: true)
     e2.sis_pseudonym_id = @p2.id
     e2.save!
     expect(SisPseudonym.for(u, e)).to eq @p

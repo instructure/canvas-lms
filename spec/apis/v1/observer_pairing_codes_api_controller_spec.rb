@@ -29,7 +29,9 @@ describe ObserverPairingCodesApiController, type: :request do
       @course.account.enable_self_registration
       @path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
       @params = { user_id: @student.to_param,
-                  controller: "observer_pairing_codes_api", action: "create", format: "json" }
+                  controller: "observer_pairing_codes_api",
+                  action: "create",
+                  format: "json" }
     end
 
     it "does not permit pairing code generation if self-registration is disabled" do
@@ -37,13 +39,13 @@ describe ObserverPairingCodesApiController, type: :request do
       ap.self_registration = "none"
       ap.save!
       api_call_as_user(@student, :post, @path, @params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "students can create pairing codes for themselves" do
       json = api_call_as_user(@student, :post, @path, @params)
       expect(json["user_id"]).to eq @student.id
-      expect(json["expires_at"] >= 6.days.from_now && json["expires_at"] <= 7.days.from_now).to eq true
+      expect(json["expires_at"] >= 6.days.from_now && json["expires_at"] <= 7.days.from_now).to be true
       expect(json["workflow_state"]).to eq "active"
       expect(json["code"].length).to eq 6
     end
@@ -53,14 +55,14 @@ describe ObserverPairingCodesApiController, type: :request do
       params = @params.merge(user_id: user.to_param)
       path = "/api/v1/users/#{user.id}/observer_pairing_codes"
       api_call_as_user(user, :post, path, params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "teacher cannot generate code by default" do
       teacher = teacher_in_course(course: @course, active_all: true).user
       json = api_call_as_user(teacher, :post, @path, @params)
-      expect(response.code).to eq "401"
-      expect(json["code"]).to eq nil
+      expect(response).to have_http_status :unauthorized
+      expect(json["code"]).to be_nil
     end
 
     it "works for teachers in courses that are not published yet" do
@@ -72,7 +74,7 @@ describe ObserverPairingCodesApiController, type: :request do
       path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
       params = @params.merge(user_id: @student.to_param)
       api_call_as_user(@teacher, :post, path, params)
-      expect(response.code).to eq "200"
+      expect(response).to have_http_status :ok
     end
 
     it "does not work for deleted courses" do
@@ -84,19 +86,19 @@ describe ObserverPairingCodesApiController, type: :request do
       path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
       params = @params.merge(user_id: @student.to_param)
       api_call_as_user(@teacher, :post, path, params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "admin can generate code" do
       admin = account_admin_user(account: Account.default)
       json = api_call_as_user(admin, :post, @path, @params)
-      expect(response.code).to eq "200"
-      expect(json["code"]).not_to be nil
+      expect(response).to have_http_status :ok
+      expect(json["code"]).not_to be_nil
     end
 
     it "errors if current_user isnt the student or a teacher/admin" do
       api_call_as_user(user_model, :post, @path, @params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     describe "sub_accounts" do
@@ -106,13 +108,15 @@ describe ObserverPairingCodesApiController, type: :request do
         @sub_admin = account_admin_user(account: @sub_account)
         @path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
         @params = { user_id: @student.to_param,
-                    controller: "observer_pairing_codes_api", action: "create", format: "json" }
+                    controller: "observer_pairing_codes_api",
+                    action: "create",
+                    format: "json" }
       end
 
       it "sub_account admin can generate code" do
         json = api_call_as_user(@sub_admin, :post, @path, @params)
-        expect(response.code).to eq "200"
-        expect(json["code"]).not_to be nil
+        expect(response).to have_http_status :ok
+        expect(json["code"]).not_to be_nil
       end
 
       it "sub_account admin cant generate code for students in other sub accounts" do
@@ -120,9 +124,11 @@ describe ObserverPairingCodesApiController, type: :request do
         other_student = course_with_student(account: other_sub_account, active_all: true).user
         path = "/api/v1/users/#{other_student.id}/observer_pairing_codes"
         params = { user_id: other_student.to_param,
-                   controller: "observer_pairing_codes_api", action: "create", format: "json" }
+                   controller: "observer_pairing_codes_api",
+                   action: "create",
+                   format: "json" }
         api_call_as_user(@sub_admin, :post, path, params)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end

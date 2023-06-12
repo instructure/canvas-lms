@@ -79,7 +79,9 @@ module Api::V1::AssignmentGroup
         assignment.context = group.context
         exclude_fields = opts[:exclude_response_fields] | ["in_closed_grading_period"] # array union
 
-        json = assignment_json(assignment, user, session,
+        json = assignment_json(assignment,
+                               user,
+                               session,
                                include_discussion_topic: includes.include?("discussion_topic"),
                                include_all_dates: includes.include?("all_dates"),
                                include_can_edit: includes.include?("can_edit"),
@@ -91,9 +93,9 @@ module Api::V1::AssignmentGroup
                                include_score_statistics: includes.include?("score_statistics"),
                                assignment_visibilities: opts[:assignment_visibilities].try(:[], assignment.id),
                                exclude_response_fields: exclude_fields,
-                               overrides: overrides,
+                               overrides:,
                                include_overrides: opts[:include_overrides],
-                               needs_grading_course_proxy: needs_grading_course_proxy,
+                               needs_grading_course_proxy:,
                                submission: includes.include?("submission") ? opts[:submissions][assignment.id] : nil,
                                master_course_status: opts[:master_course_status],
                                include_assessment_requests: includes.include?("assessment_requests"))

@@ -19,9 +19,13 @@
 
 # Initialize incoming email configuration. See config/incoming_mail.yml.example.
 
-config = ConfigFile.load("incoming_mail").dup || {}
+config = ConfigFile.load("incoming_mail").deep_dup || {}
 
 Rails.configuration.to_prepare do
+  if config.key?("sqs")
+    config["sqs"]["credentials"] = Canvas::AwsCredentialProvider.new("incoming_mail_creds", config["sqs"]["vault_credential_path"])
+  end
+
   IncomingMailProcessor::IncomingMessageProcessor.configure(config)
   IncomingMailProcessor::IncomingMessageProcessor.logger = Rails.logger
 end

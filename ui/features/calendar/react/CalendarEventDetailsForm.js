@@ -35,7 +35,7 @@ import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
 import tz from '@canvas/timezone'
 import moment from 'moment'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
@@ -71,12 +71,11 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const shouldShowConferenceField = () => shouldShowConferences
   const shouldEnableConferenceField = () => !isBlackout
   const shouldShowContextField = () => event.can_change_context
-  const shouldShowImportantDatesField = () => context.k5_course
+  const shouldShowImportantDatesField = () => context.k5_course || context.k5_account
   const shouldShowBlackoutDateCheckbox = useCallback(() => {
     return (
       ENV.FEATURES.account_level_blackout_dates &&
-      ((context.type === 'account' && ENV.FEATURES.account_calendar_events) ||
-        (context.type === 'course' && context.course_pacing_enabled))
+      (context.type === 'account' || (context.type === 'course' && context.course_pacing_enabled))
     )
   }, [context])
 
@@ -225,11 +224,18 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   }
 
   const addTimeToDate = time => {
+    // dateTime is set to the correct date but the incorrect time
+    // momentTime is set to the correct time but the incorrect date
+    // Setting the momentTime's date to the dateTime's date will give us the correct date and time. This will handle
+    // DST issues as well since the momentTime will be set to the correct time in the correct timezone.
     const dateTime = moment.tz(date, timezone)
+    if (!time) return dateTime
+
     const momentTime = moment.tz(time, timezone)
-    dateTime.add(momentTime.hours(), 'hour')
-    dateTime.add(momentTime.minutes(), 'minute')
-    return dateTime
+    momentTime.set('year', dateTime.year())
+    momentTime.set('month', dateTime.month())
+    momentTime.set('date', dateTime.date())
+    return momentTime
   }
 
   const screenReaderMessageCallback = msg => {

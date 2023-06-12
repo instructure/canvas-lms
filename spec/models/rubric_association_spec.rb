@@ -20,7 +20,7 @@
 
 describe RubricAssociation do
   def rubric_association_params_for_assignment(assign, override = {})
-    HashWithIndifferentAccess.new({
+    ActiveSupport::HashWithIndifferentAccess.new({
       hide_score_total: "0",
       purpose: "grading",
       skip_updating_points_possible: false,
@@ -143,7 +143,7 @@ describe RubricAssociation do
       it "does nothing if it is not associated to an assignment" do
         rubric = @course.rubrics.create!
         ra = RubricAssociation.create!(
-          rubric: rubric,
+          rubric:,
           association_object: @course,
           context: @course,
           purpose: "bookmark"
@@ -212,8 +212,11 @@ describe RubricAssociation do
         context: @course,
         purpose: "grading"
       )
-      request = AssessmentRequest.create!(user: submission_student, asset: submission, assessor_asset: assessor_submission,
-                                          assessor: review_student, rubric_association: ra)
+      request = AssessmentRequest.create!(user: submission_student,
+                                          asset: submission,
+                                          assessor_asset: assessor_submission,
+                                          assessor: review_student,
+                                          rubric_association: ra)
       expect(request).not_to be_nil
       ra.destroy
       expect(request.reload).not_to be_nil
@@ -278,8 +281,8 @@ describe RubricAssociation do
       user_session(@user)
       @account = @user.account
       @rubric = @account.rubrics.build
-      rubric_params = HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
-      rubric_association_params = HashWithIndifferentAccess.new({ association_object: @account, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
+      rubric_params = ActiveSupport::HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({ association_object: @account, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
       # 8864: the below raised a MethodNotFound error by trying to call @account.submissions
       expect { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.not_to raise_error
     end
@@ -289,8 +292,8 @@ describe RubricAssociation do
     it "does not try to link to assessments" do
       course_with_teacher(active_all: true)
       @rubric = @course.rubrics.build
-      rubric_params = HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
-      rubric_association_params = HashWithIndifferentAccess.new({ association_object: @course, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
+      rubric_params = ActiveSupport::HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
+      rubric_association_params = ActiveSupport::HashWithIndifferentAccess.new({ association_object: @course, hide_score_total: "0", use_for_grading: "0", purpose: "bookmark" })
       expect_any_instantiation_of(@course).not_to receive(:submissions)
       @rubric.update_with_association(@user, rubric_params, @course, rubric_association_params)
     end
@@ -298,9 +301,9 @@ describe RubricAssociation do
 
   describe "#assess" do
     let(:course) { Course.create! }
-    let!(:first_teacher) { course_with_teacher(course: course, active_all: true).user }
-    let!(:second_teacher) { course_with_teacher(course: course, active_all: true).user }
-    let(:student) { student_in_course(course: course, active_all: true).user }
+    let!(:first_teacher) { course_with_teacher(course:, active_all: true).user }
+    let!(:second_teacher) { course_with_teacher(course:, active_all: true).user }
+    let(:student) { student_in_course(course:, active_all: true).user }
     let(:assignment) { course.assignments.create!(submission_types: "online_text_entry") }
     let(:rubric) do
       course.rubrics.create! do |r|
@@ -326,11 +329,15 @@ describe RubricAssociation do
     let(:assessment_params) { { assessment_type: "grading", criterion_stuff: { points: 1 } } }
 
     it "updates the assessor/grader if the second assessor is different than the first" do
-      rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+      rubric_association.assess(user: student,
+                                assessor: first_teacher,
+                                artifact: submission,
                                 assessment: assessment_params)
 
       assessment_params[:criterion_stuff][:points] = 0
-      assessment = rubric_association.assess(user: student, assessor: second_teacher, artifact: submission,
+      assessment = rubric_association.assess(user: student,
+                                             assessor: second_teacher,
+                                             artifact: submission,
                                              assessment: assessment_params)
       submission.reload
 
@@ -340,13 +347,17 @@ describe RubricAssociation do
 
     it "propagated hide_points value" do
       rubric_association.update!(hide_points: true)
-      assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+      assessment = rubric_association.assess(user: student,
+                                             assessor: first_teacher,
+                                             artifact: submission,
                                              assessment: assessment_params)
       expect(assessment.hide_points).to be true
     end
 
     it "updates the rating description and id if not present in passed params" do
-      assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+      assessment = rubric_association.assess(user: student,
+                                             assessor: first_teacher,
+                                             artifact: submission,
                                              assessment: assessment_params)
       expect(assessment.data[0][:id]).to eq "blank"
       expect(assessment.data[0][:description]).to eq "Full Marks"
@@ -385,7 +396,7 @@ describe RubricAssociation do
           expect do
             RubricAssociation.generate(teacher, rubric, course, association_object: assignment, purpose: "grading")
           end.to change {
-            AnonymousOrModerationEvent.where(event_type: "rubric_updated", assignment: assignment).count
+            AnonymousOrModerationEvent.where(event_type: "rubric_updated", assignment:).count
           }.by(1)
         end
 
@@ -417,7 +428,7 @@ describe RubricAssociation do
           expect do
             rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           end.to change {
-            AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment: assignment).count
+            AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment:).count
           }.by(1)
         end
 
@@ -517,13 +528,67 @@ describe RubricAssociation do
       course = Course.create!
       rubric = course.rubrics.create!
       association = RubricAssociation.create!(
-        rubric: rubric,
+        rubric:,
         association_object: course,
         context: course,
         purpose: "bookmark"
       )
       association.destroy
       expect { association.restore }.to change { association.workflow_state }.from("deleted").to("active")
+    end
+  end
+
+  describe "restrict_quantitative_data" do
+    before do
+      course_with_teacher(active_course: true, active_user: true)
+      @student = student_in_course(active_user: true).user
+
+      assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        submission_types: "online_text_entry"
+      )
+
+      rubric = @course.rubrics.create!
+      @course_rubric_association = RubricAssociation.create!(
+        rubric:,
+        association_object: @course,
+        context: @course,
+        purpose: "bookmark"
+      )
+      @assignment_rubric_association = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params_for_assignment(assignment))
+    end
+
+    describe "is off" do
+      it "with course_rubric_association to be false" do
+        expect(@course_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?).to be false
+      end
+
+      it "with assignment_rubric_association to be false" do
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@assignment_rubric_association.restrict_quantitative_data?).to be false
+      end
+    end
+
+    describe "is on" do
+      before do
+        @course.root_account.enable_feature!(:restrict_quantitative_data)
+        @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+        @course.save!
+      end
+
+      it "with course_rubric_association to be false" do
+        expect(@course_rubric_association.restrict_quantitative_data?(@teacher)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?(@student)).to be false
+        expect(@course_rubric_association.restrict_quantitative_data?).to be false
+      end
+
+      it "with assignment_rubric_association to be true" do
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@teacher)).to be true
+        expect(@assignment_rubric_association.restrict_quantitative_data?(@student)).to be true
+      end
     end
   end
 end

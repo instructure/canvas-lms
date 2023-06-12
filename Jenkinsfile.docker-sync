@@ -19,20 +19,16 @@
  */
 
 final SYNC_IMAGES = [
-  'busybox:latest': [
-    job: null,
-    target: 'starlord.inscloudgate.net/jenkins/busybox:latest',
-  ],
-  'docker/dockerfile:1.0-experimental': [
-    job: null,
-    target: 'starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental',
+  'docker/dockerfile:1.5.2': [
+    platforms: ['linux/amd64', 'linux/arm64'],
+    target: 'starlord.inscloudgate.net/jenkins/dockerfile:1.5.2',
   ],
   'selenium/hub:4.6': [
-    job: null,
+    platforms: ['linux/amd64'],
     target: 'starlord.inscloudgate.net/jenkins/selenium-hub:4.6'
   ],
   'selenium/node-chrome:107.0': [
-    job: null,
+    platforms: ['linux/amd64'],
     target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:107.0'
   ]
 ]
@@ -50,46 +46,52 @@ pipeline {
       steps {
         script {
           SYNC_IMAGES.each { srcTag, config ->
-            def dstJob = config['job']
+            def dstPlatforms = config['platforms']
             def dstTag = config['target']
+            def platformImageList = ""
 
-            echo "ITERATE ${srcTag} AND ${dstTag}"
+            dstPlatforms.each { dstPlatform ->
+              def sanitizedPlatform = dstPlatform.replaceAll('/', '_')
 
-            sh """
-              docker pull $srcTag
-              docker pull $dstTag || true
-            """
+              platformImageList = "${platformImageList} ${dstTag}-${sanitizedPlatform}"
 
-            def srcImageId = sh(script: "docker images --filter=reference=$srcTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
-            def dstImageId = sh(script: "docker images --filter=reference=$dstTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
+              echo "ITERATE ${srcTag} -> ${dstTag} FOR ${dstPlatform}"
 
-            if (srcImageId == dstImageId) {
-              slackSend(
-                channel: '#devx-alerts',
-                color: 'good',
-                message: "syncing image ${srcTag} (${srcImageId}) to ${dstTag} (${dstImageId}), no changes found"
-              )
-            } else {
               sh """
-                docker tag $srcTag $dstTag
-                docker push $dstTag
+                docker pull --platform $dstPlatform $srcTag
+                docker pull $dstTag-$sanitizedPlatform || true
               """
 
-              if (dstJob) {
-                build(job: dstJob, parameters: [
-                  string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
-                ], propagate: false, wait: false)
+              def srcImageId = sh(script: "docker images --filter=reference=$srcTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
+              def dstImageId = sh(script: "docker images --filter=reference=$dstTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
+
+              if (srcImageId == dstImageId) {
+                slackSend(
+                  channel: '#devx-alerts',
+                  color: 'good',
+                  message: "syncing image ${srcTag} (${srcImageId}) to ${dstTag} (${dstImageId}), no changes found"
+                )
+              } else {
+                sh """
+                  docker tag $srcTag $dstTag-$sanitizedPlatform
+                  docker push $dstTag-$sanitizedPlatform
+                """
+
+                slackSend(
+                  channel: '#devx-alerts',
+                  color: 'warning',
+                  message: "syncing image ${srcTag} (${srcImageId}) to ${dstTag} (${dstImageId}), changes found"
+                )
               }
 
-              slackSend(
-                channel: '#devx-alerts',
-                color: 'warning',
-                message: "syncing image ${srcTag} (${srcImageId}) to ${dstTag} (${dstImageId}), changes found"
-              )
+              echo "SRC ID $srcImageId"
+              echo "DST ID $dstImageId"
             }
 
-            echo "SRC ID $srcImageId"
-            echo "DST ID $dstImageId"
+            sh """
+            docker manifest create ${dstTag} ${platformImageList}
+            docker manifest push ${dstTag}
+            """
           }
         }
       }

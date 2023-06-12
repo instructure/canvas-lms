@@ -39,10 +39,10 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
     conversation = get_conversation(input[:conversation_id])
 
     message = process_response(
-      conversation: conversation,
+      conversation:,
       context: conversation.conversation.context,
-      current_user: current_user,
-      session: session,
+      current_user:,
+      session:,
       recipients: input[:recipients],
       context_code: input[:context_code] || conversation.conversation.context&.asset_string || nil,
       message_ids: input[:included_messages],

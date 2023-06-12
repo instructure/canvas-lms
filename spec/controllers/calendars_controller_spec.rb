@@ -24,7 +24,9 @@ describe CalendarsController do
     @event = @course.calendar_events.create(title: "some assignment", start_at: date, end_at: date)
   end
 
-  before(:once) { course_with_student(active_all: true) }
+  before(:once) do
+    course_with_student(active_all: true)
+  end
 
   before { user_session(@student) }
 
@@ -48,20 +50,20 @@ describe CalendarsController do
       course_event
       get "show", params: { user_id: @user.id }
       expect(response).to be_successful
-      expect(assigns[:contexts_json][0][:can_make_reservation]).to eql(false)
-      expect(assigns[:contexts_json][1][:can_make_reservation]).to eql(true)
+      expect(assigns[:contexts_json][0][:can_make_reservation]).to be(false)
+      expect(assigns[:contexts_json][1][:can_make_reservation]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env SIS_NAME is SIS when @context does not respond_to assignments" do
@@ -80,19 +82,47 @@ describe CalendarsController do
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get "show", params: { user_id: @user.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
       allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
       get "show", params: { user_id: @user.id }
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
+    end
+
+    it "sets account's auto_subscribe if auto_subscribe_account_calendars flag is on" do
+      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+      account = @user.account
+      account.account_calendar_visible = true
+      account.account_calendar_subscription_type = "auto"
+      account.save!
+      @admin = account_admin_user(account:, active_all: true)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      get "show"
+      expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:auto_subscribe]).to be(true)
+    end
+
+    it "sets viewed_auto_subscribed_account_calendars for viewed auto-subscribed account calendars" do
+      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+      account = @user.account
+      account.account_calendar_visible = true
+      account.account_calendar_subscription_type = "auto"
+      account.save!
+      @admin = account_admin_user(account:, active_all: true)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      get "show"
+      expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:viewed_auto_subscribed_account_calendars]).to be(false)
+
+      @user.set_preference(:viewed_auto_subscribed_account_calendars, [account.global_id])
+      get "show"
+      expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:viewed_auto_subscribed_account_calendars]).to be(true)
     end
 
     it "sets context.course_sections.can_create_ag based off :manage_calendar permission" do
@@ -112,6 +142,21 @@ describe CalendarsController do
           expect(section[:can_create_ag]).to be_falsey
         end
       end
+    end
+
+    it "does not set context.course_sections on account contexts" do
+      account = @course.account
+      account.account_calendar_visible = true
+      account.save!
+      @admin = account_admin_user(account:, active_all: true)
+      @course.enroll_teacher(@admin, enrollment_state: :active)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      user_session(@admin)
+
+      get "show"
+      contexts = assigns(:contexts_json)
+      expect(contexts.find { |c| c[:type] == "account" }[:course_sections]).to be_nil
+      expect(contexts.find { |c| c[:type] == "course" }[:course_sections].length).to be 1
     end
 
     it "emits calendar.visit metric to statsd with appropriate enrollment tags" do

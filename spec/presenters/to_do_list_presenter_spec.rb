@@ -22,9 +22,9 @@ require_relative "../spec_helper"
 describe "ToDoListPresenter" do
   context "moderated assignments" do
     let(:course) { Course.create! }
-    let(:student) { course_with_student(course: course, active_all: true).user }
-    let(:grader) { course_with_teacher(course: course, active_all: true).user }
-    let(:final_grader) { course_with_teacher(course: course, active_all: true).user }
+    let(:student) { course_with_student(course:, active_all: true).user }
+    let(:grader) { course_with_teacher(course:, active_all: true).user }
+    let(:final_grader) { course_with_teacher(course:, active_all: true).user }
 
     before do
       assignment = Assignment.create!(
@@ -33,10 +33,10 @@ describe "ToDoListPresenter" do
         submission_types: "online_text_entry",
         moderated_grading: true,
         grader_count: 2,
-        final_grader: final_grader
+        final_grader:
       )
       assignment.submit_homework(student, body: "biscuits")
-      assignment.grade_student(student, grade: "1", grader: grader, provisional: true)
+      assignment.grade_student(student, grade: "1", grader:, provisional: true)
     end
 
     it "returns moderated assignments that user is the final grader for" do
@@ -70,7 +70,7 @@ describe "ToDoListPresenter" do
         submission_types: "online_text_entry",
         moderated_grading: true,
         grader_count: 2,
-        final_grader: final_grader
+        final_grader:
       ).submit_homework(student, body: "biscuits!!! and potatoes")
       Assignment.create!(
         context: course2,
@@ -78,7 +78,7 @@ describe "ToDoListPresenter" do
         submission_types: "online_text_entry",
         moderated_grading: true,
         grader_count: 2,
-        final_grader: final_grader
+        final_grader:
       ).submit_homework(student, body: "i really like potatoes")
     end
 
@@ -105,7 +105,7 @@ describe "ToDoListPresenter" do
 
     it "returns assignments from multiple types" do
       grading = Assignment.where(title: "assignment1").first
-      grading.grade_student(student, grade: "1", grader: grader, provisional: true)
+      grading.grade_student(student, grade: "1", grader:, provisional: true)
 
       presenter = ToDoListPresenter.new(nil, grader, nil)
       expect(presenter.needs_grading.map(&:title)).to contain_exactly("assignment2")

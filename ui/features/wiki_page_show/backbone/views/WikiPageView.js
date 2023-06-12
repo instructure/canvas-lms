@@ -23,7 +23,7 @@ import tz from '@canvas/timezone'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/WikiPage.handlebars'
-import StickyHeaderMixin from '@canvas/wiki/backbone/views/StickyHeaderMixin.coffee'
+import StickyHeaderMixin from '@canvas/wiki/backbone/views/StickyHeaderMixin'
 import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDialog'
 import WikiPageReloadView from '@canvas/wiki/backbone/views/WikiPageReloadView'
 import PublishButtonView from '@canvas/publish-button-view'
@@ -204,7 +204,7 @@ export default class WikiPageView extends Backbone.View {
     this.reloadView.on('reload', () => this.render())
     this.reloadView.pollForChanges()
 
-    renderFrontPagePill({
+    renderFrontPagePill(this.$el[0], {
       margin: 'small',
       children: this.toJSON().frontPageText,
     })

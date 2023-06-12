@@ -170,7 +170,7 @@ module Lti
       end
 
       it "returns message handlers tabs for course with course_navigation placement" do
-        course_with_teacher(account: account)
+        course_with_teacher(account:)
         @tp.bindings.create(context: @course)
 
         tabs = described_class.lti_apps_tabs(@course, [ResourcePlacement::COURSE_NAVIGATION], {})
@@ -251,12 +251,12 @@ module Lti
 
       it "returns false if the domain does not match the launch path domain" do
         invalid_url = "http://www.banana.com/launch"
-        expect(message_handler.valid_resource_url?(invalid_url)).to eq false
+        expect(message_handler.valid_resource_url?(invalid_url)).to be false
       end
 
       it "returns true if the domain matches the launch path domain" do
         valid_url = "#{message_handler.launch_path}/my-launch"
-        expect(message_handler.valid_resource_url?(valid_url)).to eq true
+        expect(message_handler.valid_resource_url?(valid_url)).to be true
       end
     end
 
@@ -283,7 +283,7 @@ module Lti
         guid: SecureRandom.uuid,
         product_version: "1.0beta",
         lti_version: "LTI-2p0",
-        product_family: product_family,
+        product_family:,
         workflow_state: "active",
         raw_data: "some raw data"
       }
@@ -291,12 +291,12 @@ module Lti
     end
 
     def create_resource_handler(tool_proxy = create_tool_proxy, opts = {})
-      default_opts = { resource_type_code: "code", name: "resource name", tool_proxy: tool_proxy }
+      default_opts = { resource_type_code: "code", name: "resource name", tool_proxy: }
       ResourceHandler.create(default_opts.merge(opts))
     end
 
     def create_message_handler(resource_handler = create_resource_handler, opts = {})
-      default_ops = { message_type: "basic-lti-launch-request", launch_path: "https://samplelaunch/blti", resource_handler: resource_handler }
+      default_ops = { message_type: "basic-lti-launch-request", launch_path: "https://samplelaunch/blti", resource_handler: }
       MessageHandler.create!(default_ops.merge(opts))
     end
   end

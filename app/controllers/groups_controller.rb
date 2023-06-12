@@ -151,8 +151,15 @@ class GroupsController < ApplicationController
   include K5Mode
 
   SETTABLE_GROUP_ATTRIBUTES = %w[
-    name description join_level is_public group_category avatar_attachment
-    storage_quota_mb max_membership leader
+    name
+    description
+    join_level
+    is_public
+    group_category
+    avatar_attachment
+    storage_quota_mb
+    max_membership
+    leader
   ].freeze
 
   include TextHelper
@@ -177,7 +184,7 @@ class GroupsController < ApplicationController
              end
 
     users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause("users"))
-                    .paginate(page: page, per_page: per_page)
+                    .paginate(page:, per_page:)
 
     if authorized_action(@context, @current_user, :manage)
       json = {
@@ -188,8 +195,8 @@ class GroupsController < ApplicationController
         total_entries: users.total_entries,
         users: users.map { |u| u.group_member_json(@context) }
       }
-      json[:pagination_html] = render_to_string(partial: "user_pagination", locals: { users: users }) unless params[:no_html]
-      render json: json
+      json[:pagination_html] = render_to_string(partial: "user_pagination", locals: { users: }) unless params[:no_html]
+      render json:
     end
   end
 
@@ -263,14 +270,17 @@ class GroupsController < ApplicationController
                                    .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                    .eager_load(:group_category).preload(:root_account)
 
-    if params[:section_restricted] && @context.is_a?(Course)
-      is_current_user_section_restricted = @context.membership_for_user(@current_user).limit_privileges_to_course_section
-      is_current_user_a_student = @context.user_is_student?(@current_user)
-
-      if is_current_user_section_restricted && is_current_user_a_student
+    # run this only for students
+    if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user)
+      is_current_user_section_restricted = @context.membership_for_user(@current_user)&.limit_privileges_to_course_section
+      if is_current_user_section_restricted
+        # Gets all groups in the context
         group_scope = @context.groups.active.eager_load(:group_category).preload(:root_account)
+        # Find all groups from that scope that can be limited from the section restriction parameter
         groups_with_restricted_categories_or_teacher_assigned = group_scope.where(group_categories: { self_signup: nil }).or(group_scope.where(group_categories: { self_signup: "restricted" }))
-        groups_with_no_common_section_with_current_user = groups_with_restricted_categories_or_teacher_assigned.reject { |g| g.has_common_section_with_user?(@current_user) }
+        # Find all groups that have users with different sections than the current user and DONT have the current_user in them
+        groups_with_no_common_section_with_current_user = groups_with_restricted_categories_or_teacher_assigned.reject { |g| g.has_common_section_with_user?(@current_user) || g.includes_user?(@current_user) }
+        # Remove the groups found above from the groups returned by the api
         @groups = all_groups -= groups_with_no_common_section_with_current_user
       end
     end
@@ -353,8 +363,11 @@ class GroupsController < ApplicationController
         @paginated_groups = Api.paginate(all_groups, self, path)
         render json: @paginated_groups.map { |g|
           include_inactive_users = value_to_boolean(params[:include_inactive_users])
-          group_json(g, @current_user, session, include: Array(params[:include]),
-                                                include_inactive_users: include_inactive_users)
+          group_json(g,
+                     @current_user,
+                     session,
+                     include: Array(params[:include]),
+                     include_inactive_users:)
         }
       end
     end
@@ -590,8 +603,15 @@ class GroupsController < ApplicationController
   def update
     find_group
     group_params = api_request? ? params : params.require(:group)
-    attrs = group_params.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
-                                leader: strong_anything, members: strong_anything)
+    attrs = group_params.permit(:name,
+                                :description,
+                                :join_level,
+                                :is_public,
+                                :avatar_id,
+                                :storage_quota_mb,
+                                :max_membership,
+                                leader: strong_anything,
+                                members: strong_anything)
     attrs[:leader] = nil if group_params.key?(:leader) && group_params[:leader].blank?
 
     if !api_request? && params[:group][:group_category_id]
@@ -700,7 +720,7 @@ class GroupsController < ApplicationController
     if authorized_action(@group, @current_user, :manage)
       root_account = @group.context.try(:root_account) || @domain_root_account
       ul = UserList.new(params[:invitees],
-                        root_account: root_account,
+                        root_account:,
                         search_method: :preferred,
                         current_user: @current_user)
       @memberships = []
@@ -848,7 +868,12 @@ class GroupsController < ApplicationController
   def create_file
     @attachment = Attachment.new(context: @context)
     if authorized_action(@attachment, @current_user, :create)
-      api_attachment_preflight(@context, request, check_quota: true, submit_assignment: value_to_boolean(params[:submit_assignment]))
+      submit_assignment = value_to_boolean(params[:submit_assignment])
+      opts = { check_quota: true, submit_assignment: }
+      if submit_assignment && @context.respond_to?(:submissions_folder)
+        opts[:folder] = @context.submissions_folder
+      end
+      api_attachment_preflight(@context, request, opts)
     end
   end
 

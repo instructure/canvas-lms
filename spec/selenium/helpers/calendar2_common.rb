@@ -76,7 +76,7 @@ module Calendar2Common
     rrule = "FREQ=DAILY;INTERVAL=1;COUNT=3"
   )
     rr = RRule::Rule.new(rrule, dtstart: start_at, tzid: Time.zone.tzinfo.name)
-    event_attributes = { title: title, rrule: rrule, series_uuid: SecureRandom.uuid }
+    event_attributes = { title:, rrule:, series_uuid: SecureRandom.uuid }
     dtstart_list = rr.all
 
     dtstart_list.map do |dtstart|
@@ -134,7 +134,7 @@ module Calendar2Common
       @course.assignments.create!(
         title: "assignment",
         points_possible: 10,
-        due_at: Time.zone.now + 5.minutes,
+        due_at: 5.minutes.from_now,
         submission_types: "online_text_entry",
         only_visible_to_overrides: true
       )
@@ -275,7 +275,7 @@ module Calendar2Common
     @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
-      new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
+      (new_date.to_date.mday == "15") ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
     create_timed_calendar_event(new_date, start_time, end_time)
     event_title_on_calendar.click
     expect(
@@ -302,7 +302,7 @@ module Calendar2Common
     @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
-      new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
+      (new_date.to_date.mday == "15") ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
     input_timed_calendar_event_fields(new_date, start_time, end_time)
     expect_new_page_load { edit_calendar_event_form_more_options.click }
     expect(more_options_date_field.property("value")).to eq(
@@ -354,8 +354,8 @@ module Calendar2Common
       should_add_date: with_date,
       should_add_location: with_location,
       should_duplicate: with_duplicates,
-      date: date,
-      use_current_course_calendar: use_current_course_calendar
+      date:,
+      use_current_course_calendar:
     )
   end
 

@@ -111,4 +111,9 @@ describe "login logout test" do
     fill_in_login_form("nobody@example.com", "asdfasdf")
     expect(displayed_username).to eq @user.primary_pseudonym.unique_id
   end
+
+  it "doesn't display external link icons", priority: "2" do
+    get "/login"
+    expect(f(".external_link_icon")).not_to be_displayed
+  end
 end

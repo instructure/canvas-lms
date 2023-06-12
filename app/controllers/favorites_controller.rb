@@ -93,7 +93,11 @@ class FavoritesController < ApplicationController
         end
       end
 
-      course_json(course, @current_user, session, includes, enrollments,
+      course_json(course,
+                  @current_user,
+                  session,
+                  includes,
+                  enrollments,
                   precalculated_permissions: all_precalculated_permissions&.dig(course.global_id))
     }
   end

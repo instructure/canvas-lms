@@ -161,7 +161,7 @@ describe "download submissions link" do
   it "shows download submissions button with submission not graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update(submission_type: "online_url")
-    expect(@submission.state).to eql(:submitted)
+    expect(@submission.state).to be(:submitted)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
@@ -175,7 +175,7 @@ describe "download submissions link" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    expect(@submission.state).to eql(:graded)
+    expect(@submission.state).to be(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
     @submission2.update!(submission_type: "online_url")
 
@@ -191,13 +191,13 @@ describe "download submissions link" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    expect(@submission.state).to eql(:graded)
+    expect(@submission.state).to be(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
     @submission2.update!(submission_type: "online_url")
     @submission2.grade_it
     @submission2.score = 5
     @submission2.save!
-    expect(@submission2.state).to eql(:graded)
+    expect(@submission2.state).to be(:graded)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
@@ -208,7 +208,7 @@ describe "download submissions link" do
   it "does not show download submissions button to students" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: "online_url")
-    expect(@submission.state).to eql(:submitted)
+    expect(@submission.state).to be(:submitted)
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
@@ -245,10 +245,10 @@ describe "ratio of submissions graded" do
   it "shows ratio of submissions graded with submission not graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: "online_url")
-    expect(@submission.state).to eql(:submitted)
+    expect(@submission.state).to be(:submitted)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
     @submission2.update!(submission_type: "online_url")
-    expect(@submission2.state).to eql(:submitted)
+    expect(@submission2.state).to be(:submitted)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
@@ -262,7 +262,7 @@ describe "ratio of submissions graded" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    expect(@submission.state).to eql(:graded)
+    expect(@submission.state).to be(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
     @submission2.update!(submission_type: "online_url")
 
@@ -278,13 +278,13 @@ describe "ratio of submissions graded" do
     @submission.grade_it
     @submission.score = 5
     @submission.save!
-    expect(@submission.state).to eql(:graded)
+    expect(@submission.state).to be(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
     @submission2.update!(submission_type: "online_url")
     @submission2.grade_it
     @submission2.score = 5
     @submission2.save!
-    expect(@submission2.state).to eql(:graded)
+    expect(@submission2.state).to be(:graded)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
@@ -295,7 +295,7 @@ describe "ratio of submissions graded" do
   it "does not show ratio of submissions graded to students" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: "online_url")
-    expect(@submission.state).to eql(:submitted)
+    expect(@submission.state).to be(:submitted)
 
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -414,7 +414,8 @@ describe "assignments_2 feature flag and parameter" do
         @observer,
         "ObserverEnrollment",
         section: @course.course_sections.first,
-        enrollment_state: "active", allow_multiple_enrollments: true
+        enrollment_state: "active",
+        allow_multiple_enrollments: true
       )
       add_linked_observer(@student, @observer)
     end
@@ -470,7 +471,7 @@ describe "assignments_2 feature flag and parameter" do
       expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: false))
       assignment = @course.assignments.create(
         title: "some assignment",
-        description: description
+        description:
       )
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
     end
@@ -482,9 +483,9 @@ describe "assignments_2 feature flag and parameter" do
         is_public: true
       )
       assignment = assignment_model(
-        course: course,
+        course:,
         submission_types: "online_url",
-        description: description
+        description:
       )
       get "/courses/#{course.id}/assignments/#{assignment.id}"
     end

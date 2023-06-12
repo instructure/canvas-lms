@@ -21,7 +21,7 @@ import {render, waitFor, fireEvent} from '@testing-library/react'
 import Upload, {onSubmit} from '../Upload'
 import {actions} from '../../../../reducers/imageSection'
 import {actions as svgActions} from '../../../../reducers/svgSettings'
-import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
+import FakeEditor from '../../../../../../__tests__/FakeEditor'
 import fetchMock from 'fetch-mock'
 import {isAnUnsupportedGifPngImage} from '../utils'
 

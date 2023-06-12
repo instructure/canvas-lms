@@ -80,13 +80,13 @@ module StickySisFields
     private
 
     def load_stuck_sis_fields_cache
-      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || "").split(",").map(&:to_sym).to_set
+      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || "").split(",").to_set(&:to_sym)
     end
 
     def calculate_currently_stuck_sis_fields
       @sis_fields_to_stick ||= [].to_set
       @sis_fields_to_unstick ||= [].to_set
-      changed_sis_fields = self.class.sticky_sis_fields & (changed.map(&:to_sym).to_set | @sis_fields_to_stick)
+      changed_sis_fields = self.class.sticky_sis_fields & (changed.to_set(&:to_sym) | @sis_fields_to_stick)
       (load_stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
     end
   end
@@ -94,7 +94,7 @@ module StickySisFields
   module ClassMethods
     # specify which fields are able to be stuck
     def are_sis_sticky(*fields)
-      self.sticky_sis_fields = fields.map(&:to_sym).to_set
+      self.sticky_sis_fields = fields.to_set(&:to_sym)
     end
 
     # takes a block and runs it with the following options:
@@ -111,7 +111,7 @@ module StickySisFields
     #   clear_sis_stickiness: default false,
     #       if true, the set_sis_stickiness callback is enabled and configured
     #       to write out an empty stickiness list on every save.
-    def process_as_sis(opts = {}, &block)
+    def process_as_sis(opts = {}, &)
       self.sis_stickiness_options ||= {}
       old_options = self.sis_stickiness_options.clone
       self.sis_stickiness_options = opts
@@ -119,7 +119,7 @@ module StickySisFields
         if opts[:add_sis_stickiness] || opts[:clear_sis_stickiness]
           yield
         else
-          suspend_callbacks(:set_sis_stickiness, &block)
+          suspend_callbacks(:set_sis_stickiness, &)
         end
       ensure
         self.sis_stickiness_options = old_options
@@ -129,8 +129,8 @@ module StickySisFields
 
   def self.included(klass)
     if klass < ActiveRecord::Base
-      klass.send :extend, ClassMethods
-      klass.prepend(InstanceMethods)
+      klass.extend ClassMethods
+      klass.prepend InstanceMethods
       klass.cattr_accessor :sticky_sis_fields
       klass.cattr_accessor :sis_stickiness_options
       klass.before_save :set_sis_stickiness

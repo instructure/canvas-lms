@@ -72,12 +72,12 @@ module TestDatabaseUtils
 
     private
 
-    def each_connection(&block)
+    def each_connection(&)
       ::Shard.with_each_shard(::Shard.sharded_models) do
         models = ::ActiveRecord::Base.descendants
         models.reject! { |m| m.connection_class_for_self == [::Switchman::UnshardedRecord] } unless ::Shard.current.default?
         model_connections = models.map(&:connection).uniq
-        model_connections.each(&block)
+        model_connections.each(&)
       end
     end
 

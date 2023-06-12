@@ -23,7 +23,13 @@ import ready from '@instructure/ready'
 ready(() => {
   const $preview = $('#media_preview')
   const data = $preview.data()
-  $preview.mediaComment('show_inline', data.media_entry_id || 'maybe', data.type, data.download_url)
+  $preview.mediaComment(
+    'show_inline',
+    data.media_entry_id || 'maybe',
+    data.type,
+    data.download_url,
+    data.attachment_id
+  )
   if (ENV.NEW_FILES_PREVIEW) {
     $('#media_preview').css({
       margin: '0',

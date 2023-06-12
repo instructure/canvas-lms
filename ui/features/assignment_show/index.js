@@ -16,16 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from '@canvas/axios'
 import qs from 'qs'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import PublishButtonView from '@canvas/publish-button-view'
-import SpeedgraderLinkView from './backbone/views/SpeedgraderLinkView.coffee'
+import SpeedgraderLinkView from './backbone/views/SpeedgraderLinkView'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
@@ -39,6 +38,8 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import ready from '@instructure/ready'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+
+if (!('INST' in window)) window.INST = {}
 
 const I18n = useI18nScope('assignment')
 
@@ -137,7 +138,7 @@ ready(() => {
     'immersive_reader_mobile_mount_point'
   )
   if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
-    import('../../shared/immersive-reader/ImmersiveReader')
+    import('@canvas/immersive-reader/ImmersiveReader')
       .then(ImmersiveReader => {
         const content = () => document.querySelector('.description')?.innerHTML
         const title = document.querySelector('.title')?.textContent
@@ -174,9 +175,15 @@ $(() => {
     const pbv = new PublishButtonView({model, el: $el})
     pbv.render()
 
-    pbv.on('publish', () => $('#moderated_grading_button').show())
+    pbv.on('publish', () => {
+      $('#moderated_grading_button').show()
+      $('#speed-grader-link-container').removeClass('hidden')
+    })
 
-    pbv.on('unpublish', () => $('#moderated_grading_button').hide())
+    pbv.on('unpublish', () => {
+      $('#moderated_grading_button').hide()
+      $('#speed-grader-link-container').addClass('hidden')
+    })
   }
 
   // Add module sequence footer

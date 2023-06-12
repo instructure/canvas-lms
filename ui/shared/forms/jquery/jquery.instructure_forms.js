@@ -17,7 +17,6 @@
  */
 
 import {send} from '@canvas/rce/RceCommandShim'
-import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
@@ -30,6 +29,17 @@ import '@canvas/datetime' /* date_field, time_field, datetime_field */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
+
+if (!('INST' in window)) window.INST = {}
+
+function isSafari() {
+  return (
+    !/Firefox/i.test(navigator.userAgent) &&
+    navigator.userAgent.indexOf('AppleWebKit') !== -1 &&
+    escape(navigator.javaEnabled.toString()) !==
+      'function%20javaEnabled%28%29%20%7B%20%5Bnative%20code%5D%20%7D'
+  )
+}
 
 const I18n = useI18nScope('instructure')
 
@@ -406,7 +416,7 @@ $.ajaxJSONFiles = function (url, submit_type, formData, files, success, error, o
 
 $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest)
 if ($.handlesHTML5Files) {
-  $("input[type='file']").live('change', function (_event) {
+  $(document).on('change', "input[type='file']", function (_event) {
     const file_list = this.files
     if (file_list) {
       $(this).data('file_list', file_list)
@@ -457,7 +467,7 @@ $.httpSuccess = function (r) {
       (r.status >= 200 && r.status < 300) ||
       r.status === 304 ||
       // eslint-disable-next-line eqeqeq
-      ($.browser.safari && r.status == undefined)
+      (isSafari() && r.status == undefined)
     )
   } catch (e) {
     // no-op

@@ -23,7 +23,7 @@ module SearchHelper
 
   ##
   # Loads all the contexts the user belongs to into instance variable @contexts
-  # Used for TokenInput.coffee instances
+  # Used for TokenInput.js instances
   #
   # If a course is provided, just return it (and its groups/sections)
   def load_all_contexts(options = {})
@@ -97,7 +97,7 @@ module SearchHelper
             name: group.name,
             type: :group,
             state: group.active? ? :active : :inactive,
-            parent: group.context_type == "Course" ? { course: group.context_id } : nil,
+            parent: (group.context_type == "Course") ? { course: group.context_id } : nil,
             context_name: (group_context || group.context).name,
             category: group.category
           }.tap do |hash|
@@ -134,7 +134,7 @@ module SearchHelper
         end
       when CourseSection
         visibility = context.course.enrollment_visibility_level_for(@current_user, context.course.section_visibilities_for(@current_user), require_message_permission: true)
-        sections = visibility == :restricted ? [] : [context]
+        sections = (visibility == :restricted) ? [] : [context]
         add_courses.call [context.course], :current
         add_sections.call context.course.sections_visible_to(@current_user, sections)
       else
@@ -161,26 +161,28 @@ module SearchHelper
     exclude_users, exclude_contexts = AddressBook.partition_recipients(options[:exclude] || [])
 
     if types[:context]
-      collections << ["contexts", search_messageable_contexts(
-        search: options[:search],
-        context: options[:context],
-        synthetic_contexts: options[:synthetic_contexts],
-        include_inactive: options[:include_inactive],
-        messageable_only: options[:messageable_only],
-        exclude_ids: exclude_contexts,
-        search_all_contexts: options[:search_all_contexts],
-        types: types[:context],
-        base_url: options[:base_url]
-      )]
+      collections << ["contexts",
+                      search_messageable_contexts(
+                        search: options[:search],
+                        context: options[:context],
+                        synthetic_contexts: options[:synthetic_contexts],
+                        include_inactive: options[:include_inactive],
+                        messageable_only: options[:messageable_only],
+                        exclude_ids: exclude_contexts,
+                        search_all_contexts: options[:search_all_contexts],
+                        types: types[:context],
+                        base_url: options[:base_url]
+                      )]
     end
 
     if types[:user] && !@skip_users
-      collections << ["participants", @current_user.address_book.search_users(
-        search: options[:search],
-        exclude_ids: exclude_users,
-        context: options[:context],
-        weak_checks: options[:skip_visibility_checks]
-      )]
+      collections << ["participants",
+                      @current_user.address_book.search_users(
+                        search: options[:search],
+                        exclude_ids: exclude_users,
+                        context: options[:context],
+                        weak_checks: options[:skip_visibility_checks]
+                      )]
     end
 
     collections
@@ -292,7 +294,7 @@ module SearchHelper
       ret = {
         id: context[:asset_string],
         name: context[:name],
-        avatar_url: avatar_url,
+        avatar_url:,
         type: :context,
         user_count: user_counts[context[:asset_string]] || 0,
         permissions: context[:permissions],
@@ -356,9 +358,9 @@ def synthetic_contexts_for(course, context, base_url)
       enrollment_counts[role] += 1
     end
   end
-  avatar_url = avatar_url_for_group(base_url: base_url)
+  avatar_url = avatar_url_for_group(base_url:)
   result = []
-  synthetic_context = { avatar_url: avatar_url, type: :context, permissions: course[:permissions] }
+  synthetic_context = { avatar_url:, type: :context, permissions: course[:permissions] }
   result << synthetic_context.merge({ id: "#{context}_teachers", name: I18n.t(:enrollments_teachers, "Teachers"), user_count: enrollment_counts["TeacherEnrollment"] }) if enrollment_counts["TeacherEnrollment"].to_i > 0
   result << synthetic_context.merge({ id: "#{context}_tas", name: I18n.t(:enrollments_tas, "Teaching Assistants"), user_count: enrollment_counts["TaEnrollment"] }) if enrollment_counts["TaEnrollment"].to_i > 0
   result << synthetic_context.merge({ id: "#{context}_students", name: I18n.t(:enrollments_students, "Students"), user_count: enrollment_counts["StudentEnrollment"] }) if enrollment_counts["StudentEnrollment"].to_i > 0

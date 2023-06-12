@@ -33,7 +33,7 @@ describe AssignmentsController do
     @assignment = course.assignments.create(
       title: "some assignment",
       assignment_group: @group,
-      due_at: Time.zone.now + 1.week
+      due_at: 1.week.from_now
     )
     @assignment
   end
@@ -67,7 +67,7 @@ describe AssignmentsController do
     it "js_env HAS_ASSIGNMENTS is true when the course has assignments" do
       user_session(@teacher)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to eq(true)
+      expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to be(true)
     end
 
     it "js_env HAS_ASSIGNMENTS is false when the course does not have assignments" do
@@ -75,35 +75,35 @@ describe AssignmentsController do
       @assignment.workflow_state = "deleted"
       @assignment.save!
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to eq(false)
+      expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to be(false)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is true when AssignmentUtil.sis_integration_settings_enabled? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(true)
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to be(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is false when AssignmentUtil.sis_integration_settings_enabled? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(false)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(false)
+      expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to be(false)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env SIS_NAME is SIS when @context does not respond_to assignments" do
@@ -127,7 +127,7 @@ describe AssignmentsController do
       a.settings[:sis_default_grade_export] = { locked: false, value: false }
       a.save!
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(false)
+      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to be(false)
     end
 
     it "js_env POST_TO_SIS_DEFAULT is true when sis_default_grade_export is true on the account" do
@@ -136,7 +136,7 @@ describe AssignmentsController do
       a.settings[:sis_default_grade_export] = { locked: false, value: true }
       a.save!
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(true)
+      expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to be(true)
     end
 
     it "sets QUIZ_LTI_ENABLED in js_env if quizzes 2 is available" do
@@ -238,46 +238,18 @@ describe AssignmentsController do
       expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_falsey
     end
 
-    it "sets FLAGS/new_quizzes_modules_support in js_env as true if enabled" do
-      user_session(@teacher)
-      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(true)
-    end
-
-    it "sets FLAGS/new_quizzes_modules_support in js_env as false if disabled" do
-      user_session(@teacher)
-      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(false)
-    end
-
-    it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as true if enabled" do
-      user_session(@teacher)
-      Account.site_admin.enable_feature!(:new_quizzes_skip_to_build_module_button)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to eq(true)
-    end
-
-    it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as false if disabled" do
-      user_session(@teacher)
-      Account.site_admin.disable_feature!(:new_quizzes_skip_to_build_module_button)
-      get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to eq(false)
-    end
-
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
       get "index", params: { course_id: @course.id }
-      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
@@ -325,20 +297,20 @@ describe AssignmentsController do
       it "sets the 'update' attribute to true when user is the final grader" do
         user_session(@teacher)
         get "index", params: { course_id: @course.id }
-        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
+        expect(assignment_permissions[@assignment.id][:update]).to be(true)
       end
 
       it "sets the 'update' attribute to true when user has the Select Final Grade permission" do
         user_session(@ta)
         get "index", params: { course_id: @course.id }
-        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
+        expect(assignment_permissions[@assignment.id][:update]).to be(true)
       end
 
       it "sets the 'update' attribute to false when user does not have the Select Final Grade permission" do
         @course.account.role_overrides.create!(permission: :select_final_grade, enabled: false, role: ta_role)
         user_session(@ta)
         get "index", params: { course_id: @course.id }
-        expect(assignment_permissions[@assignment.id][:update]).to eq(false)
+        expect(assignment_permissions[@assignment.id][:update]).to be(false)
       end
     end
   end
@@ -539,7 +511,7 @@ describe AssignmentsController do
         user_session(account_admin_user)
         @assignment.update(final_grader: nil)
         get :show_moderate, params: { course_id: @course.id, assignment_id: @assignment.id }
-        expect(env[:FINAL_GRADER]).to be(nil)
+        expect(env[:FINAL_GRADER]).to be_nil
       end
 
       it "includes moderation graders in GRADERS" do
@@ -574,7 +546,7 @@ describe AssignmentsController do
 
     context "with public course" do
       let(:course) { course_factory(active_all: true, is_public: true) }
-      let(:assignment) { assignment_model(course: course, submission_types: "online_url") }
+      let(:assignment) { assignment_model(course:, submission_types: "online_url") }
 
       it "doesn't fail on a public course with a nil user" do
         get "show", params: { course_id: course.id, id: assignment.id }
@@ -623,7 +595,7 @@ describe AssignmentsController do
       it "shows direct share options when the user can use it" do
         user_session(@teacher)
         get "show", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:can_direct_share]).to eq true
+        expect(assigns[:can_direct_share]).to be true
       end
 
       describe "with manage_content permission disabled" do
@@ -634,7 +606,7 @@ describe AssignmentsController do
         it "does not show direct share options if the course is active" do
           user_session(@teacher)
           get "show", params: { course_id: @course.id, id: @assignment.id }
-          expect(assigns[:can_direct_share]).to eq false
+          expect(assigns[:can_direct_share]).to be false
         end
 
         describe "when the course is concluded" do
@@ -646,14 +618,14 @@ describe AssignmentsController do
             user_session(@teacher)
 
             get "show", params: { course_id: @course.id, id: @assignment.id }
-            expect(assigns[:can_direct_share]).to eq true
+            expect(assigns[:can_direct_share]).to be true
           end
 
           it "does not show direct share options when the user can't use it" do
             user_session(@student)
 
             get "show", params: { course_id: @course.id, id: @assignment.id }
-            expect(assigns[:can_direct_share]).to eq false
+            expect(assigns[:can_direct_share]).to be false
           end
         end
       end
@@ -713,7 +685,7 @@ describe AssignmentsController do
           expect do
             subject
           end.to change {
-            Lti::LineItem.where(assignment: assignment).count
+            Lti::LineItem.where(assignment:).count
           }.from(0).to(1)
         end
       end
@@ -730,7 +702,7 @@ describe AssignmentsController do
         user_session(@student)
 
         AssignmentConfigurationToolLookup.create!(
-          assignment: assignment,
+          assignment:,
           tool: message_handler,
           tool_type: "Lti::MessageHandler",
           tool_id: message_handler.id
@@ -843,8 +815,10 @@ describe AssignmentsController do
       @assignment.submission_types = "discussion_topic"
       @assignment.save!
 
-      RoleOverride.create!(context: @course.account, permission: "read_forum",
-                           role: observer_role, enabled: false)
+      RoleOverride.create!(context: @course.account,
+                           permission: "read_forum",
+                           role: observer_role,
+                           enabled: false)
 
       get "show", params: { course_id: @course.id, id: @assignment.id }
       expect(response).not_to be_redirect
@@ -916,7 +890,7 @@ describe AssignmentsController do
           @mod.add_item(type: "assignment", id: @assignment.id)
 
           get "show", params: { course_id: @course.id, id: @assignment.id }
-          expect(assigns[:js_env][:belongs_to_unpublished_module]).to eq(true)
+          expect(assigns[:js_env][:belongs_to_unpublished_module]).to be(true)
         end
 
         context "peer reviews" do
@@ -962,14 +936,14 @@ describe AssignmentsController do
             user_session(@student)
 
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: 9999 }
-            expect(assigns[:js_env][:SUBMISSION_ID]).to eq nil
+            expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
           end
 
           it "sets SUBMISSION_ID to NULL when the anonymous_asset_id is not valid" do
             user_session(@student)
 
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: 9999 }
-            expect(assigns[:js_env][:SUBMISSION_ID]).to eq nil
+            expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
           end
 
           it "sets the student SUBMISSION_ID when peer_reviews_for_a2 FF is off and reviewee_id param is present" do
@@ -991,19 +965,19 @@ describe AssignmentsController do
           it "sets the peer_review_mode_enabled to true when peer_reviews_for_a2 FF is ON and reviewee_id is present" do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
-            expect(assigns[:js_env][:peer_review_mode_enabled]).to eq true
+            expect(assigns[:js_env][:peer_review_mode_enabled]).to be true
           end
 
           it "sets the peer_review_mode_enabled to true when peer_reviews_for_a2 FF is ON and anonymous_asset_id is present" do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
-            expect(assigns[:js_env][:peer_review_mode_enabled]).to eq true
+            expect(assigns[:js_env][:peer_review_mode_enabled]).to be true
           end
 
           it "sets the peer_review_mode_enabled to false when peer_reviews_for_a2 FF is ON with no presence of reviewee_id and anonymous_asset_id" do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id }
-            expect(assigns[:js_env][:peer_review_mode_enabled]).to eq false
+            expect(assigns[:js_env][:peer_review_mode_enabled]).to be false
           end
 
           it "sets peer_review_available to false when reviewee_id is present and one of the submissions have not been submitted" do
@@ -1011,7 +985,7 @@ describe AssignmentsController do
 
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
-            expect(assigns[:js_env][:peer_review_available]).to eq false
+            expect(assigns[:js_env][:peer_review_available]).to be false
           end
 
           it "sets peer_review_available to false when anonymous_asset_id is present and one of the submissions have not been submitted" do
@@ -1019,7 +993,7 @@ describe AssignmentsController do
 
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
-            expect(assigns[:js_env][:peer_review_available]).to eq false
+            expect(assigns[:js_env][:peer_review_available]).to be false
           end
 
           it "sets peer_review_available to true when the submissions have been graded" do
@@ -1031,7 +1005,7 @@ describe AssignmentsController do
 
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
-            expect(assigns[:js_env][:peer_review_available]).to eq true
+            expect(assigns[:js_env][:peer_review_available]).to be true
           end
 
           it "sets peer_review_available to true when reviewee_id is present and both submissions have been submitted" do
@@ -1040,7 +1014,7 @@ describe AssignmentsController do
 
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
-            expect(assigns[:js_env][:peer_review_available]).to eq true
+            expect(assigns[:js_env][:peer_review_available]).to be true
           end
 
           it "sets peer_review_available to true when anonymous_asset_id is present and both submissions have been submitted" do
@@ -1049,7 +1023,7 @@ describe AssignmentsController do
 
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
-            expect(assigns[:js_env][:peer_review_available]).to eq true
+            expect(assigns[:js_env][:peer_review_available]).to be true
           end
 
           it "sets peer_review_available value to the reviewee name when anonymous_peer_reviews is false" do
@@ -1364,7 +1338,7 @@ describe AssignmentsController do
 
           it "includes all group categories for the course if the assignment does not belong to a specific category" do
             get :show, params: { course_id: @course.id, id: @assignment.id }
-            group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+            group_category_ids = assigns[:js_env][:group_categories].pluck("id")
             expect(group_category_ids).to eq @course.group_categories.map(&:id)
           end
 
@@ -1373,7 +1347,7 @@ describe AssignmentsController do
             @assignment.update!(group_category: assignment_category, grade_group_students_individually: true)
 
             get :show, params: { course_id: @course.id, id: @assignment.id }
-            group_category_ids = assigns[:js_env][:group_categories].map { |category| category["id"] }
+            group_category_ids = assigns[:js_env][:group_categories].pluck("id")
             expect(group_category_ids).to contain_exactly(assignment_category.id)
           end
 
@@ -1594,7 +1568,7 @@ describe AssignmentsController do
           def enable_vericite!(comments: "vericite comments")
             plugin = Canvas::Plugin.find(:vericite)
             plugin_setting = PluginSetting.find_by(name: plugin.id) || PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
-            plugin_setting.posted_settings = { comments: comments }
+            plugin_setting.posted_settings = { comments: }
             plugin_setting.save!
           end
 
@@ -1819,14 +1793,14 @@ describe AssignmentsController do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "new", params: { course_id: @course.id, id: @assignment.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "new", params: { course_id: @course.id, id: @assignment.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
@@ -1916,7 +1890,7 @@ describe AssignmentsController do
     it "sets the lti_context_id if provided" do
       user_session(@student)
       lti_context_id = SecureRandom.uuid
-      jwt = Canvas::Security.create_jwt(lti_context_id: lti_context_id)
+      jwt = Canvas::Security.create_jwt(lti_context_id:)
       post "create", params: { course_id: @course.id, assignment: { title: "some assignment", secure_params: jwt } }
       expect(assigns[:assignment].lti_context_id).to eq lti_context_id
     end
@@ -2123,14 +2097,14 @@ describe AssignmentsController do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
-      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
+      expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to be(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
@@ -2361,7 +2335,7 @@ describe AssignmentsController do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         user_session(@teacher)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:dummy]).to be nil
+        expect(assigns[:js_env][:dummy]).to be_nil
       end
     end
 
@@ -2422,14 +2396,30 @@ describe AssignmentsController do
         user_session(@teacher)
         Account.site_admin.enable_feature!(:new_quizzes_assignment_build_button)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to eq(true)
+        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to be(true)
       end
 
       it "sets NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED in js_env as false if disabled" do
         user_session(@teacher)
         Account.site_admin.disable_feature!(:new_quizzes_assignment_build_button)
         get "edit", params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to eq(false)
+        expect(assigns[:js_env][:NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED]).to be(false)
+      end
+    end
+
+    describe "js_env HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED" do
+      it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:hide_zero_point_quizzes_option)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(true)
+      end
+
+      it "sets HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:hide_zero_point_quizzes_option)
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:HIDE_ZERO_POINT_QUIZZES_OPTION_ENABLED]).to be(false)
       end
     end
   end
@@ -2540,14 +2530,14 @@ describe AssignmentsController do
     it "passes errors through to Canvas::Errors" do
       allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       expect(Canvas::Errors).to receive(:capture_exception)
-      get "list_google_docs", params: params, format: "json"
-      expect(response.code).to eq("200")
+      get "list_google_docs", params:, format: "json"
+      expect(response).to have_http_status(:ok)
     end
 
     it "gives appropriate error code to connection errors" do
       allow(connection).to receive(:list_with_extension_filter).and_raise(GoogleDrive::ConnectionException)
-      get "list_google_docs", params: params, format: "json"
-      expect(response.code).to eq("504")
+      get "list_google_docs", params:, format: "json"
+      expect(response).to have_http_status(:gateway_timeout)
       expect(response.body).to include("Unable to connect to Google Drive")
     end
   end

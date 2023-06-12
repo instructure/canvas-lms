@@ -159,7 +159,7 @@ describe('DiscussionTopicContainer', () => {
   it('renders infoText only when there are replies', async () => {
     const container = setup({discussionTopic: Discussion.mock()})
     const infoText = await container.findByTestId('replies-counter')
-    expect(infoText).toHaveTextContent('56 replies, 2 unread')
+    expect(infoText).toHaveTextContent('56 Replies, 2 Unread')
   })
 
   it('does not render unread when there are none', async () => {
@@ -172,7 +172,7 @@ describe('DiscussionTopicContainer', () => {
       }),
     })
     const infoText = await container.findByTestId('replies-counter')
-    expect(infoText).toHaveTextContent('24 replies')
+    expect(infoText).toHaveTextContent('24 Replies')
   })
 
   it('renders Graded info when assignment info exists', async () => {
@@ -752,7 +752,6 @@ describe('DiscussionTopicContainer', () => {
       it('renders when Discussion Podcast Feed is present', () => {
         const ln = document.createElement('link')
         ln.title = 'Discussion Podcast Feed'
-        ln.id = 'Discussion Podcast Feed'
         ln.type = 'application/rss+xml'
         ln.href = 'http://localhost:3000/feeds/topics/47/enrollment_mhumV2R51z5IsK.rss'
         document.head.append(ln)

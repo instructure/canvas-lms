@@ -66,7 +66,7 @@ describe "shared/_new_nav_header" do
         user = user_factory
         @shard1.activate do
           account = Account.create!
-          account.account_users.create!(user: user)
+          account.account_users.create!(user:)
         end
         assign(:current_user, user)
         render "shared/_new_nav_header"

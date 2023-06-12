@@ -44,7 +44,8 @@ module Types
     graphql_name "EnrollmentFilterInput"
 
     argument :types, [EnrollmentTypeType], required: false, default_value: nil
-    argument :associated_user_ids, [ID],
+    argument :associated_user_ids,
+             [ID],
              prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
              required: false,
              default_value: []
@@ -77,6 +78,8 @@ module Types
       load_association(:course)
     end
 
+    field :course_section_id, ID, null: true
+
     field :section, SectionType, null: true
     def section
       load_association(:course_section)
@@ -87,7 +90,8 @@ module Types
     field :type, EnrollmentTypeType, null: false
 
     field :grades, GradesType, null: true do
-      argument :grading_period_id, ID,
+      argument :grading_period_id,
+               ID,
                "The grading period to return grades for. If not specified, will use the current grading period (or the course grade for courses that don't use grading periods)",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("GradingPeriod")
@@ -120,9 +124,9 @@ module Types
       # the user has permission to read it)
       if grades.nil?
         score_attrs = if grading_period_id
-                        { enrollment: enrollment, grading_period_id: grading_period_id }
+                        { enrollment:, grading_period_id: }
                       else
-                        { enrollment: enrollment, course_score: true }
+                        { enrollment:, course_score: true }
                       end
 
         grades = Score.new(score_attrs)
@@ -175,6 +179,24 @@ module Types
           :manage_sis
         )
       ) && enrollment.can_be_deleted_by(current_user, context[:course], context[:session])
+    end
+
+    field :concluded, Boolean, null: true
+    def concluded
+      return nil unless enrollment.user == current_user
+
+      # restrict_enrollments_to_section_dates means that students enrollment is based on section dates
+      if enrollment.course_section.restrict_enrollments_to_section_dates && !enrollment.course_section.end_at.nil?
+        return enrollment.course_section.end_at < Time.zone.now
+      end
+
+      # restrict_enrollments_to_course_dates means that course participation is set to course
+      if enrollment.course.restrict_enrollments_to_course_dates && !enrollment.course.end_at.nil?
+        return true if enrollment.course.end_at < Time.zone.now
+      end
+
+      # Since teachers can access courses after the course is concluded, enrollment.active! is not enough for inbox purposes
+      !enrollment.active?
     end
   end
 end

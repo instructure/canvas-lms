@@ -7,6 +7,15 @@
 
 <% if @payload.fetch("trigger", nil).present? %>**Trigger:** <%= @payload.fetch("trigger") %><% end %>
 
+<% unless @payload.fetch('schema').empty? %>
+### Event Body Schema
+
+| Field | Description |
+|-|-|
+<% for @event, @descriptions in @payload.fetch('schema') %><% for @field, @description in @descriptions %>| **<%= @event %>.<%= @field %>** | <%= @description.gsub("\n", " - ") %> |
+<% end %><% end %>
+<% end %>
+
 <% for @example in @payload.fetch('examples', []) %>
 <% if @example.fetch('description', nil).present?  %>**Description:** <%= @example.fetch('description') %><% end %>
 ### Payload Example:
@@ -17,12 +26,4 @@
 
 <% end %>
 
-<% unless @payload.fetch('schema').empty? %>
-### Event Body Schema
-
-| Field | Description |
-|-|-|
-<% for @event, @descriptions in @payload.fetch('schema') %><% for @field, @description in @descriptions %>| **<%= @event %>.<%= @field %>** | <%= @description.gsub("\n", " - ") %> |
-<% end %><% end %>
-<% end %>
 <% end %>

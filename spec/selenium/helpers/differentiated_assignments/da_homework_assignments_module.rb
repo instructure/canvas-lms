@@ -23,9 +23,12 @@ module DifferentiatedAssignments
   module Homework
     module Assignments
       class << self
-        attr_reader :assignment_for_everyone, :assignment_for_section_a,
-                    :assignment_for_section_b, :assignment_for_sections_a_and_b,
-                    :assignment_for_section_c, :assignment_for_first_student,
+        attr_reader :assignment_for_everyone,
+                    :assignment_for_section_a,
+                    :assignment_for_section_b,
+                    :assignment_for_sections_a_and_b,
+                    :assignment_for_section_c,
+                    :assignment_for_first_student,
                     :assignment_for_second_and_third_students
 
         def initialize

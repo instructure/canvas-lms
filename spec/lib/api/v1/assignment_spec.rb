@@ -73,15 +73,19 @@ describe "Api::V1::Assignment" do
 
     it "includes section-based counts when grading flag is passed" do
       allow(assignment.context).to receive(:grants_right?).and_return(true)
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false, needs_grading_count_by_section: true })
       expect(json["needs_grading_count"]).to eq(0)
       expect(json["needs_grading_count_by_section"]).to eq []
     end
 
     it "includes an associated planner override when flag is passed" do
-      po = planner_override_model(user: user, plannable: assignment)
-      json = api.assignment_json(assignment, user, session,
+      po = planner_override_model(user:, plannable: assignment)
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { include_planner_override: true })
       expect(json).to have_key("planner_override")
       expect(json["planner_override"]["id"]).to eq po.id
@@ -139,6 +143,105 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    context "restrict_quantitative_data" do
+      context "as teacher" do
+        before do
+          teacher_in_course(course: @course, active_all: true)
+        end
+
+        it "returns false when everything is truthy" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+
+          my_session = user_session @teacher
+          json = api.assignment_json(assignment, @teacher, my_session)
+          expect(json["restrict_quantitative_data"]).to be_falsey
+        end
+
+        it "returns false even when only permission is falsey" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # falsey permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: teacher_role, enabled: true, permission: "restrict_quantitative_data")
+          Account.default.reload
+
+          my_session = user_session @teacher
+          json = api.assignment_json(assignment, @teacher, my_session)
+          expect(json["restrict_quantitative_data"]).to be_falsey
+        end
+      end
+
+      context "as student" do
+        before do
+          student_in_course(course: @course, active_all: true)
+        end
+
+        it "returns true when everything is truthy" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+
+          my_session = user_session @student
+          json = api.assignment_json(assignment, @student, my_session)
+          expect(json["restrict_quantitative_data"]).to be_truthy
+        end
+
+        it "returns false even when only feature flag is falsey" do
+          # falsey feature flag
+          Account.default.disable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+
+          my_session = user_session @student
+          json = api.assignment_json(assignment, @student, my_session)
+          expect(json["restrict_quantitative_data"]).to be_falsey
+        end
+
+        it "returns false even when only setting is falsey" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # falsey setting
+          Account.default.settings[:restrict_quantitative_data] = { value: false, locked: true }
+          Account.default.save!
+
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+
+          my_session = user_session @student
+          json = api.assignment_json(assignment, @student, my_session)
+          expect(json["restrict_quantitative_data"]).to be_falsey
+        end
+      end
+    end
+
     context "for an assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(assignment, user, session)
@@ -148,7 +251,7 @@ describe "Api::V1::Assignment" do
 
       it "optionally includes 'grades_published' for moderated assignments" do
         json = api.assignment_json(assignment, user, session, { include_grades_published: true })
-        expect(json["grades_published"]).to eq(true)
+        expect(json["grades_published"]).to be(true)
       end
 
       it "excludes 'grades_published' by default" do
@@ -221,25 +324,31 @@ describe "Api::V1::Assignment" do
     it "includes all assignment overrides fields when an assignment_override exists" do
       assignment.assignment_overrides.create(workflow_state: "active")
       overrides = assignment.assignment_overrides
-      json = api.assignment_json(assignment, user, session, { overrides: overrides })
+      json = api.assignment_json(assignment, user, session, { overrides: })
       expect(json).to be_a(Hash)
       expect(json["overrides"].first.keys.sort).to eq %w[assignment_id id title student_ids].sort
     end
 
     it "excludes descriptions when exclude_response_fields flag is passed and includes 'description'" do
       assignment.description = "Foobers"
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
       expect(json["description"]).to eq(api.api_user_content("Foobers", @course, user, {}))
 
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false, exclude_response_fields: ["description"] })
       expect(json).to be_a(Hash)
       expect(json).not_to have_key "description"
 
-      json = api.assignment_json(assignment, user, session,
+      json = api.assignment_json(assignment,
+                                 user,
+                                 session,
                                  { override_dates: false })
       expect(json).to be_a(Hash)
       expect(json).to have_key "description"
@@ -267,11 +376,11 @@ describe "Api::V1::Assignment" do
         context_module = ContextModule.create!(context: course, workflow_state: "unpublished")
         context_module.content_tags.create!(content: assignment, context: course, tag_type: "context_module")
 
-        expect(context_module.published?).to eq false
-        expect(assignment.published?).to eq true
+        expect(context_module.published?).to be false
+        expect(assignment.published?).to be true
         json = api.assignment_json(assignment, student, session, { include_can_submit: true })
         expect(json).to have_key "can_submit"
-        expect(json[:can_submit]).to eq false
+        expect(json[:can_submit]).to be false
       end
     end
 
@@ -295,12 +404,12 @@ describe "Api::V1::Assignment" do
 
       it "includes ignore_for_scoring when it is on the rubric" do
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric"][0]["ignore_for_scoring"]).to eq true
+        expect(json["rubric"][0]["ignore_for_scoring"]).to be true
       end
 
       it "includes hide_score_total setting in rubric_settings" do
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_score_total"]).to eq false
+        expect(json["rubric_settings"]["hide_score_total"]).to be false
       end
 
       it "returns true for hide_score_total if set to true on the rubric association" do
@@ -308,12 +417,12 @@ describe "Api::V1::Assignment" do
         ra.hide_score_total = true
         ra.save!
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_score_total"]).to eq true
+        expect(json["rubric_settings"]["hide_score_total"]).to be true
       end
 
       it "includes hide_points setting in rubric_settings" do
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_points"]).to eq false
+        expect(json["rubric_settings"]["hide_points"]).to be false
       end
 
       it "returns true for hide_points if set to true on the rubric association" do
@@ -321,7 +430,7 @@ describe "Api::V1::Assignment" do
         ra.hide_points = true
         ra.save!
         json = api.assignment_json(assignment, user, session)
-        expect(json["rubric_settings"]["hide_points"]).to eq true
+        expect(json["rubric_settings"]["hide_points"]).to be true
       end
 
       it "excludes rubric when exclude_response_fields contains 'rubric'" do
@@ -395,12 +504,12 @@ describe "Api::V1::Assignment" do
 
     it "#turnitin_settings_hash returns a Hash with indifferent access" do
       turnitin_hash = assignment.turnitin_settings_hash(test_params)
-      expect(turnitin_hash).to be_instance_of(HashWithIndifferentAccess)
+      expect(turnitin_hash).to be_instance_of(ActiveSupport::HashWithIndifferentAccess)
     end
 
     it "#vericite_settings_hash returns a Hash with indifferent access" do
       vericite_hash = assignment.vericite_settings_hash(test_params)
-      expect(vericite_hash).to be_instance_of(HashWithIndifferentAccess)
+      expect(vericite_hash).to be_instance_of(ActiveSupport::HashWithIndifferentAccess)
     end
   end
 
@@ -621,13 +730,13 @@ describe "Api::V1::Assignment" do
       end
 
       it "allows updating the submission_types field" do
-        expect(assignment.external_tool?).to eq false
+        expect(assignment.external_tool?).to be false
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
 
         expect(response).to eq :ok
-        expect(assignment.external_tool?).to eq true
-        expect(assignment.peer_reviews).to eq false
+        expect(assignment.external_tool?).to be true
+        expect(assignment.peer_reviews).to be false
       end
     end
 
@@ -697,7 +806,7 @@ describe "Api::V1::Assignment" do
 
   describe "update with the 'duplicated_successfully' parameter" do
     let(:user) { user_model }
-    let(:assignment) { assignment_model(workflow_state: workflow_state, duplicate_of: original_assignment) }
+    let(:assignment) { assignment_model(workflow_state:, duplicate_of: original_assignment) }
 
     let(:assignment_update_params) do
       ActionController::Parameters.new(
@@ -720,6 +829,7 @@ describe "Api::V1::Assignment" do
         end
       end
     end
+
     shared_examples "falls back to 'unpublished' state" do
       context "when the original assignment state is other than 'published' or 'unpublished'" do
         let(:original_assignment) { assignment_model }

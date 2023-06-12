@@ -57,6 +57,7 @@ module SIS
           parent = @accounts_cache[parent_account_id]
           parent ||= @root_account.all_accounts.where(sis_source_id: parent_account_id).take
           raise ImportError, "Parent account didn't exist for #{account_id}" unless parent
+          raise ImportError, "Cannot restore sub_account with ID: #{account_id} because parent_account with ID: #{parent_account_id} has been deleted." if parent.workflow_state == "deleted"
 
           @accounts_cache[parent.sis_source_id] = parent
         end

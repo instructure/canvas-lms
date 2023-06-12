@@ -1,12 +1,8 @@
 # frozen_string_literal: true
 
 module Consts
-  APP_COFFEE_PATH = "app/coffeescripts/calendar/CalendarEvent.coffee"
-  APP_COFFEE_BUNDLE_PATH = "app/coffeescripts/bundles/authentication_providers.coffee"
-  COFFEE_SPEC_PATH = "spec/coffeescripts/calendar/CalendarSpec.coffee"
-
   APP_JSX_PATH = "app/jsx/dashboard_card/DashboardCardAction.js"
-  JSX_SPEC_PATH = "spec/javascripts/jsx/dashboard_card/DashboardCardActionSpec.coffee"
+  JSX_SPEC_PATH = "spec/javascripts/jsx/dashboard_card/DashboardCardActionSpec.js"
 
   APP_RB_PATH = "app/controllers/accounts_controller.rb"
   APP_RB_SPEC_PATH = "spec/controllers/accounts_controller_spec.rb"

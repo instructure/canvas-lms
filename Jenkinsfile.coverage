@@ -21,6 +21,8 @@
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
 
+commitMessageFlag.setDefaultValues(commitMessageFlagDefaults() + commitMessageFlagPrivateDefaults())
+
 @groovy.transform.Field
 def rspecqNodeTotal = 23
 @groovy.transform.Field
@@ -103,10 +105,10 @@ pipeline {
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     COMPOSE_PROJECT_NAME = 'coverage'
-    FORCE_FAILURE = "${configuration.isForceFailureSelenium() ? '1' : ''}"
-    RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
-    RSPECQ_FILE_SPLIT_THRESHOLD = "${configuration.fileSplitThreshold()}"
-    RSPECQ_MAX_REQUEUES = "${configuration.getInteger('rspecq-max-requeues')}"
+    FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
+    RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
+    RSPECQ_FILE_SPLIT_THRESHOLD = commitMessageFlag('rspecq-file-split-threshold').asType(Integer)
+    RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     SELENIUM_TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/selenium'
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium|contracts)'

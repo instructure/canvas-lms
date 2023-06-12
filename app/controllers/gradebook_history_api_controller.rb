@@ -308,7 +308,7 @@ class GradebookHistoryApiController < ApplicationController
     ActiveRecord::Associations.preload(indexed_versions, :version)
     versions = indexed_versions.filter_map(&:version)
 
-    render json: versions_json(@context, versions, api_context(nil), assignment: assignment, student: student)
+    render json: versions_json(@context, versions, api_context(nil), assignment:, student:)
   end
 
   private

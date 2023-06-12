@@ -116,13 +116,13 @@ module Lti
         jwt_validator = Lti::OAuth2::AuthorizationValidator.new(
           jwt: params[:assertion],
           authorization_url: polymorphic_url([@context, :lti_oauth2_authorize]),
-          code: code,
+          code:,
           context: @context
         )
         jwt_validator.validate!
         reg_key = code || jwt_validator.sub
         render json: {
-          access_token: Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: jwt_validator.sub, reg_key: reg_key).to_s,
+          access_token: Lti::OAuth2::AccessToken.create_jwt(aud:, sub: jwt_validator.sub, reg_key:).to_s,
           token_type: "bearer",
           expires_in: Setting.get("lti.oauth2.access_token.expiration", 1.hour.to_s)
         }

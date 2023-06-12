@@ -21,9 +21,10 @@ describe Quizzes::QuizRegrader::Answer do
   let(:points) { 15 }
 
   let(:question) do
-    double(id: 1, question_data: { id: 1,
-                                   regrade_option: "full_credit",
-                                   points_possible: points },
+    double(id: 1,
+           question_data: { id: 1,
+                            regrade_option: "full_credit",
+                            points_possible: points },
            quiz_group: nil)
   end
 
@@ -33,7 +34,7 @@ describe Quizzes::QuizRegrader::Answer do
   end
 
   let(:answer) do
-    { question_id: 1, points: points, text: "" }
+    { question_id: 1, points:, text: "" }
   end
 
   let(:wrapper) do
@@ -85,7 +86,7 @@ describe Quizzes::QuizRegrader::Answer do
         expect(sent_answer_data).to eq answer.merge("question_#{question.id}" => answer[:text])
       end
 
-      sent_params.merge(points: points, correct: correct)
+      sent_params.merge(points:, correct:)
     end
   end
 
@@ -108,7 +109,7 @@ describe Quizzes::QuizRegrader::Answer do
     it "does not raise an error if question has recognized regrade_option" do
       Quizzes::QuizRegrader::Answer::REGRADE_OPTIONS.each do |regrade_option|
         question_regrade = double(quiz_question: question,
-                                  regrade_option: regrade_option)
+                                  regrade_option:)
         expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to_not raise_error
       end
     end

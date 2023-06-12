@@ -28,7 +28,7 @@ describe GradebookCSV do
       progress = @course.progresses.new(tag: "gradebook_export")
       progress.workflow_state = "failed" if force_failure
       progress.save!
-      course.gradebook_csvs.create!(user: user, progress: progress, attachment: attachment)
+      course.gradebook_csvs.create!(user:, progress:, attachment:)
     end
 
     before(:once) do

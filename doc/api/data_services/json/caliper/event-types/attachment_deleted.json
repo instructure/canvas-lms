@@ -13,6 +13,9 @@
       "entity_id": "Canvas global ID of the object affected by the event",
       "filename": "The file name of the attachment. NOTE: This field will be truncated to only include the first 8192 characters.",
       "folder_id": "The id of the folder where the attachment was saved"
+    },
+    "data[0].object": {
+      "type": "Document"
     }
   },
   "examples": [

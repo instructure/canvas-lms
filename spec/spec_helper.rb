@@ -97,7 +97,7 @@ module WebMock::API
 end
 
 require "delayed/testing"
-Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 require "sharding_spec_helper"
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
@@ -130,10 +130,12 @@ module SpecTransactionWrapper
     raise exception if exception
   end
 end
-ActionController::Base.set_callback(:process_action, :around,
+ActionController::Base.set_callback(:process_action,
+                                    :around,
                                     ->(_r, block) { SpecTransactionWrapper.wrap_block_in_transaction(block) })
 
-ActionController::Base.set_callback(:process_action, :before,
+ActionController::Base.set_callback(:process_action,
+                                    :before,
                                     ->(_r) { @streaming_template = false })
 
 module RSpec::Core::Hooks
@@ -175,9 +177,9 @@ module ActionView::TestCase::Behavior
     if is_a?(RSpec::Rails::HelperExampleGroup)
       # the original implementation. we can't call super because
       # we replaced the whole original method
-      return _user_defined_ivars.map do |ivar|
+      return _user_defined_ivars.to_h do |ivar|
         [ivar[1..].to_sym, instance_variable_get(ivar)]
-      end.to_h
+      end
     end
     {}
   end
@@ -251,7 +253,7 @@ module ReadOnlySecondaryStub
 
   def switch_role!(env)
     if readonly_user_exists? && readonly_user_can_read?
-      ActiveRecord::Base.connection.execute(env == :secondary ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
+      ActiveRecord::Base.connection.execute((env == :secondary) ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
     else
       puts "The database #{test_db_name} is not setup with a secondary/readonly_user to fix run the following."
       puts "psql -c 'ALTER USER #{datbase_username} CREATEDB CREATEROLE' -d #{test_db_name}"
@@ -351,7 +353,7 @@ require "ams_spec_helper"
 require "i18n_tasks"
 require "factories"
 
-Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].sort.each { |f| require f }
+Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].each { |f| require f }
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -370,7 +372,7 @@ module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.
   # i.e. `and_query({assignment_id: @assignment.id})`
   def self.cast_to_strings(expected:)
-    expected.map { |k, v| [k.to_s, v.to_s] }.to_h
+    expected.to_h { |k, v| [k.to_s, v.to_s] }
   end
 end
 
@@ -436,7 +438,6 @@ RSpec.configure do |config|
   config.include Factories
   config.include RequestHelper, type: :request
   config.include Onceler::BasicHelpers
-  config.include PGCollkeyHelper
   config.include ActionDispatch::TestProcess::FixtureFile
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
@@ -481,6 +482,8 @@ RSpec.configure do |config|
     TermsOfService.skip_automatic_terms_creation = true
     LiveEvents.clear_context!
     $spec_api_tokens = {}
+
+    remove_user_session
   end
 
   Notification.after_create do
@@ -498,6 +501,7 @@ RSpec.configure do |config|
   Onceler.configure do |c|
     c.before :record do
       reset_all_the_things!
+      Canvas::DynamoDB::DatabaseBuilder.reset
     end
   end
 
@@ -532,6 +536,7 @@ RSpec.configure do |config|
 
   config.before do
     allow(AttachmentFu::Backends::S3Backend).to receive(:load_s3_config) { StubS3::AWS_CONFIG.dup }
+    allow(Canvas::Vault).to receive(:read) { StubVault::AWS_CONFIG.dup }
   end
 
   # flush redis before the first spec, and before each spec that comes after
@@ -555,6 +560,16 @@ RSpec.configure do |config|
       GuardRail.activate(:deploy) { Canvas::Redis.redis.flushdb }
     end
     Canvas::Redis.redis_used = false
+  end
+
+  if Canvas::Plugin.value_to_boolean(ENV["N_PLUS_ONE_DETECTION"])
+    config.before do
+      Prosopite.scan
+    end
+
+    config.after do
+      Prosopite.finish
+    end
   end
 
   # ****************************************************************
@@ -740,15 +755,15 @@ RSpec.configure do |config|
     BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$)/))
+      private(*instance_methods.grep_v(/(^__|^\W|^binding$|^untaint$)/)) # rubocop:disable Style/AccessModifierDeclarations
 
       def initialize(subject, ancestor)
         @subject = subject
         @ancestor = ancestor
       end
 
-      def method_missing(sym, *args, &blk)
-        @ancestor.instance_method(sym).bind_call(@subject, *args, &blk)
+      def method_missing(sym, *args, &)
+        @ancestor.instance_method(sym).bind_call(@subject, *args, &)
       end
     end
 
@@ -758,7 +773,7 @@ RSpec.configure do |config|
 
       # make sure we have all the backends
       BACKENDS.each do |backend|
-        base.send(:include, backend) unless base.ancestors.include?(backend)
+        base.include(backend) unless base.ancestors.include?(backend)
       end
       # remove the duplicate callbacks added by multiple backends
       base.before_update.uniq!
@@ -812,6 +827,14 @@ RSpec.configure do |config|
     end
   end
 
+  module StubVault
+    AWS_CONFIG = {
+      access_key: "stub_access_key",
+      secret_key: "stub_secret_key",
+      security_token: "stub_security_token"
+    }.freeze
+  end
+
   def s3_storage!(opts = { stubs: true })
     [Attachment, Thumbnail].each do |model|
       model.include(AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
@@ -847,16 +870,16 @@ RSpec.configure do |config|
     Delayed::Testing.drain
   end
 
-  def track_jobs(&block)
-    @jobs_tracking = Delayed::JobTracking.track(&block)
+  def track_jobs(&)
+    @jobs_tracking = Delayed::JobTracking.track(&)
   end
 
   def created_jobs
     @jobs_tracking.created
   end
 
-  def expects_job_with_tag(tag, count = 1, &block)
-    track_jobs(&block)
+  def expects_job_with_tag(tag, count = 1, &)
+    track_jobs(&)
     expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 
@@ -962,7 +985,7 @@ module I18nStubs
   def lookup(locale, key, scope = [], options = {})
     return super unless @stubs
 
-    ensure_initialized
+    init_translations unless initialized?
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
     keys.inject(@stubs) { |h, k| h[k] if h.respond_to?(:key) } || super
   end
@@ -973,9 +996,9 @@ module I18nStubs
     super | @stubs.keys.map(&:to_sym)
   end
 end
-LazyPresumptuousI18nBackend.prepend(I18nStubs)
+I18n.backend.class.prepend(I18nStubs)
 
-Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].sort.each { |file| require file }
+Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].each { |file| require file }
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -989,14 +1012,42 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
+module DeveloperKeyStubs
+  def get_special_key(default_key_name)
+    Shard.birth.activate do
+      @special_keys ||= {}
+
+      # TODO: we have to do this because tests run in transactions
+      testkey = DeveloperKey.where(name: default_key_name).first_or_initialize
+      testkey.auto_expire_tokens = false if testkey.new_record?
+      testkey.sns_arn = "arn:aws:s3:us-east-1:12345678910:foo/bar"
+      testkey.save! if testkey.changed?
+      return @special_keys[default_key_name] = testkey
+    end
+  end
+end
+DeveloperKey.singleton_class.prepend DeveloperKeyStubs
+
 def enable_developer_key_account_binding!(developer_key)
   developer_key.developer_key_account_bindings.first.update!(
     workflow_state: "on"
   )
 end
 
+def disable_developer_key_account_binding!(developer_key)
+  developer_key.developer_key_account_bindings.first.update!(
+    workflow_state: "off"
+  )
+end
+
 def enable_default_developer_key!
   enable_developer_key_account_binding!(DeveloperKey.default)
+end
+
+# register mime types for their responses being decoded as JSON
+Mime::SET.select { |t| t.to_s.end_with?("+json") }.map(&:ref).each do |type|
+  ActionDispatch::RequestEncoder.register_encoder(type,
+                                                  response_parser: ->(body) { JSON.parse(body) })
 end
 
 # rubocop:enable Lint/ConstantDefinitionInBlock

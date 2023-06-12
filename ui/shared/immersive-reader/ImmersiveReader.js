@@ -24,7 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {defaultFetchOptions} from '@instructure/js-utils'
 import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
-import WithBreakpoints from 'with-breakpoints'
+import WithBreakpoints from '@canvas/with-breakpoints'
 import ContentChunker from './ContentChunker'
 import ContentUtils from './ContentUtils'
 

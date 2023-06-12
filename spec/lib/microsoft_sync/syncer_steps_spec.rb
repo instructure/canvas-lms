@@ -24,7 +24,7 @@ describe MicrosoftSync::SyncerSteps do
   let(:course) do
     course_model(name: "sync test course")
   end
-  let(:group) { MicrosoftSync::Group.create(course: course) }
+  let(:group) { MicrosoftSync::Group.create(course:) }
   let(:graph_service_helpers) do
     instance_double(
       MicrosoftSync::GraphServiceHelpers,
@@ -73,7 +73,7 @@ describe MicrosoftSync::SyncerSteps do
   def new_http_error(code, headers = {})
     MicrosoftSync::Errors::HTTPInvalidStatus.for(
       response: double(
-        "response", code: code, body: "", headers: HTTParty::Response::Headers.new(headers)
+        "response", code:, body: "", headers: HTTParty::Response::Headers.new(headers)
       ),
       service: "test",
       tenant: "test"
@@ -88,8 +88,9 @@ describe MicrosoftSync::SyncerSteps do
     ra.settings[:microsoft_sync_remote_attribute] = "mail"
     ra.save!
 
-    allow(MicrosoftSync::GraphServiceHelpers).to \
-      receive(:new).with(tenant, sync_type: sync_type_statsd_tag).and_return(graph_service_helpers)
+    allow(MicrosoftSync::GraphServiceHelpers).to receive(:new)
+      .with(tenant, sync_type: sync_type_statsd_tag)
+      .and_return(graph_service_helpers)
   end
 
   describe "#max_retries" do
@@ -102,15 +103,14 @@ describe MicrosoftSync::SyncerSteps do
     it "is defined" do
       # expand once we start using this (will be soon, when we stash
       # in-progress paginated results when getting group members)
-      expect(syncer_steps.after_failure).to eq(nil)
+      expect(syncer_steps.after_failure).to be_nil
     end
   end
 
   describe "#after_complete" do
     it "sets last_synced_at on the group" do
       Timecop.freeze do
-        expect { syncer_steps.after_complete }.to \
-          change { group.reload.last_synced_at }.from(nil).to(Time.zone.now)
+        expect { syncer_steps.after_complete }.to change { group.reload.last_synced_at }.from(nil).to(Time.zone.now)
       end
     end
   end
@@ -124,7 +124,7 @@ describe MicrosoftSync::SyncerSteps do
       context "when hitting the Microsoft API raises a #{error_class}" do
         it "returns a Retry object" do
           expect(graph_service.http).to receive(:request).and_raise(error_class.new)
-          expect_retry(subject, error_class: error_class, **retry_args)
+          expect_retry(subject, error_class:, **retry_args)
         end
       end
     end
@@ -133,7 +133,8 @@ describe MicrosoftSync::SyncerSteps do
       it "returns a Retry object" do
         expect(graph_service.http).to receive(:request).and_raise(new_http_error(500))
         expect_retry(subject,
-                     error_class: MicrosoftSync::Errors::HTTPInternalServerError, **retry_args)
+                     error_class: MicrosoftSync::Errors::HTTPInternalServerError,
+                     **retry_args)
       end
     end
 
@@ -142,7 +143,8 @@ describe MicrosoftSync::SyncerSteps do
         it "goes back to step_generate_diff with a delay" do
           expect(graph_service.http).to receive(:request).and_raise(new_http_error(404))
           expect_retry(subject,
-                       error_class: MicrosoftSync::Errors::HTTPNotFound, **retry_args)
+                       error_class: MicrosoftSync::Errors::HTTPNotFound,
+                       **retry_args)
         end
       end
     end
@@ -150,8 +152,8 @@ describe MicrosoftSync::SyncerSteps do
     unless options[:except_404] || options[:except_group_not_found]
       context "on GroupNotFound" do
         it "goes back to step_generate_diff with a delay" do
-          expect(graph_service.http).to receive(:request).and_raise \
-            MicrosoftSync::Errors::GroupNotFound
+          expect(graph_service.http).to receive(:request)
+            .and_raise(MicrosoftSync::Errors::GroupNotFound)
           expect_retry(
             subject, error_class: MicrosoftSync::Errors::GroupNotFound, **retry_args
           )
@@ -184,7 +186,8 @@ describe MicrosoftSync::SyncerSteps do
         it "returns a Retry object with our default retry times" do
           expect(graph_service.http).to receive(:request).and_raise(new_http_error(429))
           expect_retry(subject,
-                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests, **retry_args)
+                       error_class: MicrosoftSync::Errors::HTTPTooManyRequests,
+                       **retry_args)
         end
       end
     end
@@ -198,9 +201,9 @@ describe MicrosoftSync::SyncerSteps do
         MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached
       end
     end
-    let(:max_default) { owners_or_members == "owners" ? 100 : 25_000 }
+    let(:max_default) { (owners_or_members == "owners") ? 100 : 25_000 }
     let(:err_msg) do
-      "Microsoft 365 allows a maximum of #{(max || max_default).to_s(:delimited)} " \
+      "Microsoft 365 allows a maximum of #{(max || max_default).to_fs(:delimited)} " \
         "#{owners_or_members} in a team."
     end
 
@@ -240,9 +243,9 @@ describe MicrosoftSync::SyncerSteps do
     subject { syncer_steps.step_full_sync_prerequisites(nil, nil) }
 
     before do
-      n_students_in_course(2, course: course)
-      teacher_in_course(course: course, active_enrollment: true)
-      teacher_in_course(course: course, active_enrollment: true)
+      n_students_in_course(2, course:)
+      teacher_in_course(course:, active_enrollment: true)
+      teacher_in_course(course:, active_enrollment: true)
     end
 
     context "when the max enrollments in a course was not reached" do
@@ -268,8 +271,8 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     it "deletes the partial sync changes for the course" do
-      expect(MicrosoftSync::PartialSyncChange).to \
-        receive(:delete_all_replicated_to_secondary_for_course).with(course.id)
+      expect(MicrosoftSync::PartialSyncChange)
+        .to receive(:delete_all_replicated_to_secondary_for_course).with(course.id)
       subject
     end
   end
@@ -291,8 +294,7 @@ describe MicrosoftSync::SyncerSteps do
         # admin deleted the MS group we created, or a group never existed
 
         it 'creates a new MS group and goes to the "update group" step' do
-          expect(graph_service_helpers).to \
-            receive(:create_education_class).with(course).and_return("id" => "newid")
+          expect(graph_service_helpers).to receive(:create_education_class).with(course).and_return("id" => "newid")
 
           expect_delayed_next_step(
             subject, :step_update_group_with_course_data, 8.seconds, "newid"
@@ -379,8 +381,8 @@ describe MicrosoftSync::SyncerSteps do
 
     context "on success" do
       it "updates the LMS metadata, sets ms_group_id, and goes to the next step" do
-        expect(graph_service_helpers).to \
-          receive(:update_group_with_course_data).with("newid", course)
+        expect(graph_service_helpers).to receive(:update_group_with_course_data)
+          .with("newid", course)
 
         expect { subject }.to change { group.reload.ms_group_id }.to("newid")
         expect_next_step(subject, :step_ensure_enrollments_user_mappings_filled)
@@ -389,9 +391,9 @@ describe MicrosoftSync::SyncerSteps do
 
     context "on other failure" do
       it "bubbles up the error" do
-        expect(graph_service_helpers).to \
-          receive(:update_group_with_course_data).with("newid", course)
-                                                 .and_raise(new_http_error(400))
+        expect(graph_service_helpers).to receive(:update_group_with_course_data)
+          .with("newid", course)
+          .and_raise(new_http_error(400))
         expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
     end
@@ -403,13 +405,13 @@ describe MicrosoftSync::SyncerSteps do
     let(:batch_size) { 4 }
 
     let!(:students) do
-      n_students_in_course(batch_size - 1, course: course)
+      n_students_in_course(batch_size - 1, course:)
     end
 
     let!(:teachers) do
       [
-        teacher_in_course(course: course, active_enrollment: true),
-        teacher_in_course(course: course, active_enrollment: true)
+        teacher_in_course(course:, active_enrollment: true),
+        teacher_in_course(course:, active_enrollment: true)
       ].map(&:user)
     end
 
@@ -463,8 +465,7 @@ describe MicrosoftSync::SyncerSteps do
         it "doesn't add any UserMappings" do
           expect(graph_service_helpers).to receive(:users_uluvs_to_aads)
             .at_least(:once).and_return({})
-          expect { subject }.to_not \
-            change { MicrosoftSync::UserMapping.count }.from(0)
+          expect { subject }.to_not change { MicrosoftSync::UserMapping.count }.from(0)
         end
       end
 
@@ -579,14 +580,15 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     it "gets members and owners and builds a diff" do
-      expect(graph_service_helpers).to \
-        receive(:get_group_users_aad_ids).with("mygroup").and_return(%w[m1 m2])
-      expect(graph_service_helpers).to \
-        receive(:get_group_users_aad_ids).with("mygroup", owners: true).and_return(%w[o1 o2])
+      expect(graph_service_helpers).to receive(:get_group_users_aad_ids)
+        .with("mygroup")
+        .and_return(%w[m1 m2])
+      expect(graph_service_helpers).to receive(:get_group_users_aad_ids)
+        .with("mygroup", owners: true)
+        .and_return(%w[o1 o2])
 
       diff = instance_double(MicrosoftSync::MembershipDiff)
-      expect(MicrosoftSync::MembershipDiff).to \
-        receive(:new).with(%w[m1 m2], %w[o1 o2]).and_return(diff)
+      expect(MicrosoftSync::MembershipDiff).to receive(:new).with(%w[m1 m2], %w[o1 o2]).and_return(diff)
       members_and_enrollment_types = []
       expect(diff).to receive(:set_local_member) { |*args| members_and_enrollment_types << args }
       allow(diff).to receive(:local_owners) do
@@ -602,13 +604,11 @@ describe MicrosoftSync::SyncerSteps do
 
   shared_examples_for "a step that executes a diff" do
     before do
-      allow(diff).to \
-        receive(:additions_in_slices_of)
+      allow(diff).to receive(:additions_in_slices_of)
         .with(MicrosoftSync::GraphService::GroupsEndpoints::USERS_BATCH_SIZE)
         .and_yield(owners: %w[o3], members: %w[o1 o2])
         .and_yield(members: %w[o3])
-      allow(diff).to \
-        receive(:removals_in_slices_of)
+      allow(diff).to receive(:removals_in_slices_of)
         .with(MicrosoftSync::GraphService::GroupsEndpoints::USERS_BATCH_SIZE)
         .and_yield(owners: %w[o1], members: %w[m1 m2])
         .and_yield(members: %w[m3])
@@ -650,8 +650,8 @@ describe MicrosoftSync::SyncerSteps do
     def membership_change_result_double(total_unsuccessful = 0, to_json = "", nonexistent_users = [])
       instance_double(
         MicrosoftSync::GraphService::GroupMembershipChangeResult,
-        to_json: to_json,
-        total_unsuccessful: total_unsuccessful,
+        to_json:,
+        total_unsuccessful:,
         blank?: total_unsuccessful == 0,
         present?: total_unsuccessful != 0,
         nonexistent_user_ids: nonexistent_users
@@ -678,7 +678,8 @@ describe MicrosoftSync::SyncerSteps do
           tags: { sync_type: sync_type_statsd_tag }
         )
         expect(InstStatsd::Statsd).to have_received(:count).twice.with(
-          "microsoft_sync.syncer_steps.skipped_total.add", 3,
+          "microsoft_sync.syncer_steps.skipped_total.add",
+          3,
           tags: { sync_type: sync_type_statsd_tag }
         )
       end
@@ -704,8 +705,7 @@ describe MicrosoftSync::SyncerSteps do
 
         subject
 
-        expect(MicrosoftSync::UserMapping.where("aad_id like ?", "aad%").pluck(:aad_id)).to \
-          eq(["aad1"])
+        expect(MicrosoftSync::UserMapping.where("aad_id like ?", "aad%").pluck(:aad_id)).to eq(["aad1"])
         expect(Rails.logger).to have_received(:warn).with(/Deleting mappings for AADs.*aad2/)
         expect(InstStatsd::Statsd).to have_received(:count).with(
           "microsoft_sync.syncer_steps.deleted_mappings_for_missing_users", 2
@@ -715,11 +715,9 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when some users to be removed aren't in the group" do
       it "logs and increments statsd metrics" do
-        allow(graph_service.groups).to \
-          receive(:add_users_ignore_duplicates)
+        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
           .and_return(membership_change_result_double)
-        expect(graph_service.groups).to \
-          receive(:remove_users_ignore_missing)
+        expect(graph_service.groups).to receive(:remove_users_ignore_missing)
           .twice.and_return(membership_change_result_double(2, "debuginfo"))
 
         allow(Rails.logger).to receive(:warn)
@@ -736,7 +734,8 @@ describe MicrosoftSync::SyncerSteps do
           tags: { sync_type: sync_type_statsd_tag }
         )
         expect(InstStatsd::Statsd).to have_received(:count).twice.with(
-          "microsoft_sync.syncer_steps.skipped_total.remove", 2,
+          "microsoft_sync.syncer_steps.skipped_total.remove",
+          2,
           tags: { sync_type: sync_type_statsd_tag }
         )
       end
@@ -767,9 +766,12 @@ describe MicrosoftSync::SyncerSteps do
 
     let(:diff) do
       instance_double(
-        MicrosoftSync::MembershipDiff, local_owners: Set.new(%w[o3]),
-                                       max_enrollment_members_reached?: false, max_enrollment_owners_reached?: false,
-                                       additions_in_slices_of: nil, removals_in_slices_of: nil
+        MicrosoftSync::MembershipDiff,
+        local_owners: Set.new(%w[o3]),
+        max_enrollment_members_reached?: false,
+        max_enrollment_owners_reached?: false,
+        additions_in_slices_of: nil,
+        removals_in_slices_of: nil
       )
     end
 
@@ -870,8 +872,9 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when the Microsoft API errors with a 404 (e.g., group doesn't exist)" do
       it "retries in (30, 90, 270 seconds)" do
-        expect(graph_service.teams).to \
-          receive(:create_for_education_class).with("mygroupid").and_raise(new_http_error(404))
+        expect(graph_service.teams).to receive(:create_for_education_class)
+          .with("mygroupid")
+          .and_raise(new_http_error(404))
         expect_retry(
           subject,
           error_class: MicrosoftSync::Errors::HTTPNotFound,
@@ -882,9 +885,9 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when the Microsoft API errors with some other error" do
       it "bubbles up the error" do
-        expect(graph_service.teams).to \
-          receive(:create_for_education_class).with("mygroupid")
-                                              .and_raise(new_http_error(400))
+        expect(graph_service.teams).to receive(:create_for_education_class)
+          .with("mygroupid")
+          .and_raise(new_http_error(400))
         expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
     end
@@ -930,13 +933,15 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when there are changes to process" do
       let(:n_students) { 1 }
-      let!(:students) { 1.upto(n_students).map { student_in_course(course: course).user } }
-      let!(:teacher) { teacher_in_course(course: course, active_enrollment: true).user }
+      let!(:students) { 1.upto(n_students).map { student_in_course(course:).user } }
+      let!(:teacher) { teacher_in_course(course:, active_enrollment: true).user }
 
       before do
         students.each_with_index do |student, index|
-          communication_channel(student, path_type: "email", username: "s#{index}@example.com",
-                                         active_cc: true)
+          communication_channel(student,
+                                path_type: "email",
+                                username: "s#{index}@example.com",
+                                active_cc: true)
         end
         communication_channel(teacher, path_type: "email", username: "t@example.com", active_cc: true)
 
@@ -947,7 +952,7 @@ describe MicrosoftSync::SyncerSteps do
       def create_partial_sync_change(e_type, user, course_for_psc = nil)
         course_for_psc ||= course
         MicrosoftSync::PartialSyncChange.create!(
-          course: course_for_psc, enrollment_type: e_type, user: user
+          course: course_for_psc, enrollment_type: e_type, user:
         )
       end
 
@@ -968,8 +973,8 @@ describe MicrosoftSync::SyncerSteps do
         it "leaves sync_type=full for statsd" do
           subject
           syncer_steps.send(:graph_service)
-          expect(MicrosoftSync::GraphServiceHelpers).to \
-            have_received(:new).with(anything, sync_type: "full")
+          expect(MicrosoftSync::GraphServiceHelpers).to have_received(:new)
+            .with(anything, sync_type: "full")
         end
       end
 
@@ -993,8 +998,11 @@ describe MicrosoftSync::SyncerSteps do
         let(:diff) do
           instance_double(
             MicrosoftSync::PartialMembershipDiff,
-            set_local_member: nil, set_member_mapping: nil,
-            log_all_actions: nil, additions_in_slices_of: nil, removals_in_slices_of: nil
+            set_local_member: nil,
+            set_member_mapping: nil,
+            log_all_actions: nil,
+            additions_in_slices_of: nil,
+            removals_in_slices_of: nil
           )
         end
 
@@ -1025,7 +1033,8 @@ describe MicrosoftSync::SyncerSteps do
         it "builds a partial membership diff" do
           subject
           expect(MicrosoftSync::PartialMembershipDiff).to have_received(:new).with(
-            students[0].id => ["member"], students[2].id => ["member", "owner"],
+            students[0].id => ["member"],
+            students[2].id => ["member", "owner"],
             teacher.id => ["owner"]
           )
           expect(diff).to have_received(:set_local_member).with(students[0].id, "StudentEnrollment")
@@ -1038,7 +1047,7 @@ describe MicrosoftSync::SyncerSteps do
 
         %w[completed deleted inactive invited rejected].each do |state|
           it "ignores #{state} enrollments" do
-            Enrollment.where(course: course, user: students[0]).update_all(workflow_state: state)
+            Enrollment.where(course:, user: students[0]).update_all(workflow_state: state)
             subject
             expect(diff).to_not have_received(:set_local_member).with(students[0].id, "StudentEnrollment")
             expect(diff).to have_received(:set_local_member).with(students[2].id, "StudentEnrollment")
@@ -1046,7 +1055,7 @@ describe MicrosoftSync::SyncerSteps do
         end
 
         it "ignores StudentViewEnrollment (fake) enrollments" do
-          Enrollment.where(course: course, user: students[0]).update_all(type: "StudentViewEnrollment")
+          Enrollment.where(course:, user: students[0]).update_all(type: "StudentViewEnrollment")
           subject
           expect(diff).to_not have_received(:set_local_member).with(students[0].id, anything)
         end
@@ -1057,7 +1066,8 @@ describe MicrosoftSync::SyncerSteps do
           # to trigger requests that can cause an intermittent error
 
           it_behaves_like "a step that returns retry on intermittent error",
-                          except_throttled: true, except_group_not_found: true do
+                          except_throttled: true,
+                          except_group_not_found: true do
             context "when a request is throttled" do
               before do
                 allow(graph_service.http).to receive(:request)
@@ -1086,13 +1096,14 @@ describe MicrosoftSync::SyncerSteps do
 
               it "retries but with a GracefulCancelError so it will eventually quietly fail" do
                 expect_retry(
-                  subject, error_class: MicrosoftSync::Errors::GroupNotFoundGracefulCancelError,
-                           delay_amount: [15, 60, 300]
+                  subject,
+                  error_class: MicrosoftSync::Errors::GroupNotFoundGracefulCancelError,
+                  delay_amount: [15, 60, 300]
                 )
-                expect(MicrosoftSync::Errors::GroupNotFoundGracefulCancelError.superclass).to \
-                  eq(MicrosoftSync::Errors::GracefulCancelError)
-                expect(MicrosoftSync::Errors::GroupNotFoundGracefulCancelError.public_message).to \
-                  include("The Microsoft 365 Group created by sync no longer exists")
+                expect(MicrosoftSync::Errors::GroupNotFoundGracefulCancelError.superclass)
+                  .to eq(MicrosoftSync::Errors::GracefulCancelError)
+                expect(MicrosoftSync::Errors::GroupNotFoundGracefulCancelError.public_message)
+                  .to include("The Microsoft 365 Group created by sync no longer exists")
               end
             end
           end

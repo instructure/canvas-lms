@@ -60,9 +60,12 @@ class AccountNotification < ActiveRecord::Base
     thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(account), alert_type: "institution_announcement")
                                        .where.not(id: ObserverAlert.where(context: self).select(:observer_alert_threshold_id))
     thresholds.find_each do |threshold|
-      ObserverAlert.create(student: threshold.student, observer: threshold.observer,
-                           observer_alert_threshold: threshold, context: self,
-                           alert_type: "institution_announcement", action_date: start_at,
+      ObserverAlert.create(student: threshold.student,
+                           observer: threshold.observer,
+                           observer_alert_threshold: threshold,
+                           context: self,
+                           alert_type: "institution_announcement",
+                           action_date: start_at,
                            title: I18n.t('Institution announcement: "%{announcement_title}"', {
                                            announcement_title: subject
                                          }))
@@ -82,7 +85,7 @@ class AccountNotification < ActiveRecord::Base
   def self.for_user_and_account(user, root_account, include_past: false)
     GuardRail.activate(:secondary) do
       if root_account.site_admin?
-        current = for_account(root_account, include_past: include_past)
+        current = for_account(root_account, include_past:)
       else
         course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
@@ -92,7 +95,7 @@ class AccountNotification < ActiveRecord::Base
                                .joins(:account).where(accounts: { workflow_state: "active" })
                                .distinct.pluck(:account_id).uniq
         all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
-        current = for_account(root_account, all_account_ids, include_past: include_past)
+        current = for_account(root_account, all_account_ids, include_past:)
       end
 
       user_role_ids = {}
@@ -138,7 +141,7 @@ class AccountNotification < ActiveRecord::Base
           user_role_ids[announcement.account_id] |= account_users.map { |au| au.role.role_for_root_account_id(root_account.id).id }
         end
 
-        role_ids.empty? || (role_ids & user_role_ids[announcement.account_id]).present?
+        role_ids.empty? || role_ids.intersect?(user_role_ids[announcement.account_id])
       end
 
       user.shard.activate do
@@ -267,7 +270,7 @@ class AccountNotification < ActiveRecord::Base
 
     if all_visible_account_ids || include_past
       # Refreshes every 10 minutes at the longest
-      all_account_ids_hash = Digest::MD5.hexdigest all_visible_account_ids.try(:sort).to_s
+      all_account_ids_hash = Digest::SHA256.hexdigest all_visible_account_ids.try(:sort).to_s
       Rails.cache.fetch(["account_notifications5", root_account, all_account_ids_hash, include_past].cache_key, expires_in: 10.minutes, &block)
     else
       # no point in doing an additional layer of caching for _only_ root accounts when root accounts are explicitly cached

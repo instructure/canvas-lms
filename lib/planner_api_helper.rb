@@ -72,7 +72,8 @@ module PlannerApiHelper
     return unless item.is_a?(ContextModuleItem) && item.is_a?(Plannable)
     return unless mark_doneable_tag(item)
 
-    planner_override = PlannerOverride.where(user: user, plannable_id: item.id,
+    planner_override = PlannerOverride.where(user:,
+                                             plannable_id: item.id,
                                              plannable_type: item.class.to_s).first_or_create
     planner_override.marked_complete = complete
     planner_override.dismissed = complete
@@ -89,6 +90,6 @@ module PlannerApiHelper
         req[:id] == tag.id && req[:type] == "must_mark_done"
       end
     end
-    doneable_tags.length == 1 ? doneable_tags.first : nil
+    (doneable_tags.length == 1) ? doneable_tags.first : nil
   end
 end

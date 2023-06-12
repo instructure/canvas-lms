@@ -129,7 +129,7 @@ module ModelCache
     expected_args = options[:key_method] ? 0 : 1
     maybe_reset = "cache[#{key_value}] = #{orig_method} if args.size > #{expected_args}"
 
-    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<~RUBY, __FILE__, __LINE__ + 1)
+    klass.send((options[:type] == :instance) ? :class_eval : :instance_eval, <<~RUBY, __FILE__, __LINE__ + 1)
       def #{method}(*args)
         if cache = ModelCache[#{options[:cache_name].inspect}] and cache = cache[#{options[:key_lookup].inspect}]
           #{maybe_reset}
@@ -143,7 +143,7 @@ module ModelCache
   end
 
   def self.included(klass)
-    klass.send :include, InstanceMethods
+    klass.include InstanceMethods
     klass.extend ClassMethods
     klass.after_create :add_to_caches
     klass.after_update :update_in_caches

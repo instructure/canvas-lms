@@ -47,6 +47,7 @@ module Api::V1::Course
     settings[:usage_rights_required] = course.usage_rights_required?
     settings[:restrict_student_past_view] = course.restrict_student_past_view?
     settings[:restrict_student_future_view] = course.restrict_student_future_view?
+    settings[:restrict_quantitative_data] = course.restrict_quantitative_data
     settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
     settings[:home_page_announcement_limit] = course.home_page_announcement_limit
     settings[:syllabus_course_summary] = course.syllabus_course_summary?
@@ -103,9 +104,12 @@ module Api::V1::Course
       return { "id" => course.id, "access_restricted_by_date" => true }
     end
 
-    Api::V1::CourseJson.to_hash(course, user, includes, enrollments,
-                                precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
-      hash = api_json(course, user, session, { only: allowed_attributes, methods: methods }, permissions_to_include)
+    Api::V1::CourseJson.to_hash(course,
+                                user,
+                                includes,
+                                enrollments,
+                                precalculated_permissions:) do |builder, allowed_attributes, methods, permissions_to_include|
+      hash = api_json(course, user, session, { only: allowed_attributes, methods: }, permissions_to_include)
       hash["term"] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?("term")
       if includes.include?("grading_periods")
         hash["grading_periods"] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
@@ -115,7 +119,7 @@ module Api::V1::Course
       if includes.include?("course_progress")
         hash["course_progress"] = CourseProgress.new(course,
                                                      subject_user,
-                                                     preloaded_progressions: preloaded_progressions).to_json
+                                                     preloaded_progressions:).to_json
       end
       hash["apply_assignment_group_weights"] = course.apply_group_weights?
       if includes.include?("sections")
@@ -144,13 +148,13 @@ module Api::V1::Course
             User.where(id: scope).map { |teacher| user_display_json(teacher) }
         end
       end
-      hash["tabs"] = tabs_available_json(course, user, session, ["external"], precalculated_permissions: precalculated_permissions) if includes.include?("tabs")
+      hash["tabs"] = tabs_available_json(course, user, session, ["external"], precalculated_permissions:) if includes.include?("tabs")
       hash["locale"] = course.locale unless course.locale.nil?
       hash["account"] = account_json(course.account, user, session, []) if includes.include?("account")
       # undocumented, but leaving for backwards compatibility.
       hash["subaccount_name"] = course.account.name if includes.include?("subaccount")
       add_helper_dependant_entries(hash, course, builder)
-      apply_nickname(hash, course, user, prefer_friendly_name: prefer_friendly_name)
+      apply_nickname(hash, course, user, prefer_friendly_name:)
 
       hash["image_download_url"] = course.image if includes.include?("course_image")
       hash["banner_image_download_url"] = course.banner_image if includes.include?("banner_image")
@@ -162,6 +166,9 @@ module Api::V1::Course
           hash["templated_accounts"] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
         end
       end
+
+      hash["grading_scheme"] = course.grading_standard_or_default.data if includes.include?("grading_scheme")
+      hash["restrict_quantitative_data"] = course.restrict_quantitative_data?(user) if includes.include?("restrict_quantitative_data")
 
       # return hash from the block for additional processing in Api::V1::CourseJson
       hash

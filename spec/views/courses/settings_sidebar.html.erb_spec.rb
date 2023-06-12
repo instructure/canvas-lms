@@ -113,6 +113,15 @@ describe "courses/_settings_sidebar" do
         tool_link = doc.at_css(".course-settings-sub-navigation-lti")
         expect(tool_link["href"]).to include("launch_type=course_settings_sub_navigation")
       end
+
+      it "does not have additional spacing between an icon and a label" do
+        create_course_settings_sub_navigation_tool
+        assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
+        render
+        doc = Nokogiri::HTML5(response.body)
+        tool_link = doc.at_css(".course-settings-sub-navigation-lti")
+        expect(tool_link.to_html).to include("<img class=\"icon\" alt=\"\" src=\"/images/delete.png\">external tool")
+      end
     end
   end
 end

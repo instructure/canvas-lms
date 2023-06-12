@@ -142,7 +142,7 @@ describe Quizzes::QuizQuestion::AnswerGroup::Answer do
   describe "#set_id" do
     it "assigns a randomly generated id to the answer" do
       @answer.set_id([])
-      expect(@answer[:id]).to be_kind_of(Integer)
+      expect(@answer[:id]).to be_a(Integer)
       expect(@answer[:id]).to be > 0
     end
 

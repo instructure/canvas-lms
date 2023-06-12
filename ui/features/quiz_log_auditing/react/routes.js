@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {BrowserRouter, HashRouter, Switch, Route} from 'react-router-dom'
+import {BrowserRouter, HashRouter, Routes, Route} from 'react-router-dom'
 
 import AnswerMatrixRoute from './routes/answer_matrix'
 import AppRoute from './routes/app'
@@ -31,29 +31,36 @@ export default function App(props) {
 
   return (
     <Router basename={baseUrl}>
-      <Switch>
-        <Route path="/questions/:id">
-          <AppRoute>
-            <QuestionRoute {...props} />
-          </AppRoute>
-        </Route>
+      <Routes>
+        <Route
+          path="/questions/:id"
+          element={
+            <AppRoute>
+              <QuestionRoute {...props} />
+            </AppRoute>
+          }
+        />
 
-        <Route path="/answer_matrix">
-          <AppRoute>
-            <AnswerMatrixRoute {...props} />
-          </AppRoute>
-        </Route>
+        <Route
+          path="/answer_matrix"
+          element={
+            <AppRoute>
+              <AnswerMatrixRoute {...props} />
+            </AppRoute>
+          }
+        />
 
-        <Route path="/">
-          <AppRoute>
-            <EventStreamRoute {...props} />
-          </AppRoute>
-        </Route>
+        <Route
+          path="/"
+          element={
+            <AppRoute>
+              <EventStreamRoute {...props} />
+            </AppRoute>
+          }
+        />
 
-        <Route path="*">
-          <AppRoute />
-        </Route>
-      </Switch>
+        <Route path="*" element={<AppRoute />} />
+      </Routes>
     </Router>
   )
 }

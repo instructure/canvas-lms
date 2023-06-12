@@ -23,7 +23,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "api_scopes"))
 require "controller_list_view"
 require "api_scope_mapping_writer"
 
-Dir.glob(Rails.root.join("doc/api/data_services/*.rb")).sort.each { |file| require file }
+Rails.root.glob("doc/api/data_services/*.rb").sort.each { |file| require file }
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
@@ -129,6 +129,17 @@ module YARD::Templates::Helpers::HtmlHelper
 
   def topicize(str)
     str.tr(" ", "_").underscore
+  end
+
+  def make_api_doc_anchors(hash, options)
+    anchors = []
+    hash.each do |key, val|
+      link = url_for(key.to_s)
+      klass = []
+      klass << "current" if key == options[:object]
+      anchors << "<a class=\"#{klass.join(" ")}\" href=\"#{link}\">#{val}</a>"
+    end
+    anchors
   end
 
   def url_for_file(filename, anchor = nil)
@@ -260,19 +271,17 @@ end
 # a redirect at the old name so people's old bookmarks don't 404
 def serialize_redirect(filename)
   path = File.join(options[:serializer].basepath, filename)
-  File.open(path, "wb") do |file|
-    file.write <<~HTML
-      <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-      <html>
-      <head>
-      <title>#{options[:page_title]}</title>
-      <meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
-      <BODY>
-      This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
-      </BODY>
-      </HTML>
-    HTML
-  end
+  File.binwrite(path, <<~HTML)
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+    <html>
+    <head>
+    <title>#{options[:page_title]}</title>
+    <meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
+    <BODY>
+    This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
+    </BODY>
+    </HTML>
+  HTML
 end
 
 def extract_page_title_from_markdown(file)

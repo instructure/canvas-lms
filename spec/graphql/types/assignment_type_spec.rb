@@ -24,8 +24,8 @@ require_relative "./shared_examples/types_with_enumerable_workflow_states"
 describe Types::AssignmentType do
   let_once(:course) { course_factory(active_all: true) }
 
-  let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
-  let_once(:student) { student_in_course(course: course, active_all: true).user }
+  let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
+  let_once(:student) { student_in_course(course:, active_all: true).user }
 
   let(:assignment) do
     course.assignments.create(title: "some assignment",
@@ -35,6 +35,7 @@ describe Types::AssignmentType do
   end
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
+  let(:teacher_assignment_type) { GraphQLTypeTester.new(assignment, current_user: teacher) }
 
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
@@ -126,7 +127,7 @@ describe Types::AssignmentType do
 
     it "is not returned if the association is soft-deleted" do
       @rubric_association.destroy!
-      expect(assignment_type.resolve("rubricAssociation { _id }")).to eq nil
+      expect(assignment_type.resolve("rubricAssociation { _id }")).to be_nil
     end
   end
 
@@ -156,8 +157,8 @@ describe Types::AssignmentType do
   end
 
   it "returns assessment requests for the current user" do
-    student2 = student_in_course(course: course, name: "Matthew Lemon", active_all: true).user
-    student3 = student_in_course(course: course, name: "Rob Orton", active_all: true).user
+    student2 = student_in_course(course:, name: "Matthew Lemon", active_all: true).user
+    student3 = student_in_course(course:, name: "Rob Orton", active_all: true).user
 
     assignment.assign_peer_review(student, student2)
     assignment.assign_peer_review(student2, student3)
@@ -231,14 +232,14 @@ describe Types::AssignmentType do
   end
 
   it "returns nil when allowed_attempts is unset" do
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
+    expect(assignment_type.resolve("allowedAttempts")).to be_nil
   end
 
   it "returns nil when allowed_attempts is an invalid non-positive value" do
     assignment.update allowed_attempts: 0
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
+    expect(assignment_type.resolve("allowedAttempts")).to be_nil
     assignment.update allowed_attempts: -1
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
+    expect(assignment_type.resolve("allowedAttempts")).to be_nil
   end
 
   it "returns allowed_attempts value set on the assignment" do
@@ -247,7 +248,7 @@ describe Types::AssignmentType do
   end
 
   describe "submissionsConnection" do
-    let_once(:other_student) { student_in_course(course: course, active_all: true).user }
+    let_once(:other_student) { student_in_course(course:, active_all: true).user }
 
     # This is kind of a catch-all test the assignment.submissionsConnection
     # graphql plumbing. The submission search specs handle testing the
@@ -575,7 +576,7 @@ describe Types::AssignmentType do
     it "works for adhoc students" do
       adhoc_override = assignment.assignment_overrides.new(set_type: "ADHOC")
       adhoc_override.assignment_override_students.build(
-        assignment: assignment,
+        assignment:,
         user: student,
         assignment_override: adhoc_override
       )
@@ -615,18 +616,18 @@ describe Types::AssignmentType do
     it "works when lock_info is false" do
       expect(
         assignment_type.resolve("lockInfo { isLocked }")
-      ).to eq false
+      ).to be false
 
       %i[lockAt unlockAt canView].each do |field|
         expect(
           assignment_type.resolve("lockInfo { #{field} }")
-        ).to eq nil
+        ).to be_nil
       end
     end
 
     it "works when lock_info is a hash" do
       assignment.update! unlock_at: 1.month.from_now
-      expect(assignment_type.resolve("lockInfo { isLocked }")).to eq true
+      expect(assignment_type.resolve("lockInfo { isLocked }")).to be true
     end
   end
 
@@ -650,7 +651,58 @@ describe Types::AssignmentType do
 
       it "returns null in place of the PostPolicy" do
         resolver = GraphQLTypeTester.new(assignment, context)
-        expect(resolver.resolve("postPolicy {_id}")).to be nil
+        expect(resolver.resolve("postPolicy {_id}")).to be_nil
+      end
+    end
+  end
+
+  describe "restrictQuantitativeData" do
+    it "returns false when restrictQuantitativeData is off" do
+      expect(
+        assignment_type.resolve("restrictQuantitativeData")
+      ).to be false
+    end
+
+    context "when RQD is enabled" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      context "default RQD state" do
+        it "returns true for student" do
+          expect(
+            assignment_type.resolve("restrictQuantitativeData")
+          ).to be true
+        end
+
+        it "returns true for teacher" do
+          expect(
+            teacher_assignment_type.resolve("restrictQuantitativeData")
+          ).to be true
+        end
+      end
+
+      context "checkExtraPermissions RQD state" do
+        it "returns true for student" do
+          expect(
+            assignment_type.resolve("restrictQuantitativeData(checkExtraPermissions: true)")
+          ).to be true
+        end
+
+        it "returns false for teacher" do
+          expect(
+            teacher_assignment_type.resolve("restrictQuantitativeData(checkExtraPermissions: true)")
+          ).to be false
+        end
       end
     end
   end

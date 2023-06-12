@@ -24,7 +24,7 @@ import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import propTypes from '../propTypes'
 import React, {Component} from 'react'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 
 import {Button} from '@instructure/ui-buttons'
 import DiscussionSettings from './DiscussionSettings'

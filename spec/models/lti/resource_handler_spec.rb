@@ -47,7 +47,7 @@ module Lti
       let(:message_type) { "custom-message-type" }
 
       before do
-        message_handler.update(message_type: message_type)
+        message_handler.update(message_type:)
         resource_handler.update(message_handlers: [message_handler])
       end
 
@@ -62,7 +62,7 @@ module Lti
     end
 
     describe "#self.by_product_family" do
-      before { resource_handler.update(tool_proxy: tool_proxy) }
+      before { resource_handler.update(tool_proxy:) }
 
       it "returns resource handlers with specified product family and context" do
         resource_handlers = ResourceHandler.by_product_family([product_family], tool_proxy.context)

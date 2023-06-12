@@ -38,7 +38,7 @@ module BrokenLinkHelper
 
     notification = BroadcastPolicy.notification_finder.by_name("Content Link Error")
     error_type = error_type(record.context, request.url)
-    data = { location: request.referer, url: request.url, anchor: anchor, error_type: error_type }
+    data = { location: request.referer, url: request.url, anchor:, error_type: }
     DelayedNotification.delay_if_production(priority: Delayed::LOW_PRIORITY)
                        .process(record, notification, recipient_keys, data)
     true

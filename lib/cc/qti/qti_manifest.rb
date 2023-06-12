@@ -35,7 +35,8 @@ module CC
                                                            @exporter.user,
                                                            key_generator: @exporter,
                                                            track_referenced_files: true,
-                                                           media_object_flavor: Setting.get("exporter_media_object_flavor", nil).presence)
+                                                           media_object_flavor: Setting.get("exporter_media_object_flavor", nil).presence,
+                                                           disable_content_rewriting: @exporter.disable_content_rewriting)
       end
 
       def export_dir

@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 const glob = require('glob')
 const path = require('path')
-const {canvasDir} = require('#params')
+const {canvasDir} = require('../params')
 
 // Put any custom moment locales here:
 const customMomentLocales = [

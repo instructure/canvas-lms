@@ -308,8 +308,9 @@ module GroupsCommon
     a = Attachment.create! context: student,
                            filename: "homework.pdf",
                            uploaded_data: StringIO.new("blah blah blah")
-    assignment.submit_homework(student, attachments: [a],
-                                        submission_type: "online_upload")
+    assignment.submit_homework(student,
+                               attachments: [a],
+                               submission_type: "online_upload")
   end
 
   def create_group_announcement_manually(title, text)
@@ -339,9 +340,11 @@ module GroupsCommon
                           end
 
     add_file(fixture_file_upload("example.pdf", "application/pdf"),
-             @testgroup.first, "example.pdf")
+             @testgroup.first,
+             "example.pdf")
     add_file(fixture_file_upload("a_file.txt", "text/plain"),
-             second_file_context, "a_file.txt")
+             second_file_context,
+             "a_file.txt")
   end
 
   def expand_files_on_content_pane

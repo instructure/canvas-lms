@@ -107,7 +107,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
       model = fake_record_type.new
       bookmark_value = bookmarker.bookmark_for(model)
       expect(bookmark_value).to eq(model.created_at.to_s)
-      expect(bookmarker.validate(bookmark_value)).to eq(true)
+      expect(bookmarker.validate(bookmark_value)).to be(true)
     end
   end
 end

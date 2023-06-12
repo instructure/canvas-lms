@@ -269,10 +269,14 @@ class ConversationsController < ApplicationController
       conversations = Api.paginate(@conversations_scope, self, api_v1_conversations_url)
       # OPTIMIZE: loading the most recent messages for each conversation into a single query
       ConversationParticipant.preload_latest_messages(conversations, @current_user)
-      @conversations_json = conversations_json(conversations, @current_user,
-                                               session, include_participant_avatars: (Array(params[:include]).include? "participant_avatars"),
-                                                        include_participant_contexts: false, visible: true,
-                                                        include_context_name: true, include_beta: params[:include_beta])
+      @conversations_json = conversations_json(conversations,
+                                               @current_user,
+                                               session,
+                                               include_participant_avatars: (Array(params[:include]).include? "participant_avatars"),
+                                               include_participant_contexts: false,
+                                               visible: true,
+                                               include_context_name: true,
+                                               include_beta: params[:include_beta])
 
       if params[:include_all_conversation_ids]
         @conversations_json = { conversations: @conversations_json, conversation_ids: @conversations_scope.conversation_ids }
@@ -446,12 +450,17 @@ class ConversationsController < ApplicationController
 
     shard.activate do
       if batch_private_messages || batch_group_messages
-        mode = params[:mode] == "async" ? :async : :sync
+        mode = (params[:mode] == "async") ? :async : :sync
         message.relativize_attachment_ids(from_shard: message.shard, to_shard: shard)
         message.shard = shard
-        batch = ConversationBatch.generate(message, @recipients, mode,
-                                           subject: params[:subject], context_type: context_type,
-                                           context_id: context_id, tags: @tags, group: batch_group_messages)
+        batch = ConversationBatch.generate(message,
+                                           @recipients,
+                                           mode,
+                                           subject: params[:subject],
+                                           context_type:,
+                                           context_id:,
+                                           tags: @tags,
+                                           group: batch_group_messages)
 
         InstStatsd::Statsd.count("inbox.conversation.created.legacy", batch.recipient_count)
         InstStatsd::Statsd.increment("inbox.message.sent.legacy")
@@ -484,7 +493,7 @@ class ConversationsController < ApplicationController
         visibility_map = infer_visibility(conversations)
         render json: conversations.map { |c| conversation_json(c, @current_user, session, include_participant_avatars: false, include_participant_contexts: false, visible: visibility_map[c.conversation_id]) }, status: :created
       else
-        @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, subject: params[:subject], context_type: context_type, context_id: context_id)
+        @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, subject: params[:subject], context_type:, context_id:)
         @conversation.add_message(message, tags: @tags, update_for_sender: false, cc_author: true)
         InstStatsd::Statsd.increment("inbox.conversation.created.legacy")
         InstStatsd::Statsd.increment("inbox.message.sent.legacy")
@@ -653,7 +662,7 @@ class ConversationsController < ApplicationController
               else
                 "default"
               end
-      return redirect_to conversations_path(scope: scope, id: @conversation.conversation_id, message: params[:message])
+      return redirect_to conversations_path(scope:, id: @conversation.conversation_id, message: params[:message])
     end
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
@@ -668,7 +677,7 @@ class ConversationsController < ApplicationController
                                    session,
                                    include_participant_contexts: value_to_boolean(params.fetch(:include_participant_contexts, true)),
                                    include_indirect_participants: true,
-                                   messages: messages,
+                                   messages:,
                                    submissions: [],
                                    include_beta: params[:include_beta],
                                    include_context_name: true,
@@ -963,7 +972,7 @@ class ConversationsController < ApplicationController
       conversation: @conversation,
       context: @conversation.conversation.context,
       current_user: @current_user,
-      session: session,
+      session:,
       recipients: params[:recipients],
       context_code: params[:context_code],
       message_ids: params[:included_messages],
@@ -1112,7 +1121,7 @@ class ConversationsController < ApplicationController
     audience_contexts = contexts_for(audience, conversation.local_context_tags) # will be 0, 1, or 2 contexts
     audience_context_names = [:courses, :groups].inject([]) do |ary, context_key|
       ary + audience_contexts[context_key].keys.map { |k| @contexts[context_key][k] && @contexts[context_key][k][:name] }
-    end.reject(&:blank?)
+    end.compact_blank
 
     content += "<hr />"
     content += "<div>#{ERB::Util.h(t("conversation_context", "From a conversation with"))} "
@@ -1120,7 +1129,8 @@ class ConversationsController < ApplicationController
     if audience_names.length <= participant_list_cutoff
       content += ERB::Util.h(audience_names.to_sentence).to_s
     else
-      others_string = t("other_recipients", {
+      others_string = t("other_recipients",
+                        {
                           one: "and 1 other",
                           other: "and %{count} others"
                         },
@@ -1139,10 +1149,10 @@ class ConversationsController < ApplicationController
 
   def render_error(attribute, message, status = :bad_request)
     render json: [{
-      attribute: attribute,
-      message: message,
+      attribute:,
+      message:,
     }],
-           status: status
+           status:
   end
 
   def infer_scope

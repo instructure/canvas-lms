@@ -34,7 +34,7 @@ export default class EventTracker {
     //
     // THIS IS REQUIRED AND MUST BE UNIQUE PER EVENT TRACKER.
     //
-    // See ./constants.coffee for the defined event types.
+    // See ./constants.js for the defined event types.
     if (!this.eventType) this.eventType = null
 
     // @property {Number} priority
@@ -44,7 +44,7 @@ export default class EventTracker {
     //
     // Higher priority indicates that events should be delivered ASAP.
     //
-    // Possible values: see ./constants.coffee
+    // Possible values: see ./constants.js
     if (!this.priority) this.priority = K.EVT_PRIORITY_LOW
 
     this._options = extend({}, this.options, options)

@@ -100,7 +100,7 @@ module Qti
       if correct_answers == 0
         @question[:import_error] = "The importer couldn't determine the correct answers for this question."
       end
-      @question[:question_type] ||= correct_answers == 1 ? "multiple_choice_question" : "multiple_answers_question"
+      @question[:question_type] ||= (correct_answers == 1) ? "multiple_choice_question" : "multiple_answers_question"
       @question[:question_type] = "multiple_choice_question" if @is_really_stupid_likert
     end
 

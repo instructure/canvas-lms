@@ -91,7 +91,7 @@ describe FilesController do
       folder ||= @course.folders.create!(name: component, workflow_state: "visible", parent_folder: folder)
     end
     filename = components.shift
-    @file = folder.active_file_attachments.build(filename: filename, uploaded_data: io)
+    @file = folder.active_file_attachments.build(filename:, uploaded_data: io)
     @file.context = @course
     @file.save!
     @file
@@ -259,11 +259,18 @@ describe FilesController do
       end
     end
 
-    it "authenticates via course if given an assignment id" do
-      user_session(@teacher)
-      assignment = @course.assignments.create!(name: "an assignment")
-      get "show", params: { assignment_id: assignment.id, id: @file.id }, format: :json
-      expect(response).to be_ok
+    it "doesn't allow an assignment_id to bypass other auth checks" do
+      assignment1 = @course.assignments.create!(name: "an assignment")
+
+      attachment_model(context: @teacher, uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"))
+
+      user_session(@student)
+
+      get "show", params: { id: @attachment.id }, format: :json
+      expect(response).not_to be_ok
+
+      get "show", params: { assignment_id: assignment1.id, id: @attachment.id }, format: :json
+      expect(response).not_to be_ok
     end
 
     describe "with verifiers" do
@@ -278,7 +285,7 @@ describe FilesController do
 
       it "allows public access with new verifier" do
         verifier = Attachments::Verification.new(@file).verifier_for_user(nil)
-        get "show", params: { course_id: @course.id, id: @file.id, verifier: verifier }, format: "json"
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
         expect(response).to be_successful
         expect(json_parse["attachment"]).to_not be_nil
         expect(json_parse["attachment"]["md5"]).to be_nil
@@ -288,7 +295,7 @@ describe FilesController do
         user_session(@teacher)
         session[:require_terms] = true
         verifier = Attachments::Verification.new(@file).verifier_for_user(@teacher)
-        get "show", params: { course_id: @course.id, id: @file.id, verifier: verifier }, format: "json"
+        get "show", params: { course_id: @course.id, id: @file.id, verifier: }, format: "json"
         expect(response).to be_successful
       end
 
@@ -362,7 +369,7 @@ describe FilesController do
     it "redirects without sf_verifier for inline_content files" do
       user = user_factory(active_all: true)
       file = user_html_file
-      verifier = Users::AccessVerifier.generate(user: user)
+      verifier = Users::AccessVerifier.generate(user:)
 
       get "show", params: verifier.merge(id: file.id)
       expect(response).to be_redirect
@@ -373,7 +380,7 @@ describe FilesController do
     it "ignores invalid sf_verifiers" do
       user = user_factory(active_all: true)
       file = user_file
-      verifier = Users::AccessVerifier.generate(user: user)
+      verifier = Users::AccessVerifier.generate(user:)
 
       # first use to establish session
       get "show", params: verifier.merge(id: file.id)
@@ -421,7 +428,7 @@ describe FilesController do
 
     context "when the attachment has been overwritten" do
       subject do
-        get "show", params: params
+        get("show", params:)
         response
       end
 
@@ -474,6 +481,79 @@ describe FilesController do
       end
     end
 
+    context "after user merge" do
+      before :once do
+        @merge_user_1 = student_in_course(name: "Merge User 1", active_all: true).user
+        @merge_user_2 = student_in_course(name: "Merge User 2", active_all: true).user
+
+        @user_1_file = attachment_model(context: @merge_user_1, md5: "hi")
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "finds file in merged-to user's context" do
+        UserMerge.from(@merge_user_1).into(@merge_user_2)
+        UserMerge.from(@merge_user_2).into(@student)
+        run_jobs
+
+        get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+        expect(response).to be_successful
+        expect(@user_1_file.reload.context_type).to eq "User"
+        expect(@user_1_file.context_id).to eq @student.id
+      end
+
+      it "finds file in merged-from user's context when merged-to user already had the file" do
+        @user_2_file = attachment_model(context: @merge_user_2, md5: "hi")
+
+        UserMerge.from(@merge_user_1).into(@merge_user_2)
+        UserMerge.from(@merge_user_2).into(@student)
+        run_jobs
+
+        get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+        expect(response).to be_successful
+        expect(@user_1_file.reload.context_type).to eq "User"
+        expect(@user_1_file.context_id).to eq @merge_user_1.id
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        it "finds file in intermediate user's context if merge has happened cross-shard" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account:)
+          end
+          UserMerge.from(@merge_user_1).into(@merge_user_2)
+          UserMerge.from(@merge_user_2).into(@student)
+          run_jobs
+
+          get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+          expect(response).to be_successful
+          expect(@user_1_file.reload.context_type).to eq "User"
+          expect(@user_1_file.context_id).to eq @merge_user_2.id
+        end
+
+        it "finds files correctly when given a non-native user ID" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account:)
+          end
+          UserMerge.from(@merge_user_1).into(@merge_user_2)
+          UserMerge.from(@merge_user_2).into(@student)
+          run_jobs
+
+          @shard1.activate do
+            get "show", params: { user_id: @merge_user_1.id, id: @user_1_file.id, verifier: @user_1_file.uuid }
+            expect(response).to be_successful
+            expect(@user_1_file.reload.context_type).to eq "User"
+            expect(@user_1_file.context_id).to eq @merge_user_2.id
+          end
+        end
+      end
+    end
+
     describe "as a student" do
       before do
         user_session(@student)
@@ -494,7 +574,7 @@ describe FilesController do
             "files",
             "files"
           )
-          get "show", params: params
+          get "show", params:
         end
       end
 
@@ -511,14 +591,14 @@ describe FilesController do
         get "show", params: { course_id: @course.id, id: @file.id, inline: 1 }
         expect(json_parse).to eq({ "ok" => true })
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks files as viewed for module progressions if the file is downloaded" do
         file_in_a_module
         get "show", params: { course_id: @course.id, id: @file.id, download: 1 }
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks files as viewed for module progressions if the file data is requested and is canvadocable" do
@@ -526,7 +606,7 @@ describe FilesController do
         allow_any_instance_of(Attachment).to receive(:canvadocable?).and_return true
         get "show", params: { course_id: @course.id, id: @file.id }, format: :json
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "marks media files viewed when rendering html with file_preview" do
@@ -534,7 +614,7 @@ describe FilesController do
         file_in_a_module
         get "show", params: { course_id: @course.id, id: @file.id }, format: :html
         @module.reload
-        expect(@module.evaluate_for(@student).state).to eql(:completed)
+        expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
       it "redirects to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
@@ -566,7 +646,7 @@ describe FilesController do
         unowned_file.destroy
 
         get "show", params: { course_id: @course.id, id: unowned_file.id }
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
 
@@ -578,7 +658,7 @@ describe FilesController do
 
         remove_user_session
         get "show", params: { course_id: @course.id, id: unowned_file.id }
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
         expect(assigns(:not_found_message)).to eq("This file has been deleted")
       end
 
@@ -610,7 +690,9 @@ describe FilesController do
         quiz_model
         file = @quiz.statistics_csv("student_analysis").csv_attachment
         get "show", params: { quiz_statistics_id: file.reload.context.id,
-                              file_id: file.id, download: "1", verifier: file.uuid }
+                              file_id: file.id,
+                              download: "1",
+                              verifier: file.uuid }
         expect(response).to be_redirect
       end
 
@@ -644,7 +726,7 @@ describe FilesController do
             "files",
             "files"
           )
-          get "show", params: params
+          get "show", params:
         end
       end
     end
@@ -671,13 +753,47 @@ describe FilesController do
       it "is included in newly uploaded files" do
         user_session(@teacher)
 
-        attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", filename: "test.txt")
+        attachment = factory_with_protected_attributes(Attachment, context: @course, file_state: "deleted", filename: "doc.doc")
         attachment.uploaded_data = io
         attachment.save!
 
         get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
         expect(json_parse["canvadoc_session_url"]).to be_present
       end
+    end
+  end
+
+  describe "GET 'api_create_success'" do
+    before do
+      category = group_category
+      @group = category.groups.create(context: @course)
+      @group.add_user(@student)
+      user_session(@student)
+    end
+
+    it "treats attachments that live in the special 'submissions' folder as quota exempt" do
+      attachment = Attachment.create!(
+        context: @group,
+        uploaded_data: StringIO.new("my file"),
+        folder: @group.submissions_folder,
+        filename: "my-great-file.txt",
+        file_state: "deleted"
+      )
+      attachment.update_attribute(:size, 51.megabytes)
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+      expect(response).to be_successful
+    end
+
+    it "does not give quota exemption to files not in the special 'submissions' folder" do
+      attachment = Attachment.create!(
+        context: @group,
+        uploaded_data: StringIO.new("my file"),
+        filename: "my-great-file.txt",
+        file_state: "deleted"
+      )
+      attachment.update_attribute(:size, 51.megabytes)
+      get "api_create_success", params: { id: attachment.id, uuid: attachment.uuid }, format: "json"
+      expect(json_parse.fetch("message")).to eq "file size exceeds quota limits"
     end
   end
 
@@ -777,11 +893,19 @@ describe FilesController do
       it "prioritizes matches on display name vs. filename" do
         display_name = "file.txt"
         # make a file with an original filename matching the other file's display_name
-        Attachment.create!(context: @course, uploaded_data: StringIO.new("blah1"), folder: Folder.root_folders(@course).first,
-                           filename: display_name, display_name: "something_else.txt")
-        file2 = Attachment.create!(context: @course, uploaded_data: StringIO.new("blah2"), folder: Folder.root_folders(@course).first,
-                                   filename: "still_something_else.txt", display_name: display_name)
-        other_file = Attachment.create!(context: @course, uploaded_data: StringIO.new("blah3"), folder: Folder.root_folders(@course).first,
+        Attachment.create!(context: @course,
+                           uploaded_data: StringIO.new("blah1"),
+                           folder: Folder.root_folders(@course).first,
+                           filename: display_name,
+                           display_name: "something_else.txt")
+        file2 = Attachment.create!(context: @course,
+                                   uploaded_data: StringIO.new("blah2"),
+                                   folder: Folder.root_folders(@course).first,
+                                   filename: "still_something_else.txt",
+                                   display_name:)
+        other_file = Attachment.create!(context: @course,
+                                        uploaded_data: StringIO.new("blah3"),
+                                        folder: Folder.root_folders(@course).first,
                                         filename: "totallydifferent.html")
 
         get "show_relative", params: { file_id: other_file.id, course_id: @course.id, file_path: file2.full_display_path }
@@ -798,6 +922,33 @@ describe FilesController do
       it "renders unauthorized if the file doesn't exist" do
         get "show_relative", params: { course_id: @course.id, file_path: "course files/nope" }
         assert_unauthorized
+      end
+    end
+
+    context "after user merge" do
+      before :once do
+        @merge_user_1 = student_in_course(name: "Merge User 1", active_all: true).user
+        @user_1_file = attachment_model(context: @merge_user_1, md5: "hi")
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        it "allows access to files from a user who was merged into another user (happens with cross-shard merge)" do
+          @shard1.activate do
+            account = Account.create!
+            course_with_student(account:)
+          end
+          UserMerge.from(@merge_user_1).into(@student)
+          run_jobs
+
+          get "show_relative", params: { user_id: @merge_user_1.id, file_id: @user_1_file.id, file_path: @user_1_file.full_path, verifier: @user_1_file.uuid }
+          expect(response).to be_redirect
+        end
       end
     end
 
@@ -876,13 +1027,13 @@ describe FilesController do
       it "does not move a file into a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @file.id, attachment: { folder_id: @sub_folder.id } }, format: "json"
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "does not move a file out of a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @sub_file.id, attachment: { folder_id: @root_folder.id } }, format: "json"
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
     end
 
@@ -944,7 +1095,7 @@ describe FilesController do
     it "refuses to delete a file in a submissions folder" do
       file = @student.attachments.create! display_name: "blah", uploaded_data: default_uploaded_data, folder: @student.submissions_folder
       delete "destroy", params: { user_id: @student.id, id: file.id }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     context "file that has been submitted" do
@@ -1047,11 +1198,35 @@ describe FilesController do
       @assignment = @course.assignments.create!(title: "upload_assignment", submission_types: "online_upload")
       Setting.set("user_default_quota", -1)
       post "create_pending", params: { attachment: {
-        context_code: @assignment.context_code,
-        asset_string: @assignment.asset_string,
-        intent: "submit",
-        filename: "bob.txt"
-      }, format: :json }
+                                         context_code: @assignment.context_code,
+                                         asset_string: @assignment.asset_string,
+                                         intent: "submit",
+                                         filename: "bob.txt"
+                                       },
+                                       format: :json }
+      expect(response).to be_successful
+      expect(assigns[:attachment]).not_to be_nil
+      expect(assigns[:attachment].id).not_to be_nil
+      json = json_parse
+      expect(json).not_to be_nil
+      expect(json["upload_url"]).not_to be_nil
+      expect(json["upload_params"]).to be_present
+      expect(json["upload_params"]["x-amz-credential"]).to start_with("stub_id")
+    end
+
+    # This test verifies that an attachment on a graded discussion will not affect the files quota
+    it "allows going over quota for graded discussions submissions" do
+      s3_storage!
+      user_session(@student)
+      @assignment = @course.assignments.create!(title: "discussion assignment", submission_types: "discussion_topic")
+      Setting.set("user_default_quota", -1)
+      post "create_pending", params: { attachment: {
+                                         context_code: @assignment.context_code,
+                                         asset_string: @assignment.asset_string,
+                                         intent: "submit",
+                                         filename: "bob.txt"
+                                       },
+                                       format: :json }
       expect(response).to be_successful
       expect(assigns[:attachment]).not_to be_nil
       expect(assigns[:attachment].id).not_to be_nil
@@ -1117,7 +1292,7 @@ describe FilesController do
         filename: "test.txt",
         folder_id: @student.submissions_folder.id
       } }
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "creates a file in the submissions folder if intent=='submit'" do
@@ -1179,7 +1354,7 @@ describe FilesController do
         local_storage!
         @shard1.activate do
           account = Account.create!
-          course_with_teacher_logged_in(active_all: true, account: account)
+          course_with_teacher_logged_in(active_all: true, account:)
         end
         post "create_pending", params: { attachment: {
           context_code: @course.asset_string,
@@ -1202,7 +1377,7 @@ describe FilesController do
         @shard1.activate do
           @student = user_factory(active_user: true)
         end
-        course_factory(active_all: true, account: account)
+        course_factory(active_all: true, account:)
         @course.enroll_user(@student, "StudentEnrollment").accept!
         @assignment = @course.assignments.create!(title: "upload_assignment", submission_types: "online_upload")
 
@@ -1362,9 +1537,11 @@ describe FilesController do
       end
 
       it "creates a new attachment" do
-        post "api_capture", params: params
+        post("api_capture", params:)
         assert_status(201)
-        expect(folder.attachments.first).not_to be_nil
+        attachment = folder.attachments.first
+        expect(attachment).not_to be_nil
+        expect(attachment.workflow_state).to eq "processed"
       end
 
       it "populates the md5 column with the instfs sha512" do
@@ -1374,7 +1551,7 @@ describe FilesController do
       end
 
       it "includes the attachment json in the response" do
-        post "api_capture", params: params
+        post("api_capture", params:)
         assert_status(201)
         attachment = folder.attachments.first
         data = json_parse
@@ -1396,7 +1573,7 @@ describe FilesController do
 
       it "works with a Quizzes::QuizSubmission as the context" do
         quiz = course.quizzes.create!
-        submission = quiz.quiz_submissions.create!(user: user)
+        submission = quiz.quiz_submissions.create!(user:)
 
         request_params = params.merge(
           context_type: "Quizzes::QuizSubmission",
@@ -1425,8 +1602,8 @@ describe FilesController do
           )
         end
         let(:progress) do
-          ::Progress
-            .new(context: assignment, user: user, tag: :test)
+          Progress
+            .new(context: assignment, user:, tag: :test)
             .tap(&:start)
             .tap(&:save!)
         end
@@ -1476,8 +1653,8 @@ describe FilesController do
 
         context "with Progress tagged as :upload_via_url" do
           let(:progress) do
-            ::Progress
-              .new(context: assignment, user: user, tag: :upload_via_url)
+            Progress
+              .new(context: assignment, user:, tag: :upload_via_url)
               .tap(&:start)
               .tap(&:save!)
           end
@@ -1485,8 +1662,8 @@ describe FilesController do
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id,
-              comment: comment,
-              eula_agreement_timestamp: eula_agreement_timestamp
+              comment:,
+              eula_agreement_timestamp:
             )
           end
           let(:eula_agreement_timestamp) { "1522419910" }

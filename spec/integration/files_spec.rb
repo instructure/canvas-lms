@@ -291,7 +291,7 @@ describe FilesController do
     hash[@tag.id.to_s] = { type: "must_view" }
     @module.completion_requirements = hash
     @module.save!
-    expect(@module.evaluate_for(@user).state).to eql(:unlocked)
+    expect(@module.evaluate_for(@user).state).to be(:unlocked)
 
     # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
     get "http://test.host/courses/#{@course.id}/files/#{@att.id}?fd_cookie_set=1" # just send in the param since other specs test the cookie redirect
@@ -308,7 +308,7 @@ describe FilesController do
     follow_redirect!
     # could be success or redirect, depending on S3 config
     expect([200, 302]).to be_include(response.status)
-    expect(@module.evaluate_for(@user).state).to eql(:completed)
+    expect(@module.evaluate_for(@user).state).to be(:completed)
   end
 
   context "should support AssessmentQuestion as a context" do
@@ -316,7 +316,7 @@ describe FilesController do
       course_with_teacher_logged_in(active_all: true, user: @user)
       host!("test.host")
       bank = @course.assessment_question_banks.create!
-      @aq = assessment_question_model(bank: bank)
+      @aq = assessment_question_model(bank:)
       @att = @aq.attachments.create!(uploaded_data: stub_png_data)
     end
 
@@ -457,7 +457,8 @@ describe FilesController do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
 
     some_course = Course.create!
-    some_file = attachment_model(context: some_course, content_type: "text/html",
+    some_file = attachment_model(context: some_course,
+                                 content_type: "text/html",
                                  uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"))
     secret_user = User.create!(name: "secret user name gasp")
 

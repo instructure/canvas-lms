@@ -26,12 +26,12 @@ describe OAuthProxyController do
 
   it "throws an error if state is missing" do
     get :redirect_proxy
-    expect(response.code).to eq "400"
+    expect(response).to have_http_status :bad_request
   end
 
   it "throws an error if the state is invalid" do
     get :redirect_proxy, params: { state: "123" }
-    expect(response.code).to eq "400"
+    expect(response).to have_http_status :bad_request
   end
 
   it "filters out rails added params" do
@@ -43,7 +43,7 @@ describe OAuthProxyController do
 
   it "handles redirect urls with an existing query" do
     get :redirect_proxy, params: { state: Canvas::Security.create_jwt({ redirect_uri: "http://example.com/test?foo=bar" }) }
-    keys = URI.decode_www_form(URI.parse(response.location).query).map { |a| a[0] }
+    keys = URI.decode_www_form(URI.parse(response.location).query).pluck(0)
     expect(keys).to eq %w[foo state]
   end
 end

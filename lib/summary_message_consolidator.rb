@@ -39,8 +39,15 @@ class SummaryMessageConsolidator
       ids_to_update = batches.flatten
       update_sql = DelayedMessage.send(:sanitize_sql_array, ["UPDATE #{DelayedMessage.quoted_table_name}
                     SET workflow_state='sent', updated_at=?, batched_at=?
-                    WHERE workflow_state='pending' AND id IN (?) RETURNING id", Time.now.utc, Time.now.utc, ids_to_update])
-      updated_ids = Shard.current.database_server.unguard { DelayedMessage.connection.select_values(update_sql) }
+                    WHERE workflow_state='pending' AND id IN (?) RETURNING id",
+                                                             Time.now.utc,
+                                                             Time.now.utc,
+                                                             ids_to_update])
+      updated_ids = Shard.current.database_server.unguard do
+        DelayedMessage.connection.with_max_update_limit(ids_to_update.size) do
+          DelayedMessage.connection.select_values(update_sql)
+        end
+      end
 
       Delayed::Batch.serial_batch do
         batches.each do |dm_ids|
@@ -58,7 +65,7 @@ class SummaryMessageConsolidator
     GuardRail.activate(:secondary) do
       DelayedMessage.connection.select_all(
         DelayedMessage.select("communication_channel_id").select("root_account_id").distinct
-          .where("workflow_state = ? AND send_at <= ?", "pending", Time.now.to_s(:db))
+          .where("workflow_state = ? AND send_at <= ?", "pending", Time.now.to_fs(:db))
           .to_sql
       )
     end
@@ -66,7 +73,7 @@ class SummaryMessageConsolidator
 
   def delayed_message_ids_for_batch(batch)
     DelayedMessage
-      .where("workflow_state = ? AND send_at <= ?", "pending", Time.now.to_s(:db))
+      .where("workflow_state = ? AND send_at <= ?", "pending", Time.now.to_fs(:db))
       .where(batch) # hash condition will properly handle the case where root_account_id is null
       .pluck(:id)
   end

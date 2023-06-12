@@ -25,8 +25,14 @@ class StreamItem < ActiveRecord::Base
   has_many :users, through: :stream_item_instances
   belongs_to :context, polymorphic: %i[course account group assignment_override assignment]
   belongs_to :asset, polymorphic: %i[
-    collaboration conversation discussion_entry
-    discussion_topic message submission web_conference assessment_request
+    collaboration
+    conversation
+    discussion_entry
+    discussion_topic
+    message
+    submission
+    web_conference
+    assessment_request
   ]
   validates :asset_type, :data, presence: true
 
@@ -243,7 +249,7 @@ class StreamItem < ActiveRecord::Base
     item = new
     item.generate_data(object)
     StreamItem.unique_constraint_retry do |retry_count|
-      retry_count == 0 ? item.save! : item = nil # if it fails just carry on - it got created somewhere else so grab it later
+      (retry_count == 0) ? item.save! : item = nil # if it fails just carry on - it got created somewhere else so grab it later
     end
     item ||= object.reload.stream_item
 
@@ -280,8 +286,8 @@ class StreamItem < ActiveRecord::Base
       user_ids_subset.each_slice(500) do |sliced_user_ids|
         inserts = sliced_user_ids.map do |user_id|
           {
-            stream_item_id: stream_item_id,
-            user_id: user_id,
+            stream_item_id:,
+            user_id:,
             hidden: false,
             workflow_state: object_unread_for_user(object, user_id),
             context_type: l_context_type,
@@ -294,7 +300,7 @@ class StreamItem < ActiveRecord::Base
         end
 
         StreamItemInstance.unique_constraint_retry do
-          StreamItemInstance.where(stream_item_id: stream_item_id, user_id: sliced_user_ids).delete_all
+          StreamItemInstance.where(stream_item_id:, user_id: sliced_user_ids).delete_all
           StreamItemInstance.bulk_insert(inserts)
         end
 
@@ -347,7 +353,7 @@ class StreamItem < ActiveRecord::Base
   def self.update_read_state_for_asset(asset, new_state, user_id)
     if (item = asset.stream_item)
       Shard.shard_for(user_id).activate do
-        StreamItemInstance.where(user_id: user_id, stream_item_id: item).first&.update_attribute(:workflow_state, new_state)
+        StreamItemInstance.where(user_id:, stream_item_id: item).first&.update_attribute(:workflow_state, new_state)
       end
     end
   end
@@ -474,7 +480,7 @@ class StreamItem < ActiveRecord::Base
       else
         StreamItemCache.invalidate_all_recent_stream_items(user_ids, context_type, context_id)
       end
-      scope.delete_all
+      scope.in_batches(of: 10_000).delete_all
       nil
     end
   end

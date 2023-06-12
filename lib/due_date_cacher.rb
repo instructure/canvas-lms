@@ -109,15 +109,15 @@ class DueDateCacher
         singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}:UpdateGrades:#{update_grades ? 1 : 0}",
         max_attempts: 10
       },
-      update_grades: update_grades,
+      update_grades:,
       original_caller: current_caller,
-      executing_user: executing_user
+      executing_user:
     }
 
     recompute_course(assignment.context, **opts)
   end
 
-  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
@@ -128,7 +128,7 @@ class DueDateCacher
     return if assignments_to_recompute.empty?
 
     executing_user ||= current_executing_user
-    due_date_cacher = new(course, assignments_to_recompute, update_grades: update_grades, original_caller: original_caller, executing_user: executing_user)
+    due_date_cacher = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:)
     if run_immediately
       due_date_cacher.recompute
     else
@@ -163,16 +163,16 @@ class DueDateCacher
           run_at: Setting.get("DueDateCacher#recompute_for_sis_import_requeue_delay", "10").to_i.seconds.from_now
         ).recompute_users_for_course(user_ids, course, assignments, opts)
       else
-        due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
+        due_date_cacher = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
         return due_date_cacher.delay_if_production(**inst_jobs_opts).recompute_for_sis_import
       end
     end
 
-    due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
+    due_date_cacher = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
     due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
   end
 
-  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
+  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
 
@@ -192,6 +192,7 @@ class DueDateCacher
     @user_ids = Array(user_ids)
     @update_grades = update_grades
     @original_caller = original_caller
+    @skip_late_policy_applicator = skip_late_policy_applicator
 
     if executing_user.present?
       @executing_user_id = executing_user.is_a?(User) ? executing_user.id : executing_user
@@ -247,7 +248,7 @@ class DueDateCacher
             enrollment_counts.accepted_student_ids - assigned_student_ids - enrollment_counts.prior_student_ids
           deletable_student_ids.each_slice(1000) do |deletable_student_ids_chunk|
             # using this approach instead of using .in_batches because we want to limit the IDs in the IN clause to 1k
-            Submission.active.where(assignment_id: assignment_id, user_id: deletable_student_ids_chunk)
+            Submission.active.where(assignment_id:, user_id: deletable_student_ids_chunk)
                       .update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
           User.clear_cache_keys(deletable_student_ids, :submissions)
@@ -257,6 +258,8 @@ class DueDateCacher
         subs = Submission.active.where(assignment_id: assignment_slice).limit(1_000)
         while subs.update_all(workflow_state: :deleted, updated_at: Time.zone.now) > 0; end
       end
+
+      nq_restore_pending_flag_enabled = Account.site_admin.feature_enabled?(:new_quiz_deleted_workflow_restore_pending_review_state)
 
       # Get any stragglers that might have had their enrollment removed from the course
       # 100 students at a time for 10 assignments each == slice of up to 1K submissions
@@ -281,6 +284,10 @@ class DueDateCacher
           cached_due_dates_by_submission = current_cached_due_dates(auditable_entries)
         end
 
+        if nq_restore_pending_flag_enabled
+          handle_lti_deleted_submissions(batch)
+        end
+
         # prepare values for SQL interpolation
         batch_values = batch.map { |entry| "(#{entry.join(",")})" }
 
@@ -293,14 +300,14 @@ class DueDateCacher
           previous_cached_dates: cached_due_dates_by_submission
         )
       end
-      User.clear_cache_keys(values.map { |v| v[1] }, :submissions)
+      User.clear_cache_keys(values.pluck(1), :submissions)
     end
 
     if @update_grades
       @course.recompute_student_scores_without_send_later(@user_ids)
     end
 
-    if @assignment_ids.size == 1
+    if @assignment_ids.size == 1 && !@skip_late_policy_applicator
       # Only changes to LatePolicy or (sometimes) Assignment records can result in a re-calculation
       # of student scores.  No changes to the Course record can trigger such re-calculations so
       # let's ensure this is triggered only when DueDateCacher is called for a Assignment-level
@@ -358,7 +365,7 @@ class DueDateCacher
   def current_cached_due_dates(entries)
     return {} if entries.empty?
 
-    entries_for_query = assignment_and_student_id_values(entries: entries)
+    entries_for_query = assignment_and_student_id_values(entries:)
     submissions_with_due_dates = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(",")})")
                                            .where.not(cached_due_date: nil)
                                            .pluck(:id, :cached_due_date)
@@ -369,7 +376,7 @@ class DueDateCacher
   end
 
   def record_due_date_changes_for_auditable_assignments!(entries:, previous_cached_dates:)
-    entries_for_query = assignment_and_student_id_values(entries: entries)
+    entries_for_query = assignment_and_student_id_values(entries:)
     updated_submissions = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(",")})")
                                     .pluck(:id, :assignment_id, :cached_due_date)
 
@@ -382,8 +389,8 @@ class DueDateCacher
       payload = { due_at: [old_due_date&.iso8601, new_due_date&.iso8601] }
 
       records << {
-        assignment_id: assignment_id,
-        submission_id: submission_id,
+        assignment_id:,
+        submission_id:,
         user_id: @executing_user_id,
         event_type: "submission_updated",
         payload: payload.to_json,
@@ -484,6 +491,38 @@ class DueDateCacher
     rescue ActiveRecord::Deadlocked => e
       Canvas::Errors.capture_exception(:due_date_cacher, e, :warn)
       raise Delayed::RetriableError, "Deadlock when upserting submissions"
+    end
+  end
+
+  def handle_lti_deleted_submissions(batch)
+    quiz_lti_index = 5
+
+    assignments_and_users_query = batch.each_with_object([]) do |entry, memo|
+      next unless entry[quiz_lti_index]
+
+      memo << "(#{entry.first}, #{entry.second})"
+    end
+
+    return if assignments_and_users_query.empty?
+
+    submission_join_query = <<~SQL.squish
+      INNER JOIN (VALUES #{assignments_and_users_query.join(",")})
+      AS vals(assignment_id, student_id)
+      ON submissions.assignment_id = vals.assignment_id
+      AND submissions.user_id = vals.student_id
+    SQL
+
+    submission_query = Submission.deleted.joins(submission_join_query)
+    submission_versions_to_check = Version
+                                   .where(versionable: submission_query)
+                                   .order(number: :desc)
+                                   .distinct(:versionable_id)
+    submissions_in_pending_review = submission_versions_to_check
+                                    .select { |version| version.model.workflow_state == "pending_review" }
+                                    .pluck(:versionable_id)
+
+    if submissions_in_pending_review.any?
+      Submission.where(id: submissions_in_pending_review).update_all(workflow_state: "pending_review")
     end
   end
 end

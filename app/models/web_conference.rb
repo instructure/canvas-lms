@@ -48,7 +48,7 @@ class WebConference < ActiveRecord::Base
 
   scope :for_context_codes, ->(context_codes) { where(context_code: context_codes) }
 
-  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map { |ct| ct["conference_type"] }) }
+  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).pluck("conference_type")) }
 
   scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
 
@@ -241,7 +241,7 @@ class WebConference < ActiveRecord::Base
     return unless user
 
     p = web_conference_participants.where(user_id: user).first
-    p ||= web_conference_participants.build(user: user)
+    p ||= web_conference_participants.build(user:)
     p.participation_type = type unless type == "attendee" && p.participation_type == "initiator"
     (@new_participants ||= []) << user if p.new_record?
     # Once anyone starts attending the conference, mark it as started.
@@ -258,6 +258,7 @@ class WebConference < ActiveRecord::Base
     new_invitees.uniq.each do |u|
       add_invitee(u)
     end
+    save
   end
 
   def recording_ready!
@@ -459,7 +460,7 @@ class WebConference < ActiveRecord::Base
   def has_calendar_event
     return 0 if calendar_event.nil?
 
-    calendar_event.workflow_state == "deleted" ? 0 : 1
+    (calendar_event.workflow_state == "deleted") ? 0 : 1
   end
 
   scope :after, ->(date) { where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
@@ -517,7 +518,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def config
-    @config ||= WebConference.config(context: context, class_name: self.class.to_s)
+    @config ||= WebConference.config(context:, class_name: self.class.to_s)
   end
 
   def valid_config?
@@ -579,7 +580,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.enabled_plugin_conference_names
-    WebConference.plugin_types.map { |wt| wt["name"] }
+    WebConference.plugin_types.pluck("name")
   end
 
   def self.conference_tab_name
@@ -601,7 +602,7 @@ class WebConference < ActiveRecord::Base
         class_name: (plugin.base || "#{plugin.id.classify}Conference"),
         user_setting_fields: klass.user_setting_fields,
         name: plugin.name,
-        plugin: plugin
+        plugin:
       ).with_indifferent_access
     end
   end
@@ -625,5 +626,9 @@ class WebConference < ActiveRecord::Base
     when Account
       self.root_account_id = context.resolved_root_account_id
     end
+  end
+
+  def self.max_invitees_sync_size
+    Setting.get("max_invitees_sync_size", 100).to_i
   end
 end

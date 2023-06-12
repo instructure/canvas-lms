@@ -3,11 +3,11 @@
 
 require "ruby_parser"
 
-def deep_inspect(expr, &block)
+def deep_inspect(expr, &)
   return unless expr.is_a?(Sexp)
 
   yield expr
-  expr.each { |subexpr| deep_inspect(subexpr, &block) }
+  expr.each { |subexpr| deep_inspect(subexpr, &) }
 end
 
 def bad_to_json_in_render?(expr)

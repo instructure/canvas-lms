@@ -43,7 +43,7 @@ class ScoreStatisticsGenerator
 
     # Only necessary in local dev because we are not running in a job
     GuardRail.activate(:primary) do
-      update_assignment_score_statistics(course_id, root_account_id: root_account_id)
+      update_assignment_score_statistics(course_id, root_account_id:)
       update_course_score_statistic(course_id)
     end
   end
@@ -134,7 +134,7 @@ class ScoreStatisticsGenerator
     current_scores = []
     enrollment_ids = []
     GuardRail.activate(:secondary) do
-      StudentEnrollment.select(:id, :user_id).not_fake.where(course_id: course_id, workflow_state: [:active, :invited])
+      StudentEnrollment.select(:id, :user_id).not_fake.where(course_id:, workflow_state: [:active, :invited])
                        .find_in_batches { |batch| enrollment_ids.concat(batch) }
       # The grade calculator ensures all enrollments for the same user have the same score, so we only need one
       # enrollment_id for our later score query
@@ -148,7 +148,7 @@ class ScoreStatisticsGenerator
     score_count = current_scores.length
 
     if score_count.zero?
-      CourseScoreStatistic.where(course_id: course_id).delete_all
+      CourseScoreStatistic.where(course_id:).delete_all
       return
     end
 
@@ -156,7 +156,7 @@ class ScoreStatisticsGenerator
 
     # This is a safeguard to avoid blowing up due to database storage which is set to be a decimal with a precision of 8
     # and a scale of 2. And really, what are you even doing awarding 1,000,000% or over in a course?
-    return if average > 999_999.99.to_d || average < -999_999.99.to_d
+    return if average > BigDecimal("999_999.99") || average < BigDecimal("-999_999.99")
 
     connection = CourseScoreStatistic.connection
     now = connection.quote(Time.now.utc)

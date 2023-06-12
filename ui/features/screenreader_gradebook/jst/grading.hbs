@@ -8,11 +8,15 @@
         {{#if selectedSubmissionHidden}}
           {{#t 'submission_hidden'}}This assignment is not available to this student and will not be included in their grade.{{/t}}
         {{else}}
-          <div class="pad-box bottom-only">
+          <div>
             <label for="student_and_assignment_grade">
-              {{#with selectedAssignment}}
-                <strong>{{#t}}Grade for: {{name}}{{/t}}</strong>
-              {{/with}}
+              {{#if anonymizeStudents}}
+                {{#with selectedAssignment}}
+                  <strong>{{#t}}Grade for: {{name}}{{/t}}</strong>
+                {{/with}}
+              {{else}}
+                  <strong>{{gradeForStudentAndAssignment}}</strong>
+              {{/if}}
               {{#if selectedSubmission.late}}
                 <span class="late-pill">
                   <ul class="pill pill-align error" />
@@ -36,6 +40,7 @@
               {{/if}}
             </label>
           </div>
+          <label for='proxy_submitter'>{{submissionPreviewText}}</label>
           {{
             grading-cell
             assignment=selectedAssignment
@@ -55,15 +60,30 @@
             </p>
           {{/unless}}
           </div>
-          {{#unless anonymizeStudents}}
-            <button
-              id="submission_details"
-              class="btn"
-              {{action 'openDialog' 'submission' target=view}}
-            >
-              {{#t 'submission_details'}}Submission Details{{/t}}
-            </button>
-          {{/unless}}
+          <div class="row-fluid">
+            {{#if proxySubmissionsAllowed}}
+              <div class="span4 ml-0 mr-add">
+                <button
+                  id="proxy_upload_trigger"
+                  class="btn btn-block"
+                  {{action 'openProxyUploadModal'}}
+                >
+                  {{#t}}Submit for Student{{/t}}
+                </button>
+              </div>
+            {{/if}}
+            {{#unless anonymizeStudents}}
+              <div class="span4 ml-0 mr-add">
+                <button
+                  id="submission_details"
+                  class="btn btn-block"
+                  {{action 'openDialog' 'submission' target=view}}
+                >
+                  {{#t}}Submission Details{{/t}}
+                </button>
+              </div>
+            {{/unless}}
+          </div>
         {{/if}}
       {{else}}
         <p class="submission_selection">

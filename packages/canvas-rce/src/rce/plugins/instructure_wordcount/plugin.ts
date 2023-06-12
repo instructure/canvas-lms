@@ -21,7 +21,7 @@ import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
 
 tinymce.PluginManager.add('instructure_wordcount', function (ed) {
-  ed.addCommand('instructureWordcount', () => clickCallback(ed, document))
+  ed.addCommand('instructureWordcount', () => clickCallback(ed, document, {skipEditorFocus: false}))
 
   ed.ui.registry.addMenuItem('instructure_wordcount', {
     text: formatMessage('Word Count'),

@@ -48,11 +48,12 @@ module Importers
         end
         if hash[:vendor_guid].present?
           item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
-                                                context: context, learning_outcome_group: parent_group)
+                                                context:,
+                                                learning_outcome_group: parent_group)
         end
         # Don't migrate if we already have a folder with the same name inside the parent_group
         item ||= LearningOutcomeGroup.active.where(
-          context: context,
+          context:,
           learning_outcome_group: parent_group,
           title: hash[:title]
         ).first
@@ -71,8 +72,8 @@ module Importers
       if hash[:source_outcome_group_id]
         source_group = LearningOutcomeGroup.active.find_by(id: hash[:source_outcome_group_id])
 
-        if source_group && \
-           item.title == source_group.title && \
+        if source_group &&
+           item.title == source_group.title &&
            context&.associated_accounts&.include?(source_group.context)
           item.source_outcome_group = source_group
         end

@@ -23,7 +23,7 @@ require_relative "messages_helper"
 describe "new_announcement" do
   include MessagesCommon
 
-  before :once do
+  before do
     announcement_model
   end
 
@@ -33,11 +33,39 @@ describe "new_announcement" do
   context ".email" do
     let(:path_type) { :email }
 
-    it "renders" do
+    it "renders for course" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "value for title: value for name"
       expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.html_body).to include "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course."
+    end
+
+    it "does not show announcement reply helper if announcement is locked" do
+      @a.locked = true
+      @a.save!
+
+      generate_message(notification_name, path_type, asset)
+      expect(@message.subject).to eq "value for title: value for name"
+      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.html_body).not_to include "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the course."
+    end
+
+    it "renders for group" do
+      @course.group_categories.create!(name: "My Group Category")
+      teacher_in_course
+      group = @course.groups.create!(name: "My Group", group_category: @course.group_categories.first)
+      group_announcement = group.announcements.create!(
+        title: "Group Announcement",
+        message: "Group",
+        user: @teacher
+      )
+      generate_message(notification_name, path_type, group_announcement)
+      expect(@message.subject).to eq "Group Announcement: My Group"
+      expect(@message.url).to match(%r{/groups/\d+/announcements/\d+})
+      expect(@message.body).to match(%r{/groups/\d+/announcements/\d+})
+      expect(@message.html_body).to include "Replies to this email will be posted as a reply to the announcement, which will be seen by everyone in the group."
     end
   end
 

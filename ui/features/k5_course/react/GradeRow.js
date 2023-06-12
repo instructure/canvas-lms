@@ -59,6 +59,7 @@ export const GradeRow = ({
   currentUserId,
   isStacked,
   dateFormatter,
+  restrictQuantitativeData,
 }) => {
   const cellTheme = isStacked ? {padding: '.5rem .75rem'} : undefined
 
@@ -140,7 +141,15 @@ export const GradeRow = ({
         )
       default:
         // Handles 'percent', 'letter_grade'
-        return notGraded ? notGradedContent() : <Text>{grade}</Text>
+        return notGraded ? (
+          notGradedContent()
+        ) : grade === 'complete' ? (
+          <AccessibleContent alt={I18n.t('Complete')}>
+            <IconCheckDarkSolid />
+          </AccessibleContent>
+        ) : (
+          <Text>{grade}</Text>
+        )
     }
   }
 
@@ -159,6 +168,8 @@ export const GradeRow = ({
       <span className="grade-details__status">{renderStatus()}</span>
     </div>
   )
+
+  const shouldShowPoints = !!pointsPossible && !restrictQuantitativeData
 
   return (
     <Table.Row data-testid="grades-table-row" key={id}>
@@ -190,7 +201,7 @@ export const GradeRow = ({
       <Table.Cell theme={cellTheme}>
         <div className="grade-details__score">
           {renderScore()}
-          {pointsPossible && (
+          {shouldShowPoints && (
             <span className="points-possible">
               <Text size="x-small">{I18n.t('Out of %{pointsPossible} pts', {pointsPossible})}</Text>
             </span>

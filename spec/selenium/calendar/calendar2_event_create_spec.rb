@@ -261,7 +261,7 @@ describe "calendar2" do
           context: section1,
           title: "Section Event",
           start_at: Time.zone.now,
-          end_at: Time.zone.now + 1.hour,
+          end_at: 1.hour.from_now,
           effective_context_code: @course.asset_string
         )
         get "/calendar2"
@@ -289,7 +289,6 @@ describe "calendar2" do
 
       context "with account level calendars" do
         before do
-          Account.site_admin.enable_feature! :account_calendar_events # if needed
           account = Account.default # or (Account.create!)
           account.account_calendar_visible = true
           account.save!
@@ -400,7 +399,7 @@ describe "calendar2" do
           event_content.find_element(:css, ".event-details-timestring").text
         ).to eq format_date_for_view(new_date, "%b %d")
         @event.reload
-        expect(@event.all_day).to eq true
+        expect(@event.all_day).to be true
       end
 
       it "can create timed events in calendar" do
@@ -514,18 +513,31 @@ describe "calendar2" do
       it "preserves correct time when editing an event in a different DST window" do
         @user.time_zone = "America/Denver"
         @user.save!
-        now = DateTime.current.beginning_of_hour
+        now = DateTime.current.noon
         # by creating an event at t+3, t+6, and t+9 months, we guarantee that at least 1 of those
         # events will be in a different DST state than now
         [now + 3.months, now + 6.months, now + 9.months].each do |start_at|
           end_at = start_at + 1.hour
-          event = CalendarEvent.create!(context: @course, start_at: start_at, end_at: end_at)
-          child_event = event.child_events.create!(context: @course.default_section, start_at: start_at, end_at: end_at)
+          event = CalendarEvent.create!(context: @course, start_at:, end_at:)
+          child_event = event.child_events.create!(context: @course.default_section, start_at:, end_at:)
           get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
           wait_for_new_page_load { f("#editCalendarEventFull").submit }
           expect(child_event.reload.start_at).to eq(start_at)
           expect(child_event.reload.end_at).to eq(end_at)
         end
+      end
+
+      it "updates the event to the correct time when saving across DST window" do
+        @user.time_zone = "America/Denver"
+        @user.save!
+        start_at = DateTime.parse("2022-03-01 1:00pm -0600")
+        event = CalendarEvent.create!(context: @course, start_at:)
+        get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
+        expect(f("#more_options_start_time").attribute(:value)).to eq("12:00pm")
+        replace_content(f("[name=\"start_date\"]"), "2022-03-14")
+        wait_for_new_page_load { more_options_submit_button.click }
+        get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
+        expect(f("#more_options_start_time").attribute(:value)).to eq("12:00pm")
       end
     end
 

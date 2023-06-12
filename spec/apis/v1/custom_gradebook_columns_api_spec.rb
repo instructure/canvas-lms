@@ -49,16 +49,20 @@ describe CustomGradebookColumnsApiController, type: :request do
       @user = @student
       raw_api_call :get,
                    "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
-                   course_id: @course.to_param, action: "index",
-                   controller: "custom_gradebook_columns_api", format: "json"
+                   course_id: @course.to_param,
+                   action: "index",
+                   controller: "custom_gradebook_columns_api",
+                   format: "json"
       assert_status(401)
     end
 
     it "returns the custom columns" do
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
-                      course_id: @course.to_param, action: "index",
-                      controller: "custom_gradebook_columns_api", format: "json"
+                      course_id: @course.to_param,
+                      action: "index",
+                      controller: "custom_gradebook_columns_api",
+                      format: "json"
       expect(json).to eq(@cols.map do |c|
         custom_gradebook_column_json(c, @user, session)
       end)
@@ -67,16 +71,22 @@ describe CustomGradebookColumnsApiController, type: :request do
     it "paginates" do
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns?per_page=1",
-                      course_id: @course.to_param, per_page: "1", action: "index",
-                      controller: "custom_gradebook_columns_api", format: "json"
+                      course_id: @course.to_param,
+                      per_page: "1",
+                      action: "index",
+                      controller: "custom_gradebook_columns_api",
+                      format: "json"
       expect(json).to eq [custom_gradebook_column_json(@cols.first, @user, session)]
     end
 
     it "returns hidden columns if requested" do
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns?include_hidden=1",
-                      course_id: @course.to_param, include_hidden: "1", action: "index",
-                      controller: "custom_gradebook_columns_api", format: "json"
+                      course_id: @course.to_param,
+                      include_hidden: "1",
+                      action: "index",
+                      controller: "custom_gradebook_columns_api",
+                      format: "json"
       expect(json).to eq([*@cols, @hidden].map do |c|
         custom_gradebook_column_json(c, @user, session)
       end)
@@ -88,8 +98,10 @@ describe CustomGradebookColumnsApiController, type: :request do
       @user = @student
       raw_api_call :post,
                    "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
-                   { course_id: @course.to_param, action: "create",
-                     controller: "custom_gradebook_columns_api", format: "json" },
+                   { course_id: @course.to_param,
+                     action: "create",
+                     controller: "custom_gradebook_columns_api",
+                     format: "json" },
                    "column[title]" => "Blah blah blah"
       assert_status(401)
     end
@@ -97,9 +109,13 @@ describe CustomGradebookColumnsApiController, type: :request do
     it "creates a column" do
       json = api_call :post,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
-                      { course_id: @course.to_param, action: "create",
-                        controller: "custom_gradebook_columns_api", format: "json" },
-                      "column[title]" => "Blah blah blah", "column[position]" => 1, "column[read_only]" => true
+                      { course_id: @course.to_param,
+                        action: "create",
+                        controller: "custom_gradebook_columns_api",
+                        format: "json" },
+                      "column[title]" => "Blah blah blah",
+                      "column[position]" => 1,
+                      "column[read_only]" => true
       expect(response).to be_successful
       expect(CustomGradebookColumn.find(json["id"])).not_to be_nil
     end
@@ -112,8 +128,11 @@ describe CustomGradebookColumnsApiController, type: :request do
       @user = @student
       raw_api_call :put,
                    "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-                   { course_id: @course.to_param, id: @col.to_param, action: "update",
-                     controller: "custom_gradebook_columns_api", format: "json" },
+                   { course_id: @course.to_param,
+                     id: @col.to_param,
+                     action: "update",
+                     controller: "custom_gradebook_columns_api",
+                     format: "json" },
                    "column[title]" => "Bar"
       assert_status(401)
       expect(@col.reload.title).to eq "Foo"
@@ -122,12 +141,16 @@ describe CustomGradebookColumnsApiController, type: :request do
     it "works" do
       json = api_call :put,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-                      { course_id: @course.to_param, id: @col.to_param, action: "update",
-                        controller: "custom_gradebook_columns_api", format: "json" },
-                      "column[title]" => "Bar", "column[read_only]" => true
+                      { course_id: @course.to_param,
+                        id: @col.to_param,
+                        action: "update",
+                        controller: "custom_gradebook_columns_api",
+                        format: "json" },
+                      "column[title]" => "Bar",
+                      "column[read_only]" => true
       expect(response).to be_successful
       expect(json["title"]).to eq "Bar"
-      expect(json["read_only"]).to eq(true)
+      expect(json["read_only"]).to be(true)
       expect(@col.reload.title).to eq "Bar"
     end
   end
@@ -141,16 +164,22 @@ describe CustomGradebookColumnsApiController, type: :request do
       @user = @student
       raw_api_call :delete,
                    "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-                   course_id: @course.to_param, id: @col.to_param, action: "destroy",
-                   controller: "custom_gradebook_columns_api", format: "json"
+                   course_id: @course.to_param,
+                   id: @col.to_param,
+                   action: "destroy",
+                   controller: "custom_gradebook_columns_api",
+                   format: "json"
       assert_status(401)
     end
 
     it "works" do
       api_call :delete,
                "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-               course_id: @course.to_param, id: @col.to_param, action: "destroy",
-               controller: "custom_gradebook_columns_api", format: "json"
+               course_id: @course.to_param,
+               id: @col.to_param,
+               action: "destroy",
+               controller: "custom_gradebook_columns_api",
+               format: "json"
       expect(response).to be_successful
       expect(@col.reload).to be_deleted
     end
@@ -158,16 +187,22 @@ describe CustomGradebookColumnsApiController, type: :request do
     it "lets you toggle the hidden state" do
       api_call :put,
                "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-               { course_id: @course.to_param, id: @col.to_param, action: "update",
-                 controller: "custom_gradebook_columns_api", format: "json" },
+               { course_id: @course.to_param,
+                 id: @col.to_param,
+                 action: "update",
+                 controller: "custom_gradebook_columns_api",
+                 format: "json" },
                "column[hidden]" => "yes"
       expect(response).to be_successful
       expect(@col.reload).to be_hidden
 
       api_call :put,
                "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-               { course_id: @course.to_param, id: @col.to_param, action: "update",
-                 controller: "custom_gradebook_columns_api", format: "json" },
+               { course_id: @course.to_param,
+                 id: @col.to_param,
+                 action: "update",
+                 controller: "custom_gradebook_columns_api",
+                 format: "json" },
                "column[hidden]" => "no"
       expect(response).to be_successful
       expect(@col.reload).not_to be_hidden
@@ -187,8 +222,10 @@ describe CustomGradebookColumnsApiController, type: :request do
 
       api_call :post,
                "/api/v1/courses/#{@course.id}/custom_gradebook_columns/reorder",
-               { course_id: @course.to_param, action: "reorder",
-                 controller: "custom_gradebook_columns_api", format: "json" },
+               { course_id: @course.to_param,
+                 action: "reorder",
+                 controller: "custom_gradebook_columns_api",
+                 format: "json" },
                order: [c3.id, c1.id, c2.id]
       expect(response).to be_successful
 

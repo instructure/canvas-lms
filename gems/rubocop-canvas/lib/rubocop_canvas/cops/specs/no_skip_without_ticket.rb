@@ -23,8 +23,8 @@ module RuboCop
   module Cop
     module Specs
       class NoSkipWithoutTicket < Cop
-        MSG = "Reference a ticket if skipping."\
-              " Example: skip('time bomb on saturdays CNVS-123456')."
+        MSG = "Reference a ticket if skipping. " \
+              "Example: skip('time bomb on saturdays CNVS-123456')."
 
         METHOD = :skip
 

@@ -626,7 +626,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       updateLatePolicyPromise.resolve()
     })
 
-    QUnit.module('when the request succeeds', contextHooks => {
+    QUnit.module('when the request succeeds (2)', contextHooks => {
       contextHooks.beforeEach(() => {
         updateLatePolicyPromise.resolve()
         return waitForModalClosed()
@@ -646,7 +646,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
     })
 
-    QUnit.module('when the request fails', contextHooks => {
+    QUnit.module('when the request fails (2)', contextHooks => {
       contextHooks.beforeEach(() => {
         updateLatePolicyPromise.reject(new Error('request failed'))
         return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
@@ -752,7 +752,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
     })
 
-    QUnit.module('when the request fails', contextHooks => {
+    QUnit.module('when the request fails (3)', contextHooks => {
       contextHooks.beforeEach(() => {
         setCoursePostPolicyPromise.reject(new Error('request failed'))
         return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
@@ -796,7 +796,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       updateCourseSettingsPromise.resolve()
     })
 
-    QUnit.module('when the request succeeds', contextHooks => {
+    QUnit.module('when the request succeeds (3)', contextHooks => {
       contextHooks.beforeEach(() => {
         updateCourseSettingsPromise.resolve()
         return waitForModalClosed()
@@ -825,7 +825,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
     })
 
-    QUnit.module('when the request fails', contextHooks => {
+    QUnit.module('when the request fails (4)', contextHooks => {
       contextHooks.beforeEach(() => {
         updateCourseSettingsPromise.reject(new Error('request failed'))
         return waitFor(() => FlashAlert.showFlashAlert.callCount > 0)
@@ -868,7 +868,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       strictEqual(getUpdateButton().disabled, true)
     })
 
-    QUnit.module('when the request succeeds', contextHooks => {
+    QUnit.module('when the request succeeds (4)', contextHooks => {
       contextHooks.beforeEach(() => {
         getUpdateButton().click()
         return waitForModalClosed()
@@ -897,7 +897,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
     })
 
-    QUnit.module('when the request fails', contextHooks => {
+    QUnit.module('when the request fails (5)', contextHooks => {
       contextHooks.beforeEach(() => {
         props.onViewOptionsUpdated.rejects(new Error('request failed'))
         getUpdateButton().click()
@@ -924,7 +924,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       return getModalElement().querySelector('#gradebook-settings-cancel-button')
     }
 
-    QUnit.module('when clicked', () => {
+    QUnit.module('when clicked (2)', () => {
       test('closes the modal', async () => {
         await mountAndOpen()
         getCancelButton().click()

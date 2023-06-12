@@ -32,7 +32,7 @@ module BroadcastPolicies
         context_id: course.id,
         deleted?: false,
         muted?: false,
-        assignment: assignment,
+        assignment:,
         survey?: false
       )
     end
@@ -47,10 +47,10 @@ module BroadcastPolicies
     end
     let(:quiz_submission) do
       double("Quizzes::QuizSubmission",
-             quiz: quiz,
+             quiz:,
              posted?: true,
-             submission: submission,
-             user: user,
+             submission:,
+             user:,
              context: course)
     end
     let(:policy) do
@@ -99,12 +99,12 @@ module BroadcastPolicies
       end
 
       it "is true when quiz submission is pending review" do
-        expect(policy.should_dispatch_submission_needs_grading?).to eq true
+        expect(policy.should_dispatch_submission_needs_grading?).to be true
       end
 
       it "is true when quiz is muted" do
         allow(quiz).to receive(:muted?).and_return true
-        expect(policy.should_dispatch_submission_needs_grading?).to eq true
+        expect(policy.should_dispatch_submission_needs_grading?).to be true
       end
 
       specify { wont_send_when { allow(quiz).to receive(:assignment).and_return nil } }

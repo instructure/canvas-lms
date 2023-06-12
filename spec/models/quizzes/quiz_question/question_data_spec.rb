@@ -42,7 +42,7 @@ describe Quizzes::QuizQuestion::QuestionData do
     it "returns an instance of QuestionData" do
       question = Quizzes::QuizQuestion::QuestionData.generate
 
-      expect(question).to be_kind_of(Quizzes::QuizQuestion::QuestionData)
+      expect(question).to be_a(Quizzes::QuizQuestion::QuestionData)
     end
 
     it "defaults to text_only_question if a type isn't given" do
@@ -139,7 +139,7 @@ describe Quizzes::QuizQuestion::QuestionData do
     it "returns an indifferent hash" do
       question = Quizzes::QuizQuestion::QuestionData.generate
 
-      expect(question.to_hash).to be_kind_of(HashWithIndifferentAccess)
+      expect(question.to_hash).to be_a(ActiveSupport::HashWithIndifferentAccess)
     end
   end
 

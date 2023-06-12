@@ -63,9 +63,9 @@ def create_user_task
       )
 
       pseudonym = Pseudonym.create!(
-        account: account,
+        account:,
         unique_id: user_login,
-        user: user
+        user:
       )
 
       user.register

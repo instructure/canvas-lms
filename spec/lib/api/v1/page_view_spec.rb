@@ -75,7 +75,7 @@ describe Api::V1::PageView do
     expect(page_view[:participated]).to eq @page_view.participated
     expect(page_view[:user_request]).to eq @page_view.user_request
     expect(page_view[:interaction_seconds]).to eq @page_view.interaction_seconds
-    expect(page_view[:contributed]).to eq false
+    expect(page_view[:contributed]).to be false
     expect(page_view[:action]).to eq @page_view.action
     expect(page_view[:controller]).to eq @page_view.controller
 

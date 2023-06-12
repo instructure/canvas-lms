@@ -19,7 +19,7 @@
 #
 
 class Folder < ActiveRecord::Base
-  self.ignored_columns = %i[last_lock_at last_unlock_at]
+  self.ignored_columns += %i[last_lock_at last_unlock_at]
 
   def self.name_order_by_clause(table = nil)
     col = table ? "#{table}.name" : "name"
@@ -150,7 +150,10 @@ class Folder < ActiveRecord::Base
   scope :not_hidden, -> { where("folders.workflow_state<>'hidden'") }
   scope :not_locked, lambda {
     where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
-    (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
+    (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))",
+          false,
+          Time.now.utc,
+          Time.now.utc)
   }
   scope :by_position, -> { ordered }
   scope :by_name, -> { order(name_order_by_clause("folders"), :id) }
@@ -258,7 +261,7 @@ class Folder < ActiveRecord::Base
   end
 
   def hidden=(val)
-    self.workflow_state = (val == true || val == "1" || val == "true" ? "hidden" : "visible")
+    self.workflow_state = ((val == true || val == "1" || val == "true") ? "hidden" : "visible")
   end
 
   def just_hide
@@ -296,7 +299,7 @@ class Folder < ActiveRecord::Base
     attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
       dup.send("#{key}=", val)
     end
-    if unique_type && context.folders.active.where(unique_type: unique_type).exists?
+    if unique_type && context.folders.active.where(unique_type:).exists?
       dup.unique_type = nil # we'll just copy the folder as a normal one and leave the existing unique_type'd one alone
     end
     dup.context = context
@@ -345,8 +348,8 @@ class Folder < ActiveRecord::Base
 
     context.shard.activate do
       Folder.unique_constraint_retry do
-        root_folder = context.folders.active.where(parent_folder_id: nil, name: name).first
-        root_folder ||= GuardRail.activate(:primary) { context.folders.create!(name: name, full_name: name, workflow_state: "visible") }
+        root_folder = context.folders.active.where(parent_folder_id: nil, name:).first
+        root_folder ||= GuardRail.activate(:primary) { context.folders.create!(name:, full_name: name, workflow_state: "visible") }
         root_folders = [root_folder]
       end
     end
@@ -358,8 +361,8 @@ class Folder < ActiveRecord::Base
     folder = nil
     context.shard.activate do
       Folder.unique_constraint_retry do
-        folder = context.folders.active.where(unique_type: unique_type).take
-        folder ||= context.folders.create!(unique_type: unique_type,
+        folder = context.folders.active.where(unique_type:).take
+        folder ||= context.folders.create!(unique_type:,
                                            name: default_name_proc.call,
                                            parent_folder_id: Folder.root_folders(context).first,
                                            workflow_state: "hidden")
@@ -390,7 +393,7 @@ class Folder < ActiveRecord::Base
 
   # if a block is given, it'll be called with each new folder created by this
   # method before the folder is saved
-  def self.assert_path(path, context)
+  def self.assert_path(path, context, conditions: {})
     @@path_lookups ||= {}
     key = [context.global_asset_string, path].join("//")
     return @@path_lookups[key] if @@path_lookups[key]
@@ -403,7 +406,7 @@ class Folder < ActiveRecord::Base
     end
     folders.each do |name|
       sub_folder = @@path_lookups[[context.global_asset_string, current_folder.full_name + "/" + name].join("//")]
-      sub_folder ||= current_folder.sub_folders.active.where(name: name).first_or_initialize
+      sub_folder ||= current_folder.sub_folders.active.where({ name: }.merge(conditions)).first_or_initialize
       current_folder = sub_folder
       if current_folder.new_record?
         current_folder.context = context
@@ -566,7 +569,7 @@ class Folder < ActiveRecord::Base
   end
 
   def self.from_context_or_id(context, id)
-    root_folders(context).first || where(id: id).first || (raise ActiveRecord::RecordNotFound)
+    root_folders(context).first || where(id:).first || (raise ActiveRecord::RecordNotFound)
   end
 
   def self.find_visible_folders(visible_ids, folder_tree, dir_contents)

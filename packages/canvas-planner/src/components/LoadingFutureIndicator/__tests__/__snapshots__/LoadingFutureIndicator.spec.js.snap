@@ -23,7 +23,7 @@ exports[`renders all future items loaded regardless of other props 1`] = `
       size="small"
       wrap="normal"
     >
-      All items loaded
+      No more items to show
     </Text>
   </View>
 </div>

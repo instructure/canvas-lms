@@ -1,9 +1,15 @@
 # frozen_string_literal: true
 
 source "https://rubygems.org"
-gem "simplecov", "0.14.1", require: false
-# Specify your gem's dependencies in canvas_cassandra.gemspec
+
 gemspec
 
-gem "cassandra-cql", "1.2.2", github: "kreynolds/cassandra-cql", ref: "beed72e249d02cebc850a4b92b468c8b64b12257"
+# rubocop:disable Bundler/OrderedGems
+gem "cassandra-cql", "1.2.3", github: "kreynolds/cassandra-cql", ref: "02b5abbe441a345c051a180327932566fd66bb36"
+  gem "thrift_client", # rubocop:disable Layout/IndentationConsistency
+      "0.9.3",
+      require: false,
+      github: "twitter/thrift_client",
+      ref: "5c10d59881825cb8e26ab1aa8f1d2738e88c0e83"
 gem "config_file", path: "../config_file"
+# rubocop:enable Bundler/OrderedGems

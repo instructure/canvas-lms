@@ -25,9 +25,15 @@ class AddLookupUuidAndResourceLinkUuidToLtiResourceLinks < ActiveRecord::Migrati
     add_column :lti_resource_links, :lookup_uuid, :uuid, if_not_exists: true
     add_column :lti_resource_links, :resource_link_uuid, :uuid, if_not_exists: true
 
-    add_index :lti_resource_links, :lookup_uuid, algorithm: :concurrently,
-                                                 unique: true, if_not_exists: true
-    add_index :lti_resource_links, :resource_link_uuid, algorithm: :concurrently,
-                                                        unique: true, if_not_exists: true
+    add_index :lti_resource_links,
+              :lookup_uuid,
+              algorithm: :concurrently,
+              unique: true,
+              if_not_exists: true
+    add_index :lti_resource_links,
+              :resource_link_uuid,
+              algorithm: :concurrently,
+              unique: true,
+              if_not_exists: true
   end
 end

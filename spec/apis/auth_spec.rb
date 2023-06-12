@@ -127,7 +127,7 @@ describe "API Authentication", type: :request do
           expect(code).to be_present
 
           # we have the code, we can close the browser session
-          post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: code }
+          post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: }
           expect(response).to be_successful
           expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
           json = JSON.parse(response.body)
@@ -143,8 +143,12 @@ describe "API Authentication", type: :request do
           expect(response).to be_successful
           json = JSON.parse(response.body)
           expect(json.size).to eq 1
-          expect(json.first["enrollments"]).to eq [{ "type" => "teacher", "role" => "TeacherEnrollment", "role_id" => teacher_role.id,
-                                                     "user_id" => @user.id, "enrollment_state" => "invited", "limit_privileges_to_course_section" => false }]
+          expect(json.first["enrollments"]).to eq [{ "type" => "teacher",
+                                                     "role" => "TeacherEnrollment",
+                                                     "role_id" => teacher_role.id,
+                                                     "user_id" => @user.id,
+                                                     "enrollment_state" => "invited",
+                                                     "limit_privileges_to_course_section" => false }]
           expect(AccessToken.authenticate(token)).to eq AccessToken.last
           expect(AccessToken.last.purpose).to eq "fun"
 
@@ -165,7 +169,7 @@ describe "API Authentication", type: :request do
         code = SecureRandom.hex(64)
         code_data = { "user" => @user.id, "client_id" => @client_id }
         Canvas.redis.setex("oauth2:#{code}", 1.day, code_data.to_json)
-        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: code }
+        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: @client_secret, code: }
         expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(AccessToken.authenticate(json["access_token"])).to eq AccessToken.last
@@ -287,7 +291,7 @@ describe "API Authentication", type: :request do
         expect(code).to be_present
 
         # we have the code, we can close the browser session
-        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: "nuh-uh", code: code }
+        post "/login/oauth2/token", params: { client_id: @client_id, client_secret: "nuh-uh", code: }
         expect(response).to be_client_error
       end
 
@@ -334,7 +338,7 @@ describe "API Authentication", type: :request do
             expect(code).to be_present
 
             # we have the code, we can close the browser session
-            post "/login/oauth2/token", params: { client_id: @key.id, client_secret: @client_secret, code: code }
+            post "/login/oauth2/token", params: { client_id: @key.id, client_secret: @client_secret, code: }
             expect(response).to be_successful
             expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
             json = JSON.parse(response.body)
@@ -399,8 +403,9 @@ describe "API Authentication", type: :request do
               expect(code).to be_present
 
               # exchange the code for the token
-              post "/login/oauth2/token", params: { code: code },
-                                          headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+              post "/login/oauth2/token",
+                   params: { code: },
+                   headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
               expect(response).to be_successful
               expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
               json = JSON.parse(response.body)
@@ -412,8 +417,12 @@ describe "API Authentication", type: :request do
               expect(response).to be_successful
               json = JSON.parse(response.body)
               expect(json.size).to eq 1
-              expect(json.first["enrollments"]).to eq [{ "type" => "teacher", "role" => "TeacherEnrollment", "role_id" => teacher_role.id,
-                                                         "user_id" => @user.id, "enrollment_state" => "invited", "limit_privileges_to_course_section" => false }]
+              expect(json.first["enrollments"]).to eq [{ "type" => "teacher",
+                                                         "role" => "TeacherEnrollment",
+                                                         "role_id" => teacher_role.id,
+                                                         "user_id" => @user.id,
+                                                         "enrollment_state" => "invited",
+                                                         "limit_privileges_to_course_section" => false }]
               expect(AccessToken.last).to eq AccessToken.authenticate(token)
             end
           end
@@ -441,7 +450,7 @@ describe "API Authentication", type: :request do
               expect(response).to be_redirect
               expect(response.location).to match(/unauthorized_client/)
 
-              @user.access_tokens.create!(developer_key: developer_key)
+              @user.access_tokens.create!(developer_key:)
 
               get "/login/oauth2/auth", params: { response_type: "code", client_id: developer_key.id, redirect_uri: "http://www.example.com/my_uri" }
               expect(response).to be_redirect
@@ -468,15 +477,16 @@ describe "API Authentication", type: :request do
 
               params = { response_type: "code", client_id: @client_id, redirect_uri: "http://www.example.com/my_uri" }
               params[:scope] = "/auth/userinfo" if userinfo
-              get "/login/oauth2/auth", params: params
+              get("/login/oauth2/auth", params:)
               expect(response).to be_redirect
               expect(response["Location"]).to match(%r{http://www.example.com/my_uri?})
               code = response["Location"].match(/code=([^?&]+)/)[1]
               expect(code).to be_present
 
               # exchange the code for the token
-              post "/login/oauth2/token", params: { code: code },
-                                          headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
+              post "/login/oauth2/token",
+                   params: { code: },
+                   headers: { "HTTP_AUTHORIZATION" => ActionController::HttpAuthentication::Basic.encode_credentials(@client_id, @client_secret) }
               expect(response).to be_successful
               expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
               JSON.parse(response.body)
@@ -686,7 +696,7 @@ describe "API Authentication", type: :request do
       @pseudonym.update!(workflow_state: "suspended")
 
       get "/api/v1/courses?access_token=#{@token.full_token}"
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "allows passing the access token in the authorization header" do
@@ -772,7 +782,7 @@ describe "API Authentication", type: :request do
             course_with_teacher(user: @user, account: @account)
             developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
             enable_developer_key_account_binding!(developer_key)
-            @token = @user.access_tokens.create!(developer_key: developer_key)
+            @token = @user.access_tokens.create!(developer_key:)
 
             allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             check_used { get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" } }
@@ -788,7 +798,7 @@ describe "API Authentication", type: :request do
             course_with_teacher(user: @user, account: @sub_account1)
             developer_key = DeveloperKey.create!(account: @account, redirect_uri: "http://www.example.com/my_uri")
             enable_developer_key_account_binding!(developer_key)
-            @token = @user.access_tokens.create!(developer_key: developer_key)
+            @token = @user.access_tokens.create!(developer_key:)
 
             allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             check_used { get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" } }
@@ -803,7 +813,7 @@ describe "API Authentication", type: :request do
             user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234", account: @account)
             course_with_teacher(user: @user, account: @account)
             developer_key = DeveloperKey.create!(account: @not_sub_account, redirect_uri: "http://www.example.com/my_uri")
-            @token = @user.access_tokens.create!(developer_key: developer_key)
+            @token = @user.access_tokens.create!(developer_key:)
 
             allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
             get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
@@ -841,7 +851,7 @@ describe "API Authentication", type: :request do
           account2 = Account.create!
           developer_key = DeveloperKey.create!(account: account2, redirect_uri: "http://www.example.com/my_uri")
           enable_developer_key_account_binding!(developer_key)
-          @token = @user.access_tokens.create!(developer_key: developer_key)
+          @token = @user.access_tokens.create!(developer_key:)
           expect(@token.developer_key.shard).to be @shard1
         end
 
@@ -866,8 +876,13 @@ describe "API Authentication", type: :request do
       account_admin_user(account: Account.site_admin)
       user_with_pseudonym(user: @user)
 
-      json = api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@student.id}",
-                      controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: @student.id.to_param)
+      json = api_call(:get,
+                      "/api/v1/users/self/profile?as_user_id=#{@student.id}",
+                      controller: "profile",
+                      action: "settings",
+                      user_id: "self",
+                      format: "json",
+                      as_user_id: @student.id.to_param)
       expect(assigns["current_user"]).to eq @student
       expect(assigns["current_pseudonym"]).to eq @student_pseudonym
       expect(assigns["real_current_user"]).to eq @user
@@ -886,14 +901,20 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
 
       # as_user_id is ignored if it's not allowed
       @user = @student
       user_with_pseudonym(user: @user, username: "nobody2@example.com")
-      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
-                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: @admin.id.to_param)
+      raw_api_call(:get,
+                   "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
+                   controller: "profile",
+                   action: "settings",
+                   user_id: "self",
+                   format: "json",
+                   as_user_id: @admin.id.to_param)
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_user"]).to be_nil
       expect(json).to eq({
@@ -910,12 +931,18 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
 
       # as_user_id is ignored if it's blank
-      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=",
-                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "")
+      raw_api_call(:get,
+                   "/api/v1/users/self/profile?as_user_id=",
+                   controller: "profile",
+                   action: "settings",
+                   user_id: "self",
+                   format: "json",
+                   as_user_id: "")
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_user"]).to be_nil
       expect(json).to eq({
@@ -932,7 +959,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
     end
 
@@ -941,8 +969,13 @@ describe "API Authentication", type: :request do
       user_with_pseudonym(user: @user)
       @student_pseudonym.update_attribute(:sis_user_id, "1234")
 
-      json = api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:#{@student.pseudonym.sis_user_id}",
-                      controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "sis_user_id:#{@student.pseudonym.sis_user_id.to_param}")
+      json = api_call(:get,
+                      "/api/v1/users/self/profile?as_user_id=sis_user_id:#{@student.pseudonym.sis_user_id}",
+                      controller: "profile",
+                      action: "settings",
+                      user_id: "self",
+                      format: "json",
+                      as_user_id: "sis_user_id:#{@student.pseudonym.sis_user_id.to_param}")
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_pseudonym"]).to eq @pseudonym
       expect(assigns["real_current_user"]).to eq @user
@@ -960,7 +993,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
     end
 
@@ -970,8 +1004,13 @@ describe "API Authentication", type: :request do
       @student_pseudonym.update_attribute(:integration_id, "1234")
       @student_pseudonym.update_attribute(:sis_user_id, "1234")
 
-      json = api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_integration_id:#{@student.pseudonym.integration_id}",
-                      controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "sis_integration_id:#{@student.pseudonym.integration_id.to_param}")
+      json = api_call(:get,
+                      "/api/v1/users/self/profile?as_user_id=sis_integration_id:#{@student.pseudonym.integration_id}",
+                      controller: "profile",
+                      action: "settings",
+                      user_id: "self",
+                      format: "json",
+                      as_user_id: "sis_integration_id:#{@student.pseudonym.integration_id.to_param}")
       expect(assigns["current_user"]).to eq @student
       expect(assigns["real_current_pseudonym"]).to eq @pseudonym
       expect(assigns["real_current_user"]).to eq @user
@@ -989,7 +1028,8 @@ describe "API Authentication", type: :request do
                            "locale" => nil,
                            "effective_locale" => "en",
                            "calendar" => { "ics" => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-                           "k5_user" => false
+                           "k5_user" => false,
+                           "use_classic_font_in_k5" => false
                          })
     end
 
@@ -997,8 +1037,13 @@ describe "API Authentication", type: :request do
       account_admin_user(account: Account.site_admin)
       user_with_pseudonym(user: @user)
 
-      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=sis_user_id:bogus",
-                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: "sis_user_id:bogus")
+      raw_api_call(:get,
+                   "/api/v1/users/self/profile?as_user_id=sis_user_id:bogus",
+                   controller: "profile",
+                   action: "settings",
+                   user_id: "self",
+                   format: "json",
+                   as_user_id: "sis_user_id:bogus")
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id" })
     end
@@ -1007,8 +1052,13 @@ describe "API Authentication", type: :request do
       account_admin_user(account: Account.site_admin)
 
       @user = @student
-      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
-                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: @admin.id.to_param)
+      raw_api_call(:get,
+                   "/api/v1/users/self/profile?as_user_id=#{@admin.id}",
+                   controller: "profile",
+                   action: "settings",
+                   user_id: "self",
+                   format: "json",
+                   as_user_id: @admin.id.to_param)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id" })
     end
@@ -1020,8 +1070,13 @@ describe "API Authentication", type: :request do
       admin = @user
       user_with_pseudonym(user: admin)
 
-      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{deleted.id}",
-                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: deleted.id.to_s)
+      raw_api_call(:get,
+                   "/api/v1/users/self/profile?as_user_id=#{deleted.id}",
+                   controller: "profile",
+                   action: "settings",
+                   user_id: "self",
+                   format: "json",
+                   as_user_id: deleted.id.to_s)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id" })
     end
@@ -1033,8 +1088,13 @@ describe "API Authentication", type: :request do
 
       account_admin_user(account: Account.site_admin)
 
-      raw_api_call(:get, "/api/v1/users/self/profile?as_user_id=#{from_user.id}",
-                   controller: "profile", action: "settings", user_id: "self", format: "json", as_user_id: from_user.id.to_s)
+      raw_api_call(:get,
+                   "/api/v1/users/self/profile?as_user_id=#{from_user.id}",
+                   controller: "profile",
+                   action: "settings",
+                   user_id: "self",
+                   format: "json",
+                   as_user_id: from_user.id.to_s)
       assert_status(401)
       expect(JSON.parse(response.body)).to eq({ "errors" => "Invalid as_user_id", "merged_into_user_id" => to_user.id })
     end

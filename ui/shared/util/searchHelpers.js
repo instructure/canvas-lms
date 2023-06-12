@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import rEscape from 'escape-regex'
+import rEscape from '@canvas/escape-regex'
 
 const SearchHelpers = {
   exactMatchRegex(string) {

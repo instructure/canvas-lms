@@ -24,7 +24,7 @@ import {
   sendBasicFetchRequest,
   sendFetchRequest,
   gotGradesSuccess,
-  gotGradesError
+  gotGradesError,
 } from '../loading-actions'
 import {addOpportunities, allOpportunitiesLoaded} from '..'
 import {
@@ -34,14 +34,14 @@ import {
   loadFutureSaga,
   loadGradesSaga,
   peekIntoPastSaga,
-  loadWeekSaga
+  loadWeekSaga,
 } from '../sagas'
 import {
   mergeFutureItems,
   mergePastItems,
   mergePastItemsForNewActivity,
   consumePeekIntoPast,
-  mergeWeekItems
+  mergeWeekItems,
 } from '../saga-actions'
 import {initialize} from '../../utilities/alertUtils'
 import {transformApiToInternalGrade} from '../../utilities/apiUtils'
@@ -60,9 +60,9 @@ function initialState(overrides = {}) {
       weekStart: thisWeekStart,
       weekEnd: moment.tz(TZ).endOf('week'),
       thisWeek: thisWeekStart,
-      weeks: {}
+      weeks: {},
     },
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -83,7 +83,7 @@ describe('loadPastUntilNewActivitySaga', () => {
       call(sendFetchRequest, {
         getState: expect.any(Function),
         fromMoment: startOfDay,
-        mode: 'past'
+        mode: 'past',
       })
     )
   })
@@ -130,7 +130,7 @@ describe('loadPastSaga', () => {
       call(sendFetchRequest, {
         getState: expect.any(Function),
         fromMoment: moment.tz(TZ).startOf('day'),
-        mode: 'past'
+        mode: 'past',
       })
     )
     expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
@@ -150,7 +150,7 @@ describe('peekIntoPastSaga', () => {
         getState: expect.any(Function),
         fromMoment: moment.tz(TZ).startOf('day'),
         mode: 'past',
-        perPage: 1
+        perPage: 1,
       })
     )
     expect(generator.next({transformedItems: ['some items'], response: 'response'}).value).toEqual(
@@ -167,7 +167,7 @@ describe('loadFutureSaga', () => {
       call(sendFetchRequest, {
         getState: expect.any(Function),
         fromMoment: moment.tz(TZ).startOf('day'),
-        mode: 'future'
+        mode: 'future',
       })
     )
     expect(generator.next({transformedItems: 'some items', response: 'response'}).value).toEqual(
@@ -183,7 +183,7 @@ function mockCourse(opts = {grade: '42.34'}) {
     id: '1',
     has_grading_periods: true,
     enrollments: [{current_period_computed_current_grade: opts.grade}],
-    ...opts
+    ...opts,
   }
 }
 
@@ -193,10 +193,10 @@ describe('loadGradesSaga', () => {
     expect(generator.next().value).toEqual(
       call(axios.get, '/api/v1/users/self/courses', {
         params: {
-          include: ['total_scores', 'current_grading_period_scores'],
+          include: ['total_scores', 'current_grading_period_scores', 'restrict_quantitative_data'],
           enrollment_type: 'student',
-          enrollment_state: 'active'
-        }
+          enrollment_state: 'active',
+        },
       })
     )
   })
@@ -207,7 +207,7 @@ describe('loadGradesSaga', () => {
     expect(
       generator.next({
         headers: {link: '<some-url>; rel="next"'},
-        data: []
+        data: [],
       }).value
     ).toEqual(call(axios.get, expect.anything(), expect.anything()))
     generator.next({headers: {}, data: []}) // put
@@ -220,13 +220,13 @@ describe('loadGradesSaga', () => {
     generator.next()
     const putResult = generator.next({
       headers: {},
-      data: mockCourses
+      data: mockCourses,
     })
     expect(putResult.value).toEqual(
       put(
         gotGradesSuccess({
           1: transformApiToInternalGrade(mockCourses[0]),
-          2: transformApiToInternalGrade(mockCourses[1])
+          2: transformApiToInternalGrade(mockCourses[1]),
         })
       )
     )
@@ -247,8 +247,8 @@ describe('loadWeekSaga', () => {
     const generator = loadWeekSaga({
       payload: {
         weekStart: state.weeklyDashboard.weekStart,
-        weekEnd: state.weeklyDashboard.weekEnd
-      }
+        weekEnd: state.weeklyDashboard.weekEnd,
+      },
     })
     generator.next()
     expect(generator.next(state).value).toEqual(
@@ -258,8 +258,8 @@ describe('loadWeekSaga', () => {
         mode: 'week',
         extraParams: {
           end_date: state.weeklyDashboard.weekEnd.toISOString(),
-          per_page: 100
-        }
+          per_page: 100,
+        },
       })
     )
     expect(
@@ -279,7 +279,7 @@ describe('loadAllOpportunitiesSaga', () => {
         include: ['planner_overrides'],
         filter: ['submittable', 'current_grading_period'],
         per_page: 100,
-        observed_user_id: null
+        observed_user_id: null,
       })
     )
   })
@@ -292,7 +292,7 @@ describe('loadAllOpportunitiesSaga', () => {
     expect(
       generator.next({
         headers: {link: '<some-url>; rel="next"'},
-        data: []
+        data: [],
       }).value
     ).toEqual(call(sendBasicFetchRequest, expect.anything(), expect.anything()))
     generator.next({headers: {}, data: []}) // add opportunities
@@ -303,7 +303,7 @@ describe('loadAllOpportunitiesSaga', () => {
   it('puts addOpportunities and allOpportunitiesLoaded when all data is loaded', () => {
     const mockOpps = [
       {id: '2', name: 'Assignment 1'},
-      {id: '5', name: 'Assignment 2'}
+      {id: '5', name: 'Assignment 2'},
     ]
     const generator = loadAllOpportunitiesSaga()
     generator.next() // start saga
@@ -311,7 +311,7 @@ describe('loadAllOpportunitiesSaga', () => {
     // fetch opportunities
     const putResult = generator.next({
       data: mockOpps,
-      headers: {}
+      headers: {},
     })
     // add opportunities
     expect(putResult.value).toEqual(put(addOpportunities({items: mockOpps, nextUrl: null})))
@@ -326,7 +326,7 @@ describe('loadAllOpportunitiesSaga', () => {
     generator.next() // start saga
     const callResult = generator.next(initialState(overrides)) // select state
     expect(callResult.value.CALL.args[1]).toMatchObject({
-      course_ids: ['3']
+      course_ids: ['3'],
     })
   })
 
@@ -344,12 +344,12 @@ describe('loadAllOpportunitiesSaga', () => {
     const overrides = {
       courses: [
         {id: '1', assetString: 'course_1'},
-        {id: '569', assetString: 'course_569'}
+        {id: '569', assetString: 'course_569'},
       ],
       currentUser: {
-        id: '3'
+        id: '3',
       },
-      selectedObservee: '12'
+      selectedObservee: '12',
     }
     const generator = loadAllOpportunitiesSaga()
     generator.next() // select state
@@ -359,7 +359,7 @@ describe('loadAllOpportunitiesSaga', () => {
         course_ids: ['1', '569'],
         include: ['planner_overrides'],
         filter: ['submittable', 'current_grading_period'],
-        per_page: 100
+        per_page: 100,
       })
     )
   })

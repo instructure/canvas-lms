@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -19,15 +20,24 @@
 import Gradebook from '../Gradebook'
 import type {GradebookProps} from '../Gradebook'
 import GradebookGrid from '../GradebookGrid/index'
+import PostGradesStore from '../../SISGradePassback/PostGradesStore'
 import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
 import PerformanceControls from '../PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
-import {camelize} from 'convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 
 const performance_controls = {
   students_chunk_size: 2, // students per page
 }
+
+const postGradesStore = PostGradesStore({
+  course: {id: '1', sis_id: null},
+  selected: {
+    id: '1',
+    type: 'course',
+  },
+})
 
 export const defaultGradebookEnv = {
   allow_apply_score_to_ungraded: false,
@@ -77,7 +87,6 @@ export const defaultGradebookEnv = {
   hideTotal: false,
   latePolicyStatusDisabled: false,
   locale: 'en',
-  new_gradebook_development_enabled: true,
   outcome_gradebook_enabled: false,
   performanceControls: new PerformanceControls(),
   post_grades_ltis: [],
@@ -93,8 +102,11 @@ export const defaultGradebookEnv = {
 }
 
 export const defaultGradebookProps: GradebookProps = {
+  actionMenuNode: document.createElement('span'),
+  anonymousSpeedGraderAlertNode: document.createElement('span'),
   appliedFilters: [],
   applyScoreToUngradedModalNode: document.createElement('div'),
+  assignmentMap: {},
   colors: {
     dropped: 'test',
     excused: 'test',
@@ -105,20 +117,18 @@ export const defaultGradebookProps: GradebookProps = {
   },
   customColumns: [],
   dispatch: new RequestDispatch(),
+  enhancedActionMenuNode: document.createElement('span'),
   fetchGradingPeriodAssignments: () => Promise.resolve({}),
-  fetchStudentIds: () => Promise.resolve([]),
-  filterNavNode: document.createElement('div'),
   flashAlerts: [],
   flashMessageContainer: document.createElement('div'),
   gradebookEnv: defaultGradebookEnv,
   gradebookGridNode: document.createElement('div'),
   gradebookMenuNode: document.createElement('div'),
   gradingPeriodAssignments: {},
-  gradingPeriodsFilterContainer: document.createElement('div'),
+  gradebookSettingsModalContainer: document.createElement('span'),
   gridColorNode: document.createElement('div'),
-  hideGrid: true,
   isFiltersLoading: false,
-  isGradingPeriodAssignmentsLoading: false,
+  isGridLoaded: false,
   isModulesLoading: false,
   isStudentIdsLoading: false,
   locale: 'en',
@@ -131,6 +141,7 @@ export const defaultGradebookProps: GradebookProps = {
   recentlyLoadedCustomColumnData: null,
   reloadStudentData: () => {},
   reorderCustomColumns: () => Promise.resolve(),
+  postGradesStore,
   settingsModalButtonContainer: document.createElement('div'),
   sisOverrides: [],
   studentIds: [],
@@ -146,10 +157,12 @@ export function createGradebook(
     gradebook_is_editable?: any
     gradebookGridNode?: HTMLElement
   } = {}
-) {
+): Gradebook & {
+  props: GradebookProps
+} {
   const performanceControls = new PerformanceControls({
     ...performance_controls,
-    ...camelize(options.performance_controls),
+    ...camelizeProperties(options.performance_controls),
   })
   const dispatch = new RequestDispatch({
     activeRequestLimit: performanceControls.activeRequestLimit,
@@ -196,20 +209,14 @@ export function setFixtureHtml($fixture) {
     <div id="application">
       <div id="wrapper">
         <div data-component="GridColor"></div>
-        <span data-component="GradebookMenu" data-variant="DefaultGradebook"></span>
-        <span data-component="ViewOptionsMenu"></span>
-        <span data-component="ActionMenu"></span>
         <div id="assignment-group-filter-container"></div>
         <div id="grading-periods-filter-container"></div>
         <div id="modules-filter-container"></div>
         <div id="sections-filter-container"></div>
         <div id="student-group-filter-container"></div>
-        <span data-component="EnhancedActionMenu"></span>
         <div id="search-filter-container">
           <input type="text" />
         </div>
-        <div id="gradebook-settings-modal-button-container"></div>
-        <div data-component="GradebookSettingsModal"></div>
         <div id="hide-assignment-grades-tray"></div>
         <div id="post-assignment-grades-tray"></div>
         <div id="assignment-posting-policy-tray"></div>
@@ -217,8 +224,6 @@ export function setFixtureHtml($fixture) {
         <div data-component="AnonymousSpeedGraderAlert"></div>
         <div id="StudentTray__Container"></div>
         <div id="gradebook_grid"></div>
-        <div id="gradebook-student-search"></div>
-        <div id="gradebook-assignment-search"></div>
       </div>
     </div>
   `)

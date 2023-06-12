@@ -26,8 +26,11 @@ shared_examples_for "an endpoint which uses parent_frame_context to set the CSP 
 
   let(:pfc_tool) do
     pfc_tool_context.context_external_tools.create(
-      name: "instructure_tool", consumer_key: "foo", shared_secret: "bar",
-      url: "http://inst-tool.example.com/abc", lti_version: "1.1",
+      name: "instructure_tool",
+      consumer_key: "foo",
+      shared_secret: "bar",
+      url: "http://inst-tool.example.com/abc",
+      lti_version: "1.1",
       developer_key: DeveloperKey.new(
         root_account: pfc_tool_context.root_account,
         internal_service: true

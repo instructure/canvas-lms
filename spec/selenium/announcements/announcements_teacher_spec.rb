@@ -133,7 +133,7 @@ describe "announcements" do
       end
 
       it "adds an attachment to a graded topic", priority: "1" do
-        what_to_create == DiscussionTopic ? @course.discussion_topics.create!(title: "graded attachment topic", user: @user) : announcement_model(title: "graded attachment topic", user: @user)
+        (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: "graded attachment topic", user: @user) : announcement_model(title: "graded attachment topic", user: @user)
         if what_to_create == DiscussionTopic
           what_to_create.last.update(assignment: @course.assignments.create!(name: "graded topic assignment"))
         end
@@ -146,7 +146,7 @@ describe "announcements" do
 
       it "edits a topic", priority: "1" do
         edit_name = "edited discussion name"
-        topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(title: @topic_title, user: @user) : announcement_model(title: @topic_title, user: @user)
+        topic = (what_to_create == DiscussionTopic) ? @course.discussion_topics.create!(title: @topic_title, user: @user) : announcement_model(title: @topic_title, user: @user)
         get "#{url}/#{topic.id}"
         expect_new_page_load { f(".edit-btn").click }
 
@@ -169,12 +169,13 @@ describe "announcements" do
       expect(ann.title).to eq("First Announcement")
       # the delayed post at should be far enough in the future to make this
       # not flaky
-      expect(ann.delayed_post_at > Time.zone.now).to eq true
+      expect(ann.delayed_post_at > Time.zone.now).to be true
       expect(ann.attachment).to be_locked
     end
 
     it "displayed delayed post note on page of delayed announcement" do
-      a = @course.announcements.create!(title: "Announcement", message: "foobers",
+      a = @course.announcements.create!(title: "Announcement",
+                                        message: "foobers",
                                         delayed_post_at: 1.week.from_now)
       get AnnouncementNewEdit.full_individual_announcement_url(@course, a)
       expect(f(".discussion-fyi")).to include_text(
@@ -251,7 +252,7 @@ describe "announcements" do
       f("#require_initial_post").click
       expect_new_page_load { submit_form(".form-actions") }
       announcement = Announcement.where(title: "title").first
-      expect(announcement.require_initial_post).to eq(true)
+      expect(announcement.require_initial_post).to be(true)
     end
 
     context "in a homeroom course" do

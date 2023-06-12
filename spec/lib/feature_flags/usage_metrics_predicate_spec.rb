@@ -21,8 +21,8 @@
 describe FeatureFlags::UsageMetricsPredicate do
   let(:settings) { nil }
   let(:external_integration_keys) { nil }
-  let(:root_account) { double(settings: settings, external_integration_keys: external_integration_keys) }
-  let(:context) { double(root_account: root_account) }
+  let(:root_account) { double(settings:, external_integration_keys:) }
+  let(:context) { double(root_account:) }
   let(:region) { nil }
   let(:predicate) { FeatureFlags::UsageMetricsPredicate.new context, region }
 

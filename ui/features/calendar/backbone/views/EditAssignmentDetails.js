@@ -21,7 +21,7 @@ import $ from 'jquery'
 import moment from 'moment'
 import natcompare from '@canvas/util/natcompare'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
-import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
+import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
 import editAssignmentTemplate from '../../jst/editAssignment.handlebars'
 import editAssignmentOverrideTemplate from '../../jst/editAssignmentOverride.handlebars'
@@ -31,7 +31,7 @@ import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import withinMomentDates from '../../momentDateHelper'
 import tz from '@canvas/timezone'
-import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
+import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import '@canvas/datetime'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -52,7 +52,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       postToSISName: ENV.SIS_NAME,
       postToSIS:
         this.event.eventType === 'assignment' ? this.event.assignment.post_to_sis : undefined,
-      datePickerFormat: 'medium_with_weekday',
+      datePickerFormat: 'full_with_weekday',
       important_dates: this.event.important_dates,
     })
     this.currentContextInfo = null

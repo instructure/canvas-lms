@@ -27,13 +27,13 @@ module Services
       return unless queue_url.present?
 
       notification_sqs.send_message(message_body: {
-        global_id: global_id,
-        type: type,
+        global_id:,
+        type:,
         message: body,
         target: to,
         request_id: RequestContextGenerator.request_id
       }.to_json,
-                                    queue_url: queue_url)
+                                    queue_url:)
     end
 
     class << self
@@ -48,14 +48,15 @@ module Services
         return nil if config.blank?
 
         @notification_sqs ||= begin
-          conf = Canvas::AWS.validate_v2_config(config, "notification_service.yml")
-          sqs = Aws::SQS::Client.new(conf.except(*QUEUE_NAME_KEYS.values))
+          conf = Canvas::AWS.validate_v2_config(config, "notification_service")
+          conf["credentials"] ||= Canvas::AwsCredentialProvider.new("notification_service_creds", conf["vault_credential_path"])
+          sqs = Aws::SQS::Client.new(conf.except(*QUEUE_NAME_KEYS.values, "vault_credential_path"))
           @queue_urls = {}
           QUEUE_NAME_KEYS.each do |key, queue_name_key|
             queue_name = conf[queue_name_key]
             next unless queue_name.present?
 
-            @queue_urls[key] = sqs.get_queue_url(queue_name: queue_name).queue_url
+            @queue_urls[key] = sqs.get_queue_url(queue_name:).queue_url
           end
           sqs
         end
@@ -69,7 +70,9 @@ module Services
       end
 
       def config
-        ConfigFile.load("notification_service").dup || {}
+        config_file = ConfigFile.load("notification_service") || {}
+
+        config_file.dup
       end
     end
   end

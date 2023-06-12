@@ -20,10 +20,13 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {Provider} from 'react-redux'
 import {COURSE, ACCOUNT} from '@canvas/permissions/react/propTypes'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 import {DEFAULT_PROPS} from '../../__tests__/examples'
 import {ConnectedPermissionsIndex as Subject} from '../PermissionsIndex'
 import createStore from '../../store'
+
+injectGlobalAlertContainers()
 
 function renderWithRedux(subject, {data, store = createStore(data), ...renderOptions} = {}) {
   const Wrapper = props => <Provider store={store}>{props.children}</Provider>

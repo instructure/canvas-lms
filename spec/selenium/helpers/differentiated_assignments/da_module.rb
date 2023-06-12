@@ -49,7 +49,7 @@ module DifferentiatedAssignments
     def create_course(opts = {})
       course_name = opts.fetch(:name, "Selective Release Course")
       course_factory(
-        course_name: course_name,
+        course_name:,
         active_course: true
       )
     end

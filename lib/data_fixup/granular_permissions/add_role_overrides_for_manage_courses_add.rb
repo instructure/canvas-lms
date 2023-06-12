@@ -53,7 +53,7 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd
     end
 
     def create_role_override(role, role_context)
-      if RoleOverride.where(permission: "manage_courses_add", context: role_context, role: role)
+      if RoleOverride.where(permission: "manage_courses_add", context: role_context, role:)
                      .exists?
         return
       end
@@ -61,7 +61,7 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd
       RoleOverride.create!(
         context: role_context,
         permission: "manage_courses_add",
-        role: role,
+        role:,
         enabled: true
       )
     end

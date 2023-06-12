@@ -20,7 +20,7 @@
 
 module BasicLTI
   class Sourcedid
-    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/.freeze
+    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/
 
     attr_reader :tool, :course, :assignment, :user
 
@@ -106,11 +106,15 @@ module BasicLTI
     end
 
     def self.signing_secret
-      DynamicSettings.find["lti-signing-secret"]
+      secret = Rails.application.credentials.dig(:lti, :signing_secret)
+
+      Base64.decode64(secret) if secret
     end
 
     def self.encryption_secret
-      DynamicSettings.find["lti-encryption-secret"]
+      secret = Rails.application.credentials.dig(:lti, :encryption_secret)
+
+      Base64.decode64(secret) if secret
     end
   end
 end

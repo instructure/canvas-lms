@@ -59,6 +59,7 @@ module Api::V1::Assignment
       group_category_id
       grading_standard_id
       moderated_grading
+      hide_in_gradebook
       omit_from_final_grade
       anonymous_instructor_annotations
       anonymous_grading
@@ -172,6 +173,8 @@ module Api::V1::Assignment
     end
 
     hash["omit_from_final_grade"] = assignment.omit_from_final_grade?
+
+    hash["hide_in_gradebook"] = assignment.hide_in_gradebook?
 
     if assignment.context&.turnitin_enabled?
       hash["turnitin_enabled"] = assignment.turnitin_enabled
@@ -335,7 +338,8 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false, exclude_messages: opts[:exclude_response_fields].include?("description")
+        include_assignment: false,
+        exclude_messages: opts[:exclude_response_fields].include?("description")
       )
     end
 
@@ -451,6 +455,8 @@ module Api::V1::Assignment
                            (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
     end
 
+    hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
+
     hash
   end
 
@@ -512,6 +518,7 @@ module Api::V1::Assignment
     notify_of_update
     sis_assignment_id
     integration_id
+    hide_in_gradebook
     omit_from_final_grade
     anonymous_instructor_annotations
     allowed_attempts
@@ -712,7 +719,7 @@ module Api::V1::Assignment
     if update_params["submission_types"].is_a? Array
       update_params["submission_types"] = update_params["submission_types"].map do |type|
         # TODO: remove. this was temporary backward support for a hotfix
-        type == "online_media_recording" ? "media_recording" : type
+        (type == "online_media_recording") ? "media_recording" : type
       end
       update_params["submission_types"] = update_params["submission_types"].join(",")
     end
@@ -887,22 +894,14 @@ module Api::V1::Assignment
     vericite_settings.to_unsafe_h
   end
 
-  def submissions_hash(include_params, assignments, submissions_for_user = nil)
+  def submissions_hash(include_params, assignments)
     return {} unless include_params.include?("submission")
 
     has_observed_users = include_params.include?("observed_users")
-
-    subs_list = if submissions_for_user
-                  assignment_ids = assignments.map(&:id).to_set
-                  submissions_for_user.select do |s|
-                    assignment_ids.include?(s.assignment_id)
-                  end
-                else
-                  users = current_user_and_observed(include_observed: has_observed_users)
-                  @context.submissions
-                          .where(assignment_id: assignments.map(&:id))
-                          .for_user(users)
-                end
+    users = current_user_and_observed(include_observed: has_observed_users)
+    subs_list = @context.submissions
+                        .where(assignment_id: assignments.map(&:id))
+                        .for_user(users)
 
     if has_observed_users
       # assignment id -> array. even if <2 results for a given
@@ -1006,10 +1005,16 @@ module Api::V1::Assignment
       assignment.peer_reviews = false
     end
 
+    line_item = assignment_params.dig(:external_tool_tag_attributes, :line_item)
+    if line_item.respond_to?(:dig)
+      assignment.line_item_resource_id = line_item[:resourceId]
+      assignment.line_item_tag = line_item[:tag]
+    end
+
     {
-      assignment: assignment,
-      overrides: overrides,
-      old_assignment: old_assignment,
+      assignment:,
+      overrides:,
+      old_assignment:,
       notify_of_update: assignment_params[:notify_of_update],
       valid: true
     }

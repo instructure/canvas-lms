@@ -18,12 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe Lti::ResourceLink, type: :model do
+RSpec.describe Lti::ResourceLink do
   let(:tool) { external_tool_1_3_model }
   let(:course) { Course.create!(name: "Course") }
-  let(:assignment) { Assignment.create!(course: course, name: "Assignment") }
+  let(:assignment) { Assignment.create!(course:, name: "Assignment") }
   let(:resource_link) do
-    Lti::ResourceLink.create!(context_external_tool: tool, context: assignment,
+    Lti::ResourceLink.create!(context_external_tool: tool,
+                              context: assignment,
                               url: "http://www.example.com/launch")
   end
 
@@ -84,7 +85,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
       end
 
       context "when a matching tool exists in the specified context" do
-        let(:second_tool) { external_tool_1_3_model(context: context) }
+        let(:second_tool) { external_tool_1_3_model(context:) }
 
         it { is_expected.to eq second_tool }
       end
@@ -132,16 +133,19 @@ RSpec.describe Lti::ResourceLink, type: :model do
   describe ".find_or_initialize_for_context_and_lookup_uuid" do
     subject do
       described_class.find_or_initialize_for_context_and_lookup_uuid(
-        context: context, context_external_tool: tool,
-        lookup_uuid: lookup_uuid, custom: { "a" => "b" },
+        context:,
+        context_external_tool: tool,
+        lookup_uuid:,
+        custom: { "a" => "b" },
         url: "http://www.example.com/launch"
       )
     end
 
     let(:context) { course }
-    let(:tool) { external_tool_1_3_model(context: context) }
+    let(:tool) { external_tool_1_3_model(context:) }
     let(:resource_link) do
-      Lti::ResourceLink.create!(context_external_tool: tool, context: course,
+      Lti::ResourceLink.create!(context_external_tool: tool,
+                                context: course,
                                 url: "http://www.example.com/launch")
     end
 
@@ -149,7 +153,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
 
     shared_examples_for "creating a new resource link" do
       it "returns a new resource link" do
-        expect(subject.id).to eq(nil)
+        expect(subject.id).to be_nil
         expect(subject.original_context_external_tool).to eq(tool)
         expect(subject.custom).to eq("a" => "b")
         expect(subject.context).to eq(context)
@@ -166,9 +170,11 @@ RSpec.describe Lti::ResourceLink, type: :model do
       context "when passing in context_external_tool_launch_url" do
         subject do
           described_class.find_or_initialize_for_context_and_lookup_uuid(
-            context: context, context_external_tool_launch_url: tool.url,
+            context:,
+            context_external_tool_launch_url: tool.url,
             url: tool.url,
-            lookup_uuid: lookup_uuid, custom: { "a" => "b" }
+            lookup_uuid:,
+            custom: { "a" => "b" }
           )
         end
 

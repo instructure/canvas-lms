@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
+RSpec.describe DeveloperKeyAccountBindingsController do
   let(:root_account) { account_model }
   let(:root_account_admin) { account_admin_user(account: root_account) }
   let(:sub_account) { account_model(parent_account: root_account) }
@@ -44,19 +44,19 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
       user_session(unauthorized_admin)
-      post :create_or_update, params: params, format: :json
+      post :create_or_update, params:, format: :json
       expect(response).to be_unauthorized
     end
 
     it 'succeeds if the user has "manage_developer_keys"' do
       user_session(authorized_admin)
-      post :create_or_update, params: params
+      post(:create_or_update, params:)
       expect(response).to be_successful
     end
 
     it "creates the binding" do
       user_session(authorized_admin)
-      post :create_or_update, params: params
+      post(:create_or_update, params:)
       expect(created_binding.account).to eq expected_account
       expect(created_binding.developer_key_id).to eq params[:developer_key_id]
       expect(created_binding.workflow_state).to eq params.dig(:developer_key_account_binding, :workflow_state)
@@ -65,16 +65,16 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     it "renders a properly formatted developer key account binding" do
       expected_keys = %w[id account_id developer_key_id workflow_state account_owns_binding]
       user_session(authorized_admin)
-      post :create_or_update, params: params
+      post(:create_or_update, params:)
       expect(json_parse.keys).to match_array(expected_keys)
     end
 
     it "updates the binding if it already exists" do
       user_session(authorized_admin)
-      post :create_or_update, params: params
+      post(:create_or_update, params:)
 
       params[:developer_key_account_binding][:workflow_state] = "allow"
-      post :create_or_update, params: params
+      post(:create_or_update, params:)
       expect(created_binding.workflow_state).to eq "allow"
     end
   end
@@ -87,20 +87,20 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
       user_session(unauthorized_admin)
-      post :create_or_update, params: params, format: :json
+      post :create_or_update, params:, format: :json
       expect(response).to be_unauthorized
     end
 
     it "allows updating the workflow_state" do
       user_session(authorized_admin)
-      post :create_or_update, params: params
+      post(:create_or_update, params:)
       expect(updated_binding.workflow_state).to eq params.dig(:developer_key_account_binding, :workflow_state)
     end
 
     it "renders a properly formatted developer key account binding" do
       expected_keys = %w[id account_id developer_key_id workflow_state account_owns_binding]
       user_session(authorized_admin)
-      post :create_or_update, params: params
+      post(:create_or_update, params:)
       expect(json_parse.keys).to match_array(expected_keys)
     end
   end

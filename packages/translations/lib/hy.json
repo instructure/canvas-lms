@@ -119,6 +119,9 @@
     "date_ee500367": {
         "message": "Ամսաթիվ"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "Փոքրացնել Ներսի Տողագլուխը"
+    },
     "deep_purple_bb3e2907": {
         "message": "Մուգ մանուշակագույն"
     },
@@ -127,6 +130,9 @@
     },
     "delimiters_4db4840d": {
         "message": "Բաժանիչներ"
+    },
+    "description_436c48d7": {
+        "message": "Նկարագրություն"
     },
     "details_98a31b68": {
         "message": "Մանրամասներ"
@@ -148,6 +154,9 @@
     },
     "done_54e3d4b6": {
         "message": "Պատրաստ է"
+    },
+    "down_5831a426": {
+        "message": "Ներքև"
     },
     "due_5d7267be": {
         "message": "Մինչև"
@@ -200,6 +209,9 @@
     "home_351838cd": {
         "message": "Սկիզբ"
     },
+    "html_editor_fb2ab713": {
+        "message": "HTML խմբագիր"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Ես թույլտվություն եմ ստացել օգտագործելու այս ֆայլը:"
     },
@@ -215,6 +227,9 @@
     "images_7ce26570": {
         "message": "Պատկերներ"
     },
+    "increase_indent_6af90f7c": {
+        "message": "Մեծացնել ներսի տողագլուխը"
+    },
     "indigo_2035fc55": {
         "message": "Indigo"
     },
@@ -223,6 +238,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Տեղադրել հղումը"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Զետեղել մաթեմատիկական հավասարում"
     },
     "invalid_file_type_881cc9b2": {
         "message": "Ֆայլի անընդունելի տեսակ"
@@ -281,6 +299,9 @@
     "misc_3b692ea7": {
         "message": "Այլ"
     },
+    "module_90d9fd32": {
+        "message": "Մոդուլ"
+    },
     "modules_c4325335": {
         "message": "Մոդուլներ"
     },
@@ -290,8 +311,17 @@
     "name_1aed4a1b": {
         "message": "Անուն"
     },
+    "navigation_ee9af92d": {
+        "message": "Նավարկում"
+    },
     "new_13daf639": {
         "message": "Նոր"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Նոր թեստ"
+    },
+    "next_40e12421": {
+        "message": "Հաջորդը"
     },
     "no_e16d9132": {
         "message": "Ոչ"
@@ -332,6 +362,9 @@
     "pink_68ad45cb": {
         "message": "Վարդագույն"
     },
+    "prev_f82cbc48": {
+        "message": "Նախորդը"
+    },
     "preview_53003fd2": {
         "message": "Նախնական դիտում"
     },
@@ -352,6 +385,9 @@
     },
     "record_7c9448b": {
         "message": "Գրառում"
+    },
+    "recording_98da6bda": {
+        "message": "Ձայնագրում"
     },
     "red_8258edf3": {
         "message": "Կարմիր"
@@ -379,6 +415,9 @@
     },
     "star_8d156e09": {
         "message": "Նշել աստղիկով"
+    },
+    "start_over_f7552aa9": {
+        "message": "Սկսել նորից"
     },
     "submit_a3cc6859": {
         "message": "Ուղարկել"
@@ -425,6 +464,9 @@
     "unpublished_dfd8801": {
         "message": "չհրապարակված"
     },
+    "up_c553575d": {
+        "message": "Վերև"
+    },
     "upload_file_fd2361b8": {
         "message": "Բեռնել ֆայլը "
     },
@@ -436,6 +478,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "Օգտագործման իրավունք՝"
+    },
+    "video_player_b371005": {
+        "message": "Տեսաձայնագրության նվագարկիչ"
     },
     "view_ba339f93": {
         "message": "Դիտել"

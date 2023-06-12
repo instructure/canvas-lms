@@ -19,7 +19,7 @@
 
 describe MicrosoftSync::UsersUluvsFinder do
   let(:course) { course_model(name: "sync test course") }
-  let(:group) { MicrosoftSync::Group.create(course: course) }
+  let(:group) { MicrosoftSync::Group.create(course:) }
   let(:root_account) { group.root_account }
 
   describe "#call" do
@@ -200,6 +200,89 @@ describe MicrosoftSync::UsersUluvsFinder do
           root_account.settings[:microsoft_sync_login_attribute] = "sis_user_id"
           root_account.save!
           expect(subject).to eq([[user1.id, "somesisid"]])
+        end
+      end
+
+      context "with a cross-shard user" do
+        specs_require_sharding
+        subject { @shard1.activate { described_class.new(user_ids, root_account).call } }
+
+        let(:root_account) { @shard1.activate { account_model } }
+        let(:course) { @shard1.activate { course_model(account: root_account) } }
+        let(:other_root_account) { @shard1.activate { account_model } }
+        let(:shard2_root_account) { @shard2.activate { account_model } }
+
+        let(:shard1_lookup_value) { "somesisid" }
+        let(:other_shard1_lookup_value) { "someothersisid" }
+        let(:shard2_lookup_value) { "fromthehomeshard" }
+        let(:cross_shard_user) { @shard2.activate { user_with_pseudonym(sis_user_id: shard2_lookup_value, account: shard2_root_account) } }
+        let(:user_ids) { [cross_shard_user.id] }
+
+        before do
+          @shard1.activate do
+            root_account.settings[:microsoft_sync_enabled] = true
+            root_account.settings[:microsoft_sync_login_attribute] = "sis_user_id"
+            root_account.save!
+
+            course.enroll_user(cross_shard_user)
+          end
+        end
+
+        context "when user has pseudonym on course shard with lookup value present" do
+          before do
+            @shard1.activate do
+              pseudonym(cross_shard_user, sis_user_id: shard1_lookup_value, account: root_account)
+            end
+          end
+
+          it "uses the course-shard pseudonym" do
+            expect(subject).to eq([[cross_shard_user.id, shard1_lookup_value]])
+          end
+
+          context "when user also has pseudonym in different root account on course shard" do
+            before do
+              @shard1.activate do
+                # put the wrong pseudonym first to confirm the sort works
+                Pseudonym.where(user: cross_shard_user).delete_all
+                pseudonym(cross_shard_user, sis_user_id: other_shard1_lookup_value, account: other_root_account).update!(position: 1)
+                pseudonym(cross_shard_user, sis_user_id: shard1_lookup_value, account: root_account)
+              end
+            end
+
+            it "prefers the pseudonym in the same root account as the course" do
+              expect(subject).to eq([[cross_shard_user.id, shard1_lookup_value]])
+            end
+          end
+        end
+
+        context "when user has pseudonym on course shard with null lookup value" do
+          before do
+            @shard1.activate do
+              pseudonym(cross_shard_user, sis_user_id: nil)
+            end
+          end
+
+          it "uses the user-shard pseudonym" do
+            expect(subject).to eq([[cross_shard_user.id, shard2_lookup_value]])
+          end
+        end
+
+        context "when user has pseudonym in different root account on course shard" do
+          before do
+            @shard1.activate do
+              pseudonym(cross_shard_user, sis_user_id: other_shard1_lookup_value, account: other_root_account)
+            end
+          end
+
+          it "uses the other course-shard pseudonym" do
+            expect(subject).to eq([[cross_shard_user.id, other_shard1_lookup_value]])
+          end
+        end
+
+        context "when user only has pseudonym on home shard" do
+          it "uses the user-shard pseudonym" do
+            expect(subject).to eq([[cross_shard_user.id, shard2_lookup_value]])
+          end
         end
       end
     end

@@ -97,6 +97,13 @@ react_inbox:
     This refactor will make this page more maintainable
   applies_to: RootAccount
 
+restrict_quantitative_data:
+  state: hidden
+  display_name: Restrict quantitative data
+  description: |-
+    This feature will hide all quantitative values from users
+  applies_to: RootAccount
+
 smart_alerts:
   state: hidden
   display_name: Smart alerts

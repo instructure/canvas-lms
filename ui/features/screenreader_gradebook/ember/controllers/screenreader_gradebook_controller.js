@@ -20,7 +20,8 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ajax from 'ic-ajax'
-import round from 'round'
+import {ApolloProvider, createClient} from '@canvas/apollo'
+import round from '@canvas/round'
 import userSettings from '@canvas/user-settings'
 import fetchAllPages from '../helpers/xhr/fetch_all_pages'
 import parseLinkHeader from '../helpers/xhr/parse_link_header'
@@ -37,7 +38,7 @@ import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
-import GradebookSelector from '../../react/GradebookSelector'
+import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import '@canvas/datetime'
 import 'jquery-tinypubsub'
@@ -83,7 +84,7 @@ function studentsUniqByEnrollments(...args) {
       array.pushObject(student)
       return array
     },
-    removedItem(array, enrollment, _, instanceMeta) {
+    removedItem(array, enrollment, __, instanceMeta) {
       const student = array.findBy('id', enrollment.user_id)
       student.sections.removeObject(enrollment.course_section_id)
 
@@ -104,6 +105,7 @@ const contextUrl = get(window, 'ENV.GRADEBOOK_OPTIONS.context_url')
 const ScreenreaderGradebookController = Ember.ObjectController.extend({
   init() {
     this.set('effectiveDueDates', Ember.ObjectProxy.create({content: {}}))
+    this.set('proxyUploadOpen', false)
     return this.set(
       'assignmentsFromGroups',
       Ember.ArrayProxy.create({content: [], isLoaded: false})
@@ -174,7 +176,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     }
   })(),
 
-  selectedGradingPeriod: function (key, newValue) {
+  selectedGradingPeriod: function (_key, newValue) {
     let savedGP
     const savedGradingPeriodId = userSettings.contextGet('gradebook_current_grading_period')
     if (savedGradingPeriodId) {
@@ -380,6 +382,9 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     selectItem(property, item) {
       return this.announce(property, item)
     },
+    openProxyUploadModal() {
+      this.set('proxyUploadOpen', true)
+    },
   },
 
   overridesForStudent(studentId) {
@@ -412,6 +417,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       () =>
         $.ajaxJSON(`/api/v1/progress/${attachmentProgress.progress_id}`, 'GET').then(response => {
           if (response.workflow_state === 'completed') {
+            // eslint-disable-next-line promise/catch-or-return
             $.ajaxJSON(
               `/api/v1/users/${ENV.current_user_id}/files/${attachmentProgress.attachment_id}`,
               'GET'
@@ -460,19 +466,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   setupAssignmentWeightingScheme: function () {
     this.set('weightingScheme', ENV.GRADEBOOK_OPTIONS.group_weighting_scheme)
-  }.on('init'),
-
-  renderGradebookMenu: function () {
-    const mountPoint = document.querySelector('[data-component="GradebookSelector"]')
-    if (!mountPoint) {
-      return
-    }
-    const props = {
-      courseUrl: ENV.GRADEBOOK_OPTIONS.context_url,
-      learningMasteryEnabled: ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled,
-    }
-    const component = React.createElement(GradebookSelector, props)
-    return ReactDOM.render(component, mountPoint)
   }.on('init'),
 
   willDestroy() {
@@ -650,7 +643,10 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   subtotal_by_period: false,
 
   fetchAssignmentGroups: function () {
-    const params = {exclude_response_fields: ['in_closed_grading_period', 'rubric']}
+    const params = {
+      exclude_response_fields: ['in_closed_grading_period', 'rubric'],
+      hide_zero_point_quizzes: ENV.GRADEBOOK_OPTIONS.hide_zero_point_quizzes,
+    }
     const gpId = this.get('selectedGradingPeriod.id')
     if (this.get('has_grading_periods') && gpId !== '0') {
       params.grading_period_id = gpId
@@ -1215,6 +1211,74 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     return !!get(window, 'ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server')
   },
 
+  proxySubmissionsAllowed: function () {
+    const hasPermission = get(window, 'ENV.GRADEBOOK_OPTIONS.proxy_submissions_allowed')
+    const assignment = this.get('selectedAssignment')
+    if (!assignment) {
+      return false
+    }
+    const isFileUploadAssingment = assignment.submission_types?.includes('online_upload')
+    return hasPermission && isFileUploadAssingment
+  }.property('selectedAssignment'),
+
+  closeProxyUploadModal() {
+    this.set('proxyUploadOpen', false)
+  },
+
+  renderProxyUploadModal: function () {
+    const mountPoint = document.querySelector('[data-component="IndividualProxyUploader"]')
+    if (!mountPoint) {
+      return
+    }
+    const assignment = this.get('selectedAssignment')
+    if (!assignment) {
+      return
+    }
+    const student = this.get('selectedStudent')
+    if (!student) {
+      return
+    }
+    const component = (
+      <ApolloProvider client={createClient()}>
+        <ProxyUploadModal
+          open={this.get('proxyUploadOpen')}
+          onClose={this.closeProxyUploadModal.bind(this)}
+          assignment={assignment}
+          student={student}
+          submission={this.get('selectedSubmission')}
+          reloadSubmission={sub => this.updateSubmissionValues(sub)}
+        />
+      </ApolloProvider>
+    )
+
+    return ReactDOM.render(component, mountPoint)
+  }
+    .on('init')
+    .observes('selectedAssignment', 'proxyUploadOpen'),
+
+  updateSubmissionValues(sub) {
+    const selected = this.get('selectedSubmission')
+    const selectedClone = {...selected, ...sub}
+    return this.updateSubmissionsFromExternal([selectedClone])
+  },
+
+  submissionPreviewText: function () {
+    const submission = this.get('selectedSubmission')
+    if (!submission) {
+      return
+    }
+    if (!submission.submission_type) {
+      return I18n.t('Has not submitted')
+    }
+    if (submission.proxy_submitter) {
+      return I18n.t('Submitted by %{proxy} on %{date}', {
+        proxy: submission.proxy_submitter,
+        date: $.datetimeString(submission.submitted_at),
+      })
+    }
+    return I18n.t('Submitted on %{date}', {date: $.datetimeString(submission.submitted_at)})
+  }.property('selectedSubmission'),
+
   assignmentGroupsHash() {
     const ags = {}
     if (!this.get('assignment_groups')) {
@@ -1327,6 +1391,15 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     selectedSubmission.gradeLocked = submissionState.locked
     selectedSubmission[selectedSubmission.late_policy_status] = true
     return selectedSubmission
+  }.property('selectedStudent', 'selectedAssignment'),
+
+  gradeForStudentAndAssignment: function () {
+    const student = this.get('selectedStudent')
+    const assignment = this.get('selectedAssignment')
+    return I18n.t('Grade for %{student} - %{assignment}', {
+      student: student.name,
+      assignment: assignment.name,
+    })
   }.property('selectedStudent', 'selectedAssignment'),
 
   selectedSubmissionHidden: function () {

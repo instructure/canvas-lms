@@ -83,6 +83,28 @@ describe Types::GroupType do
     end
   end
 
+  describe "can_message" do
+    it "returns false when course is active" do
+      expect(
+        group_type.resolve("canMessage")
+      ).to be true
+    end
+
+    it "returns nil when course is deleted" do
+      @group.context.destroy!
+      expect(
+        group_type.resolve("canMessage")
+      ).to be_nil
+    end
+
+    it "returns false when course is concluded" do
+      @group.context.complete!
+      expect(
+        group_type.resolve("canMessage")
+      ).to be false
+    end
+  end
+
   context "sis field" do
     let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
     let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false }) }

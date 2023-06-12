@@ -72,8 +72,8 @@ export const MessageDetailItem = ({...props}) => {
               <Avatar
                 size={responsiveProps.avatar}
                 margin="small small small none"
-                name={props.conversationMessage.author.name}
-                src={props.conversationMessage.author.avatarUrl}
+                name={props.conversationMessage?.author?.name}
+                src={props.conversationMessage?.author?.avatarUrl}
               />
             </Flex.Item>
             <Flex.Item shouldShrink={true} shouldGrow={true}>
@@ -85,12 +85,12 @@ export const MessageDetailItem = ({...props}) => {
                   />
                 </Flex.Item>
                 <Flex.Item>
-                  <Text weight="normal" size={responsiveProps.courseNameDate}>
+                  <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
                     {props.contextName}
                   </Text>
                 </Flex.Item>
                 <Flex.Item>
-                  <Text weight="normal" size={responsiveProps.courseNameDate}>
+                  <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
                     {createdAt}
                   </Text>
                 </Flex.Item>
@@ -108,8 +108,9 @@ export const MessageDetailItem = ({...props}) => {
             )}
           </Flex>
           <Text
+            wrap="break-word"
             size={responsiveProps.messageBody}
-            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage.body)}}
+            dangerouslySetInnerHTML={{__html: formatMessage(props.conversationMessage?.body)}}
           />
           {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
             <List isUnstyled={true} margin="medium auto small">

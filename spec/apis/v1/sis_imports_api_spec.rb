@@ -44,8 +44,10 @@ describe SisImportsApiController, type: :request do
 
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     opts.merge({ import_type: "instructure_csv",
                                  attachment: Rack::Test::UploadedFile.new(path) }))
     expect(json).to have_key("created_at")
@@ -87,10 +89,13 @@ describe SisImportsApiController, type: :request do
   end
 
   it "kicks off a sis import via multipart attachment" do
+    expect(Delayed::Worker).to receive(:current_job).at_least(:twice).and_return(double("Delayed::Job", id: 123))
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") })
     expect(Delayed::Job.where(singleton: "sis_batch:account:#{@account.id}").count).to eq 1
@@ -133,10 +138,16 @@ describe SisImportsApiController, type: :request do
     run_jobs
     expect(User.count).to eq @user_count + 1
     expect(User.last.name).to eq "Jamie Kennedy"
+    expect(batch.reload.job_ids).to eq([123])
+    expect(batch.parallel_importers.last.job_ids).to eq([123])
 
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
-                    { controller: "sis_imports_api", action: "show", format: "json",
-                      account_id: @account.id.to_s, id: batch.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
+                    { controller: "sis_imports_api",
+                      action: "show",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      id: batch.id.to_s })
     expect(json).to be_truthy
     expect(json).to have_key("created_at")
     json.delete("created_at")
@@ -209,9 +220,13 @@ describe SisImportsApiController, type: :request do
 
   it "restores batch on restore_states and return progress" do
     batch = @account.sis_batches.create
-    json = api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/restore_states",
-                    { controller: "sis_imports_api", action: "restore_states", format: "json",
-                      account_id: @account.id.to_s, id: batch.id.to_s })
+    json = api_call(:put,
+                    "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/restore_states",
+                    { controller: "sis_imports_api",
+                      action: "restore_states",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      id: batch.id.to_s })
     run_jobs
     expect(batch.reload.workflow_state).to eq "restored"
 
@@ -221,32 +236,46 @@ describe SisImportsApiController, type: :request do
 
   it "shows current running sis import" do
     batch = @account.sis_batches.create!
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/importing",
-                    { controller: "sis_imports_api", action: "importing", format: "json",
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports/importing",
+                    { controller: "sis_imports_api",
+                      action: "importing",
+                      format: "json",
                       account_id: @account.id.to_s })
     expect(json["sis_imports"]).to eq []
     batch.workflow_state = "importing"
     batch.save!
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/importing",
-                    { controller: "sis_imports_api", action: "importing", format: "json",
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports/importing",
+                    { controller: "sis_imports_api",
+                      action: "importing",
+                      format: "json",
                       account_id: @account.id.to_s })
     expect(json["sis_imports"].first["id"]).to eq batch.id
   end
 
   it "aborts batch on abort" do
     batch = @account.sis_batches.create
-    api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
-             { controller: "sis_imports_api", action: "abort", format: "json",
-               account_id: @account.id.to_s, id: batch.id.to_s })
+    api_call(:put,
+             "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
+             { controller: "sis_imports_api",
+               action: "abort",
+               format: "json",
+               account_id: @account.id.to_s,
+               id: batch.id.to_s })
     expect(batch.reload.workflow_state).to eq "aborted"
   end
 
   it "allows aborting an importing batch" do
     batch = @account.sis_batches.create
     SisBatch.where(id: batch).update_all(workflow_state: "importing")
-    api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
-             { controller: "sis_imports_api", action: "abort", format: "json",
-               account_id: @account.id.to_s, id: batch.id.to_s })
+    api_call(:put,
+             "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
+             { controller: "sis_imports_api",
+               action: "abort",
+               format: "json",
+               account_id: @account.id.to_s,
+               id: batch.id.to_s })
     expect(batch.reload.workflow_state).to eq "aborted"
   end
 
@@ -255,8 +284,11 @@ describe SisImportsApiController, type: :request do
     SisBatch.where(id: batch).update_all(workflow_state: "imported")
     raw_api_call(:put,
                  "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
-                 { controller: "sis_imports_api", action: "abort", format: "json",
-                   account_id: @account.id.to_s, id: batch.id.to_s })
+                 { controller: "sis_imports_api",
+                   action: "abort",
+                   format: "json",
+                   account_id: @account.id.to_s,
+                   id: batch.id.to_s })
     assert_status(404)
     expect(batch.reload.workflow_state).to eq "imported"
   end
@@ -269,9 +301,12 @@ describe SisImportsApiController, type: :request do
     batch3 = @account.sis_batches.create
     SisBatch.where(id: batch3).update_all(workflow_state: "created")
     batch4 = @account.sis_batches.create
-    api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/abort_all_pending",
-             { controller: "sis_imports_api", action: "abort_all_pending",
-               format: "json", account_id: @account.id.to_s })
+    api_call(:put,
+             "/api/v1/accounts/#{@account.id}/sis_imports/abort_all_pending",
+             { controller: "sis_imports_api",
+               action: "abort_all_pending",
+               format: "json",
+               account_id: @account.id.to_s })
     expect(batch1.reload.workflow_state).to eq "imported"
     expect(batch2.reload.workflow_state).to eq "importing"
     expect(batch3.reload.workflow_state).to eq "aborted"
@@ -283,8 +318,10 @@ describe SisImportsApiController, type: :request do
     expect do
       api_call(:post,
                "/api/v1/accounts/#{@account.id}/sis_imports.json",
-               { controller: "sis_imports_api", action: "create",
-                 format: "json", account_id: @account.id.to_s },
+               { controller: "sis_imports_api",
+                 action: "create",
+                 format: "json",
+                 account_id: @account.id.to_s },
                { import_type: "instructure_csv",
                  attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") })
     end.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(0)
@@ -293,8 +330,10 @@ describe SisImportsApiController, type: :request do
   it "enables batch mode and require selecting a valid term" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "1",
@@ -307,8 +346,10 @@ describe SisImportsApiController, type: :request do
   it "uses change threshold for batch mode" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "1",
@@ -321,8 +362,10 @@ describe SisImportsApiController, type: :request do
   it "requres change threshold for multi_term_batch_mode" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       multi_term_batch_mode: "1" })
@@ -332,23 +375,27 @@ describe SisImportsApiController, type: :request do
   it "uses multi_term_batch_mode" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "1",
                       multi_term_batch_mode: "1",
                       change_threshold: 7, })
     batch = SisBatch.find(json["id"])
-    expect(json["multi_term_batch_mode"]).to eq true
+    expect(json["multi_term_batch_mode"]).to be true
     expect(batch.options[:multi_term_batch_mode]).to be_truthy
   end
 
   it "enables batch with sis stickyness" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "true",
@@ -385,8 +432,10 @@ describe SisImportsApiController, type: :request do
   it "enables diffing mode with remaster disabled" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       diffing_data_set_identifier: "my-users-data",
@@ -400,15 +449,17 @@ describe SisImportsApiController, type: :request do
     expect(json["change_threshold"]).to eq 7
     expect(batch.diffing_data_set_identifier).to eq "my-users-data"
     expect(batch.diff_row_count_threshold).to eq 4
-    expect(batch.diffing_remaster).to eq false
-    expect(json["diffing_remaster"]).to eq false
+    expect(batch.diffing_remaster).to be false
+    expect(json["diffing_remaster"]).to be false
   end
 
   it "enables diffing mode with remaster enabled" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       diffing_data_set_identifier: "my-users-data",
@@ -423,16 +474,18 @@ describe SisImportsApiController, type: :request do
     expect(json["change_threshold"]).to eq 6
     expect(batch.diffing_data_set_identifier).to eq "my-users-data"
     expect(batch.diff_row_count_threshold).to eq 3
-    expect(batch.diffing_remaster).to eq true
-    expect(json["diffing_remaster"]).to eq true
+    expect(batch.diffing_remaster).to be true
+    expect(json["diffing_remaster"]).to be true
   end
 
   it "allows for other diffing_drop_status" do
     json = api_call(
       :post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",
-      { controller: "sis_imports_api", action: "create",
-        format: "json", account_id: @account.id.to_s },
+      { controller: "sis_imports_api",
+        action: "create",
+        format: "json",
+        account_id: @account.id.to_s },
       { import_type: "instructure_csv",
         attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
         diffing_data_set_identifier: "my-users-data",
@@ -450,13 +503,17 @@ describe SisImportsApiController, type: :request do
   it "errors for invalid diffing_drop_status" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       diffing_data_set_identifier: "my-users-data",
                       diffing_drop_status: "invalid",
-                      change_threshold: 7, }, {}, expected_status: 400)
+                      change_threshold: 7, },
+                    {},
+                    expected_status: 400)
     expect(json["message"]).to eq "Invalid diffing_drop_status"
   end
 
@@ -464,20 +521,26 @@ describe SisImportsApiController, type: :request do
     expect do
       json = api_call(:post,
                       "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                      { controller: "sis_imports_api", action: "create",
-                        format: "json", account_id: @account.id.to_s },
+                      { controller: "sis_imports_api",
+                        action: "create",
+                        format: "json",
+                        account_id: @account.id.to_s },
                       { import_type: "instructure_csv",
                         attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
-                        batch_mode: "1" }, {}, expected_status: 400)
+                        batch_mode: "1" },
+                      {},
+                      expected_status: 400)
       expect(json["message"]).to eq "Batch mode specified, but the given batch_mode_term_id cannot be found."
-    end.to change(SisBatch, :count).by(0)
+    end.not_to change(SisBatch, :count)
   end
 
   it "enables sis stickiness options" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") })
     batch = SisBatch.find(json["id"])
@@ -486,8 +549,10 @@ describe SisImportsApiController, type: :request do
 
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       override_sis_stickiness: "1" })
@@ -501,8 +566,10 @@ describe SisImportsApiController, type: :request do
 
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       override_sis_stickiness: "1",
@@ -518,8 +585,10 @@ describe SisImportsApiController, type: :request do
 
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       override_sis_stickiness: "1",
@@ -535,8 +604,10 @@ describe SisImportsApiController, type: :request do
 
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       add_sis_stickiness: "1" })
@@ -546,8 +617,10 @@ describe SisImportsApiController, type: :request do
 
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "create",
-                      format: "json", account_id: @account.id.to_s },
+                    { controller: "sis_imports_api",
+                      action: "create",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
                       attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       clear_sis_stickiness: "1" })
@@ -739,9 +812,12 @@ describe SisImportsApiController, type: :request do
   it "allows raw post without charset" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
-             { controller: "sis_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s,
-               import_type: "instructure_csv", attachment: "blah" },
+             { controller: "sis_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s,
+               import_type: "instructure_csv",
+               attachment: "blah" },
              {},
              { "CONTENT_TYPE" => "text/csv" })
     batch = SisBatch.last
@@ -752,9 +828,12 @@ describe SisImportsApiController, type: :request do
   it "handles raw post content-types with attributes" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
-             { controller: "sis_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s,
-               import_type: "instructure_csv", attachment: "blah" },
+             { controller: "sis_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s,
+               import_type: "instructure_csv",
+               attachment: "blah" },
              {},
              { "CONTENT_TYPE" => "text/csv; charset=utf-8" })
     batch = SisBatch.last
@@ -765,8 +844,10 @@ describe SisImportsApiController, type: :request do
   it "rejects non-utf-8 encodings on content-type" do
     raw_api_call(:post,
                  "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
-                 { controller: "sis_imports_api", action: "create",
-                   format: "json", account_id: @account.id.to_s,
+                 { controller: "sis_imports_api",
+                   action: "create",
+                   format: "json",
+                   account_id: @account.id.to_s,
                    import_type: "instructure_csv" },
                  {},
                  { "CONTENT_TYPE" => "text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1" })
@@ -781,9 +862,12 @@ describe SisImportsApiController, type: :request do
     )
 
     run_jobs
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s })
 
     json["sis_imports"].first.delete("created_at")
     json["sis_imports"].first.delete("updated_at")
@@ -861,9 +945,12 @@ describe SisImportsApiController, type: :request do
     )
 
     run_jobs
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s })
 
     atts_json = json["sis_imports"].first["csv_attachments"]
     expect(atts_json.count).to eq 1
@@ -878,9 +965,12 @@ describe SisImportsApiController, type: :request do
     batch.data = { downloadable_attachment_ids: [att1.id, att2.id], diffed_attachment_ids: [att2.id] }
     batch.save!
 
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s })
 
     atts_json = json["sis_imports"].first["csv_attachments"]
     expect(atts_json.count).to eq 1
@@ -893,46 +983,68 @@ describe SisImportsApiController, type: :request do
 
   it "filters sis imports by date if requested" do
     @account.sis_batches.create
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s, created_since: 1.day.from_now.iso8601 })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      created_since: 1.day.from_now.iso8601 })
 
     expect(json["sis_imports"].count).to eq 0
 
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s, created_since: 1.day.ago.iso8601 })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      created_since: 1.day.ago.iso8601 })
 
     expect(json["sis_imports"].count).to eq 1
   end
 
   it "filters sis imports by an end date" do
     @account.sis_batches.create
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s, created_before: 1.day.from_now.iso8601 })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      created_before: 1.day.from_now.iso8601 })
     expect(json["sis_imports"].count).to eq 1
 
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s, created_before: 1.day.ago.iso8601 })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      created_before: 1.day.ago.iso8601 })
     expect(json["sis_imports"].count).to eq 0
   end
 
   it "does not fail when options are empty" do
     batch = @account.sis_batches.create
     expect(batch.options).to be_empty
-    api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-             { controller: "sis_imports_api", action: "index",
-               format: "json", account_id: @account.id.to_s })
+    api_call(:get,
+             "/api/v1/accounts/#{@account.id}/sis_imports.json",
+             { controller: "sis_imports_api",
+               action: "index",
+               format: "json",
+               account_id: @account.id.to_s })
     assert_status(200)
   end
 
   it "errors on non-root account" do
     subaccount = @account.sub_accounts.create!
-    json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: subaccount.id.to_s },
+    json = api_call(:get,
+                    "/api/v1/accounts/#{subaccount.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: subaccount.id.to_s },
                     {},
                     {},
                     expected_status: 400)
@@ -942,9 +1054,12 @@ describe SisImportsApiController, type: :request do
   it "errors on non-enabled root account" do
     @account.allow_sis_import = false
     @account.save
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { controller: "sis_imports_api", action: "index",
-                      format: "json", account_id: @account.id.to_s },
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports.json",
+                    { controller: "sis_imports_api",
+                      action: "index",
+                      format: "json",
+                      account_id: @account.id.to_s },
                     {},
                     {},
                     expected_status: 403)
@@ -955,8 +1070,10 @@ describe SisImportsApiController, type: :request do
     account_admin_user_with_role_changes(account: @account, role_changes: { manage_sis: true, import_sis: false })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
-             { controller: "sis_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s },
+             { controller: "sis_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s },
              { import_type: "instructure_csv",
                attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") },
              {},
@@ -967,8 +1084,10 @@ describe SisImportsApiController, type: :request do
     account_admin_user_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
-             { controller: "sis_imports_api", action: "create",
-               format: "json", account_id: @account.id.to_s },
+             { controller: "sis_imports_api",
+               action: "create",
+               format: "json",
+               account_id: @account.id.to_s },
              { import_type: "instructure_csv",
                attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") },
              {},
@@ -982,9 +1101,13 @@ describe SisImportsApiController, type: :request do
     end
     batch.finish(false)
 
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
-                    { controller: "sis_imports_api", action: "show", format: "json",
-                      account_id: @account.id.to_s, id: batch.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
+                    { controller: "sis_imports_api",
+                      action: "show",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      id: batch.id.to_s })
     expect(json).to have_key("errors_attachment")
     expect(json["errors_attachment"]["id"]).to eq batch.errors_attachment.id
   end
@@ -993,9 +1116,13 @@ describe SisImportsApiController, type: :request do
     batch = @account.sis_batches.create!
     batch.sis_batch_errors.create(root_account: @account, file: "users.csv", message: "some error", row: 1)
     batch.finish(false)
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
-                    { controller: "sis_imports_api", action: "show", format: "json",
-                      account_id: @account.id.to_s, id: batch.id.to_s })
+    json = api_call(:get,
+                    "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
+                    { controller: "sis_imports_api",
+                      action: "show",
+                      format: "json",
+                      account_id: @account.id.to_s,
+                      id: batch.id.to_s })
     url_params = Rack::Utils.parse_query URI(json["errors_attachment"]["url"]).query
     expiration = Time.at(CanvasSecurity.decode_jwt(url_params["verifier"])[:exp])
 

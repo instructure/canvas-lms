@@ -89,7 +89,7 @@ class ContextController < ApplicationController
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
-        manage_students: manage_students,
+        manage_students:,
         add_users_to_course: can_add_enrollments,
         read_reports: @context.grants_right?(@current_user, session, :read_reports),
         can_add_groups: can_do(@context.groups.temp_record, @current_user, :create),
@@ -138,7 +138,9 @@ class ContextController < ApplicationController
                end
       @primary_users = { t("roster.group_members", "Group Members") => @users }
       if (course = @context.context.is_a?(Course) && @context.context)
-        @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => course.participating_instructors.order_by_sortable_name.distinct }
+        instructors = course.participating_instructors.order_by_sortable_name.distinct
+        # UserSearch.scope_for makes the teachers and ta's list to match what api v1 is returning with respect to section restrictions
+        @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => instructors.select { |instructor| UserSearch.scope_for(course, @current_user).include?(instructor) } }
       end
     end
 
@@ -206,6 +208,8 @@ class ContextController < ApplicationController
         respond_to do |format|
           format.html do
             @accesses = @accesses.paginate(page: params[:page], per_page: 50)
+            @last_activity_at = @context.enrollments.where(user_id: @user).maximum(:last_activity_at)
+            @aua_expiration_date = AssetUserAccess.expiration_date
             js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
                    accesses_total_pages: @accesses.total_pages)
           end
@@ -226,7 +230,7 @@ class ContextController < ApplicationController
       case @context
       when Course
         is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
-        scope = @context.enrollments_visible_to(@current_user, include_concluded: is_admin).where(user_id: user_id)
+        scope = @context.enrollments_visible_to(@current_user, include_concluded: is_admin).where(user_id:)
         scope = scope.active_or_pending unless is_admin
         @membership = scope.first
         if @membership
@@ -242,7 +246,7 @@ class ContextController < ApplicationController
           log_asset_access(@membership, "roster", "roster")
         end
       when Group
-        @membership = @context.group_memberships.active.where(user_id: user_id).first
+        @membership = @context.group_memberships.active.where(user_id:).first
         @enrollments = []
       end
 
@@ -273,7 +277,7 @@ class ContextController < ApplicationController
         add_body_class "not-editing"
 
         add_crumb(t("#crumbs.people", "People"), context_url(@context, :context_users_url))
-        add_crumb(@user.name, context_url(@context, :context_user_url, @user))
+        add_crumb(@user.short_name, context_url(@context, :context_user_url, @user))
         add_crumb(t("#crumbs.access_report", "Access Report"))
         set_active_tab "people"
 
@@ -302,9 +306,17 @@ class ContextController < ApplicationController
     end
   end
 
-  WORKFLOW_TYPES = %i[all_discussion_topics assignment_groups assignments
-                      collaborations context_modules enrollments groups
-                      quizzes rubrics wiki_pages rubric_associations_with_deleted].freeze
+  WORKFLOW_TYPES = %i[all_discussion_topics
+                      assignment_groups
+                      assignments
+                      collaborations
+                      context_modules
+                      enrollments
+                      groups
+                      quizzes
+                      rubrics
+                      wiki_pages
+                      rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
@@ -315,10 +327,10 @@ class ContextController < ApplicationController
           end
         end
 
-      @deleted_items = []
-      @item_types.each do |scope|
-        @deleted_items += scope.where(workflow_state: "deleted").limit(25).to_a
-      end
+      @deleted_items = @item_types.reduce([]) do |acc, scope|
+        acc + scope.where(workflow_state: "deleted").limit(25).to_a
+      end.reject { |item| item.is_a?(DiscussionTopic) && !item.restorable? }
+
       @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
       if @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
         @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a
@@ -348,6 +360,10 @@ class ContextController < ApplicationController
 
       @item = scope.association(type).reader.find(id)
       @item.restore
+      if @item.errors.any?
+        return render json: @item.errors.full_messages, status: :forbidden
+      end
+
       render json: @item
     end
   end

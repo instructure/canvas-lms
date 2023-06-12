@@ -27,7 +27,7 @@ describe Lti::ContextToolFinder do
 
   def create_tool(context, name, opts)
     context.context_external_tools.create!(
-      { name: name, consumer_key: "12345", shared_secret: "secret" }.merge(opts)
+      { name:, consumer_key: "12345", shared_secret: "secret" }.merge(opts)
     )
   end
 
@@ -64,17 +64,21 @@ describe Lti::ContextToolFinder do
       tool3.settings[:resource_selection] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
       tool3.save!
       placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ["resource_selection"]
-      expect(method_returning_scope.call(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
+      expect(method_returning_scope.call(@course, placements:).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
     it "honors only_visible option" do
       course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
       @tools = [
         create_tool(@root_account, "f", domain: "google.com"),
-        create_tool(@course, "d", domain: "google.com",
-                                  settings: { assignment_view: { visibility: "admins" } }),
-        create_tool(@course, "a", url: "http://www.google.com",
-                                  settings: { assignment_view: { visibility: "members" } })
+        create_tool(@course,
+                    "d",
+                    domain: "google.com",
+                    settings: { assignment_view: { visibility: "admins" } }),
+        create_tool(@course,
+                    "a",
+                    url: "http://www.google.com",
+                    settings: { assignment_view: { visibility: "members" } })
       ]
 
       tools = method_returning_scope.call(@course)
@@ -129,16 +133,22 @@ describe Lti::ContextToolFinder do
     context "when exclude_admin_visibility is true" do
       it "doesn't include admin tools of type options[:type]" do
         create_tool(
-          @account, "1",
-          domain: "google.com", settings: { assignment_view: { visibility: "admins" } }
+          @account,
+          "1",
+          domain: "google.com",
+          settings: { assignment_view: { visibility: "admins" } }
         )
         tool2 = create_tool(
-          @account, "2",
-          url: "http://www.google.com", settings: { assignment_view: { visibility: "members" } }
+          @account,
+          "2",
+          url: "http://www.google.com",
+          settings: { assignment_view: { visibility: "members" } }
         )
         create_tool(
-          @account, "3",
-          url: "http://www.google.com", settings: { course_navigation: { visibility: "members" } }
+          @account,
+          "3",
+          url: "http://www.google.com",
+          settings: { course_navigation: { visibility: "members" } }
         )
 
         finder = described_class.new(@course, type: :assignment_view)
@@ -153,7 +163,7 @@ describe Lti::ContextToolFinder do
     end
 
     it "returns nil if context is nil" do
-      expect(described_class.all_tools_for(nil)).to eq(nil)
+      expect(described_class.all_tools_for(nil)).to be_nil
     end
 
     it_behaves_like "a method creating a scope for all tools for a context" do

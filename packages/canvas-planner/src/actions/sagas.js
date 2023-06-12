@@ -24,7 +24,7 @@ import {
   getContextCodesFromState,
   transformApiToInternalGrade,
   observedUserId,
-  getResponseHeader
+  getResponseHeader,
 } from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
@@ -34,7 +34,7 @@ import {
   sendBasicFetchRequest,
   sendFetchRequest,
   gotGradesSuccess,
-  gotGradesError
+  gotGradesError,
 } from './loading-actions'
 import {addOpportunities, allOpportunitiesLoaded} from './index'
 
@@ -44,7 +44,7 @@ import {
   mergePastItemsForNewActivity,
   mergePastItemsForToday,
   mergeWeekItems,
-  consumePeekIntoPast
+  consumePeekIntoPast,
 } from './saga-actions'
 
 const MAX_PAGE_SIZE = 100
@@ -127,10 +127,10 @@ export function* peekIntoPastSaga() {
 export function* loadGradesSaga() {
   const loadingOptions = {
     params: {
-      include: ['total_scores', 'current_grading_period_scores'],
+      include: ['total_scores', 'current_grading_period_scores', 'restrict_quantitative_data'],
       enrollment_type: 'student',
-      enrollment_state: 'active'
-    }
+      enrollment_state: 'active',
+    },
   }
   try {
     // exhaust pagination because we really do need all the grades.
@@ -175,7 +175,7 @@ export function* loadAllOpportunitiesSaga() {
         course_ids,
         include: ['planner_overrides'],
         filter,
-        per_page: MAX_PAGE_SIZE
+        per_page: MAX_PAGE_SIZE,
       })
       items.push(...response.data)
 
@@ -198,8 +198,8 @@ export function* loadWeekSaga({payload: {weekStart, weekEnd, isPreload}}) {
     mode: 'week',
     extraParams: {
       end_date: weekEnd.toISOString(),
-      per_page: MAX_PAGE_SIZE
-    }
+      per_page: MAX_PAGE_SIZE,
+    },
   })
 }
 

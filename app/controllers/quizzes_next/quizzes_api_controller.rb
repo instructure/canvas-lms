@@ -39,9 +39,15 @@ class QuizzesNext::QuizzesApiController < ApplicationController
     if authorized_action(@context, @current_user, :read) && tab_enabled?(@context.class::TAB_QUIZZES)
       log_api_asset_access(["quizzes.next", @context], "quizzes", "other")
       cache_key = [
-        "quizzes.next", @context.id, all_quizzes.count,
-        @current_user, latest_updated_at, accepts_jsonapi?,
-        params[:search_term], params[:page], params[:per_page]
+        "quizzes.next",
+        @context.id,
+        all_quizzes.count,
+        @current_user,
+        latest_updated_at,
+        accepts_jsonapi?,
+        params[:search_term],
+        params[:page],
+        params[:per_page]
       ].cache_key
 
       value = Rails.cache.fetch(cache_key) do

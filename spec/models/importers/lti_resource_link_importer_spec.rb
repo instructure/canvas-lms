@@ -23,14 +23,14 @@ describe Importers::LtiResourceLinkImporter do
 
   let!(:source_course) { course_model }
   let!(:destination_course) { course_model }
-  let!(:migration) { ContentMigration.create(context: destination_course, source_course: source_course) }
+  let!(:migration) { ContentMigration.create(context: destination_course, source_course:) }
   let!(:tool) { external_tool_1_3_model(context: destination_course) }
 
   context "when `lti_resource_links` is not given" do
     let(:hash) { { lti_resource_links: nil } }
 
     it "does not import lti resource links" do
-      expect(subject).to eq false
+      expect(subject).to be false
     end
   end
 
@@ -63,7 +63,7 @@ describe Importers::LtiResourceLinkImporter do
         Lti::ResourceLink.create!(
           context_external_tool: tool,
           context: assignment,
-          lookup_uuid: lookup_uuid,
+          lookup_uuid:,
           custom: nil,
           url: "http://www.example.com/launch"
         )
@@ -72,7 +72,7 @@ describe Importers::LtiResourceLinkImporter do
       it "update the custom params" do
         expect(resource_link.custom).to be_nil
 
-        expect(subject).to eq true
+        expect(subject).to be true
 
         resource_link.reload
 
@@ -83,7 +83,7 @@ describe Importers::LtiResourceLinkImporter do
     context "when the Lti::ResourceLink.context_type is a Course" do
       context "and the resource link was not recorded" do
         it "create the new resource link" do
-          expect(subject).to eq true
+          expect(subject).to be true
 
           expect(destination_course.lti_resource_links.size).to eq 1
           expect(destination_course.lti_resource_links.first.lookup_uuid).to eq lookup_uuid
@@ -96,12 +96,12 @@ describe Importers::LtiResourceLinkImporter do
           destination_course.lti_resource_links.create!(
             context_external_tool: tool,
             custom: nil,
-            lookup_uuid: lookup_uuid
+            lookup_uuid:
           )
         end
 
         it "update the custom params" do
-          expect(subject).to eq true
+          expect(subject).to be true
 
           expect(destination_course.lti_resource_links.size).to eq 1
           expect(destination_course.lti_resource_links.first.lookup_uuid).to eq lookup_uuid

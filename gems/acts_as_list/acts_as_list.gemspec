@@ -11,12 +11,11 @@ Gem::Specification.new do |spec|
 
   spec.files         = Dir.glob("{lib,spec}/**/*")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_dependency "rails", ">= 3.2"
 
   spec.add_development_dependency "bundler", ">= 1.5", "< 3.0"
-  spec.add_development_dependency "rspec", "~> 3.5.0"
+  spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_development_dependency "sqlite3"
 end

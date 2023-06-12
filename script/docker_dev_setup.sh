@@ -36,7 +36,6 @@ copy_docker_config
 setup_docker_compose_override
 build_images
 docker_compose_up
-check_gemfile
 build_assets
 create_db
 display_next_steps

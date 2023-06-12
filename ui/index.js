@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// main entry for frontend code
+
 import './boot/initializers/setWebpackCdnHost'
 import '@canvas/jquery/jquery.instructure_jquery_patches' // this needs to be before anything else that requires jQuery
 import './boot'
@@ -25,8 +27,7 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import Backbone from '@canvas/backbone'
 import splitAssetString from '@canvas/util/splitAssetString'
-import mathml from 'mathml'
-import preventDefault from 'prevent-default'
+import {Mathml} from '@instructure/canvas-rce'
 import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
 import {Capabilities as C, up} from '@canvas/engine'
@@ -49,6 +50,8 @@ window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
 up({
   up: () => {
     advanceReadiness('capabilities')
+    // list of all bundles the current page needs
+    //   populated by app/helpers/application_helper.rb
     if (!window.bundles) window.bundles = []
     window.bundles.push = loadBundle
     window.bundles.forEach(loadBundle)
@@ -90,10 +93,16 @@ function afterDocumentReady() {
   })
 
   isolate(loadNewUserTutorials)()
-  isolate(setupMathML)()
+
+  if (!ENV.FEATURES.explicit_latex_typesetting) {
+    isolate(setupMathML)()
+  }
 }
 
 function setupMathML() {
+  const features = {new_math_equation_handling: Boolean(ENV?.FEATURES?.new_math_equation_handling)}
+  const config = {locale: ENV?.locale || 'en'}
+
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't
   // typeset my MathJax. Let's trick Canvas into knowing
@@ -111,6 +120,7 @@ function setupMathML() {
     // so that the code that actually renders the user_content runs first,
     // because it has to be rendered before we can check if isMathMLOnPage
     setTimeout(() => {
+      const mathml = new Mathml(features, config)
       if (mathml.isMathOnPage()) mathml.loadMathJax(undefined)
     }, 5)
     return
@@ -123,8 +133,8 @@ function setupMathML() {
   setTimeout(() => {
     processedBodyMath = true
     window.dispatchEvent(
-      new CustomEvent(mathml.processNewMathEventName, {
-        detail: {target: document.body},
+      new CustomEvent(Mathml.processNewMathEventName, {
+        detail: {target: document.body, features, config},
       })
     )
   }, 0)
@@ -137,8 +147,8 @@ function setupMathML() {
         for (let n = 0; n < addedNodes.length; ++n) {
           const node = addedNodes[n]
           if (node.nodeType !== Node.ELEMENT_NODE) continue
-          const processNewMathEvent = new CustomEvent(mathml.processNewMathEventName, {
-            detail: {target: node},
+          const processNewMathEvent = new CustomEvent(Mathml.processNewMathEventName, {
+            detail: {target: node, features, config},
           })
           window.dispatchEvent(processNewMathEvent)
         }
@@ -161,6 +171,8 @@ if (ENV.INCOMPLETE_REGISTRATION) {
   isolate(() => import('./boot/initializers/warnOnIncompleteRegistration'))()
 }
 
+// TODO: remove the need for this
+// it is only used in submissions
 if (ENV.badge_counts) {
   isolate(() => import('./boot/initializers/showBadgeCounts'))()
 }
@@ -179,13 +191,10 @@ function doRandomThingsToDOM() {
   })
 
   // Backbone routes
-  $('body').on(
-    'click',
-    '[data-pushstate]',
-    preventDefault(function () {
-      Backbone.history.navigate($(this).attr('href'), true)
-    })
-  )
+  $('body').on('click', '[data-pushstate]', function (event) {
+    if (event) event.preventDefault()
+    Backbone.history.navigate($(this).attr('href'), true)
+  })
 }
 
 async function loadNewUserTutorials() {

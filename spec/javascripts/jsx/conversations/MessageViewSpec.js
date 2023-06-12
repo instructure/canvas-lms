@@ -17,7 +17,7 @@
  */
 
 import MessageView from 'ui/features/conversations/backbone/views/MessageView'
-import Message from 'ui/features/conversations/backbone/models/Message.coffee'
+import Message from 'ui/features/conversations/backbone/models/Message'
 
 QUnit.module('MessageView', {
   setup() {

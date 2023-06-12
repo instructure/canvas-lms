@@ -508,7 +508,7 @@ module AccountReports
     def add_outcome_order_text
       order = determine_order_key
       if order
-        add_extra_text(I18n.t("account_reports.outcomes.order", "Order: %{order}", order: order))
+        add_extra_text(I18n.t("account_reports.outcomes.order", "Order: %{order}", order:))
       end
     end
 

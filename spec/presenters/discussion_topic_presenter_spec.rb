@@ -19,7 +19,7 @@
 #
 
 describe DiscussionTopicPresenter do
-  let(:topic)      { DiscussionTopic.new(title: "Test Topic", assignment: assignment) }
+  let(:topic)      { DiscussionTopic.new(title: "Test Topic", assignment:) }
   let(:user)       { user_model }
   let(:presenter)  { DiscussionTopicPresenter.new(topic, user) }
   let(:course)     { course_model }
@@ -40,8 +40,8 @@ describe DiscussionTopicPresenter do
     context "when no arguments passed" do
       it "creates a discussion topic and current_user for you" do
         presenter = DiscussionTopicPresenter.new
-        expect(presenter.topic.is_a?(DiscussionTopic)).to eq true
-        expect(presenter.user.is_a?(User)).to eq true
+        expect(presenter.topic.is_a?(DiscussionTopic)).to be true
+        expect(presenter.user.is_a?(User)).to be true
       end
     end
 
@@ -65,12 +65,12 @@ describe DiscussionTopicPresenter do
     it "returns true if assignment has a rubric association with a rubric" do
       expect(assignment).to receive(:rubric)
         .and_return double
-      expect(presenter.has_attached_rubric?).to eq true
+      expect(presenter.has_attached_rubric?).to be true
     end
 
     it "returns false if assignment has nil rubric association" do
       expect(assignment).to receive(:rubric).and_return nil
-      expect(presenter.has_attached_rubric?).to eq false
+      expect(presenter.has_attached_rubric?).to be false
     end
   end
 
@@ -78,12 +78,12 @@ describe DiscussionTopicPresenter do
     it "returns false if no assignment on the topic" do
       expect(DiscussionTopicPresenter.new(
         DiscussionTopic.new(title: "no assignment")
-      ).should_show_rubric?(user)).to eq false
+      ).should_show_rubric?(user)).to be false
     end
 
     it "returns true if has_attached_rubric? is true" do
       expect(assignment).to receive(:rubric).and_return double
-      expect(presenter.should_show_rubric?(user)).to eq true
+      expect(presenter.should_show_rubric?(user)).to be true
     end
 
     context "no rubric association or rubric for the topic's assignment" do
@@ -91,12 +91,12 @@ describe DiscussionTopicPresenter do
 
       it "returns true when the assignment grants the user update privs" do
         expect(assignment).to receive(:grants_right?).with(user, :update).and_return true
-        expect(presenter.should_show_rubric?(user)).to eq true
+        expect(presenter.should_show_rubric?(user)).to be true
       end
 
       it "returns false when the assignment grants the user update privs" do
         expect(assignment).to receive(:grants_right?).with(user, :update).and_return false
-        expect(presenter.should_show_rubric?(user)).to eq false
+        expect(presenter.should_show_rubric?(user)).to be false
       end
     end
   end
@@ -108,15 +108,15 @@ describe DiscussionTopicPresenter do
       @course.save!
       announcement = Announcement.new(title: "Announcement", context: @course)
       expect(DiscussionTopicPresenter.new(announcement).comments_disabled?)
-        .to eq true
+        .to be true
     end
 
     it "returns false for announcements or other criteria not met" do
-      expect(presenter.comments_disabled?).to eq false
+      expect(presenter.comments_disabled?).to be false
       course_factory
       announcement = Announcement.new(title: "b", context: @course)
       expect(DiscussionTopicPresenter.new(announcement).comments_disabled?)
-        .to eq false
+        .to be false
     end
   end
 
@@ -124,13 +124,13 @@ describe DiscussionTopicPresenter do
     it "returns true when context responds to large_roster and context has a large roster" do
       topic.context = Course.new(name: "Canvas")
       topic.context.large_roster = true
-      expect(presenter.large_roster?).to eq true
+      expect(presenter.large_roster?).to be true
     end
 
     it "returns false when context responds to large roster and context doesn't have a large roster" do
       topic.context = Course.new(name: "Canvas")
       topic.context.large_roster = false
-      expect(presenter.large_roster?).to eq false
+      expect(presenter.large_roster?).to be false
     end
 
     context "topic's context isn't a course" do
@@ -143,11 +143,11 @@ describe DiscussionTopicPresenter do
 
       it "returns false if topic's context's context is nil" do
         @group.context = nil
-        expect(presenter.large_roster?).to eq false
+        expect(presenter.large_roster?).to be false
       end
 
       it "returns true if topic's context's context has large_roster?" do
-        expect(presenter.large_roster?).to eq true
+        expect(presenter.large_roster?).to be true
       end
     end
   end
@@ -156,7 +156,7 @@ describe DiscussionTopicPresenter do
     it "returns false when course is large roster" do
       topic.context = Course.new(name: "Canvas")
       topic.context.large_roster = true
-      expect(presenter.allows_speed_grader?).to eq false
+      expect(presenter.allows_speed_grader?).to be false
     end
 
     context "with assignment" do
@@ -169,11 +169,11 @@ describe DiscussionTopicPresenter do
 
       it "returns false when assignment unpublished" do
         assignment.unpublish
-        expect(presenter.allows_speed_grader?).to eq false
+        expect(presenter.allows_speed_grader?).to be false
       end
 
       it "returns true when assignment published" do
-        expect(presenter.allows_speed_grader?).to eq true
+        expect(presenter.allows_speed_grader?).to be true
       end
     end
   end

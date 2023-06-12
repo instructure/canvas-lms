@@ -81,7 +81,7 @@ module CanvasRails
       (log_config["facilities"] || []).each do |facility|
         facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
       end
-      ident = ENV["RUNNING_AS_DAEMON"] == "true" ? log_config["daemon_ident"] : log_config["app_ident"]
+      ident = (ENV["RUNNING_AS_DAEMON"] == "true") ? log_config["daemon_ident"] : log_config["app_ident"]
       opts[:include_pid] = true if log_config["include_pid"] == true
       config.logger = SyslogWrapper.new(ident, facilities, opts)
       config.logger.level = log_level
@@ -147,9 +147,7 @@ module CanvasRails
             return super(conn_params)
             # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
             # for an error where the database name is in the message (i.e. a hostname lookup failure)
-            # CANVAS_RAILS="6.0" rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
-            # for any other error
-          rescue ::PG::Error, ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
+          rescue ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
             raise if index == hosts.length - 1
             # else try next host
           end
@@ -213,7 +211,7 @@ module CanvasRails
           super
         else
           # Any is eager, so we must map first or we won't run on all keys
-          SUPPORTED_VERSIONS.map do |version|
+          SUPPORTED_RAILS_VERSIONS.map do |version|
             super(key, (options || {}).merge(explicit_version: version.delete(".")))
           end.any?
         end

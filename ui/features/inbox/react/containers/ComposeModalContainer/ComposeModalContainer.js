@@ -116,6 +116,31 @@ const ComposeModalContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recipientsObserversData, recipientsObserversDataLoading, recipientsObserversError])
 
+  useEffect(() => {
+    if (!props.isReply && !props.isForward && props.currentCourseFilter) {
+      const courseOptions = [
+        props.courses?.favoriteCoursesConnection?.nodes,
+        props.courses?.favoriteGroupsConnection.nodes,
+      ]
+
+      const mergeOptions = lists => {
+        return lists.flatMap(list =>
+          list.map(option => ({
+            assetString: option.assetString,
+            contextName: option.contextName,
+          }))
+        )
+      }
+
+      const mergedOptions = mergeOptions(courseOptions)
+      setSelectedContext({
+        contextID: props.currentCourseFilter,
+        contextName: mergedOptions.find(item => item.assetString === props.currentCourseFilter)
+          ?.contextName,
+      })
+    }
+  }, [props.courses, props.currentCourseFilter, props.isForward, props.isReply])
+
   const getRecipientsObserver = () => {
     if (selectedContext?.contextID) {
       getRecipientsObserversQuery({
@@ -207,6 +232,13 @@ const ComposeModalContainer = props => {
   const onSendIndividualMessagesChange = () => {
     setSendIndividualMessages(prev => !prev)
   }
+
+  // if maxGroupRecipientsMet, change individual message setting to true
+  useEffect(() => {
+    if (props.maxGroupRecipientsMet) {
+      setSendIndividualMessages(true)
+    }
+  }, [props.maxGroupRecipientsMet])
 
   const onContextSelect = context => {
     if (context && context?.contextID) {
@@ -370,6 +402,7 @@ const ComposeModalContainer = props => {
                   contextName={props.pastConversation?.contextName}
                   courses={props.courses}
                   selectedRecipients={props.selectedIds}
+                  maxGroupRecipientsMet={props.maxGroupRecipientsMet}
                   isReply={props.isReply}
                   isForward={props.isForward}
                   onContextSelect={onContextSelect}
@@ -462,7 +495,9 @@ ComposeModalContainer.propTypes = {
   setSendingMessage: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
+  maxGroupRecipientsMet: PropTypes.bool,
   submissionCommentsHeader: PropTypes.string,
   modalError: PropTypes.string,
   isPrivateConversation: PropTypes.bool,
+  currentCourseFilter: PropTypes.string,
 }

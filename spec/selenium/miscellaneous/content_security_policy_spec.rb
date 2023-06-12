@@ -38,10 +38,16 @@ describe "content security policy" do
     before { create_session(@csp_pseudonym) }
 
     it "displays a flash alert for non-whitelisted iframe", ignore_js_errors: true do
-      @csp_course.wiki_pages.create!(title: "Page1", body: "<iframe width=\"560\" height=\"315\""\
-                                                           "src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\""\
-                                                           "allow=\"accelerometer; autoplay; encrypted-media; gyroscope;"\
-                                                           "picture-in-picture\" allowfullscreen></iframe>")
+      @csp_course.wiki_pages.create!(title: "Page1", body: <<~HTML)
+        <iframe
+         width="560"
+         height="315"
+         src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+         frameborder="0"
+         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+         allowfullscreen>
+        </iframe>
+      HTML
 
       get "/courses/#{@csp_course.id}/pages/Page1/"
 
@@ -50,10 +56,16 @@ describe "content security policy" do
 
     it "does not display a flash alert for whitelisted iframe" do
       @csp_account.add_domain!("www.youtube.com")
-      @csp_course.wiki_pages.create!(title: "Page1", body: "<iframe width=\"560\" height=\"315\""\
-                                                           " src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\""\
-                                                           " allow=\"accelerometer; autoplay; encrypted-media; gyroscope;"\
-                                                           " picture-in-picture\" allowfullscreen></iframe>")
+      @csp_course.wiki_pages.create!(title: "Page1", body: <<~HTML)
+        <iframe
+         width="560"
+         height="315"
+         src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+         frameborder="0"
+         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+         allowfullscreen>
+        </iframe>
+      HTML
 
       get "/courses/#{@csp_course.id}/pages/Page1/"
 

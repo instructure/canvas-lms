@@ -46,6 +46,66 @@ describe('CanvasRce', () => {
     expect(rceRef.current.getCode()).toEqual('How sweet.')
   })
 
+  it('passes autosave prop to child components', async () => {
+    const rceRef = createRef(null)
+
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" autosave={false} />, target)
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+
+    expect(rceRef.current.props.autosave.enabled).toEqual(false)
+  })
+
+  it('populates externalToolsConfig without context_external_tool_resource_selection_url', async () => {
+    const rceRef = createRef(null)
+
+    window.ENV = {
+      LTI_LAUNCH_FRAME_ALLOWANCES: ['test allow'],
+      a2_student_view: true,
+      MAX_MRU_LTI_TOOLS: 892,
+    }
+
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+
+    expect(rceRef.current.props.externalToolsConfig).toEqual({
+      ltiIframeAllowances: ['test allow'],
+      isA2StudentView: true,
+      maxMruTools: 892,
+      resourceSelectionUrlOverride: null,
+    })
+  })
+
+  it('populates externalToolsConfig with context_external_tool_resource_selection_url', async () => {
+    const rceRef = createRef(null)
+
+    window.ENV = {
+      LTI_LAUNCH_FRAME_ALLOWANCES: ['test allow'],
+      a2_student_view: true,
+      MAX_MRU_LTI_TOOLS: 892,
+    }
+
+    const a = document.createElement('a')
+    try {
+      a.id = 'context_external_tool_resource_selection_url'
+      a.href = 'http://www.example.com'
+      document.body.appendChild(a)
+
+      render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+
+      await waitFor(() => expect(rceRef.current).not.toBeNull())
+
+      expect(rceRef.current.props.externalToolsConfig).toEqual({
+        ltiIframeAllowances: ['test allow'],
+        isA2StudentView: true,
+        maxMruTools: 892,
+        resourceSelectionUrlOverride: 'http://www.example.com',
+      })
+    } finally {
+      a.remove()
+    }
+  })
+
   describe('merging UI elements', () => {
     // the only way I can think of to test these functions
     // is to look at the props passed to the mock Editor component
@@ -196,6 +256,48 @@ describe('CanvasRce', () => {
           },
         ])
       )
+    })
+  })
+
+  describe('body theme', () => {
+    const setupRCEWithENV = async env => {
+      window.ENV = env
+      const rceRef = createRef(null)
+      render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+      await waitFor(() => expect(rceRef.current).not.toBeNull())
+      return rceRef
+    }
+
+    it('is set to elementary-theme if canvas_k6_theme is enabled', async () => {
+      const rceRef = await setupRCEWithENV({
+        FEATURES: {
+          canvas_k6_theme: true,
+        },
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+    })
+
+    it('is set to elementary-theme if in a k5 course with balsamiq font selected', async () => {
+      const rceRef = await setupRCEWithENV({
+        K5_SUBJECT_COURSE: true,
+        USE_CLASSIC_FONT: false,
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('elementary-theme')
+    })
+
+    it('is set to default-theme if in a k5 course with lato font selected', async () => {
+      const rceRef = await setupRCEWithENV({
+        K5_SUBJECT_COURSE: true,
+        USE_CLASSIC_FONT: true,
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
+    })
+
+    it('is set to default-theme if in a classic course', async () => {
+      const rceRef = await setupRCEWithENV({
+        K5_SUBJECT_COURSE: false,
+      })
+      expect(rceRef.current.props.editorOptions.body_class).toEqual('default-theme')
     })
   })
 })

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe "request throttling", type: :request do
+describe "request throttling" do
   describe "usage of the middleware in the Canvas middleware stack" do
     it "comes below the middleware which populates the canvas domain root account" do
       acct = nil

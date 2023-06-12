@@ -151,6 +151,7 @@ class RequestThrottle
   def client_identifiers(request)
     request.env["canvas.request_throttle.user_id"] ||= [
       tag_identifier("lti_advantage", lti_advantage_client_id_and_cluster(request)),
+      tag_identifier("service_user_key", site_admin_service_user_key(request)),
       (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
@@ -191,6 +192,20 @@ class RequestThrottle
     request.env["rack.session.options"].try(:[], :id)
   end
 
+  def site_admin_service_user_key(request)
+    # We only want to allow this approvelist method for User-Agent strings that match the following format:
+    # Example (short): `inst-service-name/2d0c1jk2`
+    # Example (full): `inst-service-name/2d0c1jk2 (region: us-east-1; host: 1de983c20j1ak2; env: production)`
+    regexp = %r{^inst-[a-z0-9_-]+/[a-z0-9]+.*$}i
+    return unless regexp.match?(request.user_agent)
+
+    return unless (token_string = AuthenticationMethods.access_token(request))
+
+    return unless AccessToken.site_admin?(token_string)
+
+    AccessToken.authenticate(token_string).global_developer_key_id
+  end
+
   def self.blocklist
     @blocklist ||= list_from_setting("request_throttle.blocklist")
   end
@@ -209,7 +224,7 @@ class RequestThrottle
   end
 
   def self.list_from_setting(key)
-    Set.new(Setting.get(key, "").split(",").map { |i| i.gsub(/^\s+|\s*(?:;.+)?\s*$/, "") }.reject(&:blank?))
+    Set.new(Setting.get(key, "").split(",").map { |i| i.gsub(/^\s+|\s*(?:;.+)?\s*$/, "") }.compact_blank)
   end
 
   def self.dynamic_settings
@@ -230,10 +245,12 @@ class RequestThrottle
     RequestContext::Generator.add_meta_header("d", "%.2f" % [db_runtime])
 
     if account&.shard&.database_server
-      InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu,
+      InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}",
+                                system_cpu,
                                 short_stat: "requests_system_cpu",
                                 tags: { cluster: account.shard.database_server.id })
-      InstStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu,
+      InstStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}",
+                                user_cpu,
                                 short_stat: "requests_user_cpu",
                                 tags: { cluster: account.shard.database_server.id })
     end

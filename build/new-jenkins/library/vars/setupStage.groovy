@@ -20,19 +20,23 @@ import groovy.transform.Field
 
 @Field final static OVERRIDABLE_GEMS = ['inst-jobs', 'switchman', 'switchman-inst-jobs']
 
+def getPinnedVersionFlag(name) {
+  return commitMessageFlag("pin-commit-$name") as String
+}
+
 def hasGemOverrides() {
   return OVERRIDABLE_GEMS.any { gem ->
-    return configuration.getString("pin-commit-$gem", "skip") != "skip"
+    return getPinnedVersionFlag(gem)
   }
 }
 
 def call() {
   def refspecToCheckout = env.GERRIT_PROJECT == 'canvas-lms' ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
-  checkoutRepo('canvas-lms', refspecToCheckout, 100)
+  checkoutFromGit(gerritProjectUrl('canvas-lms'), refspec: refspecToCheckout, depth: 100)
 
   if (env.GERRIT_PROJECT != 'canvas-lms') {
     dir(env.LOCAL_WORKDIR) {
-      checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
+      checkoutFromGit(gerritProjectUrl(), refspec: env.GERRIT_REFSPEC, depth: 2)
     }
 
     // Plugin builds using the dir step above will create this @tmp file, we need to remove it
@@ -40,7 +44,7 @@ def call() {
     sh "rm -vrf ${env.LOCAL_WORKDIR}@tmp"
   }
 
-  gems = configuration.plugins()
+  gems = (commitMessageFlag('canvas-lms-plugins') as String).split(' ')
   echo "Plugin list: ${gems}"
   def pluginsToPull = []
   gems.each { gem ->
@@ -50,7 +54,7 @@ def call() {
   }
 
   OVERRIDABLE_GEMS.each { gem ->
-    if (configuration.getString("pin-commit-$gem", "skip") != "skip") {
+    if (getPinnedVersionFlag(gem)) {
       pluginsToPull.add([name: gem, version: _getPluginVersion(gem), target: "vendor/$gem"])
     }
   }
@@ -79,7 +83,8 @@ def _getCrystalballMap() {
 
 def _getPluginVersion(plugin) {
   if (env.GERRIT_BRANCH.contains('stable/')) {
-    return configuration.getString("pin-commit-$plugin", env.GERRIT_BRANCH)
+    return commitMessageFlag("pin-commit-$plugin") as String ?: env.GERRIT_BRANCH
   }
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", 'master')
+
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : (commitMessageFlag("pin-commit-$plugin") as String ?: 'master')
 }

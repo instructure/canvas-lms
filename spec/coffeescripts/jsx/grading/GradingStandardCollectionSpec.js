@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
-import _ from 'underscore'
+import _ from 'lodash'
 import GradingStandardCollection from '@canvas/grading-standard-collection'
 
 const {Simulate} = TestUtils

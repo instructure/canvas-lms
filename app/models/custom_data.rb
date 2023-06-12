@@ -31,9 +31,9 @@ class CustomData < ActiveRecord::Base
 
     def as_json
       {
-        conflict_scope: conflict_scope,
-        type_at_conflict: type_at_conflict,
-        value_at_conflict: value_at_conflict
+        conflict_scope:,
+        type_at_conflict:,
+        value_at_conflict:
       }
     end
   end

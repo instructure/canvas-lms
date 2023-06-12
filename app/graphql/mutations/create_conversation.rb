@@ -45,8 +45,8 @@ class Mutations::CreateConversation < Mutations::BaseMutation
 
     context = input[:context_code] ? Context.find_by_asset_string(input[:context_code]) : nil
     validate_context(context, recipients) if context
-    context_type = context ? context.class.name : nil
-    context_id = context ? context.id : nil
+    context_type = context&.class&.name
+    context_id = context&.id
     shard = context ? context.shard : Shard.current
 
     # TODO: Refactor this, it doesnt work anymore. recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/  returns nil
@@ -94,11 +94,11 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         batch = ConversationBatch.generate(
           message,
           recipients,
-          recipients.size > Conversation.max_group_conversation_size ? :async : :sync,
+          (recipients.size > Conversation.max_group_conversation_size) ? :async : :sync,
           subject: input[:subject],
-          context_type: context_type,
-          context_id: context_id,
-          tags: tags,
+          context_type:,
+          context_id:,
+          tags:,
           group: batch_group_messages
         )
 
@@ -127,18 +127,18 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         if input[:bulk_message]
           InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
         end
-        return { conversations: conversations }
+        return { conversations: }
       else
         conversation = @current_user.initiate_conversation(
           recipients,
           !group_conversation,
           subject: input[:subject],
-          context_type: context_type,
-          context_id: context_id
+          context_type:,
+          context_id:
         )
         conversation.add_message(
           message,
-          tags: tags,
+          tags:,
           update_for_sender: false,
           cc_author: true
         )
@@ -191,7 +191,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
   end
 
   def get_recipients(recipient_ids, context_code, conversation_id)
-    recipients = normalize_recipients(recipients: recipient_ids, context_code: context_code, conversation_id: conversation_id)
+    recipients = normalize_recipients(recipients: recipient_ids, context_code:, conversation_id:)
     raise ConversationsHelper::InvalidRecipientsError if recipients.blank?
 
     recipients

@@ -122,7 +122,7 @@ class ReleaseNotesController < ApplicationController
       # Since the time to show new notes could roll over at any time, just refresh the latest
       # notes per role every 5 minutes
       MultiCache.fetch("latest_release_notes/#{role}/#{release_note_lang}", expires_in: 300) do
-        notes = ReleaseNote.latest(env: release_note_env, role: role, limit: latest_limit)
+        notes = ReleaseNote.latest(env: release_note_env, role:, limit: latest_limit)
         # Ensure we have loaded the locales *before* caching
         notes.each { |note| note[release_note_lang] || note["en"] }
         notes
@@ -163,15 +163,5 @@ class ReleaseNotesController < ApplicationController
 
   def include_langs?
     !!params[:includes]&.include?("langs")
-  end
-
-  # For specs only
-  def clear_ivars
-    # modern rails does this for us, which is much better
-    if Rails.version < "7.0"
-      instance_variables.each do |ivar|
-        instance_variable_set(ivar, nil)
-      end
-    end
   end
 end

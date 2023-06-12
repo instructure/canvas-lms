@@ -81,6 +81,24 @@ module Lti::IMS
 
     MIME_TYPE = "application/vnd.ims.lis.v1.score+json"
 
+    def report_grade_progress_metric
+      dynamic_settings_tree = DynamicSettings.find(tree: :private)
+      if dynamic_settings_tree["frontend_data_collection_endpoint"]
+        data_collection_endpoint = dynamic_settings_tree["frontend_data_collection_endpoint"]
+        put_body = [{
+          id: SecureRandom.uuid,
+          type: "ags_grade_progress",
+          account_id: @domain_root_account.id.to_s,
+          account_name: @domain_root_account.name,
+          tool_domain: tool.domain,
+          grading_progress: params[:gradingProgress]
+        }]
+        CanvasHttp.put(data_collection_endpoint, {}, body: put_body.to_json, content_type: "application/json")
+      end
+    rescue
+      Rails.logger.warn("Couldn't send LTI AGS grade progress metric")
+    end
+
     # @API Create a Score
     #
     # Create a new Result from the score params. If this is for the first created line_item for a
@@ -199,12 +217,13 @@ module Lti::IMS
     #         }
     #   }
     def create
+      report_grade_progress_metric
       ags_scores_multiple_files = @domain_root_account.feature_enabled?(:ags_scores_multiple_files)
       return old_create unless ags_scores_multiple_files
 
       json = {}
       preflights_and_attachments = compute_preflights_and_attachments(
-        ags_scores_multiple_files: ags_scores_multiple_files
+        ags_scores_multiple_files:
       )
       attachments = preflights_and_attachments.pluck(:attachment)
       json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: preflights_and_attachments.pluck(:json) }
@@ -229,7 +248,7 @@ module Lti::IMS
       update_or_create_result
       json[:resultUrl] = result_url
 
-      render json: json, content_type: MIME_TYPE
+      render json:, content_type: MIME_TYPE
     end
 
     private
@@ -256,7 +275,7 @@ module Lti::IMS
         end
       end
 
-      render json: json, content_type: MIME_TYPE
+      render json:, content_type: MIME_TYPE
     end
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
@@ -389,7 +408,7 @@ module Lti::IMS
         submission_hash = { grader_id: -tool.id }
         if line_item.assignment.grading_type == "pass_fail"
           # This reflects behavior/logic in Basic Outcomes.
-          submission_hash[:grade] = scores_params[:result_score].to_f > 0 ? "pass" : "fail"
+          submission_hash[:grade] = (scores_params[:result_score].to_f > 0) ? "pass" : "fail"
         else
           submission_hash[:score] = submission_score
         end
@@ -402,7 +421,7 @@ module Lti::IMS
     def submit_homework(attachments = [])
       return unless line_item.assignment_line_item?
 
-      submission_opts = { submitted_at: submitted_at }
+      submission_opts = { submitted_at: }
       if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
         submission_opts[:submission_type] = submission_type
         case submission_type
@@ -424,7 +443,7 @@ module Lti::IMS
         submission = score_submission
         if result.nil?
           @_result = line_item.results.create!(
-            scores_params.merge(created_at: timestamp, updated_at: timestamp, user: user, submission: submission)
+            scores_params.merge(created_at: timestamp, updated_at: timestamp, user:, submission:)
           )
         else
           result.update!(scores_params.merge(updated_at: timestamp))
@@ -451,8 +470,8 @@ module Lti::IMS
           check_quota: false, # we don't check quota when uploading a file for assignment submission
           folder: user.submissions_folder(context), # organize attachment into the course submissions folder
           assignment: line_item.assignment,
-          submit_assignment: submit_assignment,
-          precreate_attachment: precreate_attachment,
+          submit_assignment:,
+          precreate_attachment:,
           return_json: true,
           override_logged_in_user: true,
           override_current_user_with: user,
@@ -488,8 +507,8 @@ module Lti::IMS
             title: item[:title],
             progress: progress_url
           },
-          preflight_json: preflight_json,
-          attachment: attachment
+          preflight_json:,
+          attachment:
         }
       end
     end
@@ -526,7 +545,7 @@ module Lti::IMS
     end
 
     def result
-      @_result ||= Lti::Result.active.where(line_item: line_item, user: user).first
+      @_result ||= Lti::Result.active.where(line_item:, user:).first
     end
 
     def timestamp

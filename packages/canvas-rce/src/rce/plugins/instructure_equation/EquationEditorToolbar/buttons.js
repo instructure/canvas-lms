@@ -25,14 +25,14 @@ export default [
       {
         displayName: 'x_{\u2B1A}^{\\ }',
         command: '_{\\placeholder{}}',
-        advancedCommand: '_',
+        advancedCommand: '_{}',
         svgCommand: 'x_{\\square}',
         label: formatMessage('Subscript'),
       },
       {
         displayName: 'x^{\u2B1A}_{\\ }',
         command: '^{\\placeholder{}}',
-        advancedCommand: '^',
+        advancedCommand: '^{}',
         svgCommand: 'x^{\\square}',
         label: formatMessage('Superscript'),
       },
@@ -304,6 +304,7 @@ export default [
       {command: '\\Leftarrow', label: formatMessage('Thick Leftward Arrow')},
       {command: '\\leftrightarrow', label: formatMessage('Logical Equivalence (Short)')},
       {command: '\\Leftrightarrow', label: formatMessage('Logical Equivalence (Short And Thick)')},
+      {command: '\\rightleftharpoons', label: formatMessage('Equilibrium')},
     ],
   },
 

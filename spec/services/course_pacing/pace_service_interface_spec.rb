@@ -34,7 +34,7 @@ describe CoursePacing::PaceServiceInterface do
       end
 
       it "returns nil if invalid context" do
-        expect(CoursePacing::PaceServiceInterface.pace_for(double)).to eq nil
+        expect(CoursePacing::PaceServiceInterface.pace_for(double)).to be_nil
       end
     end
 
@@ -92,7 +92,7 @@ describe CoursePacing::PaceServiceInterface do
       let(:context) { double(course_paces: double(not_deleted: double(take: "invalid context"))) }
 
       it "returns nil if invalid context" do
-        expect(CoursePacing::PaceServiceInterface.create_in_context(context)).to eq nil
+        expect(CoursePacing::PaceServiceInterface.create_in_context(context)).to be_nil
       end
     end
 
@@ -152,7 +152,7 @@ describe CoursePacing::PaceServiceInterface do
         allow(pace).to receive(:update).and_return false
         expect(
           CoursePacing::PaceServiceInterface.update_pace(pace, update_params)
-        ).to eq false
+        ).to be false
       end
     end
   end

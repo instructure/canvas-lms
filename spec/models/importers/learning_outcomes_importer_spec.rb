@@ -133,7 +133,7 @@ describe "Importing Learning Outcomes" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     expect(existing_outcome.calculation_method).to eq "decaying_average"
     expect(existing_outcome.calculation_int).to eq 65
-    expect(existing_outcome.data).to eq nil
+    expect(existing_outcome.data).to be_nil
     identifier = existing_outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
     lo_data[:calculation_method] = "highest"
@@ -147,7 +147,7 @@ describe "Importing Learning Outcomes" do
     ]
     Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
     expect(existing_outcome.calculation_method).to eq "highest"
-    expect(existing_outcome.calculation_int).to eq nil
+    expect(existing_outcome.calculation_int).to be_nil
     expect(existing_outcome.data[:rubric_criterion][:mastery_points]).to eq 3
     expect(existing_outcome.data[:rubric_criterion][:points_possible]).to eq 5
     expect(existing_outcome.data[:rubric_criterion][:ratings][0][:points]).to eq 5
@@ -159,7 +159,7 @@ describe "Importing Learning Outcomes" do
     lo_data[:calculation_method] = "highest"
     Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration, existing_outcome)
     expect(existing_outcome.calculation_method).to eq "highest"
-    expect(existing_outcome.calculation_int).to eq nil
+    expect(existing_outcome.calculation_int).to be_nil
   end
 
   it "assessed outcomes cannot change calculation method, calculation int and rubric criterion" do
@@ -221,6 +221,30 @@ describe "Importing Learning Outcomes" do
 
     Importers::LearningOutcomeImporter.import_from_migration(lo_data, @migration)
     expect(@context.learning_outcomes.count).to eq 2 # lo1 is not duplicated
+  end
+
+  it "does not duplicate learning outcomes with vendor_guid on common cartidge import" do
+    context2 = course_model
+    outcome1 = context2.created_learning_outcomes.create!({ title: "cci outcome 1", description: "cci outcome 1: desc", vendor_guid: "xyz" })
+
+    mig = ContentMigration.create!(context: context2).tap do |m|
+      m.migration_ids_to_import = { copy: { everything: true } }
+      m.migration_type = "common_cartridge_importer"
+    end
+
+    course_content = { "learning_outcomes" =>
+      [
+        {
+          "migration_id" => "z",
+          "title" => outcome1.title,
+          "description" => outcome1.description,
+          "vendor_guid" => outcome1.vendor_guid,
+          "copied_from_outcome_id" => outcome1.id
+        },
+      ] }
+    Importers::LearningOutcomeImporter.process_migration(course_content, mig)
+    duplicate_check = LearningOutcome.where(vendor_guid: outcome1.vendor_guid)
+    expect(duplicate_check.count).to eq 1
   end
 
   describe "with the outcome_alignments_course_migration FF enabled" do

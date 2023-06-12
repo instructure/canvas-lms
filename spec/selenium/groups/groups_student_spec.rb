@@ -119,8 +119,12 @@ describe "student groups" do
         fj(".student-group-title").click
         wait_for_ajaximations
 
-        expected_student_list = ["nobody@example.com", "Test Student 1", "Test Student 2",
-                                 "Test Student 3", "Test Student 4", "Test Student 5"]
+        expected_student_list = ["nobody@example.com",
+                                 "Test Student 1",
+                                 "Test Student 2",
+                                 "Test Student 3",
+                                 "Test Student 4",
+                                 "Test Student 5"]
         student_list = ff("[role=listitem]")
 
         # first item in the student_list array is the group name
@@ -175,7 +179,7 @@ describe "student groups" do
 
     describe "student group index page" do
       before do
-        create_group(group_name: group_name)
+        create_group(group_name:)
         get "/courses/#{@course.id}/groups"
       end
 
@@ -220,7 +224,7 @@ describe "student groups" do
 
     describe "student who is not in the group", priority: "2" do
       it "allows the student to join a student group they did not create" do
-        create_group(group_name: group_name, enroll_student_count: 0, add_self_to_group: false)
+        create_group(group_name:, enroll_student_count: 0, add_self_to_group: false)
         get "/courses/#{@course.id}/groups"
 
         # join group
@@ -231,7 +235,7 @@ describe "student groups" do
 
     describe "Manage Student Group Page" do
       before do
-        create_group(group_name: group_name, enroll_student_count: 2)
+        create_group(group_name:, enroll_student_count: 2)
         get "/courses/#{@course.id}/groups"
       end
 

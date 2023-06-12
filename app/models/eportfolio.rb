@@ -37,7 +37,8 @@ class Eportfolio < ActiveRecord::Base
   # marked_as_safe => an admin has manually marked this as safe.
   # marked_as_spam => an admin has manually marked this as spam.
   validates :spam_status,
-            inclusion: ["flagged_as_possible_spam", *SPAM_MODERATIONS], allow_nil: true
+            inclusion: ["flagged_as_possible_spam", *SPAM_MODERATIONS],
+            allow_nil: true
 
   workflow do
     state :active
@@ -153,7 +154,7 @@ class Eportfolio < ActiveRecord::Base
 
   def self.spam_criteria_regexp(type: :title)
     setting_name =
-      type == :title ? "eportfolio_title_spam_keywords" : "eportfolio_content_spam_keywords"
+      (type == :title) ? "eportfolio_title_spam_keywords" : "eportfolio_content_spam_keywords"
     spam_keywords = Setting.get(setting_name, "").split(",").map(&:strip).reject(&:empty?)
     return nil if spam_keywords.blank?
 

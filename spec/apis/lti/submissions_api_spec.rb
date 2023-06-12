@@ -29,8 +29,9 @@ module Lti
     let(:service_name) { SubmissionsApiController::SUBMISSION_SERVICE }
 
     let(:submission) do
-      assignment.submit_homework(student, submission_type: "online_upload",
-                                          attachments: [attachment])
+      assignment.submit_homework(student,
+                                 submission_type: "online_upload",
+                                 attachments: [attachment])
     end
 
     let(:mock_file) do
@@ -50,7 +51,7 @@ module Lti
     end
 
     let(:student) do
-      course_with_student(active_all: true, course: course)
+      course_with_student(active_all: true, course:)
       @user
     end
 
@@ -76,21 +77,21 @@ module Lti
     RSpec.shared_examples "authorization" do
       it "returns a 401 if no auth token" do
         get endpoint
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns a 401 if the tool doesn't have a similarity detection placement" do
         tool_proxy.raw_data["enabled_capability"] = []
         tool_proxy.save!
         get endpoint, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns a 401 if the tool is not associated with the assignment" do
         assignment.tool_settings_tool = []
         assignment.save!
         get endpoint, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "returns a 401 if the tool is not in the context" do
@@ -100,14 +101,14 @@ module Lti
         tool_proxy_binding.context_id = a.id
         tool_proxy_binding.save!
         get endpoint, headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "allows tool proxies with matching access" do
         tool_proxy.raw_data["tool_profile"] = tool_profile
         tool_proxy.raw_data["security_contract"] = security_contract
         tool_proxy.save!
-        token = Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
+        token = Lti::OAuth2::AccessToken.create_jwt(aud:, sub: other_tool_proxy.guid)
         other_helpers = { Authorization: "Bearer #{token}" }
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
         get endpoint, headers: other_helpers
@@ -216,8 +217,9 @@ module Lti
       it "sends back versioned attachments" do
         attachments = [attachment_model(filename: "submission-a.doc", context: student)]
         Timecop.freeze(10.seconds.ago) do
-          assignment.submit_homework(student, submission_type: "online_upload",
-                                              attachments: [attachments[0]])
+          assignment.submit_homework(student,
+                                     submission_type: "online_upload",
+                                     attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", context: student)
@@ -253,7 +255,7 @@ module Lti
         get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", headers: request_headers
         attachment1 = Attachment.create!(context: Account.create!, filename: "test.txt", content_type: "text/plain")
         get controller.attachment_url(attachment1), headers: request_headers
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       context "sharding" do

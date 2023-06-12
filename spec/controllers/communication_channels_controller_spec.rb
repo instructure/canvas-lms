@@ -85,7 +85,7 @@ describe CommunicationChannelsController do
       }
       expect(response).not_to be_successful
       expect(
-        JSON.parse(response.body)["errors"]["type"]
+        response.parsed_body["errors"]["type"]
       ).to eq "Maximum number of communication channels reached"
     end
 
@@ -102,7 +102,7 @@ describe CommunicationChannelsController do
         }
       }
       expect(response).not_to be_successful
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 
@@ -907,7 +907,7 @@ describe CommunicationChannelsController do
 
           # also test JSON format
           get "bouncing_channel_report", params: { account_id: Account.default.id, format: :json }
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json).to eq [
             ["User ID", "Name", "Communication channel ID", "Type", "Path", "Date of most recent bounce", "Bounce reason"],
             channel_csv(c2),
@@ -978,7 +978,7 @@ describe CommunicationChannelsController do
           @user.communication_channels.create!(path: "one@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now - 1.day
+            cc.last_bounce_at = 1.day.ago
           end
           c2 = @user.communication_channels.create!(path: "two@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
@@ -988,12 +988,12 @@ describe CommunicationChannelsController do
           @user.communication_channels.create!(path: "three@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now + 1.day
+            cc.last_bounce_at = 1.day.from_now
           end
 
           get "bouncing_channel_report", params: { account_id: Account.default.id,
-                                                   before: Time.zone.now + 1.hour,
-                                                   after: Time.zone.now - 1.hour }
+                                                   before: 1.hour.from_now,
+                                                   after: 1.hour.ago }
 
           expect(included_channels).to eq([c2])
         end
@@ -1087,7 +1087,7 @@ describe CommunicationChannelsController do
           c1 = @user.communication_channels.create!(path: "one@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now - 1.day
+            cc.last_bounce_at = 1.day.ago
           end
           c2 = @user.communication_channels.create!(path: "two@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
@@ -1097,12 +1097,12 @@ describe CommunicationChannelsController do
           c3 = @user.communication_channels.create!(path: "three@example.com", path_type: "email") do |cc|
             cc.workflow_state = "active"
             cc.bounce_count = 1
-            cc.last_bounce_at = Time.zone.now + 1.day
+            cc.last_bounce_at = 1.day.from_now
           end
 
           post "bulk_reset_bounce_counts", params: { account_id: Account.default.id,
-                                                     before: Time.zone.now + 1.hour,
-                                                     after: Time.zone.now - 1.hour }
+                                                     before: 1.hour.from_now,
+                                                     after: 1.hour.ago }
 
           run_jobs
           expect(c1.reload.bounce_count).to eq(1)
@@ -1313,7 +1313,8 @@ describe CommunicationChannelsController do
 
     it "does not re-send registration to a registered user when trying to re-send invitation for an unavailable course" do
       course_with_teacher_logged_in(active_all: true)
-      @course.update(start_at: 1.week.from_now, restrict_student_future_view: true,
+      @course.update(start_at: 1.week.from_now,
+                     restrict_student_future_view: true,
                      restrict_enrollments_to_course_dates: true)
 
       user_with_pseudonym(active_all: true) # new user
@@ -1378,7 +1379,7 @@ describe CommunicationChannelsController do
 
     delete "destroy", params: { id: @pseudonym.communication_channel.id }
 
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   it "does not delete a required institutional channel" do
@@ -1389,7 +1390,7 @@ describe CommunicationChannelsController do
 
     delete "destroy", params: { id: @pseudonym.communication_channel.id }
 
-    expect(response.code).to eq "401"
+    expect(response).to have_http_status :unauthorized
   end
 
   context "push token deletion" do
@@ -1399,19 +1400,20 @@ describe CommunicationChannelsController do
 
     let(:sns_developer_key) do
       allow(DeveloperKey).to receive(:sns).and_return(sns_developer_key_sns_field)
-      dk = DeveloperKey.default
-      dk.sns_arn = "apparn"
-      dk.save!
-      dk
+      DeveloperKey.default
     end
 
     let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
     let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: "push") }
 
     it "404s if there is no communication channel", type: :request do
-      status = raw_api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                            { controller: "communication_channels", action: "delete_push_token", format: "json",
-                              push_token: "notatoken" }, { push_token: "notatoken" })
+      status = raw_api_call(:delete,
+                            "/api/v1/users/self/communication_channels/push",
+                            { controller: "communication_channels",
+                              action: "delete_push_token",
+                              format: "json",
+                              push_token: "notatoken" },
+                            { push_token: "notatoken" })
       expect(status).to eq(404)
     end
 
@@ -1420,10 +1422,14 @@ describe CommunicationChannelsController do
       sns_access_token.notification_endpoints.create!(token: fake_token)
       sns_channel
 
-      json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                      { controller: "communication_channels", action: "delete_push_token", format: "json",
-                        push_token: fake_token }, { push_token: fake_token })
-      expect(json["success"]).to eq true
+      json = api_call(:delete,
+                      "/api/v1/users/self/communication_channels/push",
+                      { controller: "communication_channels",
+                        action: "delete_push_token",
+                        format: "json",
+                        push_token: fake_token },
+                      { push_token: fake_token })
+      expect(json["success"]).to be true
       endpoints = @user.notification_endpoints.where("lower(token) = ?", fake_token)
       expect(endpoints.length).to eq 0
     end
@@ -1431,10 +1437,7 @@ describe CommunicationChannelsController do
     context "has a push communication channel" do
       let(:second_sns_developer_key) do
         allow(DeveloperKey).to receive(:sns).and_return(sns_developer_key_sns_field)
-        dk = DeveloperKey.default
-        dk.sns_arn = "secondapparn"
-        dk.save!
-        dk
+        DeveloperKey.default
       end
 
       let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }
@@ -1443,10 +1446,14 @@ describe CommunicationChannelsController do
       before { sns_channel }
 
       it "shouldnt error if an endpoint does not exist for the push_token", type: :request do
-        json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                        { controller: "communication_channels", action: "delete_push_token", format: "json",
-                          push_token: "notatoken" }, { push_token: "notatoken" })
-        expect(json["success"]).to eq true
+        json = api_call(:delete,
+                        "/api/v1/users/self/communication_channels/push",
+                        { controller: "communication_channels",
+                          action: "delete_push_token",
+                          format: "json",
+                          push_token: "notatoken" },
+                        { push_token: "notatoken" })
+        expect(json["success"]).to be true
       end
 
       context "has a notification endpoint" do
@@ -1461,20 +1468,28 @@ describe CommunicationChannelsController do
             @shard1.activate { @new_user = User.create!(name: "shard one") }
             UserMerge.from(@user).into(@new_user)
             @user = @new_user
-            json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                            { controller: "communication_channels", action: "delete_push_token", format: "json",
-                              push_token: fake_token }, { push_token: fake_token })
-            expect(json["success"]).to eq true
+            json = api_call(:delete,
+                            "/api/v1/users/self/communication_channels/push",
+                            { controller: "communication_channels",
+                              action: "delete_push_token",
+                              format: "json",
+                              push_token: fake_token },
+                            { push_token: fake_token })
+            expect(json["success"]).to be true
             endpoints = @user.notification_endpoints.shard(@user).where("lower(token) = ?", fake_token)
             expect(endpoints.length).to eq 0
           end
         end
 
         it "deletes a push_token", type: :request do
-          json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                          { controller: "communication_channels", action: "delete_push_token", format: "json",
-                            push_token: fake_token }, { push_token: fake_token })
-          expect(json["success"]).to eq true
+          json = api_call(:delete,
+                          "/api/v1/users/self/communication_channels/push",
+                          { controller: "communication_channels",
+                            action: "delete_push_token",
+                            format: "json",
+                            push_token: fake_token },
+                          { push_token: fake_token })
+          expect(json["success"]).to be true
           endpoints = @user.notification_endpoints.where("lower(token) = ?", fake_token)
           expect(endpoints.length).to eq 0
         end
@@ -1483,25 +1498,37 @@ describe CommunicationChannelsController do
           another_token = "another"
           another_endpoint = second_sns_access_token.notification_endpoints.create!(token: another_token)
 
-          api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                   { controller: "communication_channels", action: "delete_push_token", format: "json",
-                     push_token: fake_token }, { push_token: fake_token })
+          api_call(:delete,
+                   "/api/v1/users/self/communication_channels/push",
+                   { controller: "communication_channels",
+                     action: "delete_push_token",
+                     format: "json",
+                     push_token: fake_token },
+                   { push_token: fake_token })
           expect(NotificationEndpoint.find(another_endpoint.id).workflow_state).to eq("active")
           expect(NotificationEndpoint.where(token: fake_token).take.workflow_state).to eq("deleted")
         end
 
         it "does not delete the communication channel", type: :request do
-          api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                   { controller: "communication_channels", action: "delete_push_token", format: "json",
-                     push_token: fake_token }, { push_token: fake_token })
+          api_call(:delete,
+                   "/api/v1/users/self/communication_channels/push",
+                   { controller: "communication_channels",
+                     action: "delete_push_token",
+                     format: "json",
+                     push_token: fake_token },
+                   { push_token: fake_token })
           expect(CommunicationChannel.where(path: "push").take).to be_truthy
         end
 
         it "deletes all endpoints for the given token", type: :request do
           second_sns_access_token.notification_endpoints.create!(token: fake_token)
-          api_call(:delete, "/api/v1/users/self/communication_channels/push",
-                   { controller: "communication_channels", action: "delete_push_token", format: "json",
-                     push_token: fake_token }, { push_token: fake_token })
+          api_call(:delete,
+                   "/api/v1/users/self/communication_channels/push",
+                   { controller: "communication_channels",
+                     action: "delete_push_token",
+                     format: "json",
+                     push_token: fake_token },
+                   { push_token: fake_token })
           expect(NotificationEndpoint.where(token: fake_token, workflow_state: "deleted").length).to eq(2)
         end
       end

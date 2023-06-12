@@ -116,8 +116,8 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it "works with multiple sections" do
-          active_course_section   = CourseSection.new(start_at: Time.zone.now - 3.days, end_at: Time.zone.now + 3.days, restrict_enrollments_to_section_dates: true)
-          inactive_course_section = CourseSection.new(start_at: Time.zone.now - 6.days, end_at: Time.zone.now - 3.days, restrict_enrollments_to_section_dates: true)
+          active_course_section   = CourseSection.new(start_at: 3.days.ago, end_at: 3.days.from_now, restrict_enrollments_to_section_dates: true)
+          inactive_course_section = CourseSection.new(start_at: 6.days.ago, end_at: 3.days.ago, restrict_enrollments_to_section_dates: true)
 
           quiz.context = Account.default.courses.new
 

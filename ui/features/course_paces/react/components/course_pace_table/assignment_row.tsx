@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+// @ts-expect-error
 import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce, pick} from 'lodash'
@@ -31,6 +32,7 @@ import {
   IconPublishSolid,
   IconQuizLine,
   IconUnpublishedLine,
+  // @ts-expect-error
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
@@ -138,7 +140,6 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     // latter changes, for example due to onResetPace
     if (prevProps.coursePaceItem.duration !== this.props.coursePaceItem.duration) {
       // we're checking that a redux state change has occurred before calling setState
-      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({duration: String(this.props.coursePaceItem.duration)})
     }
   }

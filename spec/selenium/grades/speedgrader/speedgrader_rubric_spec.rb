@@ -173,7 +173,7 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
     scroll_into_view(".toggle_full_rubric")
     f("button.toggle_full_rubric").click
-    fj("span:contains('Rockin\''):visible").click
+    fj("span:contains('Rockin''):visible").click
     fj("span:contains('You Learned'):visible").click
     scroll_into_view(".save_rubric_button")
     f("#rubric_holder button.save_rubric_button").click
@@ -185,7 +185,7 @@ describe "speed grader - rubrics" do
     expect(f("#rubric_summary_container tr:nth-child(3) td")).not_to include_text("pts")
 
     expect(fj("span[data-selenium='rubric_total']:visible")).to include_text("3")
-    expect(f("#rubric_summary_container tr:nth-child(2) td")).to include_text("-- \/ 5 pts")
+    expect(f("#rubric_summary_container tr:nth-child(2) td")).to include_text("-- / 5 pts")
 
     # check again that initial page load has the same data.
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -194,7 +194,7 @@ describe "speed grader - rubrics" do
     expect(f("#rubric_summary_container tr:nth-child(1) td")).to include_text("3 pts")
     expect(f("#rubric_summary_container tr:nth-child(3) td")).not_to include_text("pts")
     expect(fj("span[data-selenium='rubric_total']:visible")).to include_text("3")
-    expect(f("#rubric_summary_container tr:nth-child(2) td")).to include_text("-- \/ 5 pts")
+    expect(f("#rubric_summary_container tr:nth-child(2) td")).to include_text("-- / 5 pts")
   end
 
   context "when rounding .rubric_total" do

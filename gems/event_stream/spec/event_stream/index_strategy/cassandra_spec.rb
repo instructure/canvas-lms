@@ -37,6 +37,7 @@ describe EventStream::IndexStrategy::Cassandra do
     end
 
     @stream = double("stream",
+                     backend_strategy: :cassandra,
                      database: @database,
                      record_type: EventStream::Record,
                      ttl_seconds: 1.year,
@@ -144,7 +145,7 @@ describe EventStream::IndexStrategy::Cassandra do
         end
 
         # force just one bucket
-        @index.index.bucket_size Time.zone.now + 1.minute
+        @index.index.bucket_size 1.minute.from_now
         @index.index.scrollback_limit 10.minutes
         @pager = @index.for_key("key")
 
@@ -275,7 +276,7 @@ describe EventStream::IndexStrategy::Cassandra do
           expect(@database).to receive(:execute).once
                                                 .with(/AND ordered_id < \?/, anything, anything, bookmark[1], anything)
                                                 .and_return(@query)
-          @pager.paginate(per_page: 1, page: page)
+          @pager.paginate(per_page: 1, page:)
         end
       end
 
@@ -337,7 +338,7 @@ describe EventStream::IndexStrategy::Cassandra do
         end
 
         # force just one bucket
-        @index.index.bucket_size Time.zone.now + 1.minute
+        @index.index.bucket_size 1.minute.from_now
         @index.index.scrollback_limit 10.minutes
         @pager = @index.ids_for_key("key")
 
@@ -420,6 +421,7 @@ describe EventStream::IndexStrategy::Cassandra do
       @table = double("table")
       table = @table
       @stream = EventStream::Stream.new do
+        backend_strategy :cassandra
         database database
         self.table table
       end

@@ -53,7 +53,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
                                                         })
 
       expect(@mailbox.server).to eql "pop3.server.com"
-      expect(@mailbox.port).to eql 1234
+      expect(@mailbox.port).to be 1234
       expect(@mailbox.ssl).to eql "truthy-value"
       expect(@mailbox.username).to eql "user@server.com"
       expect(@mailbox.password).to eql "secret-user-password"

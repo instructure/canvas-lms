@@ -52,13 +52,13 @@ module Outcomes
 
     delegate :context, to: :@import
 
-    def run(&update)
+    def run(&)
       status = { progress: 0, errors: [] }
       yield status
 
       file_errors = []
       begin
-        parse_file(&update)
+        parse_file(&)
       rescue CSV::MalformedCSVError
         raise DataFormatError, I18n.t("Invalid CSV File")
       rescue ParseError => e
@@ -86,7 +86,7 @@ module Outcomes
 
         errors = parse_batch(headers, batch)
         status = {
-          errors: errors,
+          errors:,
           progress: (batch.last[1].to_f / total * 100).floor
         }
         yield status
@@ -118,7 +118,7 @@ module Outcomes
       has_bom = header.start_with?((+"\xEF\xBB\xBF").force_encoding("ASCII-8BIT"))
       @file.rewind
       @file.read(3) if has_bom
-      header.count(";") > header.count(",") ? ";" : ","
+      (header.count(";") > header.count(",")) ? ";" : ","
     end
 
     def file_line_count
@@ -168,34 +168,36 @@ module Outcomes
     def parse_ratings(ratings)
       prior = nil
       drop_trailing_nils(ratings).each_slice(2).to_a.map.with_index(1) do |(points, description), index|
-        raise InvalidDataError, I18n.t("Points for rating tier %{index} not present", index: index) if points.nil? || points.blank?
+        raise InvalidDataError, I18n.t("Points for rating tier %{index} not present", index:) if points.nil? || points.blank?
 
-        points = strict_parse_float(points, I18n.t("rating tier %{index} threshold", index: index))
+        points = strict_parse_float(points, I18n.t("rating tier %{index} threshold", index:))
 
         if prior.present? && prior < points
           raise InvalidDataError, I18n.t(
             "Points for tier %{index} must be less than points for prior tier (%{points} is greater than %{prior})",
-            index: index, prior: prior, points: points
+            index:,
+            prior:,
+            points:
           )
         end
 
         prior = points
-        { points: points, description: description }
+        { points:, description: }
       end
     end
 
     def normalize_i18n(string)
       raise ArgumentError if string.blank?
 
-      separator = I18n.t(:separator, scope: :"number.format")
-      delimiter = I18n.t(:delimiter, scope: :"number.format")
+      separator = I18n.t("number.format.separator")
+      delimiter = I18n.t("number.format.delimiter")
       string.gsub(delimiter, "").gsub(separator, ".")
     end
 
     def strict_parse_float(v, name)
       Float(normalize_i18n(v))
     rescue ArgumentError
-      raise InvalidDataError, I18n.t('Invalid value for %{name}: "%{i}"', name: name, i: v)
+      raise InvalidDataError, I18n.t('Invalid value for %{name}: "%{i}"', name:, i: v)
     end
 
     def drop_trailing_nils(array)

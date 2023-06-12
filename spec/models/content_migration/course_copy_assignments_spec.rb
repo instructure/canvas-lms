@@ -185,6 +185,7 @@ describe ContentMigration do
       @assignment.allowed_extensions = ["doc", "xls"]
       @assignment.position = 2
       @assignment.muted = true
+      @assignment.hide_in_gradebook = false
       @assignment.omit_from_final_grade = true
       @assignment.only_visible_to_overrides = true
       @assignment.post_to_sis = true
@@ -195,10 +196,20 @@ describe ContentMigration do
       expect_any_instantiation_of(@copy_to).to receive(:turnitin_enabled?).at_least(1).and_return(true)
       expect_any_instantiation_of(@copy_to).to receive(:vericite_enabled?).at_least(1).and_return(true)
 
-      attrs = %i[turnitin_enabled vericite_enabled turnitin_settings peer_reviews
-                 automatic_peer_reviews anonymous_peer_reviews
-                 grade_group_students_individually allowed_extensions
-                 position peer_review_count omit_from_final_grade post_to_sis allowed_attempts]
+      attrs = %i[turnitin_enabled
+                 vericite_enabled
+                 turnitin_settings
+                 peer_reviews
+                 automatic_peer_reviews
+                 anonymous_peer_reviews
+                 grade_group_students_individually
+                 allowed_extensions
+                 position
+                 peer_review_count
+                 hide_in_gradebook
+                 omit_from_final_grade
+                 post_to_sis
+                 allowed_attempts]
 
       run_course_copy
 
@@ -210,7 +221,7 @@ describe ContentMigration do
           expect(@assignment[attr]).to eq new_assignment[attr]
         end
       end
-      expect(new_assignment.muted).to eq true
+      expect(new_assignment.muted).to be true
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 
@@ -236,8 +247,11 @@ describe ContentMigration do
     end
 
     it "unsets allowed extensions" do
-      assignment_model(course: @copy_from, points_possible: 40, submission_types: "file_upload",
-                       grading_type: "points", allowed_extensions: ["txt", "doc"])
+      assignment_model(course: @copy_from,
+                       points_possible: 40,
+                       submission_types: "file_upload",
+                       grading_type: "points",
+                       allowed_extensions: ["txt", "doc"])
 
       run_course_copy
 
@@ -316,7 +330,7 @@ describe ContentMigration do
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       [:moderated_grading, :anonymous_grading].each do |attr|
-        expect(new_assignment.send(attr)).to eq false
+        expect(new_assignment.send(attr)).to be false
       end
 
       @copy_to.enable_feature!(:moderated_grading)
@@ -325,8 +339,12 @@ describe ContentMigration do
       run_course_copy
 
       new_assignment.reload
-      %i[moderated_grading grader_count grader_comments_visible_to_graders
-         anonymous_grading graders_anonymous_to_graders grader_names_visible_to_final_grader
+      %i[moderated_grading
+         grader_count
+         grader_comments_visible_to_graders
+         anonymous_grading
+         graders_anonymous_to_graders
+         grader_names_visible_to_final_grader
          anonymous_instructor_annotations].each do |attr|
         expect(new_assignment.send(attr)).to eq @assignment.send(attr)
       end
@@ -458,8 +476,10 @@ describe ContentMigration do
     end
 
     it "copies group assignment setting" do
-      assignment_model(course: @copy_from, points_possible: 40,
-                       submission_types: "file_upload", grading_type: "points")
+      assignment_model(course: @copy_from,
+                       points_possible: 40,
+                       submission_types: "file_upload",
+                       grading_type: "points")
 
       group_category = @copy_from.group_categories.create!(name: "category")
       @assignment.group_category = group_category
@@ -695,7 +715,7 @@ describe ContentMigration do
 
         run_course_copy(["Couldn't find account grading standard for the course."])
 
-        expect(@copy_to.grading_standard).to eq nil
+        expect(@copy_to.grading_standard).to be_nil
       end
 
       it "does not copy deleted grading standards" do
@@ -726,7 +746,7 @@ describe ContentMigration do
         @cm.copy_options = { "everything" => "0", "all_course_settings" => "1" }
         @cm.save!
         run_course_copy
-        expect(@copy_to.grading_standards.count).to eql 1 # no dupes
+        expect(@copy_to.grading_standards.count).to be 1 # no dupes
         expect(@copy_to.grading_standard.title).to eql gs.title
       end
 
@@ -749,7 +769,7 @@ describe ContentMigration do
         @cm.save!
         run_export_and_import
         expect(@cm.warnings).to be_empty
-        expect(@copy_to.grading_standards.count).to eql 1 # no dupes
+        expect(@copy_to.grading_standards.count).to be 1 # no dupes
         expect(@copy_to.grading_standard.title).to eql gs.title
       end
 
@@ -784,7 +804,7 @@ describe ContentMigration do
         run_export_and_import do |export|
           export.selected_content = { "assignments" => { mig_id(assign) => "1" } }
         end
-        expect(@copy_to.assignments.count).to eql 1
+        expect(@copy_to.assignments.count).to be 1
         expect(@copy_to.assignments.first.grading_standard).to be_nil
         expect(unrelated_grading_standard.reload.title).not_to eql gs.title
       end
@@ -800,10 +820,14 @@ describe ContentMigration do
         account.settings[:conditional_release] = { value: true }
         account.save!
         assignment_override_model(assignment: @assignment, set_type: "ADHOC")
-        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
-                                  set_id: AssignmentOverride::NOOP_MASTERY_PATHS, title: "Tag 1")
-        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
-                                  set_id: nil, title: "Tag 2")
+        assignment_override_model(assignment: @assignment,
+                                  set_type: AssignmentOverride::SET_TYPE_NOOP,
+                                  set_id: AssignmentOverride::NOOP_MASTERY_PATHS,
+                                  title: "Tag 1")
+        assignment_override_model(assignment: @assignment,
+                                  set_type: AssignmentOverride::SET_TYPE_NOOP,
+                                  set_id: nil,
+                                  title: "Tag 2")
         @assignment.only_visible_to_overrides = true
         @assignment.save!
         run_course_copy
@@ -832,14 +856,17 @@ describe ContentMigration do
         account.settings[:conditional_release] = { value: true }
         account.save!
         due_at = 1.hour.from_now.round
-        assignment_override_model(assignment: @assignment, set_type: "Noop",
-                                  set_id: 1, title: "Tag 1", due_at: due_at)
+        assignment_override_model(assignment: @assignment,
+                                  set_type: "Noop",
+                                  set_id: 1,
+                                  title: "Tag 1",
+                                  due_at:)
         run_course_copy
         to_override = @copy_to.assignments.first.assignment_overrides.first
         expect(to_override.title).to eq "Tag 1"
         expect(to_override.due_at).to eq due_at
-        expect(to_override.due_at_overridden).to eq true
-        expect(to_override.unlock_at_overridden).to eq false
+        expect(to_override.due_at_overridden).to be true
+        expect(to_override.unlock_at_overridden).to be false
       end
 
       it "preserves only_visible_to_overrides for page assignments" do
@@ -852,9 +879,9 @@ describe ContentMigration do
         a2.build_wiki_page(title: a2.title, context: a2.context).save!
         run_course_copy
         a1_to = @copy_to.assignments.where(migration_id: mig_id(a1)).take
-        expect(a1_to.only_visible_to_overrides).to eq true
+        expect(a1_to.only_visible_to_overrides).to be true
         a2_to = @copy_to.assignments.where(migration_id: mig_id(a2)).take
-        expect(a2_to.only_visible_to_overrides).to eq false
+        expect(a2_to.only_visible_to_overrides).to be false
       end
 
       it "ignores page assignments if mastery paths is not enabled in destination" do
@@ -862,8 +889,8 @@ describe ContentMigration do
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
         run_course_copy
         page_to = @copy_to.wiki_pages.where(migration_id: mig_id(a1.wiki_page)).take
-        expect(page_to.assignment).to eq nil
-        expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to eq false
+        expect(page_to.assignment).to be_nil
+        expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to be false
       end
     end
 
@@ -876,11 +903,11 @@ describe ContentMigration do
       let(:custom_parameters) { { "param_one" => "param value one" } }
       let(:tool_settings) do
         Lti::ToolSetting.create!(
-          tool_proxy: tool_proxy,
-          resource_link_id: resource_link_id,
+          tool_proxy:,
+          resource_link_id:,
           context: assignment.course,
           custom: custom_data,
-          custom_parameters: custom_parameters,
+          custom_parameters:,
           product_code: tool_proxy.product_family.product_code,
           vendor_code: tool_proxy.product_family.vendor_code
         )
@@ -900,7 +927,7 @@ describe ContentMigration do
         )
         tool_settings
         AssignmentConfigurationToolLookup.create!(
-          assignment: assignment,
+          assignment:,
           tool_id: message_handler.id,
           tool_type: "Lti::MessageHandler",
           tool_product_code: product_family.product_code,
@@ -932,7 +959,7 @@ describe ContentMigration do
       let(:developer_key) { DeveloperKey.create!(account: @course.root_account) }
 
       context "with one coupled and one coupled line item" do
-        let(:tool) { external_tool_model(context: @course.root_account, opts: { use_1_3: true, developer_key: developer_key }) }
+        let(:tool) { external_tool_model(context: @course.root_account, opts: { use_1_3: true, developer_key: }) }
         let(:tag) { ContentTag.new(content: tool, url: tool.url, context: assignment) }
         let(:assignment) do
           @copy_from.assignments.create!(
@@ -1052,7 +1079,7 @@ describe ContentMigration do
         run_course_copy(["The Sync to SIS setting could not be enabled for the assignment \"#{@assignment.title}\" without a due date."])
 
         a_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
-        expect(a_to.post_to_sis).to eq false
+        expect(a_to.post_to_sis).to be false
         expect(a_to).to be_valid
       end
 
@@ -1068,7 +1095,7 @@ describe ContentMigration do
 
         topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
         expect(topic_to).to be_valid
-        expect(topic_to.assignment.post_to_sis).to eq false
+        expect(topic_to.assignment.post_to_sis).to be false
       end
 
       it "is able to copy post_to_sis" do
@@ -1080,7 +1107,7 @@ describe ContentMigration do
         run_course_copy
 
         a_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
-        expect(a_to.post_to_sis).to eq true
+        expect(a_to.post_to_sis).to be true
         expect(a_to).to be_valid
       end
     end

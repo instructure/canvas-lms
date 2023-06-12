@@ -131,7 +131,7 @@ describe DynamicSettings do
       it "must return an empty FallbackProxy when fallback data is also unconfigured" do
         DynamicSettings.fallback_data = nil
         expect(DynamicSettings.find("foo")).to be_a(DynamicSettings::FallbackProxy)
-        expect(DynamicSettings.find("foo")["bar"]).to eq nil
+        expect(DynamicSettings.find("foo")["bar"]).to be_nil
       end
 
       it "must return a FallbackProxy with configured fallback data" do

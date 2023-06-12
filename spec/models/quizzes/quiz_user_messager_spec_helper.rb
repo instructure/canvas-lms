@@ -23,7 +23,7 @@ module Quizzes
       {
         subject: "Do you want ants?",
         body: "Because that's how you get ants",
-        recipients: recipients
+        recipients:
       }
     end
 

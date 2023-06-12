@@ -119,7 +119,10 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
 
     it "groups assignments into assignment groups" do
       expect(@formatter.get_content_list("assignments")).to eq [
-        { :type => "assignment_groups", :property => "copy[assignment_groups][id_a1]", :title => "a1", :migration_id => "a1",
+        { :type => "assignment_groups",
+          :property => "copy[assignment_groups][id_a1]",
+          :title => "a1",
+          :migration_id => "a1",
           "sub_items" => [{ type: "assignments", property: "copy[assignments][id_a2]", title: "a2", migration_id: "a2" }] },
         { type: "assignments", property: "copy[assignments][id_a1]", title: "a1", migration_id: "a1" }
       ]
@@ -221,6 +224,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     let(:top_level_items) do
       [{ type: "course_settings", property: "copy[all_course_settings]", title: "Course Settings" },
        { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" },
+       { type: "blueprint_settings", property: "copy[all_blueprint_settings]", title: "Blueprint Settings" },
        { type: "context_modules", property: "copy[all_context_modules]", title: "Modules", count: 1, sub_items_url: "https://example.com?type=context_modules" },
        { type: "tool_profiles", property: "copy[all_tool_profiles]", title: "Tool Profiles", count: 1, sub_items_url: "https://example.com?type=tool_profiles" },
        { type: "discussion_topics", property: "copy[all_discussion_topics]", title: "Discussion Topics", count: 1, sub_items_url: "https://example.com?type=discussion_topics" },
@@ -265,6 +269,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     context "with selectable_outcomes_in_course_copy disabled" do
       before do
         @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
+        allow(@migration).to receive(:context).and_return(course_model)
       end
 
       it "lists top-level items" do
@@ -288,6 +293,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     context "with selectable_outcomes_in_course_copy enabled" do
       before do
         @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
+        allow(@migration).to receive(:context).and_return(course_model)
       end
 
       it "lists top-level items" do
@@ -356,9 +362,12 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course.rubrics.create!.destroy
       end
 
+      before { allow(@migration).to receive(:context).and_return(course_model) }
+
       it "ignores in top-level list" do
         expect(formatter.get_content_list).to eq [{ type: "course_settings", property: "copy[all_course_settings]", title: "Course Settings" },
-                                                  { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" }]
+                                                  { type: "syllabus_body", property: "copy[all_syllabus_body]", title: "Syllabus Body" },
+                                                  { type: "blueprint_settings", property: "copy[all_blueprint_settings]", title: "Blueprint Settings" }]
       end
 
       it "ignores in specific item request" do

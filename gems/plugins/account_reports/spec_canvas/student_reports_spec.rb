@@ -27,15 +27,18 @@ describe "Student reports" do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: "New Account", default_time_zone: "UTC")
-    @course1 = course_factory(course_name: "English 101", account: @account,
+    @course1 = course_factory(course_name: "English 101",
+                              account: @account,
                               active_course: true)
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.save!
     @course1.offer
-    @course2 = course_factory(course_name: "Math 101", account: @account,
+    @course2 = course_factory(course_name: "Math 101",
+                              account: @account,
                               active_course: true)
     @course2.offer
-    @course3 = Course.create(name: "Science 101", course_code: "SCI101",
+    @course3 = Course.create(name: "Science 101",
+                             course_code: "SCI101",
                              account: @account)
     @course3.offer
 
@@ -49,18 +52,26 @@ describe "Student reports" do
     @assignment3 = @course3.assignments.create!(title: "My Assignment")
     @assignment4 = @course3.assignments.create!(title: "My Assignment")
     @user1 = user_with_managed_pseudonym(
-      active_all: true, account: @account, name: "John St. Clair",
-      sortable_name: "St. Clair, John", username: "john@stclair.com",
+      active_all: true,
+      account: @account,
+      name: "John St. Clair",
+      sortable_name: "St. Clair, John",
+      username: "john@stclair.com",
       sis_user_id: "user_sis_id_01"
     )
     @user2 = user_with_managed_pseudonym(
-      active_all: true, username: "micheal@michaelbolton.com",
-      name: "Michael Bolton", account: @account,
+      active_all: true,
+      username: "micheal@michaelbolton.com",
+      name: "Michael Bolton",
+      account: @account,
       sis_user_id: "user_sis_id_02"
     )
     @user3 = user_with_managed_pseudonym(
-      active_all: true, account: @account, name: "Rick Astley",
-      sortable_name: "Astley, Rick", username: "rick@roll.com",
+      active_all: true,
+      account: @account,
+      name: "Rick Astley",
+      sortable_name: "Astley, Rick",
+      username: "rick@roll.com",
       sis_user_id: "user_sis_id_03"
     )
 
@@ -110,24 +121,46 @@ describe "Student reports" do
       parsed = read_report(@type, { params: parameters, order: [1, 8] })
       expect(parsed.length).to eq 4
 
-      expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101",
+      expect(parsed[0]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101",
                                "completed"]
-      expect(parsed[1]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101", "invited"]
-      expect(parsed[2]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101",
+      expect(parsed[1]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101",
+                               "invited"]
+      expect(parsed[2]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101",
                                "rejected"]
-      expect(parsed[3]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101", "deleted"]
+      expect(parsed[3]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101",
+                               "deleted"]
     end
 
     it "filters on enrollment states" do
@@ -141,15 +174,26 @@ describe "Student reports" do
       parsed = read_report(@type, { params: parameters, order: [1, 8] })
       expect(parsed.length).to eq 2
 
-      expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101",
+      expect(parsed[0]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101",
                                "completed"]
-      expect(parsed[1]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101", "invited"]
+      expect(parsed[1]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101",
+                               "invited"]
     end
 
     it "filters on enrollment state" do
@@ -163,10 +207,15 @@ describe "Student reports" do
       parsed = read_report(@type, params: parameters)
       expect(parsed.length).to eq 1
 
-      expect(parsed[0]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101",
+      expect(parsed[0]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101",
                                "active"]
     end
 
@@ -177,35 +226,65 @@ describe "Student reports" do
       parsed = read_report(@type, { params: parameters, order: 1 })
       expect(parsed.length).to eq 2
 
-      expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101"]
-      expect(parsed[1]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101"]
+      expect(parsed[0]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101"]
+      expect(parsed[1]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101"]
     end
 
     it "finds users that have not submitted anything in the past 2 weeks" do
       parsed = read_report(@type, { order: [1, 8] })
 
-      expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101"]
-      expect(parsed[1]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101"]
-      expect(parsed[2]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101"]
-      expect(parsed[3]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101"]
+      expect(parsed[0]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101"]
+      expect(parsed[1]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101"]
+      expect(parsed[2]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101"]
+      expect(parsed[3]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101"]
       expect(parsed.length).to eq 4
     end
 
@@ -217,18 +296,28 @@ describe "Student reports" do
 
       parameters = {}
       parameters["start_at"] = @start_at.to_s
-      parameters["end_at"] = @end_at.to_s(:db)
+      parameters["end_at"] = @end_at.to_fs(:db)
       parameters["enrollment_term"] = @term1.id
       parsed = read_report(@type, { params: parameters, order: 1 })
 
-      expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101"]
-      expect(parsed[1]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section1.id.to_s,
-                               @section1.sis_source_id, @section1.name,
-                               @course1.id.to_s, "SIS_COURSE_ID_1", "English 101"]
+      expect(parsed[0]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101"]
+      expect(parsed[1]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section1.id.to_s,
+                               @section1.sis_source_id,
+                               @section1.name,
+                               @course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "English 101"]
       expect(parsed.length).to eq 2
     end
 
@@ -239,14 +328,24 @@ describe "Student reports" do
       @course2.save
       parsed = read_report(@type, { account: sub_account, order: 1 })
 
-      expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101"]
-      expect(parsed[1]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101"]
+      expect(parsed[0]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101"]
+      expect(parsed[1]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101"]
       expect(parsed.length).to eq 2
     end
 
@@ -256,14 +355,26 @@ describe "Student reports" do
       parameters["include_enrollment_state"] = true
       parsed = read_report(@type, { params: parameters, order: 1 })
 
-      expect(parsed[0]).to eq [@user1.id.to_s, "user_sis_id_01",
-                               @user1.sortable_name, @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101", "active"]
-      expect(parsed[1]).to eq [@user2.id.to_s, "user_sis_id_02",
-                               "Bolton, Michael", @section2.id.to_s,
-                               @section2.sis_source_id, @section2.name,
-                               @course2.id.to_s, nil, "Math 101", "active"]
+      expect(parsed[0]).to eq [@user1.id.to_s,
+                               "user_sis_id_01",
+                               @user1.sortable_name,
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101",
+                               "active"]
+      expect(parsed[1]).to eq [@user2.id.to_s,
+                               "user_sis_id_02",
+                               "Bolton, Michael",
+                               @section2.id.to_s,
+                               @section2.sis_source_id,
+                               @section2.name,
+                               @course2.id.to_s,
+                               nil,
+                               "Math 101",
+                               "active"]
       expect(parsed.length).to eq 2
     end
   end
@@ -299,10 +410,24 @@ describe "Student reports" do
       param["course"] = @course1.id
       parsed = read_report(@type, { params: param, order: 1 })
       expect(parsed).to eq_stringified_array [
-        [@user2.id, "user_sis_id_02", "Bolton, Michael", @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user3.id, "user_sis_id_03", @user3.sortable_name, @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"]
+        [@user2.id,
+         "user_sis_id_02",
+         "Bolton, Michael",
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user3.id,
+         "user_sis_id_03",
+         @user3.sortable_name,
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"]
       ]
     end
 
@@ -313,12 +438,33 @@ describe "Student reports" do
       param["enrollment_term"] = "sis_term_id:fall12"
       parsed = read_report(@type, { params: param, order: 1 })
       expect(parsed).to eq_stringified_array [
-        [@user2.id, "user_sis_id_02", "Bolton, Michael", @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user3.id, "user_sis_id_03", @user3.sortable_name, @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user4.id, "user_sis_id_04", "4, User", @section4.id, nil,
-         @section4.name, @course4.id, nil, "Course 4"]
+        [@user2.id,
+         "user_sis_id_02",
+         "Bolton, Michael",
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user3.id,
+         "user_sis_id_03",
+         @user3.sortable_name,
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user4.id,
+         "user_sis_id_04",
+         "4, User",
+         @section4.id,
+         nil,
+         @section4.name,
+         @course4.id,
+         nil,
+         "Course 4"]
       ]
     end
 
@@ -328,14 +474,42 @@ describe "Student reports" do
       parsed = parse_report(report, { order: 1 })
 
       expect(parsed).to eq_stringified_array [
-        [@user1.id, "user_sis_id_01", @user1.sortable_name, @section2.id, @section2.sis_source_id,
-         @section2.name, @course2.id, nil, "Math 101"],
-        [@user2.id, "user_sis_id_02", "Bolton, Michael", @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user3.id, "user_sis_id_03", @user3.sortable_name, @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user4.id, "user_sis_id_04", "4, User", @course4.default_section.id, nil,
-         @course4.default_section.name, @course4.id, nil, "Course 4"]
+        [@user1.id,
+         "user_sis_id_01",
+         @user1.sortable_name,
+         @section2.id,
+         @section2.sis_source_id,
+         @section2.name,
+         @course2.id,
+         nil,
+         "Math 101"],
+        [@user2.id,
+         "user_sis_id_02",
+         "Bolton, Michael",
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user3.id,
+         "user_sis_id_03",
+         @user3.sortable_name,
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user4.id,
+         "user_sis_id_04",
+         "4, User",
+         @course4.default_section.id,
+         nil,
+         @course4.default_section.name,
+         @course4.id,
+         nil,
+         "Course 4"]
       ]
     end
 
@@ -346,8 +520,15 @@ describe "Student reports" do
 
       parsed = read_report(@type, { account: sub_account })
       expect(parsed).to eq_stringified_array [
-        [@user1.id, "user_sis_id_01", @user1.sortable_name, @section2.id, @section2.sis_source_id,
-         @section2.name, @course2.id, nil, "Math 101"]
+        [@user1.id,
+         "user_sis_id_01",
+         @user1.sortable_name,
+         @section2.id,
+         @section2.sis_source_id,
+         @section2.name,
+         @course2.id,
+         nil,
+         "Math 101"]
       ]
     end
 
@@ -356,19 +537,54 @@ describe "Student reports" do
       parameter = {}
       parameter["start_at"] = 3.days.ago
       report = run_report(@type, { params: parameter })
-      expect(report.parameters["extra_text"].include?("Start At:")).to eq true
+      expect(report.parameters["extra_text"].include?("Start At:")).to be true
       parsed = parse_report(report, { order: [1, 5] })
       expect(parsed).to eq_stringified_array [
-        [@user1.id, "user_sis_id_01", @user1.sortable_name, @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user1.id, "user_sis_id_01", @user1.sortable_name, @section2.id, @section2.sis_source_id,
-         @section2.name, @course2.id, nil, "Math 101"],
-        [@user2.id, "user_sis_id_02", "Bolton, Michael", @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user3.id, "user_sis_id_03", @user3.sortable_name, @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"],
-        [@user4.id, "user_sis_id_04", "4, User", @course4.default_section.id, nil,
-         "Course 4", @course4.id, nil, "Course 4"]
+        [@user1.id,
+         "user_sis_id_01",
+         @user1.sortable_name,
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user1.id,
+         "user_sis_id_01",
+         @user1.sortable_name,
+         @section2.id,
+         @section2.sis_source_id,
+         @section2.name,
+         @course2.id,
+         nil,
+         "Math 101"],
+        [@user2.id,
+         "user_sis_id_02",
+         "Bolton, Michael",
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user3.id,
+         "user_sis_id_03",
+         @user3.sortable_name,
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"],
+        [@user4.id,
+         "user_sis_id_04",
+         "4, User",
+         @course4.default_section.id,
+         nil,
+         "Course 4",
+         @course4.id,
+         nil,
+         "Course 4"]
       ]
     end
 
@@ -382,8 +598,15 @@ describe "Student reports" do
       parsed = read_report(@type, { params: param, order: 1 })
 
       expect(parsed).to eq_stringified_array [
-        [@user3.id, "user_sis_id_03", @user3.sortable_name, @section1.id, @section1.sis_source_id,
-         @section1.name, @course1.id, "SIS_COURSE_ID_1", "English 101"]
+        [@user3.id,
+         "user_sis_id_03",
+         @user3.sortable_name,
+         @section1.id,
+         @section1.sis_source_id,
+         @section1.name,
+         @course1.id,
+         "SIS_COURSE_ID_1",
+         "English 101"]
       ]
     end
   end
@@ -585,8 +808,11 @@ describe "Student reports" do
       @course3.offer
 
       @different_account_user = user_with_managed_pseudonym(
-        active_all: true, account: @different_account, name: "Diego Renault",
-        sortable_name: "Renault, Diego", username: "diegor@diff_account.com"
+        active_all: true,
+        account: @different_account,
+        name: "Diego Renault",
+        sortable_name: "Renault, Diego",
+        username: "diegor@diff_account.com"
       )
 
       e3 = @course3.enroll_user(@different_account_user, "StudentEnrollment", { enrollment_state: "active" })
@@ -633,18 +859,42 @@ describe "Student reports" do
     it "runs and include deleted users" do
       parsed = read_report(@type, { params: { "include_deleted" => true }, order: 1 })
       expect(parsed).to eq_stringified_array [
-        [@user3.id, "Astley, Rick", @at3.token_hint.gsub(/.+~/, ""), "never",
-         "never", DeveloperKey.default.id, "User-Generated"],
-        [@user2.id, "Bolton, Michael", @at2.token_hint.gsub(/.+~/, ""), @at2.permanent_expires_at.iso8601,
-         @at2.last_used_at.iso8601, DeveloperKey.default.id, "User-Generated"],
-        [@user1.id, "Clair, John St.", @at1.token_hint.gsub(/.+~/, ""), @at1.permanent_expires_at.iso8601,
-         "never", DeveloperKey.default.id, "User-Generated"]
+        [@user3.id,
+         "Astley, Rick",
+         @at3.token_hint.gsub(/.+~/, ""),
+         "never",
+         "never",
+         DeveloperKey.default.id,
+         "User-Generated"],
+        [@user2.id,
+         "Bolton, Michael",
+         @at2.token_hint.gsub(/.+~/, ""),
+         @at2.permanent_expires_at.iso8601,
+         @at2.last_used_at.iso8601,
+         DeveloperKey.default.id,
+         "User-Generated"],
+        [@user1.id,
+         "Clair, John St.",
+         @at1.token_hint.gsub(/.+~/, ""),
+         @at1.permanent_expires_at.iso8601,
+         "never",
+         DeveloperKey.default.id,
+         "User-Generated"]
       ]
     end
 
     it "runs and exclude deleted users" do
       parsed = read_report(@type, { order: 1 })
       expect(parsed.length).to eq 2
+    end
+
+    it "deals with a missing developer key" do
+      dk = DeveloperKey.create!
+      @at3.update developer_key: dk
+      dk.destroy_permanently!
+      parsed = read_report(@type, order: 1)
+      user3_row = parsed.detect { |row| row[0] == @user3.id.to_s }
+      expect(user3_row.last).to be_nil
     end
   end
 end

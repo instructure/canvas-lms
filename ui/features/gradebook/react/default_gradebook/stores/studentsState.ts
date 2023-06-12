@@ -21,21 +21,31 @@ import {SetState, GetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
 import {getContentForStudentIdChunk} from './studentsState.utils'
-// @ts-ignore
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
-import type {Student, UserSubmissionGroup} from '../../../../../api.d'
+import type {
+  AssignmentUserSubmissionMap,
+  Student,
+  StudentMap,
+  Submission,
+  UserSubmissionGroup,
+} from '../../../../../api.d'
 
 const I18n = useI18nScope('gradebook')
 
 export type StudentsState = {
-  studentIds: string[]
-  isStudentIdsLoading: boolean
-  isStudentDataLoaded: boolean
-  isSubmissionDataLoaded: boolean
+  assignmentUserSubmissionMap: AssignmentUserSubmissionMap
   fetchStudentIds: () => Promise<string[]>
+  isStudentDataLoaded: boolean
+  isStudentIdsLoading: boolean
+  isSubmissionDataLoaded: boolean
   loadStudentData: () => Promise<void>
   recentlyLoadedStudents: Student[]
   recentlyLoadedSubmissions: UserSubmissionGroup[]
+  studentIds: string[]
+  studentList: Student[]
+  studentMap: StudentMap
+  totalSubmissionsLoaded: number
+  totalStudentsToLoad: number
 }
 
 export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): StudentsState => ({
@@ -50,6 +60,16 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
   recentlyLoadedStudents: [],
 
   recentlyLoadedSubmissions: [],
+
+  studentList: [],
+
+  studentMap: {},
+
+  assignmentUserSubmissionMap: {},
+
+  totalStudentsToLoad: 0,
+
+  totalSubmissionsLoaded: 0,
 
   fetchStudentIds: () => {
     const dispatch = get().dispatch
@@ -70,27 +90,31 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
       promise = dispatch.getJSON(`/courses/${courseId}/gradebook/user_ids`)
     }
 
-    return promise
-      .then((data: {user_ids: string[]}) => {
-        set({
-          studentIds: data.user_ids,
+    return (
+      promise
+        // @ts-expect-error until consumePrefetchedXHR and dispatch.getJSON support generics
+        .then((data: {user_ids: string[]}) => {
+          set({
+            studentIds: data.user_ids,
+          })
+          return data.user_ids
         })
-        return data.user_ids
-      })
-      .catch(() => {
-        set({
-          flashMessages: get().flashMessages.concat([
-            {
-              key: 'student-ids-loading-error',
-              message: I18n.t('There was an error fetching student data.'),
-              variant: 'error',
-            },
-          ]),
+        .catch(() => {
+          set({
+            flashMessages: get().flashMessages.concat([
+              {
+                key: 'student-ids-loading-error',
+                message: I18n.t('There was an error fetching student data.'),
+                variant: 'error',
+              },
+            ]),
+          })
+          return []
         })
-      })
-      .finally(() => {
-        set({isStudentIdsLoading: false})
-      })
+        .finally(() => {
+          set({isStudentIdsLoading: false})
+        })
+    )
   },
 
   loadStudentData: async () => {
@@ -121,16 +145,47 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
       studentIdsToLoad,
       performanceControls.studentsChunkSize
     )
+    set({
+      totalStudentsToLoad: studentIdsToLoad.length,
+      totalSubmissionsLoaded: 0,
+    })
 
     const gotChunkOfStudents = (students: Student[]) => {
+      const studentMap = students.reduce(
+        (acc, student) => {
+          acc[student.id] = student
+          return acc
+        },
+        {...get().studentMap}
+      )
       set({
         recentlyLoadedStudents: students,
+        studentList: get().studentList.concat(students),
+        studentMap,
       })
     }
 
-    const gotSubmissionsChunk = (submissions: UserSubmissionGroup[]) => {
+    const gotSubmissionsChunk = (recentlyLoadedSubmissions: UserSubmissionGroup[]) => {
+      const flattenedSubmissions = recentlyLoadedSubmissions.flatMap(
+        userSubmissionGroup => userSubmissionGroup.submissions || []
+      )
+      // merge the submissions into the existing map
+      const assignmentUserSubmissionMap: AssignmentUserSubmissionMap = flattenedSubmissions.reduce(
+        (acc: AssignmentUserSubmissionMap, submission: Submission) => {
+          return {
+            ...acc,
+            [submission.assignment_id]: {
+              ...acc[submission.assignment_id],
+              [submission.user_id]: submission,
+            },
+          }
+        },
+        {...get().assignmentUserSubmissionMap}
+      )
       set({
-        recentlyLoadedSubmissions: submissions,
+        recentlyLoadedSubmissions,
+        assignmentUserSubmissionMap,
+        totalSubmissionsLoaded: get().totalSubmissionsLoaded + flattenedSubmissions.length,
       })
     }
 

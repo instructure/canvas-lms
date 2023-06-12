@@ -147,8 +147,8 @@ describe GradebookExporter do
         expect(rows[2]["Custom Column 1"]).to eq "Row2 Custom Column 1"
         expect(rows[1]["Custom Column 2"]).to eq "Row1 Custom Column 2"
         expect(rows[2]["Custom Column 2"]).to eq "Row2 Custom Column 2"
-        expect(rows[1]["Custom Column 3"]).to eq nil
-        expect(rows[2]["Custom Column 3"]).to eq nil
+        expect(rows[1]["Custom Column 3"]).to be_nil
+        expect(rows[2]["Custom Column 3"]).to be_nil
       end
     end
 
@@ -198,10 +198,22 @@ describe GradebookExporter do
 
       let(:expected_headers) do
         [
-          "Student", "ID", "SIS Login ID", "Section", "Custom Column 1", "Custom Column 2",
-          "Current Points", "Final Points",
-          "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score",
-          "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"
+          "Student",
+          "ID",
+          "SIS Login ID",
+          "Section",
+          "Custom Column 1",
+          "Custom Column 2",
+          "Current Points",
+          "Final Points",
+          "Current Score",
+          "Unposted Current Score",
+          "Final Score",
+          "Unposted Final Score",
+          "Current Grade",
+          "Unposted Current Grade",
+          "Final Grade",
+          "Unposted Final Grade"
         ]
       end
 
@@ -352,7 +364,7 @@ describe GradebookExporter do
         end
 
         it "emits an empty value for auto-posted assignments" do
-          expect(manual_posting_row[auto_header]).to be nil
+          expect(manual_posting_row[auto_header]).to be_nil
         end
       end
 
@@ -670,11 +682,11 @@ describe GradebookExporter do
         )
 
         enrollment_term = @course.root_account.enrollment_terms.create!(grading_period_group: group)
-        @course.update!(enrollment_term: enrollment_term)
+        @course.update!(enrollment_term:)
 
         assignment_group = @course.assignment_groups.create!(name: "my group")
         @course.assignments.create!(
-          assignment_group: assignment_group,
+          assignment_group:,
           due_at: 1.day.after(@last_grading_period.start_date),
           title: "my assignment"
         )
@@ -693,9 +705,16 @@ describe GradebookExporter do
 
       let(:total_columns) do
         [
-          "Current Points", "Final Points",
-          "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade",
-          "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score"
+          "Current Points",
+          "Final Points",
+          "Current Grade",
+          "Unposted Current Grade",
+          "Final Grade",
+          "Unposted Final Grade",
+          "Current Score",
+          "Unposted Current Score",
+          "Final Score",
+          "Unposted Final Score"
         ]
       end
       let(:total_and_override_columns) { total_columns + ["Override Score", "Override Grade"] }
@@ -735,20 +754,20 @@ describe GradebookExporter do
       it "updates progress.completion to 90 when finished" do
         progress = Progress.create!(context: @course, tag: "gradebook_to_csv")
         exporter_options = {
-          progress: progress
+          progress:
         }
         GradebookExporter.new(@course, @teacher, exporter_options).to_csv
-        expect(progress.reload.completion).to eql(90.0)
+        expect(progress.reload.completion).to be(90.0)
       end
 
       it "does early return if progress workflow_state has been set to failed" do
         progress = Progress.create!(context: @course, tag: "gradebook_to_csv")
         progress.update!(workflow_state: "failed")
         exporter_options = {
-          progress: progress
+          progress:
         }
         GradebookExporter.new(@course, @teacher, exporter_options).to_csv
-        expect(progress.reload.completion).to eql(50.0)
+        expect(progress.reload.completion).to be(50.0)
       end
     end
   end
@@ -756,7 +775,7 @@ describe GradebookExporter do
   context "a course with a student whose name starts with an equals sign" do
     let(:student) do
       user = user_factory(name: "=sum(A)", active_user: true)
-      course_with_student(course: @course, user: user)
+      course_with_student(course: @course, user:)
       user
     end
     let(:course) { @course }
@@ -848,8 +867,10 @@ describe GradebookExporter do
       first_group = @course.assignment_groups.create!(name: "First Group", group_weight: 0.5)
       @course.assignment_groups.create!(name: "Second Group", group_weight: 0.5)
 
-      @assignment = @course.assignments.create!(title: "Assignment 1", points_possible: 10,
-                                                grading_type: "gpa_scale", assignment_group: first_group)
+      @assignment = @course.assignments.create!(title: "Assignment 1",
+                                                points_possible: 10,
+                                                grading_type: "gpa_scale",
+                                                assignment_group: first_group)
       @assignment.grade_student(@student, grade: 8, grader: @teacher)
     end
 

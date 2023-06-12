@@ -586,28 +586,21 @@ $.mediaComment.init = function (mediaType, opts) {
         jsUploader.onReady = mediaCommentReady
         jsUploader.addEntry = addEntry
 
-        const getBrowser = require('parse-browser-info').getBrowser
-        const currentBrowser = getBrowser()
-        if (
-          (currentBrowser.name === 'Chrome' && Number(currentBrowser.version) >= 68) ||
-          (currentBrowser.name === 'Firefox' && Number(currentBrowser.version) >= 61)
-        ) {
-          import('@canvas/media-recorder')
-            .then(({default: renderCanvasMediaRecorder}) => {
-              let tryToRenderInterval
-              const renderFunc = () => {
-                const e = document.getElementById('record_media_tab')
-                if (e) {
-                  renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
-                  clearInterval(tryToRenderInterval)
-                }
+        import('@canvas/media-recorder')
+          .then(({default: renderCanvasMediaRecorder}) => {
+            let tryToRenderInterval
+            const renderFunc = () => {
+              const e = document.getElementById('record_media_tab')
+              if (e) {
+                renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
+                clearInterval(tryToRenderInterval)
               }
-              tryToRenderInterval = setInterval(renderFunc, 10)
-            })
-            .catch(() => {
-              throw new Error('Failed to load @canvas/media-recorder')
-            })
-        }
+            }
+            tryToRenderInterval = setInterval(renderFunc, 10)
+          })
+          .catch(() => {
+            throw new Error('Failed to load @canvas/media-recorder')
+          })
       }
 
       const now = new Date()
@@ -724,10 +717,10 @@ $(document).ready(function () {
       $('#video_upload')[0].removeFiles(0, files.length - 1)
     }
   })
-  $('#media_upload_submit').live('click', _event => {
+  $(document).on('click', '#media_upload_submit', _event => {
     $.mediaComment.upload_delegate.submit()
   })
-  $('#video_record_option,#audio_record_option').live('click', function (event) {
+  $(document).on('click', '#video_record_option,#audio_record_option', function (event) {
     event.preventDefault()
     $('#video_record_option,#audio_record_option').removeClass('selected_option')
     $(this).addClass('selected_option')

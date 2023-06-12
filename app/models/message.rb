@@ -198,7 +198,7 @@ class Message < ActiveRecord::Base
     shard.activate do
       self.updated_at = Time.now.utc
       updates = changes_to_save.transform_values(&:last)
-      self.class.in_partition(attributes).where(id: id, created_at: created_at).update_all(updates)
+      self.class.in_partition(attributes).where(id:, created_at:).update_all(updates)
       clear_changes_information
     end
   end
@@ -217,7 +217,7 @@ class Message < ActiveRecord::Base
 
   scope :not_to_email, -> { where("messages.path_type NOT IN ('email', 'sms')") }
 
-  scope :by_name, ->(notification_name) { where(notification_name: notification_name) }
+  scope :by_name, ->(notification_name) { where(notification_name:) }
 
   scope :before, ->(date) { where("messages.created_at<?", date) }
 
@@ -255,7 +255,7 @@ class Message < ActiveRecord::Base
       tap do
         @table = klass.arel_table_from_key_values(attrs)
         @predicate_builder = predicate_builder.dup
-        @predicate_builder.instance_variable_set("@table", ActiveRecord::TableMetadata.new(klass, @table))
+        @predicate_builder.instance_variable_set(:@table, ActiveRecord::TableMetadata.new(klass, @table))
       end
     end
   }
@@ -384,7 +384,8 @@ class Message < ActiveRecord::Base
   end
 
   def transpose_url_ids(html)
-    url_helper = Api::Html::UrlProxy.new(self, context,
+    url_helper = Api::Html::UrlProxy.new(self,
+                                         context,
                                          HostUrl.context_host(link_root_account),
                                          HostUrl.protocol,
                                          target_shard: link_root_account.shard)
@@ -477,10 +478,10 @@ class Message < ActiveRecord::Base
 
     if dashboard?
       messages = Message.in_state(:dashboard).where(
-        notification_id: notification_id,
-        context_id: context_id,
-        context_type: context_type,
-        user_id: user_id
+        notification_id:,
+        context_id:,
+        context_type:,
+        user_id:
       )
 
       (messages - [self]).each(&:close)
@@ -616,7 +617,7 @@ class Message < ActiveRecord::Base
       # they can only change it if they are registered in the first place
       # do not show this for emails telling users to register
       if footer_message.present? && !notification&.registration?
-        self.body = <<~TEXT.strip_heredoc
+        self.body = <<~TEXT
           #{body}
 
 
@@ -663,7 +664,10 @@ class Message < ActiveRecord::Base
     end
 
     context, asset, user, delayed_messages, data = [self.context,
-      self.context, self.user, @delayed_messages, @data]
+      self.context,
+self.user,
+@delayed_messages,
+@data]
 
     link_root_account.shard.activate do
       if message_body_template.present?
@@ -719,12 +723,12 @@ class Message < ActiveRecord::Base
 
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
                                  short_stat: "message.deliver",
-                                 tags: { path_type: path_type, notification_name: notification_name })
+                                 tags: { path_type:, notification_name: })
 
     global_account_id = Shard.global_id_for(root_account_id, shard)
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
                                  short_stat: "message.deliver_per_account",
-                                 tags: { path_type: path_type, root_account_id: global_account_id })
+                                 tags: { path_type:, root_account_id: global_account_id })
 
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
@@ -741,7 +745,7 @@ class Message < ActiveRecord::Base
   def skip_and_cancel
     InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
                                  short_stat: "message.skip",
-                                 tags: { path_type: path_type, notification_name: notification_name })
+                                 tags: { path_type:, notification_name: })
     cancel
   end
 
@@ -754,7 +758,7 @@ class Message < ActiveRecord::Base
       # Log no_targets_specified error to DataDog
       InstStatsd::Statsd.increment("message.no_targets_specified",
                                    short_stat: "message.no_targets_specified",
-                                   tags: { path_type: path_type })
+                                   tags: { path_type: })
 
       self.transmission_errors = "No notification targets specified"
       set_transmission_error
@@ -770,11 +774,11 @@ class Message < ActiveRecord::Base
       end
       complete_dispatch
     end
-  rescue Aws::SQS::Errors::ServiceError => e
+  rescue => e
     Canvas::Errors.capture(
       e,
       message: "Message delivery failed",
-      to: to,
+      to:,
       object: inspect.to_s
     )
     error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
@@ -824,7 +828,8 @@ class Message < ActiveRecord::Base
       [
         "recipient" => to,
         "access_token" => Canvas::Security.decrypt_password(context_root_account.settings[:encrypted_slack_key],
-                                                            context_root_account.settings[:encrypted_slack_key_salt], "instructure_slack_encrypted_key")
+                                                            context_root_account.settings[:encrypted_slack_key_salt],
+                                                            "instructure_slack_encrypted_key")
       ]
     else
       [to]
@@ -849,7 +854,7 @@ class Message < ActiveRecord::Base
     end
 
     # not sure what this is even doing?
-    message_types.to_a.sort_by { |m| m[0] == "Other" ? CanvasSort::Last : m[0] }
+    message_types.to_a.sort_by { |m| (m[0] == "Other") ? CanvasSort::Last : m[0] }
   end
 
   # Public: Message to use if the message is unavailable to send.
@@ -1055,7 +1060,7 @@ class Message < ActiveRecord::Base
         Canvas::Errors.capture(
           @exception,
           message: "Message delivery failed",
-          to: to,
+          to:,
           object: inspect.to_s
         )
       end
@@ -1107,7 +1112,7 @@ class Message < ActiveRecord::Base
         Canvas::Errors.capture(
           e,
           message: "SMS delivery failed",
-          to: to,
+          to:,
           object: inspect.to_s,
           tags: {
             type: :sms_message
@@ -1173,7 +1178,7 @@ class Message < ActiveRecord::Base
     @name_helper ||= Messages::NameHelper.new(
       asset: context,
       message_recipient: user,
-      notification_name: notification_name
+      notification_name:
     )
   end
 

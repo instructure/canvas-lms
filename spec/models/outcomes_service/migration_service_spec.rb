@@ -29,12 +29,12 @@ describe OutcomesService::MigrationService do
   end
 
   let(:root_account) { account_model }
-  let(:course) { course_model(root_account: root_account) }
+  let(:course) { course_model(root_account:) }
 
   context "without settings" do
     describe ".applies_to_course?" do
       it "returns false" do
-        expect(described_class.applies_to_course?(course)).to eq false
+        expect(described_class.applies_to_course?(course)).to be false
       end
     end
   end
@@ -56,7 +56,7 @@ describe OutcomesService::MigrationService do
 
       describe ".applies_to_course?" do
         it "returns false" do
-          expect(described_class.applies_to_course?(course)).to eq false
+          expect(described_class.applies_to_course?(course)).to be false
         end
       end
     end
@@ -68,7 +68,7 @@ describe OutcomesService::MigrationService do
 
       describe ".applies_to_course?" do
         it "returns true" do
-          expect(described_class.applies_to_course?(course)).to eq true
+          expect(described_class.applies_to_course?(course)).to be true
         end
       end
 
@@ -103,7 +103,7 @@ describe OutcomesService::MigrationService do
           stub_post_content_export.to_return(status: 200, body: '{"id":123}')
           expect(described_class.begin_export(course, {})).to eq({
                                                                    export_id: 123,
-                                                                   course: course
+                                                                   course:
                                                                  })
         end
 
@@ -119,7 +119,7 @@ describe OutcomesService::MigrationService do
                                                 exported_assets: ["wiki_page_2"]
                                               })).to eq({
                                                           export_id: 123,
-                                                          course: course
+                                                          course:
                                                         })
         end
 
@@ -127,14 +127,14 @@ describe OutcomesService::MigrationService do
           expect(described_class.begin_export(course, {
                                                 selective: true,
                                                 exported_assets: []
-                                              })).to eq nil
+                                              })).to be_nil
         end
       end
 
       describe ".export_completed?" do
         let(:export_data) do
           {
-            course: course,
+            course:,
             export_id: 1
           }
         end
@@ -149,12 +149,12 @@ describe OutcomesService::MigrationService do
 
         it "returns true on completed" do
           stub_get_content_export.to_return(status: 200, body: '{"state":"completed"}')
-          expect(described_class.export_completed?(export_data)).to eq true
+          expect(described_class.export_completed?(export_data)).to be true
         end
 
         it "returns false on pending" do
           stub_get_content_export.to_return(status: 200, body: '{"state":"in_progress"}')
-          expect(described_class.export_completed?(export_data)).to eq false
+          expect(described_class.export_completed?(export_data)).to be false
         end
 
         it "raises error on failed" do
@@ -165,7 +165,7 @@ describe OutcomesService::MigrationService do
         it "raises error on non 2xx response" do
           stub_request(:get, "http://canvas.test/api/content_exports/1").to_return(status: 401, body: '{"valid_jwt":false}')
           export_data = {
-            course: course,
+            course:,
             export_id: 1
           }
           expect { described_class.export_completed?(export_data) }.to raise_error('Error retrieving export state for Outcomes Service: {"valid_jwt":false}')
@@ -175,7 +175,7 @@ describe OutcomesService::MigrationService do
       describe ".retrieve_export" do
         let(:export_data) do
           {
-            course: course,
+            course:,
             export_id: 1
           }
         end
@@ -228,8 +228,8 @@ describe OutcomesService::MigrationService do
           stub_post_content_import.to_return(status: 200, body: '{"id":123}')
           expect(described_class.send_imported_content(course, content_migration, imported_content)).to eq({
                                                                                                              import_id: 123,
-                                                                                                             course: course,
-                                                                                                             content_migration: content_migration
+                                                                                                             course:,
+                                                                                                             content_migration:
                                                                                                            })
         end
 
@@ -245,14 +245,14 @@ describe OutcomesService::MigrationService do
         let(:content_migration) { ContentMigration.create!(context: course) }
         let(:import_data) do
           {
-            course: course,
+            course:,
             import_id: 1,
-            content_migration: content_migration
+            content_migration:
           }
         end
 
         let!(:wiki_page) do
-          wiki_page_model({ course: course })
+          wiki_page_model({ course: })
         end
 
         def stub_get_content_import
@@ -265,20 +265,20 @@ describe OutcomesService::MigrationService do
 
         it "returns true on completed" do
           stub_get_content_import.to_return(status: 200, body: '{"state":"completed"}')
-          expect(described_class.import_completed?(import_data)).to eq true
+          expect(described_class.import_completed?(import_data)).to be true
         end
 
         it "sets the content migrations warnings" do
           stub_get_content_import.to_return(status: 200, body: "{\"state\":\"completed\", \"missing_alignments\": [
 {\"artifact_type\": \"canvas.page\", \"artifact_id\": \"#{wiki_page.id}\"}]}")
-          expect(described_class.import_completed?(import_data)).to eq true
+          expect(described_class.import_completed?(import_data)).to be true
           expect(content_migration.warnings).to eq ["Unable to align some outcomes to \"some page\""]
         end
 
         it "fails to find the outcome, but still sets the content migrations warning" do
           stub_get_content_import.to_return(status: 200, body: "{\"state\":\"completed\", \"missing_alignments\": [
 {\"artifact_type\": \"canvas.page\", \"artifact_id\": 1}]}")
-          expect(described_class.import_completed?(import_data)).to eq true
+          expect(described_class.import_completed?(import_data)).to be true
           expect(content_migration.warnings).to eq ["Unable to align some outcomes to a page"]
         end
 
@@ -286,14 +286,14 @@ describe OutcomesService::MigrationService do
           stub_get_content_import.to_return(status: 200, body: "{\"state\":\"completed\", \"missing_alignments\": [
 {\"artifact_type\": \"canvas.page\", \"artifact_id\": 1},
 {\"artifact_type\": \"canvas.page\", \"artifact_id\": #{wiki_page.id}}]}")
-          expect(described_class.import_completed?(import_data)).to eq true
+          expect(described_class.import_completed?(import_data)).to be true
           expect(content_migration.warnings).to include("Unable to align some outcomes to a page")
           expect(content_migration.warnings).to include('Unable to align some outcomes to "some page"')
         end
 
         it "returns false on pending" do
           stub_get_content_import.to_return(status: 200, body: '{"state":"in_progress"}')
-          expect(described_class.import_completed?(import_data)).to eq false
+          expect(described_class.import_completed?(import_data)).to be false
         end
 
         it "raises error on failed and adds a content_import warning" do

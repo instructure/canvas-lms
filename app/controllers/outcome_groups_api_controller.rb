@@ -531,8 +531,14 @@ class OutcomeGroupsApiController < ApplicationController
         return
       end
     else
-      outcome_params = params.permit(:title, :description, :mastery_points, :vendor_guid,
-                                     :display_name, :calculation_method, :calculation_int, ratings: strong_anything)
+      outcome_params = params.permit(:title,
+                                     :description,
+                                     :mastery_points,
+                                     :vendor_guid,
+                                     :display_name,
+                                     :calculation_method,
+                                     :calculation_int,
+                                     ratings: strong_anything)
       @outcome = context_create_outcome(outcome_params)
       unless @outcome.valid?
         render json: @outcome.errors, status: :bad_request
@@ -729,6 +735,14 @@ class OutcomeGroupsApiController < ApplicationController
     end
   end
 
+  def self.add_outcome_group_async(progress, target_group, source_group, partial_path)
+    copy = target_group.add_outcome_group(source_group)
+    progress.set_results(
+      outcome_group_id: copy.id,
+      outcome_group_url: "#{partial_path}/#{copy.id}"
+    )
+  end
+
   protected
 
   def can_read_outcomes
@@ -773,13 +787,4 @@ class OutcomeGroupsApiController < ApplicationController
     outcome.save
     outcome
   end
-
-  def self.add_outcome_group_async(progress, target_group, source_group, partial_path)
-    copy = target_group.add_outcome_group(source_group)
-    progress.set_results(
-      outcome_group_id: copy.id,
-      outcome_group_url: "#{partial_path}/#{copy.id}"
-    )
-  end
-  private_class_method :add_outcome_group_async
 end

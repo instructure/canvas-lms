@@ -23,7 +23,7 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
-import {DateTimeInput} from '@instructure/ui-forms'
+import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -41,7 +41,7 @@ export class UpdateItemTray extends Component {
     onSavePlannerItem: PropTypes.func.isRequired,
     onDeletePlannerItem: PropTypes.func.isRequired,
     locale: PropTypes.string.isRequired,
-    timeZone: PropTypes.string.isRequired
+    timeZone: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -50,7 +50,7 @@ export class UpdateItemTray extends Component {
     this.state = {
       updates,
       titleMessages: [],
-      dateMessages: []
+      dateMessages: [],
     }
   }
 
@@ -111,7 +111,7 @@ export class UpdateItemTray extends Component {
     const value = e.target.value
     if (value === '') {
       this.setState({
-        titleMessages: [{type: 'error', text: formatMessage('title is required')}]
+        titleMessages: [{type: 'error', text: formatMessage('title is required')}],
       })
     } else {
       this.setState({titleMessages: []})
@@ -159,7 +159,12 @@ export class UpdateItemTray extends Component {
   renderDeleteButton() {
     if (!this.editingExistingNote()) return
     return (
-      <Button color="primary-inverse" margin="0 x-small 0 0" onClick={this.handleDeleteClick}>
+      <Button
+        data-testid="delete"
+        color="primary-inverse"
+        margin="0 x-small 0 0"
+        onClick={this.handleDeleteClick}
+      >
         {formatMessage('Delete')}
       </Button>
     )
@@ -168,6 +173,7 @@ export class UpdateItemTray extends Component {
   renderSaveButton() {
     return (
       <Button
+        data-testid="save"
         color="primary"
         margin="0 0 0 x-small"
         interaction={this.isValid() ? 'enabled' : 'disabled'}
@@ -182,6 +188,7 @@ export class UpdateItemTray extends Component {
     const value = this.findCurrentValue('title')
     return (
       <TextInput
+        data-testid="title"
         renderLabel={() => formatMessage('Title')}
         value={value}
         messages={this.state.titleMessages}
@@ -197,17 +204,17 @@ export class UpdateItemTray extends Component {
         : undefined
     return (
       <DateTimeInput
-        required
+        required={true}
         description={
           <ScreenReaderContent>
             {formatMessage('The date and time this to do is due')}
           </ScreenReaderContent>
         }
         messages={this.state.dateMessages}
-        dateLabel={formatMessage('Date')}
-        dateNextLabel={formatMessage('Next Month')}
-        datePreviousLabel={formatMessage('Previous Month')}
-        timeLabel={formatMessage('Time')}
+        dateRenderLabel={formatMessage('Date')}
+        nextMonthLabel={formatMessage('Next Month')}
+        prevMonthLabel={formatMessage('Previous Month')}
+        timeRenderLabel={formatMessage('Time')}
         timeStep={30}
         locale={this.props.locale}
         timezone={this.props.timeZone}
@@ -215,6 +222,7 @@ export class UpdateItemTray extends Component {
         layout="stacked"
         onChange={this.handleDateChange}
         invalidDateTimeMessage={this.onInvalidDateTimeMessage}
+        allowNonStepInput={true}
       />
     )
   }
@@ -222,13 +230,13 @@ export class UpdateItemTray extends Component {
   renderCourseSelect() {
     const noneOption = {
       value: 'none',
-      label: formatMessage('Optional: Add Course')
+      label: formatMessage('Optional: Add Course'),
     }
     const courseOptions = (this.props.courses || [])
       .filter(course => course.enrollmentType === 'StudentEnrollment' || course.is_student)
       .map(course => ({
         value: course.id,
-        label: course.longName || course.long_name
+        label: course.longName || course.long_name,
       }))
 
     const courseId = this.findCurrentValue('courseId')
@@ -255,6 +263,7 @@ export class UpdateItemTray extends Component {
     const value = this.findCurrentValue('details')
     return (
       <TextArea
+        data-testid="details"
         label={formatMessage('Details')}
         height="10rem"
         autoGrow={false}

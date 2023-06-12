@@ -22,7 +22,7 @@ describe AuthenticationProvidersController do
   let!(:account) { Account.create! }
 
   before do
-    admin = account_admin_user(account: account)
+    admin = account_admin_user(account:)
     user_session(admin)
   end
 
@@ -80,7 +80,7 @@ describe AuthenticationProvidersController do
     it "complains about unsupported auth type" do
       enable_cache do
         put "start_debugging", params: { account_id: account.id, authentication_provider_id: account.canvas_authentication_provider.id }, format: :json
-        expect(response.status).to eq 400
+        expect(response).to have_http_status :bad_request
         expect(response.body).to match("Unsupported authentication type")
         expect(account.canvas_authentication_provider).to_not be_debugging
       end
@@ -184,7 +184,7 @@ describe AuthenticationProvidersController do
       account.authentication_providers.create!(linkedin)
 
       post "create", format: :json, params: { account_id: account.id }.merge(linkedin)
-      expect(response.code).to eq "422"
+      expect(response).to have_http_status :unprocessable_entity
     end
 
     it "allows multiple non-singleton types" do
@@ -240,8 +240,8 @@ describe AuthenticationProvidersController do
         expect(response).to be_redirect
 
         ap = account.authentication_providers.active.last
-        expect(ap.mfa_required).to eq(true)
-        expect(ap.skip_internal_mfa).to eq(false)
+        expect(ap.mfa_required).to be(true)
+        expect(ap.skip_internal_mfa).to be(false)
       end
 
       it "handles bypass" do
@@ -249,8 +249,8 @@ describe AuthenticationProvidersController do
         expect(response).to be_redirect
 
         ap = account.authentication_providers.active.last
-        expect(ap.mfa_required).to eq(false)
-        expect(ap.skip_internal_mfa).to eq(true)
+        expect(ap.mfa_required).to be(false)
+        expect(ap.skip_internal_mfa).to be(true)
       end
 
       it "handles default" do
@@ -258,8 +258,8 @@ describe AuthenticationProvidersController do
         expect(response).to be_redirect
 
         ap = account.authentication_providers.active.last
-        expect(ap.mfa_required).to eq(false)
-        expect(ap.skip_internal_mfa).to eq(false)
+        expect(ap.mfa_required).to be(false)
+        expect(ap.skip_internal_mfa).to be(false)
       end
     end
   end

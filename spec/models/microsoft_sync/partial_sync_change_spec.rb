@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe MicrosoftSync::PartialSyncChange do
-  subject { described_class.create(course: course, user: user, enrollment_type: "owner") }
+  subject { described_class.create(course:, user:, enrollment_type: "owner") }
 
   let(:user) { user_model }
-  let(:course) { course_with_user("TeacherEnrollment", user: user).course }
+  let(:course) { course_with_user("TeacherEnrollment", user:).course }
 
   it { is_expected.to be_a described_class }
   it { is_expected.to be_valid }
@@ -48,7 +48,10 @@ describe MicrosoftSync::PartialSyncChange do
       result = described_class
                .where(enrollment_type: "owner")
                .with_values_in(%w[course_id user_id created_at], [
-                                 [c1.id, u1.id, t1], [c1.id, u2.id, t2], [c2.id, u1.id, t2], [c2.id, u2.id, t1],
+                                 [c1.id, u1.id, t1],
+                                 [c1.id, u2.id, t2],
+                                 [c2.id, u1.id, t2],
+                                 [c2.id, u2.id, t1],
                                  [c2.id, u2.id, t2],
                                ])
                .pluck(:enrollment_type, :course_id, :user_id, :created_at)

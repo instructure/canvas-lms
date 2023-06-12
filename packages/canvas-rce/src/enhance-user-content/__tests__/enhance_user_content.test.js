@@ -96,6 +96,43 @@ describe('enhanceUserContent()', () => {
     })
   })
 
+  describe('when given a containingCanvasLtiToolId', () => {
+    const opts = {
+      canvasOrigin: 'https://canvas.is.here:2000/',
+      containingCanvasLtiToolId: 'toolid',
+    }
+
+    it('adds parent_frame_context to relative canvas urls', () => {
+      subject('<iframe id="iframe" src="/media_object_iframe" />')
+
+      enhanceUserContent(document, opts)
+
+      expect(document.getElementById('iframe').src).toEqual(
+        'https://canvas.is.here:2000/media_object_iframe?parent_frame_context=toolid'
+      )
+    })
+
+    it('adds parent_frame_context to absolute canvas urls', () => {
+      subject('<iframe id="iframe" src="https://canvas.is.here:2000/files/1?download_frd=1" />')
+
+      enhanceUserContent(document, opts)
+
+      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
+        'https://canvas.is.here:2000/files/1?download_frd=1&parent_frame_context=toolid'
+      )
+    })
+
+    it('does not add parent_frame_context to non-canvas urls', () => {
+      subject('<iframe id="iframe" src="https://canvas.is.not.here:3000/files/1?download_frd=1" />')
+
+      enhanceUserContent(document, opts)
+
+      expect(document.getElementById('iframe').getAttribute('src')).toEqual(
+        'https://canvas.is.not.here:3000/files/1?download_frd=1'
+      )
+    })
+  })
+
   describe('when a link has an href that matches a canvas file path', () => {
     it('makes relative links absolute', () => {
       subject(

@@ -144,7 +144,7 @@ module Turnitin
           it "creates a submission if we got an uploaded at" do
             process
             expect(sub.workflow_state).to eq("submitted")
-            expect(sub.submitted_at).to_not be(nil)
+            expect(sub.submitted_at).to_not be_nil
             expect(sub.submitted_at).to eq(subject.turnitin_client.uploaded_at)
             expect(sub.turnitin_data).to eq(
               "attachment_#{lti_assignment.attachments.first.id}" => {

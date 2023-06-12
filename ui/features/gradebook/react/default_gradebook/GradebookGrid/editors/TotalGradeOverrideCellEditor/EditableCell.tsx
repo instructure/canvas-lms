@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -19,7 +20,7 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 
-import GradeInput from '../GradeInput/index'
+import GradeInput from '../GradeInput/GradeInput'
 import {gradeEntry, gradeInfo} from '../GradeInput/PropTypes'
 import CellEditorComponent from '../CellEditorComponent'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'

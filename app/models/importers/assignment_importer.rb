@@ -310,12 +310,18 @@ module Importers
       end
 
       %i[peer_reviews
-         automatic_peer_reviews anonymous_peer_reviews
-         grade_group_students_individually allowed_extensions
-         position peer_review_count
-         omit_from_final_grade intra_group_peer_reviews
-         grader_count grader_comments_visible_to_graders
-         graders_anonymous_to_graders grader_names_visible_to_final_grader
+         automatic_peer_reviews
+         anonymous_peer_reviews
+         grade_group_students_individually
+         allowed_extensions
+         position
+         peer_review_count
+         omit_from_final_grade
+         intra_group_peer_reviews
+         grader_count
+         grader_comments_visible_to_graders
+         graders_anonymous_to_graders
+         grader_names_visible_to_final_grader
          anonymous_instructor_annotations].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
@@ -391,13 +397,14 @@ module Importers
           context_type: context.class.name
         )
         active_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-          context: context, vendor_code: vendor_code, product_code: product_code
+          context:, vendor_code:, product_code:
         )
 
         if active_proxies.blank?
           migration.add_warning(I18n.t(
                                   "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
-                                  vendor_code: vendor_code, product_code: product_code
+                                  vendor_code:,
+                                  product_code:
                                 ))
         else
           item.lti_context_id ||= SecureRandom.uuid
@@ -500,6 +507,11 @@ module Importers
 
           params[:client_id] = li[:client_id] unless tool
 
+          if Account.site_admin.feature_enabled?(:blueprint_line_item_support) && primary_line_item
+            params = clear_params_before_overwriting_child_li(params, primary_line_item, migration)
+            primary_line_item.mark_as_importing! migration
+          end
+
           if primary_line_item&.coupled && (li[:coupled] || !any_coupled_line_items)
             # Modify the default coupled line item if:
             # * We are processing a coupled line item (need to replace properties
@@ -536,6 +548,25 @@ module Importers
       attachment.update!(folder: context.student_annotation_documents_folder)
       attachment.move_to_bottom if attachment.saved_change_to_folder_id?
       assignment.annotatable_attachment = attachment
+    end
+
+    def self.clear_params_before_overwriting_child_li(params, primary_line_item, migration)
+      return params unless (child_tag = migration.master_course_subscription.content_tag_for(primary_line_item.assignment))
+      return params unless child_tag.downstream_changes.present?
+
+      primary_line_item.class.base_class.restricted_column_settings.each do |type, columns|
+        changed_columns = params.keys.map(&:to_s) & columns if child_tag.downstream_changes & ["lti_line_items_#{type}"] # changed restricted types
+
+        if changed_columns.any?
+          if primary_line_item.assignment.child_content_restrictions[type] # don't overwrite downstream changes _unless_ it's locked
+            child_tag.downstream_changes -= "lti_line_items_#{type}" # remove them from the downstream changes since we're going to overwrite
+            child_tag.save!
+          else
+            changed_columns.each { |cc| params.delete(cc.to_sym) } # if not locked then we should ignore the params in the category (content or settings)
+          end
+        end
+      end
+      params
     end
   end
 end

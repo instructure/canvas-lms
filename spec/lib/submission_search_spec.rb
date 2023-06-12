@@ -27,12 +27,12 @@ describe SubmissionSearch do
   let_once(:students) { [jonah, amanda, mandy, james, peter] }
   let_once(:teacher) do
     teacher = User.create!(name: "Teacher Miller")
-    TeacherEnrollment.create!(user: teacher, course: course, workflow_state: "active")
+    TeacherEnrollment.create!(user: teacher, course:, workflow_state: "active")
     teacher
   end
   let_once(:assignment) do
     Assignment.create!(
-      course: course,
+      course:,
       workflow_state: "active",
       submission_types: "online_text_entry",
       title: "an assignment",
@@ -42,7 +42,7 @@ describe SubmissionSearch do
 
   before :once do
     students.each do |student|
-      StudentEnrollment.create!(user: student, course: course, workflow_state: "active")
+      StudentEnrollment.create!(user: student, course:, workflow_state: "active")
     end
   end
 
@@ -52,7 +52,9 @@ describe SubmissionSearch do
   end
 
   it "finds submissions with user name search" do
-    results = SubmissionSearch.new(assignment, teacher, nil,
+    results = SubmissionSearch.new(assignment,
+                                   teacher,
+                                   nil,
                                    user_search: "man",
                                    order_by: [{ field: "username", direction: "descending" }]).search
     expect(results).to eq [
@@ -69,7 +71,7 @@ describe SubmissionSearch do
 
   it "filters results to specified sections" do
     section = course.course_sections.create!
-    StudentEnrollment.create!(user: amanda, course: course, course_section: section, workflow_state: "active")
+    StudentEnrollment.create!(user: amanda, course:, course_section: section, workflow_state: "active")
     results = SubmissionSearch.new(assignment, teacher, nil, section_ids: [section.id]).search
     expect(results).to eq [Submission.find_by(user: amanda)]
   end
@@ -95,7 +97,7 @@ describe SubmissionSearch do
   end
 
   it "filters by late" do
-    late_student = student_in_course(course: course, active_all: true).user
+    late_student = student_in_course(course:, active_all: true).user
     assignment = course.assignments.create!(name: "assignment", points_possible: 10, due_at: 2.days.ago)
     submission = assignment.submit_homework(late_student, body: "asdf", submitted_at: 1.day.ago)
     results = SubmissionSearch.new(assignment, teacher, nil, late: true).search
@@ -155,7 +157,7 @@ describe SubmissionSearch do
   it "orders by submission date" do
     Timecop.freeze do
       assignment.submit_homework(peter, submission_type: "online_text_entry", body: "homework", submitted_at: Time.zone.now)
-      assignment.submit_homework(amanda, submission_type: "online_text_entry", body: "homework", submitted_at: Time.zone.now + 1.hour)
+      assignment.submit_homework(amanda, submission_type: "online_text_entry", body: "homework", submitted_at: 1.hour.from_now)
       results = SubmissionSearch.new(assignment, teacher, nil, states: "submitted", order_by: [{ field: "submitted_at" }]).search
       expect(results.preload(:user).map(&:user)).to eq [peter, amanda]
     end
@@ -165,7 +167,9 @@ describe SubmissionSearch do
     assignment.grade_student(peter, score: 1, grader: teacher)
     assignment.grade_student(amanda, score: 1, grader: teacher)
     assignment.grade_student(james, score: 3, grader: teacher)
-    results = SubmissionSearch.new(assignment, teacher, nil,
+    results = SubmissionSearch.new(assignment,
+                                   teacher,
+                                   nil,
                                    scored_more_than: 0,
                                    order_by: [
                                      { field: "score", direction: "descending" },

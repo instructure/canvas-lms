@@ -36,18 +36,18 @@ describe Lti::TokenController do
         shared_secret: "secret",
         name: "test tool",
         url: "http://www.tool.com/launch",
-        developer_key: developer_key,
+        developer_key:,
         lti_version: "1.3",
         workflow_state: "public"
       )
     end
     let(:root_account) { Account.create!(name: "root account") }
-    let(:parsed_body) { JSON.parse(response.body) }
+    let(:parsed_body) { response.parsed_body }
     let(:decoded_jwt) { JSON::JWT.decode parsed_body["access_token"], :skip_verification }
     let(:params) { {} }
 
     def send_request
-      get :advantage_access_token, params: params, as: :json
+      get :advantage_access_token, params:, as: :json
     end
 
     context "when user is not logged in" do
@@ -184,7 +184,7 @@ describe Lti::TokenController do
     let(:params) { {} }
 
     def send_request
-      get :lti_2_token, params: params, as: :json
+      get :lti_2_token, params:, as: :json
     end
 
     context "when user is not logged in" do

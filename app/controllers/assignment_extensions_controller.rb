@@ -110,14 +110,14 @@ class AssignmentExtensionsController < ApplicationController
         { user_id: submission.user.id, extra_attempts: submission.extra_attempts }
       end
 
-      render json: { assignment_extensions: assignment_extensions }
+      render json: { assignment_extensions: }
     else
       invalid_submissions = submissions.reject(&:valid?)
       errors = invalid_submissions.map do |submission|
         { user_id: submission.user.id, errors: submission.errors.full_messages }
       end
 
-      render json: { errors: errors }, status: :bad_request
+      render json: { errors: }, status: :bad_request
     end
   end
 

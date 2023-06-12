@@ -71,7 +71,8 @@ describe "sync grades to sis" do
       if @enhanced_filters
         @course.enable_feature!(:enhanced_gradebook_filters)
       end
-      @assignment = @course.assignments.create!(name: "assignment", assignment_group: @assignment_group,
+      @assignment = @course.assignments.create!(name: "assignment",
+                                                assignment_group: @assignment_group,
                                                 post_to_sis: true)
     end
 
@@ -99,12 +100,12 @@ describe "sync grades to sis" do
       expect(f(".assignments-to-post-count").text).to include("You are ready to sync 1 assignment")
     end
 
-    it "asks for due dates in gradebook if due date is not given", priority: "1", ignore_js_errors: true do
+    it "asks for due dates in gradebook if due date is not given", ignore_js_errors: true, priority: "1" do
       @course.discussion_topics.create!(user: @admin,
                                         title: "Sync to SIS discussion",
                                         message: "Discussion topic message",
                                         assignment: @assignment)
-      due_at = Time.zone.now + 3.days
+      due_at = 3.days.from_now
       post_grades_dialog
       expect(f("#assignment-errors").text).to include("1 Assignment with Errors")
       f(".assignment-due-at").send_keys(format_date_for_view(due_at))

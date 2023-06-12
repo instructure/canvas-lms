@@ -42,7 +42,7 @@ module LtiSpecHelper
   end
 
   def create_resource_handler(tool_proxy, opts = {})
-    default_opts = { resource_type_code: "code", name: (0...8).map { rand(65..90).chr }.join, tool_proxy: tool_proxy }
+    default_opts = { resource_type_code: "code", name: (0...8).map { rand(65..90).chr }.join, tool_proxy: }
     Lti::ResourceHandler.create(default_opts.merge(opts))
   end
 
@@ -50,7 +50,7 @@ module LtiSpecHelper
     default_ops = {
       message_type: "basic-lti-launch-request",
       launch_path: "https://samplelaunch/blti",
-      resource_handler: resource_handler
+      resource_handler:
     }
     Lti::MessageHandler.create(default_ops.merge(opts))
   end

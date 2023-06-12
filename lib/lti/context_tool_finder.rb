@@ -88,7 +88,7 @@ module Lti
     # is on
     def scopes(include_federated_parent: true)
       placements = * options[:placements] || options[:type]
-      contexts = ContextExternalTool.contexts_to_search(context, include_federated_parent: include_federated_parent)
+      contexts = ContextExternalTool.contexts_to_search(context, include_federated_parent:)
 
       return [] if contexts.empty?
 

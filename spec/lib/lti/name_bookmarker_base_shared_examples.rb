@@ -66,52 +66,10 @@ RSpec.shared_context "name_bookmarker_base_shared_examples" do
     describe ".bookmark_for" do
       let(:model) { model_factory_proc[account, "ABc"] }
 
-      shared_examples_for "a bookmark that bases the first value on some form of the name" do
-        before do
-          allow(BookmarkedCollection).to \
-            receive(:best_unicode_collation_key).with("?")
-                                                .and_return(Arel.sql(best_unicode_collation_key_for_questionmark))
-        end
-
-        it "uses the expected value in the first key in the bookmark" do
-          expect(described_class.bookmark_for(model)).to eq(
-            [bookmark_expected_first_value, model.id, "ABc"]
-          )
-        end
-      end
-
-      context "when the database uses as-is collation (e.g. non-postgres)" do
-        it_behaves_like "a bookmark that bases the first value on some form of the name" do
-          let(:best_unicode_collation_key_for_questionmark) { "?" }
-          let(:bookmark_expected_first_value) { "ABc" }
-        end
-      end
-
-      context "when the database uses lower-case bytea" do
-        it_behaves_like "a bookmark that bases the first value on some form of the name" do
-          let(:best_unicode_collation_key_for_questionmark) do
-            "CAST(LOWER(replace(?, '\\', '\\\\')) AS bytea)"
-          end
-          let(:bookmark_expected_first_value) { "abc" }
-        end
-      end
-
-      context "when the database uses public.collkey collation" do
-        it_behaves_like "a bookmark that bases the first value on some form of the name" do
-          let(:best_unicode_collation_key_for_questionmark) do
-            "public.collkey(?, 'root', false, 3, true)"
-          end
-          let(:bookmark_expected_first_value) { Canvas::ICU.collation_key("ABc") }
-        end
-      end
-
-      context "when the database uses COLLATE collation" do
-        it_behaves_like "a bookmark that bases the first value on some form of the name" do
-          let(:best_unicode_collation_key_for_questionmark) do
-            '(? COLLATE "public"."und-u-kn-true")'
-          end
-          let(:bookmark_expected_first_value) { Canvas::ICU.collation_key("ABc") }
-        end
+      it "forms a bookmark" do
+        expect(described_class.bookmark_for(model)).to eq(
+          [Canvas::ICU.collation_key("ABc"), model.id, "ABc"]
+        )
       end
     end
   end

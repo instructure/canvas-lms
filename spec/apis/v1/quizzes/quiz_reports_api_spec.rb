@@ -26,14 +26,18 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_index(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
-      send method, :get,
-           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
+      send method,
+           :get,
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports",
+           {
              controller: "quizzes/quiz_reports",
              action: "index",
              format: "json",
              course_id: @course.id.to_s,
              quiz_id: @quiz.id.to_s
-           }, params, headers
+           },
+           params,
+           headers
     end
 
     it "denies unprivileged access" do
@@ -55,7 +59,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
         json = api_index
         expect(json.length).to eq 2
-        expect(json.map { |report| report["report_type"] }.sort)
+        expect(json.pluck("report_type").sort)
           .to eq %w[item_analysis student_analysis]
       end
 
@@ -69,22 +73,22 @@ describe Quizzes::QuizReportsController, type: :request do
 
         describe "the `includes_all_versions` flag" do
           it "enables it" do
-            expect(student_analysis(includes_all_versions: true)["includes_all_versions"]).to eq true
+            expect(student_analysis(includes_all_versions: true)["includes_all_versions"]).to be true
           end
 
           it "defaults to false" do
-            expect(student_analysis["includes_all_versions"]).to eq false
+            expect(student_analysis["includes_all_versions"]).to be false
           end
         end
 
         describe "includes_sis_ids" do
           it "includes sis ids for users with access" do
-            expect(student_analysis["includes_sis_ids"]).to eq true
+            expect(student_analysis["includes_sis_ids"]).to be true
           end
 
           it "does not include sis ids for users without access" do
             ta_in_course(active_all: true)
-            expect(student_analysis["includes_sis_ids"]).to eq false
+            expect(student_analysis["includes_sis_ids"]).to be false
           end
         end
       end
@@ -98,7 +102,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
           expect(json["quiz_reports"]).to be_present
           expect(json["quiz_reports"].length).to eq 2
-          expect(json["quiz_reports"].map { |report| report["report_type"] }.sort)
+          expect(json["quiz_reports"].pluck("report_type").sort)
             .to eq %w[item_analysis student_analysis]
         end
       end
@@ -109,14 +113,18 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_create(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
-      send method, :post,
-           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
+      send method,
+           :post,
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports",
+           {
              controller: "quizzes/quiz_reports",
              action: "create",
              format: "json",
              course_id: @course.id.to_s,
              quiz_id: @quiz.id.to_s
-           }, params, headers
+           },
+           params,
+           headers
     end
 
     before :once do
@@ -149,7 +157,8 @@ describe Quizzes::QuizReportsController, type: :request do
                             quiz_reports: [{
                               report_type: "item_analysis"
                             }]
-                          }, { jsonapi: true })
+                          },
+                          { jsonapi: true })
 
         expect(Quizzes::QuizStatistics.count).to eq 1
 
@@ -184,9 +193,10 @@ describe Quizzes::QuizReportsController, type: :request do
 
         api_create({
                      quiz_reports: [{
-                       report_type: report_type
+                       report_type:
                      }]
-                   }, { jsonapi: true })
+                   },
+                   { jsonapi: true })
 
         new_job = Delayed::Job.where(tag: job_tag).first
 
@@ -200,9 +210,10 @@ describe Quizzes::QuizReportsController, type: :request do
 
         api_create({
                      quiz_reports: [{
-                       report_type: report_type
+                       report_type:
                      }]
-                   }, { jsonapi: true, raw: true })
+                   },
+                   { jsonapi: true, raw: true })
 
         assert_status(409)
       end
@@ -224,14 +235,17 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_abort
       raw_api_call(
         :delete,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{report.id}", {
+        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{report.id}",
+        {
           controller: "quizzes/quiz_reports",
           action: "abort",
           format: "json",
           course_id: @course.id.to_s,
           quiz_id: @quiz.id.to_s,
           id: report.id.to_s
-        }, {}, {
+        },
+        {},
+        {
           "Accept" => "application/vnd.api+json"
         }
       )
@@ -247,17 +261,17 @@ describe Quizzes::QuizReportsController, type: :request do
       report.generate_csv
       api_abort
       assert_status(204)
-      expect(report.reload.csv_attachment).to eq nil
+      expect(report.reload.csv_attachment).to be_nil
     end
 
     it "works when the report is queued for generation" do
       report.generate_csv_in_background
-      expect(report.reload.generating_csv?).to eq true
+      expect(report.reload.generating_csv?).to be true
 
       api_abort
 
       assert_status(204)
-      expect(report.reload.generating_csv?).to eq false
+      expect(report.reload.generating_csv?).to be false
     end
 
     it "works when the report failed to generate" do
@@ -282,15 +296,19 @@ describe Quizzes::QuizReportsController, type: :request do
     def api_show(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
       headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
-      send method, :get,
-           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{@report.id}", {
+      send method,
+           :get,
+           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{@report.id}",
+           {
              controller: "quizzes/quiz_reports",
              action: "show",
              format: "json",
              course_id: @course.id.to_s,
              quiz_id: @quiz.id.to_s,
              id: @report.id.to_s
-           }, params, headers
+           },
+           params,
+           headers
     end
 
     it "denies unprivileged access" do

@@ -59,6 +59,9 @@
     "cancel_caeb1e68": {
         "message": "Ακύρωση"
     },
+    "characters_9d897d1c": {
+        "message": "Χαρακτήρες"
+    },
     "choose_usage_rights_33683854": {
         "message": "Επιλέξτε δικαιώματα χρήσης..."
     },
@@ -119,6 +122,9 @@
     "date_ee500367": {
         "message": "Ημερομηνία"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "Μείωση Εσοχής Κειμένου"
+    },
     "deep_purple_bb3e2907": {
         "message": "Βαθύ μοβ"
     },
@@ -127,6 +133,9 @@
     },
     "delimiters_4db4840d": {
         "message": "Οριοθέτες"
+    },
+    "description_436c48d7": {
+        "message": "Περιγραφή"
     },
     "details_98a31b68": {
         "message": "Λεπτομέρειες"
@@ -148,6 +157,9 @@
     },
     "done_54e3d4b6": {
         "message": "Ολοκληρώθηκε"
+    },
+    "down_5831a426": {
+        "message": "Κάτω"
     },
     "due_5d7267be": {
         "message": "Καταληκτική Ημερ/νία:"
@@ -200,6 +212,9 @@
     "home_351838cd": {
         "message": "Αρχική Σελίδα"
     },
+    "html_editor_fb2ab713": {
+        "message": "Επεξεργαστής HTML"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Πήρα άδεια για να χρησιμοποιήσω αυτό το αρχείο."
     },
@@ -215,6 +230,9 @@
     "images_7ce26570": {
         "message": "Εικόνες"
     },
+    "increase_indent_6af90f7c": {
+        "message": "Αύξηση Εσοχής Κειμένου"
+    },
     "indigo_2035fc55": {
         "message": "Λουλακί"
     },
@@ -223,6 +241,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Εισαγωγή Συνδέσμου"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Εισαγωγή Μαθηματικής Εξίσωσης"
     },
     "invalid_file_type_881cc9b2": {
         "message": "Μη έγκυρος τύπος αρχείου"
@@ -290,6 +311,9 @@
     "missing_1a256b3b": {
         "message": "Απομένει"
     },
+    "module_90d9fd32": {
+        "message": "Ενότητα"
+    },
     "modules_c4325335": {
         "message": "Ενότητες"
     },
@@ -299,8 +323,17 @@
     "name_1aed4a1b": {
         "message": "Όνομα"
     },
+    "navigation_ee9af92d": {
+        "message": "Πλοήγηση"
+    },
     "new_13daf639": {
         "message": "Νέο"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Νέο Κουίζ"
+    },
+    "next_40e12421": {
+        "message": "Επόμενο"
     },
     "no_e16d9132": {
         "message": "μη δημοσιευμένο"
@@ -344,6 +377,9 @@
     "points_bceb5005": {
         "message": "Μόρια"
     },
+    "prev_f82cbc48": {
+        "message": "Προηγούμενο"
+    },
     "preview_53003fd2": {
         "message": "Προεπισκόπηση"
     },
@@ -364,6 +400,9 @@
     },
     "record_7c9448b": {
         "message": "Ηχογράφηση"
+    },
+    "recording_98da6bda": {
+        "message": "Εγγράφεται"
     },
     "red_8258edf3": {
         "message": "Κόκκινο"
@@ -389,11 +428,17 @@
     "search_280d00bd": {
         "message": "Αναζήτηση"
     },
+    "selection_b52c4c5e": {
+        "message": "Επιλογή"
+    },
     "size_b30e1077": {
         "message": "Μέγεθος"
     },
     "star_8d156e09": {
         "message": " "
+    },
+    "start_over_f7552aa9": {
+        "message": "Ξεκινήστε Ξανά"
     },
     "submit_a3cc6859": {
         "message": "Υποβολή"
@@ -440,6 +485,9 @@
     "unpublished_dfd8801": {
         "message": "μη δημοσιευμένο"
     },
+    "up_c553575d": {
+        "message": "Επάνω"
+    },
     "upload_file_fd2361b8": {
         "message": "Φόρτωση Αρχείου"
     },
@@ -454,6 +502,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "Δικαίωμα Χρήσης:"
+    },
+    "video_player_b371005": {
+        "message": "Πρόγραμμα Αναπαραγωγής Βίντεο"
     },
     "view_ba339f93": {
         "message": "Προβολή"

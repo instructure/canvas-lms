@@ -19,19 +19,19 @@
 
 require_relative "../lti_1_3_spec_helper"
 
-RSpec.describe DeveloperKeyAccountBinding, type: :model do
+RSpec.describe DeveloperKeyAccountBinding do
   include_context "lti_1_3_spec_helper"
 
   let(:account) { account_model }
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_binding) do
     DeveloperKeyAccountBinding.new(
-      account: account,
-      developer_key: developer_key
+      account:,
+      developer_key:
     )
   end
   let(:params) { {} }
-  let(:root_account_key) { DeveloperKey.create!(account: account, **params) }
+  let(:root_account_key) { DeveloperKey.create!(account:, **params) }
   let(:root_account_binding) { root_account_key.developer_key_account_bindings.first }
 
   describe "validations and callbacks" do
@@ -54,17 +54,17 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     describe "workflow state" do
       it 'allows "off"' do
         dev_key_binding.workflow_state = "off"
-        expect(dev_key_binding.valid?).to eq true
+        expect(dev_key_binding.valid?).to be true
       end
 
       it 'allows "allow"' do
         dev_key_binding.workflow_state = "allow"
-        expect(dev_key_binding.valid?).to eq true
+        expect(dev_key_binding.valid?).to be true
       end
 
       it 'allows "on"' do
         dev_key_binding.workflow_state = "on"
-        expect(dev_key_binding.valid?).to eq true
+        expect(dev_key_binding.valid?).to be true
       end
 
       it "does not allow invalid workflow states" do
@@ -76,8 +76,8 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
 
       it 'defaults to "off"' do
         binding = DeveloperKeyAccountBinding.create!(
-          account: account,
-          developer_key: developer_key
+          account:,
+          developer_key:
         )
         expect(binding.workflow_state).to eq "off"
       end
@@ -86,7 +86,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     describe "after update" do
       subject { site_admin_binding.update!(update_parameters) }
 
-      let(:update_parameters) { { workflow_state: workflow_state } }
+      let(:update_parameters) { { workflow_state: } }
       let(:site_admin_key) { DeveloperKey.create! }
       let(:site_admin_binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
 
@@ -195,7 +195,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     end
 
     it "returns nil if the devleoper key is a non-site admin key" do
-      expect(DeveloperKeyAccountBinding.find_site_admin_cached(root_account_key)).to eq nil
+      expect(DeveloperKeyAccountBinding.find_site_admin_cached(root_account_key)).to be_nil
     end
   end
 

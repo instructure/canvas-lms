@@ -31,8 +31,12 @@ describe CanvasQuizStatistics::Analyzers::Calculated do
   describe "[:graded]" do
     it "reflects the number of graded answers" do
       output = subject.run([
-                             { correct: true }, { correct: "true" }, { correct: "undefined" },
-                             { correct: false }, { correct: "false" }, {}
+                             { correct: true },
+                             { correct: "true" },
+                             { correct: "undefined" },
+                             { correct: false },
+                             { correct: "false" },
+                             {}
                            ])
 
       expect(output[:graded]).to eq(2)

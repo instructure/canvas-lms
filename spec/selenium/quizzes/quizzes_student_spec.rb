@@ -58,7 +58,7 @@ describe "quizzes" do
 
       context "when attempting to resume a quiz" do
         def update_quiz_lock(lock_at, unlock_at)
-          @quiz.update(lock_at: lock_at, unlock_at: unlock_at)
+          @quiz.update(lock_at:, unlock_at:)
         end
 
         describe "on individual quiz page" do
@@ -190,7 +190,8 @@ describe "quizzes" do
     before do
       quiz_with_submission
       @quiz.update(show_correct_answers: true,
-                   show_correct_answers_last_attempt: true, allowed_attempts: 2)
+                   show_correct_answers_last_attempt: true,
+                   allowed_attempts: 2)
       @quiz.save!
     end
 

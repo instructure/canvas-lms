@@ -10,12 +10,11 @@ Gem::Specification.new do |spec|
   spec.summary       = "Generate CSV diffs"
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
   spec.add_dependency "sqlite3"
 
   spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.5.0"
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec", "~> 3.12"
 end

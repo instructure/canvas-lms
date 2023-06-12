@@ -24,7 +24,7 @@ module CC
 
     ZIP_DIR = "zip_dir"
 
-    attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration
+    attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration, :disable_content_rewriting
 
     delegate :add_error, :add_item_to_export, to: :@content_export, allow_nil: true
 
@@ -33,6 +33,7 @@ module CC
       @course = opts[:course] || @content_export.context
       raise "CCExporter supports only Courses" unless @course.is_a?(Course) # a Course is a Course, of course, of course
 
+      @disable_content_rewriting = @content_export&.disable_content_rewriting?
       @user = opts[:user] || @content_export.user
       @export_dir = nil
       @manifest = nil
@@ -76,7 +77,8 @@ module CC
             # if it's selective, we have to wait until we've completed the rest of the export
             # before we really know what we exported. because magic
             @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
-                                                                                          selective: true, exported_assets: @content_export.exported_assets.to_a)
+                                                                                          selective: true,
+                                                                                          exported_assets: @content_export.exported_assets.to_a)
           end
           external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@content_export, @pending_exports)
           write_external_content(external_content)
@@ -148,7 +150,7 @@ module CC
     end
 
     def export_id
-      @content_export ? @content_export.id : nil
+      @content_export&.id
     end
 
     def create_key(*args)

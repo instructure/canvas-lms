@@ -54,7 +54,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     if: lambda do |model|
       CALCULATION_METHODS.include?(model.calculation_method)
     end,
-    message: "invalid calculation_int for this calculation_method"
+    message: -> { t("invalid calculation_int for this calculation_method") }
   }
 
   after_save :clear_cached_methods
@@ -64,12 +64,12 @@ class OutcomeCalculationMethod < ApplicationRecord
   end
 
   def self.find_or_create_default!(context)
-    method = OutcomeCalculationMethod.find_by(context: context)
+    method = OutcomeCalculationMethod.find_by(context:)
     if method&.workflow_state == "active"
       return method
     end
 
-    method ||= OutcomeCalculationMethod.new(context: context)
+    method ||= OutcomeCalculationMethod.new(context:)
     method.workflow_state = "active"
     method.calculation_method = "highest"
     method.calculation_int = nil

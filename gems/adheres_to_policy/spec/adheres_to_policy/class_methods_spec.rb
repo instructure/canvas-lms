@@ -63,7 +63,7 @@ describe AdheresToPolicy::ClassMethods do
     end
 
     some_class = @some_class.new
-    expect(some_class.grants_right?(nil, :read)).to eq true
-    expect(some_class.grants_right?(nil, :write)).to eq true
+    expect(some_class.grants_right?(nil, :read)).to be true
+    expect(some_class.grants_right?(nil, :write)).to be true
   end
 end

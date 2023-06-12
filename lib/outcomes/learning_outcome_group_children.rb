@@ -21,6 +21,7 @@
 module Outcomes
   class LearningOutcomeGroupChildren
     include OutcomesFeaturesHelper
+    include OutcomesServiceAlignmentsHelper
     attr_reader :context
 
     SHORT_DESCRIPTION = "coalesce(learning_outcomes.short_description, '')"
@@ -105,7 +106,7 @@ module Outcomes
       # cache this in the class since this won't change so much
       @supported_languages ||= ContentTag.connection.execute(
         "SELECT cfgname FROM pg_ts_config"
-      ).to_a.map { |r| r["cfgname"] }
+      ).to_a.pluck("cfgname")
     end
 
     private
@@ -122,7 +123,7 @@ module Outcomes
     end
 
     def filter_outcomes(relation, filter)
-      if %w[WITH_ALIGNMENTS NO_ALIGNMENTS].include?(filter) && outcome_alignment_summary_enabled?(@context)
+      if %w[WITH_ALIGNMENTS NO_ALIGNMENTS].include?(filter) && improved_outcomes_management_enabled?(@context)
         outcomes_with_alignments_in_context = ContentTag
                                               .not_deleted
                                               .where(
@@ -132,6 +133,16 @@ module Outcomes
                                               )
                                               .map(&:learning_outcome_id)
                                               .uniq
+
+        if outcome_alignment_summary_with_new_quizzes_enabled?(@context)
+          outcomes_with_alignments_in_os = get_os_aligned_outcomes(@context)
+
+          if outcomes_with_alignments_in_os
+            outcomes_with_alignments_in_context
+              .concat(outcomes_with_alignments_in_os.keys.map(&:to_i))
+              .uniq
+          end
+        end
 
         return relation.where(content_id: outcomes_with_alignments_in_context) if filter == "WITH_ALIGNMENTS"
         return relation.where.not(content_id: outcomes_with_alignments_in_context) if filter == "NO_ALIGNMENTS"
@@ -167,7 +178,7 @@ module Outcomes
               SQL
             end
 
-      search_query_tokens = ContentTag.connection.execute(sql).to_a.map { |r| r["token"] }.uniq
+      search_query_tokens = ContentTag.connection.execute(sql).to_a.pluck("token").uniq
 
       short_description_query = ContentTag.sanitize_sql_array(["#{SHORT_DESCRIPTION} ~* ANY(array[?])",
                                                                search_query_tokens])
@@ -203,7 +214,7 @@ module Outcomes
         SELECT id FROM levels
       SQL
 
-      LearningOutcomeGroup.connection.execute(sql).as_json.map { |r| r["id"] }
+      LearningOutcomeGroup.connection.execute(sql).as_json.pluck("id")
     end
 
     def context_timestamp_cache
@@ -241,7 +252,7 @@ module Outcomes
 
     def lang
       # lang can be nil, so we check with instance_variable_defined? method
-      unless instance_variable_defined?("@lang")
+      unless instance_variable_defined?(:@lang)
         account = context&.root_account || LoadAccount.default_domain_root_account
         @lang = MAP_CANVAS_POSTGRES_LOCALES[account.default_locale || "en"]
       end

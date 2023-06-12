@@ -60,8 +60,8 @@ class Enrollment::BatchStateUpdater
       @user_ids = Enrollment.where(id: batch).order(:user_id).distinct.pluck(:user_id)
       @courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
       @root_account = @courses.first.root_account
-      @data = mark_enrollments_as_deleted(batch, sis_batch: sis_batch, batch_mode: batch_mode)
-      gms = remove_group_memberships(batch, @courses, @user_ids, sis_batch: sis_batch, batch_mode: batch_mode)
+      @data = mark_enrollments_as_deleted(batch, sis_batch:, batch_mode:)
+      gms = remove_group_memberships(batch, @courses, @user_ids, sis_batch:, batch_mode:)
       @data&.push(*gms) if gms
       # touch users after removing group_memberships to invalidate the cache.
       cancel_future_appointments(@courses, @user_ids)
@@ -86,15 +86,17 @@ class Enrollment::BatchStateUpdater
     EnrollmentState.where(enrollment_id: batch).update_all_locked_in_order(state: "deleted", state_valid_until: nil, updated_at: Time.now.utc)
     # we need the order to match the queries in GradeCalculator's save_course_and_grading_period_scores and save_assignment_group_scores,
     # _and_ the fact that the former runs first
-    Score.where(enrollment_id: batch).order(Arel.sql("assignment_group_id NULLS FIRST, enrollment_id")).update_all_locked_in_order(workflow_state: "deleted", updated_at: Time.zone.now)
+    Score.transaction do
+      Score.where(enrollment_id: batch).order(Arel.sql("assignment_group_id NULLS FIRST, enrollment_id")).in_batches(of: 10_000).update_all_locked_in_order(workflow_state: "deleted", updated_at: Time.zone.now)
+    end
     data
   end
 
   # updates enrollment objects to a workflow_state and generates sis_batch_data
   # and assigns sis_batch_id if there is a sis_batch.
   def self.mark_enrollments_as_state(batch, workflow_state:, sis_batch: nil, batch_mode: false)
-    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: workflow_state, batch_mode_delete: batch_mode)
-    updates = { workflow_state: workflow_state, updated_at: Time.now.utc }
+    data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: batch, updated_state: workflow_state, batch_mode_delete: batch_mode)
+    updates = { workflow_state:, updated_at: Time.now.utc }
     updates[:sis_batch_id] = sis_batch.id if sis_batch
     Enrollment.where(id: batch).update_all_locked_in_order(**updates)
     data
@@ -114,7 +116,7 @@ class Enrollment::BatchStateUpdater
                                   user_id: user_ids).where.not(user_id: c.enrollments.where.not(id: batch).pluck(:user_id))
       next unless gms.exists?
 
-      rollback = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: gms, updated_state: "deleted", batch_mode_delete: batch_mode)
+      rollback = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: gms, updated_state: "deleted", batch_mode_delete: batch_mode)
       data.push(*rollback)
       leader_change_groups = Group.joins(:group_memberships).where(group_memberships: { id: gms }, leader_id: user_ids)
       leader_change_groups.update_all(leader_id: nil, updated_at: Time.zone.now)
@@ -152,7 +154,7 @@ class Enrollment::BatchStateUpdater
   def self.disassociate_cross_shard_users(user_ids); end
 
   def self.update_linked_enrollments(students, restore: false)
-    students.each { |e| e.update_linked_enrollments(restore: restore) }
+    students.each { |e| e.update_linked_enrollments(restore:) }
   end
 
   def self.touch_all_graders_if_needed(students)
@@ -240,7 +242,7 @@ class Enrollment::BatchStateUpdater
 
   def self.update_batch_state(batch, root_account:, **kwargs)
     data = mark_enrollments_as_state(batch, **kwargs)
-    run_call_backs_for(batch, root_account: root_account, n_strand_root: "batch_mode_for")
+    run_call_backs_for(batch, root_account:, n_strand_root: "batch_mode_for")
     data
   end
 

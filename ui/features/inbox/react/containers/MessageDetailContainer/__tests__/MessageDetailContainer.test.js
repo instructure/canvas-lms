@@ -128,6 +128,11 @@ describe('MessageDetailContainer', () => {
           await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body)
         ).toBeInTheDocument()
       })
+
+      it('should render (No subject) when subject is empty', () => {
+        const container = setup({conversation: Conversation.mock({subject: ''})})
+        expect(container.getByText('(No subject)')).toBeInTheDocument()
+      })
     })
 
     describe('function inputs', () => {

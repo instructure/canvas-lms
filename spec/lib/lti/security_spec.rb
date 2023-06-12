@@ -37,12 +37,12 @@ describe Lti::Security do
           :post,
           launch_url,
           params,
-          consumer_key: consumer_key,
-          consumer_secret: consumer_secret,
-          nonce: nonce,
-          timestamp: timestamp
+          consumer_key:,
+          consumer_secret:,
+          nonce:,
+          timestamp:
         )
-        expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+        expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
       end
 
       it "doesn't copy query params" do
@@ -71,8 +71,11 @@ describe Lti::Security do
           expect(line).to match(/abc%250D%250Axyz/i)
         end
         Lti::Security.signed_post_params(
-          params.merge(custom_b: "abc\nxyz"), "http://example.com/",
-          consumer_key, consumer_secret, true
+          params.merge(custom_b: "abc\nxyz"),
+          "http://example.com/",
+          consumer_key,
+          consumer_secret,
+          true
         )
       end
     end
@@ -147,12 +150,12 @@ describe Lti::Security do
         :post,
         launch_url,
         params,
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "handles whitespace in URLs" do
@@ -166,12 +169,12 @@ describe Lti::Security do
         :post,
         url_with_whitespace.strip,
         params,
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "generates the signature for urls with query params in an incorrect way that we are aware of and saddened by" do
@@ -188,12 +191,12 @@ describe Lti::Security do
         :post,
         launch_url, # Note that we are using a different url to generate a signature than before :-(
         params.merge(test: "foo"),
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "generates the signature correctly for a non standard port" do
@@ -207,12 +210,12 @@ describe Lti::Security do
         :post,
         url,
         params,
-        consumer_key: consumer_key,
-        consumer_secret: consumer_secret,
-        nonce: nonce,
-        timestamp: timestamp
+        consumer_key:,
+        consumer_secret:,
+        nonce:,
+        timestamp:
       )
-      expect(header.valid?(signature: signed_params["oauth_signature"])).to eq true
+      expect(header.valid?(signature: signed_params["oauth_signature"])).to be true
     end
 
     it "logs the oauth base string" do
@@ -238,8 +241,10 @@ describe Lti::Security do
         expect(line).to match(/abc%250D%250Axyz/i)
       end
       Lti::Security.signed_post_params(
-        params.merge(custom_b: "abc\nxyz"), "http://example.com/",
-        consumer_key, consumer_secret
+        params.merge(custom_b: "abc\nxyz"),
+        "http://example.com/",
+        consumer_key,
+        consumer_secret
       )
     end
   end

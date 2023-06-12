@@ -76,9 +76,9 @@ module SubmittablesGradingPeriodProtection
   def grading_periods_allow_assignment_overrides_batch_update?(submittable, prepared_batch, flash_message: false)
     return true unless constrained_by_grading_periods?
 
-    can_create_overrides?(submittable, prepared_batch[:overrides_to_create], flash_message: flash_message) &&
-      can_update_overrides?(submittable, prepared_batch[:overrides_to_update], flash_message: flash_message) &&
-      can_delete_overrides?(submittable, prepared_batch[:overrides_to_delete], flash_message: flash_message)
+    can_create_overrides?(submittable, prepared_batch[:overrides_to_create], flash_message:) &&
+      can_update_overrides?(submittable, prepared_batch[:overrides_to_update], flash_message:) &&
+      can_delete_overrides?(submittable, prepared_batch[:overrides_to_delete], flash_message:)
   end
 
   def grading_periods_allow_assignment_override_update?(override)

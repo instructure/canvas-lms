@@ -143,7 +143,7 @@ class EportfolioEntry < ActiveRecord::Base
     self.name ||= t(:default_name, "Page Name")
     self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
     pages = pages.where("id<>?", self) unless new_record?
-    match_cnt = pages.where(slug: slug).count
+    match_cnt = pages.where(slug:).count
     if match_cnt > 0
       self.slug = slug + "_" + (match_cnt + 1).to_s
     end

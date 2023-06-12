@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,17 +22,18 @@ import bridge from '../../../bridge'
 import configureStore from '../../../sidebar/store/configureStore'
 import {get as getSession} from '../../../sidebar/actions/session'
 import {uploadToMediaFolder} from '../../../sidebar/actions/upload'
-import doFileUpload from '../shared/Upload/doFileUpload'
+import doFileUpload, {DoFileUploadResult} from '../shared/Upload/doFileUpload'
 import formatMessage from '../../../format-message'
 import {isAudioOrVideo, isImage} from '../shared/fileTypeUtils'
 import {showFlashAlert} from '../../../common/FlashAlert'
 import {TsMigrationAny} from '../../../types/ts-migration'
 import {
+  isMicrosoftWordContentInEvent,
+  RCEClipOrDragEvent,
   TinyClipboardEvent,
   TinyDragEvent,
-  RCEClipOrDragEvent,
-  isMicrosoftWordContentInEvent,
 } from '../shared/EventUtils'
+import RCEWrapper from '../../RCEWrapper'
 
 // assume that if there are multiple RCEs on the page,
 // they all talk to the same canvas
@@ -73,101 +75,125 @@ function initStore(initProps) {
   return config.store
 }
 
-// if the context requires usage rights to publish a file
-// open the UI for that instead of automatically uploading
-function getUsageRights(ed: Editor, document: Document, theFile: File) {
-  return doFileUpload(ed, document, {
-    accept: theFile.type,
-    panels: ['COMPUTER'],
-    preselectedFile: theFile,
-  })
-}
+tinymce.PluginManager.add(
+  'instructure_paste',
+  function (editor: Editor & {rceWrapper?: RCEWrapper}) {
+    const store = initStore(bridge.trayProps.get(editor))
 
-function handleMultiFilePaste(_files) {
-  showFlashAlert({
-    message: formatMessage("Sorry, we don't support multiple files."),
-    type: 'info',
-  } as TsMigrationAny)
-}
+    /**
+     * Starts the file upload (and insertion) process for the given file.
+     *
+     * If usage rights are required, a dialog will be displayed.
+     *
+     * @returns a promise that resolves when the user has made their choice about uploading the file
+     */
+    async function requestFileInsertion(file: File): Promise<DoFileUploadResult> {
+      // it's very doubtful that we won't have retrieved the session data yet,
+      // since it takes a while for the RCE to initialize, but if we haven't
+      // wait until we do to carry on and finish pasting.
+      await config.sessionPromise
 
-function delegateToTiny(ed: Editor, event: RCEClipOrDragEvent) {
-  // delegate to tinymce and prevent infinite recursion
-  event.instructure_handled_already = true
-  ed.fire('paste', event as TinyClipboardEvent)
-}
+      if (config.session === null) {
+        // we failed to get the session and don't know if usage rights are required in this course|group
+        // In all probability, the file upload will fail too, but I feel like we have to do something here.
+        showFlashAlert({
+          message: formatMessage(
+            'If Usage Rights are required, the file will not publish until enabled in the Files page.'
+          ),
+          type: 'info',
+        } as TsMigrationAny)
+      }
 
-tinymce.PluginManager.add('instructure_paste', function (ed: Editor) {
-  const store = initStore(bridge.trayProps.get(ed))
+      // even though usage rights might be required by the course, canvas has no place
+      // on the user to store it. Only Group and Course.
+      const requiresUsageRights =
+        config.session.usageRightsRequired &&
+        /course|group/.test(bridge.trayProps.get(editor).contextType)
 
-  function handlePasteOrDrop(event: RCEClipOrDragEvent) {
-    if (event.instructure_handled_already) return
-    const cbdata =
-      event.type === 'paste'
+      if (requiresUsageRights) {
+        return doFileUpload(editor, document, {
+          accept: file.type,
+          panels: ['COMPUTER'],
+          preselectedFile: file,
+        }).closedPromise
+      } else {
+        const fileMetaProps = {
+          altText: file.name,
+          contentType: file.type,
+          displayAs: 'embed',
+          isDecorativeImage: false,
+          name: file.name,
+          parentFolderId: 'media',
+          size: file.size,
+          domObject: file,
+        }
+
+        let tabContext = 'documents'
+
+        if (isImage(file.type)) {
+          tabContext = 'images'
+        } else if (isAudioOrVideo(file.type)) {
+          tabContext = 'media'
+        }
+
+        store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
+
+        return 'submitted'
+      }
+    }
+
+    async function handlePasteOrDrop(event: RCEClipOrDragEvent) {
+      const isPaste = event.type === 'paste'
+      const dataTransfer = isPaste
         ? (event as TinyClipboardEvent).clipboardData
         : (event as TinyDragEvent).dataTransfer
-    const files = cbdata?.files || []
-    const types = cbdata?.types || []
+      const files = Array.from(dataTransfer?.files || [])
+      const types = dataTransfer?.types || []
 
-    if (types.includes('Files')) {
-      if (files.length > 1) {
-        handleMultiFilePaste(files)
-        return
-      }
+      const isAudioVideoDisabled = bridge.activeEditor()?.props?.instRecordDisabled
 
-      if (isMicrosoftWordContentInEvent(event)) {
-        delegateToTiny(ed, event)
-        return
-      }
+      // delegate to tiny if there aren't any files to handle
+      if (!types.includes('Files')) return
 
-      // we're pasting a file
+      // delegate to tiny if there is Microsoft Word content, because it may contain an image
+      // rendering of the content and we don't want to incorrectly paste the image
+      // instead of the actual rich content, which TinyMCE has special handing for
+      if (isMicrosoftWordContentInEvent(event)) return
+
+      // we're pasting file(s), prevent the default tinymce pasting behavior
       event.preventDefault()
-      const file = files[0]
-      if (bridge.activeEditor().props.instRecordDisabled && isAudioOrVideo(file.type)) {
+
+      // Ensure the editor has focus, because downstream code requires that it does, and drag-n-drop
+      // events can be started when the editor doesn't have focus.
+      if (!editor.hasFocus()) editor.rceWrapper?.focus()
+
+      // Checking if we've encountered an issue with file processing for paste events in the browser
+      // Specifically implementing due to this bug in Firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=1699743
+      // However, there could be other issues that cause this condition so it's a nice safety net regardless
+      if (isPaste && files.some(file => file.size === 0)) {
+        showFlashAlert({
+          message: formatMessage(
+            'One or more files failed to paste. Please try uploading or dragging and dropping files.'
+          ),
+          type: 'error',
+        })
         return
       }
-      if (/(?:course|group)/.test(bridge.trayProps.get(ed).contextType)) {
-        // it's very doubtful that we won't have retrieved the session data yet,
-        // since it takes a while for the RCE to initialize, but if we haven't
-        // wait until we do to carry on and finish pasting.
-        // eslint-disable-next-line promise/catch-or-return
-        config.sessionPromise.finally(() => {
-          if (config.session === null) {
-            // we failed to get the session and don't know if usage rights are required in this course|group
-            // In all probability, the file upload will fail too, but I feel like we have to do something here.
-            showFlashAlert({
-              message: formatMessage(
-                'If Usage Rights are required, the file will not publish until enabled in the Files page.'
-              ),
-              type: 'info',
-            } as TsMigrationAny)
-          }
-          if (config.session && config.session.usageRightsRequired) {
-            return getUsageRights(ed, document, file)
-          } else {
-            const fileMetaProps = {
-              altText: file.name,
-              contentType: file.type,
-              displayAs: 'embed',
-              isDecorativeImage: false,
-              name: file.name,
-              parentFolderId: 'media',
-              size: file.size,
-              domObject: file,
-            }
-            let tabContext = 'documents'
-            if (isImage(file.type)) {
-              tabContext = 'images'
-            } else if (isAudioOrVideo(file.type)) {
-              tabContext = 'media'
-            }
-            store.dispatch(uploadToMediaFolder(tabContext, fileMetaProps))
-          }
-        })
+
+      for (const file of files) {
+        if (isAudioVideoDisabled && isAudioOrVideo(file.type)) {
+          // Skip audio and video files when disabled
+          continue
+        }
+
+        // This will finish once the dialog is closed, if one was created, putting this in a loop allows us
+        // to show a dialog for each file without them conflicting.
+        // eslint-disable-next-line no-await-in-loop
+        await requestFileInsertion(file)
       }
-    } else {
-      delegateToTiny(ed, event)
     }
+
+    editor.on('paste', handlePasteOrDrop)
+    editor.on('drop', handlePasteOrDrop)
   }
-  ed.on('paste', handlePasteOrDrop)
-  ed.on('drop', handlePasteOrDrop)
-})
+)

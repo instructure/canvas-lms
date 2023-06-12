@@ -24,8 +24,8 @@ describe "discussions" do
   include DiscussionsCommon
 
   let(:course) { course_model.tap(&:offer!) }
-  let(:student) { student_in_course(course: course, name: "student", active_all: true).user }
-  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:student) { student_in_course(course:, name: "student", active_all: true).user }
+  let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
   let(:student_topic) { course.discussion_topics.create!(user: student, title: "student topic title", message: "student topic message") }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: "teacher topic title", message: "teacher topic message") }
   let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
@@ -33,14 +33,26 @@ describe "discussions" do
     course.assignments.create!(
       name: "assignment",
       # submission_types: 'discussion_topic',
-      assignment_group: assignment_group
+      assignment_group:
     )
   end
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: "assignment topic title",
                                      message: "assignment topic message",
-                                     assignment: assignment)
+                                     assignment:)
+  end
+  let(:assignment_with_points) do
+    course.assignments.create!(
+      name: "assignment",
+      points_possible: 10
+    )
+  end
+  let(:graded_discussion) do
+    course.discussion_topics.create!(user: teacher,
+                                     title: "graded discussion topic",
+                                     message: "assignment topic message",
+                                     assignment: assignment_with_points)
   end
   let(:entry) { topic.discussion_entries.create!(user: teacher, message: "teacher entry") }
 
@@ -64,6 +76,27 @@ describe "discussions" do
 
       before do
         user_session(student)
+      end
+
+      context "restrict quantitative data" do
+        before do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+        end
+
+        it "hides points possible" do
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
+          wait_for_ajaximations
+          expect(f("#discussion_container").text).to include("This is a graded discussion")
+          expect(f("#discussion_container").text).not_to include("This is a graded discussion: 10 points possible")
+        end
       end
 
       context "teacher topic" do
@@ -150,6 +183,26 @@ describe "discussions" do
         user_session(teacher)
       end
 
+      context "restrict quantitative data" do
+        before do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+        end
+
+        it "does not hide points possible" do
+          # truthy permission(since enabled is being "not"ed)
+          Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+          Account.default.reload
+          get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
+          wait_for_ajaximations
+          expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
+        end
+      end
+
       it "creates a group discussion", priority: "1" do
         group
         get "/courses/#{course.id}/discussion_topics"
@@ -161,9 +214,9 @@ describe "discussions" do
         expect(drop_down).to include("category 1")
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }
-        expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                           " each group has its own conversation for this topic."\
-                                                           " Here are the ones you have access to:\nsome group")
+        expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                           "each group has its own conversation for this topic. " \
+                                                           "Here are the ones you have access to:\nsome group")
       end
 
       it "creates a graded discussion", priority: "1" do
@@ -202,9 +255,9 @@ describe "discussions" do
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }
         expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
-        expect(f("#discussion_container").text).to include("Since this is a group discussion,"\
-                                                           " each group has its own conversation for this topic."\
-                                                           " Here are the ones you have access to:\nsome group")
+        expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
+                                                           "each group has its own conversation for this topic. " \
+                                                           "Here are the ones you have access to:\nsome group")
         expect(f("a.discussion-reply-action[role='button']")).to be_present
       end
 

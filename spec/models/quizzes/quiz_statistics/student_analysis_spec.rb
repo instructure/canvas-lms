@@ -21,7 +21,7 @@ require_relative "common"
 
 describe Quizzes::QuizStatistics::StudentAnalysis do
   def temporary_user_code
-    "tmp_#{Digest::MD5.hexdigest("#{Time.now.to_i}_#{rand}")}"
+    "tmp_#{Digest::SHA256.hexdigest("#{Time.now.to_i}_#{rand}")}"
   end
 
   def survey_with_logged_out_submission
@@ -252,8 +252,11 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       section2 = CourseSection.new(course: @course, name: "section2")
       section2.sis_source_id = "SISSection02"
       section2.save!
-      @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active",
-                                                         allow_multiple_enrollments: true, section: section2)
+      @course.enroll_user(@student,
+                          "StudentEnrollment",
+                          enrollment_state: "active",
+                          allow_multiple_enrollments: true,
+                          section: section2)
       @student.save!
 
       @quiz.quiz_questions.create!({
@@ -383,7 +386,8 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q = @course.quizzes.create!(title: "new quiz")
     q.update_attribute :published_at, Time.now
     question = q.quiz_questions.create! question_data: {
-      name: "q1", points_possible: 1,
+      name: "q1",
+      points_possible: 1,
       question_type: "file_upload_question",
       question_text: "ohai mark"
     }
@@ -392,7 +396,8 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     qs = q.generate_submission student
     io = fixture_file_upload("docs/doc.doc", "application/msword", true)
     attach = qs.attachments.create! filename: "doc.doc",
-                                    display_name: "attachment.png", user: student,
+                                    display_name: "attachment.png",
+                                    user: student,
                                     uploaded_data: io
     qs.submission_data["question_#{question.id}".to_sym] = [attach.id.to_s]
     qs.save!
@@ -534,7 +539,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
     stats = q.statistics
 
-    expect(stats[:questions].first.last[:user_ids].first).to eq nil
+    expect(stats[:questions].first.last[:user_ids].first).to be_nil
   end
 
   it "does not count student view submissions" do

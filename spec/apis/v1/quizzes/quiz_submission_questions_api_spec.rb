@@ -199,9 +199,9 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
         @quiz_submission = @quiz.generate_submission(@student)
         @quiz_submission.complete!(create_answers({ correct: false }))
         json = api_index
-        expect(json["quiz_submission_questions"].map { |q| q["correct"] }.all?).to be_falsey
+        expect(json["quiz_submission_questions"].pluck("correct").all?).to be_falsey
         json = api_index({}, { quiz_submission_attempt: 2 })
-        expect(json["quiz_submission_questions"].map { |q| q["correct"] }.all?).to be_truthy
+        expect(json["quiz_submission_questions"].pluck("correct").all?).to be_truthy
       end
 
       it "returns unauthorized when results are hidden in quiz settings" do
@@ -428,10 +428,11 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                             quiz_questions: [{
                               id: mc.id,
                               answer: 1658
-                            }, {
-                              id: formula.id,
-                              answer: 40.0
-                            }]
+                            },
+                                             {
+                                               id: formula.id,
+                                               answer: 40.0
+                                             }]
                           })
 
         expect(json["quiz_submission_questions"][0]["answers"].map(&:keys).uniq.include?("weight")).to be_falsey
@@ -714,7 +715,8 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                        id: question.id,
                        answer: "asdf"
                      }]
-                   }, { raw: true })
+                   },
+                   { raw: true })
 
         assert_status(400)
         expect(response.body).to match(/must be of type integer/i)
@@ -744,7 +746,8 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                        id: question.id,
                        answer: nil
                      }]
-                   }, { raw: true })
+                   },
+                   { raw: true })
 
         assert_status(403)
         expect(response.body).to match(/requires the lockdown browser/i)
@@ -759,10 +762,11 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
                             quiz_questions: [{
                               id: question1.id,
                               answer: 1658
-                            }, {
-                              id: question2.id,
-                              answer: 2.5e-3
-                            }]
+                            },
+                                             {
+                                               id: question2.id,
+                                               answer: 2.5e-3
+                                             }]
                           })
 
         expect(json["quiz_submission_questions"]).to be_present
@@ -792,7 +796,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
 
       expect(json["quiz_submission_questions"]).to be_present
       expect(json["quiz_submission_questions"].length).to eq 1
-      expect(json["quiz_submission_questions"][0]["flagged"]).to eq true
+      expect(json["quiz_submission_questions"][0]["flagged"]).to be true
     end
 
     it "prevents unauthorized flagging" do
@@ -817,7 +821,7 @@ describe Quizzes::QuizSubmissionQuestionsController, type: :request do
 
       expect(json["quiz_submission_questions"]).to be_present
       expect(json["quiz_submission_questions"].length).to eq 1
-      expect(json["quiz_submission_questions"][0]["flagged"]).to eq false
+      expect(json["quiz_submission_questions"][0]["flagged"]).to be false
     end
 
     it "prevents unauthorized unflagging" do

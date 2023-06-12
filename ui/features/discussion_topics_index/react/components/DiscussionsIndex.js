@@ -46,7 +46,7 @@ import {ConnectedIndexHeader} from './IndexHeader'
 import DiscussionsDeleteModal from './DiscussionsDeleteModal'
 
 import {renderTray} from '@canvas/move-item-tray'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import {selectPaginationState} from '@canvas/pagination/redux/actions'
 import {discussionList} from '../proptypes/discussion'
 import propTypes from '../propTypes'

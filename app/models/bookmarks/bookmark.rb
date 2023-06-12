@@ -28,6 +28,6 @@ class Bookmarks::Bookmark < ActiveRecord::Base
   end
 
   def as_json
-    super(include_root: false, except: [:json, :user_id]).merge({ data: data })
+    super(include_root: false, except: [:json, :user_id]).merge({ data: })
   end
 end

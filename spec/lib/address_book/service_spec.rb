@@ -177,7 +177,7 @@ describe AddressBook::Service do
         # doesn't know of recipient's participation, likely because of section
         # limited enrollment.
         section = @course3.course_sections.create!
-        teacher_in_course(user: @sender, course: @course3, active_all: true, section: section, limit_privileges_to_course_section: true)
+        teacher_in_course(user: @sender, course: @course3, active_all: true, section:, limit_privileges_to_course_section: true)
         expect(@address_book.known_users([@recipient], context: @course3)).not_to include(@recipient)
         expect(@address_book.common_courses(@recipient)).not_to include(@course3.id)
       end
@@ -405,7 +405,7 @@ describe AddressBook::Service do
 
     it "retains sender in service call if sender is a participating admin over :context" do
       course = course_model
-      teacher_in_course(user: @sender, course: course, active_all: true)
+      teacher_in_course(user: @sender, course:, active_all: true)
       stub_search_users(
         [@sender, { search: "Bob", context: course.global_asset_string }, { per_page: 10 }],
         { @recipient => :student }
@@ -430,12 +430,12 @@ describe AddressBook::Service do
     it "passes the pager's bookmark as cursor to service" do
       cursor = 5
       stub_search_users(
-        [@sender, { search: "Bob" }, { per_page: 10, cursor: cursor }],
+        [@sender, { search: "Bob" }, { per_page: 10, cursor: }],
         { @recipient => :student }
       )
 
       known_users = @address_book.search_users(search: "Bob")
-      bookmark = "bookmark:#{::JSONToken.encode(cursor)}"
+      bookmark = "bookmark:#{JSONToken.encode(cursor)}"
       page = known_users.paginate(per_page: 10, page: bookmark)
       expect(page.map(&:id)).to include(@recipient.id)
     end
@@ -463,7 +463,7 @@ describe AddressBook::Service do
       known_users = @address_book.search_users(search: "Bob")
       page = known_users.paginate(per_page: 1)
       expected_cursor = page.bookmark_for(other_recipient)
-      expected_bookmark = "bookmark:#{::JSONToken.encode(expected_cursor)}"
+      expected_bookmark = "bookmark:#{JSONToken.encode(expected_cursor)}"
       expect(page.next_page).to eq(expected_bookmark)
     end
 

@@ -64,21 +64,31 @@ PactConfig::Consumers::ALL.each do |consumer|
         mc = MediaObject.create(media_type: "audio", media_id: "1234", context: student, user: student, title: "Display Name")
 
         attachment = student.conversation_attachments_folder.attachments.create!(context: student,
-                                                                                 filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("test"))
+                                                                                 filename: "test.txt",
+                                                                                 display_name: "test.txt",
+                                                                                 uploaded_data: StringIO.new("test"))
 
         # Create two distinct conversations, both authored by student.
         # We need the two conversations to be able to test filtering.
         # We need different participant sets for each, or else they will be combined into one conversation.
         # We're providing an attachment and a media_comment for each.
-        conversation1 = conversation(student2, sender: student,
-                                               context_type: "Course", context_id: course.id, body: "Conversation 1 Body",
-                                               subject: "Subject 1", workflow_state: "read")
+        conversation1 = conversation(student2,
+                                     sender: student,
+                                     context_type: "Course",
+                                     context_id: course.id,
+                                     body: "Conversation 1 Body",
+                                     subject: "Subject 1",
+                                     workflow_state: "read")
         conversation1.messages.first.update!(media_comment: mc, attachment_ids: [attachment.id])
         conversation1.save!
 
-        conversation2 = conversation(teacher, sender: student,
-                                              context_type: "Course", context_id: course.id, body: "Conversation 2 Body",
-                                              subject: "Subject 2", workflow_state: "unread")
+        conversation2 = conversation(teacher,
+                                     sender: student,
+                                     context_type: "Course",
+                                     context_id: course.id,
+                                     body: "Conversation 2 Body",
+                                     subject: "Subject 2",
+                                     workflow_state: "unread")
         conversation2.messages.first.update!(media_comment: mc, attachment_ids: [attachment.id])
         conversation2.save!
       end

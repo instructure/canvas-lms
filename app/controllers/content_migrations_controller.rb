@@ -183,7 +183,7 @@ class ContentMigrationsController < ApplicationController
       js_env(NEW_QUIZZES_IMPORT_THIRD: new_quizzes_import_third_party?)
       js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
       js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?("selectable_outcomes_in_course_copy"))
-      js_env(BLUEPRINT_ELIGIBLE_IMPORT: @domain_root_account.feature_enabled?(:copy_blueprint_settings) && MasterCourses::MasterTemplate.blueprint_eligible?(@context))
+      js_env(BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context))
       set_tutorial_js_env
     end
   end
@@ -442,7 +442,7 @@ class ContentMigrationsController < ApplicationController
       }
     end
 
-    render json: json
+    render json:
   end
 
   # @API List items for selective import
@@ -501,14 +501,15 @@ class ContentMigrationsController < ApplicationController
   #
   # You can include multiple copy parameters to selectively import multiple items or groups of items.
   #
-  # @argument type ["context_modules"|"assignments"|"quizzes"|"assessment_question_banks"|"d"iscussion_topics"|"wiki_pages"|"context_external_tools"|"tool_profiles"|"announcements"|"calendar_events"|"rubrics"|"groups"|"learning_outcomes"|"attachments"]
+  # @argument type ["context_modules"|"assignments"|"quizzes"|"assessment_question_banks"|"discussion_topics"|"wiki_pages"|"context_external_tools"|"tool_profiles"|"announcements"|"calendar_events"|"rubrics"|"groups"|"learning_outcomes"|"attachments"]
   #   The type of content to enumerate.
   #
   # @returns list of content items
   def content_list
     @content_migration = @context.content_migrations.find(params[:id])
     base_url = api_v1_course_content_migration_selective_data_url(@context, @content_migration)
-    formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration, base_url,
+    formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@content_migration,
+                                                                          base_url,
                                                                           global_identifiers: @content_migration.use_global_identifiers?)
 
     unless formatter.valid_type?(params[:type])

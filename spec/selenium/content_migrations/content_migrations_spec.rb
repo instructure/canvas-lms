@@ -174,7 +174,7 @@ describe "content migrations", :non_parallel do
     it "shows each form" do
       visit_page
 
-      migration_types = ff("#chooseMigrationConverter option").map { |op| op["value"] } - ["none"]
+      migration_types = ff("#chooseMigrationConverter option").pluck("value") - ["none"]
       migration_types.each do |type|
         select_migration_type(type)
 
@@ -289,7 +289,8 @@ describe "content migrations", :non_parallel do
       cm.skip_job_progress = true
       cm.save!
 
-      att = attachment_model(context: cm, filename: "cc_full_test_smaller.zip",
+      att = attachment_model(context: cm,
+                             filename: "cc_full_test_smaller.zip",
                              uploaded_data: stub_file_data("cc_full_test_smaller.zip", data, "application/zip"))
       cm.attachment = att
       cm.save!
@@ -428,7 +429,8 @@ describe "content migrations", :non_parallel do
         cm.skip_job_progress = true
         cm.save!
 
-        att = attachment_model(context: cm, filename: "cc_full_test.zip",
+        att = attachment_model(context: cm,
+                               filename: "cc_full_test.zip",
                                uploaded_data: stub_file_data("cc_full_test.zip", data, "application/zip"))
         cm.attachment = att
         cm.save!
@@ -542,8 +544,10 @@ describe "content migrations", :non_parallel do
       expect(opts["shift_dates"]).to eq "1"
       expect(opts["day_substitutions"]).to eq({ "1" => "2", "2" => "3" })
       expected = {
-        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012",
+        "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012",
+        "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
@@ -572,8 +576,10 @@ describe "content migrations", :non_parallel do
       expect(opts["shift_dates"]).to eq "1"
       expect(opts["day_substitutions"]).to eq({})
       expected = {
-        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012",
+        "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012",
+        "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
@@ -642,7 +648,7 @@ describe "content migrations", :non_parallel do
   context "importing LTI content" do
     let(:import_course) do
       account = account_model
-      course_with_teacher_logged_in(account: account).course
+      course_with_teacher_logged_in(account:).course
     end
     let(:import_tool) do
       tool = import_course.context_external_tools.new({
@@ -684,7 +690,7 @@ describe "content migrations", :non_parallel do
       other_tool
       visit_page
       migration_type_options = ff("#chooseMigrationConverter option")
-      migration_type_values = migration_type_options.map { |op| op["value"] }
+      migration_type_values = migration_type_options.pluck("value")
       migration_type_texts = migration_type_options.map(&:text)
       expect(migration_type_values).to include(import_tool.asset_string)
       expect(migration_type_texts).to include(import_tool.label_for(:migration_selection))

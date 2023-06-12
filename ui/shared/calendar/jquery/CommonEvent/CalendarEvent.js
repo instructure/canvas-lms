@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import fcUtil from '../fcUtil.coffee'
+import fcUtil from '../fcUtil'
 import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import CommonEvent from './CommonEvent'
 import natcompare from '@canvas/util/natcompare'

@@ -79,7 +79,7 @@ module SIS
           when /deleted/i
             term.workflow_state = "deleted"
           end
-          if (term.stuck_sis_fields & [:start_at, :end_at]).empty?
+          unless term.stuck_sis_fields.intersect?([:start_at, :end_at])
             term.start_at = start_date
             term.end_at = end_date
           end

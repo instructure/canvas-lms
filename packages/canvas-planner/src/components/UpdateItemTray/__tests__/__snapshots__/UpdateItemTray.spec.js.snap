@@ -34,6 +34,7 @@ exports[`renders the item to update if provided 1`] = `
       vAlign="middle"
     >
       <TextInput
+        data-testid="title"
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
@@ -50,9 +51,10 @@ exports[`renders the item to update if provided 1`] = `
         value="Planner Item"
       />
       <DateTimeInput
-        dateLabel="Date"
-        dateNextLabel="Next Month"
-        datePreviousLabel="Previous Month"
+        allowNonStepInput={true}
+        colSpacing="medium"
+        dateFormat="LL"
+        dateRenderLabel="Date"
         description={
           <ScreenReaderContent
             as="span"
@@ -60,16 +62,18 @@ exports[`renders the item to update if provided 1`] = `
             The date and time this to do is due
           </ScreenReaderContent>
         }
-        disabled={false}
         invalidDateTimeMessage={[Function]}
+        isRequired={false}
         layout="stacked"
         locale="en"
-        messageFormat="LLL"
+        messageFormat="LLLL"
         messages={Array []}
+        nextMonthLabel="Next Month"
         onChange={[Function]}
-        readOnly={false}
+        prevMonthLabel="Previous Month"
         required={true}
-        timeLabel="Time"
+        rowSpacing="small"
+        timeRenderLabel="Time"
         timeStep={30}
         timezone="Asia/Tokyo"
         value="2017-04-25T08:49:00.000Z"
@@ -116,6 +120,7 @@ exports[`renders the item to update if provided 1`] = `
       </SimpleSelect>
       <TextArea
         autoGrow={false}
+        data-testid="details"
         disabled={false}
         height="10rem"
         inline={false}
@@ -149,6 +154,7 @@ exports[`renders the item to update if provided 1`] = `
         as="button"
         color="primary-inverse"
         cursor="pointer"
+        data-testid="delete"
         display="inline-block"
         elementRef={[Function]}
         margin="0 x-small 0 0"
@@ -164,6 +170,7 @@ exports[`renders the item to update if provided 1`] = `
         as="button"
         color="primary"
         cursor="pointer"
+        data-testid="save"
         display="inline-block"
         elementRef={[Function]}
         interaction="enabled"
@@ -215,6 +222,7 @@ exports[`updates state when new note is passed in 1`] = `
       vAlign="middle"
     >
       <TextInput
+        data-testid="title"
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
@@ -231,9 +239,10 @@ exports[`updates state when new note is passed in 1`] = `
         value="Planner Item 1"
       />
       <DateTimeInput
-        dateLabel="Date"
-        dateNextLabel="Next Month"
-        datePreviousLabel="Previous Month"
+        allowNonStepInput={true}
+        colSpacing="medium"
+        dateFormat="LL"
+        dateRenderLabel="Date"
         description={
           <ScreenReaderContent
             as="span"
@@ -241,16 +250,18 @@ exports[`updates state when new note is passed in 1`] = `
             The date and time this to do is due
           </ScreenReaderContent>
         }
-        disabled={false}
         invalidDateTimeMessage={[Function]}
+        isRequired={false}
         layout="stacked"
         locale="en"
-        messageFormat="LLL"
+        messageFormat="LLLL"
         messages={Array []}
+        nextMonthLabel="Next Month"
         onChange={[Function]}
-        readOnly={false}
+        prevMonthLabel="Previous Month"
         required={true}
-        timeLabel="Time"
+        rowSpacing="small"
+        timeRenderLabel="Time"
         timeStep={30}
         timezone="Asia/Tokyo"
         value="2017-04-28T11:00:00.000Z"
@@ -305,6 +316,7 @@ exports[`updates state when new note is passed in 1`] = `
       </SimpleSelect>
       <TextArea
         autoGrow={false}
+        data-testid="details"
         disabled={false}
         height="10rem"
         inline={false}
@@ -338,6 +350,7 @@ exports[`updates state when new note is passed in 1`] = `
         as="button"
         color="primary-inverse"
         cursor="pointer"
+        data-testid="delete"
         display="inline-block"
         elementRef={[Function]}
         margin="0 x-small 0 0"
@@ -353,6 +366,7 @@ exports[`updates state when new note is passed in 1`] = `
         as="button"
         color="primary"
         cursor="pointer"
+        data-testid="save"
         display="inline-block"
         elementRef={[Function]}
         interaction="enabled"
@@ -404,6 +418,7 @@ exports[`updates state when new note is passed in 2`] = `
       vAlign="middle"
     >
       <TextInput
+        data-testid="title"
         display="block"
         inputContainerRef={[Function]}
         inputRef={[Function]}
@@ -420,9 +435,10 @@ exports[`updates state when new note is passed in 2`] = `
         value="Planner Item 2"
       />
       <DateTimeInput
-        dateLabel="Date"
-        dateNextLabel="Next Month"
-        datePreviousLabel="Previous Month"
+        allowNonStepInput={true}
+        colSpacing="medium"
+        dateFormat="LL"
+        dateRenderLabel="Date"
         description={
           <ScreenReaderContent
             as="span"
@@ -430,16 +446,18 @@ exports[`updates state when new note is passed in 2`] = `
             The date and time this to do is due
           </ScreenReaderContent>
         }
-        disabled={false}
         invalidDateTimeMessage={[Function]}
+        isRequired={false}
         layout="stacked"
         locale="en"
-        messageFormat="LLL"
+        messageFormat="LLLL"
         messages={Array []}
+        nextMonthLabel="Next Month"
         onChange={[Function]}
-        readOnly={false}
+        prevMonthLabel="Previous Month"
         required={true}
-        timeLabel="Time"
+        rowSpacing="small"
+        timeRenderLabel="Time"
         timeStep={30}
         timezone="Asia/Tokyo"
         value="2017-04-28T11:00:00.000Z"
@@ -494,6 +512,7 @@ exports[`updates state when new note is passed in 2`] = `
       </SimpleSelect>
       <TextArea
         autoGrow={false}
+        data-testid="details"
         disabled={false}
         height="10rem"
         inline={false}
@@ -527,6 +546,7 @@ exports[`updates state when new note is passed in 2`] = `
         as="button"
         color="primary-inverse"
         cursor="pointer"
+        data-testid="delete"
         display="inline-block"
         elementRef={[Function]}
         margin="0 x-small 0 0"
@@ -542,6 +562,7 @@ exports[`updates state when new note is passed in 2`] = `
         as="button"
         color="primary"
         cursor="pointer"
+        data-testid="save"
         display="inline-block"
         elementRef={[Function]}
         interaction="enabled"

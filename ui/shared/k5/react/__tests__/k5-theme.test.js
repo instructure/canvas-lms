@@ -69,6 +69,13 @@ describe('K-5 theme', () => {
     })
   })
 
+  it('does not override font when ENV.USE_CLASSIC_FONT is true', () => {
+    global.ENV = {USE_CLASSIC_FONT: true}
+    const k5Theme = require('../k5-theme').default
+    k5Theme.use()
+    expect(k5Theme.variables.typography.fontFamily).not.toMatch(/Balsamiq Sans/)
+  })
+
   it('only overrides base variables with font overrides if specified', () => {
     const k5Theme = require('../k5-theme').default
     k5Theme.use({fontOnly: true})

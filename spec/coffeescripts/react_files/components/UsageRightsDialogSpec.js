@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import UsageRightsDialog from '@canvas/files/react/components/UsageRightsDialog'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import Folder from '@canvas/files/backbone/models/Folder'
 
 QUnit.module('UsageRightsDialog', suiteHooks => {

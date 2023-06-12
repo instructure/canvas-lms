@@ -52,7 +52,7 @@ module Lti
       let(:service_name) { UsersApiController::USER_SERVICE }
       let(:canvas_id_endpoint) { "/api/lti/users/#{student.id}" }
       let(:student) do
-        course_with_student(active_all: true, course: course)
+        course_with_student(active_all: true, course:)
         @student.update(lti_context_id: SecureRandom.uuid)
         @student
       end
@@ -117,7 +117,7 @@ module Lti
         it "does not grant access if the course is inactive and the user has no associated assignments" do
           id = student.id
           course.destroy!
-          get canvas_id_endpoint, params: { id: id }, headers: request_headers
+          get canvas_id_endpoint, params: { id: }, headers: request_headers
           expect(response).to be_unauthorized
         end
 
@@ -130,7 +130,7 @@ module Lti
             end
           end
           let(:student) do
-            course_with_student(active_all: true, course: course, user: user)
+            course_with_student(active_all: true, course:, user:)
             @student.update(lti_context_id: SecureRandom.uuid)
             @student
           end

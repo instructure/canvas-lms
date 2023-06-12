@@ -26,7 +26,7 @@ describe "Moderated Grades API", type: :request do
     it "is unauthorized when the user is neither the final grader nor an admin" do
       user_session(@teacher)
       raw_api_call(api_method, api_url, api_params, api_body_params)
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "is authorized when the user is the final grader" do
@@ -52,7 +52,7 @@ describe "Moderated Grades API", type: :request do
       )
       user_session(admin)
       raw_api_call(api_method, api_url, api_params, api_body_params)
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
   end
 
@@ -144,7 +144,7 @@ describe "Moderated Grades API", type: :request do
       json = api_call(:post, create_url, create_params, student_ids: [@student1.id, @student2.id])
       expect(response).to be_successful
       expect(json.size).to eq 2
-      json_student_ids = json.map { |user| user["id"] }
+      json_student_ids = json.pluck("id")
 
       expect(json_student_ids).to match_array([@student1.id, @student2.id])
     end

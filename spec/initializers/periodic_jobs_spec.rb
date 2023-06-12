@@ -30,22 +30,22 @@ describe "PeriodicJobs" do
     it "inserts jobs without jitter" do
       expect(Delayed::Job.count).to eq(0)
       PeriodicJobs.with_each_shard_by_database_in_region(FakeJob, :some_method_to_run, "SOME ARGUMENT")
-      expect(Delayed::Job.count > 0).to eq(true)
-      expect(Delayed::Job.last.run_at <= Time.zone.now).to eq(true)
+      expect(Delayed::Job.count > 0).to be(true)
+      expect(Delayed::Job.last.run_at <= Time.zone.now).to be(true)
     end
 
     it "inserts jobs WITH jitter" do
       expect(Delayed::Job.count).to eq(0)
       PeriodicJobs.with_each_shard_by_database_in_region(FakeJob, :some_method_to_run, "SOME ARGUMENT", jitter: 2.hours)
-      expect(Delayed::Job.count > 0).to eq(true)
-      expect(Delayed::Job.last.run_at > Time.zone.now).to eq(true)
+      expect(Delayed::Job.count > 0).to be(true)
+      expect(Delayed::Job.last.run_at > Time.zone.now).to be(true)
     end
 
     it "inserts jobs WITH jitter and no args" do
       expect(Delayed::Job.count).to eq(0)
       PeriodicJobs.with_each_shard_by_database_in_region(FakeJob, :some_method_to_run, jitter: 2.hours)
-      expect(Delayed::Job.count > 0).to eq(true)
-      expect(Delayed::Job.last.run_at > Time.zone.now).to eq(true)
+      expect(Delayed::Job.count > 0).to be(true)
+      expect(Delayed::Job.last.run_at > Time.zone.now).to be(true)
     end
 
     context "sharding" do
@@ -81,7 +81,7 @@ describe "PeriodicJobs" do
       # Picked because it doesn't have DST
       Shard.current.database_server.config[:timezone] = "America/Phoenix"
       Timecop.freeze do
-        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 7.hours)
+        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(7.hours.from_now)
       end
     ensure
       Shard.current.database_server.config[:timezone] = old_tz
@@ -92,7 +92,7 @@ describe "PeriodicJobs" do
       # Picked because it doesn't have DST
       Shard.current.database_server.config[:timezone] = "Africa/Nairobi"
       Timecop.freeze do
-        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 21.hours)
+        expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(21.hours.from_now)
       end
     ensure
       Shard.current.database_server.config[:timezone] = old_tz

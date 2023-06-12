@@ -46,7 +46,7 @@ class StreamItemInstance < ActiveRecord::Base
     # is an array of [context_type, context_id])
     def update_all_with_invalidation(contexts, updates)
       contexts.each { |context| StreamItemCache.invalidate_context_stream_item_key(context.first, context.last) }
-      original_update_all(updates)
+      in_batches(of: 10_000).update_all(updates)
     end
   end
 

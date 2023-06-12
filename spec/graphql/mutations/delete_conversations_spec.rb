@@ -40,7 +40,7 @@ describe Mutations::DeleteConversations do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   it "removes all messages from the participant's view" do

@@ -31,8 +31,8 @@ export const ReplyInfo = props => {
     return props.unreadCount > 0
       ? I18n.t(
           {
-            one: '%{replyCount} reply, %{unreadCount} unread',
-            other: '%{replyCount} replies, %{unreadCount} unread',
+            one: '%{replyCount} Reply, %{unreadCount} Unread',
+            other: '%{replyCount} Replies, %{unreadCount} Unread',
           },
           {
             count: props.replyCount,
@@ -41,7 +41,7 @@ export const ReplyInfo = props => {
           }
         )
       : I18n.t(
-          {one: '%{replyCount} reply', other: '%{replyCount} replies'},
+          {one: '%{replyCount} Reply', other: '%{replyCount} Replies'},
           {count: props.replyCount, replyCount: props.replyCount}
         )
   }
@@ -50,8 +50,8 @@ export const ReplyInfo = props => {
     return props.unreadCount > 0
       ? I18n.t(
           {
-            one: '%{replyCount} reply (%{unreadCount})',
-            other: '%{replyCount} replies (%{unreadCount})',
+            one: '%{replyCount} Reply (%{unreadCount})',
+            other: '%{replyCount} Replies (%{unreadCount})',
           },
           {
             count: props.replyCount,
@@ -60,7 +60,7 @@ export const ReplyInfo = props => {
           }
         )
       : I18n.t(
-          {one: '%{replyCount} reply', other: '%{replyCount} replies'},
+          {one: '%{replyCount} Reply', other: '%{replyCount} Replies'},
           {count: props.replyCount, replyCount: props.replyCount}
         )
   }

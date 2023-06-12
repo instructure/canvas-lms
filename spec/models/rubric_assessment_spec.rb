@@ -166,7 +166,7 @@ describe RubricAssessment do
     t.extend HtmlTextHelper
     expected = t.format_message(comment).first
     expect(assessment.data.first[:comments_html]).to eq expected
-    expect(@student.reload.unread_rubric_assessments?(@assignment.submission_for_student(@student))).to eq true
+    expect(@student.reload.unread_rubric_assessments?(@assignment.submission_for_student(@student))).to be true
   end
 
   context "grading" do
@@ -189,7 +189,7 @@ describe RubricAssessment do
       expect(assessment.artifact).to be_is_a(Submission)
       expect(assessment.artifact.user).to eql(@student)
       expect(assessment.artifact.grader).to eql(@teacher)
-      expect(assessment.artifact.score).to eql(5.0)
+      expect(assessment.artifact.score).to be(5.0)
       expect(assessment.data.first[:comments_html]).to be_nil
     end
 
@@ -209,7 +209,7 @@ describe RubricAssessment do
         }
       )
       visible_rubric_assessments = submission.visible_rubric_assessments_for(@observer)
-      expect(visible_rubric_assessments.length).to eql(1)
+      expect(visible_rubric_assessments.length).to be(1)
     end
 
     it "allows observers the ability to view rubric assessments with account association" do
@@ -229,7 +229,7 @@ describe RubricAssessment do
         }
       )
       visible_rubric_assessments = submission.visible_rubric_assessments_for(@observer)
-      expect(visible_rubric_assessments.length).to eql(1)
+      expect(visible_rubric_assessments.length).to be(1)
     end
 
     it "updates scores anonymously if graded anonymously" do
@@ -259,7 +259,7 @@ describe RubricAssessment do
                                          }
                                        })
       expect(assessment.score).to be_nil
-      expect(assessment.artifact.score).to eql(nil)
+      expect(assessment.artifact.score).to be_nil
     end
 
     it "allows points to exceed max points possible for criterion" do
@@ -283,7 +283,7 @@ describe RubricAssessment do
         {
           description: "Some criterion",
           points: 10,
-          id: id,
+          id:,
           ratings: [
             { description: "Good", points: 10, id: "rat1", criterion_id: id },
             { description: "Medium", points: 5, id: "rat2", criterion_id: id },
@@ -576,8 +576,8 @@ describe RubricAssessment do
       expect(assessment.artifact).not_to be_nil
       expect(assessment.artifact).to be_is_a(Submission)
       expect(assessment.artifact.user).to eql(@student)
-      expect(assessment.artifact.grader).to eql(nil)
-      expect(assessment.artifact.score).to eql(nil)
+      expect(assessment.artifact.grader).to be_nil
+      expect(assessment.artifact.score).to be_nil
     end
 
     it "does not update scores if not a valid grader" do
@@ -600,8 +600,8 @@ describe RubricAssessment do
       expect(assessment.artifact).not_to be_nil
       expect(assessment.artifact).to be_is_a(Submission)
       expect(assessment.artifact.user).to eql(@student)
-      expect(assessment.artifact.grader).to eql(nil)
-      expect(assessment.artifact.score).to eql(nil)
+      expect(assessment.artifact.grader).to be_nil
+      expect(assessment.artifact.score).to be_nil
     end
 
     describe "when saving comments is requested" do
@@ -713,7 +713,7 @@ describe RubricAssessment do
           RubricAssessment.new(
             score: 2.0,
             assessment_type: :grading,
-            rubric: rubric,
+            rubric:,
             artifact: submission,
             assessor: @teacher
           )
@@ -757,13 +757,13 @@ describe RubricAssessment do
 
       it "sets group on submission" do
         group_category = @course.group_categories.create!(name: "Test Group Set")
-        group = @course.groups.create!(name: "Group A", group_category: group_category)
+        group = @course.groups.create!(name: "Group A", group_category:)
         group.add_user @student
         group.save!
 
         assignment = @course.assignments.create!(
           assignment_valid_attributes.merge(
-            group_category: group_category,
+            group_category:,
             grade_group_students_individually: false
           )
         )
@@ -817,14 +817,14 @@ describe RubricAssessment do
 
         it "posts submissions for all members of the group if the assignment is graded by group" do
           group_category = @course.group_categories.create!(name: "Test Group Set")
-          group = @course.groups.create!(name: "Group A", group_category: group_category)
+          group = @course.groups.create!(name: "Group A", group_category:)
           group.add_user(@student)
 
           other_student_in_group = @course.enroll_student(User.create!, enrollment_state: :active).user
           group.add_user(other_student_in_group)
           group.save!
 
-          assignment.update!(group_category: group_category, grade_group_students_individually: false)
+          assignment.update!(group_category:, grade_group_students_individually: false)
 
           rubric_association.assess(assessment_params)
           expect(assignment.submission_for_student(other_student_in_group)).to be_posted
@@ -851,18 +851,18 @@ describe RubricAssessment do
     end
 
     it "grants :read to the user" do
-      expect(@assessment.grants_right?(@student, :read)).to eq true
+      expect(@assessment.grants_right?(@student, :read)).to be true
     end
 
     it "grants :read to the assessor" do
-      expect(@assessment.grants_right?(@teacher, :read)).to eq true
+      expect(@assessment.grants_right?(@teacher, :read)).to be true
     end
 
     it "does not grant :read to an account user without :manage_courses or :view_all_grades" do
       user_factory
       role = custom_account_role("custom", account: @account)
-      @account.account_users.create!(user: @user, role: role)
-      expect(@assessment.grants_right?(@user, :read)).to eq false
+      @account.account_users.create!(user: @user, role:)
+      expect(@assessment.grants_right?(@user, :read)).to be false
     end
 
     it "grants :read to an account user with :view_all_grades but not :manage_courses" do
@@ -872,17 +872,17 @@ describe RubricAssessment do
       RoleOverride.create!(
         context: @account,
         permission: "view_all_grades",
-        role: role,
+        role:,
         enabled: true
       )
       RoleOverride.create!(
         context: @account,
         permission: "manage_courses",
-        role: role,
+        role:,
         enabled: false
       )
-      @account.account_users.create!(user: @user, role: role)
-      expect(@assessment.grants_right?(@user, :read)).to eq true
+      @account.account_users.create!(user: @user, role:)
+      expect(@assessment.grants_right?(@user, :read)).to be true
     end
 
     it "grants :read to an account user with :view_all_grades but not :manage_courses_admin (granular permissions)" do
@@ -892,17 +892,17 @@ describe RubricAssessment do
       RoleOverride.create!(
         context: @account,
         permission: "view_all_grades",
-        role: role,
+        role:,
         enabled: true
       )
       RoleOverride.create!(
         context: @account,
         permission: "manage_courses_admin",
-        role: role,
+        role:,
         enabled: false
       )
-      @account.account_users.create!(user: @user, role: role)
-      expect(@assessment.grants_right?(@user, :read)).to eq true
+      @account.account_users.create!(user: @user, role:)
+      expect(@assessment.grants_right?(@user, :read)).to be true
     end
   end
 
@@ -961,7 +961,7 @@ describe RubricAssessment do
                                                 criterion_crit1: {}
                                               }
                                             })
-        end.to change(ContentParticipation, :count).by 0
+        end.not_to change(ContentParticipation, :count)
       end
     end
   end

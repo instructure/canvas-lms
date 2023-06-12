@@ -5,7 +5,7 @@ namespace :canvas do
     desc "Generate events from snapshots for submissions to a quiz."
     task :generate_events_from_snapshots, [:quiz_id] => :environment do |_t, args|
       quiz_id = Array(args[:quiz_id])
-      quiz_submission_ids = Quizzes::QuizSubmission.where(quiz_id: quiz_id)
+      quiz_submission_ids = Quizzes::QuizSubmission.where(quiz_id:)
 
       model = Quizzes::QuizSubmissionEvent
       parser = Quizzes::LogAuditing::SnapshotScraper.new

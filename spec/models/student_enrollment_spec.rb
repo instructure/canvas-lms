@@ -70,7 +70,7 @@ describe StudentEnrollment do
       course.allow_final_grade_override = true
       course.save!
 
-      course.enrollment_term.update!(grading_period_group: grading_period_group)
+      course.enrollment_term.update!(grading_period_group:)
       course.recompute_student_scores(run_immediately: true)
     end
 
@@ -119,7 +119,7 @@ describe StudentEnrollment do
       )
 
       aggregate_failures do
-        expect(grade_change_event).not_to be nil
+        expect(grade_change_event).not_to be_nil
         expect(grade_change_event.course_id).to eq enrollment.course_id
         expect(grade_change_event.grading_period).to eq grading_period
         expect(grade_change_event.student).to eq student
@@ -130,12 +130,12 @@ describe StudentEnrollment do
 
     it "does not record a grade change event if record_grade_change is true but no updating_user is given" do
       enrollment.update_override_score(override_score: 90.0, updating_user: nil, record_grade_change: true)
-      expect(grade_change_event).to be nil
+      expect(grade_change_event).to be_nil
     end
 
     it "does not record a grade change event if record_grade_change is false" do
       enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: false)
-      expect(grade_change_event).to be nil
+      expect(grade_change_event).to be_nil
     end
 
     it "does not record a grade change if the override score did not actually change" do

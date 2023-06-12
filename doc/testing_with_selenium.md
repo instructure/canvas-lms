@@ -35,7 +35,7 @@ Gerrit host. See the README for details.
 the tests in. Homebrew is the easiest way to go:
 
 ```sh
-brew cask install chromedriver # necessary for running tests in Chrome
+brew install chromedriver --cask # necessary for running tests in Chrome
 brew install geckodriver # necessary for running tests in Firefox
 ```
 

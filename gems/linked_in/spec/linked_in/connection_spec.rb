@@ -53,11 +53,13 @@ describe LinkedIn::Connection do
 
     describe "#get_service_user_info" do
       it "returns service user info" do
-        token_response_body = "<html><id>#1</id>"\
-                              "<first-name>john</first-name>"\
-                              "<last-name>doe</last-name>"\
-                              "<public-profile-url>http://example.com/linkedin</public-profile-url>"\
-                              "</html>"
+        token_response_body = <<~HTML
+          <html><id>#1</id>
+          <first-name>john</first-name>
+          <last-name>doe</last-name>
+          <public-profile-url>http://example.com/linkedin</public-profile-url>
+          </html>
+        HTML
         mock_access_token = double
         expect(mock_access_token).to receive(:get)
           .with("/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)")
@@ -80,7 +82,7 @@ describe LinkedIn::Connection do
         access_token = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
         expect(OAuth::RequestToken).to receive(:new).with(consumer, token, secret).and_return(request_token)
-        expect(request_token).to receive(:get_access_token).with(oauth_verifier: oauth_verifier).and_return(access_token)
+        expect(request_token).to receive(:get_access_token).with(oauth_verifier:).and_return(access_token)
 
         linkedin = LinkedIn::Connection.from_request_token(token, secret, oauth_verifier)
         expect(linkedin.access_token).to eq(access_token)
@@ -92,7 +94,7 @@ describe LinkedIn::Connection do
         consumer = double
         oauth_callback = double
         expect(OAuth::Consumer).to receive(:new).and_return(consumer)
-        expect(consumer).to receive(:get_request_token).with(oauth_callback: oauth_callback)
+        expect(consumer).to receive(:get_request_token).with(oauth_callback:)
 
         LinkedIn::Connection.request_token(oauth_callback)
       end

@@ -36,7 +36,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   validates :assignment_override, :user, presence: true
   validates :user_id, uniqueness: { scope: [:assignment_id, :quiz_id],
                                     conditions: -> { where.not(workflow_state: "deleted") },
-                                    message: "already belongs to an assignment override" }
+                                    message: -> { t("already belongs to an assignment override") } }
 
   validate :assignment_override, if: :active? do |record|
     if record.assignment_override && record.assignment_override.set_type != "ADHOC"
@@ -95,7 +95,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
                         .pluck(:user_id)
 
     AssignmentOverrideStudent
-      .where(assignment: assignment)
+      .where(assignment:)
       .where.not(user_id: valid_student_ids)
       .each do |aos|
       aos.assignment_override.skip_broadcasts = true

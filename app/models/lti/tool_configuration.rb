@@ -25,6 +25,7 @@ module Lti
     belongs_to :developer_key
 
     before_save :normalize_configuration
+    before_save :update_privacy_level_from_extensions
 
     after_update :update_external_tools!, if: :update_external_tools?
 
@@ -45,7 +46,7 @@ module Lti
       # deleted tools are never updated during a dev key update so can be safely ignored
       tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
 
-      tool = existing_tool || ContextExternalTool.new(context: context)
+      tool = existing_tool || ContextExternalTool.new(context:)
       Importers::ContextExternalToolImporter.import_from_migration(
         importable_configuration,
         context,
@@ -54,7 +55,7 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || canvas_extensions["privacy_level"] || DEFAULT_PRIVACY_LEVEL
+      tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level || DEFAULT_PRIVACY_LEVEL
       tool
     end
 
@@ -85,9 +86,29 @@ module Lti
             "custom_fields" => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
           ),
           configuration_url: tool_configuration_params[:settings_url],
-          disabled_placements: tool_configuration_params[:disabled_placements]
+          disabled_placements: tool_configuration_params[:disabled_placements],
+          privacy_level: tool_configuration_params[:privacy_level]
         )
       end
+    end
+
+    # temporary measure since the actual privacy_level column is not fully backfilled
+    # remove with INTEROP-8055
+    def privacy_level
+      self[:privacy_level] || canvas_extensions["privacy_level"]
+    end
+
+    def update_privacy_level_from_extensions
+      ext_privacy_level = canvas_extensions["privacy_level"]
+      if settings_changed? && self[:privacy_level] != ext_privacy_level && ext_privacy_level.present?
+        self[:privacy_level] = ext_privacy_level
+      end
+    end
+
+    def placements
+      return [] if configuration.blank?
+
+      configuration["extensions"]&.find { |e| e["platform"] == CANVAS_EXTENSION_LABEL }&.dig("settings", "placements")&.deep_dup || []
     end
 
     private

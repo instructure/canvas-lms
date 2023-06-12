@@ -26,6 +26,6 @@ module Api::V1::PreviewHtml
     html = process_incoming_html_content(html)
     html = Sanitize.clean(html, CanvasSanitize::SANITIZE)
     html = api_user_content(html)
-    render json: { html: html }
+    render json: { html: }
   end
 end

@@ -20,11 +20,11 @@
 
 require_relative "../../spec_helper"
 
-RSpec.describe Lti::Result, type: :model do
+RSpec.describe Lti::Result do
   let_once(:assignment) { assignment_model(points_possible: 5) }
 
   context "when validating" do
-    let(:result) { lti_result_model assignment: assignment }
+    let(:result) { lti_result_model assignment: }
 
     it 'requires "line_item"' do
       expect do
@@ -70,7 +70,7 @@ RSpec.describe Lti::Result, type: :model do
 
       let(:result) do
         lti_result_model(
-          assignment: assignment,
+          assignment:,
           result_maximum: 1,
           result_score: 0.5
         )
@@ -163,7 +163,7 @@ RSpec.describe Lti::Result, type: :model do
     end
 
     describe "#result_maximum" do
-      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum }
+      let(:result) { lti_result_model assignment:, result_score:, result_maximum: }
       let(:result_score) { 10 }
       let(:result_maximum) { 10 }
 
@@ -214,7 +214,7 @@ RSpec.describe Lti::Result, type: :model do
     end
 
     describe "#result_score" do
-      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum }
+      let(:result) { lti_result_model assignment:, result_score:, result_maximum: }
       let(:result_score) { 10 }
       let(:result_maximum) { 10 }
 
@@ -255,14 +255,14 @@ RSpec.describe Lti::Result, type: :model do
       let(:creation_arguments) do
         [
           {
-            line_item: line_item,
-            user: user,
+            line_item:,
+            user:,
             created_at: Time.zone.now,
             updated_at: Time.zone.now
           },
           {
             line_item: second_line_item,
-            user: user,
+            user:,
             created_at: Time.zone.now,
             updated_at: Time.zone.now
           }
@@ -272,7 +272,7 @@ RSpec.describe Lti::Result, type: :model do
   end
 
   context "after saving" do
-    let(:result) { lti_result_model assignment: assignment }
+    let(:result) { lti_result_model assignment: }
 
     it "sets root_account_id using submission" do
       expect(result.root_account_id).to eq assignment.root_account_id
@@ -281,18 +281,18 @@ RSpec.describe Lti::Result, type: :model do
     it "sets root_account_id using line_item" do
       submission = graded_submission_model({ assignment: assignment_model, user: user_model })
       submission.assignment.root_account_id = nil
-      result = Lti::Result.create!(line_item: line_item_model, user: user_model, created_at: Time.zone.now, updated_at: Time.zone.now, submission: submission)
+      result = Lti::Result.create!(line_item: line_item_model, user: user_model, created_at: Time.zone.now, updated_at: Time.zone.now, submission:)
       expect(result.root_account_id).to eq result.line_item.root_account_id
     end
   end
 
   describe ".update_score_for_submission" do
-    let(:result) { lti_result_model assignment: assignment }
+    let(:result) { lti_result_model assignment: }
 
     context "when result maximum is null" do
       it "sets and result maxmium to the assignment's points_possible, and sets the score" do
-        expect(assignment.points_possible).to_not eq(nil)
-        expect(result.result_maximum).to eq(nil)
+        expect(assignment.points_possible).to_not be_nil
+        expect(result.result_maximum).to be_nil
         Lti::Result.update_score_for_submission(result.submission, 123)
         result.reload
         expect(result.result_maximum).to eq(assignment.points_possible)

@@ -44,9 +44,9 @@ module Lti
     }
 
     scope :has_placements, lambda { |*placements|
-      where("EXISTS (?)",
-            Lti::ResourcePlacement.where(placement: placements)
-                .where("lti_message_handlers.id = lti_resource_placements.message_handler_id"))
+      where(Lti::ResourcePlacement.where(placement: placements)
+                .where("lti_message_handlers.id = lti_resource_placements.message_handler_id")
+                .arel.exists)
     }
 
     def self.lti_apps_tabs(context, placements, _opts)
@@ -71,16 +71,16 @@ module Lti
           visibility: nil,
           external: true,
           hidden: false,
-          args: args
+          args:
         }
       end
     end
 
     def self.by_resource_codes(vendor_code:, product_code:, resource_type_code:, context:, message_type: BASIC_LTI_LAUNCH_REQUEST)
-      possible_handlers = ResourceHandler.by_resource_codes(vendor_code: vendor_code,
-                                                            product_code: product_code,
-                                                            resource_type_code: resource_type_code,
-                                                            context: context)
+      possible_handlers = ResourceHandler.by_resource_codes(vendor_code:,
+                                                            product_code:,
+                                                            resource_type_code:,
+                                                            context:)
       resource_handler = nil
       search_contexts = context.account_chain.dup.unshift(context)
       search_contexts.each do |search_context|

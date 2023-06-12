@@ -137,7 +137,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     if request.get?
       @quiz = require_quiz
       user_id = @current_user&.id
-      redirect_to course_quiz_take_url(@context, @quiz, user_id: user_id)
+      redirect_to course_quiz_take_url(@context, @quiz, user_id:)
     else
       backup
     end
@@ -185,7 +185,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
-      redirect_to named_context_url(@context, :context_quiz_history_url,
+      redirect_to named_context_url(@context,
+                                    :context_quiz_history_url,
                                     @quiz.id,
                                     user_id: @quiz_submission.user_id)
     end

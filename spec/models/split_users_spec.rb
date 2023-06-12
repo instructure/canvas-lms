@@ -637,7 +637,7 @@ describe SplitUsers do
         pseudonym1 = restored_user.pseudonyms.create!(unique_id: "sam1@example.com")
         @shard1.activate do
           account = Account.create!
-          @pseudonym2 = shard1_source_user.pseudonyms.create!(account: account, unique_id: "sam1@example.com")
+          @pseudonym2 = shard1_source_user.pseudonyms.create!(account:, unique_id: "sam1@example.com")
           UserMerge.from(restored_user).into(shard1_source_user)
           SplitUsers.split_db_users(shard1_source_user)
         end

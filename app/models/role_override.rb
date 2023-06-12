@@ -58,7 +58,9 @@ class RoleOverride < ActiveRecord::Base
   ACCOUNT_ADMIN_LABEL = -> { t("roles.account_admin", "Account Admin") }
   def self.account_membership_types(account)
     res = [{ id: Role.get_built_in_role("AccountAdmin", root_account_id: account.resolved_root_account_id).id,
-             name: "AccountAdmin", base_role_name: Role::DEFAULT_ACCOUNT_TYPE, label: ACCOUNT_ADMIN_LABEL.call }]
+             name: "AccountAdmin",
+             base_role_name: Role::DEFAULT_ACCOUNT_TYPE,
+             label: ACCOUNT_ADMIN_LABEL.call }]
     account.available_custom_account_roles.each do |r|
       res << { id: r.id, name: r.name, base_role_name: Role::DEFAULT_ACCOUNT_TYPE, label: r.name }
     end
@@ -286,6 +288,25 @@ class RoleOverride < ActiveRecord::Base
         account_only: true,
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
+      },
+      restrict_quantitative_data: {
+        label: -> { t("Grades - view quantitative feedback") },
+        label_v2: -> { t("Grades - view quantitative feedback") },
+        available_to: %w[
+          StudentEnrollment
+          TaEnrollment
+          DesignerEnrollment
+          TeacherEnrollment
+          ObserverEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[
+          AccountAdmin
+          AccountMembership
+        ],
+        acts_as_access_token_scope: true,
+        account_allows: ->(a) { a.root_account.feature_enabled?(:restrict_quantitative_data) }
       },
       view_feature_flags: {
         label: -> { t("View feature options at an account level") },
@@ -926,8 +947,7 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Manage Account Calendars") },
         account_only: true,
         available_to: %w[AccountAdmin AccountMembership],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(_a) { Account.site_admin.feature_enabled?(:account_calendar_events) }
+        true_for: %w[AccountAdmin]
       },
       manage_account_calendar_events: {
         label: -> { t("Add, edit and delete events on account calendars") },
@@ -936,8 +956,7 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Manage Account Calendars") },
         account_only: true,
         available_to: %w[AccountAdmin AccountMembership],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(_a) { Account.site_admin.feature_enabled?(:account_calendar_events) }
+        true_for: %w[AccountAdmin]
       },
       manage_calendar: {
         label: -> { t("permissions.manage_calendar", "Add, edit and delete events on the course calendar") },
@@ -1618,8 +1637,8 @@ class RoleOverride < ActiveRecord::Base
         applies_to_concluded: true
       },
       read_reports: {
-        label: -> { t("permissions.read_reports", "View usage reports for the course") },
-        label_v2: -> { t("Courses - view usage reports") },
+        label: -> { t("permissions.read_reports", "Manage account or course-level reports") },
+        label_v2: -> { t("Reports - manage") }, # Reports - manage is used by both Account and Course Roles in Permissions
         available_to: %w[
           TaEnrollment
           DesignerEnrollment
@@ -1841,13 +1860,15 @@ class RoleOverride < ActiveRecord::Base
 
     if default_data[:account_allows] || no_caching
       # could depend on anything - can't cache (but that's okay because it's not super common)
-      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching, preloaded_overrides: preloaded_overrides)
+      uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching, preloaded_overrides:)
     else
       full_base_key = [permissionless_base_key, permission, Shard.global_id_for(role_context)].join("/")
       LocalCache.fetch([full_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
-        Rails.cache.fetch_with_batched_keys(full_base_key, batch_object: account,
-                                                           batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
-          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, preloaded_overrides: preloaded_overrides)
+        Rails.cache.fetch_with_batched_keys(full_base_key,
+                                            batch_object: account,
+                                            batched_keys: [:account_chain, :role_overrides],
+                                            skip_cache_if_disabled: true) do
+          uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, preloaded_overrides:)
         end
       end
     end.freeze
@@ -1964,10 +1985,10 @@ class RoleOverride < ActiveRecord::Base
     locked = !default_data[:available_to].include?(base_role) || !account_allows
 
     generated_permission = {
-      account_allows: account_allows,
-      permission: permission,
+      account_allows:,
+      permission:,
       enabled: account_allows && (default_data[:true_for].include?(base_role) ? [:self, :descendants] : false),
-      locked: locked,
+      locked:,
       readonly: locked,
       explicit: false,
       base_role_type: base_role,
@@ -1988,13 +2009,15 @@ class RoleOverride < ActiveRecord::Base
     return generated_permission if locked
 
     overrides = if no_caching
-                  uncached_overrides_for(context, role, role_context, preloaded_overrides: preloaded_overrides, only_permission: permission.to_s)
+                  uncached_overrides_for(context, role, role_context, preloaded_overrides:, only_permission: permission.to_s)
                 else
                   RequestCache.cache(permissionless_base_key, account) do
                     LocalCache.fetch([permissionless_base_key, account.global_id].join("/"), expires_in: local_cache_ttl) do
-                      Rails.cache.fetch_with_batched_keys(permissionless_base_key, batch_object: account,
-                                                                                   batched_keys: [:account_chain, :role_overrides], skip_cache_if_disabled: true) do
-                        uncached_overrides_for(context, role, role_context, preloaded_overrides: preloaded_overrides)
+                      Rails.cache.fetch_with_batched_keys(permissionless_base_key,
+                                                          batch_object: account,
+                                                          batched_keys: [:account_chain, :role_overrides],
+                                                          skip_cache_if_disabled: true) do
+                        uncached_overrides_for(context, role, role_context, preloaded_overrides:)
                       end
                     end
                   end
@@ -2066,11 +2089,11 @@ class RoleOverride < ActiveRecord::Base
   # differentiates nil, false, and truthy as possible values
   def self.manage_role_override(context, role, permission, settings)
     context.shard.activate do
-      role_override = context.role_overrides.where(permission: permission, role_id: role.id).first
+      role_override = context.role_overrides.where(permission:, role_id: role.id).first
       if !settings[:override].nil? || settings[:locked]
         role_override ||= context.role_overrides.build(
-          permission: permission,
-          role: role
+          permission:,
+          role:
         )
         role_override.enabled = settings[:override] unless settings[:override].nil?
         role_override.locked = settings[:locked] unless settings[:locked].nil?

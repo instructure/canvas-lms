@@ -71,44 +71,36 @@ module Outcomes
     #        :users    - The users to lookup results for (required)
     #        :context  - The context to lookup results for (required)
     #        :outcomes - The outcomes to lookup results for (required)
+    #        :assignments - The assignments to lookup results for (required)
     #
-    # Returns a relation of the results
-    def find_outcomes_service_outcome_results(user, opts)
-      required_opts = %i[users context outcomes]
+    # Returns json object
+    def find_outcomes_service_outcome_results(opts)
+      required_opts = %i[users context outcomes assignments]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
-      users, context, outcomes = opts.values_at(*required_opts)
+      users, context, outcomes, assignments = opts.values_at(*required_opts)
       user_uuids = users.pluck(:uuid).join(",")
-
-      # check if the logged in user has manage_grades & view_all_grades permissions
-      # if not, apply exclude_muted_associations to the assignment query
-      assignment_ids =
-        if context.grants_any_right?(user, :manage_grades, :view_all_grades)
-          Assignment.active.where(context: context).quiz_lti.pluck(:id).join(",")
-        else
-          # return if there is more than one user in users as this would indicate
-          # user with insufficient permissions accessing the LMGB
-          return if users.length > 1
-
-          Assignment.active.where(context: context).quiz_lti.exclude_muted_associations_for_user(users[0]).pluck(:id).join(",")
-        end
+      assignment_ids = assignments.pluck(:id).join(",")
 
       outcome_ids = outcomes.pluck(:id).join(",")
-      handle_outcome_service_results(
-        get_lmgb_results(context, assignment_ids, "canvas.assignment.quizzes", outcome_ids, user_uuids),
-        context
-      )
+      get_lmgb_results(context, assignment_ids, "canvas.assignment.quizzes", outcome_ids, user_uuids)
     end
 
-    def handle_outcome_service_results(results, context)
+    # Converts json results from OS API to LearningOutcomeResults and removes duplicate result data
+    # Tech debt: decouple conversion and removing duplicates
+    #
+    # results - OS api results json (see get_lmgb_results)
+    # context - results context (aka current course)
+    #
+    # Returns an array of LearningOutcomeResult objects
+    def handle_outcomes_service_results(results, context, outcomes, users, assignments)
       # if results are nil - FF is turned off for the given context
       # if results are empty - no results were matched
       if results.blank?
         Rails.logger.warn("No Outcome Service outcome results found for context: #{context.uuid}")
         return nil
       end
-      # if results are not nil or empty (aka not blank) - results were found
       # return resolved results list of Rollup objects
-      resolve_outcome_results(results)
+      resolve_outcome_results(results, context, outcomes, users, assignments)
     end
 
     # Internal: Add an order clause to a relation so results are returned in an
@@ -156,7 +148,7 @@ module Outcomes
     #
     # Returns a Rollup.
     def aggregate_outcome_results_rollup(results, context, stat = "mean")
-      rollups = outcome_results_rollups(results: results, context: context)
+      rollups = outcome_results_rollups(results:, context:)
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
       aggregate_results = outcome_results.map do |scores|
@@ -164,7 +156,7 @@ module Outcomes
       end
       opts = { aggregate_score: true, aggregate_stat: stat, **mastery_scale_opts(context) }
       aggregate_rollups = aggregate_results.map do |result|
-        RollupScore.new(outcome_results: result, opts: opts)
+        RollupScore.new(outcome_results: result, opts:)
       end
       Rollup.new(context, aggregate_rollups)
     end
@@ -180,7 +172,7 @@ module Outcomes
       filtered_results = user_results.reject { |r| r.score.nil? }
       opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
-        RollupScore.new(outcome_results: outcome_results, opts: opts)
+        RollupScore.new(outcome_results:, opts:)
       end
     end
 

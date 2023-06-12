@@ -20,8 +20,8 @@
 describe SisApiController do
   describe "GET sis_assignments" do
     let(:account) { account_model }
-    let(:course) { course_model(account: account, workflow_state: "available") }
-    let(:admin) { account_admin_user(account: account) }
+    let(:course) { course_model(account:, workflow_state: "available") }
+    let(:admin) { account_admin_user(account:) }
 
     before do
       bypass_rescue
@@ -32,7 +32,7 @@ describe SisApiController do
       get "sis_assignments", params: { course_id: course.id }
 
       parsed_json = json_parse(response.body)
-      expect(response.code).to eq "400"
+      expect(response).to have_http_status :bad_request
       expect(parsed_json["code"]).to eq "not_enabled"
     end
 
@@ -45,13 +45,13 @@ describe SisApiController do
         get "sis_assignments", params: { course_id: course.id }
 
         parsed_json = json_parse(response.body)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
         expect(parsed_json).to eq []
       end
 
       it "includes only assignments with post_to_sis enabled" do
-        assignment_model(course: course, workflow_state: "published")
-        assignment = assignment_model(course: course, post_to_sis: true, workflow_state: "published")
+        assignment_model(course:, workflow_state: "published")
+        assignment = assignment_model(course:, post_to_sis: true, workflow_state: "published")
 
         get "sis_assignments", params: { course_id: course.id }
 
@@ -61,14 +61,14 @@ describe SisApiController do
       end
 
       context "with student overrides" do
-        let(:assignment) { assignment_model(course: course, post_to_sis: true, workflow_state: "published") }
+        let(:assignment) { assignment_model(course:, post_to_sis: true, workflow_state: "published") }
 
         before do
-          @student1 = student_in_course({ course: course, workflow_state: "active" }).user
-          @student2 = student_in_course({ course: course, workflow_state: "active" }).user
-          managed_pseudonym(@student2, sis_user_id: "SIS_ID_2", account: account)
+          @student1 = student_in_course({ course:, workflow_state: "active" }).user
+          @student2 = student_in_course({ course:, workflow_state: "active" }).user
+          managed_pseudonym(@student2, sis_user_id: "SIS_ID_2", account:)
           due_at = Time.zone.parse("2017-02-08 22:11:10")
-          @override = create_adhoc_override_for_assignment(assignment, [@student1, @student2], due_at: due_at)
+          @override = create_adhoc_override_for_assignment(assignment, [@student1, @student2], due_at:)
         end
 
         it "does not include student overrides by default" do

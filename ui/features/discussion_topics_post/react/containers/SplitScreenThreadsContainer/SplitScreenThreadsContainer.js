@@ -111,7 +111,7 @@ export const SplitScreenThreadsContainer = props => {
   }
 
   return (
-    <View data-testid="split-screen-view-children">
+    <View data-testid="split-screen-view-children" padding="0 small 0 small">
       {props.hasMoreOlderReplies && (
         <View as="div" padding="0 0 small medium">
           <ShowMoreRepliesButton
@@ -260,13 +260,13 @@ const SplitScreenThreadContainer = props => {
     },
   })
 
-  const onUpdate = (message, _includeReplyPreview, fileId) => {
+  const onUpdate = (message, _includeReplyPreview, file) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
-        fileId,
-        removeAttachment: !fileId,
+        fileId: file?._id,
+        removeAttachment: !file?._id,
       },
     })
   }
@@ -320,7 +320,7 @@ const SplitScreenThreadContainer = props => {
           padding: 'x-small',
         },
         desktop: {
-          padding: 'x-small medium',
+          padding: '0 medium',
         },
       }}
       render={responsiveProps => (
@@ -416,7 +416,7 @@ const SplitScreenThreadContainer = props => {
                     quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}
                   >
-                    <View as="div" padding="x-small none none">
+                    <View as="div">
                       <ThreadingToolbar
                         discussionEntry={props.discussionEntry}
                         isIsolatedView={true}

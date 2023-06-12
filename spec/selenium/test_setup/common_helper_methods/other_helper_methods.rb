@@ -45,10 +45,10 @@ module OtherHelperMethods
     user_agent = opts[:user_agent] || "firefox"
 
     page_view = course.page_views.build(
-      user: user,
-      controller: controller,
-      url: url,
-      user_agent: user_agent
+      user:,
+      controller:,
+      url:,
+      user_agent:
     )
 
     page_view.summarized = summarized

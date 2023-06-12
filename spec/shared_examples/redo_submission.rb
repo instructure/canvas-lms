@@ -28,7 +28,7 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
   it "does not allow on assignments without due date" do
     @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
     @submission = @assignment.submit_homework(@user)
-    @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
+    @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
     @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
@@ -38,7 +38,7 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
   it "does not allow from users without the right permissions" do
     @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload", due_at: 3.days.from_now)
     @submission = @assignment.submit_homework(@user)
-    @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
+    @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
     @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@student)
     put :redo_submission, params: @params
@@ -48,12 +48,12 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
   it "allows on assignments with due date" do
     @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload", due_at: 3.days.from_now)
     @submission = @assignment.submit_homework(@user)
-    @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
+    @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
     @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 204
-    expect(@submission.reload.redo_request).to eq true
+    expect(@submission.reload.redo_request).to be true
   end
 
   it "allows on assignments with a lock date in the future and proper permissions" do
@@ -64,12 +64,12 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
       lock_at: 3.days.from_now
     )
     @submission = @assignment.submit_homework(@user)
-    @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
+    @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
     @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 204
-    expect(@submission.reload.redo_request).to eq true
+    expect(@submission.reload.redo_request).to be true
   end
 
   it "does not allow on assignments with a lock date in the future and improper permissions" do
@@ -80,7 +80,7 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
       lock_at: 3.days.from_now
     )
     @submission = @assignment.submit_homework(@user)
-    @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
+    @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
     @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@student)
     put :redo_submission, params: @params
@@ -95,11 +95,11 @@ RSpec.shared_examples "a submission redo_submission action" do |controller|
       lock_at: 3.days.ago
     )
     @submission = @assignment.submit_homework(@user)
-    @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
+    @resource_pair = (controller == :anonymous_submissions) ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
     @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 422
-    expect(@submission.reload.redo_request).to eq false
+    expect(@submission.reload.redo_request).to be false
   end
 end

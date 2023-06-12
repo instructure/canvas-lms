@@ -146,7 +146,8 @@ describe DueDateCacher do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
-          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0", max_attempts: 10,
+          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0",
+          max_attempts: 10,
           strand: "cached_due_date:calculator:Course:#{@course.global_id}"
         )
         .and_return(@instance)
@@ -181,7 +182,8 @@ describe DueDateCacher do
         .and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
-          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0", max_attempts: 10,
+          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0",
+          max_attempts: 10,
           strand: "cached_due_date:calculator:Course:#{@course.global_id}"
         )
         .and_return(@instance)
@@ -267,7 +269,9 @@ describe DueDateCacher do
 
       it "passes along the whole user array" do
         expect(DueDateCacher).to receive(:new).and_return(instance)
-                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                              .with(@course,
+                                                    Assignment.active.where(context: @course).pluck(:id),
+                                                    student_ids,
                                                     hash_including(update_grades: false))
         DueDateCacher.recompute_users_for_course(student_ids, @course)
       end
@@ -296,7 +300,9 @@ describe DueDateCacher do
 
       it "handles being called with a course id" do
         expect(DueDateCacher).to receive(:new).and_return(instance)
-                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                              .with(@course,
+                                                    Assignment.active.where(context: @course).pluck(:id),
+                                                    student_ids,
                                                     hash_including(update_grades: false))
         DueDateCacher.recompute_users_for_course(student_ids, @course.id)
       end
@@ -403,7 +409,7 @@ describe DueDateCacher do
     end
 
     it "returns nil if no user has been set" do
-      expect(DueDateCacher.current_executing_user).to be nil
+      expect(DueDateCacher.current_executing_user).to be_nil
     end
 
     it "returns the user in the closest scope when multiple calls are nested" do
@@ -435,7 +441,7 @@ describe DueDateCacher do
       before do
         @shard1.activate do
           account = Account.create!
-          course_with_student(account: account, active_all: true)
+          course_with_student(account:, active_all: true)
           assignment_model(course: @course)
         end
       end
@@ -602,7 +608,7 @@ describe DueDateCacher do
       it "assigns the correct workflow state to the submission" do
         @shard2.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account)
+          course_with_student(active_all: true, account:)
 
           @quiz = @course.quizzes.create!
           @quiz.workflow_state = "available"
@@ -619,6 +625,58 @@ describe DueDateCacher do
             submission.reload.workflow_state
           }.from("deleted").to("pending_review")
         end
+      end
+    end
+
+    describe "re-adding removed students from a lti quiz" do
+      before :once do
+        Account.site_admin.enable_feature!(:new_quiz_deleted_workflow_restore_pending_review_state)
+
+        account = Account.create!
+        course_with_student(active_all: true, account:)
+        @new_quiz = new_quizzes_assignment(course: @course, title: "Some New Quiz")
+        @new_quiz.workflow_state = "available"
+        @new_quiz.save!
+      end
+
+      it "assigns the correct workflow state to the new quiz submission if pending_review" do
+        submission = @new_quiz.submit_homework(@student)
+        submission.workflow_state = "pending_review"
+        submission.save!
+        Version.create!(versionable: submission, model: submission)
+
+        submission.update_columns(grade: "5", workflow_state: "deleted")
+
+        expect { DueDateCacher.new(@course, @new_quiz).recompute }.to change {
+          submission.reload.workflow_state
+        }.from("deleted").to("pending_review")
+      end
+
+      it "assigns the correct workflow state to the new quiz submission if graded" do
+        submission = @new_quiz.submit_homework(@student)
+        submission.workflow_state = "graded"
+        submission.save!
+        Version.create!(versionable: submission, model: submission)
+
+        submission.update_columns(grade: "5", workflow_state: "deleted")
+
+        expect { DueDateCacher.new(@course, @new_quiz).recompute }.to change {
+          submission.reload.workflow_state
+        }.from("deleted").to("graded")
+      end
+
+      it "does not assign workflow to pending_review when feature flag off" do
+        Account.site_admin.disable_feature!(:new_quiz_deleted_workflow_restore_pending_review_state)
+        submission = @new_quiz.submit_homework(@student)
+        submission.workflow_state = "pending_review"
+        submission.save!
+        Version.create!(versionable: submission, model: submission)
+
+        submission.update_columns(grade: "5", workflow_state: "deleted")
+
+        expect { DueDateCacher.new(@course, @new_quiz).recompute }.to change {
+          submission.reload.workflow_state
+        }.from("deleted").to("graded")
       end
     end
 
@@ -1128,6 +1186,12 @@ describe DueDateCacher do
         DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
       end
 
+      it "does not kick off a LatePolicyApplicator job when explicitly told not to" do
+        expect(LatePolicyApplicator).not_to receive(:for_assignment)
+
+        DueDateCacher.new(@course, [@assignment], skip_late_policy_applicator: true).recompute
+      end
+
       it "runs the GradeCalculator inline when update_grades is true" do
         expect(@course).to receive(:recompute_student_scores_without_send_later)
 
@@ -1236,7 +1300,7 @@ describe DueDateCacher do
     let(:student) { User.create! }
 
     let(:original_due_at) { Time.zone.now }
-    let(:due_at) { Time.zone.now + 1.day }
+    let(:due_at) { 1.day.from_now }
 
     # Remove seconds, following the lead of EffectiveDueDates
     let(:original_due_at_formatted) { original_due_at.change(usec: 0).iso8601 }
@@ -1258,11 +1322,11 @@ describe DueDateCacher do
             due_at: original_due_at
           )
         end
-        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment:, event_type:).last }
 
         before do
           Assignment.suspend_due_date_caching do
-            assignment.update!(due_at: due_at)
+            assignment.update!(due_at:)
           end
         end
 
@@ -1270,7 +1334,7 @@ describe DueDateCacher do
           expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
           end.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+            AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
@@ -1287,11 +1351,11 @@ describe DueDateCacher do
 
       context "when a due date is added to an auditable assignment" do
         let!(:assignment) { course.assignments.create!(title: "zzz", anonymous_grading: true) }
-        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment:, event_type:).last }
 
         before do
           Assignment.suspend_due_date_caching do
-            assignment.update!(due_at: due_at)
+            assignment.update!(due_at:)
           end
         end
 
@@ -1299,13 +1363,13 @@ describe DueDateCacher do
           expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
           end.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+            AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
         it "includes nil as the old due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload["due_at"].first).to be nil
+          expect(last_event.payload["due_at"].first).to be_nil
         end
 
         it "includes the new due date in the payload" do
@@ -1316,7 +1380,7 @@ describe DueDateCacher do
 
       context "when a due date is removed from an auditable assignment" do
         let!(:assignment) { course.assignments.create!(title: "z!", anonymous_grading: true, due_at: original_due_at) }
-        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment:, event_type:).last }
 
         before do
           Assignment.suspend_due_date_caching do
@@ -1328,7 +1392,7 @@ describe DueDateCacher do
           expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
           end.to change {
-            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+            AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
@@ -1339,7 +1403,7 @@ describe DueDateCacher do
 
         it "includes nil as the new due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload["due_at"].second).to be nil
+          expect(last_event.payload["due_at"].second).to be_nil
         end
       end
 
@@ -1348,14 +1412,14 @@ describe DueDateCacher do
         Assignment.suspend_due_date_caching do
           assignment = course.assignments.create!(
             title: "zzz",
-            due_at: due_at
+            due_at:
           )
         end
 
         expect do
           DueDateCacher.recompute(assignment, executing_user: teacher)
         end.not_to change {
-          AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
+          AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
         }
       end
     end
@@ -1369,7 +1433,7 @@ describe DueDateCacher do
       expect do
         DueDateCacher.recompute(assignment)
       end.not_to change {
-        AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
+        AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
       }
     end
   end

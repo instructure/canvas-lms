@@ -125,7 +125,7 @@ describe GradeCalculator do
       students << course_with_student(active_all: true, course: @course).user
 
       # Enroll the last student into both sections
-      course_with_student(active_all: true, course: @course, user: students[-1], section: section, allow_multiple_enrollments: true)
+      course_with_student(active_all: true, course: @course, user: students[-1], section:, allow_multiple_enrollments: true)
 
       # Create an assignment...
       assignments = []
@@ -168,7 +168,7 @@ describe GradeCalculator do
         submissions = []
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           @course.update_attribute(:group_weighting_scheme, "percent")
           groups <<
             @course.assignment_groups.create!(name: "some group 1", group_weight: 50) <<
@@ -194,7 +194,7 @@ describe GradeCalculator do
 
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           grading_period_set = account.grading_period_groups.create!
           grading_period_set.enrollment_terms << @course.enrollment_term
           grading_period_set.grading_periods.create!(
@@ -222,7 +222,7 @@ describe GradeCalculator do
 
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           @group = @course.assignment_groups.create!(name: "some group", group_weight: 100)
           @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
           @assignment2 = @course.assignments.create!(title: "Some Assignment2", points_possible: 10, assignment_group: @group)
@@ -240,7 +240,7 @@ describe GradeCalculator do
 
         @shard1.activate do
           account = Account.create!
-          course_with_student(active_all: true, account: account, user: @user)
+          course_with_student(active_all: true, account:, user: @user)
           grading_period_set = account.grading_period_groups.create!
           grading_period_set.enrollment_terms << @course.enrollment_term
           @grading_period = grading_period_set.grading_periods.create!(
@@ -350,9 +350,11 @@ describe GradeCalculator do
       @course.update_attribute :group_weighting_scheme, "percent"
       ag1 = @course.assignment_groups.create! name: "Group 1", group_weight: 80
       ag2 = @course.assignment_groups.create! name: "Group 2", group_weight: 20
-      a1 = ag1.assignments.create! points_possible: 10, name: "Assignment 1",
+      a1 = ag1.assignments.create! points_possible: 10,
+                                   name: "Assignment 1",
                                    context: @course
-      a2 = ag2.assignments.create! points_possible: 10, name: "Assignment 2",
+      a2 = ag2.assignments.create! points_possible: 10,
+                                   name: "Assignment 2",
                                    context: @course
 
       a1.grade_student(@student, grade: 0, grader: @teacher)
@@ -367,7 +369,8 @@ describe GradeCalculator do
     end
 
     it "recomputes during #run_if_overrides_changed!" do
-      a = @course.assignments.create! name: "Foo", points_possible: 10,
+      a = @course.assignments.create! name: "Foo",
+                                      points_possible: 10,
                                       context: @assignment
       a.grade_student(@student, grade: 10, grader: @teacher)
 
@@ -386,8 +389,11 @@ describe GradeCalculator do
       before do
         # Enroll student into two sections
         section = @course.course_sections.create!(name: "Section #2")
-        course_with_student(active_all: true, course: @course, user: @student,
-                            section: section, allow_multiple_enrollments: true)
+        course_with_student(active_all: true,
+                            course: @course,
+                            user: @student,
+                            section:,
+                            allow_multiple_enrollments: true)
         assignment.grade_student(@student, grade: "5", grader: @teacher)
       end
 
@@ -946,7 +952,7 @@ describe GradeCalculator do
         assignments = Array.new(3) do |assignment_idx|
           @course.assignments.create!(
             title: "AG#{assignment_group_idx} Assignment ##{assignment_idx}",
-            assignment_group: assignment_group,
+            assignment_group:,
             # Each assignment group spans only one grading period
             due_at: @grading_period_options[:start_dates][assignment_group_idx] + (assignment_idx + 1).days,
             points_possible: 150 # * (assignment_idx + 1)
@@ -1804,8 +1810,11 @@ describe GradeCalculator do
       it "stores separate assignment group scores for each of a student’s enrollments" do
         (1..2).each do |i|
           section = @course.course_sections.create!(name: "section #{i}")
-          @course.enroll_user(@student, "StudentEnrollment", section: section,
-                                                             enrollment_state: "active", allow_multiple_enrollments: true)
+          @course.enroll_user(@student,
+                              "StudentEnrollment",
+                              section:,
+                              enrollment_state: "active",
+                              allow_multiple_enrollments: true)
         end
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
         scored_enrollment_ids = Score.where(assignment_group_id: @group1.id).map(&:enrollment_id)
@@ -1895,7 +1904,7 @@ describe GradeCalculator do
       it ".save_assignment_group_scores raises Delayed::RetriableError when deadlocked" do
         allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
 
-        expect { calc.send(:save_assignment_group_scores, nil, nil) }.to raise_error(Delayed::RetriableError)
+        expect { calc.send(:save_assignment_group_scores, [], []) }.to raise_error(Delayed::RetriableError)
       end
 
       it ".save_course_and_grading_period_scores raises Delayed::RetriableError when deadlocked" do

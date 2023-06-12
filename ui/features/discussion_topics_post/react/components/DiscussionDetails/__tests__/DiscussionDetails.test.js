@@ -24,6 +24,7 @@ import {responsiveQuerySizes} from '../../../utils/index'
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {Discussion} from '../../../../graphql/Discussion'
+import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
 
 jest.mock('../../../utils')
 
@@ -222,6 +223,21 @@ describe('DiscussionDetails', () => {
       it('displays "Show due dates" button when there are overrides', () => {
         const {queryByText} = setup({}, mockOverrides)
         expect(queryByText('Due Dates (4)')).toBeTruthy()
+      })
+      describe('Restrict Quantitative Data is true', () => {
+        const mockTopic = Discussion.mock({
+          courseSections: mockSections,
+          userCount: 1,
+          groupSet: null,
+          anonymousState: null,
+          assignment: Assignment.mock({pointsPossible: 7, restrictQuantitativeData: true}),
+          permissions: DiscussionPermissions.mock({readAsAdmin: false}),
+        })
+
+        it('does not displays points possible when RQD is true', () => {
+          const {queryByText} = setup({discussionTopic: mockTopic})
+          expect(queryByText('7 points')).toBeFalsy()
+        })
       })
     })
   })

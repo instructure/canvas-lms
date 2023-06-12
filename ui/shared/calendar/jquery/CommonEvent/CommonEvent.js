@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import fcUtil from '../fcUtil.coffee'
+import fcUtil from '../fcUtil'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
 import splitAssetString from '@canvas/util/splitAssetString'

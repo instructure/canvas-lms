@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe OutcomeCalculationMethod, type: :model do
+describe OutcomeCalculationMethod do
   subject { OutcomeCalculationMethod.create!(creation_params) }
 
   let_once(:account) { account_model }
   let(:calculation_method) { "latest" }
   let(:calculation_int) { nil }
-  let(:creation_params) { { context: account, calculation_method: calculation_method, calculation_int: calculation_int } }
+  let(:creation_params) { { context: account, calculation_method:, calculation_int: } }
 
   describe "validations" do
     it { is_expected.to validate_presence_of :context }
@@ -118,7 +118,7 @@ describe OutcomeCalculationMethod, type: :model do
       calculation_method = OutcomeCalculationMethod.find_or_create_default!(account)
       expect(calculation_method.calculation_method).to eq "highest"
       expect(calculation_method.workflow_state).to eq "active"
-      expect(calculation_method.calculation_int).to eq nil
+      expect(calculation_method.calculation_int).to be_nil
       expect(calculation_method.context).to eq account
     end
 

@@ -17,9 +17,6 @@
     "all_day_fb42c4fc": {
         "message": "כל היום"
     },
-    "all_items_loaded_aa256183": {
-        "message": "כל הפריטים נטענו"
-    },
     "alpha_15d59033": {
         "message": "אלפא"
     },
@@ -43,6 +40,9 @@
     },
     "apps_54d24a47": {
         "message": "אפליקציות"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "האם בטוחים שרוצים לבטל? שינויים שבוצעו לא ישמרו"
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "האם אתם בטוחים שברצונכם למחוק את פריט המתכנן הזה?"
@@ -115,6 +115,12 @@
     },
     "canvas_planner_98ed106": {
         "message": "מתכנן קנבס"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "תיקונים שבצעת יתכן שלא ישמרו"
+    },
+    "characters_9d897d1c": {
+        "message": "תווים"
     },
     "choose_usage_rights_33683854": {
         "message": "בחירה של זכויות שימוש..."
@@ -200,6 +206,12 @@
     "date_time_d9fbf2d7": {
         "message": "תאריך וזמן:"
     },
+    "decorative_image_fde98579": {
+        "message": "תמונת קישוט"
+    },
+    "decrease_indent_d9cf469d": {
+        "message": "צמצום עימוד"
+    },
     "deep_purple_bb3e2907": {
         "message": "סגול כהה"
     },
@@ -208,6 +220,9 @@
     },
     "delimiters_4db4840d": {
         "message": "מפסקים"
+    },
+    "description_436c48d7": {
+        "message": "תיאור"
     },
     "details_98a31b68": {
         "message": "פרטים"
@@ -241,6 +256,9 @@
     },
     "done_54e3d4b6": {
         "message": "בוצע"
+    },
+    "down_5831a426": {
+        "message": "מטה"
     },
     "due_5d7267be": {
         "message": "תאריך יעד:"
@@ -332,6 +350,9 @@
     "home_351838cd": {
         "message": "דף הבית"
     },
+    "html_editor_fb2ab713": {
+        "message": "עורך HTML"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "קיבלתי הרשאות להשתמש בקובץ זה"
     },
@@ -350,6 +371,9 @@
     "images_7ce26570": {
         "message": "תמונות"
     },
+    "increase_indent_6af90f7c": {
+        "message": "הרחבת עימוד"
+    },
     "indigo_2035fc55": {
         "message": "אינדיגו"
     },
@@ -358,6 +382,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "הוספת קישור"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "הוספת נוסחה מתימטית"
     },
     "invalid_file_type_881cc9b2": {
         "message": "סוג קובץ לא חוקי"
@@ -449,6 +476,9 @@
     "missing_items_for_title_516511f8": {
         "message": "חסרים פריטים ל { title }"
     },
+    "module_90d9fd32": {
+        "message": "מודול"
+    },
     "modules_c4325335": {
         "message": "מודולים"
     },
@@ -461,6 +491,9 @@
     "name_1aed4a1b": {
         "message": "שם"
     },
+    "navigation_ee9af92d": {
+        "message": "ניווט"
+    },
     "new_13daf639": {
         "message": "חדש"
     },
@@ -472,6 +505,12 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "הזדמנויות חדשות"
+    },
+    "new_quiz_34aacba6": {
+        "message": "בוחן חדש"
+    },
+    "next_40e12421": {
+        "message": "הבא"
     },
     "next_month_749b1778": {
         "message": "החודש הבא"
@@ -560,6 +599,9 @@
     "points_points_63e59cce": {
         "message": "{ points } נקודות"
     },
+    "prev_f82cbc48": {
+        "message": "הקודם"
+    },
     "preview_53003fd2": {
         "message": "תצוגה מקדימה"
     },
@@ -583,6 +625,9 @@
     },
     "record_7c9448b": {
         "message": "הקלטה"
+    },
+    "recording_98da6bda": {
+        "message": "מקליט"
     },
     "red_8258edf3": {
         "message": "אדום"
@@ -617,6 +662,9 @@
     "search_280d00bd": {
         "message": "חיפוש"
     },
+    "selection_b52c4c5e": {
+        "message": "בחירה"
+    },
     "show_all_ae37d610": {
         "message": "הצגה של הכל"
     },
@@ -628,6 +676,9 @@
     },
     "star_8d156e09": {
         "message": "הוספת כוכבית"
+    },
+    "start_over_f7552aa9": {
+        "message": "התחל/י מהתחלה"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } ל { endDate }"
@@ -716,6 +767,9 @@
     "unpublished_dfd8801": {
         "message": "לא פורסם"
     },
+    "up_c553575d": {
+        "message": "מעלה"
+    },
     "upload_file_fd2361b8": {
         "message": "העלאת קובץ"
     },
@@ -730,6 +784,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "זכויות שימוש"
+    },
+    "video_player_b371005": {
+        "message": "נגן הוידאו"
     },
     "view_ba339f93": {
         "message": "תצוגה"

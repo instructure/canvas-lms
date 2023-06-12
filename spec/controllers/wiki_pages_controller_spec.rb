@@ -74,25 +74,11 @@ describe WikiPagesController do
       end
     end
 
-    context "placements for Commons Favorites Import" do
-      before do
-        allow(controller).to receive(:external_tools_display_hashes).and_return(["tool 1", "tool 2"])
-      end
-
-      it "js_env has no placements when feature is disabled" do
-        @course.root_account.disable_feature! :commons_favorites
-        get "show", params: { course_id: @course.id, id: @page.url }
-        expect(response).to be_successful
-        expect(controller.external_tools_display_hashes(:wiki_index_menu)).to eq ["tool 1", "tool 2"]
-        expect(controller.js_env[:wiki_index_menu_tools]).to eq []
-      end
-
-      it "js_env has placements when feature is enabled" do
-        @course.root_account.enable_feature! :commons_favorites
-        get "show", params: { course_id: @course.id, id: @page.url }
-        expect(response).to be_successful
-        expect(controller.js_env[:wiki_index_menu_tools]).to eq ["tool 1", "tool 2"]
-      end
+    it "js_env has placements for Commons Favorites Import" do
+      allow(controller).to receive(:external_tools_display_hashes).and_return(["tool 1", "tool 2"])
+      get "show", params: { course_id: @course.id, id: @page.url }
+      expect(response).to be_successful
+      expect(controller.js_env[:wiki_index_menu_tools]).to eq ["tool 1", "tool 2"]
     end
 
     context "when K5 mode is enabled and user is a student" do
@@ -133,17 +119,17 @@ describe WikiPagesController do
 
         it "allows show" do
           get "show", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "allows edit" do
           get "edit", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "allows revisions" do
           get "revisions", params: { course_id: @course.id, wiki_page_id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         context "feature enabled" do
@@ -181,18 +167,60 @@ describe WikiPagesController do
 
         it "allows show" do
           get "show", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
         end
 
         it "allows edit" do
           get "edit", params: { course_id: @course.id, id: @page.url }
-          expect(response.code).to eq "200"
-          expect(controller.js_env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
+          expect(response).to have_http_status :ok
+          expect(controller.js_env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to be false
         end
 
         it "allows revisions" do
           get "revisions", params: { course_id: @course.id, wiki_page_id: @page.url }
-          expect(response.code).to eq "200"
+          expect(response).to have_http_status :ok
+        end
+      end
+    end
+  end
+
+  describe "metrics" do
+    before do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+    end
+
+    context "show" do
+      context "with edit rights" do
+        it "increments the count metric for a nonexistent page" do
+          course_with_teacher_logged_in(active_all: true)
+          bad_page_url = "something-that-doesnt-really-exist"
+          get "show", params: { course_id: @course.id, id: bad_page_url }
+          expect(InstStatsd::Statsd).to have_received(:increment).with("wikipage.show.page_does_not_exist.with_edit_rights")
+        end
+
+        it "does not increment the count metric when page is deleted" do
+          course_with_teacher_logged_in(active_all: true)
+          @page = @course.wiki_pages.create!(title: "delete me")
+          @page.update(workflow_state: "deleted")
+          get "show", params: { course_id: @course.id, id: @page.url }
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("wikipage.show.page_does_not_exist.with_edit_rights")
+        end
+      end
+
+      context "without edit rights" do
+        it "increments the count metric for a nonexistent page" do
+          course_with_student_logged_in(active_all: true)
+          bad_page_url = "something-else-that-doesnt-really-exist"
+          get "show", params: { course_id: @course.id, id: bad_page_url }
+          expect(InstStatsd::Statsd).to have_received(:increment).with("wikipage.show.page_does_not_exist.without_edit_rights")
+        end
+
+        it "does not increment the count metric when page is deleted" do
+          course_with_student_logged_in(active_all: true)
+          @page = @course.wiki_pages.create!(title: "delete me too")
+          @page.update(workflow_state: "deleted")
+          get "show", params: { course_id: @course.id, id: @page.url }
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("wikipage.show.page_does_not_exist.without_edit_rights")
         end
       end
     end

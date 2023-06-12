@@ -21,11 +21,29 @@
 class DelayedNotification < ActiveRecord::Base
   include Workflow
 
-  belongs_to :asset, polymorphic:
-    [:assessment_request, :attachment, :content_migration, :content_export, :collaborator, :submission,
-     :assignment, :communication_channel, :calendar_event, :conversation_message, :discussion_entry,
-     :submission_comment, { quiz_submission: "Quizzes::QuizSubmission" }, :discussion_topic, :course, :enrollment,
-     :wiki_page, :group_membership, :web_conference], polymorphic_prefix: true, exhaustive: false
+  belongs_to :asset,
+             polymorphic:
+                 [:assessment_request,
+                  :attachment,
+                  :content_migration,
+                  :content_export,
+                  :collaborator,
+                  :submission,
+                  :assignment,
+                  :communication_channel,
+                  :calendar_event,
+                  :conversation_message,
+                  :discussion_entry,
+                  :submission_comment,
+                  { quiz_submission: "Quizzes::QuizSubmission" },
+                  :discussion_topic,
+                  :course,
+                  :enrollment,
+                  :wiki_page,
+                  :group_membership,
+                  :web_conference],
+             polymorphic_prefix: true,
+             exhaustive: false
   include NotificationPreloader
 
   attr_accessor :data
@@ -49,10 +67,10 @@ class DelayedNotification < ActiveRecord::Base
     data = kwargs if data&.empty? && !kwargs.empty?
 
     DelayedNotification.new(
-      asset: asset,
-      notification: notification,
-      recipient_keys: recipient_keys,
-      data: data
+      asset:,
+      notification:,
+      recipient_keys:,
+      data:
     ).process
   end
 
@@ -60,7 +78,7 @@ class DelayedNotification < ActiveRecord::Base
     res = []
     if asset
       iterate_to_list do |to_list_slice|
-        slice_res = notification.create_message(asset, to_list_slice, data: data)
+        slice_res = notification.create_message(asset, to_list_slice, data:)
         res.concat(slice_res) if Rails.env.test?
       end
     end

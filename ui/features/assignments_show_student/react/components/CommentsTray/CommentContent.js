@@ -59,6 +59,7 @@ export default function CommentContent(props) {
           variables: {
             submissionId: props.submission.id,
             submissionAttempt: props.submission.attempt,
+            peerReview: props.isPeerReviewEnabled,
           },
         }
 
@@ -147,29 +148,43 @@ export default function CommentContent(props) {
   const peerReviewText = I18n.t(
     'Add a comment to complete your peer review. You will only see comments written by you.'
   )
+  const rubricPeerReviewText = I18n.t('You will only see comments written by you.')
 
-  const peerReviewReadyText = I18n.t('Your peer review is complete!')
+  const peerReviewCompleteText = I18n.t('Your peer review is complete!')
 
   let placeholder
   if (!props.comments.length) {
     if (props.isPeerReviewEnabled) {
-      placeholder = <SVGWithTextPlaceholder text={peerReviewText} url={noCommentsPeerReview} />
+      if (props.assignment.rubric) {
+        placeholder = (
+          <SVGWithTextPlaceholder text={rubricPeerReviewText} url={noCommentsPeerReview} />
+        )
+      } else {
+        placeholder = <SVGWithTextPlaceholder text={peerReviewText} url={noCommentsPeerReview} />
+      }
     } else if (!props.submission.gradeHidden) {
       placeholder = <SVGWithTextPlaceholder text={defaultText} url={noComments} />
     }
   }
+  const hasCompletedPeerReview = () => {
+    const {reviewerSubmission, submission} = props
+    if (!reviewerSubmission) return false
 
+    const {assignedAssessments} = reviewerSubmission
+    const matchingAssessment = assignedAssessments.find(x => x.assetId === submission._id)
+    return matchingAssessment?.workflowState === 'completed'
+  }
   return (
     <>
       {placeholder}
-      {props.isPeerReviewEnabled && !props.assignment.rubric && !!props.comments.length && (
+      {props.isPeerReviewEnabled && !props.assignment.rubric && hasCompletedPeerReview() && (
         <Alert
           variant="success"
           renderCloseButtonLabel="Close"
           margin="0 medium medium"
           transition="none"
         >
-          {peerReviewReadyText}
+          {peerReviewCompleteText}
         </Alert>
       )}
       {props.comments
@@ -189,6 +204,7 @@ CommentContent.propTypes = {
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
   isPeerReviewEnabled: bool,
+  reviewerSubmission: Submission.shape,
 }
 
 CommentContent.defaultProps = {

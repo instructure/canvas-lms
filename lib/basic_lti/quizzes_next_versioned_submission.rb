@@ -21,10 +21,24 @@
 module BasicLTI
   class QuizzesNextVersionedSubmission
     JSON_FIELDS = %i[
-      id grade score submitted_at assignment_id
-      user_id submission_type workflow_state updated_at
-      grade_matches_current_submission graded_at turnitin_data
-      excused points_deducted grading_period_id late missing url
+      id
+      grade
+      score
+      submitted_at
+      assignment_id
+      user_id
+      submission_type
+      workflow_state
+      updated_at
+      grade_matches_current_submission
+      graded_at
+      turnitin_data
+      excused
+      points_deducted
+      grading_period_id
+      late
+      missing
+      url
     ].freeze
 
     def initialize(assignment, user, prioritize_non_tool_grade: false, needs_additional_review: false)
@@ -74,7 +88,7 @@ module BasicLTI
         last = attempt.last
         first = attempt.first
         last[:submitted_at] = first[:submitted_at]
-        last[:score].blank? ? nil : last
+        (last[:score].blank? && last[:workflow_state] != "graded") ? nil : last
       end
       @_grade_history = attempts.compact
     end
@@ -160,7 +174,7 @@ module BasicLTI
     end
 
     def grade_submission(launch_url, grade, score, grader_id)
-      BasicOutcomes::LtiResponse.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
+      BasicOutcomes::LtiResponse.ensure_score_update_possible(submission:, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
         submission.grade = grade
         submission.score = score
         submission.graded_at = params[:graded_at] || Time.zone.now

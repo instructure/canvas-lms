@@ -109,7 +109,7 @@ describe SubmissionsController do
                course_id: @course.id,
                assignment_id: @assignment.id,
                submission: {
-                 submission_type: submission_type,
+                 submission_type:,
                  attachment_ids: a1.id,
                  eula_agreement_timestamp: timestamp
                }
@@ -138,7 +138,7 @@ describe SubmissionsController do
         let(:extra_params) do
           {
             submission: {
-              submission_type: submission_type,
+              submission_type:,
               eula_agreement_timestamp: timestamp,
               body: "body text"
             }
@@ -178,7 +178,7 @@ describe SubmissionsController do
       it "displays an error when lti resource link is not found" do
         params[:submission][:resource_link_lookup_uuid] = "FOO&BAR"
 
-        post "create", params: params
+        post("create", params:)
 
         expect(response).to be_redirect
         expect(assigns[:submission]).to be_nil
@@ -189,7 +189,7 @@ describe SubmissionsController do
       it "creates the submission when lti resource link is found" do
         params[:submission][:resource_link_lookup_uuid] = resource_link.lookup_uuid
 
-        post "create", params: params
+        post("create", params:)
 
         expect(response).to be_redirect
         expect(assigns[:submission]).not_to be_nil
@@ -228,7 +228,7 @@ describe SubmissionsController do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)
       group_category = @course.group_categories.create(name: "Category")
-      @group = @course.groups.create(name: "Group", group_category: group_category)
+      @group = @course.groups.create(name: "Group", group_category:)
       @group.add_user(@user)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload", group_category: @group.group_category)
 
@@ -242,7 +242,7 @@ describe SubmissionsController do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)
       group_category = @course.group_categories.create(name: "Category")
-      @group = @course.groups.create(name: "Group", group_category: group_category)
+      @group = @course.groups.create(name: "Group", group_category:)
       @group.add_user(@user)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
 
@@ -257,7 +257,8 @@ describe SubmissionsController do
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       att1 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/doc.doc", "application/msword", true))
       att2 = attachment_model(context: @user, uploaded_data: fixture_file_upload("docs/txt.txt", "application/vnd.ms-excel", true))
-      post "create", params: { course_id: @course.id, assignment_id: @assignment.id,
+      post "create", params: { course_id: @course.id,
+                               assignment_id: @assignment.id,
                                submission: { submission_type: "online_upload", attachment_ids: [att1.id, att2.id].join(",") },
                                attachments: { "0" => { uploaded_data: "doc.doc" }, "1" => { uploaded_data: "txt.txt" } } }
       expect(response).to be_redirect
@@ -266,7 +267,7 @@ describe SubmissionsController do
       expect(assigns[:submission].assignment_id).to eql(@assignment.id)
       expect(assigns[:submission].submission_type).to eql("online_upload")
       expect(assigns[:submission].attachments).not_to be_empty
-      expect(assigns[:submission].attachments.length).to eql(2)
+      expect(assigns[:submission].attachments.length).to be(2)
       expect(assigns[:submission].attachments.map(&:display_name)).to be_include("doc.doc")
       expect(assigns[:submission].attachments.map(&:display_name)).to be_include("txt.txt")
     end
@@ -357,7 +358,7 @@ describe SubmissionsController do
           eula_agreement_timestamp: timestamp
         }
       }
-      post "create", params: params
+      post("create", params:)
       expect(assigns[:submission].turnitin_data[:eula_agreement_timestamp]).to eq timestamp
     end
 
@@ -543,7 +544,7 @@ describe SubmissionsController do
 
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 1
+        expect(subs.to_a.sum { |s| s.submission_comments.size }).to be 1
       end
 
       it "does not send a comment to the entire group when false" do
@@ -561,7 +562,7 @@ describe SubmissionsController do
 
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 1
+        expect(subs.to_a.sum { |s| s.submission_comments.size }).to be 1
       end
 
       it "sends a comment to the entire group if requested" do
@@ -579,7 +580,7 @@ describe SubmissionsController do
 
         subs = @assignment.submissions
         expect(subs.size).to eq 2
-        expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 2
+        expect(subs.to_a.sum { |s| s.submission_comments.size }).to be 2
       end
 
       it "succeeds when commenting to the group from a student using PUT" do
@@ -630,7 +631,8 @@ describe SubmissionsController do
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
 
         expect(google_docs).to receive(:download).and_return([Net::HTTPOK.new(200, {}, ""), "title", "pdf"])
-        post(:create, params: { course_id: @course.id, assignment_id: @assignment.id,
+        post(:create, params: { course_id: @course.id,
+                                assignment_id: @assignment.id,
                                 submission: { submission_type: "google_doc" },
                                 google_doc: { document_id: "12345" } })
         expect(response).to be_redirect
@@ -654,7 +656,8 @@ describe SubmissionsController do
         google_docs = double
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
         expect(google_docs).to receive(:download).and_raise(GoogleDrive::ConnectionException, "fake conn timeout")
-        post(:create, params: { course_id: @course.id, assignment_id: @assignment.id,
+        post(:create, params: { course_id: @course.id,
+                                assignment_id: @assignment.id,
                                 submission: { submission_type: "google_doc" },
                                 google_doc: { document_id: "12345" } })
         expect(response).to be_redirect
@@ -669,7 +672,8 @@ describe SubmissionsController do
         google_docs = double
         expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
         expect(google_docs).to receive(:download).and_raise(GoogleDrive::WorkflowError, "fake bad entry")
-        post(:create, params: { course_id: @course.id, assignment_id: @assignment.id,
+        post(:create, params: { course_id: @course.id,
+                                assignment_id: @assignment.id,
                                 submission: { submission_type: "google_doc" },
                                 google_doc: { document_id: "12345" } })
         expect(response).to be_redirect
@@ -840,7 +844,7 @@ describe SubmissionsController do
       @submission.update!(score: 10)
     end
 
-    let(:body) { JSON.parse(response.body)["submission"] }
+    let(:body) { response.parsed_body["submission"] }
 
     it "redirects to login when logged out" do
       remove_user_session
@@ -916,10 +920,10 @@ describe SubmissionsController do
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id }, format: :json
       expect(body["id"]).to eq @submission.id
-      expect(body["score"]).to be nil
-      expect(body["grade"]).to be nil
-      expect(body["published_grade"]).to be nil
-      expect(body["published_score"]).to be nil
+      expect(body["score"]).to be_nil
+      expect(body["grade"]).to be_nil
+      expect(body["published_grade"]).to be_nil
+      expect(body["published_score"]).to be_nil
     end
 
     it "renders json without scores for students with an unposted submission for a quiz" do
@@ -936,7 +940,7 @@ describe SubmissionsController do
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: quiz.assignment.id, id: @student.id }, format: :json
       expect(body["id"]).to eq quiz_submission.submission.id
-      expect(body["body"]).to be nil
+      expect(body["body"]).to be_nil
     end
 
     it "renders the page for submitting student who can access the course" do
@@ -1105,8 +1109,8 @@ describe SubmissionsController do
     let(:attachment) { attachment_model(filename: "submission.doc", context: test_student) }
     let(:submission) { assignment.submit_homework(test_student, attachments: [attachment]) }
     let!(:originality_report) do
-      OriginalityReport.create!(attachment: attachment,
-                                submission: submission,
+      OriginalityReport.create!(attachment:,
+                                submission:,
                                 originality_score: 0.5,
                                 originality_report_url: "http://www.instructure.com")
     end
@@ -1137,13 +1141,19 @@ describe SubmissionsController do
           expect(submission2.id).to eq(submission.id) # submission2 is updated/reloaded with new version (last attempt number)
           expect(submission2.attempt).to be > submission.attempt
           get "originality_report", params: {
-            course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id,
-            asset_string: submission.asset_string, attempt: 1
+            course_id: assignment.context_id,
+            assignment_id: assignment.id,
+            submission_id: test_student.id,
+            asset_string: submission.asset_string,
+            attempt: 1
           }
           expect(response).to redirect_to originality_report.originality_report_url
           get "originality_report", params: {
-            course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id,
-            asset_string: submission.asset_string, attempt: 2
+            course_id: assignment.context_id,
+            assignment_id: assignment.id,
+            submission_id: test_student.id,
+            asset_string: submission.asset_string,
+            attempt: 2
           }
           expect(response).to redirect_to originality_report2.originality_report_url
         end
@@ -1163,7 +1173,7 @@ describe SubmissionsController do
         unauthorized_user = User.create
         user_session(unauthorized_user)
         get "originality_report", params: { course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string }
-        expect(response.status).to eq 401
+        expect(response).to have_http_status :unauthorized
       end
 
       it "shows an error if no URL is present for the OriginalityReport" do
@@ -1220,7 +1230,7 @@ describe SubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         submission_id: "{ user_id }",
-        asset_string: asset_string
+        asset_string:
       }
       expect(response).to have_http_status(:bad_request)
     end
@@ -1235,7 +1245,7 @@ describe SubmissionsController do
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           submission_id: student.id,
-          asset_string: asset_string
+          asset_string:
         }
         expect(response).to redirect_to(/#{retrieve_course_external_tools_url(course.id)}/)
       end
@@ -1245,7 +1255,7 @@ describe SubmissionsController do
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           submission_id: student.id,
-          asset_string: asset_string
+          asset_string:
         }
         expect(response).to redirect_to(/MY_GREAT_REPORT/)
       end
@@ -1256,7 +1266,7 @@ describe SubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         submission_id: student.id,
-        asset_string: asset_string
+        asset_string:
       }
       expect(response).to redirect_to course_assignment_submission_url(assignment.context_id, assignment.id, student.id)
     end
@@ -1266,7 +1276,7 @@ describe SubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         submission_id: student.id,
-        asset_string: asset_string
+        asset_string:
       }
 
       expect(flash[:error]).to be_present
@@ -1303,25 +1313,25 @@ describe SubmissionsController do
 
     it "renders unauthorized if user does not have view_audit_trail permission" do
       @teacher.account.role_overrides.where(permission: :view_audit_trail).destroy_all
-      get :audit_events, params: params, format: :json
+      get :audit_events, params:, format: :json
       expect(response).to have_http_status(:unauthorized)
     end
 
     it "renders ok if user does have view_audit_trail permission" do
-      get :audit_events, params: params, format: :json
+      get :audit_events, params:, format: :json
       expect(response).to have_http_status(:ok)
     end
 
     it "returns only related audit events" do
       @unrelated_submission.submission_comments.create!(author: @teacher, comment: "unrelated Teacher comment")
       @course.assignments.create!(name: "unrelated", anonymous_grading: true, updating_user: @teacher)
-      get :audit_events, params: params, format: :json
+      get :audit_events, params:, format: :json
       audit_events = json_parse(response.body).fetch("audit_events")
       expect(audit_events.count).to be 3
     end
 
     it "returns the assignment audit events" do
-      get :audit_events, params: params, format: :json
+      get :audit_events, params:, format: :json
       assignment_audit_events = json_parse(response.body).fetch("audit_events").select do |event|
         event.fetch("event_type").include?("assignment_")
       end
@@ -1329,7 +1339,7 @@ describe SubmissionsController do
     end
 
     it "returns the submission audit events" do
-      get :audit_events, params: params, format: :json
+      get :audit_events, params:, format: :json
       submission_audit_events = json_parse(response.body).fetch("audit_events").select do |event|
         event.fetch("event_type").include?("submission_")
       end
@@ -1337,7 +1347,7 @@ describe SubmissionsController do
     end
 
     it "returns the audit events in order of created at" do
-      get :audit_events, params: params, format: :json
+      get :audit_events, params:, format: :json
       audit_event_ids = json_parse(response.body).fetch("audit_events").map do |event|
         event.fetch("id")
       end
@@ -1353,7 +1363,7 @@ describe SubmissionsController do
 
       before do
         @course.enroll_teacher(other_grader, enrollment_state: "active")
-        @assignment.update!(moderated_grading: true, grader_count: 2, final_grader: final_grader)
+        @assignment.update!(moderated_grading: true, grader_count: 2, final_grader:)
 
         @submission.submission_comments.create!(author: admin, comment: "I am an administrator :)")
         @submission.submission_comments.create!(
@@ -1366,33 +1376,33 @@ describe SubmissionsController do
         extraneous_grader = User.create!
         @assignment.create_moderation_grader(extraneous_grader, occupy_slot: true)
 
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         user_ids = returned_users.pluck("id")
         expect(user_ids).to match_array([first_student.id, admin.id, other_grader.id, final_grader.id])
       end
 
       it "returns the name associated with a user" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(returned_users).to include(hash_including({ "id" => other_grader.id, "name" => "Nobody" }))
       end
 
       it "returns a role of 'final_grader' if a user is the final grader" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(returned_users).to include(hash_including({ "id" => final_grader.id, "role" => "final_grader" }))
       end
 
       it "returns a role of 'admin' if a user is an administrator" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(returned_users).to include(hash_including({ "id" => admin.id, "role" => "admin" }))
       end
 
       it "returns a role of 'grader' if a user is a grader" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(returned_users).to include(hash_including({ "id" => other_grader.id, "role" => "grader" }))
       end
 
       it "returns a role of 'student' if a user is a student" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(returned_users).to include(hash_including({ "id" => first_student.id, "role" => "student" }))
       end
     end
@@ -1416,17 +1426,17 @@ describe SubmissionsController do
       before { @assignment.grade_student(first_student, grader_id: -external_tool.id, score: 80) }
 
       it "returns an event for external tool" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(external_tool_events.count).to be 1
       end
 
       it "returns the name associated with an external tool" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(returned_tools).to include(hash_including({ "id" => external_tool.id, "name" => "Undertow" }))
       end
 
       it "returns the role of grader for an external tool" do
-        get :audit_events, params: params, format: :json
+        get :audit_events, params:, format: :json
         expect(returned_tools).to include(hash_including({ "id" => external_tool.id, "role" => "grader" }))
       end
     end

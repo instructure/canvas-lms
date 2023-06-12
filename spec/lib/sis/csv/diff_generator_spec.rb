@@ -37,8 +37,7 @@ describe SIS::CSV::DiffGenerator do
 
   describe "#generate_csvs" do
     it "skips diffing if previous is empty" do
-      previous = {
-      }
+      previous = {}
 
       current = {
         course: [{ file: "courses2.csv" }],

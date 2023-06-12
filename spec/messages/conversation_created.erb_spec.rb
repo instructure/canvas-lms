@@ -43,8 +43,11 @@ message")
     it "doesnt have trailing erb closures" do
       allow(@message).to receive(:attachments).and_return([
                                                             double("attachment",
-                                                                   display_name: "FileName", readable_size: "1MB", id: 42,
-                                                                   context: @teacher_enrollment.course, uuid: "abcdef123456")
+                                                                   display_name: "FileName",
+                                                                   readable_size: "1MB",
+                                                                   id: 42,
+                                                                   context: @teacher_enrollment.course,
+                                                                   uuid: "abcdef123456")
                                                           ])
       msg = generate_message(:conversation_created, :email, @message)
       expect(msg.html_body).not_to match(/%>/)
@@ -53,13 +56,13 @@ message")
     it "renders correct footer if replys are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(:conversation_created, :email, @message)
-      expect(msg.body.include?("replying directly to this email")).to eq true
+      expect(msg.body.include?("replying directly to this email")).to be true
     end
 
     it "renders correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(:conversation_created, :email, @message)
-      expect(msg.body.include?("replying directly to this email")).to eq false
+      expect(msg.body.include?("replying directly to this email")).to be false
     end
   end
 end

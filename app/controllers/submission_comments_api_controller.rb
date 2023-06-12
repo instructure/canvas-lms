@@ -94,7 +94,8 @@ class SubmissionCommentsApiController < ApplicationController
     @user = api_find(@context.students_visible_to(@current_user, include: :inactive),
                      params[:user_id])
 
-    if authorized_action?(@assignment, @current_user,
+    if authorized_action?(@assignment,
+                          @current_user,
                           :attach_submission_comment_files)
       api_attachment_preflight(@assignment, request, check_quota: false)
     end
@@ -145,7 +146,7 @@ class SubmissionCommentsApiController < ApplicationController
           end
         else # author is a student or admin
           # always notify instructor
-          broadcast_annotation_notification(submission: submission, to_list: instructors, data: broadcast_data(author))
+          broadcast_annotation_notification(submission:, to_list: instructors, data: broadcast_data(author))
         end
 
         submissions_by_user_id = if submission.group_id
@@ -163,7 +164,7 @@ class SubmissionCommentsApiController < ApplicationController
                                 .select("users.id, associated_user_id").group_by(&:associated_user_id)
         submissions_by_user_id.each_value do |sub|
           to_list = Array(observers_by_user[sub.user_id]) + ["user_#{sub.user_id}"] - ["user_#{author.id}"]
-          broadcast_annotation_notification(submission: sub, to_list: to_list, data: broadcast_data(author), teacher: false)
+          broadcast_annotation_notification(submission: sub, to_list:, data: broadcast_data(author), teacher: false)
         end
 
         render json: {}, status: :ok

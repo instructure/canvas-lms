@@ -48,8 +48,12 @@ class Lti::LineItem < ApplicationRecord
   before_destroy :destroy_assignment
 
   AGS_EXT_PREFIX = "https://canvas.instructure.com/lti/"
-  AGS_EXT_SUBMISSION_TYPE = "#{AGS_EXT_PREFIX}submission_type"
-  AGS_EXT_LAUNCH_URL = "#{AGS_EXT_PREFIX}launch_url"
+  AGS_EXT_SUBMISSION_TYPE = "#{AGS_EXT_PREFIX}submission_type".freeze
+  AGS_EXT_LAUNCH_URL = "#{AGS_EXT_PREFIX}launch_url".freeze
+
+  include MasterCourses::CollectionRestrictor
+  self.collection_owner_association = :assignment
+  restrict_columns :content, [:resource_id]
 
   def assignment_line_item?
     assignment.line_items.order(:created_at).first.id == id
@@ -62,7 +66,7 @@ class Lti::LineItem < ApplicationRecord
   def self.create_line_item!(assignment, context, tool, params)
     transaction do
       assignment_attr = {
-        context: context,
+        context:,
         name: params[:label],
         points_possible: params[:score_maximum],
         submission_types: "none",
@@ -91,7 +95,7 @@ class Lti::LineItem < ApplicationRecord
         line_item = assignment.line_items.first
       end
 
-      line_item ||= new(assignment: assignment, root_account_id: assignment.root_account_id)
+      line_item ||= new(assignment:, root_account_id: assignment.root_account_id)
       attrs = params.to_h.merge(coupled: false).compact
       attrs[:client_id] = tool.global_developer_key_id if tool
       line_item.update!(attrs)
@@ -112,7 +116,7 @@ class Lti::LineItem < ApplicationRecord
     return if resource_link.blank?
 
     ids = resource_link.line_items.pluck(:assignment_id)
-    return if ids.size.zero?
+    return if ids.empty?
     return if ids.uniq.size == 1 && ids.first == assignment_id
 
     errors.add(:assignment, "does not match ltiLink")

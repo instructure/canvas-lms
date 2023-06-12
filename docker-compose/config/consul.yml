@@ -12,9 +12,6 @@
 #   environment: test
 #   dc: "consul"
 #   init_values:
-#     canvas:
-#       signing-secret: astringthatisactually32byteslong
-#       encryption-secret: astringthatisactually32byteslong
 #     rich-content-service:
 #       app-host: rce.docker
 #       cdn-host: rce.docker
@@ -30,9 +27,6 @@
 #   ssl: false
 #   environment: "dev"
 #   init_values_witnout_env:
-#     canvas:
-#       signing-secret: astringthatisactually32byteslong
-#       encryption-secret: astringthatisactually32byteslong
 #     rich-content-service:
 #       app-host: rce.docker
 #       cdn-host: null

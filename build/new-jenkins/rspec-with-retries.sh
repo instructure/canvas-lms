@@ -24,10 +24,6 @@ while true; do
   else
     if [ $1 ] && [ $1 = 'performance' ]; then
       commands+=("docker-compose exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99")
-    else
-      for i in $(seq 0 $PROCESSES); do
-        commands+=("build/new-jenkins/rspec-tests.sh $i")
-      done
     fi
   fi
 

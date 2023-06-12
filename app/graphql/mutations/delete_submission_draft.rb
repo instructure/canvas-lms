@@ -35,7 +35,7 @@ class Mutations::DeleteSubmissionDraft < Mutations::BaseMutation
     submission_draft_ids = submission.submission_draft_ids
     submission.delete_submission_drafts!
 
-    { submission_draft_ids: submission_draft_ids }
+    { submission_draft_ids: }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
   end

@@ -244,7 +244,6 @@ function insertUndecoratedLink(editor, linkProps, canvasOrigin) {
   const onlyText = isOnlyTextSelected(selectedContent)
 
   const linkText = onlyText && textForLink(linkProps, editor, anchorElm)
-
   // only keep the props we want as attributes on the <a>
   const linkAttrs = {
     id: linkProps.id,
@@ -293,7 +292,7 @@ function createLink(editor, selectedElm, text, linkAttrs, canvasOrigin) {
     linkImageFigure(editor, selectedElm, linkAttrs, canvasOrigin)
   } else if (text) {
     // create the whole wazoo
-    insertContent(editor, renderLink(linkAttrs, editor.dom.encode(text), canvasOrigin))
+    insertContent(editor, renderLink(linkAttrs, text, canvasOrigin))
   } else {
     // create a link on the selected content
     editor.execCommand('mceInsertLink', false, linkAttrs)

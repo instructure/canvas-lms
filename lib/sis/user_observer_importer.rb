@@ -39,7 +39,8 @@ module SIS
     end
 
     class Work
-      attr_accessor :success_count, :users_to_update_account_associations,
+      attr_accessor :success_count,
+                    :users_to_update_account_associations,
                     :user_observers_to_update_sis_batch_ids
 
       def initialize(batch, root_account, logger)
@@ -76,7 +77,7 @@ module SIS
         case status.downcase
         when "active"
           check_observer_notification_settings(observer)
-          user_observer = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: @root_account)
+          user_observer = UserObservationLink.create_or_restore(observer:, student:, root_account: @root_account)
         when "deleted"
           user_observer = observer.as_observer_observation_links.for_root_accounts(@root_account).where(user_id: student).take
           if user_observer

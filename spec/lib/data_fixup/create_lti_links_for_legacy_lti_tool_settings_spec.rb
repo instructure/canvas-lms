@@ -25,7 +25,7 @@ describe DataFixup::CreateLtiLinksForLegacyLtiToolSettings do
 
   let(:link_tool_setting) do
     Lti::ToolSetting.create!(
-      tool_proxy: tool_proxy,
+      tool_proxy:,
       context: course,
       resource_link_id: SecureRandom.uuid,
       vendor_code: product_family.vendor_code,
@@ -38,7 +38,7 @@ describe DataFixup::CreateLtiLinksForLegacyLtiToolSettings do
 
   let(:proxy_tool_setting) do
     Lti::ToolSetting.create!(
-      tool_proxy: tool_proxy,
+      tool_proxy:,
       custom: { param: 42 }
     )
   end

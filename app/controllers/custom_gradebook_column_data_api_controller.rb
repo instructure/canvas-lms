@@ -60,7 +60,8 @@ class CustomGradebookColumnDataApiController < ApplicationController
     if authorized_action? col, @current_user, :read
       scope = col.custom_gradebook_column_data.where(user_id: allowed_user_ids)
 
-      data = Api.paginate(scope, self,
+      data = Api.paginate(scope,
+                          self,
                           api_v1_course_custom_gradebook_column_data_url(@context, col))
 
       render json: data.map { |d|

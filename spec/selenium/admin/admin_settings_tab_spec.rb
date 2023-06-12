@@ -326,11 +326,6 @@ describe "admin settings tab" do
       check_box_verifier("#account_services_skype", { allowed_services: :skype })
     end
 
-    it "unclicks and then click on delicious" do
-      check_box_verifier("#account_services_delicious", { allowed_services: :delicious }, false)
-      check_box_verifier("#account_services_delicious", { allowed_services: :delicious })
-    end
-
     it "unclicks and click on google docs previews" do
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, false)
       check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews })
@@ -600,7 +595,7 @@ describe "admin settings tab" do
 
   it "shows all feature flags that are expected to be visible" do
     user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
-    course_with_admin_logged_in(account: Account.default, user: user)
+    course_with_admin_logged_in(account: Account.default, user:)
     provision_quizzes_next(Account.default)
     get "/accounts/#{Account.default.id}/settings"
     f("#tab-features-link").click

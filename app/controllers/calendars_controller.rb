@@ -26,7 +26,7 @@ class CalendarsController < ApplicationController
 
   def show
     get_context
-    @show_account_calendars = Account.site_admin.feature_enabled?(:account_calendar_events) && @current_user.account_calendars.any?
+    @show_account_calendars = @current_user.all_account_calendars.any?
     get_all_pertinent_contexts(include_groups: true, include_accounts: @show_account_calendars, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select do |c|
       c.grants_right?(@current_user, session, :manage_calendar)
@@ -38,6 +38,7 @@ class CalendarsController < ApplicationController
                            @current_user.get_preference(:selected_calendar_contexts)
                          end
     @account_calendar_events_seen = @current_user.get_preference(:account_calendar_events_seen)
+    @viewed_auto_subscribed_account_calendars = @current_user.get_preference(:viewed_auto_subscribed_account_calendars) || []
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
     if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.where(id: params[:event_id]).first) && event.start_at
@@ -54,7 +55,7 @@ class CalendarsController < ApplicationController
         else
           all_course_sections = CourseSection.find(context.section_visibilities_for(@current_user).pluck(:course_section_id).map { |cs_id| Shard.global_id_for(cs_id, context.shard) })
           section_ids = all_course_sections.select { |cs| cs.grants_right?(@current_user, session, :manage_calendar) }.pluck(:id)
-          ag_permission = { all_sections: false, section_ids: section_ids } if section_ids.any?
+          ag_permission = { all_sections: false, section_ids: } if section_ids.any?
         end
       end
       info = {
@@ -63,33 +64,34 @@ class CalendarsController < ApplicationController
         id: context.id,
         type: context.class.to_s.downcase,
         url: named_context_url(context, :context_url),
-        create_calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_events_url) : "",
-        create_assignment_url: context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignments_url) : "",
-        create_appointment_group_url: context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url : "",
-        new_calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :new_context_calendar_event_url) : "",
-        new_assignment_url: context.respond_to?("assignments") ? named_context_url(context, :new_context_assignment_url) : "",
-        calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_event_url, "{{ id }}") : "",
-        assignment_url: context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignment_url, "{{ id }}") : "",
+        create_calendar_event_url: context.respond_to?(:calendar_events) ? named_context_url(context, :context_calendar_events_url) : "",
+        create_assignment_url: context.respond_to?(:assignments) ? named_context_url(context, :api_v1_context_assignments_url) : "",
+        create_appointment_group_url: context.respond_to?(:appointment_groups) ? api_v1_appointment_groups_url : "",
+        new_calendar_event_url: context.respond_to?(:calendar_events) ? named_context_url(context, :new_context_calendar_event_url) : "",
+        new_assignment_url: context.respond_to?(:assignments) ? named_context_url(context, :new_context_assignment_url) : "",
+        calendar_event_url: context.respond_to?(:calendar_events) ? named_context_url(context, :context_calendar_event_url, "{{ id }}") : "",
+        assignment_url: context.respond_to?(:assignments) ? named_context_url(context, :api_v1_context_assignment_url, "{{ id }}") : "",
         assignment_override_url: context.respond_to?(:assignments) ? api_v1_assignment_override_url(course_id: context.id, assignment_id: "{{ assignment_id }}", id: "{{ id }}") : "",
-        appointment_group_url: context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(id: "{{ id }}") : "",
-        can_create_calendar_events: context.respond_to?("calendar_events") && CalendarEvent.new.tap { |e| e.context = context }.grants_right?(@current_user, session, :create),
-        can_create_assignments: context.respond_to?("assignments") && Assignment.new.tap { |a| a.context = context }.grants_right?(@current_user, session, :create),
-        assignment_groups: context.respond_to?("assignments") ? context.assignment_groups.active.pluck(:id, :name).map { |id, name| { id: id, name: name } } : [],
+        appointment_group_url: context.respond_to?(:appointment_groups) ? api_v1_appointment_groups_url(id: "{{ id }}") : "",
+        can_create_calendar_events: context.respond_to?(:calendar_events) && CalendarEvent.new.tap { |e| e.context = context }.grants_right?(@current_user, session, :create),
+        can_create_assignments: context.respond_to?(:assignments) && Assignment.new.tap { |a| a.context = context }.grants_right?(@current_user, session, :create),
+        assignment_groups: context.respond_to?(:assignments) ? context.assignment_groups.active.pluck(:id, :name).map { |id, name| { id:, name: } } : [],
         can_create_appointment_groups: ag_permission,
         can_make_reservation: context.grants_right?(@current_user, :participate_as_student),
         can_update_todo_date: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
         can_update_discussion_topic: context.grants_right?(@current_user, session, :moderate_forum),
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
-        concluded: (context.is_a? Course) ? context.concluded? : false,
+        concluded: context.is_a?(Course) ? context.concluded? : false,
         k5_course: context.is_a?(Course) && context.elementary_enabled?,
+        k5_account: context.is_a?(Account) && context.enable_as_k5_account?,
         course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
         user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?,
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read)
       }
-      if context.respond_to?("course_sections")
+      if context.respond_to?(:course_sections) && !context.is_a?(Account)
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
-          hash = { id: id, asset_string: "course_section_#{id}", name: name }
+          hash = { id:, asset_string: "course_section_#{id}", name: }
           if ag_permission
             hash[:can_create_ag] = ag_permission[:all_sections] || ag_permission[:section_ids].include?(id)
           end
@@ -110,12 +112,18 @@ class CalendarsController < ApplicationController
           MAX_NAME_LENGTH: max_name_length,
           DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account
         }
+      elsif (context.is_a? Account) && Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
+        info[:auto_subscribe] = context.account_calendar_subscription_type == "auto"
+        info[:viewed_auto_subscribed_account_calendars] = @viewed_auto_subscribed_account_calendars.include?(context.global_id)
       end
-      if ag_permission && ag_permission[:all_sections] && context.respond_to?("group_categories")
-        info[:group_categories] = context.group_categories.active.pluck(:id, :name).map { |id, name| { id: id, asset_string: "group_category_#{id}", name: name } }
+      if ag_permission && ag_permission[:all_sections] && context.respond_to?(:group_categories)
+        info[:group_categories] = context.group_categories.active.pluck(:id, :name).map { |id, name| { id:, asset_string: "group_category_#{id}", name: } }
       end
       info
     end
+    # NOTE: which account calendars the user will have now seen
+    @current_user.set_preference(:viewed_auto_subscribed_account_calendars, @contexts.select { |c| c.class.to_s.downcase == "account" }.map(&:global_id))
+
     StringifyIds.recursively_stringify_ids(@contexts_json)
     content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + ".atom", { title: t(:feed_title, "Course Calendar Atom Feed") })
     js_env(@hash) if @hash

@@ -19,7 +19,7 @@
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
 import MasteryCalculation from './MasteryCalculation/index'
@@ -69,10 +69,8 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
   const [importsTargetGroup, setImportsTargetGroup] = useState({})
   const isMobileView = !breakpoints?.tablet
   const contextValues = getContext(isMobileView)
-  const {accountLevelMasteryScalesFF, outcomeAlignmentSummaryFF, canManage, contextType} =
-    contextValues.env
-  const shouldDisplayAlignmentsTab =
-    improvedManagement && outcomeAlignmentSummaryFF && canManage && contextType === 'Course'
+  const {accountLevelMasteryScalesFF, canManage, contextType} = contextValues.env
+  const shouldDisplayAlignmentsTab = improvedManagement && canManage && contextType === 'Course'
   const alignmentTabIndex = accountLevelMasteryScalesFF ? 3 : 1
 
   const onSetImportRef = useCallback(node => {

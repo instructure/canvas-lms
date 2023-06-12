@@ -22,14 +22,14 @@ require_relative "../graphql_spec_helper"
 
 describe Types::RubricAssessmentType do
   let_once(:course) { course_factory(active_all: true) }
-  let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
-  let_once(:student) { student_in_course(course: course, active_all: true).user }
-  let_once(:assignment) { assignment_model(course: course) }
+  let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
+  let_once(:student) { student_in_course(course:, active_all: true).user }
+  let_once(:assignment) { assignment_model(course:) }
   let_once(:rubric) { rubric_for_course }
   let_once(:rubric_association) do
     rubric_association_model(
       context: course,
-      rubric: rubric,
+      rubric:,
       association_object: assignment,
       purpose: "grading"
     )
@@ -38,7 +38,7 @@ describe Types::RubricAssessmentType do
     rubric_assessment_model(
       user: student,
       assessor: teacher,
-      rubric_association: rubric_association,
+      rubric_association:,
       assessment_type: "grading"
     )
   end

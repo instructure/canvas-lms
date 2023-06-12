@@ -31,28 +31,42 @@ describe ObserverAlert do
     end
 
     it "can link to a threshold and observer and student" do
-      alert = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @threshold,
-                                   context: @assignment, alert_type: "assignment_missing", action_date: Time.zone.now,
+      alert = ObserverAlert.create(student: @student,
+                                   observer: @observer,
+                                   observer_alert_threshold: @threshold,
+                                   context: @assignment,
+                                   alert_type: "assignment_missing",
+                                   action_date: Time.zone.now,
                                    title: "Assignment missing")
 
-      expect(alert.valid?).to eq true
+      expect(alert.valid?).to be true
       expect(alert.user_id).not_to be_nil
       expect(alert.observer_id).not_to be_nil
       expect(alert.observer_alert_threshold).not_to be_nil
     end
 
     it "observer must be linked to student" do
-      alert = ObserverAlert.create(student: user_model, observer: @observer, observer_alert_threshold: @threshold,
-                                   context: @assignment, alert_type: "assignment_missing", action_date: Time.zone.now, title: "Assignment missing")
+      alert = ObserverAlert.create(student: user_model,
+                                   observer: @observer,
+                                   observer_alert_threshold: @threshold,
+                                   context: @assignment,
+                                   alert_type: "assignment_missing",
+                                   action_date: Time.zone.now,
+                                   title: "Assignment missing")
 
-      expect(alert.valid?).to eq false
+      expect(alert.valid?).to be false
     end
 
     it "wont allow random alert_type" do
-      alert = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @threshold,
-                                   context: @assignment, alert_type: "jigglypuff", action_date: Time.zone.now, title: "Assignment missing")
+      alert = ObserverAlert.create(student: @student,
+                                   observer: @observer,
+                                   observer_alert_threshold: @threshold,
+                                   context: @assignment,
+                                   alert_type: "jigglypuff",
+                                   action_date: Time.zone.now,
+                                   title: "Assignment missing")
 
-      expect(alert.valid?).to eq false
+      expect(alert.valid?).to be false
     end
   end
 
@@ -125,7 +139,7 @@ describe ObserverAlert do
       course_with_student(user: @student)
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
 
-      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: "course_grade_high", threshold: 80)
+      ObserverAlertThreshold.create(observer:, student: @student, alert_type: "course_grade_high", threshold: 80)
 
       assignment.grade_student(@student, score: 100, grader: @teacher)
 
@@ -178,14 +192,14 @@ describe ObserverAlert do
       student2 = student_in_course(active_all: true, course: @course).user
       observer = course_with_observer(course: @course, associated_user_id: student1.id, active_all: true).user
       course_with_observer(user: observer, course: @course, associated_user_id: student2.id, active_all: true).user
-      ObserverAlertThreshold.create!(student: student1, observer: observer, alert_type: "course_announcement")
-      ObserverAlertThreshold.create!(student: student2, observer: observer, alert_type: "course_announcement")
+      ObserverAlertThreshold.create!(student: student1, observer:, alert_type: "course_announcement")
+      ObserverAlertThreshold.create!(student: student2, observer:, alert_type: "course_announcement")
 
       a = announcement_model(context: @course)
       run_jobs
 
-      alert1 = ObserverAlert.where(student: student1, observer: observer, context: a)
-      alert2 = ObserverAlert.where(student: student2, observer: observer, context: a)
+      alert1 = ObserverAlert.where(student: student1, observer:, context: a)
+      alert2 = ObserverAlert.where(student: student2, observer:, context: a)
 
       expect(alert1.count).to eq 1
       expect(alert2.count).to eq 1
@@ -229,11 +243,20 @@ describe ObserverAlert do
   describe "clean_up_old_alerts" do
     it "deletes alerts older than 6 months ago but leaves newer ones" do
       observer_alert_threshold_model(alert_type: "institution_announcement")
-      a1 = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @observer_alert_threshold,
-                                context: @account, alert_type: "institution_announcement", title: "announcement",
-                                action_date: Time.zone.now, created_at: 6.months.ago)
-      a2 = ObserverAlert.create(student: @student, observer: @observer, observer_alert_threshold: @observer_alert_threshold,
-                                context: @account, alert_type: "institution_announcement", title: "announcement",
+      a1 = ObserverAlert.create(student: @student,
+                                observer: @observer,
+                                observer_alert_threshold: @observer_alert_threshold,
+                                context: @account,
+                                alert_type: "institution_announcement",
+                                title: "announcement",
+                                action_date: Time.zone.now,
+                                created_at: 6.months.ago)
+      a2 = ObserverAlert.create(student: @student,
+                                observer: @observer,
+                                observer_alert_threshold: @observer_alert_threshold,
+                                context: @account,
+                                alert_type: "institution_announcement",
+                                title: "announcement",
                                 action_date: Time.zone.now)
 
       ObserverAlert.clean_up_old_alerts
@@ -304,7 +327,7 @@ describe ObserverAlert do
       @course = course_factory
       @student = student_in_course(active_all: true, course: @course).user
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
-      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: "assignment_missing")
+      ObserverAlertThreshold.create(observer:, student: @student, alert_type: "assignment_missing")
       assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: "online_text_entry", workflow_state: "unpublished")
 
       ObserverAlert.create_assignment_missing_alerts
@@ -334,7 +357,7 @@ describe ObserverAlert do
       course_with_student(user: @student)
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
 
-      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: "assignment_missing")
+      ObserverAlertThreshold.create(observer:, student: @student, alert_type: "assignment_missing")
 
       ObserverAlert.create_assignment_missing_alerts
 
@@ -348,7 +371,7 @@ describe ObserverAlert do
       let(:assignment) { course.assignments.create!(title: "missing", submission_types: "online_text_entry") }
 
       before do
-        ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: "assignment_missing")
+        ObserverAlertThreshold.create!(observer:, student:, alert_type: "assignment_missing")
         assignment.submission_for_student(student).update!(late_policy_status: "missing")
       end
 
@@ -356,7 +379,7 @@ describe ObserverAlert do
         expect do
           ObserverAlert.create_assignment_missing_alerts
         end.to change {
-          ObserverAlert.where(student: student, alert_type: "assignment_missing").count
+          ObserverAlert.where(student:, alert_type: "assignment_missing").count
         }.by(1)
       end
 
@@ -365,7 +388,7 @@ describe ObserverAlert do
         expect do
           ObserverAlert.create_assignment_missing_alerts
         end.not_to change {
-          ObserverAlert.where(student: student, alert_type: "assignment_missing").count
+          ObserverAlert.where(student:, alert_type: "assignment_missing").count
         }
       end
     end
@@ -374,13 +397,13 @@ describe ObserverAlert do
       course = Course.create!
       student = course.enroll_student(User.create!).user
       observer = course.enroll_user(User.create!, "ObserverEnrollment", associated_user_id: student.id).user
-      ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: "assignment_missing")
+      ObserverAlertThreshold.create!(observer:, student:, alert_type: "assignment_missing")
 
       course.assignments.create!(title: "missing", due_at: 1.hour.ago, submission_types: "online_text_entry")
       expect do
         ObserverAlert.create_assignment_missing_alerts
       end.to change {
-        ObserverAlert.where(student: student, alert_type: "assignment_missing").count
+        ObserverAlert.where(student:, alert_type: "assignment_missing").count
       }.by(1)
     end
 
@@ -388,13 +411,13 @@ describe ObserverAlert do
       course = Course.create!
       student = course.enroll_student(User.create!).user
       observer = course.enroll_user(User.create!, "ObserverEnrollment", associated_user_id: student.id).user
-      ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: "assignment_missing")
+      ObserverAlertThreshold.create!(observer:, student:, alert_type: "assignment_missing")
 
       course.assignments.create!(title: "missing", due_at: 2.days.ago, submission_types: "online_text_entry")
       expect do
         ObserverAlert.create_assignment_missing_alerts
       end.not_to change {
-        ObserverAlert.where(student: student, alert_type: "assignment_missing").count
+        ObserverAlert.where(student:, alert_type: "assignment_missing").count
       }
     end
   end
@@ -423,7 +446,7 @@ describe ObserverAlert do
 
     it "doesnt create an alert if the roles dont include student or observer" do
       role_ids = ["TeacherEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id }
-      notification = account_notification(account: @account, role_ids: role_ids)
+      notification = account_notification(account: @account, role_ids:)
       alert = ObserverAlert.where(context: notification).first
       expect(alert).to be_nil
     end
@@ -453,14 +476,14 @@ describe ObserverAlert do
 
     it "creates an alert if student role is selected but not observer" do
       role_ids = ["StudentEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id }
-      notification = account_notification(account: @account, role_ids: role_ids)
+      notification = account_notification(account: @account, role_ids:)
       alert = ObserverAlert.where(context: notification).first
       expect(alert.context).to eq notification
     end
 
     it "creates an alert if observer role is selected but not student" do
       role_ids = ["ObserverEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: @course.root_account_id).id }
-      notification = account_notification(account: @account, role_ids: role_ids)
+      notification = account_notification(account: @account, role_ids:)
       alert = ObserverAlert.where(context: notification).first
       expect(alert.context).to eq notification
     end
@@ -555,7 +578,7 @@ describe ObserverAlert do
       course_with_student(user: @student)
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
 
-      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: "assignment_grade_high", threshold: 80)
+      ObserverAlertThreshold.create(observer:, student: @student, alert_type: "assignment_grade_high", threshold: 80)
 
       assignment.grade_student(@student, score: 90, grader: @teacher)
 

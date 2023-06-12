@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -16,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createPersistentArray from 'persistent-array'
+import createPersistentArray from './enableDTNPI.utils'
 import {configure} from '@canvas/datetime-natural-parsing-instrument'
 
 const localStorageKey = 'dtnpi'
@@ -32,6 +33,7 @@ export async function up(options = {endpoint: null, throttle: 1000, size: 50}) {
     key: localStorageKey,
     throttle,
     size,
+    // @ts-expect-error
     transform: value => value.map(normalizeEvent),
   })
 
@@ -71,6 +73,7 @@ function normalizeEvent(event) {
 
 // TODO: submit to an actual backend
 function postToBackend({endpoint, events}): Promise<void> {
+  // @ts-expect-error
   return fetch(endpoint, {
     method: 'PUT',
     mode: 'cors',

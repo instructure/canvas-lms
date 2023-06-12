@@ -21,10 +21,10 @@ module RuboCop
   module Cop
     module Specs
       class NoExecuteScript < Cop
-        MSG = "Avoid using execute_script. Instead, perform actual"\
-              " user interactions such as click/keypress. If these"\
-              " seem insufficient, consider converting your"\
-              " integration spec into a JavaScript unit test."
+        MSG = "Avoid using execute_script. Instead, perform actual " \
+              "user interactions such as click/keypress. If these " \
+              "seem insufficient, consider converting your " \
+              "integration spec into a JavaScript unit test."
 
         METHOD = :execute_script
 

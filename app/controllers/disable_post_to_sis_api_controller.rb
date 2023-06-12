@@ -82,7 +82,8 @@ class DisablePostToSisApiController < ApplicationController
     assignments = Assignment.published.for_course(context)
     if grading_period
       assignments.where("due_at BETWEEN ? AND ? OR due_at IS NULL",
-                        grading_period.start_date, grading_period.end_date)
+                        grading_period.start_date,
+                        grading_period.end_date)
     else
       assignments
     end

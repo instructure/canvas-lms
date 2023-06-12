@@ -52,7 +52,7 @@ module Lti::IMS::Providers
 
       enrollment_types = queryable_roles(role)
       if enrollment_types.present? && group_role?(enrollment_types)
-        enrollment_types == [:group_leader] ? scope.where(user: context.leader_id) : scope
+        (enrollment_types == [:group_leader]) ? scope.where(user: context.leader_id) : scope
       else
         scope.none
       end
@@ -65,7 +65,7 @@ module Lti::IMS::Providers
     private
 
     def group_role?(enrollment_types)
-      (enrollment_types & [:group_leader, :group_member]).present?
+      enrollment_types.intersect?([:group_leader, :group_member])
     end
 
     def to_memberships(enrollments)
@@ -92,7 +92,7 @@ module Lti::IMS::Providers
       end
 
       def lti_roles
-        @_lti_roles ||= user.id == context.leader_id ? group_leader_role_urns : group_member_role_urns
+        @_lti_roles ||= (user.id == context.leader_id) ? group_leader_role_urns : group_member_role_urns
       end
 
       private

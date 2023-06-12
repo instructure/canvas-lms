@@ -27,7 +27,7 @@ describe "API", type: :request do
       obj.extend Api::V1::Json
       course_with_teacher
       session = double
-      expect(@course).to receive(:as_json).with({ include_root: false, permissions: { user: @user, session: session, include_permissions: false }, only: [:name, :sis_source_id] })
+      expect(@course).to receive(:as_json).with({ include_root: false, permissions: { user: @user, session:, include_permissions: false }, only: [:name, :sis_source_id] })
       obj.api_json(@course, @user, session, only: [:name, :sis_source_id])
     end
   end
@@ -41,7 +41,7 @@ describe "API", type: :request do
 
     it "does attribute filtering if obj responds" do
       course_with_teacher
-      @course.send(:extend, RSpec::Matchers)
+      @course.extend RSpec::Matchers
       def @course.filter_attributes_for_user(hash, user, session)
         expect(user).to eq teachers.first
         expect(session).to be_nil
@@ -101,14 +101,15 @@ describe "API", type: :request do
       a1 = attachment_model(context: @user)
       a2 = attachment_model(context: @user)
       json_request = { "comment" => {
-        "text_comment" => "yay"
-      },
+                         "text_comment" => "yay"
+                       },
                        "submission" => {
                          "submission_type" => "online_upload",
                          "file_ids" => [a1.id, a2.id]
                        } }
       post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions",
-           params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+           params: json_request.to_json,
+           headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_successful
       expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
 
@@ -123,18 +124,21 @@ describe "API", type: :request do
   describe "application/json+canvas-string-ids" do
     it "stringifies fields with Accept header" do
       account = Account.default.sub_accounts.create!
-      account_admin_user(active_all: true, account: account)
-      json = api_call(:get, "/api/v1/accounts/#{account.id}",
+      account_admin_user(active_all: true, account:)
+      json = api_call(:get,
+                      "/api/v1/accounts/#{account.id}",
                       { controller: "accounts", action: "show", id: account.to_param, format: "json" },
-                      {}, { "Accept" => "application/json+canvas-string-ids" })
+                      {},
+                      { "Accept" => "application/json+canvas-string-ids" })
       expect(json["id"]).to eq account.id.to_s
       expect(json["root_account_id"]).to eq Account.default.id.to_s
     end
 
     it "does not stringify fields without Accept header" do
       account = Account.default.sub_accounts.create!
-      account_admin_user(active_all: true, account: account)
-      json = api_call(:get, "/api/v1/accounts/#{account.id}",
+      account_admin_user(active_all: true, account:)
+      json = api_call(:get,
+                      "/api/v1/accounts/#{account.id}",
                       { controller: "accounts", action: "show", id: account.to_param, format: "json" })
       expect(json["id"]).to eq account.id
       expect(json["root_account_id"]).to eq Account.default.id

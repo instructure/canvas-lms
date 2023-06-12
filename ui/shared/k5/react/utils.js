@@ -24,6 +24,8 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('k5_utils')
 
@@ -49,6 +51,8 @@ export const transformGrades = courses =>
       hasGradingPeriods,
       isHomeroom: course.homeroom_course,
       enrollments: course.enrollments,
+      gradingScheme: course.grading_scheme,
+      restrictQuantitativeData: course.restrict_quantitative_data,
     }
     return getCourseGrades(basicCourseInfo)
   })
@@ -164,7 +168,13 @@ const getSubmission = (assignment, observedUserId) =>
 /* Takes raw response from assignment_groups API and returns an array of objects with each
    assignment group's id, name, and total score. If gradingPeriodId is passed, only return
    totals for assignment groups which have assignments in the provided grading period. */
-export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) => {
+export const getAssignmentGroupTotals = (
+  data,
+  gradingPeriodId,
+  observedUserId,
+  restrictQuantitativeData = false,
+  gradingScheme = []
+) => {
   if (gradingPeriodId) {
     data = data.filter(group =>
       group.assignments?.some(a => {
@@ -190,18 +200,42 @@ export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) 
       {...group, assignments},
       false
     )
+
+    let score
+    if (groupScores.current.possible === 0) {
+      score = I18n.t('n/a')
+    } else {
+      const tempScore = (groupScores.current.score / groupScores.current.possible) * 100
+      score = restrictQuantitativeData
+        ? scoreToGrade(tempScore, gradingScheme)
+        : I18n.n(tempScore, {percentage: true, precision: 2})
+    }
+
     return {
       id: group.id,
       name: group.name,
-      score:
-        groupScores.current.possible === 0
-          ? I18n.t('n/a')
-          : I18n.n((groupScores.current.score / groupScores.current.possible) * 100, {
-              percentage: true,
-              precision: 2,
-            }),
+      score,
     }
   })
+}
+// Take an assignment and submission and output the expected value when Restrict_quantitative_data is enabled
+const formatGradeToRQD = (assignment, submission) => {
+  if (!ENV.RESTRICT_QUANTITATIVE_DATA) return
+  let rqdFormattedGrade = ''
+  // When RQD is on and score and points possible === 0, we have a special case where we want the grade to be displayed as "complete"
+  if (submission?.score === 0 && assignment?.points_possible === 0) {
+    rqdFormattedGrade = 'complete'
+  } else {
+    rqdFormattedGrade = GradeFormatHelper.formatGrade(submission?.grade, {
+      gradingType: assignment.grading_type,
+      pointsPossible: assignment.points_possible,
+      score: submission?.score,
+      restrict_quantitative_data: ENV.RESTRICT_QUANTITATIVE_DATA,
+      grading_scheme: ENV.GRADING_SCHEME,
+    })
+  }
+
+  return rqdFormattedGrade
 }
 
 /* Takes raw response from assignment_groups API and returns an array of assignments with
@@ -211,6 +245,10 @@ export const getAssignmentGrades = (data, observedUserId) => {
     .map(group =>
       group.assignments.map(a => {
         const submission = getSubmission(a, observedUserId)
+        const rqd_grading_type = !['not_graded', 'pass_fail', 'gpa_scale'].includes(a.grading_type)
+          ? 'letter_grade'
+          : a.grading_type
+        const rqdFormattedGrade = formatGradeToRQD(a, submission)
         return {
           id: a.id,
           assignmentName: a.name,
@@ -219,9 +257,10 @@ export const getAssignmentGrades = (data, observedUserId) => {
           assignmentGroupName: group.name,
           assignmentGroupId: group.id,
           pointsPossible: a.points_possible,
-          gradingType: a.grading_type,
+          gradingType: ENV.RESTRICT_QUANTITATIVE_DATA ? rqd_grading_type : a.grading_type,
+          restrictQuantitativeData: ENV.RESTRICT_QUANTITATIVE_DATA,
           score: submission?.score,
-          grade: submission?.grade,
+          grade: ENV.RESTRICT_QUANTITATIVE_DATA ? rqdFormattedGrade : submission?.grade,
           submissionDate: submission?.submitted_at,
           unread: submission?.read_state === 'unread',
           late: submission?.late,
@@ -241,7 +280,13 @@ export const getAssignmentGrades = (data, observedUserId) => {
 
 /* Formats course total score and grade (if applicable) into string from enrollments API
    response */
-export const getTotalGradeStringFromEnrollments = (enrollments, userId, observedUserId) => {
+export const getTotalGradeStringFromEnrollments = (
+  enrollments,
+  userId,
+  observedUserId,
+  restrictQuantitativeData = false,
+  gradingScheme = []
+) => {
   let grades
   if (observedUserId) {
     const enrollment = enrollments.find(
@@ -253,6 +298,9 @@ export const getTotalGradeStringFromEnrollments = (enrollments, userId, observed
   }
   if (grades?.current_score == null) {
     return I18n.t('n/a')
+  }
+  if (restrictQuantitativeData) {
+    return scoreToGrade(grades.current_score, gradingScheme)
   }
   const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
   return grades.current_grade == null

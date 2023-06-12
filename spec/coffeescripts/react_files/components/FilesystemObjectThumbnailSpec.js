@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import Folder from '@canvas/files/backbone/models/Folder'
-import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import FilesystemObjectThumbnail from '@canvas/files/react/components/FilesystemObjectThumbnail'
 
 QUnit.module('Filesystem Object Thumbnail: file', {

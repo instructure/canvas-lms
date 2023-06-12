@@ -113,8 +113,8 @@ describe LiveEventsObserver do
 
     {
       display_name: "some_other_attachment_name_now",
-      lock_at: Time.zone.now + 10.days,
-      unlock_at: Time.zone.now + 10.days,
+      lock_at: 10.days.from_now,
+      unlock_at: 10.days.from_now,
     }.each do |key, val|
       context "if #{key} changes" do
         it "posts attachment_updated events" do
@@ -275,8 +275,11 @@ describe LiveEventsObserver do
     it "posts a create event when a submission is first created in an submitted state" do
       expect(Canvas::LiveEvents).to receive(:submission_created).once
       Submission.create!(
-        assignment: assignment_model, user: user_model, workflow_state: "submitted",
-        submitted_at: Time.zone.now, submission_type: "online_url"
+        assignment: assignment_model,
+        user: user_model,
+        workflow_state: "submitted",
+        submitted_at: Time.zone.now,
+        submission_type: "online_url"
       )
     end
 
@@ -437,7 +440,7 @@ describe LiveEventsObserver do
           title: "content",
           context: course,
           tag_type: "context_module",
-          context_module: context_module
+          context_module:
         )
       end
 
@@ -447,7 +450,7 @@ describe LiveEventsObserver do
           title: "content",
           context: course,
           tag_type: "context_module",
-          context_module: context_module
+          context_module:
         )
         expect(Canvas::LiveEvents).to receive(:module_item_updated).with(content_tag)
         content_tag.update_attribute(:position, 11)
@@ -489,7 +492,7 @@ describe LiveEventsObserver do
           title: "content",
           context: course,
           tag_type: "learning_outcome",
-          context_module: context_module
+          context_module:
         )
         content_tag.update_attribute(:position, 11)
       end
@@ -618,7 +621,7 @@ describe LiveEventsObserver do
     it "posts update events when the migration completes" do
       course_model
       master_template = MasterCourses::MasterTemplate.create!(course: @course)
-      master_migration = MasterCourses::MasterMigration.create!(master_template: master_template)
+      master_migration = MasterCourses::MasterMigration.create!(master_template:)
       expect(Canvas::LiveEvents).to receive(:master_migration_completed).once
       master_migration.update(workflow_state: "completed")
     end
@@ -626,7 +629,7 @@ describe LiveEventsObserver do
     it "does not post update events when the migration updates for other reasons" do
       course_model
       master_template = MasterCourses::MasterTemplate.create!(course: @course)
-      master_migration = MasterCourses::MasterMigration.create!(master_template: master_template)
+      master_migration = MasterCourses::MasterMigration.create!(master_template:)
       expect(Canvas::LiveEvents).not_to receive(:master_migration_completed)
       master_migration.update(workflow_state: "exports_failed")
     end

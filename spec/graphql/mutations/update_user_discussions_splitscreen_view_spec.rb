@@ -39,7 +39,7 @@ RSpec.describe Mutations::UpdateUserDiscussionsSplitscreenView do
     result = CanvasSchema.execute(
       mutation_str(**opts),
       context: {
-        current_user: current_user,
+        current_user:,
         domain_root_account: @course.account.root_account,
         request: ActionDispatch::TestRequest.create
       }
@@ -59,7 +59,7 @@ RSpec.describe Mutations::UpdateUserDiscussionsSplitscreenView do
     result = run_mutation({ discussions_splitscreen_view: true })
     @current_user.reload
 
-    expect(@current_user.discussions_splitscreen_view?).to eq true
-    expect(result.dig("data", "updateUserDiscussionsSplitscreenView", "user", "discussionsSplitscreenView")).to eq(true)
+    expect(@current_user.discussions_splitscreen_view?).to be true
+    expect(result.dig("data", "updateUserDiscussionsSplitscreenView", "user", "discussionsSplitscreenView")).to be(true)
   end
 end

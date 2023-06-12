@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -16,19 +17,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import _ from 'underscore'
-import round from 'round'
+import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from 'html-escape'
-import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
 import type {GradingScheme} from '../../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
+
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
 
 function getGradePercentage(score, pointsPossible) {
   const grade = scoreToPercentage(score, pointsPossible)
@@ -45,7 +49,7 @@ function buildHiddenAssignmentsWarning() {
 }
 
 function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups: {name: string}[]) {
-  const names = invalidAssignmentGroups.map(group => htmlEscape(group.name))
+  const names: string[] = invalidAssignmentGroups.map(group => htmlEscape(group.name))
   const warningText = I18n.t(
     {
       one: 'Score does not include %{groups} because it has no points possible',
@@ -53,7 +57,7 @@ function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups: {name: str
     },
     {
       count: names.length,
-      groups: $.toSentence(names),
+      groups: listFormatter.format(names),
     }
   )
 

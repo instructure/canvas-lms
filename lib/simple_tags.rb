@@ -28,7 +28,7 @@ module SimpleTags
     end
 
     def self.included(klass)
-      klass.send :extend, ClassMethods
+      klass.extend ClassMethods
     end
   end
 
@@ -43,7 +43,7 @@ module SimpleTags
       if conditions.empty?
         none
       else
-        where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
+        where(conditions.join((options[:mode] == :or) ? " OR " : " AND "))
       end
     end
 
@@ -106,7 +106,7 @@ module SimpleTags
   end
 
   def self.included(klass)
-    klass.send :include, ReaderInstanceMethods
-    klass.send :include, WriterInstanceMethods
+    klass.include ReaderInstanceMethods
+    klass.include WriterInstanceMethods
   end
 end

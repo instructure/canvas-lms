@@ -61,7 +61,7 @@ describe Lti::AccountExternalToolsController do
 
       it "returns id, domain, and other fields on account" do
         send_request
-        body = JSON.parse(response.body).first
+        body = response.parsed_body.first
         expect(body).to include(
           "id" => tool.id,
           "domain" => tool.domain,
@@ -163,7 +163,7 @@ describe Lti::AccountExternalToolsController do
           expect(response).to have_http_status :ok
           send_request
           expect(response).to have_http_status :bad_request
-          error_message = JSON.parse(response.body).dig("errors", "tool_currently_installed").first["message"]
+          error_message = response.parsed_body.dig("errors", "tool_currently_installed").first["message"]
           expect(error_message).to eq "The tool is already installed in this context."
         end
       end

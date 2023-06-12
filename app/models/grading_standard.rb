@@ -112,10 +112,10 @@ class GradingStandard < ActiveRecord::Base
     # grade cutoffs.
     # otherwise, we step down just 1/10th of a point, which is the
     # granularity we support right now
-    elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= 0.01.to_d
-      (ordered_scheme[idx - 1].last * 100.0.to_d) - 1.0.to_d
+    elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= BigDecimal("0.01")
+      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("1.0")
     elsif idx
-      (ordered_scheme[idx - 1].last * 100.0.to_d) - 0.1.to_d
+      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("0.1")
     else
       nil
     end
@@ -127,7 +127,7 @@ class GradingStandard < ActiveRecord::Base
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
     score = BigDecimal(score.to_s) # Cast this to a BigDecimal too or comparisons get wonky
-    ordered_scheme.max_by { |_, lower_bound| score >= lower_bound * 100.0.to_d ? lower_bound : -lower_bound }[0]
+    ordered_scheme.max_by { |_, lower_bound| (score >= lower_bound * BigDecimal("100.0")) ? lower_bound : -lower_bound }[0]
   end
 
   def data=(new_val)
@@ -221,7 +221,7 @@ class GradingStandard < ActiveRecord::Base
 
   def valid_grading_scheme_data
     errors.add(:data, "grading scheme values cannot be negative") if data.present? && data.any? { |v| v[1] < 0 }
-    errors.add(:data, "grading scheme cannot contain duplicate values") if data.present? && data.map { |v| v[1] } != data.map { |v| v[1] }.uniq
+    errors.add(:data, "grading scheme cannot contain duplicate values") if data.present? && data.pluck(1) != data.pluck(1).uniq
     errors.add(:data, "a grading scheme name is too long") if data.present? && data.any? { |v| v[0].length > self.class.maximum_string_length }
   end
 

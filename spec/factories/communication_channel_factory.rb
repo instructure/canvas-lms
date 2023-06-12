@@ -28,7 +28,7 @@ module Factories
     user = @user || User.create!
     {
       path: "valid@example.com",
-      user: user,
+      user:,
       pseudonym_id: "1"
     }
   end

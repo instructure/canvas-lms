@@ -24,14 +24,14 @@ describe AssessmentRequestHelper do
 
   describe "submission_author_name_for" do
     def rubric_association_params_for_assignment(assign)
-      HashWithIndifferentAccess.new({
-                                      hide_score_total: "0",
-                                      purpose: "grading",
-                                      skip_updating_points_possible: false,
-                                      update_if_existing: true,
-                                      use_for_grading: "1",
-                                      association_object: assign
-                                    })
+      ActiveSupport::HashWithIndifferentAccess.new({
+                                                     hide_score_total: "0",
+                                                     purpose: "grading",
+                                                     skip_updating_points_possible: false,
+                                                     update_if_existing: true,
+                                                     use_for_grading: "1",
+                                                     association_object: assign
+                                                   })
     end
 
     before(:once) do
@@ -52,8 +52,11 @@ describe AssessmentRequestHelper do
                                                       user: @student1,
                                                       rubric_association: @rubric_assoc
                                                     })
-      @assessment_request = AssessmentRequest.create!(rubric_assessment: @rubric_assessment, user: @student1,
-                                                      asset: @submission, assessor_asset: submission2, assessor: @student2)
+      @assessment_request = AssessmentRequest.create!(rubric_assessment: @rubric_assessment,
+                                                      user: @student1,
+                                                      asset: @submission,
+                                                      assessor_asset: submission2,
+                                                      assessor: @student2)
     end
 
     it "returns assessment user name" do

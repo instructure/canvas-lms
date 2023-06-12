@@ -80,6 +80,34 @@ describe "context_modules/index" do
     expect(page.css("#context_module_item_#{module_item.id}").length).to eq 0
   end
 
+  it "does not show failed_to_duplicate content_tags" do
+    course_factory
+    context_module = @course.context_modules.create!
+    assignment = @course.assignments.create!(workflow_state: "failed_to_duplicate")
+    module_item = context_module.add_item(type: "assignment", id: assignment.id)
+
+    view_context(@course, @user)
+    assign(:modules, @course.context_modules.active)
+    render "context_modules/index"
+    expect(response).not_to be_nil
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css("#context_module_item_#{module_item.id}").length).to eq 0
+  end
+
+  it "does not show duplicating content_tags" do
+    course_factory
+    context_module = @course.context_modules.create!
+    assignment = @course.assignments.create!(workflow_state: "duplicating")
+    module_item = context_module.add_item(type: "assignment", id: assignment.id)
+
+    view_context(@course, @user)
+    assign(:modules, @course.context_modules.active)
+    render "context_modules/index"
+    expect(response).not_to be_nil
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css("#context_module_item_#{module_item.id}").length).to eq 0
+  end
+
   it "shows download course content if settings are enabled" do
     course_factory
     acct = @course.root_account

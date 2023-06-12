@@ -31,9 +31,9 @@ describe Mutations::UpdateAssignment do
     @student = @course.enroll_student(User.create!, enrollment_state: "active").user
     @assignment_group = @course.assignment_groups.first
     group_category = GroupCategory.create(name: "Example Group Category", context: @course)
-    @group = @course.groups.create!(group_category: group_category)
+    @group = @course.groups.create!(group_category:)
     @group.users << @student
-    @assignment_id = @assignment_group.assignments.create!(context: @course, name: "Example Assignment", group_category: group_category).id
+    @assignment_id = @assignment_group.assignments.create!(context: @course, name: "Example Assignment", group_category:).id
   end
 
   def execute_with_input(update_input, user_executing = @teacher)
@@ -78,7 +78,7 @@ describe Mutations::UpdateAssignment do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   #
@@ -89,7 +89,7 @@ describe Mutations::UpdateAssignment do
   #
 
   def assert_adhoc_override(result_override, student_ids, assignment_id = @assignment_id)
-    expect(result_override["set"]["students"].map { |s| s["_id"].to_i }.to_set).to eq student_ids.to_set
+    expect(result_override["set"]["students"].to_set { |s| s["_id"].to_i }).to eq student_ids.to_set
     override = Assignment.find(assignment_id).assignment_overrides.detect { |e| e.id.to_s == result_override["_id"] }
     expect(override).to_not be_nil
     override_set = override.set

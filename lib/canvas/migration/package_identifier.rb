@@ -24,7 +24,7 @@ module Canvas::Migration
     include Canvas::Migration::XMLHelper
     attr_reader :type, :converter
 
-    COMMON_CARTRIDGE_REGEX = /IMS(?: Thin)? Common Cartridge/i.freeze
+    COMMON_CARTRIDGE_REGEX = /IMS(?: Thin)? Common Cartridge/i
 
     def initialize(archive)
       @archive = archive
@@ -91,8 +91,11 @@ module Canvas::Migration
       end
     rescue
       # Not a valid archive file
-      raise Canvas::Migration::Error, I18n.t(:package_error,
-                                             "Error identifying package type: %{error}", error: $!.message), $!.backtrace
+      raise Canvas::Migration::Error,
+            I18n.t(:package_error,
+                   "Error identifying package type: %{error}",
+                   error: $!.message),
+            $!.backtrace
     end
 
     private

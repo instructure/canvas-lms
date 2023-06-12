@@ -67,7 +67,8 @@ class PseudonymsController < ApplicationController
       scope = @context.pseudonyms.active.where(user_id: @user)
       @pseudonyms = Api.paginate(
         scope,
-        self, api_v1_account_pseudonyms_url
+        self,
+        api_v1_account_pseudonyms_url
       )
     else
       bookmark = BookmarkedCollection::SimpleBookmarker.new(Pseudonym, :id)
@@ -150,7 +151,7 @@ class PseudonymsController < ApplicationController
       # Whether the email was actually found or not, we display the same
       # message. Otherwise this form could be used to fish for valid
       # email addresses.
-      flash[:notice] = t "notices.email_sent", "Confirmation email sent to %{email}, make sure to check your spam box", email: email
+      flash[:notice] = t("notices.email_sent", "Confirmation email sent to %{email}, make sure to check your spam box", email:)
       @ccs.each(&:forgot_password!)
       format.html { redirect_to(canvas_login_url) }
       format.json { render json: { requested: true } }
@@ -175,7 +176,7 @@ class PseudonymsController < ApplicationController
       end
       @password_pseudonyms = @cc.user.pseudonyms.active_only.select { |p| p.account.canvas_authentication? }
       js_env PASSWORD_POLICY: @domain_root_account.password_policy,
-             PASSWORD_POLICIES: @password_pseudonyms.map { |p| [p.id, p.account.password_policy] }.to_h
+             PASSWORD_POLICIES: @password_pseudonyms.to_h { |p| [p.id, p.account.password_policy] }
     end
   end
 
@@ -530,7 +531,7 @@ class PseudonymsController < ApplicationController
     if params[:pseudonym].key?(:password) && !@pseudonym.passwordable?
       @pseudonym.errors.add(:password, "password can only be set for Canvas authentication")
       respond_to do |format|
-        format.html { render(params[:action] == "edit" ? :edit : :new) }
+        format.html { render((params[:action] == "edit") ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false
@@ -547,7 +548,7 @@ class PseudonymsController < ApplicationController
     if params[:pseudonym].key?(:workflow_state) && !%w[active suspended].include?(params[:pseudonym][:workflow_state])
       @pseudonym.errors.add(:workflow_state, "invalid workflow_state")
       respond_to do |format|
-        format.html { render(params[:action] == "edit" ? :edit : :new) }
+        format.html { render((params[:action] == "edit") ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false

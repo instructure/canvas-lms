@@ -21,6 +21,7 @@
 <% end %>
 <% @show_left_side = false %>
 <% @show_embedded_chat = false %>
+<% @unauthorized_message ||= t("#application.errors.unauthorized.default", "You do not have access to view this resource.") %>
 <% add_body_class 'full-width' %>
 <div id="unauthorized_message" class="ic-Error-page">
     <% if @needs_cookies %>

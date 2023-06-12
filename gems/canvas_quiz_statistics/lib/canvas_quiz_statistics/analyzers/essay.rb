@@ -73,7 +73,7 @@ module CanvasQuizStatistics::Analyzers
       responses.each { |response| point_distribution[response[:points]] += 1 }
 
       point_distribution.keys.map do |score|
-        { score: score, count: point_distribution[score] }
+        { score:, count: point_distribution[score] }
       end.sort_by { |v| v[:score] || -1 }
     end
 
@@ -128,7 +128,7 @@ module CanvasQuizStatistics::Analyzers
 
       graded_responses = []
       ungraded_responses = []
-      responses.each { |r| r[:correct] == "defined" ? graded_responses << r : ungraded_responses << r }
+      responses.each { |r| (r[:correct] == "defined") ? graded_responses << r : ungraded_responses << r }
       ranked_responses_by_score = graded_responses.sort_by { |h| h[:points] }
 
       previous_floor = ranked_responses_by_score.length

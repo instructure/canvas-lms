@@ -80,7 +80,7 @@ class ContentZipper
       # This neglects the complexity of group assignments
       students = User.where(id: submissions.pluck(:user_id)).index_by(&:id)
     else
-      students    = assignment.representatives(user: user).index_by(&:id)
+      students    = assignment.representatives(user:).index_by(&:id)
       submissions = assignment.submissions.where(user_id: students.keys,
                                                  submission_type: downloadable_submissions)
     end
@@ -105,11 +105,16 @@ class ContentZipper
   end
 
   class StaticAttachment
-    attr_accessor :display_name, :filename, :unencoded_filename,
-                  :content_type, :uuid, :id, :attachment
+    attr_accessor :display_name,
+                  :filename,
+                  :unencoded_filename,
+                  :content_type,
+                  :uuid,
+                  :id,
+                  :attachment
 
     # Match on /files URLs capturing the object id.
-    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'?/]*)(?:[^\s"<']*))?}.freeze
+    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'?/]*)(?:[^\s"<']*))?}
 
     def initialize(attachment, index = nil)
       @attachment = attachment
@@ -172,7 +177,7 @@ class ContentZipper
           update_progress(zip_attachment, index, count)
         end
         zipfile.add("eportfolio.css", Rails.root.join("app/stylesheets/eportfolio_static.css"))
-        zipfile.add("logo.svg", Rails.root.join("public/images/canvas-logo.svg"))
+        zipfile.add("logo.svg", Rails.public_path.join("images/canvas-logo.svg"))
       end
       mark_successful!
       complete_attachment!(zip_attachment, zip_name)
@@ -186,7 +191,7 @@ class ContentZipper
 
     ApplicationController.render(
       partial: "eportfolios/static_page",
-      locals: { page: page, portfolio: portfolio, static_attachments: static_attachments, submissions_hash: submissions_hash }
+      locals: { page:, portfolio:, static_attachments:, submissions_hash: }
     )
   end
 
@@ -233,11 +238,7 @@ class ContentZipper
     end
   end
 
-  # The callback should accept two arguments, the attachment/folder and the folder names
-  def zip_folder(folder, zipfile, folder_names, opts = {}, &block)
-    if block && (folder.hidden? || folder.locked)
-      yield(folder, folder_names)
-    end
+  def folder_attachments_for_export(folder, opts)
     # @user = nil either means that
     # 1. this is part of a public course, and is being downloaded by somebody
     # not logged in - OR -
@@ -251,11 +252,20 @@ class ContentZipper
       end
 
     attachments = attachments.select { |a| opts[:exporter].export_object?(a) } if opts[:exporter]
-    attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }.each do |attachment|
+    attachments = attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }
+    attachments.reject do |attachment|
       # exclude files in hidden folders unless they're referenced in rich content (or the user is an admin)
-      next if @check_user && folder.hidden? &&
-              !folder.grants_right?(@user, :read_contents) && !opts[:referenced_files]&.key?(attachment.id)
+      @check_user && folder.hidden? &&
+        !folder.grants_right?(@user, :read_contents) && !opts[:referenced_files]&.key?(attachment.id)
+    end
+  end
 
+  # The callback should accept two arguments, the attachment/folder and the folder names
+  def zip_folder(folder, zipfile, folder_names, opts = {}, &block)
+    if block && (folder.hidden? || folder.locked)
+      yield(folder, folder_names)
+    end
+    folder_attachments_for_export(folder, opts).each do |attachment|
       attachment.display_name = Attachment.shorten_filename(attachment.display_name)
       # Preventing further unwanted filename alterations during the rest of the process,
       # namely, in the block further below. Also, we want to avoid accidental saving of the file
@@ -288,8 +298,8 @@ class ContentZipper
 
   def zip_quiz(zip_attachment, quiz)
     Quizzes::QuizSubmissionZipper.new(
-      quiz: quiz,
-      zip_attachment: zip_attachment
+      quiz:,
+      zip_attachment:
     ).zip!
   end
 
@@ -389,7 +399,7 @@ class ContentZipper
   def add_online_submission_content(filename, display_page, zipfile)
     extend(ApplicationHelper)
 
-    content = File.open(File.join("app", "views", "assignments", display_page)).read
+    content = File.read(File.join("app", "views", "assignments", display_page))
     content = ERB.new(content).result(binding)
 
     if content

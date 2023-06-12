@@ -33,8 +33,8 @@ describe ContentMigration do
     let(:content_migration) do
       ContentMigration.create!(
         context: destination,
-        workflow_state: workflow_state,
-        user: user,
+        workflow_state:,
+        user:,
         migration_type: "course_copy_importer",
         source_course: context
       )
@@ -63,7 +63,7 @@ describe ContentMigration do
       end
       let(:external_tool) do
         ContextExternalTool.create!(
-          context: context,
+          context:,
           url: "https://www.test.com",
           name: "test tool",
           shared_secret: "secret",
@@ -137,42 +137,42 @@ describe ContentMigration do
 
   context "import_object?" do
     it "returns true for everything if there are no copy options" do
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns true for everything if 'everything' is selected" do
       @cm.migration_ids_to_import = { copy: { everything: "1" } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns true if there are no copy options" do
       @cm.migration_ids_to_import = { copy: {} }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns false for nil objects" do
-      expect(@cm.import_object?("content_migrations", nil)).to eq false
+      expect(@cm.import_object?("content_migrations", nil)).to be false
     end
 
     it "returns true for all object types if the all_ option is true" do
       @cm.migration_ids_to_import = { copy: { all_content_migrations: "1" } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
 
     it "returns false for objects not selected" do
       @cm.save!
       @cm.migration_ids_to_import = { copy: { all_content_migrations: "0" } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be false
       @cm.migration_ids_to_import = { copy: { content_migrations: {} } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be false
       @cm.migration_ids_to_import = { copy: { content_migrations: { CC::CCHelper.create_key(@cm) => "0" } } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be false
     end
 
     it "returns true for selected objects" do
       @cm.save!
       @cm.migration_ids_to_import = { copy: { content_migrations: { CC::CCHelper.create_key(@cm) => "1" } } }
-      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
+      expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to be true
     end
   end
 
@@ -184,7 +184,7 @@ describe ContentMigration do
   context "zip file import" do
     def setup_zip_import(context, filename = "file.zip", import_immediately: false)
       zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/#{filename}")
-      cm = ContentMigration.new(context: context, user: @user)
+      cm = ContentMigration.new(context:, user: @user)
       cm.migration_type = "zip_file_importer"
       cm.migration_settings[:folder_id] = Folder.root_folders(context).first.id
       cm.migration_settings["import_immediately"] = import_immediately
@@ -282,8 +282,11 @@ describe ContentMigration do
 
   context "copying only some content" do
     let(:content_migration) do
-      ContentMigration.create(context: destination_course, user: user_model, source_course: course,
-                              migration_type: "course_copy_importer", copy_options: copy_options,
+      ContentMigration.create(context: destination_course,
+                              user: user_model,
+                              source_course: course,
+                              migration_type: "course_copy_importer",
+                              copy_options:,
                               migration_settings: {
                                 import_immediately: true,
                                 migration_ids_to_import: {
@@ -322,7 +325,8 @@ describe ContentMigration do
         # have to make everything *exactly* the same, very explicitly >:(
         tool = external_tool_1_3_model(context: course,
                                        opts: {
-                                         settings: { vendor_extensions: [], custom_fields: {},
+                                         settings: { vendor_extensions: [],
+                                                     custom_fields: {},
                                                      client_id: dev_key.global_id.to_s },
                                          developer_key: dev_key,
                                          name: "first tool"
@@ -331,7 +335,7 @@ describe ContentMigration do
         tool
       end
       let(:assignment) do
-        assignment_model({ course: course,
+        assignment_model({ course:,
                            submission_types: "external_tool",
                            external_tool_tag_attributes: { content: tool, url: tool.url } })
       end
@@ -387,7 +391,7 @@ describe ContentMigration do
       let(:assignments) do
         assignments = []
         3.times do
-          assignments << assignment_model({ course: course })
+          assignments << assignment_model({ course: })
         end
         assignments
       end
@@ -409,7 +413,7 @@ describe ContentMigration do
                                              developer_key: dev_key,
                                              name: "tool #{i}"
                                            })
-            assignments << assignment_model({ course: course,
+            assignments << assignment_model({ course:,
                                               submission_types: "external_tool",
                                               external_tool_tag_attributes: { content: tool, url: tool.url } })
           end
@@ -732,7 +736,7 @@ describe ContentMigration do
     expect(cm.migration_issues).to be_empty
   end
 
-  it "correclties handle media comment resolution in quizzes" do
+  it "correctly handles media comment resolution in quizzes" do
     skip "Requires QtiMigrationTool" unless Qti.qti_enabled?
 
     cm = @cm
@@ -1058,13 +1062,13 @@ describe ContentMigration do
     it "doesn't overreeact to todo issues" do
       expect do
         @cm.add_todo("test todo", { exception: err })
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
 
     it "doesn't overreeact to warning issues" do
       expect do
         @cm.add_warning("test warn", { exception: err })
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
 
     it "reports error issues appropriately" do
@@ -1076,13 +1080,13 @@ describe ContentMigration do
     it "accepts downgrades for real errors" do
       expect do
         @cm.add_error("test error", { exception: err, issue_level: :warning })
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
 
     it "accepts issue level option when failing a migration" do
       expect do
         @cm.fail_with_error!(err, error_message: "foo", issue_level: :warning)
-      end.to change { ErrorReport.count }.by(0)
+      end.not_to change { ErrorReport.count }
     end
   end
 
@@ -1206,7 +1210,7 @@ describe ContentMigration do
     end
 
     it "returns a url to a file containing the asset map" do
-      expect_any_instance_of(Account).to receive(:domain).and_return("pineapple.edu")
+      allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
       url = @cm.asset_map_url(generate_if_needed: true)
       @cm.reload
       expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
@@ -1218,6 +1222,188 @@ describe ContentMigration do
                            "resource_mapping" => {
                              "assignments" => { @old.id.to_s => @new.id.to_s }
                            } })
+    end
+
+    context "when not on a test cluster" do
+      let(:content_migration) do
+        @cm.update!(source_course:)
+
+        @cm
+      end
+      let(:source_course) { course_factory }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return nil
+        allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
+      end
+
+      it "uses the 'production' host" do
+        expect(content_migration.context.root_account).to receive(:domain).with(nil)
+
+        content_migration.asset_map_url(generate_if_needed: true)
+      end
+    end
+
+    context "when on a test cluster" do
+      let(:content_migration) do
+        @cm.update!(source_course:)
+
+        @cm
+      end
+      let(:source_course) { course_factory }
+
+      before do
+        allow(ApplicationController).to receive(:test_cluster_name).and_return "banana"
+        allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
+      end
+
+      it "uses the test host" do
+        expect(content_migration.context.root_account).to receive(:domain).with("banana")
+
+        content_migration.asset_map_url(generate_if_needed: true)
+      end
+    end
+  end
+
+  context "outcomes" do
+    def context_outcome(context)
+      outcome_group ||= context.root_outcome_group
+      outcome = context.created_learning_outcomes.create!(title: "outcome")
+      outcome_group.add_outcome(outcome)
+      outcome
+    end
+
+    def mig_id(obj)
+      @template.migration_id_for(obj)
+    end
+
+    def run_migration
+      @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+      @cm = @course_to.content_migrations.build
+      @cm.migration_type = "master_course_import"
+      @cm.migration_settings[:master_migration_id] = @migration.id
+      @cm.migration_settings["import_immediately"] = true
+      @cm.child_subscription_id = @sub.id
+      @cm.save!
+      run_jobs
+      @migration.reload
+    end
+
+    def create_learning_outcome_resuls(outcome)
+      student = user_factory
+      @course_to.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+      time = Time.zone.now
+      rubric = outcome_with_rubric(context: @course_to, outcome:)
+      assignment1 = @course_to.assignments.create!(title: "Assignment 1")
+      alignment1 = outcome.align(assignment1, @course_to)
+      rubric_association1 = rubric.associate_with(assignment1, @course_to, purpose: "grading")
+      LearningOutcomeResult.create!(
+        learning_outcome: outcome,
+        user: student,
+        context: @course_to,
+        alignment: alignment1,
+        associated_asset: assignment1,
+        association_type: "RubricAssociation",
+        association_id: rubric_association1.id,
+        title: "",
+        score: 3,
+        possible: 5,
+        mastery: 3,
+        created_at: time,
+        updated_at: time,
+        submitted_at: time,
+        assessed_at: time
+      )
+    end
+
+    before(:once) do
+      @course_from = course_model
+      @course_to = course_model
+      @template = MasterCourses::MasterTemplate.set_as_master_course(@course_from)
+      @sub = @template.add_child_course!(@course_to)
+    end
+
+    describe "course level outcomes" do
+      before do
+        @outcome_from = context_outcome(@course_from)
+        run_migration
+      end
+
+      it "there are no learning outcome results nor authoritative results" do
+        @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id(@outcome_from)).first
+        @outcome_from.destroy!
+        run_migration
+        expect(@outcome_from.reload).to be_deleted
+        expect(@outcome_to.reload).to be_deleted
+      end
+
+      it "there are learning outcome results" do
+        mig_id = mig_id(@outcome_from)
+        @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
+        create_learning_outcome_resuls(@outcome_to)
+        @outcome_from.destroy!
+        run_migration
+        expect(@outcome_from.reload).to be_deleted
+        expect(@outcome_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+
+      it "there are authoritative results" do
+        mig_id = mig_id(@outcome_from)
+        @outcome_to = @course_to.learning_outcomes.where(migration_id: mig_id).first
+        @outcome_from.destroy!
+        allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return true
+        run_migration
+        expect(@outcome_from.reload).to be_deleted
+        expect(@outcome_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+    end
+
+    describe "account level outcomes" do
+      before(:once) do
+        @account = @course_from.account
+        @account_outcome = context_outcome(@account)
+      end
+
+      before do
+        @course_root = @course_from.root_outcome_group
+        @course_root.add_outcome(@account_outcome)
+        run_migration
+      end
+
+      it "there are no learning outcome results nor authoritative results" do
+        @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+        @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+        @ct_from.destroy!
+        run_migration
+        expect(@ct_from.reload).to be_deleted
+        expect(@ct_to.reload).to be_deleted
+      end
+
+      it "there are learning outcome results" do
+        create_learning_outcome_resuls(@account_outcome)
+        @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+        @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+        mig_id = @ct_to.migration_id
+        @ct_from.destroy!
+        run_migration
+        expect(@ct_from.reload).to be_deleted
+        expect(@ct_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
+
+      it "there are authoritative results" do
+        @ct_from = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_from.id)
+        @ct_to = ContentTag.find_by!(content_id: @account_outcome.id, content_type: "LearningOutcome", context_type: "Course", context_id: @course_to.id)
+        mig_id = @ct_to.migration_id
+        @ct_from.destroy!
+        allow_any_instance_of(ContentMigration).to receive(:outcome_has_authoritative_results?).and_return true
+        run_migration
+        expect(@ct_from.reload).to be_deleted
+        expect(@ct_to.reload).not_to be_deleted
+        expect(@migration.migration_results.first.results[:skipped].first).to eq(mig_id)
+      end
     end
   end
 end

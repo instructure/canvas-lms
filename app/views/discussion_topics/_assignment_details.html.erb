@@ -20,11 +20,15 @@
   <div class="row-fluid">
     <div class="span6">
       <p class="discussion-title">
-        <%= t('graded_discussion_and_points',
-              { :one => 'This is a graded discussion: *1 point possible*',
-                :other => 'This is a graded discussion: *%{count} points possible*' },
-              :count => round_if_whole(@assignment.points_possible) || 0,
-              :wrapper => "<span class='discussion-points'>\\1</span>") %>
+        <% if @assignment.restrict_quantitative_data?(@current_user, check_extra_permissions: true)%>
+          <%= t "This is a graded discussion" %>
+        <% else %>
+          <%= t('graded_discussion_and_points',
+                { :one => 'This is a graded discussion: *1 point possible*',
+                  :other => 'This is a graded discussion: *%{count} points possible*' },
+                :count => round_if_whole(@assignment.points_possible) || 0,
+                :wrapper => "<span class='discussion-points'>\\1</span>") %>
+          <% end %>
       </p>
     </div>
 

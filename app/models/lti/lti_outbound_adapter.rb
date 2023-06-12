@@ -69,18 +69,18 @@ module Lti
       @tool_launch = LtiOutbound::ToolLaunch.new(
         {
           url: launch_url,
-          link_code: link_code,
-          return_url: return_url,
-          resource_type: resource_type,
-          selected_html: selected_html,
+          link_code:,
+          return_url:,
+          resource_type:,
+          selected_html:,
           outgoing_email_address: HostUrl.outgoing_email_address,
           context: lti_context,
           user: lti_user,
           tool: lti_tool,
           account: lti_account,
-          variable_expander: variable_expander,
-          link_params: link_params,
-          include_module_context: include_module_context
+          variable_expander:,
+          link_params:,
+          include_module_context:
         }
       )
       self
@@ -110,7 +110,7 @@ module Lti
 
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment, encode_source_id(assignment)).convert
       @tool_launch.for_assignment!(lti_assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-      generate_post_payload(assignment: assignment)
+      generate_post_payload(assignment:)
     end
 
     def generate_post_payload_for_homework_submission(assignment)
@@ -124,7 +124,7 @@ module Lti
     def launch_url(post_only: false)
       raise("Called launch_url before calling prepare_tool_launch") unless @tool_launch
 
-      post_only && !disable_post_only? ? @tool_launch.url.split("?").first : @tool_launch.url
+      (post_only && !disable_post_only?) ? @tool_launch.url.split("?").first : @tool_launch.url
     end
 
     # this is the lis_result_sourcedid field in the launch, and the
@@ -146,7 +146,7 @@ module Lti
     private
 
     def default_launch_url(resource_type = nil)
-      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+      @tool.launch_url(extension_type: resource_type)
     end
 
     def default_link_code

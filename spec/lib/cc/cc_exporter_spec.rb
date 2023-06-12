@@ -314,9 +314,10 @@ describe "Common Cartridge exporting" do
         question_text: "Image yo: <img src=\"/courses/#{@course.id}/files/#{@att.id}/preview\">",
         answers: [{
           migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080
-        }, {
-          migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
-        }]
+        },
+                  {
+                    migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
+                  }]
       }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
@@ -344,8 +345,8 @@ describe "Common Cartridge exporting" do
     describe "hidden folders" do
       before :once do
         folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
-        linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder: folder, context: @course)
-        Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder: folder, context: @course)
+        linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder:, context: @course)
+        Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder:, context: @course)
         @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{linked_att.id}/preview\">")
         @ce.export_type = ContentExport::COMMON_CARTRIDGE
         @ce.save!
@@ -391,9 +392,10 @@ describe "Common Cartridge exporting" do
         question_text: "<p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/some-kaltura-id\"></a></p>",
         answers: [{
           migration_id: "QUE_1016_A1", text: "True", weight: 100, id: 8080
-        }, {
-          migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
-        }]
+        },
+                  {
+                    migration_id: "QUE_1017_A2", text: "False", weight: 0, id: 2279
+                  }]
       }.with_indifferent_access
       qq.write_attribute(:question_data, data)
       qq.save!
@@ -518,7 +520,9 @@ describe "Common Cartridge exporting" do
       @course.syllabus_body = link_thing
       @course.save!
       @ag = @course.assignment_groups.create!(name: "group1")
-      @asmnt = @course.assignments.create!(title: "Assignment 1", points_possible: 10, assignment_group: @ag,
+      @asmnt = @course.assignments.create!(title: "Assignment 1",
+                                           points_possible: 10,
+                                           assignment_group: @ag,
                                            description: link_thing)
       @ag2 = @course.assignment_groups.create!(name: "group2")
       @asmnt2 = @course.assignments.create!(title: "Assignment 2", points_possible: 10, assignment_group: @ag2)
@@ -596,13 +600,7 @@ describe "Common Cartridge exporting" do
     end
 
     it "exports context.xml" do
-      fake_canvas_host = "pineapple.127.0.0.1.xip.io" # something AccountDomain won't try to look up :P
-      if @course.root_account.respond_to?(:account_domains)
-        @course.root_account.account_domains.create!(host: fake_canvas_host)
-      else
-        # this is incompatible with MRA prepend, unfortunately, or I'd just use it all the time
-        allow_any_instance_of(Account).to receive(:primary_domain).and_return(OpenStruct.new(host: fake_canvas_host))
-      end
+      allow_any_instance_of(Account).to receive(:domain).and_return("pineapple.edu")
       run_export
       expect(@manifest_doc.at_css('file[href="course_settings/context.xml"]')).not_to be_nil
       context_info = Nokogiri::XML(@zip_file.read("course_settings/context.xml"))
@@ -611,7 +609,7 @@ describe "Common Cartridge exporting" do
       expect(context_info.at_css("root_account_id").text).to eq @course.root_account.global_id.to_s
       expect(context_info.at_css("root_account_uuid").text).to eq @course.root_account.uuid.to_s
       expect(context_info.at_css("root_account_name").text).to eq @course.root_account.name.to_s
-      expect(context_info.at_css("canvas_domain").text).to eq fake_canvas_host
+      expect(context_info.at_css("canvas_domain").text).to eq "pineapple.edu"
       expect(ccc_schema.validate(context_info)).to be_empty
     end
 
@@ -621,36 +619,95 @@ describe "Common Cartridge exporting" do
       run_export
     end
 
-    it "exports media tracks" do
-      stub_kaltura
-      allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:startSession)
-      allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return("http://www.example.com/blah.flv")
-      stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
-      allow(CC::CCHelper).to receive(:media_object_info).and_return({ asset: { id: 1, status: "2" }, path: "blah.flv" })
-      obj = @course.media_objects.create! media_id: "0_deadbeef"
-      obj.attachment = Attachment.create!(context_id: obj.context_id, context_type: obj.context_type, filename: "", content_type: "unknown/unknown")
-      obj.save!
-      track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!"
-      page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
-      page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
-      page.save!
-      @ce.export_type = ContentExport::COMMON_CARTRIDGE
-      @ce.save!
-      run_export
-      mo_node_key = CC::CCHelper.create_key(obj.attachment, global: true)
-      key = CC::CCHelper.create_key(track.content, global: true)
-      file_node = @manifest_doc.at_css("resource[identifier='#{key}'] file[href$='/blah.flv.tlh.subtitles']")
-      expect(file_node).to be_present
-      expect(@zip_file.read(file_node["href"])).to eql(track.content)
-      track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
-      expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
-      expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
-      expect(ccc_schema.validate(track_doc)).to be_empty
+    context "media_links_use_attachment_id feature enabled" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
+      end
+
+      it "exports media tracks" do
+        stub_kaltura
+        kaltura_session = double("kaltura_session")
+        allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
+        allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
+        obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+        track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!", attachment: obj.attachment
+        page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
+        page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
+        page.save!
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+        run_export
+        mo_node_key = CC::CCHelper.create_key(obj.attachment, global: true)
+        key = CC::CCHelper.create_key(track.content, global: true)
+        track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
+        expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track").text).to eq track.content
+        expect(ccc_schema.validate(track_doc)).to be_empty
+      end
+
+      it "exports media tracks when there's no attachment associated with the media object (and also get tracks from the original media object if there isn't one for that locale on the attachment)" do
+        stub_kaltura
+        kaltura_session = double("kaltura_session")
+        allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
+        allow(kaltura_session).to receive(:flavorAssetGetPlaylistUrl).and_return("http://www.example.com/blah.flv")
+        stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
+        allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
+        stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
+        expect_any_instance_of(MediaObject).to receive(:create_attachment).and_call_original
+        obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+        track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!"
+        page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
+        page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
+        page.save!
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+        run_export
+        mo_node_key = CC::CCHelper.create_key(obj.reload.attachment, global: true)
+        key = CC::CCHelper.create_key(track.content, global: true)
+        track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
+        expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track").text).to eq track.content
+        expect(ccc_schema.validate(track_doc)).to be_empty
+      end
+    end
+
+    context "media_links_use_attachment_id feature disabled" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return false
+      end
+
+      it "exports media tracks" do
+        stub_kaltura
+        kaltura_session = double("kaltura_session")
+        allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(kaltura_session)
+        allow(kaltura_session).to receive(:flavorAssetGetOriginalAsset).and_return({ id: 1, status: "2", fileExt: "flv" })
+        obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+        track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!", attachment: obj.attachment
+        page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
+        page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'
+        page.save!
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+        run_export
+        mo_node_key = CC::CCHelper.create_key(obj.attachment, global: true)
+        key = CC::CCHelper.create_key(track.content, global: true)
+        file_node = @manifest_doc.at_css("resource[identifier='#{key}'] file[href$='/blah.flv.tlh.subtitles']")
+        expect(file_node).to be_present
+        expect(@zip_file.read(file_node["href"])).to eql(track.content)
+        track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
+        expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
+        expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
+        expect(ccc_schema.validate(track_doc)).to be_empty
+      end
     end
 
     it "exports CC 1.3 assignments" do
       @file = Attachment.create!(filename: "test.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@course), context: @course)
-      @course.assignments.create! name: "test assignment", description: %(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>), points_possible: 11,
+      @course.assignments.create! name: "test assignment",
+                                  description: %(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>),
+                                  points_possible: 11,
                                   submission_types: "online_text_entry,online_upload,online_url"
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
@@ -686,7 +743,7 @@ describe "Common Cartridge exporting" do
 
     context "LTI 1.3 Assignments" do
       subject do
-        run_export(version: version)
+        run_export(version:)
         @manifest_doc
       end
 
@@ -715,7 +772,7 @@ describe "Common Cartridge exporting" do
 
       before do
         non_assignment_link
-        tool.update!(developer_key: developer_key)
+        tool.update!(developer_key:)
         assignment.external_tool_tag = tag
         assignment.save!
         assignment.primary_resource_link.update!(custom: { foo: "assignment" })
@@ -849,10 +906,10 @@ describe "Common Cartridge exporting" do
         tool_proxy.save!
         tool_proxy.tool_settings.create!(
           context: course,
-          tool_proxy: tool_proxy,
+          tool_proxy:,
           resource_link_id: assignment.lti_context_id,
-          custom: custom,
-          custom_parameters: custom_parameters,
+          custom:,
+          custom_parameters:,
           product_code: tool_proxy.product_family.product_code,
           vendor_code: tool_proxy.product_family.vendor_code
         )
@@ -1055,18 +1112,18 @@ describe "Common Cartridge exporting" do
         folder = Folder.root_folders(@course).first
         @visible = Attachment.create!({
                                         uploaded_data: stub_png_data("visible.png"),
-                                        folder: folder,
+                                        folder:,
                                         context: @course
                                       })
         @hidden = Attachment.create!({
                                        uploaded_data: stub_png_data("hidden.png"),
-                                       folder: folder,
+                                       folder:,
                                        context: @course,
                                        hidden: true
                                      })
         @locked = Attachment.create!({
                                        uploaded_data: stub_png_data("locked.png"),
-                                       folder: folder,
+                                       folder:,
                                        context: @course,
                                        locked: true
                                      })
@@ -1096,6 +1153,29 @@ describe "Common Cartridge exporting" do
         check_resource_node(@hidden, CC::CCHelper::WEBCONTENT, false)
         check_resource_node(@locked, CC::CCHelper::WEBCONTENT, false)
       end
+    end
+  end
+
+  describe "#disable_content_rewriting" do
+    subject { cc_exporter.disable_content_rewriting }
+
+    let(:content_export) { ContentExport.new(context: course_model) }
+    let(:cc_exporter) { CC::CCExporter.new(content_export) }
+
+    context "ContentExport disable_content_rewriting is true" do
+      before do
+        allow(content_export).to receive(:disable_content_rewriting?).and_return true
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context "ContentExport disable_content_rewriting is false" do
+      before do
+        allow(content_export).to receive(:disable_content_rewriting?).and_return false
+      end
+
+      it { is_expected.to be false }
     end
   end
 end

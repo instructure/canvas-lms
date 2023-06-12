@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class RequestError < ::RuntimeError
+class RequestError < RuntimeError
   attr_accessor :response_status
 
   def initialize(message, status = :bad_request)
@@ -28,7 +28,7 @@ class RequestError < ::RuntimeError
   def error_json
     {
       status: (Rack::Utils::SYMBOL_TO_STATUS_CODE.key(response_status) || :internal_server_error).to_s,
-      message: message
+      message:
     }
   end
 end

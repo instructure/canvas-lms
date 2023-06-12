@@ -20,7 +20,7 @@ import _ from 'lodash'
 import uuid from 'uuid'
 import parseLinkHeader from 'parse-link-header'
 import NaiveFetchDispatch from './NaiveFetchDispatch'
-import makePromisePool from 'make-promise-pool'
+import makePromisePool from '@canvas/make-promise-pool'
 
 const deepMerge = (lhs, rhs) => {
   if (lhs === undefined || lhs === null) {
@@ -106,6 +106,7 @@ const fetchOutcomes = (courseId, studentId) => {
         res.outcome_results
           .filter(r => !r.hidden)
           .forEach(r => {
+            outcomeResultsByOutcomeId[r.links.learning_outcome] ??= []
             outcomeResultsByOutcomeId[r.links.learning_outcome].push(r)
           })
         res.linked.assignments.forEach(a => {

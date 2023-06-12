@@ -88,19 +88,13 @@ describe('getRCSProps', () => {
       RICH_CONTENT_FILES_TAB_DISABLED: false,
       active_brand_config_json_url: 'http://the.theme.here/',
       DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://canvas.instructure.com',
-      FEATURES: {
-        // Release flag was NOT re-named, so left here as "buttons_and_icons_cropper"
-        buttons_and_icons_cropper: true,
-      },
+      FEATURES: {},
     }
     expect(getRCSProps()).toMatchObject({
       canUploadFiles: true,
       filesTabDisabled: false,
       themeUrl: 'http://the.theme.here/',
-      features: {
-        // This feature name was renamed in getRCSProps() to "icon_maker_cropper"
-        icon_maker_cropper: true,
-      },
+      features: {},
     })
   })
 

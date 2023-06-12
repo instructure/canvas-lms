@@ -43,8 +43,11 @@ module QuizQuestionsCommon
       { weight: 0, answer_text: "B", answer_comments: "", id: 1020 },
       { weight: 0, answer_text: "C", answer_comments: "", id: 7051 }
     ]
-    data = { question_name: name, points_possible: 1, question_text: question,
-             answers: answers, question_type: "multiple_choice_question" }
+    data = { question_name: name,
+             points_possible: 1,
+             question_text: question,
+             answers:,
+             question_type: "multiple_choice_question" }
 
     @quiz.quiz_questions.create!(question_data: data)
   end
@@ -85,8 +88,9 @@ module QuizQuestionsCommon
   end
 
   def it_should_show_cant_go_back_warning
-    expect(f("body")).to include_text \
+    expect(f("body")).to include_text(
       "Once you have submitted an answer, you will not be able to change it later"
+    )
   end
 
   def accept_cant_go_back_warning

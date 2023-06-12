@@ -44,7 +44,7 @@ module SpeedGrader
         # If we were given a student ID, try to find a group containing that
         # student, prioritizing the group the viewing user already selected.
         # If the student is part of no groups, the group will just be nil.
-        resolved_group = group_containing_student(student_id: student_id)
+        resolved_group = group_containing_student(student_id:)
         if resolved_group != initial_group
           reason_for_change = if resolved_group.blank?
                                 # We couldn't find a group for this student
@@ -67,7 +67,7 @@ module SpeedGrader
         end
       end
 
-      OpenStruct.new(group: resolved_group, reason_for_change: reason_for_change)
+      OpenStruct.new(group: resolved_group, reason_for_change:)
     end
 
     def group_containing_student(student_id:)
@@ -83,7 +83,7 @@ module SpeedGrader
 
     def first_group_containing_students
       course.groups.active.joins(:group_memberships)
-            .where("EXISTS (?)", GroupMembership.active.where("group_id = groups.id AND moderator IS NOT TRUE"))
+            .where(GroupMembership.active.where("group_id = groups.id AND moderator IS NOT TRUE").arel.exists)
             .order(:id)
             .first
     end

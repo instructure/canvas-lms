@@ -83,7 +83,7 @@ RSpec.describe "Api::V1::Outcome" do
             LearningOutcome.find(outcome["id"]).updateable_rubrics?
           )
           expect(outcome["ratings"].length).to eq 3
-          expect(outcome["ratings"].map { |r| r["percent"] }).to eq [30, 40, 30]
+          expect(outcome["ratings"].pluck("percent")).to eq [30, 40, 30]
         end
       end
 
@@ -125,7 +125,7 @@ RSpec.describe "Api::V1::Outcome" do
 
           it "ignores the resolved_outcome_proficiency and resolved_calculation_method of the provided context" do
             opts[:context] = @course
-            check_outcome_json.call(lib.outcome_json(new_outcome(({ **outcome_params, context: @course })), nil, nil, opts))
+            check_outcome_json.call(lib.outcome_json(new_outcome({ **outcome_params, context: @course }), nil, nil, opts))
           end
         end
       end

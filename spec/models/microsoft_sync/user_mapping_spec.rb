@@ -29,7 +29,7 @@ describe MicrosoftSync::UserMapping do
   describe ".find_enrolled_user_ids_without_mappings" do
     let(:course) { course_with_teacher.course }
     let(:users) do
-      [course.enrollments.first.user, *n_students_in_course(3, course: course)]
+      [course.enrollments.first.user, *n_students_in_course(3, course:)]
     end
 
     %w[active creation_pending].each do |state|
@@ -42,7 +42,7 @@ describe MicrosoftSync::UserMapping do
         let(:calls_results) do
           results = []
           described_class.find_enrolled_user_ids_without_mappings(
-            course: course, batch_size: 2
+            course:, batch_size: 2
           ) do |ids|
             results << ids
           end
@@ -50,8 +50,10 @@ describe MicrosoftSync::UserMapping do
         end
 
         it "returns the user ids of enrolled users without mappings in batches" do
-          described_class.create!(user: users[2], root_account: course.root_account,
-                                  aad_id: "manual2", needs_updating: true)
+          described_class.create!(user: users[2],
+                                  root_account: course.root_account,
+                                  aad_id: "manual2",
+                                  needs_updating: true)
           expect(calls_results.flatten.sort).to eq((users - [users[1]]).map(&:id))
           expect(calls_results.length).to eq(2)
         end
@@ -63,7 +65,7 @@ describe MicrosoftSync::UserMapping do
         course.enrollments.where(user: users.first).take.update!(workflow_state: state)
         calls_results = []
         described_class.find_enrolled_user_ids_without_mappings(
-          course: course, batch_size: 2
+          course:, batch_size: 2
         ) do |ids|
           calls_results << ids
         end
@@ -100,8 +102,8 @@ describe MicrosoftSync::UserMapping do
 
       it "creates UserMappings if they don't already exist and overrides if they do" do
         subject
-        expect(described_class.where(root_account_id: account.id).pluck(:user_id, :aad_id).sort).to \
-          eq([[user1.id, "user1override"], [user2.id, "user2"]].sort)
+        expect(described_class.where(root_account_id: account.id).pluck(:user_id, :aad_id).sort)
+          .to eq([[user1.id, "user1override"], [user2.id, "user2"]].sort)
       end
 
       it "sets needs_updating=false" do
@@ -130,8 +132,7 @@ describe MicrosoftSync::UserMapping do
             klass = described_class::AccountSettingsChanged
             msg = /account-wide sync settings were changed/
 
-            expect { subject }.to \
-              raise_microsoft_sync_graceful_cancel_error(klass, msg)
+            expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
 
             expect(described_class.pluck(:root_account_id, :user_id, :aad_id)).to contain_exactly(
               # [account.id, user1.id, "manual"] was overwritten, then deleted, so not here anymore
@@ -144,8 +145,8 @@ describe MicrosoftSync::UserMapping do
 
     context "when user_id_to_aad_hash is empty" do
       it "doesn't raise an error" do
-        expect { described_class.bulk_insert_for_root_account(account_model, {}) }.to_not \
-          change { described_class.count }.from(0)
+        expect { described_class.bulk_insert_for_root_account(account_model, {}) }
+          .to_not change { described_class.count }.from(0)
       end
     end
   end
@@ -277,10 +278,8 @@ describe MicrosoftSync::UserMapping do
       @enrollment = student_in_course(active_all: true)
       @ra = @enrollment.root_account
 
-      @um1 = MicrosoftSync::UserMapping.create! \
-        user: @enrollment.user, root_account: @ra, aad_id: "abc123"
-      @um2 = MicrosoftSync::UserMapping.create! \
-        user: user_model, root_account: @ra, aad_id: "abc123"
+      @um1 = MicrosoftSync::UserMapping.create!(user: @enrollment.user, root_account: @ra, aad_id: "abc123")
+      @um2 = MicrosoftSync::UserMapping.create!(user: user_model, root_account: @ra, aad_id: "abc123")
 
       @ra.settings[:microsoft_sync_enabled] = true
       @ra.settings[:microsoft_sync_login_attribute] = "email"
@@ -291,7 +290,7 @@ describe MicrosoftSync::UserMapping do
       expect do
         described_class.flag_as_needs_updating_if_using_email(@enrollment.user)
       end.to change { @um1.reload.needs_updating }.from(false).to(true)
-      expect(@um2.needs_updating).to eq(false)
+      expect(@um2.needs_updating).to be(false)
     end
 
     it "doesn't set needs_updating if the root account doesn't use email login attribute" do
@@ -307,7 +306,7 @@ describe MicrosoftSync::UserMapping do
         root_account: account_model(root_account_id: nil), user: @enrollment.user
       )
       described_class.flag_as_needs_updating_if_using_email(@enrollment.user)
-      expect(um.reload.needs_updating).to eq(false)
+      expect(um.reload.needs_updating).to be(false)
     end
   end
 
@@ -328,12 +327,12 @@ describe MicrosoftSync::UserMapping do
         um1 = @shard1.activate do
           acct1 = make_microsoft_enabled_account
           user = student_in_course(active_all: true, course: course_model(account: acct1)).user
-          described_class.create! root_account: acct1, user: user, aad_id: "foo"
+          described_class.create! root_account: acct1, user:, aad_id: "foo"
         end
         um2 = @shard2.activate do
           acct2 = make_microsoft_enabled_account
           course_model(account: acct2).enroll_user(user)
-          described_class.create! root_account: acct2, user: user, aad_id: "bar"
+          described_class.create! root_account: acct2, user:, aad_id: "bar"
         end
 
         expect do
@@ -351,7 +350,7 @@ describe MicrosoftSync::UserMapping do
 
       accts.each do |acct|
         users.each_with_index do |user, index|
-          described_class.create!(root_account: acct, user: user, needs_updating: index != 2)
+          described_class.create!(root_account: acct, user:, needs_updating: index != 2)
         end
       end
 

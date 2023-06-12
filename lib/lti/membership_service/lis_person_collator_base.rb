@@ -33,7 +33,7 @@ module Lti
           ActiveRecord::Associations.preload(users, :pseudonym)
           ActiveRecord::Associations.preload(users, :communication_channels, CommunicationChannel.email.unretired)
           ActiveRecord::Associations.preload(users, :not_ended_enrollments, Enrollment.where(course_id: context))
-          ActiveRecord::Associations.preload(users, :past_lti_ids, UserPastLtiId.where(context: context))
+          ActiveRecord::Associations.preload(users, :past_lti_ids, UserPastLtiId.where(context:))
           users.map do |user|
             generate_membership(user)
           end
@@ -51,7 +51,7 @@ module Lti
       end
 
       def generate_member(user)
-        user_id = Lti::Asset.opaque_identifier_for(user, context: context)
+        user_id = Lti::Asset.opaque_identifier_for(user, context:)
         ::IMS::LTI::Models::MembershipService::LISPerson.new(
           name: user.name,
           given_name: user.first_name,
@@ -59,7 +59,7 @@ module Lti
           img: user.avatar_image_url,
           email: user.email,
           result_sourced_id: nil,
-          user_id: user_id,
+          user_id:,
           sourced_id: user&.pseudonym&.sis_user_id
         )
       end

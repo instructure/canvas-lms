@@ -26,6 +26,7 @@ const locale = {
   "add_cc_subtitles_55f0394e": { "message": "Alt yazı ekle" },
   "add_image_60b2de07": { "message": "Görsel Ekle" },
   "aleph_f4ffd155": { "message": "Aleph" },
+  "align_11050992": { "message": "Hizala" },
   "alignment_and_lists_5cebcb69": { "message": "Eşleştirme ve Listeler" },
   "all_4321c3a1": { "message": "Tümü" },
   "all_apps_a50dea49": { "message": "Tüm Uygulamalar" },
@@ -43,14 +44,19 @@ const locale = {
     "message": "Medya dosyası yüklenirken hata oluştu."
   },
   "and_7fcc2911": { "message": "Ve" },
+  "announcement_fb4cb645": { "message": "Duyuru" },
   "announcement_list_da155734": { "message": "Duyuru Listesi" },
   "announcements_a4b8ed4a": { "message": "Duyurular" },
   "apply_781a2546": { "message": "Uygula" },
   "apps_54d24a47": { "message": "Uygulamalar" },
+  "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+    "message": "İptal etmek istediğinize emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir."
+  },
   "arrows_464a3e54": { "message": "Oklar" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Genişleme oranı korumalıdır"
   },
+  "assignment_976578a8": { "message": "Ödev" },
   "assignments_1e02582c": { "message": "Ödevler" },
   "attributes_963ba262": { "message": "Özellikler" },
   "audio_player_for_title_20cc70d": { "message": "{ title } ses oynatıcı" },
@@ -60,8 +66,15 @@ const locale = {
   "bottom_15a2a9be": { "message": "Alt" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "İptal" },
+  "changes_you_made_may_not_be_saved_4e8db973": {
+    "message": "Yaptığınız değişiklikler kaydedilmemiş olabilir."
+  },
+  "characters_9d897d1c": { "message": "Karakterler" },
   "choose_caption_file_9c45bc4e": { "message": "Alt yazı dosyasını seçin" },
   "choose_usage_rights_33683854": { "message": "Kullanıcı haklarını seçin..." },
+  "circle_unordered_list_9e3a0763": {
+    "message": "sıralanmamış listeyi yuvarlak içine al"
+  },
   "clear_2084585f": { "message": "Temizle" },
   "clear_selected_file_82388e50": { "message": "Seçili dosyayı temizle" },
   "click_to_embed_imagename_c41ea8df": {
@@ -96,18 +109,23 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Lisansı:"
   },
+  "current_volume_level_c55ab825": { "message": "Mevcut Ses Seviyesi" },
   "custom_6979cd81": { "message": "Özelleştir" },
   "cyan_c1d5f68a": { "message": "Cam göbeği" },
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
+  "decrease_indent_d9cf469d": { "message": "İçerden başlatma sınırını azalt" },
   "deep_purple_bb3e2907": { "message": "Koyu Mor" },
   "delimiters_4db4840d": { "message": "Ayıraçlar" },
+  "description_436c48d7": { "message": "Açıklama" },
   "details_98a31b68": { "message": "Ayrıntılar" },
   "dimensions_45ddb7b7": { "message": "Tanımlamalar" },
+  "discussion_6719c51d": { "message": "Tartışma" },
   "discussions_a5f96392": { "message": "Tartışmalar" },
   "discussions_index_6c36ced": { "message": "Tartışma Başlıkları" },
   "display_options_315aba85": { "message": "Gösterim Seçenekleri" },
   "documents_81393201": { "message": "Belgeler" },
   "done_54e3d4b6": { "message": "Tamam" },
+  "down_5831a426": { "message": "Aşağı" },
   "drag_a_file_here_1bf656d5": { "message": "Buraya bir Dosya Sürükleyin" },
   "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
     "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
@@ -116,12 +134,17 @@ const locale = {
   "edit_c5fbea07": { "message": "Düzenle" },
   "edit_link_7f53bebb": { "message": "Bağlantıyı Düzenle" },
   "embed_828fac4a": { "message": "Göm" },
+  "embed_content_from_external_tool_3397ad2d": {
+    "message": "Harici Araçtan içerik Ekle"
+  },
   "embed_image_1080badc": { "message": "Görsel Ekle" },
   "external_tools_6e77821": { "message": "Harici Araçlar" },
   "extra_large_b6cdf1ff": { "message": "Ekstra Büyük" },
+  "file_name_8fd421ff": { "message": "Dosya adı" },
   "file_url_c12b64be": { "message": "Dosya URL" },
   "files_c300e900": { "message": "Dosyalar" },
   "files_index_af7c662b": { "message": "Dosya Başlıkları" },
+  "finish_bc343002": { "message": "Tamamla" },
   "format_4247a9c5": { "message": "Format" },
   "generating_preview_45b53be0": { "message": "Oluşturma önizlemesi..." },
   "grades_a61eba0a": { "message": "Notlar" },
@@ -134,6 +157,7 @@ const locale = {
   "heading_4_b2e74be7": { "message": "Başlık 4" },
   "height_69b03e15": { "message": "Yükseklik" },
   "home_351838cd": { "message": "Ana Sayfa" },
+  "html_editor_fb2ab713": { "message": "HTML Düzenleyici" },
   "i_have_obtained_permission_to_use_this_file_6386f087": {
     "message": "Bu dosyayı kullanmak için iznim var."
   },
@@ -143,9 +167,11 @@ const locale = {
   "image_options_5412d02c": { "message": "Görsel Seçenekleri" },
   "image_options_tray_90a46006": { "message": "Görsel Seçenekleri Yan Menüsü" },
   "images_7ce26570": { "message": "Görseller" },
+  "increase_indent_6af90f7c": { "message": "İçerden başlat" },
   "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Ekle" },
   "insert_link_6dc23cae": { "message": "Bağlantı Ekle" },
+  "insert_math_equation_57c6e767": { "message": "Matematik Denklemi Ekle" },
   "invalid_file_c11ba11": { "message": "Geçersiz Dosya" },
   "invalid_file_type_881cc9b2": { "message": "Geçersiz dosya türü" },
   "invalid_url_cbde79f": { "message": "Geçersiz bağlantı" },
@@ -167,9 +193,13 @@ const locale = {
   "minimize_file_preview_da911944": { "message": "Dosya Ön İzlemesini Küçült" },
   "minimize_video_20aa554b": { "message": "Video''yu Küçült" },
   "misc_3b692ea7": { "message": "Çeşitli" },
+  "module_90d9fd32": { "message": "Modül" },
   "modules_c4325335": { "message": "Modüller" },
   "my_files_2f621040": { "message": "Dosyalarım" },
   "name_1aed4a1b": { "message": "İsim" },
+  "navigation_ee9af92d": { "message": "Gezinme" },
+  "new_quiz_34aacba6": { "message": "Yeni Kısa Sınav" },
+  "next_40e12421": { "message": "Sonraki" },
   "no_e16d9132": { "message": "Hayır" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Bu dosya için ön izleme bulunmamaktadır."
@@ -178,15 +208,19 @@ const locale = {
   "none_3b5e34d2": { "message": "Yok" },
   "operators_a2ef9a93": { "message": "Operatörler" },
   "orange_81386a62": { "message": "Turuncu" },
+  "page_50c4823d": { "message": "Sayfa" },
   "pages_e5414c2c": { "message": "Sayfalar" },
   "people_b4ebb13c": { "message": "Katılımcılar" },
   "percentage_34ab7c2c": { "message": "Yüzde" },
   "pink_68ad45cb": { "message": "Pembe" },
+  "prev_f82cbc48": { "message": "Önceki" },
   "preview_53003fd2": { "message": "Önizleme" },
   "published_c944a23d": { "message": "yayınlandı" },
   "purple_7678a9fc": { "message": "Mor" },
+  "quiz_e0dcce8f": { "message": "Kısa Sınav" },
   "quizzes_7e598f57": { "message": "Kısa sınavlar" },
   "record_7c9448b": { "message": "Kayıt" },
+  "recording_98da6bda": { "message": "Kaydediliyor" },
   "red_8258edf3": { "message": "Kırmızı" },
   "relationships_6602af70": { "message": "İlişkiler" },
   "replace_e61834a7": { "message": "Değiştir" },
@@ -198,6 +232,7 @@ const locale = {
   "something_went_wrong_89195131": { "message": "Bazı sorunlar oluştu." },
   "sort_by_e75f9e3e": { "message": "Sırala" },
   "star_8d156e09": { "message": "Yıldız" },
+  "start_over_f7552aa9": { "message": "Baştan Başla" },
   "submit_a3cc6859": { "message": "Gönder" },
   "syllabus_f191f65b": { "message": "Ders Programı" },
   "the_document_preview_is_currently_being_processed__7d9ea135": {
@@ -228,10 +263,16 @@ const locale = {
     "message": "Erişim tablosu seçeneklerine ulaşmak için Kontrol F9 tuşuna basın. { text }"
   },
   "unpublished_dfd8801": { "message": "yayınlanmadı" },
+  "untitled_16aa4f2b": { "message": "Başlıksız" },
+  "up_c553575d": { "message": "Yukarı" },
+  "upload_document_253f0478": { "message": "Belge Yükle" },
   "upload_file_fd2361b8": { "message": "Dosya Yükle" },
   "upload_image_6120b609": { "message": "Görsel Yükle" },
   "upload_media_ce31135a": { "message": "Medya Dosyası Yükle" },
   "uploading_19e8a4e7": { "message": "Yükleniyor" },
+  "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+    "message": "Büyük harf alfabetik sıralı liste"
+  },
   "url_22a5f3b8": { "message": "URL" },
   "usage_right_ff96f3e2": { "message": "Kullanım Şartları:" },
   "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
@@ -245,17 +286,22 @@ const locale = {
   "user_media_14fbf656": { "message": "Kullanıcı Medya Dosyası" },
   "video_options_24ef6e5d": { "message": "Video Seçenekleri" },
   "video_options_tray_3b9809a5": { "message": "Video Seçenekleri Yan Menüsü" },
+  "video_player_b371005": { "message": "Video Oynatıcı" },
   "view_ba339f93": { "message": "Göster" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Klavye Kısayollarını Göster"
   },
+  "webcam_fe91b20f": { "message": "Web Kamerası" },
   "width_492fec76": { "message": "Genişlik" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Genişlik ve yükseklik rakam olmalı"
   },
   "width_x_height_px_ff3ccb93": { "message": "{ width } x { height }px" },
   "wiki_home_9cd54d0": { "message": "Wiki Ana Sayfası" },
-  "yes_dde87d5": { "message": "Evet" }
+  "yes_dde87d5": { "message": "Evet" },
+  "your_webcam_may_already_be_in_use_6cd64c25": {
+    "message": "Web kameranız kullanılıyor olabilir."
+  }
 }
 
 

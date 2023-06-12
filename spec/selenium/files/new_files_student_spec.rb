@@ -95,8 +95,8 @@ describe "better_file_browsing" do
       end
 
       it "sees calendar icon on restricted files within a given timeframe", priority: "1" do
-        @files[0].update unlock_at: Time.zone.now - 1.week,
-                         lock_at: Time.zone.now + 1.week
+        @files[0].update unlock_at: 1.week.ago,
+                         lock_at: 1.week.from_now
         get "/courses/#{@course.id}/files"
         expect(f(".icon-calendar-day")).to be_displayed
         f(".icon-calendar-day").click
@@ -109,7 +109,9 @@ describe "better_file_browsing" do
       before :once do
         @folder = folder_model(name: "restricted_folder", context: @course)
         @file = add_file(fixture_file_upload("example.pdf", "application/pdf"),
-                         @course, "example.pdf", @folder)
+                         @course,
+                         "example.pdf",
+                         @folder)
       end
 
       it "does not return files from hidden folders in search results", priority: "1" do

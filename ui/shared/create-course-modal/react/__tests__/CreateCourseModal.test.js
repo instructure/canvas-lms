@@ -21,52 +21,54 @@ import fetchMock from 'fetch-mock'
 import {render, waitFor, fireEvent, act} from '@testing-library/react'
 
 import {CreateCourseModal} from '../CreateCourseModal'
-import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
+injectGlobalAlertContainers()
 
 const MANAGEABLE_COURSES = [
   {
-    id: 4,
+    id: '4',
     name: 'CPMS',
   },
   {
-    id: 5,
+    id: '5',
     name: 'CS',
   },
   {
-    id: 6,
+    id: '6',
     name: 'Elementary',
   },
 ]
 
 const ENROLLMENTS = [
   {
-    id: 72,
+    id: '72',
     name: 'Algebra Honors',
     account: {
-      id: 6,
+      id: '6',
       name: 'Orange Elementary',
     },
   },
   {
-    id: 74,
+    id: '74',
     name: 'Math',
     account: {
-      id: 6,
+      id: '6',
       name: 'Orange Elementary',
     },
   },
   {
-    id: 105,
+    id: '105',
     name: 'English 11',
     account: {
-      id: 13,
+      id: '13',
       name: 'Clark HS',
     },
   },
 ]
 
 const MCC_ACCOUNT = {
-  id: 3,
+  id: '3',
   name: 'Manually-Created Courses',
   workflow_state: 'active',
 }
@@ -92,9 +94,15 @@ describe('CreateCourseModal', () => {
     ...overrides,
   })
 
+  beforeEach(() => {
+    // mock requests that are made, but not explicitly tested, to clean up console warnings
+    fetchMock.get('/api/v1/users/self/courses?homeroom=true&per_page=100', 200)
+    fetchMock.get('begin:/api/v1/accounts/', 200)
+    fetchMock.post('begin:/api/v1/accounts/', 200)
+  })
+
   afterEach(() => {
     fetchMock.restore()
-    destroyContainer()
   })
 
   it('shows a spinner with correct title while loading accounts', async () => {

@@ -5,10 +5,4 @@ source "https://rubygems.org"
 # Specify your gem's dependencies in html_text_helper.gemspec
 gemspec
 
-gem "simplecov", "0.14.1", require: false
-
 gem "canvas_text_helper", path: "../canvas_text_helper"
-
-platforms :ruby_20, :ruby_21, :ruby_22 do
-  gem "iconv", "1.0.4"
-end

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import BBFile from '../../backbone/models/File.coffee'
+import BBFile from '../../backbone/models/File'
 import BaseUploader from './BaseUploader'
 
 export default class FileUploader extends BaseUploader {

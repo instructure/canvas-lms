@@ -48,7 +48,7 @@
  */
 
 import React from 'react'
-import {func, node, string, shape, oneOfType} from 'prop-types'
+import {func, node, string, shape, oneOfType, element} from 'prop-types'
 import {compact, castArray, isEqual} from 'lodash'
 import formatMessage from 'format-message'
 import {Select} from '@instructure/ui-select'
@@ -65,14 +65,14 @@ function CanvasSelectOption() {
 }
 CanvasSelectOption.propTypes = {
   id: string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  value: string.isRequired // eslint-disable-line react/no-unused-prop-types
+  value: string.isRequired, // eslint-disable-line react/no-unused-prop-types
 }
 
 function CanvasSelectGroup() {
   return <div />
 }
 CanvasSelectGroup.propTypes = {
-  label: string.isRequired // eslint-disable-line react/no-unused-prop-types
+  label: string.isRequired, // eslint-disable-line react/no-unused-prop-types
 }
 
 export default class CanvasSelect extends React.Component {
@@ -92,13 +92,14 @@ export default class CanvasSelect extends React.Component {
       USE_ARROWS: string.isRequired,
       LIST_COLLAPSED: string.isRequired,
       LIST_EXPANDED: string.isRequired,
-      OPTION_SELECTED: string.isRequired
+      OPTION_SELECTED: string.isRequired,
     }),
-    onBlur: func
+    onBlur: func,
+    mountNode: oneOfType([element, func]),
   }
 
   static defaultProps = {
-    noOptionsLabel: '---'
+    noOptionsLabel: '---',
   }
 
   constructor(props) {
@@ -111,7 +112,7 @@ export default class CanvasSelect extends React.Component {
       isShowingOptions: false,
       highlightedOptionId: null,
       selectedOptionId: option ? option.props.id : null,
-      announcement: null
+      announcement: null,
     }
 
     this._selectRef = React.createRef()
@@ -127,7 +128,7 @@ export default class CanvasSelect extends React.Component {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({
         inputValue: option ? option.props.children : '',
-        selectedOptionId: option ? option.props.id : ''
+        selectedOptionId: option ? option.props.id : '',
       })
     }
   }
@@ -150,11 +151,12 @@ export default class CanvasSelect extends React.Component {
           onRequestHideOptions={this.handleHideOptions}
           onRequestHighlightOption={this.handleHighlightOption}
           onRequestSelectOption={this.handleSelectOption}
+          mountNode={this.props.mountNode}
           {...otherProps}
         >
           {this.renderChildren(children)}
         </Select>
-        <Alert liveRegion={liveRegion} liveRegionPoliteness="assertive" screenReaderOnly>
+        <Alert liveRegion={liveRegion} liveRegionPoliteness="assertive" screenReaderOnly={true}>
           {this.state.announcement}
         </Alert>
       </>
@@ -241,7 +243,7 @@ export default class CanvasSelect extends React.Component {
 
   handleShowOptions = () => {
     this.setState({
-      isShowingOptions: true
+      isShowingOptions: true,
     })
   }
 
@@ -251,7 +253,7 @@ export default class CanvasSelect extends React.Component {
       return {
         isShowingOptions: false,
         highlightedOptionId: null,
-        inputValue: text
+        inputValue: text,
       }
     })
   }
@@ -271,7 +273,7 @@ export default class CanvasSelect extends React.Component {
     this.setState({
       highlightedOptionId: id,
       inputValue,
-      announcement: `${text} ${nowOpen}`
+      announcement: `${text} ${nowOpen}`,
     })
   }
   /* eslint-enable react/no-access-state-in-setstate */
@@ -280,7 +282,7 @@ export default class CanvasSelect extends React.Component {
     if (id === noOptionsOptionId) {
       this.setState({
         isShowingOptions: false,
-        announcement: this.props.translatedStrings.LIST_COLLAPSED
+        announcement: this.props.translatedStrings.LIST_COLLAPSED,
       })
     } else {
       const text = this.getOptionLabelById(id)
@@ -289,7 +291,7 @@ export default class CanvasSelect extends React.Component {
         selectedOptionId: id,
         inputValue: text,
         isShowingOptions: false,
-        announcement: formatMessage(this.props.translatedStrings.OPTION_SELECTED, {option: text})
+        announcement: formatMessage(this.props.translatedStrings.OPTION_SELECTED, {option: text}),
       })
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {

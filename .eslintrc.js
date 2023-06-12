@@ -91,6 +91,14 @@ module.exports = {
     'no-return-assign': 'off',
     'no-underscore-dangle': 'off',
     'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': [
+      'error',
+      {
+        functions: false,
+        classes: false,
+        variables: false,
+      },
+    ],
     'no-useless-escape': 'off',
     'one-var': 'off',
     'prefer-destructuring': 'off',
@@ -119,6 +127,7 @@ module.exports = {
     'react/no-render-return-value': 'warn', // In future versions of react this will fail
     'react/state-in-constructor': 'off',
     'react/static-property-placement': 'off',
+    'react/no-unknown-property': 'warn',
 
     // don't restrict Math.pow for ** operator
     // ref: https://github.com/airbnb/javascript/blob/1f786e154f6c32385607e1688370d7f2d053f88f/packages/eslint-config-airbnb-base/rules/best-practices.js#L225
@@ -192,7 +201,11 @@ module.exports = {
     'react/jsx-filename-extension': ['error', {extensions: ['.js', 'ts', 'tsx']}],
     'eslint-comments/no-unused-disable': 'error',
     'jest/no-disabled-tests': 'off',
-    'import/extensions': ['error', 'ignorePackages', {js: 'never', ts: 'never', tsx: 'never'}],
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {js: 'never', ts: 'never', tsx: 'never', coffee: 'never'},
+    ],
     'import/no-commonjs': 'off', // This is overridden where it counts
     'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
     'lodash/callback-binding': 'error',
@@ -234,7 +247,7 @@ module.exports = {
   settings: {
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'], // add Typescript extensions
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'], // add Typescript and CoffeeScript extensions
       },
     },
     react: {

@@ -159,44 +159,6 @@ QUnit.module('Gradebook#renderAssignmentSearchFilter)', {
   },
 })
 
-test('renders Assignment Names label', function () {
-  this.gradebook.renderAssignmentSearchFilter([])
-  const assignmentSearch = document.querySelector('#gradebook-assignment-search')
-  ok(assignmentSearch.textContent.includes('Assignment Names'))
-})
-
-test('enables the input if there is at least one assignment to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
-  this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  notOk(assignmentSearchInput.disabled)
-})
-
-test('disables the input if the grid has not yet rendered', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'pending')
-  this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  ok(assignmentSearchInput.disabled)
-})
-
-test('disables the input if there are no assignments to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
-  this.gradebook.renderAssignmentSearchFilter([])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  ok(assignmentSearchInput.disabled)
-})
-
-test('displays a select menu option for each assignment', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
-  const assignment = {id: '1', name: 'An assignment'}
-  this.gradebook.renderAssignmentSearchFilter([assignment])
-  const assignmentSearchInput = document.getElementById('assignments-filter')
-  assignmentSearchInput.click()
-  const options = [...document.querySelectorAll('ul[role="listbox"] li span[role="option"]')]
-  ok(options.some(option => option.textContent === assignment.name))
-  assignmentSearchInput.click() // close the menu to avoid DOM test pollution
-})
-
 QUnit.module('Gradebook#rowFilter', contextHooks => {
   let gradebook
   let student
@@ -217,19 +179,13 @@ QUnit.module('Gradebook#rowFilter', contextHooks => {
       gradebook = createGradebook()
     })
 
-    test('ignores the userFilterTerm', () => {
-      gradebook.userFilterTerm = 'charlie Xi'
-      gradebook.filteredStudentIds = ['2']
-      strictEqual(gradebook.rowFilter(student), false)
-    })
-
     test('returns true when filtered students include the student', () => {
-      gradebook.filteredStudentIds = ['1']
+      gradebook.searchFilteredStudentIds = ['1']
       strictEqual(gradebook.rowFilter(student), true)
     })
 
     test('returns false when filtered students do not include the student', () => {
-      gradebook.filteredStudentIds = ['2']
+      gradebook.searchFilteredStudentIds = ['2']
       strictEqual(gradebook.rowFilter(student), false)
     })
 
@@ -238,7 +194,7 @@ QUnit.module('Gradebook#rowFilter', contextHooks => {
     })
 
     test('returns true when not filtering students (originally filtered and then cleared filters)', () => {
-      gradebook.filteredStudentIds = []
+      gradebook.searchFilteredStudentIds = []
       strictEqual(gradebook.rowFilter(student), true)
     })
   })

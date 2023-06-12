@@ -27,7 +27,7 @@ describe "quizzes/quizzes/moderate" do
     course_with_teacher
     @students = Array.new(num_students) do |i|
       name = "#{(i + "a".ord).chr}_student"
-      course_with_student(name: name, course: @course)
+      course_with_student(name:, course: @course)
       @student
     end
     course_quiz

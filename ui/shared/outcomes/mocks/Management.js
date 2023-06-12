@@ -2528,17 +2528,23 @@ export const courseAlignmentMocks = ({
     title = 'Alignment 1',
     contentType = 'Assignment',
     assignmentContentType = 'assignment',
+    assignmentWorkflowState = 'published',
     moduleName = 'Module 1',
     moduleWorkflowState = 'active',
+    quizItems = [],
+    alignmentsCount = 1,
   } = {}) => ({
     _id: id,
     title,
     contentType,
     assignmentContentType,
+    assignmentWorkflowState,
     url: `/courses/${courseId}/outcomes/${outcomeId}/alignments/${id}`,
     moduleName,
     moduleUrl: `/courses/${courseId}/modules/1`,
     moduleWorkflowState,
+    quizItems,
+    alignmentsCount,
     __typename: 'Alignments',
   })
 

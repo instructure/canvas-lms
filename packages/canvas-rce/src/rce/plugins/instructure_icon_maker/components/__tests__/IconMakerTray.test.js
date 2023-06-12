@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {IconMakerTray} from '../IconMakerTray'
 import {useStoreProps} from '../../../shared/StoreContext'
-import FakeEditor from '../../../shared/__tests__/FakeEditor'
+import FakeEditor from '../../../../__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
 import bridge from '../../../../../bridge'
 import base64EncodedFont from '../../svg/font'
@@ -466,7 +466,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         <IconMakerTray
           onClose={jest.fn()}
           editor={ed}
-          rceConfig={{contextType: 'course', contextId: 2}}
           canvasOrigin="https://canvas.instructor.com"
         />
       )
@@ -502,10 +501,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           onClose={jest.fn()}
           editing={true}
           editor={ed}
-          rcsConfig={{
-            contextType: 'course',
-            contextId: 2,
-          }}
           canvasOrigin="https://canvas.instructure.com"
         />
       )

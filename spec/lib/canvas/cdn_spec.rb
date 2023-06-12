@@ -30,12 +30,12 @@ describe Canvas::Cdn do
   describe ".enabled?" do
     it "returns true when the cdn config has a bucket" do
       Canvas::Cdn.config.merge! enabled: true, bucket: "bucket_name"
-      expect(Canvas::Cdn.enabled?).to eq true
+      expect(Canvas::Cdn.enabled?).to be true
     end
 
     it "returns false when the cdn config does not have a bucket" do
       Canvas::Cdn.config.merge! enabled: true, bucket: nil
-      expect(Canvas::Cdn.enabled?).to eq false
+      expect(Canvas::Cdn.enabled?).to be false
     end
   end
 end

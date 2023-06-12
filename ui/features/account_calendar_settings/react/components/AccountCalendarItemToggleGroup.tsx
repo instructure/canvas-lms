@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,9 +22,12 @@ import React from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {IconMiniArrowEndSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {accountListTheme} from '../theme'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
-import {Account, VisibilityChange, Collection} from '../types'
+import {Account, VisibilityChange, Collection, SubscriptionChange} from '../types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -36,14 +40,17 @@ type ComponentProps = {
   readonly collections: Collection
   readonly handleToggle: (account: Account, expanded: boolean) => void
   readonly visibilityChanges: VisibilityChange[]
+  readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
+  readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
+  readonly autoSubscriptionEnabled: boolean
 }
 
 const accGroupSortCalback = (a, b, parentId) => {
-  if (a.id == parentId) {
+  if (a.id === parentId) {
     return -1
   }
-  if (b.id == parentId) {
+  if (b.id === parentId) {
     return 1
   }
   if (b.sub_account_count < a.sub_account_count) {
@@ -55,15 +62,18 @@ const accGroupSortCalback = (a, b, parentId) => {
   return 0
 }
 
-export const AccountCalendarItemToggleGroup: React.FC<ComponentProps> = ({
+export const AccountCalendarItemToggleGroup = ({
   parentId,
   accountGroup,
   defaultExpanded,
   collections,
   handleToggle,
   visibilityChanges,
+  subscriptionChanges,
   onAccountToggled,
-}) => {
+  onAccountSubscriptionToggled,
+  autoSubscriptionEnabled,
+}: ComponentProps) => {
   if (!accountGroup) return <Spinner renderTitle={I18n.t('Loading accounts')} size="x-small" />
 
   accountGroup = accountGroup
@@ -73,47 +83,53 @@ export const AccountCalendarItemToggleGroup: React.FC<ComponentProps> = ({
   return (
     <div className="account-group">
       {accountGroup.map(acc => {
-        if (!(acc.sub_account_count > 0 && parentId != acc.id)) {
+        if (!(acc.sub_account_count > 0 && parentId !== acc.id)) {
           return (
             <div key={`toggle-group-single-${acc.id}`}>
               <AccountCalendarItem
                 item={acc}
                 visibilityChanges={visibilityChanges}
+                subscriptionChanges={subscriptionChanges}
                 onAccountToggled={onAccountToggled}
                 padding="small"
+                showTopSeparator={true}
+                onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+                autoSubscriptionEnabled={autoSubscriptionEnabled}
               />
             </div>
           )
         }
 
         return (
-          <div key={`toggle-group-${acc.id}`}>
-            <ToggleGroup
-              border={false}
-              data-testid={`toggle-group-${acc.id}`}
-              summary={acc.heading}
-              toggleLabel={I18n.t('%{account_name}, %{number_of_children} accounts', {
-                account_name: acc.name,
-                number_of_children: acc.sub_account_count,
-              })}
-              iconExpanded={IconMiniArrowDownSolid}
-              icon={IconMiniArrowEndSolid}
-              onToggle={(ev, ex) => {
-                handleToggle(acc, ex)
-              }}
-              defaultExpanded={defaultExpanded}
-            >
-              <AccountCalendarItemToggleGroup
-                parentId={acc.id}
-                accountGroup={acc.children}
-                defaultExpanded={false}
-                collections={collections}
-                handleToggle={handleToggle}
-                visibilityChanges={visibilityChanges}
-                onAccountToggled={onAccountToggled}
-              />
-            </ToggleGroup>
-          </div>
+          <ApplyTheme theme={accountListTheme} key={`toggle-group-${acc.id}`}>
+            <View as="div" borderWidth={`${parentId !== null ? 'small' : '0'} 0 0 0`}>
+              <ToggleGroup
+                border={false}
+                data-testid={`toggle-group-${acc.id}`}
+                summary={acc.heading}
+                toggleLabel={acc.label}
+                iconExpanded={IconMiniArrowDownSolid}
+                icon={IconMiniArrowEndSolid}
+                onToggle={(ev, ex) => {
+                  handleToggle(acc, ex)
+                }}
+                defaultExpanded={defaultExpanded}
+              >
+                <AccountCalendarItemToggleGroup
+                  parentId={acc.id}
+                  accountGroup={acc.children}
+                  defaultExpanded={false}
+                  collections={collections}
+                  handleToggle={handleToggle}
+                  visibilityChanges={visibilityChanges}
+                  subscriptionChanges={subscriptionChanges}
+                  onAccountToggled={onAccountToggled}
+                  onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+                  autoSubscriptionEnabled={autoSubscriptionEnabled}
+                />
+              </ToggleGroup>
+            </View>
+          </ApplyTheme>
         )
       })}
     </div>

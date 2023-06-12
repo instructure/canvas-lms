@@ -34,7 +34,8 @@ describe "Course Account Reports" do
     @sub_account.sis_source_id = "sub1"
     @sub_account.save!
 
-    @term1 = EnrollmentTerm.create(name: "Fall", start_at: 6.months.ago,
+    @term1 = EnrollmentTerm.create(name: "Fall",
+                                   start_at: 6.months.ago,
                                    end_at: 1.year.from_now)
     @term1.root_account = @account
     @term1.sis_source_id = "fall12"
@@ -42,30 +43,38 @@ describe "Course Account Reports" do
 
     start_at = 1.day.ago
     end_at = 3.months.from_now
-    @course1 = Course.create(name: "English 101", course_code: "ENG101",
-                             start_at: start_at, conclude_at: end_at,
-                             account: @sub_account, enrollment_term: @term1)
+    @course1 = Course.create(name: "English 101",
+                             course_code: "ENG101",
+                             start_at:,
+                             conclude_at: end_at,
+                             account: @sub_account,
+                             enrollment_term: @term1)
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.restrict_enrollments_to_course_dates = true
     @course1.save!
 
-    @course2 = Course.create(name: "Math 101", course_code: "MAT101",
-                             conclude_at: end_at, account: @account)
+    @course2 = Course.create(name: "Math 101",
+                             course_code: "MAT101",
+                             conclude_at: end_at,
+                             account: @account)
     @course2.sis_source_id = "SIS_COURSE_ID_2"
     @course2.save!
     @course2.destroy
 
-    @course3 = Course.create(name: "Science 101", course_code: "SCI101",
+    @course3 = Course.create(name: "Science 101",
+                             course_code: "SCI101",
                              account: @account)
     @course3.workflow_state = "claimed"
     @course3.sis_source_id = "SIS_COURSE_ID_3"
     @course3.save!
 
-    @course4 = Course.create(name: "self help", course_code: "self",
+    @course4 = Course.create(name: "self help",
+                             course_code: "self",
                              account: @account)
     @course4.offer
 
-    @course5 = Course.create(name: "talking 101", course_code: "Tal101",
+    @course5 = Course.create(name: "talking 101",
+                             course_code: "Tal101",
                              account: @account)
     @course5.workflow_state = "completed"
     @course5.save!
@@ -81,27 +90,41 @@ describe "Course Account Reports" do
       parameters["enrollment_term_id"] = @default_term.id
       parsed = read_report(@report, { params: parameters })
 
-      expect(parsed).to eq [[@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                             "Science 101", nil, nil]]
+      expect(parsed).to eq [[@course3.id.to_s,
+                             "SIS_COURSE_ID_3",
+                             "SCI101",
+                             "Science 101",
+                             nil,
+                             nil]]
       expect(parsed.length).to eq 1
     end
 
     it "runs unpublished courses report on sub account" do
       parsed = read_report(@report, { account: @sub_account })
 
-      expect(parsed).to eq [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                             "English 101", @course1.start_at.iso8601,
+      expect(parsed).to eq [[@course1.id.to_s,
+                             "SIS_COURSE_ID_1",
+                             "ENG101",
+                             "English 101",
+                             @course1.start_at.iso8601,
                              @course1.conclude_at.iso8601]]
       expect(parsed.length).to eq 1
     end
 
     it "runs unpublished courses report" do
       parsed = read_report(@report, { order: 1 })
-      expect(parsed).to eq [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                             "English 101", @course1.start_at.iso8601,
+      expect(parsed).to eq [[@course1.id.to_s,
+                             "SIS_COURSE_ID_1",
+                             "ENG101",
+                             "English 101",
+                             @course1.start_at.iso8601,
                              @course1.conclude_at.iso8601],
-                            [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                             "Science 101", nil, nil]]
+                            [@course3.id.to_s,
+                             "SIS_COURSE_ID_3",
+                             "SCI101",
+                             "Science 101",
+                             nil,
+                             nil]]
       expect(parsed.length).to eq 2
     end
   end
@@ -117,8 +140,12 @@ describe "Course Account Reports" do
       parameters["enrollment_term_id"] = @default_term.id
       parsed = read_report(@report, { params: parameters })
 
-      expect(parsed[0]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
-                               "Math 101", nil, nil]
+      expect(parsed[0]).to eq [@course2.id.to_s,
+                               "SIS_COURSE_ID_2",
+                               "MAT101",
+                               "Math 101",
+                               nil,
+                               nil]
       expect(parsed.length).to eq 1
     end
 
@@ -126,8 +153,11 @@ describe "Course Account Reports" do
       @course1.destroy
       parsed = read_report(@report, { account: @sub_account })
 
-      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                               "English 101", @course1.start_at.iso8601,
+      expect(parsed[0]).to eq [@course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "ENG101",
+                               "English 101",
+                               @course1.start_at.iso8601,
                                @course1.conclude_at.iso8601]
       expect(parsed.length).to eq 1
     end
@@ -137,11 +167,18 @@ describe "Course Account Reports" do
       parsed = read_report(@report, { order: 1 })
       expect(parsed.length).to eq 2
 
-      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                               "English 101", @course1.start_at.iso8601,
+      expect(parsed[0]).to eq [@course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "ENG101",
+                               "English 101",
+                               @course1.start_at.iso8601,
                                @course1.conclude_at.iso8601]
-      expect(parsed[1]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
-                               "Math 101", nil, nil]
+      expect(parsed[1]).to eq [@course2.id.to_s,
+                               "SIS_COURSE_ID_2",
+                               "MAT101",
+                               "Math 101",
+                               nil,
+                               nil]
     end
   end
 
@@ -149,7 +186,8 @@ describe "Course Account Reports" do
     before(:once) do
       @type = "unused_courses_csv"
 
-      @course6 = Course.create(name: "Theology 101", course_code: "THE01",
+      @course6 = Course.create(name: "Theology 101",
+                               course_code: "THE01",
                                account: @account)
 
       @assignment = @course1.assignments.create(title: "some assignment",
@@ -167,14 +205,23 @@ describe "Course Account Reports" do
       parsed = read_report(@type, { order: 3 })
       expect(parsed.length).to eq 3
 
-      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                               "English 101", "unpublished",
+      expect(parsed[0]).to eq [@course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "ENG101",
+                               "English 101",
+                               "unpublished",
                                @course1.created_at.iso8601]
-      expect(parsed[1]).to eq [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                               "Science 101", "unpublished",
+      expect(parsed[1]).to eq [@course3.id.to_s,
+                               "SIS_COURSE_ID_3",
+                               "SCI101",
+                               "Science 101",
+                               "unpublished",
                                @course3.created_at.iso8601]
-      expect(parsed[2]).to eq [@course6.id.to_s, nil, "THE01",
-                               "Theology 101", "unpublished",
+      expect(parsed[2]).to eq [@course6.id.to_s,
+                               nil,
+                               "THE01",
+                               "Theology 101",
+                               "unpublished",
                                @course6.created_at.iso8601]
     end
 
@@ -206,8 +253,11 @@ describe "Course Account Reports" do
       parsed = read_report(@type, { params: parameters })
       expect(parsed.length).to eq 1
 
-      expect(parsed[0]).to eq [@course6.id.to_s, nil, "THE01",
-                               "Theology 101", "unpublished",
+      expect(parsed[0]).to eq [@course6.id.to_s,
+                               nil,
+                               "THE01",
+                               "Theology 101",
+                               "unpublished",
                                @course6.created_at.iso8601]
     end
 
@@ -222,8 +272,11 @@ describe "Course Account Reports" do
       parsed = read_report(@type, { account: sub_account })
       expect(parsed.length).to eq 1
 
-      expect(parsed[0]).to eq [@course4.id.to_s, nil, "self",
-                               "self help", "active",
+      expect(parsed[0]).to eq [@course4.id.to_s,
+                               nil,
+                               "self",
+                               "self help",
+                               "active",
                                @course4.created_at.iso8601]
     end
   end
@@ -255,25 +308,57 @@ describe "Course Account Reports" do
       headers = parsed.shift
       expect(headers.length).to eq parsed[0].length
       expect(parsed).to match_array [
-        [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-         "English 101", @sub_account.id.to_s, "sub1",
-         "Math", "1.23", "81.23"],
-        [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-         "Science 101", @account.id.to_s, nil,
-         @account.name, "0.0", "0.0"],
-        [@course5.id.to_s, nil, "Tal101", "talking 101",
-         @account.id.to_s, nil, @account.name, "92.0", "92.0"],
-        [@course4.id.to_s, nil, "self", "self help",
-         @account.id.to_s, nil, @account.name, "4.65", "4.65"]
+        [@course1.id.to_s,
+         "SIS_COURSE_ID_1",
+         "ENG101",
+         "English 101",
+         @sub_account.id.to_s,
+         "sub1",
+         "Math",
+         "1.23",
+         "81.23"],
+        [@course3.id.to_s,
+         "SIS_COURSE_ID_3",
+         "SCI101",
+         "Science 101",
+         @account.id.to_s,
+         nil,
+         @account.name,
+         "0.0",
+         "0.0"],
+        [@course5.id.to_s,
+         nil,
+         "Tal101",
+         "talking 101",
+         @account.id.to_s,
+         nil,
+         @account.name,
+         "92.0",
+         "92.0"],
+        [@course4.id.to_s,
+         nil,
+         "self",
+         "self help",
+         @account.id.to_s,
+         nil,
+         @account.name,
+         "4.65",
+         "4.65"]
       ]
     end
 
     it "adds up storage for courses in sub account" do
       parsed = read_report(@report, { account: @sub_account })
       expect(parsed.length).to eq 1
-      expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                               "English 101", @sub_account.id.to_s, "sub1",
-                               "Math", "1.23", "81.23"]
+      expect(parsed[0]).to eq [@course1.id.to_s,
+                               "SIS_COURSE_ID_1",
+                               "ENG101",
+                               "English 101",
+                               @sub_account.id.to_s,
+                               "sub1",
+                               "Math",
+                               "1.23",
+                               "81.23"]
     end
   end
 end

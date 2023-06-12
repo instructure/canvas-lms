@@ -67,7 +67,7 @@ describe Mutations::MoveOutcomeLinks do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   it "moves the outcome links" do
@@ -95,7 +95,7 @@ describe Mutations::MoveOutcomeLinks do
         current_user: @teacher
       }
     )
-    moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").map { |link| link["_id"] }
+    moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").pluck("_id")
     expect(moved_links).to eql([@outcome_link.id.to_s])
     expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
                                                                                 { "attribute" => @outcome_other_context_link.id.to_s, "message" => "Could not find associated outcome in this context" }

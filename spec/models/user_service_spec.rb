@@ -24,9 +24,9 @@ describe UserService do
   end
 
   it "has a useful workflow" do
-    expect(@user_service.state).to eql(:active)
+    expect(@user_service.state).to be(:active)
     @user_service.failed_request
-    expect(@user_service.state).to eql(:failed)
+    expect(@user_service.state).to be(:failed)
   end
 
   it "has a named scope for type" do
@@ -73,21 +73,6 @@ describe UserService do
       expect(@registration.type).to eql("DocumentService")
     end
 
-    it "is able to register a delicious service" do
-      params = {}
-      params[:service] = "delicious"
-      params[:user_name] = "some username"
-      params[:password] = "password"
-
-      us = UserService.register_from_params(user_model, params)
-
-      expect(us.service_domain).to eql("delicious.com")
-      expect(us.protocol).to eql("http-auth")
-      expect(us.service_user_id).to eql("some username")
-      expect(us.service_user_name).to eql("some username")
-      expect(us.decrypted_password).to eql("password")
-    end
-
     it "is able to register a diigo service" do
       params = {}
       params[:service] = "diigo"
@@ -108,7 +93,7 @@ describe UserService do
       @shard1.activate { user.save! }
       @shard2.activate do
         @registration = UserService.register(
-          user: user,
+          user:,
           token: "some token",
           secret: "some secret",
           service_user_id: user.id,
@@ -146,10 +131,6 @@ describe UserService do
       expect(UserService.service_type("diigo")).to eql("BookmarkService")
     end
 
-    it "knows that delicious means BookmarkService" do
-      expect(UserService.service_type("delicious")).to eql("BookmarkService")
-    end
-
     it "uses other things as a generic UserService" do
       expect(UserService.service_type("anything else")).to eql("UserService")
     end
@@ -167,12 +148,12 @@ describe UserService do
 
   describe "valid?" do
     it "validates character length maximum (255) for user input fields" do
-      lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod \
-      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud \
-      exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure \
+      lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+      exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
       dolor in reprehenderit."
       params = {}
-      params[:service] = "delicious"
+      params[:service] = "diigo"
       params[:user_name] = lorem_ipsum
       params[:password] = "password"
       expect { UserService.register_from_params(user_model, params) }

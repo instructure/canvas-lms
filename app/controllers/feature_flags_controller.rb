@@ -154,8 +154,9 @@ class FeatureFlagsController < ApplicationController
 
       flags = features.filter_map do |fd|
         @context.lookup_feature_flag(fd.feature,
-                                     override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
-                                     skip_cache: skip_cache,
+                                     override_hidden: can_read_site_admin?,
+                                     include_shadowed: can_read_site_admin?,
+                                     skip_cache:,
                                      # Hide flags that are forced ON at a higher level
                                      # Undocumented flag for frontend use only
                                      hide_inherited_enabled: params[:hide_inherited_enabled])
@@ -227,7 +228,8 @@ class FeatureFlagsController < ApplicationController
       raise ActiveRecord::RecordNotFound unless Feature.definitions.key?(feature.to_s)
 
       flag = @context.lookup_feature_flag(feature,
-                                          override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
+                                          override_hidden: can_read_site_admin?,
+                                          include_shadowed: can_read_site_admin?,
                                           skip_cache: @context.grants_right?(@current_user, session, :manage_feature_flags))
       raise ActiveRecord::RecordNotFound unless flag
 
@@ -330,6 +332,10 @@ class FeatureFlagsController < ApplicationController
   end
 
   private
+
+  def can_read_site_admin?
+    @can_read_site_admin ||= Account.site_admin.grants_right?(@current_user, session, :read)
+  end
 
   def create_or_update_feature_flag(attributes, current_flag = nil)
     FeatureFlag.unique_constraint_retry do

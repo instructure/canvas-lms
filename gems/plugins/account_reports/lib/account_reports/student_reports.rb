@@ -123,7 +123,8 @@ module AccountReports
       end
 
       add_extra_text(I18n.t("account_reports.student.enrollment_states",
-                            "Enrollment States: %{states};", states: enrollment_states_string))
+                            "Enrollment States: %{states};",
+                            states: enrollment_states_string))
 
       headers = []
       headers << I18n.t("#account_reports.report_header_user_id", "user id")
@@ -192,7 +193,8 @@ module AccountReports
               other_ens.last_activity_at IS NOT NULL
               AND other_ens.last_activity_at > ?
             )
-        )}, start_at)
+        )},
+                          start_at)
       else
         data = data.where(enrollments: { last_activity_at: nil })
         data = data.where(%{NOT EXISTS (
@@ -353,7 +355,7 @@ module AccountReports
           row << (token[:permanent_expires_at] ? default_timezone_format(token[:permanent_expires_at]) : "never")
           row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : "never")
           row << token[:developer_key_id]
-          row << dev_key.name
+          row << dev_key&.name
           csv << row
         end
       end
@@ -361,7 +363,9 @@ module AccountReports
 
     def developer_key(dev_key_id)
       @dev_keys ||= {}
-      @dev_keys[dev_key_id] ||= DeveloperKey.find(dev_key_id)
+      return @dev_keys[dev_key_id] if @dev_keys.include?(dev_key_id)
+
+      @dev_keys[dev_key_id] = DeveloperKey.find_by(id: dev_key_id)
     end
   end
 end

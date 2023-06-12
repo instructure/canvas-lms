@@ -51,7 +51,8 @@ describe IncomingMailProcessor::Instrumentation do
     it "pushes to statsd for one mailbox" do
       IncomingMailProcessor::IncomingMessageProcessor.configure(single_config)
 
-      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake", 4,
+      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake",
+                                                         4,
                                                          { short_stat: "incoming_mail_processor.mailbox_queue_size",
                                                            tags: { identifier: "fake@fake_fake" } })
 
@@ -61,13 +62,16 @@ describe IncomingMailProcessor::Instrumentation do
     it "pushes to statsd for multiple mailboxes" do
       IncomingMailProcessor::IncomingMessageProcessor.configure(multi_config)
 
-      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake", 4,
+      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake",
+                                                         4,
                                                          { short_stat: "incoming_mail_processor.mailbox_queue_size",
                                                            tags: { identifier: "user1@fake_fake" } })
-      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user3@fake_fake", 0,
+      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user3@fake_fake",
+                                                         0,
                                                          { short_stat: "incoming_mail_processor.mailbox_queue_size",
                                                            tags: { identifier: "user3@fake_fake" } })
-      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user4@fake_fake", 50,
+      expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user4@fake_fake",
+                                                         50,
                                                          { short_stat: "incoming_mail_processor.mailbox_queue_size",
                                                            tags: { identifier: "user4@fake_fake" } })
 

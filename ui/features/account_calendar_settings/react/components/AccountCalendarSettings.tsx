@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -16,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useLayoutEffect, useRef, useState} from 'react'
+import React, {useLayoutEffect, useRef, useState, useEffect} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -32,7 +33,7 @@ import {AccountList} from './AccountList'
 import {AccountTree} from './AccountTree'
 import {FilterControls, FilterType} from './FilterControls'
 import {Footer} from './Footer'
-import {VisibilityChange} from '../types'
+import {VisibilityChange, SubscriptionChange} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings')
 
@@ -43,8 +44,32 @@ type ComponentProps = {
 const BORDER_WIDTH = 'small'
 const BOTTOM_PADDING_OFFSET = 30
 
-export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) => {
+const useBeforeUnload = (hasChanges: boolean) => {
+  const dirty = useRef(false)
+
+  useEffect(() => {
+    dirty.current = hasChanges
+  }, [hasChanges])
+
+  useEffect(() => {
+    const onUnload = (e: BeforeUnloadEvent) => {
+      if (dirty.current) {
+        e.preventDefault()
+        e.returnValue = true
+      }
+    }
+
+    window.addEventListener('beforeunload', onUnload)
+
+    return () => window.removeEventListener('beforeunload', onUnload)
+  }, [])
+}
+
+export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
+  const autoSubscriptionEnabled = window.ENV?.FEATURES?.auto_subscribe_account_calendars ?? false
   const [visibilityChanges, setVisibilityChanges] = useState<VisibilityChange[]>([])
+  const [subscriptionChanges, setSubscriptionChanges] = useState<SubscriptionChange[]>([])
+  const [showConfirmation, setShowConfirmation] = useState(false)
   const [isSaving, setSaving] = useState(false)
   const [searchValue, setSearchValue] = useState('')
   const [filterValue, setFilterValue] = useState(FilterType.SHOW_ALL)
@@ -71,6 +96,12 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
     }
   }, [accountTreeRef, footerRef, windowHeight])
 
+  useEffect(() => {
+    const askConfirmation =
+      autoSubscriptionEnabled && subscriptionChanges.some(change => change.auto_subscribe)
+    setShowConfirmation(askConfirmation)
+  }, [autoSubscriptionEnabled, subscriptionChanges])
+
   const onAccountToggled = (id: number, visible: boolean) => {
     const existingChange = visibilityChanges.find(change => change.id === id)
     if (existingChange) {
@@ -80,17 +111,45 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
     } else {
       setVisibilityChanges([...visibilityChanges, {id, visible}])
     }
+    if (visible === false) {
+      setSubscriptionChanges(subscriptionChanges.filter(change => change.id !== id))
+    }
+  }
+
+  const onAccountSubscriptionToggled = (id: number, autoSubscription: boolean) => {
+    const existingChange = subscriptionChanges.find(change => change.id === id)
+    if (existingChange) {
+      if (existingChange.auto_subscribe !== autoSubscription) {
+        setSubscriptionChanges(subscriptionChanges.filter(change => change.id !== id))
+      }
+    } else {
+      setSubscriptionChanges([...subscriptionChanges, {id, auto_subscribe: autoSubscription}])
+    }
   }
 
   const onApplyClicked = () => {
+    const accountCalendarChanges = [
+      ...visibilityChanges
+        .concat(subscriptionChanges)
+        .reduce(
+          (changes, currentChange) =>
+            changes.set(
+              currentChange.id,
+              Object.assign(changes.get(currentChange.id) || {}, currentChange)
+            ),
+          new Map()
+        )
+        .values(),
+    ]
     setSaving(true)
     doFetchApi({
       path: `/api/v1/accounts/${accountId}/account_calendars`,
       method: 'PUT',
-      body: visibilityChanges,
+      body: accountCalendarChanges,
     })
       .then(({json}) => {
         setVisibilityChanges([])
+        setSubscriptionChanges([])
         showFlashSuccess(json?.message)()
       })
       .catch(err => {
@@ -100,6 +159,10 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
         setSaving(false)
       })
   }
+
+  const hasChanges = visibilityChanges.length + subscriptionChanges.length > 0
+
+  useBeforeUnload(hasChanges)
 
   const showTree = searchValue === '' && filterValue === FilterType.SHOW_ALL
 
@@ -135,7 +198,10 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
               <AccountTree
                 originAccountId={accountId}
                 visibilityChanges={visibilityChanges}
+                subscriptionChanges={subscriptionChanges}
                 onAccountToggled={onAccountToggled}
+                onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+                autoSubscriptionEnabled={autoSubscriptionEnabled}
               />
             </div>
             <div style={{display: showTree ? 'none' : 'block'}}>
@@ -144,7 +210,10 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
                 searchValue={searchValue}
                 filterValue={filterValue}
                 visibilityChanges={visibilityChanges}
+                subscriptionChanges={subscriptionChanges}
                 onAccountToggled={onAccountToggled}
+                onAccountSubscriptionToggled={onAccountSubscriptionToggled}
+                autoSubscriptionEnabled={autoSubscriptionEnabled}
               />
             </div>
           </div>
@@ -165,7 +234,8 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
             originAccountId={accountId}
             visibilityChanges={visibilityChanges}
             onApplyClicked={onApplyClicked}
-            enableSaveButton={visibilityChanges.length > 0}
+            enableSaveButton={hasChanges}
+            showConfirmation={showConfirmation}
           />
         )}
       </View>

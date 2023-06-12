@@ -31,9 +31,12 @@ class Quizzes::QuizStatisticsService
   #   An object ready for API serialization containing (persisted) versions of
   #   the *latest* Student and Item analysis for the quiz.
   def generate_aggregate_statistics(all_versions, includes_sis_ids = true, options = {})
-    Quizzes::QuizStatisticsSerializer::Input.new(quiz, options, quiz.current_statistics_for("student_analysis", {
-                                                                                              includes_all_versions: all_versions,
-                                                                                              includes_sis_ids: includes_sis_ids
-                                                                                            }), quiz.current_statistics_for("item_analysis"))
+    Quizzes::QuizStatisticsSerializer::Input.new(quiz,
+                                                 options,
+                                                 quiz.current_statistics_for("student_analysis", {
+                                                                               includes_all_versions: all_versions,
+                                                                               includes_sis_ids:
+                                                                             }),
+                                                 quiz.current_statistics_for("item_analysis"))
   end
 end

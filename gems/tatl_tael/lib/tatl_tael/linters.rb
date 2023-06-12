@@ -67,8 +67,8 @@ module TatlTael
         @comments ||= linters.map do |linter_class|
           linter_class.new(
             config: config_for_linter(linter_class),
-            changes: changes,
-            auto_correct: auto_correct
+            changes:,
+            auto_correct:
           ).run
         end.flatten.compact
       end
@@ -100,4 +100,4 @@ module TatlTael
   end
 end
 
-Dir[File.dirname(__FILE__) + "/linters/**/*_linter.rb"].sort.each { |file| require file }
+Dir[File.dirname(__FILE__) + "/linters/**/*_linter.rb"].each { |file| require file }

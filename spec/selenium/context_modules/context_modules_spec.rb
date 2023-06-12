@@ -35,6 +35,45 @@ describe "context modules" do
       course_with_teacher_logged_in(course: @course, active_enrollment: true)
     end
 
+    context "when Restrict Quantitative Data is enabled" do
+      before do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+      end
+
+      it "hides points possible for student", priority: "1" do
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+        course_with_student_logged_in(course: @course, active_enrollment: true)
+        a = @course.assignments.create!(title: "some assignment", points_possible: 10)
+        @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: "Graded Published Discussion")
+        @pub_graded_discussion.save!
+        @mod.add_item(type: "discussion_topic", id: @pub_graded_discussion.id)
+        go_to_modules
+        verify_module_title("Graded Published Discussion")
+        expect(f("body")).not_to contain_jqcss(".points_possible_display")
+      end
+
+      it "does not hide points possible for teacher", priority: "1" do
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+        a = @course.assignments.create!(title: "some assignment", points_possible: 10)
+        @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: "Graded Published Discussion")
+        @pub_graded_discussion.save!
+        @mod.add_item(type: "discussion_topic", id: @pub_graded_discussion.id)
+        go_to_modules
+        verify_module_title("Graded Published Discussion")
+        expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
+        expect(f(".points_possible_display")).to include_text "10 pts"
+      end
+    end
+
     it "adds an unpublished page to a module", priority: "1" do
       @unpub_page = @course.wiki_pages.create!(title: "Unpublished Page")
       @unpub_page.workflow_state = "unpublished"
@@ -61,14 +100,18 @@ describe "context modules" do
       go_to_modules
       verify_module_title("Unpublished Quiz")
       expect(f("span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish")).to be_displayed
+      expect(f(".speed-grader-link-container").attribute("class")).to include("hidden")
     end
 
     it "adds a published quiz to a module", priority: "1" do
       @pub_quiz = Quizzes::Quiz.create!(context: @course, title: "Published Quiz")
+      @pub_quiz.workflow_state = "published"
+      @pub_quiz.save!
       @mod.add_item(type: "quiz", id: @pub_quiz.id)
       go_to_modules
       verify_module_title("Published Quiz")
       expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
+      expect(f(".speed-grader-link-container")).to be_present
     end
 
     it "shows due date on a quiz in a module", priority: "2" do
@@ -86,6 +129,7 @@ describe "context modules" do
       go_to_modules
       verify_module_title("Unpublished Assignment")
       expect(f("span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish")).to be_displayed
+      expect(f(".speed-grader-link-container").attribute("class")).to include("hidden")
     end
 
     it "adds a published assignment to a module", priority: "1" do
@@ -94,6 +138,7 @@ describe "context modules" do
       go_to_modules
       verify_module_title("Published Assignment")
       expect(f("span.publish-icon.published.publish-icon-published")).to be_displayed
+      expect(f(".speed-grader-link-container")).to be_present
     end
 
     it "adds an non-graded unpublished discussion to a module", priority: "1" do
@@ -153,7 +198,7 @@ describe "context modules" do
 
     it "shows the due date on an graded discussion in a module", priority: "2" do
       due_at = 3.days.from_now
-      @assignment = @course.assignments.create!(name: "assignemnt", due_at: due_at)
+      @assignment = @course.assignments.create!(name: "assignemnt", due_at:)
       @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
       @mod.add_item(type: "discussion_topic", id: @discussion.id)
       go_to_modules
@@ -162,7 +207,7 @@ describe "context modules" do
 
     it "shows the todo date on an ungraded discussion in a module", priority: "1" do
       todo_date = 1.day.from_now
-      @pub_ungraded_discussion = @course.discussion_topics.create!(title: "Non-graded Published Discussion", todo_date: todo_date)
+      @pub_ungraded_discussion = @course.discussion_topics.create!(title: "Non-graded Published Discussion", todo_date:)
       @mod.add_item(type: "discussion_topic", id: @pub_ungraded_discussion.id)
       go_to_modules
       verify_module_title("Non-graded Published Discussion")
@@ -336,7 +381,7 @@ describe "context modules" do
         wait_for_ajaximations
 
         # non-empty module should not have a DnD area
-        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be_nil
       end
 
       it "adds multiple file items to a module" do
@@ -346,7 +391,7 @@ describe "context modules" do
         file_names.each { |item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed }
       end
 
-      it "uploads mutiple files to add items to a module" do
+      it "uploads multiple files to add items to a module" do
         get "/courses/#{@course.id}/modules"
 
         filename, fullpath, _data = get_file("testfile1.txt")
@@ -519,7 +564,7 @@ describe "context modules" do
         wait_for_ajaximations
 
         # non-empty module should not have a DnD area
-        expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
+        expect(find_with_jquery('.module_dnd input[type="file"]')).to be_nil
       end
 
       it "creating a new module should display a drag and drop area" do

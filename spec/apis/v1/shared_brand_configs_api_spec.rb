@@ -102,9 +102,14 @@ describe SharedBrandConfigsController, type: :request do
 
     it "returns invalid for a bad md5" do
       account_admin_user
-      api_call(:put, url, api_args_for_update, {
+      api_call(:put,
+               url,
+               api_args_for_update,
+               {
                  shared_brand_config: { brand_config_md5: "abc" }
-               }, {}, expected_status: 422)
+               },
+               {},
+               expected_status: 422)
     end
   end
 

@@ -100,7 +100,7 @@ describe "calendar2" do
         load_week_view
 
         elts = ffj(".fc-event:visible")
-        expect(elts.size).to eql(2)
+        expect(elts.size).to be(2)
 
         elt_lefts = elts.map { |elt| elt.location.x }.uniq
         expect(elt_lefts.size).to eql(elts.size)
@@ -208,7 +208,7 @@ describe "calendar2" do
       location_address = "cottonwood"
 
       # Make it an all day event so it will be visible on the screen/on top
-      make_event(location_name: location_name, all_day: true, location_address: location_address)
+      make_event(location_name:, all_day: true, location_address:)
       load_week_view
 
       # Click calendar item to bring up event summary
@@ -274,7 +274,7 @@ describe "calendar2" do
       wait_for_ajaximations
 
       # Verify object event is now all-day
-      expect(event2.reload.all_day).to eql(true)
+      expect(event2.reload.all_day).to be(true)
       expect(event2.start_at).to eql(midnight)
     end
 

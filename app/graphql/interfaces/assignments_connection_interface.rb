@@ -17,7 +17,7 @@ module Interfaces::AssignmentsConnectionInterface
     if grading_period_id
       assignments
         .joins(:submissions)
-        .where(submissions: { grading_period_id: grading_period_id })
+        .where(submissions: { grading_period_id: })
         .distinct
     elsif has_grading_periods
       # this is the case where a grading_period_id was not passed *and*
@@ -28,7 +28,8 @@ module Interfaces::AssignmentsConnectionInterface
     end
   end
 
-  field :assignments_connection, ::Types::AssignmentType.connection_type,
+  field :assignments_connection,
+        ::Types::AssignmentType.connection_type,
         <<~MD,
           returns a list of assignments.
 

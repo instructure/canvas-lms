@@ -33,8 +33,8 @@ module Stats
       enumerable.each { |item| self << item }
     end
 
-    def each(&block)
-      @items.each(&block)
+    def each(&)
+      @items.each(&)
     end
 
     def <<(item)
@@ -142,7 +142,7 @@ module Stats
       # need floats for the math to work
       bin_width = Float(bin_width)
       bin_base = Float(bin_base)
-      ret_val = { bin_width: bin_width, bin_base: bin_base }
+      ret_val = { bin_width:, bin_base: }
       bins = {}
       @items.each do |i|
         bin = (((i - bin_base) / bin_width).floor * bin_width) + bin_base

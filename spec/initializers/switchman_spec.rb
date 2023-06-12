@@ -65,7 +65,7 @@ describe Switchman::Shard do
     it "Returns an empty window if no start is defined" do
       allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return(nil)
 
-      expect(DatabaseServer.all.first.next_maintenance_window).to be(nil)
+      expect(DatabaseServer.all.first.next_maintenance_window).to be_nil
     end
 
     it "Returns a window of the correct duration" do
@@ -102,12 +102,12 @@ describe Switchman::Shard do
 
     context "with a positive timezone" do
       before do
-        @old_zone = ::Time.zone
-        ::Time.zone = ActiveSupport::TimeZone["Melbourne"]
+        @old_zone = Time.zone
+        Time.zone = ActiveSupport::TimeZone["Melbourne"]
       end
 
       after do
-        ::Time.zone = @old_zone
+        Time.zone = @old_zone
       end
 
       it "Returns a window on the correct day" do

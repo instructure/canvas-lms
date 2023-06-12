@@ -42,8 +42,8 @@ class UserMerge
     # we also store records for the from_user on the target shard for a split
     from_user.associate_with_shard(target_user.shard, :shadow)
     target_user.shard.activate do
-      @merge_data = UserMergeData.create!(user: target_user, from_user: from_user, workflow_state: "merging")
-      @merge_data.items.create!(user: target_user, item_type: "logs", item: { merger_id: merger.id, source: source }.to_s) if merger || source
+      @merge_data = UserMergeData.create!(user: target_user, from_user:, workflow_state: "merging")
+      @merge_data.items.create!(user: target_user, item_type: "logs", item: { merger_id: merger.id, source: }.to_s) if merger || source
 
       items = []
       if target_user.avatar_state == :none && from_user.avatar_state != :none
@@ -136,10 +136,20 @@ class UserMerge
       Attachment.delay.migrate_attachments(from_user, target_user)
 
       updates = {}
-      %w[access_tokens asset_user_accesses calendar_events collaborations
-         context_module_progressions group_memberships ignores
-         page_comments Polling::Poll rubric_assessments user_services
-         web_conference_participants web_conferences wiki_pages].each do |key|
+      %w[access_tokens
+         asset_user_accesses
+         calendar_events
+         collaborations
+         context_module_progressions
+         group_memberships
+         ignores
+         page_comments
+         Polling::Poll
+         rubric_assessments
+         user_services
+         web_conference_participants
+         web_conferences
+         wiki_pages].each do |key|
         updates[key] = "user_id"
       end
       updates["submission_comments"] = "author_id"
@@ -247,7 +257,7 @@ class UserMerge
       if (existing_record = target_values[[key, sub_key]])
         existing_record_updates[existing_record] = value
       else
-        new_record_hashes << { user_id: target_user.id, key: key, sub_key: sub_key&.to_json, value: value.to_yaml }
+        new_record_hashes << { user_id: target_user.id, key:, sub_key: sub_key&.to_json, value: value.to_yaml }
       end
     end
     target_user.shard.activate do
@@ -266,40 +276,53 @@ class UserMerge
     # they are unlikely to have done so if they have no enrollments or account users
     return false if target_user.has_enrollment? || target_user.account_membership?
 
+    # the source user already has past LTI IDs that would be orphaned if we did this
+    return false if from_user.past_lti_ids.shard(from_user.associated_shards).exists?
+
     true
   end
 
   def move_lti_ids
-    lti_context_id = from_user.lti_context_id
-    lti_id = from_user.lti_id
-    uuid = from_user.uuid
+    # retrieve the ids from the old user and nil them out
+    from_lti_context_id = from_user.lti_context_id
+    from_lti_id = from_user.lti_id
+    from_uuid = from_user.uuid
 
-    # null out the relevant ids for from_user (this will cause new values to be generated for 2 of the 3,
-    # which is fine; this user is about to be deleted)
-    from_user.update(lti_context_id: nil, lti_id: nil, uuid: nil)
+    from_user.override_lti_id_lock = true
+    from_user.lti_context_id = nil
+    from_user.lti_id = nil
+    from_user.uuid = nil
 
-    # now update shadow records. we can't wait for the UserSync job due to the unique constraint on lti_context_id,
-    # so update shadow records manually
-    now = from_user.updated_at
-    dummy_uuid = from_user.uuid
-    dummy_lti_id = from_user.lti_id
-    Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
-      User.where(lti_context_id: lti_context_id).update_all(lti_context_id: nil, uuid: dummy_uuid, lti_id: dummy_lti_id, updated_at: now)
+    # get the old ids from the target user and replace them with the source user's
+    target_lti_id = target_user.lti_id
+    target_uuid = target_user.uuid
+
+    target_user.override_lti_id_lock = true
+    target_user.lti_context_id = from_lti_context_id
+    target_user.lti_id = from_lti_id
+    target_user.uuid = from_uuid
+
+    # perform the move in the DB, updating shadow records synchronously so the target user
+    # doesn't trip over the unique constraint. retry once in case of odd timing issues
+    User.unique_constraint_retry do
+      from_user.lti_context_id_will_change!
+      from_user.update_shadow_records_synchronously!
+      from_user.save!
+
+      target_user.save!
     end
 
     if merge_data
-      # store target user's existing lti_id and uuid in MergeData so we can restore them in a split
+      # finally, store target user's existing lti_id and uuid in MergeData so we can restore them in a split
       # (the target lti_context_is is nil or we wouldn't be here, but the lti_id is populated on create, not on demand)
-      merge_data.items.create!(user: target_user, item_type: "lti_id", item: target_user.lti_id)
-      merge_data.items.create!(user: target_user, item_type: "uuid", item: target_user.uuid)
+      merge_data.items.create!(user: target_user, item_type: "lti_id", item: target_lti_id)
+      merge_data.items.create!(user: target_user, item_type: "uuid", item: target_uuid)
     end
-
-    # finally, move the source user LTI IDs to the target user
-    target_user.lti_context_id = lti_context_id
-    target_user.override_lti_id_lock = true
-    target_user.lti_id = lti_id
-    target_user.uuid = uuid
-    target_user.save!
+  rescue ActiveRecord::RecordNotUnique
+    # if we fail to move lti ids after a retry, put the source user's ids back and fall back on the old behavior
+    from_user.update! lti_context_id: from_lti_context_id, lti_id: from_lti_id, uuid: from_uuid
+    InstStatsd::Statsd.increment("user_merge.move_lti_ids.unique_constraint_failure")
+    populate_past_lti_ids
   end
 
   # used by SplitUsers to undo this operation from merge
@@ -358,7 +381,7 @@ class UserMerge
         User.clone_communication_channel(cc, target_user, max_position)
         new_cc = target_user.communication_channels.where.not(id: known_ccs).take
         known_ccs << new_cc.id
-        merge_data.build_more_data([new_cc], user: target_user, workflow_state: "non_existent", data: data)
+        merge_data.build_more_data([new_cc], user: target_user, workflow_state: "non_existent", data:)
       end
 
       next unless target_cc
@@ -384,13 +407,13 @@ class UserMerge
     if from_user.shard == target_user.shard
       from_user.shard.activate do
         ccs = CommunicationChannel.where(id: to_retire_ids).where.not(workflow_state: "retired")
-        merge_data.build_more_data(ccs, data: data) unless to_retire_ids.empty?
+        merge_data.build_more_data(ccs, data:) unless to_retire_ids.empty?
         ccs.update_all(workflow_state: "retired") unless to_retire_ids.empty?
       end
       scope = from_user.communication_channels.where.not(workflow_state: "retired")
       scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
       unless scope.empty?
-        merge_data.build_more_data(scope, data: data)
+        merge_data.build_more_data(scope, data:)
         scope.touch_all
         scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'", target_user, max_position, target_user.root_account_ids])
       end
@@ -403,7 +426,7 @@ class UserMerge
 
   def handle_cross_shard_cc
     ccs = from_user.communication_channels.where.not(workflow_state: "retired")
-    merge_data.build_more_data(ccs, data: data) unless ccs.empty?
+    merge_data.build_more_data(ccs, data:) unless ccs.empty?
     ccs.update_all(workflow_state: "retired") unless ccs.empty?
 
     from_user.user_services.each do |us|
@@ -411,9 +434,9 @@ class UserMerge
       new_us.shard = target_user.shard
       new_us.user = target_user
       new_us.save!
-      merge_data.build_more_data([new_us], user: target_user, workflow_state: "non_existent", data: data)
+      merge_data.build_more_data([new_us], user: target_user, workflow_state: "non_existent", data:)
     end
-    merge_data.build_more_data(from_user.user_services, data: data)
+    merge_data.build_more_data(from_user.user_services, data:)
     from_user.user_services.delete_all
   end
 
@@ -445,9 +468,9 @@ class UserMerge
       target_cc.destroy_permanently!
       if from_user.shard != target_user.shard
         User.clone_communication_channel(source_cc, target_user, max_position)
+      # elsif (to_retire = source_cc) # rubocop:disable Layout/CommentIndentation
+        # retired, retired
       end
-    elsif (to_retire = source_cc)
-      # retired, retired
     end
     to_retire
   end
@@ -476,7 +499,7 @@ class UserMerge
     observer_links = from_user.as_observer_observation_links.shard(from_user)
     # record all the records before destroying them
     # pass the from_user since user_id on observation_link is the student we are targeting the observer here
-    merge_data.build_more_data(observer_links, user: from_user, data: data)
+    merge_data.build_more_data(observer_links, user: from_user, data:)
 
     Shard.partition_by_shard(observer_links) do |shard_observer_links|
       # restore user observation links that are deleted on the target user but active on the from_user
@@ -490,14 +513,14 @@ class UserMerge
       # delete what would be observing themselves.
       UserObservationLink.where(id: shard_observer_links).where(user_id: target_user).destroy_all
       to_delete = target_user.as_student_observation_links.where(observer_id: from_user)
-      merge_data.build_more_data(to_delete, data: data)
+      merge_data.build_more_data(to_delete, data:)
       to_delete.destroy_all
       # update links to target_user
       UserObservationLink.active.where(id: shard_observer_links).update_all(observer_id: target_user.id, updated_at: Time.now.utc)
     end
 
     student_links = from_user.as_student_observation_links.shard(from_user)
-    merge_data.build_more_data(student_links, data: data)
+    merge_data.build_more_data(student_links, data:)
     Shard.partition_by_shard(student_links) do |shard_student_links|
       # restore user observee links that are deleted on the target user but active on the from_user
       UserObservationLink.where(
@@ -510,7 +533,7 @@ class UserMerge
       # delete what would be observing themselves.
       UserObservationLink.where(id: shard_student_links).where(observer_id: target_user).destroy_all
       to_delete = target_user.as_observer_observation_links.where(user_id: from_user)
-      merge_data.build_more_data(to_delete, data: data)
+      merge_data.build_more_data(to_delete, data:)
       to_delete.destroy_all
       # update links to target_user
       UserObservationLink.active.where(id: shard_student_links).update_all(user_id: target_user.id, updated_at: Time.now.utc)
@@ -528,7 +551,7 @@ class UserMerge
 
           # create the record on the target users shard.
           new_link = UserObservationLink.create_or_restore(student: target_user, observer: link.observer, root_account: link.root_account)
-          merge_data.build_more_data([new_link], user: target_user, workflow_state: "non_existent", data: data)
+          merge_data.build_more_data([new_link], user: target_user, workflow_state: "non_existent", data:)
         end
       end
     end
@@ -549,7 +572,8 @@ class UserMerge
       .where("EXISTS (SELECT *
                      FROM #{ContextModuleProgression.quoted_table_name} cmp2
                      WHERE context_module_progressions.context_module_id=cmp2.context_module_id
-                       AND cmp2.user_id = ?)", target_user.id).find_each do |cmp|
+                       AND cmp2.user_id = ?)",
+             target_user.id).find_each do |cmp|
       ContextModuleProgression
         .where(context_module_id: cmp.context_module_id, user_id: [from_user, target_user])
         .order(Arel.sql("CASE WHEN workflow_state = 'completed' THEN 0
@@ -621,14 +645,14 @@ class UserMerge
       # both target and from users records will be recorded in case of a split.
       if to_update.exists?
         # record both records state since both will change
-        merge_data.build_more_data(scope, data: data)
+        merge_data.build_more_data(scope, data:)
         update_enrollment_state(scope, keeper)
       end
 
       # identify if the from users records are worse states than target user
       to_delete = scope.active.where.not(id: keeper).where(column => from_user)
       # record the current state in case of split
-      merge_data.build_more_data(to_delete, data: data)
+      merge_data.build_more_data(to_delete, data:)
       # mark all conflicts on from_user as deleted so they will not be moved later
       to_delete.destroy_all
     end
@@ -639,8 +663,8 @@ class UserMerge
     to_delete = Enrollment.active.where("type = 'ObserverEnrollment' AND
                                                    (associated_user_id = :target_user AND user_id = :from_user OR
                                                    associated_user_id = :from_user AND user_id = :target_user)",
-                                        { target_user: target_user, from_user: from_user })
-    merge_data.build_more_data(to_delete, data: data)
+                                        { target_user:, from_user: })
+    merge_data.build_more_data(to_delete, data:)
     to_delete.destroy_all
   end
 
@@ -654,7 +678,7 @@ class UserMerge
           to_move = Enrollment.active.where(column => from_user)
           # upgrade to strong association if there are any enrollments
           target_user.associate_with_shard(from_user.shard) if to_move.exists?
-          merge_data.build_more_data(to_move, data: data)
+          merge_data.build_more_data(to_move, data:)
           to_move.update_all(column => target_user.id, :updated_at => Time.now.utc)
         end
       end
@@ -698,8 +722,8 @@ class UserMerge
                             .pluck(:id)
         to_move = scope.where(id: to_move_ids).to_a
         move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-        merge_data.build_more_data(to_move, data: data) unless to_move.empty?
-        merge_data.build_more_data(move_back, data: data) unless move_back.empty?
+        merge_data.build_more_data(to_move, data:) unless to_move.empty?
+        merge_data.build_more_data(move_back, data:) unless move_back.empty?
         swap_submission(model, move_back, table, to_move, to_move_ids, "fk_rails_8d85741475")
         swap_assignment_override_student(model, move_back, to_move)
       when "Quizzes::QuizSubmission"
@@ -709,8 +733,8 @@ class UserMerge
 
         to_move += scope.where("#{unique_id} NOT IN (?)", [subscope.map(&unique_id), move_back.map(&unique_id)].flatten).to_a
         move_back += already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-        merge_data.build_more_data(to_move, data: data)
-        merge_data.build_more_data(move_back, data: data)
+        merge_data.build_more_data(to_move, data:)
+        merge_data.build_more_data(move_back, data:)
         swap_submission(model, move_back, table, to_move, to_move, "fk_rails_04850db4b4")
         swap_assignment_override_student(model, move_back, to_move)
       end
@@ -749,8 +773,8 @@ class UserMerge
     # bail early if we don't have any student overrides to move
     return unless to_move.exists?
 
-    merge_data.build_more_data(to_move, data: data)
-    merge_data.build_more_data(move_back, data: data)
+    merge_data.build_more_data(to_move, data:)
+    merge_data.build_more_data(move_back, data:)
 
     AssignmentOverrideStudent.transaction do
       connection = AssignmentOverrideStudent.connection
@@ -771,7 +795,7 @@ class UserMerge
       # TODO: This is a hack to support namespacing
       versionable_type = ["QuizSubmission", "Quizzes::QuizSubmission"] if table.to_s == "quizzes/quiz_submissions"
       version_ids = []
-      Version.where(versionable_type: versionable_type, versionable_id: ids).find_in_batches(strategy: :cursor) do |versions|
+      Version.where(versionable_type:, versionable_id: ids).find_in_batches(strategy: :cursor) do |versions|
         versions.each do |version|
           version_attrs = YAML.load(version.yaml)
           if version_attrs[column.to_s] == from_user.id

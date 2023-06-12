@@ -23,16 +23,20 @@ require "nokogiri"
 describe CC::CCHelper do
   context "map_linked_objects" do
     it "finds linked canvas items in exported html content" do
-      content = '<a href="$CANVAS_OBJECT_REFERENCE$/assignments/123456789">Link</a>' \
-                '<img src="$IMS-CC-FILEBASE$/media/folder%201/file.jpg" />'
+      content = <<~HTML
+        <a href="$CANVAS_OBJECT_REFERENCE$/assignments/123456789">Link</a>
+        <img src="$IMS-CC-FILEBASE$/media/folder%201/file.jpg" />
+      HTML
       linked_objects = CC::CCHelper.map_linked_objects(content)
       expect(linked_objects[0]).to eq({ identifier: "123456789", type: "assignments" })
       expect(linked_objects[1]).to eq({ local_path: "/media/folder 1/file.jpg", type: "Attachment" })
     end
 
     it "finds linked canvas items in exported html content with old escapes" do
-      content = '<a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>' \
-                '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />'
+      content = <<~HTML
+        <a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>
+        '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />
+      HTML
       linked_objects = CC::CCHelper.map_linked_objects(content)
       expect(linked_objects[0]).to eq({ identifier: "123456789", type: "assignments" })
       expect(linked_objects[1]).to eq({ local_path: "/media/folder 1/file.jpg", type: "Attachment" })
@@ -42,13 +46,12 @@ describe CC::CCHelper do
   describe CC::CCHelper::HtmlContentExporter do
     before :once do
       course_with_teacher
-      @obj = @course.media_objects.create!(media_id: "abcde")
+      @obj = @course.media_objects.create!(media_id: "abcde", title: "some_media.mp4")
     end
 
     before do
       @kaltura = double("CanvasKaltura::ClientV3")
-      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@kaltura)
-      allow(@kaltura).to receive(:startSession)
+      allow(CC::CCHelper).to receive(:kaltura_admin_session).and_return(@kaltura)
       allow(@kaltura).to receive(:flavorAssetGetByEntryId).with("abcde").and_return([
                                                                                       {
                                                                                         isOriginal: 1,
@@ -122,14 +125,23 @@ describe CC::CCHelper do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4" data-media-id="abcde" data-media-type="video">)
+      expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/Uploaded Media/some_media.mp4" data-media-id="abcde" data-media-type="video">)
+      expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
+      expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
+    end
+
+    it "translates RCE media attachment iframes to relevant HTML tags" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/135?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
+      translated = @exporter.html_content(html)
+      expect(translated).to include %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde" data-is-media-attachment="true">)
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
     end
 
     it "links media to exported file if it exists" do
       folder = folder_model(name: "something", context: @course)
-      att = attachment_model(display_name: "lolcats.mp4", context: @course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      att = attachment_model(display_name: "lolcats.mp4", context: @course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @obj.attachment = att
       @obj.save!
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
@@ -141,10 +153,10 @@ describe CC::CCHelper do
     it "links media to proper file via related_attachment links" do
       disposable_course = Course.create!
       folder = folder_model(name: "something", context: disposable_course)
-      att = attachment_model(display_name: "lolcats.mp4", context: disposable_course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      att = attachment_model(display_name: "lolcats.mp4", context: disposable_course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @obj.attachment = att
       @obj.save!
-      attachment_model(root_attachment: att, display_name: "lolcats.mp4", context: @course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      attachment_model(root_attachment: att, display_name: "lolcats.mp4", context: @course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
@@ -155,7 +167,7 @@ describe CC::CCHelper do
       temp = @course
       other_course = course_factory
       folder = folder_model(name: "something", context: other_course)
-      att = attachment_model(display_name: "lolcats.mp4", context: other_course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      att = attachment_model(display_name: "lolcats.mp4", context: other_course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @obj.attachment = att
       @obj.save!
       @course = temp
@@ -314,6 +326,36 @@ describe CC::CCHelper do
           <p><a id='media_comment_xyzzy' class='instructure_inline_media_comment'>this is a media comment</a></p>
         HTML
       end.not_to raise_error
+    end
+
+    context "disable_content_rewriting is truthy" do
+      let(:html) { "<p><a href=\"/courses/#{@course.id}/files\">Files tab</a></p>" }
+
+      it "skips html rewrite" do
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: true)
+        expect(@exporter.html_content(html)).to eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: "false")
+        expect(@exporter.html_content(html)).to eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: "true")
+        expect(@exporter.html_content(html)).to eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: 5)
+        expect(@exporter.html_content(html)).to eq(html)
+      end
+    end
+
+    context "disable_content_rewriting is false or unset" do
+      let(:html) { "<p><a href=\"/courses/#{@course.id}/files\">Files tab</a></p>" }
+
+      it "does html rewrite" do
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, disable_content_rewriting: false)
+        expect(@exporter.html_content(html)).to not_eq(html)
+
+        @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+        expect(@exporter.html_content(html)).to not_eq(html)
+      end
     end
   end
 end

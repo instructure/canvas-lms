@@ -28,7 +28,7 @@ module Api::V1::Role
       role: role.name,
       label: role.label,
       last_updated_at: role.updated_at,
-      base_role_type: role.built_in? && role.account_role? ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
+      base_role_type: (role.built_in? && role.account_role?) ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
       workflow_state: role.workflow_state,
       created_at: role.created_at&.iso8601,
       permissions: {},
@@ -41,7 +41,7 @@ module Api::V1::Role
 
     preloaded_overrides ||= RoleOverride.preload_overrides(account, [role])
     RoleOverride.manageable_permissions(account).each_key do |permission|
-      perm = RoleOverride.permission_for(account, permission, role, account, true, preloaded_overrides: preloaded_overrides)
+      perm = RoleOverride.permission_for(account, permission, role, account, true, preloaded_overrides:)
       next if permission == :manage_developer_keys && !account.root_account?
 
       json[:permissions][permission] = permission_json(perm, current_user, session) if perm[:account_allows]

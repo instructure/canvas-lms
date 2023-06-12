@@ -26,10 +26,20 @@ import ready from '@instructure/ready'
 const I18n = useI18nScope('course_list')
 
 function success(target) {
-  const favorited_tooltip = I18n.t('favorited_tooltip', 'Click to remove from the courses menu.')
-  const nonfavorite_tooltip = I18n.t('nonfavorited_tooltip', 'Click to add to the courses menu.')
+  const courseName = target.context.dataset.courseName
+  const favorited_tooltip = I18n.t(
+    'favorited_tooltip',
+    'Click to remove %{course_name} from the courses menu.',
+    {course_name: courseName}
+  )
+  const nonfavorite_tooltip = I18n.t(
+    'nonfavorited_tooltip',
+    'Click to add %{course_name} to the courses menu.',
+    {course_name: courseName}
+  )
   const notfavoritable_tooltip = I18n.t(
-    'This course cannot be added to the courses menu unless the course is active.'
+    '%{course_name} cannot be added to the courses menu unless the course is active.',
+    {course_name: courseName}
   )
 
   if (target.hasClass('course-list-favorite-course')) {

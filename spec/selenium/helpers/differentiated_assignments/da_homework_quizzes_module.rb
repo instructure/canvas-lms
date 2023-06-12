@@ -23,8 +23,13 @@ module DifferentiatedAssignments
   module Homework
     module Quizzes
       class << self
-        attr_reader :quiz_for_everyone, :quiz_for_section_a, :quiz_for_section_b, :quiz_for_section_c,
-                    :quiz_for_sections_a_and_b, :quiz_for_first_student, :quiz_for_second_and_third_students
+        attr_reader :quiz_for_everyone,
+                    :quiz_for_section_a,
+                    :quiz_for_section_b,
+                    :quiz_for_section_c,
+                    :quiz_for_sections_a_and_b,
+                    :quiz_for_first_student,
+                    :quiz_for_second_and_third_students
 
         def initialize
           @quiz_for_everyone                  = create_quiz_for(HomeworkAssignee::EVERYONE)

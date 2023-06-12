@@ -24,9 +24,9 @@ describe "student interactions links" do
   before do
     username = "nobody@example.com"
     password = "asdfasdf"
-    u = user_with_pseudonym active_user: true,
-                            username: username,
-                            password: password
+    u = user_with_pseudonym(active_user: true,
+                            username:,
+                            password:)
     u.save!
     @e = course_with_teacher active_course: true,
                              user: u,
@@ -50,7 +50,7 @@ describe "student interactions links" do
   context "as a user without permissions to view grades" do
     before do
       ["view_all_grades", "manage_grades"].each do |permission|
-        RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: ta_role)
+        RoleOverride.create!(permission:, enabled: false, context: @course.account, role: ta_role)
       end
 
       user_session(@ta)

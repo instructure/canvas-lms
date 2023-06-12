@@ -36,12 +36,19 @@ class AssessmentQuestion < ActiveRecord::Base
   validates :workflow_state, :assessment_question_bank_id, presence: true
   resolves_root_account through: :context
 
-  ALL_QUESTION_TYPES = %w[multiple_answers_question fill_in_multiple_blanks_question
-                          matching_question missing_word_question
-                          multiple_choice_question numerical_question
-                          text_only_question short_answer_question
-                          multiple_dropdowns_question calculated_question
-                          essay_question true_false_question file_upload_question].freeze
+  ALL_QUESTION_TYPES = %w[multiple_answers_question
+                          fill_in_multiple_blanks_question
+                          matching_question
+                          missing_word_question
+                          multiple_choice_question
+                          numerical_question
+                          text_only_question
+                          short_answer_question
+                          multiple_dropdowns_question
+                          calculated_question
+                          essay_question
+                          true_false_question
+                          file_upload_question].freeze
 
   serialize :question_data
 
@@ -71,13 +78,14 @@ class AssessmentQuestion < ActiveRecord::Base
   def user_can_see_through_quiz_question?(user, session = nil)
     shard.activate do
       quiz_ids = quiz_questions.distinct.pluck(:quiz_id)
-      quiz_ids.any? && Quizzes::Quiz.where(id: quiz_ids, context_type: "Course",
+      quiz_ids.any? && Quizzes::Quiz.where(id: quiz_ids,
+                                           context_type: "Course",
                                            context_id: Enrollment.where(user_id: user).active.select(:course_id)).to_a.any? { |q| q.grants_right?(user, session, :read) }
     end
   end
 
   def infer_defaults
-    self.question_data ||= HashWithIndifferentAccess.new
+    self.question_data ||= ActiveSupport::HashWithIndifferentAccess.new
     if self.question_data.is_a?(Hash)
       if self.question_data[:question_name].try(:strip).blank?
         self.question_data[:question_name] = t :default_question_name, "Question"
@@ -125,7 +133,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
     unless file_substitutions[id_or_path]
       if id
-        file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
+        file = Attachment.where(context_type:, context_id:, id: id_or_path).first
       elsif path
         path = URI::DEFAULT_PARSER.unescape(id_or_path)
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
@@ -138,8 +146,8 @@ class AssessmentQuestion < ActiveRecord::Base
       rescue => e
         new_file = nil
         er_id = Canvas::Errors.capture_exception(:file_clone_during_translate_links, e)[:error_report]
-        logger.error("Error while cloning attachment during"\
-                     " AssessmentQuestion#translate_links: "\
+        logger.error("Error while cloning attachment during " \
+                     "AssessmentQuestion#translate_links: " \
                      "id: #{self.id} error_report: #{er_id}")
       end
       new_file&.save
@@ -163,7 +171,7 @@ class AssessmentQuestion < ActiveRecord::Base
     deep_translate = lambda do |obj|
       case obj
       when Hash
-        obj.each_with_object(HashWithIndifferentAccess.new) do |(k, v), h|
+        obj.each_with_object(ActiveSupport::HashWithIndifferentAccess.new) do |(k, v), h|
           h[k] = deep_translate.call(v)
         end
       when Array
@@ -188,7 +196,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def data
-    res = self.question_data || HashWithIndifferentAccess.new
+    res = self.question_data || ActiveSupport::HashWithIndifferentAccess.new
     res[:assessment_question_id] = id
     res[:question_name] = t :default_question_name, "Question" if res[:question_name].blank?
     # TODO: there's a potential id conflict here, where if a quiz
@@ -259,7 +267,7 @@ class AssessmentQuestion < ActiveRecord::Base
     # cache all the known quiz_questions
     scope = Quizzes::QuizQuestion
             .shard(Shard.shard_for(quiz_id))
-            .where(quiz_id: quiz_id, workflow_state: "generated")
+            .where(quiz_id:, workflow_state: "generated")
     # we search for nil quiz_group_id and duplicate_index to find older questions
     # generated before we added proper race condition checking
     existing_quiz_questions = scope
@@ -281,8 +289,8 @@ class AssessmentQuestion < ActiveRecord::Base
           end
         rescue ActiveRecord::RecordNotUnique
           qq = scope.where(assessment_question_id: aq,
-                           quiz_group_id: quiz_group_id,
-                           duplicate_index: duplicate_index).take!
+                           quiz_group_id:,
+                           duplicate_index:).take!
           qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
         end
       end
@@ -330,11 +338,25 @@ class AssessmentQuestion < ActiveRecord::Base
                     end.with_indifferent_access
 
     data = previous_data.merge(qdata.compact).slice(
-      :id, :regrade_option, :points_possible, :correct_comments, :incorrect_comments,
-      :neutral_comments, :question_type, :question_name, :question_text, :answers,
-      :formulas, :variables, :answer_tolerance, :formula_decimal_places,
-      :matching_answer_incorrect_matches, :matches,
-      :correct_comments_html, :incorrect_comments_html, :neutral_comments_html
+      :id,
+      :regrade_option,
+      :points_possible,
+      :correct_comments,
+      :incorrect_comments,
+      :neutral_comments,
+      :question_type,
+      :question_name,
+      :question_text,
+      :answers,
+      :formulas,
+      :variables,
+      :answer_tolerance,
+      :formula_decimal_places,
+      :matching_answer_incorrect_matches,
+      :matches,
+      :correct_comments_html,
+      :incorrect_comments_html,
+      :neutral_comments_html
     )
 
     [

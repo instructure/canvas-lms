@@ -182,3 +182,80 @@ deprioritize_section_overrides_for_nonactive_enrollments:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
+additional_speedgrader_links:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Add SpeedGrader links to Assignments and Quizzes index views
+  description: Reorders some menu options for more consistency and adds link
+    to SpeedGrader.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
+new_quiz_deleted_workflow_restore_pending_review_state:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: New Quiz deleted user restore pending review state on enroll
+  description: When set, determines if the workflow state of a new quiz should be
+    set as graded or pending_review if a user had a previous pending_review new quiz but
+    had been re-enrolled in the course.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
+individual_gradebook_enhancements:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Individual Gradebook Enhancements
+  description: This feature introduces performance and maintenance enhancements
+    to Individual Gradebook
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment
+hide_zero_point_quizzes_option:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Hide zero point new quizzes from the student and teacher gradebooks
+  description: When set, an option to not display a new quiz with 0 points possible in the gradebook
+    will be available in the form of a checkbox when creating or editing the quiz.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
+student_grade_summary_upgrade:
+  state: hidden
+  display_name: Update grade summary table to use a modern framework
+  description: |-
+    This refactor will make this page more maintainable
+  applies_to: SiteAdmin
+fix_missing_policy_applicator_gradebook_history:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Fix Missing Policy Applicator Gradebook History
+  description: Fixes the missing policy applicator to insert records into Gradebook History
+    for each submission marked as missing.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
+grading_scheme_updates:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Improve Letter Grading Scheme Usability
+  description: Teachers and Account Managers will be able to more easily manage letter grading schemes for accounts, courses, and assignments.

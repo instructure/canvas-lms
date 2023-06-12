@@ -61,7 +61,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
       account_ids_string = "{#{accounts_by_shard.map(&:id).join(",")}}"
       relation = DeveloperKeyAccountBinding
                  .joins(sanitize_sql("JOIN unnest('#{account_ids_string}'::int8[]) WITH ordinality AS i (id, ord) ON i.id=account_id"))
-                 .where(developer_key: developer_key)
+                 .where(developer_key:)
                  .order(:ord)
       relation = relation.where.not(workflow_state: "allow") if explicitly_set
       relation.take
@@ -83,7 +83,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
         GuardRail.activate(:secondary) do
           binding = where.not(workflow_state: "allow").find_by(
             account: Account.site_admin,
-            developer_key: developer_key
+            developer_key:
           )
           binding
         end

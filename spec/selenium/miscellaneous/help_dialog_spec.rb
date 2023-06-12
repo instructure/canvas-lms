@@ -34,6 +34,7 @@ describe "help dialog" do
     it "no longer shows a browser warning for IE" do
       Setting.set("show_feedback_link", "true")
       get("/login")
+      driver.execute_script("window.INST = window.INST || {}")
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")
       f("#footer .help_dialog_trigger").click
       wait_for_ajaximations
@@ -53,7 +54,7 @@ describe "help dialog" do
       expect(f("#content")).not_to contain_css(".help_dialog_trigger")
 
       support_url = "http://example.com/support"
-      Account.default.update_attribute(:settings, { support_url: support_url })
+      Account.default.update_attribute(:settings, { support_url: })
 
       get "/dashboard"
       expect(ff("#global_nav_help_link").length).to eq(1)
@@ -69,7 +70,7 @@ describe "help dialog" do
     it "shows the support url link in global nav correctly" do
       # if @domain_root_account or Account.default have settings[:support_url] set there should be a link to that site
       support_url = "http://example.com/support"
-      Account.default.update_attribute(:settings, { support_url: support_url })
+      Account.default.update_attribute(:settings, { support_url: })
       get "/dashboard"
       link = f("a[href='#{support_url}']")
       expect(link["id"]).to eq "global_nav_help_link"

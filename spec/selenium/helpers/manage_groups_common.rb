@@ -49,7 +49,7 @@ module ManageGroupsCommon
     end
     submit_dialog_form(form)
     expect(f("#add_category_form")).not_to be_displayed
-    category = course.group_categories.where(name: name).first
+    category = course.group_categories.where(name:).first
     expect(category).not_to be_nil
     expect(fj("#category_#{category.id} .student_links:visible")).to be_displayed
     category
@@ -87,7 +87,7 @@ module ManageGroupsCommon
     wait_for_ajaximations
     submit_form("#edit_group_form")
     wait_for_ajaximations
-    context.groups.where(name: name).first
+    context.groups.where(name:).first
   end
 
   def add_groups_in_category(category, i = 3)
@@ -97,8 +97,8 @@ module ManageGroupsCommon
   end
 
   def simulate_group_drag(user_id, from_group_id, to_group_id)
-    from_group = (from_group_id == "blank" ? ".group_blank:visible" : "#group_#{from_group_id}")
-    to_group = (to_group_id == "blank" ? ".group_blank:visible" : "#group_#{to_group_id}")
+    from_group = ((from_group_id == "blank") ? ".group_blank:visible" : "#group_#{from_group_id}")
+    to_group = ((to_group_id == "blank") ? ".group_blank:visible" : "#group_#{to_group_id}")
     driver.execute_script(<<~JS)
       window.contextGroups.moveToGroup(
         $('#{from_group} .user_id_#{user_id}'),
@@ -108,7 +108,7 @@ module ManageGroupsCommon
   end
 
   def expand_group(group_id)
-    group_selector = (group_id == "unassigned" ? ".unassigned-students" : ".group[data-id=\"#{group_id}\"]")
+    group_selector = ((group_id == "unassigned") ? ".unassigned-students" : ".group[data-id=\"#{group_id}\"]")
     return if group_selector == ".unassigned-students" || f(group_selector).attribute(:class).include?("group-expanded")
 
     fj("#{group_selector} .toggle-group").click

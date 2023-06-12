@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -16,7 +17,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import INST from 'browser-sniffer'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import type {Assignment} from '../../../../api.d'
@@ -51,6 +51,8 @@ class DownloadSubmissionsDialogManager {
 
   showDialog(cb) {
     this.submissionsDownloading(this.assignment.id)
+
+    // @ts-expect-error
     INST.downloadSubmissions(this.downloadUrl, cb)
   }
 }

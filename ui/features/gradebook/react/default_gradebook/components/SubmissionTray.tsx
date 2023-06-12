@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -38,7 +39,7 @@ import SubmissionCommentListItem from './SubmissionCommentListItem'
 import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
-import ProxyUploadModal from './ProxyUploadModal'
+import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 import type {
   GradingStandard,
@@ -46,7 +47,12 @@ import type {
   PendingGradeInfo,
   SerializedComment,
 } from '../gradebook.d'
-import {CamelizedAssignment, CamelizedSubmission} from '@canvas/grading/grading'
+import {
+  CamelizedAssignment,
+  CamelizedSubmission,
+  GradeEntryMode,
+  GradeResult,
+} from '@canvas/grading/grading.d'
 
 import {Link} from '@instructure/ui-link'
 
@@ -84,10 +90,10 @@ export type SubmissionTrayProps = {
   }
   student: {
     id: string
-    avatarUrl?: string
+    avatarUrl?: string | null
     gradesUrl: string
     isConcluded: boolean
-    name: string
+    name: string | null
   }
   submission: CamelizedSubmission
   courseId: string
@@ -99,23 +105,23 @@ export type SubmissionTrayProps = {
   isInClosedGradingPeriod: boolean
   isInNoGradingPeriod: boolean
   isNotCountedForScore: boolean
-  enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
+  enterGradesAs: GradeEntryMode
   isOpen: boolean
   isFirstStudent: boolean
   isLastStudent: boolean
-  latePolicy: LatePolicyCamelized
+  latePolicy?: LatePolicyCamelized
   locale: string
   editSubmissionComment: (commentId: string | null) => void
   onClose: () => void
   requireStudentGroupForSpeedGrader: boolean
   gradingScheme: null | GradingStandard[]
-  onGradeSubmission: (grade: string, excused: boolean) => void
+  onGradeSubmission: (submission: CamelizedSubmission, gradeInfo: GradeResult) => void
   onRequestClose: () => void
   selectNextAssignment: () => void
   selectPreviousAssignment: () => void
   selectNextStudent: () => void
   selectPreviousStudent: () => void
-  updateSubmission: (submission: any) => void
+  updateSubmission: (submission: CamelizedSubmission) => void
   updateSubmissionComment: (commentId: string, comment: string) => void
   createSubmissionComment: (comment: string) => void
   deleteSubmissionComment: (commentId: string) => void
@@ -277,7 +283,9 @@ export default class SubmissionTray extends React.Component<
     if (submission.proxySubmitter) {
       return (
         <View as="div" textAlign="center">
-          <Text>{I18n.t('Submitted by %{submitter}', {submitter: submission.proxySubmitter})}</Text>
+          <Text data-testid="proxy_submitter_name">
+            {I18n.t('Submitted by %{submitter}', {submitter: submission.proxySubmitter})}
+          </Text>
           <br />
           <FriendlyDatetime
             format={I18n.t('#date.formats.date_at_time')}

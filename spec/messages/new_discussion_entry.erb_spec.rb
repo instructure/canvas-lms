@@ -36,20 +36,20 @@ describe "new_discussion_entry" do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.url).to include "/courses/#{@object.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@object.id}#entry-#{@object.id}"
       expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
     end
 
     it "renders correct footer if replys are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body.include?("replying to this message")).to eq true
+      expect(msg.body.include?("replying to this message")).to be true
     end
 
     it "renders correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body.include?("replying to this message")).to eq false
+      expect(msg.body.include?("replying to this message")).to be false
     end
 
     context "fully anonymous topic" do
@@ -57,13 +57,19 @@ describe "new_discussion_entry" do
 
       before :once do
         @user = user_model(name: "Chawn Neal")
-        @object = anonymous_topic.discussion_entries.create!(user: @user)
+        @anon_object = anonymous_topic.discussion_entries.create!(user: @user)
       end
 
       it "does not render user name" do
-        msg = generate_message(notification_name, path_type, @object)
+        msg = generate_message(notification_name, path_type, @anon_object)
         expect(msg.body).to match(/Anonymous\s\w+\sreplied\sto/)
         expect(msg.body).not_to include(@user.short_name)
+        expect(msg.html_body).to match(/Anonymous\s\w+\sreplied\sto/)
+        expect(msg.html_body).not_to include(@user.short_name)
+
+        message = message_model(context: @anon_object, notification_name: "New Discussion Entry")
+        expect(message.from_name).to start_with("Anonymous ")
+        expect(message.reply_to_name).to start_with("Anonymous ")
       end
     end
   end

@@ -117,11 +117,11 @@ describe BasicLTI::BasicOutcomes do
           )
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when the needsAdditionalReview element is absent" do
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
   end
@@ -180,7 +180,7 @@ describe BasicLTI::BasicOutcomes do
     it "throws 'Tool is invalid' if the tool doesn't match" do
       t = @course.context_external_tools
                  .create(name: "b", url: "http://google.com", consumer_key: "12345", shared_secret: "secret")
-      expect { described_class.decode_source_id(tool, gen_source_id(t: t)) }
+      expect { described_class.decode_source_id(tool, gen_source_id(t:)) }
         .to raise_error(BasicLTI::Errors::InvalidSourceId, "Tool is invalid")
     end
 
@@ -225,11 +225,18 @@ describe BasicLTI::BasicOutcomes do
 
     context "jwt sourcedid" do
       before do
-        dynamic_settings = {
-          "lti-signing-secret" => "signing-secret-vp04BNqApwdwUYPUI",
-          "lti-encryption-secret" => "encryption-secret-5T14NjaTbcYjc4"
+        fake_lti_secrets = {
+          "lti-signing-secret" => Base64.encode64("signing-secret-vp04BNqApwdwUYPUI"),
+          "lti-encryption-secret" => Base64.encode64("encryption-secret-5T14NjaTbcYjc4")
         }
-        allow(DynamicSettings).to receive(:find) { dynamic_settings }
+
+        allow(Rails.application.credentials).to receive(:dig)
+          .with(:lti, :signing_secret)
+          .and_return(fake_lti_secrets["lti-signing-secret"])
+
+        allow(Rails.application.credentials).to receive(:dig)
+          .with(:lti, :encryption_secret)
+          .and_return(fake_lti_secrets["lti-encryption-secret"])
       end
 
       let(:jwt_source_id) do
@@ -270,7 +277,7 @@ describe BasicLTI::BasicOutcomes do
       it "returns false" do
         response = BasicLTI::BasicOutcomes::LtiResponse.new(xml)
         result = response.handle_request(tool)
-        expect(result).to eq false
+        expect(result).to be false
       end
 
       it "does not report a total count metric" do
@@ -384,7 +391,7 @@ describe BasicLTI::BasicOutcomes do
       expect(request.body).to eq "<replaceResultResponse />"
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
-      expected_value = assignment.points_possible * 0.92.to_d
+      expected_value = assignment.points_possible * BigDecimal("0.92")
       expect(submission.grade).to eq expected_value.to_s
     end
 
@@ -769,7 +776,7 @@ describe BasicLTI::BasicOutcomes do
         submission = assignment.submit_homework(
           @user,
           {
-            submission_type: submission_type,
+            submission_type:,
             body: "sample text",
             grade: "92%"
           }
@@ -787,8 +794,11 @@ describe BasicLTI::BasicOutcomes do
       it "succeeds with cross-sharded users" do
         @shard1.activate do
           @root = Account.create
-          @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: "Jimmy John",
-                                               username: "other_shard@example.com", sis_user_id: "other_shard")
+          @user1 = user_with_managed_pseudonym(active_all: true,
+                                               account: @root,
+                                               name: "Jimmy John",
+                                               username: "other_shard@example.com",
+                                               sis_user_id: "other_shard")
         end
         @course.enroll_student(@user1)
         xml.css("resultData").remove
@@ -798,7 +808,7 @@ describe BasicLTI::BasicOutcomes do
         expect(request.body).to eq "<replaceResultResponse />"
         expect(request.handle_request(tool)).to be_truthy
         submission = assignment.submissions.where(user_id: @user1.id).first
-        expected_value = assignment.points_possible * 0.92.to_d
+        expected_value = assignment.points_possible * BigDecimal("0.92")
         expect(submission.grade).to eq expected_value.to_s
       end
     end
@@ -834,7 +844,7 @@ describe BasicLTI::BasicOutcomes do
       stub_request(:get, "http://example.com/download").to_return(status: 500)
       Timecop.freeze do
         run_jobs
-        expect(Delayed::Job.find_by(strand: "file_download/example.com/failed").run_at).to be > Time.zone.now + 5.seconds
+        expect(Delayed::Job.find_by(strand: "file_download/example.com/failed").run_at).to be > 5.seconds.from_now
       end
       expect(submission.reload.versions.count).to eq 1
       expect(submission.attachments.count).to eq 0
@@ -957,21 +967,21 @@ describe BasicLTI::BasicOutcomes do
     it "invokes the block when the grader_id is in the tool id range" do
       submission.grader_id = -100
       expect do |b|
-        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: :taco, &b)
+        lti_response.ensure_score_update_possible(submission:, prioritize_non_tool_grade: :taco, &b)
       end.to yield_control
     end
 
     it "does not invoke the block when the grader_id is in the user id range and prioritize_non_tool_grade is true" do
       submission.grader_id = 100
       expect do |b|
-        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: true, &b)
+        lti_response.ensure_score_update_possible(submission:, prioritize_non_tool_grade: true, &b)
       end.not_to yield_control
     end
 
     it "invokes the block when the grader_id is in the user id range and prioritize_non_tool_grade is false" do
       submission.grader_id = 100
       expect do |b|
-        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: false, &b)
+        lti_response.ensure_score_update_possible(submission:, prioritize_non_tool_grade: false, &b)
       end.to yield_control
     end
   end

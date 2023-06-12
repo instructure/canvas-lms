@@ -26,7 +26,7 @@ describe "discussions" do
   include DiscussionsCommon
 
   let(:course) { course_model.tap(&:offer!) }
-  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:teacher) { teacher_in_course(course:, name: "teacher", active_all: true).user }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: "teacher topic title", message: "teacher topic message") }
   let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
   let(:group_category) { course.group_categories.create!(name: "group category") }
@@ -34,14 +34,14 @@ describe "discussions" do
     course.assignments.create!(
       name: "assignment",
       # submission_types: 'discussion_topic',
-      assignment_group: assignment_group
+      assignment_group:
     )
   end
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: "assignment topic title",
                                      message: "assignment topic message",
-                                     assignment: assignment)
+                                     assignment:)
   end
 
   context "on the edit page" do
@@ -113,16 +113,16 @@ describe "discussions" do
           f("#assignment_peer_reviews").click
 
           expect_new_page_load { f(".form-actions button[type=submit]").click }
-          expect(topic.reload.assignment.peer_reviews).to eq true
+          expect(topic.reload.assignment.peer_reviews).to be true
         end
 
         it "allows editing the due dates", priority: "1" do
           get url
           wait_for_tiny(f("textarea[name=message]"))
 
-          due_at = Time.zone.now + 3.days
-          unlock_at = Time.zone.now + 2.days
-          lock_at = Time.zone.now + 4.days
+          due_at = 3.days.from_now
+          unlock_at = 2.days.from_now
+          lock_at = 4.days.from_now
 
           # set due_at, lock_at, unlock_at
           replace_content(f(".date_field[data-date-type='due_at']"), format_date_for_view(due_at), tab_out: true)
@@ -230,14 +230,14 @@ describe "discussions" do
 
       it "shows correct date when saving" do
         Timecop.freeze do
-          topic.lock_at = Time.zone.now - 5.days
+          topic.lock_at = 5.days.ago
           topic.save!
           teacher.time_zone = "Hawaii"
           teacher.save!
           get url
           f(".form-actions button[type=submit]").click
           get url
-          expect(topic.reload.lock_at).to eq (Time.zone.now - 5.days).beginning_of_minute
+          expect(topic.reload.lock_at).to eq 5.days.ago.beginning_of_minute
         end
       end
 
@@ -282,8 +282,8 @@ describe "discussions" do
           get url
           wait_for_tiny(f("textarea[name=message]"))
 
-          delayed_post_at = Time.zone.now - 10.days
-          lock_at = Time.zone.now - 5.days
+          delayed_post_at = 10.days.ago
+          lock_at = 5.days.ago
 
           replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(delayed_post_at), tab_out: true)
           replace_content(f('input[type=text][name="lock_at"]'), format_date_for_view(lock_at), tab_out: true)
@@ -307,7 +307,7 @@ describe "discussions" do
           get url
           wait_for_tiny(f("textarea[name=message]"))
 
-          delayed_post_at = Time.zone.now - 5.days
+          delayed_post_at = 5.days.ago
 
           replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(delayed_post_at), tab_out: true)
 
@@ -357,14 +357,14 @@ describe "discussions" do
           file = @course.attachments.create!(
             display_name: "hey.txt",
             uploaded_data: default_uploaded_data,
-            usage_rights: usage_rights
+            usage_rights:
           )
           file.usage_rights
           topic.attachment = file
           topic.save!
 
           get url
-          expect(element_exists?("#usage_rights_control i.icon-files-copyright")).to eq(true)
+          expect(element_exists?("#usage_rights_control i.icon-files-copyright")).to be(true)
         end
       end
 
@@ -375,7 +375,7 @@ describe "discussions" do
           course.enable_course_paces = true
           course.save!
           context_module = course.context_modules.create! name: "M"
-          assignment_topic.context_module_tags.create! context_module: context_module, context: @course, tag_type: "context_module"
+          assignment_topic.context_module_tags.create! context_module:, context: @course, tag_type: "context_module"
         end
 
         it "shows the course pacing notice on a graded discussion" do

@@ -319,7 +319,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       it "clicks on sidebar quizzes page to create link in body" do
         title = "Quiz-Title"
-        @quiz = @course.quizzes.create!(workflow_state: "available", title: title)
+        @quiz = @course.quizzes.create!(workflow_state: "available", title:)
 
         visit_front_page_edit(@course)
 
@@ -336,7 +336,7 @@ describe "RCE next tests", ignore_js_errors: true do
       it "clicks on sidebar announcements page to create link in body" do
         title = "Announcement-Title"
         message = "Announcement 1 detail"
-        @announcement = @course.announcements.create!(title: title, message: message)
+        @announcement = @course.announcements.create!(title:, message:)
 
         visit_front_page_edit(@course)
 
@@ -355,7 +355,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       it "clicks on sidebar discussions page to create link in body" do
         title = "Discussion-Title"
-        @discussion = @course.discussion_topics.create!(title: title)
+        @discussion = @course.discussion_topics.create!(title:)
 
         visit_front_page_edit(@course)
 
@@ -557,14 +557,14 @@ describe "RCE next tests", ignore_js_errors: true do
         title = "Assignment-Title"
         due_at = 3.days.from_now
         @assignment =
-          @course.assignments.create!(name: title, workflow_state: "published", due_at: due_at)
+          @course.assignments.create!(name: title, workflow_state: "published", due_at:)
 
         visit_new_announcement_page(@course)
 
         click_course_links_toolbar_menuitem
         click_assignments_accordion
         wait_for_ajaximations
-        expect(assignment_due_date_exists?(due_at)).to eq true
+        expect(assignment_due_date_exists?(due_at)).to be true
       end
 
       context "without manage files permissions" do
@@ -579,7 +579,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         it "still allows inserting course links" do
           title = "Discussion-Title"
-          @discussion = @course.discussion_topics.create!(title: title)
+          @discussion = @course.discussion_topics.create!(title:)
 
           visit_front_page_edit(@course)
 
@@ -950,7 +950,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
         exit_full_screen_button.click
         fs_elem = driver.execute_script("return document.fullscreenElement")
-        expect(fs_elem).to eq nil
+        expect(fs_elem).to be_nil
       end
     end
 
@@ -959,7 +959,7 @@ describe "RCE next tests", ignore_js_errors: true do
 
       click_course_links_toolbar_menuitem
 
-      expect(tray_container_exists?).to eq true
+      expect(tray_container_exists?).to be true
 
       driver.action.send_keys(:escape).perform
 
@@ -967,7 +967,7 @@ describe "RCE next tests", ignore_js_errors: true do
       # and because we're waiting for something to _disappear_
       # we can't use implicit waits, so just keep trying for a bit
       keep_trying_until do
-        expect(tray_container_exists?).to eq false # Press esc key
+        expect(tray_container_exists?).to be false # Press esc key
       end
     end
 
@@ -975,12 +975,12 @@ describe "RCE next tests", ignore_js_errors: true do
       visit_front_page_edit(@course)
 
       click_course_images_toolbar_menuitem
-      expect(tray_container_exists?).to eq true
+      expect(tray_container_exists?).to be true
 
       driver.action.send_keys(:escape).perform
 
       keep_trying_until do
-        expect(tray_container_exists?).to eq false # Press esc key
+        expect(tray_container_exists?).to be false # Press esc key
       end
     end
 
@@ -1281,8 +1281,8 @@ describe "RCE next tests", ignore_js_errors: true do
             .and_return(DynamicSettings::FallbackProxy.new)
           rce_wysiwyg_state_setup(@course)
           plugins = driver.execute_script("return Object.keys(tinymce.activeEditor.plugins)") # rubocop:disable Specs/NoExecuteScript
-          expect(plugins.include?("instructure_paste")).to eql(false)
-          expect(plugins.include?("paste")).to eql(true)
+          expect(plugins.include?("instructure_paste")).to be(false)
+          expect(plugins.include?("paste")).to be(true)
         end
       end
 
@@ -1378,12 +1378,13 @@ describe "RCE next tests", ignore_js_errors: true do
       after { driver.local_storage.clear }
 
       it "shows course links after user files" do
+        get "/"
+        driver.session_storage["canvas_rce_links_accordion_index"] = "assignments"
+
         title = "Assignment-Title"
         @assignment = @course.assignments.create!(name: title)
 
         rce_wysiwyg_state_setup(@course)
-
-        driver.session_storage["canvas_rce_links_accordion_index"] = "assignments"
 
         click_course_links_toolbar_menuitem
         wait_for_ajaximations

@@ -89,6 +89,10 @@ module CalendarOtherCalendarsPage
     "#{account_calendars_list_selector} > li"
   end
 
+  def account_calendar_available_list_item_selector
+    "#other-calendars-context-list .context_list_context .context-list-toggle-box"
+  end
+
   def event_popover_header_selector
     ".event-details-header"
   end
@@ -103,6 +107,10 @@ module CalendarOtherCalendarsPage
 
   def event_link_selector
     ".view_event_link"
+  end
+
+  def other_calendars_new_pill_selector
+    "#other-calendars-list-holder .new-feature-pill"
   end
 
   #------------------------- Elements ---------------------------
@@ -168,6 +176,10 @@ module CalendarOtherCalendarsPage
 
   def account_calendar_list_items
     ffj(account_calendar_list_items_selector)
+  end
+
+  def account_calendar_available_list_item
+    f(account_calendar_available_list_item_selector)
   end
 
   def event_popover_title

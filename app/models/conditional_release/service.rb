@@ -78,7 +78,7 @@ module ConditionalRelease
         rules = course.conditional_release_rules.active.with_assignments.to_a
         rules.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
       end
-      trigger_ids = rules_data.map { |rule| rule["trigger_assignment_id"] }
+      trigger_ids = rules_data.pluck("trigger_assignment_id")
       trigger_assgs = course.assignments.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
         assgs[a.id] = {
           points_possible: a.points_possible,
@@ -162,12 +162,13 @@ module ConditionalRelease
                   end
               end
               assignment_sets_data = (assignment_sets || []).as_json(
-                include_root: false, except: [:root_account_id, :deleted_at],
+                include_root: false,
+                except: [:root_account_id, :deleted_at],
                 include: { assignment_set_associations: { except: [:root_account_id, :deleted_at] } }
               ).map(&:deep_symbolize_keys)
               rule.as_json(include_root: false, except: [:root_account_id, :deleted_at]).merge(
                 locked: relative_score.blank?,
-                selected_set_id: selected_set_id,
+                selected_set_id:,
                 assignment_sets: assignment_sets_data
               )
             end
@@ -229,10 +230,23 @@ module ConditionalRelease
       end
 
       def assignment_keys
-        %i[id title name description due_at unlock_at lock_at
-           points_possible min_score max_score grading_type
-           submission_types workflow_state context_id
-           context_type updated_at context_code]
+        %i[id
+           title
+           name
+           description
+           due_at
+           unlock_at
+           lock_at
+           points_possible
+           min_score
+           max_score
+           grading_type
+           submission_types
+           workflow_state
+           context_id
+           context_type
+           updated_at
+           context_code]
       end
     end
   end

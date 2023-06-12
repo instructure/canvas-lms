@@ -26,7 +26,7 @@
 
 require_relative "../common"
 
-RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/.freeze # 10 chars of an MD5
+RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/ # 10 chars of an MD5
 
 describe "Stuff related to how we load stuff from CDN and use brandable_css" do
   include_context "in-process server selenium tests"

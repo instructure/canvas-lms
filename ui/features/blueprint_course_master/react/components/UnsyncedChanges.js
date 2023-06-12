@@ -20,7 +20,7 @@ import React, {Component} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Heading} from '@instructure/ui-heading'

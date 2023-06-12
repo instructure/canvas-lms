@@ -35,7 +35,7 @@ module StatePoller
         wait = next_wait(wait)
       end
       spent = f3(Time.now.to_f - start)
-      { got: got, spent: spent }
+      { got:, spent: }
     end
 
     private
@@ -55,7 +55,7 @@ module StatePoller
 
     # Next wait time is calculated using exponential growth function and capped at predefined level
     def next_wait(wait)
-      wait < WAIT_STEP_CAP ? [wait * WAIT_STEP_GROWTH, WAIT_STEP_CAP].min : wait
+      (wait < WAIT_STEP_CAP) ? [wait * WAIT_STEP_GROWTH, WAIT_STEP_CAP].min : wait
     end
 
     def f3(float)

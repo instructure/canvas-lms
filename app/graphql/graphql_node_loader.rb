@@ -209,11 +209,9 @@ module GraphQLNodeLoader
       end
     when "Conversation"
       Loaders::IDLoader.for(Conversation).load(id).then do |conversation|
-        Loaders::AssociationLoader.for(User, :all_conversations).load(ctx[:current_user]).then do |all_conversations|
-          next nil unless all_conversations.where(conversation_id: conversation.id).first
+        next nil unless conversation.conversation_participants.where(user: ctx[:current_user]).first
 
-          conversation
-        end
+        conversation
       end
     when "LearningOutcome"
       Loaders::IDLoader.for(LearningOutcome).load(id).then do |record|

@@ -134,9 +134,10 @@ describe Types::UserType do
     context "as admin" do
       let(:admin) { account_admin_user }
       let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student, current_user: admin,
-                                        domain_root_account: @course.account.root_account,
-                                        request: ActionDispatch::TestRequest.create)
+        GraphQLTypeTester.new(@student,
+                              current_user: admin,
+                              domain_root_account: @course.account.root_account,
+                              request: ActionDispatch::TestRequest.create)
       end
 
       it "returns the sis user id if the user has permissions to read it" do
@@ -145,9 +146,10 @@ describe Types::UserType do
 
       it "returns nil if the user does not have permission to read the sis user id" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student, current_user: @admin,
-                                                     domain_root_account: @course.account.root_account,
-                                                     request: ActionDispatch::TestRequest.create)
+        admin_type = GraphQLTypeTester.new(@student,
+                                           current_user: @admin,
+                                           domain_root_account: @course.account.root_account,
+                                           request: ActionDispatch::TestRequest.create)
         expect(admin_type.resolve("sisId")).to be_nil
       end
     end
@@ -178,9 +180,10 @@ describe Types::UserType do
     context "as admin" do
       let(:admin) { account_admin_user }
       let(:user_type_as_admin) do
-        GraphQLTypeTester.new(@student, current_user: admin,
-                                        domain_root_account: @course.account.root_account,
-                                        request: ActionDispatch::TestRequest.create)
+        GraphQLTypeTester.new(@student,
+                              current_user: admin,
+                              domain_root_account: @course.account.root_account,
+                              request: ActionDispatch::TestRequest.create)
       end
 
       it "returns the integration id if admin user has permissions to read SIS info" do
@@ -189,9 +192,10 @@ describe Types::UserType do
 
       it "returns null for integration id if admin user does not have permission to read SIS info" do
         account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
-        admin_type = GraphQLTypeTester.new(@student, current_user: @admin,
-                                                     domain_root_account: @course.account.root_account,
-                                                     request: ActionDispatch::TestRequest.create)
+        admin_type = GraphQLTypeTester.new(@student,
+                                           current_user: @admin,
+                                           domain_root_account: @course.account.root_account,
+                                           request: ActionDispatch::TestRequest.create)
         expect(admin_type.resolve("integrationId")).to be_nil
       end
     end
@@ -275,7 +279,8 @@ describe Types::UserType do
           course {
             _id
           }
-        }', current_user: @student).map(&:to_i)).to eq [@course2.id, @course1.id]
+        }',
+                               current_user: @student).map(&:to_i)).to eq [@course2.id, @course1.id]
     end
 
     it "doesn't return enrollments for courses the user doesn't have permission for" do
@@ -288,6 +293,22 @@ describe Types::UserType do
       expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }").length).to eq 1
       @student.enrollments.update_all workflow_state: "completed"
       expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }")).to eq []
+    end
+
+    it "excludes enrollments that have a state of creation_pending" do
+      expect(user_type.resolve("enrollments { _id }").length).to eq 1
+      @student.enrollments.update(workflow_state: "creation_pending")
+      expect(user_type.resolve("enrollments { _id }")).to eq []
+    end
+
+    it "excludes enrollments that have a enrollment_state of pending_active" do
+      expect(user_type.resolve("enrollments { _id }", current_user: @student).length).to eq @student.enrollments.count
+
+      @course1.update(start_at: 1.week.from_now, restrict_enrollments_to_course_dates: true)
+
+      expect(@student.enrollments.where(course_id: @course1)[0].enrollment_state.state).to eq "pending_active"
+
+      expect(user_type.resolve("enrollments { _id }", current_user: @student)).to eq [@student.enrollments.where(course_id: @course2).first.to_param]
     end
   end
 
@@ -409,7 +430,7 @@ describe Types::UserType do
       it "returns nil" do
         expect(
           user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }")
-        ).to eq nil
+        ).to be_nil
       end
     end
   end
@@ -541,7 +562,7 @@ describe Types::UserType do
       type = GraphQLTypeTester.new(@teacher, current_user: @student, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
       expect(
         type.resolve("conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
-      ).to be nil
+      ).to be_nil
     end
 
     it "filters the conversations" do
@@ -641,7 +662,7 @@ describe Types::UserType do
 
     it "returns nil if the user is not the current user" do
       result = user_type.resolve("recipients { usersConnection { nodes { _id } } }")
-      expect(result).to be nil
+      expect(result).to be_nil
     end
 
     it "returns known users" do
@@ -657,20 +678,20 @@ describe Types::UserType do
 
     it "returns false for sendMessagesAll if no context is given" do
       result = type.resolve("recipients { sendMessagesAll }")
-      expect(result).to eq(false)
+      expect(result).to be(false)
     end
 
     it "returns false for sendMessagesAll if not allowed" do
       # Students do not have the sendMessagesAll permission by default
       result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { sendMessagesAll }")
-      expect(result).to eq(false)
+      expect(result).to be(false)
     end
 
     it "returns true for sendMessagesAll if allowed" do
       @random_person.account.role_overrides.create!(permission: :send_messages_all, role: student_role, enabled: true)
 
       result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { sendMessagesAll }")
-      expect(result).to eq(true)
+      expect(result).to be(true)
     end
 
     it "searches users" do
@@ -680,7 +701,7 @@ describe Types::UserType do
       expect(result[0]).to eq(known_users.first.id.to_s)
 
       result = type.resolve('recipients(search: "morty") { usersConnection { nodes { _id } } }')
-      expect(result).to match_array([])
+      expect(result).to be_empty
     end
 
     it "searches contexts" do
@@ -688,7 +709,7 @@ describe Types::UserType do
       expect(result[0]).to eq(@course.name)
 
       result = type.resolve('recipients(search: "Lemon") { contextsConnection { nodes { name } } }')
-      expect(result).to match_array([])
+      expect(result).to be_empty
     end
 
     it "filters results based on context" do
@@ -814,12 +835,12 @@ describe Types::UserType do
 
     it "returns nil if the user is not the current user" do
       result = teacher_type.resolve('recipientsObservers(contextCode: "course_1", recipientIds: ["1"]) { nodes { _id } } ')
-      expect(result).to be nil
+      expect(result).to be_nil
     end
 
     it "returns nil if invalid course is given" do
       result = teacher_type.resolve('recipientsObservers(contextCode: "fake_2", recipientIds: ["1"]) { nodes { _id } } ')
-      expect(result).to be nil
+      expect(result).to be_nil
     end
 
     it "returns a users observers as messageable user" do
@@ -938,7 +959,7 @@ describe Types::UserType do
       it "returns comments across shards" do
         @shard1.activate do
           account = Account.create!(name: "new shard account")
-          @course2 = course_factory(account: account)
+          @course2 = course_factory(account:)
           @course2.enroll_user(@teacher)
           @comment2 = comment_bank_item_model(user: @teacher, context: @course2, comment: "shard 2 comment")
         end
@@ -991,7 +1012,7 @@ describe Types::UserType do
 
       @custom_teacher = user_factory(name: "blah")
       role = custom_teacher_role("CustomTeacher", account: @course.account)
-      @course.enroll_user(@custom_teacher, "TeacherEnrollment", role: role)
+      @course.enroll_user(@custom_teacher, "TeacherEnrollment", role:)
 
       @teacher_with_duplicate_roles = user_factory(name: "blah")
       @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment")
@@ -1091,10 +1112,10 @@ describe Types::UserType do
       course_2 = Course.create! name: "TEST 2"
 
       # these 'course_with_user' will  reassign @course
-      @teacher = course_with_user("TeacherEnrollment", course: course, name: "Mr Teacher", active_all: true).user
+      @teacher = course_with_user("TeacherEnrollment", course:, name: "Mr Teacher", active_all: true).user
       @teacher = course_with_user("TeacherEnrollment", course: course_2, user: @teacher, active_all: true).user
-      @student = course_with_user("StudentEnrollment", course: course, name: "Mr Student 1", active_all: true).user
-      @student_2 = course_with_user("StudentEnrollment", course: course, name: "Mr Student 2", active_all: true).user
+      @student = course_with_user("StudentEnrollment", course:, name: "Mr Student 1", active_all: true).user
+      @student_2 = course_with_user("StudentEnrollment", course:, name: "Mr Student 2", active_all: true).user
       @student_2 = course_with_user("StudentEnrollment", course: course_2, user: @student_2, active_all: true).user
 
       @course = course

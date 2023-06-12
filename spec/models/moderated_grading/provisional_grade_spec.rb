@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe ModeratedGrading::ProvisionalGrade do
-  subject(:provisional_grade) { submission.provisional_grades.build(scorer: scorer) }
+  subject(:provisional_grade) { submission.provisional_grades.build(scorer:) }
 
   let(:account) { Account.default }
   let(:course) { account.courses.create! }
@@ -51,7 +51,7 @@ describe ModeratedGrading::ProvisionalGrade do
   describe "#auditable?" do
     subject(:provisional_grade) { submission.provisional_grades.build(valid_params) }
 
-    let(:valid_params) { { scorer: scorer, current_user: scorer } }
+    let(:valid_params) { { scorer:, current_user: scorer } }
 
     context "new object" do
       it { is_expected.to be_auditable }
@@ -78,7 +78,7 @@ describe ModeratedGrading::ProvisionalGrade do
     context "created object" do
       # `reload` to simulate a fresh object that would normally be fetch
       # through an association or `find` with no saved_change_attributes
-      subject(:provisional_grade) { submission.provisional_grades.create!(scorer: scorer).reload }
+      subject(:provisional_grade) { submission.provisional_grades.create!(scorer:).reload }
 
       context "given auditable changes" do
         before { provisional_grade.assign_attributes(score: 10, current_user: scorer) }
@@ -102,7 +102,7 @@ describe ModeratedGrading::ProvisionalGrade do
     context "destroyed object" do
       subject(:provisional_grade) { created_provisional_grade.destroy! }
 
-      let(:created_provisional_grade) { submission.provisional_grades.create!(scorer: scorer, current_user: scorer).reload }
+      let(:created_provisional_grade) { submission.provisional_grades.create!(scorer:, current_user: scorer).reload }
 
       it { is_expected.to be_auditable }
     end
@@ -138,7 +138,7 @@ describe ModeratedGrading::ProvisionalGrade do
 
       it "creates a provisional_grade_created audit event on creation" do
         expect { @provisional_grade.save! }.to change {
-          AnonymousOrModerationEvent.where(event_type: event_type, submission: @submission).count
+          AnonymousOrModerationEvent.where(event_type:, submission: @submission).count
         }.by(1)
       end
 
@@ -146,11 +146,11 @@ describe ModeratedGrading::ProvisionalGrade do
         before(:once) do
           @provisional_grade.assign_attributes(
             scorer: @teacher,
-            score: score,
-            grade: grade,
-            final: final,
-            source_provisional_grade_id: source_provisional_grade_id,
-            graded_anonymously: graded_anonymously
+            score:,
+            grade:,
+            final:,
+            source_provisional_grade_id:,
+            graded_anonymously:
           )
           @provisional_grade.save!
         end
@@ -158,7 +158,7 @@ describe ModeratedGrading::ProvisionalGrade do
         it { is_expected.to have_attributes(assignment: @submission.assignment) }
         it { is_expected.to have_attributes(submission: @submission) }
         it { is_expected.to have_attributes(user: @teacher) }
-        it { is_expected.to have_attributes(event_type: event_type) }
+        it { is_expected.to have_attributes(event_type:) }
         it { expect(event.payload.fetch("id")).to be_present }
         it { expect(event.payload).to include("score" => score) }
         it { expect(event.payload).to include("grade" => grade) }
@@ -176,7 +176,7 @@ describe ModeratedGrading::ProvisionalGrade do
       it "creates a provisional_grade_updated audit event on update" do
         @provisional_grade.save!
         expect { @provisional_grade.update!(score: 1) }.to change {
-          AnonymousOrModerationEvent.where(event_type: event_type, submission: @submission).count
+          AnonymousOrModerationEvent.where(event_type:, submission: @submission).count
         }.by(1)
       end
 
@@ -185,11 +185,11 @@ describe ModeratedGrading::ProvisionalGrade do
           @updated_scorer = user_factory
           @provisional_grade.assign_attributes(
             scorer: @teacher,
-            score: score,
-            grade: grade,
-            final: final,
-            source_provisional_grade_id: source_provisional_grade_id,
-            graded_anonymously: graded_anonymously
+            score:,
+            grade:,
+            final:,
+            source_provisional_grade_id:,
+            graded_anonymously:
           )
           @provisional_grade.save!
           Timecop.freeze(updated_graded_at) do
@@ -215,7 +215,7 @@ describe ModeratedGrading::ProvisionalGrade do
         it { is_expected.to have_attributes(assignment: @submission.assignment) }
         it { is_expected.to have_attributes(submission: @submission) }
         it { is_expected.to have_attributes(user: @teacher) }
-        it { is_expected.to have_attributes(event_type: event_type) }
+        it { is_expected.to have_attributes(event_type:) }
         it { expect(event.payload.fetch("id")).to be_present }
         it { expect(event.payload).to include("score" => [score, updated_score]) }
         it { expect(event.payload).to include("grade" => [grade, updated_grade]) }
@@ -229,7 +229,7 @@ describe ModeratedGrading::ProvisionalGrade do
   end
 
   describe "grade_attributes" do
-    subject(:provisional_grade) { submission.provisional_grades.build(score: 100.0, grade: "A", scorer: scorer) }
+    subject(:provisional_grade) { submission.provisional_grades.build(score: 100.0, grade: "A", scorer:) }
 
     it "returns the proper format" do
       json = provisional_grade.grade_attributes
@@ -252,7 +252,7 @@ describe ModeratedGrading::ProvisionalGrade do
     before do
       @admin1 = account_admin_user(account: course.root_account)
       @admin2 = account_admin_user(account: course.root_account)
-      ta = ta_in_course(course: course, active_all: true).user
+      ta = ta_in_course(course:, active_all: true).user
       submission.find_or_create_provisional_grade!(ta)
     end
 
@@ -275,7 +275,7 @@ describe ModeratedGrading::ProvisionalGrade do
         submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hallo")
       end
       provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
-      expect(provisional_grade.reload.grade_matches_current_submission).to eq true
+      expect(provisional_grade.reload.grade_matches_current_submission).to be true
     end
 
     it "returns false if the submission is newer than the grade" do
@@ -286,7 +286,7 @@ describe ModeratedGrading::ProvisionalGrade do
         provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
       end
       assignment.submit_homework(student, submission_type: "online_text_entry", body: "resubmit")
-      expect(provisional_grade.reload.grade_matches_current_submission).to eq false
+      expect(provisional_grade.reload.grade_matches_current_submission).to be false
     end
   end
 
@@ -353,7 +353,7 @@ describe ModeratedGrading::ProvisionalGrade do
 
   describe "publish_rubric_assessments!" do
     it "publishes rubric assessments to the submission" do
-      outcome_with_rubric(course: course)
+      outcome_with_rubric(course:)
       association = @rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
 
       submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hallo")
@@ -383,7 +383,7 @@ describe ModeratedGrading::ProvisionalGrade do
     end
 
     it "does not publish rubric assessments when the rubric association is soft-deleted" do
-      outcome_with_rubric(course: course)
+      outcome_with_rubric(course:)
       association = @rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
       association.destroy
 
@@ -407,7 +407,7 @@ describe ModeratedGrading::ProvisionalGrade do
     end
 
     it "does not error when a rubric has been deleted after an assessment took place" do
-      outcome_with_rubric(course: course)
+      outcome_with_rubric(course:)
       association = @rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
 
       submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hallo")
@@ -431,7 +431,7 @@ describe ModeratedGrading::ProvisionalGrade do
     end
 
     it "posts learning outcome results" do
-      outcome_with_rubric(course: course)
+      outcome_with_rubric(course:)
       association = @rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
 
       submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hallo")
@@ -450,13 +450,13 @@ describe ModeratedGrading::ProvisionalGrade do
             }
           }
         )
-      end.to change { LearningOutcomeResult.count }.by(0)
+      end.not_to change { LearningOutcomeResult.count }
 
       expect { provisional_grade.publish! }.to change { LearningOutcomeResult.count }.by(1)
     end
 
     it "sets grade_posting_in_progress on the rubric_assessment's submission" do
-      outcome_with_rubric(course: course)
+      outcome_with_rubric(course:)
       association = @rubric.associate_with(assignment, course, purpose: "grading", use_for_grading: true)
       submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "hallo")
       provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
@@ -482,7 +482,7 @@ describe ModeratedGrading::ProvisionalGrade do
   describe "publish!" do
     it "sets the submission as 'graded'" do
       assignment.update!(moderated_grading: true, grader_count: 2)
-      submission = submission_model(assignment: assignment, user: student)
+      submission = submission_model(assignment:, user: student)
       provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 80, graded_anonymously: true)
       provisional_grade.publish!
       submission.reload
@@ -499,12 +499,12 @@ describe ModeratedGrading::ProvisionalGrade do
       provisional_grade.publish!
       submission.reload
 
-      expect(submission.grade_matches_current_submission).to eq true
+      expect(submission.grade_matches_current_submission).to be true
       expect(submission.graded_at).not_to be_nil
       expect(submission.grader_id).to eq scorer.id
       expect(submission.score).to eq 80
       expect(submission.grade).not_to be_nil
-      expect(submission.graded_anonymously).to eq true
+      expect(submission.graded_anonymously).to be true
     end
 
     it "duplicates submission comments from the provisional grade to the submission" do
@@ -567,7 +567,7 @@ describe ModeratedGrading::ProvisionalGrade do
       submission.add_comment(comment: "provisional comment", provisional: true, author: scorer)
 
       expect { provisional_grade.publish!(skip_grade_calc: true) }.not_to change {
-        AnonymousOrModerationEvent.where(assignment: assignment, submission: submission)
+        AnonymousOrModerationEvent.where(assignment:, submission:)
                                   .submission_comment_created.count
       }
     end

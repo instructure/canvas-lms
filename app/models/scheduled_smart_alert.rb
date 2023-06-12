@@ -37,8 +37,10 @@ class ScheduledSmartAlert < ApplicationRecord
 
   def self.upsert(context_type:, context_id:, alert_type:, due_at:, root_account_id:)
     ScheduledSmartAlert.unique_constraint_retry do
-      scheduled_job = ScheduledSmartAlert.where(context_type: context_type, context_id: context_id,
-                                                alert_type: alert_type, root_account_id: root_account_id).first_or_initialize
+      scheduled_job = ScheduledSmartAlert.where(context_type:,
+                                                context_id:,
+                                                alert_type:,
+                                                root_account_id:).first_or_initialize
 
       scheduled_job.due_at = due_at
       scheduled_job.save!

@@ -87,12 +87,38 @@ module MicrosoftSync
       end
     end
 
+    # Retrieves Pseudonyms for the given user_ids that have
+    # the given field defined. Searches the current shard for
+    # all user_ids first, then any cross-shard users. Prefers
+    # pseudonyms from the given root account.
+    # Returns an array of [user id, value for field]
     def find_by_active_pseudonyms_field(field)
-      root_account.pseudonyms
-                  .active.where(user_id: user_ids)
-                  .where.not(field => nil)
-                  .order(position: :asc)
-                  .pluck(:user_id, field)
+      local_results = find_by_active_pseudonyms_field_local(field, user_ids)
+      found_user_ids = local_results.map(&:user_id).uniq
+      missing_user_ids = user_ids.difference(found_user_ids)
+
+      # look on other present shards, and only for users that live on that shard
+      sync_shard = Shard.current
+      other_results = Shard.partition_by_shard(missing_user_ids) do |shard_user_ids|
+        next if Shard.current == sync_shard
+
+        find_by_active_pseudonyms_field_local(field, shard_user_ids)
+      end
+
+      # prefer the current shard
+      (local_results + other_results)
+        # prefer the current root account
+        .sort_by { |ps| (ps.root_account_id == root_account.id) ? 0 : 1 }
+        .map { |ps| [ps.user_id, ps[field]] }
+    end
+
+    def find_by_active_pseudonyms_field_local(field, uids)
+      Pseudonym
+        .active
+        .where(user_id: uids)
+        .where.not(field => nil)
+        .order(position: :asc)
+        .select(:user_id, field, :root_account_id)
     end
 
     def login_attribute

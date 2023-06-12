@@ -21,7 +21,7 @@
 describe Lti::PrivacyLevelExpander do
   include ExternalToolsSpecHelper
   let(:course) { course_model }
-  let(:user) { course_with_student(course: course).user }
+  let(:user) { course_with_student(course:).user }
   let(:placement) { "resource_selection" }
   let(:tool) { new_valid_tool(course) }
   let(:launch_url) { "http://www.test.com/launch" }
@@ -33,7 +33,7 @@ describe Lti::PrivacyLevelExpander do
       {
         current_user: user,
         current_pseudonym: user.pseudonyms.first,
-        tool: tool
+        tool:
       }
     )
   end

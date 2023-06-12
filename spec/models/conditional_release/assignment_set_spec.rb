@@ -21,12 +21,12 @@
 require_relative "../../conditional_release_spec_helper"
 
 module ConditionalRelease
-  describe AssignmentSet, type: :model do
+  describe AssignmentSet do
     it_behaves_like "a soft-deletable model"
 
     it "must have a scoring_range_id" do
       assignment_set = build :assignment_set, scoring_range_id: nil
-      expect(assignment_set.valid?).to eq false
+      expect(assignment_set.valid?).to be false
     end
   end
 end

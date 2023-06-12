@@ -50,7 +50,8 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
       entry.quoted_entry_id = input[:quoted_entry_id]
     end
 
-    unless input[:file_id].nil?
+    # Don't do anything to attachments if the file_id is nil or hasn't changed
+    if !input[:file_id].nil? && entry&.attachment_id != input[:file_id].to_i
       attachment = Attachment.find(input[:file_id])
       raise ActiveRecord::RecordNotFound unless attachment.user == current_user
 

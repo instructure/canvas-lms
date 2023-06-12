@@ -29,13 +29,14 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :rubric_association
   belongs_to :user
   belongs_to :assessor, class_name: "User"
-  belongs_to :artifact, touch: true,
-                        polymorphic: [:submission, :assignment, { provisional_grade: "ModeratedGrading::ProvisionalGrade" }]
+  belongs_to :artifact,
+             touch: true,
+             polymorphic: [:submission, :assignment, { provisional_grade: "ModeratedGrading::ProvisionalGrade" }]
   has_many :assessment_requests, dependent: :destroy
   has_many :learning_outcome_results, as: :artifact, dependent: :destroy
   serialize :data
 
-  self.ignored_columns = [:comments]
+  self.ignored_columns += [:comments]
 
   simply_versioned
 
@@ -175,20 +176,20 @@ class RubricAssessment < ActiveRecord::Base
     requests = assessment_requests
     if active_rubric_association?
       requests += rubric_association.assessment_requests.where({
-                                                                 assessor_id: assessor_id,
+                                                                 assessor_id:,
                                                                  asset_id: artifact_id,
                                                                  asset_type: artifact_type
                                                                })
     end
     requests.each do |a|
-      a.attributes = { rubric_assessment: self, assessor: assessor }
+      a.attributes = { rubric_assessment: self, assessor: }
       a.complete
     end
   end
   protected :update_assessment_requests
 
   def attempt
-    artifact_type == "Submission" ? artifact.attempt : nil
+    (artifact_type == "Submission") ? artifact.attempt : nil
   end
 
   def set_graded_anonymously
@@ -205,14 +206,14 @@ class RubricAssessment < ActiveRecord::Base
 
       assignment.grade_student(
         artifact.student,
-        score: score,
+        score:,
         grader: assessor,
         graded_anonymously: @graded_anonymously_set,
         grade_posting_in_progress: artifact.grade_posting_in_progress
       )
       artifact.reload
     when "ModeratedGrading::ProvisionalGrade"
-      artifact.update!(score: score, grade: nil)
+      artifact.update!(score:, grade: nil)
     end
   end
   protected :update_artifact
@@ -305,7 +306,7 @@ class RubricAssessment < ActiveRecord::Base
       students = rubric_association.association_object.group_students(user).last
       students.map do |student|
         submission = rubric_association.association_object.find_asset_for_assessment(rubric_association, student).first
-        { submission: submission,
+        { submission:,
           rubric_assessments: submission.rubric_assessments
                                         .where.not(rubric_association: nil)
                                         .map { |ra| ra.as_json(methods: :assessor_name) } }

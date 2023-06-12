@@ -8,6 +8,19 @@ Grading
 **Trigger:** Triggered anytime a grade is created or modified.
 
 
+### Event Body Schema
+
+| Field | Description |
+|-|-|
+| **data[0].group.extensions["com.instructure.canvas"].context_type** | Canvas context type where the action took place e.g context_type = Course. |
+| **data[0].group.extensions["com.instructure.canvas"].entity_id** | Canvas context ID |
+| **data[0].object.extensions["com.instructure.canvas"].entity_id** | Canvas global ID of the object affected by the event |
+| **data[0].object.extensions["com.instructure.canvas"].grade** | The new submission grade |
+| **data[0].object.type** | GradeEvent |
+
+
+
+
 
 ### Payload Example:
 
@@ -134,17 +147,6 @@ Grading
 }
 ```
 
-
-
-
-### Event Body Schema
-
-| Field | Description |
-|-|-|
-| **data[0].group.extensions["com.instructure.canvas"].context_type** | Canvas context type where the action took place e.g context_type = Course. |
-| **data[0].group.extensions["com.instructure.canvas"].entity_id** | Canvas context ID |
-| **data[0].object.extensions["com.instructure.canvas"].entity_id** | Canvas global ID of the object affected by the event |
-| **data[0].object.extensions["com.instructure.canvas"].grade** | The new submission grade |
 
 
 

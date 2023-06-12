@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`data returns empty caption object 1`] = `
+Object {
+  "caption": "",
+}
+`;
+
+exports[`form returns the appropriate object 1`] = `
+Array [
+  Object {
+    "dataKey": "caption",
+    "label": "Add a caption",
+  },
+]
+`;
+
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about using captions with tables"`;
+
+exports[`message returns the proper message 1`] = `"Tables should include a caption describing the contents of the table."`;
+
+exports[`why returns the proper why message 1`] = `"Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table."`;

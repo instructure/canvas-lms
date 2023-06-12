@@ -53,7 +53,7 @@ describe "teacher k5 dashboard" do
     it "provides the homeroom dashboard tabs on dashboard" do
       get "/"
 
-      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(welcome_title).to be_present
       expect(homeroom_tab).to be_displayed
       expect(schedule_tab).to be_displayed
       expect(grades_tab).to be_displayed
@@ -82,8 +82,8 @@ describe "teacher k5 dashboard" do
     it "does not show homeroom course on dashboard" do
       get "/"
 
-      expect(element_exists?(course_card_selector(@course_name))).to eq(false)
-      expect(element_exists?(course_card_selector(@subject_course_title))).to eq(true)
+      expect(element_exists?(course_card_selector(@course_name))).to be(false)
+      expect(element_exists?(course_card_selector(@subject_course_title))).to be(true)
     end
 
     it "shows Important Info on the course navigation list" do
@@ -361,8 +361,8 @@ describe "teacher k5 dashboard" do
     end
 
     it "creates course with account name and course name",
-       ignore_js_errors: true,
-       custom_timeout: 30 do
+       custom_timeout: 30,
+       ignore_js_errors: true do
       @sub_account = @account.sub_accounts.create!(name: "test")
       course_with_teacher(
         account: @sub_account,
@@ -385,8 +385,8 @@ describe "teacher k5 dashboard" do
     end
 
     it "allows for sync of course to selected homeroom",
-       ignore_js_errors: true,
-       custom_timeout: 30 do
+       custom_timeout: 30,
+       ignore_js_errors: true do
       second_homeroom_course_name = "Second homeroom course"
 
       course_with_teacher(

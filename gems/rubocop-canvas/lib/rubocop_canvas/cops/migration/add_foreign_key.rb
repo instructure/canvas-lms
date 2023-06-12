@@ -47,7 +47,7 @@ module RuboCop
           return if @current_def == :down
 
           add_foreign_key?(node) do |table_arg|
-            if !@new_tables.include?(table_arg.value.to_s) && (!@non_transactional || !delay_validation?(node))
+            if !@new_tables.include?(table_arg.indifferent) && (!@non_transactional || !delay_validation?(node))
               add_offense(node, severity: :warning)
             end
           end

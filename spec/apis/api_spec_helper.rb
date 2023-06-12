@@ -80,7 +80,7 @@ def api_call_as_user(user, method, path, params, body_params = {}, headers = {},
   account = opts[:domain_root_account] || Account.default
   user.pseudonyms.reload
   p = SisPseudonym.for(user, account, type: :implicit, require_sis: false)
-  p ||= account.pseudonyms.create!(unique_id: "#{user.id}@example.com", user: user)
+  p ||= account.pseudonyms.create!(unique_id: "#{user.id}@example.com", user:)
   allow_any_instantiation_of(p).to receive(:works_for_account?).and_return(true)
   api_call(method, path, params, body_params, headers, opts)
 end
@@ -100,7 +100,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
   enable_forgery_protection do
     route_params = params_from_with_nesting(method, path)
     route_params.each do |key, value|
-      raise "Expected value of params[\'#{key}\'] to equal #{value}, actual: #{params[key]}" unless params[key].to_s == value.to_s
+      raise "Expected value of params['#{key}'] to equal #{value}, actual: #{params[key]}" unless params[key].to_s == value.to_s
     end
     if @use_basic_auth
       user_session(@user)
@@ -116,7 +116,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
       end
     end
     allow(LoadAccount).to receive(:default_domain_root_account).and_return(opts[:domain_root_account]) if opts.key?(:domain_root_account)
-    __send__(method, path, headers: headers, params: params.except(*route_params.keys).merge(body_params))
+    __send__(method, path, headers:, params: params.except(*route_params.keys).merge(body_params))
   end
 end
 
@@ -131,7 +131,7 @@ end
 
 def params_from_with_nesting(method, path)
   path, querystring = path.split("?")
-  params = CanvasRails::Application.routes.recognize_path(path, method: method)
+  params = CanvasRails::Application.routes.recognize_path(path, method:)
   querystring.blank? ? params : params.merge(Rack::Utils.parse_nested_query(querystring).symbolize_keys!)
 end
 
@@ -186,7 +186,7 @@ def should_translate_user_content(course, include_verifiers = true)
 end
 
 def should_process_incoming_user_content(context)
-  attachment_model(context: context)
+  attachment_model(context:)
   incoming_content = "<p>content blahblahblah <a href=\"/files/#{@attachment.id}/download?a=1&amp;verifier=2&amp;b=3\">haha</a></p>"
 
   saved_content = yield incoming_content

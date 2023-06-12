@@ -37,8 +37,6 @@ describe IncomingMailProcessor::SqsMailbox do
   let(:queue) { double }
   let(:default_config) do
     {
-      access_key_id: "access-key",
-      secret_access_key: "secret-access-key",
       incoming_mail_queue_name: "incoming-mail-queue",
       error_folder: "error-mail-queue",
       idle_timeout: 1,

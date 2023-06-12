@@ -36,7 +36,7 @@ module ActiveModel
 
       def format_error_message(attribute, error_message)
         {
-          attribute: attribute,
+          attribute:,
           type: error_message.type || error_message.message || "invalid",
           message: error_message.message || error_message.type || "invalid",
         }
@@ -57,7 +57,7 @@ module ActiveModel
           default: keys,
           model: base.class.name.humanize,
           attribute: base.class.human_attribute_name(attribute),
-          value: value
+          value:
         }.merge(self.options)
         options[:default] ||= keys
 
@@ -121,7 +121,7 @@ module ActiveModel
                   keys.shift,
                   default: keys,
                   attribute: str,
-                  message: message)
+                  message:)
       end
     end
 
@@ -163,8 +163,8 @@ module RailsErrorsExtensions
 end
 
 module RailsErrorCollectionExtensions
-  def each_key(&block)
-    @collection.each_key(&block)
+  def each_key(&)
+    @collection.each_key(&)
   end
 end
 

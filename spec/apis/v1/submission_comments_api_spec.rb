@@ -55,9 +55,12 @@ describe "Submissions Comment API", type: :request do
     def preflight(preflight_params)
       api_call :post,
                "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
-               { controller: "submission_comments_api", action: "create_file",
-                 format: "json", course_id: @course.to_param,
-                 assignment_id: @assignment.to_param, user_id: @student.to_param },
+               { controller: "submission_comments_api",
+                 action: "create_file",
+                 format: "json",
+                 course_id: @course.to_param,
+                 assignment_id: @assignment.to_param,
+                 user_id: @student.to_param },
                preflight_params
     end
 
@@ -67,9 +70,12 @@ describe "Submissions Comment API", type: :request do
       @course = orig_course
       raw_api_call :post,
                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
-                   { controller: "submission_comments_api", action: "create_file",
-                     format: "json", course_id: @course.to_param,
-                     assignment_id: @assignment.to_param, user_id: @student.to_param },
+                   { controller: "submission_comments_api",
+                     action: "create_file",
+                     format: "json",
+                     course_id: @course.to_param,
+                     assignment_id: @assignment.to_param,
+                     user_id: @student.to_param },
                    name: "whatever"
       expect(response).not_to be_successful
     end
@@ -137,31 +143,34 @@ describe "Submissions Comment API", type: :request do
     def annotation_notification_call(author_id: @student.to_param, assignment_id: auto_post_assignment.to_param)
       raw_api_call(:post,
                    "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/submissions/#{@student.to_param}/annotation_notification",
-                   { controller: "submission_comments_api", action: "annotation_notification",
-                     format: "json", course_id: @course.to_param,
-                     assignment_id: assignment_id, user_id: @student.to_param },
-                   { author_id: author_id })
+                   { controller: "submission_comments_api",
+                     action: "annotation_notification",
+                     format: "json",
+                     course_id: @course.to_param,
+                     assignment_id:,
+                     user_id: @student.to_param },
+                   { author_id: })
     end
 
     it "sends notification to teacher for student annotation" do
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*teacher_args)
       annotation_notification_call(author_id: @student.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "sends notification for admin annotation" do
       expect(BroadcastPolicy.notifier).to receive(:send_notification).twice
       annotation_notification_call(author_id: @admin.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "sends notification to student for teacher annotation when assignment post_manually is false" do
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args)
       annotation_notification_call(author_id: @teacher.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
 
       submission = auto_post_assignment.submission_for_student(@student)
-      expect(@student.reload.unread_submission_annotations?(submission)).to eq true
+      expect(@student.reload.unread_submission_annotations?(submission)).to be true
     end
 
     it "works for group submission annotation" do
@@ -173,58 +182,58 @@ describe "Submissions Comment API", type: :request do
       group_assignment_with_submission.post_submissions
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args).twice
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: group_assignment_with_submission.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "does not send to other teachers for teacher annotation" do
       second_teacher
       expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*teacher_args)
       annotation_notification_call(author_id: @teacher.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "does not send to students when assignment is post_manually" do
       expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*student_args)
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: manual_post_assignment.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "does send to students when assignment is post_manually and posted" do
       manual_post_assignment.post_submissions
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args).once
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: manual_post_assignment.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "does not send to students when submission is not posted and author is teacher" do
       expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*student_args)
       expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*teacher_args)
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: group_assignment_with_submission.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "does notify other group members of annotations" do
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args).once
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*teacher_args).once
       annotation_notification_call(author_id: @student.to_param, assignment_id: group_assignment_with_submission.to_param)
-      expect(response.status).to eq 200
+      expect(response).to have_http_status :ok
     end
 
     it "checks permission of caller" do
       @user = @teacher
       annotation_notification_call(author_id: @student.to_param)
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "checks that the assignment exists" do
       annotation_notification_call(author_id: @student.to_param, assignment_id: "invalid")
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
 
     it "checks that the author is a member of the course" do
       @course = @course.root_account.courses.create!(workflow_state: "available")
       annotation_notification_call(author_id: @student.to_param)
-      expect(response.status).to eq 404
+      expect(response).to have_http_status :not_found
     end
   end
 

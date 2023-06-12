@@ -33,11 +33,6 @@ require_migration_to_new_quizzes:
   environments:
     production:
       state: hidden
-new_quizzes_modules_support:
-  display_name: New Quizzes support for Modules
-  description: Improved New Quizzes support with Modules including creating New Quizzes from Modules
-  applies_to: SiteAdmin
-  state: hidden
 new_quizzes_assignment_build_button:
   display_name: New Quizzes Assignment Build Button
   description: Add a Build button on the Assignment edit page for New Quizzes Assignments
@@ -59,11 +54,6 @@ new_quizzes_account_course_level_item_banks:
     banks owned by specific courses and the root account in new quizzes.
   applies_to: SiteAdmin
   state: hidden
-new_quizzes_skip_to_build_module_button:
-  display_name: New Quizzes Build Button On List Views
-  description: Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page, Assignments page, and Quizzes page.
-  applies_to: SiteAdmin
-  state: hidden
 new_quizzes_by_default:
   state: allowed
   display_name: Default to New Quizzes
@@ -74,6 +64,19 @@ new_quizzes_allow_service_jwt_refresh:
   state: hidden
   display_name: New Quizzes Service JWT Refresh
   description: Enable New Quizzes to refresh Service JWTs used by RCE
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+new_quizzes_exports:
+  state: hidden
+  display_name: New Quizzes Export Support
+  description: Support exporting New Quizzes in QTI format
+  applies_to: SiteAdmin
+new_quizzes_migrate_without_content_rewrite:
+  state: hidden
+  display_name: New Quizzes Migrate Without Content Rewrite
+  description: Migrating a single classic quiz will leave HTML rich content fields as-is.
   applies_to: SiteAdmin
   environments:
     development:

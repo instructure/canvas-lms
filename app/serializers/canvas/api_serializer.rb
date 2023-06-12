@@ -77,8 +77,11 @@ module Canvas
     alias_method :user, :scope
     alias_method :current_user, :user
 
-    def_delegators :@controller, :polymorphic_url,
-                   :accepts_jsonapi?, :session, :context
+    def_delegators :@controller,
+                   :polymorphic_url,
+                   :accepts_jsonapi?,
+                   :session,
+                   :context
 
     # See ActiveModel::Serializer's documentation for options.
     #
@@ -164,10 +167,10 @@ module Canvas
     # assocs (AMS defaults to true).
     def build_serializer(association)
       object = send(association.name)
-      options = { controller: @controller, scope: scope }
+      options = { controller: @controller, scope: }
       association.build_serializer(object, options).tap do |serializer|
         if association.options.key?(:wrap_in_array)
-          serializer.instance_variable_set("@wrap_in_array",
+          serializer.instance_variable_set(:@wrap_in_array,
                                            association.options[:wrap_in_array])
         end
       end

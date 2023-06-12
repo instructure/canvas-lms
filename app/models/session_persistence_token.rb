@@ -75,7 +75,7 @@ class SessionPersistenceToken < ActiveRecord::Base
   end
 
   def self.delete_expired(since)
-    where("updated_at < ?", since.seconds.ago).delete_all
+    where("updated_at < ?", since.seconds.ago).in_batches(of: 10_000).delete_all
   end
 
   def valid_token?(persistence_token, uncrypted_token)

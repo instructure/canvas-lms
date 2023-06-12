@@ -19,10 +19,14 @@
 
 describe "DataFixup::AddRoleOverridesForNewPermission" do
   it "makes new role overrides" do
-    RoleOverride.create!(context: Account.default, permission: "read_forum",
-                         role: teacher_role, enabled: false)
-    RoleOverride.create!(context: Account.default, permission: "moderate_forum",
-                         role: admin_role, enabled: true)
+    RoleOverride.create!(context: Account.default,
+                         permission: "read_forum",
+                         role: teacher_role,
+                         enabled: false)
+    RoleOverride.create!(context: Account.default,
+                         permission: "moderate_forum",
+                         role: admin_role,
+                         enabled: true)
     DataFixup::AddRoleOverridesForNewPermission.run(:moderate_forum, :read_forum)
     new_ro = RoleOverride.where(permission: "read_forum", role_id: admin_role.id).first
     expect(new_ro.context).to eq Account.default

@@ -198,9 +198,7 @@
         </div>
 
         <div class="file-upload-submission-attachment">
-          <% unread_annotations =
-               @context.root_account.feature_enabled?(:submission_feedback_indicators) &&
-               @current_user&.unread_submission_annotations?(@submission) %>
+          <% unread_annotations = @current_user&.unread_submission_annotations?(@submission) %>
           <% if attachment.crocodoc_available? || attachment.canvadoc.try(:has_annotations?) %>
               <% preview_document = unread_annotations ?
                    t('Preview your submission and view teacher feedback. There are unread comments.') :

@@ -578,8 +578,8 @@
 #         },
 #         "rubric_settings": {
 #           "description": "(Optional) An object describing the basic attributes of the rubric, including the point total. Included if there is an associated rubric.",
-#           "example": "{\"points_possible\"=>12}",
-#           "type": "string"
+#           "example": {"points_possible": "12"},
+#           "type": "object"
 #         },
 #         "rubric": {
 #           "description": "(Optional) A list of scoring criteria and ratings for each rubric criterion. Included if there is an associated rubric.",
@@ -599,6 +599,11 @@
 #         },
 #         "omit_from_final_grade": {
 #           "description": "(Optional) If true, the assignment will be omitted from the student's final grade",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "hide_in_gradebook": {
+#           "description": "(Optional) If true, the assignment will not be shown in any gradebooks",
 #           "example": true,
 #           "type": "boolean"
 #         },
@@ -679,6 +684,66 @@
 #           "description": "(Optional, Deprecated) Boolean indicating whether notifications are muted for this assignment.",
 #           "example": false,
 #           "type": "boolean"
+#         },
+#         "anonymous_peer_reviews": {
+#           "description": "Boolean indicating whether peer reviews are anonymous.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "anonymous_instructor_annotations": {
+#           "description": "Boolean indicating whether instructor anotations are anonymous.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "graded_submissions_exist": {
+#           "description": "Boolean indicating whether this assignment has graded submissions.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "is_quiz_assignment": {
+#           "description": "Boolean indicating whether this is a quiz lti assignment.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "in_closed_grading_period": {
+#           "description": "Boolean indicating whether this assignment is in a closed grading period.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "can_duplicate": {
+#           "description": "Boolean indicating whether this assignment can be duplicated.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "original_course_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's course_id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "original_assignment_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "original_lti_resource_link_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's lti_resource_link_id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "original_assignment_name": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's name",
+#           "example": "some assignment",
+#           "type": "string"
+#         },
+#         "original_quiz_id": {
+#           "description": "If this assignment is a duplicate, it is the original assignment's quiz_id",
+#           "example": 4,
+#           "type": "integer"
+#         },
+#         "workflow_state": {
+#           "description": "String indicating what state this assignment is in.",
+#           "example": "unpublished",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -781,6 +846,9 @@ class AssignmentsApiController < ApplicationController
     if course_copy_retry?
       new_assignment.context = target_course
       new_assignment.assignment_group = target_assignment.assignment_group
+      set_assignment_asset_map(new_assignment) if new_assignment.quiz_lti?
+    else
+      new_assignment.resource_map = Assignment::DUPLICATED_IN_CONTEXT
     end
 
     # Specify the updating user to ensure that audit events are created
@@ -830,13 +898,14 @@ class AssignmentsApiController < ApplicationController
       include_params = Array(params[:include])
 
       if params[:bucket]
-        return invalid_bucket_error unless SortsAssignments::VALID_BUCKETS.include?(params[:bucket].to_sym)
-
-        users = current_user_and_observed(
-          include_observed: include_params.include?("observed_users")
-        )
-        submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
-        scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
+        args = { assignments_scope: scope, user: @current_user, session:, course: @context }
+        args[:requested_user] = user if @current_user != user
+        sorter = SortsAssignments.new(**args)
+        begin
+          scope = sorter.assignments(params[:bucket].to_sym)
+        rescue SortsAssignments::InvalidBucketError
+          return invalid_bucket_error
+        end
       end
 
       scope = scope.where(post_to_sis: value_to_boolean(params[:post_to_sis])) if params[:post_to_sis]
@@ -863,7 +932,7 @@ class AssignmentsApiController < ApplicationController
 
       assignments = if params[:assignment_group_id].present?
                       assignment_group_id = params[:assignment_group_id]
-                      scope = scope.where(assignment_group_id: assignment_group_id)
+                      scope = scope.where(assignment_group_id:)
                       Api.paginate(scope, self, api_v1_course_assignment_group_assignments_url(@context, assignment_group_id))
                     else
                       Api.paginate(scope, self, api_v1_course_assignments_url(@context))
@@ -874,7 +943,7 @@ class AssignmentsApiController < ApplicationController
         return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(",")}" }, status: :bad_request
       end
 
-      submissions = submissions_hash(include_params, assignments, submissions_for_user)
+      submissions = submissions_hash(include_params, assignments)
 
       include_all_dates = include_params.include?("all_dates")
       include_override_objects = include_params.include?("overrides") && @context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
@@ -925,13 +994,16 @@ class AssignmentsApiController < ApplicationController
                                        nil
                                      end
 
-        assignment_json(assignment, user, session,
-                        submission: submission, override_dates: override_dates,
-                        include_visibility: include_visibility,
+        assignment_json(assignment,
+                        user,
+                        session,
+                        submission:,
+                        override_dates:,
+                        include_visibility:,
                         assignment_visibilities: visibility_array,
-                        needs_grading_count_by_section: needs_grading_count_by_section,
-                        needs_grading_course_proxy: needs_grading_course_proxy,
-                        include_all_dates: include_all_dates,
+                        needs_grading_count_by_section:,
+                        needs_grading_course_proxy:,
+                        include_all_dates:,
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
@@ -981,7 +1053,7 @@ class AssignmentsApiController < ApplicationController
       options = {
         submission: submissions,
         override_dates: value_to_boolean(params[:override_assignment_dates] || true),
-        include_visibility: include_visibility,
+        include_visibility:,
         needs_grading_count_by_section: value_to_boolean(params[:needs_grading_count_by_section]),
         include_all_dates: value_to_boolean(params[:all_dates]),
         include_overrides: include_override_objects,
@@ -1133,6 +1205,9 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
   #
+  # @argument assignment[hide_in_gradebook] [Boolean]
+  #   Whether this assignment is shown in the gradebook.
+  #
   # @argument assignment[quiz_lti] [Boolean]
   #   Whether this assignment should use the Quizzes 2 LTI tool. Sets the
   #   submission type to 'external_tool' and configures the external tool
@@ -1184,7 +1259,10 @@ class AssignmentsApiController < ApplicationController
     @assignment.workflow_state = "unpublished"
     if authorized_action(@assignment, @current_user, :create)
       @assignment.content_being_saved_by(@current_user)
-      result = create_api_assignment(@assignment, params.require(:assignment), @current_user, @context,
+      result = create_api_assignment(@assignment,
+                                     params.require(:assignment),
+                                     @current_user,
+                                     @context,
                                      calculate_grades: params.delete(:calculate_grades))
       render_create_or_update_result(result)
     end
@@ -1333,6 +1411,9 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[omit_from_final_grade] [Boolean]
   #   Whether this assignment is counted towards a student's final grade.
   #
+  # @argument assignment[hide_in_gradebook] [Boolean]
+  #   Whether this assignment is shown in the gradebook.
+  #
   # @argument assignment[moderated_grading] [Boolean]
   #   Whether this assignment is moderated.
   #
@@ -1389,6 +1470,8 @@ class AssignmentsApiController < ApplicationController
       @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
       opts = assignment_json_opts
+
+      @assignment.skip_downstream_changes! if params[:skip_downstream_changes].present?
       result = update_api_assignment(@assignment, params.require(:assignment), @current_user, @context)
       render_create_or_update_result(result, opts)
     end
@@ -1438,7 +1521,7 @@ class AssignmentsApiController < ApplicationController
     return render json: { message: "expected array" }, status: :bad_request unless data.is_a?(Array)
     return render json: { message: "missing assignment id" }, status: :bad_request unless data.all? { |a| a.key?("id") }
 
-    assignments = @context.assignments.active.where(id: data.map { |a| a["id"] }).to_a
+    assignments = @context.assignments.active.where(id: data.pluck("id")).to_a
     raise ActiveRecord::RecordNotFound unless assignments.size == data.size
 
     assignments.each do |assignment|
@@ -1467,10 +1550,10 @@ class AssignmentsApiController < ApplicationController
     if [:created, :ok].include?(result)
       render json: assignment_json(@assignment, @current_user, session, opts), status: result
     else
-      status = result == :forbidden ? :forbidden : :bad_request
+      status = (result == :forbidden) ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]
       errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-      render json: { errors: errors }, status: status
+      render json: { errors: }, status:
     end
   end
 
@@ -1483,7 +1566,7 @@ class AssignmentsApiController < ApplicationController
   def require_user_visibility
     return render_unauthorized_action unless @current_user.present?
 
-    @user = params[:user_id] == "self" ? @current_user : api_find(User, params[:user_id])
+    @user = (params[:user_id] == "self") ? @current_user : api_find(User, params[:user_id])
     # teacher, ta
     return if @context.grants_right?(@current_user, :view_all_grades) && @context.students_visible_to(@current_user).include?(@user)
 
@@ -1548,5 +1631,15 @@ class AssignmentsApiController < ApplicationController
 
   def use_quiz_json?
     params[:result_type] == "Quiz" && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+  end
+
+  def set_assignment_asset_map(assignment)
+    content_migration = ContentMigration.where(migration_type: "master_course_import",
+                                               child_subscription_id: MasterCourses::ChildSubscription.where(
+                                                 master_template_id: MasterCourses::MasterContentTag.where(
+                                                   content: assignment.duplicate_of
+                                                 ).select(:master_template_id)
+                                               ).select(:id)).first
+    assignment.resource_map = content_migration&.asset_map_url
   end
 end

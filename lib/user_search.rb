@@ -35,14 +35,16 @@ module UserSearch
         users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
         users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
-        roles_scope(users_scope, context, options.slice(:enrollment_type, :enrollment_role,
-                                                        :enrollment_role_id, :exclude_groups))
+        roles_scope(users_scope, context, options.slice(:enrollment_type,
+                                                        :enrollment_role,
+                                                        :enrollment_role_id,
+                                                        :exclude_groups))
       end
     end
 
     def conditions_statement(search_term, root_account, users_scope)
       pattern = like_string_for(search_term)
-      params = { pattern: pattern, account: root_account, path_type: CommunicationChannel::TYPE_EMAIL, db_id: search_term }
+      params = { pattern:, account: root_account, path_type: CommunicationChannel::TYPE_EMAIL, db_id: search_term }
       complex_sql(users_scope, params)
     end
 
@@ -69,8 +71,10 @@ module UserSearch
       when Account
         User.of_account(context).active
       when Course
-        context.users_visible_to(searcher, include_prior_enrollments,
-                                 enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
+        context.users_visible_to(searcher,
+                                 include_prior_enrollments,
+                                 enrollment_state: enrollment_states,
+                                 include_inactive: include_inactive_enrollments).distinct
       else
         context.users_visible_to(searcher, include_inactive: include_inactive_enrollments).distinct
       end
@@ -82,7 +86,7 @@ module UserSearch
       when "last_login"
         users_scope.select("users.*").order(Arel.sql("last_login#{order}"))
       when "username"
-        users_scope.select("users.*").order_by_sortable_name(direction: options[:order] == "desc" ? :descending : :ascending)
+        users_scope.select("users.*").order_by_sortable_name(direction: (options[:order] == "desc") ? :descending : :ascending)
       when "email"
         users_scope = users_scope.select("users.*, (SELECT path FROM #{CommunicationChannel.quoted_table_name}
                           WHERE communication_channels.user_id = users.id AND
@@ -93,7 +97,7 @@ module UserSearch
                           AS email")
         users_scope.order(Arel.sql("email#{order}"))
       when "sis_id", "integration_id"
-        column = options[:sort] == "sis_id" ? "sis_user_id" : "integration_id"
+        column = (options[:sort] == "sis_id") ? "sis_user_id" : "integration_id"
         users_scope = users_scope.select(User.send(:sanitize_sql, [
                                                      "users.*, (SELECT #{column} FROM #{Pseudonym.quoted_table_name}
           WHERE pseudonyms.user_id = users.id AND
@@ -147,7 +151,7 @@ module UserSearch
         if context.is_a?(Account)
           # for example, one user can have multiple teacher enrollments, but
           # we only want one such a user record in results
-          users_scope = users_scope.where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").active.where(type: enrollment_types)).distinct
+          users_scope = users_scope.where(Enrollment.where("enrollments.user_id=users.id").active.where(type: enrollment_types).arel.exists).distinct
         else
           if context.is_a?(Group) && context.context_type == "Course"
             users_scope = users_scope.joins(:enrollments).where(enrollments: { course_id: context.context_id })
@@ -170,7 +174,7 @@ module UserSearch
       queries = [name_sql(users_scope, params)]
       if complex_search_enabled?
         queries << id_sql(users_scope, params) if @is_id
-        queries << ids_sql(users_scope, params) unless @is_id
+        queries << ids_sql(users_scope, params)
         queries << login_sql(users_scope, params) if @include_login
         queries << sis_sql(users_scope, params) if @include_sis
         queries << integration_sql(users_scope, params) if @include_integration

@@ -38,10 +38,10 @@ module GradebookSettingsHelpers
   def gradebook_enrollment_scope(user:, course:)
     scope = course.all_accepted_student_enrollments
 
-    unless gradebook_includes(user: user, course: course).include?(:inactive)
+    unless gradebook_includes(user:, course:).include?(:inactive)
       scope = scope.where("enrollments.workflow_state <> 'inactive'")
     end
-    unless gradebook_includes(user: user, course: course).include?(:completed)
+    unless gradebook_includes(user:, course:).include?(:completed)
       scope = scope.where("enrollments.workflow_state <> 'completed'")
     end
 

@@ -22,6 +22,10 @@
 import $ from 'jquery'
 import '@canvas/datetime'
 
+function isFirefox() {
+  return /Firefox/i.test(window.navigator.userAgent)
+}
+
 $.fn.keycodes = function (options, fn) {
   /* Based loosely on Tzury Bar Yochay's js-hotkeys:
   (c) Copyrights 2007 - 2008
@@ -72,7 +76,7 @@ $.fn.keycodes = function (options, fn) {
     123: 'f12',
     191: '/',
   }
-  if ($.browser.mozilla) {
+  if (isFirefox()) {
     specialKeys = $.extend(specialKeys, {
       96: '0',
       97: '1',

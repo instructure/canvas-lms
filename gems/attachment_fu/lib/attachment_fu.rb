@@ -101,7 +101,7 @@ module AttachmentFu # :nodoc:
       options[:thumbnails]       ||= {}
       options[:thumbnail_class]  ||= self
       options[:s3_access]        ||= "public-read"
-      options[:content_type] = [options[:content_type]].flatten.collect! { |t| t == :image ? AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
+      options[:content_type] = [options[:content_type]].flatten.collect! { |t| (t == :image) ? AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
 
       unless options[:thumbnails].is_a?(Hash)
         raise ArgumentError, ":thumbnails option should be a hash: e.g. :thumbnails => { :foo => '50x50' }"
@@ -120,7 +120,7 @@ module AttachmentFu # :nodoc:
       attachment_options[:storage]     ||= parent_options[:storage]
       attachment_options[:path_prefix] ||= attachment_options[:file_system_path]
       if attachment_options[:path_prefix].nil?
-        attachment_options[:path_prefix] = attachment_options[:storage] == :s3 ? table_name : File.join("public", table_name)
+        attachment_options[:path_prefix] = (attachment_options[:storage] == :s3) ? table_name : File.join("public", table_name)
       end
       attachment_options[:path_prefix] = attachment_options[:path_prefix][1..] if options[:path_prefix].first == "/"
 
@@ -267,7 +267,7 @@ module AttachmentFu # :nodoc:
       thumbnailable? || raise(ThumbnailError, "Can't create a thumbnail if the content type is not an image or there is no parent_id column")
       find_or_initialize_thumbnail(file_name_suffix).tap do |thumb|
         thumb.attributes = {
-          content_type: content_type,
+          content_type:,
           filename: thumbnail_name_for(file_name_suffix),
           temp_path: temp_file,
           thumbnail_resize_options: size
@@ -313,7 +313,10 @@ module AttachmentFu # :nodoc:
     end
 
     # Returns true if the attachment data will be written to the storage system on the next save
-    def save_attachment?
+    # This only works if temp_path is set by something else, which happens in the local file
+    # system and with s3 files when creating an image thumbnail (but not with regular s3 file uploads
+    # or instfs uploads of any kind)
+    def save_attachment_from_temp_path?
       if is_a?(Attachment)
         if root_attachment_id && new_record?
           return false
@@ -346,8 +349,8 @@ module AttachmentFu # :nodoc:
 
       if is_a?(Attachment)
         # glean information from the file handle
-        self.content_type = detect_mimetype(file_data)
-        self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
+        self.content_type = File.mime_types.include?(content_type) ? content_type : detect_mimetype(file_data)
+        self.filename = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
         file_from_path = true
         if file_data.respond_to?(:path) && file_data.path.present?
           temp_paths.unshift file_data
@@ -411,9 +414,9 @@ module AttachmentFu # :nodoc:
       shard.activate do
         GuardRail.activate(:secondary) do
           if md5.present? && (ns = infer_namespace)
-            scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
+            scope = Attachment.where(md5:, namespace: ns, root_attachment_id: nil, content_type:)
             scope = scope.where.not(filename: nil)
-            scope = scope.where("id<>?", self) unless new_record?
+            scope = scope.where.not(id: self) unless new_record?
             scope.detect { |a| a.store.exists? }
           end
         end
@@ -430,7 +433,7 @@ module AttachmentFu # :nodoc:
       elsif file_data.respond_to?(:content_type)
         file_data.content_type
       else
-        "unknown/unknown"
+        File.mime_type?(file_data)
       end
     end
 
@@ -463,7 +466,7 @@ module AttachmentFu # :nodoc:
 
     # Gets the data from the latest temp file.  This will read the file into memory.
     def temp_data
-      save_attachment? ? File.read(temp_path) : nil
+      save_attachment_from_temp_path? ? File.read(temp_path) : nil
     end
 
     # Writes the given data to a Tempfile and adds it to the collection of temp files.
@@ -490,8 +493,8 @@ module AttachmentFu # :nodoc:
     #     self.data = img.thumbnail(100, 100).to_blob
     #   end
     #
-    def with_image(&block)
-      self.class.with_image(temp_path, &block)
+    def with_image(&)
+      self.class.with_image(temp_path, &)
     end
 
     protected
@@ -508,13 +511,13 @@ module AttachmentFu # :nodoc:
         name.gsub!(%r{^.*(\\|/)}, "")
 
         # Finally, replace all non alphanumeric, underscore or periods with underscore
-        name.gsub!(/[^\w.\-]/, "_")
+        name.gsub!(/[^\w.-]/, "_")
       end
     end
 
     # before_validation callback.
     def set_size_from_temp_path
-      self.size = File.size(temp_path) if save_attachment?
+      self.size = File.size(temp_path) if save_attachment_from_temp_path?
     end
 
     # validates the size and content_type attributes according to the current model's options
@@ -534,7 +537,7 @@ module AttachmentFu # :nodoc:
 
     # Stub for a #process_attachment method in a processor
     def process_attachment
-      @saved_attachment = save_attachment?
+      @saved_attachment = save_attachment_from_temp_path?
       run_before_attachment_saved if @saved_attachment && respond_to?(:run_before_attachment_saved)
       @saved_attachment
     end

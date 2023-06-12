@@ -30,10 +30,10 @@ describe "Provisional Grades API", type: :request do
       course
     end
 
-    let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
-    let_once(:ta_1) { ta_in_course(active_all: true, course: course).user }
-    let_once(:ta_2) { ta_in_course(active_all: true, course: course).user }
-    let_once(:students) { Array.new(3) { |n| student_in_course(active_all: true, course: course, name: "Student #{n}").user } }
+    let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
+    let_once(:ta_1) { ta_in_course(active_all: true, course:).user }
+    let_once(:ta_2) { ta_in_course(active_all: true, course:).user }
+    let_once(:students) { Array.new(3) { |n| student_in_course(active_all: true, course:, name: "Student #{n}").user } }
 
     let_once(:assignment) do
       course.assignments.create!(
@@ -55,7 +55,7 @@ describe "Provisional Grades API", type: :request do
     end
 
     def grade_student(assignment, student, grader, score)
-      graded_submissions = assignment.grade_student(student, grader: grader, score: score, provisional: true)
+      graded_submissions = assignment.grade_student(student, grader:, score:, provisional: true)
       graded_submissions.first.provisional_grade(grader)
     end
 
@@ -99,7 +99,7 @@ describe "Provisional Grades API", type: :request do
 
     it "returns json including the id of each selected provisional grade" do
       json = bulk_select(grades[0..1])
-      ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+      ids = json.pluck("selected_provisional_grade_id")
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 
@@ -119,7 +119,7 @@ describe "Provisional Grades API", type: :request do
     it "includes the anonymous ids for submissions when the user cannot view student identities" do
       assignment.update!(anonymous_grading: true)
       json = bulk_select(grades[0..1])
-      ids = json.map { |grade| grade["anonymous_id"] }
+      ids = json.pluck("anonymous_id")
       expect(ids).to match_array(submissions[0..1].map(&:anonymous_id))
     end
 
@@ -138,7 +138,7 @@ describe "Provisional Grades API", type: :request do
 
       it "excludes the already-selected provisional grade from the returned json" do
         json = bulk_select(grades[0..1])
-        ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+        ids = json.pluck("selected_provisional_grade_id")
         expect(ids).to match_array([grades[1].id])
       end
 
@@ -165,7 +165,7 @@ describe "Provisional Grades API", type: :request do
 
       it "excludes the unrelated provisional grade from the returned json" do
         json = bulk_select(grades[0..1] + [other_grade])
-        ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+        ids = json.pluck("selected_provisional_grade_id")
         expect(ids).to match_array(grades[0..1].map(&:id))
       end
     end
@@ -174,7 +174,7 @@ describe "Provisional Grades API", type: :request do
       invalid_id = ModeratedGrading::ProvisionalGrade.maximum(:id).next # ensure the id is not used
       invalid_grade = ModeratedGrading::ProvisionalGrade.new(id: invalid_id)
       json = bulk_select(grades[0..1] + [invalid_grade])
-      ids = json.map { |grade| grade["selected_provisional_grade_id"] }
+      ids = json.pluck("selected_provisional_grade_id")
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 
@@ -214,8 +214,11 @@ describe "Provisional Grades API", type: :request do
       subs = @assignment.grade_student @student, grader: @ta, score: 0, provisional: true
       @pg = subs.first.provisional_grade(@ta)
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/#{@pg.id}/select"
-      @params = { controller: "provisional_grades", action: "select",
-                  format: "json", course_id: @course.to_param, assignment_id: @assignment.to_param,
+      @params = { controller: "provisional_grades",
+                  action: "select",
+                  format: "json",
+                  course_id: @course.to_param,
+                  assignment_id: @assignment.to_param,
                   provisional_grade_id: @pg.to_param }
     end
 
@@ -262,8 +265,11 @@ describe "Provisional Grades API", type: :request do
       course_with_ta course: @course, active_all: true
       @assignment = @course.assignments.create!
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/publish"
-      @params = { controller: "provisional_grades", action: "publish",
-                  format: "json", course_id: @course.to_param, assignment_id: @assignment.to_param }
+      @params = { controller: "provisional_grades",
+                  action: "publish",
+                  format: "json",
+                  course_id: @course.to_param,
+                  assignment_id: @assignment.to_param }
     end
 
     it "requires a moderated assignment" do

@@ -32,9 +32,15 @@ describe "CSP Settings API", type: :request do
 
   context "GET get_csp_settings" do
     def get_csp_settings(context, expected_status = 200)
-      api_call(:get, "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings",
-               { controller: "csp_settings", action: "get_csp_settings", format: "json",
-                 "#{context.class.name.downcase}_id": context.id.to_s }, {}, {}, { expected_status: expected_status })
+      api_call(:get,
+               "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings",
+               { controller: "csp_settings",
+                 action: "get_csp_settings",
+                 format: "json",
+                 "#{context.class.name.downcase}_id": context.id.to_s },
+               {},
+               {},
+               { expected_status: })
     end
 
     it "requires authorization" do
@@ -50,8 +56,8 @@ describe "CSP Settings API", type: :request do
     describe "course-level settings" do
       it "gets the default state" do
         json = get_csp_settings(@course)
-        expect(json["enabled"]).to eq false
-        expect(json["inherited"]).to eq true
+        expect(json["enabled"]).to be false
+        expect(json["inherited"]).to be true
         expect(json["effective_whitelist"]).to be_nil
       end
 
@@ -61,8 +67,8 @@ describe "CSP Settings API", type: :request do
         create_tool(@sub, domain: "example2.com")
 
         json = get_csp_settings(@course)
-        expect(json["enabled"]).to eq true
-        expect(json["inherited"]).to eq true
+        expect(json["enabled"]).to be true
+        expect(json["inherited"]).to be true
         expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com", "*.example2.com"])
       end
 
@@ -72,17 +78,17 @@ describe "CSP Settings API", type: :request do
         @course.disable_csp!
 
         json = get_csp_settings(@course)
-        expect(json["enabled"]).to eq false
-        expect(json["inherited"]).to eq false # not inherited
+        expect(json["enabled"]).to be false
+        expect(json["inherited"]).to be false # not inherited
       end
     end
 
     describe "account-level settings" do
       it "gets the default state" do
         json = get_csp_settings(@sub)
-        expect(json["enabled"]).to eq false
-        expect(json["inherited"]).to eq true
-        expect(json["settings_locked"]).to eq false
+        expect(json["enabled"]).to be false
+        expect(json["inherited"]).to be true
+        expect(json["settings_locked"]).to be false
         expect(json["effective_whitelist"]).to be_nil
       end
 
@@ -92,7 +98,7 @@ describe "CSP Settings API", type: :request do
           a.lock_csp!
         end
         json = get_csp_settings(@sub)
-        expect(json["settings_locked"]).to eq true
+        expect(json["settings_locked"]).to be true
       end
 
       it "gets the whitelist if enabled" do
@@ -101,8 +107,8 @@ describe "CSP Settings API", type: :request do
         tool = create_tool(@sub, domain: "example2.com")
 
         json = get_csp_settings(@sub)
-        expect(json["enabled"]).to eq true
-        expect(json["inherited"]).to eq true
+        expect(json["enabled"]).to be true
+        expect(json["inherited"]).to be true
         expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com", "*.example2.com"])
         expect(json["tools_whitelist"]).to eq({
                                                 "example2.com" => [{ "id" => tool.id, "name" => tool.name, "account_id" => @sub.id }],
@@ -122,10 +128,16 @@ describe "CSP Settings API", type: :request do
 
   context "PUT set_csp_setting" do
     def set_csp_setting(context, csp_status, expected_status = 200)
-      api_call(:put, "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings",
-               { controller: "csp_settings", action: "set_csp_setting", format: "json",
-                 "#{context.class.name.downcase}_id": context.id.to_s, status: csp_status },
-               {}, {}, { expected_status: expected_status })
+      api_call(:put,
+               "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings",
+               { controller: "csp_settings",
+                 action: "set_csp_setting",
+                 format: "json",
+                 "#{context.class.name.downcase}_id": context.id.to_s,
+                 status: csp_status },
+               {},
+               {},
+               { expected_status: })
     end
 
     context "setting on courses" do
@@ -145,18 +157,18 @@ describe "CSP Settings API", type: :request do
         @sub.enable_csp!
         @course.disable_csp!
         set_csp_setting(@course, "enabled")
-        expect(@course.reload.csp_disabled?).to eq false
+        expect(@course.reload.csp_disabled?).to be false
       end
 
       it "unsets explicit disabling" do
         @course.disable_csp!
         set_csp_setting(@course, "inherited")
-        expect(@course.reload.csp_disabled?).to eq false
+        expect(@course.reload.csp_disabled?).to be false
       end
 
       it "disables explicitly" do
         set_csp_setting(@course, "disabled")
-        expect(@course.reload.csp_disabled?).to eq true
+        expect(@course.reload.csp_disabled?).to be true
       end
     end
 
@@ -174,36 +186,42 @@ describe "CSP Settings API", type: :request do
         @sub.enable_csp!
         @sub.lock_csp!
         set_csp_setting(@sub, "disabled")
-        expect(Account.find(@sub.id).csp_enabled?).to eq false
+        expect(Account.find(@sub.id).csp_enabled?).to be false
       end
 
       it "enables csp" do
         set_csp_setting(@sub, "enabled")
-        expect(@sub.reload.csp_directly_enabled?).to eq true
+        expect(@sub.reload.csp_directly_enabled?).to be true
       end
 
       it "disables csp" do
         Account.default.enable_csp!
         json = set_csp_setting(@sub, "disabled")
-        expect(json["enabled"]).to eq false
-        expect(@sub.reload.csp_enabled?).to eq false
+        expect(json["enabled"]).to be false
+        expect(@sub.reload.csp_enabled?).to be false
       end
 
       it "inherits csp settings" do
         Account.default.enable_csp!
         @sub.disable_csp!
         set_csp_setting(@sub, "inherited")
-        expect(@sub.reload.csp_enabled?).to eq true
+        expect(@sub.reload.csp_enabled?).to be true
       end
     end
   end
 
   context "PUT set_csp_lock" do
     def set_csp_lock(context, lock_status, expected_status = 200)
-      api_call(:put, "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings/lock",
-               { controller: "csp_settings", action: "set_csp_lock", format: "json",
-                 "#{context.class.name.downcase}_id": context.id.to_s, settings_locked: lock_status },
-               {}, {}, { expected_status: expected_status })
+      api_call(:put,
+               "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings/lock",
+               { controller: "csp_settings",
+                 action: "set_csp_lock",
+                 format: "json",
+                 "#{context.class.name.downcase}_id": context.id.to_s,
+                 settings_locked: lock_status },
+               {},
+               {},
+               { expected_status: })
     end
 
     context "setting on accounts" do
@@ -215,7 +233,7 @@ describe "CSP Settings API", type: :request do
       it "locks csp" do
         Account.default.enable_csp!
         set_csp_lock(Account.default, true)
-        expect(@sub.reload.csp_locked?).to eq true
+        expect(@sub.reload.csp_locked?).to be true
       end
 
       it "unlocks csp" do
@@ -224,17 +242,23 @@ describe "CSP Settings API", type: :request do
           a.lock_csp!
         end
         set_csp_lock(Account.default, false)
-        expect(@sub.reload.csp_locked?).to eq false
+        expect(@sub.reload.csp_locked?).to be false
       end
     end
   end
 
   describe "POST add_domain" do
     def add_domain(account, domain, expected_status = 200)
-      api_call(:post, "/api/v1/accounts/#{account.id}/csp_settings/domains",
-               { controller: "csp_settings", action: "add_domain", format: "json",
-                 account_id: account.id.to_s, domain: domain },
-               {}, {}, { expected_status: expected_status })
+      api_call(:post,
+               "/api/v1/accounts/#{account.id}/csp_settings/domains",
+               { controller: "csp_settings",
+                 action: "add_domain",
+                 format: "json",
+                 account_id: account.id.to_s,
+                 domain: },
+               {},
+               {},
+               { expected_status: })
     end
 
     it "adds domains even if csp isn't enabled yet" do
@@ -252,10 +276,16 @@ describe "CSP Settings API", type: :request do
 
   describe "POST add_multiple_domains" do
     def add_domains(account, domains, expected_status = 200)
-      api_call(:post, "/api/v1/accounts/#{account.id}/csp_settings/domains/batch_create",
-               { controller: "csp_settings", action: "add_multiple_domains", format: "json",
-                 account_id: account.id.to_s, domains: domains },
-               {}, {}, { expected_status: expected_status })
+      api_call(:post,
+               "/api/v1/accounts/#{account.id}/csp_settings/domains/batch_create",
+               { controller: "csp_settings",
+                 action: "add_multiple_domains",
+                 format: "json",
+                 account_id: account.id.to_s,
+                 domains: },
+               {},
+               {},
+               { expected_status: })
     end
 
     it "adds domains even if csp isn't enabled yet" do
@@ -275,10 +305,16 @@ describe "CSP Settings API", type: :request do
 
   describe "DELETE remove_domain" do
     def remove_domain(account, domain, expected_status = 200)
-      api_call(:delete, "/api/v1/accounts/#{account.id}/csp_settings/domains",
-               { controller: "csp_settings", action: "remove_domain", format: "json",
-                 account_id: account.id.to_s, domain: domain },
-               {}, {}, { expected_status: expected_status })
+      api_call(:delete,
+               "/api/v1/accounts/#{account.id}/csp_settings/domains",
+               { controller: "csp_settings",
+                 action: "remove_domain",
+                 format: "json",
+                 account_id: account.id.to_s,
+                 domain: },
+               {},
+               {},
+               { expected_status: })
     end
 
     it "removes domains even if csp isn't enabled yet" do
@@ -294,9 +330,15 @@ describe "CSP Settings API", type: :request do
 
   describe "GET csp_log" do
     def get_csp_log(account, expected_status)
-      api_call(:get, "/api/v1/accounts/#{account.id}/csp_log",
-               { controller: "csp_settings", action: "csp_log", format: "json",
-                 account_id: account.id.to_param }, {}, {}, { expected_status: expected_status })
+      api_call(:get,
+               "/api/v1/accounts/#{account.id}/csp_log",
+               { controller: "csp_settings",
+                 action: "csp_log",
+                 format: "json",
+                 account_id: account.id.to_param },
+               {},
+               {},
+               { expected_status: })
     end
 
     it "400s for a subaccount" do

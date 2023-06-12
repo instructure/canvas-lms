@@ -223,7 +223,7 @@ class ErrorReport < ActiveRecord::Base
   # delete old error reports before a given date
   # returns the number of destroyed error reports
   def self.destroy_error_reports(before_date)
-    where("created_at<?", before_date).delete_all
+    where("created_at<?", before_date).in_batches(of: 10_000).delete_all
   end
 
   def self.categories

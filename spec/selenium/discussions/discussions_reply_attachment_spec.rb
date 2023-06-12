@@ -28,7 +28,7 @@ describe "reply attachment" do
     @topic_title = "discussion topic"
     course_with_teacher_logged_in
     @topic = create_discussion(@topic_title, "threaded")
-    @student = student_in_course.user
+    @student = student_in_course(active_all: true).user
   end
 
   before do
@@ -49,7 +49,7 @@ describe "reply attachment" do
       wait_for_ajaximations
       begin
         tinymce = f(".tox-tinymce")
-        expect(tinymce.enabled?).to eq true
+        expect(tinymce.enabled?).to be true
       rescue Selenium::WebDriver::Error::NoSuchElementError
         expect("tinymce not loaded").to eq "loaded"
       end
@@ -91,9 +91,82 @@ describe "reply attachment" do
     end
   end
 
-  context "when react_discussions_post ff is ON" do
+  context "when react_discussions_post ff is ON", ignore_js_errors: true do
     before :once do
       Account.site_admin.enable_feature! :react_discussions_post
+    end
+
+    def add_a_reply_react(message = "message!", attachment = nil)
+      f("button[data-testid='discussion-topic-reply']").click
+      wait_for_ajaximations
+      type_in_tiny "textarea", message
+      if attachment.present?
+        _filename, fullpath, _data = get_file(attachment)
+        f("[data-testid='attachment-input']").send_keys(fullpath)
+      end
+
+      f("button[data-testid='DiscussionEdit-submit'").click
+      wait_for_ajaximations
+    end
+
+    it "can add a mention from the mentions menu" do
+      Discussion.visit(@course, @topic)
+      f("button[data-testid='discussion-topic-reply']").click
+      wait_for_ajaximations
+      type_in_tiny "textarea", "@"
+      ff("[data-testid='mention-dropdown-item']")[0].click
+      f("button[data-testid='DiscussionEdit-submit'").click
+      wait_for_ajaximations
+      expect(f(".mceNonEditable.mention")).to be_displayed
+    end
+
+    it "replies to the discussion with attachment" do
+      file_attachment = "graded.png"
+      entry_text = "new entry"
+      Discussion.visit(@course, @topic)
+
+      add_a_reply_react(entry_text, file_attachment)
+      entry = DiscussionEntry.last
+      expect(entry.attachment.folder.full_name).to include("/unfiled")
+
+      attachment_link = fj("a:contains('graded')")
+      expect(attachment_link).to be_truthy
+      expect(attachment_link.attribute("href")).to include("/files/#{entry.attachment.id}")
+    end
+
+    it "respects quota limits when replying to the discussion with attachment" do
+      Setting.set("user_default_quota", -1)
+      file_attachment = "graded.png"
+      entry_text = "new entry"
+
+      user_session(@student)
+      Discussion.visit(@course, @topic)
+
+      add_a_reply_react(entry_text, file_attachment)
+      entry = DiscussionEntry.last
+
+      expect(entry.attachment).to be_falsey
+      expect(f("body")).not_to contain_jqcss("a:contains('graded')")
+    end
+
+    it "replies to a graded discussion with attachment regardless of quota limit" do
+      discussion_assignment = @course.assignments.create!(name: "graded discussion")
+      graded_discussion_topic = @course.discussion_topics.create!(title: "graded discussion", assignment: discussion_assignment)
+
+      Setting.set("user_default_quota", -1)
+      file_attachment = "graded.png"
+      entry_text = "new entry"
+
+      user_session(@student)
+      Discussion.visit(@course, graded_discussion_topic)
+
+      add_a_reply_react(entry_text, file_attachment)
+      entry = DiscussionEntry.last
+      expect(entry.attachment.folder.full_name).to include("/Submissions/#{@course.name}")
+
+      attachment_link = fj("a:contains('graded')")
+      expect(attachment_link).to be_truthy
+      expect(attachment_link.attribute("href")).to include("/courses/#{@course.id}")
     end
 
     it "can view and delete legacy reply attachments" do

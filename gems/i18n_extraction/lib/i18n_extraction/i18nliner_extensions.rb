@@ -175,7 +175,7 @@ module I18nExtraction::Extensions
       scope = case filename
               when %r{app/controllers/}
                 scope = filename.gsub(%r{.*app/controllers/|_controller\.rb}, "").gsub(%r{/_?}, ".")
-                scope == "application." ? "" : scope
+                (scope == "application.") ? "" : scope
               when %r{app/models/}
                 scope = filename.gsub(%r{.*app/models/|\.rb}, "")
                 STI_SUPERCLASSES.include?(scope) ? "" : scope
@@ -194,7 +194,7 @@ module I18nExtraction::Extensions
               when %r{app/views/}
                 filename.gsub(%r{.*app/views/|\.(html\.|fbml\.)?erb\z}, "").gsub(%r{/_?}, ".")
               end
-      I18nliner::Scope.new scope, remove_whitespace: remove_whitespace
+      I18nliner::Scope.new scope, remove_whitespace:
     end
   end
 end

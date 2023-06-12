@@ -10,7 +10,8 @@ These instructions, and a guide to the rest of Live Events/Canvas Data Services,
         - URL - AWS SQS URL
         - Authentication via an IAM User Key and Secret is supported but optional. When using a Key and Secret for your SQS queue, please provide the region.
   * HTTPS - Webhook with JWT signing
-        - URL - web service endpoint. The event body is a signed JWT. Beta and Production JWKs can be found [here](https://8axpcl50e4.execute-api.us-east-1.amazonaws.com/main/jwks). Most libraries should be able to match the kid in the JWT header to the relevant JWK to validate the signature. If a customer's HTTPS service experiences an outage, the events will not be delivered till the service is recovered.
+        - URL - web service endpoint. The event body is a signed JWT. Beta and Production JWKs can be found [here](https://8axpcl50e4.execute-api.us-east-1.amazonaws.com/main/jwks). Most libraries should be able to match the kid in the JWT header to the relevant JWK to validate the signature.
+        - If a customer's HTTPS service experiences an outage, the events will not be delivered till the service is recovered. Repeated failures within a 24-hour period will result in the subscription being deactivated and the creator of the subscription will be notified via email. It is the end user’s responsibility to implement logging on their endpoints to alert them to any issues and enable troubleshooting should an issue arise.
         - More info is found in [this Canvas Community article](https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-and-test-Canvas-Live-Events-using-HTTPS/ta-p/151)
 4. Select the format of the events:
   * Canvas: A simple JSON payload of the events. See the docs for examples

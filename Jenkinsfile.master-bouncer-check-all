@@ -48,7 +48,7 @@ pipeline {
         timeout(time: 30) {
           script {
             credentials.withMasterBouncerCredentials {
-              credentials.withGerritCredentials {
+              withGerritCredentials {
                 sh 'build/new-jenkins/linters/run-master-bouncer-all.py'
               }
             }

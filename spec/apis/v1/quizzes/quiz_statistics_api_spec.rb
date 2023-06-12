@@ -43,7 +43,10 @@ describe Quizzes::QuizStatisticsController, type: :request do
 
     teacher = @user
 
-    simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T],
+    simple_quiz_with_submissions %w[T T T],
+                                 %w[T T T],
+                                 %w[T F F],
+                                 %w[T F T],
                                  user: @user,
                                  course: @course
 

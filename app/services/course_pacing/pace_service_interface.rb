@@ -55,7 +55,7 @@ class CoursePacing::PaceServiceInterface
       else
         pace = course.course_paces.new(create_params(context))
         course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
-          pace.course_pace_module_items.create(module_item: module_item, duration: 0)
+          pace.course_pace_module_items.create(module_item:, duration: 0)
         end
       end
       if pace.save

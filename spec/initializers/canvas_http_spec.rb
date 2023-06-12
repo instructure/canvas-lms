@@ -34,7 +34,7 @@ describe "CanvasHttp Configuration" do
     begin
       CanvasHttp.get("some.url.com")
     rescue Net::OpenTimeout
-      expect(CanvasHttp::CircuitBreaker.tripped?("some.url.com")).to eq(true)
+      expect(CanvasHttp::CircuitBreaker.tripped?("some.url.com")).to be(true)
     end
     expect { CanvasHttp.get("some.url.com") }.to raise_error(CanvasHttp::CircuitBreakerError)
   end

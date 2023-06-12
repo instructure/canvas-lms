@@ -301,10 +301,10 @@ describe DiscussionEntry do
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
       @sub_entry = @sub_topic.discussion_entries.create!(message: "entry", user: @first_user)
-      expect(@group_entry.grants_right?(@first_user, :update)).to eql(true)
-      expect(@group_entry.grants_right?(@second_user, :update)).to eql(false)
-      expect(@sub_entry.grants_right?(@first_user, :update)).to eql(true)
-      expect(@sub_entry.grants_right?(@second_user, :update)).to eql(false)
+      expect(@group_entry.grants_right?(@first_user, :update)).to be(true)
+      expect(@group_entry.grants_right?(@second_user, :update)).to be(false)
+      expect(@sub_entry.grants_right?(@first_user, :update)).to be(true)
+      expect(@sub_entry.grants_right?(@second_user, :update)).to be(false)
     end
   end
 
@@ -363,7 +363,7 @@ describe DiscussionEntry do
       @topic.saved_by = :migration
       @topic.last_reply_at = nil
       @topic.save!
-      expect(@topic.last_reply_at).to eq nil
+      expect(@topic.last_reply_at).to be_nil
 
       @entry.update_topic
       @topic.reload
@@ -399,7 +399,7 @@ describe DiscussionEntry do
 
     it "allows teacher entry on assignment topic to be destroyed" do
       assignment = @course.assignments.create!(title: @topic.title, submission_types: "discussion_topic")
-      topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, assignment: assignment)
+      topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, assignment:)
       entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
       expect { entry.destroy }.to_not raise_error
     end
@@ -565,10 +565,10 @@ describe DiscussionEntry do
       teacher2 = teacher_in_course(course: @course, active_all: true).user
 
       group_category = @course.group_categories.create(name: "new category")
-      @group = @course.groups.create(name: "group", group_category: group_category)
+      @group = @course.groups.create(name: "group", group_category:)
       @group.add_user(@student)
 
-      root_topic = @course.discussion_topics.create!(title: "parent topic", message: "msg", group_category: group_category)
+      root_topic = @course.discussion_topics.create!(title: "parent topic", message: "msg", group_category:)
       student_participant = root_topic.discussion_topic_participants.create!(user: @student)
       teacher_participant = root_topic.discussion_topic_participants.create!(user: teacher2)
       root_topic.discussion_entries.create!(message: "message", user: teacher1)
@@ -875,7 +875,7 @@ describe DiscussionEntry do
 
   describe "permissions" do
     let(:user) { user_model }
-    let(:entry) { topic.discussion_entries.create!(message: "Hello!", user: user) }
+    let(:entry) { topic.discussion_entries.create!(message: "Hello!", user:) }
 
     describe "reply" do
       context "when a user is no longer enrolled in the course" do
@@ -884,7 +884,7 @@ describe DiscussionEntry do
         end
 
         it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :reply)).to eq false
+          expect(entry.grants_right?(user, :reply)).to be false
         end
       end
     end
@@ -896,7 +896,7 @@ describe DiscussionEntry do
         end
 
         it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :update)).to eq false
+          expect(entry.grants_right?(user, :update)).to be false
         end
       end
     end
@@ -908,7 +908,40 @@ describe DiscussionEntry do
         end
 
         it "returns false for their own posts" do
-          expect(entry.grants_right?(user, :delete)).to eq false
+          expect(entry.grants_right?(user, :delete)).to be false
+        end
+      end
+    end
+
+    describe "create" do
+      context "with an active enrollment" do
+        before :once do
+          course_with_student active_all: true
+        end
+
+        let(:topic) { @course.discussion_topics.create(title: "topic", message: "message") }
+        let(:announcement) { @course.announcements.create(title: "announcement", message: "message") }
+
+        it "allows replies from students on topics" do
+          entry = topic.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be true
+        end
+
+        it "does not allow replies from students on locked topics" do
+          topic.lock!
+          entry = topic.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be false
+        end
+
+        it "allows replies from students on announcements" do
+          entry = announcement.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be true
+        end
+
+        it "does not allow replies from students on locked announcements" do
+          announcement.lock!
+          entry = announcement.discussion_entries.build(user: @student, message: "message")
+          expect(entry.grants_right?(@student, :create)).to be false
         end
       end
     end
@@ -916,8 +949,8 @@ describe DiscussionEntry do
 
   describe "#author_name" do
     let(:user) { user_model(name: "John Doe") }
-    let(:entry) { topic.discussion_entries.create!(message: "Hello!", user: user) }
-    let(:anon_entry) { anonymous_topic.discussion_entries.create!(message: "Hello!", user: user) }
+    let(:entry) { topic.discussion_entries.create!(message: "Hello!", user:) }
+    let(:anon_entry) { anonymous_topic.discussion_entries.create!(message: "Hello!", user:) }
 
     it "returns author name" do
       expect(entry.author_name).to eq "John Doe"
@@ -935,7 +968,7 @@ describe DiscussionEntry do
       context "TeacherEnrollment" do
         it "returns user.short_name" do
           anonymous_topic.course.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
-          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user: user)
+          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user:)
 
           expect(entry.author_name).to eq(user.short_name)
         end
@@ -944,7 +977,7 @@ describe DiscussionEntry do
       context "TaEnrollment" do
         it "returns user.short_name" do
           anonymous_topic.course.enroll_user(user, "TaEnrollment", enrollment_state: "active")
-          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user: user)
+          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user:)
 
           expect(entry.author_name).to eq(user.short_name)
         end
@@ -953,7 +986,7 @@ describe DiscussionEntry do
       context "DesignerEnrollment" do
         it "returns user.short_name" do
           anonymous_topic.course.enroll_user(user, "DesignerEnrollment", enrollment_state: "active")
-          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user: user)
+          entry = anonymous_topic.discussion_entries.create!(message: "Hello!", user:)
 
           expect(entry.author_name).to eq(user.short_name)
         end
@@ -961,7 +994,7 @@ describe DiscussionEntry do
 
       context "discussion_topic partial_anonymity && !entry.is_anonymous_author" do
         it "returns user.short_name" do
-          entry = partially_anonymous_topic.discussion_entries.create!(message: "Hello!", user: user, is_anonymous_author: false)
+          entry = partially_anonymous_topic.discussion_entries.create!(message: "Hello!", user:, is_anonymous_author: false)
           expect(entry.author_name).to eq(user.short_name)
         end
       end
@@ -972,14 +1005,14 @@ describe DiscussionEntry do
     let(:user) { user_model(name: "John Doe") }
 
     it "creates version 1 on new entry" do
-      entry = topic.discussion_entries.create(message: "Test 1", user: user)
+      entry = topic.discussion_entries.create(message: "Test 1", user:)
 
       expect(entry.discussion_entry_versions.count).to eq(1)
       expect(entry.discussion_entry_versions.take.message).to eq(entry.message)
     end
 
     it "creates various versions on entry updates" do
-      entry = topic.discussion_entries.create(message: "Test 1", user: user)
+      entry = topic.discussion_entries.create(message: "Test 1", user:)
 
       expect(entry.discussion_entry_versions.count).to eq(1)
       expect(entry.discussion_entry_versions.take.message).to eq(entry.message)

@@ -28,8 +28,8 @@ module DataFixup::CreateQuizLtiNavigationPlacements
       ["account", "course"].each do |context|
         placement_type = "#{context}_navigation"
 
-        if placements.find_by(placement_type: placement_type).blank?
-          ContextExternalToolPlacement.create(placement_type: placement_type, context_external_tool_id: quiz_tool.id)
+        if placements.find_by(placement_type:).blank?
+          ContextExternalToolPlacement.create(placement_type:, context_external_tool_id: quiz_tool.id)
         end
       end
     end

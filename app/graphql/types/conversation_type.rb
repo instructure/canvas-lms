@@ -48,7 +48,7 @@ module Types
     def conversation_messages_connection(participants: nil, created_before: nil)
       load_association(:conversation_messages).then do |messages|
         Loaders::AssociationLoader.for(ConversationMessage, :conversation_message_participants).load_many(messages).then do
-          messages = messages.select { |message| message.conversation_message_participants.pluck(:user_id, :workflow_state).include?([current_user.id, "active"]) }
+          messages = messages.select { |message| should_return_message?(message) }
           if participants
             messages = messages.select { |message| (participants - message.conversation_message_participants.pluck(:user_id).map(&:to_s)).empty? }
           end
@@ -73,6 +73,11 @@ module Types
       load_association(:context).then do |context|
         context&.name
       end
+    end
+
+    def should_return_message?(message)
+      participants = message.conversation_message_participants.pluck(:user_id, :workflow_state)
+      participants.include?([current_user.id, "active"]) || participants.include?([current_user.id, nil])
     end
   end
 end

@@ -33,7 +33,7 @@ describe Lti::Asset do
     end
 
     it "creates lti_context_id for asset" do
-      expect(@course.lti_context_id).to eq nil
+      expect(@course.lti_context_id).to be_nil
       context_id = described_class.opaque_identifier_for(@course)
       @course.reload
       expect(@course.lti_context_id).to eq context_id
@@ -42,7 +42,7 @@ describe Lti::Asset do
     it "uses old_id when present" do
       user = user_model
       context_id = described_class.opaque_identifier_for(user)
-      UserPastLtiId.create!(user: user, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
+      UserPastLtiId.create!(user:, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
       expect(described_class.opaque_identifier_for(user, context: @course)).to_not eq context_id
       expect(described_class.opaque_identifier_for(user, context: @course)).to eq "old_lti_id"
     end

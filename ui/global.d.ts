@@ -16,42 +16,108 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {sendMessageStudentsWho} from './shared/grading/messageStudentsWhoHelper'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {GlobalInst} from '@canvas/global/inst/GlobalInst'
+
 declare global {
   interface Global {
-    readonly ENV?: any
+    /**
+     * Global environment variables provided by the server.
+     */
+    readonly ENV?: GlobalEnv
+
+    /**
+     * Utility global for various values and utility functions, some provided by the server,
+     * some by client code.
+     */
+    readonly INST?: GlobalInst
   }
 
   interface Window {
-    readonly ENV?: any
+    /**
+     * Global environment variables provided by the server.
+     *
+     * Note: should be readonly, but some tests overwrite.
+     */
+    ENV: GlobalEnv
+
+    /**
+     * Utility global for various values and utility functions, some provided by the server,
+     * some by client code.
+     *
+     * Should be readonly, but tests overwrite
+     */
+    INST: GlobalInst
+
     webkitSpeechRecognition: any
     jsonData: any
+    messageStudents: (options: ReturnType<typeof sendMessageStudentsWho>) => void
+    updateGrades: () => void
   }
 
-  const ENV: any
+  /**
+   * Global environment variables provided by the server.
+   */
+  const ENV: GlobalEnv
+
+  /**
+   * Utility global for various values and utility functions, some provided by the server,
+   * some by client code.
+   */
+  const INST: GlobalInst
+
+  type ShowIf = {
+    (bool?: boolean): JQuery<HTMLElement>
+    /**
+     * @deprecated use a boolean parameter instead
+     * @param num
+     * @returns
+     */
+    (num?: number): JQuery<HTMLElement>
+  }
 
   declare interface JQuery {
+    scrollTo: (y: number, x?: number) => void
     capitalize: (str: string) => string
+    change: any
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>
     decodeFromHex: (str: string) => string
+    disableWhileLoading: any
     encodeToHex: (str: string) => string
     fileSize: (size: number) => string
+    fillTemplateData: any
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>
     fixDialogButtons: () => void
-    keycodes: any
+    errorBox: (
+      message: string,
+      scroll?: boolean,
+      override_position?: string | number
+    ) => JQuery<HTMLElement>
+    getFormData: () => Record<string, unknown>
     live: any
+    loadDocPreview: (options: {
+      height: string
+      id: string
+      mimeType: string
+      attachment_id: string
+      submission_id: any
+      attachment_view_inline_ping_url: string | undefined
+      attachment_preview_processing: boolean
+    }) => void
     mediaComment: any
+    mediaCommentThumbnail: (size?: 'normal' | 'small') => void
     queryParam: (name: string) => string
     raw: (str: string) => string
-    showIf: (boolean) => void
+    showIf: ShowIf
     titleize: (str: string) => string
-    toSentence: (array: string[], options: any) => string
     underscore: (str: string) => string
     youTubeID: (path: string) => string
   }
 
   declare interface JQueryStatic {
-    subscribe: any
+    subscribe: (topic: string, callback: (...args: any[]) => void) => void
     ajaxJSON: (
       url: string,
       submit_type?: string,
@@ -61,12 +127,11 @@ declare global {
       options?: any
     ) => JQuery.JQueryXHR
     replaceTags: (string, string, string?) => string
-    raw: any
+    raw: (str: string) => string
     getScrollbarWidth: any
     datetimeString: any
     ajaxJSONFiles: any
     isPreviewable: any
-    toSentence: any
   }
 
   declare interface Array<T> {

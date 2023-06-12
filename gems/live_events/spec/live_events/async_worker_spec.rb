@@ -22,15 +22,15 @@ require "spec_helper"
 
 describe LiveEvents::AsyncWorker do
   let(:put_records_return) { [] }
-  let(:stream_client) { double(stream_name: stream_name) }
+  let(:stream_client) { double(stream_name:) }
   let(:stream_name) { "stream_name_x" }
   let(:event_name) { "event_name" }
   let(:statsd_double) { double(increment: nil) }
   let(:event) do
     {
-      event_name: event_name,
+      event_name:,
       event_time: Time.now.utc.iso8601(3),
-      attributes: attributes,
+      attributes:,
       body: payload
     }
   end
@@ -50,7 +50,7 @@ describe LiveEvents::AsyncWorker do
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.statsd = nil
     allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, debug: nil))
-    @worker = LiveEvents::AsyncWorker.new(false, stream_client: stream_client, stream_name: stream_name)
+    @worker = LiveEvents::AsyncWorker.new(false, stream_client:, stream_name:)
     allow(@worker).to receive(:at_exit)
     expect(LiveEvents.logger).to_not receive(:error).with(/Exception making LiveEvents async call/)
     LiveEvents.statsd = statsd_double

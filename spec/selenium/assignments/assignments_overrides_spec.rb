@@ -27,8 +27,8 @@ describe "assignment groups" do
 
   context "as a teacher" do
     let(:due_at) { Time.zone.now }
-    let(:unlock_at) { Time.zone.now - 1.day }
-    let(:lock_at) { Time.zone.now + 4.days }
+    let(:unlock_at) { 1.day.ago }
+    let(:lock_at) { 4.days.from_now }
 
     before do
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([])
@@ -78,7 +78,7 @@ describe "assignment groups" do
     end
 
     it "clears a due date", priority: "2" do
-      assign = @course.assignments.create!(title: "due tomorrow", due_at: Time.zone.now + 2.days)
+      assign = @course.assignments.create!(title: "due tomorrow", due_at: 2.days.from_now)
       get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
 
       fj(".date_field:first[data-date-type='due_at']").clear
@@ -93,8 +93,8 @@ describe "assignment groups" do
 
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(name: "other section")
-      default_section_due = Time.zone.now + 1.day
-      other_section_due = Time.zone.now + 2.days
+      default_section_due = 1.day.from_now
+      other_section_due = 2.days.from_now
 
       assign = create_assignment!
       visit_assignment_edit_page(assign)
@@ -149,8 +149,8 @@ describe "assignment groups" do
 
     it "validates override dates against proper section", priority: "1" do
       date = Time.zone.now
-      date2 = Time.zone.now - 10.days
-      due_date = Time.zone.now + 5.days
+      date2 = 10.days.ago
+      due_date = 5.days.from_now
       section1 = @course.course_sections.create!(name: "Section 9", restrict_enrollments_to_section_dates: true, start_at: date)
       section2 = @course.course_sections.create!(name: "Section 31", restrict_enrollments_to_section_dates: true, end_at: date2)
 
@@ -259,8 +259,8 @@ describe "assignment groups" do
   end
 
   context "as a student" do
-    let(:unlock_at) { Time.zone.now - 2.days }
-    let(:lock_at) { Time.zone.now + 4.days }
+    let(:unlock_at) { 2.days.ago }
+    let(:lock_at) { 4.days.from_now }
 
     before do
       course_with_student_logged_in(active_all: true)

@@ -78,14 +78,15 @@ describe Submissions::DownloadsController do
 
       it "renders as json" do
         request.accept = Mime[:json].to_s
-        get :show, params: {
-          course_id: @context.id,
-          assignment_id: @assignment.id,
-          id: @student.id,
-          download: @submission.attachment_id
-        },
-                   format: :json
-        expect(JSON.parse(response.body)["attachment"]["id"]).to eq @submission.attachment_id
+        get :show,
+            params: {
+              course_id: @context.id,
+              assignment_id: @assignment.id,
+              id: @student.id,
+              download: @submission.attachment_id
+            },
+            format: :json
+        expect(response.parsed_body["attachment"]["id"]).to eq @submission.attachment_id
       end
     end
 
@@ -115,7 +116,7 @@ describe Submissions::DownloadsController do
 
     it "sets attachment from attachments collection when attachment_id is not present" do
       attachment = attachment_model(context: @context)
-      AttachmentAssociation.create!(context: @submission, attachment: attachment)
+      AttachmentAssociation.create!(context: @submission, attachment:)
       get :show, params: {
         course_id: @context.id,
         assignment_id: @assignment.id,
@@ -166,7 +167,7 @@ describe Submissions::DownloadsController do
       att = attachment_model(uploaded_data: stub_file_data("test.txt", "asdf", "text/plain"), context: @student)
       submission_model(
         course: @course,
-        assignment: assignment,
+        assignment:,
         submission_type: "online_upload",
         attachment_ids: att.id,
         attachments: [att],
@@ -176,6 +177,38 @@ describe Submissions::DownloadsController do
 
       expect(response).to be_redirect
       expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}
+    end
+
+    it "redirects download requests for submissions other than the most recent" do
+      course_with_teacher_logged_in
+      assignment = assignment_model(course: @course)
+      student_in_course
+
+      Timecop.travel(3.days.ago) do
+        @attachment1 = attachment_model(uploaded_data: stub_file_data("test1.txt", "asdf", "text/plain"), context: @student)
+        assignment.submit_homework(@student, {
+                                     submission_type: "online_upload",
+                                     attachment_ids: @attachment1.id,
+                                     attachments: [@attachment1],
+                                   })
+      end
+
+      @attachment2 = attachment_model(uploaded_data: stub_file_data("test2.txt", "asdf", "text/plain"), context: @student)
+      assignment.submit_homework(@student, {
+                                   submission_type: "online_upload",
+                                   attachment_ids: @attachment2.id,
+                                   attachments: [@attachment2],
+                                 })
+
+      get :show, params: { assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: @attachment1.id }
+      expect(response).to be_redirect
+      expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{@attachment1.id}/download\?download_frd=true}
+      expect(URI.parse(response.headers["Location"]).query).to match(/verifier=#{@attachment1.uuid}/)
+
+      get :show, params: { assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: @attachment2.id }
+      expect(response).to be_redirect
+      expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{@attachment2.id}/download\?download_frd=true}
+      expect(URI.parse(response.headers["Location"]).query).to match(/verifier=#{@attachment2.uuid}/)
     end
   end
 end

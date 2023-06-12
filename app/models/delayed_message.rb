@@ -24,12 +24,30 @@ class DelayedMessage < ActiveRecord::Base
   belongs_to :notification_policy_override, inverse_of: :delayed_messages
   belongs_to :context, polymorphic:
     [
-      :discussion_entry, :assignment, :submission_comment, :submission,
-      :conversation_message, :course, :discussion_topic, :enrollment,
-      :attachment, :assignment_override, :group_membership, :calendar_event,
-      :wiki_page, :assessment_request, :account_user, :web_conference,
-      :account, :user, :appointment_group, :collaborator, :account_report,
-      :alert, :content_migration, :account_notification,
+      :discussion_entry,
+      :assignment,
+      :submission_comment,
+      :submission,
+      :conversation_message,
+      :course,
+      :discussion_topic,
+      :enrollment,
+      :attachment,
+      :assignment_override,
+      :group_membership,
+      :calendar_event,
+      :wiki_page,
+      :assessment_request,
+      :account_user,
+      :web_conference,
+      :account,
+      :user,
+      :appointment_group,
+      :collaborator,
+      :account_report,
+      :alert,
+      :content_migration,
+      :account_notification,
       {
         context_communication_channel: "CommunicationChannel",
         quiz_submission: "Quizzes::QuizSubmission",
@@ -122,9 +140,9 @@ class DelayedMessage < ActiveRecord::Base
         subject: notification.subject,
         to: to.path,
         notification_name: notification.name,
-        notification: notification,
+        notification:,
         from: path,
-        user: user
+        user:
       )
       message.delayed_messages = delayed_messages
       message.context = context

@@ -649,8 +649,10 @@ describe AssignmentOverrideApplicator do
         end
 
         it "works even if :read_roster is disabled" do
-          RoleOverride.create!(context: @course.root_account, permission: "read_roster",
-                               role: student_role, enabled: false)
+          RoleOverride.create!(context: @course.root_account,
+                               permission: "read_roster",
+                               role: student_role,
+                               enabled: false)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
           expect(overrides).to eq [@override2]
         end
@@ -678,7 +680,7 @@ describe AssignmentOverrideApplicator do
 
         it "does not include section overrides for sections without an enrollment" do
           assignment = create_assignment(course: @course, due_at: 5.days.from_now)
-          override = assignment_override_model(assignment: assignment)
+          override = assignment_override_model(assignment:)
           override.set = @course.course_sections.create!
           override.save!
           overrides = AssignmentOverrideApplicator.section_overrides(assignment, @student)
@@ -864,7 +866,7 @@ describe AssignmentOverrideApplicator do
             section = @course.course_sections.create! name: "title"
             @course.enroll_user(@student,
                                 "StudentEnrollment",
-                                section: section,
+                                section:,
                                 enrollment_state: "active",
                                 allow_multiple_enrollments: true)
             override = quiz.assignment_overrides.build
@@ -895,7 +897,7 @@ describe AssignmentOverrideApplicator do
             section = @course.course_sections.create! name: "title"
             @course.enroll_user(@student,
                                 "StudentEnrollment",
-                                section: section,
+                                section:,
                                 enrollment_state: "active",
                                 allow_multiple_enrollments: true)
             override = quiz.assignment_overrides.build
@@ -1372,7 +1374,7 @@ describe AssignmentOverrideApplicator do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
       @unoverridden_assignment = @overridden_assignment.without_overrides
-      expect(@unoverridden_assignment.overridden_for_user).to eq nil
+      expect(@unoverridden_assignment.overridden_for_user).to be_nil
     end
   end
 

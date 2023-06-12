@@ -55,7 +55,7 @@ describe ContentParticipation do
                                                 user: @student,
                                                 workflow_state: "unread",
                                               })
-      end.to change(ContentParticipation, :count).by 0
+      end.not_to change(ContentParticipation, :count)
 
       cp = ContentParticipation.where(user_id: @student).first
       expect(cp.workflow_state).to eq "unread"
@@ -98,7 +98,8 @@ describe ContentParticipation do
         end.to change(ContentParticipation, :count).by 1
       end
 
-      it "doesn't change the read state if submission is not posted" do
+      it "doesn't change the read state if submission is not posted and post policy is manual" do
+        @assignment.ensure_post_policy(post_manually: true)
         @content.update_columns(posted_at: nil)
 
         ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
@@ -317,7 +318,7 @@ describe ContentParticipation do
 
         expect do
           ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
-        end.to change(ContentParticipationCount, :count).by 0
+        end.not_to change(ContentParticipationCount, :count)
 
         cpc = ContentParticipationCount.where(user_id: @student).first
         expect(cpc.unread_count).to eq 1
@@ -490,6 +491,34 @@ describe ContentParticipation do
                                                             workflow_state: "unread",
                                                           })
       expect(participant.root_account_id).to eq(@assignment.root_account_id)
+    end
+  end
+
+  context "clear unread submissions" do
+    before :once do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      assignment_model(course: @course)
+      @content = @assignment.submit_homework(@student)
+      @assignment2 = assignment_model(course: @course)
+      @content2 = @assignment2.submit_homework(@student)
+      @assignment.ensure_post_policy(post_manually: false)
+      @content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+      @assignment2.ensure_post_policy(post_manually: false)
+      @content2.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "grade")
+      ContentParticipation.participate(content: @content2, user: @student, workflow_state: "unread", content_item: "grade")
+    end
+
+    it "marks all submission grades as read" do
+      content_participation_count = ContentParticipationCount.find_by(user: @student, context: @course)
+      content_participation_count.refresh_unread_count
+      expect(content_participation_count.unread_count).to eq(2)
+      submissions = @course.submissions.where(user: @student)
+      ContentParticipation.mark_all_as_read_for_user(@student, submissions, @course)
+      content_participation_count.reload
+      expect(content_participation_count.unread_count).to eq(0)
     end
   end
 end

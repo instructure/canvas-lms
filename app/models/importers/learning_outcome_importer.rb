@@ -102,6 +102,7 @@ module Importers
             item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s)
                                     .where(migration_id: hash[:migration_id]).first
           end
+          item ||= LearningOutcome.where(context_id: context, context_type: context.class.to_s, vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
           item ||= context.created_learning_outcomes.temp_record
           item.context = context
           item.mark_as_importing!(migration)

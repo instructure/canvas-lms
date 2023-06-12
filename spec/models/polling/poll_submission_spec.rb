@@ -119,7 +119,7 @@ describe Polling::PollSubmission do
       expect do
         Polling::PollSubmission.create!(poll: @poll,
                                         user: @student,
-                                        poll_choice: poll_choice,
+                                        poll_choice:,
                                         poll_session: @session)
       end.to raise_error(ActiveRecord::RecordInvalid,
                          /That poll choice does not belong to the existing poll/)

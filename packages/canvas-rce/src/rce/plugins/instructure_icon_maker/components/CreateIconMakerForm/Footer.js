@@ -61,7 +61,7 @@ export const Footer = ({
         <Flex>
           <Flex.Item shouldGrow={true} shouldShrink={true} />
           <Flex.Item>
-            <Button disabled={disabled} onClick={onCancel}>
+            <Button disabled={disabled} onClick={onCancel} data-testid="icon-maker-cancel">
               {formatMessage('Cancel')}
             </Button>
             {editing ? (
@@ -77,7 +77,7 @@ export const Footer = ({
                   margin="0 0 0 x-small"
                   data-testid="icon-maker-save"
                 >
-                  {formatMessage('Save')}
+                  {replaceAll ? formatMessage('Save') : formatMessage('Save Copy')}
                 </Button>
               </ConditionalTooltip>
             ) : (

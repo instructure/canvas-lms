@@ -24,15 +24,24 @@ analytics_2:
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: true
 admin_analytics:
-  state: hidden
+  state: allowed
   applies_to: Account
   display_name: Admin Analytics
   description:
-    wrapper: <a href="https://community.canvaslms.com/t5/New-Analytics-Users/gh-p/analytics">\1</a>
-    admin_analytics_description: Enabling displays Admin Analytics to show overviews of
-      courses and students. Learn more and give feedback by joining the
-      *New Analytics user group* in the Canvas community.
+    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
+    admin_analytics_description: Enables Analytics at the account-level. Admin Analytics dashboards provide
+     details on Canvas usage, Canvas course success, and student engagement.
+      Learn more in the *Admin Analytics Hub* in the Canvas community.
   after_state_change_proc: analytics_2_after_state_change_hook
+  root_opt_in: true
+  beta: true
+admin_analytics_new_filter_ui:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics - New Filter UI
+  description:
+    admin_analytics_new_filter_ui_description: Enables the new Admin Analytics Filter UI.
+  root_opt_in: true
   beta: true
 anonymous_instructor_annotations:
   type: setting
@@ -56,12 +65,6 @@ common_cartridge_page_conversion:
   description: If enabled, Common Cartridge importers will convert HTML files into
     Pages
   applies_to: Course
-commons_favorites:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Import Commons Favorites
-  description: If Commons is installed, allows importing favorited content items from
-    within Canvas.
 compact_live_event_payloads:
   state: allowed
   applies_to: RootAccount
@@ -177,14 +180,6 @@ high_contrast:
       High Contrast enhances the color contrast of the UI (text, buttons, etc.), making those items more
       distinct and easier to identify. Note: Institution branding will be disabled.
   applies_to: User
-high_contrast_course_colors:
-  state: allowed
-  display_name: High Contrast Course Colors
-  description:
-    high_contrast_course_colors_description: |-
-      High Contrast Course Colors darkens system provided and color picker course colors
-      (not manually defined ones) to improve contrast ratio
-  applies_to: SiteAdmin
 include_byte_order_mark_in_gradebook_exports:
   type: setting
   state: allowed
@@ -424,17 +419,13 @@ scheduled_page_publication:
   state: hidden
   display_name: Scheduled page publication
   description: Allows course pages to be published on a schedule
-copy_blueprint_settings:
-  applies_to: RootAccount
-  state: hidden
-  display_name: Copy Blueprint Course settings
-  description: Allows Blueprint Course settings to be exported and copied to another Blueprint Course
 send_usage_metrics:
   state: hidden
   display_name: Send usage metrics
   description: Send usage metrics
   applies_to: RootAccount
   visible_on: usage_metrics_allowed_hook
+  shadow: true
 new_quiz_public_api:
   applies_to: SiteAdmin
   state: hidden

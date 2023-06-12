@@ -90,6 +90,11 @@
 #           "description": "Optional: Whether or not the user is a K5 user. This field is nil if the user settings are not for the user making the request.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "use_classic_font_in_k5": {
+#           "description": "Optional: Whether or not the user should see the classic font on the dashboard. Only applies if k5_user is true. This field is nil if the user settings are not for the user making the request.",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -345,8 +350,18 @@ class ProfileController < ApplicationController
     respond_to do |format|
       user_params = if params[:user]
                       params[:user]
-                        .permit(:name, :short_name, :sortable_name, :time_zone, :show_user_services, :gender,
-                                :avatar_image, :subscribe_to_emails, :locale, :bio, :birthdate, :pronouns)
+                        .permit(:name,
+                                :short_name,
+                                :sortable_name,
+                                :time_zone,
+                                :show_user_services,
+                                :gender,
+                                :avatar_image,
+                                :subscribe_to_emails,
+                                :locale,
+                                :bio,
+                                :birthdate,
+                                :pronouns)
                     else
                       {}
                     end
@@ -434,7 +449,7 @@ class ProfileController < ApplicationController
       params[:link_urls].zip(params[:link_titles])
                         .reject { |url, title| url.blank? && title.blank? }
                         .each do |url, title|
-        new_link = @profile.links.build url: url, title: title
+        new_link = @profile.links.build(url:, title:)
         # since every time we update links, we delete and recreate everything,
         # deleting invalid link records will make sure the rest of the
         # valid ones still save
@@ -525,6 +540,6 @@ class ProfileController < ApplicationController
 end
 
 def instructure_misc_plugin_available?
-  Object.const_defined?("InstructureMiscPlugin")
+  Object.const_defined?(:InstructureMiscPlugin)
 end
 private :instructure_misc_plugin_available?

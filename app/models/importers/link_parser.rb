@@ -123,7 +123,7 @@ module Importers
     end
 
     def resolved(new_url = nil)
-      { resolved: true, new_url: new_url }
+      { resolved: true, new_url: }
     end
 
     # returns a hash with resolution status and data to hold onto if unresolved
@@ -135,8 +135,10 @@ module Importers
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^?]*)(\?.*)?}
         unresolved(:module_item, migration_id: $1, query: $2)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/?#]+)(.*)}
-        unresolved(:file_ref, migration_id: $1, rest: $2,
-                              in_media_iframe: attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
+        unresolved(:file_ref,
+                   migration_id: $1,
+                   rest: $2,
+                   in_media_iframe: attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^?]*)(\?.*)?}
         unresolved(:object, type: $1, migration_id: $2, query: $3)
 
@@ -147,9 +149,9 @@ module Importers
         rel_path = URI::DEFAULT_PARSER.unescape($1)
         if (attr == "href" && node["class"]&.include?("instructure_inline_media_comment")) ||
            (attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
-          unresolved(:media_object, rel_path: rel_path)
+          unresolved(:media_object, rel_path:)
         else
-          unresolved(:file, rel_path: rel_path)
+          unresolved(:file, rel_path:)
         end
       elsif (attr == "href" && node["class"]&.include?("instructure_inline_media_comment")) ||
             (attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
@@ -183,13 +185,13 @@ module Importers
       md5 = Digest::MD5.hexdigest image_data
       folder_name = I18n.t("embedded_images")
       @folder ||= Folder.root_folders(context).first.sub_folders
-                        .where(name: folder_name, workflow_state: "hidden", context: context).first_or_create!
+                        .where(name: folder_name, workflow_state: "hidden", context:).first_or_create!
       filename = "#{md5}.#{extension}"
       file = Tempfile.new([md5, ".#{extension}"])
       file.binmode
       file.write(image_data)
       file.close
-      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5: md5)
+      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5:)
       resolved("#{context_path}/files/#{attachment.id}/preview")
     rescue
       unresolved(:file, rel_path: "#{folder_name}/#{filename}")

@@ -73,13 +73,13 @@ describe Api do
 
     it "does not find record from other account" do
       account = Account.create(name: "new")
-      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      @user = user_with_pseudonym(username: "sis_user_1@example.com", account:)
       expect { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "finds record from other root account explicitly" do
       account = Account.create(name: "new")
-      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
+      @user = user_with_pseudonym(username: "sis_user_1@example.com", account:)
       expect(Api).to receive(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything)
                                            .and_return(["sis_login_id", ["sis_user_1@example.com", account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
@@ -87,8 +87,8 @@ describe Api do
 
     it "allows passing account param and find record" do
       account = Account.create(name: "new")
-      @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com", account: account)).to eq @user
+      @user = user_with_pseudonym(username: "sis_user_1@example.com", account:)
+      expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com", account:)).to eq @user
     end
 
     it "does not find a missing sis_id record" do
@@ -121,7 +121,7 @@ describe Api do
 
     it "finds group_category with sis_id" do
       account = Account.create!
-      gc = GroupCategory.create(sis_source_id: "gc_sis", account: account, name: "gc")
+      gc = GroupCategory.create(sis_source_id: "gc_sis", account:, name: "gc")
       expect(gc).to eq TestApiInstance.new(account, nil).api_find(GroupCategory, "sis_group_category_id:gc_sis")
     end
 
@@ -264,6 +264,41 @@ describe Api do
       assignment = assignment_model(lti_context_id: "LTI_CTX_ID1")
       expect(@api.api_find(Assignment, "lti_context_id:#{assignment.lti_context_id}")).to eq assignment
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      before :once do
+        @shard1.activate { @cs_user = User.create! }
+        @cs_ps = managed_pseudonym(@cs_user, account: Account.default, sis_user_id: "cross_shard_user")
+      end
+
+      it "finds the shadow record" do
+        user = @api.api_find(User, "sis_user_id:cross_shard_user")
+        expect(user).to eq @cs_user
+        expect(user).to be_shadow_record
+        expect(user).to be_readonly
+      end
+
+      it "finds the primary record if given `writable`" do
+        user = @api.api_find(User, "sis_user_id:cross_shard_user", writable: true)
+        expect(user).to eq @cs_user
+        expect(user).not_to be_shadow_record
+        expect(user).not_to be_readonly
+      end
+
+      it "infers `writable: false` from read-only request method" do
+        expect(@api).to receive(:request).and_return(double(method: "GET"))
+        user = @api.api_find(User, "sis_user_id:cross_shard_user")
+        expect(user).to be_shadow_record
+      end
+
+      it "infers `writable: true` from writable request method" do
+        expect(@api).to receive(:request).and_return(double(method: "POST"))
+        user = @api.api_find(User, "sis_user_id:cross_shard_user")
+        expect(user).not_to be_shadow_record
+      end
+    end
   end
 
   context "api_find_all" do
@@ -401,11 +436,15 @@ describe Api do
       @user2 = @user
       user_with_pseudonym username: "sisuser3@example.com"
       @user3 = @user
-      expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
-                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4",
-                          "5123"], User, Account.default).sort).to eq [
-                            @user1.id, @user2.id, @user3.id, 5123
-                          ].sort
+      expect(Api.map_ids(["sis_user_id:sisuser1",
+                          "sis_login_id:sisuser2@example.com",
+                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d",
+                          "sis_user_id:sisuser4",
+                          "5123"],
+                         User,
+                         Account.default).sort).to eq [
+                           @user1.id, @user2.id, @user3.id, 5123
+                         ].sort
     end
 
     it "works when only provided sis_ids" do
@@ -417,10 +456,14 @@ describe Api do
       @user2 = @user
       user_with_pseudonym username: "sisuser3@example.com"
       @user3 = @user
-      expect(Api.map_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
-                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4"], User, Account.default).sort).to eq [
-                            @user1.id, @user2.id, @user3.id
-                          ].sort
+      expect(Api.map_ids(["sis_user_id:sisuser1",
+                          "sis_login_id:sisuser2@example.com",
+                          "hex:sis_login_id:7369737573657233406578616d706c652e636f6d",
+                          "sis_user_id:sisuser4"],
+                         User,
+                         Account.default).sort).to eq [
+                           @user1.id, @user2.id, @user3.id
+                         ].sort
     end
 
     it "does not find sis ids in other accounts" do
@@ -539,8 +582,8 @@ describe Api do
     end
 
     it "handles user uuid" do
-      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0")).to \
-        eq ["uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
+      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"))
+        .to eq ["uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
       expect(Api.sis_parse_ids(["uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"], @lookups)).to \
         eq({ "users.uuid" => { ids: ["tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"] } })
     end
@@ -603,7 +646,7 @@ describe Api do
   context "relation_for_sis_mapping" do
     it "passes along the parsed ids to sis_make_params_for_sis_mapping_and_columns" do
       root_account = account_model
-      expect(Api).to receive(:sis_parse_ids).with([1, 2, 3], "lookups", anything, root_account: root_account).and_return({ "users.id" => [4, 5, 6] })
+      expect(Api).to receive(:sis_parse_ids).with([1, 2, 3], "lookups", anything, root_account:).and_return({ "users.id" => [4, 5, 6] })
       expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(User, { "users.id" => [4, 5, 6] }, { lookups: "lookups" }, root_account).and_return("params")
       expect(Api.relation_for_sis_mapping(User, { lookups: "lookups" }, [1, 2, 3], root_account)).to eq "params"
     end
@@ -933,7 +976,7 @@ describe Api do
   context ".paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
-    let(:controller) { double("controller", request: request, response: response, params: {}) }
+    let(:controller) { double("controller", request:, response:, params: {}) }
 
     describe "#ordered_colection" do
       it "orders a relation" do
@@ -946,7 +989,7 @@ describe Api do
       let(:collection) { [1, 2, 3] }
 
       it "does not raise Folio::InvalidPage for pages past the end" do
-        controller = double("controller", request: request, response: response, params: { per_page: 1 })
+        controller = double("controller", request:, response:, params: { per_page: 1 })
         expect(Api.paginate(collection, controller, "example.com", page: collection.size + 1))
           .to eq []
       end
@@ -975,7 +1018,7 @@ describe Api do
 
       context "with no max_per_page argument" do
         it "limits to the default max_per_page" do
-          controller = double("controller", request: request, response: response, params: { per_page: Api.max_per_page + 5 })
+          controller = double("controller", request:, response:, params: { per_page: Api.max_per_page + 5 })
           expect(Api.paginate(collection, controller, "example.com").size)
             .to eq Api.max_per_page
         end
@@ -983,14 +1026,14 @@ describe Api do
 
       context "with no per_page parameter" do
         it "limits to the default per_page" do
-          controller = double("controller", request: request, response: response, params: {})
+          controller = double("controller", request:, response:, params: {})
           expect(Api.paginate(collection, controller, "example.com").size)
             .to eq Api.per_page
         end
       end
 
       context "with per_page parameter > max_per_page argument" do
-        let(:controller) { double("controller", request: request, response: response, params: { per_page: 100 }) }
+        let(:controller) { double("controller", request:, response:, params: { per_page: 100 }) }
 
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, "example.com", { max_per_page: 75 }).size)
@@ -999,7 +1042,7 @@ describe Api do
       end
 
       context "with per_page parameter < max_per_page argument" do
-        let(:controller) { double("controller", request: request, response: response, params: { per_page: 75 }) }
+        let(:controller) { double("controller", request:, response:, params: { per_page: 75 }) }
 
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, "example.com", { max_per_page: 100 }).size)
@@ -1012,7 +1055,7 @@ describe Api do
   context ".jsonapi_paginate" do
     let(:request) { double("request", query_parameters: {}) }
     let(:response) { double("response", headers: {}) }
-    let(:controller) { double("controller", request: request, response: response, params: {}) }
+    let(:controller) { double("controller", request:, response:, params: {}) }
     let(:collection) { [1, 2, 3] }
 
     it "returns the links in the headers" do
@@ -1123,7 +1166,7 @@ describe Api do
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  "Accept" => "application/vnd.api+json"
                                                                })
-      expect(controller.accepts_jsonapi?).to eq true
+      expect(controller.accepts_jsonapi?).to be true
     end
 
     it "returns false when application/vnd.api+json not in the Accept header" do
@@ -1131,7 +1174,7 @@ describe Api do
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  "Accept" => "application/json"
                                                                })
-      expect(controller.accepts_jsonapi?).to eq false
+      expect(controller.accepts_jsonapi?).to be false
     end
   end
 

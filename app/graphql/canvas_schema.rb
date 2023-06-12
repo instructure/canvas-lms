@@ -62,6 +62,7 @@ class CanvasSchema < GraphQL::Schema
     when Group then Types::GroupType
     when GroupCategory then Types::GroupSetType
     when GradingPeriod then Types::GradingPeriodType
+    when GradingStandard then Types::GradingStandardType
     when ContextModule then Types::ModuleType
     when PostPolicy then Types::PostPolicyType
     when WikiPage then Types::PageType
@@ -99,9 +100,13 @@ class CanvasSchema < GraphQL::Schema
                  graphql_type: error.type.graphql_name)
   end
 
-  orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,
-                Types::ExternalToolType, Types::ModuleExternalToolType,
-                Types::ProgressType, Types::ModuleSubHeaderType,
+  orphan_types [Types::PageType,
+                Types::FileType,
+                Types::ExternalUrlType,
+                Types::ExternalToolType,
+                Types::ModuleExternalToolType,
+                Types::ProgressType,
+                Types::ModuleSubHeaderType,
                 Types::InternalSettingType]
 
   def self.for_federation

@@ -21,7 +21,7 @@
 require_relative "../../conditional_release_spec_helper"
 
 module ConditionalRelease
-  describe AssignmentSetAssociation, type: :model do
+  describe AssignmentSetAssociation do
     it_behaves_like "a soft-deletable model"
 
     it "must have an assignment_id" do
@@ -34,16 +34,16 @@ module ConditionalRelease
       asg = create :assignment_set_association
       dup = build :assignment_set_association, assignment_id: asg.assignment_id
       asg.assignment_set.assignment_set_associations << dup
-      expect(dup.valid?).to eq false
+      expect(dup.valid?).to be false
       expect(dup.errors["assignment_id"].to_s).to match(/taken/)
-      expect(asg.assignment_set.valid?).to eq false
+      expect(asg.assignment_set.valid?).to be false
       expect(asg.assignment_set.errors["assignment_set_associations.assignment_id"].to_s).to match(/taken/)
     end
 
     it "enforces not having the same assigment_id as the trigger_assignment of its rule" do
       asg = create :assignment_set_association
       asg.assignment_id = asg.rule.trigger_assignment_id
-      expect(asg.valid?).to eq false
+      expect(asg.valid?).to be false
       expect(asg.errors["assignment_id"].to_s).to match(/trigger/)
     end
   end

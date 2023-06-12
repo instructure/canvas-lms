@@ -71,12 +71,12 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
       it "returns list of old quizzes" do
         quiz_collection = subject.collect.reject { |quiz| quiz["quiz_type"] == "quizzes.next" }
-        expect(quiz_collection.map { |q| q["id"] }).to eq quizzes.map(&:id)
+        expect(quiz_collection.pluck("id")).to eq quizzes.map(&:id)
       end
 
       it "returns list of assignments (new quizzes)" do
         quiz_collection = subject.collect.select { |quiz| quiz["quiz_type"] == "quizzes.next" }
-        expect(quiz_collection.map { |q| q["id"] }).to eq new_quizzes.map(&:id)
+        expect(quiz_collection.pluck("id")).to eq new_quizzes.map(&:id)
       end
 
       describe "search_term query param" do
@@ -105,13 +105,13 @@ describe QuizzesNext::QuizzesApiController, type: :request do
             action: "index",
             format: "json",
             course_id: @course.id.to_s,
-            search_term: search_term
+            search_term:
           )
 
-          response_quizzes = response.reject { |quiz| quiz["quiz_type"] == "quizzes.next" }.map { |quiz| quiz["title"] }
+          response_quizzes = response.reject { |quiz| quiz["quiz_type"] == "quizzes.next" }.pluck("title")
           expect(response_quizzes.sort).to eq(quizzes_with_search_term.map(&:title).sort)
 
-          response_quizzes = response.select { |quiz| quiz["quiz_type"] == "quizzes.next" }.map { |quiz| quiz["title"] }
+          response_quizzes = response.select { |quiz| quiz["quiz_type"] == "quizzes.next" }.pluck("title")
           expect(response_quizzes.sort).to eq(assignments_with_search_term.map(&:title).sort)
         end
       end
@@ -172,9 +172,9 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           subject
           link_header = response.headers["Link"]
           expect(link_header).to eq(
-            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"current\","\
-            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=2&per_page=2>; rel=\"next\","\
-            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"first\","\
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"current\"," \
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=2&per_page=2>; rel=\"next\"," \
+            "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=1&per_page=2>; rel=\"first\"," \
             "<http://www.example.com/api/v1/courses/#{@course.id}/all_quizzes?page=4&per_page=2>; rel=\"last\""
           )
         end
@@ -234,7 +234,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
         end
 
         it "only returns published quizzes" do
-          quiz_ids = subject.map { |quiz| quiz["id"] }
+          quiz_ids = subject.pluck("id")
           expect(quiz_ids).to eq([published_quiz.id, published_new_quiz.id])
         end
       end

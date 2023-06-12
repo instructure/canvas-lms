@@ -64,7 +64,7 @@ module Mutable
       visible_comment_sub_ids =
         SubmissionComment.where(hidden: false, submission_id: submission_ids, author_id: instructor_ids)
                          .pluck(:submission_id)
-      update_submission_comments_and_count(visible_comment_sub_ids, hidden: true, instructor_ids: instructor_ids) if visible_comment_sub_ids.any?
+      update_submission_comments_and_count(visible_comment_sub_ids, hidden: true, instructor_ids:) if visible_comment_sub_ids.any?
     end
   end
 
@@ -91,12 +91,13 @@ module Mutable
     submission_ids.each_slice(100) do |submission_id_slice|
       submission_comment_scope = SubmissionComment.where(hidden: !hidden, submission_id: submission_id_slice)
       submission_comment_scope = submission_comment_scope.where(author_id: instructor_ids) if instructor_ids.present?
-      submission_comment_scope.update_all(hidden: hidden, updated_at: update_time)
+      submission_comment_scope.update_all(hidden:, updated_at: update_time)
 
       Submission.where(id: submission_id_slice)
                 .update_all(["submission_comments_count = (SELECT COUNT(*) FROM #{SubmissionComment.quoted_table_name} WHERE
             submissions.id = submission_comments.submission_id AND submission_comments.hidden = ? AND
-            submission_comments.draft IS NOT TRUE AND submission_comments.provisional_grade_id IS NULL)", false])
+            submission_comments.draft IS NOT TRUE AND submission_comments.provisional_grade_id IS NULL)",
+                             false])
     end
   end
 

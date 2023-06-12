@@ -84,7 +84,7 @@ describe BrandConfigsController do
         expect(s["group_name"]).to be_present
       end
 
-      vars = variable_schema.map { |schema| schema["variables"] }.flatten
+      vars = variable_schema.pluck("variables").flatten
       vars.each do |v|
         expect(v["human_name"]).to be_present
       end
@@ -104,7 +104,7 @@ describe BrandConfigsController do
       user_session(admin)
       post "create", params: { account_id: @account.id, brand_config: bcin }
       assert_status(200)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["brand_config"]["variables"]["ic-brand-primary"]).to eq "#000000"
     end
 
@@ -123,13 +123,14 @@ describe BrandConfigsController do
 
     it "returns an existing brand config" do
       user_session(admin)
-      post "create", params: { account_id: @account.id, brand_config: {
-        variables: {
-          "ic-brand-primary" => "#321"
-        }
-      } }
+      post "create", params: { account_id: @account.id,
+                               brand_config: {
+                                 variables: {
+                                   "ic-brand-primary" => "#321"
+                                 }
+                               } }
       assert_status(200)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["brand_config"]["md5"]).to eq @bc.md5
     end
 
@@ -140,7 +141,7 @@ describe BrandConfigsController do
       uf = ActionDispatch::Http::UploadedFile.new(tempfile: tf, filename: "test.js")
       post "create", params: { account_id: @account.id, brand_config: bcin, js_overrides: uf }
       assert_status(200)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["brand_config"]["js_overrides"]).to be_present
     end
   end
@@ -181,7 +182,7 @@ describe BrandConfigsController do
       session[:brand_config] = { md5: @bc.md5, type: :base }
       post "save_to_account", params: { account_id: @account.id }
       assert_status(200)
-      json = JSON.parse(response.body)
+      json = response.parsed_body
       expect(json["subAccountProgresses"]).to be_present
     end
 

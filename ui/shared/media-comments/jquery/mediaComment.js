@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-// mediaComment.coffee
+// mediaComment.js
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import pubsub from 'jquery-tinypubsub'
@@ -23,7 +23,7 @@ import mejs from '@canvas/mediaelement'
 import MediaElementKeyActionHandler from './MediaElementKeyActionHandler'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
-import sanitizeUrl from 'sanitize-url'
+import sanitizeUrl from '@canvas/util/sanitizeUrl'
 
 const I18n = useI18nScope('jquery_media_comments')
 
@@ -177,7 +177,7 @@ const mediaCommentActions = {
     return $.mediaComment.init(mediaType, initOpts)
   },
 
-  show_inline(id, mediaType = 'video', downloadUrl) {
+  show_inline(id, mediaType = 'video', downloadUrl, attachmentId = null) {
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
     const $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
     $holder.text(I18n.t('loading', 'Loading media...'))
@@ -190,6 +190,7 @@ const mediaCommentActions = {
           const mediaPlayerOptions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
             mediaCommentId: id,
+            attachmentId,
             menuTimeoutMouseLeave: 50,
             success(media) {
               holder.focus()

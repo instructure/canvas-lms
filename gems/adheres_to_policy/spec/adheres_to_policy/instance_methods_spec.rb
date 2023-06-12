@@ -44,7 +44,7 @@ describe AdheresToPolicy::InstanceMethods do
   it "is able to check a policy" do
     some_instance = some_class.new
     some_instance.user = 1
-    expect(some_instance.grants_right?(1, :read)).to eq true
+    expect(some_instance.grants_right?(1, :read)).to be true
   end
 
   it "allows multiple forms of can statements" do
@@ -242,7 +242,7 @@ describe AdheresToPolicy::InstanceMethods do
       expect(Rails.cache).to receive(:delete).with(%r{/write$})
 
       sample = sample_class.new
-      expect(sample.grants_right?(1, :read)).to eq true
+      expect(sample.grants_right?(1, :read)).to be true
       sample.clear_permissions_cache(1)
     end
   end
@@ -264,13 +264,13 @@ describe AdheresToPolicy::InstanceMethods do
 
     it "checks the policy" do
       sample = sample_class.new
-      expect(sample.grants_any_right?(1, :read, :write)).to eq true
-      expect(sample.grants_any_right?(1, :asdf)).to eq false
+      expect(sample.grants_any_right?(1, :read, :write)).to be true
+      expect(sample.grants_any_right?(1, :asdf)).to be false
     end
 
     it "returns false if no specific ones are sought" do
       sample = sample_class.new
-      expect(sample.grants_any_right?(1)).to eq false
+      expect(sample.grants_any_right?(1)).to be false
     end
   end
 
@@ -291,14 +291,14 @@ describe AdheresToPolicy::InstanceMethods do
 
     it "checks the policy" do
       sample = sample_class.new
-      expect(sample.grants_all_rights?(1, :read, :write)).to eq false
-      expect(sample.grants_all_rights?(2, :read, :write)).to eq true
-      expect(sample.grants_all_rights?(3, :read, :asdf)).to eq false
+      expect(sample.grants_all_rights?(1, :read, :write)).to be false
+      expect(sample.grants_all_rights?(2, :read, :write)).to be true
+      expect(sample.grants_all_rights?(3, :read, :asdf)).to be false
     end
 
     it "returns false if no specific ones are sought" do
       sample = sample_class.new
-      expect(sample.grants_all_rights?(1)).to eq false
+      expect(sample.grants_all_rights?(1)).to be false
     end
   end
 
@@ -347,24 +347,24 @@ describe AdheresToPolicy::InstanceMethods do
 
     it "checks the policy" do
       non_context = actor_class.new
-      expect(non_context.grants_right?("allowed actor", :read)).to eq true
-      expect(non_context.grants_right?("allowed actor", :asdf)).to eq false
+      expect(non_context.grants_right?("allowed actor", :read)).to be true
+      expect(non_context.grants_right?("allowed actor", :asdf)).to be false
     end
 
     it "returns false if no specific ones are sought" do
       non_context = actor_class.new
-      expect(non_context.grants_right?("allowed actor")).to eq false
+      expect(non_context.grants_right?("allowed actor")).to be false
     end
 
     it "returns false if no user is provided" do
       non_context = actor_class.new
-      expect(non_context.grants_right?("allowed actor", :read)).to eq true
-      expect(non_context.grants_right?(nil, :read)).to eq false
+      expect(non_context.grants_right?("allowed actor", :read)).to be true
+      expect(non_context.grants_right?(nil, :read)).to be false
     end
 
     it "raises argument exception if anything other then one right is provided" do
       non_context = actor_class.new
-      expect(non_context.grants_right?("allowed actor", :read)).to eq true
+      expect(non_context.grants_right?("allowed actor", :read)).to be true
       expect do
         non_context.grants_right?("allowed actor", :asdf, :read)
       end.to raise_exception ArgumentError

@@ -88,7 +88,7 @@ module SIS
         # group_category's context, so assign context
         if group_category
           context = group_category.context
-          group ? group.group_category = group_category : group = group_category.groups.new(name: name, sis_source_id: group_id)
+          group ? group.group_category = group_category : group = group_category.groups.new(name:, sis_source_id: group_id)
         end
         # no account_id, course_id, or group_category, assign context to root_account
         context ||= @root_account
@@ -99,12 +99,12 @@ module SIS
           raise ImportError, "Cannot move group #{group_id} because it has group_memberships."
         end
 
-        group ||= context.groups.new(name: name, sis_source_id: group_id)
+        group ||= context.groups.new(name:, sis_source_id: group_id)
         # only update the name on groups that haven't had their name changed since the last sis import
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
         group.sis_batch_id = @batch.id
-        group.workflow_state = status == "deleted" ? "deleted" : "available"
+        group.workflow_state = (status == "deleted") ? "deleted" : "available"
 
         if group.save
           data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group)

@@ -106,7 +106,7 @@ describe LearningOutcomeGroup do
     it "returns non-empty array" do
       group = @course.learning_outcome_groups.create!(title: "groupage")
 
-      expect(group.parent_ids).to be_a_kind_of(Array)
+      expect(group.parent_ids).to be_a(Array)
       expect(group.parent_ids).not_to be_empty
     end
 
@@ -359,7 +359,11 @@ describe LearningOutcomeGroup do
         title = group[:title]
         childs = group[:groups]
 
-        db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
+        # root_account_id should match the context of the db_parent_group.context root_account_id
+        log_db_root_account_id = LearningOutcomeGroup.find_by(context: db_parent_group.context, title:).root_account_id
+        expect(log_db_root_account_id).to eq(db_parent_group.context.resolved_root_account_id)
+
+        db_group = db_parent_group.child_outcome_groups.find_by!(title:)
 
         db_outcomes = db_group.child_outcome_links.map(&:content)
 
@@ -379,16 +383,19 @@ describe LearningOutcomeGroup do
                                groups: [{
                                  title: "Group D",
                                  outcomes: 1
-                               }, {
-                                 title: "Group E",
-                                 outcomes: 1
-                               }]
+                               },
+                                        {
+                                          title: "Group E",
+                                          outcomes: 1
+                                        }]
                              }]
-                           }, Account.default)
+                           },
+                           Account.default)
 
       group_a = LearningOutcomeGroup.find_by(title: "Group A")
       @course_group_a = LearningOutcomeGroup.create!(
-        title: "Group A", context: @course,
+        title: "Group A",
+        context: @course,
         source_outcome_group: group_a
       )
     end
@@ -397,7 +404,8 @@ describe LearningOutcomeGroup do
       assert_tree_exists([{
                            title: "Group A",
                            outcomes: []
-                         }], @root)
+                         }],
+                         @root)
 
       @course_group_a.sync_source_group
 
@@ -410,12 +418,14 @@ describe LearningOutcomeGroup do
                              groups: [{
                                title: "Group D",
                                outcomes: ["0 Group D outcome"]
-                             }, {
-                               title: "Group E",
-                               outcomes: ["0 Group E outcome"]
-                             }]
+                             },
+                                      {
+                                        title: "Group E",
+                                        outcomes: ["0 Group E outcome"]
+                                      }]
                            }]
-                         }], @root)
+                         }],
+                         @root)
     end
 
     it "restore previous deleted group" do
@@ -425,6 +435,7 @@ describe LearningOutcomeGroup do
       @course_group_a.sync_source_group
       group_d.reload
       expect(group_d.workflow_state).to eql("active")
+      expect(group_d.root_account_id).to eql(@course.resolved_root_account_id)
     end
   end
 end

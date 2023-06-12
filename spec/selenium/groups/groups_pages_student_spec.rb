@@ -118,7 +118,7 @@ describe "groups" do
 
       it "hides groups for inaccessible courses in groups list", priority: "2" do
         term = EnrollmentTerm.find(@course.enrollment_term_id)
-        term.end_at = Time.zone.now - 2.days
+        term.end_at = 2.days.ago
         term.save!
         @course.restrict_student_past_view = true
         @course.save
@@ -176,7 +176,8 @@ describe "groups" do
           user: @user
         )
         # NOTE: announcement_url includes a leading '/'
-        AnnouncementNewEdit.edit_group_announcement(@testgroup.first, announcement,
+        AnnouncementNewEdit.edit_group_announcement(@testgroup.first,
+                                                    announcement,
                                                     "Canvas will be rewritten in chicken")
         announcement.reload
         # Editing *appends* to existing message, and the resulting announcement's
@@ -229,7 +230,7 @@ describe "groups" do
         expect(f("#content")).not_to contain_css(".edit-btn")
       end
 
-      it "allows all group members to see announcements", priority: "1", ignore_js_errors: true do
+      it "allows all group members to see announcements", ignore_js_errors: true, priority: "1" do
         @announcement = @testgroup.first.announcements.create!(
           title: "Group Announcement",
           message: "Group",
@@ -283,8 +284,10 @@ describe "groups" do
       end
 
       it "allows group members to access a discussion", priority: "1" do
-        dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                                     title: "Discussion Topic", message: "hi dudes")
+        dt = DiscussionTopic.create!(context: @testgroup.first,
+                                     user: @teacher,
+                                     title: "Discussion Topic",
+                                     message: "hi dudes")
         get discussions_page
         # Verifies group member can access the teacher's group discussion & that it's the correct discussion
         expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
@@ -306,7 +309,7 @@ describe "groups" do
         verify_no_course_user_access(discussions_page)
       end
 
-      it "allows discussions to be deleted by their creator", priority: "1", ignore_js_errors: true do
+      it "allows discussions to be deleted by their creator", ignore_js_errors: true, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first, user: @user, title: "Delete Me", message: "Discussion text")
         get discussions_page
         expect(f("[data-testid='discussion-link-#{dt.id}']")).to be_truthy

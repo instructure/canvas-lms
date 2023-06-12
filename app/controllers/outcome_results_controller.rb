@@ -187,6 +187,7 @@
 #     }
 
 class OutcomeResultsController < ApplicationController
+  CACHE_EXPIRATION = 5.minutes
   include Api::V1::OutcomeResults
   include Outcomes::Enrollments
   include Outcomes::ResultAnalytics
@@ -235,23 +236,19 @@ class OutcomeResultsController < ApplicationController
   # used in sLMGB
   def index
     include_hidden_value = value_to_boolean(params[:include_hidden])
-    @results = find_results(
-      include_hidden: include_hidden_value
-    )
-    @outcome_service_results = find_outcomes_service_results(
-      include_hidden: include_hidden_value
-    )
+    @results, @outcome_service_results = find_canvas_os_results(include_hidden: include_hidden_value)
+
     json = nil
     if @outcome_service_results.nil?
       @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
       json = outcome_results_json(@results)
     else
-      @outcome_service_results.push(@results).flatten!
+      @outcome_service_results.push(@results).flatten!.select! { |outcome| params[:outcome_ids]&.include? outcome.learning_outcome_id.to_s }
       @outcome_service_results = Api.paginate(@outcome_service_results, self, api_v1_course_outcome_results_url)
       json = outcome_results_json(@outcome_service_results)
     end
     json[:linked] = linked_include_collections if params[:include].present?
-    render json: json
+    render json:
   end
 
   # @API Get outcome result rollups
@@ -359,39 +356,111 @@ class OutcomeResultsController < ApplicationController
 
   private
 
-  def find_results(opts = {})
-    find_outcome_results(
-      @current_user,
-      users: opts[:all_users] ? @all_users : @users,
-      context: @context,
-      outcomes: @outcomes,
-      **opts
-    )
+  def find_new_quiz_assignments
+    # check if the logged in user has manage_grades & view_all_grades permissions
+    # if not, apply exclude_muted_associations to the assignment query
+    @new_quiz_assignments =
+      if context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
+        Assignment.active.where(context:).quiz_lti
+      else
+        # return if there is more than one user in users as this would indicate
+        # user with insufficient permissions accessing the LMGB
+        return if @users.length > 1
+
+        Assignment.active.where(context:).quiz_lti.exclude_muted_associations_for_user(@users[0])
+      end
   end
 
-  def find_outcomes_service_results(opts = {})
-    find_outcomes_service_outcome_results(
+  def fetch_and_handle_os_results_for_all_users(opts)
+    os_results_json = find_outcomes_service_outcome_results(
+      users: @all_users,
+      context: @context,
+      outcomes: @outcomes,
+      assignments: @new_quiz_assignments,
+      **opts
+    )
+    return if os_results_json.nil?
+
+    handle_outcomes_service_results(os_results_json, @context, @outcomes, @all_users, @new_quiz_assignments)
+  end
+
+  def fetch_and_convert_os_results(opts)
+    # Returns a list of new quiz assignments for the current context
+    # If it is empty then no need to continue
+    return if find_new_quiz_assignments.empty?
+
+    # fetches and converts OS results json to LearningOutcomeResult objects then removes duplicate rubric results, if found.
+    results = Rails.cache.fetch(generate_cache_results_key, expires_in: CACHE_EXPIRATION) do
+      fetch_and_handle_os_results_for_all_users(opts)
+    end
+
+    # Remove users that are filtered out since we are pulling all results from OS.
+    # See filter_users_by_excludes for why this is needed.
+    unless opts[:all_users]
+      user_map = @users.index_by(&:uuid)
+      results = results&.filter do |r|
+        user_map.key?(r.user_uuid)
+      end
+    end
+    results
+  end
+
+  def find_canvas_os_results(opts = { all_users: false })
+    canvas_results = find_outcome_results(
       @current_user,
       users: opts[:all_users] ? @all_users : @users,
       context: @context,
       outcomes: @outcomes,
       **opts
     )
+
+    os_results = fetch_and_convert_os_results(opts)
+
+    [canvas_results, os_results]
+  end
+
+  # There are two other parameters that could be concatenated that are
+  # specific when viewing sLMGB and course section LMGB
+  # For sLMGB ... user_ids plus a delimited list of students' user ids will be present in the cache key in the form of:
+  # slmgb_user_ids_1|2|3
+  # For course section LMGB ... student_id plus the section id will be present in the cache key in the form of:
+  # lmgb_section_id_123
+  # FURTHERMORE... to ensure the cache key is unique, the key also includes the @current_user.uuid, @context.uuid, & @domain_root_account.uuid
+  # example of cache key:
+  # slmgb_user_ids_5319/context_uuid/xDlV3Ca2nBRtRHX2K0ie0Wxng6grJKzEXSuIGoey/
+  #    current_user_uuid/dPu5lwmdwEJxBUqfiNlzyod3jbvVtdD0u8GrnVje/account_uuid/SYMqtl31AbcfmV6WfKkO5gqwpNr7Mvx21RHgG1bc
+  def generate_cache_results_key
+    # lmgb overall course
+    results_type = "lmgb"
+    # if section_id params is present then it is a course section and should be cached with section_id param
+    results_type = "lmgb_section_id_#{params[:section_id]}" unless params[:section_id].nil?
+    # slmgb is identified with the user_ids parameter and should be cached with user_ids params
+    results_type = "slmgb_user_ids_#{params[:user_ids].join("|")}" unless params[:user_ids].nil?
+
+    # Adding the currently logged in course, currently logged in user, and domain_root_account for session uniqueness
+    # looking around at other Rails.cache implementations, context and/or current_user and/or domain_root_account
+    # are used for uniqueness. We will use all 3's uuid for tripley safe measures.
+    # Refer to the below controllers for examples of cache keys
+    #   app/controllers/quizzes/quizzes_controller.rb
+    #   app/controllers/quizzes_next/quizzes_api_controller.rb
+    #   app/controllers/application_controller.rb
+    [results_type, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid]
   end
 
   # used in sLMGB/LMGB
-  def user_rollups(opts = {})
+  def user_rollups(opts = { all_users: false })
     excludes = Api.value_to_array(params[:exclude]).uniq
     filter_users_by_excludes
 
-    @results = find_results(opts).preload(:user)
+    @results, @outcome_service_results = find_canvas_os_results(opts)
+
+    @results = @results.preload(:user)
     ActiveRecord::Associations.preload(@results, :learning_outcome)
-    @outcome_service_results = find_outcomes_service_results(opts)
     if @outcome_service_results.nil?
-      outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
+      outcome_results_rollups(results: @results, users: @users, excludes:, context: @context)
     else
       @outcome_service_results.push(@results).flatten!
-      outcome_results_rollups(results: @outcome_service_results, users: @users, excludes: excludes, context: @context)
+      outcome_results_rollups(results: @outcome_service_results, users: @users, excludes:, context: @context)
     end
   end
 
@@ -434,11 +503,12 @@ class OutcomeResultsController < ApplicationController
   # Flagging potential issue - no reason to pull all the results for finding users
   # why not send the already pulled results to the definition and use that to filter
   def remove_users_with_no_results
-    userids_with_results = find_results.pluck(:user_id).uniq
-    os_userids_with_results = find_outcomes_service_results
+    userids_with_results, os_userids_with_results = find_canvas_os_results
+    userids_with_results = userids_with_results.pluck(:user_id).uniq
 
     if os_userids_with_results.nil?
       @users = @users.select { |u| userids_with_results.include? u.id }
+
     else
       os_userids_with_results = os_userids_with_results.pluck(:user_id).uniq
       os_userids_with_results.push(userids_with_results).flatten!
@@ -488,7 +558,7 @@ class OutcomeResultsController < ApplicationController
     # (sorting by name for duplicate scores), then reorder users
     # from those rollups, then paginate those users, and finally
     # only include rollups for those users
-    missing_score_sort = params[:sort_order] == "desc" ? CanvasSort::First : CanvasSort::Last
+    missing_score_sort = (params[:sort_order] == "desc") ? CanvasSort::First : CanvasSort::Last
     rollups = user_rollups.sort_by do |r|
       score = r.scores.find { |s| s.outcome.id.to_s == params[:sort_outcome_id] }&.score
       [score || missing_score_sort, Canvas::ICU.collation_key(r.context.sortable_name)]
@@ -510,10 +580,11 @@ class OutcomeResultsController < ApplicationController
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in this method.
     filter_users_by_excludes(true)
-    @results = find_results(all_users: false).preload(:user)
-    ActiveRecord::Associations.preload(@results, :learning_outcome)
 
-    @outcome_service_results = find_outcomes_service_results(all_users: false)
+    @results, @outcome_service_results = find_canvas_os_results(all_users: false)
+    @results = @results.preload(:user)
+
+    ActiveRecord::Associations.preload(@results, :learning_outcome)
     aggregate_rollups = nil
     if @outcome_service_results.nil?
       aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
@@ -521,8 +592,8 @@ class OutcomeResultsController < ApplicationController
       @outcome_service_results.push(@results).flatten!
       aggregate_rollups = [aggregate_outcome_results_rollup(@outcome_service_results, @context, params[:aggregate_stat])]
     end
+
     aggregate_outcome_results_rollups_json(aggregate_rollups)
-    # no pagination, so no meta field
   end
 
   def linked_include_collections
@@ -674,7 +745,7 @@ class OutcomeResultsController < ApplicationController
   def build_outcome_paths
     @outcome_paths = @outcome_links.map do |link|
       parts = outcome_group_prefix(link.associated_asset).push({ name: link.learning_outcome_content.title })
-      { id: link.learning_outcome_content.id, parts: parts }
+      { id: link.learning_outcome_content.id, parts: }
     end
   end
 

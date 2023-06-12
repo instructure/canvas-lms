@@ -135,7 +135,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
           className="Opportunities-styles__item"
           key="1"
         >
-          <Animatable(Opportunity)
+          <Animatable(undefined)
             animatableIndex={0}
             courseName="Course Short Name"
             dismiss={[Function]}
@@ -173,7 +173,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
           className="Opportunities-styles__item"
           key="2"
         >
-          <Animatable(Opportunity)
+          <Animatable(undefined)
             animatableIndex={0}
             courseName="Course Short Name"
             dismiss={null}
@@ -246,7 +246,7 @@ exports[`renders the right course with the right opportunity 1`] = `
           className="Opportunities-styles__item"
           key="1"
         >
-          <Animatable(Opportunity)
+          <Animatable(undefined)
             animatableIndex={0}
             courseName="Course Short Name"
             dismiss={[Function]}
@@ -261,7 +261,7 @@ exports[`renders the right course with the right opportunity 1`] = `
           className="Opportunities-styles__item"
           key="2"
         >
-          <Animatable(Opportunity)
+          <Animatable(undefined)
             animatableIndex={1}
             courseName="A different Course Name"
             dismiss={[Function]}
@@ -299,7 +299,7 @@ exports[`renders the right course with the right opportunity 1`] = `
           className="Opportunities-styles__item"
           key="2"
         >
-          <Animatable(Opportunity)
+          <Animatable(undefined)
             animatableIndex={0}
             courseName="Course Short Name"
             dismiss={null}

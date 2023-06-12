@@ -35,7 +35,7 @@ describe Types::MediaObjectType do
     def resolve_media_object_field(field, current_user: @teacher)
       media_object_type.resolve(
         field,
-        current_user: current_user
+        current_user:
       )
     end
 
@@ -85,7 +85,7 @@ describe Types::MediaObjectType do
       @media_object.media_type = "fakemediatype"
       @media_object.save!
 
-      expect(resolve_media_object_field("mediaType")).to eq(nil)
+      expect(resolve_media_object_field("mediaType")).to be_nil
     end
 
     it "returns an empty list if there are no media sources" do
@@ -104,7 +104,7 @@ describe Types::MediaObjectType do
     end
 
     it "checks permissions on canAddCaptions" do
-      expect(resolve_media_object_field("canAddCaptions", current_user: User.new)).to eq(false)
+      expect(resolve_media_object_field("canAddCaptions", current_user: User.new)).to be(false)
     end
   end
 end

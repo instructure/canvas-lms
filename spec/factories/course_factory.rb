@@ -26,7 +26,7 @@ module Factories
         sis_source_id: opts[:sis_source_id],
         name: opts[:course_name],
         course_code: opts[:course_code],
-        account: account,
+        account:,
         is_public: !!opts[:is_public],
         enrollment_term_id: opts[:enrollment_term_id]
       )
@@ -164,7 +164,7 @@ module Factories
       section_ids = create_records(CourseSection, course_ids.map { |id| { course_id: id, root_account_id: account.id, name: "Default Section", default_section: true, created_at: now, updated_at: now } })
       type = options[:enrollment_type] || "TeacherEnrollment"
       role_id = Role.get_built_in_role(type, root_account_id: account.resolved_root_account_id).id
-      result = create_records(Enrollment, course_ids.each_with_index.map { |id, i| { course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: "active", role_id: role_id, created_at: now, updated_at: now } })
+      result = create_records(Enrollment, course_ids.each_with_index.map { |id, i| { course_id: id, user_id: user.id, type:, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: "active", role_id:, created_at: now, updated_at: now } })
       create_enrollment_states(result, { state: "active", root_account_id: account.id })
     end
     course_data

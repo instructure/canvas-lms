@@ -26,6 +26,14 @@ import ExternalToolDialog from './react/components/ExternalToolDialog'
 
 const I18n = useI18nScope('ExternalToolsPlugin')
 
+/**
+ * This is the legacy external tools plugin for the RCE. Since it resides in Canvas, not the RCE, it is not
+ * functional unless the RCE is running in Canvas.
+ *
+ * See 'packages/canvas-rce/src/rce/plugins/instructure_rce_external_tools' for the new version of this plugin.
+ *
+ * @deprecated
+ */
 const ExternalToolsPlugin = {
   init(ed, url, _INST) {
     if (!_INST || !_INST.editorButtons || !_INST.editorButtons.length) {

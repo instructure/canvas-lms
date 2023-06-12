@@ -40,9 +40,9 @@ describe Api::V1::AssignmentOverride do
       allow(subject).to receive(:api_find_all).and_return []
       assignment = double(context: double(all_students: []))
       result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
-      expect(result.first[:due_at]).to eq nil
-      expect(result.first[:unlock_at]).to eq nil
-      expect(result.first[:lock_at]).to eq nil
+      expect(result.first[:due_at]).to be_nil
+      expect(result.first[:unlock_at]).to be_nil
+      expect(result.first[:lock_at]).to be_nil
     end
 
     context "sharding" do
@@ -100,44 +100,54 @@ describe Api::V1::AssignmentOverride do
     end
 
     it "fails if list of overrides is malformed" do
-      _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
+      _data, errors = subject.interpret_batch_assignment_overrides_data(@course,
+                                                                        [
                                                                           { assignment_id: @a.id, override: @a1.id }.with_indifferent_access,
                                                                           { title: "foo" }.with_indifferent_access
-                                                                        ], true)
+                                                                        ],
+                                                                        true)
       expect(errors[0]).to eq ["must specify an override id"]
       expect(errors[1]).to eq ["must specify an assignment id", "must specify an override id"]
     end
 
     it "fails if individual overrides are malformed" do
-      _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
+      _data, errors = subject.interpret_batch_assignment_overrides_data(@course,
+                                                                        [
                                                                           { assignment_id: @a.id, id: @a1.id, due_at: "foo" }.with_indifferent_access
-                                                                        ], true)
+                                                                        ],
+                                                                        true)
       expect(errors[0]).to eq ['invalid due_at "foo"']
     end
 
     it "fails if assignment not found" do
       @a.destroy!
-      _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
+      _data, errors = subject.interpret_batch_assignment_overrides_data(@course,
+                                                                        [
                                                                           { assignment_id: @a.id, id: @a1.id, title: "foo" }.with_indifferent_access
-                                                                        ], true)
+                                                                        ],
+                                                                        true)
       expect(errors[0]).to eq ["assignment not found"]
     end
 
     it "fails if override not found" do
       @a1.destroy!
-      _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
+      _data, errors = subject.interpret_batch_assignment_overrides_data(@course,
+                                                                        [
                                                                           { assignment_id: @a.id, id: @a1.id, title: "foo" }.with_indifferent_access
-                                                                        ], true)
+                                                                        ],
+                                                                        true)
       expect(errors[0]).to eq ["override not found"]
     end
 
     it "succeeds if formatted correctly" do
       new_date = Time.zone.now.tomorrow
-      data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
+      data, errors = subject.interpret_batch_assignment_overrides_data(@course,
+                                                                       [
                                                                          { assignment_id: @a.id, id: @a1.id, due_at: new_date.to_s }.with_indifferent_access,
                                                                          { assignment_id: @a.id, id: @a2.id, lock_at: new_date.to_s }.with_indifferent_access,
                                                                          { assignment_id: @b.id, id: @b2.id, unlock_at: new_date.to_s }.with_indifferent_access
-                                                                       ], true)
+                                                                       ],
+                                                                       true)
       expect(errors).to be_blank
       expect(data[0][:due_at].to_date).to eq new_date.to_date
       expect(data[1][:lock_at].to_date).to eq new_date.to_date
@@ -270,7 +280,7 @@ describe Api::V1::AssignmentOverride do
           @student = User.create!
           @teacher = User.create!
 
-          @cs_course = Course.create!(account: account)
+          @cs_course = Course.create!(account:)
           @cs_course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
           @cs_course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
 

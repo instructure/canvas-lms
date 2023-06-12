@@ -38,12 +38,25 @@ class GradebookUserIds
       sort_by_student_field
     when /assignment_\d+$/
       assignment_id = @column[/\d+$/]
-      send("sort_by_assignment_#{@sort_by}", assignment_id)
+      case @sort_by
+      when "grade"
+        sort_by_assignment_grade(assignment_id)
+      when "missing"
+        sort_by_assignment_missing(assignment_id)
+      when "late"
+        sort_by_assignment_late(assignment_id)
+      when "excused"
+        sort_by_assignment_excused(assignment_id)
+      when "unposted"
+        sort_by_assignment_unposted(assignment_id)
+      end
     when /^assignment_group_\d+$/
       assignment_id = @column[/\d+$/]
       sort_by_assignment_group(assignment_id)
     when "total_grade"
       sort_by_total_grade
+    when "student_firstname"
+      sort_by_student_first_name
     else
       sort_by_student_name
     end
@@ -63,6 +76,14 @@ class GradebookUserIds
     students
       .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
       .order_by_sortable_name(direction: @direction.to_sym)
+      .pluck(:id)
+      .uniq
+  end
+
+  def sort_by_student_first_name
+    students
+      .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
+      .order_by_name(direction: @direction.to_sym, table: "users")
       .pluck(:id)
       .uniq
   end
@@ -103,11 +124,19 @@ class GradebookUserIds
   end
 
   def sort_by_assignment_missing(assignment_id)
-    sort_user_ids(Submission.missing.where(assignment_id: assignment_id))
+    sort_user_ids(Submission.missing.where(assignment_id:))
+  end
+
+  def sort_by_assignment_excused(assignment_id)
+    sort_user_ids(Submission.excused.where(assignment_id:))
+  end
+
+  def sort_by_assignment_unposted(assignment_id)
+    sort_user_ids(Submission.graded.unposted.where(assignment_id:))
   end
 
   def sort_by_assignment_late(assignment_id)
-    sort_user_ids(Submission.late.where(assignment_id: assignment_id))
+    sort_user_ids(Submission.late.where(assignment_id:))
   end
 
   def sort_by_total_grade
@@ -211,7 +240,7 @@ class GradebookUserIds
   end
 
   def sort_direction
-    @direction == "ascending" ? :asc : :desc
+    (@direction == "ascending") ? :asc : :desc
   end
 
   def grading_period_id

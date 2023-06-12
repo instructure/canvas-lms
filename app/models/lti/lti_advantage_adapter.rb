@@ -64,7 +64,7 @@ module Lti
 
     include Lti::RedisMessageClient
 
-    def initialize(tool:, user:, context:, return_url:, expander:, opts:)
+    def initialize(tool:, user:, context:, return_url:, expander:, opts:, include_storage_target: true)
       @tool = tool
       @user = user
       @context = context
@@ -72,6 +72,7 @@ module Lti
       @expander = expander
       @opts = opts
       @target_link_uri = opts[:launch_url]
+      @include_storage_target = include_storage_target
     end
 
     # Generates a login request pointing to a cached launch (ID token)
@@ -176,13 +177,15 @@ module Lti
 
       req = LtiAdvantage::Messages::LoginRequest.new(
         iss: Canvas::Security.config["lti_iss"],
-        login_hint: login_hint,
+        login_hint:,
         client_id: @tool.global_developer_key_id,
-        target_link_uri: target_link_uri,
+        deployment_id: @tool.deployment_id,
+        target_link_uri:,
         lti_message_hint: message_hint,
-        canvas_region: @context.shard.database_server.config[:region] || "not_configured",
-        lti_storage_target: Lti::PlatformStorage.lti_storage_target
+        canvas_environment: ApplicationController.test_cluster_name || "prod",
+        canvas_region: @context.shard.database_server.config[:region] || "not_configured"
       )
+      req.lti_storage_target = Lti::PlatformStorage.lti_storage_target if @include_storage_target
       req.as_json
     end
 
@@ -190,12 +193,13 @@ module Lti
       verifier = cache_launch(lti_params, @context)
       Canvas::Security.create_jwt(
         {
-          verifier: verifier,
+          verifier:,
           canvas_domain: @opts[:domain],
           context_type: @context.class,
           context_id: @context.global_id,
           canvas_locale: I18n.locale || I18n.default_locale.to_s,
-          parent_frame_context: @opts[:parent_frame_context]
+          parent_frame_context: @opts[:parent_frame_context],
+          include_storage_target: @include_storage_target
         }.compact,
         (Time.zone.now + MESSAGE_HINT_LIFESPAN)
       )
@@ -225,7 +229,7 @@ module Lti
 
     def option_overrides
       {
-        target_link_uri: target_link_uri
+        target_link_uri:
       }
     end
 

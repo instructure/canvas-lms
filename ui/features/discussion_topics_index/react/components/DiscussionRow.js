@@ -56,18 +56,18 @@ import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
 
-import DiscussionModel from '@canvas/discussions/backbone/models/DiscussionTopic.coffee'
+import DiscussionModel from '@canvas/discussions/backbone/models/DiscussionTopic'
 import LockIconView from '@canvas/lock-icon'
 
 import actions from '../actions'
-import compose from 'compose'
+import {flowRight as compose} from 'lodash'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import DiscussionManageMenu from './DiscussionManageMenu'
 import discussionShape from '../proptypes/discussion'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
 import propTypes from '../propTypes'
 import SectionsTooltip from '@canvas/sections-tooltip'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import ToggleIcon from './ToggleIcon'
 import UnreadBadge from '@canvas/unread-badge'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
@@ -525,6 +525,27 @@ class DiscussionRow extends Component {
         : I18n.t('Pin discussion %{title}', {title: discussionTitle})
       menuList.push(
         this.createMenuItem('togglepinned', this.pinMenuItemDisplay(), screenReaderContent)
+      )
+    }
+
+    if (
+      ENV.show_additional_speed_grader_links &&
+      this.props.discussion.assignment &&
+      this.props.discussion.published
+    ) {
+      const assignmentId = this.props.discussion.assignment.id
+      menuList.push(
+        this.createMenuItem(
+          'speed-grader-link',
+          <a
+            href={`gradebook/speed_grader?assignment_id=${assignmentId}`}
+            className="icon-speed-grader"
+            style={{color: 'inherit', textDecoration: 'none'}}
+          >
+            {I18n.t('SpeedGrader')}
+          </a>,
+          I18n.t('Navigate to speed grader for %{title} assignment', {title: discussionTitle})
+        )
       )
     }
 

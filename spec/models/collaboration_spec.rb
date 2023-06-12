@@ -43,37 +43,37 @@ describe Collaboration do
           selection_height: 400
         }
         tool.save!
-        expect(Collaboration.any_collaborations_configured?(context)).to eq true
+        expect(Collaboration.any_collaborations_configured?(context)).to be true
       end
 
       it "uses Lti::ContextToolFinder.all_tools_scope_union to find tools" do
         expect(Lti::ContextToolFinder).to receive(:all_tools_scope_union).and_return(double(exists?: true))
-        expect(Collaboration.any_collaborations_configured?(context)).to eq true
+        expect(Collaboration.any_collaborations_configured?(context)).to be true
       end
     end
 
     it "allows google docs collaborations" do
-      expect(Collaboration.collaboration_class("GoogleDocs")).to eql(nil)
+      expect(Collaboration.collaboration_class("GoogleDocs")).to be_nil
       plugin_setting = PluginSetting.new(name: "google_drive", settings: {})
       plugin_setting.save!
       expect(Collaboration.collaboration_class("GoogleDocs")).to eql(GoogleDocsCollaboration)
       plugin_setting.disabled = true
       plugin_setting.save!
-      expect(Collaboration.collaboration_class("GoogleDocs")).to eql(nil)
+      expect(Collaboration.collaboration_class("GoogleDocs")).to be_nil
     end
 
     it "allows etherpad collaborations" do
-      expect(Collaboration.collaboration_class("Etherpad")).to eql(nil)
+      expect(Collaboration.collaboration_class("Etherpad")).to be_nil
       plugin_setting = PluginSetting.new(name: "etherpad", settings: {})
       plugin_setting.save!
       expect(Collaboration.collaboration_class("Etherpad")).to eql(EtherpadCollaboration)
       plugin_setting.disabled = true
       plugin_setting.save!
-      expect(Collaboration.collaboration_class("Etherpad")).to eql(nil)
+      expect(Collaboration.collaboration_class("Etherpad")).to be_nil
     end
 
     it "does not allow invalid collaborations" do
-      expect(Collaboration.collaboration_class("Bacon")).to eql(nil)
+      expect(Collaboration.collaboration_class("Bacon")).to be_nil
     end
   end
 

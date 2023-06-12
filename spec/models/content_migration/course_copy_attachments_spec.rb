@@ -26,10 +26,10 @@ describe ContentMigration do
     it "assigns the correct parent folder when the parent folder has already been created" do
       folder = Folder.root_folders(@copy_from).first
       folder = folder.sub_folders.create!(context: @copy_from, name: "folder_1")
-      Attachment.create!(filename: "dummy.txt", uploaded_data: StringIO.new("fakety"), folder: folder, context: @copy_from)
+      Attachment.create!(filename: "dummy.txt", uploaded_data: StringIO.new("fakety"), folder:, context: @copy_from)
       folder = folder.sub_folders.create!(context: @copy_from, name: "folder_2")
       folder = folder.sub_folders.create!(context: @copy_from, name: "folder_3")
-      old_attachment = Attachment.create!(filename: "merge.test", uploaded_data: StringIO.new("ohey"), folder: folder, context: @copy_from)
+      old_attachment = Attachment.create!(filename: "merge.test", uploaded_data: StringIO.new("ohey"), folder:, context: @copy_from)
 
       run_course_copy
 

@@ -26,7 +26,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import editCalendarEventFullTemplate from '../../jst/editCalendarEventFull.handlebars'
-import MissingDateDialogView from '@canvas/due-dates/backbone/views/MissingDateDialogView.coffee'
+import MissingDateDialogView from '@canvas/due-dates/backbone/views/MissingDateDialogView'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import unflatten from 'obj-unflatten'
 import deparam from 'deparam'
@@ -406,15 +406,14 @@ export default class EditCalendarEventView extends Backbone.View {
     const course_pacing_enabled = this.model.get('course_pacing_enabled') === 'true'
     return (
       ENV.FEATURES?.account_level_blackout_dates &&
-      ((context_type === 'account' && ENV.FEATURES?.account_calendar_events) ||
-        (context_type === 'course' && course_pacing_enabled))
+      (context_type === 'account' || (context_type === 'course' && course_pacing_enabled))
     )
   }
 
   toJSON() {
     const result = super.toJSON(...arguments)
     result.recurringEventLimit = 200
-    result.k5_course = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE
+    result.k5_context = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE || ENV.K5_ACCOUNT
     result.should_show_blackout_dates = this.shouldShowBlackoutDatesCheckbox()
     result.disableSectionDates =
       result.use_section_dates &&
@@ -444,9 +443,9 @@ export default class EditCalendarEventView extends Backbone.View {
       const start_at_key = start_date_key.replace(/start_date/, 'start_at')
       const end_at_key = start_date_key.replace(/start_date/, 'end_at')
 
-      const start_date = this.$el.find(`[name='${start_date_key}']`).data('date')
-      const start_time = this.$el.find(`[name='${start_time_key}']`).data('date')
-      const end_time = this.$el.find(`[name='${end_time_key}']`).data('date')
+      const start_date = this.$el.find(`[name='${start_date_key}']`).change().data('date')
+      const start_time = this.$el.find(`[name='${start_time_key}']`).change().data('date')
+      const end_time = this.$el.find(`[name='${end_time_key}']`).change().data('date')
       if (!start_date) return
 
       data = _.omit(data, start_date_key, start_time_key, end_time_key)

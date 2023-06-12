@@ -117,18 +117,18 @@ describe Course do
 
     it "identifies a course as active correctly" do
       @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
-      expect(@course.inactive?).to eq false
+      expect(@course.inactive?).to be false
     end
 
     it "identifies a destroyed course as not active" do
       @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
       @course.destroy!
-      expect(@course.inactive?).to eq true
+      expect(@course.inactive?).to be true
     end
 
     it "identifies concluded course as not active" do
       @course.complete!
-      expect(@course.inactive?).to eq true
+      expect(@course.inactive?).to be true
     end
 
     describe "#assigned_assignment_ids_by_user" do
@@ -237,7 +237,7 @@ describe Course do
         user = User.create!(name: "the best")
         course.enroll_teacher(user, enrollment_state: :completed)
         course.enroll_student(user, enrollment_state: :active)
-        expect(course.membership_for_user(user).active?).to eq true
+        expect(course.membership_for_user(user).active?).to be true
       end
     end
 
@@ -260,7 +260,7 @@ describe Course do
 
       it "only includes a user once when they are enrolled multiple times in a course" do
         section = @course.course_sections.create!
-        @course.enroll_teacher(@teacher, section: section, allow_multiple_enrollments: true, enrollment_state: :active)
+        @course.enroll_teacher(@teacher, section:, allow_multiple_enrollments: true, enrollment_state: :active)
         expect(@course.moderators.count { |user| user == @teacher }).to eq 1
       end
 
@@ -454,11 +454,11 @@ describe Course do
 
     it "properly determines if group weights are active" do
       @course.update_attribute(:group_weighting_scheme, nil)
-      expect(@course.apply_group_weights?).to eq false
+      expect(@course.apply_group_weights?).to be false
       @course.update_attribute(:group_weighting_scheme, "equal")
-      expect(@course.apply_group_weights?).to eq false
+      expect(@course.apply_group_weights?).to be false
       @course.update_attribute(:group_weighting_scheme, "percent")
-      expect(@course.apply_group_weights?).to eq true
+      expect(@course.apply_group_weights?).to be true
     end
 
     it "returns course visibility flag" do
@@ -496,13 +496,13 @@ describe Course do
     end
 
     it "returns offline web export flag" do
-      expect(@course.enable_offline_web_export?).to eq false
+      expect(@course.enable_offline_web_export?).to be false
       account = Account.default
       account.settings[:enable_offline_web_export] = true
       account.save
-      expect(@course.enable_offline_web_export?).to eq true
+      expect(@course.enable_offline_web_export?).to be true
       @course.update_attribute(:enable_offline_web_export, false)
-      expect(@course.enable_offline_web_export?).to eq false
+      expect(@course.enable_offline_web_export?).to be false
     end
 
     describe "soft-concluded?" do
@@ -589,49 +589,49 @@ describe Course do
 
     describe "allow_student_forum_attachments" do
       it "defaults to true" do
-        expect(@course.allow_student_forum_attachments).to eq true
+        expect(@course.allow_student_forum_attachments).to be true
       end
 
       it "allows setting and getting" do
         @course.allow_student_forum_attachments = false
         @course.save!
-        expect(@course.allow_student_forum_attachments).to eq false
+        expect(@course.allow_student_forum_attachments).to be false
       end
     end
 
     describe "allow_student_discussion_reporting" do
       it "defaults to true" do
-        expect(@course.allow_student_discussion_reporting).to eq true
+        expect(@course.allow_student_discussion_reporting).to be true
       end
 
       it "allows setting and getting" do
         @course.allow_student_discussion_reporting = false
         @course.save!
-        expect(@course.allow_student_discussion_reporting).to eq false
+        expect(@course.allow_student_discussion_reporting).to be false
       end
     end
 
     describe "allow_student_anonymous_discussion_topics" do
       it "defaults to false" do
-        expect(@course.allow_student_anonymous_discussion_topics).to eq false
+        expect(@course.allow_student_anonymous_discussion_topics).to be false
       end
 
       it "allows setting and getting" do
         @course.allow_student_anonymous_discussion_topics = true
         @course.save!
-        expect(@course.allow_student_anonymous_discussion_topics).to eq true
+        expect(@course.allow_student_anonymous_discussion_topics).to be true
       end
     end
 
     describe "allow_student_discussion_topics" do
       it "defaults true" do
-        expect(@course.allow_student_discussion_topics).to eq true
+        expect(@course.allow_student_discussion_topics).to be true
       end
 
       it "sets and get" do
         @course.allow_student_discussion_topics = false
         @course.save!
-        expect(@course.allow_student_discussion_topics).to eq false
+        expect(@course.allow_student_discussion_topics).to be false
       end
     end
 
@@ -684,7 +684,7 @@ describe Course do
 
       it "returns nil when there are no relevant grading_period_group" do
         @course.save!
-        expect(@course.relevant_grading_period_group).to be nil
+        expect(@course.relevant_grading_period_group).to be_nil
       end
     end
 
@@ -1507,17 +1507,17 @@ describe Course do
       it "does not have self enrollment enabled if account setting disables it" do
         @course.self_enrollment = true
         @course.save!
-        expect(@course.self_enrollment_enabled?).to eq false
+        expect(@course.self_enrollment_enabled?).to be false
 
         account = @course.root_account
         account.allow_self_enrollment!
         @course.self_enrollment = true
         @course.save!
-        expect(@course.reload.self_enrollment_enabled?).to eq true
+        expect(@course.reload.self_enrollment_enabled?).to be true
 
         account.settings.delete(:self_enrollment)
         account.save!
-        expect(@course.reload.self_enrollment_enabled?).to eq false
+        expect(@course.reload.self_enrollment_enabled?).to be false
       end
 
       it "retains original course profile" do
@@ -1636,7 +1636,7 @@ describe Course do
       end
 
       it "returns nil if no quiz LTI tool is configured" do
-        expect(@course.quiz_lti_tool).to be nil
+        expect(@course.quiz_lti_tool).to be_nil
       end
     end
 
@@ -1684,7 +1684,7 @@ describe Course do
         expect do
           course.apply_post_policy!(post_manually: true)
         end.not_to change {
-          PostPolicy.find_by!(assignment: assignment).updated_at
+          PostPolicy.find_by!(assignment:).updated_at
         }
       end
 
@@ -1720,7 +1720,7 @@ describe Course do
         course = Course.create!
 
         aggregate_failures do
-          expect(course.default_post_policy).not_to be nil
+          expect(course.default_post_policy).not_to be_nil
           expect(course.default_post_policy).not_to be_post_manually
         end
       end
@@ -1845,8 +1845,9 @@ describe Course do
 
     it "correctly limits visibilities for a limited teacher" do
       limited_teacher = User.create(name: "Limited Teacher")
-      @course.enroll_teacher(limited_teacher, limit_privileges_to_course_section: true,
-                                              section: @section2)
+      @course.enroll_teacher(limited_teacher,
+                             limit_privileges_to_course_section: true,
+                             section: @section2)
       expect(@course.course_section_visibility(limited_teacher)).to eq [@section2.id]
     end
 
@@ -1883,7 +1884,7 @@ describe Course do
       root_method = outcome_proficiency_model(root_account)
       subaccount = root_account.sub_accounts.create!
       course = course_model(account: subaccount)
-      expect(course.outcome_proficiency).to eq nil
+      expect(course.outcome_proficiency).to be_nil
       expect(course.resolved_outcome_proficiency).to eq root_method
     end
 
@@ -1902,7 +1903,7 @@ describe Course do
         root_account = Account.create!
         root_account.enable_feature!(:account_level_mastery_scales)
         course = course_model(account: root_account)
-        expect(course.outcome_proficiency).to eq nil
+        expect(course.outcome_proficiency).to be_nil
         expect(course.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(root_account)
       end
     end
@@ -1912,8 +1913,8 @@ describe Course do
         root_account = Account.create!
         root_account.disable_feature!(:account_level_mastery_scales)
         course = course_model(account: root_account)
-        expect(course.outcome_proficiency).to eq nil
-        expect(course.resolved_outcome_proficiency).to eq nil
+        expect(course.outcome_proficiency).to be_nil
+        expect(course.resolved_outcome_proficiency).to be_nil
       end
     end
   end
@@ -1923,7 +1924,7 @@ describe Course do
       root_account = Account.create!
       method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
       course = course_model(account: root_account)
-      expect(course.outcome_calculation_method).to eq nil
+      expect(course.outcome_calculation_method).to be_nil
       expect(course.resolved_outcome_calculation_method).to eq method
     end
 
@@ -1932,7 +1933,7 @@ describe Course do
       subaccount = root_account.sub_accounts.create!
       method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
       course = course_model(account: subaccount)
-      expect(course.outcome_calculation_method).to eq nil
+      expect(course.outcome_calculation_method).to be_nil
       expect(course.resolved_outcome_calculation_method).to eq method
     end
 
@@ -1959,7 +1960,7 @@ describe Course do
         root_account = Account.create!
         root_account.enable_feature!(:account_level_mastery_scales)
         course = course_model(account: root_account)
-        expect(course.outcome_calculation_method).to eq nil
+        expect(course.outcome_calculation_method).to be_nil
         expect(course.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(root_account)
       end
     end
@@ -1969,8 +1970,8 @@ describe Course do
         root_account = Account.create!
         root_account.disable_feature!(:account_level_mastery_scales)
         course = course_model(account: root_account)
-        expect(course.outcome_calculation_method).to eq nil
-        expect(course.resolved_outcome_calculation_method).to eq nil
+        expect(course.outcome_calculation_method).to be_nil
+        expect(course.resolved_outcome_calculation_method).to be_nil
       end
     end
   end
@@ -2163,7 +2164,7 @@ describe Course do
       default = GradingStandard.default_grading_standard
       expect(default.to_json).to eq([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
       course_model
-      expect(@course.score_to_grade(95)).to eql(nil)
+      expect(@course.score_to_grade(95)).to be_nil
       @course.grading_standard_id = 0
       expect(@course.score_to_grade(1005)).to eql("A")
       expect(@course.score_to_grade(105)).to eql("A")
@@ -2291,8 +2292,8 @@ describe Course do
 
       now = Time.now
 
-      @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 1, assignment_group: assignment_group, points_possible: 10)
-      @course.assignments.create!(title: "Assignment 02", due_at: nil, position: 1, assignment_group: assignment_group, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 1, assignment_group:, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 02", due_at: nil, position: 1, assignment_group:, points_possible: 10)
 
       @course.recompute_student_scores
       @student.reload
@@ -2313,7 +2314,7 @@ describe Course do
       before :once do
         course_with_teacher active_all: true
         _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map do |name|
-          student_in_course(name: name)
+          student_in_course(name:)
           @student
         end
         zed.update_attribute :sortable_name, "aaaaaa zed"
@@ -2403,8 +2404,12 @@ describe Course do
       before(:once) do
         @account = Account.create!(name: "A new root")
         course_factory(active_all: true, account: @account)
-        @user1 = user_with_managed_pseudonym(active_all: true, name: "Brian", username: "brianp@instructure.com",
-                                             account: @account, sis_user_id: "SISUSERID", integration_id: "int1")
+        @user1 = user_with_managed_pseudonym(active_all: true,
+                                             name: "Brian",
+                                             username: "brianp@instructure.com",
+                                             account: @account,
+                                             sis_user_id: "SISUSERID",
+                                             integration_id: "int1")
         student_in_course(user: @user1)
         @user2 = user_with_pseudonym(active_all: true, name: "Cody", username: "cody@instructure.com", account: @account)
         student_in_course(user: @user2)
@@ -2430,9 +2435,9 @@ describe Course do
         expect(rows[0][2]).to eq "SIS User ID"
         expect(rows[0][3]).to eq "SIS Login ID"
         expect(rows[0][4]).to eq "Section"
-        expect(rows[1][2]).to eq nil
-        expect(rows[1][3]).to eq nil
-        expect(rows[1][4]).to eq nil
+        expect(rows[1][2]).to be_nil
+        expect(rows[1][3]).to be_nil
+        expect(rows[1][4]).to be_nil
         expect(rows[1][-1]).to eq "(read only)"
         expect(rows[2][1]).to eq @user1.id.to_s
         expect(rows[2][2]).to eq "SISUSERID"
@@ -2490,10 +2495,10 @@ describe Course do
       expect(rows[0][3]).to eq "SIS Login ID"
       expect(rows[0][4]).to eq "Root Account"
       expect(rows[0][5]).to eq "Section"
-      expect(rows[1][2]).to eq nil
-      expect(rows[1][3]).to eq nil
-      expect(rows[1][4]).to eq nil
-      expect(rows[1][5]).to eq nil
+      expect(rows[1][2]).to be_nil
+      expect(rows[1][3]).to be_nil
+      expect(rows[1][4]).to be_nil
+      expect(rows[1][5]).to be_nil
       expect(rows[2][1]).to eq @user1.id.to_s
       expect(rows[2][2]).to eq "SISUSERID"
       expect(rows[2][3]).to eq @user1.pseudonym.unique_id
@@ -2596,12 +2601,12 @@ describe Course do
       expect(rows[0][2]).to eq "SIS User ID"
       expect(rows[0][3]).to eq "SIS Login ID"
       expect(rows[0][4]).to eq "Section"
-      expect(rows[1][0]).to eq nil
+      expect(rows[1][0]).to be_nil
       expect(rows[1][5]).to eq "Manual Posting"
-      expect(rows[1][6]).to eq nil
-      expect(rows[2][2]).to eq nil
-      expect(rows[2][3]).to eq nil
-      expect(rows[2][4]).to eq nil
+      expect(rows[1][6]).to be_nil
+      expect(rows[2][2]).to be_nil
+      expect(rows[2][3]).to be_nil
+      expect(rows[2][4]).to be_nil
       expect(rows[2][-1]).to eq "(read only)"
       expect(rows[3][1]).to eq @user1.id.to_s
       expect(rows[3][2]).to eq "SISUSERID"
@@ -2730,13 +2735,13 @@ describe Course do
       account2 = Account.create!(name: "second")
 
       @c = Course.create!(account: account1)
-      expect(@c.associated_accounts.length).to eql(1)
+      expect(@c.associated_accounts.length).to be(1)
       expect(@c.associated_accounts.first).to eql(account1)
 
       @c.account = account2
       @c.save!
       @c.reload
-      expect(@c.associated_accounts.length).to eql(1)
+      expect(@c.associated_accounts.length).to be(1)
       expect(@c.associated_accounts.first).to eql(account2)
     end
 
@@ -3425,8 +3430,10 @@ describe Course do
       end
 
       it "does not show discussion tab for observers without read_forum" do
-        RoleOverride.create!(context: @course.account, permission: "read_forum",
-                             role: observer_role, enabled: false)
+        RoleOverride.create!(context: @course.account,
+                             permission: "read_forum",
+                             role: observer_role,
+                             enabled: false)
         tab_ids = @course.tabs_available(@user).pluck(:id)
         expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
       end
@@ -3832,7 +3839,9 @@ describe Course do
             enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false
           ).and_return 42
           expect(Course.valid_grade_export_types["instructure_csv"][:callback].call(course,
-                                                                                    enrollments, publishing_user, publishing_pseudonym)).to eq 42
+                                                                                    enrollments,
+                                                                                    publishing_user,
+                                                                                    publishing_pseudonym)).to eq 42
           expect(Course.valid_grade_export_types["instructure_csv"][:requires_grading_standard]).to be_falsey
           expect(Course.valid_grade_export_types["instructure_csv"][:requires_publishing_pseudonym]).to be_falsey
         end
@@ -4143,7 +4152,8 @@ describe Course do
                                                                                return [
                                                                                  [[@ase[1].id, @ase[3].id],
                                                                                   "post1",
-                                                                                  "test/mime1", { "header_param" => "header_value" }],
+                                                                                  "test/mime1",
+                                                                                  { "header_param" => "header_value" }],
                                                                                  [[@ase[4].id, @ase[5].id],
                                                                                   "post2",
                                                                                   "test/mime2"]
@@ -4484,9 +4494,18 @@ describe Course do
         it "works for a number of boolean representations" do
           expect(@course.grading_standard_enabled?).to be_falsey
           expect(@course.grading_standard_enabled).to be_falsey
-          [[false, false], [true, true], ["false", false], ["true", true],
-           ["0", false], [0, false], ["1", true], [1, true], ["off", false],
-           ["on", true], ["yes", true], ["no", false]].each do |val, enabled|
+          [[false, false],
+           [true, true],
+           ["false", false],
+           ["true", true],
+           ["0", false],
+           [0, false],
+           ["1", true],
+           [1, true],
+           ["off", false],
+           ["on", true],
+           ["yes", true],
+           ["no", false]].each do |val, enabled|
             @course.grading_standard_enabled = val
             expect(@course.grading_standard_enabled?).to eq enabled
             expect(@course.grading_standard_enabled).to eq enabled
@@ -4508,7 +4527,8 @@ describe Course do
                       expect(publishing_user).to eq @user
                       return [[[], "test-jt-data", "application/jtmimetype"]]
                     end,
-          requires_grading_standard: false, requires_publishing_pseudonym: true
+          requires_grading_standard: false,
+          requires_publishing_pseudonym: true
         }
 
         @plugin = Canvas::Plugin.find!("grade_export")
@@ -4740,7 +4760,7 @@ describe Course do
       tool = new_external_tool @course
       tool.user_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq false
+      expect(tool.has_placement?(:course_navigation)).to be false
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
@@ -4751,7 +4771,7 @@ describe Course do
       tool = new_external_tool @course
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
@@ -4769,7 +4789,7 @@ describe Course do
       tool = new_external_tool @account
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
@@ -4787,7 +4807,7 @@ describe Course do
       tool = new_external_tool @account.root_account
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
@@ -4805,7 +4825,7 @@ describe Course do
       tool = new_external_tool @course
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL", visibility: "admins" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       @student = user_model
@@ -4830,7 +4850,7 @@ describe Course do
       tool = new_external_tool @course
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL", visibility: "members" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       @student = user_model
@@ -4852,7 +4872,7 @@ describe Course do
       tool = new_external_tool @course
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       @course.tab_configuration = Course.default_tabs.map { |t| { id: t[:id] } }.insert(1, { id: tool.asset_string })
@@ -4865,7 +4885,7 @@ describe Course do
       tool = new_external_tool @course
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
       tabs = @course.tabs_available(@teacher)
@@ -4890,7 +4910,7 @@ describe Course do
       tool.save!
 
       expect(tool.course_navigation(:url)).to eq "http://www.example.com"
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
 
       settings = @course.external_tool_tabs({}, User.new).first
       expect(settings).to include(visibility: "members")
@@ -4905,7 +4925,7 @@ describe Course do
       tool.save!
 
       expect(tool.course_navigation(:url)).to eq "http://www.example.com"
-      expect(tool.has_placement?(:course_navigation)).to eq true
+      expect(tool.has_placement?(:course_navigation)).to be true
 
       settings = @course.external_tool_tabs({}, User.new).first
       expect(settings).to include(visibility: "admins")
@@ -5157,20 +5177,20 @@ describe Course do
 
       it "cancels all future appointments when concluding an enrollment" do
         @enrollment.conclude
-        expect(@ag.appointments_participants.size).to eql 1
-        expect(@ag.appointments_participants.current.size).to eql 0
+        expect(@ag.appointments_participants.size).to be 1
+        expect(@ag.appointments_participants.current.size).to be 0
       end
 
       it "cancels all future appointments when deleting an enrollment" do
         @enrollment.destroy
-        expect(@ag.appointments_participants.size).to eql 1
-        expect(@ag.appointments_participants.current.size).to eql 0
+        expect(@ag.appointments_participants.size).to be 1
+        expect(@ag.appointments_participants.current.size).to be 0
       end
 
       it "cancels all future appointments when concluding all enrollments" do
         @course.complete!
-        expect(@ag.appointments_participants.size).to eql 1
-        expect(@ag.appointments_participants.current.size).to eql 0
+        expect(@ag.appointments_participants.size).to be 1
+        expect(@ag.appointments_participants.current.size).to be 0
       end
     end
   end
@@ -5323,12 +5343,18 @@ describe Course do
       it "does not return observers to section-restricted students" do
         section2 = @course.course_sections.create!
         limited_student = user_factory(active_all: true)
-        @course.enroll_user(limited_student, "StudentEnrollment", enrollment_state: "active",
-                                                                  section: section2, limit_privileges_to_course_section: true)
+        @course.enroll_user(limited_student,
+                            "StudentEnrollment",
+                            enrollment_state: "active",
+                            section: section2,
+                            limit_privileges_to_course_section: true)
 
         limited_teacher = user_factory(active_all: true)
-        @course.enroll_user(limited_teacher, "TeacherEnrollment", enrollment_state: "active",
-                                                                  section: section2, limit_privileges_to_course_section: true)
+        @course.enroll_user(limited_teacher,
+                            "TeacherEnrollment",
+                            enrollment_state: "active",
+                            section: section2,
+                            limit_privileges_to_course_section: true)
 
         observer = user_factory(active_all: true)
         @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active", section: section2)
@@ -5381,26 +5407,32 @@ describe Course do
     context "restricted" do
       it "returns no students except self and the observed" do
         expect(@course.students_visible_to(@observer)).to eq [@student1]
-        RoleOverride.create!(context: @course.account, permission: "read_roster",
-                             role: student_role, enabled: false)
+        RoleOverride.create!(context: @course.account,
+                             permission: "read_roster",
+                             role: student_role,
+                             enabled: false)
         expect(@course.students_visible_to(@student1)).to eq [@student1]
       end
 
       it "returns student's sections" do
         expect(@course.sections_visible_to(@observer)).to eq [@course.default_section]
-        RoleOverride.create!(context: @course.account, permission: "read_roster",
-                             role: student_role, enabled: false)
+        RoleOverride.create!(context: @course.account,
+                             permission: "read_roster",
+                             role: student_role,
+                             enabled: false)
         expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
       end
     end
 
     context "require_message_permission" do
       it "checks the message permission" do
-        expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), require_message_permission: true)).to eql :full
-        expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), require_message_permission: true)).to eql :restricted
-        RoleOverride.create!(context: @course.account, permission: "send_messages",
-                             role: student_role, enabled: false)
-        expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), require_message_permission: true)).to eql :restricted
+        expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), require_message_permission: true)).to be :full
+        expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), require_message_permission: true)).to be :restricted
+        RoleOverride.create!(context: @course.account,
+                             permission: "send_messages",
+                             role: student_role,
+                             enabled: false)
+        expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), require_message_permission: true)).to be :restricted
       end
     end
   end
@@ -5450,37 +5482,37 @@ describe Course do
     end
 
     it "copies enrollments the homeroom course" do
-      expect(@course.user_is_instructor?(@teacher)).to eq(false)
-      expect(@course.user_is_instructor?(@ta)).to eq(false)
-      expect(@course.user_is_student?(@student)).to eq(false)
-      expect(@course.user_has_been_observer?(@observer)).to eq(false)
+      expect(@course.user_is_instructor?(@teacher)).to be(false)
+      expect(@course.user_is_instructor?(@ta)).to be(false)
+      expect(@course.user_is_student?(@student)).to be(false)
+      expect(@course.user_has_been_observer?(@observer)).to be(false)
       @course.sync_homeroom_enrollments
-      expect(@course.user_is_instructor?(@teacher)).to eq(true)
-      expect(@course.user_is_instructor?(@ta)).to eq(true)
-      expect(@course.user_is_student?(@student)).to eq(true)
-      expect(@course.user_has_been_observer?(@observer)).to eq(true)
+      expect(@course.user_is_instructor?(@teacher)).to be(true)
+      expect(@course.user_is_instructor?(@ta)).to be(true)
+      expect(@course.user_is_student?(@student)).to be(true)
+      expect(@course.user_has_been_observer?(@observer)).to be(true)
       expect(@course.observer_enrollments.first.associated_user_id).to eq(@student.id)
     end
 
     it "readds enrollments deleted on subject courses" do
       @course.sync_homeroom_enrollments
       @course.enrollments.find_by(user: @teacher).destroy
-      expect(@course.user_is_instructor?(@teacher)).to eq(false)
+      expect(@course.user_is_instructor?(@teacher)).to be(false)
       @course.sync_homeroom_enrollments
-      expect(@course.user_is_instructor?(@teacher)).to eq(true)
+      expect(@course.user_is_instructor?(@teacher)).to be(true)
     end
 
     it "removes enrollments on subject courses when removed on the homeroom" do
       @course.sync_homeroom_enrollments
-      expect(@course.user_is_instructor?(@teacher)).to eq(true)
+      expect(@course.user_is_instructor?(@teacher)).to be(true)
       @homeroom_course.enrollments.find_by(user: @teacher).destroy
       @course.sync_homeroom_enrollments
-      expect(@course.user_is_instructor?(@teacher)).to eq(false)
+      expect(@course.user_is_instructor?(@teacher)).to be(false)
     end
 
     it "copies custom roles and enrollment dates" do
       role = Account.default.roles.create!(name: "Cool Student", base_role_type: "StudentEnrollment")
-      e1 = @homeroom_course.enroll_student(@student, role: role, start_at: 1.day.ago.beginning_of_day, end_at: 1.day.from_now.beginning_of_day, allow_multiple_enrollments: true)
+      e1 = @homeroom_course.enroll_student(@student, role:, start_at: 1.day.ago.beginning_of_day, end_at: 1.day.from_now.beginning_of_day, allow_multiple_enrollments: true)
       e1.conclude
       @course.sync_homeroom_enrollments
       expect(@course.enrollments.where(user_id: @student.id).size).to eq 2
@@ -5494,32 +5526,32 @@ describe Course do
     it "returns false unless course is an elementary subject and sync setting is on and homeroom_course_id is set" do
       @course.sync_enrollments_from_homeroom = false
       @course.save!
-      expect(@course.sync_homeroom_enrollments).to eq(false)
+      expect(@course.sync_homeroom_enrollments).to be(false)
       @course.sync_enrollments_from_homeroom = true
       @course.homeroom_course_id = nil
       @course.save!
-      expect(@course.sync_homeroom_enrollments).to eq(false)
+      expect(@course.sync_homeroom_enrollments).to be(false)
       @course.homeroom_course_id = @homeroom_course.id
       @course.save!
-      expect(@course.sync_homeroom_enrollments).not_to eq(false)
+      expect(@course.sync_homeroom_enrollments).not_to be(false)
     end
 
     it "returns false if course has a SIS batch id" do
       batch = @course.root_account.sis_batches.create!
       @course.sis_batch_id = batch.id
       @course.save!
-      expect(@course.sync_homeroom_enrollments).to eq(false)
+      expect(@course.sync_homeroom_enrollments).to be(false)
     end
 
     it "returns false if linked homeroom course is deleted" do
       @homeroom_course.destroy!
-      expect(@course.sync_homeroom_enrollments).to eq(false)
+      expect(@course.sync_homeroom_enrollments).to be(false)
     end
 
     it "returns false if linked homeroom course is no longer a homeroom course" do
       @homeroom_course.homeroom_course = false
       @homeroom_course.save!
-      expect(@course.sync_homeroom_enrollments).to eq(false)
+      expect(@course.sync_homeroom_enrollments).to be(false)
     end
 
     it "works with linked observers observing multiple students" do
@@ -5538,7 +5570,7 @@ describe Course do
         @shard1.activate do
           account = Account.create!
           toggle_k5_setting(account, true)
-          @cross_shard_course = course_factory(account: account, active_course: true)
+          @cross_shard_course = course_factory(account:, active_course: true)
           @cross_shard_course.sync_enrollments_from_homeroom = true
           @cross_shard_course.homeroom_course_id = @homeroom_course.id
           @cross_shard_course.save!
@@ -5546,15 +5578,15 @@ describe Course do
       end
 
       it "syncs enrollments across shards" do
-        expect(@cross_shard_course.user_is_instructor?(@teacher)).to eq(false)
-        expect(@cross_shard_course.user_is_instructor?(@ta)).to eq(false)
-        expect(@cross_shard_course.user_is_student?(@student)).to eq(false)
-        expect(@cross_shard_course.user_has_been_observer?(@observer)).to eq(false)
+        expect(@cross_shard_course.user_is_instructor?(@teacher)).to be(false)
+        expect(@cross_shard_course.user_is_instructor?(@ta)).to be(false)
+        expect(@cross_shard_course.user_is_student?(@student)).to be(false)
+        expect(@cross_shard_course.user_has_been_observer?(@observer)).to be(false)
         @cross_shard_course.sync_homeroom_enrollments
-        expect(@cross_shard_course.user_is_instructor?(@teacher)).to eq(true)
-        expect(@cross_shard_course.user_is_instructor?(@ta)).to eq(true)
-        expect(@cross_shard_course.user_is_student?(@student)).to eq(true)
-        expect(@cross_shard_course.user_has_been_observer?(@observer)).to eq(true)
+        expect(@cross_shard_course.user_is_instructor?(@teacher)).to be(true)
+        expect(@cross_shard_course.user_is_instructor?(@ta)).to be(true)
+        expect(@cross_shard_course.user_is_student?(@student)).to be(true)
+        expect(@cross_shard_course.user_has_been_observer?(@observer)).to be(true)
       end
     end
   end
@@ -5747,7 +5779,7 @@ describe Course do
       not_default_section = student_view_course.course_sections.create! name: "not default section"
       expect(not_default_section).not_to be_default_section
       student_view_student = student_view_course.student_view_student
-      expect(student_view_course.reload.course_sections.active.count).to eql 1
+      expect(student_view_course.reload.course_sections.active.count).to be 1
       expect(not_default_section.enrollments.map(&:user_id)).to be_include(student_view_student.id)
     end
 
@@ -5757,7 +5789,7 @@ describe Course do
 
     it "finds and return the student view student on successive calls" do
       @course.student_view_student
-      expect { @course.student_view_student }.to change(User, :count).by(0)
+      expect { @course.student_view_student }.not_to change(User, :count)
     end
 
     it "creates enrollments for each section" do
@@ -5831,7 +5863,7 @@ describe Course do
       account.authentication_providers.first.move_to_bottom
       account.settings[:open_registration] = true
       account.save!
-      course_factory(account: account)
+      course_factory(account:)
       expect(@course.user_list_search_mode_for(nil)).to eq :preferred
       expect(@course.user_list_search_mode_for(user_factory)).to eq :preferred
     end
@@ -6064,7 +6096,7 @@ describe Course do
     it "grants enrollment-based permissions regardless of shard" do
       @shard1.activate do
         account = Account.create!
-        course_factory(active_course: true, account: account)
+        course_factory(active_course: true, account:)
       end
 
       @shard2.activate do
@@ -6258,7 +6290,7 @@ describe Course do
 
     it "returns true when the provided user is a student" do
       student = user_model
-      student.student_enrollments.create!(course: course)
+      student.student_enrollments.create!(course:)
       expect(course.includes_student?(student)).to be_truthy
     end
 
@@ -6333,7 +6365,7 @@ describe Course do
       it "removes SIS attributes from enrollments when re-created manually" do
         @enrollment.destroy
         @enrollment = @course.enroll_student @user
-        expect(@enrollment.sis_batch_id).to eql nil
+        expect(@enrollment.sis_batch_id).to be_nil
       end
     end
 
@@ -6387,28 +6419,28 @@ describe Course do
       it "re-uses an enrollment with the same role" do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
-        expect(@user.enrollments.count).to eql 1
+        expect(@user.enrollments.count).to be 1
         expect(enrollment1).to eql enrollment2
       end
 
       it "does not re-use an enrollment with a different role" do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment", role: @lazy_role)
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
-        expect(@user.enrollments.count).to eql 2
+        expect(@user.enrollments.count).to be 2
         expect(enrollment1).to_not eql enrollment2
       end
 
       it "does not re-use an enrollment with no role when enrolling with a role" do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment")
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment", role: @honor_role)
-        expect(@user.enrollments.count).to eql 2
+        expect(@user.enrollments.count).to be 2
         expect(enrollment1).to_not eql enrollment2
       end
 
       it "does not re-use an enrollment with a role when enrolling with no role" do
         enrollment1 = @course.enroll_user(@user, "StudentEnrollment", role: @lazy_role)
         enrollment2 = @course.enroll_user(@user, "StudentEnrollment")
-        expect(@user.enrollments.count).to eql 2
+        expect(@user.enrollments.count).to be 2
         expect(enrollment1).not_to eql enrollment2
       end
     end
@@ -6741,11 +6773,11 @@ describe Course do
     end
 
     it "returns true if a user has a course set as a favorite" do
-      expect(@courses[0].favorite_for_user?(@user)).to eql(true)
+      expect(@courses[0].favorite_for_user?(@user)).to be(true)
     end
 
     it "returns false if a user has not set a course to be a favorite" do
-      expect(@courses[1].favorite_for_user?(@user)).to eql(false)
+      expect(@courses[1].favorite_for_user?(@user)).to be(false)
     end
   end
 
@@ -6767,7 +6799,7 @@ describe Course do
 
     it "shows all modules to teachers even when course is concluded" do
       @course.complete!
-      expect(@course.grants_right?(@teacher, :manage_content)).to eq(false)
+      expect(@course.grants_right?(@teacher, :manage_content)).to be(false)
       expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w[published unpublished]
     end
   end
@@ -6923,9 +6955,9 @@ describe Course do
     it "filters out course users that don't have a permission based on their enrollment roles" do
       permission = :moderate_forum # happens to be true for ta's, but available to students
       super_student_role = custom_student_role("superstudent", account: Account.default)
-      Account.default.role_overrides.create!(role: super_student_role, permission: permission, enabled: true)
+      Account.default.role_overrides.create!(role: super_student_role, permission:, enabled: true)
       unsuper_ta_role = custom_ta_role("unsuperta", account: Account.default)
-      Account.default.role_overrides.create!(role: unsuper_ta_role, permission: permission, enabled: false)
+      Account.default.role_overrides.create!(role: unsuper_ta_role, permission:, enabled: false)
 
       course_factory(active_all: true)
       reg_student = student_in_course(course: @course).user
@@ -6950,7 +6982,7 @@ describe Course do
       edd = EffectiveDueDates.for_course(test_course)
       expect(EffectiveDueDates).to receive(:for_course).with(test_course).and_return(edd)
       expect(edd).to receive(:any_in_closed_grading_period?).and_return(true)
-      expect(test_course.any_assignment_in_closed_grading_period?).to eq(true)
+      expect(test_course.any_assignment_in_closed_grading_period?).to be(true)
     end
   end
 
@@ -7058,7 +7090,7 @@ describe Course do
       end
 
       context "With submissions" do
-        let(:student) { student_in_course(course: course).user }
+        let(:student) { student_in_course(course:).user }
         let!(:assignment) { course.assignments.create!(title: "assignment", points_possible: 10) }
         let(:submission) { assignment.submissions.find_by(user: student) }
 
@@ -7774,6 +7806,196 @@ describe Course do
     it "returns the completed_ids" do
       completed_ids = @course.batch_update_context_modules(module_ids: @ids_to_update, event: :publish)
       expect(completed_ids).to eq @ids_to_update
+    end
+  end
+
+  describe "restrict quantitative data" do
+    before do
+      @root = Account.default
+      @course = Account.default.courses.build
+      @course.update(root_account_id: @root.id)
+      @admin = account_admin_user
+      @teacher = user_model
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @student = user_model
+      @course.enroll_student(@student, enrollment_state: "active")
+      @observer = user_model
+      @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student.id)
+      @ta = user_model
+      @course.enroll_ta(@ta, enrollment_state: "active")
+      @designer = user_model
+      @course.enroll_designer(@designer, enrollment_state: "active")
+    end
+
+    describe "with no user" do
+      it "calls restrict_quantitative_data with no user" do
+        expect(@course.restrict_quantitative_data?).to be_nil
+      end
+    end
+
+    describe "with feature flag on" do
+      before do
+        @root.enable_feature!(:restrict_quantitative_data)
+      end
+
+      describe "updates metric if setting is enabled/disabled" do
+        before do
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        it "increments enabled log when setting is turned on" do
+          expect(@course.restrict_quantitative_data).to be false
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+          expect(@course.restrict_quantitative_data).to be true
+
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled").once
+        end
+
+        it "increments disabled log when setting is turned off" do
+          expect(@course.restrict_quantitative_data).to be false
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+          expect(@course.restrict_quantitative_data).to be true
+          @course.settings = @course.settings.merge(restrict_quantitative_data: false)
+          @course.save!
+          expect(@course.restrict_quantitative_data).to be false
+
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled").once.ordered
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled").once.ordered
+        end
+
+        it "doesn't increment either log when settings update but RQD setting is unchanged" do
+          expect(@course.hide_final_grade).to be false
+          @course.settings = @course.settings.merge(hide_final_grade: true)
+          @course.save!
+          expect(@course.hide_final_grade).to be true
+
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled")
+        end
+
+        it "doesn't increment when account setting propagates enabled" do
+          expect(@course.restrict_quantitative_data).to be false
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          @root.save!
+          expect(@course.restrict_quantitative_data).to be true
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: false }
+          @root.save!
+          expect(@course.restrict_quantitative_data).to be false
+
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled")
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled")
+        end
+      end
+
+      describe "with setting turned on" do
+        before do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+        end
+
+        # Admins are the only role to return false when the setting is on
+        it "does not restrict quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to be false
+        end
+
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to be true
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to be true
+        end
+
+        it "restricts quantitative data for observers" do
+          expect(@course.restrict_quantitative_data?(@observer)).to be true
+        end
+
+        it "restricts quantitative data for designer" do
+          expect(@course.restrict_quantitative_data?(@designer)).to be true
+        end
+
+        it "restricts quantitative data for ta" do
+          expect(@course.restrict_quantitative_data?(@ta)).to be true
+        end
+
+        # By default, only students and observers should be restricted when extra permissions are checked
+        context "with check_extra_permissions" do
+          it "restricts quantitative data for students" do
+            expect(@course.restrict_quantitative_data?(@student, check_extra_permissions: true)).to be true
+          end
+
+          it "restricts quantitative data for observers" do
+            expect(@course.restrict_quantitative_data?(@observer, check_extra_permissions: true)).to be true
+          end
+
+          it "does not restrict quantitative data for admin" do
+            expect(@course.restrict_quantitative_data?(@admin, check_extra_permissions: true)).to be false
+          end
+
+          it "does not restrict quantitative data for teacher" do
+            expect(@course.restrict_quantitative_data?(@teacher, check_extra_permissions: true)).to be false
+          end
+
+          it "does not restrict quantitative data for ta" do
+            expect(@course.restrict_quantitative_data?(@ta, check_extra_permissions: true)).to be false
+          end
+
+          it "does not restrict quantitative data for designer" do
+            expect(@course.restrict_quantitative_data?(@designer, check_extra_permissions: true)).to be false
+          end
+        end
+      end
+
+      describe "with setting turned off" do
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to be false
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to be false
+        end
+
+        it "restricts quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to be false
+        end
+      end
+    end
+
+    describe "with feature flag off" do
+      describe "with setting turned on" do
+        before do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.save!
+        end
+
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to be false
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to be false
+        end
+
+        it "restricts quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to be false
+        end
+      end
+
+      describe "with setting turned off" do
+        it "restricts quantitative data for students" do
+          expect(@course.restrict_quantitative_data?(@student)).to be false
+        end
+
+        it "restricts quantitative data for teacher" do
+          expect(@course.restrict_quantitative_data?(@teacher)).to be false
+        end
+
+        it "restricts quantitative data for admin" do
+          expect(@course.restrict_quantitative_data?(@admin)).to be false
+        end
+      end
     end
   end
 end

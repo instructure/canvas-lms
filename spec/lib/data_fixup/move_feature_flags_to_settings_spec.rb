@@ -54,7 +54,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
     DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
     reload_all
 
-    expect(@root_account.some_root_only_setting?).to eq(false)
+    expect(@root_account.some_root_only_setting?).to be(false)
     expect(@root_account.settings).not_to have_key(:some_root_only_setting)
   end
 
@@ -67,7 +67,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       reload_all
 
       expect { @root_account.feature_enabled?(:root_account_feature_going_away) }.to raise_error("no such feature - root_account_feature_going_away")
-      expect(@root_account.some_root_only_setting?).to eq(false)
+      expect(@root_account.some_root_only_setting?).to be(false)
       expect(@root_account.settings).not_to have_key(:some_root_only_setting)
     end
 
@@ -78,7 +78,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
       reload_all
 
-      expect(@root_account.some_root_only_setting?).to eq(false)
+      expect(@root_account.some_root_only_setting?).to be(false)
       expect(@root_account.settings).to have_key(:some_root_only_setting)
     end
 
@@ -89,7 +89,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
       reload_all
 
-      expect(@root_account.some_root_only_setting?).to eq(true)
+      expect(@root_account.some_root_only_setting?).to be(true)
       expect(@root_account.settings).to have_key(:some_root_only_setting)
     end
 
@@ -97,7 +97,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
       reload_all
 
-      expect(@root_account.some_root_only_setting?).to eq(false)
+      expect(@root_account.some_root_only_setting?).to be(false)
       expect(@root_account.settings).not_to have_key(:some_root_only_setting)
     end
 
@@ -108,7 +108,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_other_root_only_setting)
       reload_all
 
-      expect(@root_account.settings[:some_other_root_only_setting]).to eq(true)
+      expect(@root_account.settings[:some_other_root_only_setting]).to be(true)
     end
   end
 
@@ -122,13 +122,13 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:course_feature_going_away, "AccountAndCourseInherited", :some_course_setting)
       reload_all
 
-      expect(@root_account.some_course_setting[:value]).to eq(false)
-      expect(@root_account.some_course_setting[:locked]).to eq(false)
+      expect(@root_account.some_course_setting[:value]).to be(false)
+      expect(@root_account.some_course_setting[:locked]).to be(false)
       expect(@root_account.settings).not_to have_key(:some_course_setting)
-      expect(@sub_account.some_course_setting[:value]).to eq(false)
-      expect(@sub_account.some_course_setting[:locked]).to eq(false)
+      expect(@sub_account.some_course_setting[:value]).to be(false)
+      expect(@sub_account.some_course_setting[:locked]).to be(false)
       expect(@sub_account.settings).not_to have_key(:some_course_setting)
-      expect(@course.some_course_setting).to eq(true)
+      expect(@course.some_course_setting).to be(true)
       expect(@course.settings).to have_key(:some_course_setting)
     end
 
@@ -141,13 +141,13 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:course_feature_going_away, "AccountAndCourseInherited", :some_course_setting)
       reload_all
 
-      expect(@root_account.some_course_setting[:value]).to eq(false)
-      expect(@root_account.some_course_setting[:locked]).to eq(false)
+      expect(@root_account.some_course_setting[:value]).to be(false)
+      expect(@root_account.some_course_setting[:locked]).to be(false)
       expect(@root_account.settings).not_to have_key(:some_course_setting)
-      expect(@sub_account.some_course_setting[:value]).to eq(false)
-      expect(@sub_account.some_course_setting[:locked]).to eq(false)
+      expect(@sub_account.some_course_setting[:value]).to be(false)
+      expect(@sub_account.some_course_setting[:locked]).to be(false)
       expect(@sub_account.settings).not_to have_key(:some_course_setting)
-      expect(@course.some_course_setting).to eq(false)
+      expect(@course.some_course_setting).to be(false)
       expect(@course.settings).to have_key(:some_course_setting)
     end
 
@@ -159,13 +159,13 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:course_feature_going_away, "AccountAndCourseInherited", :some_course_setting)
       reload_all
 
-      expect(@root_account.some_course_setting[:value]).to eq(false)
-      expect(@root_account.some_course_setting[:locked]).to eq(false)
+      expect(@root_account.some_course_setting[:value]).to be(false)
+      expect(@root_account.some_course_setting[:locked]).to be(false)
       expect(@root_account.settings).not_to have_key(:some_course_setting)
-      expect(@sub_account.some_course_setting[:value]).to eq(false)
-      expect(@sub_account.some_course_setting[:locked]).to eq(true)
+      expect(@sub_account.some_course_setting[:value]).to be(false)
+      expect(@sub_account.some_course_setting[:locked]).to be(true)
       expect(@sub_account.settings).to have_key(:some_course_setting)
-      expect(@course.some_course_setting).to eq(false)
+      expect(@course.some_course_setting).to be(false)
       expect(@course.settings).not_to have_key(:some_course_setting)
     end
 
@@ -177,13 +177,13 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:course_feature_going_away, "AccountAndCourseInherited", :some_course_setting)
       reload_all
 
-      expect(@root_account.some_course_setting[:value]).to eq(false)
-      expect(@root_account.some_course_setting[:locked]).to eq(false)
+      expect(@root_account.some_course_setting[:value]).to be(false)
+      expect(@root_account.some_course_setting[:locked]).to be(false)
       expect(@root_account.settings).not_to have_key(:some_course_setting)
-      expect(@sub_account.some_course_setting[:value]).to eq(true)
-      expect(@sub_account.some_course_setting[:locked]).to eq(true)
+      expect(@sub_account.some_course_setting[:value]).to be(true)
+      expect(@sub_account.some_course_setting[:locked]).to be(true)
       expect(@sub_account.settings).to have_key(:some_course_setting)
-      expect(@course.some_course_setting).to eq(true)
+      expect(@course.some_course_setting).to be(true)
       expect(@course.settings).not_to have_key(:some_course_setting)
     end
 
@@ -195,13 +195,13 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:course_feature_going_away, "AccountAndCourseInherited", :some_course_setting)
       reload_all
 
-      expect(@root_account.some_course_setting[:value]).to eq(true)
-      expect(@root_account.some_course_setting[:locked]).to eq(false)
+      expect(@root_account.some_course_setting[:value]).to be(true)
+      expect(@root_account.some_course_setting[:locked]).to be(false)
       expect(@root_account.settings).to have_key(:some_course_setting)
-      expect(@sub_account.some_course_setting[:value]).to eq(true)
-      expect(@sub_account.some_course_setting[:locked]).to eq(false)
+      expect(@sub_account.some_course_setting[:value]).to be(true)
+      expect(@sub_account.some_course_setting[:locked]).to be(false)
       expect(@sub_account.settings).to have_key(:some_course_setting)
-      expect(@course.some_course_setting).to eq(true)
+      expect(@course.some_course_setting).to be(true)
       expect(@course.settings).not_to have_key(:some_course_setting)
     end
 
@@ -212,13 +212,13 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       DataFixup::MoveFeatureFlagsToSettings.run(:course_feature_going_away, "AccountAndCourseInherited", :some_course_setting)
       reload_all
 
-      expect(@root_account.some_course_setting[:value]).to eq(false)
-      expect(@root_account.some_course_setting[:locked]).to eq(false)
+      expect(@root_account.some_course_setting[:value]).to be(false)
+      expect(@root_account.some_course_setting[:locked]).to be(false)
       expect(@root_account.settings).not_to have_key(:some_course_setting)
-      expect(@sub_account.some_course_setting[:value]).to eq(false)
-      expect(@sub_account.some_course_setting[:locked]).to eq(false)
+      expect(@sub_account.some_course_setting[:value]).to be(false)
+      expect(@sub_account.some_course_setting[:locked]).to be(false)
       expect(@sub_account.settings).not_to have_key(:some_course_setting)
-      expect(@course.some_course_setting).to eq(false)
+      expect(@course.some_course_setting).to be(false)
       expect(@course.settings).not_to have_key(:some_course_setting)
     end
 
@@ -232,8 +232,8 @@ describe DataFixup::MoveFeatureFlagsToSettings do
 
       expect(@root_account.settings).not_to have_key(:some_other_account_setting)
       expect(@sub_account.settings).to have_key(:some_other_account_setting)
-      expect(@sub_account.settings[:some_other_account_setting][:value]).to eq(true)
-      expect(@sub_account.settings[:some_other_account_setting][:locked]).to eq(true)
+      expect(@sub_account.settings[:some_other_account_setting][:value]).to be(true)
+      expect(@sub_account.settings[:some_other_account_setting][:locked]).to be(true)
       expect(@course.settings[:some_other_account_setting]).to be_nil
     end
 
@@ -248,8 +248,8 @@ describe DataFixup::MoveFeatureFlagsToSettings do
 
       expect(@root_account.settings).not_to have_key(:some_other_account_setting)
       expect(@sub_account.settings).to have_key(:some_other_account_setting)
-      expect(@sub_account.settings[:some_other_account_setting][:value]).to eq(true)
-      expect(@sub_account.settings[:some_other_account_setting][:locked]).to eq(true)
+      expect(@sub_account.settings[:some_other_account_setting][:value]).to be(true)
+      expect(@sub_account.settings[:some_other_account_setting][:locked]).to be(true)
       expect(@course.settings[:some_other_account_setting]).to be_nil
     end
   end

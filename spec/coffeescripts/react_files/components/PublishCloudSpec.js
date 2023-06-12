@@ -22,7 +22,7 @@ import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
 import wait from 'waait'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
-import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
+import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 
 QUnit.module('PublishCloud', {
   setup() {

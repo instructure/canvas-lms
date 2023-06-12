@@ -117,11 +117,16 @@ class Header extends React.Component {
             gradingStatus={submission.gradingStatus}
             gradingType={assignment.gradingType}
             receivedGrade={submission.grade}
+            receivedScore={submission.score}
             pointsPossible={assignment.pointsPossible}
           />
         )
 
-        if (this.isSubmissionLate(submission) && !submission.gradeHidden) {
+        if (
+          !ENV.restrict_quantitative_data &&
+          this.isSubmissionLate(submission) &&
+          !submission.gradeHidden
+        ) {
           return (
             <Tooltip
               as="div"
@@ -150,16 +155,25 @@ class Header extends React.Component {
 
   selectedSubmissionGrade = () => {
     const {assignment, submission} = this.props
-    if (submission.gradingStatus === 'excused') {
+    if (
+      submission.gradingStatus === 'excused' ||
+      (ENV.restrict_quantitative_data &&
+        GradeFormatHelper.QUANTITATIVE_GRADING_TYPES.includes(assignment.gradingType) &&
+        assignment.pointsPossible === 0 &&
+        submission.score <= 0)
+    ) {
       return null
     }
-    const attemptGrade = submission.gradingStatus !== 'needs_grading' ? submission.grade : null
 
+    const attemptGrade = submission.gradingStatus !== 'needs_grading' ? submission.grade : null
     const formattedGrade = GradeFormatHelper.formatGrade(attemptGrade, {
       defaultValue: I18n.t('N/A'),
       formatType: 'points_out_of_fraction',
       gradingType: assignment.gradingType,
       pointsPossible: assignment.pointsPossible,
+      score: ENV.restrict_quantitative_data && submission.score != null ? submission.score : null,
+      restrict_quantitative_data: ENV.restrict_quantitative_data,
+      grading_scheme: ENV.grading_scheme,
     })
 
     const textProps =

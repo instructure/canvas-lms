@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -47,7 +48,13 @@ export const COURSE_ASSIGNMENT_POST_POLICIES_QUERY = gql`
   }
 `
 
-export function setCoursePostPolicy({courseId, postManually}) {
+export function setCoursePostPolicy({
+  courseId,
+  postManually,
+}: {
+  courseId: string
+  postManually: boolean
+}) {
   return createClient()
     .mutate({
       mutation: SET_COURSE_POST_POLICY_MUTATION,
@@ -72,7 +79,7 @@ export function setCoursePostPolicy({courseId, postManually}) {
     })
 }
 
-export function getAssignmentPostPolicies({courseId}) {
+export function getAssignmentPostPolicies({courseId}: {courseId: string}) {
   return createClient()
     .query({
       query: COURSE_ASSIGNMENT_POST_POLICIES_QUERY,

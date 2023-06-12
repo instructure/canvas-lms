@@ -54,24 +54,28 @@ module CanvasHttp
 
   class ResponseTooLargeError < CanvasHttp::Error; end
 
-  def self.put(*args, **kwargs, &block)
-    CanvasHttp.request(Net::HTTP::Put, *args, **kwargs, &block)
+  def self.put(*args, **kwargs, &)
+    CanvasHttp.request(Net::HTTP::Put, *args, **kwargs, &)
   end
 
-  def self.delete(*args, **kwargs, &block)
-    CanvasHttp.request(Net::HTTP::Delete, *args, **kwargs, &block)
+  def self.delete(*args, **kwargs, &)
+    CanvasHttp.request(Net::HTTP::Delete, *args, **kwargs, &)
   end
 
-  def self.head(*args, **kwargs, &block)
-    CanvasHttp.request(Net::HTTP::Head, *args, **kwargs, &block)
+  def self.head(*args, **kwargs, &)
+    CanvasHttp.request(Net::HTTP::Head, *args, **kwargs, &)
   end
 
-  def self.get(*args, **kwargs, &block)
-    CanvasHttp.request(Net::HTTP::Get, *args, **kwargs, &block)
+  def self.get(*args, **kwargs, &)
+    CanvasHttp.request(Net::HTTP::Get, *args, **kwargs, &)
   end
 
-  def self.post(*args, **kwargs, &block)
-    CanvasHttp.request(Net::HTTP::Post, *args, **kwargs, &block)
+  def self.post(*args, **kwargs, &)
+    CanvasHttp.request(Net::HTTP::Post, *args, **kwargs, &)
+  end
+
+  def self.patch(*args, **kwargs, &)
+    CanvasHttp.request(Net::HTTP::Patch, *args, **kwargs, &)
   end
 
   # Use this helper method to do HTTP GET requests. It knows how to handle
@@ -103,11 +107,36 @@ module CanvasHttp
       http = CanvasHttp.connection_for_uri(uri)
 
       request = request_class.new(uri.request_uri, other_headers)
-      add_form_data(request, form_data, multipart: multipart, streaming: streaming) if form_data
+      add_form_data(request, form_data, multipart:, streaming:) if form_data
       request.body = body if body
       request.content_type = content_type if content_type
 
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.verify_hostname = false # temporary; remove once all offenders have been fixed
+
+      curr_cert = 0
+      num_certs = nil
+      http.verify_callback = lambda do |preverify_ok, x509_store_context| # temporary; remove once all offenders have been fixed
+        Sentry.with_scope do |scope|
+          scope.set_tags(verify_host: "#{uri.host}:#{uri.port}")
+
+          valid = preverify_ok
+          error = valid ? "" : x509_store_context.error_string
+          num_certs ||= x509_store_context.chain.length
+
+          # only check the last certificate (aka the peer certificate)
+          # We can't have OpenSSL and Net::HTTP check this without failing, so manually check it
+          if (curr_cert += 1) == num_certs && valid && !(valid = OpenSSL::SSL.verify_certificate_identity(x509_store_context.current_cert, uri.host))
+            error = "Hostname mismatch"
+          end
+
+          unless valid
+            scope.set_tags(verify_error: error)
+            Sentry.capture_message("Certificate verify failed: #{error}", level: :warning)
+          end
+
+          true # never fail 🦸
+        end
+      end
       logger.info("CANVAS_HTTP INITIATE REQUEST | url: #{url_str}")
       start_time = Time.now
       http.request(request) do |response|

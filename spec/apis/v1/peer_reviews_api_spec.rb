@@ -22,14 +22,14 @@ require_relative "../api_spec_helper"
 
 describe PeerReviewsApiController, type: :request do
   def rubric_association_params_for_assignment(assign)
-    HashWithIndifferentAccess.new({
-                                    hide_score_total: "0",
-                                    purpose: "grading",
-                                    skip_updating_points_possible: false,
-                                    update_if_existing: true,
-                                    use_for_grading: "1",
-                                    association_object: assign
-                                  })
+    ActiveSupport::HashWithIndifferentAccess.new({
+                                                   hide_score_total: "0",
+                                                   purpose: "grading",
+                                                   skip_updating_points_possible: false,
+                                                   update_if_existing: true,
+                                                   use_for_grading: "1",
+                                                   association_object: assign
+                                                 })
   end
 
   def assessment_request(submission, teacher, assessor_submission)
@@ -44,7 +44,7 @@ describe PeerReviewsApiController, type: :request do
                                                    rubric_association: rubric_assoc
                                                  })
     AssessmentRequest.create!(
-      rubric_assessment: rubric_assessment,
+      rubric_assessment:,
       user: submission.user,
       asset: submission,
       assessor_asset: assessor_submission,
@@ -68,8 +68,13 @@ describe PeerReviewsApiController, type: :request do
     before :once do
       @resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}/submissions/#{@submission.id}/peer_reviews"
       @section_resource_path = "/api/v1/sections/#{@cs.id}/assignments/#{@assignment1.id}/submissions/#{@submission.id}/peer_reviews"
-      @resource_params = { controller: "peer_reviews_api", action: "destroy", format: "json", course_id: @course.id,
-                           assignment_id: @assignment1.id, submission_id: @submission.id, section_id: @cs.id }
+      @resource_params = { controller: "peer_reviews_api",
+                           action: "destroy",
+                           format: "json",
+                           course_id: @course.id,
+                           assignment_id: @assignment1.id,
+                           submission_id: @submission.id,
+                           section_id: @cs.id }
     end
 
     def delete_peer_review(current_user, resource_path, resource_params)
@@ -102,8 +107,12 @@ describe PeerReviewsApiController, type: :request do
       it "renders bad request" do
         student3 = student_in_course(active_all: true).user
         @user = @admin
-        api_call(:delete, @resource_path, @resource_params, { user_id: student3.id },
-                 {}, { expected_status: 400 })
+        api_call(:delete,
+                 @resource_path,
+                 @resource_params,
+                 { user_id: student3.id },
+                 {},
+                 { expected_status: 400 })
       end
     end
 
@@ -116,8 +125,12 @@ describe PeerReviewsApiController, type: :request do
     context "with student context" do
       it "returns 401 unauthorized access" do
         student3 = student_in_course(active_all: true).user
-        api_call(:delete, @resource_path, @resource_params, { user_id: student3.id },
-                 {}, { expected_status: 401 })
+        api_call(:delete,
+                 @resource_path,
+                 @resource_params,
+                 { user_id: student3.id },
+                 {},
+                 { expected_status: 401 })
       end
     end
   end
@@ -126,8 +139,13 @@ describe PeerReviewsApiController, type: :request do
     before :once do
       @resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}/submissions/#{@submission.id}/peer_reviews"
       @section_resource_path = "/api/v1/sections/#{@cs.id}/assignments/#{@assignment1.id}/submissions/#{@submission.id}/peer_reviews"
-      @resource_params = { controller: "peer_reviews_api", action: "create", format: "json", course_id: @course.id,
-                           assignment_id: @assignment1.id, submission_id: @submission.id, section_id: @cs.id }
+      @resource_params = { controller: "peer_reviews_api",
+                           action: "create",
+                           format: "json",
+                           course_id: @course.id,
+                           assignment_id: @assignment1.id,
+                           submission_id: @submission.id,
+                           section_id: @cs.id }
     end
 
     def create_peer_review(current_user, resource_path, resource_params)
@@ -166,8 +184,12 @@ describe PeerReviewsApiController, type: :request do
     context "with student context" do
       it "returns 401 unauthorized access" do
         student3 = student_in_course(active_all: true).user
-        api_call(:post, @resource_path, @resource_params, { user_id: student3.id },
-                 {}, { expected_status: 401 })
+        api_call(:post,
+                 @resource_path,
+                 @resource_params,
+                 { user_id: student3.id },
+                 {},
+                 { expected_status: 401 })
       end
     end
   end
@@ -178,11 +200,19 @@ describe PeerReviewsApiController, type: :request do
       @section_resource_path = "/api/v1/sections/#{@cs.id}/assignments/#{@assignment1.id}/peer_reviews"
       @submission_resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}/submissions/#{@submission.id}/peer_reviews"
       @submission_section_resource_path = "/api/v1/sections/#{@cs.id}/assignments/#{@assignment1.id}/submissions/#{@submission.id}/peer_reviews"
-      @resource_params = { controller: "peer_reviews_api", action: "index", format: "json", course_id: @course.id,
-                           assignment_id: @assignment1.id, section_id: @cs.id }
-      @submission_resource_params = { controller: "peer_reviews_api", action: "index", format: "json",
-                                      course_id: @course.id, assignment_id: @assignment1.id,
-                                      submission_id: @submission.id, section_id: @cs.id }
+      @resource_params = { controller: "peer_reviews_api",
+                           action: "index",
+                           format: "json",
+                           course_id: @course.id,
+                           assignment_id: @assignment1.id,
+                           section_id: @cs.id }
+      @submission_resource_params = { controller: "peer_reviews_api",
+                                      action: "index",
+                                      format: "json",
+                                      course_id: @course.id,
+                                      assignment_id: @assignment1.id,
+                                      submission_id: @submission.id,
+                                      section_id: @cs.id }
 
       @assessment_with_user = { "assessor" => { "id" => @student2.id,
                                                 "anonymous_id" => @student2.id.to_s(36),
@@ -224,6 +254,7 @@ describe PeerReviewsApiController, type: :request do
         "id" => @assessment_request.id,
         "submission_comments" => [
           {
+            "attempt" => nil,
             "author_id" => @student2.id,
             "author_name" => @student2.name,
             "comment" => comment.comment,
@@ -393,6 +424,7 @@ describe PeerReviewsApiController, type: :request do
             "id" => @assessment_request.id,
             "submission_comments" => [
               {
+                "attempt" => nil,
                 "author_id" => nil,
                 "author_name" => "Anonymous User",
                 "avatar_path" => User.default_avatar_fallback,
@@ -426,9 +458,13 @@ describe PeerReviewsApiController, type: :request do
       it "returns no peer reviews for invalid submission" do
         @assignment2 = assignment_model(course: @course)
         @submission_resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@submission.id}/peer_reviews"
-        @submission_resource_params = { controller: "peer_reviews_api", action: "index", format: "json",
-                                        course_id: @course.id, assignment_id: @assignment2.id,
-                                        submission_id: @submission.id, section_id: @cs.id }
+        @submission_resource_params = { controller: "peer_reviews_api",
+                                        action: "index",
+                                        format: "json",
+                                        course_id: @course.id,
+                                        assignment_id: @assignment2.id,
+                                        submission_id: @submission.id,
+                                        section_id: @cs.id }
         json = api_call(:get, @submission_resource_path, @submission_resource_params)
         expect(json.count).to eq(0)
       end

@@ -157,7 +157,10 @@ describe Api::V1::PlannerItem do
             https://meet146.webex.com/meet146/j?MTID=mb0f63c6586178c903f161b109886066b
             https://google.com/sbs-ycbe-yhu
             https://instructure.com
-            not even a link
+            not
+            even
+            a
+            link
             .
             zoom
             http://example.com/124?pwd=1234

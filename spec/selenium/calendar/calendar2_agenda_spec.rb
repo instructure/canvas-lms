@@ -68,7 +68,8 @@ describe "calendar2" do
       it "sets the header in the format 'Oct 11, 2013'", priority: "1" do
         start_date = Time.zone.now.beginning_of_day + 12.hours
         @course.calendar_events.create!(title: "ohai",
-                                        start_at: start_date, end_at: start_date + 1.hour)
+                                        start_at: start_date,
+                                        end_at: start_date + 1.hour)
         load_agenda_view
         expect(agenda_view_header.text).to match(/[A-Z][a-z]{2}\s\d{1,2},\s\d{4}/)
       end
@@ -76,7 +77,8 @@ describe "calendar2" do
       it "respects context filters" do
         start_date = Time.now.utc.beginning_of_day + 12.hours
         @course.calendar_events.create!(title: "ohai",
-                                        start_at: start_date, end_at: start_date + 1.hour)
+                                        start_at: start_date,
+                                        end_at: start_date + 1.hour)
         load_agenda_view
         expect(all_agenda_items.length).to eq 1
         fj(".context-list-toggle-box:last").click
@@ -213,7 +215,7 @@ describe "calendar2" do
       it "shows the location when clicking on a calendar event", priority: "1" do
         location_name = "brighton"
         location_address = "cottonwood"
-        make_event(location_name: location_name, location_address: location_address)
+        make_event(location_name:, location_address:)
         load_agenda_view
 
         # Click calendar item to bring up event summary
@@ -298,7 +300,7 @@ describe "calendar2" do
           # Edit title and date
           replace_content(fj(".ui-dialog:visible #assignment_title"), test_name)
           due_at_field = fj(".ui-dialog:visible #assignment_due_at")
-          replace_content(due_at_field, test_date.to_formatted_s(:long))
+          replace_content(due_at_field, test_date.to_fs(:long))
           driver.action.send_keys(due_at_field, :return)
           f("[class='event_button btn btn-primary save_assignment']").click
           wait_for_ajaximations

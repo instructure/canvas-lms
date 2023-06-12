@@ -68,7 +68,8 @@ describe "student planner" do
   it "shows course images", priority: "1" do
     @course_root = Folder.root_folders(@course).first
     @course_attachment = @course_root.attachments.create!(context: @course,
-                                                          uploaded_data: jpeg_data_frd, filename: "course.jpg",
+                                                          uploaded_data: jpeg_data_frd,
+                                                          filename: "course.jpg",
                                                           display_name: "course.jpg")
     @course.image_id = @course_attachment.id
     @course.save!
@@ -122,7 +123,7 @@ describe "student planner" do
     before :once do
       @quiz = quiz_model(course: @course)
       @quiz.generate_quiz_data
-      @quiz.due_at = Time.zone.now + 2.days
+      @quiz.due_at = 2.days.from_now
       @quiz.save!
     end
 
@@ -339,7 +340,7 @@ describe "student planner" do
     it "groups the to-do item with other course items", priority: "1" do
       @assignment = @course.assignments.create({
                                                  name: "Assignment 1",
-                                                 due_at: Time.zone.now + 1.day,
+                                                 due_at: 1.day.from_now,
                                                  submission_types: "online_text_entry"
                                                })
       @student1.planner_notes.create!(todo_date: 1.day.from_now, title: "Title Text", course_id: @course.id)
@@ -369,6 +370,9 @@ describe "student planner" do
         expect(element_value_for_attr(date_input, "value")).to eq(day)
       end
 
+      # date input needs to be blurred in order to trigger state update
+      date_input.send_keys(:tab)
+
       todo_save_button.click
       @student_to_do.reload
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
@@ -383,14 +387,14 @@ describe "student planner" do
       fj("button:contains('15')").click
       title_input.send_keys("the title")
       time_input.click
-      fj("li[role=option]:contains('9:00 AM')").click
+      fj("span[role=option]:contains('9:00 AM')").click
 
       todo_save_button.click
       expect(ff(".planner-item").last).to include_text "DUE: 9:00 AM"
     end
 
     it "updates the sidebar when clicking on mutiple to-do items", priority: "1" do
-      student_to_do2 = @student1.planner_notes.create!(todo_date: Time.zone.now + 5.minutes,
+      student_to_do2 = @student1.planner_notes.create!(todo_date: 5.minutes.from_now,
                                                        title: "Student to do 2")
       view_todo_item
       modal = todo_sidebar_modal(@student_to_do.title)
@@ -423,7 +427,7 @@ describe "student planner" do
 
       todo_save_button.click
       @student_to_do.reload
-      expect(@student_to_do.course_id).to be nil
+      expect(@student_to_do.course_id).to be_nil
     end
 
     it "has courses in the course combo box.", priority: "1" do
@@ -446,7 +450,7 @@ describe "student planner" do
   end
 
   it "shows and navigates to wiki pages with todo dates from student planner", priority: "1" do
-    page = @course.wiki_pages.create!(title: "Page1", todo_date: Time.zone.now + 2.days)
+    page = @course.wiki_pages.create!(title: "Page1", todo_date: 2.days.from_now)
     go_to_list_view
     validate_object_displayed(@course.name, "Page")
     validate_link_to_url(page, "pages")
@@ -457,7 +461,8 @@ describe "student planner" do
       @assignment_opportunity = @course.assignments.create!(name: "assignmentThatHasToBeDoneNow",
                                                             description: "This will take a long time",
                                                             submission_types: "online_text_entry",
-                                                            due_at: Time.zone.now - 2.days)
+                                                            due_at: 2.days.ago,
+                                                            points_possible: 132)
     end
 
     it "closes the opportunities dropdown.", priority: "1" do
@@ -477,10 +482,28 @@ describe "student planner" do
     it "links opportunity to the correct assignment page.", priority: "1" do
       go_to_list_view
       open_opportunities_dropdown
+      expect(fj(".Opportunity-styles__points:contains('132')")).to be_present
       click_opportunity(@assignment_opportunity.name)
 
       expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment_opportunity.id}"
       expect(AssignmentPage.assignment_description.text).to eq @assignment_opportunity.description
+    end
+
+    it "does not show points possible when restrict_quantitative_data is true" do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+
+      go_to_list_view
+      open_opportunities_dropdown
+      expect(f("body")).not_to contain_jqcss(".Opportunity-styles__points:contains('132')")
     end
 
     it "dismisses assignment from opportunity dropdown.", priority: "1" do
@@ -508,36 +531,6 @@ describe "student planner" do
 
     before do
       user_session(@student1)
-    end
-
-    it "scrolls to the next new activity", priority: "1" do
-      skip("Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041")
-      go_to_list_view
-      expect(items_displayed.count).to eq 1
-      expect(scroll_height).to eq 0
-
-      new_activity_button.click
-      expect(items_displayed.count).to eq 5
-
-      next_item_y = item_top_position(1)
-      new_activity_button.click
-      expect { header_bottom_position }.to become_between next_item_y - 2, next_item_y + 2
-
-      next_item_y = item_top_position(0)
-      new_activity_button.click
-      expect { header_bottom_position }.to become_between next_item_y - 2, next_item_y + 2
-    end
-
-    it "shows any new activity above the current scroll position", priority: "1" do
-      skip("Flaky, throws a weird JS error 1/20 times. Needs to be addressed in LS-2041")
-      go_to_list_view
-
-      expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
-      new_activity_button.click
-      scroll_page_to_top
-      expect(planner_header_container).not_to contain_jqcss(new_activity_button_selector)
-      scroll_page_to_bottom
-      expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
     end
 
     it "collapses an item when marked as complete", priority: "1" do
@@ -579,8 +572,8 @@ describe "student planner" do
       admin = account_admin_user_with_role_changes(role_changes: { manage_courses: false })
       user_session(admin)
 
-      expect(@course.grants_right?(admin, :manage)).to eq false # sanity check
-      expect(@course.grants_right?(admin, :manage_content)).to eq true
+      expect(@course.grants_right?(admin, :manage)).to be false # sanity check
+      expect(@course.grants_right?(admin, :manage_content)).to be true
 
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
       f("#student_planner_checkbox").click
@@ -597,8 +590,8 @@ describe "student planner" do
       admin = account_admin_user
       user_session(admin)
 
-      expect(@course.grants_right?(admin, :manage)).to eq true
-      expect(@course.grants_right?(admin, :manage_course_content_edit)).to eq true
+      expect(@course.grants_right?(admin, :manage)).to be true
+      expect(@course.grants_right?(admin, :manage_course_content_edit)).to be true
 
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
       f("#student_planner_checkbox").click
@@ -618,6 +611,42 @@ describe "student planner" do
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         expect(get_value('input[name="todo_date"]')).to eq format_date_for_view(Time.zone.today, "%b %-d, %Y, 11:59 PM")
       end
+    end
+  end
+
+  context "My Grades tray" do
+    before :once do
+      @course2 = course_factory(active_all: true)
+      @course2.enroll_student(@student1).accept!
+      @course2_assignment = @course2.assignments.create!(name: "Course 2 Assignment", points_possible: 20, submission_types: "online_text_entry")
+      @course2_assignment.grade_student(@student1, grader: @teacher, score: 14)
+    end
+
+    it "shows effective grades for student courses" do
+      user_session(@student1)
+      go_to_list_view
+      fj("button:contains('Show My Grades')").click
+      shown_grades = ff("[data-testid='my-grades-score']")
+      expect(shown_grades.map(&:text)).to eq ["No Grade", "70.00%"]
+    end
+
+    it "shows letter grades when user is quantitative data restricted" do
+      # truthy feature flag
+      Account.default.enable_feature! :restrict_quantitative_data
+
+      # truthy setting
+      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+      Account.default.save!
+
+      # truthy permission(since enabled is being "not"ed)
+      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+      Account.default.reload
+
+      user_session(@student1)
+      go_to_list_view
+      fj("button:contains('Show My Grades')").click
+      shown_grades = ff("[data-testid='my-grades-score']")
+      expect(shown_grades.map(&:text)).to eq ["No Grade", "C-"]
     end
   end
 
@@ -643,6 +672,42 @@ describe "student planner" do
 
       go_to_list_view
       expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
+    end
+  end
+
+  context "with restrict_quantitative_data ff" do
+    before do
+      @course.account.enable_feature!(:restrict_quantitative_data)
+
+      @course.assignments.create!(name: "Assignment 1",
+                                  points_possible: 10,
+                                  due_at: 2.days.from_now)
+      @course.assignments.create!(name: "Assignment 2",
+                                  points_possible: 15,
+                                  due_at: 2.days.from_now)
+    end
+
+    describe "with setting turned off" do
+      it "should show points" do
+        go_to_dashcard_view
+
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[0].text.start_with?("10 points")).to be_truthy
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[1].text.start_with?("15 points")).to be_truthy
+      end
+    end
+
+    describe "with setting turned on" do
+      before do
+        @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+        @course.save!
+      end
+
+      it "should not show points" do
+        go_to_dashcard_view
+
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[0].text.start_with?("10 points")).to be_falsey
+        expect(ff("ul[data-testid='ToDoSidebarItem__InformationRow']")[1].text.start_with?("15 points")).to be_falsey
+      end
     end
   end
 end

@@ -34,9 +34,9 @@ describe Quizzes::QuizQuestion do
     data = q.data
     expect(data[:assessment_question_id]).to eql(a.id)
     expect(data[:answers]).not_to be_empty
-    expect(data[:answers].length).to eql(2)
+    expect(data[:answers].length).to be(2)
     expect(data[:answers][0][:weight]).to eq 100
-    expect(data[:answers][1][:weight]).to eql(0.0)
+    expect(data[:answers][1][:weight]).to be(0.0)
   end
 
   context "blank answers for fill_in[_multiple]_blank[s] questions" do
@@ -48,7 +48,7 @@ describe Quizzes::QuizQuestion do
       @short_answer_data = { question_name: "test question",
                              points_possible: "1",
                              question_type: "short_answer_question",
-                             answers: answers }
+                             answers: }
       @question = @quiz.quiz_questions.create(question_data: @short_answer_data)
     end
 
@@ -116,7 +116,7 @@ describe Quizzes::QuizQuestion do
           }
         ]
       }
-      qq = @quiz.quiz_questions.create(question_data: question_data)
+      qq = @quiz.quiz_questions.create(question_data:)
       expect(qq.question_data["correct_comments_html"]).not_to include("onerror")
       expect(qq.question_data["incorrect_comments_html"]).not_to include("onerror")
       expect(qq.question_data["neutral_comments_html"]).not_to include("onerror")

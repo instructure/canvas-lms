@@ -19,7 +19,7 @@
 
 RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
   let(:account) { Account.create! }
-  let(:course) { Course.create!(account: account) }
+  let(:course) { Course.create!(account:) }
   let(:developer_key) { DeveloperKey.create!(redirect_uri: "http://www.example.com/redirect") }
   let(:product_family) do
     Lti::ProductFamily.create!(
@@ -27,7 +27,7 @@ RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
       product_code: "abc",
       vendor_name: "acme",
       root_account: account,
-      developer_key: developer_key
+      developer_key:
     )
   end
   let(:tool_proxy) do
@@ -35,7 +35,7 @@ RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
       context: course,
       guid: SecureRandom.uuid,
       shared_secret: "abc",
-      product_family: product_family,
+      product_family:,
       product_version: "1",
       workflow_state: "active",
       raw_data: {
@@ -98,7 +98,8 @@ RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
       },
       lti_version: "1"
     )
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+    Lti::ToolProxyBinding.where(context_id: account,
+                                context_type: account.class.to_s,
                                 tool_proxy_id: tp).first_or_create!
     tp
   end
@@ -106,19 +107,20 @@ RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
     Lti::ResourceHandler.create!(
       resource_type_code: "code",
       name: "resource name",
-      tool_proxy: tool_proxy
+      tool_proxy:
     )
   end
   let(:message_handler) do
     Lti::MessageHandler.create!(
       message_type: Lti::MessageHandler::BASIC_LTI_LAUNCH_REQUEST,
       launch_path: "https://www.samplelaunch.com/blti",
-      resource_handler: resource_handler,
-      tool_proxy: tool_proxy
+      resource_handler:,
+      tool_proxy:
     )
   end
   let(:tool_proxy_binding) do
-    Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
+    Lti::ToolProxyBinding.where(context_id: account,
+                                context_type: account.class.to_s,
                                 tool_proxy_id: tool_proxy).first_or_create!
   end
 end

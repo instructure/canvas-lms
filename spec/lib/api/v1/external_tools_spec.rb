@@ -30,8 +30,12 @@ describe Api::V1::ExternalTools do
     end
 
     let(:tool) do
-      params = { name: "a", url: "www.google.com/tool_launch", domain: "google.com", consumer_key: "12345",
-                 shared_secret: "secret", privacy_level: "public" }
+      params = { name: "a",
+                 url: "www.google.com/tool_launch",
+                 domain: "google.com",
+                 consumer_key: "12345",
+                 shared_secret: "secret",
+                 privacy_level: "public" }
       tool = @course.context_external_tools.new(params)
       tool.settings = { selection_width: 1234, selection_height: 99, icon_url: "www.google.com/icon" }
       tool.save

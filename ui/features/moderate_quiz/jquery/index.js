@@ -49,7 +49,7 @@ const updateExtraTime = function ($studentBlock, extraTime) {
   const $extraTime = $studentBlock.find('.extra_time_allowed')
 
   if (extraTime > 0) {
-    $extraTime.text($extraTime.text().replace(/\s\d+\s/, ' ' + extraTime + ' '))
+    $extraTime.text($extraTime.text().replace(/\d(.*\d)?/, I18n.n(extraTime)))
   }
 
   $extraTime.toggle(extraTime > 0)
@@ -244,7 +244,7 @@ $(document).ready(function (_event) {
     checkChange()
   })
 
-  $('.moderate_multiple_link').live('click', function (event) {
+  $(document).on('click', '.moderate_multiple_link', function (event) {
     event.preventDefault()
     const student_ids = []
     const data = {}
@@ -281,7 +281,7 @@ $(document).ready(function (_event) {
       .fixDialogButtons()
   })
 
-  $('.moderate_student_link').live('click', function (event) {
+  $(document).on('click', '.moderate_student_link', function (event) {
     event.preventDefault()
     const $student = $(this).parents('.student')
     const data = {
@@ -466,7 +466,7 @@ $(document).ready(function (_event) {
     .click(() => {
       $('#moderate_student_dialog').dialog('close')
     })
-  $('.extend_time_link').live('click', event => {
+  $(document).on('click', '.extend_time_link', event => {
     event.preventDefault()
     const $row = $(event.target).parents('.student')
     const end_at = $.datetimeString($row.attr('data-end-at'))

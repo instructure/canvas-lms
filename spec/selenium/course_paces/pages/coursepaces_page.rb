@@ -485,7 +485,7 @@ module CoursePacesPageObject
   end
 
   def course_pace_option(option_type:)
-    f(course_pace_option_selector(option_type: option_type))
+    f(course_pace_option_selector(option_type:))
   end
 
   def course_paces_page
@@ -697,10 +697,10 @@ module CoursePacesPageObject
   end
 
   def force_click_pace_option(option_type:)
-    course_pace_option(option_type: option_type).click
+    course_pace_option(option_type:).click
     # Reducing the flakiness of this menu
     unless element_exists?(menu_selector(menu_type: option_type))
-      course_pace_option(option_type: option_type).click
+      course_pace_option(option_type:).click
     end
   end
 

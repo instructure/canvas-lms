@@ -20,6 +20,8 @@ import React, {useState} from 'react'
 import {node} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
 import {propType as termsPropType} from '../store/TermsStore'
@@ -28,7 +30,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import CoursesStore from '../store/CoursesStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import {flatten} from 'lodash'
 
 const I18n = useI18nScope('account_course_user_search')
@@ -79,7 +81,13 @@ export default function NewCourseModal({terms, children}) {
         closeModal()
         showFlashAlert({
           type: 'success',
-          message: I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name}),
+          message: (
+            <Text>
+              {I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name})}
+              &emsp;
+              <Link href={`/courses/${createdCourse.id}`}>{I18n.t('Go to the new course')}</Link>
+            </Text>
+          ),
         })
       })
       .error(() => {

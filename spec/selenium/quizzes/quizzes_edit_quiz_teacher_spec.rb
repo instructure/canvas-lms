@@ -86,9 +86,9 @@ describe "editing a quiz" do
 
         # verify alert
         alert_box = f(".alert .unpublished_warning")
-        expect(alert_box.text).to \
-          eq "You have made changes to the questions in this quiz.\nThese "\
-             "changes will not appear for students until you save the quiz."
+        expect(alert_box.text)
+          .to eq "You have made changes to the questions in this quiz.\nThese " \
+                 "changes will not appear for students until you save the quiz."
 
         # verify button
         save_it_now_button = fj(".btn.btn-primary", ".edit_quizzes_quiz")
@@ -99,6 +99,12 @@ describe "editing a quiz" do
         expect(f(".alert .unpublished_warning")).not_to be_displayed
 
         expect { @quiz.quiz_questions.count }.to become(1)
+      end
+
+      it "shows the speed grader link" do
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
+        f(".al-trigger").click
+        expect(f(".speed-grader-link-quiz")).to be_displayed
       end
     end
 

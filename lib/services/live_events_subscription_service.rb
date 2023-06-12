@@ -38,7 +38,7 @@ module Services
 
       def create_tool_proxy_subscription(tool_proxy, subscription)
         Rails.logger.info do
-          "in: LiveEventsSubscriptionService::create_tool_proxy_subscription, "\
+          "in: LiveEventsSubscriptionService::create_tool_proxy_subscription, " \
             "tool_proxy_id: #{tool_proxy.id}, subscription: #{subscription}"
         end
         create(tool_proxy_jwt_body(tool_proxy), subscription)
@@ -50,7 +50,7 @@ module Services
 
       def destroy_tool_proxy_subscription(tool_proxy, subscription_id)
         Rails.logger.info do
-          "in: LiveEventsSubscriptionService::destroy_tool_proxy_subscription, "\
+          "in: LiveEventsSubscriptionService::destroy_tool_proxy_subscription, " \
             "tool_proxy_id: #{tool_proxy.id}, subscription_id: #{subscription_id}"
         end
         destroy(tool_proxy_jwt_body(tool_proxy), subscription_id)
@@ -88,7 +88,7 @@ module Services
       end
 
       def index(jwt_body, opts = {}, query: {})
-        options = { headers: headers(jwt_body, opts), query: query }
+        options = { headers: headers(jwt_body, opts), query: }
         request(:get, "/api/root_account_subscriptions", options)
       end
 

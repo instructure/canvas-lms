@@ -60,7 +60,7 @@
               <input type="checkbox" class="criterion_use_range" <%= 'checked' if (criterion.try(:criterion_use_range) && range_rating_enabled) %>/></label>
           </div>
         </div>
-        <div class="threshold toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
+        <div class="threshold toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
           <%= before_label :threshold, "threshold" %>
           <%= t :points, "%{points} pts", :points => %{<span class="mastery_points">#{n((criterion.mastery_points rescue 5))}</span>}.html_safe %>
         </div>
@@ -121,7 +121,7 @@
                   </div>
                   <div class="clear"></div>
                 <% end %>
-                <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
+                <span class="nobr toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
                   <span class="points"><%= n(round_if_whole(rating.points)) %></span>
                   <span class="range_rating" style="<%= hidden if !use_range %>"><%= t('to') %> ><span class="min_points"><%= n(rating_min) %></span></span> <%= t('pts') %>
                 </span>
@@ -143,7 +143,7 @@
       </div>
     <% end %>
   </td>
-  <td class="nobr points_form toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
+  <td class="nobr points_form toggle_for_hide_points <%= rubric_association&.hide_points(@current_user) ? 'hidden' : '' %>">
     <div class="editing" style="white-space: normal">
       <span style="white-space: nowrap; font-size: 0.8em">
         <%

@@ -72,7 +72,7 @@ describe RuboCop::Cop::Lint::NoSleep do
         end
       RUBY
       expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to eq("Avoid using sleep.")
+      expect(cop.messages.first).to eq("Lint/NoSleep: Avoid using sleep.")
       expect(cop.offenses.first.severity.name).to eq(:warning)
     end
   end

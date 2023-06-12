@@ -60,10 +60,10 @@ module LocaleSelection
     nil
   end
 
-  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/.freeze
-  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/.freeze
-  SEPARATOR = /\s*,\s*/.freeze
-  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/.freeze
+  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/
+  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/
+  SEPARATOR = /\s*,\s*/
+  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/
 
   def infer_browser_locale(accept_language, locales_with_aliases)
     return nil unless ACCEPT_LANGUAGE.match?(accept_language)
@@ -74,7 +74,7 @@ module LocaleSelection
       quality = (range =~ QUALITY_VALUE) ? $1.to_f : 1
       [range.sub(/\s*;.*/, ""), quality]
     end
-    ranges = ranges.sort_by { |r,| r == "*" ? 1 : -r.count("-") }
+    ranges = ranges.sort_by { |r,| (r == "*") ? 1 : -r.count("-") }
     # we want the longest ranges first (and * last of all), since the "quality
     # factor assigned to a [language] ... is the quality value of the longest
     # language-range ... that matches", e.g.
@@ -84,7 +84,7 @@ module LocaleSelection
     #                           en-US range is a longer match, so it loses)
 
     best_locales = supported_locales.filter_map do |locale|
-      if (best_range = ranges.detect { |r, _q| "#{r}-" == ("#{locale.downcase}-")[0..r.size] || r == "*" }) &&
+      if (best_range = ranges.detect { |r, _q| "#{r}-" == "#{locale.downcase}-"[0..r.size] || r == "*" }) &&
          best_range.last != 0
         [locale, best_range.last, ranges.index(best_range)]
       end
@@ -117,8 +117,8 @@ module LocaleSelection
     settings = Canvas::Plugin.find(:i18n).settings || {}
     enabled_custom_locales = settings.select { |_locale, enabled| enabled }.keys.map(&:to_sym)
     I18n.available_locales.each do |locale|
-      name = I18n.send(:t, :locales, locale: locale)[locale]
-      custom = I18n.send(:t, :custom, locale: locale) == true
+      name = I18n.send(:t, :locales, locale:)[locale]
+      custom = I18n.send(:t, :custom, locale:) == true
       next if custom && !enabled_custom_locales.include?(locale)
 
       result[locale.to_s] = name if name
@@ -127,18 +127,18 @@ module LocaleSelection
   end
 
   def self.custom_locales
-    @custom_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :custom, locale: locale) == true }.sort
+    @custom_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :custom, locale:) == true }.sort
   end
 
   def crowdsourced_locales
-    @crowdsourced_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :crowdsourced, locale: locale) == true }
+    @crowdsourced_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :crowdsourced, locale:) == true }
   end
 
   def self.locales_with_aliases
     @locales_with_aliases ||= begin
-      locales = I18n.available_locales.map { |l| [l.to_s, nil] }.to_h
+      locales = I18n.available_locales.to_h { |l| [l.to_s, nil] }
       locales.keys.each do |locale| # rubocop:disable Style/HashEachMethods mutation during iteration
-        aliases = Array.wrap(I18n.send(:t, :aliases, locale: locale, default: nil))
+        aliases = Array.wrap(I18n.send(:t, :aliases, locale:, default: nil))
         aliases.each do |a|
           locales[a] = locale
         end

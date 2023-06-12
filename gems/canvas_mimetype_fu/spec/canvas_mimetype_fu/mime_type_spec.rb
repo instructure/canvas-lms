@@ -42,7 +42,7 @@ describe "A file with a know extension" do
   end
 end
 
-describe "A file with anunknow extension" do
+describe "A file with an unknow extension" do
   before do
     @file = File.open(File.dirname(__FILE__) + "/../fixtures/file.unknown")
   end

@@ -36,7 +36,7 @@ describe Login::CasController do
 
   it "logouts with specific cas ticket" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
 
     cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
     request_text = <<~XML.strip
@@ -55,12 +55,12 @@ describe Login::CasController do
     session[:login_aac] = Account.default.authentication_providers.first.id
 
     post :destroy, params: { logoutRequest: request_text }
-    expect(response.status).to eq 200
+    expect(response).to have_http_status :ok
   end
 
   it "doesn't allow deleted users to login" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
     @user.update!(workflow_state: "deleted")
 
     response_text = <<~XML
@@ -84,7 +84,7 @@ describe Login::CasController do
 
   it "doesn't allow suspended users to login" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
     @pseudonym.update!(workflow_state: "suspended")
 
     response_text = <<~XML
@@ -108,7 +108,7 @@ describe Login::CasController do
 
   it "accepts extra attributes" do
     account = account_with_cas(account: Account.default)
-    user_with_pseudonym(active_all: true, account: account)
+    user_with_pseudonym(active_all: true, account:)
 
     response_text = <<~XML
       <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
@@ -240,7 +240,7 @@ describe Login::CasController do
     expect(response).to redirect_to(login_url)
     expect(flash[:delegated_message]).to_not be_blank
     expect(Time.now.utc - start).to be < 1
-    expect(session[:sentinel]).to eq true
+    expect(session[:sentinel]).to be true
   end
 
   it "sets a cookie for site admin login" do

@@ -84,7 +84,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def is_assignment?
-    assignment.class.to_s == "Assignment"
+    assignment.instance_of?(Assignment)
   end
 
   def has_no_group_weight?
@@ -245,14 +245,14 @@ class GradeSummaryAssignmentPresenter
       # Just render the old-style fake box-and whiskers plot (box edges are high and low with middle at mean)
       # if flag off or we don't have the new statistics
       GradeSummaryGraph.new(
-        high: high,
-        low: low,
-        lower_q: lower_q,
-        upper_q: upper_q,
-        median: median,
-        mean: mean,
+        high:,
+        low:,
+        lower_q:,
+        upper_q:,
+        median:,
+        mean:,
         points_possible: assignment.points_possible,
-        score: score,
+        score:,
         legacy: !show_advanced_statistics?(median)
       )
     end
@@ -322,7 +322,8 @@ class GradeSummaryAssignmentPresenter
 
     def title
       if legacy
-        I18n.t("#grade_summary.graph_title", "Mean %{mean}, High %{high}, Low %{low}",
+        I18n.t("#grade_summary.graph_title",
+               "Mean %{mean}, High %{high}, Low %{low}",
                {
                  mean: I18n.n(mean), high: I18n.n(high), low: I18n.n(low)
                })

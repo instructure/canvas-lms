@@ -63,7 +63,7 @@ describe "account admin terms" do
         alert = driver.switch_to.alert
         expect(alert.text).to eq "You can't delete a term that still has classes in it."
         alert.accept
-      end.to change(EnrollmentTerm, :count).by(0)
+      end.not_to change(EnrollmentTerm, :count)
       validate_term_display
     end
   end
@@ -106,7 +106,7 @@ describe "account admin terms" do
         f(".add_term_link").click
         replace_content(f("#enrollment_term_name_new"), "false add")
         f(".cancel_button").click
-      end.to change(EnrollmentTerm, :count).by(0)
+      end.not_to change(EnrollmentTerm, :count)
       validate_term_display
       check_element_has_focus f(".add_term_link")
     end

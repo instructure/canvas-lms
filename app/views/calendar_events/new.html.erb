@@ -30,6 +30,7 @@
   end
   js_env :CALENDAR_EVENT => event_attrs
   js_env CALENDAR: {}
+  js_env K5_ACCOUNT: @context.is_a?(Account) && @context.enable_as_k5_account?
   js_bundle :edit_calendar_event
   css_bundle :tinymce, :edit_calendar_event_full
 %>

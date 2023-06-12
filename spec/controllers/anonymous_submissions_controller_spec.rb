@@ -34,7 +34,7 @@ RSpec.describe AnonymousSubmissionsController do
       @assignment.unmute!
     end
 
-    let(:body) { JSON.parse(response.body)["submission"] }
+    let(:body) { response.parsed_body["submission"] }
 
     it "renders show template" do
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }
@@ -102,7 +102,7 @@ RSpec.describe AnonymousSubmissionsController do
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
 
       # render_user_not_found attempts to render the passed-in ID param and ignores anonymous_id
-      expect(JSON.parse(response.body)["errors"]).to eq "The specified user () is not a student in this course"
+      expect(response.parsed_body["errors"]).to eq "The specified user () is not a student in this course"
     end
 
     it "renders json without scores for students whose grades have not posted" do
@@ -111,10 +111,10 @@ RSpec.describe AnonymousSubmissionsController do
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
       expect(body["anonymous_id"]).to eq @submission.anonymous_id
-      expect(body["score"]).to be nil
-      expect(body["grade"]).to be nil
-      expect(body["published_grade"]).to be nil
-      expect(body["published_score"]).to be nil
+      expect(body["score"]).to be_nil
+      expect(body["grade"]).to be_nil
+      expect(body["published_grade"]).to be_nil
+      expect(body["published_score"]).to be_nil
     end
 
     it "shows rubric assessments to peer reviewers" do
@@ -165,8 +165,8 @@ RSpec.describe AnonymousSubmissionsController do
     let(:submission) { assignment.submit_homework(student, attachments: [attachment]) }
     let!(:originality_report) do
       OriginalityReport.create!(
-        attachment: attachment,
-        submission: submission,
+        attachment:,
+        submission:,
         originality_score: 0.5,
         originality_report_url: "http://www.instructure.com"
       )
@@ -316,7 +316,7 @@ RSpec.describe AnonymousSubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: "{ anonymous_id }",
-        asset_string: asset_string
+        asset_string:
       }
       expect(response).to have_http_status(:bad_request)
     end
@@ -331,7 +331,7 @@ RSpec.describe AnonymousSubmissionsController do
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
-          asset_string: asset_string
+          asset_string:
         }
         expect(response).to redirect_to(/#{retrieve_course_external_tools_url(course.id)}/)
       end
@@ -341,7 +341,7 @@ RSpec.describe AnonymousSubmissionsController do
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
-          asset_string: asset_string
+          asset_string:
         }
         expect(response).to redirect_to(/MY_GREAT_REPORT/)
       end
@@ -352,7 +352,7 @@ RSpec.describe AnonymousSubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: submission.anonymous_id,
-        asset_string: asset_string
+        asset_string:
       }
 
       speed_grader_url = speed_grader_course_gradebook_url(
@@ -368,7 +368,7 @@ RSpec.describe AnonymousSubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: submission.anonymous_id,
-        asset_string: asset_string
+        asset_string:
       }
 
       expect(flash[:error]).to be_present

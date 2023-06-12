@@ -25,6 +25,7 @@ import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
 import PublishableModuleItem from '../backbone/models/PublishableModuleItem'
 import PublishIconView from '@canvas/publish-icon-view'
+import {underscoreString} from '@canvas/convert-case'
 
 const I18n = useI18nScope('context_modulespublic')
 
@@ -126,23 +127,34 @@ export function initPublishButton($el, data) {
       display_name: moduleItem.content_details.display_name,
       thumbnail_url: moduleItem.content_details.thumbnail_url,
       usage_rights: moduleItem.content_details.usage_rights,
+      module_item_id: parseInt(moduleItem.id, 10),
     })
 
-    file.url = function () {
-      return '/api/v1/files/' + this.id
-    }
-
     const props = {
-      model: file,
       togglePublishClassOn: $el.parents('.ig-row')[0],
       userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files_edit,
       usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required,
       fileName: file.displayName(),
     }
 
-    const Cloud = <PublishCloud {...props} />
-    ReactDOM.render(Cloud, $el[0])
-    return {model: file} // Pretending this is a backbone view
+    const fileFauxView = {
+      render: () => {
+        const model = $el.data('view').model
+        ReactDOM.render(
+          <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
+          $el[0]
+        )
+        // to look disable, we need to add the class here
+        $el[0].classList[model.get('disabled') ? 'add' : 'remove']('disabled')
+      },
+      model: file,
+    }
+    file.view = fileFauxView
+    $el.data('view', fileFauxView)
+
+    fileFauxView.render()
+
+    return fileFauxView // Pretending this is a backbone view
   }
 
   const model = new PublishableModuleItem({
@@ -157,6 +169,7 @@ export function initPublishButton($el, data) {
     publishable: data.publishable,
     unpublishable: data.unpublishable,
     publish_at: data.publishAt,
+    quiz_lti: data.quizLti,
   })
 
   const viewOptions = {
@@ -288,7 +301,7 @@ export function itemContentKey(model) {
   if (model === null) return null
 
   const attrs = model.attributes || model
-  let content_type = $.underscore(attrs.module_type || attrs.type)
+  let content_type = underscoreString(attrs.module_type || attrs.type)
   let content_id = attrs.content_id || attrs.id
 
   content_type = content_type_map[content_type] || content_type
@@ -307,23 +320,48 @@ export function itemContentKey(model) {
       content_id = attrs.id
     }
 
-    return content_type + '_' + content_id
+    let result = content_type + '_' + content_id
+    // moduleItems has differing keys for lti-quiz items depending on whether the module has been recently added
+    // to the DOM or whether it was there on page load. Here we add both keys to the list of keys to check for each
+    // iteration.
+    if (attrs.quiz_lti) {
+      result = [result, 'lti-quiz_' + content_id]
+    }
+    return result
   }
 }
 
 export function updateModuleItem(moduleItems, attrs, model) {
   let i, item, parsedAttrs
-  const items = moduleItems[itemContentKey(attrs) || itemContentKey(model)]
+  const itemContentKeys = itemContentKey(attrs) || itemContentKey(model)
+  let items = []
+  // If the itemContentKeys is an array, we need to iterate over each key and concat the items together. This is because
+  // moduleItems has multiple keys for lti-quiz items depending on whether the module has been recently added to the DOM
+  // or whether it was there on page load.
+  if (Array.isArray(itemContentKeys)) {
+    items = itemContentKeys
+      .map(key => moduleItems[key])
+      .filter(mitem => mitem !== undefined)
+      .flat(1)
+  } else {
+    items = moduleItems[itemContentKeys]
+  }
+
   if (items) {
     for (i = 0; i < items.length; i++) {
       item = items[i]
       parsedAttrs = item.model.parse(attrs)
-      if (parsedAttrs.type === 'File') {
-        item.model.set({locked: !parsedAttrs.published})
+
+      if (parsedAttrs.type === 'File' || model.attributes.type === 'file') {
+        const locked =
+          'published' in parsedAttrs ? !parsedAttrs.published : item.model.get('locked')
+        item.model.set({locked, disabled: parsedAttrs.bulkPublishInFlight})
       } else {
-        item.model.set({published: parsedAttrs.published})
-        item.model.view.render()
+        const published =
+          'published' in parsedAttrs ? parsedAttrs.published : item.model.get('published')
+        item.model.set({published, bulkPublishInFlight: parsedAttrs.bulkPublishInFlight})
       }
+      item.model.view.render()
     }
   }
 }

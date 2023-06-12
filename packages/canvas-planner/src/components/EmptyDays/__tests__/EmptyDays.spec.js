@@ -19,7 +19,7 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import MockDate from 'mockdate'
-import {EmptyDays} from '../index'
+import EmptyDays from '../index'
 
 const TZ = 'Asia/Tokyo'
 

@@ -24,9 +24,14 @@ class ReplaceOtherGistIndexesWithGin < ActiveRecord::Migration[5.1]
   def up
     if (schema = connection.extension(:pg_trgm)&.schema)
       add_index :users, "LOWER(short_name) #{schema}.gin_trgm_ops", name: "index_gin_trgm_users_short_name", using: :gin, algorithm: :concurrently
-      add_index :users, "LOWER(name) #{schema}.gin_trgm_ops", name: "index_gin_trgm_users_name_active_only",
-                                                              using: :gin, algorithm: :concurrently, where: "workflow_state IN ('registered', 'pre_registered')"
-      add_index :courses, "(
+      add_index :users,
+                "LOWER(name) #{schema}.gin_trgm_ops",
+                name: "index_gin_trgm_users_name_active_only",
+                using: :gin,
+                algorithm: :concurrently,
+                where: "workflow_state IN ('registered', 'pre_registered')"
+      add_index :courses,
+                "(
           coalesce(lower(name), '') || ' ' ||
           coalesce(lower(sis_source_id), '') || ' ' ||
           coalesce(lower(course_code), '')
@@ -46,9 +51,14 @@ class ReplaceOtherGistIndexesWithGin < ActiveRecord::Migration[5.1]
   def down
     if (schema = connection.extension(:pg_trgm)&.schema)
       add_index :users, "LOWER(short_name) #{schema}.gist_trgm_ops", name: "index_trgm_users_short_name", using: :gist, algorithm: :concurrently
-      add_index :users, "LOWER(name) #{schema}.gist_trgm_ops", name: "index_trgm_users_name_active_only",
-                                                               using: :gist, algorithm: :concurrently, where: "workflow_state IN ('registered', 'pre_registered')"
-      add_index :courses, "(
+      add_index :users,
+                "LOWER(name) #{schema}.gist_trgm_ops",
+                name: "index_trgm_users_name_active_only",
+                using: :gist,
+                algorithm: :concurrently,
+                where: "workflow_state IN ('registered', 'pre_registered')"
+      add_index :courses,
+                "(
           coalesce(lower(name), '') || ' ' ||
           coalesce(lower(sis_source_id), '') || ' ' ||
           coalesce(lower(course_code), '')

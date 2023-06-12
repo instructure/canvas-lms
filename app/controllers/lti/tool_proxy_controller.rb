@@ -57,10 +57,10 @@ module Lti
           ActiveRecord::Base.transaction do
             tp_service.process_tool_proxy_json(
               json: payload,
-              context: context,
-              guid: guid,
+              context:,
+              guid:,
               tool_proxy_to_update: @tool_proxy,
-              tc_half_shared_secret: tc_half_shared_secret
+              tc_half_shared_secret:
             )
 
             ack_response = CanvasHttp.put(ack_url)
@@ -101,7 +101,7 @@ module Lti
 
     def update_workflow_state(workflow_state)
       Rails.logger.info do
-        "in: ToolProxyController::update_workflow_state, tool_id: #{@tool_proxy.id}, "\
+        "in: ToolProxyController::update_workflow_state, tool_id: #{@tool_proxy.id}, " \
           "old state: #{@tool_proxy.workflow_state}, new state: #{workflow_state}"
       end
       @tool_proxy.update_attribute(:workflow_state, workflow_state)
@@ -117,7 +117,7 @@ module Lti
         placements.merge(resource_handler.placements.map(&:placement))
       end
 
-      unless (placements & [ResourcePlacement::COURSE_NAVIGATION, ResourcePlacement::ACCOUNT_NAVIGATION]).blank?
+      if placements.intersect?([ResourcePlacement::COURSE_NAVIGATION, ResourcePlacement::ACCOUNT_NAVIGATION])
         Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
       end
     end

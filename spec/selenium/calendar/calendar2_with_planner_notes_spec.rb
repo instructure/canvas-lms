@@ -146,7 +146,8 @@ describe "calendar2" do
     end
 
     it "creates a calendar event for non graded discussions with to do date" do
-      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
+      discussion = @course.discussion_topics.create!(user: @teacher,
+                                                     title: "topic 1",
                                                      message: "somebody topic message",
                                                      todo_date: 30.seconds.from_now)
       get "/calendar2"
@@ -194,7 +195,8 @@ describe "calendar2" do
     end
 
     it "edits a todo discussion" do
-      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
+      discussion = @course.discussion_topics.create!(user: @teacher,
+                                                     title: "topic 1",
                                                      message: "somebody topic message",
                                                      todo_date: Date.today)
       get "/calendar2"
@@ -211,7 +213,8 @@ describe "calendar2" do
     end
 
     it "deletes a todo discussion" do
-      discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
+      discussion = @course.discussion_topics.create!(user: @teacher,
+                                                     title: "topic 1",
                                                      message: "somebody topic message",
                                                      todo_date: Date.today)
       get "/calendar2"
@@ -255,7 +258,7 @@ describe "calendar2" do
       f(".fc-week td").click # click the first day of the month
       wait_for_ajax_requests
       f('li[aria-controls="edit_planner_note_form_holder"]').click # the My To Do tab
-      context_codes = ff("#planner_note_context option").map { |el| el["value"] }
+      context_codes = ff("#planner_note_context option").pluck("value")
       expect(context_codes).to match_array([@user.asset_string, @course2.asset_string])
     end
   end

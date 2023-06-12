@@ -22,7 +22,7 @@ module UserNotesHelper
   def pageless(total_pages, url = nil)
     js_env user_note_list_pageless_options: {
       totalPages: total_pages,
-      url: url,
+      url:,
       loaderHtml: '
 <div id="pageless-loader" style="display:none;text-align:center;width:100%;">
   <div class="msg" style="color: #666;font-size:2em">' + t("#user_notes.messages.loading_more", "Loading more entries") + '</div>

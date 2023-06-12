@@ -148,10 +148,10 @@ module CanvasKaltura
       suspicious_bitrate_threshold = original_source ? original_source[:bitrate].to_i * 5 : 0
 
       sources = sources.sort_by do |a|
-        [a[:hasWarnings] || a[:isOriginal] != "0" ? CanvasSort::Last : CanvasSort::First,
-         a[:isOriginal] == "0" ? CanvasSort::First : CanvasSort::Last,
+        [(a[:hasWarnings] || a[:isOriginal] != "0") ? CanvasSort::Last : CanvasSort::First,
+         (a[:isOriginal] == "0") ? CanvasSort::First : CanvasSort::Last,
          PREFERENCE.index(a[:fileExt]) || (PREFERENCE.size + 1),
-         a[:bitrate].to_i < suspicious_bitrate_threshold ? CanvasSort::First : CanvasSort::Last,
+         (a[:bitrate].to_i < suspicious_bitrate_threshold) ? CanvasSort::First : CanvasSort::Last,
          0 - a[:bitrate].to_i]
       end
 
@@ -179,19 +179,21 @@ module CanvasKaltura
 
     def startSession(type = SessionType::USER, userId = nil)
       partnerId = @partnerId
-      secret = type == SessionType::USER ? @user_secret : @secret
-      result = getRequest(:session, :start,
-                          secret: secret,
-                          partnerId: partnerId,
-                          userId: userId,
-                          type: type)
+      secret = (type == SessionType::USER) ? @user_secret : @secret
+      result = getRequest(:session,
+                          :start,
+                          secret:,
+                          partnerId:,
+                          userId:,
+                          type:)
       @ks = result.content if result.respond_to? :content
     end
 
     def mediaGet(entryId)
-      result = getRequest(:media, :get,
+      result = getRequest(:media,
+                          :get,
                           ks: @ks,
-                          entryId: entryId)
+                          entryId:)
       return nil unless result
 
       item = {}
@@ -204,7 +206,7 @@ module CanvasKaltura
     def mediaUpdate(entryId, attributes)
       hash = {
         ks: @ks,
-        entryId: entryId
+        entryId:
       }
       attributes.each do |key, val|
         hash["mediaEntry:#{key}"] = val
@@ -222,11 +224,12 @@ module CanvasKaltura
     def mediaDelete(entryId)
       hash = {
         ks: @ks,
-        entryId: entryId
+        entryId:
       }
       getRequest(:media, :delete, hash)
     end
 
+    # See the method of the same name in saveMediaRecording.js
     def mediaTypeToSymbol(type)
       case type.to_i
       when 2
@@ -239,9 +242,10 @@ module CanvasKaltura
     end
 
     def bulkUploadGet(id)
-      result = getRequest(:bulkUpload, :get,
+      result = getRequest(:bulkUpload,
+                          :get,
                           ks: @ks,
-                          id: id)
+                          id:)
       return nil unless result
 
       parseBulkUpload(result)
@@ -267,7 +271,8 @@ module CanvasKaltura
     end
 
     def bulkUploadCsv(csv)
-      result = postRequest(:bulkUpload, :add,
+      result = postRequest(:bulkUpload,
+                           :add,
                            ks: @ks,
                            conversionProfileId: -1,
                            csvFileData: KalturaStringIO.new(csv, "bulk_data.csv"))
@@ -298,9 +303,10 @@ module CanvasKaltura
     end
 
     def flavorAssetGetByEntryId(entryId)
-      result = getRequest(:flavorAsset, :getByEntryId,
+      result = getRequest(:flavorAsset,
+                          :getByEntryId,
                           ks: @ks,
-                          entryId: entryId)
+                          entryId:)
       return nil unless result
 
       items = []
@@ -322,7 +328,8 @@ module CanvasKaltura
     end
 
     def flavorAssetGetDownloadUrl(assetId)
-      result = getRequest(:flavorAsset, :getDownloadUrl,
+      result = getRequest(:flavorAsset,
+                          :getDownloadUrl,
                           ks: @ks,
                           id: assetId)
       return result.content if result
@@ -378,18 +385,12 @@ module CanvasKaltura
       end
     end
 
-    # FIXME: SSL verifification should not be turned off, but since we're just
-    # turning on HTTPS everywhere for kaltura, we're being gentle about it in
-    # the first pass
     def sendRequest(request, body = nil)
       response = nil
       CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
         http = Net::HTTP.new(@host, @use_ssl ? Net::HTTP.https_default_port : Net::HTTP.http_default_port)
         http.use_ssl = @use_ssl
-
-        if ENV["RAILS_ENV"] == "development"
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ENV["RAILS_ENV"] == "development"
 
         response = http.request(request, body)
       end
@@ -397,7 +398,7 @@ module CanvasKaltura
 
       unless response.is_a?(Net::HTTPSuccess) || response.is_a?(Net::HTTPNotFound)
         CanvasKaltura.error_handler.capture(
-          "Error from Kaltura service", { response: response, path: request.path }, :warn
+          "Error from Kaltura service", { response:, path: request.path }, :warn
         )
       end
 

@@ -59,6 +59,7 @@ module CustomSeleniumActions
   def f(selector, scope = nil)
     stale_element_protection { (scope || driver).find_element :css, selector }
   end
+
   alias_method :find, :f
 
   # short for find with link
@@ -108,6 +109,7 @@ module CustomSeleniumActions
   def ff(selector, scope = nil)
     reloadable_collection { (scope || driver).find_elements(:css, selector) }
   end
+
   alias_method :find_all, :ff
 
   # same as `fj`, but returns all matching elements
@@ -504,13 +506,14 @@ module CustomSeleniumActions
   end
 
   MODIFIER_KEY = RUBY_PLATFORM.include?("darwin") ? :command : :control
+
   def replace_content(el, value, options = {})
     # el.clear doesn't work with textboxes that have a pattern attribute that's why we have :backspace.
     # We are treating the chrome browser different because Selenium cannot send :command key to chrome on Mac.
     # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
     if SeleniumDriverSetup.saucelabs_test_run?
       el.click
-      el.send_keys [(driver.browser == :safari ? :command : :control), "a"]
+      el.send_keys [((driver.browser == :safari) ? :command : :control), "a"]
       el.send_keys(value)
     else
       driver.execute_script("arguments[0].select();", el)
@@ -530,24 +533,22 @@ module CustomSeleniumActions
   # can pass in either an element or a forms css
   def submit_form(form)
     submit_button_css = 'button[type="submit"]'
-    button =
-      if form.is_a?(Selenium::WebDriver::Element)
-        form.find_element(:css, submit_button_css)
-      else
-        f("#{form} #{submit_button_css}")
-      end
+    button = if form.is_a?(Selenium::WebDriver::Element)
+               form.find_element(:css, submit_button_css)
+             else
+               f("#{form} #{submit_button_css}")
+             end
     button.click
   end
 
   # can pass in either an element or a forms css
   def scroll_to_submit_button_and_click(form)
     submit_button_css = 'button[type="submit"]'
-    button =
-      if form.is_a?(Selenium::WebDriver::Element)
-        form.find_element(:css, submit_button_css)
-      else
-        f("#{form} #{submit_button_css}")
-      end
+    button = if form.is_a?(Selenium::WebDriver::Element)
+               form.find_element(:css, submit_button_css)
+             else
+               f("#{form} #{submit_button_css}")
+             end
     scroll_to(button)
     driver.action.move_to(button).click.perform
   end
@@ -561,12 +562,11 @@ module CustomSeleniumActions
     # used to be called submit_form, but it turns out that if you're
     # searching for a dialog that doesn't exist it's suuuuuper slow
     submit_button_css = 'button[type="submit"]'
-    button =
-      if form.is_a?(Selenium::WebDriver::Element)
-        form.find_element(:css, submit_button_css)
-      else
-        f("#{form} #{submit_button_css}")
-      end
+    button = if form.is_a?(Selenium::WebDriver::Element)
+               form.find_element(:css, submit_button_css)
+             else
+               f("#{form} #{submit_button_css}")
+             end
 
     # the button may have been hidden via fixDialogButtons
     dialog = dialog_for(button)
@@ -587,11 +587,10 @@ module CustomSeleniumActions
   # load the simulate plugin to simulate a drag events (among other things)
   # will only load it once even if its called multiple times
   def load_simulate_js
-    @load_simulate_js ||=
-      begin
-        js = File.read("spec/selenium/helpers/jquery.simulate.js")
-        driver.execute_script js
-      end
+    @load_simulate_js ||= begin
+      js = File.read("spec/selenium/helpers/jquery.simulate.js")
+      driver.execute_script js
+    end
   end
 
   # when selenium fails you, reach for .simulate
@@ -674,7 +673,7 @@ module CustomSeleniumActions
   end
 
   def dismiss_flash_messages_if_present
-    unless (find_all_with_jquery(flash_message_selector).length) == 0
+    unless find_all_with_jquery(flash_message_selector).empty?
       find_all_with_jquery(flash_message_selector).each(&:click)
     end
   end
@@ -713,17 +712,25 @@ module CustomSeleniumActions
     driver.execute_script("$(#{selector.to_json}).scrollTo(#{target.to_json})")
   end
 
-  def stale_element_protection(&block)
+  def stale_element_protection(&)
     element = yield
-    element.finder_proc = proc { disable_implicit_wait(&block) }
+    element.finder_proc = proc { disable_implicit_wait(&) }
     element
   end
 
-  def reloadable_collection(&block)
+  def reloadable_collection(&)
     collection = yield
     SeleniumExtensions::ReloadableCollection.new(
       collection,
-      proc { disable_implicit_wait(&block) }
+      proc { disable_implicit_wait(&) }
     )
+  end
+
+  # some elements in the RCE are loaded in stages (ex: math)
+  # and aren't immediately clickable, even though they are visible
+  def click_repeat(element)
+    element.click
+  rescue
+    click_repeat(element)
   end
 end

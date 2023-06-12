@@ -30,10 +30,10 @@ module AcademicBenchmarks
         hash = {
           migration_id: guid,
           vendor_guid: guid,
-          low_grade: low_grade,
-          high_grade: high_grade,
+          low_grade:,
+          high_grade:,
           is_global_standard: true,
-          description: description
+          description:
         }
         # .all? returns true for [], so check has_children? too
         all_clarification = has_children? && children.all?(&:clarification?)

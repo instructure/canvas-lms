@@ -195,7 +195,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def results_visible?(user: nil)
     return true unless quiz.present?
     return true if quiz.grants_right?(user, :review_grades)
-    return false if quiz.restrict_answers_for_concluded_course?(user: user)
+    return false if quiz.restrict_answers_for_concluded_course?(user:)
     return false if quiz.one_time_results && has_seen_results?
     return false if quiz.hide_results == "always"
 
@@ -231,7 +231,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
        (
          quiz_submissions.workflow_state = 'completed'
          AND quiz_submissions.submission_data IS NOT NULL
-       )", { time: Time.now }).to_a
+       )",
+                 { time: Time.now }).to_a
     resp.select!(&:needs_grading?)
     resp
   end
@@ -303,7 +304,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     self.class.where(id: self)
         .where("workflow_state NOT IN ('complete', 'pending_review')")
-        .update_all(user_id: user_id, submission_data: new_params)
+        .update_all(user_id:, submission_data: new_params)
 
     record_answer(new_params)
 
@@ -320,7 +321,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       event_type: Quizzes::QuizSubmissionEvent::EVT_SUBMISSION_CREATED,
       event_data: { "quiz_version" => quiz_version, "quiz_data" => quiz_data },
       created_at: Time.zone.now,
-      attempt: attempt
+      attempt:
     )
   end
 
@@ -371,7 +372,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     Quizzes::QuizSubmissionSnapshot.create({
                                              quiz_submission: self,
-                                             attempt: attempt,
+                                             attempt:,
                                              data: snapshot_data
                                            })
   end
@@ -450,7 +451,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission = submission
       @assignment_submission.score = kept_score if kept_score
       @assignment_submission.submitted_at = finished_at
-      @assignment_submission.grade_matches_current_submission = true
+      @assignment_submission.grade_matches_current_submission = workflow_state != "pending_review" || attempt == 1
       @assignment_submission.quiz_submission_id = id
       @assignment_submission.graded_at = Time.zone.now
       @assignment_submission.grader_id = grader_id || "-#{quiz_id}".to_i
@@ -763,7 +764,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         s = submission
         s.score = kept_score
         s.grade_change_event_author_id = params[:grader_id]
-        s.grade_matches_current_submission = true
+        s.grade_matches_current_submission = workflow_state != "pending_review" || attempt == 1
         s.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission
       end
@@ -856,7 +857,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def delete_ignores
     if completed?
-      Ignore.where(asset_type: "Quizzes::Quiz", asset_id: quiz_id, user_id: user_id, purpose: "submitting").delete_all
+      Ignore.where(asset_type: "Quizzes::Quiz", asset_id: quiz_id, user_id:, purpose: "submitting").delete_all
     end
     true
   end

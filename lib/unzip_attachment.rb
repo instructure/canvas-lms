@@ -21,7 +21,7 @@
 # This is used to take a zipped file, unzip it, add directories to a
 # context, and attach the files in the correct directories.
 class UnzipAttachment
-  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/.freeze
+  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
 
   def self.process(opts = {})
     @ua = new(opts)
@@ -132,7 +132,7 @@ class UnzipAttachment
           zip_stats.charge_quota(file_size)
           # This is where the attachment actually happens.  See file_in_context.rb
           migration_id = @migration_id_map[entry.name]
-          attachment = attach(f.path, entry, folder, sha512, migration_id: migration_id)
+          attachment = attach(f.path, entry, folder, sha512, migration_id:)
           id_positions[attachment.id] = path_positions[entry.name]
         rescue Attachment::OverQuotaError
           f.unlink
@@ -165,11 +165,23 @@ class UnzipAttachment
   end
 
   def attach(path, entry, folder, md5, migration_id: nil)
-    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
-                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context,
+                         path,
+                         display_name: display_name(entry.name),
+                         folder:,
+                         explicit_filename: File.split(entry.name).last,
+                         allow_rename: @rename_files,
+                         md5:,
+                         migration_id:)
   rescue
-    FileInContext.attach(context, path, display_name: display_name(entry.name), folder: folder,
-                                        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+    FileInContext.attach(context,
+                         path,
+                         display_name: display_name(entry.name),
+                         folder:,
+                         explicit_filename: File.split(entry.name).last,
+                         allow_rename: @rename_files,
+                         md5:,
+                         migration_id:)
   end
 
   def with_unzip_configuration

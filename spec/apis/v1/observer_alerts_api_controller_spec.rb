@@ -31,20 +31,35 @@ describe ObserverAlertsApiController, type: :request do
       @course.offer!
       @assignment = assignment_model(context: @course)
 
-      alerts << observer_alert_model(course: @course, alert_type: "assignment_grade_high",
-                                     threshold: 80, context: @assignment)
+      alerts << observer_alert_model(course: @course,
+                                     alert_type: "assignment_grade_high",
+                                     threshold: 80,
+                                     context: @assignment)
       observer_alert_threshold = @observer_alert_threshold
 
-      alerts << observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
-                                     alert_type: "assignment_grade_low", threshold: 70, context: @assignment)
-      alerts << observer_alert_model(course: @course, observer: @observer, student: @student, link: @observation_link,
-                                     alert_type: "course_grade_high", threshold: 80, context: @course)
+      alerts << observer_alert_model(course: @course,
+                                     observer: @observer,
+                                     student: @student,
+                                     link: @observation_link,
+                                     alert_type: "assignment_grade_low",
+                                     threshold: 70,
+                                     context: @assignment)
+      alerts << observer_alert_model(course: @course,
+                                     observer: @observer,
+                                     student: @student,
+                                     link: @observation_link,
+                                     alert_type: "course_grade_high",
+                                     threshold: 80,
+                                     context: @course)
 
       @observer_alert_threshold = observer_alert_threshold
 
       @path = "/api/v1/users/#{@observer.id}/observer_alerts/#{@student.id}"
-      @params = { user_id: @observer.to_param, student_id: @student.to_param,
-                  controller: "observer_alerts_api", action: "alerts_by_student", format: "json" }
+      @params = { user_id: @observer.to_param,
+                  student_id: @student.to_param,
+                  controller: "observer_alerts_api",
+                  action: "alerts_by_student",
+                  format: "json" }
     end
 
     it "returns correct attributes" do
@@ -59,7 +74,7 @@ describe ObserverAlertsApiController, type: :request do
       expect(alert["alert_type"]).to eq("assignment_grade_high")
       expect(alert["workflow_state"]).to eq("unread")
       expect(alert["html_url"]).to eq course_assignment_url(@course, @assignment)
-      expect(alert["locked_for_user"]).to eq false
+      expect(alert["locked_for_user"]).to be false
       expect(alert["user_id"]).to eq @student.id
       expect(alert["observer_id"]).to eq @observer.id
       expect(alert["observer_alert_threshold_id"]).to eq @observer_alert_threshold.id
@@ -69,15 +84,18 @@ describe ObserverAlertsApiController, type: :request do
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json.length).to eq 3
 
-      expect(json.map { |e| e["id"] }).to eq alerts.map(&:id).reverse
+      expect(json.pluck("id")).to eq alerts.map(&:id).reverse
     end
 
     it "doesnt return alerts for other students" do
       user = user_model
       link = add_linked_observer(user, @observer)
       asg = assignment_model(context: @course)
-      observer_alert_model(link: link, observer: @observer, alert_type: "assignment_grade_high",
-                           threshold: 90, context: asg)
+      observer_alert_model(link:,
+                           observer: @observer,
+                           alert_type: "assignment_grade_high",
+                           threshold: 90,
+                           context: asg)
       json = api_call_as_user(@observer, :get, @path, @params)
       expect(json.length).to eq 3
     end
@@ -85,8 +103,11 @@ describe ObserverAlertsApiController, type: :request do
     it "returns empty array if users are not linked" do
       user = user_model
       path = "/api/v1/users/#{@observer.id}/observer_alerts/#{user.id}"
-      params = { user_id: @observer.to_param, student_id: user.to_param,
-                 controller: "observer_alerts_api", action: "alerts_by_student", format: "json" }
+      params = { user_id: @observer.to_param,
+                 student_id: user.to_param,
+                 controller: "observer_alerts_api",
+                 action: "alerts_by_student",
+                 format: "json" }
 
       json = api_call_as_user(@observer, :get, path, params)
       expect(json.length).to eq 0
@@ -94,7 +115,7 @@ describe ObserverAlertsApiController, type: :request do
 
     it "sets locked_for_user if the course is invisible" do
       @course.destroy
-      expect(api_call_as_user(@observer, :get, @path, @params).map { |a| a["locked_for_user"] }).to all(eq true)
+      expect(api_call_as_user(@observer, :get, @path, @params).pluck("locked_for_user")).to all(be true)
     end
 
     it "sets locked_for_user if the assignment is deleted" do
@@ -102,9 +123,9 @@ describe ObserverAlertsApiController, type: :request do
       api_call_as_user(@observer, :get, @path, @params).each do |alert|
         case alert["context_type"]
         when "Course"
-          expect(alert["locked_for_user"]).not_to eq true
+          expect(alert["locked_for_user"]).not_to be true
         when "Assignment"
-          expect(alert["locked_for_user"]).to eq true
+          expect(alert["locked_for_user"]).to be true
         end
       end
     end
@@ -115,13 +136,24 @@ describe ObserverAlertsApiController, type: :request do
       @course = course_model
       @assignment = assignment_model(context: @course)
 
-      observer_alert_model(course: @course, alert_type: "assignment_grade_high",
-                           threshold: 90, context: @assignment, workflow_state: "unread")
+      observer_alert_model(course: @course,
+                           alert_type: "assignment_grade_high",
+                           threshold: 90,
+                           context: @assignment,
+                           workflow_state: "unread")
       student = @student
-      observer_alert_model(course: @course, alert_type: "assignment_grade_high",
-                           threshold: 90, context: @assignment, workflow_state: "unread", observer: @observer)
-      observer_alert_model(course: @course, alert_type: "assignment_grade_low",
-                           threshold: 40, context: @assignment, workflow_state: "read", observer: @observer)
+      observer_alert_model(course: @course,
+                           alert_type: "assignment_grade_high",
+                           threshold: 90,
+                           context: @assignment,
+                           workflow_state: "unread",
+                           observer: @observer)
+      observer_alert_model(course: @course,
+                           alert_type: "assignment_grade_low",
+                           threshold: 40,
+                           context: @assignment,
+                           workflow_state: "read",
+                           observer: @observer)
       @student = student
     end
 
@@ -134,8 +166,11 @@ describe ObserverAlertsApiController, type: :request do
 
     it "will only return the unread count for the specific student id provided" do
       path = "/api/v1/users/self/observer_alerts/unread_count?student_id=#{@student.id}"
-      params = { user_id: "self", student_id: @student.to_param, controller: "observer_alerts_api",
-                 action: "alerts_count", format: "json" }
+      params = { user_id: "self",
+                 student_id: @student.to_param,
+                 controller: "observer_alerts_api",
+                 action: "alerts_count",
+                 format: "json" }
 
       json = api_call_as_user(@observer, :get, path, params)
       expect(json["unread_count"]).to eq 1
@@ -150,8 +185,11 @@ describe ObserverAlertsApiController, type: :request do
       observer_alert_model(course: @course, alert_type: "assignment_grade_high", threshold: 80, context: @assignment)
 
       @path = "/api/v1/users/#{@observer.id}/observer_alerts/#{@observer_alert.id}"
-      @params = { user_id: @observer.to_param, observer_alert_id: @observer_alert.to_param,
-                  controller: "observer_alerts_api", action: "update", format: "json" }
+      @params = { user_id: @observer.to_param,
+                  observer_alert_id: @observer_alert.to_param,
+                  controller: "observer_alerts_api",
+                  action: "update",
+                  format: "json" }
     end
 
     it "updates the workflow_state to read" do
@@ -186,7 +224,7 @@ describe ObserverAlertsApiController, type: :request do
       user = user_model
       params = @params.merge(workflow_state: "read")
       api_call_as_user(user, :put, "#{@path}/read", params)
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
   end
 end

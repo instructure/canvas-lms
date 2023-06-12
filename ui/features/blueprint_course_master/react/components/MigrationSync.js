@@ -21,7 +21,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import cx from 'classnames'
 import '@canvas/rails-flash-notifications'
 

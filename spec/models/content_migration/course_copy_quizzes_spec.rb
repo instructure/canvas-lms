@@ -218,7 +218,7 @@ describe ContentMigration do
       run_course_copy
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
-      expect(q2.quiz_data.size).to eql(2)
+      expect(q2.quiz_data.size).to be(2)
       ans_count = 0
       q2.quiz_data.each do |qd|
         qd["answers"].each do |ans|
@@ -226,7 +226,7 @@ describe ContentMigration do
           ans_count += 1
         end
       end
-      expect(ans_count).to eql(4)
+      expect(ans_count).to be(4)
     end
 
     it "makes true-false question answers consistent" do
@@ -247,8 +247,8 @@ describe ContentMigration do
       run_course_copy
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
-      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["True", "False"]
-      expect(q2.quiz_data.first["answers"].map { |a| a["weight"] }).to eq [100, 0]
+      expect(q2.quiz_data.first["answers"].pluck("text")).to eq ["True", "False"]
+      expect(q2.quiz_data.first["answers"].pluck("weight")).to eq [100, 0]
     end
 
     it "imports invalid true-false questions as multiple choice" do
@@ -270,7 +270,7 @@ describe ContentMigration do
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
       expect(q2.quiz_data.first["question_type"]).to eq "multiple_choice_question"
-      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["foo", "tr00"]
+      expect(q2.quiz_data.first["answers"].pluck("text")).to eq ["foo", "tr00"]
     end
 
     it "escapes html characters in text answers" do
@@ -291,7 +291,7 @@ describe ContentMigration do
       run_course_copy
 
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
-      expect(q2.quiz_data.first["answers"].map { |a| a["text"] }).to eq ["<p>foo</p>", "<div/>tr00"]
+      expect(q2.quiz_data.first["answers"].pluck("text")).to eq ["<p>foo</p>", "<div/>tr00"]
     end
 
     it "copies quizzes as published if they were published before" do
@@ -347,7 +347,7 @@ describe ContentMigration do
       g = q.quiz_groups[1]
       expect(g.assessment_question_bank_id).to eq bank2.id
       g = q.quiz_groups[2]
-      expect(g.assessment_question_bank_id).to eq nil
+      expect(g.assessment_question_bank_id).to be_nil
     end
 
     it "omits deleted questions in banks" do
@@ -400,11 +400,14 @@ describe ContentMigration do
     it "does not copy plain text question comments as html" do
       bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
       bank1.assessment_questions.create!(question_data: {
-                                           "question_type" => "multiple_choice_question", "name" => "test question",
+                                           "question_type" => "multiple_choice_question",
+                                           "name" => "test question",
                                            "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100, "comments" => "another comment" },
                                                          { "id" => 2, "text" => "inorrect", "weight" => 0 }],
-                                           "correct_comments" => "Correct answer comment", "incorrect_comments" => "Incorrect answer comment",
-                                           "neutral_comments" => "General Comment", "more_comments" => "even more comments"
+                                           "correct_comments" => "Correct answer comment",
+                                           "incorrect_comments" => "Incorrect answer comment",
+                                           "neutral_comments" => "General Comment",
+                                           "more_comments" => "even more comments"
                                          })
 
       run_course_copy
@@ -515,7 +518,7 @@ describe ContentMigration do
       att = Attachment.create!(filename: "first.jpg", display_name: "first.jpg", uploaded_data: StringIO.new("first"), folder: root, context: @copy_from)
       att2 = Attachment.create!(filename: "test.jpg", display_name: "test.jpg", uploaded_data: StringIO.new("second"), folder: root, context: @copy_from)
       att3 = Attachment.create!(filename: "testing.jpg", display_name: "testing.jpg", uploaded_data: StringIO.new("test this"), folder: root, context: @copy_from)
-      att4 = Attachment.create!(filename: "sub_test.jpg", display_name: "sub_test.jpg", uploaded_data: StringIO.new("sub_folder"), folder: folder, context: @copy_from)
+      att4 = Attachment.create!(filename: "sub_test.jpg", display_name: "sub_test.jpg", uploaded_data: StringIO.new("sub_folder"), folder:, context: @copy_from)
       qtext = <<~HTML.strip
         sad file ref: <img src="%s">
         File ref:<img src="/courses/%s/files/%s/download">
@@ -842,9 +845,11 @@ describe ContentMigration do
       data = { question_type: "numerical_question",
                question_text: "how many problems does QTI cause?",
                answers: [{
-                 text: "answer_text", weight: 100,
+                 text: "answer_text",
+                 weight: 100,
                  numerical_answer_type: "precision_answer",
-                 answer_approximate: 99_000_000, answer_precision: 2
+                 answer_approximate: 99_000_000,
+                 answer_precision: 2
                }] }.with_indifferent_access
       q.quiz_questions.create!(question_data: data)
 
@@ -1041,7 +1046,8 @@ describe ContentMigration do
       html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
 
       bank = @copy_from.assessment_question_banks.create!(title: "bank")
-      data = { "question_name" => "test question", "question_type" => "essay_question",
+      data = { "question_name" => "test question",
+               "question_type" => "essay_question",
                "question_text" => (html % [@copy_from.id, link_quiz.id]) }
       aq = bank.assessment_questions.create!(question_data: data)
 
@@ -1073,7 +1079,8 @@ describe ContentMigration do
       html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
 
       bank = @copy_from.assessment_question_banks.create!(title: "bank")
-      data = { "question_name" => "test question", "question_type" => "essay_question",
+      data = { "question_name" => "test question",
+               "question_type" => "essay_question",
                "question_text" => (html % [@copy_from.id, link_quiz.id]) }
       bank.assessment_questions.create!(question_data: data)
 
@@ -1103,7 +1110,8 @@ describe ContentMigration do
       bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
       text = "&lt;braaackets&gt;"
       bank1.assessment_questions.create!(question_data: {
-                                           "question_type" => "multiple_choice_question", "name" => "test question",
+                                           "question_type" => "multiple_choice_question",
+                                           "name" => "test question",
                                            "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100, "comments_html" => text },
                                                          { "id" => 2, "text" => "inorrect", "weight" => 0 }],
                                            "correct_comments_html" => text
@@ -1143,7 +1151,7 @@ describe ContentMigration do
         account.save!
         due_at = 1.hour.from_now.round
         assignment_override_model(quiz: @quiz_plain, set_type: "Noop", set_id: 1, title: "Tag 3")
-        assignment_override_model(quiz: @quiz_assigned, set_type: "Noop", set_id: 1, title: "Tag 4", due_at: due_at)
+        assignment_override_model(quiz: @quiz_assigned, set_type: "Noop", set_id: 1, title: "Tag 4", due_at:)
         run_course_copy
         to_quiz_plain = @copy_to.quizzes.where(migration_id: mig_id(@quiz_plain)).first
         to_quiz_assigned = @copy_to.quizzes.where(migration_id: mig_id(@quiz_assigned)).first
@@ -1163,16 +1171,17 @@ describe ContentMigration do
         to_quiz_plain = @copy_to.quizzes.where(migration_id: mig_id(@quiz_plain)).first
         to_quiz_assigned = @copy_to.quizzes.where(migration_id: mig_id(@quiz_assigned)).first
         expect(to_quiz_assigned.assignment_overrides.count).to eq 0
-        expect(to_quiz_assigned.only_visible_to_overrides).to eq false
+        expect(to_quiz_assigned.only_visible_to_overrides).to be false
         expect(to_quiz_plain.assignment_overrides.count).to eq 1
-        expect(to_quiz_plain.only_visible_to_overrides).to eq true
+        expect(to_quiz_plain.only_visible_to_overrides).to be true
       end
     end
 
     it "does not destroy assessment questions when copying twice" do
       bank1 = @copy_from.assessment_question_banks.create!(title: "bank")
       data = {
-        "question_type" => "multiple_choice_question", "name" => "test question",
+        "question_type" => "multiple_choice_question",
+        "name" => "test question",
         "answers" => [{ "id" => 1, "text" => "Correct", "weight" => 100 },
                       { "id" => 2, "text" => "inorrect", "weight" => 0 }],
       }
@@ -1189,7 +1198,8 @@ describe ContentMigration do
     it "does not remove outer tags with style tags from questions" do
       html = "<p style=\"text-align: center;\">This is aligned to the center</p>"
       q = @copy_from.quizzes.create!(title: "q")
-      data = { "question_name" => "test question", "question_type" => "essay_question",
+      data = { "question_name" => "test question",
+               "question_type" => "essay_question",
                "question_text" => html }
       q.quiz_questions.create!(question_data: data)
 

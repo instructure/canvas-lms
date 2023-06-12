@@ -32,7 +32,7 @@ describe Course do
       # TODO: pull this out into smaller tests... right now I'm using
       # the whole example JSON from Bracken because the formatting is
       # somewhat in flux
-      json = File.open(File.join(IMPORT_JSON_DIR, "import_from_migration.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "import_from_migration.json"))
       data = JSON.parse(json).with_indifferent_access
       data["all_files_export"] = {
         "file_path" => File.join(IMPORT_JSON_DIR, "import_from_migration_small.zip")
@@ -217,7 +217,7 @@ describe Course do
     end
 
     def setup_import(import_course, filename, migration)
-      json = File.open(File.join(IMPORT_JSON_DIR, filename)).read
+      json = File.read(File.join(IMPORT_JSON_DIR, filename))
       data = JSON.parse(json).with_indifferent_access
       Importers::CourseContentImporter.import_content(
         import_course,
@@ -299,7 +299,7 @@ describe Course do
       @course.reload
 
       expect(DueDateCacher).to receive(:recompute_course).once
-      json = File.open(File.join(IMPORT_JSON_DIR, "assignment.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "assignment.json"))
       @data = { "assignments" => JSON.parse(json) }.with_indifferent_access
       Importers::CourseContentImporter.import_content(
         @course, @data, migration.migration_settings[:migration_ids_to_import], migration
@@ -395,20 +395,20 @@ describe Course do
       it "is set to true when originally true" do
         import_data = { course: { enable_course_paces: "true" } }.with_indifferent_access
         Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
-        expect(@course.enable_course_paces).to eq true
+        expect(@course.enable_course_paces).to be true
       end
 
       it "is set to false when originally true, but with the FF off" do
         import_data = { course: { enable_course_paces: "true" } }.with_indifferent_access
         @course.root_account.disable_feature!(:course_paces)
         Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
-        expect(@course.enable_course_paces).to eq false
+        expect(@course.enable_course_paces).to be false
       end
 
       it "is set to false when originally false" do
         import_data = { course: { enable_course_paces: "false" } }.with_indifferent_access
         Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
-        expect(@course.enable_course_paces).to eq false
+        expect(@course.enable_course_paces).to be false
       end
     end
   end
@@ -416,7 +416,7 @@ describe Course do
   describe "shift_date_options" do
     it "defaults options[:time_zone] to the root account's time zone" do
       account = Account.default.sub_accounts.create!
-      course_with_teacher(account: account)
+      course_with_teacher(account:)
       @course.root_account.default_time_zone = "America/New_York"
       @course.start_at = 1.month.ago
       @course.conclude_at = 1.month.from_now
@@ -430,8 +430,10 @@ describe Course do
       course_factory
       @course.root_account.default_time_zone = Time.zone
       options = Importers::CourseContentImporter.shift_date_options(@course, {
-                                                                      old_start_date: "2014-3-2", old_end_date: "2014-4-26",
-                                                                      new_start_date: "2014-5-11", new_end_date: "2014-7-5"
+                                                                      old_start_date: "2014-3-2",
+                                                                      old_end_date: "2014-4-26",
+                                                                      new_start_date: "2014-5-11",
+                                                                      new_end_date: "2014-7-5"
                                                                     })
       unlock_at = DateTime.new(2014, 3, 23, 0, 0)
       due_at    = DateTime.new(2014, 3, 29, 23, 59)
@@ -543,7 +545,7 @@ describe Course do
     it "logs content migration in audit logs" do
       course_factory
 
-      json = File.open(File.join(IMPORT_JSON_DIR, "assessments.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "assessments.json"))
       data = JSON.parse(json).with_indifferent_access
 
       params = { "copy" => { "quizzes" => { "i7ed12d5eade40d9ee8ecb5300b8e02b2" => true } } }
@@ -567,7 +569,7 @@ describe Course do
       @module = @course.context_modules.create! name: "test"
       @module.add_item(type: "context_module_sub_header", title: "blah")
       @params = { "copy" => { "assignments" => { "1865116198002" => true } } }
-      json = File.open(File.join(IMPORT_JSON_DIR, "import_from_migration.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "import_from_migration.json"))
       @data = JSON.parse(json).with_indifferent_access
     end
 
@@ -626,7 +628,7 @@ describe Course do
         assignments: { "1865116014002" => true },
         quizzes: { "1865116160002" => true }
       } }.with_indifferent_access
-      json = File.open(File.join(IMPORT_JSON_DIR, "import_from_migration.json")).read
+      json = File.read(File.join(IMPORT_JSON_DIR, "import_from_migration.json"))
       @data = JSON.parse(json).with_indifferent_access
       @migration = @course.content_migrations.build
       @migration.migration_settings[:migration_ids_to_import] = @params
@@ -677,13 +679,52 @@ describe Course do
     expect(migration.migration_issues.count).to eq 1 # should ignore the sanitized one
     expect(migration.migration_issues.first.fix_issue_html_url).to eq "/courses/#{@course.id}/assignments/#{broken_assmt.id}"
   end
+
+  describe "metrics logging" do
+    subject { Importers::CourseContentImporter.import_content(@course, {}, {}, migration) }
+
+    before do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:timing)
+    end
+
+    before :once do
+      course_factory
+    end
+
+    let(:migration) { @course.content_migrations.create! migration_type: "atypeofmigration" }
+
+    it "logs import successes" do
+      subject
+      expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_success").once
+    end
+
+    it "logs import duration" do
+      subject
+      expect(InstStatsd::Statsd).to have_received(:timing).with("content_migrations.import_duration", anything, {
+                                                                  tags: { migration_type: "atypeofmigration" }
+                                                                }).once
+    end
+
+    it "logs import failures" do
+      allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
+      expect { subject }.to raise_error("Something went wrong at the last minute")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("content_migrations.import_failure").once
+    end
+
+    it "Does not log duration on failures" do
+      allow(Auditors::Course).to receive(:record_copied).and_raise("Something went wrong at the last minute")
+      expect { subject }.to raise_error("Something went wrong at the last minute")
+      expect(InstStatsd::Statsd).to_not have_received(:timing).with("content_migrations.import_failure")
+    end
+  end
 end
 
 def from_file_path(path, course)
   list = path.split("/").reject(&:empty?)
   filename = list.pop
   folder = Folder.assert_path(list.join("/"), course)
-  file = folder.file_attachments.build(display_name: filename, filename: filename, content_type: "text/plain")
+  file = folder.file_attachments.build(display_name: filename, filename:, content_type: "text/plain")
   file.uploaded_data = StringIO.new("fake data")
   file.context = course
   file.save!

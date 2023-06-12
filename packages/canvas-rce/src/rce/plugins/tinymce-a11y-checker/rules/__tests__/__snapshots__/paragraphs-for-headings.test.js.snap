@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`data returns the proper object 1`] = `
+Object {
+  "change": false,
+}
+`;
+
+exports[`form returns the appropriate object 1`] = `
+Array [
+  Object {
+    "checkbox": true,
+    "dataKey": "change",
+    "label": "Change heading tag to paragraph",
+  },
+]
+`;
+
+exports[`message returns the proper message 1`] = `"Headings should not contain more than 120 characters."`;
+
+exports[`why returns the proper why message 1`] = `"Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should be concise within the proper structure."`;

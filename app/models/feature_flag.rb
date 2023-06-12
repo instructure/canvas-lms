@@ -27,7 +27,7 @@ class FeatureFlag < ActiveRecord::Base
 
   belongs_to :context, polymorphic: %i[account course user]
 
-  self.ignored_columns = %i[visibility manipulate]
+  self.ignored_columns += %i[visibility manipulate]
 
   validate :valid_state, :feature_applies
   before_save :check_cache
@@ -100,7 +100,7 @@ class FeatureFlag < ActiveRecord::Base
       acting_user = @current_user || Canvas.infer_user
       prior_state = prior_flag_state(operation)
       post_state = post_flag_state(operation)
-      Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state: post_state)
+      Auditors::FeatureFlag.record(self, acting_user, prior_state, post_state:)
     end
   end
 
@@ -113,11 +113,11 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def prior_flag_state(operation)
-    operation == :create ? default_for_flag : state_in_database
+    (operation == :create) ? default_for_flag : state_in_database
   end
 
   def post_flag_state(operation)
-    operation == :destroy ? default_for_flag : state
+    (operation == :destroy) ? default_for_flag : state
   end
 
   def default_for_flag

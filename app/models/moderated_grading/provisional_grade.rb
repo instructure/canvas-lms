@@ -224,16 +224,16 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def create_provisional_grade_updated_event
-    create_audit_event(event_type: :provisional_grade_updated, payload: saved_auditable_changes.merge({ id: id }))
+    create_audit_event(event_type: :provisional_grade_updated, payload: saved_auditable_changes.merge({ id: }))
   end
 
   def create_audit_event(event_type:, payload:)
     AnonymousOrModerationEvent.create!(
       assignment: submission.assignment,
-      submission: submission,
+      submission:,
       user: @current_user,
-      event_type: event_type,
-      payload: payload
+      event_type:,
+      payload:
     )
   end
 

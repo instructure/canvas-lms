@@ -34,7 +34,7 @@ import {ConnectedIndexHeader} from './IndexHeader'
 import AnnouncementEmptyState from './AnnouncementEmptyState'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 
-import select from 'obj-select'
+import select from '@canvas/obj-select'
 import {selectPaginationState} from '@canvas/pagination/redux/actions'
 import {announcementList} from '@canvas/announcements/react/proptypes/announcement'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
@@ -130,7 +130,10 @@ export default class AnnouncementsIndex extends Component {
             <AnnouncementRow
               key={announcement.id}
               announcement={announcement}
-              canManage={announcement.permissions.delete}
+              canManage={
+                this.props.permissions.manage_course_content_edit && announcement.permissions.update
+              }
+              canDelete={this.props.permissions.manage_course_content_delete}
               masterCourseData={this.props.masterCourseData}
               onSelectedChanged={this.props.announcementSelectionChangeStart}
               onManageMenuSelect={this.onManageAnnouncement}

@@ -278,8 +278,10 @@ describe BigBlueButtonConference do
 
     it "properly serializes a response with no recordings" do
       allow(@bbb).to receive(:conference_key).and_return("12345")
-      response = { returncode: "SUCCESS", recordings: "\n  ",
-                   messageKey: "noRecordings", message: "There are no recordings for the meeting(s)." }
+      response = { returncode: "SUCCESS",
+                   recordings: "\n  ",
+                   messageKey: "noRecordings",
+                   message: "There are no recordings for the meeting(s)." }
       allow(@bbb).to receive(:send_request).and_return(response)
       expect(@bbb.recordings).to eq []
     end
@@ -307,6 +309,18 @@ describe BigBlueButtonConference do
       @bbb.recordings.each do |recording|
         recording[:playback_formats].each do |format|
           expect(format[:show_to_students]).to eq(format[:type] != "statistics")
+        end
+      end
+    end
+
+    it "includes translated type for playback format" do
+      allow(@bbb).to receive(:conference_key).and_return("12345")
+      response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
+      allow(@bbb).to receive(:send_request).and_return(response)
+      @bbb.recordings.each do |recording|
+        recording[:playback_formats].each do |format|
+          # turns video into Video, etc.
+          expect(format[:translated_type]).to eq(format[:type].upcase_first)
         end
       end
     end
@@ -349,21 +363,21 @@ describe BigBlueButtonConference do
         recording_id = nil
         allow(@bbb).to receive(:send_request)
         response = @bbb.delete_recording(recording_id)
-        expect(response[:deleted]).to eq false
+        expect(response[:deleted]).to be false
       end
 
       it "doesn't delete the recording if record_id is not found" do
         recording_id = ""
         allow(@bbb).to receive(:send_request).and_return({ returncode: "SUCCESS", deleted: "false" })
         response = @bbb.delete_recording(recording_id)
-        expect(response[:deleted]).to eq false
+        expect(response[:deleted]).to be false
       end
 
       it "does delete the recording if record_id is found" do
         recording_id = "abc123-xyz"
         allow(@bbb).to receive(:send_request).and_return({ returncode: "SUCCESS", deleted: "true" })
         response = @bbb.delete_recording(recording_id)
-        expect(response[:deleted]).to eq true
+        expect(response[:deleted]).to be true
       end
     end
 

@@ -225,7 +225,7 @@ describe AuthenticationMethods do
 
       it "sets the CSRF cookie" do
         @controller.send(:load_user)
-        expect(@controller.cookies["_csrf_token"]).not_to be nil
+        expect(@controller.cookies["_csrf_token"]).not_to be_nil
       end
     end
 
@@ -258,7 +258,7 @@ describe AuthenticationMethods do
                          host_with_port: "",
                          url: "",
                          method: "GET")
-        controller = mock_controller_class.new(request: request)
+        controller = mock_controller_class.new(request:)
         allow(controller).to receive(:api_request?).and_return(true)
         controller
       end
@@ -314,7 +314,7 @@ describe AuthenticationMethods do
                          host_with_port: "",
                          url: "",
                          method: "GET")
-        controller = mock_controller_class.new(request: request)
+        controller = mock_controller_class.new(request:)
         allow(controller).to receive(:api_request?).and_return(true)
         controller
       end
@@ -387,7 +387,7 @@ describe AuthenticationMethods do
         controller = setup_with_token(token)
         controller.params[:as_user_id] = @other_user.id
 
-        expect(controller.send(:load_user)).to eq false
+        expect(controller.send(:load_user)).to be false
         expect(controller.render_hash[:json][:errors]).to eq "Cannot change masquerade"
       end
     end
@@ -437,10 +437,10 @@ describe AuthenticationMethods do
 
   describe "#access_token_account" do
     let(:account) { Account.create! }
-    let(:dev_key) { DeveloperKey.create!(account: account) }
+    let(:dev_key) { DeveloperKey.create!(account:) }
     let(:access_token) { AccessToken.create!(developer_key: dev_key) }
     let(:request) { double(format: double(json?: false), host_with_port: "") }
-    let(:controller) { mock_controller_class.new(request: request, root_account: account) }
+    let(:controller) { mock_controller_class.new(request:, root_account: account) }
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
       expect(controller).not_to receive(:get_context)

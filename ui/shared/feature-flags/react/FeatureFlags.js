@@ -17,8 +17,8 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState} from 'react'
-import {groupBy, debounce} from 'lodash'
+import React, {useEffect, useState} from 'react'
+import {debounce, groupBy} from 'lodash'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -40,6 +40,7 @@ const SEARCH_DELAY = 350
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
   const [features, setFeatures] = useState([])
+  const [groupedFeatures, setGroupedFeatures] = useState()
   const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [stateFilter, setStateFilter] = useState('all')
@@ -54,10 +55,6 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
       per_page: 50,
     },
   })
-
-  const matchesName = name => {
-    return name.toLowerCase().includes(searchQuery.toLowerCase())
-  }
 
   const filterableStateOf = x => (x.state === 'hidden' ? 'off' : x.state)
   function matchesState(flag) {
@@ -75,19 +72,26 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     }
   }
 
-  const matchesFilters = x => matchesName(x.display_name) && matchesState(x.feature_flag)
+  const containsSearchQuery = value => value.toLowerCase().includes(searchQuery.toLowerCase())
+  const matchesFilters = feature =>
+    (containsSearchQuery(feature.feature) || containsSearchQuery(feature.display_name)) &&
+    matchesState(feature.feature_flag)
 
-  const groupedFeatures = groupBy(
-    features.filter(
-      feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat)
-    ),
-    'applies_to'
-  )
-  if (groupedFeatures.Account || groupedFeatures.RootAccount) {
-    groupedFeatures.Account = (groupedFeatures.Account || []).concat(
-      groupedFeatures.RootAccount || []
+  useEffect(() => {
+    const groupings = groupBy(
+      features.filter(
+        feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat)
+      ),
+      'applies_to'
     )
-  }
+
+    if (groupings.Account || groupings.RootAccount) {
+      groupings.Account = (groupings.Account || []).concat(groupings.RootAccount || [])
+    }
+
+    setGroupedFeatures(groupings)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hiddenFlags, disableDefaults, features, searchQuery, stateFilter])
 
   const categories = [
     {
@@ -159,7 +163,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
             <Flex.Item padding="small">
               <TextInput
                 renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
-                placeholder={I18n.t('Search')}
+                placeholder={I18n.t('Search by name or id')}
                 type="search"
                 value={searchInput}
                 onChange={acceptSearchInput}
@@ -175,7 +179,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
           </Flex>
 
           {categories.map(cat => {
-            if (!groupedFeatures[cat.id]?.length) {
+            if (!groupedFeatures?.[cat.id]?.length) {
               return null
             }
             return (

@@ -63,7 +63,7 @@ module Types
     field :send_observed_names_in_notifications, Boolean, null: true
     def send_observed_names_in_notifications
       user = object[:user]
-      user.observer_enrollments.any? || user.as_observer_observation_links.any? ? user.send_observed_names_in_notifications? : nil
+      (user.observer_enrollments.any? || user.as_observer_observation_links.any?) ? user.send_observed_names_in_notifications? : nil
     end
 
     field :read_privacy_notice_date, String, null: true

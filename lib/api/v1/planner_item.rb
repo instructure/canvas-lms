@@ -31,9 +31,22 @@ module Api::V1::PlannerItem
   include Api::V1::AssessmentRequest
   include PlannerApiHelper
 
-  API_PLANNABLE_FIELDS = %i[id title course_id location_name todo_date details url unread_count
-                            read_state created_at updated_at].freeze
-  CALENDAR_PLANNABLE_FIELDS = %i[all_day location_address description start_at end_at
+  API_PLANNABLE_FIELDS = %i[id
+                            title
+                            course_id
+                            location_name
+                            todo_date
+                            details
+                            url
+                            unread_count
+                            read_state
+                            created_at
+                            updated_at].freeze
+  CALENDAR_PLANNABLE_FIELDS = %i[all_day
+                                 location_address
+                                 description
+                                 start_at
+                                 end_at
                                  online_meeting_url].freeze
   GRADABLE_FIELDS = %i[assignment_id points_possible due_at].freeze
   PLANNER_NOTE_FIELDS = [:user_id].freeze
@@ -77,12 +90,12 @@ module Api::V1::PlannerItem
         ann_hash.delete("todo_date")
         unread_count, read_state = topics_status_for(user, item.id, opts[:topics_status])[item.id]
         hash[:plannable_date] = item.posted_at || item.created_at
-        hash[:plannable] = plannable_json({ unread_count: unread_count, read_state: read_state }.merge(ann_hash))
+        hash[:plannable] = plannable_json({ unread_count:, read_state: }.merge(ann_hash))
         hash[:html_url] = named_context_url(item.context, :context_discussion_topic_url, item.id)
       elsif item.is_a?(DiscussionTopic) || (item.respond_to?(:discussion_topic?) && item.discussion_topic?)
         topic = item.is_a?(DiscussionTopic) ? item : item.discussion_topic
         unread_count, read_state = topics_status_for(user, topic.id, opts[:topics_status])[topic.id]
-        unread_attributes = { unread_count: unread_count, read_state: read_state }
+        unread_attributes = { unread_count:, read_state: }
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
         hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(topic.class_name)
@@ -104,6 +117,9 @@ module Api::V1::PlannerItem
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = assignment_html_url(item, user, hash[:submissions])
       end
+      if item.respond_to?(:restrict_quantitative_data?) && item.restrict_quantitative_data?(@current_user)
+        hash[:plannable][:restrict_quantitative_data] = true
+      end
     end.tap do |hash|
       if (context = item.try(:context) || item.try(:course))
         hash[:context_name] = context.try(:nickname_for, @user) || context.name
@@ -123,7 +139,7 @@ module Api::V1::PlannerItem
       end
     end
 
-    ActiveRecord::Associations.preload(preload_items, :planner_overrides, ::PlannerOverride.where(user: user))
+    ActiveRecord::Associations.preload(preload_items, :planner_overrides, ::PlannerOverride.where(user:))
     events, other_items = preload_items.partition { |i| i.is_a?(::CalendarEvent) }
     ActiveRecord::Associations.preload(events, :context) if events.any?
     assessment_requests, plannable_items = other_items.partition { |i| i.is_a?(::AssessmentRequest) }
@@ -136,7 +152,7 @@ module Api::V1::PlannerItem
     topics_status = topics_status_for(user, discussions.map(&:id))
 
     items.map do |item|
-      planner_item_json(item, user, session, opts.merge(submission_statuses: ss, topics_status: topics_status))
+      planner_item_json(item, user, session, opts.merge(submission_statuses: ss, topics_status:))
     end
   end
 
@@ -161,7 +177,7 @@ module Api::V1::PlannerItem
   end
 
   def submission_statuses(assignments, user)
-    subs = Submission.where(assignment: assignments, user: user)
+    subs = Submission.where(assignment: assignments, user:)
                      .preload([:content_participations, visible_submission_comments: :author])
     subs_hash = subs.index_by(&:assignment_id)
     subs_data_hash = {}

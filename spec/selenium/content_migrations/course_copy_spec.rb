@@ -45,7 +45,7 @@ describe "course copy" do
     @course.save!
     get "/courses/#{@course.id}/copy"
     expect_new_page_load { f('button[type="submit"]').click }
-    expect(f("div.progressStatus").text.include?("Queued")).to eq(true)
+    expect(f("div.progressStatus").text.include?("Queued")).to be(true)
     run_jobs
     wait_for_ajaximations
     wait_for_migration_to_complete
@@ -55,6 +55,16 @@ describe "course copy" do
     expect(@new_course.tab_configuration).to eq @course.tab_configuration
     expect(@new_course.default_view).to eq @course.default_view
     expect(@new_course.wiki_pages.count).to eq 1
+  end
+
+  it "finished calculating course dates for access before redirect" do
+    course_with_teacher_logged_in
+    @course.root_account.update!(settings: { teachers_can_create_courses: true })
+    past_term_id = EnrollmentTerm.create(end_at: 1.day.ago, root_account: @teacher.account).id
+    @course.update! enrollment_term_id: past_term_id, conclude_at: 5.days.from_now, restrict_enrollments_to_course_dates: true
+    get "/courses/#{@course.id}/copy"
+    expect_new_page_load { f('button[type="submit"]').click }
+    expect(f("body")).not_to contain_css("#unauthorized_message")
   end
 
   it "sets the course name and code correctly" do
@@ -96,8 +106,10 @@ describe "course copy" do
     expect(opts["shift_dates"]).to eq "1"
     expect(opts["day_substitutions"]).to eq({ "1" => "2" })
     expected = {
-      "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-      "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+      "old_start_date" => "Jul 1, 2012",
+      "old_end_date" => "Jul 11, 2012",
+      "new_start_date" => "Aug 5, 2012",
+      "new_end_date" => "Aug 15, 2012"
     }
     expected.each do |k, v|
       expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
@@ -170,7 +182,7 @@ describe "course copy" do
 
     # this test requires jobs to run in the middle of it and course_copys
     # need to check a lot of things, a longer timeout is reasonable.
-    it "shifts the dates a week later", priority: "2", custom_timeout: 30 do
+    it "shifts the dates a week later", custom_timeout: 30, priority: "2" do
       event = @course.calendar_events.create! title: "Monday Event", start_at: @date_to_use
 
       get "/courses/#{@course.id}/copy"

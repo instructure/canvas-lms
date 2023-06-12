@@ -38,7 +38,7 @@ describe Types::AssessmentRequestType do
 
   it "requires permission" do
     user2 = User.create!
-    expect(submission_type.resolve("assignedAssessments { _id }", current_user: user2)).to eq nil
+    expect(submission_type.resolve("assignedAssessments { _id }", current_user: user2)).to be_nil
   end
 
   it "works for workflowState" do
@@ -53,6 +53,10 @@ describe Types::AssessmentRequestType do
     expect(submission_type.resolve("assignedAssessments { assetSubmissionType }").first).to eq @submission.submission_type
   end
 
+  it "works for asset_id" do
+    expect(submission_type.resolve("assignedAssessments { assetId }").first).to eq @assessment_request.asset_id.to_s
+  end
+
   describe "with anonymous peer review disabled" do
     it "works for user" do
       expect(submission_type.resolve("assignedAssessments { user { _id } }").first).to eq @assessment_request.user.id.to_s
@@ -63,7 +67,7 @@ describe Types::AssessmentRequestType do
     end
 
     it "anonymousId should be null" do
-      expect(submission_type.resolve("assignedAssessments { anonymousId }").first).to eq nil
+      expect(submission_type.resolve("assignedAssessments { anonymousId }").first).to be_nil
     end
   end
 
@@ -75,7 +79,7 @@ describe Types::AssessmentRequestType do
     end
 
     it "anonymizedUser should be null" do
-      expect(submission_type.resolve("assignedAssessments { anonymizedUser { _id } }").first).to eq nil
+      expect(submission_type.resolve("assignedAssessments { anonymizedUser { _id } }").first).to be_nil
     end
 
     it "anonymousId should match the anonymous id of the asset" do

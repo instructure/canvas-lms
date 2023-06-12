@@ -44,7 +44,7 @@ describe "Account Notification API", type: :request do
       second_announcement
       json = api_call(:get, @path, @api_params)
       expect(json.length).to eq 2
-      expect(json.map { |r| r["message"] }).to match_array(%w[default second])
+      expect(json.pluck("message")).to match_array(%w[default second])
     end
 
     it "still works on the old endpoint" do
@@ -55,18 +55,22 @@ describe "Account Notification API", type: :request do
                         user_id: @admin.id.to_s,
                         account_id: @admin.account.id.to_s
                       })
-      expect(json.map { |r| r["message"] }).to eq %w[default]
+      expect(json.pluck("message")).to eq %w[default]
     end
 
     it "catches a user_id mismatch on the old endpoint" do
       other_user = User.create!
-      api_call(:get, "/api/v1/accounts/#{@admin.account.id}/users/#{other_user.id}/account_notifications", {
+      api_call(:get,
+               "/api/v1/accounts/#{@admin.account.id}/users/#{other_user.id}/account_notifications",
+               {
                  controller: "account_notifications",
                  action: "user_index_deprecated",
                  format: "json",
                  user_id: other_user.id.to_s,
                  account_id: @admin.account.id.to_s
-               }, {}, { expected_status: 404 })
+               },
+               {},
+               { expected_status: 404 })
     end
 
     it "includes dismissed past announcements" do
@@ -147,7 +151,9 @@ describe "Account Notification API", type: :request do
     end
 
     it "creates an account notification" do
-      json = api_call(:post, @path, @api_params,
+      json = api_call(:post,
+                      @path,
+                      @api_params,
                       { account_notification: {
                         subject: "New global notification",
                         start_at: @start_at.iso8601,
@@ -164,7 +170,9 @@ describe "Account Notification API", type: :request do
     end
 
     it "defaults icon to warning" do
-      json = api_call(:post, @path, @api_params,
+      json = api_call(:post,
+                      @path,
+                      @api_params,
                       { account_notification: {
                         subject: "New global notification",
                         start_at: @start_at.iso8601,
@@ -176,7 +184,9 @@ describe "Account Notification API", type: :request do
     end
 
     it "creates an account notification for specific roles using the old role names" do
-      json = api_call(:post, @path, @api_params,
+      json = api_call(:post,
+                      @path,
+                      @api_params,
                       { account_notification_roles: ["AccountAdmin"],
                         account_notification: {
                           subject: "New global notification",
@@ -194,7 +204,9 @@ describe "Account Notification API", type: :request do
     end
 
     it "creates an account notification for specific roles using role ids" do
-      json = api_call(:post, @path, @api_params,
+      json = api_call(:post,
+                      @path,
+                      @api_params,
                       { account_notification_roles: [admin_role.id],
                         account_notification: {
                           subject: "New global notification",
@@ -212,7 +224,9 @@ describe "Account Notification API", type: :request do
     end
 
     it "creates an account notification for specific course-level roles using role ids" do
-      json = api_call(:post, @path, @api_params,
+      json = api_call(:post,
+                      @path,
+                      @api_params,
                       { account_notification_roles: [student_role.id],
                         account_notification: {
                           subject: "New global notification",
@@ -230,7 +244,9 @@ describe "Account Notification API", type: :request do
     end
 
     it 'creates an account notification for the "nil enrollment"' do
-      json = api_call(:post, @path, @api_params,
+      json = api_call(:post,
+                      @path,
+                      @api_params,
                       { account_notification_roles: ["NilEnrollment"],
                         account_notification: {
                           subject: "New global notification",
@@ -242,14 +258,17 @@ describe "Account Notification API", type: :request do
       notification = AccountNotification.last
       roles = notification.account_notification_roles
       expect(roles.count).to eq 1
-      expect(roles.first.role_id).to eq nil
+      expect(roles.first.role_id).to be_nil
       expect(json["roles"]).to eq ["NilEnrollment"]
       expect(json["role_ids"]).to eq [nil]
     end
 
     it "returns not authorized for non admin user" do
       user = user_with_managed_pseudonym
-      api_call_as_user(user, :post, @path, @api_params,
+      api_call_as_user(user,
+                       :post,
+                       @path,
+                       @api_params,
                        { account_notification_roles: ["StudentEnrollment"],
                          account_notification: {
                            subject: "New global notification",
@@ -264,14 +283,16 @@ describe "Account Notification API", type: :request do
     it "returns an error for missing required params" do
       missing = %w[subject message start_at end_at]
       raw_api_call(:post, @path, @api_params, { account_notification: { icon: "warning" } })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
       json = JSON.parse(response.body)
       errors = json["errors"].keys
       expect(missing - errors).to be_blank
     end
 
     it "returns an error for malformed dates" do
-      raw_api_call(:post, @path, @api_params,
+      raw_api_call(:post,
+                   @path,
+                   @api_params,
                    { account_notification: {
                      subject: "New global notification",
                      start_at: "asdrsldkfj",
@@ -279,11 +300,13 @@ describe "Account Notification API", type: :request do
                      message: "This is a notification",
                      icon: "information"
                    } })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
     end
 
     it "does not allow an end date to be before a start date" do
-      raw_api_call(:post, @path, @api_params,
+      raw_api_call(:post,
+                   @path,
+                   @api_params,
                    { account_notification: {
                      subject: "New global notification",
                      start_at: @end_at.iso8601,
@@ -291,7 +314,7 @@ describe "Account Notification API", type: :request do
                      message: "This is a notification",
                      icon: "information"
                    } })
-      expect(response.code).to eql "400"
+      expect(response).to have_http_status :bad_request
       errors = JSON.parse(response.body)
       expect(errors["errors"].keys).to include "end_at"
     end
@@ -307,12 +330,15 @@ describe "Account Notification API", type: :request do
                       account_id: @admin.account.id.to_s,
                       id: @notification.id.to_s }
       @start_at = Time.zone.now
-      @end_at = Time.zone.now + 1.day
+      @end_at = 1.day.from_now
     end
 
     it "returns not authorized for non admin user" do
       user = user_with_managed_pseudonym
-      api_call_as_user(user, :put, @path, @api_params,
+      api_call_as_user(user,
+                       :put,
+                       @path,
+                       @api_params,
                        { account_notification_roles: ["StudentEnrollment"],
                          account_notification: {
                            subject: "update a global notification",
@@ -325,7 +351,9 @@ describe "Account Notification API", type: :request do
     end
 
     it "updates an existing account notification" do
-      raw_api_call(:put, @path, @api_params,
+      raw_api_call(:put,
+                   @path,
+                   @api_params,
                    { account_notification: {
                      subject: "updated global notification",
                      start_at: @start_at.iso8601,
@@ -346,7 +374,9 @@ describe "Account Notification API", type: :request do
       existing_roles = [student_role]
       @notification.account_notification_roles.build(existing_roles.map { |r| { role: r } })
       @notification.save
-      raw_api_call(:put, @path, @api_params,
+      raw_api_call(:put,
+                   @path,
+                   @api_params,
                    { account_notification_roles: ["TeacherEnrollment"],
                      account_notification: {
                        subject: "added role to global notification",

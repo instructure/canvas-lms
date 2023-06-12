@@ -72,19 +72,21 @@ module MicrosoftSync
       @user_infos[user_id].aad_id = aad_id
     end
 
-    def additions_in_slices_of(slice_size, &blk)
+    def additions_in_slices_of(slice_size, &)
       MembershipDiff.in_slices_of(
         aads_with_action(:add_owner),
         aads_with_action(:add_member),
-        slice_size, &blk
+        slice_size,
+        &
       )
     end
 
-    def removals_in_slices_of(slice_size, &blk)
+    def removals_in_slices_of(slice_size, &)
       MembershipDiff.in_slices_of(
         aads_with_action(:remove_owner),
         aads_with_action(:remove_member),
-        slice_size, &blk
+        slice_size,
+        &
       )
     end
 

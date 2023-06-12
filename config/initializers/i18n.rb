@@ -31,7 +31,7 @@ module CanvasI18nFallbacks
     ((?:-[a-wy-z](?:-[a-z0-9]{2,8})*)*)        # optional extensions
     (-x(?:-[a-z0-9]{1,8})+)*                   # optional private use
     $
-  /ix.freeze
+  /ix
 
   # This fallback order is more intelligent than simply lopping off
   # elements from the end. For instance, in Canvas we use the private
@@ -91,24 +91,20 @@ module I18n
 end
 # rubocop:enable Style/OptionalBooleanParameter
 
-module DontTrustI18nPluralizations
-  def pluralize(locale, entry, count)
-    super
-  rescue I18n::InvalidPluralizationData => e
-    Rails.logger.error("#{e.message} in locale #{locale.inspect}")
-    ""
-  end
-end
-
 Rails.configuration.to_prepare do
   Rails.application.config.i18n.enforce_available_locales = true
   Rails.application.config.i18n.fallbacks = true
 
-  I18n.backend = LazyPresumptuousI18nBackend.new(
-    meta_keys: %w[aliases crowdsourced custom locales],
-    logger: Rails.logger.method(:debug)
+  # create a unique backend class with the behaviors we want
+  backend_class = Class.new(I18n::Backend::MetaLazyLoadable)
+  backend_class.prepend(I18n::Backend::DontTrustPluralizations)
+  backend_class.include(I18n::Backend::CSV)
+  backend_class.include(I18n::Backend::Fallbacks)
+
+  I18n.backend = backend_class.new(
+    meta_keys: %w[aliases community crowdsourced custom locales],
+    lazy_load: !Rails.application.config.eager_load
   )
-  LazyPresumptuousI18nBackend.prepend(DontTrustI18nPluralizations)
 end
 
 module FormatInterpolatedNumbers
@@ -230,28 +226,28 @@ module NumberLocalizer
         strip_insignificant_zeros = true
       end
       return ActiveSupport::NumberHelper.number_to_percentage(number,
-                                                              precision: precision,
-                                                              strip_insignificant_zeros: strip_insignificant_zeros)
+                                                              precision:,
+                                                              strip_insignificant_zeros:)
     end
 
     if precision.nil?
       return ActiveSupport::NumberHelper.number_to_delimited(number)
     end
 
-    ActiveSupport::NumberHelper.number_to_rounded(number, precision: precision)
+    ActiveSupport::NumberHelper.number_to_rounded(number, precision:)
   end
 
   def form_proper_noun_singular_genitive(noun)
     if I18n.locale.to_s.start_with?("de") && %(s ß x z).include?(noun.last)
       "#{noun}'"
     else
-      I18n.t("#proper_noun_singular_genitive", "%{noun}'s", noun: noun)
+      I18n.t("#proper_noun_singular_genitive", "%{noun}'s", noun:)
     end
   end
 end
 I18n.singleton_class.include(NumberLocalizer)
 
-I18n.send(:extend, Module.new do
+I18n.extend(Module.new do
   attr_accessor :localizer
 
   # Public: If a localizer has been set, use it to set the locale and then

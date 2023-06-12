@@ -55,7 +55,7 @@ module AccountReports
             }
           },
           "mgp_grade_export_csv" => {
-            title: proc { I18n.t("MGP Grade Export") },
+            title: proc { I18n.t("Multiple Grading Periods Grade Export") },
             description_partial: true,
             parameters_partial: true,
             parameters: {
@@ -379,6 +379,12 @@ module AccountReports
                 description: "Include deleted objects"
               }
             }
+          },
+          "developer_key_report_csv" => {
+            title: proc { I18n.t("Developer Keys Report") },
+            parameters_partial: false,
+            description_partial: true,
+            parameters: {}
           }
         }
       end

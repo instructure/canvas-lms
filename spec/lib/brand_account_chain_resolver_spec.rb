@@ -24,7 +24,7 @@ describe BrandAccountChainResolver do
 
   context "with no associated accounts" do
     it "returns an empty chain" do
-      expect(subject(Account.create!(name: "A"))).to eql(nil)
+      expect(subject(Account.create!(name: "A"))).to be_nil
     end
   end
 
@@ -50,7 +50,7 @@ describe BrandAccountChainResolver do
       user.user_account_associations.create!(account: a, depth: 0)
 
       expect(subject(a).try(&:name)).to eql("A")
-      expect(subject(b).try(&:name)).to eql(nil)
+      expect(subject(b).try(&:name)).to be_nil
     end
   end
 
@@ -380,7 +380,7 @@ describe BrandAccountChainResolver do
 
   def subject(account)
     described_class.new(
-      user: user,
+      user:,
       root_account: account
     ).resolve
   end
@@ -389,7 +389,7 @@ describe BrandAccountChainResolver do
     accounts_and_parents.each_with_object({}) do |(name, parent, *opts), acc|
       opts = opts.first || {}
       acc[name] = Account.create!(
-        name: name,
+        name:,
         parent_account: parent ? acc.fetch(parent) : nil
       )
 
@@ -401,7 +401,7 @@ describe BrandAccountChainResolver do
       next unless opts[:enroll] == true
 
       course_with_student(
-        user: user,
+        user:,
         account: acc[name],
         active_all: true
       )

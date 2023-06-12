@@ -145,12 +145,18 @@ describe EpubExportsController do
 
       it "does not create one epub_export" do
         expect do
-          api_call_as_user(@student, :post, url, {
+          api_call_as_user(@student,
+                           :post,
+                           url,
+                           {
                              action: :create,
                              controller: :epub_exports,
                              course_id: @course.id,
                              format: "json"
-                           }, {}, {}, {
+                           },
+                           {},
+                           {},
+                           {
                              expected_status: 422
                            })
         end.not_to change { EpubExport.count }
@@ -167,7 +173,7 @@ describe EpubExportsController do
       account = Account.default
       account.disable_feature!(:epub_export)
       get :index
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
     end
 
     it "returns 404 with the feature enabled and offline web enabled" do
@@ -176,7 +182,7 @@ describe EpubExportsController do
       account.settings[:enable_offline_web_export] = true
       account.save!
       get :index
-      expect(response.code).to eq "404"
+      expect(response).to have_http_status :not_found
     end
   end
 end

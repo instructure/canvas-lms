@@ -54,7 +54,7 @@ describe ModeratedGrading::Selection do
       assignment = course.assignments.create!(moderated_grading: true, grader_count: 2)
       assignment.grade_student(student, grader: @teacher, provisional: true, score: 10)
       @provisional_grade = assignment.provisional_grades.find_by(scorer: @teacher)
-      @selection = assignment.moderated_grading_selections.find_by(student: student)
+      @selection = assignment.moderated_grading_selections.find_by(student:)
     end
 
     it "raises an error if there is no selected provisional grade" do

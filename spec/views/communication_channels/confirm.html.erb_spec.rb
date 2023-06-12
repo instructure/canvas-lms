@@ -204,7 +204,7 @@ describe "communication_channels/confirm" do
 
     it "renders to merge with the current user that doesn't have a pseudonym in the default account" do
       account = Account.create!
-      user_with_pseudonym(active_all: 1, account: account)
+      user_with_pseudonym(active_all: 1, account:)
       assign(:current_user, @user)
       assign(:merge_opportunities, [[@user, [@pseudonym]]])
       render

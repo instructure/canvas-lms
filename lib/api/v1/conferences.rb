@@ -21,10 +21,23 @@
 module Api::V1::Conferences
   API_CONFERENCE_JSON_OPTS = {
     only: %w[
-      id title conference_type description
-      duration ended_at started_at user_ids long_running
-      recordings join_url has_advanced_settings conference_key
-      context_type context_id start_at end_at
+      id
+      title
+      conference_type
+      description
+      duration
+      ended_at
+      started_at
+      user_ids
+      long_running
+      recordings
+      join_url
+      has_advanced_settings
+      conference_key
+      context_type
+      context_id
+      start_at
+      end_at
     ].freeze
   }.freeze
 
@@ -48,8 +61,8 @@ module Api::V1::Conferences
     cs = conferences.map do |c|
       c.as_json(
         permissions: {
-          user: user,
-          session: session,
+          user:,
+          session:,
         },
         url: named_context_url(context, :context_conference_url, c)
       )
@@ -70,8 +83,8 @@ module Api::V1::Conferences
 
     conference.as_json(
       permissions: {
-        user: user,
-        session: session,
+        user:,
+        session:,
       },
       url: named_context_url(context, :context_conferences_url)
     )

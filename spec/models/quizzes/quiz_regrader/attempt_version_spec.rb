@@ -57,8 +57,8 @@ describe Quizzes::QuizRegrader::AttemptVersion do
   end
 
   let(:attempt_version) do
-    Quizzes::QuizRegrader::AttemptVersion.new(version: version,
-                                              question_regrades: question_regrades)
+    Quizzes::QuizRegrader::AttemptVersion.new(version:,
+                                              question_regrades:)
   end
 
   describe "#initialize" do

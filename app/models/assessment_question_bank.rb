@@ -129,7 +129,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
         matching_outcome = outcomes.detect { |outcome| outcome.id == outcome_id.to_i }
         next unless matching_outcome
 
-        matching_outcome.align(self, context, mastery_score: mastery_score)
+        matching_outcome.align(self, context, mastery_score:)
       end
     end
   end
@@ -142,7 +142,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   def bookmark_for(user, do_bookmark = true)
     if do_bookmark
-      assessment_question_bank_users.where(user: user).first_or_create!
+      assessment_question_bank_users.where(user:).first_or_create!
     else
       AssessmentQuestionBankUser.where(user_id: user, assessment_question_bank_id: self).delete_all
     end

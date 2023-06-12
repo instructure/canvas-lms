@@ -8,17 +8,9 @@
 # this file is here to facilitate running it.
 #
 
-require "bundler/inline"
+ENV["BUNDLE_GEMFILE"] = File.expand_path("../Gemfile.d/rubocop.rb", __dir__)
 
-Dir.chdir(File.expand_path("..", __dir__)) do
-  # be tricksy and use a tiny subset of the gemfile so that
-  # it will be very quick
-  gemfile do
-    source 'https://rubygems.org/'
-
-    gemfile = File.expand_path("../Gemfile.d/rubocop.rb", __dir__)
-    eval(File.read(gemfile))
-  end
-end
+require "rubygems"
+require "bundler/setup"
 
 load Gem.bin_path("rubocop", "rubocop")

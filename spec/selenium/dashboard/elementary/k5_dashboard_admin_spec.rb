@@ -41,8 +41,7 @@ describe "admin k5 dashboard" do
   context "homeroom dashboard standard" do
     it "provides the homeroom dashboard tabs on dashboard" do
       get "/"
-
-      expect(retrieve_welcome_text).to match(/Welcome,/)
+      expect(welcome_title).to be_present
       expect(homeroom_tab).to be_displayed
       expect(schedule_tab).to be_displayed
       expect(grades_tab).to be_displayed
@@ -110,7 +109,7 @@ describe "admin k5 dashboard" do
       expect(latest_course.name).not_to eq(course_name)
     end
 
-    it "creates course with account name and course name", ignore_js_errors: true, custom_timeout: 30 do
+    it "creates course with account name and course name", custom_timeout: 30, ignore_js_errors: true do
       get "/"
 
       click_new_course_button
@@ -129,7 +128,7 @@ describe "admin k5 dashboard" do
       expect(driver.current_url).to include("/courses/#{latest_course.id}/settings")
     end
 
-    it "allows for sync of course to selected homeroom", ignore_js_errors: true, custom_timeout: 30 do
+    it "allows for sync of course to selected homeroom", custom_timeout: 30, ignore_js_errors: true do
       second_homeroom_course_name = "Second homeroom course"
 
       course_with_teacher(

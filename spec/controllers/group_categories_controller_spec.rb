@@ -59,9 +59,9 @@ describe GroupCategoriesController do
       expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       groups = assigns[:group_category].groups
-      expect(groups.length).to eql(2)
-      expect(groups[0].users.length).to eql(3)
-      expect(groups[1].users.length).to eql(3)
+      expect(groups.length).to be(2)
+      expect(groups[0].users.length).to be(3)
+      expect(groups[1].users.length).to be(3)
     end
 
     it "gives the new groups the right group_category" do
@@ -247,10 +247,10 @@ describe GroupCategoriesController do
       delete "destroy", params: { course_id: @course.id, id: category1.id }
       expect(response).to be_successful
       @course.reload
-      expect(@course.all_group_categories.length).to eql(2)
-      expect(@course.group_categories.length).to eql(1)
-      expect(@course.groups.length).to eql(2)
-      expect(@course.groups.active.length).to eql(1)
+      expect(@course.all_group_categories.length).to be(2)
+      expect(@course.group_categories.length).to be(1)
+      expect(@course.groups.length).to be(2)
+      expect(@course.groups.active.length).to be(1)
     end
 
     it "deletes the category and groups (granular permissions)" do
@@ -263,10 +263,10 @@ describe GroupCategoriesController do
       delete "destroy", params: { course_id: @course.id, id: category1.id }
       expect(response).to be_successful
       @course.reload
-      expect(@course.all_group_categories.length).to eql(2)
-      expect(@course.group_categories.length).to eql(1)
-      expect(@course.groups.length).to eql(2)
-      expect(@course.groups.active.length).to eql(1)
+      expect(@course.all_group_categories.length).to be(2)
+      expect(@course.group_categories.length).to be(1)
+      expect(@course.groups.length).to be(2)
+      expect(@course.groups.active.length).to be(1)
     end
 
     it "does not delete the category/groups if :manage_groups_delete is not enabled (granular permissions)" do
@@ -315,7 +315,7 @@ describe GroupCategoriesController do
     it "includes group submissions if param is present" do
       user_session(@teacher)
       get "users", params: { course_id: @course.id, group_category_id: @category.id, include: ["group_submissions"] }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
 
       expect(response).to be_successful
       expect(json.count).to be_equal 1
@@ -325,7 +325,7 @@ describe GroupCategoriesController do
     it "does not include group submissions if param is absent" do
       user_session(@teacher)
       get "users", params: { course_id: @course.id, group_category_id: @category.id }
-      json = JSON.parse(response.body)
+      json = response.parsed_body
 
       expect(response).to be_successful
       expect(json.count).to be_equal 1
@@ -358,7 +358,7 @@ describe GroupCategoriesController do
         attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
       expect(json["context_type"]).to eq "GroupCategory"
       expect(json["tag"]).to eq "course_group_import"
       expect(json["completion"]).to eq 0
@@ -373,7 +373,7 @@ describe GroupCategoriesController do
         attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       expect(response).to be_successful
-      json = JSON.parse(response.body)
+      json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
       expect(json["context_type"]).to eq "GroupCategory"
       expect(json["tag"]).to eq "course_group_import"
       expect(json["completion"]).to eq 0

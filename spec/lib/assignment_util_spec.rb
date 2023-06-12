@@ -43,49 +43,49 @@ describe AssignmentUtil do
   describe "due_date_required?" do
     it "returns true when all 4 are set to true" do
       due_date_required_helper(assignment, true, true, true, true)
-      expect(described_class.due_date_required?(assignment)).to eq(true)
+      expect(described_class.due_date_required?(assignment)).to be(true)
     end
 
     it "returns false when post_to_sis is false" do
       due_date_required_helper(assignment, false, true, true, true)
-      expect(described_class.due_date_required?(assignment)).to eq(false)
+      expect(described_class.due_date_required?(assignment)).to be(false)
     end
 
     it "returns false when sis_require_assignment_due_date is false" do
       due_date_required_helper(assignment, true, false, true, true)
-      expect(described_class.due_date_required?(assignment)).to eq(false)
+      expect(described_class.due_date_required?(assignment)).to be(false)
     end
 
     it "returns false when sis_syncing is false" do
       due_date_required_helper(assignment, true, true, false, true)
-      expect(described_class.due_date_required?(assignment)).to eq(false)
+      expect(described_class.due_date_required?(assignment)).to be(false)
     end
 
     it "returns false when new_sis_integrations is false" do
       due_date_required_helper(assignment, true, true, true, false)
-      expect(described_class.due_date_required?(assignment)).to eq(false)
+      expect(described_class.due_date_required?(assignment)).to be(false)
     end
   end
 
   describe "due_date_required_for_account?" do
     it "returns true when all 3 are set to true" do
       account_stub_helper(assignment, true, true, true)
-      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(true)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to be(true)
     end
 
     it "returns false when sis_require_assignment_due_date is false" do
       account_stub_helper(assignment, false, true, true)
-      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to be(false)
     end
 
     it "returns false when sis_syncing is false" do
       account_stub_helper(assignment, true, false, true)
-      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to be(false)
     end
 
     it "returns false when new_sis_integrations is false" do
       account_stub_helper(assignment, true, true, false)
-      expect(described_class.due_date_required_for_account?(assignment.context)).to eq(false)
+      expect(described_class.due_date_required_for_account?(assignment.context)).to be(false)
     end
   end
 
@@ -111,44 +111,44 @@ describe AssignmentUtil do
     it "returns false when due_at is blank and due_date_required? is true" do
       assignment.due_at = nil
       allow(described_class).to receive(:due_date_required?).with(assignment).and_return(true)
-      expect(described_class.due_date_ok?(assignment)).to eq(false)
+      expect(described_class.due_date_ok?(assignment)).to be(false)
     end
 
     it "returns true when due_at is blank, due_date_required? is true and grading_type is not_graded" do
       assignment.due_at = nil
       assignment.grading_type = "not_graded"
       allow(described_class).to receive(:due_date_required?).with(assignment).and_return(true)
-      expect(described_class.due_date_ok?(assignment)).to eq(true)
+      expect(described_class.due_date_ok?(assignment)).to be(true)
     end
 
     it "returns true when due_at is present and due_date_required? is true" do
       assignment.due_at = Time.zone.now
       allow(described_class).to receive(:due_date_required?).with(assignment).and_return(true)
-      expect(described_class.due_date_ok?(assignment)).to eq(true)
+      expect(described_class.due_date_ok?(assignment)).to be(true)
     end
 
     it "returns true when due_at is present and due_date_required? is false" do
       assignment.due_at = Time.zone.now
       allow(described_class).to receive(:due_date_required?).with(assignment).and_return(false)
-      expect(described_class.due_date_ok?(assignment)).to eq(true)
+      expect(described_class.due_date_ok?(assignment)).to be(true)
     end
 
     it "returns true when due_at is not present and due_date_required? is false" do
       assignment.due_at = nil
       allow(described_class).to receive(:due_date_required?).with(assignment).and_return(false)
-      expect(described_class.due_date_ok?(assignment)).to eq(true)
+      expect(described_class.due_date_ok?(assignment)).to be(true)
     end
   end
 
   describe "sis_integration_settings_enabled?" do
     it "returns true when new_sis_integrations fetaure enabled" do
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to eq(true)
+      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to be(true)
     end
 
     it "returns false when new_sis_integrations fetaure enabled" do
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(false)
-      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to eq(false)
+      expect(described_class.sis_integration_settings_enabled?(assignment.context)).to be(false)
     end
   end
 
@@ -158,7 +158,7 @@ describe AssignmentUtil do
       allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
       allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      expect(described_class.assignment_name_length_required?(assignment)).to eq(true)
+      expect(described_class.assignment_name_length_required?(assignment)).to be(true)
     end
 
     it "returns false when sis_sycning is set to false" do
@@ -166,7 +166,7 @@ describe AssignmentUtil do
       allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: false })
       allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+      expect(described_class.assignment_name_length_required?(assignment)).to be(false)
     end
 
     it "returns false when post_to_sis is false" do
@@ -174,7 +174,7 @@ describe AssignmentUtil do
       allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
       allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+      expect(described_class.assignment_name_length_required?(assignment)).to be(false)
     end
 
     it "returns false when sis_assignment_name_length is false" do
@@ -182,7 +182,7 @@ describe AssignmentUtil do
       allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: false })
       allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: false })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+      expect(described_class.assignment_name_length_required?(assignment)).to be(false)
     end
 
     it "returns false when new_sis_integrations is false" do
@@ -190,7 +190,7 @@ describe AssignmentUtil do
       allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: false })
       allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(false)
-      expect(described_class.assignment_name_length_required?(assignment)).to eq(false)
+      expect(described_class.assignment_name_length_required?(assignment)).to be(false)
     end
   end
 
@@ -202,7 +202,7 @@ describe AssignmentUtil do
     end
 
     it "alerts students who have not submitted" do
-      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[@student])
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment:, submission: submission_for[@student])
 
       described_class.process_due_date_reminder("Assignment", assignment.id)
     end
@@ -245,9 +245,9 @@ describe AssignmentUtil do
       student_in_course(active_all: true, section: section_b).student
       create_section_override_for_assignment(assignment, course_section: section_b)
 
-      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[section_a_user_1])
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment:, submission: submission_for[section_a_user_1])
 
-      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[section_a_user_2])
+      expect(described_class).to receive(:alert_unaware_student).with(anything, assignment:, submission: submission_for[section_a_user_2])
 
       described_class.process_due_date_reminder(section_a_ao.class.name, section_a_ao.id)
     end

@@ -36,7 +36,7 @@ module GoogleDriveCommon
       .and_return(authorized)
 
     data = double("data", id: 1, to_json: { id: 1 }, alternateLink: "http://localhost/googleDoc")
-    doc = double("doc", data: data)
+    doc = double("doc", data:)
     adapter = double("google_adapter", create_doc: doc, acl_add: nil, acl_remove: nil)
     allow_any_instance_of(GoogleDocsCollaboration)
       .to receive(:google_adapter_for_user)

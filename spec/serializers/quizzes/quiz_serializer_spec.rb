@@ -20,7 +20,7 @@
 describe Quizzes::QuizSerializer do
   def quiz_serializer(options = {})
     options.reverse_merge!({
-                             controller: controller,
+                             controller:,
                              scope: @user,
                              session: @session
                            })
@@ -56,13 +56,29 @@ describe Quizzes::QuizSerializer do
   end
 
   %i[
-    title quiz_type hide_results time_limit
-    shuffle_answers show_correct_answers scoring_policy
-    allowed_attempts one_question_at_a_time question_count
-    points_possible cant_go_back access_code ip_filter due_at
-    lock_at unlock_at published show_correct_answers_at
-    hide_correct_answers_at show_correct_answers_last_attempt
-    has_access_code migration_id
+    title
+    quiz_type
+    hide_results
+    time_limit
+    shuffle_answers
+    show_correct_answers
+    scoring_policy
+    allowed_attempts
+    one_question_at_a_time
+    question_count
+    points_possible
+    cant_go_back
+    access_code
+    ip_filter
+    due_at
+    lock_at
+    unlock_at
+    published
+    show_correct_answers_at
+    hide_correct_answers_at
+    show_correct_answers_last_attempt
+    has_access_code
+    migration_id
   ].each do |attribute|
     it "serializes #{attribute}" do
       expect(json[attribute]).to eq quiz.send(attribute)
@@ -213,7 +229,7 @@ describe Quizzes::QuizSerializer do
       json = quiz_serializer.as_json[:quiz]
       expect(json).to have_key :lock_info
       expect(json).to have_key :lock_explanation
-      expect(json[:locked_for_user]).to eq true
+      expect(json[:locked_for_user]).to be true
 
       expect(quiz).to receive(:locked_for?)
         .with(@user, check_policies: true, context: @context)
@@ -221,7 +237,7 @@ describe Quizzes::QuizSerializer do
       json = quiz_serializer.as_json[:quiz]
       expect(json).not_to have_key :lock_info
       expect(json).not_to have_key :lock_explanation
-      expect(json[:locked_for_user]).to eq false
+      expect(json[:locked_for_user]).to be false
     end
 
     it "doesn't if skip_lock_tests is on" do
@@ -259,18 +275,18 @@ describe Quizzes::QuizSerializer do
 
     it "is true when there is no quiz submision" do
       Quizzes::QuizSubmission.delete_all
-      expect(quiz_serializer.as_json[:quiz][:takeable]).to eq true
+      expect(quiz_serializer.as_json[:quiz][:takeable]).to be true
     end
 
     it "is true when quiz_submission is present but not completed" do
       @quiz_submission.workflow_state = "settings_only"
-      expect(@serializer.as_json[:quiz][:takeable]).to eq true
+      expect(@serializer.as_json[:quiz][:takeable]).to be true
     end
 
     it "is true when the quiz submission is completed but quiz has unlimited attempts" do
       @quiz_submission.workflow_state = "complete"
       @quiz.allowed_attempts = -1
-      expect(@serializer.as_json[:quiz][:takeable]).to eq true
+      expect(@serializer.as_json[:quiz][:takeable]).to be true
     end
 
     it "is true when quiz submission is completed, !quiz.unlimited_attempts" do
@@ -278,10 +294,10 @@ describe Quizzes::QuizSerializer do
       @quiz.allowed_attempts = 2
       # false when attempts left attempts is 0
       expect(@quiz_submission).to receive(:attempts_left).at_least(:once).and_return 0
-      expect(@serializer.as_json[:quiz][:takeable]).to eq false
+      expect(@serializer.as_json[:quiz][:takeable]).to be false
       # true when than attempts left greater than 0
       expect(@quiz_submission).to receive(:attempts_left).at_least(:once).and_return 1
-      expect(@serializer.as_json[:quiz][:takeable]).to eq true
+      expect(@serializer.as_json[:quiz][:takeable]).to be true
     end
   end
 
@@ -307,7 +323,8 @@ describe Quizzes::QuizSerializer do
           @quiz.assignment_group = assignment_group = AssignmentGroup.new
           assignment_group.id = 1
           expect(serializer.as_json[:quiz]["links"]["assignment_group"]).to eq(
-            controller.send(:api_v1_course_assignment_group_url, course.id,
+            controller.send(:api_v1_course_assignment_group_url,
+                            course.id,
                             assignment_group.id)
           )
         end
@@ -561,12 +578,13 @@ describe Quizzes::QuizSerializer do
       lock_at: nil,
       unlock_at: nil,
       base: true
-    }, {
-      due_at: 30.minutes.from_now,
-      lock_at: 1.hour.from_now,
-      unlock_at: 10.minutes.from_now,
-      title: "Some Section"
-    }]
+    },
+                         {
+                           due_at: 30.minutes.from_now,
+                           lock_at: 1.hour.from_now,
+                           unlock_at: 10.minutes.from_now,
+                           title: "Some Section"
+                         }]
 
     expect(quiz).to receive(:due_at).at_least(:once)
     allow(serializer).to receive(:all_dates).and_return teacher_overrides
@@ -619,7 +637,7 @@ describe Quizzes::QuizSerializer do
     quiz.quiz_type = "survey"
     quiz.anonymous_submissions = true
     new_json = quiz_serializer.as_json[:quiz]
-    expect(new_json[:anonymous_submissions]).to eq true
+    expect(new_json[:anonymous_submissions]).to be true
   end
 
   it "does not include question_types" do

@@ -35,7 +35,7 @@ describe Types::CourseType do
   it "works" do
     expect(course_type.resolve("_id")).to eq course.id.to_s
     expect(course_type.resolve("name")).to eq course.name
-    expect(course_type.resolve("courseNickname")).to eq nil
+    expect(course_type.resolve("courseNickname")).to be_nil
   end
 
   it "works for root_outcome_group" do
@@ -166,6 +166,32 @@ describe Types::CourseType do
         ].map { |a| a.id.to_s })
       end
     end
+
+    context "grading standards" do
+      it "returns grading standard title" do
+        expect(
+          course_type.resolve("gradingStandard { title }", current_user: @student)
+        ).to eq "Default Grading Scheme"
+      end
+
+      it "returns grading standard data" do
+        expect(
+          course_type.resolve("gradingStandard { data { letterGrade } }", current_user: @student)
+        ).to eq ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"]
+
+        expect(
+          course_type.resolve("gradingStandard { data { baseValue } }", current_user: @student)
+        ).to eq [0.94, 0.9, 0.87, 0.84, 0.8, 0.77, 0.74, 0.7, 0.67, 0.64, 0.61, 0.0]
+      end
+    end
+
+    context "apply assignment group weights" do
+      it "returns false if not weighted" do
+        expect(
+          course_type.resolve("applyGroupWeights", current_user: @student)
+        ).to be false
+      end
+    end
   end
 
   describe "outcomeProficiency" do
@@ -191,7 +217,7 @@ describe Types::CourseType do
       account_admin_user
       outcome_alignment_stats_model
       course_with_student(course: @course)
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
     end
 
     context "for users with Admin role" do
@@ -452,8 +478,8 @@ describe Types::CourseType do
       context "loginId" do
         def pseud_params(unique_id, account = Account.default)
           {
-            account: account,
-            unique_id: unique_id,
+            account:,
+            unique_id:,
           }
         end
 
@@ -550,8 +576,8 @@ describe Types::CourseType do
         ).compact
 
         expect(student_last_activity).to have(1).items
-        expect(student_last_activity.first.to_datetime).to be_within(1.second).of \
-          @student1.enrollments.first.last_activity_at.to_datetime
+        expect(student_last_activity.first.to_datetime).to be_within(1.second)
+          .of(@student1.enrollments.first.last_activity_at.to_datetime)
       end
 
       it "returns zero for each user's initial totalActivityTime" do
@@ -706,7 +732,7 @@ describe Types::CourseType do
       it "returns null if there is no course-specific PostPolicy" do
         course.default_post_policy.destroy
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("postPolicy { _id }")).to be nil
+        expect(resolver.resolve("postPolicy { _id }")).to be_nil
       end
     end
 
@@ -716,7 +742,7 @@ describe Types::CourseType do
       it "returns null in place of the PostPolicy" do
         course.default_post_policy.update!(post_manually: true)
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("postPolicy { _id }")).to be nil
+        expect(resolver.resolve("postPolicy { _id }")).to be_nil
       end
     end
   end
@@ -750,7 +776,7 @@ describe Types::CourseType do
 
       it "returns null in place of the PostPolicy" do
         resolver = GraphQLTypeTester.new(course, context)
-        expect(resolver.resolve("assignmentPostPolicies { nodes { _id } }")).to be nil
+        expect(resolver.resolve("assignmentPostPolicies { nodes { _id } }")).to be_nil
       end
     end
   end

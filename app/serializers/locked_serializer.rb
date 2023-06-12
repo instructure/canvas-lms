@@ -23,7 +23,8 @@ module LockedSerializer
   include Canvas::LockExplanation
   extend Forwardable
 
-  def_delegators :@controller, :course_context_modules_url,
+  def_delegators :@controller,
+                 :course_context_modules_url,
                  :course_context_module_prerequisites_needing_finishing_path
 
   def lock_info
@@ -46,7 +47,7 @@ module LockedSerializer
     @_locked_for_hash = (
       if scope && object.respond_to?(:locked_for?)
         context = object.try(:context)
-        object.locked_for?(scope, check_policies: true, context: context)
+        object.locked_for?(scope, check_policies: true, context:)
       else
         false
       end

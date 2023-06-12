@@ -26,10 +26,10 @@ function compute_tags_from_hash {
   local cacheId=$1; shift
   local cacheSalt=$(echo "$CACHE_VERSION" | md5sum | cut -c1-8)
 
-  [ ! -z "${CACHE_LOAD_SCOPE-}" ] && tags[LOAD_TAG]="$cachePrefix:$CACHE_LOAD_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}"
-  [ ! -z "${CACHE_LOAD_FALLBACK_SCOPE-}" ] && tags[LOAD_FALLBACK_TAG]="$cachePrefix:$CACHE_LOAD_FALLBACK_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}"
-  [ ! -z "${CACHE_SAVE_SCOPE-}" ] && tags[SAVE_TAG]="$cachePrefix:$CACHE_SAVE_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}"
-  [ ! -z "${CACHE_UNIQUE_SCOPE-}" ] && tags[UNIQUE_TAG]="$cachePrefix:$CACHE_UNIQUE_SCOPE"
+  [ ! -z "${CACHE_LOAD_SCOPE-}" ] && tags[LOAD_TAG]="$cachePrefix:$CACHE_LOAD_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}${PLATFORM_SUFFIX-}"
+  [ ! -z "${CACHE_LOAD_FALLBACK_SCOPE-}" ] && tags[LOAD_FALLBACK_TAG]="$cachePrefix:$CACHE_LOAD_FALLBACK_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}${PLATFORM_SUFFIX-}"
+  [ ! -z "${CACHE_SAVE_SCOPE-}" ] && tags[SAVE_TAG]="$cachePrefix:$CACHE_SAVE_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}${PLATFORM_SUFFIX-}"
+  [ ! -z "${CACHE_UNIQUE_SCOPE-}" ] && tags[UNIQUE_TAG]="$cachePrefix:$CACHE_UNIQUE_SCOPE${PLATFORM_SUFFIX-}"
 
   return 0
 }

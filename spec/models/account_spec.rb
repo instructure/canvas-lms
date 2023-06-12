@@ -27,6 +27,10 @@ describe Account do
     it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
   end
 
+  describe "validations" do
+    it { is_expected.to validate_inclusion_of(:account_calendar_subscription_type).in_array(Account::CALENDAR_SUBSCRIPTION_TYPES) }
+  end
+
   context "BASIC_COLUMNS_FOR_CALLBACKS" do
     it "can save a minimal object" do
       a = Account.select(*Account::BASIC_COLUMNS_FOR_CALLBACKS).find(Account.default.id)
@@ -127,8 +131,8 @@ describe Account do
       end
 
       it "returns a OutcomeProficiency default at the root level if no proficiency exists" do
-        expect(@root_account.outcome_proficiency).to eq nil
-        expect(@subaccount.outcome_proficiency).to eq nil
+        expect(@root_account.outcome_proficiency).to be_nil
+        expect(@subaccount.outcome_proficiency).to be_nil
         expect(@subaccount.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(@root_account)
         expect(@root_account.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(@root_account)
       end
@@ -137,8 +141,8 @@ describe Account do
     context "with the account_level_mastery_scales FF disabled" do
       it "can be nil" do
         @root_account.disable_feature!(:account_level_mastery_scales)
-        expect(@root_account.resolved_outcome_proficiency).to eq nil
-        expect(@subaccount.resolved_outcome_proficiency).to eq nil
+        expect(@root_account.resolved_outcome_proficiency).to be_nil
+        expect(@subaccount.resolved_outcome_proficiency).to be_nil
       end
     end
   end
@@ -152,7 +156,7 @@ describe Account do
     it "retrieves parent account's outcome calculation method" do
       method = OutcomeCalculationMethod.create! context: @root_account, calculation_method: :highest
       expect(@root_account.outcome_calculation_method).to eq method
-      expect(@subaccount.outcome_calculation_method).to eq nil
+      expect(@subaccount.outcome_calculation_method).to be_nil
       expect(@root_account.resolved_outcome_calculation_method).to eq method
       expect(@subaccount.resolved_outcome_calculation_method).to eq method
     end
@@ -223,8 +227,8 @@ describe Account do
       end
 
       it "returns a OutcomeCalculationMethod default if no method exists" do
-        expect(@root_account.outcome_calculation_method).to eq nil
-        expect(@subaccount.outcome_calculation_method).to eq nil
+        expect(@root_account.outcome_calculation_method).to be_nil
+        expect(@subaccount.outcome_calculation_method).to be_nil
         expect(@root_account.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(@root_account)
         expect(@subaccount.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(@root_account)
       end
@@ -233,8 +237,8 @@ describe Account do
     context "with the account_level_mastery_scales FF disabled" do
       it "can be nil" do
         @root_account.disable_feature!(:account_level_mastery_scales)
-        expect(@root_account.resolved_outcome_calculation_method).to eq nil
-        expect(@subaccount.resolved_outcome_calculation_method).to eq nil
+        expect(@root_account.resolved_outcome_calculation_method).to be_nil
+        expect(@subaccount.resolved_outcome_calculation_method).to be_nil
       end
     end
   end
@@ -377,9 +381,19 @@ describe Account do
     context "fast list" do
       it "lists associated courses" do
         expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq %w[
-          C001 C005 C006 C007 C008 C009
+          C001
+          C005
+          C006
+          C007
+          C008
+          C009
 
-          C001S C005S C006S C007S C008S C009S
+          C001S
+          C005S
+          C006S
+          C007S
+          C008S
+          C009S
         ].sort
       end
 
@@ -391,15 +405,15 @@ describe Account do
 
       it "counting cross-listed courses only if requested" do
         def check_account(account, include_crosslisted_courses, expected_length, expected_course_names)
-          actual_courses = account.fast_all_courses({ include_crosslisted_courses: include_crosslisted_courses })
+          actual_courses = account.fast_all_courses({ include_crosslisted_courses: })
           expect(actual_courses.length).to eq expected_length
           actual_course_names = actual_courses.pluck("name").sort!
           expect(actual_course_names).to eq(expected_course_names.sort!)
         end
 
         root_account = Account.create!
-        account_a = Account.create!({ root_account: root_account })
-        account_b = Account.create!({ root_account: root_account })
+        account_a = Account.create!({ root_account: })
+        account_b = Account.create!({ root_account: })
         course_a = course_factory({ account: account_a, course_name: "course_a" })
         course_b = course_factory({ account: account_b, course_name: "course_b" })
         course_b.course_sections.create!({ name: "section_b" })
@@ -422,8 +436,8 @@ describe Account do
 
       it "orders list by specified parameter" do
         order = "courses.created_at ASC"
-        expect(@account).to receive(:fast_course_base).with({ order: order })
-        @account.fast_all_courses(order: order)
+        expect(@account).to receive(:fast_course_base).with({ order: })
+        @account.fast_all_courses(order:)
       end
     end
 
@@ -580,13 +594,13 @@ describe Account do
     it "filters non-hash hash settings" do
       a = Account.new
       a.settings = { "sis_default_grade_export" => "string" }.with_indifferent_access
-      expect(a.settings[:error_reporting]).to eql(nil)
+      expect(a.settings[:error_reporting]).to be_nil
 
       a.settings = { "sis_default_grade_export" => {
         "value" => true
       } }.with_indifferent_access
       expect(a.settings[:sis_default_grade_export]).to be_is_a(Hash)
-      expect(a.settings[:sis_default_grade_export][:value]).to eql true
+      expect(a.settings[:sis_default_grade_export][:value]).to be true
     end
   end
 
@@ -697,7 +711,7 @@ describe Account do
     admin = User.create
     user = User.create
     account.account_users.create!(user: admin, role: admin_role)
-    account.account_users.create!(user: user, role: restricted_role)
+    account.account_users.create!(user:, role: restricted_role)
     [admin, user]
   end
 
@@ -731,7 +745,7 @@ describe Account do
 
     hash.each do |k, v|
       v[:account].update_attribute(:settings, { no_enrollments_can_create_courses: false })
-      admin, user = account_with_admin_and_restricted_user(v[:account], (k == :site_admin ? @sa_role : @root_role))
+      admin, user = account_with_admin_and_restricted_user(v[:account], ((k == :site_admin) ? @sa_role : @root_role))
       hash[k][:admin] = admin
       hash[k][:user] = user
     end
@@ -779,8 +793,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:user])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -794,7 +808,7 @@ describe Account do
     some_access = [:read_reports] + limited_access
     hash.each do |k, v|
       account = v[:account]
-      account.role_overrides.create!(permission: "read_reports", role: (k == :site_admin ? @sa_role : @root_role), enabled: true)
+      account.role_overrides.create!(permission: "read_reports", role: ((k == :site_admin) ? @sa_role : @root_role), enabled: true)
       account.role_overrides.create!(permission: "reset_any_mfa", role: @sa_role, enabled: true)
       # clear caches
       account.tap do |a|
@@ -810,7 +824,7 @@ describe Account do
       admin_privileges += [:read_global_outcomes] if k == :site_admin
       admin_privileges += [:manage_privacy_settings] if k == :root
       user_array = some_access + [:reset_any_mfa] +
-                   (k == :site_admin ? [:read_global_outcomes] : [])
+                   ((k == :site_admin) ? [:read_global_outcomes] : [])
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user])).to match_array user_array
     end
@@ -831,8 +845,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
+      expect(account.check_policy(hash[:sub][:user])).to match_array((k == :site_admin) ? [:read_global_outcomes] : %i[read_outcomes read_terms launch_external_tool])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -851,7 +865,7 @@ describe Account do
       @enrollment.accept!
 
       @shard1.activate do
-        expect(@course.grants_right?(@user, :read_sis)).to eq true
+        expect(@course.grants_right?(@user, :read_sis)).to be true
       end
     end
 
@@ -906,8 +920,8 @@ describe Account do
     manual = a.manually_created_courses_account
     user_factory
 
-    expect(a.grants_right?(@user, :create_courses)).to eq false
-    expect(manual.grants_right?(@user, :create_courses)).to eq false
+    expect(a.grants_right?(@user, :create_courses)).to be false
+    expect(manual.grants_right?(@user, :create_courses)).to be false
   end
 
   it "does not allow create courses for student view students" do
@@ -919,8 +933,8 @@ describe Account do
     course = manual.courses.create!
     user = course.student_view_student
 
-    expect(a.grants_right?(user, :create_courses)).to eq false
-    expect(manual.grants_right?(user, :create_courses)).to eq false
+    expect(a.grants_right?(user, :create_courses)).to be false
+    expect(manual.grants_right?(user, :create_courses)).to be false
   end
 
   it "does not allow create courses for student view students (granular permissions)" do
@@ -933,8 +947,8 @@ describe Account do
     course = manual.courses.create!
     user = course.student_view_student
 
-    expect(a.grants_right?(user, :create_courses)).to eq false
-    expect(manual.grants_right?(user, :create_courses)).to eq false
+    expect(a.grants_right?(user, :create_courses)).to be false
+    expect(manual.grants_right?(user, :create_courses)).to be false
   end
 
   it "returns sub-accounts as options correctly" do
@@ -1094,7 +1108,7 @@ describe Account do
 
     it "includes 'Developer Keys' for the admin users of an account" do
       account = Account.create!
-      account_admin_user(account: account)
+      account_admin_user(account:)
       tabs = account.tabs_available(@admin)
       expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
 
@@ -1114,7 +1128,7 @@ describe Account do
       tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
       tool.user_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:account_navigation)).to eq false
+      expect(tool.has_placement?(:account_navigation)).to be false
       tabs = @account.tabs_available(nil)
       expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     end
@@ -1136,7 +1150,7 @@ describe Account do
       tool1, tool2 = tools
       tool2.destroy
 
-      tools.each { |t| expect(t.has_placement?(:account_navigation)).to eq true }
+      tools.each { |t| expect(t.has_placement?(:account_navigation)).to be true }
 
       tabs = @account.tabs_available
       tab_ids = tabs.pluck(:id)
@@ -1152,7 +1166,7 @@ describe Account do
       tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
       tool.account_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:account_navigation)).to eq true
+      expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(nil)
       expect(tabs.pluck(:id)).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
@@ -1161,12 +1175,22 @@ describe Account do
       expect(tab[:args]).to eq [@account.id, tool.id]
     end
 
+    it "does not include external tools for subaccounts if 'root_account_only' is used" do
+      expect(@account.root_account?).to be false
+      course_with_teacher(account: @account.root_account)
+      tool = @account.root_account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.account_navigation = { url: "http://www.example.com", text: "Example URL", root_account_only: true }
+      tool.save!
+      expect(@account.root_account.tabs_available(@teacher).pluck(:id)).to include(tool.asset_string)
+      expect(@account.tabs_available(@teacher).pluck(:id)).to_not include(tool.asset_string)
+    end
+
     it "does not include external tools for non-admins if visibility is set" do
       course_with_teacher(account: @account)
       tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
       tool.account_navigation = { url: "http://www.example.com", text: "Example URL", visibility: "admins" }
       tool.save!
-      expect(tool.has_placement?(:account_navigation)).to eq true
+      expect(tool.has_placement?(:account_navigation)).to be true
       tabs = @account.tabs_available(@teacher)
       expect(tabs.pluck(:id)).to_not be_include(tool.asset_string)
 
@@ -1176,7 +1200,9 @@ describe Account do
     end
 
     it "uses localized labels" do
-      tool = @account.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret",
+      tool = @account.context_external_tools.new(name: "bob",
+                                                 consumer_key: "test",
+                                                 shared_secret: "secret",
                                                  url: "http://example.com")
 
       account_navigation = {
@@ -1218,10 +1244,6 @@ describe Account do
     end
 
     describe "account calendars tab" do
-      before :once do
-        Account.site_admin.enable_feature! :account_calendar_events
-      end
-
       it "is shown if the user has manage_account_calendar_visibility permission" do
         account_admin_user_with_role_changes(account: @account)
         expect(@account.tabs_available(@admin).pluck(:id)).to include(Account::TAB_ACCOUNT_CALENDARS)
@@ -1229,12 +1251,6 @@ describe Account do
 
       it "is not shown if the user lacks manage_account_calendar_visibility permission" do
         account_admin_user_with_role_changes(account: @account, role_changes: { manage_account_calendar_visibility: false })
-        expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
-      end
-
-      it "is not shown if the :account_calendar_events flag is disabled" do
-        Account.site_admin.disable_feature! :account_calendar_events
-        account_admin_user_with_role_changes(account: @account)
         expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
       end
     end
@@ -1360,7 +1376,6 @@ describe Account do
 
     context "view_account_calendar_details permission" do
       before :once do
-        Account.site_admin.enable_feature! :account_calendar_events
         @account = Account.default
       end
 
@@ -1379,13 +1394,15 @@ describe Account do
       it "is true for an account admin without :manage_account_calendar_visibility on a visible calendar" do
         @account.account_calendar_visible = true
         @account.save!
-        account_admin_user_with_role_changes(active_all: true, account: @account,
+        account_admin_user_with_role_changes(active_all: true,
+                                             account: @account,
                                              role_changes: { manage_account_calendar_visibility: false })
         expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_truthy
       end
 
       it "is false for an account admin without :manage_account_calendar_visibility on a hidden calendar" do
-        account_admin_user_with_role_changes(active_all: true, account: @account,
+        account_admin_user_with_role_changes(active_all: true,
+                                             account: @account,
                                              role_changes: { manage_account_calendar_visibility: false })
         expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_falsey
       end
@@ -1443,12 +1460,12 @@ describe Account do
 
     it "is false for LDAP" do
       account.authentication_providers.create!(auth_type: "ldap")
-      expect(account.delegated_authentication?).to eq false
+      expect(account.delegated_authentication?).to be false
     end
 
     it "is true for CAS" do
       account.authentication_providers.create!(auth_type: "cas")
-      expect(account.delegated_authentication?).to eq true
+      expect(account.delegated_authentication?).to be true
     end
   end
 
@@ -1664,13 +1681,13 @@ describe Account do
 
     it "doesn't have permission, it returns false" do
       allow(account).to receive(:grants_right?).and_return(false)
-      account_admin_user(account: account)
+      account_admin_user(account:)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_falsey
     end
 
     it "does have permission, it returns true" do
       allow(account).to receive(:grants_right?).and_return(true)
-      account_admin_user(account: account)
+      account_admin_user(account:)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_truthy
     end
   end
@@ -1740,9 +1757,9 @@ describe Account do
 
   it "sets allow_sis_import if root_account" do
     account = Account.create!
-    expect(account.allow_sis_import).to eq true
+    expect(account.allow_sis_import).to be true
     sub = account.sub_accounts.create!
-    expect(sub.allow_sis_import).to eq false
+    expect(sub.allow_sis_import).to be false
   end
 
   describe "#ensure_defaults" do
@@ -2016,28 +2033,28 @@ describe Account do
   context "require terms of use" do
     describe "#terms_required?" do
       it "returns true by default" do
-        expect(account_model.terms_required?).to eq true
+        expect(account_model.terms_required?).to be true
       end
 
       it "returns false by default for new accounts" do
         TermsOfService.skip_automatic_terms_creation = false
-        expect(account_model.terms_required?).to eq false
+        expect(account_model.terms_required?).to be false
       end
 
       it "returns false if Setting is false" do
         Setting.set(:terms_required, "false")
-        expect(account_model.terms_required?).to eq false
+        expect(account_model.terms_required?).to be false
       end
 
       it "returns false if account setting is false" do
         account = account_model(settings: { account_terms_required: false })
-        expect(account.terms_required?).to eq false
+        expect(account.terms_required?).to be false
       end
 
       it "consults root account setting" do
         parent_account = account_model(settings: { account_terms_required: false })
-        child_account = Account.create!(parent_account: parent_account)
-        expect(child_account.terms_required?).to eq false
+        child_account = Account.create!(parent_account:)
+        expect(child_account.terms_required?).to be false
       end
     end
   end
@@ -2056,12 +2073,12 @@ describe Account do
       end
 
       it "errors if infrastructure fails and we can't see the account" do
-        expect { Account.find_cached(nonsense_id) }.to raise_error(::Canvas::AccountCacheError)
+        expect { Account.find_cached(nonsense_id) }.to raise_error(Canvas::AccountCacheError)
       end
 
       it "includes the account id in the error message" do
         Account.find_cached(nonsense_id)
-      rescue ::Canvas::AccountCacheError => e
+      rescue Canvas::AccountCacheError => e
         expect(e.message).to eq("Couldn't find Account with 'id'=#{nonsense_id}")
       end
     end
@@ -2072,7 +2089,7 @@ describe Account do
           @shard1.activate do
             a = Account.create!
             Account.find_cached(a.id) # set the cache
-            expect(Account.invalidate_cache(a.id)).to eq true
+            expect(Account.invalidate_cache(a.id)).to be true
           end
         end
       end
@@ -2117,7 +2134,7 @@ describe Account do
     non_cached.settings[:blah] = true
     non_cached.save!
 
-    expect(Account.default.settings[:blah]).to eq true
+    expect(Account.default.settings[:blah]).to be true
   end
 
   it_behaves_like "a learning outcome context"
@@ -2181,6 +2198,7 @@ describe Account do
     active_admin = account_admin_user(active_all: true)
     deleted_admin = account_admin_user(active_all: true)
     deleted_admin.account_users.destroy_all
+    Account.default.reload
     n = Notification.create(name: "New Account User", category: "TestImmediately")
     [active_admin, deleted_admin].each do |u|
       NotificationPolicy.create(notification: n, communication_channel: u.communication_channel, frequency: "immediately")
@@ -2336,7 +2354,7 @@ describe Account do
 
   describe "#allow_disable_post_to_sis_when_grading_period_closed?" do
     let(:root_account) { Account.create!(root_account: nil) }
-    let(:subaccount) { Account.create!(root_account: root_account) }
+    let(:subaccount) { Account.create!(root_account:) }
 
     it "returns false if the account is not a root account" do
       root_account.enable_feature!(:new_sis_integrations)
@@ -2405,10 +2423,10 @@ describe Account do
   context "#roles_with_enabled_permission" do
     def create_role_override(permission, role, context, enabled = true)
       RoleOverride.create!(
-        context: context,
-        permission: permission,
-        role: role,
-        enabled: enabled
+        context:,
+        permission:,
+        role:,
+        enabled:
       )
     end
     let(:account) { account_model }
@@ -2560,6 +2578,66 @@ describe Account do
       expect(act.unless_dummy).to be_nil
       act.id = 1
       expect(act.unless_dummy).to be(act)
+    end
+  end
+
+  describe "logging Restrict Quantitative Data (RQD) setting enable/disable" do
+    before do
+      # @account = Account.create!
+      account_model
+      @account.enable_feature!(:restrict_quantitative_data)
+
+      allow(InstStatsd::Statsd).to receive(:increment)
+    end
+
+    it "restrict_quantitative_data? helper returns false by default" do
+      expect(@account.restrict_quantitative_data?).to be false
+    end
+
+    it "increments enabled log when setting is turned on" do
+      @account.settings[:restrict_quantitative_data] = { locked: false, value: true }
+      @account.save!
+      expect(@account.restrict_quantitative_data?).to be true
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled").once
+    end
+
+    it "increments disabled log when setting is turned off" do
+      @account.settings[:restrict_quantitative_data] = { locked: false, value: true }
+      @account.save!
+      expect(@account.restrict_quantitative_data?).to be true
+      @account.settings[:restrict_quantitative_data] = { locked: false, value: false }
+      @account.save!
+      expect(@account.restrict_quantitative_data?).to be false
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled").once.ordered
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled").once.ordered
+    end
+
+    it "doesn't increment either log when settings update but RQD setting is unchanged" do
+      expect(@account.restrict_student_future_view[:value]).to be false
+      @account.settings[:restrict_student_future_view] = { locked: false, value: true }
+      @account.save!
+      expect(@account.restrict_student_future_view[:value]).to be true
+
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled")
+    end
+
+    it "doesn't increment either counter when parent account setting is changed" do
+      @sub_account = @account.sub_accounts.create!
+      @sub_account.settings[:restrict_quantitative_data] = { locked: false, value: true }
+      @sub_account.save!
+
+      expect(@sub_account.restrict_quantitative_data?).to be true
+      expect(InstStatsd::Statsd).to have_received(:increment).with("account.settings.restrict_quantitative_data.enabled").once
+
+      @account.settings[:restrict_quantitative_data] = { locked: true, value: false }
+      @account.save!
+      # Ignores changes completely
+      expect(@sub_account.restrict_quantitative_data?).to be true
+
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled")
     end
   end
 end

@@ -21,7 +21,6 @@ require_relative "./shared_constants"
 require_relative "./shared_linter_examples"
 # pp required for to make fakefs happy, see:
 # github.com/fakefs/fakefs#fakefs-----typeerror-superclass-mismatch-for-class-file
-require "pp"
 require "fakefs/safe"
 require "timecop"
 
@@ -35,14 +34,14 @@ describe TatlTael::Linters::CopyrightLinter do
       {
         path: fixture_path,
         path_from_root: fixture_path,
-        status: status
+        status:
       }
     ]
   end
   let(:changes) { raw_changes.map { |c| double(c) } }
-  let(:linter) { described_class.new(changes: changes, config: config) }
+  let(:linter) { described_class.new(changes:, config:) }
   let(:linter_with_auto_correct) do
-    described_class.new(changes: changes, config: config, auto_correct: true)
+    described_class.new(changes:, config:, auto_correct: true)
   end
   let(:comment) do
     {

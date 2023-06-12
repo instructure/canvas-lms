@@ -18,8 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
+require_relative "../../spec_helper"
+require_relative "../../outcome_alignments_spec_helper"
 
 describe Types::OutcomeAlignmentType do
   before :once do
@@ -36,14 +37,14 @@ describe Types::OutcomeAlignmentType do
       assignment: @discussion
     )
     @module = @course.context_modules.create!(name: "module")
-    @course.account.enable_feature!(:outcome_alignment_summary)
+    @course.account.enable_feature!(:improved_outcomes_management)
   end
 
   let(:graphql_context) { { current_user: @admin } }
   let(:outcome_type) { GraphQLTypeTester.new(@outcome, graphql_context) }
 
-  def resolve_field(field_name)
-    outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { #{field_name} }")[0]
+  def resolve_field(field_name, result_index: 0)
+    outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { #{field_name} }")[result_index]
   end
 
   describe "for direct outcome alignments to assignment, quiz and graded discussion" do
@@ -100,6 +101,14 @@ describe Types::OutcomeAlignmentType do
     it "returns module_workflow_state" do
       expect(resolve_field("moduleWorkflowState")).to eq @module.workflow_state
     end
+
+    it "returns quizItems" do
+      expect(resolve_field("quizItems { _id }")).to be_nil
+    end
+
+    it "returns alignmentsCount" do
+      expect(resolve_field("alignmentsCount")).to eq 1
+    end
   end
 
   describe "for outcome alignment not included in module" do
@@ -115,11 +124,16 @@ describe Types::OutcomeAlignmentType do
 
   describe "for outcome alignment to an Assignment" do
     before do
+      @assignment.unpublish
       @rubric.associate_with(@assignment, @course, purpose: "grading")
     end
 
     it "returns assignment_content_type 'assignment'" do
       expect(resolve_field("assignmentContentType")).to eq "assignment"
+    end
+
+    it "returns the workflow state of the assignment in assignment_workflow_state" do
+      expect(resolve_field("assignmentWorkflowState")).to eq @assignment.workflow_state
     end
   end
 
@@ -130,6 +144,10 @@ describe Types::OutcomeAlignmentType do
 
     it "returns assignment_content_type 'quiz'" do
       expect(resolve_field("assignmentContentType")).to eq "quiz"
+    end
+
+    it "returns the workflow state of the quiz in assignment_workflow_state" do
+      expect(resolve_field("assignmentWorkflowState")).to eq @quiz.workflow_state
     end
   end
 
@@ -160,6 +178,10 @@ describe Types::OutcomeAlignmentType do
     it "returns assignment_content_type 'discussion'" do
       expect(resolve_field("assignmentContentType")).to eq "discussion"
     end
+
+    it "returns the workflow state of the discussion in assignment_workflow_state" do
+      expect(resolve_field("assignmentWorkflowState")).to eq @discussion.workflow_state
+    end
   end
 
   describe "for outcome alignment to a Rubric" do
@@ -182,6 +204,67 @@ describe Types::OutcomeAlignmentType do
 
     it "returns url for the question bank" do
       expect(resolve_field("url")).to eq "/courses/#{@course.id}/question_banks/#{@bank.id}"
+    end
+  end
+
+  describe "for outcome alignments to New Quiz" do
+    before do
+      @course.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+      @new_quiz = @course.assignments.create!(title: "new quiz - aligned in OS", submission_types: "external_tool")
+      @module.add_item type: "assignment", id: @new_quiz.id
+      allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+        .to receive(:get_os_aligned_outcomes)
+        .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome], @new_quiz.id))
+    end
+
+    it "returns assignment_content_type 'new_quiz'" do
+      expect(resolve_field("assignmentContentType", result_index: 1)).to eq "new_quiz"
+    end
+
+    context "when outcome is aligned only to the quiz" do
+      it "returns empty list of quizItems" do
+        expect(resolve_field("quizItems { _id, title}", result_index: 1)).to eq []
+      end
+
+      it "calculates properly alignmentCount" do
+        expect(resolve_field("alignmentsCount", result_index: 1)).to eq 1
+      end
+    end
+
+    context "when outcome is aligned to both the quiz and to quiz items" do
+      before do
+        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+          .to receive(:get_os_aligned_outcomes)
+          .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome], @new_quiz.id, with_items: true))
+      end
+
+      it "returns list of aligned quiz items" do
+        expect(resolve_field("quizItems { _id, title}", result_index: 1).length).to be 2
+        expect(resolve_field("quizItems {_id}", result_index: 1)).to match_array(["101", "102"])
+        expect(resolve_field("quizItems {title}", result_index: 1)).to match_array(["Question Number 101", "Question Number 102"])
+      end
+
+      it "calculates properly alignmentsCount" do
+        expect(resolve_field("alignmentsCount", result_index: 1)).to eq 3
+      end
+    end
+
+    context "when outcome is aligned only to quiz items" do
+      before do
+        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+          .to receive(:get_os_aligned_outcomes)
+          .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome], @new_quiz.id, with_quiz: false, with_items: true))
+      end
+
+      it "returns list of aligned quiz items" do
+        expect(resolve_field("quizItems { _id, title}", result_index: 1).length).to be 2
+        expect(resolve_field("quizItems {_id}", result_index: 1)).to match_array(["101", "102"])
+        expect(resolve_field("quizItems {title}", result_index: 1)).to match_array(["Question Number 101", "Question Number 102"])
+      end
+
+      it "calculates properly alignmentCount" do
+        expect(resolve_field("alignmentsCount", result_index: 1)).to eq 2
+      end
     end
   end
 end

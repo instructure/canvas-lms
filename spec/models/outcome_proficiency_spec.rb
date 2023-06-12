@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe OutcomeProficiency, type: :model do
+describe OutcomeProficiency do
   describe "associations" do
     it { is_expected.to have_many(:outcome_proficiency_ratings).dependent(:destroy).order("points DESC, id ASC").inverse_of(:outcome_proficiency) }
     it { is_expected.to belong_to(:context).required }
@@ -73,7 +73,8 @@ describe OutcomeProficiency, type: :model do
       root_account_2 = account_model
       rating1 = OutcomeProficiencyRating.new(description: "best", points: 10, mastery: true, color: "00ff00")
       rating2 = OutcomeProficiencyRating.new(description: "worst", points: 0, mastery: false, color: "ff0000")
-      proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], context: root_account_1,
+      proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2],
+                                               context: root_account_1,
                                                root_account_id: root_account_2.resolved_root_account_id)
       expect(proficiency.root_account_id).to be(root_account_2.resolved_root_account_id)
     end
@@ -193,7 +194,7 @@ describe OutcomeProficiency, type: :model do
     end
 
     let_once(:account) { account_model }
-    let_once(:course) { course_model(account: account) }
+    let_once(:course) { course_model(account:) }
     let_once(:account_rubric) { outcome_with_rubric(context: account) }
     let_once(:course_rubric) { outcome_with_rubric(context: course) }
     let_once(:outcome_proficiency) { outcome_proficiency_model(account) }
@@ -224,7 +225,7 @@ describe OutcomeProficiency, type: :model do
     end
 
     it "does not update assessed rubrics" do
-      student_in_course(course: course)
+      student_in_course(course:)
       rubric_assessment_model(rubric: course_rubric, context: course, user: @student, purpose: "grading")
       outcome_proficiency.outcome_proficiency_ratings[0].points = 30
       outcome_proficiency.save!
@@ -236,7 +237,7 @@ describe OutcomeProficiency, type: :model do
     it "does not update rubrics associated with multiple assignments" do
       rubric_association_model(rubric: account_rubric, context: course, purpose: "grading")
       rubric_association_model(rubric: course_rubric, context: course, purpose: "grading")
-      other_course = course_model(account: account)
+      other_course = course_model(account:)
       rubric_association_model(rubric: account_rubric, context: other_course, purpose: "grading")
 
       outcome_proficiency.outcome_proficiency_ratings[0].points = 30

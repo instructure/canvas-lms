@@ -22,6 +22,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {IconLockLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 
 import formatMessage from '../../../../format-message'
@@ -57,7 +58,7 @@ const getMessage = (dimensionsState, minWidth, minHeight, minPercentage) => {
 }
 
 export default function DimensionsInput(props) {
-  const {dimensionsState, minHeight, minWidth, minPercentage} = props
+  const {dimensionsState, minHeight, minWidth, minPercentage, hidePercentage} = props
 
   const handleDimensionTypeChange = e => {
     dimensionsState.setUsePercentageUnits(e.target.value === 'percentage')
@@ -68,16 +69,20 @@ export default function DimensionsInput(props) {
   return (
     <Flex direction="column">
       <Flex.Item padding="small">
-        <RadioInputGroup
-          data-testid="dimension-type"
-          name="dimension-type"
-          description={formatMessage('Dimension Type')}
-          onChange={handleDimensionTypeChange}
-          value={dimensionsState.usePercentageUnits ? 'percentage' : 'pixels'}
-        >
-          <RadioInput label={formatMessage('Pixels')} value="pixels" />
-          <RadioInput label={formatMessage('Percentage')} value="percentage" />
-        </RadioInputGroup>
+        {hidePercentage ? (
+          <Text weight="bold">{formatMessage('Custom width and height (Pixels)')}</Text>
+        ) : (
+          <RadioInputGroup
+            data-testid="dimension-type"
+            name="dimension-type"
+            description={formatMessage('Dimension Type')}
+            onChange={handleDimensionTypeChange}
+            value={dimensionsState.usePercentageUnits ? 'percentage' : 'pixels'}
+          >
+            <RadioInput label={formatMessage('Pixels')} value="pixels" />
+            <RadioInput label={formatMessage('Percentage')} value="percentage" />
+          </RadioInputGroup>
+        )}
       </Flex.Item>
       <Flex.Item padding="small">
         <FormFieldGroup
@@ -150,4 +155,9 @@ DimensionsInput.propTypes = {
   minHeight: number.isRequired,
   minWidth: number.isRequired,
   minPercentage: number.isRequired,
+  hidePercentage: bool,
+}
+
+DimensionsInput.defaultProps = {
+  hidePercentage: false,
 }

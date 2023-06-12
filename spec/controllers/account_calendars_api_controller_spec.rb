@@ -20,7 +20,6 @@
 
 describe AccountCalendarsApiController do
   before :once do
-    Account.site_admin.enable_feature! :account_calendar_events
     @user = user_factory(active_all: true)
 
     @root_account = Account.default
@@ -40,7 +39,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount1a.id)
+      expect(json["account_calendars"].pluck("id")).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount1a.id)
     end
 
     it "returns only visible calendars" do
@@ -54,7 +53,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
+      expect(json["account_calendars"].pluck("id")).to contain_exactly(@root_account.id, @subaccount2.id)
     end
 
     context "sharding" do
@@ -72,7 +71,7 @@ describe AccountCalendarsApiController do
 
         get :index
         expect(response).to be_successful
-        expect(json_parse(response.body)["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(Account.default.id, Account.last.id)
+        expect(json_parse(response.body)["account_calendars"].pluck("id")).to contain_exactly(Account.default.id, Account.last.id)
       end
     end
 
@@ -85,7 +84,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
+        expect(json["account_calendars"].pluck("id")).to contain_exactly(@subaccount1.id, @subaccount1a.id)
       end
 
       it "does not include hidden calendars in the search results" do
@@ -97,7 +96,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1a.id)
+        expect(json["account_calendars"].pluck("id")).to contain_exactly(@subaccount1a.id)
       end
 
       it "does not include accounts without an association" do
@@ -107,7 +106,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
+        expect(json["account_calendars"].pluck("id")).to contain_exactly(@subaccount1.id)
       end
     end
 
@@ -128,7 +127,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to eq([@subaccount1.id, @subaccount1a.id, @subaccount2.id, @root_account.id])
+      expect(json["account_calendars"].pluck("id")).to eq([@subaccount1.id, @subaccount1a.id, @subaccount2.id, @root_account.id])
     end
 
     it "returns an empty array for a user without any enrollments" do
@@ -145,14 +144,6 @@ describe AccountCalendarsApiController do
       get :index
 
       expect(response).to be_redirect
-    end
-
-    it "returns not found if the flag is disabled" do
-      Account.site_admin.disable_feature! :account_calendar_events
-      course_with_student_logged_in(user: @user, account: @subaccount1a)
-      get :index
-
-      expect(response).to be_not_found
     end
 
     context "metrics collection" do
@@ -178,7 +169,7 @@ describe AccountCalendarsApiController do
   end
 
   describe "GET 'show'" do
-    it "returns the calendar with id, name, parent_account_id, root_account_id, and visible attributes" do
+    it "returns the calendar with id, name, parent_account_id, root_account_id, visible, and auto_subscribe attributes" do
       course_with_student_logged_in(user: @user, account: @subaccount1a)
       user_session(@user)
       get :show, params: { account_id: @subaccount1a.id }
@@ -190,6 +181,18 @@ describe AccountCalendarsApiController do
       expect(json["parent_account_id"]).to be @subaccount1.id
       expect(json["root_account_id"]).to be @root_account.id
       expect(json["visible"]).to be_truthy
+      expect(json["auto_subscribe"]).to be_falsey
+    end
+
+    it "does not include auto_subscribe if auto_subscribe_account_calendars flag is disabled" do
+      Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
+      course_with_student_logged_in(user: @user, account: @subaccount1a)
+      user_session(@user)
+      get :show, params: { account_id: @subaccount1a.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.key?("auto_subscribe")).to be false
     end
 
     it "returns a hidden calendar for an admin with :manage_account_calendar_visibility" do
@@ -240,6 +243,7 @@ describe AccountCalendarsApiController do
       json = json_parse(response.body)
       @root_account.reload
       expect(@root_account.account_calendar_visible).to be_falsey
+      expect(@root_account.account_calendar_subscription_type).to eq "manual"
       expect(json["id"]).to be @root_account.id
       expect(json["visible"]).to be_falsey
 
@@ -252,14 +256,30 @@ describe AccountCalendarsApiController do
       expect(json["visible"]).to be_truthy
     end
 
-    it "returns bad request if visible param is not provided" do
+    it "updates calendar auto_subscribe and returns calendar json" do
       account_admin_user(active_all: true, account: @root_account, user: @user)
       user_session(@user)
-      put :update, params: { account_id: @root_account }
+      expect(@root_account.account_calendar_subscription_type).to eq "manual"
 
-      expect(response).to be_bad_request
+      put :update, params: { account_id: @root_account, auto_subscribe: true }
+      expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json["errors"]).to eq "Missing param: `visible`"
+      @root_account.reload
+      expect(@root_account.account_calendar_subscription_type).to eq "auto"
+      expect(@root_account.account_calendar_visible).to be true
+      expect(json["id"]).to be @root_account.id
+      expect(json["auto_subscribe"]).to be_truthy
+    end
+
+    it "updates both visible and auto_subscribe attributes" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+
+      put :update, params: { account_id: @root_account, visible: false, auto_subscribe: true }
+      expect(response).to be_successful
+      @root_account.reload
+      expect(@root_account.account_calendar_subscription_type).to eq "auto"
+      expect(@root_account.account_calendar_visible).to be false
     end
 
     it "returns not found for a fake account id" do
@@ -271,12 +291,42 @@ describe AccountCalendarsApiController do
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
-      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @root_account,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       put :update, params: { account_id: @root_account.id, visible: false }
 
       expect(response).to be_unauthorized
+    end
+
+    it "does not update auto_subscribe if auto_subscribe_account_calendars is disabled" do
+      Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      expect(@root_account.account_calendar_subscription_type).to eq "manual"
+
+      put :update, params: { account_id: @root_account, auto_subscribe: true }
+      expect(@root_account.reload.account_calendar_subscription_type).to eq "manual"
+    end
+
+    describe "metrics collection" do
+      before do
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+        user_session(@user)
+        allow(InstStatsd::Statsd).to receive(:gauge)
+      end
+
+      it "collects auto-subscribe on data" do
+        put :update, params: { account_id: @root_account, auto_subscribe: true }
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.auto_subscribing", 1)
+      end
+
+      it "collects auto-subscribe off data" do
+        put :update, params: { account_id: @root_account, auto_subscribe: false }
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.manual_subscribing", 1)
+      end
     end
   end
 
@@ -285,27 +335,39 @@ describe AccountCalendarsApiController do
       account_admin_user(active_all: true, account: @root_account, user: @user)
       user_session(@user)
       @subaccount1.account_calendar_visible = false
+      @subaccount1.account_calendar_subscription_type = "auto"
       @subaccount1.save!
+      @subaccount2.update!(account_calendar_subscription_type: "auto")
       put :bulk_update, params: {
         account_id: @root_account,
-        _json: [{ id: @root_account.id, visible: false }, { id: @subaccount1a.id, visible: false }, { id: @subaccount1.id, visible: true }]
+        _json: [{ id: @root_account.id, visible: false, auto_subscribe: true }, { id: @subaccount1a.id, visible: false }, { id: @subaccount1.id, visible: true, auto_subscribe: false }]
       }
 
       expect(response).to be_successful
       json = json_parse(response.body)
       expect(json["message"]).to eq "Updated 3 accounts"
+
       expect(@root_account.reload.account_calendar_visible).to be_falsey
       expect(@subaccount1.reload.account_calendar_visible).to be_truthy
       expect(@subaccount1a.reload.account_calendar_visible).to be_falsey
       expect(@subaccount2.reload.account_calendar_visible).to be_truthy # unchanged
+
+      expect(@root_account.account_calendar_subscription_type).to eq "auto"
+      expect(@subaccount1.account_calendar_subscription_type).to eq "manual"
+      expect(@subaccount1a.account_calendar_subscription_type).to eq "manual" # unchanged
+      expect(@subaccount2.account_calendar_subscription_type).to eq "auto" # unchanged
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility on provided account" do
-      account_admin_user_with_role_changes(active_all: true, account: @subaccount2, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @subaccount2,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       put :bulk_update, params: { account_id: @subaccount2.id, _json: [{ id: @subaccount2.id, visible: false }] }
+      expect(response).to be_unauthorized
 
+      put :bulk_update, params: { account_id: @subaccount2.id, _json: [{ id: @subaccount2.id, auto_subscribe: true }] }
       expect(response).to be_unauthorized
     end
 
@@ -333,20 +395,67 @@ describe AccountCalendarsApiController do
       put :bulk_update, params: { account_id: @root_account.id, _json: [{}] }
       expect(response).to be_bad_request
 
-      put :bulk_update, params: { account_id: @root_account.id, _json: [{ id: @root_account.id }] }
-      expect(response).to be_bad_request
-
       put :bulk_update, params: {
         account_id: @root_account.id,
         _json: [{ id: @root_account.id, visible: true }, { id: @root_account.id, visible: false }]
       }
       expect(response).to be_bad_request
+    end
 
+    it "does not update auto_subscribe if auto_subscribe_account_calendars is disabled" do
+      Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
       put :bulk_update, params: {
-        account_id: @root_account.id,
-        _json: [{ id: @root_account.id, visible: true }, { id: @subaccount2.id }]
+        account_id: @root_account,
+        _json: [{ id: @root_account.id, visible: false, auto_subscribe: true }]
       }
-      expect(response).to be_bad_request
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["message"]).to eq "Updated 1 account"
+      expect(@root_account.reload.account_calendar_visible).to be_falsey
+      expect(@root_account.account_calendar_subscription_type).to eq "manual"
+    end
+
+    it "only updates provided attributes" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      @subaccount1.update!(account_calendar_subscription_type: "auto")
+      user_session(@user)
+      put :bulk_update, params: {
+        account_id: @root_account,
+        _json: [{ id: @root_account.id, auto_subscribe: true }, { id: @subaccount1.id, visible: true }]
+      }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["message"]).to eq "Updated 2 accounts"
+
+      expect(@root_account.reload.account_calendar_visible).to be_truthy
+      expect(@root_account.account_calendar_subscription_type).to eq "auto"
+      expect(@subaccount1.reload.account_calendar_visible).to be_truthy
+      expect(@subaccount1.account_calendar_subscription_type).to eq "auto"
+    end
+
+    describe "metrics collection" do
+      before do
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+        user_session(@user)
+        allow(InstStatsd::Statsd).to receive(:gauge)
+      end
+
+      it "collects auto-subscribe data`" do
+        put :bulk_update, params: {
+          account_id: @root_account,
+          _json: [
+            { id: @root_account.id, auto_subscribe: true },
+            { id: @subaccount1.id, auto_subscribe: true },
+            { id: @subaccount2.id, auto_subscribe: false }
+          ]
+        }
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.auto_subscribing", 2)
+        expect(InstStatsd::Statsd).to have_received(:gauge).once.with("account_calendars.manual_subscribing", 1)
+      end
     end
   end
 
@@ -358,7 +467,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount2.id)
+      expect(json.pluck("id")).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount2.id)
     end
 
     it "returns hidden calendars" do
@@ -370,7 +479,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
+      expect(json.pluck("id")).to contain_exactly(@subaccount1.id, @subaccount1a.id)
     end
 
     it "returns only one account if provided account doesn't have subaccounts" do
@@ -380,7 +489,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount2.id)
+      expect(json.pluck("id")).to contain_exactly(@subaccount2.id)
     end
 
     context "with a search term" do
@@ -391,7 +500,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
+        expect(json.pluck("id")).to contain_exactly(@subaccount1.id, @subaccount1a.id)
       end
 
       it "returns SearchTermTooShortError if search term is less than 2 characters" do
@@ -421,7 +530,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1a.id, @subaccount2.id)
+        expect(json.pluck("id")).to contain_exactly(@root_account.id, @subaccount1a.id, @subaccount2.id)
       end
 
       it "only returns hidden calendars if filter is 'hidden'" do
@@ -429,7 +538,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
+        expect(json.pluck("id")).to contain_exactly(@subaccount1.id)
       end
 
       it "returns bad_request if filter is not 'visible' or 'hidden'" do
@@ -448,7 +557,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
+        expect(json.pluck("id")).to contain_exactly(@subaccount1.id)
       end
     end
 
@@ -461,7 +570,9 @@ describe AccountCalendarsApiController do
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
-      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @root_account,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       get :all_calendars, params: { account_id: @root_account.id }
@@ -493,7 +604,7 @@ describe AccountCalendarsApiController do
       get :all_calendars, params: { account_id: @subaccount2.id }
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount2.id)
+      expect(json.pluck("id")).to contain_exactly(@subaccount2.id)
     end
 
     it "includes appropriate value for sub_account_count in the response" do
@@ -520,7 +631,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to eq([@root_account.id, @subaccount2.id, @subaccount1.id])
+      expect(json.pluck("id")).to eq([@root_account.id, @subaccount2.id, @subaccount1.id])
     end
   end
 
@@ -538,7 +649,9 @@ describe AccountCalendarsApiController do
     end
 
     it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
-      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @root_account,
+                                           user: @user,
                                            role_changes: { manage_account_calendar_visibility: false })
       user_session(@user)
       get :visible_calendars_count, params: { account_id: @root_account.id }

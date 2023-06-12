@@ -59,7 +59,8 @@ describe MicrosoftSync::GraphService::Http do
     describe "quota option" do
       def expect_quota_counted(read_or_write, num)
         expect(InstStatsd::Statsd).to have_received(:count)
-          .with("microsoft_sync.graph_service.quota_#{read_or_write}", num,
+          .with("microsoft_sync.graph_service.quota_#{read_or_write}",
+                num,
                 tags: { msft_endpoint: "get_foo", extra_tag: "abc" })
       end
 
@@ -121,7 +122,8 @@ describe MicrosoftSync::GraphService::Http do
       # pagination "next" links are complete URLs
       subject.request(:get, "https://graph.microsoft.com/v1.0/foo/bar", quota: [1, 0])
       expect(InstStatsd::Statsd).to have_received(:count)
-        .with("microsoft_sync.graph_service.quota_read", 1,
+        .with("microsoft_sync.graph_service.quota_read",
+              1,
               tags: { msft_endpoint: "get_foo", extra_tag: "abc" })
       expect(InstStatsd::Statsd).to have_received(:increment)
         .with("microsoft_sync.graph_service.success",
@@ -139,7 +141,7 @@ describe MicrosoftSync::GraphService::Http do
         ]
       end
       let(:special_case_value) { :foo }
-      let(:result) { subject.request(:get, url, special_cases: special_cases) }
+      let(:result) { subject.request(:get, url, special_cases:) }
 
       shared_examples_for "when a special case is matched" do
         it "returns the special case's value" do
@@ -216,7 +218,8 @@ describe MicrosoftSync::GraphService::Http do
           subject.request(:post, "foo/bar", body: { hello: "world" })
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             "microsoft_sync.graph_service.retried",
-            tags: { msft_endpoint: "post_foo", extra_tag: "abc",
+            tags: { msft_endpoint: "post_foo",
+                    extra_tag: "abc",
                     status_code: status_code_statsd_tag }
           )
           expect(InstStatsd::Statsd).to have_received(:increment).with(
@@ -244,12 +247,14 @@ describe MicrosoftSync::GraphService::Http do
           expect { subject.request(:post, "foo/bar", body: { hello: "world" }) }.to raise_error(error_class)
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             "microsoft_sync.graph_service.retried",
-            tags: { msft_endpoint: "post_foo", extra_tag: "abc",
+            tags: { msft_endpoint: "post_foo",
+                    extra_tag: "abc",
                     status_code: status_code_statsd_tag }
           )
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             "microsoft_sync.graph_service.intermittent",
-            tags: { msft_endpoint: "post_foo", extra_tag: "abc",
+            tags: { msft_endpoint: "post_foo",
+                    extra_tag: "abc",
                     status_code: status_code_statsd_tag }
           )
         end
@@ -372,8 +377,8 @@ describe MicrosoftSync::GraphService::Http do
 
     it "passes in a url and quota to subsequent requests" do
       subject
-      expect(http).to \
-        have_received(:request).with(:get, continue_url, hash_including(quota: [2, 3]))
+      expect(http).to have_received(:request)
+        .with(:get, continue_url, hash_including(quota: [2, 3]))
     end
 
     context "when passed special_cases" do
@@ -384,14 +389,14 @@ describe MicrosoftSync::GraphService::Http do
 
       it "passes it on to the first request" do
         subject
-        expect(http).to \
-          have_received(:request).with(:get, "some/list", hash_including(special_cases: cases))
+        expect(http).to have_received(:request)
+          .with(:get, "some/list", hash_including(special_cases: cases))
       end
 
       it "passes it on to subsequent requests" do
         subject
-        expect(http).to \
-          have_received(:request).with(:get, continue_url, hash_including(special_cases: cases))
+        expect(http).to have_received(:request)
+          .with(:get, continue_url, hash_including(special_cases: cases))
       end
     end
   end
@@ -400,9 +405,10 @@ describe MicrosoftSync::GraphService::Http do
     before do
       WebMock.disable_net_connect!
       WebMock.stub_request(:post, "https://graph.microsoft.com/v1.0/$batch")
-             .with(body: { requests: requests })
+             .with(body: { requests: })
              .and_return(
-               status: status_code, body: { responses: responses }.to_json,
+               status: status_code,
+               body: { responses: }.to_json,
                headers: { "Content-type" => "application/json" }
              )
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
@@ -418,7 +424,7 @@ describe MicrosoftSync::GraphService::Http do
     end
     let(:status_code) { 200 }
     let(:run_batch) do
-      subject.run_batch("wombat", requests, quota: [3, 4], special_cases: special_cases)
+      subject.run_batch("wombat", requests, quota: [3, 4], special_cases:)
     end
     let(:special_cases) { [] }
     let(:responses) { [] }
@@ -426,10 +432,12 @@ describe MicrosoftSync::GraphService::Http do
     it "counts statsd metrics with the quota" do
       run_batch
       expect(InstStatsd::Statsd).to have_received(:count)
-        .with("microsoft_sync.graph_service.quota_read", 3,
+        .with("microsoft_sync.graph_service.quota_read",
+              3,
               tags: { msft_endpoint: "batch_wombat", extra_tag: "abc" })
       expect(InstStatsd::Statsd).to have_received(:count)
-        .with("microsoft_sync.graph_service.quota_write", 4,
+        .with("microsoft_sync.graph_service.quota_write",
+              4,
               tags: { msft_endpoint: "batch_wombat", extra_tag: "abc" })
     end
 
@@ -441,7 +449,8 @@ describe MicrosoftSync::GraphService::Http do
       it "counts a statsd metric with error status=unknown" do
         expect { run_batch }.to raise_error(MicrosoftSync::Errors::HTTPInternalServerError)
         expect(InstStatsd::Statsd).to have_received(:count)
-          .with("microsoft_sync.graph_service.batch.error", 2,
+          .with("microsoft_sync.graph_service.batch.error",
+                2,
                 tags: { msft_endpoint: "wombat", extra_tag: "abc", status: "unknown" })
       end
     end
@@ -466,7 +475,8 @@ describe MicrosoftSync::GraphService::Http do
           it 'raises a new error of that class and increments the "ignored" counter' do
             expect { run_batch }.to raise_error(custom_error_class)
             expect(InstStatsd::Statsd).to have_received(:count)
-              .with("microsoft_sync.graph_service.batch.ignored", 1,
+              .with("microsoft_sync.graph_service.batch.ignored",
+                    1,
                     tags: { msft_endpoint: "wombat", extra_tag: "abc", status: 400 })
           end
         end
@@ -479,7 +489,8 @@ describe MicrosoftSync::GraphService::Http do
           it 'increments the "ignored" counter' do
             run_batch
             expect(InstStatsd::Statsd).to have_received(:count)
-              .with("microsoft_sync.graph_service.batch.ignored", 1,
+              .with("microsoft_sync.graph_service.batch.ignored",
+                    1,
                     tags: { msft_endpoint: "wombat", extra_tag: "abc", status: 400 })
           end
 

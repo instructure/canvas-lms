@@ -78,7 +78,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
       attachments: [],
       body: "",
       require_submission_type_is_valid: true,
-      submission_type: submission_type,
+      submission_type:,
       url: nil
     }
     case submission_type
@@ -129,7 +129,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
         owning_user =
           User
           .joins(:submissions)
-          .where(submissions: { assignment: assignment })
+          .where(submissions: { assignment: })
           .find(input[:student_id])
         submission_params[:proxied_student] = owning_user
       else
@@ -162,7 +162,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     end
 
     submission = assignment.submit_homework(current_user, submission_params)
-    { submission: submission }
+    { submission: }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
   rescue ActiveRecord::RecordInvalid => e

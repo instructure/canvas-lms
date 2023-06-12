@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../cassandra_spec_helper"
-
 describe Auditors::Authentication do
   before do
     shard_class = Class.new do
@@ -28,279 +26,180 @@ describe Auditors::Authentication do
     EventStream.current_shard_lookup = lambda do
       shard_class.new
     end
-    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id:)
   end
 
   let(:request_id) { 42 }
 
-  describe "with cassandra backend" do
-    include_examples "cassandra audit logs"
-
-    before do
-      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra"], "read_path" => "cassandra" })
-      @account = Account.default
-      user_with_pseudonym(active_all: true)
-      @event = Auditors::Authentication.record(@pseudonym, "login")
-    end
-
-    context "nominal cases" do
-      it "returns the event on generation" do
-        expect(@event.class).to eq(Auditors::Authentication::Record)
-      end
-
-      it "includes event for pseudonym" do
-        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
-          .to include(@event)
-      end
-
-      it "includes event for account" do
-        expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
-          .to include(@event)
-      end
-
-      it "includes event at user" do
-        expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
-          .to include(@event)
-      end
-
-      it "sets request_id" do
-        expect(@event.request_id).to eq request_id.to_s
-      end
-
-      it "doesn't record an error when not configured" do
-        allow(Auditors::Authentication::Stream).to receive(:database).and_return(nil)
-        expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
-        expect(EventStream::Logger).not_to receive(:error)
-        Auditors::Authentication.record(@pseudonym, "login")
-      end
-    end
-
-    context "with a second account (same user)" do
-      before do
-        @account = account_model
-        user_with_pseudonym(user: @user, account: @account, active_all: true)
-      end
-
-      it "does not include cross-account events for pseudonym" do
-        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
-          .not_to include(@event)
-      end
-
-      it "does not include cross-account events for account" do
-        expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
-          .not_to include(@event)
-      end
-
-      it "includes cross-account events for user" do
-        expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
-          .to include(@event)
-      end
-    end
-
-    context "with a second user (same account)" do
-      before do
-        user_with_pseudonym(active_all: true)
-      end
-
-      it "does not include cross-user events for pseudonym" do
-        expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
-          .not_to include(@event)
-      end
-
-      it "includes cross-user events for account" do
-        expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
-          .to include(@event)
-      end
-
-      it "does not include cross-user events for user" do
-        expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
-          .not_to include(@event)
-      end
-    end
-
-    describe "options forwarding" do
-      before do
-        @event2 = @pseudonym.shard.activate do
-          record = Auditors::Authentication::Record.new(
-            "id" => SecureRandom.uuid,
-            "created_at" => 1.day.ago,
-            "pseudonym" => @pseudonym,
-            "event_type" => "login"
-          )
-          Auditors::Authentication::Stream.insert(record)
-        end
-      end
-
-      it "recognizes :oldest for pseudonyms" do
-        page = Auditors::Authentication
-               .for_pseudonym(@pseudonym, oldest: 12.hours.ago)
-               .paginate(per_page: 1)
-        expect(page).to include(@event)
-        expect(page).not_to include(@event2)
-      end
-
-      it "recognizes :newest for pseudonyms" do
-        page = Auditors::Authentication
-               .for_pseudonym(@pseudonym, newest: 12.hours.ago)
-               .paginate(per_page: 1)
-        expect(page).to include(@event2)
-        expect(page).not_to include(@event)
-      end
-
-      it "recognizes :oldest for accounts" do
-        page = Auditors::Authentication
-               .for_account(@account, oldest: 12.hours.ago)
-               .paginate(per_page: 1)
-        expect(page).to include(@event)
-        expect(page).not_to include(@event2)
-      end
-
-      it "recognizes :newest for accounts" do
-        page = Auditors::Authentication
-               .for_account(@account, newest: 12.hours.ago)
-               .paginate(per_page: 1)
-        expect(page).to include(@event2)
-        expect(page).not_to include(@event)
-      end
-
-      it "recognizes :oldest for users" do
-        page = Auditors::Authentication
-               .for_user(@user, oldest: 12.hours.ago)
-               .paginate(per_page: 1)
-        expect(page).to include(@event)
-        expect(page).not_to include(@event2)
-      end
-
-      it "recognizes :newest for users" do
-        page = Auditors::Authentication
-               .for_user(@user, newest: 12.hours.ago)
-               .paginate(per_page: 1)
-        expect(page).to include(@event2)
-        expect(page).not_to include(@event)
-      end
-    end
-
-    describe "sharding" do
-      specs_require_sharding
-
-      before(:once) do
-        [Shard.current, @shard1, @shard2].each do |s|
-          s.activate { Auditors::ActiveRecord::Partitioner.process }
-        end
-      end
-
-      context "different shard, same database server" do
-        before do
-          @shard1.activate do
-            @account = account_model
-            user_with_pseudonym(account: @account, active_all: true)
-            @event1 = Auditors::Authentication.record(@pseudonym, "login")
-          end
-          user_with_pseudonym(user: @user, active_all: true)
-          @event2 = Auditors::Authentication.record(@pseudonym, "login")
-        end
-
-        it "includes events from the user's native shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
-            .to include(@event1)
-        end
-
-        it "includes events from the other pseudonym's shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
-            .to include(@event2)
-        end
-
-        it "does not include duplicate events" do
-          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 4)
-            .size).to eq 2
-        end
-      end
-
-      context "different shard, different database server" do
-        before do
-          @shard2.activate do
-            @account = account_model
-            user_with_pseudonym(account: @account, active_all: true)
-            @event1 = Auditors::Authentication.record(@pseudonym, "login")
-          end
-          user_with_pseudonym(user: @user, active_all: true)
-          @event2 = Auditors::Authentication.record(@pseudonym, "login")
-        end
-
-        it "includes events from the user's native shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
-            .to include(@event1)
-        end
-
-        it "includes events from the other pseudonym's shard" do
-          expect(Auditors::Authentication.for_user(@user).paginate(per_page: 2))
-            .to include(@event2)
-        end
-      end
-
-      context "different shard, db auditors" do
-        before do
-          allow(Audits).to receive(:write_to_cassandra?).and_return(false)
-          allow(Audits).to receive(:write_to_postgres?).and_return(true)
-          allow(Audits).to receive(:read_from_cassandra?).and_return(false)
-          allow(Audits).to receive(:read_from_postgres?).and_return(true)
-          @shard2.activate do
-            @account = account_model
-            user_with_pseudonym(account: @account, active_all: true)
-            @event1 = Auditors::Authentication.record(@pseudonym, "login")
-          end
-          user_with_pseudonym(user: @user, active_all: true)
-          @event2 = Auditors::Authentication.record(@pseudonym, "login")
-        end
-
-        it "includes events from the user's native shard" do
-          records = Auditors::Authentication.for_user(@user).paginate(per_page: 2)
-          uuids = records.map(&:uuid)
-          expect(uuids).to include(@event1.id)
-        end
-
-        it "includes events from the other pseudonym's shard" do
-          records = Auditors::Authentication.for_user(@user).paginate(per_page: 2)
-          uuids = records.map(&:uuid)
-          expect(uuids).to include(@event2.id)
-        end
-      end
-    end
+  before do
+    @account = Account.default
+    user_with_pseudonym(active_all: true)
+    @raw_event = Auditors::Authentication.record(@pseudonym, "login")
+    @event = Auditors::ActiveRecord::AuthenticationRecord.where(uuid: @raw_event.id).first
   end
 
-  describe "with dual writing enabled to postgres" do
-    before do
-      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "cassandra" })
-      @account = Account.default
-      user_with_pseudonym(active_all: true)
-      @event = Auditors::Authentication.record(@pseudonym, "login")
+  context "nominal cases" do
+    it "returns the event on generation" do
+      expect(@raw_event.class).to eq(Auditors::Authentication::Record)
     end
 
-    it "writes to cassandra" do
-      expect(Audits.write_to_cassandra?).to eq(true)
+    it "includes event for pseudonym" do
       expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
         .to include(@event)
     end
 
-    it "writes to postgres" do
-      expect(Audits.write_to_postgres?).to eq(true)
-      pg_record = Auditors::ActiveRecord::AuthenticationRecord.where(uuid: @event.id).first
-      expect(pg_record.pseudonym_id).to eq(@pseudonym.id)
+    it "includes event for account" do
+      expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
+        .to include(@event)
+    end
+
+    it "includes event at user" do
+      expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
+        .to include(@event)
+    end
+
+    it "sets request_id" do
+      expect(@event.request_id).to eq request_id.to_s
     end
   end
 
-  describe "with reading from postgres" do
+  context "with a second account (same user)" do
     before do
-      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "active_record" })
-      @account = Account.default
-      user_with_pseudonym(active_all: true)
-      @event = Auditors::Authentication.record(@pseudonym, "login")
+      @account = account_model
+      user_with_pseudonym(user: @user, account: @account, active_all: true)
     end
 
-    it "can be read from postgres" do
-      expect(Audits.read_from_postgres?).to eq(true)
-      pg_record = Auditors::ActiveRecord::AuthenticationRecord.where(uuid: @event.id).first
-      expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1)).to include(pg_record)
+    it "does not include cross-account events for pseudonym" do
+      expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
+        .not_to include(@event)
+    end
+
+    it "does not include cross-account events for account" do
+      expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
+        .not_to include(@event)
+    end
+
+    it "includes cross-account events for user" do
+      expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
+        .to include(@event)
+    end
+  end
+
+  context "with a second user (same account)" do
+    before do
+      user_with_pseudonym(active_all: true)
+    end
+
+    it "does not include cross-user events for pseudonym" do
+      expect(Auditors::Authentication.for_pseudonym(@pseudonym).paginate(per_page: 1))
+        .not_to include(@event)
+    end
+
+    it "includes cross-user events for account" do
+      expect(Auditors::Authentication.for_account(@account).paginate(per_page: 1))
+        .to include(@event)
+    end
+
+    it "does not include cross-user events for user" do
+      expect(Auditors::Authentication.for_user(@user).paginate(per_page: 1))
+        .not_to include(@event)
+    end
+  end
+
+  describe "options forwarding" do
+    before do
+      @raw_event2 = @pseudonym.shard.activate do
+        record = Auditors::Authentication::Record.new(
+          "id" => SecureRandom.uuid,
+          "created_at" => 1.day.ago,
+          "pseudonym" => @pseudonym,
+          "event_type" => "login"
+        )
+        Auditors::Authentication::Stream.insert(record)
+      end
+      @event2 = Auditors::ActiveRecord::AuthenticationRecord.where(uuid: @raw_event2.id).first
+    end
+
+    it "recognizes :oldest for pseudonyms" do
+      page = Auditors::Authentication
+             .for_pseudonym(@pseudonym, oldest: 12.hours.ago)
+             .paginate(per_page: 1)
+      expect(page).to include(@event)
+      expect(page).not_to include(@event2)
+    end
+
+    it "recognizes :newest for pseudonyms" do
+      page = Auditors::Authentication
+             .for_pseudonym(@pseudonym, newest: 12.hours.ago)
+             .paginate(per_page: 1)
+      expect(page).to include(@event2)
+      expect(page).not_to include(@event)
+    end
+
+    it "recognizes :oldest for accounts" do
+      page = Auditors::Authentication
+             .for_account(@account, oldest: 12.hours.ago)
+             .paginate(per_page: 1)
+      expect(page).to include(@event)
+      expect(page).not_to include(@event2)
+    end
+
+    it "recognizes :newest for accounts" do
+      page = Auditors::Authentication
+             .for_account(@account, newest: 12.hours.ago)
+             .paginate(per_page: 1)
+      expect(page).to include(@event2)
+      expect(page).not_to include(@event)
+    end
+
+    it "recognizes :oldest for users" do
+      page = Auditors::Authentication
+             .for_user(@user, oldest: 12.hours.ago)
+             .paginate(per_page: 1)
+      expect(page).to include(@event)
+      expect(page).not_to include(@event2)
+    end
+
+    it "recognizes :newest for users" do
+      page = Auditors::Authentication
+             .for_user(@user, newest: 12.hours.ago)
+             .paginate(per_page: 1)
+      expect(page).to include(@event2)
+      expect(page).not_to include(@event)
+    end
+  end
+
+  describe "sharding" do
+    specs_require_sharding
+
+    before(:once) do
+      [Shard.current, @shard1, @shard2].each do |s|
+        s.activate { Auditors::ActiveRecord::Partitioner.process }
+      end
+    end
+
+    context "different shard, db auditors" do
+      before do
+        @shard2.activate do
+          @account = account_model
+          user_with_pseudonym(account: @account, active_all: true)
+          @event1 = Auditors::Authentication.record(@pseudonym, "login")
+        end
+        user_with_pseudonym(user: @user, active_all: true)
+        @event2 = Auditors::Authentication.record(@pseudonym, "login")
+      end
+
+      it "includes events from the user's native shard" do
+        records = Auditors::Authentication.for_user(@user).paginate(per_page: 2)
+        uuids = records.map(&:uuid)
+        expect(uuids).to include(@event1.id)
+      end
+
+      it "includes events from the other pseudonym's shard" do
+        records = Auditors::Authentication.for_user(@user).paginate(per_page: 2)
+        uuids = records.map(&:uuid)
+        expect(uuids).to include(@event2.id)
+      end
     end
   end
 end

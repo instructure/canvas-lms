@@ -58,7 +58,7 @@ describe "quizzes question banks" do
     it "tallies up question bank question points", priority: "1" do
       quiz = @course.quizzes.create!(title: "My Quiz")
       bank = AssessmentQuestionBank.create!(context: @course)
-      3.times { assessment_question_model(bank: bank) }
+      3.times { assessment_question_model(bank:) }
       harder = bank.assessment_questions.last
       harder.question_data[:points_possible] = 15
       harder.save!
@@ -79,7 +79,7 @@ describe "quizzes question banks" do
       @course.save
       quiz = @course.quizzes.create!(title: "My Quiz")
       bank = AssessmentQuestionBank.create!(context: @course.account)
-      assessment_question_model(bank: bank)
+      assessment_question_model(bank:)
 
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
       click_questions_tab
@@ -112,7 +112,7 @@ describe "quizzes question banks" do
       @course.save
       quiz = @course.quizzes.create!(title: "My Quiz")
       bank = AssessmentQuestionBank.create!(context: Course.create!)
-      assessment_question_model(bank: bank)
+      assessment_question_model(bank:)
       @user.assessment_question_banks << bank
 
       get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
@@ -171,7 +171,7 @@ describe "quizzes question banks" do
 
     it "creates a question group from a question bank", custom_timeout: 30, priority: "1" do
       bank = AssessmentQuestionBank.create!(context: @course)
-      3.times { assessment_question_model(bank: bank) }
+      3.times { assessment_question_model(bank:) }
 
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
@@ -218,7 +218,7 @@ describe "quizzes question banks" do
 
       # create new quiz question group from selected questions
       question_group_name = "Quiz Question Group A"
-      click_option(ffj(".quiz_group_select"), "[ New Group ]")
+      click_option(ff(".quiz_group_select"), "[ Create Group ]")
       fj("#found_question_group_name").send_keys question_group_name
       fj("#found_question_group_pick").send_keys "1"
       fj("#found_question_group_points").send_keys "1"
@@ -378,8 +378,10 @@ describe "quizzes question banks" do
       51.times do |o|
         assessment_question[o] = source_bank.assessment_questions.create!
         @quiz_question.push(@q.quiz_questions.create!(question_data:
-                                                   { :name => "question #{o}", :question_type => "multiple_choice_question",
-                                                     "answers" => answers, :points_possible => 1 },
+                                                   { :name => "question #{o}",
+                                                     :question_type => "multiple_choice_question",
+                                                     "answers" => answers,
+                                                     :points_possible => 1 },
                                                       assessment_question: assessment_question[o]))
       end
       get "/courses/#{@course.id}/question_banks/#{source_bank.id}"

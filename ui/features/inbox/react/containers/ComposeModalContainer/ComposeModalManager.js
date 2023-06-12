@@ -47,10 +47,13 @@ const ComposeModalManager = props => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [modalError, setModalError] = useState(null)
 
+  // no-cache policy is required here to decouple the composeModalManager course query from the
+  // MessageListActionContainer course query. Otherwise the filtered courses get cached to both
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
       userID: ENV.current_user_id?.toString(),
     },
+    fetchPolicy: 'no-cache',
     skip: props.isReply || props.isReplyAll || props.isForward,
   })
 
@@ -59,7 +62,7 @@ const ComposeModalManager = props => {
 
     const lastAuthor = props.conversationMessage
       ? props.conversationMessage?.author
-      : props.conversation?.messages[0].author
+      : props.conversation?.messages[0]?.author
 
     if (
       lastAuthor &&
@@ -84,7 +87,7 @@ const ComposeModalManager = props => {
     variables: {
       conversationID: props.conversation?._id,
       participants: getReplyRecipientIDs(),
-      ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt}),
+      ...(props.conversationMessage && {createdBefore: props.conversationMessage?.createdAt}),
       first: props.isForward && props.conversationMessage ? 1 : null,
     },
     notifyOnNetworkStatusChange: true,
@@ -132,7 +135,7 @@ const ComposeModalManager = props => {
               conversationID: props.conversation?._id,
               participants: getReplyRecipientIDs(),
               ...(props.conversationMessage && {
-                createdBefore: props.conversationMessage.createdAt,
+                createdBefore: props.conversationMessage?.createdAt,
               }),
             },
           })
@@ -148,7 +151,7 @@ const ComposeModalManager = props => {
         variables: {
           conversationID: props.conversation?._id,
           participants: getReplyRecipientIDs(),
-          ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt}),
+          ...(props.conversationMessage && {createdBefore: props.conversationMessage?.createdAt}),
         },
         data: {legacyNode: replyQueryResult.legacyNode},
       })
@@ -307,6 +310,18 @@ const ComposeModalManager = props => {
     return <ModalSpinner label={I18n.t('Loading')} message={I18n.t('Loading Compose Modal')} />
   }
 
+  const filteredCourses = () => {
+    const courses = coursesQuery?.data?.legacyNode
+    if (courses) {
+      courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.concluded)
+      courses.favoriteGroupsConnection.nodes = courses?.favoriteGroupsConnection?.nodes.filter(
+        group => group?.canMessage
+      )
+    }
+
+    return courses
+  }
+
   return (
     <ComposeModalContainer
       addConversationMessage={data => {
@@ -328,7 +343,7 @@ const ComposeModalManager = props => {
           },
         })
       }}
-      courses={coursesQuery?.data?.legacyNode}
+      courses={filteredCourses()}
       createConversation={createConversation}
       isReply={props.isReply || props.isReplyAll}
       isForward={props.isForward}
@@ -339,9 +354,11 @@ const ComposeModalManager = props => {
       setSendingMessage={setSendingMessage}
       onSelectedIdsChange={props.onSelectedIdsChange}
       selectedIds={props.selectedIds}
+      maxGroupRecipientsMet={props.maxGroupRecipientsMet}
       submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
       modalError={modalError}
       isPrivateConversation={!!props?.conversation?.isPrivate}
+      currentCourseFilter={props.currentCourseFilter}
     />
   )
 }
@@ -357,6 +374,8 @@ ComposeModalManager.propTypes = {
   conversationsQueryOption: PropTypes.object,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
+  maxGroupRecipientsMet: PropTypes.bool,
+  currentCourseFilter: PropTypes.string,
 }
 
 export default ComposeModalManager

@@ -26,11 +26,11 @@ module DataFixup
     end
 
     def self.find_or_create_default_account_binding(developer_key)
-      return if developer_key.owner_account.developer_key_account_bindings.where(developer_key: developer_key).exists?
+      return if developer_key.owner_account.developer_key_account_bindings.where(developer_key:).exists?
 
       developer_key.owner_account.developer_key_account_bindings.create!(
         workflow_state: "on",
-        developer_key: developer_key
+        developer_key:
       )
     end
   end

@@ -66,13 +66,12 @@ describe GroupsController do
       get "index", params: { course_id: @course.id }
       expect(response).to be_successful
       expect(assigns[:groups]).not_to be_empty
-      expect(assigns[:groups].length).to eql(3)
+      expect(assigns[:groups].length).to be(3)
       expect(assigns[:groups] - [g1, g2, g3]).to be_empty
-      expect(assigns[:categories].length).to eql(2)
+      expect(assigns[:categories].length).to be(2)
     end
 
     it "returns groups in sorted by group category name, then group name for student view" do
-      skip_unless_pg_collkey_present
       user_session(@student)
       category1 = @course.group_categories.create(name: "1")
       category2 = @course.group_categories.create(name: "2")
@@ -91,7 +90,7 @@ describe GroupsController do
       get "index", params: { course_id: @course.id, per_page: 50 }, format: "json"
       expect(response).to be_successful
       expect(assigns[:paginated_groups]).not_to be_empty
-      expect(assigns[:paginated_groups].length).to eql(9)
+      expect(assigns[:paginated_groups].length).to be(9)
       # Check group category ordering
       expect(assigns[:paginated_groups][0].group_category.name).to eql("1")
       expect(assigns[:paginated_groups][1].group_category.name).to eql("1")
@@ -114,6 +113,24 @@ describe GroupsController do
       expect(assigns[:paginated_groups][8].name).to eql("44")
     end
 
+    it "does not 500 for admins that can view but cannot manage groups" do
+      a = Account.default
+      role = custom_account_role("groups-view-only", account: a)
+      a.role_overrides.create! role:, permission: "manage_groups", enabled: false
+      a.role_overrides.create! role:, permission: "read_roster", enabled: true
+      a.role_overrides.create! role:, permission: "view_group_pages", enabled: true
+
+      my_admin = User.create!(name: "my admin")
+      a.account_users.create!(user: my_admin, role:)
+
+      course_with_teacher(active_all: true)
+      user_session(my_admin)
+      category1 = @course.group_categories.create(name: "category 1")
+      @course.groups.create(name: "some group", group_category: category1)
+      get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
+      expect(response).to have_http_status :ok
+    end
+
     it "don't filter out inactive students if json and param set" do
       course_with_teacher(active_all: true)
       students = create_users_in_course(@course, 2, return_type: :record)
@@ -124,16 +141,19 @@ describe GroupsController do
       g.add_user(student2)
       student2.enrollments.first.deactivate
       user_session(student1)
-      get "index", params: { course_id: @course.id, include: "users",
-                             include_inactive_users: true }, format: :json
+      get "index",
+          params: { course_id: @course.id,
+                    include: "users",
+                    include_inactive_users: true },
+          format: :json
       parsed_json = json_parse(response.body)
       expect(parsed_json.length).to eq 1
       users_json = parsed_json.first["users"]
       expect(users_json).not_to be_nil
       expect(users_json.length).to eq 2
-      ids_json = users_json.map { |u| u["id"] }.to_set
+      ids_json = users_json.to_set { |u| u["id"] }
       expect(ids_json).to eq [student1.id, student2.id].to_set
-      names_json = users_json.map { |u| u["name"] }.to_set
+      names_json = users_json.to_set { |u| u["name"] }
       expect(names_json).to eq [student1.name, student2.name].to_set
       expect(response).to be_successful
     end
@@ -175,15 +195,15 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
+          expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user.id)
         end
 
         it "does not hide group if you are a group member" do
-          # Group with the restricted user
+          # Group with a section_restricted user
           group_with_section_restricted_user = @course.groups.create(name: "restricted 1", group_category: @group_category)
-          group_with_section_restricted_user.add_user(@section_restricted_student)
+          group_with_section_restricted_user.add_user(@section_restricted_student_2)
           group_with_section_restricted_user.save
 
           # Group with student from another section
@@ -197,9 +217,9 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(2)
+          expect(assigns[:groups].length).to be(2)
+          expect(assigns[:groups].map(&:id).sort).to eql(@group_category.groups.map(&:id).sort)
         end
       end
 
@@ -225,9 +245,9 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(2)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(2)
+          expect(json_parse(response.body).length).to be(2)
+          expect(assigns[:groups].length).to be(2)
+          expect(assigns[:groups].map(&:id).sort).to eql(@group_category_non_restricted.groups.map(&:id).sort)
         end
       end
 
@@ -256,9 +276,9 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(2)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(2)
+          expect(json_parse(response.body).length).to be(2)
+          expect(assigns[:groups].length).to be(2)
+          expect(assigns[:groups].map(&:id).sort).to eql(@group_category.groups.map(&:id).sort)
         end
 
         it "does not remove empty groups" do
@@ -271,9 +291,9 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
+          expect(assigns[:groups][0].id).to eql(group_with_user_in_different_section.id)
         end
 
         it "does not remove full groups if users have the same section as the current user" do
@@ -288,9 +308,9 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
+          expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user_2.id)
         end
 
         it "does not show groups with students from other sections to section restricted students" do
@@ -308,9 +328,9 @@ describe GroupsController do
           get "index", params: { course_id: @course.id, section_restricted: true }, format: :json
 
           expect(response).to be_successful
-          expect(json_parse(response.body).length).to eql(1)
-          expect(assigns[:groups]).not_to be_empty
-          expect(assigns[:groups].length).to eql(1)
+          expect(json_parse(response.body).length).to be(1)
+          expect(assigns[:groups].length).to be(1)
+          expect(assigns[:groups][0].id).to eql(group_with_section_restricted_user.id)
         end
       end
     end
@@ -672,7 +692,7 @@ describe GroupsController do
     it "fails when group[group_category_id] doesn't exist" do
       user_session(@teacher)
       group_category = @course.group_categories.create(name: "some category")
-      @group = @course.groups.create!(name: "some group", group_category: group_category)
+      @group = @course.groups.create!(name: "some group", group_category:)
       put "update", params: { course_id: @course.id, id: @group.id, group: { group_category_id: 11_235 } }
       expect(response).not_to be_successful
     end
@@ -792,7 +812,7 @@ describe GroupsController do
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }.sort)
+      expect(data["users"].pluck("user_id").sort)
         .to eq [u1, u2, u3].map(&:id).sort
     end
 
@@ -819,21 +839,21 @@ describe GroupsController do
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }.sort)
+      expect(data["users"].pluck("user_id").sort)
         .to eq [u2, u3].map(&:id).sort
 
       get "unassigned_members", params: { course_id: @course.id, category_id: group2.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }.sort)
+      expect(data["users"].pluck("user_id").sort)
         .to eq [u1, u3].map(&:id).sort
 
       get "unassigned_members", params: { course_id: @course.id, category_id: group3.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
-      expect(data["users"].map { |u| u["user_id"] }).to eq [u1.id]
+      expect(data["users"].pluck("user_id")).to eq [u1.id]
     end
 
     it "includes the users' sections when available" do
@@ -1022,28 +1042,54 @@ describe GroupsController do
 
   describe "POST create_file" do
     let(:course) { Course.create! }
-    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
     let(:group_category) { course.group_categories.create!(name: "just a category") }
-    let(:group) { course.groups.create!(name: "just a group", group_category: group_category) }
+    let(:group) { course.groups.create!(name: "just a group", group_category:) }
     let(:assignment) { course.assignments.create!(title: "hi", submission_types: "online_upload") }
 
-    let(:request_params) do
-      { course_id: course.id, group_id: group.id, filename: "An attachment!", url: "http://nowhere" }
-    end
-    let(:progress) { Progress.last }
+    context "as a teacher" do
+      before do
+        user_session(teacher)
+      end
 
-    before do
-      user_session(teacher)
+      let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+      let(:progress) { Progress.last }
+      let(:request_params) do
+        { course_id: course.id, group_id: group.id, filename: "An attachment!", url: "http://nowhere" }
+      end
+
+      it "creates a Progress object with an assignment as the context when the assignment_id parameter is included" do
+        put "create_file", params: request_params.merge({ assignment_id: assignment.id })
+        expect(progress.context).to eq(assignment)
+      end
+
+      it "creates a Progress object with the current user as the context when no assignment parameter is included" do
+        put "create_file", params: request_params
+        expect(progress.context).to eq(teacher)
+      end
     end
 
-    it "creates a Progress object with an assignment as the context when the assignment_id parameter is included" do
-      put "create_file", params: request_params.merge({ assignment_id: assignment.id })
-      expect(progress.context).to eq(assignment)
-    end
+    context "as a student" do
+      before do
+        @student = course.enroll_student(User.create!, enrollment_state: "active").user
+        group.add_user(@student, "accepted")
+        user_session(@student)
+      end
 
-    it "creates a Progress object with the current user as the context when no assignment parameter is included" do
-      put "create_file", params: request_params
-      expect(progress.context).to eq(teacher)
+      let(:request_params) do
+        { group_id: group.id, assignment_id: assignment.id, filename: "An attachment!", url: "http://nowhere" }
+      end
+
+      let(:created_attachment) { group.attachments.first }
+
+      it "uses the 'submissions' folder for assignment submissions" do
+        put "create_file", params: request_params.merge(submit_assignment: true)
+        expect(created_attachment.folder).to eq group.submissions_folder
+      end
+
+      it "uses the default folder for non-submissions" do
+        put "create_file", params: request_params
+        expect(created_attachment.folder).to eq Folder.unfiled_folder(group)
+      end
     end
   end
 end

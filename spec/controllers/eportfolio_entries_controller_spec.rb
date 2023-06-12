@@ -112,7 +112,7 @@ describe EportfolioEntriesController do
           user_session(@user)
           get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
 
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
         end
       end
 
@@ -142,7 +142,7 @@ describe EportfolioEntriesController do
           user_session(@admin)
           get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
 
-          expect(response.status).to eq(200)
+          expect(response).to have_http_status(:ok)
         end
 
         it "is unauthorized when the eportfolio is spam and the admin does not have :moderate_user_content permissions" do
@@ -218,7 +218,7 @@ describe EportfolioEntriesController do
     it "will 404 for bad IDs" do
       user_session(@user)
       get "attachment", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, attachment_id: SecureRandom.uuid }
-      expect(response.status).to eq(404)
+      expect(response).to have_http_status(:not_found)
     end
 
     describe "with sharding" do
@@ -241,7 +241,7 @@ describe EportfolioEntriesController do
       @student = @user
       course = Course.create!
       course.enroll_student(@student).accept(true)
-      teacher = teacher_in_course(course: course, active_all: true).user
+      teacher = teacher_in_course(course:, active_all: true).user
       @assignment = course.assignments.create!
       @submission = @assignment.submissions.find_by(user: @student)
       @assignment.grade_student(@student, grader: teacher, score: 5)

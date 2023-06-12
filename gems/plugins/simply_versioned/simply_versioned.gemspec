@@ -12,7 +12,6 @@ Gem::Specification.new do |s|
   s.summary     = "Instructure-maintained fork of simply_versioned"
 
   s.files = Dir["{app,config,db,lib}/**/*"]
-  s.test_files = Dir["spec_canvas/**/*"]
 
   s.add_dependency "rails", ">= 3.2"
 end

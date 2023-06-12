@@ -20,7 +20,7 @@
 require_relative "../lti2_spec_helper"
 
 describe OriginalityReport do
-  subject { OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission, workflow_state: "pending") }
+  subject { OriginalityReport.create!(attachment:, originality_score: "1", submission:, workflow_state: "pending") }
 
   let(:attachment) { attachment_model }
   let(:course) { course_model }
@@ -90,15 +90,15 @@ describe OriginalityReport do
 
   it "can create multiple originality reports with the same originality_report_attachment_id" do
     report = OriginalityReport.create!(
-      attachment: attachment,
+      attachment:,
       originality_score: "1",
-      submission: submission,
+      submission:,
       workflow_state: "pending"
     )
     report2 = OriginalityReport.create!(
-      attachment: attachment,
+      attachment:,
       originality_score: "1",
-      submission: submission,
+      submission:,
       workflow_state: "pending"
     )
     report.originality_report_attachment_id = 123
@@ -127,22 +127,22 @@ describe OriginalityReport do
 
     it "creates an lti link" do
       report = OriginalityReport.create!(
-        attachment: attachment,
+        attachment:,
         originality_score: "1",
-        submission: submission,
+        submission:,
         workflow_state: "pending",
-        lti_link_attributes: lti_link_attributes
+        lti_link_attributes:
       )
       expect(report.lti_link.product_code).to eq "product"
     end
 
     it "updates an lti link" do
       report = OriginalityReport.create!(
-        attachment: attachment,
+        attachment:,
         originality_score: "1",
-        submission: submission,
+        submission:,
         workflow_state: "pending",
-        lti_link_attributes: lti_link_attributes
+        lti_link_attributes:
       )
       report.update(lti_link_attributes: { id: report.lti_link.id, resource_url: "http://example.com" })
       expect(report.lti_link.resource_url).to eq "http://example.com"
@@ -150,11 +150,11 @@ describe OriginalityReport do
 
     it "destroys an lti link" do
       report = OriginalityReport.create!(
-        attachment: attachment,
+        attachment:,
         originality_score: "1",
-        submission: submission,
+        submission:,
         workflow_state: "pending",
-        lti_link_attributes: lti_link_attributes
+        lti_link_attributes:
       )
       link_id = report.lti_link.id
       report.update!(lti_link_attributes: { id: link_id, _destroy: true })
@@ -163,8 +163,8 @@ describe OriginalityReport do
   end
 
   describe "workflow_state transitions" do
-    let(:report_no_score) { OriginalityReport.new(attachment: attachment, submission: submission) }
-    let(:report_with_score) { OriginalityReport.new(attachment: attachment, submission: submission, originality_score: 23.2) }
+    let(:report_no_score) { OriginalityReport.new(attachment:, submission:) }
+    let(:report_with_score) { OriginalityReport.new(attachment:, submission:, originality_score: 23.2) }
 
     it "updates state to 'scored' if originality_score is set on existing record" do
       report_no_score.update(originality_score: 23.0)
@@ -208,7 +208,7 @@ describe OriginalityReport do
     context 'when "submission_time" is blank' do
       let(:originality_report) do
         o = OriginalityReport.create!(
-          submission: submission,
+          submission:,
           originality_score: 23
         )
         o.update_attribute(:submission_time, nil)
@@ -221,8 +221,8 @@ describe OriginalityReport do
 
     it "returns the attachment asset string if attachment is present" do
       report = OriginalityReport.create!(
-        submission: submission,
-        attachment: attachment,
+        submission:,
+        attachment:,
         originality_score: 23
       )
       expect(report.asset_key).to eq attachment.asset_string
@@ -230,7 +230,7 @@ describe OriginalityReport do
 
     it "returns the submission asset string if the attachment is blank" do
       report = OriginalityReport.create!(
-        submission: submission,
+        submission:,
         originality_score: 23
       )
       expect(report.asset_key).to eq "#{submission.asset_string}_#{submission.submitted_at.utc.iso8601}"
@@ -249,9 +249,9 @@ describe OriginalityReport do
     let(:report) { subject }
 
     it "creates an LTI launch URL if a lti_link is present" do
-      report.update(lti_link: lti_link)
-      expected_url = "/courses/"\
-                     "#{submission.assignment.course.id}/assignments/"\
+      report.update(lti_link:)
+      expected_url = "/courses/" \
+                     "#{submission.assignment.course.id}/assignments/" \
                      "#{submission.assignment.id}/lti/resource/#{lti_link.resource_link_id}?display=borderless"
       expect(report.report_launch_path).to eq expected_url
     end
@@ -287,14 +287,14 @@ describe OriginalityReport do
       group = course.groups.create!(name: "group one")
       group.add_user(user_one)
       group.add_user(user_two)
-      submission_one.update!(group: group)
-      submission_two.update!(group: group)
+      submission_one.update!(group:)
+      submission_two.update!(group:)
       group
     end
     let(:originality_score) { 23.2 }
     let!(:originality_report) do
       OriginalityReport.create!(
-        originality_score: originality_score,
+        originality_score:,
         submission: submission_one
       )
     end
@@ -390,12 +390,10 @@ describe OriginalityReport do
 
     it "uses the updated_at of the original report so an old report doesn't look new" do
       originality_report.copy_to_group_submissions!
-      expect(submission_two.originality_reports.first.updated_at).to \
-        eq(originality_report.updated_at)
+      expect(submission_two.originality_reports.first.updated_at).to eq(originality_report.updated_at)
       originality_report.touch
       originality_report.copy_to_group_submissions!
-      expect(submission_two.originality_reports.first.updated_at).to \
-        eq(originality_report.updated_at)
+      expect(submission_two.originality_reports.first.updated_at).to eq(originality_report.updated_at)
     end
 
     context "with sharding" do
@@ -407,7 +405,7 @@ describe OriginalityReport do
 
       it "allows cross-shard attachment associations" do
         report = OriginalityReport.create!(
-          submission: submission,
+          submission:,
           originality_score: 50,
           attachment: new_shard_attachment
         )
@@ -416,7 +414,7 @@ describe OriginalityReport do
 
       it "allows cross-shard report attachment associations" do
         report = OriginalityReport.create!(
-          submission: submission,
+          submission:,
           originality_score: 50,
           originality_report_attachment: new_shard_attachment
         )
@@ -471,7 +469,7 @@ describe OriginalityReport do
 
       before do
         group.add_user(submission.user)
-        submission.update!(group: group)
+        submission.update!(group:)
       end
 
       it "enqueues a job to copy_to_group_submissions! with the correct parameters" do

@@ -60,7 +60,7 @@ class Quizzes::QuizQuestion::QuestionData
 
   def self.generate(fields = {})
     fields = Quizzes::QuizQuestion::RawFields.new(fields)
-    question = Quizzes::QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
+    question = Quizzes::QuizQuestion::QuestionData.new(ActiveSupport::HashWithIndifferentAccess.new)
     question.allows_partial_credit! if fields.fetch_any(:allow_partial_credit, true)
 
     # general fields
@@ -103,9 +103,18 @@ class Quizzes::QuizQuestion::QuestionData
   private
 
   def question_types
-    @question_types ||= %w[calculated essay file_upload fill_in_multiple_blanks matching
-                           multiple_answers multiple_choice multiple_dropdowns numerical
-                           short_answer text_only unknown ].map(&:to_sym)
+    @question_types ||= %w[calculated
+                           essay
+                           file_upload
+                           fill_in_multiple_blanks
+                           matching
+                           multiple_answers
+                           multiple_choice
+                           multiple_dropdowns
+                           numerical
+                           short_answer
+                           text_only
+                           unknown ].map(&:to_sym)
   end
 
   def set_defaults

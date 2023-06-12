@@ -47,7 +47,7 @@ describe Mutations::CreateCommentBankItem do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   let(:valid_query) do

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector.coffee'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
+import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'

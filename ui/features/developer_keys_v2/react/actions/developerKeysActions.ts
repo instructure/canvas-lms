@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -513,8 +514,7 @@ actions.updateLtiKey = (
   disabled_placements,
   developerKeyId,
   toolConfiguration,
-  customFields,
-  privacyLevel
+  customFields
 ) => {
   const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
   return axios
@@ -530,7 +530,6 @@ actions.updateLtiKey = (
         custom_fields: customFields,
         disabled_placements,
         settings: toolConfiguration,
-        privacy_level: privacyLevel,
       },
     })
     .then(data => {

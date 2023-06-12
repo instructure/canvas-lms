@@ -42,7 +42,7 @@ export function PostMessage({...props}) {
       props={{
         mobile: {
           titleMargin: '0',
-          titleTextSize: 'medium',
+          titleTextSize: 'small',
           titleTextWeight: 'bold',
           messageTextSize: 'fontSizeSmall',
         },
@@ -56,7 +56,11 @@ export function PostMessage({...props}) {
       render={responsiveProps => (
         <View>
           {props.title ? (
-            <View as="h2" margin={responsiveProps.titleMargin}>
+            <View
+              as="h2"
+              margin={responsiveProps.titleMargin}
+              padding={props.isTopic ? 'small 0 0 0' : '0'}
+            >
               <Text size={responsiveProps.titleTextSize} weight={responsiveProps.titleTextWeight}>
                 <AccessibleContent alt={I18n.t('Discussion Topic: %{title}', {title: props.title})}>
                   {props.title}
@@ -155,6 +159,7 @@ PostMessage.propTypes = {
   canReplyAnonymously: PropTypes.bool,
   draftSaved: PropTypes.bool,
   threadMode: PropTypes.bool,
+  isTopic: PropTypes.bool,
 }
 
 PostMessage.defaultProps = {

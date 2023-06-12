@@ -42,4 +42,19 @@ describe "sub account basic settings" do
 
     expect(is_checked("#account_settings_restrict_student_future_view_value")).to be_truthy
   end
+
+  it "restrict_quantitative_data is disabled when parent account has setting locked", priority: "1" do
+    parent = Account.default
+    parent.settings[:restrict_quantitative_data] = { locked: true, value: true }
+    parent.save!
+
+    account.root_account.enable_feature!(:restrict_quantitative_data)
+
+    get account_settings_url
+
+    expect(f("#account_settings_restrict_quantitative_data_value")).to be_disabled
+    expect(f("#account_settings")).not_to contain_css("#account_settings_restrict_quantitative_data_locked") # don't even show the locked checkbox
+
+    expect(is_checked("#account_settings_restrict_quantitative_data_value")).to be_truthy
+  end
 end

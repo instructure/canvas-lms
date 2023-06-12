@@ -54,7 +54,7 @@ class ObserverAlertThreshold < ActiveRecord::Base
   end
 
   def users_are_still_linked?
-    return true if observer.as_observer_observation_links.active.where(student: student).exists?
+    return true if observer.as_observer_observation_links.active.where(student:).exists?
     return true if observer.enrollments.active.where(associated_user: student).shard(observer).exists?
 
     false

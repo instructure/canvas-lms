@@ -36,10 +36,12 @@ export default class PublishButton extends React.Component {
     courseId: PropTypes.string.isRequired,
     courseNickname: PropTypes.string.isRequired,
     frontPageTitle: PropTypes.string,
+    onSuccess: PropTypes.func,
   }
 
   static defaultProps = {
     frontPageTitle: '',
+    onSuccess: () => null,
   }
 
   state = {
@@ -59,7 +61,7 @@ export default class PublishButton extends React.Component {
   }
 
   handleClick = () => {
-    const {defaultView, courseId} = this.props
+    const {defaultView, courseId, onSuccess} = this.props
     if (defaultView === 'modules') {
       apiClient
         .getModules({courseId})
@@ -67,19 +69,19 @@ export default class PublishButton extends React.Component {
           if (modules.length === 0) {
             this.setState({showModal: true})
           } else {
-            apiClient.publishCourse({courseId})
+            apiClient.publishCourse({courseId, onSuccess})
           }
         })
         .catch(() =>
           $.flashError(I18n.t('An error ocurred while fetching course details. Please try again.'))
         )
     } else {
-      apiClient.publishCourse({courseId})
+      apiClient.publishCourse({courseId, onSuccess})
     }
   }
 
   render() {
-    const {courseId, frontPageTitle, pagesUrl, courseNickname} = this.props
+    const {courseId, frontPageTitle, pagesUrl, courseNickname, onSuccess} = this.props
     const {showModal} = this.state
 
     return (
@@ -101,7 +103,7 @@ export default class PublishButton extends React.Component {
             wikiFrontPageTitle={frontPageTitle}
             onSubmit={() => {
               if (this.defaultViewStore.getState().savedDefaultView !== 'modules') {
-                apiClient.publishCourse({courseId})
+                apiClient.publishCourse({courseId, onSuccess})
               }
             }}
             returnFocusTo={this.publishButton}

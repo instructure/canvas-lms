@@ -100,9 +100,12 @@ module MicrosoftSync
       # "expected", not "error"). This is useful if there are non-200s expected
       # and you don't want to raise an HTTP error / count those these as errors
       # in the stats.
-      def request(method, path,
-                  quota: nil, retries: DEFAULT_N_INTERMITTENT_RETRIES,
-                  special_cases: [], **options)
+      def request(method,
+                  path,
+                  quota: nil,
+                  retries: DEFAULT_N_INTERMITTENT_RETRIES,
+                  special_cases: [],
+                  **options)
         statsd_tags = statsd_tags_for_request(method, path)
         increment_statsd_quota_points(quota, options, statsd_tags)
 
@@ -114,7 +117,8 @@ module MicrosoftSync
 
         special_case_value = SpecialCase.match(
           special_cases,
-          status_code: response.code, body: response.body
+          status_code: response.code,
+          body: response.body
         )
         if special_case_value
           log_and_increment(method, path, statsd_tags, :expected, response.code)
@@ -161,7 +165,7 @@ module MicrosoftSync
       # @param [Array] special_cases passed on to request()
       def get_paginated_list(endpoint, quota:, special_cases: [], **options_to_be_expanded)
         request_options = expand_options(**options_to_be_expanded)
-        response = request(:get, endpoint, query: request_options, quota: quota, special_cases: special_cases)
+        response = request(:get, endpoint, query: request_options, quota:, special_cases:)
         return response[PAGINATED_VALUE_KEY] unless block_given?
 
         loop do
@@ -171,7 +175,7 @@ module MicrosoftSync
 
           break if next_link.nil?
 
-          response = request(:get, next_link, quota: quota, special_cases: special_cases)
+          response = request(:get, next_link, quota:, special_cases:)
         end
       end
 
@@ -200,7 +204,7 @@ module MicrosoftSync
 
         response =
           begin
-            request(:post, "$batch", body: { requests: requests })
+            request(:post, "$batch", body: { requests: })
           rescue Errors::HTTPFailedDependency => e
             # The main request may return a 424 if any subrequests fail (esp. if throttled).
             # Regardless, we handle subrequests failures below.
@@ -216,7 +220,7 @@ module MicrosoftSync
 
         failed = (grouped[:error] || []) + (grouped[:throttled] || [])
         if failed.present?
-          codes = failed.map { |resp| resp["status"] }
+          codes = failed.pluck("status")
           bodies = failed.map { |resp| resp["body"].to_s.truncate(500) }
           msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
 
@@ -264,7 +268,7 @@ module MicrosoftSync
           raise ApplicationNotAuthorizedForTenant
         elsif !(200..299).cover?(response.code)
           raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
-            service: "graph", tenant: tenant, response: response
+            service: "graph", tenant:, response:
           )
         end
       end
@@ -282,10 +286,10 @@ module MicrosoftSync
         if read && read > 0
           query = request_options["query"] || request_options[:query]
           read -= 1 if read > 1 && query&.dig("$select")
-          InstStatsd::Statsd.count("#{STATSD_PREFIX}.quota_read", read, tags: tags)
+          InstStatsd::Statsd.count("#{STATSD_PREFIX}.quota_read", read, tags:)
         end
         if write && write > 0
-          InstStatsd::Statsd.count("#{STATSD_PREFIX}.quota_write", write, tags: tags)
+          InstStatsd::Statsd.count("#{STATSD_PREFIX}.quota_write", write, tags:)
         end
       end
 
@@ -350,7 +354,8 @@ module MicrosoftSync
         grouped = responses.group_by do |subresponse|
           special_case_value = SpecialCase.match(
             special_cases,
-            status_code: subresponse["status"], body: subresponse["body"].to_json,
+            status_code: subresponse["status"],
+            body: subresponse["body"].to_json,
             batch_request_id: subresponse["id"]
           )
 
@@ -373,14 +378,14 @@ module MicrosoftSync
         responses_grouped_by_type.each do |type, responses|
           responses.group_by { |c| c["status"] }.transform_values(&:count).each do |code, count|
             tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: code)
-            InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
+            InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags:)
           end
         end
       end
 
       def increment_batch_statsd_counters_unknown_error(endpoint_name, count)
         tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: "unknown")
-        InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.error", count, tags: tags)
+        InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.error", count, tags:)
       end
     end
   end

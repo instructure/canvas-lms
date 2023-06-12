@@ -19,10 +19,22 @@
 #
 
 describe Loaders::CourseOutcomeAlignmentStatsLoader do
+  def mock_os_aligned_outcomes(outcomes, associated_asset_id)
+    (outcomes || []).to_h do |o|
+      [o.id.to_s,
+       [{
+         artifact_type: "quizzes.quiz",
+         artifact_id: "1",
+         associated_asset_type: "canvas.assignment.quizzes",
+         associated_asset_id: associated_asset_id.to_s
+       }]]
+    end
+  end
+
   context "with only direct alignments" do
     before :once do
       outcome_alignment_stats_model
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
     end
 
     it "returns nil if course is invalid" do
@@ -34,7 +46,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
     end
 
     it "returns nil if outcome alignment summary FF is disabled" do
-      @course.account.disable_feature!(:outcome_alignment_summary)
+      @course.account.disable_feature!(:improved_outcomes_management)
 
       GraphQL::Batch.batch do
         Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |alignment_stats|
@@ -56,6 +68,60 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
         end
       end
     end
+
+    context "when Outcome Alignment Summary with New Quizzes FF is enabled" do
+      before do
+        @course.enable_feature!(:outcome_alignment_summary_with_new_quizzes)
+        @new_quiz = @course.assignments.create!(title: "new quiz - aligned in OS", submission_types: "external_tool")
+        allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+          .to receive(:get_os_aligned_outcomes)
+          .and_return(mock_os_aligned_outcomes([@outcome2], @new_quiz.id))
+      end
+
+      it "returns alignments stats for outcome alignments in both Canvas and Outcomes-Service" do
+        GraphQL::Batch.batch do
+          Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+            expect(stats).not_to be_nil
+            expect(stats[:total_outcomes]).to eq 2
+            expect(stats[:aligned_outcomes]).to eq 2
+            expect(stats[:total_alignments]).to eq 4
+            expect(stats[:total_artifacts]).to eq 5
+            expect(stats[:aligned_artifacts]).to eq 3
+            expect(stats[:artifact_alignments]).to eq 3
+          end
+        end
+      end
+
+      it "returns correct alignments stats even if outcome is deleted in Canvas but not synched to OS" do
+        @outcome2.destroy
+        GraphQL::Batch.batch do
+          Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+            expect(stats).not_to be_nil
+            expect(stats[:total_outcomes]).to eq 1
+            expect(stats[:aligned_outcomes]).to eq 1
+            expect(stats[:total_alignments]).to eq 3
+            expect(stats[:total_artifacts]).to eq 5
+            expect(stats[:aligned_artifacts]).to eq 2
+            expect(stats[:artifact_alignments]).to eq 2
+          end
+        end
+      end
+
+      it "returns correct alignments stats even if new quiz is deleted in Canvas but not synched to OS" do
+        @new_quiz.destroy
+        GraphQL::Batch.batch do
+          Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+            expect(stats).not_to be_nil
+            expect(stats[:total_outcomes]).to eq 2
+            expect(stats[:aligned_outcomes]).to eq 1
+            expect(stats[:total_alignments]).to eq 3
+            expect(stats[:total_artifacts]).to eq 4
+            expect(stats[:aligned_artifacts]).to eq 2
+            expect(stats[:artifact_alignments]).to eq 2
+          end
+        end
+      end
+    end
   end
 
   context "returns stats with indirect alignments" do
@@ -63,7 +129,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
       course_model
       @teacher = User.create!
       @course.enroll_teacher(@teacher, enrollment_state: "active")
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
 
       assessment_question_bank_with_questions
       @outcome = outcome_model(context: @course, title: "outcome - aligned to question bank")
@@ -225,7 +291,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
       )
       @rubric.associate_with(@assignment5, @course, purpose: "grading")
 
-      @course.account.enable_feature!(:outcome_alignment_summary)
+      @course.account.enable_feature!(:improved_outcomes_management)
     end
 
     def unpublish_artifacts(*args)

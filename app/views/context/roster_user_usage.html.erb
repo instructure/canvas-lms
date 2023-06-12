@@ -27,6 +27,14 @@
   </a>
 <% end %>
 <h1><%= t 'headings.user_access_report', '%{user} Access Report', :user => @user.name %></h1>
+<% if @last_activity_at.present? %>
+  <p><em>
+    <%= t "This user's last activity in the course was %{datetime}", :datetime => datetime_string(@last_activity_at) %>
+  </em></p>
+<% end %>
+<p><em>
+  <%= t 'Items last accessed before %{date} may not be shown.', :date => date_string(@aua_expiration_date) %>
+</em></p>
 <div id="usage_report">
 <table class="ic-Table">
   <thead>

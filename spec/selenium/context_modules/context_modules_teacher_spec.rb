@@ -208,7 +208,7 @@ describe "context modules" do
       @course.context_modules.create!(name: "Quiz")
       get "/courses/#{@course.id}/modules"
 
-      add_new_module_item("#quizs_select", "Quiz", "[ New Quiz ]", "New Quiz") do
+      add_new_module_item("#quizs_select", "Quiz", "[ Create Quiz ]", "New Quiz") do
         click_option("select[name='quiz[assignment_group_id]']", @ag2.name)
       end
       expect(@ag2.assignments.length).to eq 1
@@ -467,7 +467,7 @@ describe "context modules" do
       new_section = @course.course_sections.create!(name: "New Section")
       override = @assignment2.assignment_overrides.build
       override.set = new_section
-      override.due_at = Time.zone.now + 1.day
+      override.due_at = 1.day.from_now
       override.due_at_overridden = true
       override.save!
 
@@ -521,7 +521,7 @@ describe "context modules" do
     it "adds a discussion item to a module", priority: "1" do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
-      add_new_module_item("#discussion_topics_select", "Discussion", "[ New Topic ]", "New Discussion Title")
+      add_new_module_item("#discussion_topics_select", "Discussion", "[ Create Topic ]", "New Discussion Title")
       verify_persistence("New Discussion Title")
     end
 
@@ -678,7 +678,7 @@ describe "context modules" do
       end
     end
 
-    context "with quizzes_next and new_quizzes_modules_support flags enabled" do
+    context "with quizzes_next flag enabled" do
       before :once do
         @course.enable_feature! :quizzes_next
         @course.context_external_tools.create!(
@@ -690,7 +690,6 @@ describe "context modules" do
         )
         @course.root_account.settings[:provision] = { "lti" => "lti url" }
         @course.root_account.save!
-        Account.site_admin.enable_feature!(:new_quizzes_modules_support)
         @course.context_modules.create!(name: "Course Quizzes")
       end
 

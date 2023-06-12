@@ -36,7 +36,7 @@ describe ConversationMessageParticipant do
     describe "#active" do
       it "ignores soft deletes" do
         @teacher.conversations.first.remove_messages(@msg)
-        expect(ConversationMessageParticipant.all.count).to eql 3
+        expect(ConversationMessageParticipant.all.count).to be 3
         expect(ConversationMessageParticipant.all.map(&:workflow_state).sort).to eql %w[active active deleted]
         expect(ConversationMessageParticipant.active.map(&:workflow_state)).to eql ["active", "active"]
       end
@@ -50,7 +50,7 @@ describe ConversationMessageParticipant do
     describe "#deleted" do
       it "only includes soft deletes" do
         @teacher.conversations.first.remove_messages(@msg)
-        expect(ConversationMessageParticipant.all.count).to eql 3
+        expect(ConversationMessageParticipant.all.count).to be 3
         expect(ConversationMessageParticipant.deleted.map(&:workflow_state)).to eql ["deleted"]
       end
     end

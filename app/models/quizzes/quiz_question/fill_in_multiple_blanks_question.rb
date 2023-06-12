@@ -99,7 +99,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
           text: sub_answer[:text],
           user_ids: [],
           id: @question_data.is_type?(:fill_in_multiple_blanks) ? found_answer[:blank_id] : sub_answer[:id],
-          correct: correct
+          correct:
         }
         found_answer[:answer_matches] << match
       end

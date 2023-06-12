@@ -19,6 +19,7 @@
 
 module Canvas::Migration::Helpers
   class SelectiveContentFormatter
+    BLUEPRINT_SETTING_TYPE = -> { I18n.t("Blueprint Settings") }
     COURSE_SETTING_TYPE = -> { I18n.t("lib.canvas.migration.course_settings", "Course Settings") }
     COURSE_SYLLABUS_TYPE = -> { I18n.t("lib.canvas.migration.syllabus_body", "Syllabus Body") }
     COURSE_PACE_TYPE = -> { I18n.t("Course Pace") }
@@ -73,7 +74,7 @@ module Canvas::Migration::Helpers
         att = @migration.overview_attachment.open
         data = JSON.parse(att.read)
         data = separate_announcements(data)
-        data["attachments"] ||= data["file_map"] ? data["file_map"].values : nil
+        data["attachments"] ||= data["file_map"]&.values
         data["quizzes"] ||= data["assessments"]
         data["context_modules"] ||= data["modules"]
         data["wiki_pages"] ||= data["wikis"]
@@ -209,7 +210,7 @@ module Canvas::Migration::Helpers
 
     def item_hash(type, item)
       hash = {
-        type: type,
+        type:,
         property: "#{property_prefix}[#{type}][id_#{item["migration_id"]}]",
         title: item["title"],
         migration_id: item["migration_id"]
@@ -325,6 +326,10 @@ module Canvas::Migration::Helpers
           content_list << { type: "syllabus_body", property: "#{property_prefix}[all_syllabus_body]", title: COURSE_SYLLABUS_TYPE.call }
           content_list << { type: "course_paces", property: "#{property_prefix}[all_course_paces]", title: COURSE_PACE_TYPE.call } if source.course_paces.primary.not_deleted.any?
 
+          if @migration && MasterCourses::MasterTemplate.blueprint_eligible?(@migration.context)
+            content_list << { type: "blueprint_settings", property: "#{property_prefix}[all_blueprint_settings]", title: BLUEPRINT_SETTING_TYPE.call }
+          end
+
           SELECTIVE_CONTENT_TYPES.each do |type2, title|
             next if type2 == "groups"
 
@@ -347,7 +352,7 @@ module Canvas::Migration::Helpers
 
             next if count == 0
 
-            hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: count }
+            hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: }
             add_url!(hash, type2, selectable_outcomes)
             content_list << hash
           end
@@ -385,7 +390,7 @@ module Canvas::Migration::Helpers
       title ||= item.short_description if item.respond_to?(:short_description)
       title ||= ""
 
-      hash = { type: type, title: title }
+      hash = { type:, title: }
       if @migration
         mig_id = CC::CCHelper.create_key(item, global: @global_identifiers)
         hash[:migration_id] = mig_id
@@ -403,11 +408,13 @@ module Canvas::Migration::Helpers
       if item.is_a?(Assignment)
         if item.quiz
           lr = course_item_hash("quizzes", item.quiz, false)
-          lr[:message] = I18n.t("linked_quiz_message", "linked with Quiz '%{title}'",
+          lr[:message] = I18n.t("linked_quiz_message",
+                                "linked with Quiz '%{title}'",
                                 title: item.quiz.title)
         elsif item.discussion_topic
           lr = course_item_hash("discussion_topics", item.discussion_topic, false)
-          lr[:message] = I18n.t("linked_discussion_topic_message", "linked with Discussion Topic '%{title}'",
+          lr[:message] = I18n.t("linked_discussion_topic_message",
+                                "linked with Discussion Topic '%{title}'",
                                 title: item.discussion_topic.title)
         elsif item.wiki_page
           lr = course_item_hash("wiki_pages", item.wiki_page, false)
@@ -416,7 +423,8 @@ module Canvas::Migration::Helpers
         end
       elsif [DiscussionTopic, WikiPage, Quizzes::Quiz].any? { |t| item.is_a?(t) } && item.assignment
         lr = course_item_hash("assignments", item.assignment, false)
-        lr[:message] = I18n.t("linked_assignment_message", "linked with Assignment '%{title}'",
+        lr[:message] = I18n.t("linked_assignment_message",
+                              "linked with Assignment '%{title}'",
                               title: item.assignment.title)
       end
       if lr

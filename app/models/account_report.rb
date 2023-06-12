@@ -20,6 +20,7 @@
 
 class AccountReport < ActiveRecord::Base
   include Workflow
+  include LocaleSelection
 
   belongs_to :account, inverse_of: :account_reports
   belongs_to :user, inverse_of: :account_reports
@@ -73,12 +74,8 @@ class AccountReport < ActiveRecord::Base
 
   def self.delete_old_rows_and_runners
     # There is a FK between rows and runners, so delete rows first
-    cleanup = AccountReportRow.where("created_at<?", 28.days.ago).limit(10_000)
-    until cleanup.delete_all < 10_000; end
-    delete_old_runners
-  end
+    AccountReportRow.where("created_at<?", 28.days.ago).in_batches(of: 10_000).delete_all
 
-  def self.delete_old_runners
     # There is a FK between rows and runners.
     # Use subquery to ensure we don't remove any that
     # had rows created late enough that they're on different sides
@@ -87,13 +84,11 @@ class AccountReport < ActiveRecord::Base
     no_fk_scope = date_window_scope.where("NOT EXISTS (SELECT NULL
                     FROM #{AccountReportRow.quoted_table_name} arr
                     WHERE arr.account_report_runner_id = account_report_runners.id)")
-    cleanup_scope = no_fk_scope.limit(10_000)
-    until cleanup_scope.delete_all < 10_000; end
+    no_fk_scope.in_batches(of: 10_000).delete_all
   end
 
   def delete_account_report_rows
-    cleanup = account_report_rows.limit(10_000)
-    until cleanup.delete_all < 10_000; end
+    account_report_rows.in_batches(of: 10_000).delete_all
   end
 
   def context
@@ -107,6 +102,7 @@ class AccountReport < ActiveRecord::Base
   end
 
   def run_report(type = nil)
+    parameters["locale"] = infer_locale(user:, root_account: account)
     self.report_type ||= type
     if AccountReport.available_reports[self.report_type]
       begin
@@ -118,9 +114,10 @@ class AccountReport < ActiveRecord::Base
       mark_as_errored
     end
   end
-  handle_asynchronously :run_report, priority: Delayed::LOW_PRIORITY,
-                                     n_strand: proc { |ar| ["account_reports", ar.account.root_account.global_id] },
-                                     on_permanent_failure: :mark_as_errored
+  handle_asynchronously :run_report,
+                        priority: Delayed::LOW_PRIORITY,
+                        n_strand: proc { |ar| ["account_reports", ar.account.root_account.global_id] },
+                        on_permanent_failure: :mark_as_errored
 
   def mark_as_errored
     self.workflow_state = :error

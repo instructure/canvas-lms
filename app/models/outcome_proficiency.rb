@@ -21,14 +21,17 @@
 class OutcomeProficiency < ApplicationRecord
   extend RootAccountResolver
   include Canvas::SoftDeletable
-  self.ignored_columns = %i[account_id]
+  self.ignored_columns += %i[account_id]
 
   def self.emit_live_events_on_any_update?
     true
   end
 
-  has_many :outcome_proficiency_ratings, -> { order "points DESC, id ASC" },
-           dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
+  has_many :outcome_proficiency_ratings,
+           -> { order "points DESC, id ASC" },
+           dependent: :destroy,
+           inverse_of: :outcome_proficiency,
+           autosave: true
   belongs_to :context, polymorphic: %i[account course], required: true
 
   validates :outcome_proficiency_ratings, presence: { message: t("Missing required ratings") }, unless: :deleted?
@@ -108,14 +111,14 @@ class OutcomeProficiency < ApplicationRecord
   end
 
   def self.find_or_create_default!(context)
-    proficiency = OutcomeProficiency.find_by(context: context)
+    proficiency = OutcomeProficiency.find_by(context:)
     if proficiency&.workflow_state == "active"
       return proficiency
     end
 
     GuardRail.activate(:primary) do
       OutcomeProficiency.transaction do
-        proficiency ||= OutcomeProficiency.new(context: context)
+        proficiency ||= OutcomeProficiency.new(context:)
         proficiency.workflow_state = "active"
         proficiency.replace_ratings(default_ratings)
         proficiency.save!
@@ -197,7 +200,7 @@ class OutcomeProficiency < ApplicationRecord
         Rubric.where(context: context.associated_courses)
       ]
     else
-      [Rubric.where(context: context)]
+      [Rubric.where(context:)]
     end
   end
 end

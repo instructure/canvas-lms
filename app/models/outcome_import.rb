@@ -53,12 +53,12 @@ class OutcomeImport < ApplicationRecord
   # before the import is marked created and eligible for processing.
   def self.create_with_attachment(context, import_type, attachment, user = nil, learning_outcome_group_id = nil)
     import = OutcomeImport.create!(
-      context: context,
-      learning_outcome_group_id: learning_outcome_group_id,
+      context:,
+      learning_outcome_group_id:,
       progress: 0,
       workflow_state: :initializing,
-      data: { import_type: import_type },
-      user: user
+      data: { import_type: },
+      user:
     )
 
     att = Attachment.create_data_attachment(import, attachment, "outcome_upload_#{import.global_id}.csv")
@@ -129,9 +129,9 @@ class OutcomeImport < ApplicationRecord
 
   def add_error(row, error, failure = false)
     outcome_import_errors.create!(
-      row: row,
+      row:,
       message: error,
-      failure: failure
+      failure:
     )
   end
 
@@ -144,8 +144,8 @@ class OutcomeImport < ApplicationRecord
     message = Message.new({
                             to: user.email,
                             from: "notifications@instructure.com",
-                            subject: subject,
-                            body: body,
+                            subject:,
+                            body:,
                             delay_for: 0,
                             context: nil,
                             path_type: "email",
@@ -177,7 +177,7 @@ class OutcomeImport < ApplicationRecord
       subject = I18n.t "Outcomes Import Completed"
       user_name = user.name.split("@").first
       if error_count == 0
-        body = I18n.t(<<~TEXT, name: user_name, url: url).gsub(/^ +/, "")
+        body = I18n.t(<<~TEXT, name: user_name, url:).gsub(/^ +/, "")
           Hello %{name},
 
           Your outcomes were successfully imported. You can now manage them at %{url}
@@ -187,7 +187,7 @@ class OutcomeImport < ApplicationRecord
         TEXT
       else
         rows = n_errors(100).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.join("\n")
-        body = I18n.t(<<~TEXT, name: user_name, rows: rows, url: url).gsub(/^ +/, "")
+        body = I18n.t(<<~TEXT, name: user_name, rows:, url:).gsub(/^ +/, "")
           Hello %{name},
 
           Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings):
@@ -205,7 +205,7 @@ class OutcomeImport < ApplicationRecord
       user_name = user.name.split("@").first
       doc_url = "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/doc/api/file.outcomes_csv.html"
       row = n_errors(1).map { |r, m| I18n.t("Row %{row}: %{message}", row: r, message: m) }.first
-      body = I18n.t(<<~TEXT, name: user_name, row: row, doc_url: doc_url, url: url).gsub(/^ +/, "")
+      body = I18n.t(<<~TEXT, name: user_name, row:, doc_url:, url:).gsub(/^ +/, "")
         Hello %{name},
 
         Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at %{url}

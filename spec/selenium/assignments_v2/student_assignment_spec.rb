@@ -33,6 +33,241 @@ describe "as a student" do
       @teacher = teacher_in_course(name: "teacher", course: @course, enrollment_state: :active).user
     end
 
+    context "assignment details with restrict_quantitative_data truthy" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      context "not submitted" do
+        it "does not show points possible for points grading_type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+
+          expect(f("body")).not_to contain_jqcss("span:contains('#{assignment.points_possible}'))")
+        end
+      end
+
+      context "graded" do
+        it "shows grade as letter_grade for points grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span.selected-submission-grade").text).not_to include("9")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).not_to include("9")
+        end
+
+        context "0 points possible" do
+          it "shows no grade when score is 0 or less for points" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "points"
+            )
+
+            assignment.grade_student(@student, grade: "0", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            expect(f("body")).not_to contain_css("span.selected-submission-grade")
+            expect(f("span[data-testid='grade-display']").text).to eq ""
+          end
+
+          it "shows A when score is greater than 0 for quantitative assignments" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "points"
+            )
+            assignment.submit_homework(@student, { body: "blah" })
+            assignment.grade_student(@student, grade: "1", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nA"
+            expect(f("span[data-testid='grade-display']").text).to eq "A"
+          end
+
+          it "shows complete when score is greater than 0 for pass_fail assignments" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "pass_fail"
+            )
+            assignment.submit_homework(@student, { body: "blah" })
+            assignment.grade_student(@student, grade: "complete", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nComplete"
+            expect(f("span[data-testid='grade-display']").text).to eq "Complete"
+          end
+
+          it "uses the coerced score to letter_grade when score is greater than 0 for letter_grade assignments" do
+            assignment = @course.assignments.create!(
+              name: "assignment",
+              due_at: 5.days.ago,
+              points_possible: 0,
+              submission_types: "online_text_entry",
+              grading_type: "letter_grade"
+            )
+            assignment.submit_homework(@student, { body: "blah" })
+            assignment.grade_student(@student, grade: "1", grader: @teacher)
+            user_session(@student)
+            StudentAssignmentPageV2.visit(@course, assignment)
+            wait_for_ajaximations
+            # showing A means it used the coerced score, without coercion, it would show "1"
+            expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nA"
+            expect(f("span[data-testid='grade-display']").text).to eq "A"
+          end
+        end
+
+        it "shows 0 grade as F for points grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          assignment.grade_student(@student, grade: "0", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(f("span.selected-submission-grade").text).to include("F")
+          expect(f("span.selected-submission-grade").text).not_to include("0")
+          expect(f("span[data-testid='grade-display']").text).to include("F")
+          expect(f("span[data-testid='grade-display']").text).not_to include("0")
+        end
+
+        it "shows Excused when student is excused" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "points"
+          )
+
+          assignment.grade_student(@student, excused: true, grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_css("span.selected-submission-grade")
+          expect(f("span[data-testid='grade-display']").text).to include("Excused")
+        end
+
+        it "shows grade as letter_grade for percent grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "percent"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span.selected-submission-grade").text).not_to include("9")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).not_to include("9")
+        end
+
+        it "shows grade as letter_grade for gpa_scale grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "gpa_scale"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+        end
+
+        it "still shows grade as letter_grade for letter_grade grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "letter_grade"
+          )
+
+          assignment.grade_student(@student, grade: "9", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("A-")
+          expect(f("span[data-testid='grade-display']").text).to include("A-")
+        end
+
+        it "still shows grade as complete/incomplete for pass_fail grading type" do
+          assignment = @course.assignments.create!(
+            name: "assignment",
+            due_at: 5.days.ago,
+            points_possible: 10,
+            submission_types: "online_text_entry",
+            grading_type: "pass_fail"
+          )
+
+          assignment.grade_student(@student, grade: "pass", grader: @teacher)
+          user_session(@student)
+          StudentAssignmentPageV2.visit(@course, assignment)
+          wait_for_ajaximations
+          # making sure 9 does not show implicitly makes sure 90% does not show as well
+          expect(f("span.selected-submission-grade").text).to include("Complete")
+          expect(f("span[data-testid='grade-display']").text).to include("Complete")
+        end
+      end
+    end
+
     context "assignment details" do
       before(:once) do
         @assignment = @course.assignments.create!(
@@ -159,6 +394,79 @@ describe "as a student" do
         StudentAssignmentPageV2.cancel_attempt_button.click
 
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("REVIEW FEEDBACK")
+      end
+    end
+
+    context "0 points possible assignments" do
+      it "shows score/0 for points type assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "4", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\n4/0"
+        expect(f("span[data-testid='grade-display']").text).to eq "4/0 Points"
+      end
+
+      it "simply shows the score for letter-grade assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry",
+          grading_type: "letter_grade"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "9", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\n9"
+        expect(f("span[data-testid='grade-display']").text).to eq "9"
+      end
+
+      it "shows N/A once for complete/incomplete assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry",
+          grading_type: "pass_fail"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "9", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\nN/A"
+        expect(f("span[data-testid='grade-display']").text).to eq ""
+      end
+
+      it "shows simply the percentage for percent assignments" do
+        assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.from_now,
+          points_possible: 0,
+          submission_types: "online_text_entry",
+          grading_type: "percent"
+        )
+        assignment.submit_homework(@student, { body: "blah" })
+        assignment.grade_student(@student, grade: "9", grader: @teacher)
+
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, assignment)
+        wait_for_ajaximations
+        expect(f("span.selected-submission-grade").text).to eq "Attempt 1 Score:\n9%"
+        expect(f("span[data-testid='grade-display']").text).to eq "9%"
       end
     end
 
@@ -332,6 +640,36 @@ describe "as a student" do
       end
     end
 
+    context "proxy submitted assignment" do
+      before do
+        @assignment = @course.assignments.create!(
+          name: "proxy upload assignment",
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: "online_upload"
+        )
+        Account.site_admin.enable_feature!(:proxy_file_uploads)
+        teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+        RoleOverride.create!(
+          permission: "proxy_assignment_submission",
+          enabled: true,
+          role: teacher_role,
+          account: @course.root_account
+        )
+        file_attachment = attachment_model(content_type: "application/pdf", context: @student)
+        @submission = @assignment.submit_homework(@student, submission_type: "online_upload", attachments: [file_attachment])
+        @teacher.update!(short_name: "Test Teacher")
+        @submission.update!(proxy_submitter: @teacher)
+        user_session(@student)
+        StudentAssignmentPageV2.visit(@course, @assignment)
+        wait_for_ajaximations
+      end
+
+      it "submission workflow tracker identifies the proxy submitter" do
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("by " + @teacher.short_name)
+      end
+    end
+
     context "mark as done" do
       before(:once) do
         @assignment = @course.assignments.create!(
@@ -385,6 +723,506 @@ describe "as a student" do
         StudentAssignmentPageV2.similarity_pledge.click
 
         expect(StudentAssignmentPageV2.submit_button).to_not be_disabled
+      end
+    end
+
+    context "peer reviews" do
+      before(:once) do
+        Account.default.enable_feature!(:peer_reviews_for_a2)
+        @student1 = student_in_course(name: "Student 1", course: @course, enrollment_state: :active).user
+        @student2 = student_in_course(name: "Student 2", course: @course, enrollment_state: :active).user
+        @student3 = student_in_course(name: "Student 3", course: @course, enrollment_state: :active).user
+
+        @peer_review_assignment = assignment_model({
+                                                     course: @course,
+                                                     peer_reviews: true,
+                                                     automatic_peer_reviews: false,
+                                                     points_possible: 10,
+                                                     submission_types: "online_text_entry"
+                                                   })
+
+        @peer_review_assignment.assign_peer_review(@student1, @student3)
+      end
+
+      before do
+        user_session(@student1)
+      end
+
+      it "shows a modal reminding the student that they have 2 peer reviews and 1 is availible after submitting" do
+        @peer_review_assignment.assign_peer_review(@student1, @student2)
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+
+        expect(StudentAssignmentPageV2.peer_review_header_text).to include("Your work has been submitted.\nCheck back later to view feedback.")
+        expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("You have 2 Peer Reviews to complete.\nPeer submissions ready for review: 1")
+      end
+
+      it "shows a modal reminding the student that they have 2 peer reviews and 0 are availible after submitting" do
+        @peer_review_assignment.assign_peer_review(@student1, @student2)
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+
+        expect(StudentAssignmentPageV2.peer_review_header_text).to include("Your work has been submitted.\nCheck back later to view feedback.")
+        expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("You have 2 Peer Reviews to complete.\nPeer submissions ready for review: 0")
+        expect(StudentAssignmentPageV2.peer_review_next_button).to be_disabled
+      end
+
+      it "allows the student to navigate to assigned peer review through the reminder modal after submitting" do
+        @peer_review_assignment.assign_peer_review(@student1, @student2)
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+        StudentAssignmentPageV2.peer_review_next_button.click
+
+        expect(StudentAssignmentPageV2.assignment_sub_header).to include_text("Peer: Student 3")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("Add a comment to complete your peer review. You will only see comments written by you.")
+        expect(StudentAssignmentPageV2.attempt_tab).to include_text("student 3 attempt")
+      end
+
+      it "allows the student to complete a peer review without a rubric by adding a comment" do
+        @peer_review_assignment.assign_peer_review(@student1, @student2)
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+        StudentAssignmentPageV2.peer_review_next_button.click
+        StudentAssignmentPageV2.leave_a_comment("great job!")
+
+        expect(StudentAssignmentPageV2.comment_container).to include_text("Your peer review is complete!")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("great job!")
+      end
+
+      it "after completing a peer review the student is reminded that they still have one more to complete but it is not availible yet" do
+        @peer_review_assignment.assign_peer_review(@student1, @student2)
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+        StudentAssignmentPageV2.peer_review_next_button.click
+        StudentAssignmentPageV2.leave_a_comment("great job!")
+
+        expect(StudentAssignmentPageV2.peer_review_header_text).to include("You have 1 more Peer Review to complete.")
+        expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("The submission is not available just yet.\nPlease check back soon.")
+        expect(StudentAssignmentPageV2.peer_review_next_button).to be_disabled
+      end
+
+      it "after completing all assigned peer reviews the student is shown a modal that they have completed all reviews for this assignment" do
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+        StudentAssignmentPageV2.peer_review_next_button.click
+        StudentAssignmentPageV2.leave_a_comment("great job!")
+
+        expect(StudentAssignmentPageV2.peer_review_header_text).to include("You have completed your Peer Reviews!")
+      end
+
+      it "allows student to view peer reviewer and teacher comments in feedback tray" do
+        @peer_review_assignment.assign_peer_review(@student1, @student2)
+        @submission = @peer_review_assignment.submit_homework(
+          @student1,
+          body: "student 1 attempt",
+          submission_type: "online_text_entry"
+        )
+
+        @peer_review_assignment.submit_homework(
+          @student2,
+          body: "student 2 attempt",
+          submission_type: "online_text_entry"
+        )
+
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+
+        @submission.add_comment(author: @student2, comment: "peer review comment from student 2")
+        @submission.add_comment(author: @student3, comment: "peer review comment from student 3")
+        @submission.add_comment(author: @teacher, comment: "teacher comment")
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+
+        expect(StudentAssignmentPageV2.comment_container).to include_text("Student 2")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("peer review comment from student 2")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("Student 3")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("peer review comment from student 3")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("teacher")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("teacher comment")
+      end
+
+      context "anonymous peer review" do
+        before(:once) do
+          @peer_review_assignment.update!(anonymous_peer_reviews: true)
+        end
+
+        it "anonymizes reviewee when completing a review on an assignment with anonymous peer reviews enabled" do
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "anonymous attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+          StudentAssignmentPageV2.peer_review_next_button.click
+
+          expect(StudentAssignmentPageV2.assignment_sub_header).to include_text("Peer: Anonymous student")
+          expect(StudentAssignmentPageV2.attempt_tab).to include_text("anonymous attempt")
+        end
+
+        it "allows student to view anonymous peer reviewer and non-anonymous teacher comments in feedback tray" do
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          @submission = @peer_review_assignment.submit_homework(
+            @student1,
+            body: "student 1 attempt",
+            submission_type: "online_text_entry"
+          )
+
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 2 attempt",
+            submission_type: "online_text_entry"
+          )
+
+          @submission.add_comment(author: @student3, comment: "peer review comment from student 2")
+          @submission.add_comment(author: @teacher, comment: "teacher comment")
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+
+          expect(StudentAssignmentPageV2.comment_container).to include_text("Anonymous")
+          expect(StudentAssignmentPageV2.comment_container).to include_text("peer review comment from student 2")
+          expect(StudentAssignmentPageV2.comment_container).to include_text("teacher")
+          expect(StudentAssignmentPageV2.comment_container).to include_text("teacher comment")
+        end
+      end
+
+      context "with rubric" do
+        before(:once) do
+          rubric_model
+          @association = @rubric.associate_with(@peer_review_assignment, @course, purpose: "grading", use_for_grading: true)
+        end
+
+        it "shows a modal reminding the student that they have 2 peer reviews and 1 is availible after submitting" do
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+
+          expect(StudentAssignmentPageV2.peer_review_header_text).to include("Your work has been submitted.\nCheck back later to view feedback.")
+          expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("You have 2 Peer Reviews to complete.\nPeer submissions ready for review: 1")
+        end
+
+        it "shows a modal reminding the student that they have 2 peer reviews and 0 are availible after submitting" do
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+
+          expect(StudentAssignmentPageV2.peer_review_header_text).to include("Your work has been submitted.\nCheck back later to view feedback.")
+          expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("You have 2 Peer Reviews to complete.\nPeer submissions ready for review: 0")
+          expect(StudentAssignmentPageV2.peer_review_next_button).to be_disabled
+        end
+
+        it "allows the student to navigate to assigned peer review through the reminder modal after submitting" do
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+          StudentAssignmentPageV2.peer_review_next_button.click
+
+          expect(StudentAssignmentPageV2.assignment_sub_header).to include_text("Peer: Student 3")
+          expect(StudentAssignmentPageV2.fill_out_rubric_toggle).to include_text("Fill Out Rubric")
+          expect(StudentAssignmentPageV2.rubric_tab).to include_text("Fill out the rubric below after reviewing the student submission to complete this review.")
+        end
+
+        it "allows the student to complete a peer review by completing the rubric and submitting" do
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+          StudentAssignmentPageV2.peer_review_next_button.click
+          StudentAssignmentPageV2.select_rubric_criterion("Good")
+          StudentAssignmentPageV2.submit_peer_review_button.click
+
+          expect(StudentAssignmentPageV2.peer_review_header_text).to include("You have 1 more Peer Review to complete.")
+          expect(StudentAssignmentPageV2.peer_review_sub_header_text).to include("The submission is not available just yet.\nPlease check back soon.")
+          expect(StudentAssignmentPageV2.peer_review_next_button).to be_disabled
+        end
+
+        it "after completing all assigned peer reviews the student is shown a modal that they have completed all reviews for this assignment" do
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+          StudentAssignmentPageV2.peer_review_next_button.click
+          StudentAssignmentPageV2.select_rubric_criterion("Good")
+          StudentAssignmentPageV2.submit_peer_review_button.click
+
+          expect(StudentAssignmentPageV2.peer_review_header_text).to include("You have completed your Peer Reviews!")
+        end
+
+        it "allows student to view peer reviewer and teacher rubric assessments via the dropdown menu" do
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          @submission = @peer_review_assignment.submit_homework(
+            @student1,
+            body: "student 1 attempt",
+            submission_type: "online_text_entry"
+          )
+
+          @peer_review_assignment.submit_homework(
+            @student2,
+            body: "student 2 attempt",
+            submission_type: "online_text_entry"
+          )
+
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          @association.assess({
+                                user: @student1,
+                                assessor: @teacher,
+                                artifact: @peer_review_assignment.find_or_create_submission(@student1),
+                                assessment: {
+                                  assessment_type: "grading",
+                                  criterion_crit1: {
+                                    points: 10,
+                                    comments: "teacher comment",
+                                  }
+                                }
+                              })
+          @association.assess({
+                                user: @student1,
+                                assessor: @student2,
+                                artifact: @peer_review_assignment.find_or_create_submission(@student1),
+                                assessment: {
+                                  assessment_type: "peer_review",
+                                  criterion_crit1: {
+                                    points: 5,
+                                    comments: "student 2 comment",
+                                  }
+                                }
+                              })
+          @association.assess({
+                                user: @student1,
+                                assessor: @student3,
+                                artifact: @peer_review_assignment.find_or_create_submission(@student1),
+                                assessment: {
+                                  assessment_type: "peer_review",
+                                  criterion_crit1: {
+                                    points: 0,
+                                    comments: "student 3 comment",
+                                  }
+                                }
+                              })
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+
+          expect(StudentAssignmentPageV2.rubric_comments).to include_text("teacher comment")
+          expect(StudentAssignmentPageV2.rubric_rating_selected).to include_text("10 pts")
+
+          StudentAssignmentPageV2.select_grader("Student 3 (Student)")
+          expect(StudentAssignmentPageV2.rubric_comments).to include_text("student 3 comment")
+          expect(StudentAssignmentPageV2.rubric_rating_selected).to include_text("0 pts")
+
+          StudentAssignmentPageV2.select_grader("Student 2 (Student)")
+          expect(StudentAssignmentPageV2.rubric_comments).to include_text("student 2 comment")
+          expect(StudentAssignmentPageV2.rubric_rating_selected).to include_text("5 pts")
+        end
+
+        context "anonymous peer review" do
+          before(:once) do
+            @peer_review_assignment.update!(anonymous_peer_reviews: true)
+          end
+
+          it "allows student to view anonymous peer reviewer rubric assessments via the dropdown menu" do
+            @peer_review_assignment.assign_peer_review(@student1, @student2)
+            @submission = @peer_review_assignment.submit_homework(
+              @student1,
+              body: "student 1 attempt",
+              submission_type: "online_text_entry"
+            )
+            @peer_review_assignment.submit_homework(
+              @student2,
+              body: "student 2 attempt",
+              submission_type: "online_text_entry"
+            )
+            @association.assess({
+                                  user: @student1,
+                                  assessor: @student2,
+                                  artifact: @peer_review_assignment.find_or_create_submission(@student1),
+                                  assessment: {
+                                    assessment_type: "peer_review",
+                                    criterion_crit1: {
+                                      points: 5,
+                                      comments: "student 2 comment",
+                                    }
+                                  }
+                                })
+            StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+
+            StudentAssignmentPageV2.select_grader("Anonymous")
+            expect(StudentAssignmentPageV2.rubric_comments).to include_text("student 2 comment")
+            expect(StudentAssignmentPageV2.rubric_rating_selected).to include_text("5 pts")
+          end
+        end
+      end
+
+      context "group peer review" do
+        before(:once) do
+          gc = GroupCategory.create(name: "gc", context: @course)
+          group = @course.groups.create!(group_category: gc)
+          group.users << @student1
+          group.users << @student2
+          @peer_review_assignment.update!(group_category_id: gc.id)
+        end
+
+        it "allows the student to complete a group peer review without a rubric by adding a comment" do
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+          StudentAssignmentPageV2.peer_review_next_button.click
+          StudentAssignmentPageV2.leave_a_comment("great job!")
+
+          expect(StudentAssignmentPageV2.comment_container).to include_text("Your peer review is complete!")
+          expect(StudentAssignmentPageV2.comment_container).to include_text("great job!")
+        end
+
+        it "allows the student to complete a group peer review with a rubric by completing the rubric and submitting" do
+          rubric_model
+          @association = @rubric.associate_with(@peer_review_assignment, @course, purpose: "grading", use_for_grading: true)
+          @peer_review_assignment.assign_peer_review(@student1, @student2)
+          @peer_review_assignment.submit_homework(
+            @student3,
+            body: "student 3 attempt",
+            submission_type: "online_text_entry"
+          )
+          StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+          wait_for_ajaximations
+
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.create_text_entry_draft("hello")
+          wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+          StudentAssignmentPageV2.submit_button_enabled
+          StudentAssignmentPageV2.submit_assignment
+          StudentAssignmentPageV2.peer_review_next_button.click
+          StudentAssignmentPageV2.select_rubric_criterion("Good")
+          StudentAssignmentPageV2.submit_peer_review_button.click
+
+          expect(StudentAssignmentPageV2.peer_review_header_text).to include("You have 1 more Peer Review to complete.")
+          expect(StudentAssignmentPageV2.peer_review_next_button).to be_displayed
+        end
       end
     end
   end

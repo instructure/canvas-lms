@@ -41,8 +41,8 @@ module AcademicBenchmark
 
       def api
         @_api ||= AcademicBenchmarks::Api::Handle.new(
-          partner_id: partner_id,
-          partner_key: partner_key
+          partner_id:,
+          partner_key:
         )
       end
 

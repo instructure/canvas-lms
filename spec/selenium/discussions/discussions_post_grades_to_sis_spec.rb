@@ -71,8 +71,10 @@ describe "sync grades to sis" do
       if @enhanced_filters
         @course.enable_feature!(:enhanced_gradebook_filters)
       end
-      @assignment = @course.assignments.create!(name: "assignment", assignment_group: @assignment_group,
-                                                post_to_sis: true, workflow_state: "published")
+      @assignment = @course.assignments.create!(name: "assignment",
+                                                assignment_group: @assignment_group,
+                                                post_to_sis: true,
+                                                workflow_state: "published")
     end
 
     def post_grades_dialog
@@ -103,7 +105,7 @@ describe "sync grades to sis" do
                                         title: "Sync to SIS discussion",
                                         message: "Discussion topic message",
                                         assignment: @assignment)
-      due_at = Time.zone.now + 3.days
+      due_at = 3.days.from_now
       post_grades_dialog
       expect(f("#assignment-errors").text).to include("1 Assignment with Errors")
       f(".assignment-due-at").send_keys(format_date_for_view(due_at))

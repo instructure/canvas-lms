@@ -28,7 +28,7 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import DatetimeDisplay from '@canvas/datetime/react/components/DatetimeDisplay'
 import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
-import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
+import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import * as shapes from './shapes'
 
 const I18n = useI18nScope('IndividualStudentMasteryOutcomePopover')

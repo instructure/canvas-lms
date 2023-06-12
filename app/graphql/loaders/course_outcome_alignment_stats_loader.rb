@@ -20,10 +20,14 @@
 
 class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
   include OutcomesFeaturesHelper
+  include OutcomesServiceAlignmentsHelper
+
+  # Should add support for NQ questions after OUT-5474 is merged
+  SUPPORTED_OS_ALIGNMENTS = %w[quizzes.quiz].freeze
 
   def perform(courses)
     courses.each do |course|
-      unless course_valid?(course) && outcome_alignment_summary_enabled?(course)
+      unless course_valid?(course) && improved_outcomes_management_enabled?(course)
         fulfill(course, nil) unless fulfilled?(course)
         return
       end
@@ -72,6 +76,37 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
       alignment_summary_stats[:total_alignments] += indirect_alignments_count
       alignment_summary_stats[:aligned_artifacts] = @artifacts_with_alignments_ids.length
       alignment_summary_stats[:artifact_alignments] += indirect_artifact_alignments_count
+
+      if outcome_alignment_summary_with_new_quizzes_enabled?(course)
+        active_os_alignments = get_active_os_alignments(course)
+
+        if active_os_alignments.present?
+          all_supported_os_alignments = active_os_alignments
+                                        .values
+                                        .flatten
+                                        .filter { |a| SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type]) }
+
+          os_aligned_new_quiz_ids = all_supported_os_alignments
+                                    .filter_map { |a| a[:associated_asset_id].to_i if a[:associated_asset_type] == "canvas.assignment.quizzes" }
+
+          canvas_aligned_outcome_ids = Set.new(all_outcome_alignments.pluck(:learning_outcome_id))
+
+          os_aligned_outcome_ids = active_os_alignments.keys.map(&:to_i)
+
+          alignment_summary_stats[:aligned_outcomes] = canvas_aligned_outcome_ids
+                                                       .merge(os_aligned_outcome_ids)
+                                                       .size
+          alignment_summary_stats[:aligned_artifacts] = @artifacts_with_alignments_ids
+                                                        .merge(os_aligned_new_quiz_ids)
+                                                        .size
+
+          # OS API returns alignments to new quizzes and questions (which belong to a quiz) and since new quizzes are
+          # artifacts, the total number of alignments returned by OS API is equal to the number of artifact alignments
+          alignment_summary_stats[:total_alignments] += all_supported_os_alignments.size
+          alignment_summary_stats[:artifact_alignments] += all_supported_os_alignments.size
+        end
+      end
+
       fulfill(course, alignment_summary_stats)
     end
   end
@@ -86,7 +121,7 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
     bank.assessment_questions.preload(:quiz_questions).reduce(0) do |acc, q|
       quiz_ids, artifact_assignment_ids = Quizzes::Quiz
                                           .active
-                                          .where(context: context, id: q.quiz_questions.active.pluck(:quiz_id))
+                                          .where(context:, id: q.quiz_questions.active.pluck(:quiz_id))
                                           .pluck(:id, :assignment_id)
                                           .reduce([[], []]) { |(acc1, acc2), (val1, val2)| [acc1 << val1, acc2 << val2] }
       @artifacts_with_alignments_ids.merge(artifact_assignment_ids)

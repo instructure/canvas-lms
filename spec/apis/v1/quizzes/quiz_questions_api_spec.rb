@@ -36,11 +36,15 @@ describe Quizzes::QuizQuestionsController, type: :request do
           @quiz.quiz_questions.create!(question_data: { question_name: "Question #{n}" })
         end
 
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                        controller: "quizzes/quiz_questions", action: "index", format: "json",
-                        course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                        controller: "quizzes/quiz_questions",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        quiz_id: @quiz.id.to_s)
 
-        question_ids = json.collect { |q| q["id"] }
+        question_ids = json.pluck("id")
         expect(question_ids).to eq questions.map(&:id)
       end
 
@@ -56,19 +60,27 @@ describe Quizzes::QuizQuestionsController, type: :request do
           .to receive(:api_user_content)
           .exactly(6).times
 
-        api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                 controller: "quizzes/quiz_questions", action: "index", format: "json",
-                 course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                 controller: "quizzes/quiz_questions",
+                 action: "index",
+                 format: "json",
+                 course_id: @course.id.to_s,
+                 quiz_id: @quiz.id.to_s)
       end
 
       it "returns a list of questions which do not include previously deleted questions" do
         question1 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 1" })
         question2 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 2" })
         question1.destroy
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                        controller: "quizzes/quiz_questions", action: "index", format: "json",
-                        course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
-        question_ids = json.collect { |q| q["id"] }
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                        controller: "quizzes/quiz_questions",
+                        action: "index",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        quiz_id: @quiz.id.to_s)
+        question_ids = json.pluck("id")
         expect(question_ids).to eq [question2.id]
       end
 
@@ -100,7 +112,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
             }
           )
 
-          question_ids = json.collect { |q| q["id"] }.sort
+          question_ids = json.pluck("id").sort
           expect(question_ids).to eq [question1.id, question2.id]
         end
       end
@@ -118,7 +130,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
         }
         json = api_call(
           :post,
-          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions", {
+          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+          {
             controller: "quizzes/quiz_questions",
             action: "create",
             format: "json",
@@ -167,17 +180,28 @@ describe Quizzes::QuizQuestionsController, type: :request do
       context "existing question" do
         before do
           @question = @quiz.quiz_questions.create!(question_data: {
-                                                     "question_name" => "Example Question", "assessment_question_id" => "",
-                                                     "question_type" => "multiple_choice_question", "points_possible" => "1",
-                                                     "correct_comments" => "", "incorrect_comments" => "", "neutral_comments" => "",
-                                                     "question_text" => "<p>What's your favorite color?</p>", "position" => "0",
-                                                     "text_after_answers" => "", "matching_answer_incorrect_matches" => "",
+                                                     "question_name" => "Example Question",
+                                                     "assessment_question_id" => "",
+                                                     "question_type" => "multiple_choice_question",
+                                                     "points_possible" => "1",
+                                                     "correct_comments" => "",
+                                                     "incorrect_comments" => "",
+                                                     "neutral_comments" => "",
+                                                     "question_text" => "<p>What's your favorite color?</p>",
+                                                     "position" => "0",
+                                                     "text_after_answers" => "",
+                                                     "matching_answer_incorrect_matches" => "",
                                                      "answers" => []
                                                    })
 
-          @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                           controller: "quizzes/quiz_questions", action: "show", format: "json",
-                           course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
+          @json = api_call(:get,
+                           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
+                           controller: "quizzes/quiz_questions",
+                           action: "show",
+                           format: "json",
+                           course_id: @course.id.to_s,
+                           quiz_id: @quiz.id.to_s,
+                           id: @question.id.to_s)
 
           @json.symbolize_keys!
         end
@@ -214,9 +238,14 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "answers" => []
                                                      })
 
-            json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                            controller: "quizzes/quiz_questions", action: "show", format: "json",
-                            course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
+                            controller: "quizzes/quiz_questions",
+                            action: "show",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            quiz_id: @quiz.id.to_s,
+                            id: @question.id.to_s)
 
             json["question_text"]
           end
@@ -233,9 +262,14 @@ describe Quizzes::QuizQuestionsController, type: :request do
                                                        "answers" => [{ "text" => plain_answer_txt }, { "html" => content }]
                                                      })
 
-            json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                            controller: "quizzes/quiz_questions", action: "show", format: "json",
-                            course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
+            json = api_call(:get,
+                            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
+                            controller: "quizzes/quiz_questions",
+                            action: "show",
+                            format: "json",
+                            course_id: @course.id.to_s,
+                            quiz_id: @quiz.id.to_s,
+                            id: @question.id.to_s)
 
             expect(json["answers"][0]["text"]).to eq plain_answer_txt
             json["answers"][1]["html"]
@@ -245,9 +279,12 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
       context "non-existent question" do
         it "returns a not found error message" do
-          json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/9034831",
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/9034831",
                           { controller: "quizzes/quiz_questions", action: "show", format: "json", course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: "9034831" },
-                          {}, {}, { expected_status: 404 })
+                          {},
+                          {},
+                          { expected_status: 404 })
           expect(json.inspect).to include "does not exist"
         end
       end
@@ -267,9 +304,13 @@ describe Quizzes::QuizQuestionsController, type: :request do
     context "whom has not started the quiz" do
       describe "GET /courses/:course_id/quizzes/:quiz_id/questions (index)" do
         it "is unauthorized" do
-          raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                       controller: "quizzes/quiz_questions", action: "index", format: "json",
-                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
+          raw_api_call(:get,
+                       "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                       controller: "quizzes/quiz_questions",
+                       action: "index",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       quiz_id: @quiz.id.to_s)
           assert_status(401)
         end
       end
@@ -278,9 +319,14 @@ describe Quizzes::QuizQuestionsController, type: :request do
         it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 
-          raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                       controller: "quizzes/quiz_questions", action: "show", format: "json",
-                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id)
+          raw_api_call(:get,
+                       "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
+                       controller: "quizzes/quiz_questions",
+                       action: "show",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       quiz_id: @quiz.id.to_s,
+                       id: @question.id)
           assert_status(401)
         end
       end
@@ -293,18 +339,27 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
       describe "GET /courses/:course_id/quizzes/:quiz_id/questions (index)" do
         it "is unauthorized" do
-          raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
-                       controller: "quizzes/quiz_questions", action: "index", format: "json",
-                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
+          raw_api_call(:get,
+                       "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
+                       controller: "quizzes/quiz_questions",
+                       action: "index",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       quiz_id: @quiz.id.to_s)
           assert_status(401)
         end
 
         it "is authorized with quiz_submission_id & attempt" do
           url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions?quiz_submission_id=#{@submission.id}&quiz_submission_attempt=1"
-          raw_api_call(:get, url,
-                       controller: "quizzes/quiz_questions", action: "index", format: "json",
-                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s,
-                       quiz_submission_id: @submission.id, quiz_submission_attempt: 1)
+          raw_api_call(:get,
+                       url,
+                       controller: "quizzes/quiz_questions",
+                       action: "index",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       quiz_id: @quiz.id.to_s,
+                       quiz_submission_id: @submission.id,
+                       quiz_submission_attempt: 1)
           assert_status(200)
         end
       end
@@ -313,9 +368,14 @@ describe Quizzes::QuizQuestionsController, type: :request do
         it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 
-          raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
-                       controller: "quizzes/quiz_questions", action: "show", format: "json",
-                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id)
+          raw_api_call(:get,
+                       "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
+                       controller: "quizzes/quiz_questions",
+                       action: "show",
+                       format: "json",
+                       course_id: @course.id.to_s,
+                       quiz_id: @quiz.id.to_s,
+                       id: @question.id)
           assert_status(401)
         end
       end

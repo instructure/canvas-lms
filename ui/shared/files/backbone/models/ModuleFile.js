@@ -15,10 +15,19 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import FilesystemObject from './FilesystemObject.coffee'
+import FilesystemObject from './FilesystemObject'
 
 export default class ModuleFile extends FilesystemObject {
+  constructor(props) {
+    super(props)
+    this.module_item_id = props.module_item_id
+  }
+
   initialize(_attributes, _options) {
     return super.initialize(...arguments)
+  }
+
+  url() {
+    return '/api/v1/files/' + this.id
   }
 }

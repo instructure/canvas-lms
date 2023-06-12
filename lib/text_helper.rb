@@ -36,7 +36,8 @@ module TextHelper
     if end_date.nil? || start_date == end_date
       start_date_display
     else
-      I18n.t("time.ranges.different_days", "%{start_date_and_time} to %{end_date_and_time}",
+      I18n.t("time.ranges.different_days",
+             "%{start_date_and_time} to %{end_date_and_time}",
              start_date_and_time: start_date_display,
              end_date_and_time: Utils::DatePresenter.new(end_date).as_string(style))
     end
@@ -62,8 +63,8 @@ module TextHelper
 
   def datetime_string(start_datetime, datetime_type = :event, end_datetime = nil, shorten_midnight = false, zone = nil, with_weekday: false)
     zone ||= ::Time.zone
-    presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone, with_weekday: with_weekday)
-    presenter.as_string(shorten_midnight: shorten_midnight)
+    presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone, with_weekday:)
+    presenter.as_string(shorten_midnight:)
   end
 
   def time_ago_in_words_with_ago(time)
@@ -85,7 +86,8 @@ module TextHelper
     elsif hours > 1
       I18n.t(
         { one: "%{hours} hours and 1 minute", other: "%{hours} hours and %{count} minutes" },
-        hours: hours, count: minutes
+        hours:,
+        count: minutes
       )
     elsif hours == 1
       I18n.t(
@@ -218,7 +220,7 @@ module TextHelper
     blank_re = I18n.t("#subject_reply_to", "Re: %{subject}", subject: "")
     return subject if subject.starts_with?(blank_re)
 
-    I18n.t("#subject_reply_to", "Re: %{subject}", subject: subject)
+    I18n.t("#subject_reply_to", "Re: %{subject}", subject:)
   end
 
   class MarkdownSafeBuffer < String; end
@@ -246,7 +248,7 @@ module TextHelper
         next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
         next if key == :wrapper
 
-        options[key] = markdown_escape(value).gsub("\\\*", "\\\\\\*").gsub(/\s+/, " ").strip
+        options[key] = markdown_escape(value).gsub("\\*", "\\\\\\*").gsub(/\s+/, " ").strip
       end
     end
     translated = t(*args)

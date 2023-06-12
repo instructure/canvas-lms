@@ -112,7 +112,7 @@ describe "better_file_browsing, folders" do
       folder = @course.folders.where(name: folder_name).first
       expect(folder).to_not be_nil
       file_name = "some silly file"
-      @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data, folder: folder)
+      @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data, folder:)
       folder_link = fln(folder_name, f(".ef-directory"))
       expect(folder_link).to be_present
       folder_link.click
@@ -143,7 +143,8 @@ describe "better_file_browsing, folders" do
 
     it "displays folders in tree view", priority: "1" do
       add_file(fixture_file_upload("example.pdf", "application/pdf"),
-               @course, "example.pdf")
+               @course,
+               "example.pdf")
       get "/courses/#{@course.id}/files"
       create_new_folder
       add_folder("New Folder")
@@ -162,7 +163,7 @@ describe "better_file_browsing, folders" do
       f(".ef-name-col > a.ef-name-col__link").click
       wait_for_ajaximations
       1.upto(15) do |number_of_folders|
-        folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
+        folder_regex = (number_of_folders > 1) ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
         create_new_folder
         expect(all_files_folders.count).to eq number_of_folders
         expect(all_files_folders.last.text).to match folder_regex

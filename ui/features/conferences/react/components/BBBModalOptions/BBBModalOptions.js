@@ -29,7 +29,7 @@ import {Flex} from '@instructure/ui-flex'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tabs} from '@instructure/ui-tabs'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {DateTimeInput} from '@instructure/ui-forms'
+import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
 import {View} from '@instructure/ui-view'
@@ -129,10 +129,32 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                   label={I18n.t('Add to Calendar')}
                   value="add_to_calendar"
                   onChange={event => {
-                    setAddToCalendar(event.target.checked)
-                    // due to calendar api, it sends invite to full course, thus invite_all must be checked
+                    const confirmMessage = I18n.t(
+                      'Checking Add to Calendar will invite all course members.'
+                    )
                     if (event.target.checked) {
-                      props.onSetInvitationOptions(['invite_all'])
+                      // eslint-disable-next-line no-alert
+                      if (window.confirm(confirmMessage)) {
+                        setAddToCalendar(event.target.checked)
+                        // due to calendar api, it sends invite to full course, thus invite_all must be checked
+                        if (event.target.checked) {
+                          props.onSetInvitationOptions(['invite_all'])
+                        }
+                      } else {
+                        // This does not stop the button click, however it will
+                        // prevent all the state changes it would have set off.
+                        // We cannot stop a button click. Thus we must re-click.
+                        // Ensures this code runs AFTER the browser handles click however it wants.
+                        setTimeout(() => {
+                          document
+                            .querySelector('input[type="checkbox"][value="add_to_calendar"]')
+                            .click()
+                          setAddToCalendar(false)
+                        }, 0)
+                      }
+                    } else {
+                      // You are unchecking.
+                      setAddToCalendar(false)
                     }
                   }}
                   disabled={props.hasBegun}
@@ -166,12 +188,12 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                       props.onStartDateChange(newValue)
                     }}
                     layout="columns"
-                    dateLabel={I18n.t('Start Date')}
-                    timeLabel={I18n.t('Start Time')}
+                    dateRenderLabel={I18n.t('Start Date')}
+                    timeRenderLabel={I18n.t('Start Time')}
                     value={props.startDate}
                     invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                    dateNextLabel={I18n.t('Next Month')}
-                    datePreviousLabel={I18n.t('Previous Month')}
+                    nextMonthLabel={I18n.t('Next Month')}
+                    prevMonthLabel={I18n.t('Previous Month')}
                     description={
                       <ScreenReaderContent>
                         {I18n.t('Start Date for Conference')}
@@ -187,12 +209,12 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                       props.onEndDateChange(newValue)
                     }}
                     layout="columns"
-                    dateLabel={I18n.t('End Date')}
-                    timeLabel={I18n.t('End Time')}
+                    dateRenderLabel={I18n.t('End Date')}
+                    timeRenderLabel={I18n.t('End Time')}
                     value={props.endDate}
                     invalidDateTimeMessage={I18n.t('Invalid date and time')}
-                    dateNextLabel={I18n.t('Next Month')}
-                    datePreviousLabel={I18n.t('Previous Month')}
+                    nextMonthLabel={I18n.t('Next Month')}
+                    prevMonthLabel={I18n.t('Previous Month')}
                     description={
                       <ScreenReaderContent>{I18n.t('End Date for Conference')}</ScreenReaderContent>
                     }
@@ -225,6 +247,10 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
             <CheckboxGroup
               name="invitation_options"
               onChange={value => {
+                // make sure to uncheck remove_observers if invite_all is unchecked
+                if (!value.includes('invite_all') && value.indexOf('remove_observers') > -1) {
+                  value.splice(value.indexOf('remove_observers'), 1)
+                }
                 props.onSetInvitationOptions([...value])
               }}
               defaultValue={props.invitationOptions}

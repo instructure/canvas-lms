@@ -23,6 +23,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/templateData'
+import {underscoreString} from '@canvas/convert-case'
 
 const I18n = useI18nScope('terms.index')
 
@@ -113,7 +114,7 @@ $(document).ready(() => {
       for (const idx in term.enrollment_dates_overrides) {
         let start_string
         const override = term.enrollment_dates_overrides[idx].enrollment_dates_override
-        const type_string = $.underscore(override.enrollment_type)
+        const type_string = underscoreString(override.enrollment_type)
         // Student enrollments without an overridden start date get the term's overall start date, while teacher, ta,
         // and designer roles without an overridden start date allow access from the dawn of time. The logic
         // implementing this is in EnrollmentTerm#enrollment_dates_for.

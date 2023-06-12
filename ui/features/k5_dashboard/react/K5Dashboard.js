@@ -160,6 +160,7 @@ const K5Dashboard = ({
   canAddObservee,
   openTodosInNewTab,
   loadingOpportunities,
+  accountCalendarContexts,
 }) => {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -225,8 +226,8 @@ const K5Dashboard = ({
   const handleChangeObservedUser = id => {
     if (id !== observedUserId) {
       fetchShowK5Dashboard(id)
-        .then(isK5User => {
-          if (isK5User) {
+        .then(response => {
+          if (response.show_k5_dashboard && response.use_classic_font === ENV.USE_CLASSIC_FONT) {
             updateDashboardForObserverCallback(id)
           } else {
             window.location.reload()
@@ -332,17 +333,22 @@ const K5Dashboard = ({
       <View as="div" margin={`medium 0 ${sticky && showingAdditionalOptions ? '0' : 'small'} 0`}>
         {placeAdditionalOptionsAbove && (
           <Flex margin={`0 0 ${sticky ? 'small' : 'medium'} 0`}>
-            {/* place the Welcome... heading above the observer picker when necessary since
-                the h1 should be the first item on the page */}
+            {/* place the Welcome... heading above the observer picker when necessary (observer mode with mobile view) */}
             <ScreenReaderContent>
-              <Heading as="h1">{welcomeMessage}</Heading>
+              <Heading as="span" level="h1">
+                {welcomeMessage}
+              </Heading>
             </ScreenReaderContent>
             {additionalOptions}
           </Flex>
         )}
         <Flex alignItems="center">
           <Flex.Item shouldGrow={true} shouldShrink={true} margin="0 small 0 0">
-            <Heading as="h1" aria-hidden={placeAdditionalOptionsAbove} level={sticky ? 'h2' : 'h1'}>
+            <Heading
+              as="span"
+              aria-hidden={placeAdditionalOptionsAbove}
+              level={sticky ? 'h2' : 'h1'}
+            >
               {welcomeMessage}
             </Heading>
           </Flex.Item>
@@ -352,10 +358,20 @@ const K5Dashboard = ({
     )
   }
 
+  const importantDatesContexts = cards
+    ?.filter(c => c.isK5Subject || c.isHomeroom)
+    .map(c => ({assetString: c.assetString, color: c.color, name: c.shortName}))
+    .concat(
+      accountCalendarContexts.map(c => ({
+        assetString: c.asset_string,
+        name: c.name,
+      }))
+    )
+
   const importantDates = (
     <ImportantDates
       timeZone={timeZone}
-      contexts={cards?.filter(c => c.isK5Subject || c.isHomeroom)}
+      contexts={importantDatesContexts}
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
@@ -482,6 +498,12 @@ K5Dashboard.propTypes = {
   observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired,
+  accountCalendarContexts: PropTypes.arrayOf(
+    PropTypes.shape({
+      asset_string: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ),
 }
 
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))

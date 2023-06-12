@@ -33,7 +33,7 @@ describe Turnitin::Client do
 
   def stub_net_http_to_return(partial_body, return_code = 1)
     body = "<returndata>#{partial_body}<rcode>#{return_code}</rcode></returndata>"
-    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(double(body: body))
+    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(double(body:))
   end
 
   describe "#state_from_similarity_score" do
@@ -207,7 +207,7 @@ describe Turnitin::Client do
 
       expect(status).to be_falsey
       expect(@submission.turnitin_data[@attachment.asset_string][:object_id]).to be_nil
-      expect(@submission.turnitin_data[@attachment.asset_string][:error_code]).to eql 216
+      expect(@submission.turnitin_data[@attachment.asset_string][:error_code]).to be 216
       expect(@submission.turnitin_data[@attachment.asset_string][:error_message]).to eql "I am a random turnitin error message."
       expect(@submission.turnitin_data[@attachment.asset_string][:public_error_message]).to eql "The student limit for this account has been reached. Please contact your account administrator."
     end

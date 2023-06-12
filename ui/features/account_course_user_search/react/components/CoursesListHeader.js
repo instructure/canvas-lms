@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import React from 'react'
 import {string, func} from 'prop-types'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 
 export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
   const SortIcon = order === 'asc' ? IconMiniArrowUpSolid : IconMiniArrowDownSolid

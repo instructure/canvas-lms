@@ -108,6 +108,14 @@ describe "course index" do
         expect(row_with_text(name)).not_to contain_css(star)
       end
     end
+
+    it "includes the course title in the star's text" do
+      get "/courses"
+
+      expect(fj('.course-list-favoritable:contains("Click to add Classic Course (Current) to the courses menu.")')).to be_displayed
+      expect(fj('.course-list-favoritable:contains("Classic Course (Past) cannot be added to the courses menu unless the course is active.")')).to be_displayed
+      expect(fj('.course-list-favoritable:contains("Click to add Classic Course (Future) to the courses menu.")')).to be_displayed
+    end
   end
 
   context "start new course button" do

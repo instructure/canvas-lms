@@ -29,7 +29,7 @@ module QuizzesNext
           selected_assignment_ids = opts[:exported_assets].filter_map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }
           return unless selected_assignment_ids.any?
         end
-        assignments = QuizzesNext::Service.active_lti_assignments_for_course(course, selected_assignment_ids: selected_assignment_ids)
+        assignments = QuizzesNext::Service.active_lti_assignments_for_course(course, selected_assignment_ids:)
         return if assignments.empty?
 
         {
@@ -66,6 +66,7 @@ module QuizzesNext
           old_assignment_id = assignment.fetch(:original_assignment_id)
           old_assignment = Assignment.find(old_assignment_id)
 
+          new_assignment.skip_downstream_changes! # don't let these updates prevent future blueprint syncs
           new_assignment.duplicate_of = old_assignment
           new_assignment.workflow_state = "duplicating"
           new_assignment.duplication_started_at = Time.zone.now

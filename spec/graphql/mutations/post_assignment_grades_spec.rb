@@ -53,7 +53,7 @@ describe Mutations::PostAssignmentGrades do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   context "when user has grade permission" do
@@ -82,7 +82,7 @@ describe Mutations::PostAssignmentGrades do
       now = Time.zone.now
       assignment.update!(moderated_grading: true, grader_count: 2, final_grader: teacher, grades_published_at: now)
       result = execute_query(mutation_str(assignment_id: assignment.id), context)
-      expect(result["errors"]).to be nil
+      expect(result["errors"]).to be_nil
     end
 
     describe "posting the grades" do
@@ -233,7 +233,7 @@ describe Mutations::PostAssignmentGrades do
         it "only posts grades for students that the user can see" do
           execute_query(mutation_str(assignment_id: assignment.id), context)
           post_submissions_job.invoke_job
-          expect(assignment.submission_for_student(secret_student).posted_at).to be nil
+          expect(assignment.submission_for_student(secret_student).posted_at).to be_nil
         end
 
         it "stores only the user ids of affected students on the Progress object" do
@@ -256,7 +256,7 @@ describe Mutations::PostAssignmentGrades do
 
     it "does not return data for the related submissions" do
       result = execute_query(mutation_str(assignment_id: assignment.id), context)
-      expect(result.dig("data", "postAssignmentGrades")).to be nil
+      expect(result.dig("data", "postAssignmentGrades")).to be_nil
     end
   end
 
@@ -328,7 +328,7 @@ describe Mutations::PostAssignmentGrades do
     let(:submissions_posted_messages) do
       Message.where(
         communication_channel: teacher.email_channel,
-        notification: notification
+        notification:
       )
     end
 

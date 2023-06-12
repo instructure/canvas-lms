@@ -23,7 +23,7 @@ module.exports = {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
     'node_modules-version-of-react-modal': require.resolve('react-modal'),
-    'underscore$': require.resolve('lodash-underscore'),
+    underscore$: '<rootDir>/packages/lodash-underscore/index.js',
     '^Backbone$': '<rootDir>/public/javascripts/Backbone.js',
     // jest can't import the icons
     '@instructure/ui-icons/es/svg': '<rootDir>/packages/canvas-rce/src/rce/__tests__/_mockIcons.js',
@@ -36,7 +36,8 @@ module.exports = {
     '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js',
     'decimal.js/decimal.mjs': 'decimal.js/decimal.js',
     // https://github.com/ai/nanoid/issues/363
-    "^nanoid(/(.*)|$)": "nanoid$1",
+    '^nanoid(/(.*)|$)': 'nanoid$1',
+    '\\.(css)$': '<rootDir>/jest/styleMock.js',
   },
   roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
@@ -48,16 +49,16 @@ module.exports = {
         suiteName: 'Jest Tests',
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage-js/junit-reports',
         outputName: 'jest.xml',
-        addFileAttribute: 'true'
-      }
-    ]
+        addFileAttribute: 'true',
+      },
+    ],
   ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: [
     '@testing-library/jest-dom/extend-expect',
     './packages/validated-apollo/src/ValidatedApolloCleanup.js',
-    '<rootDir>/jest/stubInstUi.js'
+    '<rootDir>/jest/stubInstUi.js',
   ],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
@@ -68,7 +69,7 @@ module.exports = {
   // k5_dashboard: LS-2243
   collectCoverageFrom: [
     '**/__tests__/**/?(*.)(spec|test).[jt]s?(x)',
-    '!<rootDir>/ui/features/k5_dashboard/react/__tests__/k5DashboardPlanner.test.js'
+    '!<rootDir>/ui/features/k5_dashboard/react/__tests__/k5DashboardPlanner.test.js',
   ],
 
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
@@ -77,7 +78,6 @@ module.exports = {
   testEnvironment: '<rootDir>/jest/strictTimeLimitEnvironment.js',
 
   transform: {
-    '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
     '\\.graphql$': '<rootDir>/jest/rawLoader.js',
     '\\.[jt]sx?$': [
@@ -90,16 +90,16 @@ module.exports = {
             {
               // until we're on Jest 27 and can look into loading ESMs natively;
               // https://jestjs.io/docs/ecmascript-modules
-              modules: 'commonjs'
-            }
+              modules: 'commonjs',
+            },
           ],
           ['@babel/preset-react', {useBuiltIns: true}],
-          ['@babel/preset-typescript', {}]
+          ['@babel/preset-typescript', {}],
         ],
         targets: {
-          node: 'current'
-        }
-      }
-    ]
-  }
+          node: 'current',
+        },
+      },
+    ],
+  },
 }

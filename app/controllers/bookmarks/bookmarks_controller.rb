@@ -62,7 +62,7 @@ class Bookmarks::BookmarksController < ApplicationController
   # @returns [Bookmark]
   def index
     GuardRail.activate(:secondary) do
-      @bookmarks = Bookmarks::Bookmark.where(user_id: user_id).ordered
+      @bookmarks = Bookmarks::Bookmark.where(user_id:).ordered
       @bookmarks = Api.paginate(@bookmarks, self, api_v1_bookmarks_url)
     end
 
@@ -164,20 +164,20 @@ class Bookmarks::BookmarksController < ApplicationController
     @current_user.id
   end
 
-  def activate_user_shard(&block)
-    @current_user.shard.activate(&block)
+  def activate_user_shard(&)
+    @current_user.shard.activate(&)
   end
 
   def find_bookmark
     GuardRail.activate(:secondary) do
-      @bookmark = Bookmarks::Bookmark.where(id: params[:id], user_id: user_id).take
+      @bookmark = Bookmarks::Bookmark.where(id: params[:id], user_id:).take
     end
 
     return head :not_found unless @bookmark.present?
   end
 
   def valid_params
-    params.permit(:name, :url, data: strong_anything).merge(user_id: user_id)
+    params.permit(:name, :url, data: strong_anything).merge(user_id:)
   end
 
   def set_position

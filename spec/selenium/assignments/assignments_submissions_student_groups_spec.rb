@@ -42,7 +42,8 @@ describe "submissions" do
       it "Submitting Group Assignments - File Upload", priority: "1" do
         create_assignment_for_group("online_upload")
         add_file(fixture_file_upload("example.pdf", "application/pdf"),
-                 @student, "example.pdf")
+                 @student,
+                 "example.pdf")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f(".submit_assignment_link").click
         wait_for_ajaximations

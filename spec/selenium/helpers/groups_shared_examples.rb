@@ -33,7 +33,7 @@ shared_examples "home_page" do |context|
   it "displays a coming up section with relevant events", priority: pick_priority(context, student: "1", teacher: "2") do
     # Create an event to have something in the Coming up Section
     event = @testgroup[0].calendar_events.create!(title: "ohai",
-                                                  start_at: Time.zone.now + 1.day)
+                                                  start_at: 1.day.from_now)
     get url
 
     expect(".coming_up").to be_present
@@ -54,8 +54,10 @@ shared_examples "home_page" do |context|
   end
 
   it "displays recent activity feed on the group home page", priority: pick_priority(context, student: "1", teacher: "2") do
-    DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                            title: "Discussion Topic", message: "test")
+    DiscussionTopic.create!(context: @testgroup.first,
+                            user: @teacher,
+                            title: "Discussion Topic",
+                            message: "test")
     @testgroup.first.announcements.create!(title: "Test Announcement", message: "Message", user: @teacher)
 
     get url
@@ -270,10 +272,14 @@ shared_examples "discussions_page" do |context|
 
   it "only lists in-group discussions in RCE links tray", priority: pick_priority(context, student: "1", teacher: "2") do
     # create group and course announcements
-    group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
-                                       title: "Group Discussion", message: "Group")
-    course_dt = DiscussionTopic.create!(context: @course, user: @teacher,
-                                        title: "Course Discussion", message: "Course")
+    group_dt = DiscussionTopic.create!(context: @testgroup.first,
+                                       user: @teacher,
+                                       title: "Group Discussion",
+                                       message: "Group")
+    course_dt = DiscussionTopic.create!(context: @course,
+                                        user: @teacher,
+                                        title: "Course Discussion",
+                                        message: "Course")
 
     get discussions_page
     expect_new_page_load { f("#add_discussion").click }
@@ -333,7 +339,7 @@ shared_examples "conferences_page" do |context|
     skip_if_chrome("issue with invite_all_but_one_user method")
     title = "test conference"
     get conferences_page
-    create_conference(title: title)
+    create_conference(title:)
     expect(f("#new-conference-list .ig-title").text).to include(title)
   end
 

@@ -32,8 +32,8 @@ describe "new_discussion_topic" do
   context "locked discussions" do
     it "sends locked notification if availibility date is locked for email" do
       @topic.update(
-        unlock_at: Time.zone.now + 3.days,
-        lock_at: Time.zone.now + 6.days,
+        unlock_at: 3.days.from_now,
+        lock_at: 6.days.from_now,
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
@@ -63,8 +63,8 @@ describe "new_discussion_topic" do
 
     it "sends locked notification if availibility date is locked for sms" do
       @topic.update(
-        unlock_at: Time.zone.now + 3.days,
-        lock_at: Time.zone.now + 6.days,
+        unlock_at: 3.days.from_now,
+        lock_at: 6.days.from_now,
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student
@@ -85,8 +85,8 @@ describe "new_discussion_topic" do
 
     it "sends locked notification if availibility date is locked for summary" do
       @topic.update(
-        unlock_at: Time.zone.now + 3.days,
-        lock_at: Time.zone.now + 6.days,
+        unlock_at: 3.days.from_now,
+        lock_at: 6.days.from_now,
         message: "the content here of the discussion body"
       )
       enrollment = course_with_student

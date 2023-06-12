@@ -30,7 +30,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         course = Pact::Canvas.base_state.course
         course.assignments.create({
                                     name: "Assignment 1",
-                                    due_at: Time.zone.now + 1.day,
+                                    due_at: 1.day.from_now,
                                     submission_types: "online_text_entry"
                                   })
       end
@@ -66,7 +66,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         student = Pact::Canvas.base_state.students.first
         assignment = course.assignments.create({
                                                  name: "Assignment Override",
-                                                 due_at: Time.zone.now + 1.day,
+                                                 due_at: 1.day.from_now,
                                                  submission_types: "online_text_entry"
                                                })
 
@@ -159,7 +159,8 @@ PactConfig::Consumers::ALL.each do |consumer|
           rubric.save!
           # Unbelievable -- The only way I could see to apply rubric criteria to the assignment was
           # to update them here.  Couldn't do it in Rubric.create!() above.
-          rubric_association = rubric.update_with_association(mteacher, {
+          rubric_association = rubric.update_with_association(mteacher,
+                                                              {
                                                                 criteria: {
                                                                   "0" => {
                                                                     ignore_for_scoring: "0",
@@ -172,7 +173,9 @@ PactConfig::Consumers::ALL.each do |consumer|
                                                                     },
                                                                   },
                                                                 },
-                                                              }, mcourse, {
+                                                              },
+                                                              mcourse,
+                                                              {
                                                                 association_object: assignment, purpose: "grading", update_if_existing: true, use_for_grading: "1", skip_updating_points_possible: true
                                                               })
           rubric.save!
@@ -182,9 +185,9 @@ PactConfig::Consumers::ALL.each do |consumer|
                                      artifact: submission,
                                      assessment_type: "grading",
                                      assessor: mteacher,
-                                     rubric: rubric,
+                                     rubric:,
                                      user: mstudent,
-                                     rubric_association: rubric_association,
+                                     rubric_association:,
                                      data: [{ points: 10.0, comments: "hey" }]
                                    })
           # Unfortunately, the rubric assessment above will not actually assign a grade

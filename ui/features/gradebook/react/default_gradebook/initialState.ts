@@ -21,14 +21,17 @@ import StudentDatastore from './stores/StudentDatastore'
 import type {
   ContentLoadStates,
   CourseContent,
+  CustomColumn,
   GradebookOptions,
   GradebookSettings,
   InitialActionStates,
+  LatePolicyCamelized,
 } from './gradebook.d'
+import type {StatusColors} from './constants/colors'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
-import {camelize} from 'convert-case'
+import {camelizeProperties} from '@canvas/convert-case'
 
-export function getInitialGradebookContent(options) {
+export function getInitialGradebookContent(options: {teacher_notes: null | CustomColumn}) {
   return {
     customColumns: options.teacher_notes ? [options.teacher_notes] : [],
   }
@@ -36,7 +39,7 @@ export function getInitialGradebookContent(options) {
 
 export function getInitialGridDisplaySettings(
   settings: GradebookSettings,
-  colors
+  colors: StatusColors
 ): GridDisplaySettings {
   const selectedPrimaryInfo = studentRowHeaderConstants.primaryInfoKeys.includes(
     settings.student_column_display_as
@@ -56,14 +59,14 @@ export function getInitialGridDisplaySettings(
     endDate: null,
   }
   if (settings.filter_columns_by != null) {
-    Object.assign(filterColumnsBy, camelize(settings.filter_columns_by))
+    Object.assign(filterColumnsBy, camelizeProperties(settings.filter_columns_by))
   }
   const filterRowsBy = {
     sectionId: null,
     studentGroupId: null,
   }
   if (settings.filter_rows_by != null) {
-    Object.assign(filterRowsBy, camelize(settings.filter_rows_by))
+    Object.assign(filterRowsBy, camelizeProperties(settings.filter_rows_by))
   }
   return {
     colors,
@@ -99,7 +102,7 @@ export function getInitialGridDisplaySettings(
   }
 }
 
-export function getInitialContentLoadStates(options): ContentLoadStates {
+export function getInitialContentLoadStates(options: {has_modules: boolean}): ContentLoadStates {
   return {
     assignmentGroupsLoaded: false,
     contextModulesLoaded: !options.has_modules,
@@ -129,10 +132,12 @@ export function getInitialCourseContent(options: GradebookOptions): CourseConten
     contextModules: [],
     courseGradingScheme,
     defaultGradingScheme,
-    gradingSchemes: options.grading_schemes.map(camelize),
+    gradingSchemes: options.grading_schemes.map(camelizeProperties),
     gradingPeriodAssignments: {},
     assignmentStudentVisibility: {},
-    latePolicy: options.late_policy ? camelize(options.late_policy) : undefined,
+    latePolicy: options.late_policy
+      ? camelizeProperties<LatePolicyCamelized>(options.late_policy)
+      : undefined,
     students: new StudentDatastore({}, {}),
     modulesById: {},
   }

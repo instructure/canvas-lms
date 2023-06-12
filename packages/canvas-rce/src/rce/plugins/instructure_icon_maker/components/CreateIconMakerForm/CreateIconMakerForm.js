@@ -31,7 +31,6 @@ export const CreateIconMakerForm = ({
   editing,
   allowNameChange,
   nameRef,
-  rcsConfig,
   canvasOrigin,
 }) => {
   return (
@@ -51,7 +50,6 @@ export const CreateIconMakerForm = ({
         settings={settings}
         onChange={dispatch}
         editing={editing}
-        rcsConfig={rcsConfig}
         canvasOrigin={canvasOrigin}
       />
     </>

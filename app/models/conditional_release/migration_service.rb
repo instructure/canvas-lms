@@ -32,7 +32,7 @@ module ConditionalRelease
         end
 
         # just pretend like we started an export even if we're not actually hitting a service anymore
-        { native: true, course: course, assignment_ids: assignment_ids }
+        { native: true, course:, assignment_ids: }
       end
 
       def export_completed?(export_data)
@@ -94,7 +94,7 @@ module ConditionalRelease
                 assignment_id = assoc_hash["$canvas_assignment_id"]
                 next unless valid_id?(assignment_id)
 
-                associations << { assignment_id: assignment_id }
+                associations << ({ assignment_id: })
               end
               set_hash["assignment_set_associations_attributes"] = associations
               set_hash

@@ -45,13 +45,13 @@ class FileInContext
       display_name ||= File.split(filename).last
 
       if md5 && folder && !allow_rename
-        scope = context.attachments.where(display_name: display_name, folder: folder).not_deleted
+        scope = context.attachments.where(display_name:, folder:).not_deleted
         scope = scope.where(migration_id: [migration_id, nil]) if migration_id # either find a previous copy or an unassociated match
         existing_att = false
 
         # only engage in hash comparison if there are possible duplicates
         if scope.take
-          existing_att = scope.where(md5: md5).take
+          existing_att = scope.where(md5:).take
 
           # Hashing an alternative digest to check the possible duplicate that didn't match the previous hash
           # Keep in mind that the md5 argument isn't necessarily an actual md5 hash, it may be a sha512 (maybe even other stuff in the future)
@@ -74,7 +74,7 @@ class FileInContext
 
       uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
 
-      @attachment = Attachment.new(context: context, display_name: display_name, folder: folder)
+      @attachment = Attachment.new(context:, display_name:, folder:)
       Attachments::Storage.store_for_attachment(@attachment, uploaded_data)
       @attachment.filename = explicit_filename if explicit_filename
       @attachment.migration_id = migration_id

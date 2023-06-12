@@ -93,7 +93,7 @@ module CanvasSecurity
 
         it "can pull out the masquerading user if provided" do
           real_user_id = 24
-          base64_encoded_wrapper = build_wrapped_token(user_id, real_user_id: real_user_id)
+          base64_encoded_wrapper = build_wrapped_token(user_id, real_user_id:)
           jwt = ServicesJwt.new(base64_encoded_wrapper)
           expect(jwt.masquerading_user_global_id).to eq(real_user_id)
         end
@@ -167,12 +167,12 @@ module CanvasSecurity
           it "doesn't include the masq key if there is no real user" do
             jwt = ServicesJwt.for_user(host, user, real_user: nil)
             decrypted_token_body = translate_token.call(jwt)
-            expect(decrypted_token_body.key?(:masq_sub)).to eq(false)
+            expect(decrypted_token_body.key?(:masq_sub)).to be(false)
           end
 
           it "includes workflows if given" do
             workflows = ["foo"]
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows)
+            jwt = ServicesJwt.for_user(host, user, workflows:)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body[:workflows]).to eq workflows
           end
@@ -185,7 +185,7 @@ module CanvasSecurity
 
           it "does not include a workflow if empty array" do
             workflows = []
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows)
+            jwt = ServicesJwt.for_user(host, user, workflows:)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body).not_to have_key :workflow
           end
@@ -194,7 +194,7 @@ module CanvasSecurity
             workflows = [:foo]
             state = { "a" => 123 }
             expect(CanvasSecurity::JWTWorkflow).to receive(:state_for).with(workflows, ctx, user).and_return(state)
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
+            jwt = ServicesJwt.for_user(host, user, workflows:, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body[:workflow_state]).to eq(state)
           end
@@ -202,7 +202,7 @@ module CanvasSecurity
           it "does not include workflow_state if empty" do
             workflows = [:foo]
             expect(CanvasSecurity::JWTWorkflow).to receive(:state_for).and_return({})
-            jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
+            jwt = ServicesJwt.for_user(host, user, workflows:, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body).not_to have_key :workflow_state
           end
@@ -287,7 +287,7 @@ module CanvasSecurity
 
           it "generates a token with same workflows as original" do
             workflows = ["rich_content", "ui"]
-            jwt = ServicesJwt.for_user(host, user1, workflows: workflows)
+            jwt = ServicesJwt.for_user(host, user1, workflows:)
             refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
             payload = translate_token.call(refreshed)
             expect(payload[:workflows]).to eq(workflows)
@@ -295,7 +295,7 @@ module CanvasSecurity
 
           it "generates a token with same context as original" do
             context = ServicesJwtContext.new(123)
-            jwt = ServicesJwt.for_user(host, user1, context: context)
+            jwt = ServicesJwt.for_user(host, user1, context:)
             refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
             payload = translate_token.call(refreshed)
             expect(payload[:context_type]).to eq(context.class.name)
@@ -320,7 +320,7 @@ module CanvasSecurity
       it "has secrets accessors" do
         expect(ServicesJwt.encryption_secret).to eq(fake_encryption_secret)
         expect(ServicesJwt.signing_secret).to eq(fake_signing_secret)
-        expect(ServicesJwt.previous_signing_secret).to eq(fake_deprecated_signing_secret)
+        expect(ServicesJwt.previous_signing_secret).to eq(fake_signing_secret_deprecated)
       end
 
       it "defers direct secrets access to the security module" do
@@ -332,7 +332,7 @@ module CanvasSecurity
         it "can decode tokens built with either key" do
           user_id = 84
           base64_encoded_wrapper_new_key = build_wrapped_token(user_id, encoding_secret: fake_signing_secret)
-          base64_encoded_wrapper_old_key = build_wrapped_token(user_id, encoding_secret: fake_deprecated_signing_secret)
+          base64_encoded_wrapper_old_key = build_wrapped_token(user_id, encoding_secret: fake_signing_secret_deprecated)
           base64_encoded_wrapper_non_key = build_wrapped_token(user_id, encoding_secret: "aint-a-used-secret-but-ok-length")
           jwt_new_key = ServicesJwt.new(base64_encoded_wrapper_new_key)
           jwt_old_key = ServicesJwt.new(base64_encoded_wrapper_old_key)

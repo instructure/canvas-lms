@@ -9,3 +9,9 @@ feature_flag_test:
   applies_to: SiteAdmin
   display_name: Test Feature Flag
   description: This flag is a no-op and is only intended for testing.
+verify_ldap_certs:
+  state: hidden
+  shadow: true
+  display_name: Verify LDAP TLS certificates
+  description: Verify TLS certificates presented by LDAP authentication providers.
+  applies_to: Account

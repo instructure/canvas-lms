@@ -7,19 +7,3 @@ test:
      connect_timeout: 15
      timeout: 15
 
-   auditors:
-     servers:
-       - cassandra:9160
-     keyspace: auditors<%= ENV.fetch('PARALLEL_INDEX', '') %>
-     retries: 10
-     connect_timeout: 15
-     timeout: 15
-
-   global_lookups:
-     servers:
-       - cassandra:9160
-     keyspace: global_lookups<%= ENV.fetch('PARALLEL_INDEX', '') %>
-     retries: 10
-     connect_timeout: 15
-     auto_snapshot: false
-     timeout: 15

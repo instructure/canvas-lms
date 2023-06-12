@@ -43,7 +43,7 @@ describe Mutations::CreateInternalSetting do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   it "creates and returns the internal setting" do
@@ -57,7 +57,7 @@ describe Mutations::CreateInternalSetting do
     expect(internal_setting_result["id"]).to eq CanvasSchema.id_from_object(Setting.find_by(name: "sentry_disabled"), Types::InternalSettingType, nil)
     expect(internal_setting_result["name"]).to eq "sentry_disabled"
     expect(internal_setting_result["value"]).to eq "never! 👀"
-    expect(internal_setting_result["secret"]).to eq false
+    expect(internal_setting_result["secret"]).to be false
 
     Setting.reset_cache!
     expect(Setting.get("sentry_disabled", "")).to eq "never! 👀"

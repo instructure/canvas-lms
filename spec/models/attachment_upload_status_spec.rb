@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe AttachmentUploadStatus, type: :model do
-  let(:upload) { AttachmentUploadStatus.new(attachment: attachment, error: "error") }
+RSpec.describe AttachmentUploadStatus do
+  let(:upload) { AttachmentUploadStatus.new(attachment:, error: "error") }
   let(:progress) { Progress.create!(context: assignment_model, tag: "tag") }
   let(:attachment) { attachment_model }
   let(:memory_store) { ActiveSupport::Cache.lookup_store(:memory_store) }
@@ -61,7 +61,7 @@ RSpec.describe AttachmentUploadStatus, type: :model do
     end
 
     it "creates an instance" do
-      expect(described_class.where(attachment: attachment)).to be_exist
+      expect(described_class.where(attachment:)).to be_exist
     end
   end
 
@@ -81,7 +81,7 @@ RSpec.describe AttachmentUploadStatus, type: :model do
 
     context "for error" do
       it "sets error status" do
-        AttachmentUploadStatus.create!(attachment: attachment, error: "error msg")
+        AttachmentUploadStatus.create!(attachment:, error: "error msg")
         expect(described_class.upload_status(attachment)).to eq "failed"
       end
     end

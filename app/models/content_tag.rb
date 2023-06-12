@@ -21,8 +21,18 @@ class ContentTag < ActiveRecord::Base
   class LastLinkToOutcomeNotDestroyed < StandardError
   end
 
-  TABLED_CONTENT_TYPES = ["Attachment", "Assignment", "WikiPage", "Quizzes::Quiz", "LearningOutcome", "DiscussionTopic",
-                          "Rubric", "ContextExternalTool", "LearningOutcomeGroup", "AssessmentQuestionBank", "LiveAssessments::Assessment", "Lti::MessageHandler"].freeze
+  TABLED_CONTENT_TYPES = ["Attachment",
+                          "Assignment",
+                          "WikiPage",
+                          "Quizzes::Quiz",
+                          "LearningOutcome",
+                          "DiscussionTopic",
+                          "Rubric",
+                          "ContextExternalTool",
+                          "LearningOutcomeGroup",
+                          "AssessmentQuestionBank",
+                          "LiveAssessments::Assessment",
+                          "Lti::MessageHandler"].freeze
   TABLELESS_CONTENT_TYPES = ["ContextModuleSubHeader", "ExternalUrl"].freeze
   CONTENT_TYPES = (TABLED_CONTENT_TYPES + TABLELESS_CONTENT_TYPES).freeze
 
@@ -36,10 +46,14 @@ class ContentTag < ActiveRecord::Base
   belongs_to :content, polymorphic: [], exhaustive: false
   validates :content_type, inclusion: { allow_nil: true, in: CONTENT_TYPES }
   belongs_to :context, polymorphic:
-      [:course, :learning_outcome_group, :assignment, :account,
+      [:course,
+       :learning_outcome_group,
+       :assignment,
+       :account,
        { quiz: "Quizzes::Quiz" }]
-  belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: "Lti::ResourceLink"],
-                                polymorphic_prefix: true
+  belongs_to :associated_asset,
+             polymorphic: [:learning_outcome_group, lti_resource_link: "Lti::ResourceLink"],
+             polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
@@ -329,11 +343,11 @@ class ContentTag < ActiveRecord::Base
     return unless asset_context_matches?
 
     # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
-    if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
+    if content.respond_to?(:name=) && content.respond_to?(:name) && !content.is_a?(Assignment)
       content.name = asset_safe_title("name")
-    elsif content.respond_to?("title=")
+    elsif content.respond_to?(:title=)
       content.title = asset_safe_title("title")
-    elsif content.respond_to?("display_name=")
+    elsif content.respond_to?(:display_name=)
       content.display_name = asset_safe_title("display_name")
     end
     if content.changed?
@@ -368,7 +382,7 @@ class ContentTag < ActiveRecord::Base
       # and there are no other links to the same outcome in the same context...
       outcome = content
       other_link = ContentTag.learning_outcome_links.active
-                             .where(context_type: context_type, context_id: context_id, content_id: outcome)
+                             .where(context_type:, context_id:, content_id: outcome)
                              .where.not(id: self).take
       unless other_link
         # and there are alignments to the outcome (in the link's context for
@@ -526,13 +540,13 @@ class ContentTag < ActiveRecord::Base
     content.respond_to?(:rubric_association) && !!content.rubric_association&.active?
   end
 
-  scope :for_tagged_url, ->(url, tag) { where(url: url, tag: tag) }
+  scope :for_tagged_url, ->(url, tag) { where(url:, tag:) }
   scope :for_context, lambda { |context|
     case context
     when Account
-      where(context: context).union(for_associated_courses(context))
+      where(context:).union(for_associated_courses(context))
     else
-      where(context: context)
+      where(context:)
     end
   }
   scope :for_associated_courses, lambda { |account|
@@ -579,7 +593,8 @@ class ContentTag < ActiveRecord::Base
       .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND content_tags.content_type = 'DiscussionTopic'
-             AND discussion_topics.assignment_id IS NULL", course_ids)
+             AND discussion_topics.assignment_id IS NULL",
+             course_ids)
   }
 
   scope :for_non_differentiable_wiki_pages, lambda { |course_ids|
@@ -587,7 +602,8 @@ class ContentTag < ActiveRecord::Base
       .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND content_tags.content_type = 'WikiPage'
-             AND wp.assignment_id IS NULL", course_ids)
+             AND wp.assignment_id IS NULL",
+             course_ids)
   }
 
   scope :for_differentiable_quizzes, lambda { |user_ids, course_ids|
@@ -597,7 +613,10 @@ class ContentTag < ActiveRecord::Base
              AND qsv.course_id IN (?)
              AND content_tags.content_type in ('Quiz', 'Quizzes::Quiz')
              AND qsv.user_id = ANY( '{?}'::INT8[] )
-        ", course_ids, course_ids, user_ids)
+        ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :for_differentiable_assignments, lambda { |user_ids, course_ids|
@@ -607,7 +626,10 @@ class ContentTag < ActiveRecord::Base
              AND asv.course_id IN (?)
              AND content_tags.content_type = 'Assignment'
              AND asv.user_id = ANY( '{?}'::INT8[] )
-        ", course_ids, course_ids, user_ids)
+        ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :for_differentiable_discussions, lambda { |user_ids, course_ids|
@@ -620,7 +642,10 @@ class ContentTag < ActiveRecord::Base
              AND content_tags.content_type = 'DiscussionTopic'
              AND discussion_topics.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
-      ", course_ids, course_ids, user_ids)
+      ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :for_differentiable_wiki_pages, lambda { |user_ids, course_ids|
@@ -633,7 +658,10 @@ class ContentTag < ActiveRecord::Base
              AND content_tags.content_type = 'WikiPage'
              AND wp.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
-      ", course_ids, course_ids, user_ids)
+      ",
+             course_ids,
+             course_ids,
+             user_ids)
   }
 
   scope :can_have_assignment, -> { where(content_type: ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"]) }
@@ -696,7 +724,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def quiz_lti
-    @quiz_lti ||= has_attribute?(:content_type) && content_type == "Assignment" ? content&.quiz_lti? : false
+    @quiz_lti ||= (has_attribute?(:content_type) && content_type == "Assignment") ? content&.quiz_lti? : false
   end
 
   def to_json(options = {})
@@ -710,12 +738,12 @@ class ContentTag < ActiveRecord::Base
   def clear_total_outcomes_cache
     return unless tag_type == "learning_outcome_association" && associated_asset_type == "LearningOutcomeGroup"
 
-    clear_context = context_type == "LearningOutcomeGroup" ? nil : context
+    clear_context = (context_type == "LearningOutcomeGroup") ? nil : context
     Outcomes::LearningOutcomeGroupChildren.new(clear_context).clear_total_outcomes_cache
   end
 
   def delete_outcome_friendly_description
-    OutcomeFriendlyDescription.active.find_by(context: context, learning_outcome_id: content_id)&.destroy
+    OutcomeFriendlyDescription.active.find_by(context:, learning_outcome_id: content_id)&.destroy
   end
 
   def update_course_pace_module_items
@@ -743,7 +771,7 @@ class ContentTag < ActiveRecord::Base
 
   def trigger_publish!
     enable_publish_at = context.root_account.feature_enabled?(:scheduled_page_publication)
-    if unpublished?
+    if unpublished? && (!content.respond_to?(:can_publish?) || content&.can_publish?)
       if content_type == "Attachment"
         content.set_publish_state_for_usage_rights
         content.save!
@@ -757,7 +785,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def trigger_unpublish!
-    if published?
+    if published? && (!content.respond_to?(:can_unpublish?) || content&.can_unpublish?)
       if content_type == "Attachment"
         content.locked = true
         content.save!

@@ -54,8 +54,11 @@ describe UserLearningObjectScopes do
     context "as observer" do
       before do
         @observer = User.create
-        @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2,
-                                                                                    enrollment_state: "active", allow_multiple_enrollments: true)
+        @observer_enrollment = @course.enroll_user(@observer,
+                                                   "ObserverEnrollment",
+                                                   section: @section2,
+                                                   enrollment_state: "active",
+                                                   allow_multiple_enrollments: true)
       end
 
       context "observer watching student with visibility" do
@@ -348,7 +351,7 @@ describe UserLearningObjectScopes do
 
       it "includes assignments from other shards" do
         student = @shard1.activate { user_factory }
-        assignment = create_assignment_with_override(student: student, override: true, due_at: 2.days.from_now)
+        assignment = create_assignment_with_override(student:, override: true, due_at: 2.days.from_now)
         DueDateCacher.recompute(assignment)
         expect(student.assignments_needing_submitting).to eq [assignment]
       end
@@ -386,7 +389,7 @@ describe UserLearningObjectScopes do
 
     it "excludes assignments that have an existing submission" do
       assignment = @course.assignments.create! title: "submitted", due_at: 1.day.from_now, submission_types: "online_url"
-      submission_model(assignment: assignment, user: @student, submission_type: "online_url", url: "www.hi.com")
+      submission_model(assignment:, user: @student, submission_type: "online_url", url: "www.hi.com")
       DueDateCacher.recompute(assignment)
       expect(@student.assignments_needing_submitting).not_to include assignment
     end
@@ -522,10 +525,16 @@ describe UserLearningObjectScopes do
       @reviewee = course_with_student(course: @course, active_all: true).user
 
       add_section("section1")
-      @course.enroll_user(@reviewer, "StudentEnrollment",
-                          section: @course_section, enrollment_state: "active", allow_multiple_enrollments: true)
-      @course.enroll_user(@reviewee, "StudentEnrollment",
-                          section: @course_section, enrollment_state: "active", allow_multiple_enrollments: true)
+      @course.enroll_user(@reviewer,
+                          "StudentEnrollment",
+                          section: @course_section,
+                          enrollment_state: "active",
+                          allow_multiple_enrollments: true)
+      @course.enroll_user(@reviewee,
+                          "StudentEnrollment",
+                          section: @course_section,
+                          enrollment_state: "active",
+                          allow_multiple_enrollments: true)
 
       assignment_model(course: @course, peer_reviews: true)
 
@@ -553,8 +562,11 @@ describe UserLearningObjectScopes do
       # since the reviewee is no longer assigned @assignment, the reviewer should
       # have nothing to do.
       add_section("section2")
-      @course.enroll_user(@reviewer, "StudentEnrollment",
-                          section: @course_section, enrollment_state: "active", allow_multiple_enrollments: true)
+      @course.enroll_user(@reviewer,
+                          "StudentEnrollment",
+                          section: @course_section,
+                          enrollment_state: "active",
+                          allow_multiple_enrollments: true)
       override = @assignment.assignment_overrides.build
       override.set = @course_section
       override.save!
@@ -608,7 +620,7 @@ describe UserLearningObjectScopes do
     end
 
     it "counts assignments with ungraded submissions across multiple courses" do
-      expect(@teacher.assignments_needing_grading.size).to eql(2)
+      expect(@teacher.assignments_needing_grading.size).to be(2)
       expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
       expect(@teacher.assignments_needing_grading).to be_include(@course2.assignments.first)
 
@@ -649,8 +661,12 @@ describe UserLearningObjectScopes do
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
 
       # but if we enroll the TA in both sections of course1, it should be accessible
-      @course1.enroll_user(@ta, "TaEnrollment", enrollment_state: "active", section: @section1b,
-                                                allow_multiple_enrollments: true, limit_privileges_to_course_section: true)
+      @course1.enroll_user(@ta,
+                           "TaEnrollment",
+                           enrollment_state: "active",
+                           section: @section1b,
+                           allow_multiple_enrollments: true,
+                           limit_privileges_to_course_section: true)
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 2
       expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 2

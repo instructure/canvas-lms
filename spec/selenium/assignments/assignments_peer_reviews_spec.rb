@@ -179,7 +179,7 @@ describe "assignments" do
     end
     let!(:submission) do
       submission_model({
-                         assignment: assignment,
+                         assignment:,
                          body: "submission body",
                          course: review_course,
                          grade: "5",
@@ -190,7 +190,7 @@ describe "assignments" do
     end
     let!(:submissionReviewer) do
       submission_model({
-                         assignment: assignment,
+                         assignment:,
                          body: "submission body reviewer",
                          course: review_course,
                          grade: "5",
@@ -202,7 +202,7 @@ describe "assignments" do
     let!(:comment) do
       submission_comment_model({
                                  author: reviewer,
-                                 submission: submission
+                                 submission:
                                })
     end
     let!(:rubric) { rubric_model }

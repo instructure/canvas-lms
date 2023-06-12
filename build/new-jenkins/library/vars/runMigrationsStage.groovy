@@ -18,7 +18,10 @@
 
 def call() {
   credentials.withStarlordCredentials {
-    def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
+    // The switchman gem is likely enough to commonly break migrations that it
+    // deserves its own special case to always run migrations so we don't fail
+    // post-merge builds unnecessarily.
+    def cacheLoadScope = configuration.isChangeMerged() || setupStage.getPinnedVersionFlag('switchman') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
     def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
 
     withEnv([

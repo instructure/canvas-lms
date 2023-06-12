@@ -31,13 +31,13 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
     it_behaves_like "a graph service endpoint", ignore_404: true
 
     context "when the team exists" do
-      it { is_expected.to eq(true) }
+      it { is_expected.to be(true) }
     end
 
     context "when the team doesn't exist" do
       let(:response) { json_response(404, error: { code: "NotFound", message: "Does not exist" }) }
 
-      it { is_expected.to eq(false) }
+      it { is_expected.to be(false) }
 
       it 'increments an "expected" statsd counter instead of an "notfound" one' do
         subject
@@ -65,7 +65,7 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
     let(:with_params) { { body: req_body } }
     let(:response) { { status: 204, body: "" } }
 
-    it { is_expected.to eq(nil) }
+    it { is_expected.to be_nil }
 
     it_behaves_like "a graph service endpoint"
 

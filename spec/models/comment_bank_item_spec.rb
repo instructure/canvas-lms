@@ -20,11 +20,11 @@
 
 require_relative "../spec_helper"
 
-describe CommentBankItem, type: :model do
+describe CommentBankItem do
   let(:course) { course_model }
   let(:user) { user_model }
   let(:comment) { "comment" }
-  let(:creation_params) { { course: course, comment: comment, user: user } }
+  let(:creation_params) { { course:, comment:, user: } }
 
   describe "validations" do
     subject { CommentBankItem.create!(creation_params) }
@@ -43,7 +43,7 @@ describe CommentBankItem, type: :model do
   end
 
   describe "root_account_id" do
-    subject { CommentBankItem.create!(comment: "A", course: @course, user: user) }
+    subject { CommentBankItem.create!(comment: "A", course: @course, user:) }
 
     before do
       root_account = account_model
@@ -56,7 +56,7 @@ describe CommentBankItem, type: :model do
   end
 
   describe "permissions" do
-    subject { CommentBankItem.create!(comment: "A", course: course, user: user) }
+    subject { CommentBankItem.create!(comment: "A", course:, user:) }
 
     describe "read/update/delete" do
       it "is allowed for the creator" do
@@ -80,7 +80,7 @@ describe CommentBankItem, type: :model do
 
       it "requires manage_grades permissions" do
         expect(subject.grants_right?(user, :create)).to be(true)
-        user = account_admin_user_with_role_changes(user: user, role_changes: { manage_grades: false })
+        user = account_admin_user_with_role_changes(user:, role_changes: { manage_grades: false })
         expect(subject.grants_right?(user, :create)).to be(false)
       end
     end

@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
-import _ from 'underscore'
+import _ from 'lodash'
 import GradingPeriod from 'ui/features/course_grading_standards/react/gradingPeriodTemplate'
 
 const defaultProps = {

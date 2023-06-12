@@ -30,7 +30,6 @@ describe "calendar2" do
       @root_account = Account.default
       @subaccount1 = @root_account.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
       @student = user_factory(active_all: true)
-      Account.site_admin.enable_feature!(:account_calendar_events)
     end
 
     before do
@@ -115,6 +114,26 @@ describe "calendar2" do
       get "/calendar2"
       expect(sidebar).not_to contain_css(other_calendars_container_selector)
       expect(sidebar).not_to include_text("OTHER CALENDARS")
+    end
+
+    it "the NEW pill is shown only for unseen account calendars" do
+      @student.set_preference(:viewed_auto_subscribed_account_calendars, [])
+      @subaccount2 = @root_account.sub_accounts.create!(name: "SA-2", account_calendar_visible: true, account_calendar_subscription_type: "auto")
+      course_with_student_logged_in(user: @student, account: @subaccount2)
+
+      # for some reason, if I don't get some other page first, this spec will fetch /calendar2
+      # twice at the top of this spec on subsequent runs when it's being run under the
+      # flakey_spec_catcher. This is the only way I could find that resolved that.
+      get "/"
+      wait_for_dom_ready
+
+      get "/calendar2"
+      expect(sidebar).to contain_css(other_calendars_new_pill_selector)
+
+      driver.navigate.refresh
+      wait_for_dom_ready
+
+      expect(sidebar).not_to contain_css(other_calendars_new_pill_selector)
     end
 
     context "Add other calendars modal" do
@@ -269,6 +288,31 @@ describe "calendar2" do
         expect(event_popover).to be_displayed
         expect(event_popover_content).to be_displayed
         expect(event_popover_content).not_to contain_css("a")
+      end
+    end
+
+    context "auto subscription for an account calendar" do
+      before :once do
+        @subaccount1.account_calendar_subscription_type = "auto"
+        @subaccount1.save!
+      end
+
+      it "cannot uncheck auto-subscribed calendar on selection modal" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        user_session(@student)
+        get "/calendar2"
+
+        open_other_calendars_modal
+        expect(f(account_calendar_checkbox_selector(@subaccount1.id))).to be_disabled
+      end
+
+      it "can uncheck auto-subscribed calendar for viewing on calendar" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        user_session(@student)
+        get "/calendar2"
+
+        account_calendar_available_list_item.click
+        expect(account_calendar_available_list_item).not_to be_checked
       end
     end
   end

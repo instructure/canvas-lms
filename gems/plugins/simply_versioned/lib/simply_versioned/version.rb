@@ -56,7 +56,7 @@ module SimplyVersioned
         # INSTRUCTURE: Added to allow model instances pulled out
         # of versions to still know their version number
         obj.simply_versioned_version_model = true
-        obj.send("force_version_number", number)
+        obj.send(:force_version_number, number)
         obj
       end
     end
@@ -78,7 +78,7 @@ module SimplyVersioned
     end
 
     # If the model has new columns that it didn't have before just return nil
-    def method_missing(method_name, *args, &block)
+    def method_missing(method_name, *args, &)
       if read_attribute(:versionable_type) && read_attribute(:versionable_type).constantize.column_names.member?(method_name.to_s)
         nil
       else

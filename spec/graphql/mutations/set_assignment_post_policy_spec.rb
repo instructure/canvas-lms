@@ -56,7 +56,7 @@ describe Mutations::SetAssignmentPostPolicy do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   context "when user has manage_grades permission" do
@@ -108,7 +108,7 @@ describe Mutations::SetAssignmentPostPolicy do
 
     it "returns the related post policy" do
       result = execute_query(mutation_str(assignment_id: assignment.id, post_manually: true), context)
-      policy = PostPolicy.find_by(course: course, assignment: assignment)
+      policy = PostPolicy.find_by(course:, assignment:)
       expect(result.dig("data", "setAssignmentPostPolicy", "postPolicy", "_id").to_i).to be policy.id
     end
 
@@ -128,7 +128,7 @@ describe Mutations::SetAssignmentPostPolicy do
 
     it "does not return data for the related post policy" do
       result = execute_query(mutation_str(assignment_id: assignment.id, post_manually: true), context)
-      expect(result.dig("data", "setAssignmentPostPolicy")).to be nil
+      expect(result.dig("data", "setAssignmentPostPolicy")).to be_nil
     end
   end
 end

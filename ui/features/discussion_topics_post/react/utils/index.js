@@ -197,6 +197,7 @@ export const getOptimisticResponse = ({
   quotedEntry = null,
   isAnonymous = false,
   depth = null,
+  attachment = null,
 } = {}) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
@@ -273,10 +274,19 @@ export const getOptimisticResponse = ({
         rootEntryId,
         isolatedEntryId,
         quotedEntry,
-        attachment: null,
+        attachment: attachment
+          ? {...attachment, id: 'ATTACHMENT_PLACEHOLDER', __typename: 'File'}
+          : null,
         discussionEntryVersionsConnection: {
           nodes: [],
           __typename: 'DiscussionEntryVersionConnection',
+        },
+        reportTypeCounts: {
+          inappropriateCount: 0,
+          offensiveCount: 0,
+          otherCount: 0,
+          total: 0,
+          __typename: 'DiscussionEntryReportTypeCounts',
         },
         depth,
         __typename: 'DiscussionEntry',
@@ -293,6 +303,7 @@ export const buildQuotedReply = (nodes, previewId) => {
   nodes.every(reply => {
     if (reply._id === previewId) {
       preview = {
+        id: previewId,
         author: {shortName: getDisplayName(reply)},
         createdAt: reply.createdAt,
         previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),

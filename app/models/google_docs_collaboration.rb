@@ -114,13 +114,13 @@ class GoogleDocsCollaboration < Collaboration
 
   def authorized_service_user_id_for(user)
     service = google_adapter_user_service(user)
-    service ? service.service_user_id : nil
+    service&.service_user_id
   end
 
   private
 
   def google_user_service(user, service_domain = GOOGLE_DRIVE_SERVICE)
-    google_services = user.user_services.where(service_domain: service_domain).to_a
+    google_services = user.user_services.where(service_domain:).to_a
     google_services.find(&:service_user_id)
   end
 

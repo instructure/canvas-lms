@@ -22,7 +22,7 @@ import {
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import fakeENV from 'helpers/fakeENV'
 import qs from 'qs'
-import _ from 'underscore'
+import {map} from 'lodash'
 import {
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
@@ -96,52 +96,6 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
     $fixtures.innerHTML = ''
   })
 
-  QUnit.module('initialization', () => {
-    test('sets column sort direction to "ascending" when the settings are invalid', () => {
-      createWithSettings({
-        direction: 'descending',
-        freezeTotalGrade: 'false',
-        sortType: 'due_date',
-      })
-      equal(gradebook.getColumnOrder().direction, 'descending')
-    })
-
-    test('sets column sort type to "assignment_group" when the settings are invalid', () => {
-      createWithSettings({
-        direction: 'descending',
-        freezeTotalGrade: 'false',
-        sortType: 'due_date',
-      })
-      equal(gradebook.getColumnOrder().sortType, 'due_date')
-    })
-
-    test('freezes the total grade column when the setting is "true"', () => {
-      createWithSettings({
-        direction: 'descending',
-        freezeTotalGrade: 'true',
-        sortType: 'due_date',
-      })
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true)
-    })
-
-    test('does not freeze the total grade column when the setting is "false"', () => {
-      createWithSettings({
-        direction: 'descending',
-        freezeTotalGrade: 'false',
-        sortType: 'due_date',
-      })
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
-    })
-
-    test('does not freeze the total grade column when the setting is not set', () => {
-      createWithSettings({
-        direction: 'descending',
-        sortType: 'due_date',
-      })
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
-    })
-  })
-
   QUnit.module('#setColumnOrder', hooks => {
     hooks.beforeEach(() => {
       createWithSettings({direction: 'descending', sortType: 'module_position'})
@@ -149,49 +103,49 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
 
     test('updates "direction"', () => {
       gradebook.setColumnOrder({direction: 'ascending', sortType: 'due_date'})
-      equal(gradebook.getColumnOrder().direction, 'ascending')
+      equal(gradebook.gradebookColumnOrderSettings.direction, 'ascending')
     })
 
     test('updates "sortType"', () => {
       gradebook.setColumnOrder({direction: 'ascending', sortType: 'due_date'})
-      equal(gradebook.getColumnOrder().sortType, 'due_date')
+      equal(gradebook.gradebookColumnOrderSettings.sortType, 'due_date')
     })
 
     test('does not update "direction" when not included', () => {
       gradebook.setColumnOrder({direction: undefined, sortType: 'due_date'})
-      equal(gradebook.getColumnOrder().direction, 'descending')
+      equal(gradebook.gradebookColumnOrderSettings.direction, 'descending')
     })
 
     test('does not update "sortType" when "direction" is not included', () => {
       gradebook.setColumnOrder({direction: undefined, sortType: 'due_date'})
-      equal(gradebook.getColumnOrder().sortType, 'module_position')
+      equal(gradebook.gradebookColumnOrderSettings.sortType, 'module_position')
     })
 
     test('does not update "sortType" when not included', () => {
       gradebook.setColumnOrder({direction: 'ascending', sortType: undefined})
-      equal(gradebook.getColumnOrder().sortType, 'module_position')
+      equal(gradebook.gradebookColumnOrderSettings.sortType, 'module_position')
     })
 
     test('does not update "direction" when "sortType" is not included', () => {
       gradebook.setColumnOrder({direction: 'ascending', sortType: undefined})
-      equal(gradebook.getColumnOrder().direction, 'descending')
+      equal(gradebook.gradebookColumnOrderSettings.direction, 'descending')
     })
 
     test('updates a "sortType" of "custom"', () => {
       const originalOrder = ['assignment_2301', 'total_grade']
       gradebook.setColumnOrder({customOrder: originalOrder, sortType: 'custom'})
-      equal(gradebook.getColumnOrder().sortType, 'custom')
+      equal(gradebook.gradebookColumnOrderSettings.sortType, 'custom')
     })
 
     test('updates "customOrder" with a "sortType" of "custom"', () => {
       const customOrder = ['assignment_2301', 'total_grade']
       gradebook.setColumnOrder({customOrder, sortType: 'custom'})
-      equal(gradebook.getColumnOrder().customOrder, customOrder)
+      equal(gradebook.gradebookColumnOrderSettings.customOrder, customOrder)
     })
 
     test('does not update "sortType" of "custom" when "customOrder" is not included', () => {
       gradebook.setColumnOrder({customOrder: undefined, sortType: 'custom'})
-      equal(gradebook.getColumnOrder().sortType, 'module_position')
+      equal(gradebook.gradebookColumnOrderSettings.sortType, 'module_position')
     })
 
     test('does not update "customOrder" when "sortType" is not included', () => {
@@ -199,7 +153,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
         customOrder: ['assignment_2301', 'total_grade'],
         sortType: undefined,
       })
-      strictEqual(typeof gradebook.getColumnOrder().customOrder, 'undefined')
+      strictEqual(typeof gradebook.gradebookColumnOrderSettings.customOrder, 'undefined')
     })
 
     test('does not update "customOrder" when "sortType" is not "custom"', () => {
@@ -209,73 +163,17 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
         customOrder: ['total_grade', 'assignment_2301'],
         sortType: 'due_date',
       })
-      equal(gradebook.getColumnOrder().customOrder, originalOrder)
+      equal(gradebook.gradebookColumnOrderSettings.customOrder, originalOrder)
     })
 
     test('updates "freezeTotalGrade"', () => {
       gradebook.setColumnOrder({freezeTotalGrade: true})
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true)
+      strictEqual(gradebook.gradebookColumnOrderSettings.freezeTotalGrade, true)
     })
 
     test('does not update "freezeTotalGrade" when not included', () => {
       gradebook.setColumnOrder({freezeTotalGrade: undefined})
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
-    })
-  })
-
-  QUnit.module('#getColumnOrder', () => {
-    test('sets column sort direction to "ascending" when the settings are invalid', () => {
-      createWithSettings({sortType: 'custom'})
-      equal(gradebook.getColumnOrder().direction, 'ascending')
-    })
-
-    test('sets column sort type to "assignment_group" when the settings are invalid', () => {
-      createWithSettings({sortType: 'custom'})
-      equal(gradebook.getColumnOrder().sortType, 'assignment_group')
-    })
-
-    test('does not freeze the total grade column when the settings are invalid', () => {
-      createWithSettings({sortType: 'custom'})
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
-    })
-
-    test('sets column sort direction to "ascending" when the settings are not defined', () => {
-      createWithSettings(undefined)
-      equal(gradebook.getColumnOrder().direction, 'ascending')
-    })
-
-    test('sets column sort type to "assignment_group" when the settings are not defined', () => {
-      createWithSettings(undefined)
-      equal(gradebook.getColumnOrder().sortType, 'assignment_group')
-    })
-
-    test('does not freeze the total grade column when the settings are not defined', () => {
-      createWithSettings(undefined)
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
-    })
-  })
-
-  QUnit.module('#getColumnOrder when sorting by module position', hooks => {
-    hooks.beforeEach(() => {
-      createWithSettings({direction: 'descending', sortType: 'module_position'})
-    })
-
-    test('includes the stored column sort direction', () => {
-      equal(gradebook.getColumnOrder().direction, 'descending')
-    })
-
-    test('includes "module_position" as the stored column sort type', () => {
-      equal(gradebook.getColumnOrder().sortType, 'module_position')
-    })
-
-    test('sets the column direction to "ascending" when the course has no modules', () => {
-      gradebook.setContextModules([])
-      equal(gradebook.getColumnOrder().direction, 'ascending')
-    })
-
-    test('sets the column sort type to "assignment_group" when the course has no modules', () => {
-      gradebook.setContextModules([])
-      equal(gradebook.getColumnOrder().sortType, 'assignment_group')
+      strictEqual(gradebook.gradebookColumnOrderSettings.freezeTotalGrade, false)
     })
   })
 
@@ -314,7 +212,10 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
         request => request.url === 'http://example.com/gradebook_column_order_settings_url'
       )
       const requestBody = qs.parse(saveRequest.requestBody)
-      deepEqual(qs.stringify(requestBody.column_order), qs.stringify(gradebook.getColumnOrder()))
+      deepEqual(
+        qs.stringify(requestBody.column_order),
+        qs.stringify(gradebook.gradebookColumnOrderSettings)
+      )
     })
 
     test('does not send a request when the order setting is invalid', () => {
@@ -350,7 +251,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
 
     test('includes the "sortType" when storing the order', () => {
       gradebook.saveCustomColumnOrder()
-      equal(gradebook.getColumnOrder().sortType, 'custom')
+      equal(gradebook.gradebookColumnOrderSettings.sortType, 'custom')
     })
 
     test('includes the column order when storing the order', () => {
@@ -361,7 +262,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
         'assignment_group_2201',
         'total_grade',
       ]
-      deepEqual(gradebook.getColumnOrder().customOrder, expectedOrder)
+      deepEqual(gradebook.gradebookColumnOrderSettings.customOrder, expectedOrder)
     })
 
     test('saves the column order', () => {
@@ -371,7 +272,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
 
     test('saves the column order after setting the new settings', () => {
       gradebook.saveColumnOrder.callsFake(() => {
-        equal(gradebook.getColumnOrder().sortType, 'custom')
+        equal(gradebook.gradebookColumnOrderSettings.sortType, 'custom')
       })
       gradebook.saveCustomColumnOrder()
     })
@@ -402,7 +303,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
 
     test('sets the total grade column as frozen', () => {
       gradebook.freezeTotalGradeColumn()
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true)
+      strictEqual(gradebook.gradebookColumnOrderSettings.freezeTotalGrade, true)
     })
 
     test('saves column order', () => {
@@ -412,7 +313,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
 
     test('saves column order after setting the total grade column as frozen', () => {
       gradebook.saveColumnOrder.callsFake(() => {
-        strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true)
+        strictEqual(gradebook.gradebookColumnOrderSettings.freezeTotalGrade, true)
       })
       gradebook.freezeTotalGradeColumn()
     })
@@ -449,7 +350,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
 
     test('sets the total grade column as not frozen', () => {
       gradebook.moveTotalGradeColumnToEnd()
-      strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
+      strictEqual(gradebook.gradebookColumnOrderSettings.freezeTotalGrade, false)
     })
 
     test('saves column order when not using a custom order', () => {
@@ -470,7 +371,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
 
     test('saves column order after setting the total grade column as not frozen', () => {
       gradebook.saveColumnOrder.callsFake(() => {
-        strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
+        strictEqual(gradebook.gradebookColumnOrderSettings.freezeTotalGrade, false)
       })
       gradebook.moveTotalGradeColumnToEnd()
     })
@@ -901,19 +802,8 @@ test('invalidates each student row', function () {
 
 test('includes the row index of the student when invalidating', function () {
   this.gradebook.invalidateRowsForStudentIds(['1101', '1102'])
-  const rows = _.map(this.gradebook.gradebookGrid.invalidateRow.args, args => args[0]) // get the first arg of each call
+  const rows = map(this.gradebook.gradebookGrid.invalidateRow.args, args => args[0]) // get the first arg of each call
   deepEqual(rows, [0, 1])
-})
-
-test('re-renders the grid after invalidating', function () {
-  this.gradebook.gradebookGrid.render.callsFake(() => {
-    strictEqual(
-      this.gradebook.gradebookGrid.invalidateRow.callCount,
-      2,
-      'both rows have already been validated'
-    )
-  })
-  this.gradebook.invalidateRowsForStudentIds(['1101', '1102'])
 })
 
 test('does not invalidate rows for students not included', function () {
@@ -932,20 +822,6 @@ test('has no effect when the grid has not been initialized', function () {
   ok(true, 'no error was thrown')
 })
 
-QUnit.module('Gradebook Rows', () => {
-  QUnit.module('#buildRows', () => {
-    test('invalidates the grid', () => {
-      setFixtureHtml($fixtures)
-      const gradebook = createGradebook()
-      sinon.spy(gradebook.gradebookGrid, 'invalidate')
-      gradebook.buildRows()
-      strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1)
-      gradebook.destroy()
-      $fixtures.innerHTML = ''
-    })
-  })
-})
-
 QUnit.module('Gradebook#updateColumns', hooks => {
   let gradebook
 
@@ -959,22 +835,6 @@ QUnit.module('Gradebook#updateColumns', hooks => {
   test('sets the visible grid columns', () => {
     gradebook.updateColumns()
     strictEqual(gradebook.setVisibleGridColumns.callCount, 1)
-  })
-
-  test('sets the columns on the grid', () => {
-    gradebook.updateColumns()
-    strictEqual(gradebook.gradebookGrid.updateColumns.callCount, 1)
-  })
-
-  test('sets the columns after updating the grid', () => {
-    gradebook.gradebookGrid.updateColumns.callsFake(() => {
-      strictEqual(
-        gradebook.setVisibleGridColumns.callCount,
-        1,
-        'setVisibleGridColumns was already called'
-      )
-    })
-    gradebook.updateColumns()
   })
 
   test('calls updateColumnHeaders', () => {
@@ -1672,14 +1532,6 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
   })
 })
 
-QUnit.module('Gradebook#listRowIndicesForStudentIds')
-
-test('returns a row index for each student id', () => {
-  const gradebook = createGradebook()
-  gradebook.gridData.rows = [{id: '1101'}, {id: '1102'}, {id: '1103'}, {id: '1104'}]
-  deepEqual(gradebook.listRowIndicesForStudentIds(['1102', '1104']), [1, 3])
-})
-
 QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
   let gradebook
 
@@ -1709,13 +1561,13 @@ QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
 
   test('includes the row index of the student when updating', () => {
     gradebook.updateTotalGradeColumn()
-    const rows = _.map(gradebook.gradebookGrid.grid.updateCell.args, args => args[0])
+    const rows = map(gradebook.gradebookGrid.grid.updateCell.args, args => args[0])
     deepEqual(rows, [0, 1])
   })
 
   test('includes the index of the total_grade column when updating', () => {
     gradebook.updateTotalGradeColumn()
-    const rows = _.map(gradebook.gradebookGrid.grid.updateCell.args, args => args[1])
+    const rows = map(gradebook.gradebookGrid.grid.updateCell.args, args => args[1])
     deepEqual(rows, [2, 2])
   })
 
@@ -1886,13 +1738,13 @@ test('updates cells for each column', function () {
 
 test('includes the row index of the student when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1102'])
-  const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[0]) // get the first arg of each call
+  const rows = map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[0]) // get the first arg of each call
   deepEqual(rows, [1, 1, 1, 1], 'each call specified row 1 (student 1102)')
 })
 
 test('includes the index of each column when updating', function () {
   this.gradebook.updateRowCellsForStudentIds(['1101', '1102'])
-  const rows = _.map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[1]) // get the first arg of each call
+  const rows = map(this.gradebook.gradebookGrid.grid.updateCell.args, args => args[1]) // get the first arg of each call
   deepEqual(rows, [0, 1, 2, 3, 0, 1, 2, 3])
 })
 

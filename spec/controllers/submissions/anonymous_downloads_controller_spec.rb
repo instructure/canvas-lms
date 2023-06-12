@@ -50,14 +50,15 @@ describe Submissions::AnonymousDownloadsController do
 
       it "renders as json" do
         request.accept = Mime[:json].to_s
-        get :show, params: {
-          course_id: @context.id,
-          assignment_id: @assignment.id,
-          anonymous_id: @submission.anonymous_id,
-          download: @submission.attachment_id
-        },
-                   format: :json
-        expect(JSON.parse(response.body)["attachment"]["id"]).to eq @submission.attachment_id
+        get :show,
+            params: {
+              course_id: @context.id,
+              assignment_id: @assignment.id,
+              anonymous_id: @submission.anonymous_id,
+              download: @submission.attachment_id
+            },
+            format: :json
+        expect(response.parsed_body["attachment"]["id"]).to eq @submission.attachment_id
       end
     end
 
@@ -87,7 +88,7 @@ describe Submissions::AnonymousDownloadsController do
 
     it "sets attachment from attachments collection when attachment_id is not present" do
       attachment = attachment_model(context: @context)
-      AttachmentAssociation.create!(context: @submission, attachment: attachment)
+      AttachmentAssociation.create!(context: @submission, attachment:)
       get :show, params: {
         course_id: @context.id,
         assignment_id: @assignment.id,
@@ -140,7 +141,7 @@ describe Submissions::AnonymousDownloadsController do
       att = attachment_model(uploaded_data: stub_file_data("test.txt", "asdf", "text/plain"), context: @student)
       submission_model(
         course: @course,
-        assignment: assignment,
+        assignment:,
         submission_type: "online_upload",
         attachment_ids: att.id,
         attachments: [att],

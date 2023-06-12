@@ -23,7 +23,7 @@ class OutcomesController < ApplicationController
   include Api::V1::Role
 
   before_action :require_context, except: [:build_outcomes]
-  add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, except: [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
+  add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, except: [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_outcomes_path }
   before_action { |c| c.active_tab = "outcomes" }
   before_action :rce_js_env, only: [:show, :index]
 
@@ -56,7 +56,6 @@ class OutcomesController < ApplicationController
           @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
       },
       OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
-      OUTCOME_ALIGNMENT_SUMMARY: @context.root_account.feature_enabled?(:outcome_alignment_summary),
       OUTCOME_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcome_average_calculation)
     )
 
@@ -183,7 +182,7 @@ class OutcomesController < ApplicationController
     else
       @group.add_outcome(@outcome)
     end
-    render json: @outcome.as_json(methods: :cached_context_short_name, permissions: { user: @current_user, session: session })
+    render json: @outcome.as_json(methods: :cached_context_short_name, permissions: { user: @current_user, session: })
   end
 
   def align
@@ -192,7 +191,7 @@ class OutcomesController < ApplicationController
     @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
     @asset = @context.find_asset(params[:asset_string])
     mastery_type = @asset.is_a?(Assignment) ? "points" : "none"
-    @alignment = @outcome.align(@asset, @context, mastery_type: mastery_type) if @asset
+    @alignment = @outcome.align(@asset, @context, mastery_type:) if @asset
     render json: @alignment.as_json(include: :learning_outcome)
   end
 
@@ -248,10 +247,12 @@ class OutcomesController < ApplicationController
         anchor = "question_#{question_id}"
       end
       redirect_to named_context_url(
-        @result.context, :context_quiz_history_url, @submission.quiz_id,
+        @result.context,
+        :context_quiz_history_url,
+        @submission.quiz_id,
         quiz_submission_id: @submission.id,
         version: @submission_version.version_number,
-        anchor: anchor
+        anchor:
       )
     else
       flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || "nil"}"

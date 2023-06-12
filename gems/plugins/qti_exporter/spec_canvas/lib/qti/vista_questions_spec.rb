@@ -58,10 +58,10 @@ if Qti.migration_executable
     it "mocks the manifest node correctly" do
       manifest_node = get_manifest_node("multiple_choice", interaction_type: "extendedTextInteraction", bb_question_type: "Calculated")
       expect(manifest_node.at_css("instructureMetadata")).to eq manifest_node
-      expect(manifest_node["identifier"]).to eq nil
+      expect(manifest_node["identifier"]).to be_nil
       expect(manifest_node["href"]).to eq "multiple_choice.xml"
       if (title = manifest_node.at_css("title langstring"))
-        expect(title.text).to eq nil
+        expect(title.text).to be_nil
       end
       if (type = manifest_node.at_css("interactiontype"))
         expect(type.text.downcase).to eq "extendedtextinteraction"
@@ -87,7 +87,7 @@ if Qti.migration_executable
 
     it "converts images correctly" do
       manifest_node = get_manifest_node("true_false", interaction_type: "choiceInteraction")
-      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: vista_question_dir).with_indifferent_access
+      hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node:, base_dir: vista_question_dir).with_indifferent_access
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::TRUE_FALSE2
     end

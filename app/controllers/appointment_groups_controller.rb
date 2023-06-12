@@ -361,7 +361,7 @@ class AppointmentGroupsController < ApplicationController
 
     shard.activate do
       publish = value_to_boolean(params[:appointment_group].delete(:publish))
-      @group = AppointmentGroup.new(appointment_group_params.merge(contexts: contexts))
+      @group = AppointmentGroup.new(appointment_group_params.merge(contexts:))
       @group.update_contexts_and_sub_contexts
       if authorized_action(@group, @current_user, :manage)
         if @group.save
@@ -389,7 +389,9 @@ class AppointmentGroupsController < ApplicationController
     if authorized_action(@group, @current_user, :read)
       return web_show unless request.format == :json
 
-      render json: appointment_group_json(@group, @current_user, session,
+      render json: appointment_group_json(@group,
+                                          @current_user,
+                                          session,
                                           include: ((params[:include] || []) | ["appointments"]),
                                           include_past_appointments: @group.grants_right?(@current_user, :manage))
     end
@@ -565,7 +567,7 @@ class AppointmentGroupsController < ApplicationController
 
   protected
 
-  def participants(type, &formatter)
+  def participants(type, &)
     if authorized_action(@group, @current_user, :read)
       return render json: [] unless @group.participant_type == type
 
@@ -573,7 +575,7 @@ class AppointmentGroupsController < ApplicationController
         @group.possible_participants(registration_status: params[:registration_status]),
         self,
         send("api_v1_appointment_group_#{params[:action]}_url", @group)
-      ).map(&formatter)
+      ).map(&)
     end
   end
 
@@ -593,16 +595,24 @@ class AppointmentGroupsController < ApplicationController
   end
 
   def appointment_group_params
-    params.require(:appointment_group).permit(:title, :description, :location_name, :location_address, :participants_per_appointment,
-                                              :min_appointments_per_participant, :max_appointments_per_participant, :participant_visibility, :cancel_reason,
-                                              sub_context_codes: [], new_appointments: strong_anything)
+    params.require(:appointment_group).permit(:title,
+                                              :description,
+                                              :location_name,
+                                              :location_address,
+                                              :participants_per_appointment,
+                                              :min_appointments_per_participant,
+                                              :max_appointments_per_participant,
+                                              :participant_visibility,
+                                              :cancel_reason,
+                                              sub_context_codes: [],
+                                              new_appointments: strong_anything)
   end
 
   def web_index
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
     anchor = calendar_fragment view_name: :agenda, view_start: group&.start_at&.strftime("%Y-%m-%d")
-    redirect_to calendar2_url(anchor: anchor)
+    redirect_to calendar2_url(anchor:)
   end
 
   def web_show

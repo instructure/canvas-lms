@@ -32,6 +32,6 @@ class AppointmentGroupSubContext < ActiveRecord::Base
   end
 
   def participant_type
-    sub_context_type == "GroupCategory" ? "Group" : "User"
+    (sub_context_type == "GroupCategory") ? "Group" : "User"
   end
 end

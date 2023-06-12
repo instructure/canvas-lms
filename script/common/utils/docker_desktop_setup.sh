@@ -31,7 +31,7 @@ function check_docker_memory {
   if [[ "$docker_memory" -lt '8300000000' ]]; then
     echo_console_and_log "
   Canvas requires at least 8GB of memory dedicated to Docker Desktop. Please refer to
-  https://docs.docker.com/docker-for-mac/#resources for more info on increasing your memory."
+  https://docs.docker.com/desktop/settings/mac/#advanced for more info on increasing your memory."
     exit 1
   fi
 }
@@ -45,7 +45,7 @@ function attempt_start_docker {
 }
 
 function check_for_docker_desktop {
-  if ! mdfind "kMDItemKind == 'Application'" |grep -qE 'Docker.app|Docker\ Desktop.app'; then
+  if [[ -z $(mdfind kind:application Docker.app) ]]; then
     echo "  Docker Desktop is not installed!"
     echo "  Refer to https://docs.docker.com/docker-for-mac/install/ for help installing."
     echo "  Once Docker Desktop is installed rerun this script."

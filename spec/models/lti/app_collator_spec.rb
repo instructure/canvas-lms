@@ -41,8 +41,8 @@ module Lti
 
         collection = subject.bookmarked_collection
         per_page = 3
-        page1 = collection.paginate(per_page: per_page)
-        page2 = collection.paginate(page: page1.next_page, per_page: per_page)
+        page1 = collection.paginate(per_page:)
+        page2 = collection.paginate(page: page1.next_page, per_page:)
         expect(page1.count).to eq 3
         expect(page2.count).to eq 3
         expect(page1.first).to_not eq page2.first
@@ -83,8 +83,10 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq(example_definition(external_tool, lti_version: "1.1", deployment_id: external_tool.deployment_id,
-                                                                   editor_button_settings: external_tool.editor_button))
+        expect(definition).to eq(example_definition(external_tool,
+                                                    lti_version: "1.1",
+                                                    deployment_id: external_tool.deployment_id,
+                                                    editor_button_settings: external_tool.editor_button))
       end
 
       it "returns an external tool app definition as 1.3 tool" do
@@ -96,8 +98,10 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq(example_definition(external_tool, lti_version: "1.3", deployment_id: external_tool.deployment_id,
-                                                                   editor_button_settings: external_tool.editor_button))
+        expect(definition).to eq(example_definition(external_tool,
+                                                    lti_version: "1.3",
+                                                    deployment_id: external_tool.deployment_id,
+                                                    editor_button_settings: external_tool.editor_button))
       end
 
       it "returns definition with rce_favorite when editor_button placement is present" do
@@ -109,10 +113,11 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq(example_definition(external_tool, lti_version: "1.1",
-                                                                   deployment_id: external_tool.deployment_id,
-                                                                   editor_button_settings: external_tool.editor_button,
-                                                                   is_rce_favorite: false))
+        expect(definition).to eq(example_definition(external_tool,
+                                                    lti_version: "1.1",
+                                                    deployment_id: external_tool.deployment_id,
+                                                    editor_button_settings: external_tool.editor_button,
+                                                    is_rce_favorite: false))
       end
 
       it "returns an external tool and a tool proxy" do
@@ -126,8 +131,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:app_type] == "ContextExternalTool" }
         tool_proxy = definitions.find { |d| d[:app_type] == "Lti::ToolProxy" }
-        expect(tool_proxy).to_not be nil
-        expect(external_tool).to_not be nil
+        expect(tool_proxy).to_not be_nil
+        expect(external_tool).to_not be_nil
       end
 
       it "has check_for_update set to false" do
@@ -141,8 +146,8 @@ module Lti
         expect(definitions.count).to eq 2
         external_tool = definitions.find { |d| d[:app_type] == "ContextExternalTool" }
         tool_proxy = definitions.find { |d| d[:app_type] == "Lti::ToolProxy" }
-        expect(external_tool[:reregistration_url]).to eq nil
-        expect(tool_proxy[:reregistration_url]).to eq nil
+        expect(external_tool[:reregistration_url]).to be_nil
+        expect(tool_proxy[:reregistration_url]).to be_nil
       end
 
       it "has reregistartion set to true for tool proxies if the feature flag is enabled" do
@@ -199,7 +204,7 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition[:reregistration_url]).to eq nil
+        expect(definition[:reregistration_url]).to be_nil
       end
     end
   end

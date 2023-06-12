@@ -152,7 +152,7 @@ describe "accounts/settings" do
   describe "Admin setting allow_gradebook_show_first_last_names" do
     context "site admin user" do
       let_once(:account) { Account.site_admin }
-      let_once(:admin) { account_admin_user(account: account) }
+      let_once(:admin) { account_admin_user(account:) }
 
       before do
         view_context(account, admin)
@@ -180,7 +180,7 @@ describe "accounts/settings" do
 
     context "account admin user" do
       let_once(:account) { Account.default }
-      let_once(:admin) { account_admin_user(account: account) }
+      let_once(:admin) { account_admin_user(account:) }
 
       before do
         view_context(account, admin)
@@ -459,7 +459,7 @@ describe "accounts/settings" do
       role = custom_account_role("CustomAdmin", account: Account.site_admin)
       account_admin_user_with_role_changes(
         account: Account.site_admin,
-        role: role,
+        role:,
         role_changes: { manage_account_memberships: true }
       )
       view_context(Account.default, @user)
@@ -539,8 +539,8 @@ describe "accounts/settings" do
 
     def expect_threshold_to_be(value)
       expect(response).to have_tag(
-        "select#account_settings_smart_alerts_threshold" \
-        "  option[value=\"#{value}\"][selected]"
+        "select#account_settings_smart_alerts_threshold  " \
+        "option[value=\"#{value}\"][selected]"
       )
     end
 
@@ -582,7 +582,7 @@ describe "accounts/settings" do
 
   context "privacy" do
     let(:account) { account_model }
-    let(:account_admin) { account_admin_user(account: account) }
+    let(:account_admin) { account_admin_user(account:) }
     let(:dom) { Nokogiri::HTML5(response) }
     let(:enable_fullstory) { dom.at_css("#account_settings_enable_fullstory") }
     let(:site_admin) { site_admin_user }
@@ -638,7 +638,7 @@ describe "accounts/settings" do
 
   context "course templates" do
     let_once(:account) { Account.default }
-    let_once(:admin) { account_admin_user(account: account) }
+    let_once(:admin) { account_admin_user(account:) }
 
     before do
       account.enable_feature!(:course_templates)
@@ -656,7 +656,7 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq [""]
+      expect(select.css("option").pluck("value")).to eq [""]
     end
 
     it "shows no template and inherit for sub accounts" do
@@ -668,7 +668,7 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq ["", "0"]
+      expect(select.css("option").pluck("value")).to eq ["", "0"]
     end
 
     it "disables if you don't have permission" do
@@ -678,8 +678,8 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq ["", c.id.to_s]
-      expect(select.css("option").map { |o| o["disabled"] }).to eq [nil, "disabled"]
+      expect(select.css("option").pluck("value")).to eq ["", c.id.to_s]
+      expect(select.css("option").pluck("disabled")).to eq [nil, "disabled"]
     end
 
     it "disables if you don't have permission in a sub-account" do
@@ -695,8 +695,8 @@ describe "accounts/settings" do
       render
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("#account_course_template_id")
-      expect(select.css("option").map { |o| o["value"] }).to eq ["", "0", c.id.to_s]
-      expect(select.css("option").map { |o| o["disabled"] }).to eq %w[disabled disabled disabled]
+      expect(select.css("option").pluck("value")).to eq ["", "0", c.id.to_s]
+      expect(select.css("option").pluck("disabled")).to eq %w[disabled disabled disabled]
     end
   end
 

@@ -62,7 +62,7 @@ module CC
                   end
 
           if quiz.assignment && !quiz.assignment.can_copy?(@user)
-            add_error(I18n.t("course_exports.errors.quiz_is_locked", "The quiz \"%{title}\" could not be copied because it is locked.", title: title))
+            add_error(I18n.t("course_exports.errors.quiz_is_locked", "The quiz \"%{title}\" could not be copied because it is locked.", title:))
             next
           end
 
@@ -70,7 +70,7 @@ module CC
           begin
             generate_quiz(quiz)
           rescue
-            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title: title), $!)
+            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title:), $!)
           end
         end
 
@@ -147,7 +147,7 @@ module CC
             generate_quiz(quiz, false)
           rescue
             title = quiz.title rescue I18n.t("unknown_quiz", "Unknown quiz")
-            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title: title), $!)
+            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title:), $!)
           end
         end
 
@@ -172,7 +172,7 @@ module CC
                       I18n.t("unknown_question_bank", "Unknown question bank")
                     end
 
-            add_error(I18n.t("course_exports.errors.question_bank", "The question bank \"%{title}\" failed to export", title: title), $!)
+            add_error(I18n.t("course_exports.errors.question_bank", "The question bank \"%{title}\" failed to export", title:), $!)
           end
         end
       end
@@ -279,7 +279,7 @@ module CC
                 meta_field(meta_node, "qmd_scoretype", "Percentage")
               end
               meta_field(meta_node, "qmd_timelimit", quiz.time_limit) if quiz.time_limit
-              allowed = quiz.allowed_attempts == -1 ? "unlimited" : quiz.allowed_attempts
+              allowed = (quiz.allowed_attempts == -1) ? "unlimited" : quiz.allowed_attempts
               meta_field(meta_node, "cc_maxattempts", allowed)
             end # meta_node
 

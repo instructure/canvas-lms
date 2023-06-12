@@ -81,10 +81,10 @@ describe "master courses - child courses - module item locking" do
 
     it "loads new restriction info as needed when adding an item" do
       title = "new quiz"
-      original_quiz = @copy_from.quizzes.create!(title: title)
+      original_quiz = @copy_from.quizzes.create!(title:)
       quiz_mc_tag = @template.create_content_tag_for!(original_quiz, restrictions: { content: true })
 
-      quiz_copy = @copy_to.quizzes.create!(title: title, migration_id: quiz_mc_tag.migration_id)
+      quiz_copy = @copy_to.quizzes.create!(title:, migration_id: quiz_mc_tag.migration_id)
       @sub.create_content_tag_for!(quiz_copy)
 
       get "/courses/#{@copy_to.id}/modules"

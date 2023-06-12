@@ -126,7 +126,7 @@ class RubricAssessmentsController < ApplicationController
       # slot for the submitting provisional grader (or throws an error if no
       # slots remain).
       begin
-        ensure_adjudication_possible(provisional: provisional) do
+        ensure_adjudication_possible(provisional:) do
           @asset, @user = @association_object.find_asset_for_assessment(@association, user_id, opts)
           unless @association.user_can_assess_for?(assessor: @current_user, assessee: @user)
             return render_unauthorized_action
@@ -182,11 +182,11 @@ class RubricAssessmentsController < ApplicationController
             )
           end
 
-          render json: json
+          render json:
         end
       rescue Assignment::GradeError => e
         json = { errors: { base: e.to_s, error_code: e.error_code } }
-        render json: json, status: e.status_code || :bad_request
+        render json:, status: e.status_code || :bad_request
       end
     end
   end
@@ -236,8 +236,9 @@ class RubricAssessmentsController < ApplicationController
 
     @association_object.ensure_grader_can_adjudicate(
       grader: @current_user,
-      provisional: provisional,
-      occupy_slot: true, &block
+      provisional:,
+      occupy_slot: true,
+&block
     )
   end
 end

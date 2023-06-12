@@ -33,21 +33,21 @@ describe FilePreviewsController do
     course_model
     attachment_model
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
-    expect(response.status).to eq 401
+    expect(response).to have_http_status :unauthorized
   end
 
   it "accepts a valid verifier token" do
     course_model
     attachment_model
     get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: @attachment.uuid }
-    expect(response.status).to eq 200
+    expect(response).to have_http_status :ok
   end
 
   it "does not accept an invalid verifier token" do
     course_model
     attachment_model
     get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: "nope" }
-    expect(response.status).to eq 401
+    expect(response).to have_http_status :unauthorized
   end
 
   it "renders lock information for the file" do
@@ -60,10 +60,10 @@ describe FilePreviewsController do
     attachment_model
     file_id = @attachment.id
     @attachment.destroy_permanently!
-    get :show, params: { course_id: @course.id, file_id: file_id }
-    expect(response.status).to eq 404
-    expect(assigns["headers"]).to eq false
-    expect(assigns["show_left_side"]).to eq false
+    get :show, params: { course_id: @course.id, file_id: }
+    expect(response).to have_http_status :not_found
+    expect(assigns["headers"]).to be false
+    expect(assigns["show_left_side"]).to be false
   end
 
   it "redirects to crododoc_url if available and params[:annotate] is given" do
@@ -107,21 +107,21 @@ describe FilePreviewsController do
     @account.save!
     attachment_model content_type: "application/msword"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
-    expect(response.status).to eq 200
+    expect(response).to have_http_status :ok
     expect(response).to render_template "no_preview"
   end
 
   it "renders an img element for image types" do
     attachment_model content_type: "image/png"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
-    expect(response.status).to eq 200
+    expect(response).to have_http_status :ok
     expect(response).to render_template "img_preview"
   end
 
   it "renders a media tag for media types" do
     attachment_model content_type: "video/mp4"
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
-    expect(response.status).to eq 200
+    expect(response).to have_http_status :ok
     expect(response).to render_template "media_preview"
   end
 

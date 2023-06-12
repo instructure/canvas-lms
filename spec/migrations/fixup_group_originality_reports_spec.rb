@@ -30,14 +30,14 @@ describe DataFixup::FixupGroupOriginalityReports do
     group = course.groups.create!(name: "group one")
     group.add_user(user_one)
     group.add_user(user_two)
-    submission_one.update!(group: group)
-    submission_two.update!(group: group)
+    submission_one.update!(group:)
+    submission_two.update!(group:)
     group
   end
   let(:originality_score) { 23.2 }
   let!(:originality_report) do
     OriginalityReport.create!(
-      originality_score: originality_score,
+      originality_score:,
       submission: submission_one
     )
   end

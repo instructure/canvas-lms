@@ -180,7 +180,8 @@ describe "External Tools" do
       @member_tool.save!
       @permissiony_tool = Account.default.context_external_tools.new(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @permissiony_tool.global_navigation = { required_permissions: "manage_assignments,manage_calendar",
-                                              url: "http://www.example.com", text: "Example URL 3" }
+                                              url: "http://www.example.com",
+                                              text: "Example URL 3" }
       @permissiony_tool.save!
     end
 
@@ -219,11 +220,16 @@ describe "External Tools" do
     context "caching" do
       specs_require_cache(:redis_cache_store)
 
+      let(:highlight_nav_css_class) { "ic-app-header__menu-list-item--active" }
+
       it "caches the template" do
         course_with_teacher_logged_in(account: @account, active_all: true)
         get "/courses" # populate the cache once
-
-        expect(ContextExternalTool).not_to receive(:filtered_global_navigation_tools)
+        # We can't cache the lookup for global navigation tools due to highlighting issues,
+        # so we can't assert that we don't look things up, cause we have to.
+        # We can assert that we don't look up extraneous information
+        # again though.
+        expect(ContextExternalTool).not_to receive(:label_for)
         get "/courses"
         doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
@@ -265,7 +271,10 @@ describe "External Tools" do
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present
 
         c2 = course_with_teacher(account: @account, active_all: true, user: @teacher).course
-        expect(ContextExternalTool).not_to receive(:filtered_global_navigation_tools)
+        # We can't cache the lookup for global navigation tools due to highlighting issues,
+        # so we can't assert on that. We can asssert that we don't look up extraneous information
+        # again though.
+        expect(ContextExternalTool).not_to receive(:label_for)
         get "/courses/#{c2.id}" # viewing different course but permissions are the same - should remain cached
         doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present
@@ -302,6 +311,24 @@ describe "External Tools" do
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to_not be_present
       end
 
+      it "doesn't highlight the tool if the tool is no longer the current page" do
+        admin = account_admin_user(account: @account)
+        user_session(admin)
+        get "/accounts/#{Account.default.id}/external_tools/#{@admin_tool.id}?launch_type=global_navigation"
+        doc = Nokogiri::HTML5(response.body)
+        external_tool_link = doc.at_css("##{@admin_tool.asset_string}_menu_item")
+        # Expect the tool to be highlighted
+        expect(external_tool_link.attributes["class"].value).to include(highlight_nav_css_class)
+
+        get "/accounts/#{Account.default.id}"
+        doc = Nokogiri::HTML5(response.body)
+        external_tool_link = doc.at_css("##{@admin_tool.asset_string}_menu_item")
+        expect(external_tool_link.attributes["class"].value).not_to include(highlight_nav_css_class)
+
+        account_nav = doc.at_css("#global_nav_accounts_link").parent
+        expect(account_nav.attributes["class"].value).to include(highlight_nav_css_class)
+      end
+
       it "doesn't rebuild the html unless it detects a global_nav root account tool change" do
         skip("Fails in RSpecQ") if ENV["RSPECQ_REDIS_URL"]
         course_with_teacher_logged_in(account: @account, active_all: true)
@@ -310,8 +337,10 @@ describe "External Tools" do
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
 
         # trigger the global_nav cache register clearing in a callback
-        Account.default.context_external_tools.new(name: "b", domain: "google.com",
-                                                   consumer_key: "12345", shared_secret: "secret")
+        Account.default.context_external_tools.new(name: "b",
+                                                   domain: "google.com",
+                                                   consumer_key: "12345",
+                                                   shared_secret: "secret")
         new_secret_settings = @admin_tool.settings
         new_secret_settings[:global_navigation][:text] = "new text"
         # update the url secretly in the db but don't update the cache_key (updated_at)

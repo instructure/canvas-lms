@@ -24,7 +24,7 @@ import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
-import type {Filter} from '../gradebook.d'
+import type {Filter, FilterType, SubmissionFilterValue} from '../gradebook.d'
 import type {
   AssignmentGroup,
   Module,
@@ -38,27 +38,35 @@ import natcompare from '@canvas/util/natcompare'
 const I18n = useI18nScope('gradebook')
 
 const {Option, Group: OptionGroup} = SimpleSelect as any
-const formatDate = date => tz.format(date, 'date.formats.medium')
+const formatDate = (date: Date) => tz.format(date, 'date.formats.medium') as string
 const dateLabels = {'start-date': I18n.t('Start Date'), 'end-date': I18n.t('End Date')}
 
-type SubmissionTypeOption = ['has-ungraded-submissions' | 'has-submissions' | '__EMPTY__', string]
+type SubmissionTypeOption = [SubmissionFilterValue | '__EMPTY__', string]
 
 const submissionTypeOptions: SubmissionTypeOption[] = [
   ['__EMPTY__', I18n.t('--')],
   ['has-ungraded-submissions', I18n.t('Has ungraded submissions')],
   ['has-submissions', I18n.t('Has submissions')],
+  ['has-no-submissions', I18n.t('Has no submissions')],
+  ['has-unposted-grades', I18n.t('Has unposted grades')],
+  ['late', I18n.t('Late')],
+  ['missing', I18n.t('Missing')],
+  ['resubmitted', I18n.t('Resubmitted')],
+  ['dropped', I18n.t('Dropped')],
+  ['excused', I18n.t('Excused')],
+  ['extended', I18n.t('Extended')],
 ]
 
-const filterTypeLabels = {
-  'assignment-group': I18n.t('Assignment Groups'),
-  'grading-period': I18n.t('Grading Periods'),
-  module: I18n.t('Modules'),
-  section: I18n.t('Sections'),
-  'student-group': I18n.t('Student Groups'),
-  submission: I18n.t('Submissions'),
-  'start-date': I18n.t('Start Date'),
-  'end-date': I18n.t('End Date'),
-}
+const filterTypeLabels = new Map<FilterType, string>([
+  ['assignment-group', I18n.t('Assignment Groups')],
+  ['grading-period', I18n.t('Grading Periods')],
+  ['module', I18n.t('Modules')],
+  ['section', I18n.t('Sections')],
+  ['student-group', I18n.t('Student Groups')],
+  ['submissions', I18n.t('Submissions')],
+  ['start-date', I18n.t('Start Date')],
+  ['end-date', I18n.t('End Date')],
+])
 
 export type FilterNavFilterProps = {
   assignmentGroups: AssignmentGroup[]
@@ -130,7 +138,7 @@ export default function ({
         <SimpleSelect
           data-testid="select-filter"
           key={filter.type} // resets dropdown when filter type is changed
-          renderLabel={filterTypeLabels[filter.type || 'assignment-group']}
+          renderLabel={filterTypeLabels.get(filter.type || 'assignment-group')}
           placeholder="--"
           size="small"
           value={filter.value || '_'}
@@ -168,7 +176,7 @@ export default function ({
         <CanvasDateInput
           size="small"
           dataTestid="date-input"
-          renderLabel={dateLabels[filter.type!]}
+          renderLabel={dateLabels[filter.type as 'start-date' | 'end-date']}
           selectedDate={filter.value}
           formatDate={formatDate}
           interaction="enabled"

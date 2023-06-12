@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// K5 font-related overrides belong in k5_font.scss (so that they can be selectively
+// included, depending on the account's K5 font setting).
+
 @import "base/environment";
 
 // We'll control the padding from react, especially because we want the important dates sidebar
@@ -28,16 +31,6 @@
 #dashboard > .ic-notification,
 #announcementWrapper > div:not(:empty) {
   margin: $ic-sp;
-}
-
-// These overrides are only here because the Dashboard cards don't fully use InstUI.
-// Once they are on InstUI they can be removed
-.ic-DashboardCard__box {
-  font-family: "Balsamiq Sans", "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
-
-  & h1, h2, h3, h4, h5, h6 {
-    font-family: inherit;
-  }
 }
 
 .unpublished_courses_redesign .ic-DashboardCard__box {

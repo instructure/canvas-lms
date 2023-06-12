@@ -39,8 +39,12 @@ describe Polling::PollChoicesController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
-                  { controller: "polling/poll_choices", action: "index", format: "json",
-                    poll_id: @poll.id.to_s }, data, headers)
+                  { controller: "polling/poll_choices",
+                    action: "index",
+                    format: "json",
+                    poll_id: @poll.id.to_s },
+                  data,
+                  headers)
     end
 
     it "returns all existing poll choices" do
@@ -83,7 +87,7 @@ describe Polling::PollChoicesController, type: :request do
 
       it "is unauthorized if there are no open sessions" do
         get_index(true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "doesn't display is_correct within the poll choices" do
@@ -110,9 +114,12 @@ describe Polling::PollChoicesController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-                  { controller: "polling/poll_choices", action: "show", format: "json",
+                  { controller: "polling/poll_choices",
+                    action: "show",
+                    format: "json",
                     poll_id: @poll.id.to_s,
-                    id: @poll_choice.id.to_s }, data)
+                    id: @poll_choice.id.to_s },
+                  data)
     end
 
     it "retrieves the poll specified" do
@@ -130,13 +137,13 @@ describe Polling::PollChoicesController, type: :request do
 
       it "is unauthorized if there are no existing sessions" do
         get_show(true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
 
       it "is authorized if there are existing sessions" do
         Polling::PollSession.create!(course: @course, poll: @poll)
         get_show(true)
-        expect(response.code).to eq "200"
+        expect(response).to have_http_status :ok
       end
 
       context "with opened sessions" do
@@ -175,9 +182,13 @@ describe Polling::PollChoicesController, type: :request do
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
-                  { controller: "polling/poll_choices", action: "create", format: "json",
+                  { controller: "polling/poll_choices",
+                    action: "create",
+                    format: "json",
                     poll_id: @poll.id.to_s },
-                  { poll_choices: [params] }, {}, {})
+                  { poll_choices: [params] },
+                  {},
+                  {})
     end
 
     context "as a teacher" do
@@ -198,7 +209,7 @@ describe Polling::PollChoicesController, type: :request do
       it "is unauthorized" do
         student_in_course(active_all: true, course: @course)
         post_create({ text: "Poll Choice 1" }, true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -214,10 +225,14 @@ describe Polling::PollChoicesController, type: :request do
 
       helper.call(:put,
                   "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-                  { controller: "polling/poll_choices", action: "update", format: "json",
+                  { controller: "polling/poll_choices",
+                    action: "update",
+                    format: "json",
                     poll_id: @poll.id.to_s,
                     id: @poll_choice.id.to_s },
-                  { poll_choices: [params] }, {}, {})
+                  { poll_choices: [params] },
+                  {},
+                  {})
     end
 
     context "as a teacher" do
@@ -239,7 +254,7 @@ describe Polling::PollChoicesController, type: :request do
       it "is unauthorized" do
         student_in_course(active_all: true, course: @course)
         put_update({ text: "New Text" }, true)
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
       end
     end
   end
@@ -253,17 +268,21 @@ describe Polling::PollChoicesController, type: :request do
     def delete_destroy
       raw_api_call(:delete,
                    "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-                   { controller: "polling/poll_choices", action: "destroy", format: "json",
+                   { controller: "polling/poll_choices",
+                     action: "destroy",
+                     format: "json",
                      poll_id: @poll.id.to_s,
                      id: @poll_choice.id.to_s },
-                   {}, {}, {})
+                   {},
+                   {},
+                   {})
     end
 
     context "as a teacher" do
       it "deletes a poll choice successfully" do
         delete_destroy
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(Polling::PollChoice.where(id: @poll_choice)).not_to be_exists
       end
     end
@@ -273,7 +292,7 @@ describe Polling::PollChoicesController, type: :request do
         student_in_course(active_all: true, course: @course)
         delete_destroy
 
-        expect(response.code).to eq "401"
+        expect(response).to have_http_status :unauthorized
         expect(Polling::PollChoice.where(id: @poll_choice).first).to eq @poll_choice
       end
     end

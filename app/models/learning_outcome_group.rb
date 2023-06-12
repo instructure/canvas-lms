@@ -24,7 +24,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   extend RootAccountResolver
 
   restrict_columns :state, [:workflow_state]
-  self.ignored_columns = %i[migration_id_2 vendor_guid_2]
+  self.ignored_columns += %i[migration_id_2 vendor_guid_2]
 
   belongs_to :learning_outcome_group
   belongs_to :source_outcome_group, class_name: "LearningOutcomeGroup", inverse_of: :destination_outcome_groups
@@ -77,8 +77,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
     child_outcome_links.create(
       content: outcome,
       context: context || self,
-      skip_touch: skip_touch,
-      migration_id: migration_id
+      skip_touch:,
+      migration_id:
     )
   end
 
@@ -103,7 +103,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
         associated_asset_type: group.class,
         context_id: group.context_id || group.id,
         context_type: group.context_id.present? ? group.context_type : LearningOutcomeGroup,
-        root_account_id: root_account_id,
+        root_account_id:,
         title: outcome.title,
         comments: "",
         context_code: "#{group.context_type.to_s.underscore}_#{group.context_id}",
@@ -121,7 +121,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def sync_source_group
     transaction do
-      return unless source_outcome_group
+      raise ActiveRecord::Rollback unless source_outcome_group
 
       source_outcome_group.child_outcome_links.active.each do |link|
         add_outcome(link.content, skip_touch: true)
@@ -132,6 +132,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
         if target_child_group
           unless target_child_group.workflow_state == "active"
+            target_child_group.root_account_id = context.resolved_root_account_id
             target_child_group.workflow_state = "active"
             target_child_group.save!
           end
@@ -300,7 +301,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
         new_ids = []
         ids_to_check.each do |id|
-          group = LearningOutcomeGroup.for_context(context).active.where(id: id).first
+          group = LearningOutcomeGroup.for_context(context).active.where(id:).first
           new_ids += group.parent_ids if group
         end
 

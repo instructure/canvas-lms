@@ -84,6 +84,11 @@ Delayed::Settings.sleep_delay_stagger        = -> { Setting.get("delayed_jobs_sl
 Delayed::Settings.worker_procname_prefix     = -> { "#{Shard.current(Delayed::Backend::ActiveRecord::AbstractJob).id}~" }
 Delayed::Settings.worker_health_check_type   = Delayed::CLI.instance&.config&.dig("health_check", "type")&.to_sym || :none
 Delayed::Settings.worker_health_check_config = Delayed::CLI.instance&.config&.[]("health_check")
+# this is effectively disabled for now. The following areas of code use stranded jobs with long-delayed run_at:
+# ResendPlagiarismEvents
+# MicrosoftSync::StateMachineJob
+# turnitin/veracite/canvadocs/etc.
+Delayed::Settings.stranded_run_at_grace_period = -> { Setting.get("delayed_jobs_stranded_run_at_grace_period", 31_622_400).to_f.seconds }
 # transitional
 Delayed::Settings.infer_strand_from_singleton = -> { Setting.get("infer_strand_from_singleton", false) == "true" }
 
@@ -96,10 +101,11 @@ Rails.application.config.after_initialize do
     require "jobs_autoscaling"
     actions = [JobsAutoscaling::LoggerAction.new]
     if config[:asg_name]
-      aws_config = config[:aws_config] || {}
+      aws_config = config[:aws_config].dup || {}
+      aws_config[:credentials] ||= Canvas::AwsCredentialProvider.new("jobs_autoscaling_creds", config["vault_credential_path"])
       aws_config[:region] ||= ApplicationController.region
       actions << JobsAutoscaling::AwsAction.new(asg_name: config[:asg_name],
-                                                aws_config: aws_config,
+                                                aws_config:,
                                                 instance_id: ApplicationController.instance_id)
     end
     autoscaler = JobsAutoscaling::Monitor.new(action: actions)
@@ -236,7 +242,7 @@ end
 module CanvasDelayedMessageSending
   def delay_if_production(sender: nil, **kwargs)
     sender ||= __calculate_sender_for_delay
-    delay(sender: sender, **kwargs.merge(synchronous: !Rails.env.production?))
+    delay(sender:, **kwargs.merge(synchronous: !Rails.env.production?))
   end
 end
 Object.include CanvasDelayedMessageSending

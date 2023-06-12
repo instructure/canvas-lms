@@ -39,7 +39,7 @@ module ActiveRecord
 
       it "bases modulos on either end of the query per the configured type" do
         { full: "%somestring%", left: "%somestring", right: "somestring%" }.each do |type, result|
-          expect(Base.wildcard_pattern("somestring", type: type)).to eq result
+          expect(Base.wildcard_pattern("somestring", type:)).to eq result
         end
       end
     end
@@ -203,7 +203,7 @@ module ActiveRecord
         end
 
         it "keeps the specified order" do
-          %w[user_F user_D user_A user_C user_B user_E].map { |name| user_model(name: name) }
+          %w[user_F user_D user_A user_C user_B user_E].map { |name| user_model(name:) }
           names = []
           User.order(:name).find_in_batches(strategy: :pluck_ids, batch_size: 3) do |u_batch|
             names += u_batch.map(&:name)
@@ -338,6 +338,58 @@ module ActiveRecord
           .to eq [user]
       end
     end
+
+    describe ".ignored_columns" do
+      before do
+        allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+
+        # If this test is the first one to run that requires User - preload User so that the correct
+        # accessors (getters / setters) already exist since the "ensure" block won't create them. In
+        # a real situation, we would first perform a rolling restart after having unset this key and
+        # finished pre-deploy migrations everywhere.
+        User.create!(name: "user u1")
+      end
+
+      after do
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_call_original
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns_disabled", tree: :store).and_call_original
+
+        reset_cache!
+        User.create!(name: "user u2")
+      end
+
+      def reset_cache!
+        Canvas::Reloader.reload!
+        User.reset_column_information
+      end
+
+      def set_ignored_columns_state!(columns, enabled)
+        allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store).and_return(
+          {
+            "ignored_columns_disabled" => !enabled
+          }
+        )
+
+        allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
+          {
+            "users" => columns
+          }
+        )
+
+        reset_cache!
+      end
+
+      it "ignores additional columns specified in Consul" do
+        set_ignored_columns_state!("name", true)
+        expect { User.create!(name: "user u2") }.to raise_exception(ActiveModel::UnknownAttributeError)
+      end
+
+      it "does not ignore additional columns if disabled" do
+        set_ignored_columns_state!("name", false)
+        expect(DynamicSettings).not_to receive(:find).with("activerecord/ignored_columns")
+        expect { User.create!(name: "user u2") }.not_to raise_exception
+      end
+    end
   end
 
   describe ".asset_string" do
@@ -397,7 +449,7 @@ module ActiveRecord
       let(:scope) { User.active }
 
       it "uses FOR UPDATE on a normal exclusive lock" do
-        expect(scope.lock(true).lock_value).to eq true
+        expect(scope.lock(true).lock_value).to be true
       end
 
       it "substitutes 'FOR NO KEY UPDATE' if specified" do
@@ -504,7 +556,7 @@ module ActiveRecord
       it "uses 'SKIP LOCKED' lock" do
         Timecop.freeze do
           now = Time.now.utc
-          expect(@relation).to receive(:update_all_locked_in_order).with(updated_at: now, lock_type: :no_key_update_skip_locked)
+          expect(@relation).to receive(:update_all_locked_in_order).with("updated_at" => now, :lock_type => :no_key_update_skip_locked)
           @relation.touch_all_skip_locked
         end
       end
@@ -527,7 +579,8 @@ module ActiveRecord
       end
 
       it "finds the name of a foreign key on a specific column" do
-        fk_name = ActiveRecord::Migration.find_foreign_key(:accounts, :outcome_imports,
+        fk_name = ActiveRecord::Migration.find_foreign_key(:accounts,
+                                                           :outcome_imports,
                                                            column: "latest_outcome_import_id")
         expect(fk_name).to eq("fk_rails_3f0c8923c0")
       end

@@ -42,7 +42,7 @@ describe LtiApiController, type: :request do
   def check_error_response(message, check_generated_sig = true, with_report: true)
     expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
 
-    json = JSON.parse response.body
+    json = response.parsed_body
     expect(json["errors"][0]["message"]).to eq message
 
     if with_report
@@ -64,7 +64,7 @@ describe LtiApiController, type: :request do
   end
 
   def error_data(json = nil)
-    json ||= JSON.parse response.body
+    json ||= response.parsed_body
     error_report = ErrorReport.find json["error_report_id"]
     error_report.data
   end
@@ -334,7 +334,7 @@ describe LtiApiController, type: :request do
       # source_id is a string consisting of 5 parts which are random in these tests.
       # [@tool.id, @context.id, assignment.id, @user.id, some_hash]
       # We simply test for their presence in the headers.
-      (0...4).each do |i|
+      4.times do |i|
         expect(source_id_parts[i]).not_to be_empty
       end
       expect(header_keys["sa"]).to eql submission_time
@@ -378,7 +378,7 @@ describe LtiApiController, type: :request do
 
       verify_xml(response)
       submission = @assignment.submissions.where(user_id: @student).first
-      expect(submission.score).to eq nil
+      expect(submission.score).to be_nil
       expect(submission.body).to eq "oioi"
     end
 

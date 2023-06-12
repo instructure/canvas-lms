@@ -77,6 +77,32 @@ describe MasterCourses::MasterMigration do
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:perform_exports).once
       run_jobs
     end
+
+    context "priority option" do
+      before :once do
+        course_factory
+        @template.add_child_course!(@course)
+      end
+
+      def assert_job_priority(priority)
+        export_job = Delayed::Job.where(tag: "MasterCourses::MasterMigration#perform_exports").last
+        expect(export_job.priority).to eq priority
+        run_job(export_job)
+
+        import_job = Delayed::Job.where(tag: "ContentMigration#import_content").last
+        expect(import_job.priority).to eq priority
+      end
+
+      it "defaults to Delayed::LOW_PRIORITY" do
+        MasterCourses::MasterMigration.start_new_migration!(@template, @user)
+        assert_job_priority(Delayed::LOW_PRIORITY)
+      end
+
+      it "honors the setting if present" do
+        MasterCourses::MasterMigration.start_new_migration!(@template, @user, priority: 42)
+        assert_job_priority(42)
+      end
+    end
   end
 
   describe "perform_exports" do
@@ -145,17 +171,20 @@ describe MasterCourses::MasterMigration do
     before :once do
       account_admin_user(active_all: true)
       @copy_from = @course
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+      tool = external_tool_model(context: Account.default, opts: { use_1_3: true, developer_key: DeveloperKey.create!(account: Account.default) })
+      @original_assignment = @copy_from.assignments.create!(title: "some assignment", submission_types: "external_tool", points_possible: 10)
+      tag = ContentTag.new(content: tool, url: "http://example.com/original", context: @original_assignment)
+      @original_assignment.update!(external_tool_tag: tag)
+      @original_line_item = @original_assignment.line_items.first
+      @original_line_item.update!(resource_id: "some_resource_id")
     end
 
     before do
-      @copy_to = course_factory
-      @sub = @template.add_child_course!(@copy_to)
-
-      @original_assignment = @copy_from.assignments.create!(title: "some assignment", submission_types: "external_tool")
-      @original_assignment.build_external_tool_tag(url: "http://example.com/original", new_tab: true)
-      @original_assignment.save!
-
       run_master_migration
+      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
+      @line_item_copy = @assignment_copy.line_items.last
     end
 
     it "copies external tool tag over" do
@@ -173,11 +202,62 @@ describe MasterCourses::MasterMigration do
     end
 
     it "does not update associated course's external tool tag on blueprint update if the associated course had an independent update" do
-      @assignment_copy = @copy_to.assignments.where(migration_id: mig_id(@original_assignment)).first
       @assignment_copy.external_tool_tag.update!(url: "http://example.com/associated_updated", new_tab: true)
       @original_assignment.touch
       run_master_migration
       expect(@assignment_copy.reload.external_tool_tag.url).to eq "http://example.com/associated_updated"
+    end
+
+    context "with blueprint_line_item_support ON" do
+      it "respects line item downstream editing and assignment locking" do
+        Account.site_admin.enable_feature! :blueprint_line_item_support
+
+        @original_line_item.update!(resource_id: "updated_resource_id")
+        @original_assignment.update!(title: "updated assignment title")
+        run_master_migration
+        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id")
+
+        @line_item_copy.update! resource_id: "downstream_resource_id"
+        @original_line_item.update!(resource_id: "updated_resource_id AGAIN")
+        @original_assignment.update!(title: "updated assignment title AGAIN")
+        @original_assignment.touch
+        run_master_migration
+
+        # The one line item downstream change stops assignment synch as a whole
+        expect(@assignment_copy.reload.title).to eq("updated assignment title")
+        expect(@line_item_copy.reload.label).to eq("updated assignment title")
+        expect(@line_item_copy.reload.resource_id).to eq("downstream_resource_id")
+
+        @template.content_tag_for(@original_assignment).update_attribute(:restrictions, { content: true })
+        run_master_migration
+
+        expect(@assignment_copy.reload.title).to eq("updated assignment title AGAIN")
+        expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
+        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
+      end
+    end
+
+    context "with blueprint_line_item_support OFF" do
+      it "respects line item downstream editing and assignment locking" do
+        Account.site_admin.disable_feature! :blueprint_line_item_support
+
+        expect(@original_line_item.resource_id).to eq("some_resource_id")
+
+        @original_line_item.update!(resource_id: "updated_resource_id")
+        @original_assignment.update!(title: "updated assignment title")
+        run_master_migration
+        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id")
+
+        @line_item_copy.update! resource_id: "downstream_resource_id"
+        @original_line_item.update!(resource_id: "updated_resource_id AGAIN")
+        @original_assignment.update!(title: "updated assignment title AGAIN")
+        @original_assignment.touch
+        run_master_migration
+
+        expect(@assignment_copy.reload.title).to eq("updated assignment title AGAIN")
+        expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
+        expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
+      end
     end
   end
 
@@ -343,8 +423,11 @@ describe MasterCourses::MasterMigration do
       bank.assessment_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question" })
       file = @copy_from.attachments.create!(filename: "blah", uploaded_data: default_uploaded_data)
       event = @copy_from.calendar_events.create!(title: "thing", description: "blargh", start_at: 1.day.from_now)
-      tool = @copy_from.context_external_tools.create!(name: "new tool", consumer_key: "key",
-                                                       shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com")
+      tool = @copy_from.context_external_tools.create!(name: "new tool",
+                                                       consumer_key: "key",
+                                                       shared_secret: "secret",
+                                                       custom_fields: { "a" => "1", "b" => "2" },
+                                                       url: "http://www.example.com")
 
       run_master_migration
 
@@ -511,7 +594,7 @@ describe MasterCourses::MasterMigration do
       qq1 = quiz.quiz_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question" })
       qq2 = quiz.quiz_questions.create!(question_data: { "question_name" => "test question 2", "question_type" => "essay_question" })
       qgroup = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qq3 = qgroup.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qq3 = qgroup.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
@@ -555,14 +638,14 @@ describe MasterCourses::MasterMigration do
         quiz.touch # re-sync
       end
       run_master_migration
-      expect(quiz_to.quiz_questions.active.exists?).to eq false # didn't recreate the question
+      expect(quiz_to.quiz_questions.active.exists?).to be false # didn't recreate the question
 
       Timecop.freeze(4.minutes.from_now) do
         @template.content_tag_for(quiz).update_attribute(:restrictions, { content: true })
       end
       run_master_migration
 
-      expect(quiz_to.quiz_questions.active.exists?).to eq true # new question but it has the same content
+      expect(quiz_to.quiz_questions.active.exists?).to be true # new question but it has the same content
       expect(qq_to.reload).to be_deleted # original doesn't get restored because it just made a new question instead /shrug
     end
 
@@ -572,9 +655,9 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!
       qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qgroup1.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qgroup1.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       qgroup2 = quiz.quiz_groups.create!(name: "group2", pick_count: 1)
-      qq2 = qgroup2.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qq2 = qgroup2.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
@@ -636,7 +719,7 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!
       qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qgroup1.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qgroup1.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       qgroup1.save
       Timecop.freeze(2.minutes.from_now) do
         @template.content_tag_for(quiz).update_attribute(:restrictions, { content: true })
@@ -711,7 +794,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       q_to = @copy_to.quizzes.where(migration_id: mig_id(q)).first
-      copied_answers = q_to.quiz_questions.to_a.map { |qq| [qq.id, qq.question_data.to_hash["answers"]] }.to_h
+      copied_answers = q_to.quiz_questions.to_a.to_h { |qq| [qq.id, qq.question_data.to_hash["answers"]] }
       expect(copied_answers.values.flatten.all? { |a| a["id"] != 0 }).to be_truthy
       q.quiz_questions.each do |qq|
         qq_to = q_to.quiz_questions.where(migration_id: mig_id(qq)).first
@@ -732,7 +815,7 @@ describe MasterCourses::MasterMigration do
 
       quiz = @copy_from.quizzes.create!
       qgroup = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qgroup.quiz_questions.create!(quiz: quiz, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
+      qgroup.quiz_questions.create!(quiz:, question_data: { "question_name" => "test group question", "question_type" => "essay_question" })
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
@@ -1149,10 +1232,14 @@ describe MasterCourses::MasterMigration do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
 
-      att1 = Attachment.create!(filename: "file1.txt", uploaded_data: StringIO.new("1"),
-                                folder: Folder.root_folders(@copy_from).first, context: @copy_from)
-      att2 = Attachment.create!(filename: "file2.txt", uploaded_data: StringIO.new("2"),
-                                folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      att1 = Attachment.create!(filename: "file1.txt",
+                                uploaded_data: StringIO.new("1"),
+                                folder: Folder.root_folders(@copy_from).first,
+                                context: @copy_from)
+      att2 = Attachment.create!(filename: "file2.txt",
+                                uploaded_data: StringIO.new("2"),
+                                folder: Folder.root_folders(@copy_from).first,
+                                context: @copy_from)
 
       run_master_migration
 
@@ -1187,8 +1274,10 @@ describe MasterCourses::MasterMigration do
 
       @root_folder = Folder.root_folders(@copy_from).first
       @folder_to_delete = @root_folder.sub_folders.create!(name: "nowyouseeme", context: @copy_from)
-      @att1 = Attachment.create!(filename: "file1.txt", uploaded_data: StringIO.new("1"),
-                                 folder: @folder_to_delete, context: @copy_from)
+      @att1 = Attachment.create!(filename: "file1.txt",
+                                 uploaded_data: StringIO.new("1"),
+                                 folder: @folder_to_delete,
+                                 context: @copy_from)
 
       run_master_migration
       @att1_to = @copy_to.attachments.where(migration_id: mig_id(@att1)).first
@@ -1205,6 +1294,102 @@ describe MasterCourses::MasterMigration do
       @att1_to.reload
       expect(@att1_to).to_not be_deleted
       expect(@att1_to.folder).to_not be_deleted
+    end
+
+    context "media_links_use_attachment_id feature flag off" do
+      it "does not copy media tracks" do
+        @copy_to = course_factory
+        @template.add_child_course!(@copy_to)
+
+        media_id = "m-you_know_what_you_did"
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+        media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+        run_master_migration
+
+        att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+        expect(att_to.media_entry_id).to eq media_id
+        expect(att_to.media_tracks).to be_empty
+      end
+    end
+
+    context "media_links_use_attachment_id feature flag" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
+      end
+
+      it "copies media tracks" do
+        @copy_to = course_factory
+        @template.add_child_course!(@copy_to)
+
+        media_id = "m-you_know_what_you_did"
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+        copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+        run_master_migration
+
+        att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+        expect(att_to.media_tracks.length).to eq 1
+        expect(att_to.media_entry_id).to eq media_id
+        copy_to_track = att_to.media_tracks.first
+        expect(copy_to_track.id).not_to eq copy_from_track.id
+        expect(copy_to_track.slice(:locale, :content)).to match({ locale: "en", content: "en subs" })
+      end
+
+      it "doesn't overwrite media tracks with downstream changes" do
+        @copy_to = course_factory
+        @template.add_child_course!(@copy_to)
+
+        media_id = "m-you_know_what_you_did"
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+        copy_from_track = media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+        run_master_migration
+
+        att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+        copy_to_track = att_to.media_tracks.first
+        expect(copy_to_track).to be_present
+
+        Timecop.freeze(1.minute.from_now) do
+          copy_to_track.destroy
+          att_to.media_tracks.create!(kind: "subtitles", locale: "en", content: "new subs")
+          copy_from_track.destroy
+          media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
+        end
+        run_master_migration
+
+        expect(att_to.media_tracks.length).to eq 1
+        copy_to_track = att_to.media_tracks.first
+        expect(copy_to_track.content).to eq "new subs"
+      end
+
+      it "does overwrite media tracks with downstream changes if the attachment has been updated" do
+        @copy_to = course_factory
+        @template.add_child_course!(@copy_to)
+
+        media_id = "m-you_know_what_you_did"
+        media_object = @copy_from.media_objects.create!(title: "video.mp4", media_id:)
+        media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs")
+
+        run_master_migration
+
+        att_to = @copy_to.attachments.where(migration_id: mig_id(media_object.attachment)).first
+        copy_to_track = att_to.media_tracks.first
+        expect(copy_to_track).to be_present
+
+        Timecop.freeze(1.minute.from_now) do
+          copy_to_track.destroy
+          att_to.media_tracks.create!(kind: "subtitles", locale: "en", content: "new subs")
+          @new_att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("ohai"), folder: media_object.attachment.folder, context: @copy_from, media_entry_id: media_id)
+          @new_att.handle_duplicates(:overwrite)
+          @new_att.media_tracks.create!(kind: "subtitles", locale: "en", content: "orig subs")
+        end
+        run_master_migration
+
+        expect(@new_att.media_tracks.length).to eq 1
+        copy_to_track = @new_att.media_tracks.first
+        expect(copy_to_track.content).to eq "orig subs"
+      end
     end
 
     it "limits the number of items to track" do
@@ -1263,8 +1448,11 @@ describe MasterCourses::MasterMigration do
       aq = bank.assessment_questions.create!(question_data: { "question_name" => "test question", "question_type" => "essay_question" })
       file = @copy_from.attachments.create!(filename: "blah", uploaded_data: default_uploaded_data)
       event = @copy_from.calendar_events.create!(title: "thing", description: "blargh", start_at: 1.day.from_now)
-      tool = @copy_from.context_external_tools.create!(name: "new tool", consumer_key: "key",
-                                                       shared_secret: "secret", custom_fields: { "a" => "1", "b" => "2" }, url: "http://www.example.com")
+      tool = @copy_from.context_external_tools.create!(name: "new tool",
+                                                       consumer_key: "key",
+                                                       shared_secret: "secret",
+                                                       custom_fields: { "a" => "1", "b" => "2" },
+                                                       url: "http://www.example.com")
 
       # TODO: make sure that we skip the validations on each importer when we add the Restrictor and
       # probably add more content here
@@ -1285,8 +1473,15 @@ describe MasterCourses::MasterMigration do
       copied_event = @copy_to.calendar_events.where(migration_id: mig_id(event)).first
       copied_tool = @copy_to.context_external_tools.where(migration_id: mig_id(tool)).first
 
-      copied_things = [copied_assmt, copied_topic, copied_ann, copied_page, copied_quiz,
-                       copied_bank, copied_file, copied_event, copied_tool]
+      copied_things = [copied_assmt,
+                       copied_topic,
+                       copied_ann,
+                       copied_page,
+                       copied_quiz,
+                       copied_bank,
+                       copied_file,
+                       copied_event,
+                       copied_tool]
       copied_things.each do |copy|
         expect(MasterCourses::ChildContentTag.where(content: copy).first.migration_id).to eq copy.migration_id
       end
@@ -1758,7 +1953,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       copied_quiz = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
-      expect(copied_quiz.only_visible_to_overrides).to eq false
+      expect(copied_quiz.only_visible_to_overrides).to be false
     end
 
     it "allows a minion course's change of the graded status of a discussion topic to stick" do
@@ -1871,13 +2066,13 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       expect(@copy_to.reload.grading_standard.data).to eq gs.data
-      expect(@copy_to.grading_standard_enabled).to eq true
+      expect(@copy_to.grading_standard_enabled).to be true
 
       @copy_from.update_attribute(:grading_standard_enabled, false)
       run_master_migration(copy_settings: true)
 
       expect(@copy_to.reload.grading_standard).to be_nil
-      expect(@copy_to.grading_standard_enabled).to eq false
+      expect(@copy_to.grading_standard_enabled).to be false
     end
 
     it "copies front wiki pages" do
@@ -1932,7 +2127,7 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
 
-      expect(@page_copy.reload.is_front_page?).to eq true
+      expect(@page_copy.reload.is_front_page?).to be true
       expect(@copy_to.reload.default_view).to eq "wiki"
     end
 
@@ -1965,7 +2160,7 @@ describe MasterCourses::MasterMigration do
 
       run_master_migration
 
-      expect(@copy_to.wiki.reload.front_page_url).to be nil # should leave alone
+      expect(@copy_to.wiki.reload.front_page_url).to be_nil # should leave alone
     end
 
     it "does not overwrite syllabus body if already present or changed" do
@@ -2045,7 +2240,7 @@ describe MasterCourses::MasterMigration do
 
       copied_att = @copy_to.attachments.where(migration_id: att_tag.migration_id).first
       expect(copied_att.full_path).to eq "course files/parent RENAMED/child/file.txt"
-      expect(@copy_to.folders.where(name: "parent RENAMED").first.locked).to eq true
+      expect(@copy_to.folders.where(name: "parent RENAMED").first.locked).to be true
     end
 
     it "deals with a deleted folder being changed upstream" do
@@ -2165,7 +2360,7 @@ describe MasterCourses::MasterMigration do
       sub2 = @template.add_child_course!(@copy_to2)
 
       group_category = @copy_from.group_categories.create!(name: "a set")
-      topic = @copy_from.discussion_topics.create!(title: "a group dis", group_category: group_category)
+      topic = @copy_from.discussion_topics.create!(title: "a group dis", group_category:)
 
       run_master_migration
 
@@ -2184,7 +2379,7 @@ describe MasterCourses::MasterMigration do
         topic.update_attribute(:group_category_id, nil)
         run_master_migration
       end
-      expect(topic_to1.reload.group_category).to eq nil
+      expect(topic_to1.reload.group_category).to be_nil
       expect(topic_to2.reload.group_category).to be_present # has a reply so can't be unset
 
       result2 = @migration.migration_results.where(child_subscription_id: sub2).first
@@ -2218,7 +2413,7 @@ describe MasterCourses::MasterMigration do
         @ra.destroy # unlink the rubric
         run_master_migration
       end
-      expect(assignment_to.reload.rubric).to eq nil
+      expect(assignment_to.reload.rubric).to be_nil
 
       # create another rubric - it should leave alone
       other_rubric = outcome_with_rubric(course: @copy_to)
@@ -2345,8 +2540,12 @@ describe MasterCourses::MasterMigration do
 
       Timecop.freeze(1.minute.from_now) do
         @lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "whee", workflow_state: "active")
-        @lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                      { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+        @lo.data = { rubric_criterion: { mastery_points: 2,
+                                         ratings: [{ description: "e", points: 50 },
+                                                   { description: "me", points: 2 },
+                                                   { description: "Does Not Meet Expectations", points: 0.5 }],
+                                         description: "First outcome",
+                                         points_possible: 5 } }
         @lo.save!
         log.reload.add_outcome(@lo)
       end
@@ -2363,8 +2562,12 @@ describe MasterCourses::MasterMigration do
 
       default = @copy_from.root_outcome_group
       @lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "whee", workflow_state: "active")
-      @lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                    { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+      @lo.data = { rubric_criterion: { mastery_points: 2,
+                                       ratings: [{ description: "e", points: 50 },
+                                                 { description: "me", points: 2 },
+                                                 { description: "Does Not Meet Expectations", points: 0.5 }],
+                                       description: "First outcome",
+                                       points_possible: 5 } }
       @lo.save!
       default.add_outcome(@lo)
 
@@ -2395,8 +2598,12 @@ describe MasterCourses::MasterMigration do
       @copy_from.root_outcome_group.adopt_outcome_group(@og)
 
       @lo = @copy_from.account.created_learning_outcomes.new(context: @copy_from.account, short_description: "whee", workflow_state: "active")
-      @lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                    { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+      @lo.data = { rubric_criterion: { mastery_points: 2,
+                                       ratings: [{ description: "e", points: 50 },
+                                                 { description: "me", points: 2 },
+                                                 { description: "Does Not Meet Expectations", points: 0.5 }],
+                                       description: "First outcome",
+                                       points_possible: 5 } }
       @lo.save!
       @og.add_outcome(@lo)
 
@@ -2529,8 +2736,10 @@ describe MasterCourses::MasterMigration do
       # this was 'fun' to debug - i'm still not quite sure how it came about
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
-      att1 = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"),
-                                folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
+      att1 = Attachment.create!(filename: "first.txt",
+                                uploaded_data: StringIO.new("ohai"),
+                                folder: Folder.unfiled_folder(@copy_from),
+                                context: @copy_from)
 
       run_master_migration
 
@@ -2541,8 +2750,11 @@ describe MasterCourses::MasterMigration do
 
       @copy_from2 = course_factory
       @template2 = MasterCourses::MasterTemplate.set_as_master_course(@copy_from2)
-      att2 = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"),
-                                folder: Folder.unfiled_folder(@copy_from2), context: @copy_from2, cloned_item_id: att1.cloned_item_id)
+      att2 = Attachment.create!(filename: "first.txt",
+                                uploaded_data: StringIO.new("ohai"),
+                                folder: Folder.unfiled_folder(@copy_from2),
+                                context: @copy_from2,
+                                cloned_item_id: att1.cloned_item_id)
       @template2.add_child_course!(@copy_to)
 
       MasterCourses::MasterMigration.start_new_migration!(@template2, @admin)
@@ -2558,8 +2770,12 @@ describe MasterCourses::MasterMigration do
       @template.add_child_course!(@copy_to)
 
       lo = @copy_from.created_learning_outcomes.new(context: @copy_from, short_description: "whee", workflow_state: "active")
-      lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                   { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
+      lo.data = { rubric_criterion: { mastery_points: 2,
+                                      ratings: [{ description: "e", points: 50 },
+                                                { description: "me", points: 2 },
+                                                { description: "Does Not Meet Expectations", points: 0.5 }],
+                                      description: "First outcome",
+                                      points_possible: 5 } }
       lo.save!
       from_root = @copy_from.root_outcome_group
       from_root.add_outcome(lo)
@@ -2572,8 +2788,11 @@ describe MasterCourses::MasterMigration do
 
       rub = Rubric.new(context: @copy_from)
       rub.data = [{
-        points: 3, description: "Outcome row", id: 2,
-        ratings: [{ points: 3, description: "meep", criterion_id: 2, id: 3 }], ignore_for_scoring: true,
+        points: 3,
+        description: "Outcome row",
+        id: 2,
+        ratings: [{ points: 3, description: "meep", criterion_id: 2, id: 3 }],
+        ignore_for_scoring: true,
         learning_outcome_id: lo.id
       }]
       rub.save!
@@ -2741,7 +2960,7 @@ describe MasterCourses::MasterMigration do
       mod2_to.reload
       expect(mod2_to.completion_requirements).to eq([{ id: tag_to.id, type: "must_submit" }])
       expect(mod2_to.prerequisites).to eq([{ id: mod1_to.id, type: "context_module", name: "module1" }])
-      expect(mod2_to.require_sequential_progress).to eq true
+      expect(mod2_to.require_sequential_progress).to be true
       expect(mod2_to.requirement_count).to eq 1
     end
 
@@ -2848,7 +3067,7 @@ describe MasterCourses::MasterMigration do
         ag.update_attribute(:rules, "never_drop:#{a.id}\n")
       end
       run_master_migration
-      expect(ag_to.reload.rules).to eq nil # set to empty if there are no dropping rules
+      expect(ag_to.reload.rules).to be_nil # set to empty if there are no dropping rules
     end
 
     it "doesn't clear external tool config on exception" do
@@ -2863,8 +3082,10 @@ describe MasterCourses::MasterMigration do
         a.touch
       end
 
-      tool = @copy_to.context_external_tools.create!(name: "some tool", consumer_key: "test_key",
-                                                     shared_secret: "test_secret", url: "http://example.com/launch")
+      tool = @copy_to.context_external_tools.create!(name: "some tool",
+                                                     consumer_key: "test_key",
+                                                     shared_secret: "test_secret",
+                                                     url: "http://example.com/launch")
       a_to.update(submission_types: "external_tool", external_tool_tag_attributes: { content: tool })
       tag = a_to.external_tool_tag
 
@@ -2943,8 +3164,11 @@ describe MasterCourses::MasterMigration do
 
     context "attachment migration id preservation" do
       def run_course_copy(copy_from, copy_to)
-        @cm = ContentMigration.new(context: copy_to, user: @user, source_course: copy_from,
-                                   migration_type: "course_copy_importer", copy_options: { everything: "1" })
+        @cm = ContentMigration.new(context: copy_to,
+                                   user: @user,
+                                   source_course: copy_from,
+                                   migration_type: "course_copy_importer",
+                                   copy_options: { everything: "1" })
         @cm.migration_settings[:import_immediately] = true
         @cm.set_default_settings
         @cm.save!

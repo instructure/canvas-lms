@@ -17,10 +17,10 @@
  */
 
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
-import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
-import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/CreateAssignmentView.coffee'
-import DialogFormView from '@canvas/forms/backbone/views/DialogFormView.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
+import Assignment from '@canvas/assignments/backbone/models/Assignment'
+import CreateAssignmentView from 'ui/features/assignment_index/backbone/views/CreateAssignmentView'
+import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import $ from 'jquery'
 import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'

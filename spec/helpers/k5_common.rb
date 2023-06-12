@@ -23,4 +23,11 @@ module K5Common
     account.root_account.save!
     account.save!
   end
+
+  def toggle_classic_font_setting(account, enable = true)
+    account.settings[:use_classic_font_in_k5] = { value: enable, locked: enable }
+    account.root_account.settings[:k5_classic_font_accounts] = enable ? [account.id] : []
+    account.root_account.save!
+    account.save!
+  end
 end

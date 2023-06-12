@@ -39,8 +39,8 @@ describe Lti::ScopeUnion do
       s1 = Course.where(id: -1)
       s2 = Course.where(id: course.id)
       s3 = Course.where(id: -2)
-      expect(described_class.new([s1, s2, s3]).exists?).to eq(true)
-      expect(described_class.new([s1, s3]).exists?).to eq(false)
+      expect(described_class.new([s1, s2, s3]).exists?).to be(true)
+      expect(described_class.new([s1, s3]).exists?).to be(false)
     end
   end
 

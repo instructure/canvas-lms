@@ -19,7 +19,7 @@
 #
 
 describe "Submissions::ShowHelper" do
-  describe "included in a controller", type: :controller do
+  describe "included in a controller" do
     controller do
       include Submissions::ShowHelper
 
@@ -57,7 +57,7 @@ describe "Submissions::ShowHelper" do
         end
 
         it "render json with errors key" do
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json).to have_key("errors")
         end
       end
@@ -71,7 +71,7 @@ describe "Submissions::ShowHelper" do
 
         it "works with json too" do
           get :show, params: { context_id: @course.id, assignment_id: -9000 }, format: :json
-          json = JSON.parse(response.body)
+          json = response.parsed_body
           expect(json["errors"]).to eq "The specified assignment (-9000) could not be found"
         end
       end

@@ -26,6 +26,7 @@ group :development do
   gem "active_record_query_trace", "1.8", require: false
 
   gem "byebug", "11.1.3", platform: :mri
+  gem "pry-byebug", "3.10.1", platform: :mri
   # These gems aren't compatible with newer rubies; just use the built-in debug gem instead
   # Only try to install them if the env var is set so we don't have conditional gems in the
   # production build

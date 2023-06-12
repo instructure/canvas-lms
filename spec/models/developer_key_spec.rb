@@ -77,11 +77,11 @@ describe DeveloperKey do
     end
 
     it "validates when public jwk is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk: public_jwk) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk:) }.to_not raise_error
     end
 
     it "validates when public jwk url is present" do
-      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url: public_jwk_url) }.to_not raise_error
+      expect { DeveloperKey.create!(is_lti_key: true, public_jwk_url:) }.to_not raise_error
     end
   end
 
@@ -97,7 +97,7 @@ describe DeveloperKey do
         tool = ContextExternalTool.create!(
           name: "shard 1 tool",
           workflow_state: "public",
-          developer_key: developer_key,
+          developer_key:,
           context: shard_1_account,
           url: "https://www.test.com",
           consumer_key: "key",
@@ -118,7 +118,7 @@ describe DeveloperKey do
         tool = ContextExternalTool.create!(
           name: "shard 2 tool",
           workflow_state: "public",
-          developer_key: developer_key,
+          developer_key:,
           context: shard_2_account,
           url: "https://www.test.com",
           consumer_key: "key",
@@ -284,7 +284,7 @@ describe DeveloperKey do
 
       before do
         developer_key
-        @shard1.activate { tool_configuration.update!(privacy_level: "anonymous") }
+        @shard1.activate { tool_configuration }
         shard_1_tool.update!(workflow_state: "disabled")
         shard_2_tool.update!(workflow_state: "disabled")
         subject
@@ -294,11 +294,11 @@ describe DeveloperKey do
         let(:account) { Account.site_admin }
 
         it "enables tools on shard 1" do
-          expect(shard_1_tool.reload.workflow_state).to eq "anonymous"
+          expect(shard_1_tool.reload.workflow_state).to eq "public"
         end
 
         it "enables tools on shard 2" do
-          expect(shard_2_tool.reload.workflow_state).to eq "anonymous"
+          expect(shard_2_tool.reload.workflow_state).to eq "public"
         end
       end
 
@@ -306,11 +306,24 @@ describe DeveloperKey do
         let(:account) { shard_1_tool.root_account }
 
         it "enables tools on shard 1" do
-          expect(shard_1_tool.reload.workflow_state).to eq "anonymous"
+          expect(shard_1_tool.reload.workflow_state).to eq "public"
         end
 
         it "does not enable tools on shard 2" do
           expect(shard_2_tool.reload.workflow_state).to eq "disabled"
+        end
+      end
+
+      context "privacy_level is not set on tool_configuration" do
+        let(:account) { shard_1_tool.root_account }
+        let(:tool_configuration) do
+          tc = super()
+          tc.update!(privacy_level: nil)
+          tc
+        end
+
+        it "still correctly uses privacy_level from extensions" do
+          expect(shard_1_tool.reload.workflow_state).to eq "public"
         end
       end
     end
@@ -379,7 +392,7 @@ describe DeveloperKey do
 
   describe "usable_in_context?" do
     let(:account) { account_model }
-    let(:developer_key) { DeveloperKey.create!(account: account) }
+    let(:developer_key) { DeveloperKey.create!(account:) }
 
     shared_examples_for "a boolean indicating the key is usable in context" do
       subject { developer_key.usable_in_context?(context) }
@@ -391,17 +404,17 @@ describe DeveloperKey do
           developer_key.account_binding_for(account).update!(workflow_state: "on")
         end
 
-        it { is_expected.to eq true }
+        it { is_expected.to be true }
       end
 
       context "when the key is not usable" do
         before { developer_key.update!(workflow_state: "deleted") }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context "when the binding is not on" do
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
 
@@ -413,7 +426,7 @@ describe DeveloperKey do
 
     context "when the context is a course" do
       it_behaves_like "a boolean indicating the key is usable in context" do
-        let(:context) { course_model(account: account) }
+        let(:context) { course_model(account:) }
       end
     end
   end
@@ -466,8 +479,8 @@ describe DeveloperKey do
 
   describe "sets a default value" do
     it "when visible is not specified" do
-      expect(developer_key_not_saved.valid?).to eq(true)
-      expect(developer_key_not_saved.visible).to eq(false)
+      expect(developer_key_not_saved.valid?).to be(true)
+      expect(developer_key_not_saved.visible).to be(false)
     end
 
     it "is false for site admin generated keys" do
@@ -478,7 +491,7 @@ describe DeveloperKey do
         account_id: nil
       )
 
-      expect(key.visible).to eq(false)
+      expect(key.visible).to be(false)
     end
 
     it "is true for non site admin generated keys" do
@@ -489,7 +502,7 @@ describe DeveloperKey do
         account_id: account.id
       )
 
-      expect(key.visible).to eq(true)
+      expect(key.visible).to be(true)
     end
   end
 
@@ -504,19 +517,19 @@ describe DeveloperKey do
       context 'when the kty is not "RSA"' do
         before { developer_key_saved.public_jwk["kty"] = "foo" }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context 'when the alg is not "RS256"' do
         before { developer_key_saved.public_jwk["alg"] = "foo" }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
 
       context "when required claims are missing" do
         before { developer_key_saved.update public_jwk: { foo: "bar" } }
 
-        it { is_expected.to eq false }
+        it { is_expected.to be false }
       end
     end
 
@@ -582,13 +595,13 @@ describe DeveloperKey do
             developer_key_not_saved
           end
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
 
         context "when a public jwk is not set" do
           let(:key) { developer_key_not_saved }
 
-          it { is_expected.to eq false }
+          it { is_expected.to be false }
         end
 
         context "when a key requires scopes but has no public jwk" do
@@ -600,7 +613,7 @@ describe DeveloperKey do
             developer_key_not_saved
           end
 
-          it { is_expected.to eq true }
+          it { is_expected.to be true }
         end
       end
 
@@ -723,8 +736,8 @@ describe DeveloperKey do
 
     context "when not site admin" do
       it "creates a binding on save" do
-        key = DeveloperKey.create!(account: account)
-        expect(key.developer_key_account_bindings.find_by(account: account)).to be_present
+        key = DeveloperKey.create!(account:)
+        expect(key.developer_key_account_bindings.find_by(account:)).to be_present
       end
 
       describe "destroy_external_tools!" do
@@ -752,7 +765,7 @@ describe DeveloperKey do
           end
 
           context "when tools are installed at the course level" do
-            let(:course) { course_model(account: account) }
+            let(:course) { course_model(account:) }
             let(:course_tool) do
               t = tool_configuration.new_external_tool(course)
               t.save!
@@ -789,7 +802,7 @@ describe DeveloperKey do
 
           let(:account) { nil }
 
-          before { developer_key_not_saved.update!(account: account) }
+          before { developer_key_not_saved.update!(account:) }
 
           it { is_expected.to eq Account.site_admin }
         end
@@ -1128,21 +1141,21 @@ describe DeveloperKey do
     it "does not allow subdomains when it matches in redirect_uris" do
       developer_key_not_saved.redirect_uris << "http://example.com/a/b"
 
-      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/a/b")).to eq true
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/a/b")).to be true
 
       # other paths on the same domain are NOT ok
-      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/other")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/other")).to be false
       # sub-domains are not ok either
-      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq false
-      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to eq false
-      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to be false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/a/b")).to be false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://a.b.example.com/other")).to be false
     end
 
     it "requires scheme to match on lenient matches" do
       developer_key_not_saved.redirect_uri = "http://example.com/a/b"
 
-      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to eq true
-      expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to eq false
+      expect(developer_key_not_saved.redirect_domain_matches?("http://www.example.com/a/b")).to be true
+      expect(developer_key_not_saved.redirect_domain_matches?("intents://www.example.com/a/b")).to be false
     end
   end
 
@@ -1183,7 +1196,7 @@ describe DeveloperKey do
           site_admin_key = nil
 
           Account.site_admin.shard.activate do
-            site_admin_key = DeveloperKey.create!(vendor_code: vendor_code)
+            site_admin_key = DeveloperKey.create!(vendor_code:)
           end
 
           not_site_admin_shard.activate do
@@ -1192,7 +1205,7 @@ describe DeveloperKey do
         end
 
         it "finds keys in the current shard" do
-          local_key = DeveloperKey.create!(vendor_code: vendor_code, account: account_model)
+          local_key = DeveloperKey.create!(vendor_code:, account: account_model)
           expect(DeveloperKey.by_cached_vendor_code(vendor_code)).to include local_key
         end
       end

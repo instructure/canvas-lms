@@ -29,7 +29,9 @@ module Api::V1::MasterCourses
 
   def master_migration_json(migration, user, session, opts = {})
     migration.expire_if_necessary!
-    hash = api_json(migration, user, session,
+    hash = api_json(migration,
+                    user,
+                    session,
                     only: %w[id user_id workflow_state created_at exports_started_at imports_queued_at imports_completed_at comment])
     if opts[:subscription]
       hash["subscription_id"] = opts[:subscription].id
@@ -66,11 +68,11 @@ module Api::V1::MasterCourses
 
     json = {
       asset_id: asset.id,
-      asset_type: asset_type,
-      asset_name: asset_name,
+      asset_type:,
+      asset_name:,
       change_type: action.to_s,
       html_url: url,
-      locked: locked
+      locked:
     }
     json[:exceptions] = exceptions[migration_id] || [] unless migration_id.nil?
     json

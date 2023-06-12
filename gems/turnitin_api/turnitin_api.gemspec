@@ -15,12 +15,14 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "activesupport"
   spec.add_dependency "faraday", "~> 0.17.3"
   spec.add_dependency "faraday_middleware", "~> 0.8"
+  spec.add_dependency "inst_statsd"
   spec.add_dependency "simple_oauth", "~> 0.3"
 
   spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.5.0"
+  spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_development_dependency "webmock", "~> 3.0"
 end

@@ -72,7 +72,7 @@ describe RubricAssessmentsController do
       submission.submission_comments.create!(author: @student, comment: "A Comment")
 
       put "update", params: { course_id: @course.id, rubric_association_id: @rubric_association.id, id: @rubric_assessment.id, rubric_assessment: { user_id: @user.to_param, assessment_type: "no_reason" } }
-      response_json = JSON.parse(response.body)
+      response_json = response.parsed_body
       expect(response_json.dig("artifact", "submission_comments").first).to have_key("anonymous_id")
       expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_id")
       expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_name")
@@ -88,7 +88,7 @@ describe RubricAssessmentsController do
       submission.submission_comments.create!(author: @student, comment: "A Comment")
 
       put "update", params: { provisional: true, course_id: @course.id, rubric_association_id: @rubric_association.id, id: @rubric_assessment.id, rubric_assessment: { user_id: @user.to_param, assessment_type: "no_reason" } }
-      response_json = JSON.parse(response.body)
+      response_json = response.parsed_body
       expect(response_json.dig("artifact", "submission_comments").first).to have_key("anonymous_id")
       expect(response_json.dig("artifact", "submission_comments").first["anonymous_id"]).to eq(submission.anonymous_id)
       expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_id")
@@ -224,7 +224,7 @@ describe RubricAssessmentsController do
           course_id: course.id.to_s,
           id: "",
           provisional: true,
-          rubric_assessment: { user_id: assessor.id.to_s, assessment_type: assessment_type },
+          rubric_assessment: { user_id: assessor.id.to_s, assessment_type: },
           rubric_association_id: rubric_association.id.to_s
         }
       end
@@ -262,7 +262,7 @@ describe RubricAssessmentsController do
           user_session(interloper)
           put(:update, params: update_params(assessor: interloper))
 
-          response_json = JSON.parse(response.body)
+          response_json = response.parsed_body
           expect(response_json.dig("errors", "error_code")).to eq "MAX_GRADERS_REACHED"
         end
       end
@@ -330,7 +330,7 @@ describe RubricAssessmentsController do
           rubric_association_id: rubric_association.id.to_s
         }
 
-        put(:update, params: params)
+        put(:update, params:)
         expect(response).not_to be_successful
       end
     end
@@ -344,7 +344,7 @@ describe RubricAssessmentsController do
       @course.enroll_student(assessor)
       assessor_asset = @rubric_association.association_object.find_or_create_submission(assessor)
       user_asset = @rubric_association.association_object.find_or_create_submission(assessor)
-      @assessment_request = @rubric_association.assessment_requests.create!(user: @user, asset: user_asset, assessor: assessor, assessor_asset: assessor_asset)
+      @assessment_request = @rubric_association.assessment_requests.create!(user: @user, asset: user_asset, assessor:, assessor_asset:)
     end
 
     it "requires authorization" do
@@ -476,7 +476,7 @@ describe RubricAssessmentsController do
       res = @assignment.assign_peer_reviews
       expect(res).not_to be_empty
       # two of the six possible combinations have already been created
-      expect(res.length).to eql(4)
+      expect(res.length).to be(4)
       expect(res.to_a.find { |r| r.assessor == @student1 && r.user == @student2 }).not_to be_nil
 
       post "create", params: { course_id: @course.id, rubric_association_id: @rubric_association.id, rubric_assessment: { user_id: @student2.to_param, assessment_type: "peer_review" } }

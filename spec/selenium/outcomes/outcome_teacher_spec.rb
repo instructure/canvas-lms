@@ -167,7 +167,7 @@ describe "outcomes as a teacher" do
   context "moving outcomes tree" do
     before do
       course_with_teacher_logged_in
-      @context = who_to_login == "teacher" ? @course : account
+      @context = (who_to_login == "teacher") ? @course : account
     end
 
     it "alerts user if attempting to move with no directory selected" do

@@ -37,7 +37,7 @@ describe "quizzes question creation" do
       @last_quiz = start_quiz_question
     end
 
-    it "creates a quiz with a variety of quiz questions", priority: "1", custom_timeout: 30 do
+    it "creates a quiz with a variety of quiz questions", custom_timeout: 30, priority: "1" do
       quiz = @last_quiz
 
       create_multiple_choice_question

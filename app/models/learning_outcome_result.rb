@@ -24,19 +24,26 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :user
   belongs_to :learning_outcome
   belongs_to :alignment, class_name: "ContentTag", foreign_key: :content_tag_id
-  belongs_to :association_object, polymorphic:
-      [:rubric_association, :assignment,
-       { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
-                                  polymorphic_prefix: :association,
-                                  foreign_type: :association_type, foreign_key: :association_id
-  belongs_to :artifact, polymorphic:
-      [:rubric_assessment, :submission,
-       { quiz_submission: "Quizzes::QuizSubmission", live_assessments_submission: "LiveAssessments::Submission" }],
-                        polymorphic_prefix: true
-  belongs_to :associated_asset, polymorphic:
-      [:assessment_question, :assignment,
-       { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
-                                polymorphic_prefix: true
+  belongs_to :association_object,
+             polymorphic:
+                   [:rubric_association,
+                    :assignment,
+                    { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
+             polymorphic_prefix: :association,
+             foreign_type: :association_type,
+             foreign_key: :association_id
+  belongs_to :artifact,
+             polymorphic:
+                   [:rubric_assessment,
+                    :submission,
+                    { quiz_submission: "Quizzes::QuizSubmission", live_assessments_submission: "LiveAssessments::Submission" }],
+             polymorphic_prefix: true
+  belongs_to :associated_asset,
+             polymorphic:
+                   [:assessment_question,
+                    :assignment,
+                    { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
+             polymorphic_prefix: true
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, class_name: "Account"
   has_many :learning_outcome_question_results, dependent: :destroy
@@ -148,13 +155,15 @@ class LearningOutcomeResult < ActiveRecord::Base
       .joins("LEFT JOIN #{Assignment.quoted_table_name} sa ON sa.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Assignment'")
       .joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = learning_outcome_results.user_id AND submissions.assignment_id in (ra.id, qa.id, sa.id)")
       .joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  in (ra.id, qa.id, sa.id)")
-      .where("(ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)"\
-             " OR submissions.posted_at IS NOT NULL"\
-             " OR ra.grading_type = 'not_graded'"\
-             " OR qa.grading_type = 'not_graded'"\
-             " OR sa.grading_type = 'not_graded'"\
-             " OR pc.id IS NULL"\
-             " OR (pc.id IS NOT NULL AND pc.post_manually = False)")
+      .where(<<~SQL.squish)
+        (ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)
+              OR submissions.posted_at IS NOT NULL
+              OR ra.grading_type = 'not_graded'
+              OR qa.grading_type = 'not_graded'
+              OR sa.grading_type = 'not_graded'
+              OR pc.id IS NULL
+              OR (pc.id IS NOT NULL AND pc.post_manually = False)
+      SQL
   }
 
   private
@@ -162,13 +171,18 @@ class LearningOutcomeResult < ActiveRecord::Base
   def check_for_existing_results
     # Find all LearningOutcomeResults for a user for a specific learning_outcome_id
     out_results = LearningOutcomeResult.active.preload(:alignment).where(learning_outcome_id: alignment.learning_outcome_id, user_id: user.id).to_a
-    # Check if there is a LearningOutcomeResult for the alignment
-    out_results.select! { |res| res.alignment.content_type == "AssessmentQuestionBank" ? res.associated_asset_id == associated_asset_id : res.alignment.content_id == alignment.content_id }
+    # Check if there is already a LearningOutcomeResult for the same quiz/assignment with the same alignment.
+    # (we need to check both type and id so that we do not match ids for different types)
+    out_results.select! do |res|
+      res.associated_asset_type == associated_asset_type && res.associated_asset_id == associated_asset_id &&
+        res.alignment.content_type == alignment.content_type && res.alignment.content_id == alignment.content_id
+    end
     unless out_results.empty?
       # Delete current LearningOutcomeResult
       self.workflow_state = "deleted"
       # Update existing LearningOutcomeResult
       out_results.first.score = score
+      out_results.first.possible = possible
       out_results.first.save!
     end
   end
@@ -215,7 +229,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
     if parent_mastery > 0 && alignment_mastery > 0
       { scale_percent: parent_mastery / alignment_mastery,
-        alignment_mastery: alignment_mastery }
+        alignment_mastery: }
     end
   end
 

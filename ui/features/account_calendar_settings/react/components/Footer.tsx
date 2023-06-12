@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,6 +22,7 @@ import React, {useCallback, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
+import ConfirmationModal from './ConfirmationModal'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -35,14 +37,17 @@ type ComponentProps = {
   readonly visibilityChanges: VisibilityChange[]
   readonly onApplyClicked: () => void
   readonly enableSaveButton: boolean
+  readonly showConfirmation: boolean
 }
 
-export const Footer: React.FC<ComponentProps> = ({
+export const Footer = ({
   originAccountId,
   visibilityChanges,
   onApplyClicked,
   enableSaveButton,
-}) => {
+  showConfirmation,
+}: ComponentProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [initialEnabledCalendarsCount, setInitialEnabledCalendarsCount] = useState<
     number | undefined
   >(undefined)
@@ -53,6 +58,14 @@ export const Footer: React.FC<ComponentProps> = ({
     success: useCallback(response => setInitialEnabledCalendarsCount(response.count), []),
     error: useCallback(error => showFlashError(I18n.t('Unable to load calendar count'))(error), []),
   })
+
+  const handleApply = () => {
+    if (showConfirmation) {
+      setIsModalOpen(true)
+    } else {
+      onApplyClicked()
+    }
+  }
 
   return (
     <Flex alignItems="center" justifyItems="end">
@@ -76,12 +89,19 @@ export const Footer: React.FC<ComponentProps> = ({
       <Button
         color="primary"
         interaction={enableSaveButton ? 'enabled' : 'disabled'}
-        onClick={onApplyClicked}
+        onClick={handleApply}
         margin="small"
         data-testid="save-button"
       >
         {I18n.t('Apply Changes')}
       </Button>
+      {showConfirmation && (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          onConfirm={onApplyClicked}
+        />
+      )}
     </Flex>
   )
 }

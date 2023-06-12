@@ -31,7 +31,7 @@ describe ConditionalRelease::Service do
       context.conditional_release = true
       context.save!
       env = described_class.env_for(context)
-      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq true
+      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to be true
     end
 
     it "reports enabled as false if the context is an Account" do
@@ -39,13 +39,13 @@ describe ConditionalRelease::Service do
       context.settings[:conditional_release] = { value: true }
       context.save!
       env = described_class.env_for(context)
-      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
+      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to be false
     end
 
     it "reports enabled as false if feature flag is off" do
       context = Course.create!
       env = described_class.env_for(context)
-      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
+      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to be false
     end
   end
 
@@ -87,7 +87,7 @@ describe ConditionalRelease::Service do
       assignment_model course: @course, unlock_at: 1.day.from_now, due_at: 2.days.from_now
       env = described_class.env_for(@course, @student, assignment: @assignment)
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
-      expect(cr_env[:assignment]).to be nil
+      expect(cr_env[:assignment]).to be_nil
     end
 
     it "includes a grading scheme when assignment uses it" do
@@ -175,8 +175,8 @@ describe ConditionalRelease::Service do
         expect(data.count).to eq 1
         rule_hash = data.first
         expect(rule_hash["trigger_assignment_id"]).to eq @trigger_assmt.id
-        expect(rule_hash["locked"]).to eq true
-        expect(rule_hash["selected_set_id"]).to eq nil
+        expect(rule_hash["locked"]).to be true
+        expect(rule_hash["selected_set_id"]).to be_nil
         expect(rule_hash["assignment_sets"]).to eq []
       end
 
@@ -184,7 +184,7 @@ describe ConditionalRelease::Service do
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
         rule_hash = described_class.rules_for(@course, @student, nil).first
         expect(rule_hash["trigger_assignment_id"]).to eq @trigger_assmt.id
-        expect(rule_hash["locked"]).to eq false
+        expect(rule_hash["locked"]).to be false
         released_set = @set1_assmt1.conditional_release_associations.first.assignment_set
         expect(rule_hash["selected_set_id"]).to eq released_set.id
         expect(rule_hash["assignment_sets"].count).to eq 1
@@ -196,8 +196,8 @@ describe ConditionalRelease::Service do
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # has two choices now
         rule_hash = described_class.rules_for(@course, @student, nil).first
         expect(rule_hash["trigger_assignment_id"]).to eq @trigger_assmt.id
-        expect(rule_hash["locked"]).to eq false
-        expect(rule_hash["selected_set_id"]).to eq nil # neither one was picked yet
+        expect(rule_hash["locked"]).to be false
+        expect(rule_hash["selected_set_id"]).to be_nil # neither one was picked yet
         expect(rule_hash["assignment_sets"].count).to eq 2
         expect(rule_hash["assignment_sets"].map { |s| s["assignment_set_associations"].first["model"] }).to match_array([@set3a_assmt, @set3b_assmt])
       end
@@ -254,7 +254,7 @@ describe ConditionalRelease::Service do
 
       it "releases mastery paths assigned ungraded quizzes" do
         quiz = quiz_model(course: @course, quiz_type: "survey", only_visible_to_overrides: true)
-        assignment_override_model(quiz: quiz,
+        assignment_override_model(quiz:,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
                                   set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
         tag = @module.add_item(id: quiz.id, type: "quiz")

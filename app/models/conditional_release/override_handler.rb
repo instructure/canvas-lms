@@ -28,8 +28,11 @@ module ConditionalRelease
         sets_to_assign, sets_to_unassign = find_assignment_sets(submission)
 
         set_assignment_overrides(submission.user_id, sets_to_assign, sets_to_unassign)
-        ConditionalRelease::AssignmentSetAction.create_from_sets(sets_to_assign, sets_to_unassign,
-                                                                 student_id: submission.user_id, actor_id: submission.grader_id, source: "grade_change")
+        ConditionalRelease::AssignmentSetAction.create_from_sets(sets_to_assign,
+                                                                 sets_to_unassign,
+                                                                 student_id: submission.user_id,
+                                                                 actor_id: submission.grader_id,
+                                                                 source: "grade_change")
       end
 
       def handle_assignment_set_selection(student, trigger_assignment, assignment_set_id)
@@ -45,8 +48,10 @@ module ConditionalRelease
         sets_to_unassign = other_assignment_sets.select { |set| previous_set_ids.include?(set.id) }
 
         set_assignment_overrides(submission.user_id, [assignment_set], sets_to_unassign)
-        ConditionalRelease::AssignmentSetAction.create_from_sets([assignment_set], sets_to_unassign,
-                                                                 student_id: submission.user_id, source: "select_assignment_set")
+        ConditionalRelease::AssignmentSetAction.create_from_sets([assignment_set],
+                                                                 sets_to_unassign,
+                                                                 student_id: submission.user_id,
+                                                                 source: "select_assignment_set")
         assignment_set.assignment_set_associations.map(&:assignment_id)
       end
 
@@ -74,7 +79,8 @@ module ConditionalRelease
 
         existing_overrides = AssignmentOverride.active
                                                .where(assignment_id: assignments_to_assign + assignments_to_unassign, set_type: "ADHOC").to_a
-        ActiveRecord::Associations.preload(existing_overrides, :assignment_override_students,
+        ActiveRecord::Associations.preload(existing_overrides,
+                                           :assignment_override_students,
                                            AssignmentOverrideStudent.where(user_id: student_id)) # only care about records for this student
         existing_overrides_map = existing_overrides.group_by(&:assignment_id)
 

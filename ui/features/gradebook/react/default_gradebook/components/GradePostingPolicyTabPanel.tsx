@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -17,7 +18,6 @@
  */
 
 import React, {Component} from 'react'
-import {bool, func, shape} from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
@@ -30,20 +30,22 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')
 
+const {Item: ListItem} = List as any
+
 const MANUAL_POST = 'manual'
 const AUTOMATIC_POST = 'auto'
 
-export default class GradePostingPolicyTabPanel extends Component {
-  static propTypes = {
-    anonymousAssignmentsPresent: bool.isRequired,
-    gradebookIsEditable: bool.isRequired,
-    onChange: func.isRequired,
-    settings: shape({
-      postManually: bool.isRequired,
-    }).isRequired,
+type Props = {
+  anonymousAssignmentsPresent: boolean
+  gradebookIsEditable: boolean
+  onChange: (settings: {postManually: boolean}) => void
+  settings: {
+    postManually: boolean
   }
+}
 
-  constructor(props) {
+export default class GradePostingPolicyTabPanel extends Component<Props> {
+  constructor(props: Props) {
     super(props)
 
     this.handlePostPolicySelected = this.handlePostPolicySelected.bind(this)
@@ -56,6 +58,7 @@ export default class GradePostingPolicyTabPanel extends Component {
           'Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.'
         ),
         type: 'warning',
+        err: null,
       })
     }
 
@@ -100,11 +103,11 @@ export default class GradePostingPolicyTabPanel extends Component {
             </Text>
 
             <List margin="0 0 0 small" size="small" itemSpacing="small">
-              <List.Item>{I18n.t('Their grade for the assignment')}</List.Item>
-              <List.Item>{I18n.t('Grade change notifications')}</List.Item>
-              <List.Item>{I18n.t('Submission comments')}</List.Item>
-              <List.Item>{I18n.t('Curving assignments')}</List.Item>
-              <List.Item>{I18n.t('Score change notifications')}</List.Item>
+              <ListItem>{I18n.t('Their grade for the assignment')}</ListItem>
+              <ListItem>{I18n.t('Grade change notifications')}</ListItem>
+              <ListItem>{I18n.t('Submission comments')}</ListItem>
+              <ListItem>{I18n.t('Curving assignments')}</ListItem>
+              <ListItem>{I18n.t('Score change notifications')}</ListItem>
             </List>
 
             <Text size="small" as="p">
@@ -118,6 +121,7 @@ export default class GradePostingPolicyTabPanel extends Component {
     )
 
     return (
+      // @ts-expect-error
       <View as="div" id="GradePostingPolicyTabPanel__Container" margin="small">
         <RadioInputGroup
           description={

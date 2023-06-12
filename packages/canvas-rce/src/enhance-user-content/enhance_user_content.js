@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import htmlEscape from 'escape-html'
 import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
 import formatMessage from '../format-message'
-import {closest, show, hide, insertAfter, getData, setData} from './jqueryish_funcs'
-import {youTubeID, isExternalLink, getTld, showFilePreview} from './instructure_helper'
+import {closest, getData, hide, insertAfter, setData, show} from './jqueryish_funcs'
+import {getTld, isExternalLink, showFilePreview, youTubeID} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
+import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_external_tools/util/addParentFrameContextToUrl'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
@@ -46,7 +46,7 @@ function makeDownloadButton(download_url, filename) {
 
   const srspan = document.createElement('span')
   srspan.setAttribute('class', 'screenreader-only')
-  srspan.innerHTML = htmlEscape(formatMessage('Download {filename}', {filename}))
+  srspan.textContent = formatMessage('Download {filename}', {filename})
   a.appendChild(srspan)
 
   return a
@@ -56,7 +56,9 @@ function makeExternalLinkIcon(forLink) {
   const dir = (forLink && window.getComputedStyle(forLink).direction) || 'ltr'
   const $icon = document.createElement('span')
   $icon.setAttribute('class', 'external_link_icon')
-  const style = `margin-inline-start: 5px; ${dir === 'rtl' ? 'transform:scale(-1, 1)' : ''}`
+  const style = `margin-inline-start: 5px; display: inline-block; text-indent: initial; ${
+    dir === 'rtl' ? 'transform:scale(-1, 1)' : ''
+  }`
   $icon.setAttribute('style', style)
   $icon.setAttribute('role', 'presentation')
   $icon.innerHTML = IconExternalLinkSVG
@@ -67,7 +69,7 @@ function makeExternalLinkIcon(forLink) {
 
   const srspan = document.createElement('span')
   srspan.setAttribute('class', 'screenreader-only')
-  srspan.innerHTML = htmlEscape(formatMessage('Links to an external site.'))
+  srspan.textContent = formatMessage('Links to an external site.')
   $icon.appendChild(srspan)
   return $icon
 }
@@ -79,36 +81,39 @@ function handleYoutubeLink($link) {
     const $after = document.createElement('a')
     $after.setAttribute('href', href)
     $after.setAttribute('class', 'youtubed')
-    $after.innerHTML = `
-      <img src="/images/play_overlay.png"
-        class="media_comment_thumbnail"
-        style="background-image: url(//img.youtube.com/vi/${htmlEscape(id)}/2.jpg)"
-        alt="${htmlEscape(getData($link, 'preview-alt') || '')}"
-      />
-    `
+
+    const img = document.createElement('img')
+    img.src = '/images/play_overlay.png'
+    img.className = 'media_comment_thumbnail'
+    img.alt = getData($link, 'preview-alt') || ''
+    img.style.backgroundImage = `url(//img.youtube.com/vi/${id}/2.jpg)`
+    $after.appendChild(img)
+
     $after.addEventListener('click', function (event) {
       event.preventDefault()
       const $this = event.currentTarget
       const $video = document.createElement('span')
       $video.setAttribute('class', 'youtube_holder')
       $video.style.display = 'block'
-      $video.innerHTML = `
-        <iframe
-          src='//www.youtube.com/embed/${htmlEscape(id)}?autoplay=1&rel=0&hl=en_US&fs=1'
-          frameborder='0'
-          width='425'
-          height='344'
-          allowfullscreen
-        ></iframe>
-        <br/>
-        <a
-          href='#'
-          style='font-size: 0.8em;'
-          class='hide_youtube_embed_link'
-        >
-          ${htmlEscape(formatMessage('Minimize Video'))}
-        </a>
-      `
+
+      const iframe = document.createElement('iframe')
+      iframe.src = `//www.youtube.com/embed/${id}?autoplay=1&rel=0&hl=en_US&fs=1`
+      iframe.setAttribute('frameborder', '0')
+      iframe.setAttribute('width', '425')
+      iframe.setAttribute('height', '344')
+      iframe.setAttribute('allowfullscreen', '')
+      $video.appendChild(iframe)
+
+      const br = document.createElement('br')
+      $video.appendChild(br)
+
+      const link = document.createElement('a')
+      link.href = '#'
+      link.setAttribute('style', 'font-size: 0.8em;')
+      link.setAttribute('class', 'hide_youtube_embed_link')
+      link.textContent = formatMessage('Minimize Video')
+      $video.appendChild(link)
+
       $video.querySelectorAll('.hide_youtube_embed_link').forEach($elem => {
         $elem.addEventListener('click', function (event2) {
           event2.preventDefault()
@@ -145,6 +150,11 @@ export function enhanceUserContent(container = document, opts = {}) {
     kalturaSettings,
     disableGooglePreviews,
     canvasLinksTarget,
+
+    /**
+     * When used inside of an LTI tool, this contains the canvas global id of the tool.
+     */
+    containingCanvasLtiToolId,
   } = opts
 
   const content =
@@ -201,6 +211,17 @@ export function enhanceUserContent(container = document, opts = {}) {
           }
         } catch (_ignore) {
           // canvasOrigin probably isn't a valid base url
+        }
+      })
+    }
+
+    // add parent_frame_context to canvas iframes to allow them loading inside another LTI tool
+    if (containingCanvasLtiToolId != null) {
+      unenhanced_elem.querySelectorAll('iframe[src]').forEach(iframeElem => {
+        const src = iframeElem.getAttribute('src')
+
+        if (src.startsWith(canvasOrigin)) {
+          iframeElem.setAttribute('src', addParentFrameContextToUrl(src, containingCanvasLtiToolId))
         }
       })
     }

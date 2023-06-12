@@ -49,7 +49,7 @@ describe WikiPagesController do
   it "links correctly in the breadcrumbs for group wikis" do
     course_with_teacher_logged_in(active_all: true, user: user_with_pseudonym)
     group_category = @course.group_categories.build(name: "mygroup")
-    @group = Group.create!(name: "group1", group_category: group_category, context: @course)
+    @group = Group.create!(name: "group1", group_category:, context: @course)
     @wiki_page = @group.wiki_pages.create title: "hello", body: "This is a wiki page."
 
     def test_page(url)

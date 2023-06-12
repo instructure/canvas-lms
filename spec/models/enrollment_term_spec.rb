@@ -121,16 +121,18 @@ describe EnrollmentTerm do
     end
 
     it "returns the most favorable dates given multiple enrollments" do
-      @term.set_overrides(@account, "StudentEnrollment" => { start_at: "2014-12-01", end_at: "2015-01-31" },
-                                    "ObserverEnrollment" => { start_at: "2014-11-01", end_at: "2014-12-31" })
+      @term.set_overrides(@account,
+                          "StudentEnrollment" => { start_at: "2014-12-01", end_at: "2015-01-31" },
+                          "ObserverEnrollment" => { start_at: "2014-11-01", end_at: "2014-12-31" })
       student_enrollment = student_in_course
       observer_enrollment = @course.enroll_user(student_enrollment.user, "ObserverEnrollment")
       expect(@term.overridden_term_dates([student_enrollment, observer_enrollment])).to eq([Date.parse("2014-11-01"), Date.parse("2015-01-31")])
     end
 
     it "prioritizes nil (unrestricted) dates if present" do
-      @term.set_overrides(@account, "StudentEnrollment" => { start_at: "2014-12-01", end_at: nil },
-                                    "TaEnrollment" => { start_at: nil, end_at: "2014-12-31" })
+      @term.set_overrides(@account,
+                          "StudentEnrollment" => { start_at: "2014-12-01", end_at: nil },
+                          "TaEnrollment" => { start_at: nil, end_at: "2014-12-31" })
       student_enrollment = student_in_course
       ta_enrollment = course_with_ta course: @course, user: student_enrollment.user
       expect(@term.overridden_term_dates([student_enrollment, ta_enrollment])).to eq([nil, nil])
@@ -299,7 +301,7 @@ describe EnrollmentTerm do
       course.enroll_student(student, active_all: true)
       course.enroll_teacher(teacher, active_all: true)
       assignment = course.assignments.create!(due_at: due, points_possible: 10)
-      assignment.grade_student(student, grader: teacher, grade: grade)
+      assignment.grade_student(student, grader: teacher, grade:)
       [course, assignment]
     end
 
@@ -320,16 +322,27 @@ describe EnrollmentTerm do
       @student = User.create!
       teacher = User.create!
       @first_course_in_term, @first_course_assignment = course_with_graded_assignment(
-        account: root_account, teacher: teacher, student: @student,
-        term: @term, due: @now, grade: 8
+        account: root_account,
+        teacher:,
+        student: @student,
+        term: @term,
+        due: @now,
+        grade: 8
       )
       @second_course_in_term, @second_course_assignment = course_with_graded_assignment(
-        account: root_account, teacher: teacher, student: @student,
-        term: @term, due: @now, grade: 5
+        account: root_account,
+        teacher:,
+        student: @student,
+        term: @term,
+        due: @now,
+        grade: 5
       )
       @course_not_in_term, @not_in_term_assignment = course_with_graded_assignment(
-        account: root_account, teacher: teacher, student: @student,
-        due: @now, grade: 4
+        account: root_account,
+        teacher:,
+        student: @student,
+        due: @now,
+        grade: 4
       )
     end
 
@@ -357,7 +370,7 @@ describe EnrollmentTerm do
       expect(fake_term).to receive(:recompute_scores_for_batch)
 
       strand_identifier = "GradingPeriodGroup:#{@grading_period_set.global_id}"
-      @term.recompute_course_scores_later(strand_identifier: strand_identifier)
+      @term.recompute_course_scores_later(strand_identifier:)
     end
 
     it "recomputes scores for all courses in the enrollment term" do

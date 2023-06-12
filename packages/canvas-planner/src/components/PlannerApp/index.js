@@ -25,8 +25,8 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {arrayOf, oneOfType, shape, bool, number, object, string, func} from 'prop-types'
 import {userShape, sizeShape} from '../plannerPropTypes'
-import Day from '../Day'
-import EmptyDays from '../EmptyDays'
+import AnimatableDay from '../Day'
+import ThemedEmptyDays from '../EmptyDays'
 import ShowOnFocusButton from '../ShowOnFocusButton'
 import LoadingFutureIndicator from '../LoadingFutureIndicator'
 import LoadingPastIndicator from '../LoadingPastIndicator'
@@ -38,7 +38,7 @@ import {
   togglePlannerItemCompletion,
   updateTodo,
   scrollToToday,
-  reloadWithObservee
+  reloadWithObservee,
 } from '../../actions'
 import {notifier} from '../../dynamic-ui'
 import {daysToDaysHash} from '../../utilities/daysUtils'
@@ -79,7 +79,7 @@ export class PlannerApp extends Component {
     loadingWeek: bool,
     thisWeek: shape({
       weekStart: momentObj,
-      weekEnd: momentObj
+      weekEnd: momentObj,
     }),
     weekLoaded: bool,
     loadingOpportunities: bool,
@@ -87,7 +87,7 @@ export class PlannerApp extends Component {
     singleCourseView: bool,
     isObserving: bool,
     observedUserId: string,
-    observedUserContextCodes: arrayOf(string)
+    observedUserContextCodes: arrayOf(string),
   }
 
   static defaultProps = {
@@ -100,10 +100,10 @@ export class PlannerApp extends Component {
     responsiveSize: 'large',
     appRef: () => {},
     focusFallback: () => {},
-    isCompletelyEmpty: bool,
+    isCompletelyEmpty: true,
     k5Mode: false,
     singleCourseView: false,
-    isObserving: false
+    isObserving: false,
   }
 
   constructor(props) {
@@ -246,7 +246,7 @@ export class PlannerApp extends Component {
         <ShowOnFocusButton
           elementRef={ref => (this.loadPriorButton = ref)}
           buttonProps={{
-            onClick: this.props.loadPastButtonClicked
+            onClick: this.props.loadPastButtonClicked,
           }}
         >
           {formatMessage('Load prior dates')}
@@ -297,7 +297,7 @@ export class PlannerApp extends Component {
   // advances workingDay to the next day
   renderOneDay(workingDay, workingDayKey, dayItems, dayIndex) {
     const day = (
-      <Day
+      <AnimatableDay
         timeZone={this.props.timeZone}
         day={workingDayKey}
         itemsForDay={dayItems}
@@ -335,7 +335,7 @@ export class PlannerApp extends Component {
     workingDay.add(numEmptyDays - 1, 'days') // ending day
     const endingDayKey = formatDayKey(workingDay) // ending day key
     const child = (
-      <EmptyDays
+      <ThemedEmptyDays
         timeZone={this.props.timeZone}
         day={workingDayKey}
         endday={endingDayKey}
@@ -525,7 +525,7 @@ export const mapStateToProps = state => {
       state.loading.partialWeekDays.length === 0,
     thisWeek: state.weeklyDashboard && {
       weekStart: state.weeklyDashboard.weekStart,
-      weekEnd: state.weeklyDashboard.weekEnd
+      weekEnd: state.weeklyDashboard.weekEnd,
     },
     weekLoaded: weeks ? !!weeks[state.weeklyDashboard.weekStart.format()] : false,
     loadingOpportunities: !!state.loading.loadingOpportunities,
@@ -533,7 +533,7 @@ export const mapStateToProps = state => {
     singleCourseView: state.singleCourse,
     isObserving: !!observedUserId(state),
     observeduserId: observedUserId(state),
-    observedUserContextCodes: observedUserContextCodes(state)
+    observedUserContextCodes: observedUserContextCodes(state),
   }
 }
 
@@ -543,6 +543,6 @@ const mapDispatchToProps = {
   loadPastButtonClicked,
   togglePlannerItemCompletion,
   updateTodo,
-  scrollToToday
+  scrollToToday,
 }
 export default notifier(connect(mapStateToProps, mapDispatchToProps)(ResponsivePlannerApp))

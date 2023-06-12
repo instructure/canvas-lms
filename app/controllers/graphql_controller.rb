@@ -38,6 +38,7 @@ class GraphQLController < ApplicationController
   def execute
     result = execute_on(CanvasSchema)
     prep_page_view_for_submit
+    prep_page_view_for_create_discussion_entry
     render json: result
   end
 
@@ -54,8 +55,8 @@ class GraphQLController < ApplicationController
     context = {
       current_user: @current_user,
       real_current_user: @real_current_user,
-      session: session,
-      request: request,
+      session:,
+      request:,
       domain_root_account: @domain_root_account,
       access_token: @access_token,
       in_app: in_app?,
@@ -71,7 +72,7 @@ class GraphQLController < ApplicationController
 
     overall_timeout = Setting.get("graphql_overall_timeout", "60").to_i.seconds
     Timeout.timeout(overall_timeout) do
-      schema.execute(query, variables: variables, context: context)
+      schema.execute(query, variables:, context:)
     end
   end
 
@@ -111,5 +112,13 @@ class GraphQLController < ApplicationController
     assignment = ::Assignment.active.find(params[:variables][:assignmentLid])
     get_context
     log_asset_access(assignment, "assignments", nil, "participate")
+  end
+
+  def prep_page_view_for_create_discussion_entry
+    return unless params[:operationName] == "CreateDiscussionEntry"
+
+    topic = DiscussionTopic.find(params[:variables][:discussionTopicId])
+    get_context
+    log_asset_access(topic, "topics", "topics", "participate")
   end
 end

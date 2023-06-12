@@ -7,13 +7,13 @@ module GraphQLHelpers
     include Api
     include UrlHelpers
 
-    attr :request, :user, :context
+    attr_reader :request, :user, :context
 
     # NOTE: context here is *not* referring to graphql context, it is
     # referring to a canvas context (typically a course)
     def self.process(content, request:, context:, user:, in_app:,
                      preloaded_attachments: {}, options: {})
-      new(request: request, context: context, user: user, in_app: in_app)
+      new(request:, context:, user:, in_app:)
         .api_user_content(content, preloaded_attachments, options)
     end
 

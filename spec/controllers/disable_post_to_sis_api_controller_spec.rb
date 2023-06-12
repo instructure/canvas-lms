@@ -20,8 +20,8 @@
 describe DisablePostToSisApiController do
   describe "PUT disable_post_to_sis" do
     let(:account) { account_model }
-    let(:course) { course_model(account: account, workflow_state: "available") }
-    let(:admin) { account_admin_user(account: account) }
+    let(:course) { course_model(account:, workflow_state: "available") }
+    let(:admin) { account_admin_user(account:) }
 
     before do
       bypass_rescue
@@ -29,14 +29,14 @@ describe DisablePostToSisApiController do
     end
 
     it "works even when post_to_sis/new_sis_integrations disabled" do
-      assignment = assignment_model(course: course,
+      assignment = assignment_model(course:,
                                     post_to_sis: true,
                                     workflow_state: "published")
 
       put "disable_post_to_sis", params: { course_id: course.id }
 
       expect(response).to be_successful
-      expect(assignment.reload.post_to_sis).to eq false
+      expect(assignment.reload.post_to_sis).to be false
     end
 
     context "with new_sis_integrations enabled" do
@@ -47,19 +47,19 @@ describe DisablePostToSisApiController do
       it "responds with 200" do
         put "disable_post_to_sis", params: { course_id: course.id }
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(response).to be_successful
       end
 
       it "disables assignments with post_to_sis enabled" do
-        assignment = assignment_model(course: course,
+        assignment = assignment_model(course:,
                                       post_to_sis: true,
                                       workflow_state: "published")
 
         put "disable_post_to_sis", params: { course_id: course.id }
         assignment = Assignment.find(assignment.id)
 
-        expect(response.code).to eq "204"
+        expect(response).to have_http_status :no_content
         expect(response).to be_successful
         expect(assignment.post_to_sis).to be_falsey
       end
@@ -85,12 +85,12 @@ describe DisablePostToSisApiController do
                                                grading_period_id: 789_465_789 }
 
           parsed_json = json_parse(response.body)
-          expect(response.code).to eq "400"
+          expect(response).to have_http_status :bad_request
           expect(parsed_json["code"]).to eq "not_found"
         end
 
         it "disables assignments with post_to_sis enabled based on grading period" do
-          assignment = assignment_model(course: course,
+          assignment = assignment_model(course:,
                                         post_to_sis: true,
                                         workflow_state: "published",
                                         due_at: grading_period.start_date + 1.minute)
@@ -99,7 +99,7 @@ describe DisablePostToSisApiController do
                                                grading_period_id: grading_period.id }
           assignment = Assignment.find(assignment.id)
 
-          expect(response.code).to eq "204"
+          expect(response).to have_http_status :no_content
           expect(response).to be_successful
           expect(assignment.post_to_sis).to be_falsey
         end

@@ -17,7 +17,7 @@
  */
 
 import Backbone from '@canvas/backbone'
-import CourseFindSelectView from 'ui/features/content_migrations/backbone/views/subviews/CourseFindSelectView.coffee'
+import CourseFindSelectView from 'ui/features/content_migrations/backbone/views/subviews/CourseFindSelectView'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 

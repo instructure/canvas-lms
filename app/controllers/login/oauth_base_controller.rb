@@ -33,7 +33,7 @@ class Login::OAuthBaseController < ApplicationController
     # ActionController::TestCase can't deal with aliased controllers, so we have to
     # explicitly specify this
     auth_type = params[:auth_type] if Rails.env.test?
-    scope = @domain_root_account.authentication_providers.active.where(auth_type: auth_type)
+    scope = @domain_root_account.authentication_providers.active.where(auth_type:)
     @aac = if params[:id]
              scope.find(params[:id])
            else

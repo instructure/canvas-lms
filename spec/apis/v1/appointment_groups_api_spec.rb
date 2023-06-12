@@ -34,12 +34,27 @@ describe AppointmentGroupsController, type: :request do
   end
 
   expected_fields = %w[
-    appointments_count context_codes created_at description
-    end_at html_url id location_address location_name
-    max_appointments_per_participant min_appointments_per_participant
-    participant_type participant_visibility
-    participants_per_appointment requiring_action start_at
-    sub_context_codes title updated_at url workflow_state
+    appointments_count
+    context_codes
+    created_at
+    description
+    end_at
+    html_url
+    id
+    location_address
+    location_name
+    max_appointments_per_participant
+    min_appointments_per_participant
+    participant_type
+    participant_visibility
+    participants_per_appointment
+    requiring_action
+    start_at
+    sub_context_codes
+    title
+    updated_at
+    url
+    workflow_state
   ]
 
   it "returns manageable appointment groups" do
@@ -52,7 +67,7 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "manageable"
                     })
-    expect(json.size).to eql 2
+    expect(json.size).to be 2
     expect(json.first.keys.sort).to eql expected_fields
     expect(json.first.slice("id", "title", "participant_type")).to eql({ "id" => ag1.id, "title" => "something", "participant_type" => "User" })
     expect(json.last.slice("id", "title", "participant_type")).to eql({ "id" => ag2.id, "title" => "another", "participant_type" => "Group" })
@@ -63,7 +78,7 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include_past_appointments=1", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "manageable", include_past_appointments: "1"
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
   end
 
   it "restricts manageable appointment groups by context_codes" do
@@ -73,12 +88,12 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "manageable"
                     })
-    expect(json.size).to eql 2
+    expect(json.size).to be 2
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&context_codes[]=course_#{@course2.id}", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "manageable", context_codes: ["course_#{@course2.id}"]
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
   end
 
   it "returns reservable appointment groups" do
@@ -122,7 +137,7 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "reservable"
                     })
-    expect(json.size).to eql 2
+    expect(json.size).to be 2
     expect(json.first.keys.sort).to eql expected_fields
     expect(json.first.slice("id", "title", "participant_type")).to eql({ "id" => ag6.id, "title" => "yay", "participant_type" => "User" })
     expect(json.last.slice("id", "title", "participant_type")).to eql({ "id" => ag7.id, "title" => "double yay", "participant_type" => "Group" })
@@ -132,7 +147,7 @@ describe AppointmentGroupsController, type: :request do
       json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
                         controller: "appointment_groups", action: "index", format: "json", scope: "reservable"
                       })
-      expect(json.size).to eql 1
+      expect(json.size).to be 1
       expect(json.first["id"]).to eql ag9.id
     end
   end
@@ -149,12 +164,12 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "reservable"
                     })
-    expect(json.size).to eql 2
+    expect(json.size).to be 2
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&context_codes[]=course_#{@course.id}", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "reservable", context_codes: ["course_#{@course.id}"]
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
   end
 
   it "returns past reservable appointment groups, if requested" do
@@ -164,23 +179,30 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&include_past_appointments=1", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "reservable", include_past_appointments: "1"
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
   end
 
   it "paginates appointment groups" do
     5.times { |i| AppointmentGroup.create!(title: i, contexts: [@course]) }
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=2", {
-                      controller: "appointment_groups", action: "index", format: "json",
-                      scope: "manageable", per_page: "2"
+                      controller: "appointment_groups",
+                      action: "index",
+                      format: "json",
+                      scope: "manageable",
+                      per_page: "2"
                     })
-    expect(json.size).to eql 2
+    expect(json.size).to be 2
     expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=2&page=3", {
-                      controller: "appointment_groups", action: "index", format: "json",
-                      scope: "manageable", per_page: "2", page: "3"
+                      controller: "appointment_groups",
+                      action: "index",
+                      format: "json",
+                      scope: "manageable",
+                      per_page: "2",
+                      page: "3"
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
     expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
   end
 
@@ -191,13 +213,13 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=appointments", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "manageable", include: ["appointments"]
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
     expect(json.first.keys.sort).to eql((expected_fields + ["appointments"]).sort)
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=appointments&include[]=child_events", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "manageable", include: ["appointments", "child_events"]
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
     expect(json.first.keys.sort).to eql((expected_fields + ["appointments"]).sort)
     ajson = json.first["appointments"]
     expect(ajson.first.keys).to include("child_events")
@@ -227,7 +249,7 @@ describe AppointmentGroupsController, type: :request do
     expect(json.keys.sort).to eql((expected_fields + ["appointments"]).sort)
     expect(json["id"]).to eql ag.id
     expect(json["requiring_action"]).to be_falsey
-    expect(json["appointments"].size).to eql 1
+    expect(json["appointments"].size).to be 1
     expect(json["appointments"].first.keys).to include("child_events_count")
     expect(json["appointments"].first.keys).not_to include("child_events")
   end
@@ -316,13 +338,17 @@ describe AppointmentGroupsController, type: :request do
     end
 
     it "returns past appointment slots for teachers" do
-      json = api_call_as_user(@teacher, :get, "/api/v1/appointment_groups/#{@ag.id}",
+      json = api_call_as_user(@teacher,
+                              :get,
+                              "/api/v1/appointment_groups/#{@ag.id}",
                               { controller: "appointment_groups", action: "show", format: "json", id: @ag.to_param })
       expect(json["appointments"].size).to eq 2
     end
 
     it "does not return past appointment slots for students" do
-      json = api_call_as_user(@student, :get, "/api/v1/appointment_groups/#{@ag.id}",
+      json = api_call_as_user(@student,
+                              :get,
+                              "/api/v1/appointment_groups/#{@ag.id}",
                               { controller: "appointment_groups", action: "show", format: "json", id: @ag.to_param })
       expect(json["appointments"].size).to eq 1
     end
@@ -330,20 +356,22 @@ describe AppointmentGroupsController, type: :request do
 
   it "enforces create permissions" do
     student_in_course course: course_factory(active_all: true), user: @me, active_all: true
-    raw_api_call(:post, "/api/v1/appointment_groups",
+    raw_api_call(:post,
+                 "/api/v1/appointment_groups",
                  { controller: "appointment_groups", action: "create", format: "json" },
                  { appointment_group: { context_codes: [@course.asset_string], title: "ohai" } })
     expect(JSON.parse(response.body)["status"]).to eq "unauthorized"
   end
 
   it "creates a new appointment group" do
-    json = api_call(:post, "/api/v1/appointment_groups",
+    json = api_call(:post,
+                    "/api/v1/appointment_groups",
                     { controller: "appointment_groups", action: "create", format: "json" },
                     { appointment_group: { context_codes: [@course.asset_string], title: "ohai", new_appointments: { "0" => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] } } })
     expect(json.keys.sort).to eql((expected_fields + ["new_appointments"]).sort)
     expect(json["start_at"]).to eql "2012-01-01T12:00:00Z"
     expect(json["end_at"]).to eql "2012-01-01T13:00:00Z"
-    expect(json["new_appointments"].size).to eql 1
+    expect(json["new_appointments"].size).to be 1
     expect(json["workflow_state"]).to eql "pending"
   end
 
@@ -352,7 +380,8 @@ describe AppointmentGroupsController, type: :request do
 
     it "creates an appointment group in the contexts' shard" do
       json = @shard1.activate do
-        api_call(:post, "/api/v1/appointment_groups",
+        api_call(:post,
+                 "/api/v1/appointment_groups",
                  { controller: "appointment_groups", action: "create", format: "json" },
                  { appointment_group: { context_codes: [@course.asset_string], title: "over there", new_appointments: { "0" => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] } } })
       end
@@ -374,14 +403,18 @@ describe AppointmentGroupsController, type: :request do
         new_appointments: { "0" => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] }
       }
     }
-    json = api_call(:post, "/api/v1/appointment_groups",
+    json = api_call(:post,
+                    "/api/v1/appointment_groups",
                     { controller: "appointment_groups", action: "create", format: "json" },
-                    appointment_group_params, {}, expected_status: 400)
+                    appointment_group_params,
+                    {},
+                    expected_status: 400)
     expect(json["error"]).to eql "cannot create an appointment group for a concluded course"
   end
 
   it "creates a new appointment group with a sub_context" do
-    json = api_call(:post, "/api/v1/appointment_groups",
+    json = api_call(:post,
+                    "/api/v1/appointment_groups",
                     { controller: "appointment_groups", action: "create", format: "json" },
                     { appointment_group: { context_codes: [@course.asset_string], sub_context_codes: [@course.default_section.asset_string], title: "ohai" } })
     expect(json.keys.sort).to eql expected_fields
@@ -392,7 +425,8 @@ describe AppointmentGroupsController, type: :request do
   it "enforces update permissions" do
     student_in_course course: course_factory(active_all: true), user: @me, active_all: true
     ag = AppointmentGroup.create!(title: "something", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], contexts: [@course])
-    raw_api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
+    raw_api_call(:put,
+                 "/api/v1/appointment_groups/#{ag.id}",
                  { controller: "appointment_groups", action: "update", format: "json", id: ag.id.to_s },
                  { appointment_group: { title: "lol" } })
     expect(JSON.parse(response.body)["status"]).to eq "unauthorized"
@@ -400,7 +434,8 @@ describe AppointmentGroupsController, type: :request do
 
   it "updates an appointment group" do
     ag = AppointmentGroup.create!(title: "something", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], contexts: [@course])
-    json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
+    json = api_call(:put,
+                    "/api/v1/appointment_groups/#{ag.id}",
                     { controller: "appointment_groups", action: "update", format: "json", id: ag.id.to_s },
                     { appointment_group: { title: "lol" } })
     expect(json.keys.sort).to eql expected_fields
@@ -410,7 +445,8 @@ describe AppointmentGroupsController, type: :request do
   it "publishes an appointment group in an update through the api" do
     ag = AppointmentGroup.create!(title: "something", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], contexts: [@course])
     expect(ag.workflow_state).to eq "pending"
-    api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
+    api_call(:put,
+             "/api/v1/appointment_groups/#{ag.id}",
              { controller: "appointment_groups", action: "update", format: "json", id: ag.id.to_s },
              { appointment_group: { publish: "1" } })
     ag.reload
@@ -418,7 +454,8 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it "publishes an appointment group when creating through the api when requested" do
-    json = api_call(:post, "/api/v1/appointment_groups",
+    json = api_call(:post,
+                    "/api/v1/appointment_groups",
                     { controller: "appointment_groups", action: "create", format: "json" },
                     { appointment_group: { context_codes: [@course.asset_string], title: "ohai", new_appointments: { "0" => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] }, publish: "1" } })
     expect(json["workflow_state"]).to eql "active"
@@ -428,14 +465,16 @@ describe AppointmentGroupsController, type: :request do
   it "enforces delete permissions" do
     student_in_course course: course_factory(active_all: true), user: @me, active_all: true
     ag = AppointmentGroup.create!(title: "something", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], contexts: [@course])
-    raw_api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
+    raw_api_call(:delete,
+                 "/api/v1/appointment_groups/#{ag.id}",
                  { controller: "appointment_groups", action: "destroy", format: "json", id: ag.id.to_s })
     expect(JSON.parse(response.body)["status"]).to eq "unauthorized"
   end
 
   it "deletes an appointment group" do
     ag = AppointmentGroup.create!(title: "something", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], contexts: [@course])
-    json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
+    json = api_call(:delete,
+                    "/api/v1/appointment_groups/#{ag.id}",
                     { controller: "appointment_groups", action: "destroy", format: "json", id: ag.id.to_s })
     expect(response).to be_successful
     expect(json.keys.sort).to eql expected_fields
@@ -444,17 +483,20 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it "deletes an appointment group with appointments" do
-    ag = AppointmentGroup.create!(title: "something", new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00",
-                                                                          "#{Time.now.year + 1}-01-01 13:00:00"],
-                                                                         ["#{Time.now.year + 1}-01-01 13:00:00",
-                                                                          "#{Time.now.year + 1}-01-01 14:00:00"]], contexts: [@course])
+    ag = AppointmentGroup.create!(title: "something",
+                                  new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00",
+                                                      "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                     ["#{Time.now.year + 1}-01-01 13:00:00",
+                                                      "#{Time.now.year + 1}-01-01 14:00:00"]],
+                                  contexts: [@course])
     student_in_course(course: @course, active_all: true)
     ag.appointments.first.reserve_for @student, @me
     ag.appointments.last.reserve_for @student, @me
 
     @user = @me
 
-    json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
+    json = api_call(:delete,
+                    "/api/v1/appointment_groups/#{ag.id}",
                     { controller: "appointment_groups", action: "destroy", format: "json", id: ag.id.to_s })
 
     expect(response).to be_successful
@@ -464,10 +506,12 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it "includes participant count, if requested" do
-    ag = AppointmentGroup.create!(title: "something", new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00",
-                                                                          "#{Time.now.year + 1}-01-01 13:00:00"],
-                                                                         ["#{Time.now.year + 1}-01-01 13:00:00",
-                                                                          "#{Time.now.year + 1}-01-01 14:00:00"]], contexts: [@course])
+    ag = AppointmentGroup.create!(title: "something",
+                                  new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00",
+                                                      "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                     ["#{Time.now.year + 1}-01-01 13:00:00",
+                                                      "#{Time.now.year + 1}-01-01 14:00:00"]],
+                                  contexts: [@course])
     student_in_course(course: @course, active_all: true)
     ag.appointments.first.reserve_for @student, @me
     student_in_course(course: @course, active_all: true)
@@ -478,9 +522,9 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=participant_count", {
                       controller: "appointment_groups", action: "index", format: "json", scope: "manageable", include: ["participant_count"]
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
     expect(json.first.keys.sort).to eql((expected_fields + ["participant_count"]).sort)
-    expect(json.first["participant_count"]).to eql(2)
+    expect(json.first["participant_count"]).to be(2)
   end
 
   it "includes the user's reserved times, if requested" do
@@ -498,7 +542,7 @@ describe AppointmentGroupsController, type: :request do
     json = api_call(:get, "/api/v1/appointment_groups?include[]=reserved_times", {
                       controller: "appointment_groups", action: "index", format: "json", include: ["reserved_times"]
                     })
-    expect(json.size).to eql 1
+    expect(json.size).to be 1
     expect(json.first.keys.sort).to eql((expected_fields + ["reserved_times"]).sort)
     expect(json.first["reserved_times"].length).to eql(child_events.length)
     child_events.each do |event|
@@ -529,45 +573,60 @@ describe AppointmentGroupsController, type: :request do
 
       it "returns all #{type}" do
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}", {
-                          controller: "appointment_groups", id: @ag.id.to_s, action: type,
+                          controller: "appointment_groups",
+                          id: @ag.id.to_s,
+                          action: type,
                           format: "json"
                         })
-        expect(json.size).to eql 2
-        expect(json.map { |j| j["id"] }).to eql @ag.possible_participants.map(&:id)
+        expect(json.size).to be 2
+        expect(json.pluck("id")).to eql @ag.possible_participants.map(&:id)
       end
 
       it "paginates #{type}" do
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1", {
-                          controller: "appointment_groups", id: @ag.id.to_s, action: type,
-                          format: "json", per_page: "1"
+                          controller: "appointment_groups",
+                          id: @ag.id.to_s,
+                          action: type,
+                          format: "json",
+                          per_page: "1"
                         })
-        expect(json.size).to eql 1
+        expect(json.size).to be 1
         expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
 
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1&page=2", {
-                          controller: "appointment_groups", id: @ag.id.to_s, action: type,
-                          format: "json", per_page: "1", page: "2"
+                          controller: "appointment_groups",
+                          id: @ag.id.to_s,
+                          action: type,
+                          format: "json",
+                          per_page: "1",
+                          page: "2"
                         })
-        expect(json.size).to eql 1
+        expect(json.size).to be 1
         expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
       end
 
       it "returns registered #{type}" do
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=registered", {
-                          controller: "appointment_groups", id: @ag.id.to_s, action: type,
-                          registration_status: "registered", format: "json"
+                          controller: "appointment_groups",
+                          id: @ag.id.to_s,
+                          action: type,
+                          registration_status: "registered",
+                          format: "json"
                         })
-        expect(json.size).to eql 1
-        expect(json.map { |j| j["id"] }).to eql @ag.possible_participants(registration_status: "registered").map(&:id)
+        expect(json.size).to be 1
+        expect(json.pluck("id")).to eql @ag.possible_participants(registration_status: "registered").map(&:id)
       end
 
       it "returns unregistered #{type}" do
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=unregistered", {
-                          controller: "appointment_groups", id: @ag.id.to_s, action: type,
-                          registration_status: "unregistered", format: "json"
+                          controller: "appointment_groups",
+                          id: @ag.id.to_s,
+                          action: type,
+                          registration_status: "unregistered",
+                          format: "json"
                         })
-        expect(json.size).to eql 1
-        expect(json.map { |j| j["id"] }).to eql @ag.possible_participants(registration_status: "unregistered").map(&:id)
+        expect(json.size).to be 1
+        expect(json.pluck("id")).to eql @ag.possible_participants(registration_status: "unregistered").map(&:id)
       end
 
       it "does not return non-#{type.singularize} participants" do
@@ -606,7 +665,9 @@ describe AppointmentGroupsController, type: :request do
       @ag2.publish!
       @ag2.appointments.first.reserve_for(@student1, @me)
       @path = "/api/v1/appointment_groups/next_appointment?appointment_group_ids[]=#{@ag1.to_param}&appointment_group_ids[]=#{@ag2.to_param}"
-      @params = { controller: "appointment_groups", action: "next_appointment", format: "json",
+      @params = { controller: "appointment_groups",
+                  action: "next_appointment",
+                  format: "json",
                   appointment_group_ids: [@ag1.to_param, @ag2.to_param] }
     end
 
@@ -623,7 +684,8 @@ describe AppointmentGroupsController, type: :request do
     end
 
     it "doesnt get confused by appointment groups with both past and future" do
-      ag3 = AppointmentGroup.create!(title: "past and future", contexts: [@course2],
+      ag3 = AppointmentGroup.create!(title: "past and future",
+                                     contexts: [@course2],
                                      new_appointments: [
                                        [1.month.ago, 1.month.ago + 30.minutes],
                                        [1.month.from_now, 1.month.from_now + 30.minutes]

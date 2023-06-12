@@ -50,7 +50,6 @@ $gradebook_header_height: 3.5em;
 #gradebook_header {
   background-color: var(--ic-brand-global-nav-bgd);
   color: var(--ic-brand-global-nav-menu-item__text-color);
-
   padding: 0.375em 0.75em;
   @include fontSize(11px);
   min-width: 960px;
@@ -985,4 +984,15 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 figure {
   margin: 0;
+}
+
+// even though we show no headers in speed grader, we want the
+// masquerade bar to always show if someone is masquerading
+// (#masquerade_bar is set to 'display: none !important' for
+// body.no-headers at the top level _layout.scss, and speed grader
+// uses body.no-headers to hide the standard canvas headers/footer)
+body.no-headers {
+  #masquerade_bar {
+    display: flex !important
+  }
 }

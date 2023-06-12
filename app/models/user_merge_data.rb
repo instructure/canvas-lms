@@ -31,7 +31,7 @@ class UserMergeData < ActiveRecord::Base
   end
 
   def add_more_data(objects, user: nil, workflow_state: nil, data: [])
-    data = build_more_data(objects, user: user, workflow_state: workflow_state, data: data)
+    data = build_more_data(objects, user:, workflow_state:, data:)
     bulk_insert_merge_data(data)
   end
 

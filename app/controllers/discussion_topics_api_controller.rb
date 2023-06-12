@@ -26,11 +26,19 @@ class DiscussionTopicsApiController < ApplicationController
 
   before_action :require_context_and_read_access
   before_action :require_topic
-  before_action :require_initial_post, except: %i[add_entry mark_topic_read
-                                                  mark_topic_unread show
+  before_action :require_initial_post, except: %i[add_entry
+                                                  mark_topic_read
+                                                  mark_topic_unread
+                                                  show
                                                   unsubscribe_topic]
-  before_action only: %i[replies entries add_entry add_reply show
-                         view entry_list subscribe_topic] do
+  before_action only: %i[replies
+                         entries
+                         add_entry
+                         add_reply
+                         show
+                         view
+                         entry_list
+                         subscribe_topic] do
     check_differentiated_assignments(@topic)
   end
 
@@ -60,8 +68,10 @@ class DiscussionTopicsApiController < ApplicationController
 
     include_params = Array(params[:include])
     log_asset_access(@topic, "topics", "topics")
-    render(json: discussion_topics_api_json([@topic], @context,
-                                            @current_user, session,
+    render(json: discussion_topics_api_json([@topic],
+                                            @context,
+                                            @current_user,
+                                            session,
                                             include_all_dates: include_params.include?("all_dates"),
                                             include_sections: include_params.include?("sections"),
                                             include_sections_user_count: include_params.include?("sections_user_count"),
@@ -273,7 +283,10 @@ class DiscussionTopicsApiController < ApplicationController
       new_topic.publish
     end
     if new_topic.save!
-      result = discussion_topic_api_json(new_topic, @context, @current_user, session,
+      result = discussion_topic_api_json(new_topic,
+                                         @context,
+                                         @current_user,
+                                         session,
                                          include_sections: true)
       # If pinned, make the new topic show up just below the old one
       if new_topic.pinned

@@ -28,7 +28,7 @@ FactoryBot.define do
       end
 
       after(:create) do |assignment_set, evaluator|
-        create_list :assignment_set_association, evaluator.assignment_count, assignment_set: assignment_set
+        create_list :assignment_set_association, evaluator.assignment_count, assignment_set:
       end
     end
   end

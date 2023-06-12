@@ -63,6 +63,7 @@ class SubmissionComment < ActiveRecord::Base
   end
   validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
 
+  after_destroy :refresh_submission_comment_read_state
   before_save :infer_details
   before_save :set_root_account_id
   before_save :set_edited_at
@@ -87,12 +88,16 @@ class SubmissionComment < ActiveRecord::Base
   scope :for_final_grade, -> { where(provisional_grade_id: nil) }
   scope :for_provisional_grade, ->(id) { where(provisional_grade_id: id) }
   scope :for_provisional_grades, -> { where.not(provisional_grade_id: nil) }
-  scope :for_assignment_id, ->(assignment_id) { where(submissions: { assignment_id: assignment_id }).joins(:submission) }
+  scope :for_assignment_id, ->(assignment_id) { where(submissions: { assignment_id: }).joins(:submission) }
   scope :for_groups, -> { where.not(group_comment_id: nil) }
   scope :not_for_groups, -> { where(group_comment_id: nil) }
 
   workflow do
     state :active
+  end
+
+  def refresh_submission_comment_read_state
+    submission.refresh_comment_read_state
   end
 
   def delete_other_comments_in_this_group
@@ -103,7 +108,7 @@ class SubmissionComment < ActiveRecord::Base
     return unless saved_change_to_draft?
 
     update_other_comments_in_this_group do |comment|
-      comment.update(draft: draft)
+      comment.update(draft:)
     end
   end
 
@@ -115,8 +120,8 @@ class SubmissionComment < ActiveRecord::Base
     # therefore cannot be destroyed
     comment_ids = SubmissionComment
                   .for_assignment_id(submission.assignment_id)
-                  .where(group_comment_id: group_comment_id)
-                  .where.not(id: id)
+                  .where(group_comment_id:)
+                  .where.not(id:)
                   .pluck(:id)
 
     SubmissionComment.find(comment_ids).each do |comment|
@@ -152,6 +157,18 @@ class SubmissionComment < ActiveRecord::Base
 
   def media_comment?
     media_comment_id && media_comment_type
+  end
+
+  def self.serialize_media_comment(media_comment_id)
+    media_object = MediaObject.by_media_id(media_comment_id).first
+    media_tracks = media_object&.media_tracks&.map { |media_track| media_track.as_json(only: %i[id locale content kind], include_root: false) }
+    media_sources = media_object.media_sources
+    {
+      id: media_object.media_id,
+      media_tracks:,
+      media_sources:,
+      title: media_object.title,
+    }
   end
 
   def check_for_media_object
@@ -370,9 +387,9 @@ class SubmissionComment < ActiveRecord::Base
     return nil if hidden? || provisional_grade_id.present?
 
     relevant_comments = SubmissionComment.published
-                                         .where(submission_id: submission_id)
+                                         .where(submission_id:)
                                          .where(hidden: false)
-                                         .where(provisional_grade_id: provisional_grade_id)
+                                         .where(provisional_grade_id:)
 
     comments_count = relevant_comments.count
     Submission.where(id: submission_id).update_all(submission_comments_count: comments_count)
@@ -410,6 +427,8 @@ class SubmissionComment < ActiveRecord::Base
   def update_participation
     # id_changed? because new_record? is false in after_save callbacks
     if saved_change_to_id? || (saved_change_to_hidden? && !hidden?)
+      return if draft?
+
       if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
         return update_participation_with_ff_on
       end
@@ -436,7 +455,7 @@ class SubmissionComment < ActiveRecord::Base
     return if provisional_grade_id.present?
 
     self.class.connection.after_transaction_commit do
-      submission.user.clear_cache_key(:submissions)
+      submission.user.clear_cache_key(:potential_unread_submission_ids)
       submission.mark_item_unread("comment")
     end
   end
@@ -480,15 +499,15 @@ class SubmissionComment < ActiveRecord::Base
   def record_save_audit_event
     updating_user = saved_change_to_id? ? author : @updating_user
     event_type = event_type_for_save
-    changes_to_save = auditable_changes(event_type: event_type)
+    changes_to_save = auditable_changes(event_type:)
     return if changes_to_save.empty?
 
     AnonymousOrModerationEvent.create!(
       assignment: submission.assignment,
-      submission: submission,
+      submission:,
       user: updating_user,
-      event_type: event_type,
-      payload: changes_to_save.merge({ id: id })
+      event_type:,
+      payload: changes_to_save.merge({ id: })
     )
   end
 
@@ -517,10 +536,10 @@ class SubmissionComment < ActiveRecord::Base
   def record_deletion_audit_event
     AnonymousOrModerationEvent.create!(
       assignment: submission.assignment,
-      submission: submission,
+      submission:,
       user: @updating_user,
       event_type: :submission_comment_deleted,
-      payload: { id: id }
+      payload: { id: }
     )
   end
 end

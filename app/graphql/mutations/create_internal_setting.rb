@@ -32,7 +32,7 @@ class Mutations::CreateInternalSetting < Mutations::BaseMutation
     internal_setting = Setting.new(name: input[:name], value: input[:value])
 
     if internal_setting.save
-      { internal_setting: internal_setting }
+      { internal_setting: }
     else
       errors_for(internal_setting)
     end

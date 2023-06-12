@@ -22,7 +22,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import Cache from '../../cache'
-import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
+import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 

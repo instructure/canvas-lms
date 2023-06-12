@@ -659,6 +659,53 @@ test('renders pin item in manage menu if permitted', () => {
   tree.unmount()
 })
 
+test('renders speedgrader link in manage menu if permitted', () => {
+  ENV.show_additional_speed_grader_links = true
+  const tree = mount(
+    <DiscussionRow
+      {...makeProps({
+        displayManageMenu: true,
+        discussion: {
+          assignment: {
+            lock_at: '2018-07-01T05:59:00Z',
+            unlock_at: '2018-06-21T06:00:00Z',
+            id: '50',
+          },
+          id: '1',
+          position: 1,
+          published: true,
+          title: 'Hello World',
+          message: 'Foo bar bar baz boop beep bop Foo',
+          posted_at: 'January 10, 2019 at 10:00 AM',
+          can_unpublish: true,
+          author: {
+            id: '5',
+            display_name: 'John Smith',
+            html_url: '',
+            avatar_image_url: null,
+          },
+          read_state: 'unread',
+          unread_count: 0,
+          discussion_subentry_count: 5,
+          locked: false,
+          html_url: '',
+          user_count: 10,
+          delayed_post_at: '2018-06-21T06:00:00Z',
+          last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0),
+        },
+      })}
+    />
+  )
+  const manageMenu = tree.find('DiscussionManageMenu')
+  const allKeys = manageMenu
+    .props()
+    .menuOptions()
+    .map(option => option.key)
+  equal(allKeys.length, 1)
+  equal(allKeys[0], 'speed-grader-link')
+  tree.unmount()
+})
+
 test('renders duplicate item in manage menu if permitted', () => {
   const tree = mount(
     <DiscussionRow

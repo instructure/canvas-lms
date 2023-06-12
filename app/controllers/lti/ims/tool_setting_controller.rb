@@ -28,9 +28,10 @@ module Lti
 
       rescue_from ActiveRecord::RecordNotFound do
         render json: {
-          status: I18n.t("lib.auth.api.not_found_status", "not_found"),
-          errors: [{ message: I18n.t("lib.auth.api.not_found_message", "not_found") }]
-        }, status: :not_found
+                 status: I18n.t("lib.auth.api.not_found_status", "not_found"),
+                 errors: [{ message: I18n.t("lib.auth.api.not_found_message", "not_found") }]
+               },
+               status: :not_found
       end
 
       TOOL_SETTINGS_SERVICE = "ToolProxySettings"
@@ -94,7 +95,7 @@ module Lti
       def tool_setting_json(tool_setting, bubble)
         if %w[all distinct].include?(bubble)
           graph = []
-          distinct = bubble == "distinct" ? [] : nil
+          distinct = (bubble == "distinct") ? [] : nil
           while tool_setting
             graph << collect_tool_settings(tool_setting, distinct)
             distinct |= graph.last.custom.keys if distinct
@@ -110,7 +111,7 @@ module Lti
 
           if request.headers["accept"].include?("application/vnd.ims.lti.v2.toolsettings+json")
             @content_type = "application/vnd.ims.lti.v2.toolsettings+json"
-            ::IMS::LTI::Models::ToolSettingContainer.new(graph: graph)
+            ::IMS::LTI::Models::ToolSettingContainer.new(graph:)
           elsif bubble == "distinct" && request.headers["accept"].include?("application/vnd.ims.lti.v2.toolsettings.simple+json")
             @content_type = "application/vnd.ims.lti.v2.toolsettings.simple+json"
             custom = {}
@@ -131,7 +132,7 @@ module Lti
         url = show_lti_tool_settings_url(tool_setting.id)
         custom = tool_setting.custom || {}
         custom.delete_if { |k, _| distinct.include? k } if distinct
-        ::IMS::LTI::Models::ToolSetting.new(custom: custom, type: type, id: url)
+        ::IMS::LTI::Models::ToolSetting.new(custom:, type:, id: url)
       end
 
       def custom_settings(type, json)
@@ -180,7 +181,7 @@ module Lti
 
                  tool_proxy.tool_settings.find_by(
                    context: @context,
-                   resource_link_id: resource_link_id
+                   resource_link_id:
                  )
                end
           raise ActiveRecord::RecordNotFound if ts.blank?
@@ -208,9 +209,9 @@ module Lti
 
       def render_bad_request
         render json: {
-          status: I18n.t("lib.auth.api.bad_request_status", "bad_request"),
-          errors: [{ message: I18n.t("lib.auth.api.bad_request_message", "bad_request") }]
-        },
+                 status: I18n.t("lib.auth.api.bad_request_status", "bad_request"),
+                 errors: [{ message: I18n.t("lib.auth.api.bad_request_message", "bad_request") }]
+               },
                status: :bad_request
       end
     end

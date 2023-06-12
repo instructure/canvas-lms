@@ -21,8 +21,8 @@ module RuboCop
   module Cop
     module Specs
       class NoBeforeOnceStubs < Cop
-        MSG = "Stubs in a `before(:once)` block won't carry over"\
-              " to the examples; you should move this to a `before(:each)`"
+        MSG = "Stubs in a `before(:once)` block won't carry over " \
+              "to the examples; you should move this to a `before(:each)`"
 
         # http://gofreerange.com/mocha/docs/Mocha/Mock.html
         # - stubs

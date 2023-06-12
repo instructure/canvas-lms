@@ -20,7 +20,7 @@
 describe ProgressSerializer do
   subject do
     ProgressSerializer.new(progress, {
-                             controller: controller,
+                             controller:,
                              scope: User.new
                            })
   end
@@ -55,8 +55,14 @@ describe ProgressSerializer do
   end
 
   %i[
-    context_type user_id tag completion workflow_state created_at
-    updated_at message
+    context_type
+    user_id
+    tag
+    completion
+    workflow_state
+    created_at
+    updated_at
+    message
   ].map(&:to_s).each do |key|
     it "serializes #{key}" do
       expect(json[key]).to eq progress.send(key)

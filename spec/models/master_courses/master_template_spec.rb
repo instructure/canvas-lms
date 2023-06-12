@@ -27,7 +27,7 @@ describe MasterCourses::MasterTemplate do
       template = MasterCourses::MasterTemplate.set_as_master_course(@course)
       expect(template.course).to eq @course
       expect(template.root_account).to eq @course.root_account
-      expect(template.full_course).to eq true
+      expect(template.full_course).to be true
 
       expect(MasterCourses::MasterTemplate.set_as_master_course(@course)).to eq template # should not create a copy
       expect(MasterCourses::MasterTemplate.full_template_for(@course)).to eq template
@@ -51,7 +51,7 @@ describe MasterCourses::MasterTemplate do
       other_course = Course.create!
       sub = template.add_child_course!(other_course)
       expect(template.workflow_state).to eq "active"
-      expect(template.active?).to eq true
+      expect(template.active?).to be true
 
       expect { MasterCourses::MasterTemplate.remove_as_master_course(@course) }.to change { template.reload.workflow_state }.from("active").to("deleted")
       expect(MasterCourses::MasterTemplate.full_template_for(@course)).to be_nil
@@ -324,7 +324,37 @@ describe MasterCourses::MasterTemplate do
       sub = t.add_child_course!(c2)
       expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to eq @course
       sub.destroy!
-      expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to eq nil
+      expect(MasterCourses::MasterTemplate.master_course_for_child_course(c2)).to be_nil
+    end
+  end
+
+  describe "#deletions_since_last_export" do
+    before do
+      @t = MasterCourses::MasterTemplate.set_as_master_course(@course)
+      out = LearningOutcome.create!(title: "account level outcome", context: @course.account)
+      @out_master_tag = @t.create_content_tag_for!(out)
+      @out_content_tag = ContentTag.create!(content: out, context: @course)
+    end
+
+    it "returns empty object if last_export_started_at is nil" do
+      expect(@t.deletions_since_last_export).to eq({})
+    end
+
+    context "returns changes since last export" do
+      before do
+        @t.add_child_course!(Course.create!)
+        time = 2.days.ago
+        @t.master_migrations.create!(exports_started_at: time, workflow_state: "completed")
+        MasterCourses::MasterTemplate.preload_index_data([@t])
+      end
+
+      it "when an account level outcome is deleted" do
+        # mark ContentTag for account level outcome as deleted
+        @out_content_tag.workflow_state = "deleted"
+        @out_content_tag.save!
+
+        expect(@t.deletions_since_last_export).to eq({ "ContentTag" => [@out_master_tag.migration_id] })
+      end
     end
   end
 end

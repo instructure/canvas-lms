@@ -20,12 +20,13 @@ export const reduceDuplicateCourses = (enrollments, favoriteCourses) => {
   if (!enrollments || !favoriteCourses) {
     return []
   }
-  return enrollments
+  const coursesWithoutFavorites = enrollments
     .map(c => {
       return {
-        id: c.course.id,
+        id: c.course._id,
         contextName: c.course.contextName,
         assetString: c.course.assetString,
+        concluded: c.concluded,
       }
     })
     .filter(c => {
@@ -38,4 +39,17 @@ export const reduceDuplicateCourses = (enrollments, favoriteCourses) => {
       }
       return !isMatch
     })
+
+  const uniqCourses = {}
+  coursesWithoutFavorites.forEach(course => {
+    if (!(course.assetString in uniqCourses)) {
+      uniqCourses[course.assetString] = course
+    } else {
+      // This logic is to make sure course concluded is always false if there is at least one active enrollment in a course
+      uniqCourses[course.assetString].concluded =
+        course.concluded && uniqCourses[course.assetString].concluded
+    }
+  })
+
+  return Object.keys(uniqCourses).map(assetString => uniqCourses[assetString])
 }

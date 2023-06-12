@@ -75,8 +75,8 @@ describe "users/_logins" do
 
   describe "add_pseudonym_link" do
     let(:account) { Account.default }
-    let(:sally) { account_admin_user(account: account) }
-    let(:bob) { student_in_course(account: account).user }
+    let(:sally) { account_admin_user(account:) }
+    let(:bob) { student_in_course(account:).user }
 
     it "displays when user has permission to create pseudonym" do
       assign(:domain_root_account, account)
@@ -97,11 +97,11 @@ describe "users/_logins" do
 
   describe "reset_mfa_link" do
     let(:account) { Account.default }
-    let(:sally) { account_admin_user(account: account) }
-    let(:bob) { student_in_course(account: account).user }
+    let(:sally) { account_admin_user(account:) }
+    let(:bob) { student_in_course(account:).user }
 
     it "displays when user has permission to reset MFA" do
-      pseudonym(bob, account: account)
+      pseudonym(bob, account:)
       bob.otp_secret_key = "secret"
 
       assign(:domain_root_account, account)
@@ -112,7 +112,7 @@ describe "users/_logins" do
     end
 
     it "does not display when user lacks permission to reset MFA" do
-      pseudonym(sally, account: account)
+      pseudonym(sally, account:)
       sally.otp_secret_key = "secret"
 
       assign(:domain_root_account, account)
@@ -125,11 +125,11 @@ describe "users/_logins" do
 
   describe "add_holder" do
     let(:account) { Account.default }
-    let(:sally) { account_admin_user(account: account) }
-    let(:bob) { student_in_course(account: account).user }
+    let(:sally) { account_admin_user(account:) }
+    let(:bob) { student_in_course(account:).user }
 
     it "displays when user can only reset MFA" do
-      pseudonym(bob, account: account)
+      pseudonym(bob, account:)
       bob.otp_secret_key = "secret"
 
       assign(:domain_root_account, account)
@@ -140,7 +140,7 @@ describe "users/_logins" do
     end
 
     it "displays when user can only add pseudonym" do
-      pseudonym(sally, account: account)
+      pseudonym(sally, account:)
       sally.otp_secret_key = "secret"
       account.settings[:mfa_settings] = :required
       account.save!
@@ -153,7 +153,7 @@ describe "users/_logins" do
     end
 
     it "does not display when user lacks permission to do either" do
-      pseudonym(bob, account: account)
+      pseudonym(bob, account:)
       bob.otp_secret_key = "secret"
       account.settings[:mfa_settings] = :required
       account.save!
@@ -181,6 +181,22 @@ describe "users/_logins" do
 
       doc = Nokogiri::HTML5(response)
       expect(doc.at_css(".screenreader-only")).to be_nil
+    end
+
+    it "shows icon when authentication provider id is set to canvas" do
+      @account = Account.default
+      user_with_pseudonym(active_all: 1)
+      ap = @account.authentication_providers.first
+      @pseudonym.authentication_provider_id = ap
+      @pseudonym.save!
+
+      assign(:domain_root_account, @account)
+      assign(:current_user, @user)
+      assign(:user, @user)
+      render
+
+      doc = Nokogiri::HTML5(response)
+      expect(doc.at_css(".screenreader-only")).not_to be_nil
     end
   end
 end

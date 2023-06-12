@@ -79,7 +79,7 @@ describe DeveloperKeysController do
 
           get "index", params: { account_id: Account.site_admin.id }, format: :json
 
-          expect(json_parse.map { |dk| dk["id"] }).to match_array [site_admin_key.global_id]
+          expect(json_parse.pluck("id")).to match_array [site_admin_key.global_id]
         end
 
         it "includes valid LTI scopes in js env" do
@@ -96,7 +96,7 @@ describe DeveloperKeysController do
 
         it 'includes the "includes parameter" release flag' do
           get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns.dig(:js_env, :includesFeatureFlagEnabled)).to eq false
+          expect(assigns.dig(:js_env, :includesFeatureFlagEnabled)).to be false
         end
 
         describe "js bundles" do
@@ -213,10 +213,10 @@ describe DeveloperKeysController do
       it "returns the newly created key" do
         post "create", params: create_params
 
-        json_data = JSON.parse(response.body)
+        json_data = response.parsed_body
         expect(response).to be_successful
         key = DeveloperKey.find(json_data["id"])
-        expect(key.account).to be nil
+        expect(key.account).to be_nil
       end
 
       it "cannot create keys for a subaccount" do
@@ -269,7 +269,7 @@ describe DeveloperKeysController do
 
         it 'allows setting "allow_includes"' do
           post "create", params: { account_id: root_account.id, developer_key: { scopes: valid_scopes, allow_includes: true } }
-          expect(DeveloperKey.find(json_parse["id"]).allow_includes).to eq true
+          expect(DeveloperKey.find(json_parse["id"]).allow_includes).to be true
         end
 
         it "allows setting scopes" do
@@ -359,7 +359,7 @@ describe DeveloperKeysController do
 
         it 'allows setting "allow_includes"' do
           put "update", params: { id: developer_key.id, developer_key: { scopes: valid_scopes, allow_includes: false } }
-          expect(developer_key.reload.allow_includes).to eq false
+          expect(developer_key.reload.allow_includes).to be false
         end
 
         it "allows setting scopes for site admin keys" do
@@ -384,7 +384,7 @@ describe DeveloperKeysController do
 
         it "sets the scopes to empty if the scopes parameter is an empty string" do
           put "update", params: { id: developer_key.id, developer_key: { scopes: "" } }
-          expect(developer_key.reload.scopes).to match_array []
+          expect(developer_key.reload.scopes).to be_empty
         end
       end
     end
@@ -551,9 +551,10 @@ describe DeveloperKeysController do
 
     it "is allowed update a dev key" do
       dk = test_domain_root_account.developer_keys.create!(redirect_uri: "http://asd.com/")
-      put "update", params: { id: dk.id, developer_key: {
-        redirect_uri: "http://example.com/sdf"
-      } }
+      put "update", params: { id: dk.id,
+                              developer_key: {
+                                redirect_uri: "http://example.com/sdf"
+                              } }
       expect(response).to be_successful
       dk.reload
       expect(dk.redirect_uri).to eq("http://example.com/sdf")

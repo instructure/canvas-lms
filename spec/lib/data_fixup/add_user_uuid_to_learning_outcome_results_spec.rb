@@ -54,7 +54,7 @@ describe DataFixup::AddUserUuidToLearningOutcomeResults do
     result = learning_outcome_result
     result.update_column(:user_uuid, nil)
 
-    expect(result.reload.user_uuid).to eq(nil)
+    expect(result.reload.user_uuid).to be_nil
     DataFixup::AddUserUuidToLearningOutcomeResults.run
     expect(result.reload.user_uuid).to eq(student.uuid)
   end

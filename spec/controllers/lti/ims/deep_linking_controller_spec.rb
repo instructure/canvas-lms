@@ -26,13 +26,13 @@ module Lti
       include_context "deep_linking_spec_helper"
 
       describe "#deep_linking_response" do
-        subject { post :deep_linking_response, params: params }
+        subject { post :deep_linking_response, params: }
 
         let(:placement) { "editor_button" }
-        let(:return_url_params) { { placement: placement } }
+        let(:return_url_params) { { placement:, content_item_id: 123 } }
         let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
         let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
-        let(:course) { course_model(account: account) }
+        let(:course) { course_model(account:) }
 
         let(:context_external_tool) do
           ContextExternalTool.create!(
@@ -41,7 +41,7 @@ module Lti
             name: "test tool",
             shared_secret: "secret",
             consumer_key: "key",
-            developer_key: developer_key,
+            developer_key:,
             lti_version: "1.3"
           )
         end
@@ -56,12 +56,13 @@ module Lti
           expect(controller).to receive(:js_env).with({ deep_linking_use_window_parent: true })
           expect(controller).to receive(:js_env).with({
                                                         deep_link_response: {
-                                                          placement: placement,
-                                                          content_items: content_items,
-                                                          msg: msg,
-                                                          log: log,
-                                                          errormsg: errormsg,
-                                                          errorlog: errorlog,
+                                                          placement:,
+                                                          content_items:,
+                                                          service_id: 123,
+                                                          msg:,
+                                                          log:,
+                                                          errormsg:,
+                                                          errorlog:,
                                                           ltiEndpoint: Rails.application.routes.url_helpers.polymorphic_url(
                                                             [:retrieve, account, :external_tools],
                                                             host: "test.host"
@@ -75,7 +76,7 @@ module Lti
         end
 
         context "when returning from a non-internal service" do
-          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+          let(:return_url_params) { { placement:, parent_frame_context: context_external_tool.id } }
 
           it "does not change the DEEP_LINKING_POST_MESSAGE_ORIGIN value in jsenv" do
             subject
@@ -87,11 +88,11 @@ module Lti
         context "when returning from an internal service" do
           before do
             developer_key.update!(internal_service: true)
-            u = course_with_teacher(course: course, user: user_model, active_all: true).user
+            u = course_with_teacher(course:, user: user_model, active_all: true).user
             user_session(u)
           end
 
-          let(:return_url_params) { { placement: placement, parent_frame_context: context_external_tool.id } }
+          let(:return_url_params) { { placement:, parent_frame_context: context_external_tool.id } }
 
           it "sets the DEEP_LINKING_POST_MESSAGE_ORIGIN value in js_env" do
             subject
@@ -100,10 +101,10 @@ module Lti
         end
 
         it_behaves_like "an endpoint which uses parent_frame_context to set the CSP header" do
-          let(:return_url_params) { { placement: placement, parent_frame_context: pfc_tool.id } }
+          let(:return_url_params) { { placement:, parent_frame_context: pfc_tool.id } }
           let(:pfc_tool_context) do
             # Need to enroll user to make sure user can access pfc tool
-            enrollment = course_with_teacher(course: course, user: user_model, active_all: true)
+            enrollment = course_with_teacher(course:, user: user_model, active_all: true)
             user_session(enrollment.user)
             enrollment.course
           end
@@ -142,7 +143,7 @@ module Lti
               context: account,
               opts: {
                 url: "http://tool.url/login",
-                developer_key: developer_key
+                developer_key:
               }
             )
           end
@@ -174,7 +175,7 @@ module Lti
           end
 
           context "when context is a course" do
-            let(:course) { course_model(account: account) }
+            let(:course) { course_model(account:) }
             let(:params) { { JWT: deep_linking_jwt, course_id: course.id, data: data_token } }
 
             it_behaves_like "creates resource links in context" do
@@ -183,7 +184,7 @@ module Lti
           end
 
           context "when context is a group" do
-            let(:group) { group_model(context: course_model(account: account)) }
+            let(:group) { group_model(context: course_model(account:)) }
             let(:params) { { JWT: deep_linking_jwt, group_id: group.id, data: data_token } }
 
             it_behaves_like "creates resource links in context" do
@@ -402,7 +403,7 @@ module Lti
         end
 
         context "content_item claim message" do
-          let(:course) { course_model(account: account) }
+          let(:course) { course_model(account:) }
           let(:developer_key) do
             key = DeveloperKey.create!(account: course.account)
             key.generate_rsa_keypair!
@@ -419,7 +420,7 @@ module Lti
               name: "test tool",
               shared_secret: "secret",
               consumer_key: "key",
-              developer_key: developer_key,
+              developer_key:,
               lti_version: "1.3"
             )
           end
@@ -496,6 +497,17 @@ module Lti
 
                 it "creates a module item" do
                   expect { subject }.to change { context_module.content_tags.count }.by 1
+                end
+
+                context "when window.targetName is _blank" do
+                  let(:content_items) do
+                    [{ type: "ltiResourceLink", url: launch_url, title: "Item 1", window: { targetName: "_blank" } }]
+                  end
+
+                  it "sets new_tab true on module item" do
+                    subject
+                    expect(context_module.content_tags.last.new_tab).to be true
+                  end
                 end
 
                 it "asks to reload page" do
@@ -585,7 +597,7 @@ module Lti
 
                 it "does not pass launch dimensions" do
                   expect(subject).to be_successful
-                  expect(context_module.content_tags[0][:link_settings]).to be(nil)
+                  expect(context_module.content_tags[0][:link_settings]).to be_nil
                 end
 
                 it "ignores line items from tool" do
@@ -612,9 +624,9 @@ module Lti
                     expect(context_module.content_tags[0][:link_settings]["selection_height"]).to be(842)
 
                     expect(context_module.content_tags[1][:link_settings]["selection_width"]).to be(642)
-                    expect(context_module.content_tags[1][:link_settings]["selection_height"]).to be(nil)
+                    expect(context_module.content_tags[1][:link_settings]["selection_height"]).to be_nil
 
-                    expect(context_module.content_tags[2][:link_settings]["selection_width"]).to be(nil)
+                    expect(context_module.content_tags[2][:link_settings]["selection_width"]).to be_nil
                     expect(context_module.content_tags[2][:link_settings]["selection_height"]).to be(842)
                   end
                 end
@@ -737,7 +749,7 @@ module Lti
           context "when content items that contain line items are received" do
             let(:content_items) { [content_item] }
             let(:content_item) do
-              { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: lineItem }
+              { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: }
             end
             let(:lineItem) do
               { scoreMaximum: 10 }
@@ -793,7 +805,7 @@ module Lti
               context "when title is present in content item" do
                 let(:title) { "hello" }
                 let(:content_item) do
-                  super().merge({ title: title })
+                  super().merge({ title: })
                 end
 
                 it "includes title in response" do
@@ -804,17 +816,13 @@ module Lti
 
               context "when label is present in line item" do
                 let(:label) { "will not work" }
-                let(:lineItem) { { label: label } }
+                let(:lineItem) { { label: } }
 
                 it "includes label as title in response" do
                   subject
                   expect(assigns.dig(:js_env, :deep_link_response, :content_items, 0, :title)).to eq label
                 end
               end
-            end
-
-            it "creates an assignment from lineItem data" do
-              expect { subject }.to change { course.assignments.count }.by 1
             end
 
             it "leaves assignment unpublished" do
@@ -824,6 +832,20 @@ module Lti
 
             it "does not create a context module" do
               expect { subject }.not_to change { course.context_modules.count }
+            end
+
+            context "when the `Default SIS Sync for assignments, quizzes, grade discussion` option is enabled" do
+              before do
+                course.root_account.enable_feature! :new_sis_integrations
+                course.root_account.enable_feature! :post_grades
+                course.root_account.settings[:sis_default_grade_export] = { value: true }
+                course.root_account.save!
+              end
+
+              it "creates assignments with 'Post to SIS' enabled" do
+                subject
+                expect(course.assignments.last.post_to_sis).to be true
+              end
             end
 
             context "when content item includes available dates" do
@@ -964,18 +986,13 @@ module Lti
                 expect { subject }.not_to change { course.context_modules.count }
               end
 
-              it "only uses the first content item for a new assignment" do
-                expect { subject }.to change { course.assignments.count }.by 1
-              end
-
-              it "leaves assignment unpublished" do
-                subject
-                expect(course.assignments.last.workflow_state).to eq("unpublished")
+              it "does not create an assignment" do
+                expect { subject }.not_to change { course.assignments.count }
               end
             end
 
             context "when on the edit assignment page" do
-              let(:assignment) { assignment_model(course: course, workflow_state: "published") }
+              let(:assignment) { assignment_model(course:, workflow_state: "published") }
               let(:return_url_params) { super().merge({ placement: "assignment_selection", assignment_id: assignment.id }) }
               let(:content_items) do
                 [

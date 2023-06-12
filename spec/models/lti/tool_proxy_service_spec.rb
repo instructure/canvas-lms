@@ -245,7 +245,7 @@ module Lti
           rescue Lti::Errors::InvalidToolProxyError => e
             puts e.message
           end
-          expect(tool_proxy).to eq nil
+          expect(tool_proxy).to be_nil
         end
       end
 

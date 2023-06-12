@@ -23,7 +23,7 @@ Rails.application.config.after_initialize do
     def to_a(*args)
       if current_page.nil? then super # workaround for Active Record 3.0
       else
-        ::WillPaginate::Collection.create(current_page, limit_value) do |col|
+        WillPaginate::Collection.create(current_page, limit_value) do |col|
           col.replace super
           col.next_page = nil if total_entries.nil? && col.respond_to?(:length) && col.length < col.per_page # don't return a next page if there's nothing to get next
           col.total_entries ||= total_entries
@@ -239,10 +239,12 @@ Rails.application.config.after_initialize do
     end
   end
 
-  Object.send(:remove_const, :Shard) if defined?(::Shard)
-  Object.send(:remove_const, :DatabaseServer) if defined?(::DatabaseServer)
-  ::Shard = Switchman::Shard
-  ::DatabaseServer = Switchman::DatabaseServer
+  Object.send(:remove_const, :Shard) if defined?(Shard)
+  Object.send(:remove_const, :DatabaseServer) if defined?(DatabaseServer)
+  # rubocop:disable Lint/ConstantDefinitionInBlock
+  Shard = Switchman::Shard
+  DatabaseServer = Switchman::DatabaseServer
+  # rubocop:enable Lint/ConstantDefinitionInBlock
 
   Switchman::DefaultShard.class_eval do
     attr_writer :settings
@@ -272,4 +274,13 @@ Rails.application.config.after_initialize do
 
   # TODO: fix canvas so we don't need this because this is not good
   Switchman.config[:writable_shadow_records] = true
+
+  Switchman::Deprecation.behavior = [
+    :log,
+    lambda do |message, callstack, _deprecation_horizon, _gem_name|
+      e = ActiveSupport::DeprecationException.new(message)
+      e.set_backtrace(callstack.map(&:to_s))
+      Sentry.capture_exception(e, level: :warning)
+    end
+  ]
 end

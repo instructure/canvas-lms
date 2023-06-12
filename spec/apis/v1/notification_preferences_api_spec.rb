@@ -112,8 +112,10 @@ describe NotificationPreferencesController, type: :request do
     def update_preference
       # self is the only possible one
       @params.delete(:user_id)
-      json = api_call(:put, "#{@prefix}/new_announcement?notification_preferences[frequency]=never",
-                      @params.merge(action: "update", notification: "new_announcement",
+      json = api_call(:put,
+                      "#{@prefix}/new_announcement?notification_preferences[frequency]=never",
+                      @params.merge(action: "update",
+                                    notification: "new_announcement",
                                     notification_preferences: { "frequency" => "never" }))
       assert_jsonapi_compliance(json, "notification_preferences")
       expect(json["notification_preferences"]).to eq [{
@@ -140,7 +142,8 @@ describe NotificationPreferencesController, type: :request do
       by_address
       # self is the only possible one
       @params.delete(:user_id)
-      json = api_call(:put, "#{@prefix}/new_announcement",
+      json = api_call(:put,
+                      "#{@prefix}/new_announcement",
                       @params.merge(action: "update", notification: "new_announcement"),
                       "notification_preferences" => [{ "frequency" => "never" }])
       assert_jsonapi_compliance(json, "notification_preferences")
@@ -157,8 +160,10 @@ describe NotificationPreferencesController, type: :request do
     def update_preferences_by_category(category, notification = category)
       # self is the only possible one
       @params.delete(:user_id)
-      json = api_call(:put, "#{@prefix}/#{category}?notification_preferences[frequency]=never",
-                      @params.merge(action: "update_preferences_by_category", category: category,
+      json = api_call(:put,
+                      "#{@prefix}/#{category}?notification_preferences[frequency]=never",
+                      @params.merge(action: "update_preferences_by_category",
+                                    category:,
                                     notification_preferences: { "frequency" => "never" }))
       assert_jsonapi_compliance(json, "notification_preferences")
       expect(json["notification_preferences"]).to eq [{
@@ -180,7 +185,8 @@ describe NotificationPreferencesController, type: :request do
       by_category
       # self is the only possible one
       @params.delete(:user_id)
-      json = api_call(:put, "#{@prefix}/announcements",
+      json = api_call(:put,
+                      "#{@prefix}/announcements",
                       @params.merge(action: "update_preferences_by_category", category: "announcements"),
                       "notification_preferences" => [{ "frequency" => "never" }])
       assert_jsonapi_compliance(json, "notification_preferences")
@@ -197,7 +203,8 @@ describe NotificationPreferencesController, type: :request do
     def update_preferences
       # self is the only possible one
       @params.delete(:user_id)
-      json = api_call(:put, "#{@prefix}?notification_preferences[new_announcement][frequency]=never&notification_preferences[course_started][frequency]=weekly",
+      json = api_call(:put,
+                      "#{@prefix}?notification_preferences[new_announcement][frequency]=never&notification_preferences[course_started][frequency]=weekly",
                       @params.merge(action: "update_all",
                                     notification_preferences: { "new_announcement" => { "frequency" => "never" }, "course_started" => { "frequency" => "weekly" } }))
 
@@ -235,7 +242,8 @@ describe NotificationPreferencesController, type: :request do
       by_address
       # self is the only possible one
       @params.delete(:user_id)
-      json = api_call(:put, @prefix.to_s,
+      json = api_call(:put,
+                      @prefix.to_s,
                       @params.merge(action: "update_all"),
                       "notification_preferences" => [{ "notification" => "new_announcement", "frequency" => "never" }, { "notification" => "course_started", "frequency" => "weekly" }])
 

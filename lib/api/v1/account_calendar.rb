@@ -24,19 +24,20 @@ module Api::V1::AccountCalendar
   ACCOUNT_ATTRIBUTES = %w[id name parent_account_id root_account_id].freeze
 
   def account_calendars_json(accounts, user, session, include: [])
-    accounts.map { |account| account_calendar_json(account, user, session, include: include) }
+    accounts.map { |account| account_calendar_json(account, user, session, include:) }
   end
 
   def account_calendar_json(account, user, session, include: [])
     json = api_json(account, user, session, only: ACCOUNT_ATTRIBUTES)
     json["visible"] = account.account_calendar_visible
+    json["auto_subscribe"] = account.account_calendar_subscription_type == "auto" if Account.site_admin.feature_enabled?(:auto_subscribe_account_calendars)
     json["asset_string"] = account.asset_string
     json["type"] = account.class.to_s.downcase
     json["sub_account_count"] = account.sub_accounts.count if include.include? "sub_account_count"
-    json["calendar_event_url"] = account.respond_to?("calendar_events") ? named_context_url(account, :context_calendar_event_url, "{{ id }}") : ""
-    json["can_create_calendar_events"] = account.respond_to?("calendar_events") && CalendarEvent.new.tap { |e| e.context = account }.grants_right?(user, session, :create)
-    json["create_calendar_event_url"] = account.respond_to?("calendar_events") ? named_context_url(account, :context_calendar_events_url) : ""
-    json["new_calendar_event_url"] = account.respond_to?("calendar_events") ? named_context_url(account, :new_context_calendar_event_url) : ""
+    json["calendar_event_url"] = account.respond_to?(:calendar_events) ? named_context_url(account, :context_calendar_event_url, "{{ id }}") : ""
+    json["can_create_calendar_events"] = account.respond_to?(:calendar_events) && CalendarEvent.new.tap { |e| e.context = account }.grants_right?(user, session, :create)
+    json["create_calendar_event_url"] = account.respond_to?(:calendar_events) ? named_context_url(account, :context_calendar_events_url) : ""
+    json["new_calendar_event_url"] = account.respond_to?(:calendar_events) ? named_context_url(account, :new_context_calendar_event_url) : ""
     json
   end
 end

@@ -34,7 +34,7 @@ describe PlannerController do
     @course.assignments.create(
       title: "some assignment #{@course.assignments.count}",
       assignment_group: @group,
-      due_at: Time.zone.now + 1.week
+      due_at: 1.week.from_now
     )
   end
 
@@ -150,7 +150,7 @@ describe PlannerController do
 
         get :index
         json = json_parse(response.body)
-        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.map { |thing| thing["plannable_id"] }
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
 
         my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pluck(:id).first
         expect(event_ids).not_to include event.id
@@ -160,7 +160,7 @@ describe PlannerController do
 
         get :index
         json = json_parse(response.body)
-        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.map { |thing| thing["plannable_id"] }
+        event_ids = json.select { |thing| thing["plannable_type"] == "calendar_event" }.pluck("plannable_id")
         expect(event_ids).to include event.id
         expect(event_ids).not_to include my_event_id
       end
@@ -181,7 +181,7 @@ describe PlannerController do
 
         get :index
         response_json = json_parse(response.body)
-        expect(response_json.select { |i| i["plannable_type"] == "announcement" }.map { |i| i["plannable_id"] }).to eq [a1.id]
+        expect(response_json.select { |i| i["plannable_type"] == "announcement" }.pluck("plannable_id")).to eq [a1.id]
       end
 
       it "shows planner overrides created on quizzes" do
@@ -251,7 +251,7 @@ describe PlannerController do
         submission_model(assignment: @assignment, user: reviewee)
         assessment_request = @assignment.assign_peer_review(@current_user, reviewee)
         PlannerOverride.create!(user: @current_user, plannable_id: assessment_request.id, plannable_type: "AssessmentRequest", marked_complete: false)
-        @submission.add_comment(comment: "comment", author: @current_user, assessment_request: assessment_request)
+        @submission.add_comment(comment: "comment", author: @current_user, assessment_request:)
         assessment_request.save!
         get :index, params: { start_date: @start_date, end_date: @end_date }
         response_json = json_parse(response.body)
@@ -308,6 +308,89 @@ describe PlannerController do
           expect(items).not_to include ["assignment", @a2.id]
           expect(items).to include ["assignment", @a3.id]
           expect(items).to include ["planner_note", @pn3.id]
+        end
+      end
+
+      describe "account calendars" do
+        before do
+          Account.site_admin.enable_feature!(:account_calendars_planner_support)
+          Account.default.account_calendar_visible = true
+          Account.default.save!
+          @sub_account1 = Account.default.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
+          @student2 = user_factory(active_all: true)
+          @course_ac = course_with_student(active_all: true, user: @student2).course
+          course_with_student_logged_in(user: @student2, account: Account.default)
+          course_with_student_logged_in(user: @student2, account: @sub_account1)
+          @sub_account_event = @sub_account1.calendar_events.create!(title: "Sub account event", start_at: 0.days.from_now)
+          @default_account_event = Account.default.calendar_events.create!(title: "Default account event", start_at: 0.days.from_now)
+
+          @student2.set_preference(:enabled_account_calendars, [@sub_account1.id, Account.default.id])
+        end
+
+        it "shows calendar events for the enabled account calendars" do
+          get :index
+          response_json = json_parse(response.body)
+          default_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @default_account_event.id }
+          sub_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @sub_account_event.id }
+          expect(response_json.length).to eq 2
+          expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
+          expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
+        end
+
+        it "does not show account calendar events if the feature flag is disabledd" do
+          Account.site_admin.disable_feature!(:account_calendars_planner_support)
+          get :index
+          response_json = json_parse(response.body)
+          expect(response_json).to eq []
+        end
+
+        it "does not show calendar events for hidden account calendars" do
+          Account.default.account_calendar_visible = false
+          Account.default.save!
+          get :index
+          response_json = json_parse(response.body)
+          account_event = response_json[0]
+          expect(response_json.length).to eq 1
+          expect(account_event["plannable"]["title"]).to eq @sub_account_event.title
+        end
+
+        it "filters by context_codes" do
+          get :index, params: { context_codes: [@sub_account1.asset_string] }
+          response_json = json_parse(response.body)
+          sub_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @sub_account_event.id }
+          expect(response_json.length).to eq 1
+          expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
+        end
+
+        it "returns unauthorized if the context_code is not visible" do
+          @sub_account1.account_calendar_visible = false
+          @sub_account1.save!
+          get :index, params: { context_codes: [@sub_account1.asset_string] }
+          assert_unauthorized
+        end
+
+        it "does not include account calendar events by default when filtering by context_codes" do
+          course_ac_event = @course_ac.calendar_events.create!(title: "Course event", start_at: 0.days.from_now)
+          get :index, params: { context_codes: [@course_ac.asset_string] }
+
+          response_json = json_parse(response.body)
+          course_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == course_ac_event.id }
+          expect(response_json.length).to eq 1
+          expect(course_event["plannable"]["title"]).to eq course_ac_event.title
+        end
+
+        it "includes account calendar events along with context_codes events if requested" do
+          course_ac_event = @course_ac.calendar_events.create!(title: "Course event", start_at: 0.days.from_now)
+          get :index, params: { include: %w[account_calendars], context_codes: [@course_ac.asset_string] }
+
+          response_json = json_parse(response.body)
+          default_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @default_account_event.id }
+          sub_account_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == @sub_account_event.id }
+          course_event = response_json.find { |i| i["plannable_type"] == "calendar_event" && i["plannable_id"] == course_ac_event.id }
+          expect(response_json.length).to eq 3
+          expect(sub_account_event["plannable"]["title"]).to eq @sub_account_event.title
+          expect(default_account_event["plannable"]["title"]).to eq @default_account_event.title
+          expect(course_event["plannable"]["title"]).to eq course_ac_event.title
         end
       end
 
@@ -555,19 +638,19 @@ describe PlannerController do
           get :index
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 5
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id, @assignment5.id, @assignment.id, @assignment2.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment3.id, @page.id, @assignment5.id, @assignment.id, @assignment2.id]
 
           get :index, params: { per_page: 2 }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment3.id, @page.id]
 
           link = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
           expect(link[:uri].path).to include "/api/v1/planner/items"
           get :index, params: { per_page: 2, page: link["page"] }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment5.id, @assignment.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment5.id, @assignment.id]
 
           link = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
           get :index, params: { per_page: 2, page: link["page"] }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment2.id]
         end
 
         it "behaves consistently with different object types on the same datetime" do
@@ -597,11 +680,11 @@ describe PlannerController do
           @assignment2.update_attribute(:due_at, time)
 
           get :index, params: { per_page: 1 }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment.id]
 
           next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }["page"]
           get :index, params: { per_page: 1, page: next_page }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment2.id]
         end
 
         it "returns results in reverse order by date if requested" do
@@ -612,14 +695,14 @@ describe PlannerController do
           get :index, params: { order: :desc }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 4
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id, @page.id, @assignment3.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment2.id, @assignment.id, @page.id, @assignment3.id]
 
           get :index, params: { order: :desc, per_page: 2 }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@assignment2.id, @assignment.id]
 
           next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }["page"]
           get :index, params: { order: :desc, per_page: 2, page: next_page }
-          expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@page.id, @assignment3.id]
+          expect(json_parse(response.body).pluck("plannable_id")).to eq [@page.id, @assignment3.id]
         end
 
         it "does not try to compare missing dates" do
@@ -633,7 +716,7 @@ describe PlannerController do
           get :index
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 3
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @assignment.id, @assignment2.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment3.id, @assignment.id, @assignment2.id]
         end
 
         it "orders with unread items as well" do
@@ -655,7 +738,7 @@ describe PlannerController do
           get :index, params: { filter: "new_activity" }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 4
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, dt.id, graded_topic.id, @assignment.id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignment3.id, dt.id, graded_topic.id, @assignment.id]
         end
 
         context "with assignment overrides" do
@@ -678,7 +761,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([@planner_note1.id, assignment1.id, @planner_note2.id, assignment2.id])
+            expect(response_json.pluck("plannable_id")).to eq([@planner_note1.id, assignment1.id, @planner_note2.id, assignment2.id])
           end
 
           it "orders assignments with overridden due dates correctly" do
@@ -693,7 +776,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([assignment1.id, @planner_note1.id, assignment2.id, @planner_note2.id])
+            expect(response_json.pluck("plannable_id")).to eq([assignment1.id, @planner_note1.id, assignment2.id, @planner_note2.id])
           end
 
           it "orders ungraded quizzes with overridden due dates correctly" do
@@ -707,7 +790,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([quiz1.id, @planner_note1.id, quiz2.id, @planner_note2.id])
+            expect(response_json.pluck("plannable_id")).to eq([quiz1.id, @planner_note1.id, quiz2.id, @planner_note2.id])
           end
 
           it "orders graded discussions with overridden due dates correctly" do
@@ -741,7 +824,7 @@ describe PlannerController do
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 4
-            expect(response_json.map { |i| i["plannable_id"] }).to eq([page1.id, @planner_note1.id, @page.id, @planner_note2.id])
+            expect(response_json.pluck("plannable_id")).to eq([page1.id, @planner_note1.id, @page.id, @planner_note2.id])
           end
         end
       end
@@ -757,7 +840,7 @@ describe PlannerController do
         it "allows a linked observer to query a student's planner items" do
           observer = user_with_pseudonym
           user_session(observer)
-          UserObservationLink.create_or_restore(observer: observer, student: @student, root_account: Account.default)
+          UserObservationLink.create_or_restore(observer:, student: @student, root_account: Account.default)
           get :index, params: { user_id: @student.to_param, per_page: 1 }
           expect(response).to be_successful
           link = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
@@ -798,7 +881,7 @@ describe PlannerController do
 
           get :index
           response_json = json_parse(response.body)
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [announcement.id, @assignment.id, @assignment2.id]
+          expect(response_json.pluck("plannable_id")).to eq [announcement.id, @assignment.id, @assignment2.id]
         end
 
         it "queries the correct shard-relative context codes for calendar events" do
@@ -856,9 +939,9 @@ describe PlannerController do
 
           get :index, params: { context_codes: [@original_course.asset_string, @group.asset_string, @cs_student.asset_string] }
           json = json_parse(response.body)
-          expect(json.map { |h| h["plannable_id"] }).to match_array([
-                                                                      @planner_note.id, @group_assignment.id, @original_topic.id, @original_page.id
-                                                                    ])
+          expect(json.pluck("plannable_id")).to match_array([
+                                                              @planner_note.id, @group_assignment.id, @original_topic.id, @original_page.id
+                                                            ])
         end
       end
 
@@ -873,7 +956,7 @@ describe PlannerController do
           links = Api.parse_pagination_links(page.headers["Link"])
           response_json = json_parse(page.body)
           expect(response_json.length).to eq 5
-          ids = response_json.map { |i| i["plannable_id"] }
+          ids = response_json.pluck("plannable_id")
           expected_ids = []
           5.times { |i| expected_ids << @assignments[i].id }
           expect(ids).to eq expected_ids
@@ -895,7 +978,7 @@ describe PlannerController do
           get :index, params: { per_page: 2 }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 2
-          expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignments[0].id, @assignments[1].id]
+          expect(response_json.pluck("plannable_id")).to eq [@assignments[0].id, @assignments[1].id]
         end
 
         it "paginates results in correct order" do
@@ -1090,7 +1173,7 @@ describe PlannerController do
                                   end_date: 1.week.from_now.to_date.to_s }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
-            expect(response_json.map { |i| i["plannable_id"] }).to include dt.id
+            expect(response_json.pluck("plannable_id")).to include dt.id
           end
         end
 
@@ -1120,7 +1203,7 @@ describe PlannerController do
             @entry = @topic.discussion_entries.create!(message: "Hello!", user: @student)
             @reply = @entry.reply_from(user: @teacher, text: "ohai!")
             @topic.reload
-            expect(@topic.unread?(@student)).to eq true
+            expect(@topic.unread?(@student)).to be true
             expect(@topic.unread_count(@student)).to eq 1
 
             get :index, params: { filter: "new_activity" }

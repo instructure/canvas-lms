@@ -17,8 +17,8 @@
  */
 
 import $ from 'jquery'
-import UserCollection from '@canvas/users/backbone/collections/UserCollection.coffee'
-import RecentStudentCollectionView from './backbone/views/RecentStudentCollectionView.coffee'
+import UserCollection from '@canvas/users/backbone/collections/UserCollection'
+import RecentStudentCollectionView from './backbone/views/RecentStudentCollectionView'
 import 'jqueryui/tabs'
 
 $(() => {

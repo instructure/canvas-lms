@@ -25,15 +25,25 @@ describe ContentMigration do
       ag = @copy_from.assignment_groups.create!(name: "empty group")
       asmnt = @copy_from.assignments.create!(title: "some assignment")
       cal = @copy_from.calendar_events.create!(title: "haha", description: "oi")
-      tool = @copy_from.context_external_tools.create!(name: "new tool", consumer_key: "key", shared_secret: "secret",
-                                                       domain: "example.com", custom_fields: { "a" => "1", "b" => "2" }, workflow_state: "public")
+      tool = @copy_from.context_external_tools.create!(name: "new tool",
+                                                       consumer_key: "key",
+                                                       shared_secret: "secret",
+                                                       domain: "example.com",
+                                                       custom_fields: { "a" => "1", "b" => "2" },
+                                                       workflow_state: "public")
       data = [{ points: 3, description: "Outcome row", id: 1, ratings: [{ points: 3, description: "Rockin'", criterion_id: 1, id: 2 }] }]
-      rub1 = @copy_from.rubrics.create!(title: "rub1", data: data)
+      rub1 = @copy_from.rubrics.create!(title: "rub1", data:)
       rub1.associate_with(@copy_from, @copy_from)
       default = @copy_from.root_outcome_group
-      lo = @copy_from.created_learning_outcomes.create!(context: @copy_from, short_description: "outcome1", workflow_state: "active",
-                                                        data: { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
-                                                                                                                 { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } })
+      lo = @copy_from.created_learning_outcomes.create!(context: @copy_from,
+                                                        short_description: "outcome1",
+                                                        workflow_state: "active",
+                                                        data: { rubric_criterion: { mastery_points: 2,
+                                                                                    ratings: [{ description: "e", points: 50 },
+                                                                                              { description: "me", points: 2 },
+                                                                                              { description: "Does Not Meet Expectations", points: 0.5 }],
+                                                                                    description: "First outcome",
+                                                                                    points_possible: 5 } })
       default.add_outcome(lo)
       gs = @copy_from.grading_standards.create!(title: "Standard eh", data: [["A", 0.93], ["A-", 0.89], ["F", 0]])
 
@@ -46,13 +56,13 @@ describe ContentMigration do
       expect(@copy_to.attachments.count).to eq 1
       att_to = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(att_to.file_state).to eq "available"
-      expect(att_to.root_attachment_id).to eq nil # should be root
+      expect(att_to.root_attachment_id).to be_nil # should be root
       expect(att_to.open.read).to eq "ohai" # should have copied content over
       expect(att_to.namespace).to eq "account_#{@copy_to.root_account.id}"
       expect(@copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first.workflow_state).to eq "active"
       rub2 = @copy_to.rubrics.where(migration_id: mig_id(rub1)).first
       expect(rub2.workflow_state).to eq "active"
-      expect(rub2.rubric_associations.first.bookmarked).to eq true
+      expect(rub2.rubric_associations.first.bookmarked).to be true
       expect(@copy_to.created_learning_outcomes.where(migration_id: mig_id(lo)).first.workflow_state).to eq "active"
       expect(@copy_to.quizzes.where(migration_id: mig_id(quiz)).first.workflow_state).to eq "unpublished" if Qti.qti_enabled?
       expect(@copy_to.context_external_tools.where(migration_id: mig_id(tool)).first.workflow_state).to eq "public"
@@ -71,7 +81,7 @@ describe ContentMigration do
       run_course_copy
 
       expect(@copy_from.content_exports.last).to eq @cm.content_export
-      expect(@cm.content_export.global_identifiers?).to eq false
+      expect(@cm.content_export.global_identifiers?).to be false
 
       dt_to = @copy_to.discussion_topics.first
       expect(dt_to.migration_id).to eq CC::CCHelper.create_key("discussion_topic_#{dt.local_id}", global: false)
@@ -89,8 +99,10 @@ describe ContentMigration do
 
     it "does not blow up with usage rights" do
       ur = @copy_from.usage_rights.create! use_justification: "used_by_permission", legal_copyright: "(C) 2015 Wyndham Systems"
-      att = @copy_from.attachments.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"),
-                                           folder: Folder.unfiled_folder(@copy_from), usage_rights: ur)
+      att = @copy_from.attachments.create!(filename: "first.txt",
+                                           uploaded_data: StringIO.new("ohai"),
+                                           folder: Folder.unfiled_folder(@copy_from),
+                                           usage_rights: ur)
 
       run_course_copy
 

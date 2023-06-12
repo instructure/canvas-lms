@@ -89,7 +89,7 @@ describe SIS::CSV::AccountImporter do
 
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
-      "A002,A001,,",
+      "A002,A001,,active",
       "A003,A002,,",
       "A004,A002,,"
     )
@@ -104,7 +104,7 @@ describe SIS::CSV::AccountImporter do
     expect(a3.parent_account).to eq a2
     expect(a4.parent_account).to eq a2
 
-    expect(Account.where(sis_source_id: "A002").first.workflow_state).to eq "deleted"
+    expect(Account.where(sis_source_id: "A002").first.workflow_state).to eq "active"
     expect(Account.where(sis_source_id: "A003").first.name).to eq "English Literature"
   end
 
@@ -121,6 +121,32 @@ describe SIS::CSV::AccountImporter do
 
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["Cannot delete the sub_account with ID: A001 because it has active sub accounts."]
+  end
+
+  it "does not allow the restoration of a sub_account with a deleted parent_account" do
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A001,,Humanities,active",
+      "A002,A001,Sub Humanities,active"
+    )
+    expect(Account.where(sis_source_id: "A001").first.workflow_state).to eq "active"
+    expect(Account.where(sis_source_id: "A002").first.workflow_state).to eq "active"
+
+    process_csv_data_cleanly(
+      "account_id,parent_account_id,name,status",
+      "A002,A001,Sub Humanities,deleted",
+      "A001,,Humanities,deleted"
+    )
+    expect(Account.where(sis_source_id: "A001").first.workflow_state).to eq "deleted"
+    expect(Account.where(sis_source_id: "A002").first.workflow_state).to eq "deleted"
+
+    importer = process_csv_data(
+      "account_id,parent_account_id,name,status",
+      "A002,A001,Sub Humanities,active"
+    )
+
+    errors = importer.errors.map(&:last)
+    expect(errors).to eq ["Cannot restore sub_account with ID: A002 because parent_account with ID: A001 has been deleted."]
   end
 
   it "supports sticky fields" do
@@ -209,7 +235,7 @@ describe SIS::CSV::AccountImporter do
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active",
-      batch: batch
+      batch:
     )
     a1 = @account.sub_accounts.where(sis_source_id: "A001").first
     expect(a1).not_to be_nil

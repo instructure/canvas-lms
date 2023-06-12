@@ -60,7 +60,7 @@ describe "Exporters::ZipExporter" do
     describe "exporting attachments" do
       def exporter_for_attachment(attachment, course, user, opts = {})
         content_export = course.content_exports.create!(
-          user: user,
+          user:,
           workflow_state: "created",
           selected_content: { attachments: { "attachment_#{attachment.id}": "1" } }
         )
@@ -77,7 +77,7 @@ describe "Exporters::ZipExporter" do
         before do
           attachment_model(
             context: course,
-            folder: folder,
+            folder:,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
         end
@@ -92,7 +92,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 
@@ -112,7 +112,7 @@ describe "Exporters::ZipExporter" do
         before do
           attachment_model(
             context: course,
-            folder: folder,
+            folder:,
             locked: true,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
@@ -128,7 +128,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 
@@ -148,7 +148,7 @@ describe "Exporters::ZipExporter" do
         before do
           attachment_model(
             context: course,
-            folder: folder,
+            folder:,
             lock_at: 1.day.ago,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain"),
             unlock_at: 3.days.ago
@@ -165,7 +165,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 
@@ -186,7 +186,7 @@ describe "Exporters::ZipExporter" do
           attachment_model(
             context: course,
             file_state: "hidden",
-            folder: folder,
+            folder:,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
         end
@@ -201,7 +201,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 
@@ -222,7 +222,7 @@ describe "Exporters::ZipExporter" do
     describe "exporting folders" do
       def exporter_for_folder(folder, course, user, opts = {})
         content_export = course.content_exports.create!(
-          user: user,
+          user:,
           workflow_state: "created",
           selected_content: { folders: { "folder_#{folder.id}": "1" } }
         )
@@ -239,7 +239,7 @@ describe "Exporters::ZipExporter" do
         before do
           attachment_model(
             context: course,
-            folder: folder,
+            folder:,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
         end
@@ -254,7 +254,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 
@@ -276,7 +276,7 @@ describe "Exporters::ZipExporter" do
 
           attachment_model(
             context: course,
-            folder: folder,
+            folder:,
             locked: true,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
@@ -292,7 +292,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 
@@ -314,7 +314,7 @@ describe "Exporters::ZipExporter" do
 
           attachment_model(
             context: course,
-            folder: folder,
+            folder:,
             lock_at: 1.day.ago,
             unlock_at: 3.days.ago,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
@@ -331,7 +331,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 
@@ -354,7 +354,7 @@ describe "Exporters::ZipExporter" do
           attachment_model(
             context: course,
             file_state: "hidden",
-            folder: folder,
+            folder:,
             uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
         end
@@ -369,7 +369,7 @@ describe "Exporters::ZipExporter" do
 
         context "when the user is a concluded teacher" do
           before do
-            teacher.enrollments.find_by(course: course).conclude
+            teacher.enrollments.find_by(course:).conclude
             @user = teacher
           end
 

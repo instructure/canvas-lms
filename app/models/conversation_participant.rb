@@ -19,7 +19,7 @@
 #
 
 class ConversationParticipant < ActiveRecord::Base
-  self.ignored_columns = %i[root_account_id]
+  self.ignored_columns += %i[root_account_id]
 
   include Workflow
   include TextHelper
@@ -209,16 +209,16 @@ class ConversationParticipant < ActiveRecord::Base
     options[:include_context_info] ||= private?
     {
       id: conversation_id,
-      subject: subject,
-      workflow_state: workflow_state,
+      subject:,
+      workflow_state:,
       last_message: latest ? CanvasTextHelper.truncate_text(latest.body, max_length: 100) : nil,
-      last_message_at: last_message_at,
+      last_message_at:,
       last_authored_message: latest_authored ? CanvasTextHelper.truncate_text(latest_authored.body, max_length: 100) : nil,
       last_authored_message_at: latest_authored ? latest_authored.created_at : visible_last_authored_at,
-      message_count: message_count,
+      message_count:,
       subscribed: subscribed?,
       private: private?,
-      starred: starred,
+      starred:,
       properties: properties(latest || latest_authored)
     }.with_indifferent_access
   end
@@ -301,7 +301,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
 
     message = Conversation.build_message(*message_args)
-    add_message(message, tags: tags, update_for_sender: false, only_users: recipients)
+    add_message(message, tags:, update_for_sender: false, only_users: recipients)
 
     message
   end
@@ -348,8 +348,8 @@ class ConversationParticipant < ActiveRecord::Base
   def remove_or_delete_messages(operation, *to_delete)
     conversation.shard.activate do
       scope = ConversationMessageParticipant.joins(:conversation_message)
-                                            .where(conversation_messages: { conversation_id: conversation_id },
-                                                   user_id: user_id)
+                                            .where(conversation_messages: { conversation_id: },
+                                                   user_id:)
       if to_delete == [:all]
         if operation == :delete
           scope.delete_all
@@ -504,7 +504,7 @@ class ConversationParticipant < ActiveRecord::Base
           destroy
         else
           ConversationMessageParticipant.joins(:conversation_message)
-                                        .where(conversation_messages: { conversation_id: conversation_id }, user_id: user_id)
+                                        .where(conversation_messages: { conversation_id: }, user_id:)
                                         .update_all(user_id: new_user.id)
           update_attribute :user, new_user
           clear_participants_cache
@@ -585,7 +585,8 @@ class ConversationParticipant < ActiveRecord::Base
   def self.do_batch_update(progress, user, conversation_ids, update_params)
     progress_runner = ProgressRunner.new(progress)
     progress_runner.completed_message do |completed_count|
-      t("batch_update_message", {
+      t("batch_update_message",
+        {
           one: "1 conversation processed",
           other: "%{count} conversations processed"
         },
@@ -593,7 +594,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
 
     progress_runner.do_batch_update(conversation_ids) do |conversation_id|
-      participant = user.all_conversations.where(conversation_id: conversation_id).first
+      participant = user.all_conversations.where(conversation_id:).first
       raise t("not_participating", "The user is not participating in this conversation") unless participant
 
       InstStatsd::Statsd.increment("inbox.conversation.unarchived.legacy") if participant[:workflow_state] == "archived" && ["mark_as_read", "mark_as_unread"].include?(update_params[:event])
@@ -630,7 +631,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def update_unread_count(direction = :up, user_id = self.user_id)
     User.where(id: user_id)
-        .update_all(["unread_conversations_count = GREATEST(unread_conversations_count + ?, 0), updated_at = ?", direction == :up ? 1 : -1, Time.now.utc])
+        .update_all(["unread_conversations_count = GREATEST(unread_conversations_count + ?, 0), updated_at = ?", (direction == :up) ? 1 : -1, Time.now.utc])
   end
 
   def update_unread_count_for_update
@@ -638,7 +639,7 @@ class ConversationParticipant < ActiveRecord::Base
       update_unread_count(:up) if unread?
       update_unread_count(:down, user_id_was) if workflow_state_was == "unread"
     elsif workflow_state_changed? && [workflow_state, workflow_state_was].include?("unread")
-      update_unread_count(workflow_state == "unread" ? :up : :down)
+      update_unread_count((workflow_state == "unread") ? :up : :down)
     end
   end
 

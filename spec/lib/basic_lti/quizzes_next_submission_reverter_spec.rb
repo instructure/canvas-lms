@@ -59,7 +59,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     end
 
     let(:submission) do
-      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
+      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment:, user: @user)
 
       submission_version_data.each do |d|
         s.score = d[:score]
@@ -114,7 +114,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
         expect(submission.versions.count).to be(submission_version_data.count + 1)
         versions = submission.versions.map(&:model).sort_by(&:submitted_at)
         data = submission_version_data.sort_by { |x| x[:submitted_at] }
-        (0..3).each do |i|
+        4.times do |i|
           d = data[i]
           v = versions[i]
           expect(d[:submitted_at]).to eq(v.submitted_at)
@@ -174,7 +174,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     end
 
     let(:submission) do
-      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
+      s = assignment.submissions.first || Submission.find_or_initialize_by(assignment:, user: @user)
 
       s.with_versioning(explicit: true) { s.save! }
       submission_version_data.each do |d|

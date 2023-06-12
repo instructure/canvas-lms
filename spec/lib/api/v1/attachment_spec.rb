@@ -31,8 +31,8 @@ describe Api::V1::Attachment do
   describe "#attachment_json" do
     let(:course) { Course.create! }
     let(:attachment) { attachment_model(content_type: "application/pdf", context: student) }
-    let(:student) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
-    let(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
+    let(:student) { course_with_user("StudentEnrollment", course:, active_all: true).user }
+    let(:teacher) { course_with_user("TeacherEnrollment", course:, active_all: true).user }
 
     before do
       allow(Canvadocs).to receive(:enabled?).and_return(true)

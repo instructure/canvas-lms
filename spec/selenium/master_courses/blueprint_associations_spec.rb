@@ -41,10 +41,10 @@ describe "Blueprint association settings" do
   def create_sub_account(name = "sub account", number_to_create = 1, parent_account = Account.default)
     created_sub_accounts = []
     number_to_create.times do |i|
-      sub_account = Account.create(name: name + " #{i}", parent_account: parent_account)
+      sub_account = Account.create(name: name + " #{i}", parent_account:)
       created_sub_accounts.push(sub_account)
     end
-    created_sub_accounts.count == 1 ? created_sub_accounts[0] : created_sub_accounts
+    (created_sub_accounts.count == 1) ? created_sub_accounts[0] : created_sub_accounts
   end
 
   before do

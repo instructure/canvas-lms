@@ -21,7 +21,7 @@
 require_relative "../spec_helper"
 require_relative "../support/request_helper"
 
-describe "Discussion Topics API", type: :request do
+describe "Discussion Topics API" do
   let(:teacher_enrollment) { course_with_teacher(active_all: true) }
   let(:course) { teacher_enrollment.course }
   let(:teacher) { teacher_enrollment.user }
@@ -37,8 +37,8 @@ describe "Discussion Topics API", type: :request do
       context "when the discussion is not anonymous" do
         it "includes the author information" do
           get api_v1_course_discussion_topics_path(course.id), params: { format: :json }
-          expect(response.status).to eq 200
-          json = JSON.parse(response.body).detect { |d| d["id"] == discussion.id }
+          expect(response).to have_http_status :ok
+          json = response.parsed_body.detect { |d| d["id"] == discussion.id }
           expect(json["author"]).to_not be_nil
         end
       end
@@ -46,8 +46,8 @@ describe "Discussion Topics API", type: :request do
       context "when the discussion is anonymous" do
         it "does not include the author information" do
           get api_v1_course_discussion_topics_path(course.id), params: { format: :json }
-          expect(response.status).to eq 200
-          json = JSON.parse(response.body).detect { |d| d["id"] == anon_discussion.id }
+          expect(response).to have_http_status :ok
+          json = response.parsed_body.detect { |d| d["id"] == anon_discussion.id }
           expect(json["author"]).to be_nil
         end
       end

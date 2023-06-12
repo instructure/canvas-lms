@@ -46,6 +46,21 @@ const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[
 const CONVERSATIONS_URL = '/api/v1/conversations'
 const getSyllabusUrl = courseId => encodeURI(`/api/v1/courses/${courseId}?include[]=syllabus_body`)
 
+const DEFAULT_GRADING_SCHEME = [
+  ['A', 0.94],
+  ['A-', 0.9],
+  ['B+', 0.87],
+  ['B', 0.84],
+  ['B-', 0.8],
+  ['C+', 0.77],
+  ['C', 0.74],
+  ['C-', 0.7],
+  ['D+', 0.67],
+  ['D', 0.64],
+  ['D-', 0.61],
+  ['F', 0.0],
+]
+
 afterEach(() => {
   fetchMock.restore()
 })
@@ -403,6 +418,50 @@ describe('getAssignmentGroupTotals', () => {
     expect(totals[0].score).toBe('80.00%')
   })
 
+  it('returns an array of objects that have id, name, and letter grade as score when Restrict Quantitative Data', () => {
+    const data = [
+      {
+        id: '49',
+        name: 'Assignments',
+        rules: {},
+        group_weight: 0.0,
+        assignments: [
+          {
+            id: 149,
+            name: '1',
+            points_possible: 10.0,
+            grading_type: 'points',
+            submission: {
+              score: 7.0,
+              grade: '7.0',
+              late: false,
+              excused: false,
+              missing: false,
+            },
+          },
+          {
+            id: 150,
+            name: '2',
+            points_possible: 5.0,
+            grading_type: 'points',
+            submission: {
+              score: 5.0,
+              grade: '5.0',
+              late: false,
+              excused: false,
+              missing: false,
+            },
+          },
+        ],
+      },
+    ]
+    const totals = getAssignmentGroupTotals(data, null, null, true, DEFAULT_GRADING_SCHEME)
+    expect(totals.length).toBe(1)
+    expect(totals[0].id).toBe('49')
+    expect(totals[0].name).toBe('Assignments')
+    expect(totals[0].score).toBe('B-')
+  })
+
   it('returns n/a for assignment groups with no assignments', () => {
     const data = [
       {
@@ -572,6 +631,37 @@ describe('getTotalGradeStringFromEnrollments', () => {
     expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('n/a')
   })
 
+  it('returns just the B Letter Grade if Restrict Quantitative Data is true', () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 84,
+          current_grade: null,
+        },
+      },
+    ]
+    expect(
+      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME)
+    ).toBe('B')
+  })
+
+  it('returns just the F Letter Grade if Restrict Quantitative Data is true', () => {
+    const enrollments = [
+      {
+        user_id: '2',
+        grades: {
+          current_score: 0,
+          current_grade: null,
+        },
+      },
+    ]
+
+    expect(
+      getTotalGradeStringFromEnrollments(enrollments, '2', false, true, DEFAULT_GRADING_SCHEME)
+    ).toBe('F')
+  })
+
   it("returns just the percent with 2 decimals if there's no grade", () => {
     const enrollments = [
       {
@@ -582,6 +672,7 @@ describe('getTotalGradeStringFromEnrollments', () => {
         },
       },
     ]
+
     expect(getTotalGradeStringFromEnrollments(enrollments, '2')).toBe('84.00%')
   })
 

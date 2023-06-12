@@ -127,6 +127,19 @@ describe "assignments" do
       end
     end
 
+    it "shows speed grader link when published" do
+      @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f("#speed-grader-link-container")).to be_present
+    end
+
+    it "hides speed grader link when unpublished" do
+      @assignment = @course.assignments.create({ name: "Test Moderated Assignment" })
+      @assignment.unpublish
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      expect(f("#speed-grader-link-container").attribute("class")).to include("hidden")
+    end
+
     it "edits an assignment", priority: "1" do
       assignment_name = "first test assignment"
       due_date = Time.now.utc + 2.days
@@ -599,8 +612,10 @@ describe "assignments" do
       let(:assignment) do
         @course.assignment_groups.first.assignments.create!(title: "custom params",
                                                             lti_resource_link_custom_params: custom_params,
-                                                            submission_types: "external_tool", context: @course,
-                                                            points_possible: 10, external_tool_tag: content_tag,
+                                                            submission_types: "external_tool",
+                                                            context: @course,
+                                                            points_possible: 10,
+                                                            external_tool_tag: content_tag,
                                                             workflow_state: "unpublished")
       end
 
@@ -830,7 +845,7 @@ describe "assignments" do
       course_with_teacher_logged_in
       @new_group = "fine_leather_jacket"
       get "/courses/#{@course.id}/assignments/new"
-      click_option("#assignment_group_id", "[ New Group ]")
+      click_option("#assignment_group_id", "[ Create Group ]")
 
       # type something in here so you can check to make sure it was not added
       fj("div.controls > input:visible").send_keys(@new_group)
@@ -855,6 +870,375 @@ describe "assignments" do
       wait_for_ajaximations
 
       expect(f("#assignment_group_id")).not_to include_text(@new_group)
+    end
+  end
+
+  context "with restrict_quantitative_data" do
+    all_options = ["Percentage", "Complete/Incomplete", "Points", "Letter Grade", "GPA Scale", "Not Graded"]
+
+    before do
+      course_with_teacher_logged_in
+    end
+
+    context "turned off" do
+      it "show all options on create" do
+        get "/courses/#{@course.id}/assignments/new"
+        wait_for_ajaximations
+
+        expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+      end
+
+      context "index page" do
+        it "shows submission score and letter grade for students on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 10, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "10/10 pts  |  A"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Score: 10 out of 10 points. Grade: A"
+        end
+
+        it "shows percentage if percent type", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "percent")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: "88%", grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "8.8/10 pts  |  88%"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Score: 8.8 out of 10 points. Grade: 88%"
+        end
+
+        it "shows letter grade if points type", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "points")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 8, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "8/10 pts"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Score: 8 out of 10 points."
+        end
+      end
+
+      context "creation and edit" do
+        it "show all options on edit" do
+          @assignment = @course.assignments.create({ name: "Test Assignment" })
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+        end
+      end
+
+      context "assignment show page" do
+        it "shows points for teachers" do
+          @assignment = @course.assignments.create({ name: "Test Assignment" })
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          wait_for_ajaximations
+          expect(ff("div .control-label").map(&:text)).to include "Points"
+        end
+
+        it "shows points for students" do
+          course_with_student_logged_in(active_all: true, course: @course)
+
+          @assignment = @course.assignments.create({ name: "Test Assignment" })
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          wait_for_ajaximations
+          expect(ff("div .title").map(&:text)).to include "Points"
+        end
+
+        context "with rubric" do
+          before do
+            rubric = @course.rubrics.create!
+            rubric.data = [{ description: "Description of criterion",
+                             long_description: "",
+                             points: 5.0,
+                             id: "_7491",
+                             criterion_use_range: false,
+                             ratings: [{ description: "Full Marks", long_description: "", points: 5.0, criterion_id: "_7491", id: "blank" },
+                                       { description: "No Marks", long_description: "", points: 0.0, criterion_id: "_7491", id: "blank_2" }] }]
+            rubric.save!
+
+            @course_rubric_association = RubricAssociation.create!(
+              rubric:,
+              association_object: @course,
+              context: @course,
+              purpose: "bookmark"
+            )
+
+            @assignment = @course.assignments.create({ name: "Test Assignment" })
+            @assignment_rubric_association = RubricAssociation.generate(@teacher, rubric, @course, ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                                                                                  hide_score_total: "0",
+                                                                                                                                                  purpose: "grading",
+                                                                                                                                                  skip_updating_points_possible: false,
+                                                                                                                                                  update_if_existing: true,
+                                                                                                                                                  use_for_grading: "1",
+                                                                                                                                                  association_object: @assignment
+                                                                                                                                                }))
+          end
+
+          it "show points and totals" do
+            get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+            wait_for_ajaximations
+
+            expect(ff("div .rating-main")[0].text).to match "5 pts\nFull Marks"
+            expect(ff("div .rating-main")[1].text).to match "0 pts\nNo Marks"
+            expect(ff("div .points_form")[0].text).to match "5 pts"
+            expect(ff("div .total_points_holder")[0].text).to match "Total Points:"
+          end
+        end
+      end
+    end
+
+    context "turned on" do
+      before do
+        Account.default.enable_feature! :restrict_quantitative_data
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+        Account.default.reload
+      end
+
+      context "index" do
+        it "shows only submission letter grade for students on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 10, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+        end
+
+        it "shows Complete for students with 0/0 score on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 0, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "Complete"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: Complete"
+        end
+
+        it "shows A for students with 1/0 score on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 1, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+        end
+
+        it "shows -1 for students with -1/0 score on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: -1, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "-1"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: -1"
+        end
+
+        it "shows points possible for teachers on index page", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_teacher_logged_in(active_all: true, course: @course)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "10 pts"
+        end
+
+        it "shows letter grade if percent type", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "percent")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: "88%", grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "B+"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: B+"
+        end
+
+        it "shows letter grade if points type", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 10, grading_type: "points")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 8, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "B-"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: B-"
+        end
+
+        it "shows A if points type, pointsPossible is 0 and score is more than 0", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "points")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 3, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+        end
+
+        it "shows nothing if points type, pointsPossible is 0 and score is 0 or less", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "points")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 0, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match ""
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match ""
+        end
+
+        it "shows complete if pass_fail type, pointsPossible is 0 and score is complete", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "pass_fail")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: "complete", grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "Complete"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: Complete"
+        end
+
+        it "shows A if letter grade type, pointsPossible is 0 and score is more than 0", priority: "2" do
+          @assignment = @course.assignments.create! context: @course, title: "to publish"
+          @assignment.update(points_possible: 0, grading_type: "letter_grade")
+          @assignment.publish
+          course_with_student_logged_in(active_all: true, course: @course)
+          @assignment.grade_student(@student, grade: 3, grader: @teacher)
+
+          get "/courses/#{@course.id}/assignments"
+          wait_for_ajaximations
+
+          expect(f("#assignment_#{@assignment.id} .js-score .non-screenreader").text).to match "A"
+          expect(f("#assignment_#{@assignment.id} .js-score .screenreader-only").text).to match "Grade: A"
+        end
+      end
+
+      context "creation and edit" do
+        it "show all options on create" do
+          get "/courses/#{@course.id}/assignments/new"
+          wait_for_ajaximations
+
+          expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+        end
+
+        it "show only qualitative options on edit" do
+          @assignment = @course.assignments.create({ name: "Test Assignment" })
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
+          wait_for_ajaximations
+
+          expect(get_options("#assignment_grading_type").map(&:text)).to eq all_options
+        end
+      end
+
+      context "assignment show page" do
+        it "shows points for teachers" do
+          @assignment = @course.assignments.create({ name: "Test Assignment" })
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          wait_for_ajaximations
+          expect(ff("div .control-label").map(&:text)).to include "Points"
+        end
+
+        it "does not show points for students" do
+          course_with_student_logged_in(active_all: true, course: @course)
+
+          @assignment = @course.assignments.create({ name: "Test Assignment" })
+          get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+          wait_for_ajaximations
+          expect(ff("div .title").map(&:text)).not_to include "Points"
+        end
+
+        context "with rubric" do
+          before do
+            rubric = @course.rubrics.create!
+            rubric.data = [{ description: "Description of criterion",
+                             long_description: "",
+                             points: 5.0,
+                             id: "_7491",
+                             criterion_use_range: false,
+                             ratings: [{ description: "Full Marks", long_description: "", points: 5.0, criterion_id: "_7491", id: "blank" },
+                                       { description: "No Marks", long_description: "", points: 0.0, criterion_id: "_7491", id: "blank_2" }] }]
+            rubric.save!
+
+            @course_rubric_association = RubricAssociation.create!(
+              rubric:,
+              association_object: @course,
+              context: @course,
+              purpose: "bookmark"
+            )
+
+            @assignment = @course.assignments.create({ name: "Test Assignment" })
+            @assignment_rubric_association = RubricAssociation.generate(@teacher, rubric, @course, ActiveSupport::HashWithIndifferentAccess.new({
+                                                                                                                                                  hide_score_total: "0",
+                                                                                                                                                  purpose: "grading",
+                                                                                                                                                  skip_updating_points_possible: false,
+                                                                                                                                                  update_if_existing: true,
+                                                                                                                                                  use_for_grading: "1",
+                                                                                                                                                  association_object: @assignment
+                                                                                                                                                }))
+          end
+
+          it "hide points and totals" do
+            get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+            wait_for_ajaximations
+
+            expect(ff("div .rating-main")[0].text).to match "Full Marks"
+            expect(ff("div .rating-main")[1].text).to match "No Marks"
+            expect(ff("div .points_form")[0].text).to match ""
+            expect(ff("div .total_points_holder")[0].text).to match ""
+          end
+        end
+      end
     end
   end
 end

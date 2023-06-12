@@ -30,8 +30,6 @@ class MessageableUser < User
       common_role_column: nil
     }.merge(options)
 
-    bookmark_sql = User.sortable_name_order_by_clause
-
     common_course_sql =
       if options[:common_role_column]
         raise ArgumentError unless options[:common_course_column]
@@ -51,7 +49,7 @@ class MessageableUser < User
         "NULL::text"
       end
 
-    "#{SELECT}, #{bookmark_sql} AS bookmark, #{common_course_sql} AS common_courses, #{common_group_sql} AS common_groups"
+    "#{SELECT}, sortable_name, #{common_course_sql} AS common_courses, #{common_group_sql} AS common_groups"
   end
 
   def self.prepped(options = {})
@@ -167,7 +165,7 @@ class MessageableUser < User
       sharded_ids.each do |id|
         # a context id of 0 indicates admin visibility without an actual shared
         # context; don't "globalize" it
-        global_id = id == 0 ? id : Shard.global_id_for(id)
+        global_id = (id == 0) ? id : Shard.global_id_for(id)
         id = global_id unless Shard.current == target_shard
         local_common_contexts[id] = common_contexts[global_id]
       end
@@ -185,7 +183,7 @@ class MessageableUser < User
   # interpretation: local to Shard.current.
   class MessageableUser::Bookmarker
     def self.bookmark_for(user)
-      [user.bookmark, user.id]
+      [user.sortable_name, user.id]
     end
 
     def self.validate(bookmark)
@@ -199,9 +197,6 @@ class MessageableUser < User
     def self.restrict_scope(scope, pager)
       if pager.current_bookmark
         name, id = pager.current_bookmark
-        if MessageableUser.connection.adapter_name == "PostgreSQL"
-          name = MessageableUser.connection.escape_bytea(name)
-        end
         scope_shard = scope.shard_value
         id = Shard.relative_id_for(id, Shard.current, scope_shard) if scope_shard
 
@@ -210,12 +205,14 @@ class MessageableUser < User
             #{User.sortable_name_order_by_clause} > ? OR
             #{User.sortable_name_order_by_clause} = ? AND users.id > ?
           SQL
-          name, name, id
+          name,
+          name,
+          id
         ]
 
         if pager.include_bookmark
           condition[0] << "OR #{User.sortable_name_order_by_clause} = ? AND users.id = ?"
-          condition.concat([name, id])
+          condition.push(name, id)
         end
 
         scope.where(condition)

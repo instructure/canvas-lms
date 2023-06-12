@@ -18,15 +18,19 @@
 
 import 'isomorphic-fetch'
 import {parse} from 'url'
-import {saveClosedCaptions, CONSTANTS} from '@instructure/canvas-media'
+import {
+  saveClosedCaptions,
+  saveClosedCaptionsForAttachment,
+  CONSTANTS,
+} from '@instructure/canvas-media'
 import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
 import alertHandler from '../rce/alertHandler'
 import buildError from './buildError'
+import RCEGlobals from '../rce/RCEGlobals'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
 }
-
 export function originFromHost(host, windowOverride) {
   let origin = host
 
@@ -181,6 +185,18 @@ class RceApiSource {
   fetchMedia(props) {
     const media = props.media[props.contextType]
     const uri = media.bookmark || this.uriFor('media', props)
+
+    if (RCEGlobals.getFeatures()?.media_links_use_attachment_id) {
+      return this.apiFetch(uri, headerFor(this.jwt)).then(({bookmark, files}) => {
+        return {
+          bookmark,
+          files: files.map(f =>
+            fixupFileUrl(props.contextType, props.contextId, f, this.canvasOrigin)
+          ),
+        }
+      })
+    }
+
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
@@ -222,27 +238,36 @@ class RceApiSource {
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
   }
 
-  updateMediaObject(apiProps, {media_object_id, title}) {
-    const uri = `${this.baseUri(
-      'media_objects',
-      apiProps.host
-    )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
+  updateMediaObject(apiProps, {media_object_id, title, attachment_id}) {
+    const uri =
+      RCEGlobals.getFeatures()?.media_links_use_attachment_id && attachment_id
+        ? `${this.baseUri(
+            'media_attachments',
+            apiProps.host
+          )}/${attachment_id}?user_entered_title=${encodeURIComponent(title)}`
+        : `${this.baseUri(
+            'media_objects',
+            apiProps.host
+          )}/${media_object_id}?user_entered_title=${encodeURIComponent(title)}`
     return this.apiPost(uri, headerFor(this.jwt), null, 'PUT')
   }
 
   // PUT to //RCS/api/media_objects/:mediaId/media_tracks [{locale, content}, ...]
   // receive back a 200 with the new subtitles, or a 4xx error
-  updateClosedCaptions(apiProps, {media_object_id, subtitles}, maxBytes) {
-    return saveClosedCaptions(
-      media_object_id,
-      subtitles,
-      {
-        origin: originFromHost(apiProps.host),
-        headers: headerFor(apiProps.jwt),
-      },
-      maxBytes || CONSTANTS.CC_FILE_MAX_BYTES
-    ).catch(e => {
-      console.error('Failed saving CC', e)
+  updateClosedCaptions(
+    apiProps,
+    {media_object_id, attachment_id, subtitles},
+    maxBytes = CONSTANTS.CC_FILE_MAX_BYTES
+  ) {
+    const rcsConfig = {
+      origin: originFromHost(apiProps.host),
+      headers: headerFor(apiProps.jwt),
+    }
+    const saveCaptions = attachment_id
+      ? saveClosedCaptionsForAttachment(attachment_id, subtitles, rcsConfig, maxBytes)
+      : saveClosedCaptions(media_object_id, subtitles, rcsConfig, maxBytes)
+
+    return saveCaptions.catch(e => {
       this.alertFunc(buildError({message: 'failed to save captions'}, e))
     })
   }

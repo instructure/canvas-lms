@@ -142,7 +142,7 @@ describe "dashboard" do
         wait_for_ajaximations
         f("#assignment_name").send_keys("unpublished assignment")
         f("input[type=checkbox][id=assignment_text_entry]").click
-        f(".datePickerDateField[data-date-type='due_at']").send_keys(Time.zone.now + 1.day)
+        f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
 
         expect_new_page_load { f(".btn-primary[type=submit]").click }
         wait_for_ajaximations
@@ -369,7 +369,7 @@ describe "dashboard" do
     it "does not show an unpublished assignment for an unpublished course", priority: "2" do
       name = "venkman"
       due_date = Time.zone.now.utc + 2.days
-      assignment = @course.assignments.create(name: name,
+      assignment = @course.assignments.create(name:,
                                               submission_types: "online",
                                               due_at: due_date,
                                               lock_at: 1.week.from_now,

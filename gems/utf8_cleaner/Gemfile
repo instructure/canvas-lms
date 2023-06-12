@@ -3,10 +3,3 @@
 source "https://rubygems.org"
 
 gemspec
-
-group :test do
-  platforms :ruby_20, :ruby_21, :ruby_22 do
-    gem "iconv", "1.0.4"
-    gem "syck", "1.0.4"
-  end
-end

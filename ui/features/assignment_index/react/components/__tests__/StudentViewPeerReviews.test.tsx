@@ -27,6 +27,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
         id: '1',
         anonymous_peer_reviews: true,
         course_id: '1',
+        name: 'Assignment 1',
         assessment_requests: [
           {
             anonymous_id: 'anonymous1',
@@ -68,6 +69,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
         id: '1',
         anonymous_peer_reviews: false,
         course_id: '1',
+        name: 'Assignment 1',
         assessment_requests: [
           {
             anonymous_id: 'anonymous1',
@@ -116,6 +118,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
     const defaultProps: StudentViewPeerReviewsProps = {
       assignment: {
         id: '1',
+        name: 'Assignment 1',
         anonymous_peer_reviews: false,
         course_id: '1',
         assessment_requests: [
@@ -148,5 +151,59 @@ describe('StudentViewPeerReviews Component Tests', () => {
     expect(secondLink.attributes.getNamedItem('href')?.value).toEqual(
       '/courses/1/assignments/1?reviewee_id=user2'
     )
+  })
+
+  it('renders the StudentViewPeerReviews with correct peer review icon based on workflow_state', () => {
+    const defaultProps: StudentViewPeerReviewsProps = {
+      assignment: {
+        id: '1',
+        name: 'Assignment 1',
+        anonymous_peer_reviews: false,
+        course_id: '1',
+        assessment_requests: [
+          {
+            anonymous_id: 'anonymous1',
+            user_id: 'user1',
+            user_name: 'username1',
+            available: true,
+            workflow_state: 'completed',
+          },
+          {
+            anonymous_id: 'anonymous2',
+            user_id: 'user2',
+            user_name: 'username2',
+            available: false,
+            workflow_state: '',
+          },
+        ],
+      },
+    }
+    const {container} = render(<StudentViewPeerReviews {...defaultProps} />)
+    expect(container.querySelector('svg[name="IconPeerGraded"]')).toBeInTheDocument()
+    expect(container.querySelector('svg[name="IconPeerReview"]')).toBeInTheDocument()
+  })
+
+  it('renders screen reader text for peer review link', () => {
+    const defaultProps: StudentViewPeerReviewsProps = {
+      assignment: {
+        id: '1',
+        name: 'Assignment 1',
+        anonymous_peer_reviews: false,
+        course_id: '1',
+        assessment_requests: [
+          {
+            anonymous_id: 'anonymous1',
+            user_id: 'user1',
+            user_name: 'username1',
+            available: true,
+            workflow_state: 'completed',
+          },
+        ],
+      },
+    }
+    const {container} = render(<StudentViewPeerReviews {...defaultProps} />)
+    expect(
+      container.querySelector('a[aria-label="Required Peer Review 1 for Assignment 1"]')
+    ).toBeInTheDocument()
   })
 })

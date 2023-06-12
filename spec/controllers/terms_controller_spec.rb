@@ -28,12 +28,15 @@ describe TermsController do
     term = a.default_enrollment_term
     expect_any_instantiation_of(term).to receive(:touch_all_courses).once
 
-    put "update", params: { account_id: a.id, id: term.id, enrollment_term: { start_at: 1.day.ago, end_at: 1.day.from_now,
-                                                                              overrides: {
-                                                                                student_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
-                                                                                teacher_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
-                                                                                ta_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
-                                                                              } } }
+    put "update", params: { account_id: a.id,
+                            id: term.id,
+                            enrollment_term: { start_at: 1.day.ago,
+                                               end_at: 1.day.from_now,
+                                               overrides: {
+                                                 student_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
+                                                 teacher_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
+                                                 ta_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
+                                               } } }
   end
 
   it "is not able to change the name for a default term" do
@@ -51,7 +54,7 @@ describe TermsController do
   it "doesn't overwrite stuck sis fields" do
     account = Account.default
     user = user_factory(active_all: true)
-    account.account_users.create!(user: user)
+    account.account_users.create!(user:)
     user_session(@user)
 
     term = account.default_enrollment_term
@@ -110,7 +113,6 @@ describe TermsController do
       course_model(account: @account)
       account_admin_user(account: @account)
       @course.account.enable_feature!(:course_paces)
-      @course.restrict_enrollments_to_course_dates = false
       @course.enable_course_paces = true
       @course.save!
       @course_pace = course_pace_model(course: @course)

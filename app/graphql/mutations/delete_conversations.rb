@@ -31,7 +31,7 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
     context[:deleted_models] = { conversations: {} }
     # rubocop:disable Style/BlockDelimiters
     resolved_ids = input[:ids].filter_map { |id|
-      conversation = Conversation.find_by(id: id)
+      conversation = Conversation.find_by(id:)
       if conversation.nil?
         errors[id] = "Unable to find Conversation"
         next

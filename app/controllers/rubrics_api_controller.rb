@@ -300,9 +300,11 @@ class RubricsApiController < ApplicationController
     else
       assessments = rubric_assessments(rubric)
       associations = rubric_associations(rubric)
-      render json: rubric_json(rubric, @current_user, session,
-                               assessments: assessments,
-                               associations: associations,
+      render json: rubric_json(rubric,
+                               @current_user,
+                               session,
+                               assessments:,
+                               associations:,
                                style: params[:style])
     end
   end

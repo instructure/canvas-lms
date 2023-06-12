@@ -19,7 +19,7 @@ import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/userDateRangeSearchForm.handlebars'
-import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
+import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
@@ -199,8 +199,18 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
     // Update the params (which fetches the collection)
     const json = this.$el.toJSON()
     delete json.search_term
-    if (!json.start_time) json.start_time = ''
-    if (!json.end_time) json.end_time = ''
+
+    if (!json.start_time) {
+      json.start_time = ''
+    } else {
+      json.start_time = new Date(this.$dateStartSearchField.data('unfudged-date')).toISOString()
+    }
+    if (!json.end_time) {
+      json.end_time = ''
+    } else {
+      json.end_time = new Date(this.$dateEndSearchField.data('unfudged-date')).toISOString()
+    }
+
     return this.collection.setParams(json)
   }
 }

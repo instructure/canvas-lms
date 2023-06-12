@@ -118,7 +118,9 @@ module AddressBook
             # and then ignoring
             Canvas::Errors.capture(RuntimeError.new(
                                      "AddressBook::Service#search_users should not be paged with include_bookmark: true"
-                                   ), {}, :warn)
+                                   ),
+                                   {},
+                                   :warn)
           end
           service_options[:cursor] = pager.current_bookmark
         end

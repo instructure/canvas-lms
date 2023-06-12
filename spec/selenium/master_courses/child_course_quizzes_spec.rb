@@ -24,7 +24,7 @@ describe "master courses - child courses - quiz locking" do
 
   before :once do
     qd = { question_type: "text_only_question", id: 1, question_name: "the hardest question ever" }.with_indifferent_access
-    due_date = format_date_for_view(Time.zone.now - 1.month)
+    due_date = format_date_for_view(1.month.ago)
     @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
@@ -56,7 +56,7 @@ describe "master courses - child courses - quiz locking" do
 
     # open the questions tab
     hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
-    expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to eq  true
+    expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to be  true
 
     # hover the question description and the edit/pencil link should not appear
     hover(f(".question_text"))

@@ -108,16 +108,16 @@ module CanvasPartman
       def table_regex
         @table_regex ||= case base_class.partitioning_interval
                          when :weeks
-                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<week>\d{2,})$/.freeze
+                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<week>\d{2,})$/
                          when :months
-                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<month>\d{1,2})$/.freeze
+                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<month>\d{1,2})$/
                          when :years
-                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})$/.freeze
+                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})$/
                          end
       end
 
       def generate_check_constraint(date)
-        constraint_range = generate_date_constraint_range(date).map { |d| Rails.version < "7.0" ? d.to_s(:db) : d.to_fs(:db) }
+        constraint_range = generate_date_constraint_range(date).map { |d| d.to_fs(:db) }
 
         <<~SQL.squish
           #{base_class.partitioning_field} >= TIMESTAMP '#{constraint_range[0]}'

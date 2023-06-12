@@ -52,7 +52,7 @@ describe PlannerApiHelper do
         planner_override_model({ plannable: @assignment, marked_complete: true })
         sync_module_requirement_done(@assignment, @user, true)
         progression = @module1.find_or_create_progression(@user)
-        expect(progression.finished_item?(@assignment_tag)).to eq true
+        expect(progression.finished_item?(@assignment_tag)).to be true
       end
 
       it "sets module requirement as not done when un-completed in planner for assignment" do
@@ -60,14 +60,14 @@ describe PlannerApiHelper do
         planner_override_model({ plannable: @assignment, marked_complete: false })
         sync_module_requirement_done(@assignment, @user, false)
         progression = @module1.find_or_create_progression(@user)
-        expect(progression.finished_item?(@assignment_tag)).to eq false
+        expect(progression.finished_item?(@assignment_tag)).to be false
       end
 
       it "sets module requirement as done when completed in planner for wiki page" do
         planner_override_model({ plannable: @wiki_page, marked_complete: true })
         sync_module_requirement_done(@wiki_page, @user, true)
         progression = @module1.find_or_create_progression(@user)
-        expect(progression.finished_item?(@wiki_page_tag)).to eq true
+        expect(progression.finished_item?(@wiki_page_tag)).to be true
       end
 
       it "sets module requirement as not done when un-completed in planner for wiki page" do
@@ -75,7 +75,7 @@ describe PlannerApiHelper do
         planner_override_model({ plannable: @wiki_page, marked_complete: false })
         sync_module_requirement_done(@wiki_page, @user, false)
         progression = @module1.find_or_create_progression(@user)
-        expect(progression.finished_item?(@wiki_page_tag)).to eq false
+        expect(progression.finished_item?(@wiki_page_tag)).to be false
       end
 
       it "catches error if tried on non-module object types" do
@@ -90,18 +90,18 @@ describe PlannerApiHelper do
                                  dismissed: false })
 
         override = sync_planner_completion(@assignment, @user, true)
-        expect(override.marked_complete).to eq true
-        expect(override.dismissed).to eq true
+        expect(override.marked_complete).to be true
+        expect(override.dismissed).to be true
 
         override = sync_planner_completion(@assignment, @user, false)
-        expect(override.marked_complete).to eq false
-        expect(override.dismissed).to eq false
+        expect(override.marked_complete).to be false
+        expect(override.dismissed).to be false
       end
 
       it "creates new override if none exists for assignment" do
         override = sync_planner_completion(@assignment, @user, true)
-        expect(override.marked_complete).to eq true
-        expect(override.dismissed).to eq true
+        expect(override.marked_complete).to be true
+        expect(override.dismissed).to be true
       end
 
       it "updates existing override for wiki page" do
@@ -110,18 +110,18 @@ describe PlannerApiHelper do
                                  dismissed: false })
 
         override = sync_planner_completion(@wiki_page, @user, true)
-        expect(override.marked_complete).to eq true
-        expect(override.dismissed).to eq true
+        expect(override.marked_complete).to be true
+        expect(override.dismissed).to be true
 
         override = sync_planner_completion(@wiki_page, @user, false)
-        expect(override.marked_complete).to eq false
-        expect(override.dismissed).to eq false
+        expect(override.marked_complete).to be false
+        expect(override.dismissed).to be false
       end
 
       it "creates new override if none exists for wiki page" do
         override = sync_planner_completion(@wiki_page, @user, true)
-        expect(override.marked_complete).to eq true
-        expect(override.dismissed).to eq true
+        expect(override.marked_complete).to be true
+        expect(override.dismissed).to be true
       end
 
       it "does not throw error if tried on object type not valid for override" do
@@ -132,7 +132,7 @@ describe PlannerApiHelper do
         @module1.completion_requirements = {}
         @module1.save!
         override = sync_planner_completion(@assignment, @user, true)
-        expect(override).to eq nil
+        expect(override).to be_nil
       end
 
       it "does nothing if mark-doneable in multiple modules" do
@@ -143,7 +143,7 @@ describe PlannerApiHelper do
         }
         @module2.save!
         override = sync_planner_completion(@assignment, @user, true)
-        expect(override).to eq nil
+        expect(override).to be_nil
       end
     end
   end

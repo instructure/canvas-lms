@@ -498,9 +498,9 @@ describe "submissions/show" do
             )
           end
           let(:moderated_submission) { moderated_assignment.submission_for_student(student) }
-          let(:first_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
+          let(:first_ta) { course_with_user("TaEnrollment", course:, active_all: true).user }
           let(:second_ta) do
-            course_with_user("TaEnrollment", course: course, active_all: true).user
+            course_with_user("TaEnrollment", course:, active_all: true).user
           end
 
           before do
@@ -573,10 +573,6 @@ describe "submissions/show" do
       end
 
       context "submission_feedback_indicators" do
-        before :once do
-          @course.root_account.enable_feature! :submission_feedback_indicators
-        end
-
         it "adds an indicator if unread comments are present" do
           view_context(@course, @student)
           @student.mark_rubric_assessments_unread!(@submission)
@@ -712,7 +708,7 @@ describe "submissions/show" do
     it "does not show assessment instructions when the assignment has a rubric" do
       rubric_association =
         rubric_association_model(association_object: assignment, purpose: "grading")
-      assessment_request.update!(rubric_association: rubric_association)
+      assessment_request.update!(rubric_association:)
 
       render "submissions/show"
       html = Nokogiri::HTML5.fragment(response.body)
@@ -769,7 +765,7 @@ describe "submissions/show" do
       html = Nokogiri::HTML5.fragment(response.body)
       comment_list = html.css(".submission-details-comments .comment_list")
       comment_contents = comment_list.css(".comment .comment").map { |comment| comment.text.strip }
-      expect(comment_contents.find { |c| c.include?("good job!") }).not_to be nil
+      expect(comment_contents.find { |c| c.include?("good job!") }).not_to be_nil
     end
 
     it "comment text includes boilerplate about being a media comment" do

@@ -22,7 +22,7 @@ require_relative "../spec_helper"
 describe BroadcastPolicy::NotificationPolicy do
   let(:subject) do
     policy = BroadcastPolicy::NotificationPolicy.new(:test_notification)
-    policy.to       = proc { ["user@example.com", "user2@example.com"] }
+    policy.to       = proc { ["user@example.com", "user2@example.com", MockSuspendedUser.new] }
     policy.whenever = proc { true }
     policy
   end
@@ -38,7 +38,7 @@ describe BroadcastPolicy::NotificationPolicy do
 
   before do
     BroadcastPolicy.notifier = MockNotifier.new
-    BroadcastPolicy.notification_finder = MockNotificationFinder.new(test_notification: test_notification)
+    BroadcastPolicy.notification_finder = MockNotificationFinder.new(test_notification:)
   end
 
   it "send_notifications for each slice of users" do
@@ -52,6 +52,12 @@ describe BroadcastPolicy::NotificationPolicy do
     record = double("test record", skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages.count).to eq(1)
+  end
+
+  it "broadcast message only to not suspended users" do
+    record = double("test record", skip_broadcasts: false, class: double(connection: test_connection_class.new))
+    subject.broadcast(record)
+    expect(BroadcastPolicy.notifier.messages[0][:recipients].count).to eq(2)
   end
 
   it "does not send if skip_broadcasts is set" do

@@ -69,7 +69,7 @@ module I18nTasks
     def core_translations(locale)
       pool = {}
 
-      Utils::CORE_KEYS.map(&:to_s).each do |scope|
+      CORE_KEYS.map(&:to_s).each do |scope|
         phrases = lookup(locale, scope) || {}
         phrases.flatten_keys.each do |key, value|
           pool["#{scope}.#{key}"] = value
@@ -80,7 +80,7 @@ module I18nTasks
     end
 
     def lookup(locale, key)
-      ::I18n.translate!(key.to_sym, locale: locale, raise: true)
+      ::I18n.translate!(key.to_sym, locale:, raise: true)
     rescue ::I18n::MissingTranslationData
       nil
     end

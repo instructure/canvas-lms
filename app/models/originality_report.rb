@@ -35,7 +35,7 @@ class OriginalityReport < ActiveRecord::Base
 
   validates :submission, presence: true
   validates :workflow_state, inclusion: { in: ORDERED_VALID_WORKFLOW_STATES }
-  validates :originality_score, inclusion: { in: 0..100, message: "score must be between 0 and 100" }, allow_nil: true
+  validates :originality_score, inclusion: { in: 0..100, message: -> { t("score must be between 0 and 100") } }, allow_nil: true
 
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id
@@ -98,16 +98,18 @@ class OriginalityReport < ActiveRecord::Base
       # reports, so if we can't find a report but the user is also
       # gone or is known to be a fake_student, we can ignore this and not
       # continue with the job
-      Canvas::Errors.capture(e, { report_id: report_id, user_id: user_id }, :info)
+      Canvas::Errors.capture(e, { report_id:, user_id: }, :info)
     elsif updated_at && where("updated_at > ?", updated_at)
-          .where(submission_id: submission_id, attachment_id: attachment_id).exists?
+          .where(submission_id:, attachment_id:).exists?
       # It is possible for the report to have been deleted by another job (of
       # the same group but different submission/student). In this case it would
       # have created another report, so if we find that, it's an expected
       # error.
       info = {
-        report_id: report_id, submission_id: submission_id,
-        attachment_id: attachment_id, updated_at: updated_at
+        report_id:,
+        submission_id:,
+        attachment_id:,
+        updated_at:
       }
       Canvas::Errors.capture(e, info, :info)
     else
@@ -123,12 +125,12 @@ class OriginalityReport < ActiveRecord::Base
     strand = "originality_report_copy_to_group_submissions:" \
              "#{submission.global_assignment_id}:#{submission.group_id}:#{attachment_id}"
 
-    self.class.delay_if_production(strand: strand).copy_to_group_submissions!(
+    self.class.delay_if_production(strand:).copy_to_group_submissions!(
       report_id: id,
       user_id: submission.user_id,
-      submission_id: submission_id,
-      attachment_id: attachment_id,
-      updated_at: updated_at
+      submission_id:,
+      attachment_id:,
+      updated_at:
     )
   end
 
@@ -141,7 +143,7 @@ class OriginalityReport < ActiveRecord::Base
 
     group_submissions.find_each do |s|
       same_or_later_report_exists =
-        s.originality_reports.where(attachment_id: attachment_id)
+        s.originality_reports.where(attachment_id:)
          .where("updated_at >= ?", updated_at).exists?
       next if same_or_later_report_exists
 
@@ -152,11 +154,11 @@ class OriginalityReport < ActiveRecord::Base
       # multiple originality reports with the same
       # attachment/submission combo hanging around.
       s.originality_reports
-       .where(attachment_id: attachment_id)
+       .where(attachment_id:)
        .where("updated_at < ?", updated_at)
        .destroy_all
 
-      copy_of_report.update!(submission: s, updated_at: updated_at)
+      copy_of_report.update!(submission: s, updated_at:)
       lti_link&.dup&.update!(
         linkable: copy_of_report,
         resource_link_id: nil

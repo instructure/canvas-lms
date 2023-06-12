@@ -46,7 +46,7 @@ describe ContentMigration do
 
       expect(tool_to.name).to eq @tool_from.name
       expect(tool_to.custom_fields).to eq @tool_from.custom_fields
-      expect(tool_to.has_placement?(:course_navigation)).to eq true
+      expect(tool_to.has_placement?(:course_navigation)).to be true
       expect(tool_to.consumer_key).to eq @tool_from.consumer_key
       expect(tool_to.shared_secret).to eq @tool_from.shared_secret
     end
@@ -66,7 +66,7 @@ describe ContentMigration do
       tool_to = @copy_to.context_external_tools.first
       expect(tool_to.name).to eq @tool_from.name
       expect(tool_to.consumer_key).to eq @tool_from.consumer_key
-      expect(tool_to.has_placement?(:course_navigation)).to eq true
+      expect(tool_to.has_placement?(:course_navigation)).to be true
     end
 
     it "copies external tool assignments" do
@@ -141,7 +141,8 @@ describe ContentMigration do
 
     it "keeps reference to ContextExternalTool by id for courses" do
       mod1 = @copy_from.context_modules.create!(name: "some module")
-      mod1.add_item type: "context_external_tool", id: @tool_from.id,
+      mod1.add_item type: "context_external_tool",
+                    id: @tool_from.id,
                     url: "https://www.example.com/launch"
       run_course_copy
 
@@ -193,7 +194,8 @@ describe ContentMigration do
     end
 
     it "copies message_type (and other fields)" do
-      @tool_from.course_settings_sub_navigation = { url: "http://www.example.com", text: "hello",
+      @tool_from.course_settings_sub_navigation = { url: "http://www.example.com",
+                                                    text: "hello",
                                                     message_type: "ContentItemSelectionResponse" }
       @tool_from.settings[:selection_width] = 5000
       @tool_from.save!

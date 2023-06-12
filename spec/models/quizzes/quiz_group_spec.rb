@@ -24,7 +24,7 @@ describe Quizzes::QuizGroup do
       course_factory
       quiz = @course.quizzes.create!(title: "some quiz")
       group = quiz.quiz_groups.create!(name: "question group", pick_count: 1, question_points: 5.0)
-      group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+      group.quiz_questions.create!(quiz:, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
       quiz.published_at = Time.now
       quiz.publish!
       expect(quiz.unpublished_changes?).to be_falsey
@@ -42,8 +42,8 @@ describe Quizzes::QuizGroup do
         course_factory
         quiz = @course.quizzes.create!(title: "some quiz")
         group = quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
-        group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
-        group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
+        group.quiz_questions.create!(quiz:, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+        group.quiz_questions.create!(quiz:, question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
         expect(group.quiz_questions.active.size).to eq 2
 
         expect(group.pick_count).to eq 3
@@ -90,16 +90,16 @@ describe Quizzes::QuizGroup do
       g.quiz_questions << quiz.quiz_questions.create!(question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
       g.quiz_questions << quiz.quiz_questions.create!(question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
       expect(g.name).to eql("question group")
-      expect(g.pick_count).to eql(2)
-      expect(g.question_points).to eql(5.0)
+      expect(g.pick_count).to be(2)
+      expect(g.question_points).to be(5.0)
       g.save!
 
       data = g.data
       expect(data[:name]).to eql("question group")
-      expect(data[:pick_count]).to eql(2)
-      expect(data[:question_points]).to eql(5.0)
+      expect(data[:pick_count]).to be(2)
+      expect(data[:question_points]).to be(5.0)
       expect(data[:questions]).not_to be_empty
-      expect(data[:questions].length).to eql(2)
+      expect(data[:questions].length).to be(2)
       data[:questions].sort_by! { |q| q[:id] }
       expect(data[:questions][0][:name]).to eql("test question")
       expect(data[:questions][1][:name]).to eql("test question 2")

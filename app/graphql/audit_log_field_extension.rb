@@ -116,7 +116,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       when Array
         o.map! { |x| truncate_params!(x) }
       when String
-        o.size > 256 ? o.slice(0, 256) : o
+        (o.size > 256) ? o.slice(0, 256) : o
       else
         o
       end
@@ -142,8 +142,10 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       #
       # Also skip audit logs for internal setting mutations, which can only
       # be executed by siteadmins.
-      next if [Mutations::CreateDiscussionEntryDraft, Mutations::CreateInternalSetting,
-               Mutations::UpdateInternalSetting, Mutations::DeleteInternalSetting].include? mutation
+      next if [Mutations::CreateDiscussionEntryDraft,
+               Mutations::CreateInternalSetting,
+               Mutations::UpdateInternalSetting,
+               Mutations::DeleteInternalSetting].include? mutation
 
       logger = Logger.new(mutation, context, arguments)
 

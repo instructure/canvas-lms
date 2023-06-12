@@ -45,7 +45,7 @@ module FeatureFlags
 
   def set_feature_flag!(feature, state)
     feature = feature.to_s
-    flag = feature_flags.find_or_initialize_by(feature: feature)
+    flag = feature_flags.find_or_initialize_by(feature:)
     flag.state = state
     @feature_flag_cache ||= {}
     @feature_flag_cache[feature] = flag
@@ -131,11 +131,12 @@ module FeatureFlags
 
   # find the feature flag setting that applies to this object
   # it may be defined on the object or inherited
-  def lookup_feature_flag(feature, override_hidden: false, skip_cache: false, hide_inherited_enabled: false, inherited_only: false)
+  def lookup_feature_flag(feature, override_hidden: false, skip_cache: false, hide_inherited_enabled: false, inherited_only: false, include_shadowed: true)
     feature = feature.to_s
     feature_def = Feature.definitions[feature]
     raise "no such feature - #{feature}" unless feature_def
     return nil unless feature_def.applies_to_object(self)
+    return nil if feature_def.shadow? && !include_shadowed
 
     return nil if feature_def.visible_on.is_a?(Proc) && !feature_def.visible_on.call(self)
     return return_flag(feature_def, hide_inherited_enabled) unless feature_def.can_override? || feature_def.hidden?
@@ -209,7 +210,7 @@ module FeatureFlags
 
   def persist_result(feature, result)
     persist_result_context(feature, result)
-    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: result.to_s })
+    InstStatsd::Statsd.increment("feature_flag_check", tags: { feature:, enabled: result.to_s })
     result
   end
 
@@ -224,7 +225,7 @@ module FeatureFlags
 
     LocalCache.fetch(feature_analytics_cache_key(feature, result), expires_in: cache_expiry) do
       message = {
-        feature: feature,
+        feature:,
         env: Canvas.environment,
         context: context_type,
         root_account_id: try(:root_account?) ? global_id : try(:global_root_account_id),

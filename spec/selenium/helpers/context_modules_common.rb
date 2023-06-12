@@ -66,8 +66,10 @@ module ContextModulesCommon
     @module.add_item type: "assignment", id: @assignment3.id
 
     # add external tool
-    @tool = @course.context_external_tools.create!(name: "new tool", consumer_key: "key",
-                                                   shared_secret: "secret", domain: "example.com",
+    @tool = @course.context_external_tools.create!(name: "new tool",
+                                                   consumer_key: "key",
+                                                   shared_secret: "secret",
+                                                   domain: "example.com",
                                                    custom_fields: { "a" => "1", "b" => "2" })
     @external_tool_tag = @module.add_item({
                                             type: "context_external_tool",
@@ -211,7 +213,7 @@ module ContextModulesCommon
     wait_for_ajaximations
     select_module_item("#add_module_item_select", "File")
 
-    select_module_item(item_select_selector + " .module_item_select", "[ New File(s) ]")
+    select_module_item(item_select_selector + " .module_item_select", "[ Create File(s) ]")
     wait_for_ajaximations
 
     f("#module_attachment_uploaded_data").send_keys(filepath)
@@ -227,7 +229,7 @@ module ContextModulesCommon
     wait_for_ajaximations
     select_module_item("#add_module_item_select", "File")
 
-    select_module_item(item_select_selector + " .module_item_select", "[ New File(s) ]")
+    select_module_item(item_select_selector + " .module_item_select", "[ Create File(s) ]")
     wait_for_ajaximations
 
     # the folder options have &nbsp; entities in them and I cannot

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useCallback} from 'react'
 import {Link} from '@instructure/ui-link'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
@@ -24,14 +24,14 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
-import type {Filter, FilterDrilldownData} from '../gradebook.d'
+import type {Filter, FilterPreset} from '../gradebook.d'
 import type {AssignmentGroup, Module, Section, StudentGroupCategoryMap} from '../../../../../api.d'
-import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
+import {doFiltersMatch, getLabelForFilter, isFilterNotEmpty} from '../Gradebook.utils'
 import useStore from '../stores/index'
 import FilterDropdown from './FilterDropdown'
 import FilterNavDateModal from './FilterDateModal'
 import FilterTray from './FilterTray'
-import natcompare from '@canvas/util/natcompare'
+import {useFilterDropdownData} from './FilterNav.utils'
 
 const I18n = useI18nScope('gradebook')
 
@@ -57,7 +57,6 @@ export default function FilterNav({
   const filterPresets = useStore(state => state.filterPresets)
   const applyFilters = useStore(state => state.applyFilters)
   const addFilters = useStore(state => state.addFilters)
-  const toggleFilter = useStore(state => state.toggleFilter)
   const appliedFilters = useStore(state => state.appliedFilters)
 
   const handleClearFilters = () => {
@@ -89,218 +88,28 @@ export default function FilterNav({
     )
   })
 
-  const dataMap: FilterDrilldownData = {
-    savedFilterPresets: {
-      id: 'savedFilterPresets',
-      parentId: null,
-      name: I18n.t('Saved Filter Presets'),
-      items: [],
+  const onToggleFilterPreset = useCallback(
+    (filterPreset: FilterPreset) => {
+      if (doFiltersMatch(appliedFilters, filterPreset.filters)) {
+        applyFilters([])
+      } else {
+        applyFilters(filterPreset.filters)
+      }
     },
-  }
+    [appliedFilters, applyFilters]
+  )
 
-  for (const filterPreset of filterPresets) {
-    const item = {
-      id: filterPreset.id,
-      parentId: 'savedFilterPresets',
-      name: filterPreset.name,
-      isSelected: doFiltersMatch(appliedFilters, filterPreset.filters),
-      onToggle: () => {
-        if (doFiltersMatch(appliedFilters, filterPreset.filters)) {
-          applyFilters([])
-        } else {
-          applyFilters(filterPreset.filters)
-        }
-      },
-    }
-    dataMap[filterPreset.id] = item
-    dataMap.savedFilterPresets.items?.push(item)
-  }
-
-  const filterItems: FilterDrilldownData = {}
-
-  if (sections.length > 0) {
-    filterItems.sections = {
-      id: 'sections',
-      name: I18n.t('Sections'),
-      parentId: 'savedFilterPresets',
-      isSelected: appliedFilters.some(c => c.type === 'section'),
-      items: sections.map(a => ({
-        id: a.id,
-        name: a.name,
-        isSelected: appliedFilters.some(c => c.type === 'section' && c.value === a.id),
-        onToggle: () => {
-          const filter: Filter = {
-            id: uuid(),
-            type: 'section',
-            value: a.id,
-            created_at: new Date().toISOString(),
-          }
-          toggleFilter(filter)
-        },
-      })),
-    }
-    dataMap.sections = filterItems.sections
-  }
-
-  if (modules.length > 0) {
-    filterItems.modules = {
-      id: 'modules',
-      name: I18n.t('Modules'),
-      parentId: 'savedFilterPresets',
-      isSelected: appliedFilters.some(c => c.type === 'module'),
-      items: modules.map(m => ({
-        id: m.id,
-        name: m.name,
-        isSelected: appliedFilters.some(c => c.type === 'module' && c.value === m.id),
-        onToggle: () => {
-          const filter: Filter = {
-            id: uuid(),
-            type: 'module',
-            value: m.id,
-            created_at: new Date().toISOString(),
-          }
-          toggleFilter(filter)
-        },
-      })),
-    }
-    dataMap.modules = filterItems.modules
-  }
-
-  if (gradingPeriods.length > 0) {
-    filterItems['grading-periods'] = {
-      id: 'grading-periods',
-      name: I18n.t('Grading Periods'),
-      parentId: 'savedFilterPresets',
-      isSelected: appliedFilters.some(c => c.type === 'grading-period'),
-      items: gradingPeriods.map(a => ({
-        id: a.id,
-        name: a.title,
-        isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === a.id),
-        onToggle: () => {
-          const filter: Filter = {
-            id: uuid(),
-            type: 'grading-period',
-            value: a.id,
-            created_at: new Date().toISOString(),
-          }
-          toggleFilter(filter)
-        },
-      })),
-      itemGroups: [],
-    }
-    dataMap['grading-periods'] = filterItems['grading-periods']
-  }
-
-  if (assignmentGroups.length > 1) {
-    filterItems['assignment-groups'] = {
-      id: 'assignment-groups',
-      name: I18n.t('Assignment Groups'),
-      parentId: 'savedFilterPresets',
-      isSelected: appliedFilters.some(c => c.type === 'assignment-group'),
-      items: assignmentGroups.map(a => ({
-        id: a.id,
-        name: a.name,
-        isSelected: appliedFilters.some(c => c.type === 'assignment-group' && c.value === a.id),
-        onToggle: () => {
-          const filter: Filter = {
-            id: uuid(),
-            type: 'assignment-group',
-            value: a.id,
-            created_at: new Date().toISOString(),
-          }
-          toggleFilter(filter)
-        },
-      })),
-      itemGroups: [],
-    }
-    dataMap['assignment-groups'] = filterItems['assignment-groups']
-  }
-
-  if (Object.values(studentGroupCategories).length > 0) {
-    filterItems['student-groups'] = {
-      id: 'student-groups',
-      name: I18n.t('Student Groups'),
-      parentId: 'savedFilterPresets',
-      isSelected: appliedFilters.some(c => c.type === 'student-group'),
-      itemGroups: Object.values(studentGroupCategories)
-        .sort((c1, c2) => natcompare.strings(c1.name, c2.name))
-        .map(category => ({
-          id: category.id,
-          name: category.name,
-          items: category.groups
-            .sort((g1, g2) => natcompare.strings(g1.name, g2.name))
-            .map(group => ({
-              id: group.id,
-              name: group.name,
-              isSelected: appliedFilters.some(
-                c => c.type === 'student-group' && c.value === group.id
-              ),
-              onToggle: () => {
-                const filter: Filter = {
-                  id: uuid(),
-                  type: 'student-group',
-                  value: group.id,
-                  created_at: new Date().toISOString(),
-                }
-                toggleFilter(filter)
-              },
-            })),
-        })),
-    }
-    dataMap['student-groups'] = filterItems['student-groups']
-  }
-
-  filterItems.submissions = {
-    id: 'submissions',
-    name: I18n.t('Submissions'),
-    parentId: 'savedFilterPresets',
-    isSelected: appliedFilters.some(c => c.type === 'submissions'),
-    items: [
-      {
-        id: 'savedFilterPresets',
-        name: 'Has Ungraded Submissions',
-        isSelected: appliedFilters.some(
-          c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
-        ),
-        onToggle: () => {
-          const filter: Filter = {
-            id: uuid(),
-            type: 'submissions',
-            value: 'has-ungraded-submissions',
-            created_at: new Date().toISOString(),
-          }
-          toggleFilter(filter)
-        },
-      },
-      {
-        id: '2',
-        name: 'Has Submissions',
-        isSelected: appliedFilters.some(
-          c => c.type === 'submissions' && c.value === 'has-submissions'
-        ),
-        onToggle: () => {
-          const filter: Filter = {
-            id: uuid(),
-            type: 'submissions',
-            value: 'has-submissions',
-            created_at: new Date().toISOString(),
-          }
-          toggleFilter(filter)
-        },
-      },
-    ],
-  }
-  dataMap.submissions = filterItems.submissions
-
-  filterItems.startAndEndDate = {
-    id: 'start-and-end-date',
-    name: I18n.t('Start & End Date'),
-    parentId: 'savedFilterPresets',
-    isSelected: appliedFilters.some(
-      f => (f.type === 'start-date' || f.type === 'end-date') && isFilterNotEmpty(f)
-    ),
-    onToggle: () => setIsDateModalOpen(true),
-  }
+  const {dataMap, filterItems} = useFilterDropdownData({
+    appliedFilters,
+    assignmentGroups,
+    filterPresets,
+    gradingPeriods,
+    modules,
+    sections,
+    studentGroupCategories,
+    onToggleFilterPreset,
+    onToggleDateModal: () => setIsDateModalOpen(true),
+  })
 
   const startDate = appliedFilters.find((c: Filter) => c.type === 'start-date')?.value || null
 
@@ -347,15 +156,15 @@ export default function FilterNav({
         endDate={endDate}
         isOpen={isDateModalOpen}
         onCloseDateModal={() => setIsDateModalOpen(false)}
-        onSelectDates={(startDateValue, endDateValue) => {
+        onSelectDates={(startDateValue: string | null, endDateValue: string | null) => {
           const startDateCondition: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'start-date',
             value: startDateValue,
             created_at: new Date().toISOString(),
           }
           const endDateCondition: Filter = {
-            id: uuid(),
+            id: uuid.v4(),
             type: 'end-date',
             value: endDateValue,
             created_at: new Date().toISOString(),

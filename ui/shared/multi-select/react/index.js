@@ -276,6 +276,7 @@ CanvasMultiSelect.propTypes = {
   disabled: bool,
   label: oneOfType([node, func]).isRequired,
   onChange: func.isRequired,
+  placeholder: string,
   children: node.isRequired,
   selectedOptionIds: arrayOf(string).isRequired,
   noOptionsLabel: string,

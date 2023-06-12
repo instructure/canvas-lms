@@ -20,7 +20,6 @@ const XSSLint = require('xsslint')
 const Linter = require('xsslint/linter')
 const globby = require('gglobby')
 const fs = require('fs')
-const CoffeeScript = require('coffee-script')
 const glob = require('glob')
 const babylon = require('@babel/parser')
 
@@ -38,13 +37,13 @@ XSSLint.configure({
     /(Template|Html)$/,
     'toISOString',
     'friendlyDatetime',
-    /^(date|(date)?time)String$/
-  ]
+    /^(date|(date)?time)String$/,
+  ],
 })
 
 // treat I18n.t calls w/ wrappers as html-safe, since they are
 const origIsSafeString = Linter.prototype.isSafeString
-Linter.prototype.isSafeString = function(node) {
+Linter.prototype.isSafeString = function (node) {
   const result = origIsSafeString.call(this, node)
   if (result) return result
 
@@ -72,6 +71,7 @@ function getFilesAndDirs(root, files = [], dirs = []) {
   entries.forEach(entry => {
     const stats = fs.lstatSync(root + entry)
     if (stats.isSymbolicLink()) {
+      // do nothing
     } else if (stats.isDirectory()) {
       dirs.push(`${root + entry}/`)
       getFilesAndDirs(root + entry, files, dirs)
@@ -99,19 +99,14 @@ let warningCount = 0
 
 const allPaths = [
   {
-    paths: ['ui'].concat(glob.sync('gems/plugins/*/app/coffeescripts')),
-    glob: '*.coffee',
-    transform: source => CoffeeScript.compile(source, {})
-  },
-  {
     paths: ['ui'].concat(glob.sync('gems/plugins/*/app/jsx')),
-    glob: '*.js'
+    glob: '*.js',
   },
   {
     paths: glob.sync('gems/plugins/*/public/javascripts'),
     defaultIgnores: ['/compiled', '/jst', '/vendor'],
-    glob: '*.js'
-  }
+    glob: '*.js',
+  },
 ]
 
 allPaths.forEach(({paths, glob, defaultIgnores = ['**/__tests__/**/*.js'], transform}) => {
@@ -142,9 +137,9 @@ allPaths.forEach(({paths, glob, defaultIgnores = ['**/__tests__/**/*.js'], trans
           'classProperties',
           'objectRestSpread',
           'dynamicImport',
-          'optionalChaining'
+          'optionalChaining',
         ],
-        sourceType: 'module'
+        sourceType: 'module',
       })
       const warnings = XSSLint.run({source})
       warningCount += warnings.length

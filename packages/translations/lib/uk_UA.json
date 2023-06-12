@@ -14,14 +14,14 @@
     "address_3159962f": {
         "message": "Адреса:"
     },
+    "align_11050992": {
+        "message": "Вирівняти"
+    },
     "all_4321c3a1": {
         "message": "Всі"
     },
     "all_day_fb42c4fc": {
         "message": "Весь день"
-    },
-    "all_items_loaded_aa256183": {
-        "message": "Всі елементи завантажені"
     },
     "alpha_15d59033": {
         "message": "Альфа"
@@ -52,6 +52,9 @@
     },
     "apps_54d24a47": {
         "message": "Застосунки"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "Ви впевнені, що хочете скасувати? Зроблені зміни можуть бути не збережені."
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Ви впевнені, що хочете видалити цей елемент планувальника?"
@@ -127,6 +130,12 @@
     },
     "canvas_planner_98ed106": {
         "message": "Планувальник Canvas"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "Зроблені Вами зміни можуть бути не збережені."
+    },
+    "characters_9d897d1c": {
+        "message": "Символи"
     },
     "choose_usage_rights_33683854": {
         "message": "Виберіть права використання..."
@@ -224,6 +233,12 @@
     "date_time_d9fbf2d7": {
         "message": "Дата та час:"
     },
+    "decorative_image_fde98579": {
+        "message": "Декоративне зображення"
+    },
+    "decrease_indent_d9cf469d": {
+        "message": "Зменшити відступ"
+    },
     "deep_purple_bb3e2907": {
         "message": "Темно-фіолетовий"
     },
@@ -232,6 +247,9 @@
     },
     "delimiters_4db4840d": {
         "message": "Розділювачі"
+    },
+    "description_436c48d7": {
+        "message": "Опис"
     },
     "details_98a31b68": {
         "message": "Подробиці"
@@ -268,6 +286,9 @@
     },
     "done_54e3d4b6": {
         "message": "Готово"
+    },
+    "down_5831a426": {
+        "message": "Вниз"
     },
     "drag_a_file_here_1bf656d5": {
         "message": "Перетягніть файл сюди"
@@ -365,6 +386,9 @@
     "home_351838cd": {
         "message": "На домашню сторінку"
     },
+    "html_editor_fb2ab713": {
+        "message": "HTML-редактор"
+    },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
         "message": "Я отримав дозвіл на використання цього файлу."
     },
@@ -383,6 +407,9 @@
     "images_7ce26570": {
         "message": "Зображення"
     },
+    "increase_indent_6af90f7c": {
+        "message": "Збільшити відступ"
+    },
     "indigo_2035fc55": {
         "message": "Індиго"
     },
@@ -391,6 +418,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Вставити посилання"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Вставити математичну формулу"
     },
     "invalid_file_type_881cc9b2": {
         "message": "Недійсний тип файлу"
@@ -482,6 +512,9 @@
     "missing_items_for_title_516511f8": {
         "message": "Відсутні елементи для { title }"
     },
+    "module_90d9fd32": {
+        "message": "Розділ"
+    },
     "modules_c4325335": {
         "message": "Розділи"
     },
@@ -494,6 +527,9 @@
     "name_1aed4a1b": {
         "message": "Ім''я"
     },
+    "navigation_ee9af92d": {
+        "message": "Навігація"
+    },
     "new_13daf639": {
         "message": "Новий"
     },
@@ -505,6 +541,12 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Нові можливості"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Нова контрольна робота"
+    },
+    "next_40e12421": {
+        "message": "Далі"
     },
     "next_month_749b1778": {
         "message": "Наступний місяць"
@@ -593,6 +635,9 @@
     "points_points_63e59cce": {
         "message": "{ points } балів"
     },
+    "prev_f82cbc48": {
+        "message": "Попередній"
+    },
     "preview_53003fd2": {
         "message": "Попередній перегляд"
     },
@@ -616,6 +661,12 @@
     },
     "record_7c9448b": {
         "message": "Записати"
+    },
+    "record_upload_media_5fdce166": {
+        "message": "Запис/завантаження медіа"
+    },
+    "recording_98da6bda": {
+        "message": "Запис"
     },
     "red_8258edf3": {
         "message": "Червоний"
@@ -662,6 +713,9 @@
     "star_8d156e09": {
         "message": "Помітити зіркою"
     },
+    "start_over_f7552aa9": {
+        "message": "Почати з початку"
+    },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } до { endDate }"
     },
@@ -698,11 +752,17 @@
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Попередній перегляд документа в даний момент обробляється. Будь-ласка спробуйте пізніше."
     },
+    "the_following_content_is_partner_provided_ed1da756": {
+        "message": "Наступний контент наданий партнером"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Матеріал в публічному домені"
     },
     "the_material_is_licensed_under_creative_commons_3242cb5e": {
         "message": "Матеріал опубліковано під ліцензією Creative Commons"
+    },
+    "the_preceding_content_is_partner_provided_d753928c": {
+        "message": "Попередній контент наданий партнером"
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "З цим елементом не пов''язані бали"
@@ -752,6 +812,9 @@
     "unpublished_dfd8801": {
         "message": "Неопублікований"
     },
+    "up_c553575d": {
+        "message": "вверх"
+    },
     "upload_media_ce31135a": {
         "message": "Завантажити медіа контент"
     },
@@ -763,6 +826,9 @@
     },
     "usage_right_ff96f3e2": {
         "message": "Права використання:"
+    },
+    "video_player_b371005": {
+        "message": "Відеопрогравач"
     },
     "view_ba339f93": {
         "message": "Вигляд"

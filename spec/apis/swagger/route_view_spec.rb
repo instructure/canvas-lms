@@ -31,12 +31,12 @@ describe RouteView do
   describe "#query_args" do
     let(:argument_tag) do
       text = "foo [String]\nA description."
-      double(tag_name: "argument", text: text)
+      double(tag_name: "argument", text:)
     end
 
     let(:deprecated_argument_tag) do
       text = "foo NOTICE 2018-01-05 EFFECTIVE 2018-05-05\nA description."
-      double(tag_name: "deprecated_argument", text: text)
+      double(tag_name: "deprecated_argument", text:)
     end
 
     it "argument views it returns respond with false to deprecated?" do
@@ -57,7 +57,7 @@ describe RouteView do
 
     let(:deprecated_response_field_tag) do
       text = "baz NOTICE 2018-01-05 EFFECTIVE 2018-05-05\nA description."
-      double(tag_name: "deprecated_response_field", text: text, types: ["String"])
+      double(tag_name: "deprecated_response_field", text:, types: ["String"])
     end
 
     it "returns response fields" do

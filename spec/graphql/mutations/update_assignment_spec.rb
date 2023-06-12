@@ -92,11 +92,11 @@ describe Mutations::UpdateAssignment do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   def create_module_and_add_assignment(name)
-    course_module1 = @course.context_modules.create!(name: name)
+    course_module1 = @course.context_modules.create!(name:)
     course_module1.add_item(id: @assignment_id, type: "assignment")
     course_module1
   end
@@ -146,12 +146,12 @@ describe Mutations::UpdateAssignment do
 
   it "can update moderatedGrading" do
     assignment = Assignment.find(@assignment_id)
-    expect(assignment.moderated_grading).to eq false
+    expect(assignment.moderated_grading).to be false
     expect(assignment.grader_count).to eq 0
-    expect(assignment.grader_comments_visible_to_graders).to eq true
-    expect(assignment.grader_names_visible_to_final_grader).to eq true
-    expect(assignment.graders_anonymous_to_graders).to eq false
-    expect(assignment.final_grader_id).to eq nil
+    expect(assignment.grader_comments_visible_to_graders).to be true
+    expect(assignment.grader_names_visible_to_final_grader).to be true
+    expect(assignment.graders_anonymous_to_graders).to be false
+    expect(assignment.final_grader_id).to be_nil
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
       moderatedGrading: {
@@ -165,20 +165,20 @@ describe Mutations::UpdateAssignment do
     GQL
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateAssignment", "errors")).to be_nil
-    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "enabled")).to eq true
+    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "enabled")).to be true
     expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "graderCount")).to eq 1
-    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "graderCommentsVisibleToGraders")).to eq false
-    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "graderNamesVisibleToFinalGrader")).to eq false
+    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "graderCommentsVisibleToGraders")).to be false
+    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "graderNamesVisibleToFinalGrader")).to be false
 
     # this will still be false because it requires graderCommentsVisibleToGraders to be true
-    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "gradersAnonymousToGraders")).to eq false
+    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "gradersAnonymousToGraders")).to be false
     expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "finalGrader", "_id")).to eq @teacher.id.to_s
     assignment = Assignment.find(@assignment_id)
-    expect(assignment.moderated_grading).to eq true
+    expect(assignment.moderated_grading).to be true
     expect(assignment.grader_count).to eq 1
-    expect(assignment.grader_comments_visible_to_graders).to eq false
-    expect(assignment.grader_names_visible_to_final_grader).to eq false
-    expect(assignment.graders_anonymous_to_graders).to eq false
+    expect(assignment.grader_comments_visible_to_graders).to be false
+    expect(assignment.grader_names_visible_to_final_grader).to be false
+    expect(assignment.graders_anonymous_to_graders).to be false
     expect(assignment.final_grader_id).to eq @teacher.id
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
@@ -193,18 +193,18 @@ describe Mutations::UpdateAssignment do
     GQL
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateAssignment", "errors")).to be_nil
-    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "gradersAnonymousToGraders")).to eq true
-    expect(Assignment.find(@assignment_id).graders_anonymous_to_graders).to eq true
+    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "gradersAnonymousToGraders")).to be true
+    expect(Assignment.find(@assignment_id).graders_anonymous_to_graders).to be true
   end
 
   it "can update peerReviews" do
     assignment = Assignment.find(@assignment_id)
-    expect(assignment.peer_reviews).to eq false
+    expect(assignment.peer_reviews).to be false
     expect(assignment.peer_review_count).to eq 0
-    expect(assignment.peer_reviews_due_at).to eq nil
-    expect(assignment.intra_group_peer_reviews).to eq false
-    expect(assignment.anonymous_peer_reviews).to eq false
-    expect(assignment.automatic_peer_reviews).to eq false
+    expect(assignment.peer_reviews_due_at).to be_nil
+    expect(assignment.intra_group_peer_reviews).to be false
+    expect(assignment.anonymous_peer_reviews).to be false
+    expect(assignment.automatic_peer_reviews).to be false
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
       moderatedGrading: {
@@ -221,26 +221,26 @@ describe Mutations::UpdateAssignment do
     GQL
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateAssignment", "errors")).to be_nil
-    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "enabled")).to eq true
+    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "enabled")).to be true
     expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "count")).to eq 2
     expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "dueAt")).to eq "2018-01-01T01:00:00Z"
-    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "intraReviews")).to eq true
-    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "anonymousReviews")).to eq true
-    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "automaticReviews")).to eq true
+    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "intraReviews")).to be true
+    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "anonymousReviews")).to be true
+    expect(result.dig("data", "updateAssignment", "assignment", "peerReviews", "automaticReviews")).to be true
     assignment = Assignment.find(@assignment_id)
-    expect(assignment.peer_reviews).to eq true
+    expect(assignment.peer_reviews).to be true
     expect(assignment.peer_review_count).to eq 2
     expect(assignment.peer_reviews_due_at).to eq "2018-01-01T01:00:00Z"
-    expect(assignment.intra_group_peer_reviews).to eq true
-    expect(assignment.anonymous_peer_reviews).to eq true
-    expect(assignment.automatic_peer_reviews).to eq true
+    expect(assignment.intra_group_peer_reviews).to be true
+    expect(assignment.anonymous_peer_reviews).to be true
+    expect(assignment.automatic_peer_reviews).to be true
   end
 
   it "enabling moderated grading sticks with other updates" do
     assignment = Assignment.find(@assignment_id)
-    expect(assignment.moderated_grading).to eq false
+    expect(assignment.moderated_grading).to be false
     expect(assignment.grader_count).to eq 0
-    expect(assignment.final_grader_id).to eq nil
+    expect(assignment.final_grader_id).to be_nil
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
       moderatedGrading: {
@@ -251,11 +251,11 @@ describe Mutations::UpdateAssignment do
     GQL
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateAssignment", "errors")).to be_nil
-    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "enabled")).to eq true
+    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "enabled")).to be true
     expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "graderCount")).to eq 1
     expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "finalGrader", "_id")).to eq @teacher.id.to_s
     assignment = Assignment.find(@assignment_id)
-    expect(assignment.moderated_grading).to eq true
+    expect(assignment.moderated_grading).to be true
     expect(assignment.grader_count).to eq 1
     expect(assignment.final_grader_id).to eq @teacher.id
     result = execute_with_input <<~GQL
@@ -266,11 +266,11 @@ describe Mutations::UpdateAssignment do
     GQL
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateAssignment", "errors")).to be_nil
-    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "enabled")).to eq true
+    expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "enabled")).to be true
     expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "graderCount")).to eq 2
     expect(result.dig("data", "updateAssignment", "assignment", "moderatedGrading", "finalGrader", "_id")).to eq @teacher.id.to_s
     assignment = Assignment.find(@assignment_id)
-    expect(assignment.moderated_grading).to eq true
+    expect(assignment.moderated_grading).to be true
     expect(assignment.grader_count).to eq 2
     expect(assignment.final_grader_id).to eq @teacher.id
   end
@@ -480,7 +480,7 @@ describe Mutations::UpdateAssignment do
   end
 
   it "backend validation happens for moderated grading" do
-    expect(Assignment.find(@assignment_id).moderated_grading).to eq false
+    expect(Assignment.find(@assignment_id).moderated_grading).to be false
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
       moderatedGrading: {enabled: true}
@@ -491,7 +491,7 @@ describe Mutations::UpdateAssignment do
     expect(result.dig("data", "updateAssignment", "errors", 0, "attribute")).to eq "grader_count"
     expect(result.dig("data", "updateAssignment", "errors", 0, "message")).to eq "must be greater than 0"
     expect(result.dig("data", "updateAssignment", "errors", 1, "attribute")).to eq "invalid_record"
-    expect(Assignment.find(@assignment_id).moderated_grading).to eq false
+    expect(Assignment.find(@assignment_id).moderated_grading).to be false
   end
 
   it "can do multiple updates" do
@@ -531,7 +531,7 @@ describe Mutations::UpdateAssignment do
       }
     GQL
     context = { current_user: @teacher, request: ActionDispatch::TestRequest.create }
-    result = CanvasSchema.execute(mutation_command, context: context)
+    result = CanvasSchema.execute(mutation_command, context:)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "changeName", "errors")).to be_nil
     expect(result.dig("data", "changeName", "assignment", "name")).to eq "Example Assignment (deleted)"
@@ -557,7 +557,7 @@ describe Mutations::UpdateAssignment do
       state: "deleted"
     GQL
     expect(
-      result["errors"].map { |e| e["path"] }
+      result["errors"].pluck("path")
     ).to eq [
       %w[mutation updateAssignment input state]
     ]
@@ -581,7 +581,7 @@ describe Mutations::UpdateAssignment do
       }
     GQL
     context = { current_user: @teacher, request: ActionDispatch::TestRequest.create, session: {} }
-    result = CanvasSchema.execute(mutation_command, context: context)
+    result = CanvasSchema.execute(mutation_command, context:)
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "updateAssignment", "assignment")).to be_nil
     expect(result.dig("data", "updateAssignment", "errors")).to_not be_nil

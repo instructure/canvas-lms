@@ -34,7 +34,7 @@ module Factories
     course = opts[:course] || @course || course(opts)
     @enrollment = course.enroll_student(user,
                                         enrollment_state: "active",
-                                        section: section,
+                                        section:,
                                         allow_multiple_enrollments: true)
   end
 
@@ -67,22 +67,24 @@ module Factories
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
     role_id = options[:role].try(:id) || Role.get_built_in_role(type, root_account_id: course.root_account_id).id
-    result = create_records(Enrollment, user_ids.map do |id|
-      {
-        course_id: course.id,
-        user_id: id,
-        type: type,
-        course_section_id: section_id,
-        root_account_id: course.root_account_id,
-        workflow_state: enrollment_state,
-        role_id: role_id,
-        sis_batch_id: sis_batch_id,
-        associated_user_id: associated_user_id,
-        limit_privileges_to_course_section: limit_privileges_to_course_section,
-        created_at: now,
-        updated_at: now
-      }
-    end, options[:return_type])
+    result = create_records(Enrollment,
+                            user_ids.map do |id|
+                              {
+                                course_id: course.id,
+                                user_id: id,
+                                type:,
+                                course_section_id: section_id,
+                                root_account_id: course.root_account_id,
+                                workflow_state: enrollment_state,
+                                role_id:,
+                                sis_batch_id:,
+                                associated_user_id:,
+                                limit_privileges_to_course_section:,
+                                created_at: now,
+                                updated_at: now
+                              }
+                            end,
+                            options[:return_type])
     create_enrollment_states(result, { state: enrollment_state, root_account_id: course.root_account_id })
     result
   end

@@ -194,6 +194,7 @@ export const SplitScreenParent = props => {
                     discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
                     isTopic={false}
+                    threadParent={true}
                     postUtilities={
                       <ThreadActions
                         id={props.discussionEntry.id}
@@ -241,9 +242,9 @@ export const SplitScreenParent = props => {
                     anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
-                    onSave={(message, _includeReplyPreview, fileId) => {
+                    onSave={(message, _includeReplyPreview, file) => {
                       if (props.onSave) {
-                        props.onSave(props.discussionEntry, message, fileId)
+                        props.onSave(props.discussionEntry, message, file)
                         setIsEditing(false)
                       }
                     }}
@@ -270,7 +271,7 @@ export const SplitScreenParent = props => {
                     attachment={props.discussionEntry.attachment}
                   >
                     {threadActions.length > 0 && (
-                      <View as="div" padding="x-small none none">
+                      <View as="div" padding="0">
                         <ThreadingToolbar
                           discussionEntry={props.discussionEntry}
                           isIsolatedView={true}

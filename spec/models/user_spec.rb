@@ -102,7 +102,7 @@ describe User do
 
   it "identifies active courses correctly when there are no active groups" do
     user = User.create(name: "longname1", short_name: "shortname1")
-    expect(user.current_active_groups?).to eql(false)
+    expect(user.current_active_groups?).to be(false)
   end
 
   it "identifies active courses correctly when there are active groups" do
@@ -110,14 +110,14 @@ describe User do
     course_with_student(account: account1)
     group_model(group_category: @communities, is_public: true, context: @course)
     group.add_user(@student)
-    expect(@student.current_active_groups?).to eql(true)
+    expect(@student.current_active_groups?).to be(true)
   end
 
   it "updates account associations when a course account changes" do
     account1 = account_model
     account2 = account_model
     course_with_student
-    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.length).to be(1)
     expect(@user.associated_accounts.first).to eql(Account.default)
 
     @course.account = account1
@@ -125,14 +125,14 @@ describe User do
     @course.reload
     @user.reload
 
-    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.length).to be(1)
     expect(@user.associated_accounts.first).to eql(account1)
 
     @course.account = account2
     @course.save!
     @user.reload
 
-    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.length).to be(1)
     expect(@user.associated_accounts.first).to eql(account2)
   end
 
@@ -145,14 +145,14 @@ describe User do
     @course.reload
     @user.reload
 
-    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.length).to be(1)
     expect(@user.associated_accounts.first).to eql(account1)
 
     account2 = account_model(root_account: account1)
     @course.update(account: account2)
     @user.reload
 
-    expect(@user.associated_accounts.length).to eql(2)
+    expect(@user.associated_accounts.length).to be(2)
     expect(@user.associated_accounts[0]).to eql(account2)
     expect(@user.associated_accounts[1]).to eql(account1)
   end
@@ -167,7 +167,7 @@ describe User do
     pseudonym.save
 
     user.reload
-    expect(user.associated_accounts.length).to eql(1)
+    expect(user.associated_accounts.length).to be(1)
     expect(user.associated_accounts.first).to eql(account1)
 
     # Make sure that multiple sequential updates also work
@@ -176,7 +176,7 @@ describe User do
     pseudonym.account = account1
     pseudonym.save
     user.reload
-    expect(user.associated_accounts.length).to eql(1)
+    expect(user.associated_accounts.length).to be(1)
     expect(user.associated_accounts.first).to eql(account1)
   end
 
@@ -186,7 +186,7 @@ describe User do
     account.account_users.create!(user: @user)
 
     @user.reload
-    expect(@user.associated_accounts.length).to eql(1)
+    expect(@user.associated_accounts.length).to be(1)
     expect(@user.associated_accounts.first).to eql(account)
   end
 
@@ -321,9 +321,9 @@ describe User do
     p2.account = account2
     p1.save!
     p2.save!
-    account1.account_users.create!(user: user)
-    account2.account_users.create!(user: user)
-    sub.account_users.create!(user: user)
+    account1.account_users.create!(user:)
+    account2.account_users.create!(user:)
+    sub.account_users.create!(user:)
 
     course1 = account1.courses.create
     course2 = account2.courses.create
@@ -489,6 +489,14 @@ describe User do
         )
       end
     end
+
+    context "student_view user" do
+      it "does create root_account_ids for student view student" do
+        course_with_teacher(active_all: true)
+        @fake_student = @course.student_view_student
+        expect(@fake_student.reload.root_account_ids).to eq([root_account.global_id])
+      end
+    end
   end
 
   describe "update_account_associations" do
@@ -517,7 +525,7 @@ describe User do
       enrollment = course.enroll_student(user)
       expect(enrollment).to be_invited
       expect(user.user_account_associations).to eq []
-      Account.default.account_users.create!(user: user)
+      Account.default.account_users.create!(user:)
       expect(user.user_account_associations.reload).to eq []
       user.pseudonyms.create!(unique_id: "test@example.com")
       expect(user.user_account_associations.reload).to eq []
@@ -742,6 +750,12 @@ describe User do
         expect(student.recent_feedback(contexts: [post_policies_course])).not_to include submission
       end
     end
+
+    it "does include recent feedback for auto posted assignment that has last_comment_at but has no posted_at date" do
+      submission = auto_posted_assignment.submissions.find_by!(user: student)
+      submission.update!(last_comment_at: 1.day.ago, posted_at: nil)
+      expect(student.recent_feedback(contexts: [post_policies_course])).not_to be_empty
+    end
   end
 
   describe "#alternate_account_for_course_creation?" do
@@ -881,7 +895,7 @@ describe User do
         before(:once) do
           @shard2.activate do
             account = Account.create!
-            course_with_teacher(account: account, active_all: true)
+            course_with_teacher(account:, active_all: true)
 
             observer_enrollment = @observer_course.enroll_user(@teacher, "ObserverEnrollment", enrollment_state: "active")
             observer_enrollment.associated_user_id = @student.id
@@ -1071,23 +1085,24 @@ describe User do
       end
 
       it "calls #includes_subset_of_course_admin_permissions? if self is a course admin user" do
-        allow_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).and_return(true)
         course_admin = user_with_pseudonym(username: "nobody@example.com")
         course_with_user("TeacherEnrollment", user: course_admin)
         admin = user_with_pseudonym(username: "nobody2@example.com")
         @account.account_users.create!(user: admin)
-        expect_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).once
-        course_admin.can_masquerade?(admin, @account)
+        expect(course_admin).to receive(:includes_subset_of_course_admin_permissions?).once.and_return(false)
+        expect(course_admin).not_to receive(:has_subset_of_account_permissions?)
+        expect(course_admin.can_masquerade?(admin, @account)).to be false
       end
 
-      it "does not call #includes_subset_of_course_admin_permissions? if self is an account user" do
-        allow_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).and_return(true)
-        admin = user_with_pseudonym(username: "nobody@example.com")
-        admin2 = user_with_pseudonym(username: "nobody2@example.com")
+      it "checks both account and course permissions if masquerade target is a teacher and an account admin" do
+        super_teacher = user_with_pseudonym(username: "nobody@example.com")
+        course_with_user("TeacherEnrollment", user: super_teacher)
+        @account.account_users.create!(user: super_teacher)
+        admin = user_with_pseudonym(username: "nobody2@example.com")
         @account.account_users.create!(user: admin)
-        @account.account_users.create!(user: admin2)
-        expect_any_instance_of(User).not_to receive(:includes_subset_of_course_admin_permissions?)
-        admin.can_masquerade?(admin2, @account)
+        expect(super_teacher).to receive(:includes_subset_of_course_admin_permissions?).once.and_return(true)
+        expect(super_teacher).to receive(:has_subset_of_account_permissions?).once.and_return(false)
+        expect(super_teacher.can_masquerade?(admin, @account)).to be false
       end
 
       it "does not allow restricted admins to become course admins with elevated permissions" do
@@ -1097,7 +1112,7 @@ describe User do
         role = custom_account_role("Restricted", account: @account)
         account_admin_user_with_role_changes(
           user: restricted_admin,
-          role: role,
+          role:,
           role_changes: { become_user: true, view_all_grades: false }
         )
         expect(user.can_masquerade?(restricted_admin, @account)).to be_truthy
@@ -1110,9 +1125,9 @@ describe User do
         let(:role2) { custom_designer_role("Custom Designer Role", account: @account) }
 
         it "handles multiple course admin type roles" do
-          course_with_user("TeacherEnrollment", user: user, active_all: true)
-          course_with_user("TeacherEnrollment", user: user, role: role1, active_all: true)
-          course_with_user("DesignerEnrollment", user: user, role: role2, active_all: true)
+          course_with_user("TeacherEnrollment", user:, active_all: true)
+          course_with_user("TeacherEnrollment", user:, role: role1, active_all: true)
+          course_with_user("DesignerEnrollment", user:, role: role2, active_all: true)
 
           permissions = User.all_course_admin_type_permissions_for(user)
 
@@ -1125,14 +1140,14 @@ describe User do
         end
 
         it "excludes course admin enrollments that are not active" do
-          course_with_user("TeacherEnrollment", user: user)
+          course_with_user("TeacherEnrollment", user:)
 
           permissions = User.all_course_admin_type_permissions_for(user)
           expect(permissions.values.all?(&:empty?)).to be_truthy
         end
 
         it "excludes non course admin type roles" do
-          course_with_user("StudentEnrollment", user: user, active_all: true)
+          course_with_user("StudentEnrollment", user:, active_all: true)
 
           permissions = User.all_course_admin_type_permissions_for(user)
           expect(permissions.values.all?(&:empty?)).to be_truthy
@@ -1200,7 +1215,7 @@ describe User do
       user = user_with_pseudonym(username: "nobody1@example.com")
       @restricted_admin = user_with_pseudonym(username: "nobody3@example.com")
       role = custom_account_role("Restricted", account: Account.default)
-      account_admin_user_with_role_changes(user: @restricted_admin, role: role, role_changes: { become_user: true })
+      account_admin_user_with_role_changes(user: @restricted_admin, role:, role_changes: { become_user: true })
       @admin = user_with_pseudonym(username: "nobody2@example.com")
       Account.default.account_users.create!(user: @admin)
       expect(user.can_masquerade?(@restricted_admin, Account.default)).to be_truthy
@@ -1309,9 +1324,9 @@ describe User do
       it "works cross-shard" do
         @shard1.activate do
           account = Account.create!
-          course_with_teacher(account: account, active_all: true)
+          course_with_teacher(account:, active_all: true)
           course_with_student(course: @course, user: @student1, active_all: true)
-          expect(@student1.check_courses_right?(@teacher, :read_forum)).to eq true
+          expect(@student1.check_courses_right?(@teacher, :read_forum)).to be true
         end
       end
     end
@@ -1323,7 +1338,7 @@ describe User do
       @student = user_model
       tie_user_to_account(@admin, role: admin_role)
       role = custom_account_role("CustomStudent", account: Account.default)
-      tie_user_to_account(@student, role: role)
+      tie_user_to_account(@student, role:)
       set_up_course_with_users
     end
 
@@ -1380,8 +1395,10 @@ describe User do
     end
 
     it "does not let users message the entire class if they cannot send_messages" do
-      RoleOverride.create!(context: @course.account, permission: "send_messages",
-                           role: student_role, enabled: false)
+      RoleOverride.create!(context: @course.account,
+                           permission: "send_messages",
+                           role: student_role,
+                           enabled: false)
       @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
 
       # can only message self or the admins
@@ -1426,10 +1443,10 @@ describe User do
       @group.users << @other_section_user
 
       expect(search_messageable_users(@this_section_user, context: "group_#{@group.id}").map(&:id).sort).to eql [@this_section_user.id, @other_section_user.id]
-      expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 2
+      expect(@this_section_user.count_messageable_users_in_group(@group)).to be 2
       # student can only see people in his section
       expect(search_messageable_users(@student, context: "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
-      expect(@student.count_messageable_users_in_group(@group)).to eql 1
+      expect(@student.count_messageable_users_in_group(@group)).to be 1
     end
 
     it "only shows admins and the observed if the receiver is an observer" do
@@ -1461,9 +1478,9 @@ describe User do
       enrollment.save
 
       expect(search_messageable_users(student1).map(&:id)).to include observer.id
-      expect(student1.count_messageable_users_in_course(@course)).to eql 8
+      expect(student1.count_messageable_users_in_course(@course)).to be 8
       expect(search_messageable_users(student2).map(&:id)).not_to include observer.id
-      expect(student2.count_messageable_users_in_course(@course)).to eql 7
+      expect(student2.count_messageable_users_in_course(@course)).to be 7
     end
 
     it "includes all shared contexts and enrollment information" do
@@ -1538,22 +1555,22 @@ describe User do
         expect(search_messageable_users(@this_section_user, context: "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
         # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
         expect(search_messageable_users(@this_section_user, context: "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
-        expect(@this_section_user.count_messageable_users_in_course(@course)).to eql 2 # just the admins
+        expect(@this_section_user.count_messageable_users_in_course(@course)).to be 2 # just the admins
         expect(search_messageable_users(@student, context: "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
         expect(search_messageable_users(@student, context: "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
-        expect(@student.count_messageable_users_in_course(@course)).to eql 2
+        expect(@student.count_messageable_users_in_course(@course)).to be 2
       end
 
       it "users with concluded enrollments should not be messageable" do
         @course.enroll_user(@student, "StudentEnrollment", enrollment_state: "active")
         expect(search_messageable_users(@student, context: "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
-        expect(@student.count_messageable_users_in_group(@group)).to eql 1
+        expect(@student.count_messageable_users_in_group(@group)).to be 1
         @this_section_user_enrollment.conclude
 
         expect(search_messageable_users(@this_section_user, context: "group_#{@group.id}").map(&:id)).to eql []
-        expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 0
+        expect(@this_section_user.count_messageable_users_in_group(@group)).to be 0
         expect(search_messageable_users(@student, context: "group_#{@group.id}").map(&:id)).to eql []
-        expect(@student.count_messageable_users_in_group(@group)).to eql 0
+        expect(@student.count_messageable_users_in_group(@group)).to be 0
       end
     end
 
@@ -1580,7 +1597,7 @@ describe User do
       tool = Account.default.context_external_tools.new(consumer_key: "bob", shared_secret: "bob", name: "bob", domain: "example.com")
       tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:user_navigation)).to eq false
+      expect(tool.has_placement?(:user_navigation)).to be false
       user_model
       tabs = @user.profile.tabs_available(@user, root_account: Account.default)
       expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
@@ -1590,7 +1607,7 @@ describe User do
       tool = Account.default.context_external_tools.new(consumer_key: "bob", shared_secret: "bob", name: "bob", domain: "example.com")
       tool.user_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
-      expect(tool.has_placement?(:user_navigation)).to eq true
+      expect(tool.has_placement?(:user_navigation)).to be true
       user_model
       tabs = @user.profile.tabs_available(@user, root_account: Account.default)
       expect(tabs.pluck(:id)).to be_include(tool.asset_string)
@@ -1626,7 +1643,7 @@ describe User do
     it "does not allow external urls to be assigned" do
       @user.avatar_image = { "type" => "external", "url" => "http://www.example.com/image.jpg" }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq nil
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     it "allows external urls that match avatar_external_url_patterns to be assigned" do
@@ -1638,19 +1655,19 @@ describe User do
     it "does not allow external urls that do not match avatar_external_url_patterns to be assigned (apple.com)" do
       @user.avatar_image = { "type" => "external", "url" => "https://apple.com/image.jpg" }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq nil
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     it "does not allow external urls that do not match avatar_external_url_patterns to be assigned (ddinstructure.com)" do
       @user.avatar_image = { "type" => "external", "url" => "https://ddinstructure.com/image" }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq nil
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     it "does not allow external urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
       @user.avatar_image = { "type" => "external", "url" => "https://3510111291#sdf.instructure.com/image" }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq nil
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     it "allows gravatar urls to be assigned" do
@@ -1662,13 +1679,13 @@ describe User do
     it "does not allow non gravatar urls to be assigned (ddgravatar.com)" do
       @user.avatar_image = { "type" => "external", "url" => "http://ddgravatar.com/@google.com" }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq nil
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     it "does not allow non gravatar external urls to be assigned (3510111291#secure.gravatar.com)" do
       @user.avatar_image = { "type" => "external", "url" => "http://3510111291#secure.gravatar.com/@google.com" }
       @user.save!
-      expect(@user.reload.avatar_image_url).to eq nil
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     it "returns a useful avatar_fallback_url" do
@@ -1725,7 +1742,7 @@ describe User do
       it "clears avatar_image_url when uuid matches" do
         @user.clear_avatar_image_url_with_uuid("1234567890ABCDEF")
         expect(@user.avatar_image_url).to be_nil
-        expect(@user.changed?).to eq false # should be saved
+        expect(@user.changed?).to be false # should be saved
       end
 
       it "does not clear avatar_image_url when no match" do
@@ -2054,7 +2071,7 @@ describe User do
       u.favorites.create!(context_type: "Course", context_id: c1)
 
       c2 = course_with_student(active_all: true, user: u).course
-      expect(u.favorites.where(context_type: "Course", context_id: c2).exists?).to eq true
+      expect(u.favorites.where(context_type: "Course", context_id: c2).exists?).to be true
     end
   end
 
@@ -2188,7 +2205,7 @@ describe User do
       before :once do
         @shard1.activate do
           account = Account.create!
-          user_with_pseudonym(active_all: 1, account: account, password: "qwertyuiop")
+          user_with_pseudonym(active_all: 1, account:, password: "qwertyuiop")
         end
       end
 
@@ -2352,7 +2369,7 @@ describe User do
           # create three sections and three child events that will be retrieved in the same order
           data = {}
           @sections.each_with_index do |section, i|
-            data[i] = { start_at: start_at, end_at: start_at + 1.day, context_code: section.asset_string }
+            data[i] = { start_at:, end_at: start_at + 1.day, context_code: section.asset_string }
             start_at += 1.day
           end
           event = @course.calendar_events.build(title: "event", child_event_data: data)
@@ -2450,14 +2467,14 @@ describe User do
     end
 
     it "returns nil for an invalid avatar key" do
-      expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1("1")}")).to eq nil
-      expect(User.user_id_from_avatar_key("1")).to eq nil
-      expect(User.user_id_from_avatar_key("2-123456")).to eq nil
-      expect(User.user_id_from_avatar_key("a")).to eq nil
-      expect(User.user_id_from_avatar_key(nil)).to eq nil
-      expect(User.user_id_from_avatar_key("")).to eq nil
-      expect(User.user_id_from_avatar_key("-")).to eq nil
-      expect(User.user_id_from_avatar_key("-159135")).to eq nil
+      expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1("1")}")).to be_nil
+      expect(User.user_id_from_avatar_key("1")).to be_nil
+      expect(User.user_id_from_avatar_key("2-123456")).to be_nil
+      expect(User.user_id_from_avatar_key("a")).to be_nil
+      expect(User.user_id_from_avatar_key(nil)).to be_nil
+      expect(User.user_id_from_avatar_key("")).to be_nil
+      expect(User.user_id_from_avatar_key("-")).to be_nil
+      expect(User.user_id_from_avatar_key("-159135")).to be_nil
     end
   end
 
@@ -2469,37 +2486,71 @@ describe User do
       ids << User.create!(name: "john john")
     end
 
-    context "given pg_collkey extension is present" do
-      before do
-        skip_unless_pg_collkey_present
+    it "sorts lexicographically" do
+      ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
+      expect(ascending_sortable_names).to eq(["john, john", "John, John", "Johnson, John"])
+    end
+
+    it "sorts support direction toggle" do
+      descending_sortable_names = User.order_by_sortable_name(direction: :descending)
+                                      .where(id: ids).map(&:sortable_name)
+      expect(descending_sortable_names).to eq(["Johnson, John", "John, John", "john, john"])
+    end
+
+    it "sorts support direction toggle with a prior select" do
+      descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(direction: :descending)
+                                      .where(id: ids).map(&:sortable_name)
+      expect(descending_sortable_names).to eq ["Johnson, John", "John, John", "john, john"]
+    end
+
+    it "sorts by the current locale" do
+      I18n.with_locale(:es) do
+        expect(User.sortable_name_order_by_clause).to match(/es-u-kn-true/)
+        expect(User.sortable_name_order_by_clause).not_to match(/und-u-kn-true/)
+      end
+      I18n.with_locale(:en) do
+        # english has no specific sorting rules, so use root
+        expect(User.sortable_name_order_by_clause).not_to match(/en-u-kn-true/)
+        expect(User.sortable_name_order_by_clause).not_to match(/es-u-kn-true/)
+        expect(User.sortable_name_order_by_clause).to match(/und-u-kn-true/)
+      end
+    end
+
+    describe "order_by_name" do
+      let_once :ids do
+        ids = []
+        ids << User.create!(name: "John Johnson")
+        ids << User.create!(name: "Jimmy Johns")
+        ids << User.create!(name: "Jimmy John")
       end
 
       it "sorts lexicographically" do
-        ascending_sortable_names = User.order_by_sortable_name.where(id: ids).map(&:sortable_name)
-        expect(ascending_sortable_names).to eq(["john, john", "John, John", "Johnson, John"])
+        ascending_names = User.order_by_name.where(id: ids).map(&:name)
+        expect(ascending_names).to eq(["Jimmy John", "Jimmy Johns", "John Johnson"])
       end
 
       it "sorts support direction toggle" do
-        descending_sortable_names = User.order_by_sortable_name(direction: :descending)
-                                        .where(id: ids).map(&:sortable_name)
-        expect(descending_sortable_names).to eq(["Johnson, John", "John, John", "john, john"])
+        descending_names = User.order_by_name(direction: :descending)
+                               .where(id: ids).map(&:name)
+        expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
       end
 
       it "sorts support direction toggle with a prior select" do
-        descending_sortable_names = User.select([:id, :sortable_name]).order_by_sortable_name(direction: :descending)
-                                        .where(id: ids).map(&:sortable_name)
-        expect(descending_sortable_names).to eq ["Johnson, John", "John, John", "john, john"]
+        descending_names = User.select([:id, :name]).order_by_name(direction: :descending)
+                               .where(id: ids).map(&:name)
+        expect(descending_names).to eq(["John Johnson", "Jimmy Johns", "Jimmy John"])
       end
 
       it "sorts by the current locale" do
         I18n.with_locale(:es) do
-          expect(User.sortable_name_order_by_clause).to match(/'es'/)
-          expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
+          expect(User.name_order_by_clause).to match(/es-u-kn-true/)
+          expect(User.name_order_by_clause).not_to match(/und-u-kn-true/)
         end
         I18n.with_locale(:en) do
           # english has no specific sorting rules, so use root
-          expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
-          expect(User.sortable_name_order_by_clause).to match(/'root'/)
+          expect(User.name_order_by_clause).not_to match(/en-u-kn-true/)
+          expect(User.name_order_by_clause).not_to match(/es-u-kn-true/)
+          expect(User.name_order_by_clause).to match(/und-u-kn-true/)
         end
       end
     end
@@ -2593,28 +2644,28 @@ describe User do
 
     it "is required if admin and required_for_admins" do
       account = Account.create!(settings: { mfa_settings: :required_for_admins })
-      user.pseudonyms.create!(account: account, unique_id: "user")
+      user.pseudonyms.create!(account:, unique_id: "user")
 
       expect(user.mfa_settings).to eq :optional
-      account.account_users.create!(user: user)
+      account.account_users.create!(user:)
       user.reload
       expect(user.mfa_settings).to eq :required
     end
 
     it "required_for_admins shouldn't get confused by admins in other accounts" do
       account = Account.create!(settings: { mfa_settings: :required_for_admins })
-      user.pseudonyms.create!(account: account, unique_id: "user")
+      user.pseudonyms.create!(account:, unique_id: "user")
       user.pseudonyms.create!(account: Account.default, unique_id: "user")
 
-      Account.default.account_users.create!(user: user)
+      Account.default.account_users.create!(user:)
 
       expect(user.mfa_settings).to eq :optional
     end
 
     it "short circuits when a hint is provided" do
       account = Account.create!(settings: { mfa_settings: :required_for_admins })
-      p = user.pseudonyms.create!(account: account, unique_id: "user")
-      account.account_users.create!(user: user)
+      p = user.pseudonyms.create!(account:, unique_id: "user")
+      account.account_users.create!(user:)
 
       expect(user).not_to receive(:pseudonyms)
       expect(user.mfa_settings(pseudonym_hint: p)).to eq :required
@@ -2624,7 +2675,7 @@ describe User do
       account = Account.create(settings: { mfa_settings: :optional })
       ap = account.canvas_authentication_provider
       ap.update!(mfa_required: true)
-      p = user.pseudonyms.create!(account: account, unique_id: "user", authentication_provider: ap)
+      p = user.pseudonyms.create!(account:, unique_id: "user", authentication_provider: ap)
 
       expect(user.mfa_settings).to eq :required
 
@@ -2641,7 +2692,7 @@ describe User do
 
     it "generates a unique crocodoc_id" do
       expect(@user.crocodoc_id).to be_nil
-      expect(@user.crocodoc_id!).to eql 999
+      expect(@user.crocodoc_id!).to be 999
       expect(@user.crocodoc_user).to eql "999,Bob"
     end
 
@@ -2653,8 +2704,8 @@ describe User do
 
     it "does not change a user's crocodoc_id" do
       @user.update_attribute :crocodoc_id, 2
-      expect(@user.crocodoc_id!).to eql 2
-      expect(Setting.get("crocodoc_counter", 0).to_i).to eql 998
+      expect(@user.crocodoc_id!).to be 2
+      expect(Setting.get("crocodoc_counter", 0).to_i).to be 998
     end
   end
 
@@ -3022,29 +3073,29 @@ describe User do
       end
 
       it "is granted to root account admins" do
-        expect(@student.grants_right?(@root_admin, :manage_user_details)).to eq true
+        expect(@student.grants_right?(@root_admin, :manage_user_details)).to be true
       end
 
       it "is not granted to root account admins w/o :manage_user_logins" do
         @root_account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_user_logins)
-        expect(@student.grants_right?(@root_admin, :manage_user_details)).to eq false
+        expect(@student.grants_right?(@root_admin, :manage_user_details)).to be false
       end
 
       it "is not granted to sub-account admins" do
-        expect(@student.grants_right?(@sub_admin, :manage_user_details)).to eq false
+        expect(@student.grants_right?(@sub_admin, :manage_user_details)).to be false
       end
 
       it "is not granted to custom sub-account admins with inherited roles" do
         custom_role = custom_account_role("somerole", account: @root_account)
         @root_account.role_overrides.create!(role: custom_role, enabled: true, permission: :manage_user_logins)
         @custom_sub_admin = account_admin_user(account: @sub_account, role: custom_role)
-        expect(@student.grants_right?(@custom_sub_admin, :manage_user_details)).to eq false
+        expect(@student.grants_right?(@custom_sub_admin, :manage_user_details)).to be false
       end
 
       it "is not granted to root account admins on other root account admins who are invited as students" do
         other_admin = account_admin_user account: Account.create!
         course_with_student account: @root_account, user: other_admin, enrollment_state: "invited"
-        expect(@root_admin.grants_right?(other_admin, :manage_user_details)).to eq false
+        expect(@root_admin.grants_right?(other_admin, :manage_user_details)).to be false
       end
     end
 
@@ -3058,25 +3109,25 @@ describe User do
       end
 
       it "is granted to self" do
-        expect(@student.grants_right?(@student, :generate_observer_pairing_code)).to eq true
+        expect(@student.grants_right?(@student, :generate_observer_pairing_code)).to be true
       end
 
       it "is granted to root account admins" do
-        expect(@student.grants_right?(@root_admin, :generate_observer_pairing_code)).to eq true
+        expect(@student.grants_right?(@root_admin, :generate_observer_pairing_code)).to be true
       end
 
       it "is not granted to root account w/o :generate_observer_pairing_code" do
         @root_account.role_overrides.create!(role: admin_role, enabled: false, permission: :generate_observer_pairing_code)
-        expect(@student.grants_right?(@root_admin, :generate_observer_pairing_code)).to eq false
+        expect(@student.grants_right?(@root_admin, :generate_observer_pairing_code)).to be false
       end
 
       it "is granted to sub-account admins" do
-        expect(@student.grants_right?(@sub_admin, :generate_observer_pairing_code)).to eq true
+        expect(@student.grants_right?(@sub_admin, :generate_observer_pairing_code)).to be true
       end
 
       it "is not granted to sub-account admins w/o :generate_observer_pairing_code" do
         @root_account.role_overrides.create!(role: admin_role, enabled: false, permission: :generate_observer_pairing_code)
-        expect(@student.grants_right?(@sub_admin, :generate_observer_pairing_code)).to eq false
+        expect(@student.grants_right?(@sub_admin, :generate_observer_pairing_code)).to be false
       end
     end
 
@@ -3084,7 +3135,7 @@ describe User do
       before(:once) do
         root_account = Account.default
         @root_admin = account_admin_user(account: root_account)
-        sub_account = Account.create!(root_account: root_account)
+        sub_account = Account.create!(root_account:)
         @sub_admin = account_admin_user(account: sub_account)
         @student = course_with_student(account: sub_account, active_all: true).user
       end
@@ -3125,9 +3176,9 @@ describe User do
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
-        account_admin_user(user: target, account: account, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
+        account_admin_user(user: target, account:, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
         # create seeking user as admin on that account
-        seeker = account_admin_user(account: account, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
+        seeker = account_admin_user(account:, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to be_truthy
       end
@@ -3137,23 +3188,23 @@ describe User do
         # create account on another shard
         account = @shard1.activate { Account.create! }
         # associate target user with that account
-        account_admin_user(user: target, account: account, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
+        account_admin_user(user: target, account:, role: Role.get_built_in_role("AccountMembership", root_account_id: account.id))
         # create seeking user as admin on that account
-        seeker = account_admin_user(account: account, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
+        seeker = account_admin_user(account:, role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id))
         allow(seeker).to receive(:associated_shards).and_return([])
         # ensure seeking user gets permissions it should on target user
-        expect(target.grants_right?(seeker, :view_statistics)).to eq true
+        expect(target.grants_right?(seeker, :view_statistics)).to be true
       end
 
       it "falls back to user shard for callsite, if no account associations found for target user" do
         account = Account.default
         target = user_factory
         seeker = account_admin_user(
-          account: account,
+          account:,
           role: Role.get_built_in_role("AccountAdmin", root_account_id: account.id)
         )
         # ensure seeking user gets permissions it should on target user
-        expect(target.grants_right?(seeker, :read_full_profile)).to eq true
+        expect(target.grants_right?(seeker, :read_full_profile)).to be true
       end
     end
   end
@@ -3384,7 +3435,7 @@ describe User do
     end
 
     it "shows if user has group_membership" do
-      expect(@student.current_active_groups?).to eq true
+      expect(@student.current_active_groups?).to be true
     end
 
     it "excludes groups in concluded courses with current_group_memberships_by_date" do
@@ -3435,7 +3486,7 @@ describe User do
 
     it "excludes groups in courses with concluded enrollments" do
       course_with_student
-      @course.conclude_at = Time.zone.now - 2.days
+      @course.conclude_at = 2.days.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
       @group = Group.create! context: @course, name: "GroupOne"
@@ -3672,32 +3723,32 @@ describe User do
     let(:user) { User.create! }
 
     it "returns false by default" do
-      expect(user.has_student_enrollment?).to eq false
+      expect(user.has_student_enrollment?).to be false
     end
 
     it "returns true when user is student and a course is active" do
-      course_with_student(user: user, active_all: true)
-      expect(user.has_student_enrollment?).to eq true
+      course_with_student(user:, active_all: true)
+      expect(user.has_student_enrollment?).to be true
     end
 
     it "returns true when user is student and no courses are active" do
-      course_with_student(user: user, active_all: false)
-      expect(user.has_student_enrollment?).to eq true
+      course_with_student(user:, active_all: false)
+      expect(user.has_student_enrollment?).to be true
     end
 
     it "returns false when user is teacher" do
-      course_with_teacher(user: user)
-      expect(user.has_student_enrollment?).to eq false
+      course_with_teacher(user:)
+      expect(user.has_student_enrollment?).to be false
     end
 
     it "returns false when user is TA" do
-      course_with_ta(user: user)
-      expect(user.has_student_enrollment?).to eq false
+      course_with_ta(user:)
+      expect(user.has_student_enrollment?).to be false
     end
 
     it "returns false when user is designer" do
-      course_with_designer(user: user)
-      expect(user.has_student_enrollment?).to eq false
+      course_with_designer(user:)
+      expect(user.has_student_enrollment?).to be false
     end
   end
 
@@ -3705,7 +3756,7 @@ describe User do
     let(:user) { User.create! }
 
     before do
-      course_with_student(user: user, active_all: true)
+      course_with_student(user:, active_all: true)
     end
 
     it "includes courses for current enrollments" do
@@ -3724,15 +3775,57 @@ describe User do
     end
   end
 
+  describe "#participating_student_current_and_unrestricted_concluded_course_ids" do
+    let(:user) { User.create! }
+
+    before do
+      # restricts view of this course when it is in the past (it IS in the past)
+      @restricted = Account.default.courses.create!(
+        start_at: 2.months.ago,
+        conclude_at: 1.month.ago,
+        restrict_enrollments_to_course_dates: true,
+        name: "Restricted",
+        restrict_student_past_view: true
+      )
+      # doesnt restrict view of this course when it is in the past (it IS in the past)
+      @unrestricted = Account.default.courses.create!(
+        start_at: 2.months.ago,
+        conclude_at: 1.month.ago,
+        restrict_enrollments_to_course_dates: true,
+        name: "Unrestricted",
+        restrict_student_past_view: false
+      )
+      @restricted.offer!
+      @unrestricted.offer!
+    end
+
+    it "includes unrestricted but not restricted course" do
+      course_with_student course: @restricted, user:, active_all: true
+      course_with_student course: @unrestricted, user:, active_all: true
+
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids).to include(@unrestricted.id)
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids).not_to include(@restricted.id)
+    end
+
+    it "includes unrestricted concluded and restricted current course" do
+      @restricted.update(conclude_at: nil, restrict_enrollments_to_course_dates: false)
+      course_with_student course: @restricted, user:, active_all: true
+      course_with_student course: @unrestricted, user:, active_all: true
+
+      expect(user.participating_student_current_and_unrestricted_concluded_course_ids)
+        .to contain_exactly(@restricted.id, @unrestricted.id)
+    end
+  end
+
   describe "from_tokens" do
     specs_require_sharding
 
     let(:users) { [User.create!, @shard1.activate { User.create! }] }
     let(:tokens) { users.map(&:token) }
 
-    it "generates tokens made of id/md5(uuid) pairs" do
+    it "generates tokens made of id/hash(uuid) pairs" do
       tokens.each_with_index do |token, i|
-        expect(token).to eq "#{users[i].id}_#{Digest::MD5.hexdigest(users[i].uuid)}"
+        expect(token).to eq "#{users[i].id}_#{Digest::SHA256.hexdigest(users[i].uuid)}"
       end
     end
 
@@ -3786,13 +3879,13 @@ describe User do
     end
 
     it "does not allow editing user name by default" do
-      expect(@user.user_can_edit_name?).to eq false
+      expect(@user.user_can_edit_name?).to be false
     end
 
     it "allows editing user name if the pseudonym allows this" do
       @pseudonym.account.settings[:users_can_edit_name] = true
       @pseudonym.account.save!
-      expect(@user.user_can_edit_name?).to eq true
+      expect(@user.user_can_edit_name?).to be true
     end
 
     describe "multiple pseudonyms" do
@@ -3804,12 +3897,12 @@ describe User do
       end
 
       it "allows editing if one pseudonym's account allows this" do
-        expect(@user.user_can_edit_name?).to eq true
+        expect(@user.user_can_edit_name?).to be true
       end
 
       it "doesn't allow editing if only a deleted pseudonym's account allows this" do
         @user.pseudonyms.where(account_id: @other_account).first.destroy
-        expect(@user.user_can_edit_name?).to eq false
+        expect(@user.user_can_edit_name?).to be false
       end
     end
   end
@@ -3822,13 +3915,13 @@ describe User do
     end
 
     it "does not allow editing user name by default" do
-      expect(@user.user_can_edit_profile?).to eq false
+      expect(@user.user_can_edit_profile?).to be false
     end
 
     it "allows editing user name if the pseudonym allows this" do
       @pseudonym.account.settings[:users_can_edit_profile] = true
       @pseudonym.account.save!
-      expect(@user.user_can_edit_profile?).to eq true
+      expect(@user.user_can_edit_profile?).to be true
     end
 
     describe "multiple pseudonyms" do
@@ -3840,12 +3933,12 @@ describe User do
       end
 
       it "allows editing if one pseudonym's account allows this" do
-        expect(@user.user_can_edit_profile?).to eq true
+        expect(@user.user_can_edit_profile?).to be true
       end
 
       it "doesn't allow editing if only a deleted pseudonym's account allows this" do
         @user.pseudonyms.where(account_id: @other_account).first.destroy
-        expect(@user.user_can_edit_profile?).to eq false
+        expect(@user.user_can_edit_profile?).to be false
       end
     end
   end
@@ -3858,13 +3951,13 @@ describe User do
     end
 
     it "does not allow editing user name by default" do
-      expect(@user.user_can_edit_comm_channels?).to eq false
+      expect(@user.user_can_edit_comm_channels?).to be false
     end
 
     it "allows editing user name if the pseudonym allows this" do
       @pseudonym.account.settings[:users_can_edit_comm_channels] = true
       @pseudonym.account.save!
-      expect(@user.user_can_edit_comm_channels?).to eq true
+      expect(@user.user_can_edit_comm_channels?).to be true
     end
 
     describe "multiple pseudonyms" do
@@ -3876,12 +3969,12 @@ describe User do
       end
 
       it "allows editing if one pseudonym's account allows this" do
-        expect(@user.user_can_edit_comm_channels?).to eq true
+        expect(@user.user_can_edit_comm_channels?).to be true
       end
 
       it "doesn't allow editing if only a deleted pseudonym's account allows this" do
         @user.pseudonyms.where(account_id: @other_account).first.destroy
-        expect(@user.user_can_edit_comm_channels?).to eq false
+        expect(@user.user_can_edit_comm_channels?).to be false
       end
     end
   end
@@ -3894,13 +3987,13 @@ describe User do
     end
 
     it "does not limit parent app web access by default" do
-      expect(@user.limit_parent_app_web_access?).to eq false
+      expect(@user.limit_parent_app_web_access?).to be false
     end
 
     it "does limit if the pseudonym limits this" do
       @pseudonym.account.settings[:limit_parent_app_web_access] = true
       @pseudonym.account.save!
-      expect(@user.limit_parent_app_web_access?).to eq true
+      expect(@user.limit_parent_app_web_access?).to be true
     end
 
     describe "multiple pseudonyms" do
@@ -3912,12 +4005,12 @@ describe User do
       end
 
       it "limits if one pseudonym's account limits this" do
-        expect(@user.limit_parent_app_web_access?).to eq true
+        expect(@user.limit_parent_app_web_access?).to be true
       end
 
       it "doesn't limit if only a deleted pseudonym's account limits this" do
         @user.pseudonyms.where(account_id: @other_account).first.destroy
-        expect(@user.limit_parent_app_web_access?).to eq false
+        expect(@user.limit_parent_app_web_access?).to be false
       end
     end
   end
@@ -3936,12 +4029,11 @@ describe User do
   end
 
   describe "#custom_colors" do
-    context "user has high_contrast and high_contrast_course_colors enables" do
+    context "user has high_contrast enabled" do
       let(:user) { user_model }
 
       before do
         user.enable_feature!(:high_contrast)
-        Account.site_admin.enable_feature!(:high_contrast_course_colors)
       end
 
       it "sufficiently darkens colors with a contrast below 4.5" do
@@ -3971,7 +4063,7 @@ describe User do
     let(:user) { user_model }
 
     it "returns false by default" do
-      expect(user.prefers_no_celebrations?).to eq false
+      expect(user.prefers_no_celebrations?).to be false
     end
 
     context "user has opted out of celebrations" do
@@ -3980,7 +4072,7 @@ describe User do
       end
 
       it "returns true" do
-        expect(user.prefers_no_celebrations?).to eq true
+        expect(user.prefers_no_celebrations?).to be true
       end
     end
   end
@@ -3989,12 +4081,12 @@ describe User do
     let(:user) { user_model }
 
     it "returns false by default" do
-      expect(user.prefers_no_keyboard_shortcuts?).to eq false
+      expect(user.prefers_no_keyboard_shortcuts?).to be false
     end
 
     it "returns true if user disables keyboard shortcuts" do
       user.enable_feature!(:disable_keyboard_shortcuts)
-      expect(user.prefers_no_keyboard_shortcuts?).to eq true
+      expect(user.prefers_no_keyboard_shortcuts?).to be true
     end
   end
 
@@ -4227,9 +4319,8 @@ describe User do
     end
   end
 
-  describe "account_calendars" do
+  context "account_calendars" do
     before :once do
-      Account.site_admin.enable_feature! :account_calendar_events
       user_factory(active_all: true)
       @root_account = Account.default
       @root_account.account_calendar_visible = false
@@ -4240,22 +4331,61 @@ describe User do
       course_with_student(account: @associated_subaccount, user: @user)
     end
 
-    it "returns only accounts associated to the user where the calendar is visible" do
-      expect(@user.account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
-    end
-
-    describe "sharding" do
-      specs_require_sharding
-
-      before :once do
-        @shard2.activate do
-          @account2 = Account.create!(account_calendar_visible: true)
-        end
-        course_with_student(account: @account2, user: @user)
+    describe "all_account_calendars" do
+      it "returns only accounts associated to the user where the calendar is visible" do
+        expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
       end
 
-      it "includes cross-shard accounts" do
-        expect(@user.account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account2.id)
+      describe "sharding" do
+        specs_require_sharding
+
+        before :once do
+          @shard2.activate do
+            @account2 = Account.create!(account_calendar_visible: true)
+          end
+          course_with_student(account: @account2, user: @user)
+        end
+
+        it "includes cross-shard accounts" do
+          expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account2.id)
+        end
+      end
+    end
+
+    describe "enabled_account_calendars" do
+      it "returns subset of all_account_calendars where the user has subscribed" do
+        @root_account.account_calendar_visible = true
+        @root_account.save!
+        @user.set_preference(:enabled_account_calendars, [@root_account.id])
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id)
+      end
+
+      it "returns auto-subscribed account calendars" do
+        expect(@user.enabled_account_calendars.pluck(:id)).to be_empty
+        @associated_subaccount.account_calendar_subscription_type = "auto"
+        @associated_subaccount.save!
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
+      end
+
+      it "returns subscribed and auto-subscribed account calendars" do
+        @root_account.account_calendar_visible = true
+        @root_account.save!
+        @user.set_preference(:enabled_account_calendars, [@root_account.id])
+
+        @associated_subaccount.account_calendar_subscription_type = "auto"
+        @associated_subaccount.save!
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id, @associated_subaccount.id)
+      end
+
+      it "returns subscribed account calendars only if the feature flag is off" do
+        Account.site_admin.disable_feature!(:auto_subscribe_account_calendars)
+        @root_account.account_calendar_visible = true
+        @root_account.save!
+        @user.set_preference(:enabled_account_calendars, [@root_account.id])
+
+        @associated_subaccount.account_calendar_subscription_type = "auto"
+        @associated_subaccount.save!
+        expect(@user.enabled_account_calendars.pluck(:id)).to contain_exactly(@root_account.id)
       end
     end
   end
@@ -4263,19 +4393,55 @@ describe User do
   describe "discussions_splitscreen_view" do
     it "returns false for a user without the setting set" do
       u = User.create
-      expect(u.discussions_splitscreen_view?).to eq(false)
+      expect(u.discussions_splitscreen_view?).to be(false)
     end
 
     it "returns false for a user when the setting is false" do
       u = User.create
       u.preferences[:discussions_splitscreen_view] = false
-      expect(u.discussions_splitscreen_view?).to eq(false)
+      expect(u.discussions_splitscreen_view?).to be(false)
     end
 
     it "returns true for a user when the setting is true" do
       u = User.create
       u.preferences[:discussions_splitscreen_view] = true
-      expect(u.discussions_splitscreen_view?).to eq(true)
+      expect(u.discussions_splitscreen_view?).to be(true)
+    end
+  end
+
+  describe "disabled?" do
+    before do
+      @account = Account.create!
+      @user = User.create! name: "longname1", short_name: "shortname1"
+    end
+
+    it "if all pseudonyms are suspended then the user is suspended" do
+      p1 = @user.pseudonyms.new unique_id: "uniqueid1", account: @account
+      p1.workflow_state = "suspended"
+      p1.sis_user_id = "sisid1"
+      p1.save!
+      p2 = @user.pseudonyms.new unique_id: "uniqueid2", account: @account
+      p2.workflow_state = "suspended"
+      p2.sis_user_id = "sisid2"
+      p2.save!
+
+      expect(@user.suspended?).to be_truthy
+    end
+
+    it "if only one of the pseudonyms is suspended then the user is not suspended" do
+      p1 = @user.pseudonyms.new unique_id: "uniqueid1", account: @account
+      p1.workflow_state = "suspended"
+      p1.sis_user_id = "sisid1"
+      p1.save!
+      p2 = @user.pseudonyms.new unique_id: "uniqueid2", account: @account
+      p2.sis_user_id = "sisid2"
+      p2.save!
+
+      expect(@user.suspended?).to be_falsey
+    end
+
+    it "if there are no pseudonyms then the user is not suspended" do
+      expect(@user.suspended?).to be_falsey
     end
   end
 end

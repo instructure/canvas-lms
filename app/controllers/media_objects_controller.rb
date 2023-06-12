@@ -72,8 +72,12 @@
 #
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
+  include FilesHelper
 
-  before_action :load_media_object, only: %i[show iframe_media_player]
+  before_action :load_media_object, except: %i[create_media_object index]
+  before_action :load_media_object_from_service, only: %i[show iframe_media_player]
+  before_action :check_media_permissions, except: %i[create_media_object index media_object_thumbnail update_media_object]
+  before_action(only: %i[update_media_object]) { check_media_permissions(access_type: :update) }
   before_action :require_user, only: %i[index update_media_object]
   protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
@@ -123,30 +127,39 @@ class MediaObjectsController < ApplicationController
   #
   # @returns [MediaObject]
   def index
-    if params[:course_id]
-      context = Course.find(params[:course_id])
-      url = api_v1_course_media_objects_url
-    elsif params[:group_id]
-      context = Group.find(params[:group_id])
-      url = api_v1_group_media_objects_url
-    end
-    if context
-      root_folder = Folder.root_folders(context).first
+    media_attachment = Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+    url = if params[:course_id]
+            context = Course.find(params[:course_id])
+            media_attachment ? api_v1_course_media_attachments_url : api_v1_course_media_objects_url
+          elsif params[:group_id]
+            context = Group.find(params[:group_id])
+            media_attachment ? api_v1_group_media_attachments_url : api_v1_group_media_objects_url
+          else
+            media_attachment ? api_v1_media_attachments_url : api_v1_media_objects_url
+          end
+    scope = if context
+              root_folder = Folder.root_folders(context).first
 
-      if root_folder.grants_right?(@current_user, :read_contents)
-        # if the user has access to the context's root folder, let's
-        # assume they have access to the context's media, even if it's
-        # media not associated with an Attachment in there
-        scope = MediaObject.active.where(context: context)
-      else
-        return render_unauthorized_action # not allowed to view files in the context
-      end
-    else
-      scope = MediaObject.active.where(context: @current_user)
-      url = api_v1_media_objects_url
-    end
+              if root_folder.grants_right?(@current_user, :read_contents)
+                if media_attachment
+                  attachment_scope = Attachment.not_deleted.is_media_object.where(context:)
+                  attachment_scope = attachment_scope.select { |att| access_allowed(att, @current_user, :download) }
 
-    order_dir = params[:order] == "desc" ? "desc" : "asc"
+                  MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
+                else
+                  MediaObject.active.where(context:)
+                end
+              else
+                render_unauthorized_action # not allowed to view files in the context
+              end
+            elsif media_attachment
+              attachment_scope = Attachment.not_deleted.is_media_object.where(context: @current_user)
+              MediaObject.by_media_id(attachment_scope.pluck(:media_entry_id))
+            else
+              MediaObject.active.where(context: @current_user)
+            end
+
+    order_dir = (params[:order] == "desc") ? "desc" : "asc"
     order_by = params[:sort] || "title"
     if order_by == "title"
       order_by = MediaObject.best_unicode_collation_key("COALESCE(user_entered_title, title)")
@@ -168,29 +181,24 @@ class MediaObjectsController < ApplicationController
   #
   def update_media_object
     # media objects don't have any permissions associated with them,
-    # so we just check that this is the user's media
-
+    # so we just check that this is the user's media unless the media
+    # is linked by attachment
     if params[:media_object_id]
-      @media_object = MediaObject.by_media_id(params[:media_object_id]).first
-
-      return render_unauthorized_action unless @media_object
       return render_unauthorized_action unless @current_user&.id
-
       return render_unauthorized_action unless @media_object.user_id == @current_user.id
-
-      if params[:user_entered_title].blank?
-        return(
-          render json: { message: "The user_entered_title parameter must have a value" },
-                 status: :bad_request
-        )
-      end
-
-      extend TextHelper
-      @media_object.user_entered_title =
-        CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
-      @media_object.save!
-      render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
     end
+
+    if params[:user_entered_title].blank?
+      return(
+        render json: { message: "The user_entered_title parameter must have a value" },
+               status: :bad_request
+      )
+    end
+    extend TextHelper
+    @media_object.user_entered_title =
+      CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
+    @media_object.save!
+    render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
   end
 
   def create_media_object
@@ -224,15 +232,13 @@ class MediaObjectsController < ApplicationController
     @show_embedded_chat = false
     @show_left_side = false
     @show_right_side = false
-    @media_object = MediaObject.by_media_id(params[:id]).first
     js_env(MEDIA_OBJECT_ID: params[:id],
            MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video")
     render
   end
 
   def media_object_redirect
-    mo = MediaObject.by_media_id(params[:id]).first
-    mo&.viewed!
+    @media_object&.viewed!
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
@@ -242,21 +248,15 @@ class MediaObjectsController < ApplicationController
   end
 
   def media_object_thumbnail
-    media_id = params[:id]
-    # we prefer using the MediaObject if it exists (so that it can give us
-    # a different media_id if it wants to), but we will also use the provided
-    # media id directly if we can't find a MediaObject. (They don't always get
-    # created yet.)
-    mo = MediaObject.by_media_id(media_id).first
     width = params[:width]
     height = params[:height]
     type = (params[:type].presence || 2).to_i
     config = CanvasKaltura::ClientV3.config
     if config
-      redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
-                                                            width: width,
-                                                            height: height,
-                                                            type: type),
+      redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(@media_object.try(:media_id) || @media_id,
+                                                            width:,
+                                                            height:,
+                                                            type:),
                   status: :moved_permanently
     else
       render plain: t(:media_objects_not_configured, "Media Objects not configured")
@@ -277,10 +277,9 @@ class MediaObjectsController < ApplicationController
 
   private
 
-  def load_media_object
-    return nil unless params[:media_object_id].present?
+  def load_media_object_from_service
+    return unless params[:media_object_id].present?
 
-    @media_object = MediaObject.by_media_id(params[:media_object_id]).first
     unless @media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.

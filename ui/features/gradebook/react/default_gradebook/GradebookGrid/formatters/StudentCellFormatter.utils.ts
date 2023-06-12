@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -16,24 +17,40 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 
 const I18n = useI18nScope('gradebook')
 
-export function getSecondaryDisplayInfo(student, secondaryInfo, options) {
+const listFormatter = Intl.ListFormat
+  ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
+  : listFormatterPolyfill
+
+export function getSecondaryDisplayInfo(
+  student: {
+    sections: string[]
+    group_ids: string[]
+    login_id: string
+    sis_user_id?: string
+    integration_id?: string
+  },
+  secondaryInfo: string,
+  options
+) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {
-    const sectionNames = student.sections
+    const sectionNames: string[] = (student?.sections || [])
       .filter(options.isVisibleSection)
       .map((sectionId: string) => options.getSection(sectionId).name)
-    return $.toSentence(sectionNames.sort())
+    return listFormatter.format(sectionNames.sort())
   }
 
   if (options.shouldShowGroups() && secondaryInfo === 'group') {
-    const groupNames = student.group_ids.map((groupId: string) => options.getGroup(groupId).name)
-    return $.toSentence(groupNames.sort())
+    const groupNames: string[] = student.group_ids.map(
+      (groupId: string) => options.getGroup(groupId).name
+    )
+    return listFormatter.format(groupNames.sort())
   }
 
   return {

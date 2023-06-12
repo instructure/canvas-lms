@@ -16,10 +16,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection.coffee'
+import ModuleCollection from '@canvas/modules/backbone/collections/ModuleCollection'
 import template from '../../jst/ProgressionStudentView.handlebars'
 import collectionTemplate from '../../jst/ProgressionModuleCollection.handlebars'
-import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
+import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
 import ProgressionModuleView from './ProgressionModuleView'
 
 export default class ProgressionStudentView extends Backbone.View {

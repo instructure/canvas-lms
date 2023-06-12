@@ -179,14 +179,14 @@ module MicrosoftSync
 
     # Mostly used for debugging. May use sleep!
     def run_synchronously(initial_mem_state = nil)
-      run_with_delay(initial_mem_state: initial_mem_state, synchronous: true)
+      run_with_delay(initial_mem_state:, synchronous: true)
     rescue IRB::Abort => e
       update_state_record_to_errored_and_cleanup(error: e, step: nil)
       raise
     end
 
     def run_later(initial_mem_state = nil)
-      run_with_delay(initial_mem_state: initial_mem_state)
+      run_with_delay(initial_mem_state:)
     end
 
     private
@@ -251,7 +251,7 @@ module MicrosoftSync
           raise InternalError, "A job is waiting to be retried; use run_later() to enqueue another"
         end
 
-        delay(strand: strand, run_at: currently_retrying_job.run_at + 1)
+        delay(strand:, run_at: currently_retrying_job.run_at + 1)
           .run(nil, initial_mem_state)
       end
     end
@@ -311,10 +311,10 @@ module MicrosoftSync
 
     def statsd_increment(bucket, step, error = nil)
       tags = { category: error&.class&.name&.tr(":", "_"), microsoft_sync_step: step.to_s }.compact
-      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags: tags)
+      InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags:)
     end
 
-    def log(&_blk)
+    def log(&)
       Rails.logger.info { "#{strand}: #{yield}" }
     end
 
@@ -332,13 +332,13 @@ module MicrosoftSync
         return
       end
 
-      delay(strand: strand, run_at: delay_amount&.seconds&.from_now)
+      delay(strand:, run_at: delay_amount&.seconds&.from_now)
         .run(step, initial_mem_state)
     end
 
     def update_state_record_to_errored_and_cleanup(error:, step:, capture: nil)
       error_report_id = capture && capture_exception(capture)[:error_report]
-      error_msg = MicrosoftSync::Errors.serialize(error, step: step)
+      error_msg = MicrosoftSync::Errors.serialize(error, step:)
       job_state_record&.update_unless_deleted(
         workflow_state: :errored, job_state: nil,
         last_error: error_msg, last_error_report_id: error_report_id
@@ -367,7 +367,7 @@ module MicrosoftSync
       run_with_delay(
         step: delayed_next_step.step,
         delay_amount: clip_delay_amount(delayed_next_step.delay_amount),
-        synchronous: synchronous
+        synchronous:
       )
     end
 
@@ -402,7 +402,8 @@ module MicrosoftSync
         else
           statsd_increment(:final_retry, current_step, e)
           update_state_record_to_errored_and_cleanup(
-            error: e, step: current_step,
+            error: e,
+            step: current_step,
             capture: RetriesExhaustedError.new(e)
           )
           raise e
@@ -426,7 +427,7 @@ module MicrosoftSync
       delay_amount = clip_delay_amount(delay_amount) if delay_amount
       log { "handle_retry #{current_step} -> #{retry_step} - #{delay_amount}" }
 
-      run_with_delay(step: retry_step, delay_amount: delay_amount, synchronous: synchronous)
+      run_with_delay(step: retry_step, delay_amount:, synchronous:)
     end
 
     # Find a delayed job on the strand with arguments that match the selector
@@ -436,7 +437,7 @@ module MicrosoftSync
     # primitives. So if you use non-primitives in initial_mem_state, duplicate
     # job detection won't work.
     def find_delayed_job(strand, &args_selector)
-      Delayed::Job.where(strand: strand).find_each.find do |job|
+      Delayed::Job.where(strand:).find_each.find do |job|
         job != Delayed::Worker.current_job && args_selector[
           YAML.unsafe_load(job.handler)["args"]
         ]

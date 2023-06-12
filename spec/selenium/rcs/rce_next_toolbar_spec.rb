@@ -359,12 +359,66 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
     end
 
     context "math equations" do
+      it "renders math equation from math modal" do
+        page_title = "math_rendering"
+        create_wiki_page_with_text(page_title)
+        visit_existing_wiki_edit(@course, page_title)
+        equation_editor_button.click
+        advanced_editor_toggle.click
+        advanced_editor_textarea.send_keys '\sqrt{81}'
+        equation_editor_done_button.click
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body).to contain_css("img.equation_image")
+          expect(math_image.attribute("title")).to eq '\sqrt{81}'
+          click_repeat(math_image)
+        end
+        edit_math_image_button.click
+        expect(advanced_editor_textarea.text).to eq '\sqrt{81}'
+
+        equation_editor_done_button.click
+        save_button.click
+        wait_for_ajaximations
+        expect(math_rendering_exists?).to be true
+      end
+
+      it "renders inline LaTeX in the equation editor" do
+        page_title = "math_rendering"
+        body = "<p>\\(\\LaTeX\\)</p>"
+        @course.wiki_pages.create!(title: page_title, body:)
+        visit_existing_wiki_edit(@course, page_title)
+        in_frame rce_page_body_ifr_id do
+          double_click("#tinymce p")
+        end
+        equation_editor_button.click
+        editor_text = advanced_editor_textarea.text
+        expect(editor_text).to eq("\\LaTeX")
+      end
+
+      it "redirects focus in the equation editor" do
+        def active_element
+          driver.execute_script("return document.activeElement") # rubocop:disable Specs/NoExecuteScript
+        end
+
+        page_title = "math_focus"
+        create_wiki_page_with_text(page_title)
+        visit_existing_wiki_edit(@course, page_title)
+        equation_editor_button.click
+        advanced_editor_toggle.click
+        first_math_symbol_button.click
+        expect(active_element).to eq(advanced_editor_textarea)
+
+        advanced_editor_toggle.click
+        first_math_symbol_button.click
+        expect(active_element).to eq(basic_editor_textarea)
+      end
+
       it 'renders math equations for inline math with "\("' do
         title = "Assignment-Title with Math \\(x^2\\)"
         @assignment = @course.assignments.create!(name: title)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
         wait_for_ajaximations
-        expect(mathjax_element_exists_in_title?).to eq true
+        expect(mathjax_element_exists_in_title?).to be true
       end
 
       it "renders math equations for inline math with $$" do
@@ -372,34 +426,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
         @assignment = @course.assignments.create!(name: title)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
         wait_for_ajaximations
-        expect(mathjax_element_exists_in_title?).to eq true
-      end
-    end
-
-    describe "floating toolbar" do
-      before do
-        create_wiki_page_with_text("hello")
-        visit_existing_wiki_edit(@course, "hello")
-        driver.manage.window.resize_to(1_000, 800)
-      end
-
-      it "closes on executing any command" do
-        more_toolbar_button.click
-        expect(overflow_toolbar).to be_displayed
-        click_lists_toolbar_menubutton
-        click_bullet_list_toolbar_menuitem
-        expect(f("body")).not_to contain_css(overflow_toolbar_selector)
-      end
-
-      it "closes on losing focus" do
-        in_frame rce_page_body_ifr_id do
-          f("#tinymce").send_keys("") # focus
-        end
-        more_toolbar_button.click
-        wait_for_animations
-        expect(overflow_toolbar).to be_displayed
-        f("#title").click
-        expect(f("body")).not_to contain_css(overflow_toolbar_selector)
+        expect(mathjax_element_exists_in_title?).to be true
       end
     end
 
@@ -411,11 +438,9 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
 
       it "list button in overflow menu should indicate active when appropriate" do
         click_lists_toolbar_quickaction
-        more_toolbar_button.click
         expect(lists_toolbar_splitbutton).to contain_css(".tox-tbtn--enabled")
 
         click_lists_toolbar_quickaction
-        more_toolbar_button.click
         expect(lists_toolbar_splitbutton).not_to contain_css(".tox-tbtn--enabled")
       end
 
@@ -443,7 +468,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
           <p><span id="ifr">cannot link <iframe>me</iframe></span></p>
           <p><span id="vid">nor <video>me</video></span></p>
         HTML
-        @course.wiki_pages.create!(title: "title", body: body)
+        @course.wiki_pages.create!(title: "title", body:)
         visit_existing_wiki_edit(@course, "title")
 
         driver.execute_script(<<~JS)

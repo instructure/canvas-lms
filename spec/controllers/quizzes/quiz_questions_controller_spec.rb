@@ -53,54 +53,58 @@ describe Quizzes::QuizQuestionsController do
 
     it "creates a quiz question" do
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {
-        question_type: "multiple_choice_question",
-        answers: {
-          "0" => {
-            answer_text: "asdf",
-            weight: 100
-          },
-          "1" => {
-            answer_text: "jkl;",
-            weight: 0
-          }
-        }
-      } }
+      post "create", params: { course_id: @course.id,
+                               quiz_id: @quiz,
+                               question: {
+                                 question_type: "multiple_choice_question",
+                                 answers: {
+                                   "0" => {
+                                     answer_text: "asdf",
+                                     weight: 100
+                                   },
+                                   "1" => {
+                                     answer_text: "jkl;",
+                                     weight: 0
+                                   }
+                                 }
+                               } }
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
-      expect(assigns[:question].question_data[:answers].length).to eql(2)
+      expect(assigns[:question].question_data[:answers].length).to be(2)
       expect(assigns[:quiz]).to eql(@quiz)
     end
 
     it "preserves ids, if provided, on create" do
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {
-        question_type: "multiple_choice_question",
-        answers: [
-          {
-            id: 123_456,
-            answer_text: "asdf",
-            weight: 100
-          },
-          {
-            id: 654_321,
-            answer_text: "jkl;",
-            weight: 0
-          },
-          {
-            id: 654_321,
-            answer_text: "qwer",
-            weight: 0
-          }
-        ]
-      } }
+      post "create", params: { course_id: @course.id,
+                               quiz_id: @quiz,
+                               question: {
+                                 question_type: "multiple_choice_question",
+                                 answers: [
+                                   {
+                                     id: 123_456,
+                                     answer_text: "asdf",
+                                     weight: 100
+                                   },
+                                   {
+                                     id: 654_321,
+                                     answer_text: "jkl;",
+                                     weight: 0
+                                   },
+                                   {
+                                     id: 654_321,
+                                     answer_text: "qwer",
+                                     weight: 0
+                                   }
+                                 ]
+                               } }
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
 
-      expect(data.length).to eql(3)
-      expect(data[0][:id]).to eql(123_456)
-      expect(data[1][:id]).to eql(654_321)
+      expect(data.length).to be(3)
+      expect(data[0][:id]).to be(123_456)
+      expect(data[1][:id]).to be(654_321)
       expect(data[2][:id]).not_to eql(654_321)
     end
 
@@ -110,36 +114,44 @@ describe Quizzes::QuizQuestionsController do
         long_data = "#{long_data}abcdefghijklmnopqrstuvwxyz#{long_data}"
       end
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {
-        question_text: long_data
-      } }, xhr: true
+      post "create",
+           params: { course_id: @course.id,
+                     quiz_id: @quiz,
+                     question: {
+                       question_text: long_data
+                     } },
+           xhr: true
       expect(response.body).to match(/max length is 16384/)
     end
 
     it "strips the origin from local URLs in answers" do
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {
-        question_type: "multiple_choice_question",
-        answers: {
-          "0" => {
-            answer_html: "<a href='https://test.host:80/courses/#{@course.id}/files/27'>home</a>",
-            comment_html: "<a href='https://test.host:80/courses/#{@course.id}/assignments'>home</a>",
-          }
-        }
-      } }
+      post "create", params: { course_id: @course.id,
+                               quiz_id: @quiz,
+                               question: {
+                                 question_type: "multiple_choice_question",
+                                 answers: {
+                                   "0" => {
+                                     answer_html: "<a href='https://test.host:80/courses/#{@course.id}/files/27'>home</a>",
+                                     comment_html: "<a href='https://test.host:80/courses/#{@course.id}/assignments'>home</a>",
+                                   }
+                                 }
+                               } }
       expect(assigns[:question].question_data[:answers][0][:html]).not_to match(%r{https://test.host})
       expect(assigns[:question].question_data[:answers][0][:html]).to match(%r{href=['"]/courses/#{@course.id}/files/27})
     end
 
     it "strips the origin from local URLs in answers when they are provided as an array" do
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, quiz_id: @quiz, question: {
-        question_type: "multiple_choice_question",
-        answers: [{
-          answer_html: "<a href='https://test.host:80/courses/#{@course.id}/files/27'>home</a>",
-          comment_html: "<a href='https://test.host:80/courses/#{@course.id}/assignments'>home</a>",
-        }]
-      } }
+      post "create", params: { course_id: @course.id,
+                               quiz_id: @quiz,
+                               question: {
+                                 question_type: "multiple_choice_question",
+                                 answers: [{
+                                   answer_html: "<a href='https://test.host:80/courses/#{@course.id}/files/27'>home</a>",
+                                   comment_html: "<a href='https://test.host:80/courses/#{@course.id}/assignments'>home</a>",
+                                 }]
+                               } }
       expect(assigns[:question].question_data[:answers][0][:html]).not_to match(%r{https://test.host})
       expect(assigns[:question].question_data[:answers][0][:html]).to match(%r{href=['"]/courses/#{@course.id}/files/27})
     end
@@ -155,57 +167,63 @@ describe Quizzes::QuizQuestionsController do
 
     it "updates a quiz question" do
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
-        question_type: "multiple_choice_question",
-        answers: {
-          "0" => {
-            answer_text: "asdf",
-            weight: 100
-          },
-          "1" => {
-            answer_text: "jkl;",
-            weight: 0
-          },
-          "2" => {
-            answert_text: "qwer",
-            weight: 0
-          }
-        }
-      } }
+      put "update", params: { course_id: @course.id,
+                              quiz_id: @quiz,
+                              id: @question.id,
+                              question: {
+                                question_type: "multiple_choice_question",
+                                answers: {
+                                  "0" => {
+                                    answer_text: "asdf",
+                                    weight: 100
+                                  },
+                                  "1" => {
+                                    answer_text: "jkl;",
+                                    weight: 0
+                                  },
+                                  "2" => {
+                                    answert_text: "qwer",
+                                    weight: 0
+                                  }
+                                }
+                              } }
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
-      expect(assigns[:question].question_data[:answers].length).to eql(3)
+      expect(assigns[:question].question_data[:answers].length).to be(3)
       expect(assigns[:quiz]).to eql(@quiz)
     end
 
     it "preserves ids, if provided, on update" do
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
-        question_type: "multiple_choice_question",
-        answers: {
-          "0" => {
-            id: 123_456,
-            answer_text: "asdf",
-            weight: 100
-          },
-          "1" => {
-            id: 654_321,
-            answer_text: "jkl;",
-            weight: 0
-          },
-          "2" => {
-            id: 654_321,
-            answer_text: "qwer",
-            weight: 0
-          }
-        }
-      } }
+      put "update", params: { course_id: @course.id,
+                              quiz_id: @quiz,
+                              id: @question.id,
+                              question: {
+                                question_type: "multiple_choice_question",
+                                answers: {
+                                  "0" => {
+                                    id: 123_456,
+                                    answer_text: "asdf",
+                                    weight: 100
+                                  },
+                                  "1" => {
+                                    id: 654_321,
+                                    answer_text: "jkl;",
+                                    weight: 0
+                                  },
+                                  "2" => {
+                                    id: 654_321,
+                                    answer_text: "qwer",
+                                    weight: 0
+                                  }
+                                }
+                              } }
       expect(assigns[:question]).not_to be_nil
       expect(assigns[:question].question_data).not_to be_nil
       data = assigns[:question].question_data[:answers]
-      expect(data.length).to eql(3)
-      expect(data[0][:id]).to eql(123_456)
-      expect(data[1][:id]).to eql(654_321)
+      expect(data.length).to be(3)
+      expect(data[0][:id]).to be(123_456)
+      expect(data[1][:id]).to be(654_321)
       expect(data[2][:id]).not_to eql(654_321)
     end
 
@@ -215,9 +233,14 @@ describe Quizzes::QuizQuestionsController do
         long_data = "#{long_data}abcdefghijklmnopqrstuvwxyz#{long_data}"
       end
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
-        question_text: long_data
-      } }, xhr: true
+      put "update",
+          params: { course_id: @course.id,
+                    quiz_id: @quiz,
+                    id: @question.id,
+                    question: {
+                      question_text: long_data
+                    } },
+          xhr: true
       expect(response.body).to match(/max length is 16384/)
     end
 
@@ -259,7 +282,9 @@ describe Quizzes::QuizQuestionsController do
       linked_question.save!
 
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, quiz_id: @quiz, id: linked_question.id,
+      put "update", params: { course_id: @course.id,
+                              quiz_id: @quiz,
+                              id: linked_question.id,
                               question: { question_text: translated_text } }
       expect(response).to be_successful
 
@@ -276,7 +301,9 @@ describe Quizzes::QuizQuestionsController do
       it "generates an assessment_question for the quiz_question" do
         user_session(@teacher)
         expect do
-          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+          put "update", params: { course_id: @course.id,
+                                  quiz_id: @quiz,
+                                  id: @question.id,
                                   question: {
                                     neutral_comments_html: ""
                                   } }
@@ -287,7 +314,9 @@ describe Quizzes::QuizQuestionsController do
       it "does not reset the question's data" do
         user_session(@teacher)
         expect do
-          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+          put "update", params: { course_id: @course.id,
+                                  quiz_id: @quiz,
+                                  id: @question.id,
                                   question: {
                                     neutral_comments_html: ""
                                   } }
@@ -305,7 +334,9 @@ describe Quizzes::QuizQuestionsController do
       it "does not generate an assessment_question for the quiz_question" do
         user_session(@teacher)
         expect do
-          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+          put "update", params: { course_id: @course.id,
+                                  quiz_id: @quiz,
+                                  id: @question.id,
                                   question: { neutral_comments_html: "" } }
           @question.reload
         end.not_to change { @question.assessment_question.present? }
@@ -316,7 +347,9 @@ describe Quizzes::QuizQuestionsController do
       it "does not generates an assessment_question for the quiz_question" do
         user_session(@teacher)
         expect do
-          put "update", params: { course_id: @course.id, quiz_id: @quiz, id: @question.id,
+          put "update", params: { course_id: @course.id,
+                                  quiz_id: @quiz,
+                                  id: @question.id,
                                   question: { neutral_comments_html: "" } }
           @question.reload
         end.not_to change { @question.assessment_question }

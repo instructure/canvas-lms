@@ -68,7 +68,7 @@ module BasicLTI
     # gives instfs about 7 hours to have an outage and eventually take the file
     MAX_ATTEMPTS = 10
 
-    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/.freeze
+    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
@@ -151,7 +151,7 @@ module BasicLTI
       def result_data_download_url
         url = @lti_request&.at_css("imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > downloadUrl").try(:content)
         name = @lti_request&.at_css("imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > documentName").try(:content)
-        return { url: url, name: name } if url && name
+        return { url:, name: } if url && name
       end
 
       def result_data_launch_url
@@ -232,7 +232,7 @@ module BasicLTI
         op = operation_ref_identifier.underscore
         return false unless respond_to?("handle_#{op}", true)
 
-        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.requests", tags: { op: op, type: request_type })
+        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.requests", tags: { op:, type: request_type })
 
         # Write results are disabled for concluded users, read results are still allowed
         if op != "read_result" && !user_enrollment_active?(assignment, user)
@@ -340,7 +340,7 @@ module BasicLTI
             workflow_state: "unattached",
             filename: result_data[:name],
             display_name: result_data[:name],
-            user: user
+            user:
           )
 
           submission_hash[:attachments] = [attachment]
@@ -356,7 +356,7 @@ module BasicLTI
         # than the ltitool before the tool finished pushing it. We've seen this need with NewQuizzes
         LtiResponse.ensure_score_update_possible(submission: existing_submission, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
           if assignment.grading_type == "pass_fail" && (raw_score || new_score)
-            submission_hash[:grade] = ((raw_score || new_score) > 0 ? "pass" : "fail")
+            submission_hash[:grade] = (((raw_score || new_score) > 0) ? "pass" : "fail")
             submission_hash[:grader_id] = -tool.id
           elsif raw_score
             submission_hash[:grade] = raw_score
@@ -377,15 +377,15 @@ module BasicLTI
         submitted_at = xml_submitted_at.present? ? Time.zone.parse(xml_submitted_at) : nil
         if xml_submitted_at.present? && submitted_at.nil?
           report_failure(:timestamp_not_parseable, I18n.t("Invalid timestamp - timestamp not parseable"))
-        elsif submitted_at.present? && submitted_at > Time.zone.now + 1.minute
+        elsif submitted_at.present? && submitted_at > 1.minute.from_now
           report_failure(:timestamp_in_future, I18n.t("Invalid timestamp - timestamp in future"))
         end
         submission_hash[:submitted_at] = submitted_at || Time.zone.now
 
         if !failure? && assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
           unless (submission = existing_submission)
-            submission = Submission.create!(submission_hash.merge(user: user,
-                                                                  assignment: assignment))
+            submission = Submission.create!(submission_hash.merge(user:,
+                                                                  assignment:))
           end
           submission.submission_comments.create!(comment: I18n.t("lib.basic_lti.no_points_comment", <<~TEXT, grade: submission_hash[:grade]))
             An external tool attempted to grade this assignment as %{grade}, but was unable

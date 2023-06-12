@@ -532,6 +532,9 @@ matching, and to only return URLs matching that domain.
 
 External tools can support different LTI environments for different canvas environments.
 
+NOTE: This setting is only supported by LTI 1.1 tools. LTI 1.3 tools should redirect to the
+desired domain/launch URL as described in the <a href="file.lti_dev_key_config.html#login-redirect">LTI 1.3 configuration guide</a>.
+
 * __domain__: All url domains in this tool's configuration will be replaced with this domain
 * __launch_url__: the blti:launch\_url property that should be used for all canvas test environments.
 This property takes precedent over domain changes if both properties are set.
@@ -541,8 +544,7 @@ by specifying the environment as part of the property name (ie, test\_launch\_ur
 beta\_domain, etc).  When used in this manner, specific environment properties take
 precedent over the default values.
 
-NOTE: Test environment settings are established during the refresh process when the environments are
-<a href="https://community.canvaslms.com/t5/Releases/What-is-the-Canvas-release-schedule-for-beta-production-and-test/ta-p/242411">mirrored from production</a>.
+These settings will be applied dynamically during the launch process.
 
 ### Test Environment Example
 

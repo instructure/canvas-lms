@@ -297,7 +297,7 @@ class Quizzes::QuizSubmissionService
     end
 
     can_take = Quizzes::QuizEligibility.new(course: quiz.context,
-                                            quiz: quiz,
+                                            quiz:,
                                             user: participant.user,
                                             remote_ip: participant.ip_address,
                                             access_code: participant.access_code)

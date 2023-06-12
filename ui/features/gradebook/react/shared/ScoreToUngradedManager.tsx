@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -18,15 +19,11 @@
 
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type {ProgressCamelized} from '../default_gradebook/gradebook.d'
 
 import GradebookApi from '../default_gradebook/apis/GradebookApi'
 
 const I18n = useI18nScope('gradebookSharedScoreToUngradedManager')
-
-type Progress = {
-  progressId: number
-  workflowState: string
-}
 
 class ScoreToUngradedManager {
   static DEFAULT_POLLING_INTERVAL = 2000
@@ -47,12 +44,12 @@ class ScoreToUngradedManager {
 
   monitoringBaseUrl: string
 
-  process?: Progress
+  process?: ProgressCamelized
 
   processStatusPoll?: number
 
   constructor(
-    existingProcess?: Progress,
+    existingProcess?: ProgressCamelized,
     pollingInterval: number = ScoreToUngradedManager.DEFAULT_POLLING_INTERVAL
   ) {
     this.pollingInterval = pollingInterval
@@ -60,7 +57,7 @@ class ScoreToUngradedManager {
 
     if (existingProcess) {
       const workflowState = existingProcess.workflowState
-      if (!['completed', 'failed'].includes(workflowState)) {
+      if (!['completed', 'failed'].includes(workflowState || '')) {
         this.process = existingProcess
       }
     }
@@ -100,7 +97,7 @@ class ScoreToUngradedManager {
     }, this.pollingInterval)
   }
 
-  startProcess(courseId: string, options) {
+  startProcess(courseId?: string, options: any = {}) {
     if (this.process) {
       return Promise.reject(I18n.t('A process is already in progress.'))
     }

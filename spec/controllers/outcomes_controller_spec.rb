@@ -40,19 +40,19 @@ describe OutcomesController do
 
     LearningOutcomeResult.create!(
       learning_outcome: @outcome,
-      user: user,
+      user:,
       context: @course,
-      alignment: alignment,
+      alignment:,
       associated_asset: assignment,
       association_type: "RubricAssociation",
       association_id: rubric_association.id,
-      title: title,
-      score: score,
-      possible: possible,
-      mastery: mastery,
+      title:,
+      score:,
+      possible:,
+      mastery:,
       created_at: submitted_at,
       updated_at: submitted_at,
-      submitted_at: submitted_at,
+      submitted_at:,
       assessed_at: submitted_at
     )
   end
@@ -103,7 +103,11 @@ describe OutcomesController do
       get "index", params: { account_id: @account.id }
       permissions = assigns[:js_env][:PERMISSIONS]
       %i[
-        manage_outcomes manage_rubrics can_manage_courses import_outcomes manage_proficiency_scales
+        manage_outcomes
+        manage_rubrics
+        can_manage_courses
+        import_outcomes
+        manage_proficiency_scales
         manage_proficiency_calculations
       ].each do |permission|
         expect(permissions).to have_key(permission)
@@ -138,7 +142,7 @@ describe OutcomesController do
       it "does not return the global root id for a course" do
         user_session(@admin)
         get "index", params: { course_id: @course.id }
-        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq nil
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to be_nil
       end
     end
 
@@ -147,30 +151,14 @@ describe OutcomesController do
         Account.site_admin.enable_feature!(:outcomes_friendly_description)
         user_session(@admin)
         get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq true
+        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be true
       end
 
       it "returns false if outcomes_friendly_description feature flag is disabled" do
         Account.site_admin.disable_feature!(:outcomes_friendly_description)
         user_session(@admin)
         get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq false
-      end
-    end
-
-    context "outcome_alignment_summary" do
-      it "returns true if outcome_alignment_summary feature flag is enabled" do
-        @account.root_account.enable_feature!(:outcome_alignment_summary)
-        user_session(@admin)
-        get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOME_ALIGNMENT_SUMMARY]).to eq true
-      end
-
-      it "returns false if outcome_alignment_summary feature flag is disabled" do
-        @account.root_account.disable_feature!(:outcome_alignment_summary)
-        user_session(@admin)
-        get "index", params: { account_id: @account.id }
-        expect(assigns[:js_env][:OUTCOME_ALIGNMENT_SUMMARY]).to eq false
+        expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to be false
       end
     end
   end
@@ -180,14 +168,14 @@ describe OutcomesController do
       @account.root_account.enable_feature!(:outcome_average_calculation)
       user_session(@admin)
       get "index", params: { account_id: @account.id }
-      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to eq true
+      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to be true
     end
 
     it "returns false if outcome_average_calculation feature flag is disabled" do
       @account.root_account.disable_feature!(:outcome_average_calculation)
       user_session(@admin)
       get "index", params: { account_id: @account.id }
-      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to eq false
+      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to be false
     end
   end
 
@@ -425,7 +413,8 @@ describe OutcomesController do
       expect(outcome_group.id).not_to be_nil
       expect(outcome_group).not_to be_nil
 
-      post "create", params: { course_id: @course.id, learning_outcome_group_id: outcome_group.id,
+      post "create", params: { course_id: @course.id,
+                               learning_outcome_group_id: outcome_group.id,
                                learning_outcome: outcome_params }
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
@@ -449,21 +438,24 @@ describe OutcomesController do
     end
 
     it "requires authorization" do
-      put "update", params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       assert_unauthorized
     end
 
     it "does not let a student update the outcome" do
       user_session(@student)
-      put "update", params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       assert_unauthorized
     end
 
     it "allows updating the outcome" do
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       @outcome.reload
       expect(@outcome[:short_description]).to eql test_string

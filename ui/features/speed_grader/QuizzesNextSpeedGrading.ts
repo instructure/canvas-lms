@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -30,7 +31,7 @@
 // refreshGradesCb executes the normal speedGrader refresh grades
 // actions, plus whatever callback is passed in as an argument
 
-import type {Submission} from './jquery/speed_grader.d'
+import type {Submission} from '../../api.d'
 import $ from 'jquery'
 
 function sendPostMessage($iframe_holder, message) {
@@ -86,6 +87,10 @@ function setup(EG, $iframe_holder, registerCb, refreshGradesCb, speedGraderWindo
         return registerCb(postChangeSubmissionMessage, message.payload || {singleLtiLaunch: true})
       case 'quizzesNext.submissionUpdate':
         return refreshGradesCb(quizzesNextChange, retryRefreshGrades, 1000)
+      case 'quizzesNext.previousStudent':
+        return EG.prev()
+      case 'quizzesNext.nextStudent':
+        return EG.next()
     }
   }
 

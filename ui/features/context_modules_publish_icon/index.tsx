@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -18,7 +19,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ContextModulesPublishIcon from '@canvas/context-modules-publish-icon/ContextModulesPublishIcon'
+import ContextModulesPublishIcon from '@canvas/context-modules/react/ContextModulesPublishIcon'
 import ready from '@instructure/ready'
 
 ready(() => {
@@ -26,11 +27,18 @@ ready(() => {
     'module-publish-icon'
   ) as HTMLCollectionOf<HTMLElement> // eslint-disable-line no-undef
   Array.from(menuElements).forEach(el => {
+    const courseId = el.getAttribute('data-course-id')
+    const moduleId = el.getAttribute('data-module-id')
+    const moduleName = el.closest('.context_module').querySelector('.ig-header-title').textContent
+    const published = el.getAttribute('data-published') === 'true'
     ReactDOM.render(
       <ContextModulesPublishIcon
-        courseId={el.dataset.courseId}
-        moduleId={el.dataset.moduleId}
-        published={el.dataset.published === 'true'}
+        courseId={courseId}
+        moduleId={moduleId}
+        moduleName={moduleName}
+        published={published}
+        isPublishing={false}
+        disabled={false}
       />,
       el
     )

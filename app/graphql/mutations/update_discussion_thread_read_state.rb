@@ -31,7 +31,8 @@ class Mutations::UpdateDiscussionThreadReadState < Mutations::BaseMutation
 
     read_state = input[:read] ? "read" : "unread"
 
-    DiscussionEntryParticipant.upsert_for_root_entry_and_descendants(root_entry, current_user,
+    DiscussionEntryParticipant.upsert_for_root_entry_and_descendants(root_entry,
+                                                                     current_user,
                                                                      new_state: read_state,
                                                                      forced: true)
 
@@ -39,7 +40,7 @@ class Mutations::UpdateDiscussionThreadReadState < Mutations::BaseMutation
     total_read_count = topic.discussion_entry_participants.read.where(
       discussion_entry_participants: { user_id: current_user.id }
     ).count
-    topic.update_or_create_participant(current_user: current_user, new_count: topic.default_unread_count - total_read_count)
+    topic.update_or_create_participant(current_user:, new_count: topic.default_unread_count - total_read_count)
 
     {
       discussion_entry: root_entry

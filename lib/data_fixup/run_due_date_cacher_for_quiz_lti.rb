@@ -22,7 +22,7 @@ module DataFixup::RunDueDateCacherForQuizLti
   def self.run(start_at, end_at)
     # The migration will have us at most a range of 100,000 items,
     # we'll break it down to a thousand at a time here.
-    Course.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |batch_start, batch_end|
+    Course.find_ids_in_ranges(start_at:, end_at:) do |batch_start, batch_end|
       courses_to_recompute =
         Course.joins(assignments: :external_tool_tag)
               .joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id")

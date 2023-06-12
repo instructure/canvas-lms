@@ -89,10 +89,30 @@ describe CC::BasicLTILinks do
     end
 
     it "add an icon element if found in the tool settings" do
-      tool.settings[:icon_url] = "http://example.com/icon"
+      tool.icon_url = "http://example.com/icon"
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      expect(xml_doc.at_xpath("//blti:icon").text).to eq tool.settings[:icon_url]
+      expect(xml_doc.at_xpath("//blti:icon").text).to eq tool.icon_url
+    end
+
+    context "with environment-specific overrides" do
+      before do
+        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        tool.settings[:environments] = {
+          domain: "example-beta.com"
+        }
+      end
+
+      let(:icon_url) { "https://example.com/lti/icon" }
+      let(:override_icon_url) { "https://example-beta.com/lti/icon" }
+
+      it "add an icon element if found in the tool settings" do
+        tool.icon_url = icon_url
+        subject.create_blti_link(tool, lti_doc)
+        xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+        expect(xml_doc.at_xpath("//blti:icon").text).to eq override_icon_url
+      end
     end
 
     it "sets the vendor code to 'unknown'" do
@@ -251,7 +271,7 @@ describe CC::BasicLTILinks do
 
         it "adds labels correctly" do
           labels = { en_US: "My Label" }
-          tool.settings[:course_navigation] = { labels: labels }
+          tool.settings[:course_navigation] = { labels: }
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/lticm:options[@name="labels"]/lticm:property[@name="en_US"]'
@@ -263,7 +283,7 @@ describe CC::BasicLTILinks do
             "custom_key_name_1" => "custom_key_1",
             "custom_key_name_2" => "custom_key_2"
           }
-          tool.settings[:course_navigation] = { custom_fields: custom_fields }
+          tool.settings[:course_navigation] = { custom_fields: }
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/blti:custom/lticm:property'
@@ -285,7 +305,7 @@ describe CC::BasicLTILinks do
             "custom_key_name_1" => "custom_key_1",
             "custom_key_name_2" => "custom_key_2"
           }
-          tool.settings[:vendor_extensions] = [{ platform: "my vendor platform", custom_fields: custom_fields }]
+          tool.settings[:vendor_extensions] = [{ platform: "my vendor platform", custom_fields: }]
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions[@platform="my vendor platform"]/lticm:property'

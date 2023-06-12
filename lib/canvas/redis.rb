@@ -33,10 +33,10 @@ class << Canvas::Redis
   # technically this is just disconnect_redis, because new connections are created lazily,
   # but we didn't want to rename it when there are several uses of it
   def reconnect_redis
-    ::Canvas::RedisConnections.disconnect!
+    Canvas::RedisConnections.disconnect!
   end
 
   def clear_idle_connections
-    ::Canvas::RedisConnections.clear_idle!
+    Canvas::RedisConnections.clear_idle!
   end
 end

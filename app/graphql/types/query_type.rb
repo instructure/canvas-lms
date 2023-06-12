@@ -34,8 +34,11 @@ module Types
     end
 
     field :account, Types::AccountType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: false,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
       argument :sis_id, String, "a id from the original SIS system", required: false
     end
     def account(id: nil, sis_id: nil)
@@ -45,8 +48,11 @@ module Types
     end
 
     field :course, Types::CourseType, null: true do
-      argument :id, ID, "a graphql or legacy id, preference for search is given to this id", required: false,
-                                                                                             prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :id,
+               ID,
+               "a graphql or legacy id, preference for search is given to this id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
       argument :sis_id, String, "a id from the original SIS system", required: false
     end
     def course(id: nil, sis_id: nil)
@@ -56,8 +62,11 @@ module Types
     end
 
     field :assignment, Types::AssignmentType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: false,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
       argument :sis_id, String, "an id from the original SIS system", required: false
     end
     def assignment(id: nil, sis_id: nil)
@@ -67,8 +76,11 @@ module Types
     end
 
     field :assignment_group, Types::AssignmentGroupType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: false,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("AssignmentGroup")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("AssignmentGroup")
       argument :sis_id, String, "an id from the original SIS system", required: false
     end
     def assignment_group(id: nil, sis_id: nil)
@@ -78,16 +90,22 @@ module Types
     end
 
     field :submission, Types::SubmissionType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: true,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
     end
     def submission(id:)
       GraphQLNodeLoader.load("Submission", id, context)
     end
 
     field :term, Types::TermType, null: true do
-      argument :id, ID, "a graphql or legacy id", required: false,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Term")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Term")
       argument :sis_id, String, "an id from the original SIS system", required: false
     end
     def term(id: nil, sis_id: nil)
@@ -96,7 +114,8 @@ module Types
       return GraphQLNodeLoader.load("TermBySis", sis_id, context) if sis_id
     end
 
-    field :all_courses, [CourseType],
+    field :all_courses,
+          [CourseType],
           "All courses viewable by the current user",
           null: true
     def all_courses
@@ -112,8 +131,11 @@ module Types
 
     field :module_item, Types::ModuleItemType, null: true do
       description "ModuleItem"
-      argument :id, ID, "a graphql or legacy id", required: true,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ModuleItem")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ModuleItem")
     end
     def module_item(id:)
       GraphQLNodeLoader.load("ModuleItem", id, context)
@@ -126,8 +148,11 @@ module Types
 
     field :outcome_calculation_method, Types::OutcomeCalculationMethodType, null: true do
       description "OutcomeCalculationMethod"
-      argument :id, ID, "a graphql or legacy id", required: true,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("OutcomeCalculationMethod")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("OutcomeCalculationMethod")
     end
     def outcome_calculation_method(id:)
       GraphQLNodeLoader.load("OutcomeCalculationMethod", id, context)
@@ -135,8 +160,11 @@ module Types
 
     field :outcome_proficiency, Types::OutcomeProficiencyType, null: true do
       description "OutcomeProficiency"
-      argument :id, ID, "a graphql or legacy id", required: true,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("OutcomeProficiency")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("OutcomeProficiency")
     end
     def outcome_proficiency(id:)
       GraphQLNodeLoader.load("OutcomeProficiency", id, context)
@@ -144,8 +172,11 @@ module Types
 
     field :learning_outcome_group, Types::LearningOutcomeGroupType, null: true do
       description "LearningOutcomeGroup"
-      argument :id, ID, "a graphql or legacy id", required: true,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
     end
     def learning_outcome_group(id:)
       GraphQLNodeLoader.load("LearningOutcomeGroup", id, context)
@@ -153,8 +184,11 @@ module Types
 
     field :learning_outcome, Types::LearningOutcomeType, null: true do
       description "LearningOutcome"
-      argument :id, ID, "a graphql or legacy id", required: true,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
     end
     def learning_outcome(id:)
       GraphQLNodeLoader.load("LearningOutcome", id, context)
@@ -162,8 +196,11 @@ module Types
 
     field :internal_setting, Types::InternalSettingType, null: true do
       description "Retrieves a single internal setting by its ID or name"
-      argument :id, ID, "a graphql or legacy id", required: false,
-                                                  prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InternalSetting")
+      argument :id,
+               ID,
+               "a graphql or legacy id",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("InternalSetting")
       argument :name, String, "the name of the Setting", required: false
     end
     def internal_setting(id: nil, name: nil)

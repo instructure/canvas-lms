@@ -60,7 +60,7 @@ describe "Discussion Topic Show" do
         discussion_type: "threaded",
         posted_at: "2017-07-09 16:32:34",
         user: @teacher,
-        assignment: assignment
+        assignment:
       )
 
       rubric = rubric_model({ context: @course })
@@ -109,7 +109,7 @@ describe "Discussion Topic Show" do
 
       gc = @course.account.group_categories.create(name: "Group Category")
       group = group_model(name: "Group", group_category: gc, context: @course.account)
-      group_membership_model(group: group, user: @teacher)
+      group_membership_model(group:, user: @teacher)
       topic = discussion_topic_model(context: group)
 
       get "/groups/#{group.id}/discussion_topics/#{topic.id}"
@@ -153,7 +153,7 @@ describe "Discussion Topic Show" do
         end
 
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        fj("button:contains('6 replies')").click
+        fj("button:contains('6 Replies')").click
         wait_for_ajaximations
         fj("button:contains('Show older replies')").click
         wait_for_ajaximations
@@ -193,7 +193,7 @@ describe "Discussion Topic Show" do
         discussion_type: "threaded",
         posted_at: "2017-07-09 16:32:34",
         user: @teacher,
-        assignment: assignment
+        assignment:
       )
 
       get "/courses/#{@course.id}/discussion_topics/#{dt.id}"
@@ -209,7 +209,7 @@ describe "Discussion Topic Show" do
     it "Able to reply to a group discussion" do
       gc = @course.account.group_categories.create(name: "Group Category")
       group = group_model(name: "Group", group_category: gc, context: @course.account)
-      group_membership_model(group: group, user: @teacher)
+      group_membership_model(group:, user: @teacher)
       topic = discussion_topic_model(context: group, type: "Announcement")
 
       get "/groups/#{group.id}/discussion_topics/#{topic.id}"

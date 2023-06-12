@@ -23,6 +23,8 @@ require "webmock"
 require "tempfile"
 require "multipart"
 
+WebMock.enable!
+
 describe "CanvasHttp" do
   include WebMock::API
 
@@ -36,11 +38,11 @@ describe "CanvasHttp" do
       end
 
       def info(message)
-        @messages << { level: "info", message: message }
+        @messages << ({ level: "info", message: })
       end
 
       def warn(message)
-        @messages << { level: "warn", message: message }
+        @messages << ({ level: "warn", message: })
       end
     end
     logger = fake_logger.new
@@ -60,7 +62,7 @@ describe "CanvasHttp" do
       body = "abc"
       stub_request(:post, url).with(body: "abc")
                               .to_return(status: 200)
-      expect(CanvasHttp.post(url, body: body).code).to eq "200"
+      expect(CanvasHttp.post(url, body:).code).to eq "200"
       logs = CanvasHttp.logger.messages
       expect(logs.size).to eq(3)
       expect(logs[0][:message] =~ /CANVAS_HTTP START REQUEST CHAIN | method: Net::HTTP::Post/).to be_truthy
@@ -75,7 +77,7 @@ describe "CanvasHttp" do
       content_type = "plain/text"
       stub_request(:post, url).with(body: "abc", headers: { "Content-Type" => content_type })
                               .to_return(status: 200)
-      expect(CanvasHttp.post(url, body: body, content_type: content_type).code).to eq "200"
+      expect(CanvasHttp.post(url, body:, content_type:).code).to eq "200"
     end
 
     it "allows you to do a streaming multipart upload" do
@@ -91,7 +93,7 @@ describe "CanvasHttp" do
         expect(req.body.lines[5]).to match("file contents")
       end.to_return(status: 200)
 
-      CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
+      CanvasHttp.post(url, form_data:, multipart: true, streaming: true)
 
       assert_requested(stubbed)
     end
@@ -109,7 +111,7 @@ describe "CanvasHttp" do
         expect(req.body.lines[5]).to match("file contents")
       end.to_return(status: 200)
 
-      CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
+      CanvasHttp.post(url, form_data:, multipart: true, streaming: true)
 
       assert_requested(stubbed)
     end
@@ -151,7 +153,9 @@ describe "CanvasHttp" do
       http = double
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
-      expect(http).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(http).not_to receive(:verify_mode).with(OpenSSL::SSL::VERIFY_NONE)
+      expect(http).to receive(:verify_hostname=).with(false) # temporary; until all offenders are fixed
+      expect(http).to receive(:verify_callback=)             # temporary; until all offenders are fixed
       expect(http).to receive(:request).and_yield(double(body: "Hello SSL"))
       expect(http).to receive(:open_timeout=).with(5)
       expect(http).to receive(:ssl_timeout=).with(5)
@@ -257,8 +261,8 @@ describe "CanvasHttp" do
 
       context "if the total response body is larger than the max length" do
         it "raises a ResponseTooLargeError" do
-          expect { CanvasHttp.read_body_max_length(mock_response, 99) }.to \
-            raise_error(CanvasHttp::ResponseTooLargeError)
+          expect { CanvasHttp.read_body_max_length(mock_response, 99) }
+            .to raise_error(CanvasHttp::ResponseTooLargeError)
         end
       end
 
@@ -281,12 +285,12 @@ describe "CanvasHttp" do
     end
 
     it "checks for insecure hosts" do
-      expect(CanvasHttp.insecure_host?("example.com")).to eq false
-      expect(CanvasHttp.insecure_host?("localhost")).to eq true
-      expect(CanvasHttp.insecure_host?("127.0.0.1")).to eq true
-      expect(CanvasHttp.insecure_host?("42.42.42.42")).to eq true
-      expect(CanvasHttp.insecure_host?("42.42.1.1")).to eq true
-      expect(CanvasHttp.insecure_host?("42.1.1.1")).to eq false
+      expect(CanvasHttp.insecure_host?("example.com")).to be false
+      expect(CanvasHttp.insecure_host?("localhost")).to be true
+      expect(CanvasHttp.insecure_host?("127.0.0.1")).to be true
+      expect(CanvasHttp.insecure_host?("42.42.42.42")).to be true
+      expect(CanvasHttp.insecure_host?("42.42.1.1")).to be true
+      expect(CanvasHttp.insecure_host?("42.1.1.1")).to be false
     end
 
     it "raises an error when URL is not resolveable" do
@@ -319,13 +323,13 @@ describe "CanvasHttp" do
       http = CanvasHttp.connection_for_uri(URI.parse("http://example.com:1234/x/y/z"))
       expect(http.address).to eq("example.com")
       expect(http.port).to eq(1234)
-      expect(http.use_ssl?).to eq(false)
+      expect(http.use_ssl?).to be(false)
     end
 
     it "returns an https connection" do
       http = CanvasHttp.connection_for_uri(URI.parse("https://example.com"))
       expect(http.address).to eq("example.com")
-      expect(http.use_ssl?).to eq(true)
+      expect(http.use_ssl?).to be(true)
     end
   end
 

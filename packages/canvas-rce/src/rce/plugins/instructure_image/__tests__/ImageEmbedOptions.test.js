@@ -31,6 +31,7 @@ import {
   scaleImageForWidth,
   scaleToSize,
 } from '../ImageEmbedOptions'
+import RCEGlobals from '../../../RCEGlobals'
 
 Object.defineProperty(HTMLImageElement.prototype, 'naturalHeight', {
   get() {
@@ -625,5 +626,38 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
 
     // that's all we can unit test because we can't fully setup the video,
     // and the element doesn't have a size in jsdom
+
+    describe('attachmentId', () => {
+      beforeEach(() => {
+        $video.innerHTML =
+          '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_attachments_iframe/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>'
+        RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
+      })
+
+      afterEach(() => {
+        jest.resetAllMocks()
+      })
+
+      it('is included', () => {
+        expect(getVideoOptions().attachmentId).toEqual('17')
+      })
+
+      it('is not included', () => {
+        RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: false})
+        expect(getVideoOptions().attachmentId).toBeUndefined()
+      })
+
+      it('is not included due invalid src', () => {
+        $video.innerHTML =
+          '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/blahblahblah/17?type=video&embedded=true" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>'
+        expect(getVideoOptions().attachmentId).toBeUndefined()
+      })
+
+      it('is not included due non-existent src', () => {
+        $video.innerHTML =
+          '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>'
+        expect(getVideoOptions().attachmentId).toBeUndefined()
+      })
+    })
   })
 })

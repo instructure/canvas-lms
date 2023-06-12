@@ -119,6 +119,18 @@ describe "Web conferences" do
       expect(WebConference.last.invitees.pluck(:id)).to eq [@student.id]
     end
 
+    it "invites course members async" do
+      Setting.set("max_invitees_sync_size", 5)
+
+      get conferences_index_page
+      stub_request(:get, /wimba\.instructure\.com/)
+      f("button[title='New Conference']").click
+      fj("button:contains('Create')").click
+      wait_for_ajaximations
+      run_jobs
+      expect(WebConference.last.invitees.count).to eq 7
+    end
+
     it "can exclude observers on creation" do
       my_observer = user_factory(name: "Cogsworth", active_all: true)
       @course.enroll_user(my_observer, "ObserverEnrollment", { associated_user_id: @student.id })
@@ -266,7 +278,7 @@ describe "Web conferences" do
           get conferences_index_page
           stub_request(:get, /wimba\.instructure\.com/)
           cog_menu_item = f(".al-trigger")
-          delete_conference(cog_menu_item: cog_menu_item, cancel: true)
+          delete_conference(cog_menu_item:, cancel: true)
           check_element_has_focus(cog_menu_item)
         end
 
@@ -274,7 +286,7 @@ describe "Web conferences" do
           get conferences_index_page
           stub_request(:get, /wimba\.instructure\.com/)
           cog_menu_item = f(".al-trigger")
-          edit_conference(cog_menu_item: cog_menu_item, cancel: false)
+          edit_conference(cog_menu_item:, cancel: false)
 
           duration_edit_field = f("#web_conference_duration")
 

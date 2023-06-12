@@ -66,9 +66,9 @@ describe Api::V1::SubmissionComment do
       student_sub.add_comment(author: student2, comment: "I'm Student2")
       student2_sub = assignment.submissions.find_by!(user: student2)
       anonymous_ids = @comment.anonymous_moderated_submission_comments_json(
-        assignment: assignment,
+        assignment:,
         avatars: nil,
-        course: course,
+        course:,
         current_user: teacher,
         submissions: [student_sub],
         submission_comments: student_sub.submission_comments
@@ -80,23 +80,23 @@ describe Api::V1::SubmissionComment do
     it "does not contain entries for students that did not comment on the submission" do
       student3_sub = assignment.submissions.find_by!(user: student3)
       student3_comment = @comment.anonymous_moderated_submission_comments_json(
-        assignment: assignment,
+        assignment:,
         avatars: nil,
-        course: course,
+        course:,
         current_user: teacher,
         submissions: [student_sub],
         submission_comments: student_sub.submission_comments
       ).find { |comment| comment[:anonymous_id] == student3_sub.anonymous_id }
 
-      expect(student3_comment).to be nil
+      expect(student3_comment).to be_nil
     end
 
     it "comments retain author data when the viewing user wrote the comment" do
       student_sub.add_comment(author: student, comment: "I'm Student")
       student_comment = @comment.anonymous_moderated_submission_comments_json(
-        assignment: assignment,
+        assignment:,
         avatars: nil,
-        course: course,
+        course:,
         current_user: student,
         submissions: [student_sub],
         submission_comments: student_sub.submission_comments

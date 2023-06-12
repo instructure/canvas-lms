@@ -30,7 +30,7 @@ class CommunicationChannel
       @account, @pattern, @path_type, @with_invalid_paths = account, pattern, path_type, with_invalid_paths
       @after = Time.zone.parse(after) if after
       @before = Time.zone.parse(before) if before
-      @order = order&.downcase == "desc" ? :desc : :asc
+      @order = (order&.downcase == "desc") ? :desc : :asc
     end
 
     def matching_channels(for_report: false)
@@ -41,7 +41,7 @@ class CommunicationChannel
 
       ccs = filter(ccs)
       ccs = ccs.path_like(pattern.tr("*", "%")) if pattern
-      ccs = ccs.where(path_type: path_type) if path_type
+      ccs = ccs.where(path_type:) if path_type
       ccs = ccs.where("path_type != 'email' or lower(path) LIKE '%_@%_.%_'") unless @with_invalid_paths
 
       ccs

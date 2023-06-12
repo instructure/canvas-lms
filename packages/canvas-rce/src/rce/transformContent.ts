@@ -38,15 +38,14 @@ export function transformRceContentForEditing(
     return inputHtml
   }
 
-  let container: HTMLElement | null
+  const container = document.createElement('div')
 
   try {
-    container = new DOMParser().parseFromString(inputHtml, 'text/html').querySelector('body')
+    // Note we're doing this instead of using a DOMParser because the DOMParser semantics are different than how we
+    // actually use user html, which is to insert it into the page.
+    // Specifically, user content that includes malformed <html>,<body>,<head>, etc... tags will be parsed differently.
+    container.innerHTML = inputHtml
   } catch (e) {
-    return inputHtml
-  }
-
-  if (!container) {
     return inputHtml
   }
 

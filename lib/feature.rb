@@ -19,10 +19,21 @@
 #
 
 class Feature
-  ATTRS = %i[feature display_name description applies_to state
-             root_opt_in beta type
-             release_notes_url custom_transition_proc visible_on
-             after_state_change_proc autoexpand touch_context].freeze
+  ATTRS = %i[feature
+             display_name
+             description
+             applies_to
+             state
+             root_opt_in
+             beta
+             type
+             shadow
+             release_notes_url
+             custom_transition_proc
+             visible_on
+             after_state_change_proc
+             autoexpand
+             touch_context].freeze
   attr_reader(*ATTRS)
 
   def initialize(opts = {})
@@ -59,6 +70,10 @@ class Feature
 
   def hidden?
     @state == "hidden"
+  end
+
+  def shadow?
+    @shadow || false
   end
 
   def self.environment
@@ -141,7 +156,7 @@ class Feature
       @features[feature] = if attrs[:state] == STATE_DISABLED
                              DISABLED_FEATURE
                            else
-                             Feature.new({ feature: feature }.merge(attrs))
+                             Feature.new({ feature: }.merge(attrs))
                            end
     end
   end

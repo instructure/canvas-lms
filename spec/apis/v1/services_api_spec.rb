@@ -41,8 +41,11 @@ describe "Services API", type: :request do
   end
 
   it "returns the config information for kaltura" do
-    json = api_call(:get, "/api/v1/services/kaltura",
-                    controller: "services_api", action: "show_kaltura_config", format: "json")
+    json = api_call(:get,
+                    "/api/v1/services/kaltura",
+                    controller: "services_api",
+                    action: "show_kaltura_config",
+                    format: "json")
     expect(json).to eq({
                          "enabled" => true,
                          "domain" => "kaltura.example.com",
@@ -54,8 +57,11 @@ describe "Services API", type: :request do
 
   it "degrades gracefully if kaltura is disabled or not configured" do
     allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
-    json = api_call(:get, "/api/v1/services/kaltura",
-                    controller: "services_api", action: "show_kaltura_config", format: "json")
+    json = api_call(:get,
+                    "/api/v1/services/kaltura",
+                    controller: "services_api",
+                    action: "show_kaltura_config",
+                    format: "json")
     expect(json).to eq({
                          "enabled" => false,
                        })
@@ -65,8 +71,11 @@ describe "Services API", type: :request do
     kal = double("CanvasKaltura::ClientV3")
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
-    json = api_call(:post, "/api/v1/services/kaltura_session",
-                    controller: "services_api", action: "start_kaltura_session", format: "json")
+    json = api_call(:post,
+                    "/api/v1/services/kaltura_session",
+                    controller: "services_api",
+                    action: "start_kaltura_session",
+                    format: "json")
     expect(json.delete_if { |k| %w[serverTime].include?(k) }).to eq({
                                                                       "ks" => "new_session_id_here",
                                                                       "subp_id" => "10000",
@@ -79,9 +88,12 @@ describe "Services API", type: :request do
     kal = double("CanvasKaltura::ClientV3")
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
-    json = api_call(:post, "/api/v1/services/kaltura_session",
-                    controller: "services_api", action: "start_kaltura_session",
-                    format: "json", include_upload_config: 1)
+    json = api_call(:post,
+                    "/api/v1/services/kaltura_session",
+                    controller: "services_api",
+                    action: "start_kaltura_session",
+                    format: "json",
+                    include_upload_config: 1)
     expect(json.delete_if { |k| %w[serverTime].include?(k) }).to eq({
                                                                       "ks" => "new_session_id_here",
                                                                       "subp_id" => "10000",
@@ -113,15 +125,17 @@ describe "Services API", type: :request do
   describe "#rce_config" do
     let(:register_a_tool_to_course) do
       url = "http://example.com"
-      tool_params = { name: "bob", consumer_key: "test", shared_secret: "secret", url: url, description: "description" }
+      tool_params = { name: "bob", consumer_key: "test", shared_secret: "secret", url:, description: "description" }
       tool = @course.context_external_tools.new(tool_params)
-      tool.editor_button = { url: url, icon_url: url, canvas_icon_class: "icon" }
+      tool.editor_button = { url:, icon_url: url, canvas_icon_class: "icon" }
       tool.save!
     end
     let(:rce_config_api_call) do
       course_with_student(active_all: true)
       register_a_tool_to_course
-      api_call_as_user(@student, :get, "/api/v1/services/rce_config",
+      api_call_as_user(@student,
+                       :get,
+                       "/api/v1/services/rce_config",
                        {
                          controller: "services_api",
                          action: "rce_config",
@@ -170,8 +184,11 @@ describe "Services API", type: :request do
       expect_any_instance_of(ApplicationController).to receive(:rce_js_env).and_return(nil)
       expect_any_instance_of(ApplicationController).to receive(:inst_env).and_return(nil)
 
-      json = api_call(:get, "/api/v1/services/rce_config",
-                      controller: "services_api", action: "rce_config", format: "json")
+      json = api_call(:get,
+                      "/api/v1/services/rce_config",
+                      controller: "services_api",
+                      action: "rce_config",
+                      format: "json")
       expect(json.deep_symbolize_keys).to eq({
                                                RICH_CONTENT_CAN_UPLOAD_FILES: nil,
                                                RICH_CONTENT_INST_RECORD_TAB_DISABLED: nil,
@@ -192,6 +209,7 @@ describe "Services API", type: :request do
                                                url_for_high_contrast_tinymce_editor_css: [],
                                                url_to_what_gets_loaded_inside_the_tinymce_editor_css: [],
                                                FEATURES: nil,
+                                               LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances,
                                              })
     end
 
@@ -237,7 +255,8 @@ describe "Services API", type: :request do
                                 DEEP_LINKING_POST_MESSAGE_ORIGIN: an_instance_of_string,
                                 current_user_id: an_instance_of_integer,
                                 disable_keyboard_shortcuts: a_bool_value,
-                                editorButtons: editor_buttons_matcher
+                                editorButtons: editor_buttons_matcher,
+                                LTI_LAUNCH_FRAME_ALLOWANCES: a_not_empty_string_array
                               })
     end
   end

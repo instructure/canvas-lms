@@ -20,6 +20,7 @@ import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOpt
 import {isOnlyTextSelected} from '../../contentInsertionUtils'
 import * as url from 'url'
 import formatMessage from '../../../format-message'
+import {isStudioEmbeddedMedia} from './StudioLtiSupportUtils'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -101,7 +102,7 @@ export function asLink($element, editor) {
 export function asVideoElement($element) {
   const $videoElem = findMediaPlayerIframe($element)
 
-  if (!isVideoElement($videoElem)) {
+  if (!isVideoElement($videoElem) && !isStudioEmbeddedMedia($videoElem)) {
     return null
   }
 

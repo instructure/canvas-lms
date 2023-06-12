@@ -87,7 +87,7 @@ module ApplicationHelper
   end
 
   def count_if_any(count = nil)
-    count && count > 0 ? "(#{count})" : ""
+    (count && count > 0) ? "(#{count})" : ""
   end
 
   # Used to generate context_specific urls, as in:
@@ -96,7 +96,7 @@ module ApplicationHelper
   def context_url(context, *opts)
     @context_url_lookup ||= {}
     context_name = url_helper_context_from_object(context)
-    lookup = [context ? context.id : nil, context_name, *opts]
+    lookup = [context&.id, context_name, *opts]
     return @context_url_lookup[lookup] if @context_url_lookup[lookup]
 
     res = nil
@@ -373,7 +373,7 @@ module ApplicationHelper
       .cache
       .fetch(["active_external_tool_for", @context, tool_id].cache_key, expires_in: 1.hour) do
         # don't use for groups. they don't have account_chain_ids
-        tool = @context.context_external_tools.active.where(tool_id: tool_id).first
+        tool = @context.context_external_tools.active.where(tool_id:).first
 
         unless tool
           # account_chain_ids is in the order we need to search for tools
@@ -384,7 +384,7 @@ module ApplicationHelper
           tools =
             ContextExternalTool
             .active
-            .where(context_type: "Account", context_id: account_chain_ids, tool_id: tool_id)
+            .where(context_type: "Account", context_id: account_chain_ids, tool_id:)
             .to_a
           account_chain_ids.each do |account_id|
             tool = tools.find { |t| t.context_id == account_id }
@@ -472,7 +472,7 @@ module ApplicationHelper
 
   def safe_cache_key(*args)
     key = args.cache_key
-    key = Digest::MD5.hexdigest(key) if key.length > 200
+    key = Digest::SHA256.hexdigest(key) if key.length > 200
     key
   end
 
@@ -481,7 +481,7 @@ module ApplicationHelper
 
     # TODO: get these kaltura settings out of the global INST object completely.
     # Only load them when trying to record a video
-    if @context.try_rescue(:allow_media_comments?) || controller_name == "conversations"
+    if @context.try_rescue(:allow_media_comments?) || ["conversations", "file_previews"].include?(controller_name)
       kalturaConfig = CanvasKaltura::ClientV3.config
       if kalturaConfig
         global_inst_object[:allowMediaComments] = true
@@ -589,7 +589,7 @@ module ApplicationHelper
         )
       end
     end
-    content_tag("iframe", "", { src: src }.merge(html_options))
+    content_tag("iframe", "", { src: }.merge(html_options))
   end
 
   # returns a time object at 00:00:00 tomorrow
@@ -621,7 +621,7 @@ module ApplicationHelper
         folders_as_options(child_folders, opts.merge({ depth: opts[:depth] + 1 }))
       end
     end
-    opts[:depth] == 0 ? raw(opts[:options_so_far].join("\n")) : nil
+    (opts[:depth] == 0) ? raw(opts[:options_so_far].join("\n")) : nil
   end
 
   # this little helper just allows you to do <% ot(...) %> and have it output the same as <%= t(...) %>. The upside though, is you can interpolate whole blocks of HTML, like:
@@ -638,7 +638,7 @@ module ApplicationHelper
     parts.join(t("#title_separator", ": "))
   end
 
-  def cache(name = {}, options = {}, &block)
+  def cache(name = {}, options = {}, &)
     unless options && options[:no_locale]
       name = name.cache_key if name.respond_to?(:cache_key)
       name += "/#{I18n.locale}" if name.is_a?(String)
@@ -829,7 +829,7 @@ module ApplicationHelper
     stylesheet_link_tag(*(includes + [{ media: "all" }])) if includes.present?
   end
 
-  # this should be the same as friendlyDatetime in handlebars_helpers.coffee
+  # this should be the same as friendlyDatetime in handlebars_helpers.js
   def friendly_datetime(datetime, opts = {}, attributes = {})
     attributes[:pubdate] = true if opts[:pubdate]
     context = opts[:context]
@@ -897,7 +897,7 @@ module ApplicationHelper
   def multiple_due_date_tooltip(assignment, user, opts = {})
     user ||= @current_user
     presenter = OverrideTooltipPresenter.new(assignment, user, opts)
-    render "shared/vdd_tooltip", presenter: presenter
+    render "shared/vdd_tooltip", presenter:
   end
 
   require "digest"
@@ -908,7 +908,7 @@ module ApplicationHelper
   # if you can avoid loading the list at all, that's even better, of course.
   def collection_cache_key(collection)
     keys = collection.map(&:cache_key)
-    Digest::MD5.hexdigest(keys.join("/"))
+    Digest::SHA256.hexdigest(keys.join("/"))
   end
 
   def add_uri_scheme_name(uri)
@@ -1062,7 +1062,10 @@ module ApplicationHelper
       csp_context
       .csp_whitelisted_domains(request, include_files: true, include_tools: true)
       .join(" ")
-    headers[csp_header] = "frame-src 'self' #{domains}#{csp_report_uri}; "
+
+    # Due to New Analytics generating CSV reports as blob on the client-side and then trying to download them,
+    # as well as an interesting difference in browser interpretations of CSP, we have to allow blobs as a frame-src
+    headers[csp_header] = "frame-src 'self' blob: #{domains}#{csp_report_uri}; "
   end
 
   def add_csp_for_file
@@ -1090,7 +1093,7 @@ module ApplicationHelper
       object_domains = ["'self'"] + script_domains
       script_domains = ["'self'", "'unsafe-eval'", "'unsafe-inline'"] + script_domains
     end
-    "frame-src #{frame_domains.join(" ")}; script-src #{script_domains.join(" ")}; object-src #{object_domains.join(" ")}; "
+    "frame-src #{frame_domains.join(" ")} blob:; script-src #{script_domains.join(" ")}; object-src #{object_domains.join(" ")}; "
   end
 
   # Returns true if the current_path starts with the given value
@@ -1115,7 +1118,7 @@ module ApplicationHelper
       "#",
       id: "signup_parent",
       class: "signup_link",
-      data: data,
+      data:,
       title: I18n.t("Parent Signup")
     )
   end
@@ -1132,7 +1135,7 @@ module ApplicationHelper
       @context.is_a?(Course) && tutorials_enabled? &&
       @context.grants_right?(@current_user, session, :manage)
 
-    js_env NEW_USER_TUTORIALS: { is_enabled: is_enabled }
+    js_env NEW_USER_TUTORIALS: { is_enabled: }
   end
 
   def planner_enabled?
@@ -1155,8 +1158,8 @@ module ApplicationHelper
       developer_key: @access_token&.developer_key,
       root_account: @domain_root_account,
       oauth_host: request.host_with_port,
-      return_url: return_url,
-      fallback_url: fallback_url
+      return_url:,
+      fallback_url:
     )
   end
 
@@ -1269,26 +1272,28 @@ module ApplicationHelper
     end
 
     needed_tags = ContentTag.where(id: needed_tag_ids.uniq).preload(:context_module).index_by(&:id)
+    opts = { can_view_published: @context.grants_right?(@current_user, session, :read_as_admin) }
+
     tag_indices.each do |ix|
       hash = {
-        current: module_item_json(needed_tags[tag_ids[ix]], @current_user, session),
+        current: module_item_json(needed_tags[tag_ids[ix]], @current_user, session, nil, nil, [], opts),
         prev: nil,
         next: nil
       }
-      hash[:prev] = module_item_json(needed_tags[tag_ids[ix - 1]], @current_user, session) if ix > 0
+      hash[:prev] = module_item_json(needed_tags[tag_ids[ix - 1]], @current_user, session, nil, nil, [], opts) if ix > 0
       if ix < tag_ids.size - 1
-        hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session)
+        hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session, nil, nil, [], opts)
       end
       if cyoe_enabled?(@context)
         is_student = @context.grants_right?(@current_user, session, :participate_as_student)
-        opts = { context: @context, user: @current_user, session: session, is_student: is_student }
+        opts = { context: @context, user: @current_user, session:, is_student: }
         hash[:mastery_path] =
           conditional_release_rule_for_module_item(needed_tags[tag_ids[ix]], opts)
       end
       result[:items] << hash
     end
     modules = needed_tags.values.map(&:context_module).uniq
-    result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
+    result[:modules] = modules.map { |mod| module_json(mod, @current_user, session, nil, [], opts) }
     result
   end
 
@@ -1326,7 +1331,7 @@ module ApplicationHelper
 
   def render_file_location(location)
     headers["X-Canvas-File-Location"] = "True"
-    render json: { location: location, token: file_authenticator.instfs_bearer_token }
+    render json: { location:, token: file_authenticator.instfs_bearer_token }
   end
 
   def authenticated_download_url(attachment)
@@ -1402,7 +1407,7 @@ module ApplicationHelper
   end
 
   def find_heap_application_id
-    DynamicSettings.find(tree: :private)&.fetch([:heap_app_id])
+    DynamicSettings.find(tree: :private)&.fetch(:heap_app_id)
   end
 
   def load_heap?

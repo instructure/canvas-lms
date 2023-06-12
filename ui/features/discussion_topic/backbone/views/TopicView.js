@@ -20,8 +20,8 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Backbone from '@canvas/backbone'
-import DiscussionTopic from '@canvas/discussions/backbone/models/DiscussionTopic.coffee'
-import EntryView from './EntryView.coffee'
+import DiscussionTopic from '@canvas/discussions/backbone/models/DiscussionTopic'
+import EntryView from './EntryView'
 import PublishButtonView from '@canvas/publish-button-view'
 import replyTemplate from '../../jst/_reply_form.handlebars'
 import Reply from '../Reply'
@@ -127,7 +127,7 @@ export default class TopicView extends Backbone.View {
   }
 
   toggleLocked(event) {
-    // this is weird but Topic.coffee was not set up to talk to the API for CRUD
+    // this is weird but Topic.js was not set up to talk to the API for CRUD
     const locked = $(event.currentTarget).data('mark-locked')
     return this.topic.save({locked}).done(() => window.location.reload())
   }

@@ -67,7 +67,7 @@ describe CoursePacePresenter do
       expect(first_module_item[:points_possible]).to eq(100)
       expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct1.id}")
       expect(first_module_item[:module_item_type]).to eq("Assignment")
-      expect(first_module_item[:published]).to eq(true)
+      expect(first_module_item[:published]).to be(true)
 
       second_module = formatted_plan[:modules].second
       expect(second_module[:name]).to eq(@mod2.name)
@@ -79,20 +79,20 @@ describe CoursePacePresenter do
       expect(first_module_item[:points_possible]).to eq(50)
       expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct2.id}")
       expect(first_module_item[:module_item_type]).to eq("Assignment")
-      expect(first_module_item[:published]).to eq(false)
+      expect(first_module_item[:published]).to be(false)
       second_module_item = second_module[:items].second
       expect(second_module_item[:assignment_title]).to eq(@a3.name)
       expect(second_module_item[:position]).to eq(2)
       expect(second_module_item[:points_possible]).to be_nil
       expect(second_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct3.id}")
       expect(second_module_item[:module_item_type]).to eq("Assignment")
-      expect(second_module_item[:published]).to eq(true)
+      expect(second_module_item[:published]).to be(true)
     end
 
     it "returns necessary data if the course pace is only instantiated" do
       course_pace = @course.course_paces.new
       @course.context_module_tags.each do |module_item|
-        course_pace.course_pace_module_items.new module_item: module_item, duration: 0
+        course_pace.course_pace_module_items.new module_item:, duration: 0
       end
       formatted_plan = CoursePacePresenter.new(course_pace).as_json
 
@@ -122,7 +122,7 @@ describe CoursePacePresenter do
       expect(first_module_item[:points_possible]).to eq(100)
       expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct1.id}")
       expect(first_module_item[:module_item_type]).to eq("Assignment")
-      expect(first_module_item[:published]).to eq(true)
+      expect(first_module_item[:published]).to be(true)
 
       second_module = formatted_plan[:modules].second
       expect(second_module[:name]).to eq(@mod2.name)
@@ -134,14 +134,14 @@ describe CoursePacePresenter do
       expect(first_module_item[:points_possible]).to eq(50)
       expect(first_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct2.id}")
       expect(first_module_item[:module_item_type]).to eq("Assignment")
-      expect(first_module_item[:published]).to eq(false)
+      expect(first_module_item[:published]).to be(false)
       second_module_item = second_module[:items].second
       expect(second_module_item[:assignment_title]).to eq(@a3.name)
       expect(second_module_item[:position]).to eq(2)
       expect(second_module_item[:points_possible]).to be_nil
       expect(second_module_item[:assignment_link]).to eq("/courses/#{@course.id}/modules/items/#{@ct3.id}")
       expect(second_module_item[:module_item_type]).to eq("Assignment")
-      expect(second_module_item[:published]).to eq(true)
+      expect(second_module_item[:published]).to be(true)
     end
   end
 end

@@ -42,13 +42,64 @@ describe TurnitinApi::OutcomesResponseTransformer do
   end
 
   describe "response" do
+    let(:stubbed_response) do
+      {
+        status: 200,
+        body: fixture("outcome_detailed_response.json"),
+        headers: { "Content-Type" => "application/json" }
+      }
+    end
+
     before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
-        .to_return(status: 200, body: fixture("outcome_detailed_response.json"), headers: { "Content-Type" => "application/json" })
+        .to_return(stubbed_response)
     end
 
     it "returns expected json response" do
       expect(subject.response.body["outcome_originalfile"]["launch_url"]).to eq "https://turnitin.com/api/lti/1p0/dow...72874634?lang="
+    end
+
+    context "when TII returns a non-2xx response" do
+      let(:stubbed_body) { "TII errored out oh no " * 10 }
+      let(:stubbed_response) { { status: 403, body: stubbed_body } }
+      let(:truncated_body) { stubbed_body.truncate(100).inspect }
+
+      it "raises an InvalidResponse error with the status code and content length" do
+        expect { subject.response }.to raise_error(
+          described_class::InvalidResponse,
+          "TII returned 403 code, content length=#{stubbed_body.length}, message unknown, body #{truncated_body}"
+        )
+      end
+
+      it "increments a statsd counter which includes the status code" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        expect { subject.response }.to raise_error(described_class::InvalidResponse)
+        expect(InstStatsd::Statsd).to have_received(:increment).with(
+          "lti.tii.outcomes_response_bad",
+          tags: { status: 403, message: :unknown }
+        )
+      end
+
+      context "when the response body is one of the known recognized ones" do
+        let(:stubbed_body) { "bla bla API product inactive or expired bla bla" }
+        let(:stubbed_response) { { status: 401, body: stubbed_body } }
+
+        it "identifies known responses in the InvalidResponse error" do
+          expect { subject.response }.to raise_error(
+            described_class::InvalidResponse,
+            "TII returned 401 code, content length=47, message api_product_inactive, body #{truncated_body}"
+          )
+        end
+
+        it "identifies known responses in the statsd counter" do
+          allow(InstStatsd::Statsd).to receive(:increment)
+          expect { subject.response }.to raise_error(described_class::InvalidResponse)
+          expect(InstStatsd::Statsd).to have_received(:increment).with(
+            "lti.tii.outcomes_response_bad",
+            tags: { status: 401, message: :api_product_inactive }
+          )
+        end
+      end
     end
   end
 

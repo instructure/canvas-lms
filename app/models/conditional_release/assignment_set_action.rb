@@ -51,7 +51,7 @@ module ConditionalRelease
       [["assign", assigned], ["unassign", unassigned]].each do |action, sets|
         sets = Array.wrap(sets)
         sets.each do |set|
-          find_or_create_by! opts.merge(action: action, assignment_set: set, root_account_id: set.root_account_id)
+          find_or_create_by! opts.merge(action:, assignment_set: set, root_account_id: set.root_account_id)
         end
       end
     end

@@ -64,7 +64,7 @@ describe "Global Navigation" do
         f("#global_nav_courses_link").send_keys(:enter)
         wait_for_ajaximations
         links = ff('[aria-label="Courses tray"] li a')
-        expect(links.count).to eql 2
+        expect(links.count).to be 2
       end
     end
 
@@ -117,11 +117,15 @@ describe "Global Navigation" do
         Setting.set("enable_page_views", "db")
         @assignment = @course.assignments.create(name: "another assessment")
         @quiz = Quizzes::Quiz.create!(title: "quiz1", context: @course)
-        page_view_for url: app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}", context: @course,
-                      created_at: 5.minutes.ago, asset_category: "assignments",
+        page_view_for url: app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}",
+                      context: @course,
+                      created_at: 5.minutes.ago,
+                      asset_category: "assignments",
                       asset_code: @assignment.asset_string
-        page_view_for url: app_url + "/courses/#{@course.id}/quizzes/#{@quiz.id}", context: @course,
-                      created_at: 1.minute.ago, asset_category: "quizzes",
+        page_view_for url: app_url + "/courses/#{@course.id}/quizzes/#{@quiz.id}",
+                      context: @course,
+                      created_at: 1.minute.ago,
+                      asset_category: "quizzes",
                       asset_code: @quiz.asset_string
       end
 

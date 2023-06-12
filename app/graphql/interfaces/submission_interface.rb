@@ -39,11 +39,11 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
       Submission
       .where(id: submission_ids)
       .joins(:submission_comments)
-      .where(
-        "NOT EXISTS (?)",
+      .where.not(
         ViewedSubmissionComment
           .where("viewed_submission_comments.submission_comment_id=submission_comments.id")
           .where(user_id: @current_user)
+          .arel.exists
       )
       .group(:submission_id, "submission_comments.attempt")
       .count
@@ -149,7 +149,7 @@ module Interfaces::SubmissionInterface
   end
   def comments_connection(filter:, sort_order:)
     filter = filter.to_h
-    all_comments, for_attempt = filter.values_at(:all_comments, :for_attempt)
+    all_comments, for_attempt, peer_review = filter.values_at(:all_comments, :for_attempt, :peer_review)
 
     load_association(:assignment).then do
       scope = submission.comments_excluding_drafts_for(current_user)
@@ -159,9 +159,13 @@ module Interfaces::SubmissionInterface
           target_attempt = [nil, 0, 1] # Submission 0 and 1 share comments
         end
         scope = scope.where(attempt: target_attempt)
+
+        if peer_review
+          scope = scope.where(author: current_user)
+        end
       end
       scope = scope.reorder(created_at: sort_order) if sort_order
-      scope
+      scope.select { |comment| comment.grants_right?(current_user, :read) }
     end
   end
 
@@ -267,7 +271,7 @@ module Interfaces::SubmissionInterface
                     context: assignment.context,
                     in_app: context[:in_app],
                     request: context[:request],
-                    preloaded_attachments: preloaded_attachments,
+                    preloaded_attachments:,
                     user: current_user
                   )
                 end
@@ -386,4 +390,6 @@ module Interfaces::SubmissionInterface
   def assigned_assessments
     load_association(:assigned_assessments)
   end
+
+  field :assignment_id, ID, null: false
 end

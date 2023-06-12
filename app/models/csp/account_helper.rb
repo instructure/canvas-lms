@@ -104,11 +104,11 @@ module Csp::AccountHelper
   def add_domain!(domain)
     domain = domain.downcase
     Csp::Domain.unique_constraint_retry do |retry_count|
-      if retry_count > 0 && (record = csp_domains.where(domain: domain).take)
+      if retry_count > 0 && (record = csp_domains.where(domain:).take)
         record.undestroy if record.deleted?
         record
       else
-        record = csp_domains.create(domain: domain)
+        record = csp_domains.create(domain:)
         record.valid? && record
       end
     end
@@ -177,6 +177,6 @@ module Csp::AccountHelper
   end
 
   def csp_logging_config
-    @config ||= YAML.safe_load(DynamicSettings.find(tree: :private, cluster: shard.database_server.id)["csp_logging.yml"] || "{}")
+    @config ||= Rails.application.credentials.csp_logging || {}
   end
 end

@@ -133,7 +133,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
         let(:grading_type) { raise "set in examples" }
 
-        before { assignment.update!(points_possible: nil, grading_type: grading_type) }
+        before { assignment.update!(points_possible: nil, grading_type:) }
 
         context "and the grading_type requires points" do
           let(:grading_type) { Assignment::GRADING_TYPES.points }
@@ -231,7 +231,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
     end
 
     context "when submission is deleted" do
-      let(:submission) { Submission.find_or_initialize_by(assignment: assignment, user: @user) }
+      let(:submission) { Submission.find_or_initialize_by(assignment:, user: @user) }
       let(:quiz_lti_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
 
       before do
@@ -249,7 +249,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
     end
 
     context "when submission validation raises an error" do
-      let(:submission) { Submission.find_or_initialize_by(assignment: assignment, user: @user) }
+      let(:submission) { Submission.find_or_initialize_by(assignment:, user: @user) }
       let(:quiz_lti_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
       let(:grades) { [0.11, 0.22, 0.33] }
       let(:launch_urls) do
@@ -263,7 +263,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
       before do
         allow(BasicLTI::QuizzesNextVersionedSubmission).to receive(:new).and_return(quiz_lti_submission)
         allow(quiz_lti_submission).to receive(:submission).and_return(submission)
-        (0..2).each do |i|
+        3.times do |i|
           grade = "#{TextHelper.round_if_whole(grades[i] * 100)}%"
           grade, score = assignment.compute_grade_and_score(grade, nil)
           submission.grade = grade
@@ -349,7 +349,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         before do
           BasicLTI::BasicOutcomes.process_request(tool, xml)
           submission = assignment.submissions.first
-          (0..2).each do |i|
+          3.times do |i|
             grade = "#{TextHelper.round_if_whole(grades[i] * 100)}%"
             grade, score = assignment.compute_grade_and_score(grade, nil)
             submission.grade = grade
@@ -428,7 +428,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         let(:text) { "{ \"graded_at\" : \"#{graded_at_time}\" }" }
 
         before do
-          submission = Submission.find_or_initialize_by(assignment: assignment, user: @user)
+          submission = Submission.find_or_initialize_by(assignment:, user: @user)
           submission.grade = "0.67"
           submission.score = 0.67
           submission.graded_at = Time.zone.now

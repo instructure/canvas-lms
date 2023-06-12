@@ -1,5 +1,9 @@
 <% define_content :link do %>
-  <%= settings_profile_url %>
+  <% if user&.account&.primary_domain&.host %>
+    <%= url_for({ controller: :profile, action: :settings, host: user.account.primary_domain.host }) %>
+  <% else %>
+    <%= settings_profile_url %>
+  <% end %>
 <% end %>
 
 <%= t "A Canvas security token was just generated for your account. If you requested a user token, no further action is necessary. If you did not request a token or would like to manage your canvas access tokens, you can do so here:" %>

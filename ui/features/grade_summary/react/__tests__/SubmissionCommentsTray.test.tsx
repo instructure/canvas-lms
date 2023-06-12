@@ -25,6 +25,7 @@ describe('SubmissionCommentsTray', () => {
   const attempts: SubmissionAttemptsComments = {
     attempts: {
       1: [
+        // @ts-ignore
         {
           id: '1',
           comment: 'this is a comment',

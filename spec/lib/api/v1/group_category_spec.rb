@@ -67,20 +67,20 @@ describe "Api::V1::GroupCategory" do
       it "sets protected with the category value" do
         allow(category).to receive_messages(protected?: true)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
-        expect(json["protected"]).to eq(true)
+        expect(json["protected"]).to be(true)
       end
 
       it 'passes through "allows_multiple_memberships"' do
         allow(category).to receive_messages(allows_multiple_memberships?: false)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
-        expect(json["allows_multiple_memberships"]).to eq(false)
+        expect(json["allows_multiple_memberships"]).to be(false)
       end
 
       it 'checks the user against the category to set "is_member"' do
         user = User.new
         expect(category).to receive(:is_member?).with(user).and_return(true)
         json = CategoryHarness.new.group_category_json(category, user, nil)
-        expect(json["is_member"]).to eq(true)
+        expect(json["is_member"]).to be(true)
       end
     end
 
@@ -94,18 +94,20 @@ describe "Api::V1::GroupCategory" do
       end
 
       context "when 'groups' is specified as an include key" do
-        it "are included if active" do
+        it "are included if active and sorted by creation date" do
           json = CategoryHarness.new.group_category_json(category, user, nil, { include: ["groups"] })
-          json_group_ids = json["groups"].map { |group| group["id"] }
+          json_group_ids = json["groups"].pluck("id")
+          json_group_dates = json["groups"].pluck("created_at")
 
           expect(json_group_ids).to match_array(category.groups.pluck(:id))
+          expect(json_group_dates).to eq(json_group_dates.sort)
         end
 
         it "are not included if deleted" do
           category.groups.second.destroy!
 
           json = CategoryHarness.new.group_category_json(category, user, nil, { include: ["groups"] })
-          json_group_ids = json["groups"].map { |group| group["id"] }
+          json_group_ids = json["groups"].pluck("id")
 
           expect(json_group_ids).to contain_exactly(category.groups.first.id)
         end

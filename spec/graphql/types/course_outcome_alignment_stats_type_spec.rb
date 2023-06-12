@@ -25,7 +25,7 @@ describe Types::CourseOutcomeAlignmentStatsType do
   before :once do
     account_admin_user
     outcome_alignment_stats_model
-    @course.account.enable_feature!(:outcome_alignment_summary)
+    @course.account.enable_feature!(:improved_outcomes_management)
   end
 
   let(:graphql_context) { { current_user: @admin } }

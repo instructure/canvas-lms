@@ -19,5 +19,5 @@
 import doFileUpload from '../shared/Upload/doFileUpload'
 
 export default function (ed, document) {
-  return doFileUpload(ed, document, {panels: ['COMPUTER']})
+  return doFileUpload(ed, document, {panels: ['COMPUTER']}).shownPromise
 }

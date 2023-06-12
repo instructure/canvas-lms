@@ -95,7 +95,7 @@ describe ContentTag do
 
       it "returns nil for other workflow_state" do
         a = mock_asset.new("terrified")
-        expect(ContentTag.asset_workflow_state(a)).to eq nil
+        expect(ContentTag.asset_workflow_state(a)).to be_nil
       end
     end
   end
@@ -167,22 +167,22 @@ describe ContentTag do
     tag = ContentTag.new
     tag.content_asset_string = "discussion_topic_5"
     expect(tag.content_type).to eql("DiscussionTopic")
-    expect(tag.content_id).to eql(5)
+    expect(tag.content_id).to be(5)
   end
 
   it "does not allow setting an invalid content_asset_string" do
     tag = ContentTag.new
     tag.content_asset_string = "bad_class_41"
-    expect(tag.content_type).to eql(nil)
-    expect(tag.content_id).to eql(nil)
+    expect(tag.content_type).to be_nil
+    expect(tag.content_id).to be_nil
 
     tag.content_asset_string = "bad_class"
-    expect(tag.content_type).to eql(nil)
-    expect(tag.content_id).to eql(nil)
+    expect(tag.content_type).to be_nil
+    expect(tag.content_id).to be_nil
 
     tag.content_asset_string = "course_55"
-    expect(tag.content_type).to eql(nil)
-    expect(tag.content_id).to eql(nil)
+    expect(tag.content_type).to be_nil
+    expect(tag.content_id).to be_nil
   end
 
   it "returns content for a assignment" do
@@ -310,12 +310,12 @@ describe ContentTag do
                                                     name: "tool",
                                                     consumer_key: "key",
                                                     shared_secret: "secret",
-                                                    url: url
+                                                    url:
                                                   })
     assignment = @course.assignments.create!(
       title: "some assignment",
       submission_types: "external_tool",
-      external_tool_tag_attributes: { url: url }
+      external_tool_tag_attributes: { url: }
     )
     expect(assignment.external_tool_tag.content).to eq(tool)
   end
@@ -800,8 +800,10 @@ describe ContentTag do
 
   it "syncs tag published state with attachment locked state" do
     course_factory
-    att = Attachment.create!(filename: "blah.txt", uploaded_data: StringIO.new("blah"),
-                             folder: Folder.unfiled_folder(@course), context: @course)
+    att = Attachment.create!(filename: "blah.txt",
+                             uploaded_data: StringIO.new("blah"),
+                             folder: Folder.unfiled_folder(@course),
+                             context: @course)
     att.locked = true
     att.save!
 
@@ -893,7 +895,7 @@ describe ContentTag do
       tag = ContentTag.create!(context: @course)
       expect(ContentTag.can_have_assignment).not_to include(tag)
       ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"].each do |content_type|
-        tag.update(content_type: content_type)
+        tag.update(content_type:)
         expect(ContentTag.can_have_assignment).to include(tag)
       end
     end
@@ -903,10 +905,10 @@ describe ContentTag do
     it "true if content_type can have assignments" do
       course_factory
       tag = ContentTag.create!(context: @course)
-      expect(tag.can_have_assignment?).to eq(false)
+      expect(tag.can_have_assignment?).to be(false)
       ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"].each do |content_type|
-        tag.update(content_type: content_type)
-        expect(tag.can_have_assignment?).to eq(true)
+        tag.update(content_type:)
+        expect(tag.can_have_assignment?).to be(true)
       end
     end
   end
@@ -930,15 +932,15 @@ describe ContentTag do
       @context_module.add_item(id: assignment.id, type: "assignment")
       tag = @context_module.content_tags.find_by(content_id: assignment.id)
       tag.update_course_pace_module_items
-      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
+      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to be(true)
     end
 
     it "deletes a CoursePaceModuleItem if a content tag is deleted" do
       @tag.update_course_pace_module_items
-      expect(@course_pace.course_pace_module_items.where(module_item_id: @tag.id).exists?).to eq(true)
+      expect(@course_pace.course_pace_module_items.where(module_item_id: @tag.id).exists?).to be(true)
       @tag.destroy
       @tag.update_course_pace_module_items
-      expect(@course_pace.course_pace_module_items.where(module_item_id: @tag.id).exists?).to eq(false)
+      expect(@course_pace.course_pace_module_items.where(module_item_id: @tag.id).exists?).to be(false)
     end
 
     it "updates all published pace plans with content tags" do
@@ -948,14 +950,14 @@ describe ContentTag do
       @context_module.add_item(id: assignment.id, type: "assignment")
       tag = @context_module.content_tags.find_by(content_id: assignment.id)
       tag.update_course_pace_module_items
-      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
-      expect(section_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
+      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to be(true)
+      expect(section_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to be(true)
     end
 
     it "does not make changes if the tag_type is not 'context_module'" do
       assignment = @course.assignments.create!
       tag = ContentTag.create!(context: @course, content: assignment, tag_type: "learning_outcome")
-      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(false)
+      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to be(false)
     end
   end
 
@@ -963,19 +965,28 @@ describe ContentTag do
     it "publishes the tag if it is unpublished" do
       course_factory
       tag = ContentTag.create!(context: @course, workflow_state: "unpublished")
-      expect(tag.published?).to eq(false)
+      expect(tag.published?).to be(false)
       tag.trigger_publish!
-      expect(tag.reload.published?).to eq(true)
+      expect(tag.reload.published?).to be(true)
     end
 
     it "publishes the tag and the attachment content if possible" do
       course_factory
       tag = ContentTag.create!(context: @course, content: attachment_model(locked: true), workflow_state: "unpublished")
-      expect(tag.published?).to eq(false)
-      expect(@attachment.published?).to eq(false)
+      expect(tag.published?).to be(false)
+      expect(@attachment.published?).to be(false)
       tag.trigger_publish!
-      expect(tag.reload.published?).to eq(true)
-      expect(@attachment.reload.published?).to eq(true)
+      expect(tag.reload.published?).to be(true)
+      expect(@attachment.reload.published?).to be(true)
+    end
+
+    it "respects the content's can_publish? method" do
+      course_factory
+      tag = ContentTag.create!(context: @course, content: assignment_model, workflow_state: "unpublished")
+      allow(tag.content).to receive(:can_publish?).and_return(false)
+      expect(tag.published?).to be(false)
+      tag.trigger_publish!
+      expect(tag.reload.published?).to be(false)
     end
   end
 
@@ -983,19 +994,18 @@ describe ContentTag do
     it "unpublishes the tag if it is published" do
       course_factory
       tag = ContentTag.create!(context: @course, workflow_state: "published")
-      expect(tag.published?).to eq(true)
+      expect(tag.published?).to be(true)
       tag.trigger_unpublish!
-      expect(tag.reload.published?).to eq(false)
+      expect(tag.reload.published?).to be(false)
     end
 
-    it "unpublishes the tag and locks the attachment content" do
+    it "respects the content's can_unpublish? method" do
       course_factory
-      tag = ContentTag.create!(context: @course, content: attachment_model, workflow_state: "published")
-      expect(tag.published?).to eq(true)
-      expect(@attachment.published?).to eq(true)
+      tag = ContentTag.create!(context: @course, content: assignment_model, workflow_state: "published")
+      allow(tag.content).to receive(:can_unpublish?).and_return(false)
+      expect(tag.published?).to be(true)
       tag.trigger_unpublish!
-      expect(tag.reload.published?).to eq(false)
-      expect(@attachment.reload.published?).to eq(false)
+      expect(tag.reload.published?).to be(true)
     end
   end
 end

@@ -29,7 +29,8 @@ describe Types::MutationLogType do
   end
 
   before(:once) do
-    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
+    creds = Aws::Credentials.new("key", "secret")
+    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true, credentials: creds)
     student_in_course(active_all: true)
     @assignment = @course.assignments.create! name: "asdf"
     account_admin_user
@@ -110,11 +111,11 @@ describe Types::MutationLogType do
              .dig("data", "auditLogs", "mutationLogs")
 
     cursor = result.dig("pageInfo", "endCursor")
-    expect(result.dig("pageInfo", "hasNextPage")).to eq true
+    expect(result.dig("pageInfo", "hasNextPage")).to be true
 
     result = audit_log_query({ assetString: @asset_string, after: cursor }, current_user: @admin)
              .dig("data", "auditLogs", "mutationLogs")
-    expect(result.dig("pageInfo", "hasNextPage")).to eq false
+    expect(result.dig("pageInfo", "hasNextPage")).to be false
     expect(result["nodes"].size).to eq 1
   end
 
@@ -122,7 +123,8 @@ describe Types::MutationLogType do
     result = audit_log_query({
                                assetString: @asset_string,
                                startTime: 1.day.ago.iso8601,
-                             }, current_user: @admin).dig("data", "auditLogs", "mutationLogs")
+                             },
+                             current_user: @admin).dig("data", "auditLogs", "mutationLogs")
 
     expect(result["nodes"].size).to eq 1
     expect(result.dig("nodes", 0, "timestamp")).to be > 1.day.ago
@@ -130,7 +132,8 @@ describe Types::MutationLogType do
     result = audit_log_query({
                                assetString: @asset_string,
                                endTime: 1.day.ago.iso8601,
-                             }, current_user: @admin).dig("data", "auditLogs", "mutationLogs")
+                             },
+                             current_user: @admin).dig("data", "auditLogs", "mutationLogs")
 
     expect(result["nodes"].size).to eq 1
     expect(result.dig("nodes", 0, "timestamp")).to be < 1.day.ago
@@ -139,7 +142,8 @@ describe Types::MutationLogType do
                                assetString: @asset_string,
                                startTime: 2.years.ago.iso8601,
                                endTime: 1.year.ago.iso8601,
-                             }, current_user: @admin).dig("data", "auditLogs", "mutationLogs")
+                             },
+                             current_user: @admin).dig("data", "auditLogs", "mutationLogs")
 
     expect(result["nodes"].size).to eq 0
   end

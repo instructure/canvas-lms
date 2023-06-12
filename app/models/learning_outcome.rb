@@ -23,7 +23,7 @@ class LearningOutcome < ActiveRecord::Base
   include Workflow
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
-  self.ignored_columns = %i[migration_id_2 vendor_guid_2 root_account_id]
+  self.ignored_columns += %i[migration_id_2 vendor_guid_2 root_account_id]
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :learning_outcome_results
@@ -125,7 +125,7 @@ class LearningOutcome < ActiveRecord::Base
       else
         errors.add(:calculation_int, t(
                                        "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
-                                       calculation_int: calculation_int,
+                                       calculation_int:,
                                        valid_calculation_ints_min: valid_ints.min,
                                        valid_calculation_ints_max: valid_ints.max
                                      ))
@@ -457,7 +457,7 @@ class LearningOutcome < ActiveRecord::Base
     alignments.find_or_create_by(
       content: asset,
       tag_type: "learning_outcome",
-      context: context
+      context:
     ) do |_a|
       InstStatsd::Statsd.increment("learning_outcome.align", tags: { type: asset.class.name })
     end

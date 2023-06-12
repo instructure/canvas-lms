@@ -46,7 +46,7 @@ describe "Conferences API", type: :request do
       @user = nil
       raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
         .merge(action: "index", course_id: @course.to_param))
-      expect(response.code).to eq "401"
+      expect(response).to have_http_status :unauthorized
     end
 
     it "lists all the conferences" do
@@ -152,7 +152,7 @@ describe "Conferences API", type: :request do
         end
 
         it "excludes conferences for courses the user is not actively enrolled in" do
-          StudentEnrollment.find_by(user: student, course: course).destroy
+          StudentEnrollment.find_by(user: student, course:).destroy
           expect(conference_json_ids).to be_empty
         end
       end
@@ -169,7 +169,7 @@ describe "Conferences API", type: :request do
         end
 
         it "excludes conferences for groups for which this user is not an active member" do
-          GroupMembership.find_by!(user: student, group: group).update!(workflow_state: "deleted")
+          GroupMembership.find_by!(user: student, group:).update!(workflow_state: "deleted")
 
           expect(conference_json_ids).to be_empty
         end
@@ -403,7 +403,7 @@ describe "Conferences API", type: :request do
 
     let(:params) do
       @category_path_options.merge(action: "recording_ready",
-                                   course_id: course_id,
+                                   course_id:,
                                    conference_id: conference.id)
     end
 
@@ -413,7 +413,7 @@ describe "Conferences API", type: :request do
       body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
-      expect(response.status).to eq 202
+      expect(response).to have_http_status :accepted
     end
 
     it "errors if the secret key is wrong" do
@@ -422,7 +422,7 @@ describe "Conferences API", type: :request do
       body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
-      expect(response.status).to eq 401
+      expect(response).to have_http_status :unauthorized
     end
 
     it "errors if the conference_key is wrong" do
@@ -431,7 +431,7 @@ describe "Conferences API", type: :request do
       body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
-      expect(response.status).to eq 422
+      expect(response).to have_http_status :unprocessable_entity
     end
   end
 end

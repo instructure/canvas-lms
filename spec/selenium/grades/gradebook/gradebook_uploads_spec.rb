@@ -47,7 +47,8 @@ describe "Gradebook - uploads" do
 
   it "updates grades for assignments with GPA Scale grading type correctly", priority: "1" do
     assignment = @course.assignments.create!(title: "GPA Scale Assignment",
-                                             grading_type: "gpa_scale", points_possible: 5)
+                                             grading_type: "gpa_scale",
+                                             points_possible: 5)
     assignment.grade_student(@student, grade: "D", grader: @teacher)
     _filename, fullpath, _data = gradebook_file("gradebook0.csv",
                                                 "Student Name,ID,Section,GPA Scale Assignment",
@@ -160,7 +161,7 @@ describe "Gradebook - uploads" do
     expect(@course.assignments.count).to eql(assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
     expect(assignment.name).to eq "Assignment 2"
-    expect(assignment.submissions.having_submission.count).to eql 0
+    expect(assignment.submissions.having_submission.count).to be 0
     expect(f("#gradebook_wrapper")).to be_displayed
   end
 

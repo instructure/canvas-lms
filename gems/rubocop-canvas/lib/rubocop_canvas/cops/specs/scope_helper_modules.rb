@@ -21,9 +21,9 @@ module RuboCop
   module Cop
     module Specs
       class ScopeHelperModules < Cop
-        MSG = "Define all helper and factory methods within modules"\
-              " (or `shared_context`). Otherwise they will live on Object"\
-              " and potentially wreak havoc on other specs."
+        MSG = "Define all helper and factory methods within modules " \
+              "(or `shared_context`). Otherwise they will live on Object " \
+              "and potentially wreak havoc on other specs."
 
         WHITELISTED_BLOCKS = %i[
           class_eval

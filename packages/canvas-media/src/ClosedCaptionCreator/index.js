@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component, useEffect, useState} from 'react'
-import {arrayOf, func, objectOf, shape, string} from 'prop-types'
+import {arrayOf, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
 import formatMessage from 'format-message'
 
 import {Alert} from '@instructure/ui-alerts'
@@ -69,6 +69,7 @@ export class ClosedCaptionPanel extends Component {
       SelectStrings: objectOf(string),
     }).isRequired,
     userLocale: string,
+    mountNode: oneOfType([element, func]),
   }
 
   static defaultProps = {
@@ -219,6 +220,7 @@ export class ClosedCaptionPanel extends Component {
               languages={this.closedCaptionLanguages}
               selectedLanguage={this.closedCaptionLanguages.find(l => l.id === cc.locale)}
               selectedFile={cc.file}
+              mountNode={this.props.mountNode}
             />
           ))}
         </View>
@@ -237,6 +239,7 @@ export class ClosedCaptionPanel extends Component {
               })}
               selectedLanguage={this.state.newSelectedLanguage}
               selectedFile={this.state.newSelectedFile}
+              mountNode={this.props.mountNode}
             />
           </View>
         ) : (

@@ -11,8 +11,17 @@
     "accessibility_checker_b3af1f6c": {
         "message": "Tilgængelighedskontrol"
     },
+    "action_to_take_b626a99a": {
+        "message": "Handling, der skal tages:"
+    },
     "add_8523c19b": {
         "message": "Tilføj"
+    },
+    "add_a_caption_2a915239": {
+        "message": "Tilføj billedtekst"
+    },
+    "add_alt_text_for_the_image_48cd88aa": {
+        "message": "Tilføj alternativ tekst til billedet"
     },
     "add_another_f4e50d57": {
         "message": "Tilføj en mere"
@@ -29,8 +38,14 @@
     "add_to_do_7def3c37": {
         "message": "Tilføj til opgaveliste"
     },
+    "additional_considerations_f3801683": {
+        "message": "Yderligere overvejelser"
+    },
     "address_3159962f": {
         "message": "Adresse:"
+    },
+    "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
+        "message": "Tilstødende links med samme URL skal være et enkelt link."
     },
     "afrikaans_da0fe6ee": {
         "message": "Afrikaans"
@@ -40,6 +55,9 @@
     },
     "aleph_f4ffd155": {
         "message": "Aleph"
+    },
+    "align_11050992": {
+        "message": "Juster"
     },
     "alignment_and_lists_5cebcb69": {
         "message": "Justering og lister"
@@ -53,14 +71,14 @@
     "all_day_fb42c4fc": {
         "message": "Hele dagen"
     },
-    "all_items_loaded_aa256183": {
-        "message": "Alle elementer er indlæst"
-    },
     "alpha_15d59033": {
         "message": "Alfa"
     },
     "alphabetical_55b5b4e0": {
         "message": "Alfabetisk"
+    },
+    "alt_attribute_text_should_not_contain_more_than_12_e21d4040": {
+        "message": "Alternativ attributtekst må ikke indeholde mere end 120 tegn."
     },
     "alt_text_611fb322": {
         "message": "Alt-tekst"
@@ -115,6 +133,9 @@
     },
     "arabic_c5c87acd": {
         "message": "Arabisk"
+    },
+    "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
+        "message": "Er du sikker på, du vil annullere? Ændringer, du har foretaget, kan ikke blive gemt."
     },
     "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
         "message": "Er du sikker på, du vil slette dette planlægningselement?"
@@ -266,11 +287,41 @@
     "catalan_16f6b78f": {
         "message": "Katalansk"
     },
+    "center_align_e68d9997": {
+        "message": "Centerjustering"
+    },
     "centered_dot_64d5e378": {
         "message": "Centreret prik"
     },
     "centered_horizontal_dots_451c5815": {
         "message": "Centrerede vandrette prikker"
+    },
+    "change_alt_text_92654906": {
+        "message": "Skift alternativ tekst"
+    },
+    "change_heading_tag_to_paragraph_a61e3113": {
+        "message": "Skift overskrift-tag til afsnit"
+    },
+    "change_only_this_heading_s_level_903cc956": {
+        "message": "Skift kun denne overskrifts niveau"
+    },
+    "change_text_color_1aecb912": {
+        "message": "Skift tekstfarve"
+    },
+    "changes_you_made_may_not_be_saved_4e8db973": {
+        "message": "Ændringer, du har foretaget, kan ikke blive gemt."
+    },
+    "characters_9d897d1c": {
+        "message": "Tegn"
+    },
+    "characters_no_spaces_485e5367": {
+        "message": "Tegn (ingen mellemrum)"
+    },
+    "check_accessibility_3c78211c": {
+        "message": "Kontroller tilgængelighed"
+    },
+    "checking_for_accessibility_issues_fac18c6d": {
+        "message": "Kontrollerer tilgængelighedsproblemer"
     },
     "chi_54a32644": {
         "message": "Chi"
@@ -292,6 +343,9 @@
     },
     "circle_484abe63": {
         "message": "Cirkel"
+    },
+    "circle_unordered_list_9e3a0763": {
+        "message": "cirkel usorteret liste"
     },
     "clear_2084585f": {
         "message": "Ryd"
@@ -323,6 +377,9 @@
     "close_a_menu_or_dialog_also_returns_you_to_the_edi_739079e6": {
         "message": "Luk en menu eller dialog. Sender dig også tilbage til redigeringsområdet"
     },
+    "close_accessibility_checker_29d1c51e": {
+        "message": "Luk tilgængelighedskontrol"
+    },
     "close_d634289d": {
         "message": "Luk"
     },
@@ -349,6 +406,12 @@
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Farvevælger ({ colorName } valgt)"
+    },
+    "column_e1ae5c64": {
+        "message": "Kolonne"
+    },
+    "column_group_1c062368": {
+        "message": "Kolonnegruppe"
     },
     "complex_numbers_a543d004": {
         "message": "Komplekse tal"
@@ -379,6 +442,12 @@
     },
     "copyright_holder_66ee111": {
         "message": "Rettighedshaver:"
+    },
+    "could_not_insert_content_itemtype_items_are_not_cu_638dfecd": {
+        "message": "Kunne ikke indsætte indhold: \"{ itemType }\" elementer er i øjeblikket ikke understøttet i Canvas."
+    },
+    "count_40eced3b": {
+        "message": "Tæl"
     },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 ord}\n    one {1 ord}\n  other {# ord}\n}"
@@ -413,6 +482,9 @@
     "course_images_f8511d04": {
         "message": "Fagbilleder"
     },
+    "course_link_b369426": {
+        "message": "Faglink"
+    },
     "course_links_b56959b9": {
         "message": "Faglinks"
     },
@@ -427,6 +499,9 @@
     },
     "create_icon_110d6463": {
         "message": "Opret ikon"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Opret Icon Maker-ikon"
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons licens:"
@@ -445,6 +520,9 @@
     },
     "current_image_f16c249c": {
         "message": "Nuværende billede"
+    },
+    "current_volume_level_c55ab825": {
+        "message": "Nuværende lydstyrke"
     },
     "custom_6979cd81": {
         "message": "Brugerdefineret"
@@ -482,11 +560,23 @@
     "decorative_icon_9a7f3fc3": {
         "message": "Dekorativt ikon"
     },
+    "decorative_image_fde98579": {
+        "message": "Dekorativt billede"
+    },
     "decorative_type_upper_f2c95e3": {
         "message": "Dekorativ { TYPE_UPPER }"
     },
+    "decrease_indent_d9cf469d": {
+        "message": "Formindsk indrykning"
+    },
     "deep_purple_bb3e2907": {
         "message": "Dyb lilla"
+    },
+    "default_bulleted_unordered_list_47079da8": {
+        "message": "standard punktliste usorteret liste"
+    },
+    "default_numerical_ordered_list_48dd3548": {
+        "message": "standard numerisk sorteret liste"
     },
     "definite_integral_fe7ffed1": {
         "message": "Bestemt integral"
@@ -511,6 +601,9 @@
     },
     "describe_the_video_2fe8f46a": {
         "message": "(Beskriv videoen)"
+    },
+    "description_436c48d7": {
+        "message": "Beskrivelse"
     },
     "details_98a31b68": {
         "message": "Nærmere oplysninger"
@@ -578,6 +671,9 @@
     "division_sign_72190870": {
         "message": "Divisionstegn"
     },
+    "document_678cd7bf": {
+        "message": "Dokument"
+    },
     "documents_81393201": {
         "message": "Dokumenter"
     },
@@ -586,6 +682,9 @@
     },
     "double_dagger_faf78681": {
         "message": "Dobbelt kors"
+    },
+    "down_5831a426": {
+        "message": "Ned"
     },
     "down_and_left_diagonal_arrow_40ef602c": {
         "message": "Ned og venstre diagonal pil"
@@ -635,6 +734,9 @@
     "edit_course_link_5a5c3c59": {
         "message": "Rediger faglink"
     },
+    "edit_equation_f5279959": {
+        "message": "Rediger ligning"
+    },
     "edit_existing_icon_maker_icon_5d0ebb3f": {
         "message": "Rediger eksisterende Icon Maker-ikon"
     },
@@ -650,11 +752,17 @@
     "editor_statusbar_26ac81fc": {
         "message": "Editor-statusbar"
     },
+    "element_starting_with_start_91bf4c3b": {
+        "message": "Element begynder med { start }"
+    },
     "embed_828fac4a": {
         "message": "Indlejre"
     },
     "embed_code_314f1bd5": {
         "message": "Indlejr kode"
+    },
+    "embed_content_from_external_tool_3397ad2d": {
+        "message": "Indlejr indhold fra eksternt værktøj"
     },
     "embed_image_1080badc": {
         "message": "Integrer billede"
@@ -710,8 +818,14 @@
     "equals_sign_c51bdc58": {
         "message": "Lig med-symbol"
     },
+    "equation_1c5ac93c": {
+        "message": "Regnestykke"
+    },
     "equation_editor_39fbc3f1": {
         "message": "Redigeringsværktøj til regnestykker"
+    },
+    "equilibrium_6ff3040b": {
+        "message": "Ligevægt"
     },
     "equivalence_class_7b0f11c0": {
         "message": "Ækvivalensklasse"
@@ -758,6 +872,12 @@
     "extended_9a58dcb6": {
         "message": "Udvidet"
     },
+    "external_link_d3f9e62a": {
+        "message": "Eksternt link"
+    },
+    "external_tool_frame_70b32473": {
+        "message": "Ramme af eksternt værktøj"
+    },
     "external_tools_6e77821": {
         "message": "Eksterne værktøjer"
     },
@@ -803,6 +923,9 @@
     "failed_to_load_opportunities_52ab6404": {
         "message": "Kunne ikke indlæse muligheder"
     },
+    "failed_to_retrieve_content_from_external_tool_5899c213": {
+        "message": "Kunne ikke hente indhold fra eksternt værktøj"
+    },
     "failed_to_save_to_do_ddc7503b": {
         "message": "Kunne ikke gemme opgave"
     },
@@ -839,8 +962,14 @@
     "filipino_33339264": {
         "message": "Filippinsk"
     },
+    "finish_bc343002": {
+        "message": "Færdig"
+    },
     "finnish_4df2923d": {
         "message": "Finsk"
+    },
+    "fix_heading_hierarchy_f60884c4": {
+        "message": "Ret overskriftshierarki"
     },
     "flat_music_76d5a5c3": {
         "message": "Sænket (musik)"
@@ -856,6 +985,9 @@
     },
     "format_4247a9c5": {
         "message": "Format"
+    },
+    "format_as_a_list_142210c3": {
+        "message": "Listeformat"
     },
     "formatting_5b143aa8": {
         "message": "Formatering"
@@ -950,6 +1082,9 @@
     "group_isomorphism_45b1458c": {
         "message": "Gruppe isomorfisme"
     },
+    "group_link_63e626b3": {
+        "message": "Gruppelink"
+    },
     "group_links_9493129e": {
         "message": "Gruppelinks"
     },
@@ -968,6 +1103,15 @@
     "hat_ea321e35": {
         "message": "Hat"
     },
+    "header_column_f27433cb": {
+        "message": "Overskriftskolonne"
+    },
+    "header_row_and_column_ec5b9ec": {
+        "message": "Overskriftsrække- og kolonne"
+    },
+    "header_row_f33eb169": {
+        "message": "Overskriftsrække"
+    },
     "heading_2_5b84eed2": {
         "message": "Overskrift 2"
     },
@@ -976,6 +1120,15 @@
     },
     "heading_4_b2e74be7": {
         "message": "Overskrift 4"
+    },
+    "heading_levels_should_not_be_skipped_3947c0e0": {
+        "message": "Overskriftsniveauer bør ikke springes over."
+    },
+    "heading_starting_with_start_42a3e7f9": {
+        "message": "Overskrift, der starter med { start }"
+    },
+    "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
+        "message": "Overskrifter må ikke indeholde mere end 120 tegn."
     },
     "health_icon_8d292eb5": {
         "message": "Sundheds-ikon"
@@ -998,6 +1151,9 @@
     "hide_title_description_caf092ef": {
         "message": "Skjul { title } beskrivelse"
     },
+    "highlight_an_element_to_activate_the_element_optio_60e1e56b": {
+        "message": "Fremhæv et element for at aktivere værktøjslinjen til elementindstilling"
+    },
     "hindi_9bcd4b34": {
         "message": "Hindi"
     },
@@ -1006,6 +1162,9 @@
     },
     "html_code_editor_fd967a44": {
         "message": "html kode-editor"
+    },
+    "html_editor_fb2ab713": {
+        "message": "HTML-editor"
     },
     "hungarian_fc7d30c9": {
         "message": "Ungarsk"
@@ -1046,8 +1205,11 @@
     "icon_size_9353edea": {
         "message": "Ikon-størrelse"
     },
-    "if_left_empty_link_text_will_display_as_course_lin_61087540": {
+    "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
         "message": "Hvis linket er tomt, vises tekst som faglinkets navn"
+    },
+    "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
+        "message": "Hvis brugsrettigheder er påkrævet, vil filen ikke offentliggøres, før det er aktiveret på siden Filer."
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Hvis du ikke vælger brugsrettigheder nu, vil denne fil ikke blive offentliggjort, når den uploades."
@@ -1058,6 +1220,9 @@
     "image_c1c98202": {
         "message": "billede"
     },
+    "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
+        "message": "Billedfilnavne bør ikke bruges som den alternative attribut, der beskriver billedindholdet."
+    },
     "image_options_5412d02c": {
         "message": "Billedindstillinger"
     },
@@ -1067,14 +1232,23 @@
     "image_to_crop_3a34487d": {
         "message": "Billede til beskæring"
     },
+    "image_with_filename_file_aacd7180": {
+        "message": "Billede med filnavn { file }"
+    },
     "images_7ce26570": {
         "message": "Billeder"
+    },
+    "images_should_include_an_alt_attribute_describing__b86d6a86": {
+        "message": "Billeder skal indeholde en alternativ attribut, der beskriver billedindholdet."
     },
     "imaginary_portion_of_complex_number_2c733ffa": {
         "message": "Imaginær del (af komplekst tal)"
     },
     "in_element_of_19ca2f33": {
         "message": "I (element af)"
+    },
+    "increase_indent_6af90f7c": {
+        "message": "Øg indrykning"
     },
     "indefinite_integral_6623307e": {
         "message": "Ubestemt integral"
@@ -1096,6 +1270,9 @@
     },
     "insert_link_6dc23cae": {
         "message": "Indsæt link"
+    },
+    "insert_math_equation_57c6e767": {
+        "message": "Indsæt matematikregnestykke"
     },
     "integers_336344e1": {
         "message": "Heltal"
@@ -1120,6 +1297,9 @@
     },
     "irish_567e109f": {
         "message": "Irsk"
+    },
+    "issue_num_total_f94536cf": {
+        "message": "Udstedelse { num }/{ total }"
     },
     "italian_bd3c792d": {
         "message": "Italiensk"
@@ -1154,6 +1334,9 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Genvejstaster"
     },
+    "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
+        "message": "Tastaturer navigerer til links ved hjælp af Tab-tasten. To tilstødende links, der fører til samme destination, kan være forvirrende for tastaturbrugere."
+    },
     "korean_da812d9": {
         "message": "Koreansk"
     },
@@ -1177,6 +1360,45 @@
     },
     "latvian_2bbb6aab": {
         "message": "Lettisk"
+    },
+    "learn_more_about_adjacent_links_2cb9762c": {
+        "message": "Få mere at vide om tilstødende links"
+    },
+    "learn_more_about_color_contrast_c019dfb9": {
+        "message": "Få mere at vide om farvekontrast"
+    },
+    "learn_more_about_organizing_page_headings_8a7caa2e": {
+        "message": "Få mere at vide om at organisere sideoverskrifter"
+    },
+    "learn_more_about_proper_page_heading_structure_d2959f2d": {
+        "message": "Få mere at vide om korrekt struktur for sideoverskrifter"
+    },
+    "learn_more_about_table_headers_5f5ee13": {
+        "message": "Få mere at vide om tabeloverskrifter"
+    },
+    "learn_more_about_using_alt_text_for_images_5698df9a": {
+        "message": "Få mere at vide om at bruge alt-tekst til billeder"
+    },
+    "learn_more_about_using_captions_with_tables_36fe496f": {
+        "message": "Få mere at vide om brug af billedtekster med tabeller"
+    },
+    "learn_more_about_using_filenames_as_alt_text_264286af": {
+        "message": "Få mere at vide om at bruge filnavne som alt-tekst"
+    },
+    "learn_more_about_using_lists_4e6eb860": {
+        "message": "Få mere at vide om at bruge lister"
+    },
+    "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+        "message": "Få mere at vide om at bruge anvendelsesområde-attributter med tabeller"
+    },
+    "leave_as_is_4facfe55": {
+        "message": "Lad det være, som det er"
+    },
+    "left_3ea9d375": {
+        "message": "Venstre"
+    },
+    "left_align_43d95491": {
+        "message": "Venstrejustering"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Venstre vinkelparantes"
@@ -1229,11 +1451,17 @@
     "link_options_a16b758b": {
         "message": "Link-muligheder"
     },
+    "link_with_text_starting_with_start_b3fcbe71": {
+        "message": "Link med tekst, der begynder med { start }"
+    },
     "links_14b70841": {
         "message": "Links"
     },
     "links_to_an_external_site_de74145d": {
         "message": "Links til en ekstern webside."
+    },
+    "lists_should_be_formatted_as_lists_f862de8d": {
+        "message": "Lister skal have listeformat."
     },
     "lithuanian_5adcbe24": {
         "message": "Litauisk"
@@ -1262,6 +1490,9 @@
     "loading_closed_captions_subtitles_failed_95ceef47": {
         "message": "indlæsning af undertekster mislykkedes."
     },
+    "loading_external_tool_d839042c": {
+        "message": "Indlæser eksternt værktøj"
+    },
     "loading_failed_b3524381": {
         "message": "Indlæsning mislykkedes ..."
     },
@@ -1276,6 +1507,9 @@
     },
     "loading_past_items_ca499e75": {
         "message": "Indlæser forrige elementer"
+    },
+    "loading_placeholder_for_filename_792ef5e8": {
+        "message": "Indlæser pladsholder for { fileName }"
     },
     "loading_planner_items_947a813d": {
         "message": "Indlæser planlægningselementer"
@@ -1340,8 +1574,20 @@
     "media_file_is_processing_please_try_again_later_58a6d49": {
         "message": "Mediefil behandles. Prøv igen senere."
     },
+    "media_title_2112243b": {
+        "message": "Medietitel"
+    },
     "medium_5a8e9ead": {
         "message": "Medium"
+    },
+    "merge_links_2478df96": {
+        "message": "Sammenlæg links"
+    },
+    "mic_a7f3d311": {
+        "message": "Mikrofon"
+    },
+    "microphone_disabled_15c83130": {
+        "message": "Mikrofon deaktiveret"
     },
     "middle_27dc1d5": {
         "message": "I midten"
@@ -1372,6 +1618,9 @@
     },
     "modules_c4325335": {
         "message": "Forløb"
+    },
+    "moving_image_to_crop_directionword_6f66cde2": {
+        "message": "Flytter billede for at beskære { directionWord }"
     },
     "mu_37223b8b": {
         "message": "My"
@@ -1436,8 +1685,14 @@
     "new_opportunities_7d349c4d": {
         "message": "Nye muligheder"
     },
+    "next_40e12421": {
+        "message": "Næste"
+    },
     "next_month_749b1778": {
         "message": "Næste måned"
+    },
+    "no_accessibility_issues_were_detected_f8d3c875": {
+        "message": "Der blev ikke fundet nogen tilgængelighedsproblemer."
     },
     "no_changes_to_save_d29f6e91": {
         "message": "Ingen ændringer at gemme."
@@ -1454,6 +1709,9 @@
     "no_grade_3b4d7f3e": {
         "message": "Ingen vurdering"
     },
+    "no_headers_9bc7dc7f": {
+        "message": "Ingen overskrifter"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Der findes ikke forhåndsvisning for denne fil."
     },
@@ -1462,6 +1720,9 @@
     },
     "no_results_found_for_filterterm_ad1b04c8": {
         "message": "Ingen resultater fundet for { filterTerm }"
+    },
+    "no_video_1ed00b26": {
+        "message": "Ingen video"
     },
     "none_3b5e34d2": {
         "message": "Ingen"
@@ -1568,6 +1829,9 @@
     "orange_81386a62": {
         "message": "Orange"
     },
+    "ordered_and_unordered_lists_cfadfc38": {
+        "message": "Sorterede og usorterede lister"
+    },
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andre redigeringsgenveje kan findes på"
     },
@@ -1587,7 +1851,10 @@
         "message": "Sider"
     },
     "paragraph_5e5ad8eb": {
-        "message": "Paragraf"
+        "message": "Afsnit"
+    },
+    "paragraph_starting_with_start_a59923f8": {
+        "message": "Paragraf begynder med { start }"
     },
     "parallel_d55d6e38": {
         "message": "Parallel"
@@ -1597,6 +1864,9 @@
     },
     "paste_5963d1c1": {
         "message": "Sæt ind"
+    },
+    "pause_12af3bb4": {
+        "message": "Pause"
     },
     "peer_review_74f26a13": {
         "message": "Elev-elev vurdering"
@@ -1646,11 +1916,17 @@
     "pixels_52ece7d1": {
         "message": "Pixels"
     },
+    "play_1a47eaa7": {
+        "message": "Afspil"
+    },
     "play_media_comment_35257210": {
         "message": "Afspil medie kommentar."
     },
     "play_media_comment_by_name_from_createdat_c230123d": {
         "message": "Afspil mediekommentar af { name } fra { createdAt }."
+    },
+    "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
+        "message": "Lad Canvas få adgang til din mikrofon og webcam."
     },
     "plus_d43cd4ec": {
         "message": "Plus"
@@ -1685,8 +1961,14 @@
     "preformatted_d0670862": {
         "message": "Præformatteret"
     },
+    "prev_f82cbc48": {
+        "message": "Forrige"
+    },
     "preview_53003fd2": {
         "message": "Eksempel"
+    },
+    "preview_a3f8f854": {
+        "message": "FORHÅNDSVISNING"
     },
     "preview_in_overlay_ed772c46": {
         "message": "Overlejret forhåndsvisning"
@@ -1751,6 +2033,12 @@
     "record_7c9448b": {
         "message": "Optag"
     },
+    "record_upload_media_5fdce166": {
+        "message": "Optag/overfør medier"
+    },
+    "recording_98da6bda": {
+        "message": "Optagelse"
+    },
     "red_8258edf3": {
         "message": "Rød"
     },
@@ -1765,6 +2053,12 @@
     },
     "reminder_date_4564d12d": {
         "message": "Påmindelse: { date }"
+    },
+    "remove_heading_style_5fdc8855": {
+        "message": "Fjern overskriftsstil"
+    },
+    "remove_link_d1f2f4d0": {
+        "message": "Fjern link"
     },
     "replace_e61834a7": {
         "message": "Erstat"
@@ -1793,8 +2087,14 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich Content Editor"
     },
-    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
-        "message": "Område med RTF. Tryk på ALT+0 for genveje til Rich Content Editor."
+    "rich_text_area_press_oskey_f8_for_rich_content_edi_c2f651d": {
+        "message": "Område med RTF. Tryk på { OSKey }+F8 for genveje i Rich Content Editor."
+    },
+    "right_71ffdc4d": {
+        "message": "Højre"
+    },
+    "right_align_39e7a32a": {
+        "message": "Højrejustering"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Højre vinkelparantes"
@@ -1841,6 +2141,12 @@
     "rotation_9699c538": {
         "message": "Rotation"
     },
+    "row_fc0944a7": {
+        "message": "Række"
+    },
+    "row_group_979f5528": {
+        "message": "Rækkegruppe"
+    },
     "russian_1e3e197": {
         "message": "Russisk"
     },
@@ -1850,11 +2156,38 @@
     "save_11a80ec3": {
         "message": "Gem"
     },
+    "save_copy_ca63944e": {
+        "message": "Gem kopi"
+    },
+    "save_media_cb9e786e": {
+        "message": "Gem medier"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Gemte Icon Maker-ikoner"
+    },
     "schedule_preview_3bcda153": {
         "message": "Forhåndsvisning af tidsplan"
     },
     "science_8d92214a": {
         "message": "Videnskab"
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
+        "message": "Skærmlæsere kan ikke bestemme, hvad der vises i et billede uden alternativ tekst, og filnavne er ofte en meningsløs række tal og bogstaver, der ikke beskriver konteksten eller betydningen."
+    },
+    "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
+        "message": "Skærmlæsere kan ikke bestemme, hvad der vises i et billede uden alternativ tekst, der beskriver billedets indhold og betydning. Alternativ tekst skal være enkel og kortfattet."
+    },
+    "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
+        "message": "Skærmlæsere kan ikke bestemme, hvad der vises i et billede uden alternativ tekst, der beskriver billedets indhold og betydning."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_bd861652": {
+        "message": "Skærmlæsere kan ikke fortolke tabeller uden den rette struktur. Tabeloverskrifter giver en ide om indholdet og dets omfang."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
+        "message": "Skærmlæsere kan ikke fortolke tabeller uden den rette struktur. Tabelbetegnelser beskriver tabellens kontekst og generelle indhold."
+    },
+    "screen_readers_cannot_interpret_tables_without_the_f0bdec0f": {
+        "message": "Skærmlæsere kan ikke fortolke tabeller uden den rette struktur. Tabeloverskrifter giver en ide om indholdet og en oversigt over det."
     },
     "script_l_42a7b254": {
         "message": "Script L"
@@ -1868,32 +2201,74 @@
     "search_280d00bd": {
         "message": "Søg"
     },
+    "select_audio_source_21043cd5": {
+        "message": "Vælg lydkilde"
+    },
     "select_crop_shape_d441feeb": {
         "message": "Vælg beskæringsform"
     },
     "select_language_7c93a900": {
         "message": "Vælg sprog"
     },
+    "select_video_source_1b5c9dbe": {
+        "message": "Vælg videokilde"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Valgt { linkFileName }"
+    },
+    "selection_b52c4c5e": {
+        "message": "Udvælgelse"
     },
     "serbian_7187f1f2": {
         "message": "Serbisk"
     },
+    "set_header_scope_8c548f40": {
+        "message": "Indstil overskriftens omfang"
+    },
     "set_minus_b46e9b88": {
         "message": "Mængde minus"
+    },
+    "set_table_header_cfab13a0": {
+        "message": "Indstil tabellens overskrift"
     },
     "sharp_music_ab956814": {
         "message": "Hævet (musik)"
     },
+    "shift_arrows_4d5785fe": {
+        "message": "SHIFT+pile"
+    },
     "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
         "message": "Shift-O for at åbne det pæne html-redigeringsværktøj."
+    },
+    "shortcut_911d6255": {
+        "message": "Genvej"
     },
     "show_all_ae37d610": {
         "message": "Vis alle"
     },
+    "show_audio_options_b489926b": {
+        "message": "Vis lydindstillinger"
+    },
+    "show_image_options_1e2ecc6b": {
+        "message": "Vis billedindstillinger"
+    },
+    "show_link_options_545338fd": {
+        "message": "Vis linkindstillinger"
+    },
     "show_my_grades_ebd08684": {
         "message": "Vis mine vurderinger"
+    },
+    "show_studio_media_options_a0c748c6": {
+        "message": "Vis Studio-medieindstillinger"
+    },
+    "show_video_options_6ed3721a": {
+        "message": "Vis videoindstillinger"
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
+        "message": "Brugere, der er i stand til at se, gennemser websider hurtigt og leder efter store overskrifter. Skærmlæsere er afhængige af overskrifter for kontekstuel forståelse. Overskrifter bør anvende den rigtige struktur."
+    },
+    "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
+        "message": "Brugere, der er i stand til at se, gennemser websider hurtigt og leder efter store overskrifter. Skærmlæsere er afhængige af overskrifter for kontekstuel forståelse. Overskrifter bør være kortfattede inden for den rigtige struktur."
     },
     "sigma_5c35e553": {
         "message": "Sigma"
@@ -1931,6 +2306,9 @@
     "something_went_wrong_89195131": {
         "message": "Noget gik galt."
     },
+    "something_went_wrong_accessing_your_webcam_6643b87e": {
+        "message": "Noget gik galt ved adgang til dit webcam."
+    },
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Der gik noget galt, og jeg ved ikke, hvad jeg skal vise dig."
     },
@@ -1939,6 +2317,9 @@
     },
     "something_went_wrong_d238c551": {
         "message": "Noget gik galt"
+    },
+    "something_went_wrong_while_sharing_your_screen_8de579e5": {
+        "message": "Noget gik galt under deling af din skærm."
     },
     "sort_by_e75f9e3e": {
         "message": "Sorter efter"
@@ -1976,8 +2357,17 @@
     "square_superset_strict_fa4262e4": {
         "message": "Kvadratisk overmængde (streng)"
     },
+    "square_unordered_list_b15ce93b": {
+        "message": "firkantet usorteret liste"
+    },
     "star_8d156e09": {
         "message": "Giv stjerne"
+    },
+    "start_over_f7552aa9": {
+        "message": "Start forfra"
+    },
+    "start_recording_9a65141a": {
+        "message": "Start optagelse"
     },
     "startdate_to_enddate_d245175b": {
         "message": "{ startDate } til { endDate }"
@@ -1996,6 +2386,12 @@
     },
     "student_to_do_c018c835": {
         "message": "Elevens - opgaveliste"
+    },
+    "studio_media_options_ee504361": {
+        "message": "Studio-medieindstillinger"
+    },
+    "studio_media_options_tray_cfb94654": {
+        "message": "Bakke til Studio-medieindstillinger"
     },
     "styles_2aa721ef": {
         "message": "Stile"
@@ -2030,6 +2426,9 @@
     "superscript_8cb349a2": {
         "message": "Hævet skrift"
     },
+    "superscript_and_subscript_37f94a50": {
+        "message": "Hævet skrift og sænket skrift"
+    },
     "superset_c4db8a7a": {
         "message": "Overmængde"
     },
@@ -2060,8 +2459,29 @@
     "syllabus_f191f65b": {
         "message": "Fagplan"
     },
+    "system_audio_allowed_b2508f8c": {
+        "message": "Systemlyd tilladt"
+    },
+    "system_audio_disabled_c177bd13": {
+        "message": "Systemlyd deaktiveret"
+    },
     "tab_arrows_4cf5abfc": {
         "message": "TAB / pile"
+    },
+    "table_header_starting_with_start_ffcabba6": {
+        "message": "Tabeloverskrift, der starter med { start }"
+    },
+    "table_starting_with_start_e7232848": {
+        "message": "Tabel, der starter med { start }"
+    },
+    "tables_headers_should_specify_scope_5abf3a8e": {
+        "message": "Tabeloverskrifter skal angive omfang."
+    },
+    "tables_should_include_a_caption_describing_the_con_e91e78fc": {
+        "message": "Tabeller skal indeholde en billedtekst, der beskriver tabellens indhold."
+    },
+    "tables_should_include_at_least_one_header_48779eac": {
+        "message": "Tabeller skal indeholde mindst et overskrift."
     },
     "tagalog_74906db7": {
         "message": "Tagalog"
@@ -2084,6 +2504,12 @@
     "text_color_acf75eb6": {
         "message": "Tekstfarve"
     },
+    "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+        "message": "Tekst er vanskelig at læse uden tilstrækkelig kontrast mellem tekst og baggrund, især for personer med dårligt syn."
+    },
+    "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
+        "message": "Tekst større end 18pt (eller fed 14pt) skal have et kontrastforhold på mindst 3:1."
+    },
     "text_optional_384f94f7": {
         "message": "Tekst (valgfrit)"
     },
@@ -2092,6 +2518,9 @@
     },
     "text_size_887c2f6": {
         "message": "Tekststørrelse"
+    },
+    "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
+        "message": "Tekst mindre end 18pt (eller fed 14pt) skal have et kontrastforhold på mindst 4,5:1."
     },
     "thai_8f9bc548": {
         "message": "Thai"
@@ -2105,6 +2534,12 @@
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Dokumentets forhåndsvisning bliver behandlet i øjeblikket. Prøv igen senere."
     },
+    "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
+        "message": "Den første overskrift på en side skal være H2."
+    },
+    "the_following_content_is_partner_provided_ed1da756": {
+        "message": "Følgende indhold er partnerleveret"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Materialer er på det offentlige domæne"
     },
@@ -2114,8 +2549,14 @@
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materialet er underlagt en undtagelse - fx fair brug, retten til at citere eller andre i henhold til gældende copyright-love"
     },
+    "the_preceding_content_is_partner_provided_d753928c": {
+        "message": "Foregående indhold er partnerleveret"
+    },
     "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
         "message": "Det pæne html-redigeringsværktøj er ikke tilgængeligt på tastaturet. Tryk på Shift-O for at åbne det rå html-redigeringsværktøj."
+    },
+    "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
+        "message": "Den valgte fil overstiger grænsen på { maxSize } byte"
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Der er ingen point associeret med dette element"
@@ -2164,6 +2605,9 @@
     },
     "time_2b5aac58": {
         "message": "Tidspunkt"
+    },
+    "timebar_a4d18443": {
+        "message": "Tidslinje"
     },
     "title_ee03d132": {
         "message": "Titel"
@@ -2234,6 +2678,9 @@
     "ukrainian_945b00b7": {
         "message": "Ukrainsk"
     },
+    "unable_to_determine_resource_selection_url_7867e060": {
+        "message": "Kan ikke bestemme webadressen til ressourcevalg"
+    },
     "unable_to_mark_as_complete_8141856d": {
         "message": "Kan ikke markeres som færdig."
     },
@@ -2242,6 +2689,9 @@
     },
     "unpublished_dfd8801": {
         "message": "Ikke offentliggjort"
+    },
+    "untitled_16aa4f2b": {
+        "message": "Uden titel"
     },
     "untitled_efdc2d7d": {
         "message": "uden titel"
@@ -2252,6 +2702,12 @@
     "up_and_right_diagonal_arrow_935b902e": {
         "message": "Op og højre diagonal pil"
     },
+    "up_c553575d": {
+        "message": "Op"
+    },
+    "upload_document_253f0478": {
+        "message": "Upload dokument"
+    },
     "upload_file_fd2361b8": {
         "message": "Overfør fil"
     },
@@ -2261,8 +2717,14 @@
     "upload_media_ce31135a": {
         "message": "Upload medier"
     },
+    "upload_record_media_e4207d72": {
+        "message": "Upload / optag medier"
+    },
     "uploading_19e8a4e7": {
         "message": "Uploader"
+    },
+    "uppercase_alphabetic_ordered_list_3f5aa6b2": {
+        "message": "store bogstaver alfabetisk sorteret liste"
     },
     "uppercase_delta_d4f4bc41": {
         "message": "Delta med stort bogstav"
@@ -2284,6 +2746,9 @@
     },
     "uppercase_psi_6395acbe": {
         "message": "Psi med stort bogstav"
+    },
+    "uppercase_roman_numeral_ordered_list_853f292b": {
+        "message": "store bogstaver romertal sorteret liste"
     },
     "uppercase_sigma_dbb70e92": {
         "message": "Sigma med stort bogstav"
@@ -2375,6 +2840,9 @@
     "video_options_tray_3b9809a5": {
         "message": "Bakke for videoindstillinger"
     },
+    "video_player_b371005": {
+        "message": "Videoafspiller"
+    },
     "video_player_for_9e7d373b": {
         "message": "Videoafspiller til "
     },
@@ -2383,6 +2851,9 @@
     },
     "vietnamese_e7a76583": {
         "message": "Vietnamesisk"
+    },
+    "view_all_e13bf0a6": {
+        "message": "Se alle"
     },
     "view_ba339f93": {
         "message": "Vis"
@@ -2405,14 +2876,38 @@
     "view_word_and_character_counts_a743dd0c": {
         "message": "Se antal ord og tegn"
     },
+    "we_couldn_t_detect_a_working_microphone_connected__ceb71c40": {
+        "message": "Vi kunne ikke registrere en fungerende mikrofon tilsluttet til din enhed."
+    },
+    "we_couldn_t_detect_a_working_webcam_connected_to_y_6715cc4": {
+        "message": "Vi kunne ikke registrere et fungerende webcam tilsluttet til din enhed."
+    },
+    "we_couldn_t_detect_a_working_webcam_or_microphone__263b6674": {
+        "message": "Vi kunne ikke registrere et fungerende webkamera eller en mikrofon tilsluttet din enhed."
+    },
+    "webcam_disabled_30c66986": {
+        "message": "Webcam deaktiveret"
+    },
+    "webcam_fe91b20f": {
+        "message": "Webcam"
+    },
+    "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
+        "message": "Websider bør kun have en enkelt H1, som automatisk bruges af sidens titel. Den første overskrift i dit indhold skal være H2."
+    },
     "weekly_schedule_navigation_6b042645": {
         "message": "Ugentlig tidsplannavigation"
     },
     "welsh_42ab94b1": {
         "message": "Walisisk"
     },
+    "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
+        "message": "Når der anvendes fremhævelse, der visuelt formaterer elementer i listeform, men som ikke angiver listeforholdet, kan brugere have svært ved at navigere gennem oplysningerne."
+    },
     "white_87fa64fd": {
         "message": "Hvid"
+    },
+    "why_523b3d8c": {
+        "message": "Hvorfor"
     },
     "width_492fec76": {
         "message": "Bredde"
@@ -2425,6 +2920,12 @@
     },
     "wiki_home_9cd54d0": {
         "message": "Wiki startside"
+    },
+    "word_count_c77fe3a6": {
+        "message": "Ordtælling"
+    },
+    "words_b448b7d5": {
+        "message": "Ord"
     },
     "wreath_product_200b38ef": {
         "message": "Krans-produkt"
@@ -2450,6 +2951,9 @@
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Du har ikke-gemte ændringer i Icon Maker-bakken. Vil du fortsætte uden at gemme disse ændringer?"
     },
+    "you_may_need_to_adjust_additional_headings_to_main_975f0eee": {
+        "message": "Du skal muligvis justere yderligere overskrifter for at bevare sidehierarkiet."
+    },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "Du må ikke uploade en tom fil."
     },
@@ -2461,6 +2965,18 @@
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Dit billede er blevet komprimeret til Icon Maker. Billeder mindre end { size } KB vil ikke blive komprimeret."
+    },
+    "your_microphone_is_blocked_in_the_browser_settings_42af0ddc": {
+        "message": "Din mikrofon er blokeret i browserindstillingerne."
+    },
+    "your_webcam_and_microphone_are_blocked_in_the_brow_73357dc6": {
+        "message": "Dit webcam og din mikrofon er blokeret i browserindstillingerne."
+    },
+    "your_webcam_is_blocked_in_the_browser_settings_7f638128": {
+        "message": "Dit webcam er blokeret i browserindstillingerne."
+    },
+    "your_webcam_may_already_be_in_use_6cd64c25": {
+        "message": "Dit webcam kan allerede være i brug."
     },
     "zeta_5ef24f0e": {
         "message": "Zeta"

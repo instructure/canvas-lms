@@ -73,11 +73,11 @@ class OverrideTooltipPresenter < OverrideListPresenter
 
   def as_json
     {
-      selector: selector,
-      link_text: link_text,
-      link_href: link_href,
+      selector:,
+      link_text:,
+      link_href:,
       due_dates: due_date_summary,
-      more_message: more_message
+      more_message:
     }
   end
 end

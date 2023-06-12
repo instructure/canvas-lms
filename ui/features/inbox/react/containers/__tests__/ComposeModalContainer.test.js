@@ -209,20 +209,6 @@ describe('ComposeModalContainer', () => {
     })
   })
 
-  describe('Send individual messages', () => {
-    it('allows toggling the setting', async () => {
-      const {findByTestId} = setup()
-      const checkbox = await findByTestId('individual-message-checkbox')
-      expect(checkbox.checked).toBe(false)
-
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(true)
-
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(false)
-    })
-  })
-
   describe('Course Select', () => {
     it('queries graphql for courses', async () => {
       const component = setup()
@@ -234,11 +220,37 @@ describe('ComposeModalContainer', () => {
       expect(selectOptions.length).toBeGreaterThan(0)
     })
 
+    it('removes enrollment duplicates that come from graphql', async () => {
+      const component = setup()
+
+      const select = await component.findByTestId('course-select')
+      fireEvent.click(select) // This will fail without the fix because of an unhandled error. We can't have items with duplicate keys because of our jest-setup.
+
+      const selectOptions = await component.findAllByText('Flying The Blackbird')
+      expect(selectOptions.length).toBe(1)
+    })
+
     it('does not render All Courses option', async () => {
       const {findByTestId, queryByText} = setup()
       const courseDropdown = await findByTestId('course-select')
       fireEvent.click(courseDropdown)
       expect(await queryByText('All Courses')).not.toBeInTheDocument()
+      await waitForApolloLoading()
+    })
+
+    it('does not render concluded groups', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('concluded_group')).not.toBeInTheDocument()
+      await waitForApolloLoading()
+    })
+
+    it('does not render concluded courses', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('Fighting Magneto 202')).not.toBeInTheDocument()
       await waitForApolloLoading()
     })
   })

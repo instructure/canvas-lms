@@ -22,11 +22,18 @@ import fetchMock from 'fetch-mock'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {FilterPreset, Filter} from '../../gradebook.d'
+import type {Assignment} from '../../../../../../api.d'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
+
+const defaultRules = {
+  drop_lowest: 0,
+  drop_highest: 0,
+  never_drop: [],
+}
 
 const defaultAssignmentGroupProps = {
   rules: {},
@@ -80,7 +87,11 @@ const defaultProps: FilterNavProps = {
       name: 'Assignment Group 4',
       position: 1,
       group_weight: 0,
-      assignments: [],
+      assignments: [
+        {
+          module_ids: ['1'],
+        } as Assignment,
+      ],
     },
     {
       id: '5',
@@ -89,7 +100,7 @@ const defaultProps: FilterNavProps = {
       group_weight: 0,
       assignments: [],
       integration_data: null,
-      rules: null,
+      rules: defaultRules,
       sis_source_id: null,
     },
     {
@@ -99,7 +110,7 @@ const defaultProps: FilterNavProps = {
       group_weight: 0,
       assignments: [],
       integration_data: null,
-      rules: null,
+      rules: defaultRules,
       sis_source_id: null,
     },
   ],
@@ -109,9 +120,33 @@ const defaultProps: FilterNavProps = {
     {...defaultSectionProps, id: '9', name: 'Section 9'},
   ],
   gradingPeriods: [
-    {...defaultGradingPeriodProps, id: '1', title: 'Grading Period 1', startDate: new Date(1)},
-    {...defaultGradingPeriodProps, id: '2', title: 'Grading Period 2', startDate: new Date(2)},
-    {...defaultGradingPeriodProps, id: '3', title: 'Grading Period 3', startDate: new Date(3)},
+    {
+      ...defaultGradingPeriodProps,
+      id: '1',
+      title: 'Grading Period 1',
+      startDate: new Date(1),
+      closeDate: new Date(2),
+      isLast: false,
+      weight: 0.5,
+    },
+    {
+      ...defaultGradingPeriodProps,
+      id: '2',
+      title: 'Grading Period 2',
+      startDate: new Date(2),
+      closeDate: new Date(2),
+      isLast: false,
+      weight: 0.5,
+    },
+    {
+      ...defaultGradingPeriodProps,
+      id: '3',
+      title: 'Grading Period 3',
+      startDate: new Date(3),
+      closeDate: new Date(2),
+      isLast: false,
+      weight: 0.5,
+    },
   ],
   studentGroupCategories: {
     '1': {
@@ -226,6 +261,21 @@ describe('FilterNav', () => {
     expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('Module 1')
   })
 
+  it('render All Grading Periods filter', async () => {
+    store.setState({
+      appliedFilters: [
+        {
+          id: '1',
+          type: 'grading-period',
+          value: '0',
+          created_at: new Date().toISOString(),
+        },
+      ],
+    })
+    const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('All Grading Periods')
+  })
+
   it('opens tray', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
@@ -294,11 +344,13 @@ describe('Filter dropdown', () => {
   })
 
   it('Clicking filter activates condition', async () => {
-    const {getByText, getByTestId, queryByTestId} = render(<FilterNav {...defaultProps} />)
+    const {getByText, getByTestId, queryByTestId, getByRole} = render(
+      <FilterNav {...defaultProps} />
+    )
     expect(queryByTestId('applied-filter-tag')).toBeNull()
     userEvent.click(getByText('Apply Filters'))
-    userEvent.click(getByText('Sections'))
-    userEvent.click(getByText('Section 7'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
     expect(getByTestId('applied-filter-tag')).toBeVisible()
   })
 })

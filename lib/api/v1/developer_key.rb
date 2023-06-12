@@ -27,7 +27,7 @@ module Api::V1::DeveloperKey
   INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state].freeze
 
   def developer_keys_json(keys, user, session, context, inherited: false, include_tool_config: false)
-    keys.map { |k| developer_key_json(k, user, session, context, inherited: inherited, include_tool_config: include_tool_config) }
+    keys.map { |k| developer_key_json(k, user, session, context, inherited:, include_tool_config:) }
   end
 
   def developer_key_json(key, user, session, context, inherited: false, include_tool_config: false)

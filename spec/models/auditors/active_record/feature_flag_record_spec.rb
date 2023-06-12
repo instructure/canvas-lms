@@ -23,7 +23,7 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
   let(:feature_name) { "root_account_feature" }
 
   before do
-    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id:)
     allow(Feature).to receive(:definitions).and_return({
                                                          feature_name => Feature.new(feature: feature_name, applies_to: "RootAccount")
                                                        })

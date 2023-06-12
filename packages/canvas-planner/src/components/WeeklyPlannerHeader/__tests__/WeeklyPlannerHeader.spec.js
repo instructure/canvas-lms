@@ -27,9 +27,10 @@ function defaultProps(options) {
     loadPastWeekItems: () => {},
     loadThisWeekItems: () => {},
     scrollToToday: () => {},
+    toggleMissing: () => {},
     loading: {
       isLoading: false,
-      loadingWeek: false
+      loadingWeek: false,
     },
     todayMoment: moment('2021-03-21T13:00:00Z'),
     visible: true,
@@ -46,7 +47,7 @@ function defaultProps(options) {
     cancelEditingPlannerItem: () => {},
     openEditingPlannerItem: () => {},
     courses: [],
-    ...options
+    ...options,
   }
 }
 
@@ -59,7 +60,7 @@ beforeEach(() => {
     host: 'localhost',
     pathname: '',
     search: '',
-    hash: ''
+    hash: '',
   }
   window.history.replaceState = jest.fn()
 })
@@ -134,7 +135,7 @@ describe('WeeklyPlannerHeader', () => {
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     expect(callback).not.toHaveBeenCalled()
 
-    rerender(<WeeklyPlannerHeader {...props} visible />)
+    rerender(<WeeklyPlannerHeader {...props} visible={true} />)
     await waitFor(() => expect(callback).toHaveBeenCalledWith({isWeekly: true}))
   })
 
@@ -144,7 +145,7 @@ describe('WeeklyPlannerHeader', () => {
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
     expect(callback).not.toHaveBeenCalled()
 
-    rerender(<WeeklyPlannerHeader {...props} weekLoaded />)
+    rerender(<WeeklyPlannerHeader {...props} weekLoaded={true} />)
     await waitFor(() => expect(callback).toHaveBeenCalledWith({isWeekly: true}))
   })
 
@@ -153,7 +154,7 @@ describe('WeeklyPlannerHeader', () => {
     const callback = jest.fn()
     const props = defaultProps({visible: false, scrollToToday: callback})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
-    rerender(<WeeklyPlannerHeader {...props} visible />)
+    rerender(<WeeklyPlannerHeader {...props} visible={true} />)
     await waitFor(() =>
       expect(callback).toHaveBeenCalledWith({focusTarget: 'today', isWeekly: true})
     )
@@ -165,7 +166,7 @@ describe('WeeklyPlannerHeader', () => {
     const toggleMissing = jest.fn()
     const props = defaultProps({visible: false, scrollToToday, toggleMissing})
     const {rerender} = render(<WeeklyPlannerHeader {...props} />)
-    rerender(<WeeklyPlannerHeader {...props} visible />)
+    rerender(<WeeklyPlannerHeader {...props} visible={true} />)
     await waitFor(() => {
       expect(scrollToToday).toHaveBeenCalledWith({focusTarget: 'missing-items', isWeekly: true})
       expect(toggleMissing).toHaveBeenCalledWith({forceExpanded: true})
@@ -216,8 +217,8 @@ describe('personal to-dos', () => {
   it('opens the to-do editor if todo updateitem prop is set', () => {
     const todo = {
       updateTodoItem: {
-        id: 10
-      }
+        id: 10,
+      },
     }
     const {queryByTestId, rerender} = render(<WeeklyPlannerHeader {...defaultProps()} />)
     expect(queryByTestId('todo-editor-modal')).not.toBeInTheDocument()

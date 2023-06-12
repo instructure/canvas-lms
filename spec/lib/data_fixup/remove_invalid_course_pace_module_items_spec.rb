@@ -23,9 +23,9 @@ describe DataFixup::RemoveInvalidCoursePaceModuleItems do
     course_pace = course_pace_model
     assignment = @course.assignments.create!
     context_module = @course.context_modules.create!
-    context_module_tag = assignment.context_module_tags.create!(context_module: context_module, context: @course, tag_type: "context_module")
+    context_module_tag = assignment.context_module_tags.create!(context_module:, context: @course, tag_type: "context_module")
     course_pace.course_pace_module_items.create!(module_item: context_module_tag)
-    learning_outcome_tag = assignment.context_module_tags.create!(context_module: context_module, context: @course, tag_type: "learning_outcome")
+    learning_outcome_tag = assignment.context_module_tags.create!(context_module:, context: @course, tag_type: "learning_outcome")
     learning_outcome_module_item = course_pace.course_pace_module_items.new(module_item: learning_outcome_tag)
     learning_outcome_module_item.save(validate: false)
     nil_assignment_tag = context_module.add_item(type: "context_module_sub_header", title: "not an assignment")

@@ -152,7 +152,7 @@ describe "login" do
         get "/login/cas", params: { ticket: "ST-abcd" }
         expect(response).to redirect_to(dashboard_url(login_success: 1))
         expect(session[:cas_session]).to eq "ST-abcd"
-        expect(Canvas.redis.get("cas_session_slo:ST-abcd")).to eq nil
+        expect(Canvas.redis.get("cas_session_slo:ST-abcd")).to be_nil
 
         # single-sign-out from CAS server cannot find key but should store the session is expired
         post cas_logout_url, params: { logoutRequest: <<~XML }

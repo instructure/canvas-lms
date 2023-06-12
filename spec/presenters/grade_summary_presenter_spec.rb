@@ -22,7 +22,7 @@ describe GradeSummaryPresenter do
     describe "all on one shard" do
       let(:course) { Course.create! }
       let(:presenter) { GradeSummaryPresenter.new(course, @user, nil) }
-      let(:assignment) { assignment_model(course: course) }
+      let(:assignment) { assignment_model(course:) }
       let(:enrollment) { course.enroll_student(@user, enrollment_state: "active") }
 
       before do
@@ -76,7 +76,7 @@ describe GradeSummaryPresenter do
           user = User.create!
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(course: course, user: user)
+          enrollment = StudentEnrollment.create!(course:, user:)
           enrollment.update_attribute(:workflow_state, "active")
           course.update_attribute(:workflow_state, "available")
         end
@@ -94,7 +94,7 @@ describe GradeSummaryPresenter do
         @shard2.activate do
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(course: course, user: user)
+          enrollment = StudentEnrollment.create!(course:, user:)
           enrollment.update_attribute(:workflow_state, "active")
           course.update_attribute(:workflow_state, "available")
         end
@@ -346,8 +346,8 @@ describe GradeSummaryPresenter do
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       submission = p.submissions.find { |s| s[:assignment_id] == assignment.id }
       expect(submission.submission_comments.length).to eq 2
-      expect(submission.submission_comments[0].read?(@student)).to eq true
-      expect(submission.submission_comments[1].read?(@student)).to eq false
+      expect(submission.submission_comments[0].read?(@student)).to be true
+      expect(submission.submission_comments[1].read?(@student)).to be false
     end
   end
 
@@ -378,6 +378,20 @@ describe GradeSummaryPresenter do
       @course.enrollments.find_by(user: @student).deactivate
       presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       expect(presenter.assignments).to include published_assignment
+    end
+
+    it "filters out hidden zero point quizzes when hide_zero_point_quizzes_option FF is enabled" do
+      Account.site_admin.enable_feature!(:hide_zero_point_quizzes_option)
+      @practice_quiz = @course.assignments.create!(name: "Practice Quiz", points_possible: 0, submission_types: ["external_tool"], omit_from_final_grade: true, hide_in_gradebook: true)
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.assignments).not_to include @practice_quiz
+    end
+
+    it "does not filter out hidden zero point quizzes when hide_zero_point_quizzes_option FF is disabled" do
+      Account.site_admin.disable_feature!(:hide_zero_point_quizzes_option)
+      @practice_quiz = @course.assignments.create!(name: "Practice Quiz", points_possible: 0, submission_types: ["external_tool"], omit_from_final_grade: true, hide_in_gradebook: true)
+      presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      expect(presenter.assignments).to include @practice_quiz
     end
   end
 
@@ -590,8 +604,11 @@ describe GradeSummaryPresenter do
 
           it "handles comparing discussions, quizzes, and assignments to each other" do
             expected_id_order = [
-              assignment3.id, assignment2.id, assignment_owning_quiz.id,
-              assignment_owning_discussion_topic.id, assignment1.id
+              assignment3.id,
+              assignment2.id,
+              assignment_owning_quiz.id,
+              assignment_owning_discussion_topic.id,
+              assignment1.id
             ]
             expect(ordered_assignment_ids).to eq(expected_id_order)
           end

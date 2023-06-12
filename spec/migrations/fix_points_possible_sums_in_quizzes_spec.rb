@@ -61,7 +61,7 @@ describe "FixPointsPossibleSumsInQuizzes" do
       broken_version = @quiz.versions.current.number
       DataFixup::FixPointsPossibleSumsInQuizzes.run
       @quiz.reload
-      expect(@quiz.changed_significantly_since?(broken_version)).to eq false
+      expect(@quiz.changed_significantly_since?(broken_version)).to be false
       expect(@quiz.versions.current.number).to eq(broken_version + 1)
     end
 
@@ -99,7 +99,7 @@ describe "FixPointsPossibleSumsInQuizzes" do
       broken_version = @quiz.versions.current.number
       DataFixup::FixPointsPossibleSumsInQuizzes.run
       @quiz.reload
-      expect(@quiz.changed_significantly_since?(broken_version)).to eq false
+      expect(@quiz.changed_significantly_since?(broken_version)).to be false
       expect(@quiz.versions.current.number).to eq(broken_version + 1)
     end
   end

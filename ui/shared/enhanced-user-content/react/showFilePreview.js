@@ -22,7 +22,7 @@ import {instanceOf} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import FilePreview from '@canvas/files/react/components/FilePreview'
-import File from '@canvas/files/backbone/models/File.coffee'
+import File from '@canvas/files/backbone/models/File'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 const I18n = useI18nScope('standalone_file_preview')

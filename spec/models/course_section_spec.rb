@@ -24,7 +24,7 @@ describe CourseSection, "moving to new course" do
     course = account.courses.create!
     section = course.course_sections.create!
     student = User.create!
-    course.enroll_student(student, enrollment_state: "active", section: section)
+    course.enroll_student(student, enrollment_state: "active", section:)
     new_course = account.courses.create!
     assignment = new_course.assignments.create!
 
@@ -132,7 +132,8 @@ describe CourseSection, "moving to new course" do
 
     cs.crosslist_to_course(course2)
     expect(course1.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id].sort
-    expect(course2.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account2.id].sort
+    expect(course2.reload.associated_accounts(include_crosslisted_courses: false).map(&:id).sort).to eq [root_account.id, sub_account2.id].sort
+    expect(course2.reload.associated_accounts(include_crosslisted_courses: true).map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account2.id].sort
     expect(course3.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account3.id].sort
     u.reload
     expect(u.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account2.id].sort
@@ -141,7 +142,8 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course_id).to eq course1.id
     expect(course1.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id].sort
     expect(course2.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account2.id].sort
-    expect(course3.reload.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account3.id].sort
+    expect(course3.reload.associated_accounts(include_crosslisted_courses: false).map(&:id).sort).to eq [root_account.id, sub_account3.id].sort
+    expect(course3.reload.associated_accounts(include_crosslisted_courses: true).map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account3.id].sort
     u.reload
     expect(u.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id, sub_account3.id].sort
 
@@ -254,15 +256,18 @@ describe CourseSection, "moving to new course" do
     u.favorites.where(context_type: "Course", context_id: course1).first_or_create!
 
     cs.crosslist_to_course(course2)
-    expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to eq true
+    expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to be true
   end
 
   it "removes discussion visibilites on crosslist" do
     course = course_factory({ course_name: "Course 1", active_all: true })
     section = course.course_sections.create!
     course.save!
-    announcement1 = Announcement.create!(title: "some topic", message: "blah",
-                                         context: course, is_section_specific: true, course_sections: [section])
+    announcement1 = Announcement.create!(title: "some topic",
+                                         message: "blah",
+                                         context: course,
+                                         is_section_specific: true,
+                                         course_sections: [section])
     visibility = announcement1.reload.discussion_topic_section_visibilities.first
 
     course2 = course_factory
@@ -337,7 +342,7 @@ describe CourseSection, "moving to new course" do
   describe "validation" do
     before :once do
       course = Course.create_unique
-      @section = CourseSection.create(course: course)
+      @section = CourseSection.create(course:)
       @long_string = "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm"
     end
 
@@ -635,16 +640,18 @@ describe CourseSection, "moving to new course" do
     end
 
     it "invalidates access if section is cross-listed" do
-      @course.update(workflow_state: "available", restrict_student_future_view: true,
-                     restrict_enrollments_to_course_dates: true, start_at: 1.day.from_now)
-      expect(@enrollment.enrollment_state.reload.restricted_access?).to eq true
+      @course.update(workflow_state: "available",
+                     restrict_student_future_view: true,
+                     restrict_enrollments_to_course_dates: true,
+                     start_at: 1.day.from_now)
+      expect(@enrollment.enrollment_state.reload.restricted_access?).to be true
 
       other_course = course_factory(active_all: true)
       other_course.update(restrict_enrollments_to_course_dates: true, start_at: 1.day.from_now)
 
       @section.crosslist_to_course(other_course)
 
-      expect(@enrollment.enrollment_state.reload.restricted_access?).to eq false
+      expect(@enrollment.enrollment_state.reload.restricted_access?).to be false
     end
   end
 

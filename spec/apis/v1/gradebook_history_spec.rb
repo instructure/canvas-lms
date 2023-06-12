@@ -106,7 +106,7 @@ describe Api::V1::GradebookHistory do
     it "puts an assignment list under each grader" do
       graders = @days.find { |d| d[:date] == yesterday.to_date.as_json }[:graders]
       grader2_assignments = graders.find { |g| g[:id] == @grader2.id }[:assignments]
-      ids = grader2_assignments.map { |assignment| assignment["id"] }
+      ids = grader2_assignments.pluck("id")
       expect(ids).to include(@assignment1.id)
       expect(ids).to include(@assignment2.id)
     end
@@ -161,7 +161,7 @@ describe Api::V1::GradebookHistory do
     let(:harness) {  GradebookHistoryHarness.new }
     let(:submission) do
       s = assignment.submit_homework(student)
-      s.update(graded_at: now, score: 90, grade: "90", grader: grader)
+      s.update(graded_at: now, score: 90, grade: "90", grader:)
       s
     end
     let(:course) do
@@ -174,7 +174,7 @@ describe Api::V1::GradebookHistory do
     it "does preloads originality reports" do
       submission.reload
       harness.versions_json(course, versions, api_context)
-      expect(versions.first.model.association(:originality_reports).loaded?).to eq true
+      expect(versions.first.model.association(:originality_reports).loaded?).to be true
     end
 
     it "handles versions without an associated 'versionable' object" do
@@ -240,7 +240,7 @@ describe Api::V1::GradebookHistory do
       expect(submissions.first[:versions][0][:grade]).to eq "80"
       expect(submissions.first[:versions][0][:previous_grade]).to eq "90"
       expect(submissions.first[:versions][1][:grade]).to eq "90"
-      expect(submissions.first[:versions][1][:previous_grade]).to eq nil
+      expect(submissions.first[:versions][1][:previous_grade]).to be_nil
     end
   end
 

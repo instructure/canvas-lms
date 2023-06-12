@@ -3,5 +3,5 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./jquery/select_content_dialog.js"
+  "main": "./jquery/select_content_dialog.tsx"
 }

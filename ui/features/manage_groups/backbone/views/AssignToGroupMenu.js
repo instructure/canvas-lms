@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import PopoverMenuView from './PopoverMenuView'
-import GroupCategoryCloneView from './GroupCategoryCloneView.coffee'
+import GroupCategoryCloneView from './GroupCategoryCloneView'
 import template from '../../jst/assignToGroupMenu.handlebars'
 import $ from 'jquery'
 import groupHasSubmissions from '../../groupHasSubmissions'

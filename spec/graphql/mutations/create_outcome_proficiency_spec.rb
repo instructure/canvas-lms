@@ -57,7 +57,7 @@ describe Mutations::CreateOutcomeProficiency do
       }
     GQL
     context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
-    CanvasSchema.execute(mutation_command, context: context)
+    CanvasSchema.execute(mutation_command, context:)
   end
 
   let(:good_query) do
@@ -88,7 +88,7 @@ describe Mutations::CreateOutcomeProficiency do
     expect(ratings.length).to eq 1
     expect(ratings[0]["color"]).to eq "FFFFFF"
     expect(ratings[0]["description"]).to eq "white"
-    expect(ratings[0]["mastery"]).to eq true
+    expect(ratings[0]["mastery"]).to be true
     expect(ratings[0]["points"]).to eq 1.0
   end
 

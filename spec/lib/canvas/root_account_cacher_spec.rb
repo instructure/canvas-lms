@@ -30,7 +30,7 @@ describe Canvas::RootAccountCacher do
     @shard1.activate do
       a2 = Account.create!(id: Account.default.local_id)
       user.associate_with_shard(@shard1)
-      a2.pseudonyms.create!(unique_id: "p2", user: user)
+      a2.pseudonyms.create!(unique_id: "p2", user:)
     end
     RequestCache.enable do
       expect(user.reload.all_active_pseudonyms.map(&:account)).to eq [Account.default, a2]

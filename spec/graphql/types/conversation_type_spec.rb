@@ -55,12 +55,12 @@ describe Types::ConversationType do
   context "conversation properties" do
     it "is_private returns true when conversation is private" do
       result = not_private_conversation_type.resolve("isPrivate")
-      expect(result).to eq(false)
+      expect(result).to be(false)
     end
 
     it "is_private returns false when conversation is not private" do
       result = private_conversation_type.resolve("isPrivate")
-      expect(result).to eq(true)
+      expect(result).to be(true)
     end
   end
 
@@ -75,12 +75,12 @@ describe Types::ConversationType do
 
       it "returns false when conversation is between students" do
         result = conversation_students_type.resolve("canReply")
-        expect(result).to eq(false)
+        expect(result).to be(false)
       end
 
       it "returns true when conversation is between teacher and student" do
         result = conversation_type.resolve("canReply")
-        expect(result).to eq(true)
+        expect(result).to be(true)
       end
     end
 
@@ -92,12 +92,12 @@ describe Types::ConversationType do
 
       it "returns true when conversation is between students" do
         result = conversation_students_type.resolve("canReply")
-        expect(result).to eq(true)
+        expect(result).to be(true)
       end
 
       it "returns true when conversation is between teacher and student" do
         result = conversation_type.resolve("canReply")
-        expect(result).to eq(true)
+        expect(result).to be(true)
       end
     end
   end
@@ -135,14 +135,14 @@ describe Types::ConversationType do
     end
 
     it "returns conversation messages before a given date" do
-      @conversation.conversation.conversation_messages[0].update!(created_at: Time.zone.now - 5.days)
-      result = conversation_type.resolve(%|conversationMessagesConnection(createdBefore: "#{(Time.zone.now - 1.day).iso8601}") { nodes { body } }|)
+      @conversation.conversation.conversation_messages[0].update!(created_at: 5.days.ago)
+      result = conversation_type.resolve(%|conversationMessagesConnection(createdBefore: "#{1.day.ago.iso8601}") { nodes { body } }|)
       expect(result).to include(@conversation.conversation.conversation_messages[0].body)
       expect(result).not_to include(@conversation.conversation.conversation_messages[1].body)
     end
 
     it "ignores nanoseconds when comparing time" do
-      float_time = (Time.zone.now - 1.day).to_f.floor
+      float_time = 1.day.ago.to_f.floor
       @conversation.conversation.conversation_messages[0].update!(created_at: Time.zone.at(float_time + 0.5))
       result = conversation_type.resolve(%|conversationMessagesConnection(createdBefore: "#{Time.zone.at(float_time).iso8601}") { nodes { body } }|)
       expect(result).to include(@conversation.conversation.conversation_messages[0].body)
@@ -153,6 +153,16 @@ describe Types::ConversationType do
       message.conversation_message_participants.where(user_id: @teacher.id).first.update!(workflow_state: "deleted")
       result = conversation_type.resolve("conversationMessagesConnection { nodes { body } }")
       expect(result).to match_array(@conversation.conversation.conversation_messages.where.not(id: message).pluck(:body))
+    end
+
+    # This test is for legacy conversations that don't have a set workflow state
+    it "returns messages whose conversation participants workflow is nil" do
+      message = @conversation.conversation.add_message(@student, "delete me")
+      participant = message.conversation_message_participants.where(user_id: @teacher.id).first
+      participant.workflow_state = nil
+      participant.save(validate: false)
+      result = conversation_type.resolve("conversationMessagesConnection { nodes { body } }")
+      expect(result).to match_array(@conversation.conversation.conversation_messages.pluck(:body))
     end
   end
 

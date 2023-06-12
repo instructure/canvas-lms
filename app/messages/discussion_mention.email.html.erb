@@ -1,5 +1,6 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_entry.discussion_topic_id, anchor: "entry-#{asset.discussion_entry_id}") %>
+<%# TODO: once react_discussions_post is no longer feature_flag_dependent, remove the anchor param %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_entry.discussion_topic_id, anchor: "entry-#{asset.discussion_entry_id}", entry_id: asset.discussion_entry_id) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -56,7 +57,9 @@
 </p>
 
 <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-  <%= t("Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion.", link: content(:link)) %>
+  <p>
+    <%= t("Comment by replying to this message, or join the conversation using the link below. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion.") %>
+  </p>
 <% else %>
     <p><%= t "Join the conversation using the link below." %></p>
 <% end %>

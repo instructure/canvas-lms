@@ -26,7 +26,8 @@ describe AcademicBenchmark do
     @cm.converter_class = @plugin.settings["converter_class"]
     @cm.migration_settings[:migration_type] = "academic_benchmark_importer"
     @cm.migration_settings[:import_immediately] = true
-    @cm.migration_settings[:migration_options] = { points_possible: 10, mastery_points: 6,
+    @cm.migration_settings[:migration_options] = { points_possible: 10,
+                                                   mastery_points: 6,
                                                    ratings: [{ description: "Bad", points: 0 }, { description: "Awesome", points: 10 }] }
     @cm.user = @user
     @cm.save!
@@ -68,14 +69,14 @@ describe AcademicBenchmark do
       "AF2F887A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           short_description: "SS.912.A.1.1",
-          description: "Describe the importance of historiography, which includes how historical knowledge is obtained" \
-                       " and transmitted, when interpreting events in history."
+          description: "Describe the importance of historiography, which includes how historical knowledge is obtained " \
+                       "and transmitted, when interpreting events in history."
         },
       "AF2FEA9A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           short_description: "SS.912.A.1.2",
-          description: "Utilize a variety of primary and secondary sources to identify author, historical significance," \
-                       " audience, and authenticity to understand a historical period."
+          description: "Utilize a variety of primary and secondary sources to identify author, historical significance, " \
+                       "audience, and authenticity to understand a historical period."
         },
       "AF3058F4-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
@@ -85,8 +86,8 @@ describe AcademicBenchmark do
       "AF30C56E-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           short_description: "SS.912.A.1.4",
-          description: "Analyze how images, symbols, objects, cartoons, graphs, charts, maps, and artwork may be used" \
-                       " to interpret the significance of time periods and events from the past."
+          description: "Analyze how images, symbols, objects, cartoons, graphs, charts, maps, and artwork may be used " \
+                       "to interpret the significance of time periods and events from the past."
         },
       "AF31281A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
@@ -111,8 +112,8 @@ describe AcademicBenchmark do
       "AF359634-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           short_description: "SS.912.A.3",
-          description: "Analyze the transformation of the American economy and the changing social and" \
-                       " political conditions in response to the Industrial Revolution."
+          description: "Analyze the transformation of the American economy and the changing social and " \
+                       "political conditions in response to the Industrial Revolution."
         },
       "AF3B2A72-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
@@ -127,17 +128,17 @@ describe AcademicBenchmark do
       "AF4522DE-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           short_description: "SS.912.A.6",
-          description: "Understand the causes and course of World War II, the character of the war at home and abroad," \
-                       " and its reshaping of the United States role in the post-war world."
+          description: "Understand the causes and course of World War II, the character of the war at home and abroad, " \
+                       "and its reshaping of the United States role in the post-war world."
         },
       "AF4B6DB0-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           short_description: "SS.912.A.7",
-          description: "Understand the rise and continuing international influence of the United States as a" \
-                       " world leader and the impact of contemporary social and political movements on American life."
+          description: "Understand the rise and continuing international influence of the United States as a " \
+                       "world leader and the impact of contemporary social and political movements on American life."
         }
     }.each do |migration_id, descriptions|
-      g = LearningOutcome.global.find_by(migration_id: migration_id)
+      g = LearningOutcome.global.find_by(migration_id:)
       verify_rubric_criterion(g)
       expect(g.short_description).to eq descriptions[:short_description]
       expect(g.description).to eq descriptions[:description]
@@ -145,7 +146,7 @@ describe AcademicBenchmark do
   end
 
   def check_for_parent_num_duplication(outcome)
-    parent = outcome.instance_variable_get("@parent")
+    parent = outcome.instance_variable_get(:@parent)
     if outcome.resolve_number && parent && parent.build_title && outcome.resolve_number.include?(parent.build_title)
       outcome.title == "#{parent.title}.#{outcome.resolve_number}"
     else
@@ -155,7 +156,7 @@ describe AcademicBenchmark do
 
   def check_built_outcome(outcome)
     expect(check_for_parent_num_duplication(outcome)).to be_falsey
-    outcome.instance_variable_get("@children").each { |o| check_built_outcome(o) }
+    outcome.instance_variable_get(:@children).each { |o| check_built_outcome(o) }
   end
 
   it "imports the standards successfully" do

@@ -22,7 +22,7 @@ import {
   fetchMedia,
   updateMediaObject,
   updateMediaObjectFailure,
-  updateClosedCaptions
+  updateClosedCaptions,
 } from '../../../src/rcs/fake'
 import alertHandler from '../../../src/rce/alertHandler'
 
@@ -36,10 +36,10 @@ function getInitialState() {
         files: [],
         bookmark: null,
         isLoading: false,
-        hasMore: true
-      }
+        hasMore: true,
+      },
     },
-    contextType: 'course'
+    contextType: 'course',
   }
 }
 
@@ -100,7 +100,7 @@ describe('Media actions', () => {
       const getState = () => {
         const state = getInitialState()
         state.source = {
-          fetchMedia: fetchMediaSpy
+          fetchMedia: fetchMediaSpy,
         }
         return state
       }
@@ -115,7 +115,7 @@ describe('Media actions', () => {
     it('returns the action object', () => {
       assert.deepEqual(actions.requestInitialMedia('course'), {
         type: actions.REQUEST_INITIAL_MEDIA,
-        payload: {contextType: 'course'}
+        payload: {contextType: 'course'},
       })
     })
   })
@@ -123,7 +123,7 @@ describe('Media actions', () => {
     it('returns the action object', () => {
       assert.deepEqual(actions.requestMedia('course'), {
         type: actions.REQUEST_MEDIA,
-        payload: {contextType: 'course'}
+        payload: {contextType: 'course'},
       })
     })
   })
@@ -131,15 +131,15 @@ describe('Media actions', () => {
     it('returns the action object', () => {
       const fetchResponse = {
         files: [{one: 1}],
-        bookmark: 'anotherurl'
+        bookmark: 'anotherurl',
       }
       assert.deepEqual(actions.receiveMedia({response: fetchResponse, contextType: 'course'}), {
         type: actions.RECEIVE_MEDIA,
         payload: {
           files: [{one: 1}],
           bookmark: 'anotherurl',
-          contextType: 'course'
-        }
+          contextType: 'course',
+        },
       })
     })
   })
@@ -149,8 +149,8 @@ describe('Media actions', () => {
         type: actions.FAIL_MEDIA,
         payload: {
           error: 'whoops',
-          contextType: 'course'
-        }
+          contextType: 'course',
+        },
       })
     })
   })
@@ -162,6 +162,7 @@ describe('Media actions', () => {
     after(() => {
       alertHandler.alertFunc = origAlertFunc
     })
+
     it('calls the api', async () => {
       const updateSpy = sinon.spy(updateMediaObject)
       const updateCCSpy = sinon.spy()
@@ -174,19 +175,50 @@ describe('Media actions', () => {
       await actions.updateMediaObject({
         media_object_id: 'moid',
         title: 'title',
-        subtitles: {en: 'whatever'}
+        subtitles: {en: 'whatever'},
       })(dispatch, getState)
       assert(updateSpy.called)
       assert.deepEqual(updateSpy.getCalls()[0].args[1], {
+        attachment_id: undefined,
         media_object_id: 'moid',
-        title: 'title'
+        title: 'title',
       })
       assert(updateCCSpy.called)
       assert.deepEqual(updateCCSpy.getCalls()[0].args[1], {
         media_object_id: 'moid',
-        subtitles: {en: 'whatever'}
+        subtitles: {en: 'whatever'},
       })
     })
+
+    it('calls the api with attachment_id', async () => {
+      const updateSpy = sinon.spy(updateMediaObject)
+      const updateCCSpy = sinon.spy()
+      const dispatch = () => {}
+      const getState = () => {
+        const state = getInitialState()
+        state.source = {updateMediaObject: updateSpy, updateClosedCaptions: updateCCSpy}
+        return state
+      }
+      await actions.updateMediaObject({
+        attachment_id: '123',
+        media_object_id: 'moid',
+        title: 'title',
+        subtitles: {en: 'whatever'},
+      })(dispatch, getState)
+      assert(updateSpy.called)
+      assert.deepEqual(updateSpy.getCalls()[0].args[1], {
+        attachment_id: '123',
+        media_object_id: 'moid',
+        title: 'title',
+      })
+      assert(updateCCSpy.called)
+      assert.deepEqual(updateCCSpy.getCalls()[0].args[1], {
+        attachment_id: '123',
+        media_object_id: 'moid',
+        subtitles: {en: 'whatever'},
+      })
+    })
+
     it('handles failure', async () => {
       const dispatch = () => {}
       const getState = () => {

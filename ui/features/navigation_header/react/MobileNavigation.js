@@ -20,7 +20,7 @@ import React from 'react'
 import $ from 'jquery'
 import {shape, func, object} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
-import preventDefault from 'prevent-default'
+import preventDefault from '@canvas/util/preventDefault'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -48,6 +48,10 @@ export default class MobileNavigation extends React.Component {
       'touchstart click',
       preventDefault(() => this.setState({globalNavIsOpen: true}))
     )
+
+    $('.mobile-header-blueprint-button').on('touchstart click', () => {
+      window.openBPSidebar()
+    })
 
     const arrowIcon = document.getElementById('mobileHeaderArrowIcon')
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')

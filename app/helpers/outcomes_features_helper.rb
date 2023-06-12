@@ -23,7 +23,11 @@ module OutcomesFeaturesHelper
     context&.root_account&.feature_enabled?(:account_level_mastery_scales)
   end
 
-  def outcome_alignment_summary_enabled?(context)
-    context&.root_account&.feature_enabled?(:outcome_alignment_summary)
+  def improved_outcomes_management_enabled?(context)
+    context&.root_account&.feature_enabled?(:improved_outcomes_management)
+  end
+
+  def outcome_alignment_summary_with_new_quizzes_enabled?(context)
+    context&.feature_enabled?(:outcome_alignment_summary_with_new_quizzes)
   end
 end

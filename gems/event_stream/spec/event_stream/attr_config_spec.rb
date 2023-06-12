@@ -40,7 +40,7 @@ describe EventStream::AttrConfig do
       value = double("value")
       obj = @class.new
       obj.field(value)
-      obj.field.== value
+      obj.field == value
     end
 
     it "errors on accessor with > 1 args" do
@@ -55,7 +55,7 @@ describe EventStream::AttrConfig do
       value = double("value")
       @class.attr_config :field, default: value
       obj = @class.new
-      obj.field.== value
+      obj.field == value
     end
 
     it "casts values with type String" do
@@ -64,7 +64,7 @@ describe EventStream::AttrConfig do
       value = double(to_s: string)
       obj = @class.new
       obj.field(value)
-      obj.field.== string
+      obj.field == string
     end
 
     it "casts values with type Integer" do
@@ -73,7 +73,7 @@ describe EventStream::AttrConfig do
       value = double(to_i: integer)
       obj = @class.new
       obj.field(value)
-      obj.field.== integer
+      obj.field == integer
     end
 
     it "casts values with type Proc" do
@@ -81,7 +81,7 @@ describe EventStream::AttrConfig do
       value = -> { "value" }
       obj = @class.new
       obj.field(value)
-      obj.field.== value
+      obj.field == value
     end
 
     it "errors when expecting a Proc" do
@@ -113,7 +113,7 @@ describe EventStream::AttrConfig do
       value = double("value")
       obj = @class.new
       obj.field(value)
-      obj.field.== value
+      obj.field == value
     end
 
     it "casts defaults with type" do
@@ -121,14 +121,14 @@ describe EventStream::AttrConfig do
       value = double(to_s: string)
       @class.attr_config :field, type: String, default: value
       obj = @class.new
-      obj.field.== string
+      obj.field == string
     end
 
     it "does not cast defaults with unknown type" do
       value = double("value")
       @class.attr_config :field, type: double("unknown"), default: value
       obj = @class.new
-      obj.field.== value
+      obj.field == value
     end
 
     it "requires setting non-defaulted fields before validation" do

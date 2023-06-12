@@ -37,7 +37,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   include K5Mode
 
-  add_crumb(proc { t("#crumbs.quizzes", "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
+  add_crumb(proc { t("#crumbs.quizzes", "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_quizzes_url }
   before_action { |c| c.active_tab = "quizzes" }
   before_action :require_quiz, only: %i[
     statistics
@@ -75,7 +75,9 @@ class Quizzes::QuizzesController < ApplicationController
 
       quiz_options = Rails.cache.fetch(
         [
-          "quiz_user_permissions", @context.id, @current_user,
+          "quiz_user_permissions",
+          @context.id,
+          @current_user,
           quiz_index.map(&:id), # invalidate on add/delete of quizzes
           quiz_index.map(&:updated_at).max # invalidate on modifications
         ].cache_key
@@ -96,12 +98,15 @@ class Quizzes::QuizzesController < ApplicationController
       if scoped_new_quizzes_index.any? && @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
         mc_status = setup_master_course_restrictions(scoped_new_quizzes_index, @context)
       end
-      serializer_options = [@context, @current_user, session, {
-        permissions: quiz_options,
-        master_course_status: mc_status,
-        skip_date_overrides: true,
-        skip_lock_tests: true
-      }]
+      serializer_options = [@context,
+                            @current_user,
+                            session,
+                            {
+                              permissions: quiz_options,
+                              master_course_status: mc_status,
+                              skip_date_overrides: true,
+                              skip_lock_tests: true
+                            }]
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
       sis_name = AssignmentUtil.post_to_sis_friendly_name(@context)
       due_date_required_for_account = AssignmentUtil.due_date_required_for_account?(@context)
@@ -132,26 +137,22 @@ class Quizzes::QuizzesController < ApplicationController
           question_banks: feature_enabled?(:question_banks),
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
           quiz_lti_enabled: quiz_lti_on_quizzes_page?,
-          new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
-          new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
           migrate_quiz_enabled: quiz_lti_enabled?,
+          show_additional_speed_grader_link: Account.site_admin.feature_enabled?(:additional_speedgrader_links),
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
           DIRECT_SHARE_ENABLED: @context.grants_right?(@current_user, session, :direct_share)
         },
         quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
-        quiz_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                  external_tools_display_hashes(:quiz_index_menu)
-                                else
-                                  []
-                                end),
+        quiz_index_menu_tools: external_tools_display_hashes(:quiz_index_menu),
         SIS_NAME: sis_name,
         MAX_NAME_LENGTH: max_name_length,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
         SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
-        NEW_QUIZZES_SELECTED: quiz_engine_selection
+        NEW_QUIZZES_SELECTED: quiz_engine_selection,
+        SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
       }
       if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
         hash[:COURSE_ID] = @context.id.to_s
@@ -213,7 +214,7 @@ class Quizzes::QuizzesController < ApplicationController
         session.delete(:quiz_id)
       end
       is_observer = @context_enrollment&.observer?
-      @locked_reason = @quiz.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true, is_observer: is_observer)
+      @locked_reason = @quiz.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true, is_observer:)
       @locked = @locked_reason && !can_preview?
 
       @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
@@ -251,7 +252,7 @@ class Quizzes::QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       hash = {
-        ATTACHMENTS: @attachments.map { |_, a| [a.id, attachment_hash(a)] }.to_h,
+        ATTACHMENTS: @attachments.to_h { |_, a| [a.id, attachment_hash(a)] },
         CONTEXT_ACTION_SOURCE: :quizzes,
         COURSE_ID: @context.id,
         LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
@@ -331,9 +332,9 @@ class Quizzes::QuizzesController < ApplicationController
         flash[:notice] = t("notices.has_submissions_already", "Keep in mind, some students have already taken or started taking this quiz")
       end
 
-      regrade_options = @quiz.current_quiz_question_regrades.map do |qqr|
+      regrade_options = @quiz.current_quiz_question_regrades.to_h do |qqr|
         [qqr.quiz_question_id, qqr.regrade_option]
-      end.to_h
+      end
       sections = @context.course_sections.active
 
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
@@ -694,7 +695,7 @@ class Quizzes::QuizzesController < ApplicationController
         @submission = @quiz.quiz_submissions.find(params[:quiz_submission_id])
       else
         user_id = params[:user_id].presence || @current_user&.id
-        @submission = @quiz.quiz_submissions.where(user_id: user_id).order(:created_at).first
+        @submission = @quiz.quiz_submissions.where(user_id:).order(:created_at).first
       end
       if @submission && !@submission.user_id && (logged_out_index = params[:u_index])
         @logged_out_user_index = logged_out_index
@@ -997,7 +998,7 @@ class Quizzes::QuizzesController < ApplicationController
     @quiz_eligibility = Quizzes::QuizEligibility.new(course: @context,
                                                      quiz: @quiz,
                                                      user: @current_user,
-                                                     session: session,
+                                                     session:,
                                                      remote_ip: request.remote_ip,
                                                      access_code: params[:access_code])
 
@@ -1106,8 +1107,10 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def update_quiz_and_assignment_versions(quiz, prepared_batch)
-    params = { quiz_id: quiz.id, quiz_version: quiz.version_number,
-               assignment_id: quiz.assignment_id, assignment_version: quiz.assignment&.version_number }
+    params = { quiz_id: quiz.id,
+               quiz_version: quiz.version_number,
+               assignment_id: quiz.assignment_id,
+               assignment_version: quiz.assignment&.version_number }
     prepared_batch[:overrides_to_create].each { |override| override.assign_attributes(params) }
     prepared_batch[:overrides_to_update].each { |override| override.assign_attributes(params) }
   end

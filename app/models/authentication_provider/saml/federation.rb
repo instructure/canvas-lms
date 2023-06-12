@@ -76,14 +76,14 @@ class AuthenticationProvider::SAML::Federation < AuthenticationProvider::SAML::M
         raise "Problem with validUntil: #{entities.valid_until}"
       end
       raise "Not signed!" unless entities.signed?
-      unless entities.valid_signature?(cert: cert)
+      unless entities.valid_signature?(cert:)
         raise "Invalid signature!"
       end
 
       entities.index_by(&:entity_id)
     end
 
-    def refresh_if_necessary(*)
+    def refresh_if_necessary(...)
       result = super
       # save the new data if there is any
       if Canvas.redis_enabled? && result
