@@ -51,7 +51,7 @@ describe "Student Gradebook - Assignment Details" do
       17
     ]
 
-    it "shows assignment grade distribution", priority: "1" do
+    before do
       init_course_with_students 3
       user_session(@teacher)
 
@@ -62,7 +62,7 @@ describe "Student Gradebook - Assignment Details" do
         means.push mean
       end
 
-      expectations = [
+      @expectations = [
         { high: "15", low: "5", mean: means[0] },
         { high: "19", low: "10", mean: means[1] },
         { high: "17", low: "4", mean: means[2] }
@@ -71,22 +71,52 @@ describe "Student Gradebook - Assignment Details" do
       grades.each_with_index do |grade, index|
         assignments[index / 3].grade_student @students[index % 3], grade:, grader: @teacher
       end
+    end
 
-      get "/courses/#{@course.id}/grades/#{@students[0].id}"
-      f("#show_all_details_button").click
-      details = ff('[id^="score_details"] td')
+    context "when user is not quantitative data restricted" do
+      it "shows assignment grade distribution" do
+        get "/courses/#{@course.id}/grades/#{@students[0].id}"
+        f("#show_all_details_button").click
+        details = ff('[id^="score_details"] td')
 
-      expectations.each_with_index do |expectation, index|
-        i = index * 4 # each detail row has 4 items, we only want the first 3
-        expect(details[i]).to include_text "Mean: #{expectation[:mean]}"
-        expect(details[i + 1]).to include_text "High: #{expectation[:high]}"
-        expect(details[i + 2]).to include_text "Low: #{expectation[:low]}"
+        @expectations.each_with_index do |expectation, index|
+          i = index * 4 # each detail row has 4 items, we only want the first 3
+          expect(details[i]).to include_text "Mean: #{expectation[:mean]}"
+          expect(details[i + 1]).to include_text "High: #{expectation[:high]}"
+          expect(details[i + 2]).to include_text "Low: #{expectation[:low]}"
+        end
+
+        f("#show_all_details_button").click
+        details = ff('[id^="grade_info"]')
+        details.each do |detail|
+          expect(detail.css_value("display")).to eq "none"
+        end
+      end
+    end
+
+    context "when user is quantitative data restricted" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
       end
 
-      f("#show_all_details_button").click
-      details = ff('[id^="grade_info"]')
-      details.each do |detail|
-        expect(detail.css_value("display")).to eq "none"
+      it "does not show grade distribution" do
+        get "/courses/#{@course.id}/grades/#{@students[0].id}"
+        f("#show_all_details_button").click
+        wait_for_ajaximations
+        # show all details will do nothing in this case, since there are no grade distribution(due to quantitative data restriction)
+        # nor submission comments to show
+        # there is no grade distribution implementation for quantitative data restricted users
+        # so expecting the table row's text to be exactly like below makes sure no grade distribution is showing
+        expect(ff("#grade-summary-react tr")[1].text).to eq "Assignment 1\nAssignments\nGRADED\nF\nYour grade has been updated"
       end
     end
   end
@@ -98,23 +128,58 @@ describe "Student Gradebook - Assignment Details" do
       @sub = @asn.submit_homework(@students[0], body: "my submission", submission_type: "online_text_entry")
     end
 
-    it "displays submission comments" do
-      @asn.grade_student(@students[0], grade: "10", grader: @teacher)
-      @sub.submission_comments.create!(comment: "good job")
-      user_session @students[0]
-      get "/courses/#{@course.id}/grades"
-      f("a[aria-label='Read comments']").click
-      expect(f(".score_details_table").text).to include "good job"
+    context "when user is not quantitative data restricted" do
+      it "displays submission comments" do
+        @asn.grade_student(@students[0], grade: "10", grader: @teacher)
+        @sub.submission_comments.create!(comment: "good job")
+        user_session @students[0]
+        get "/courses/#{@course.id}/grades"
+        f("a[aria-label='Read comments']").click
+        expect(f(".score_details_table").text).to include "good job"
+      end
+
+      it "does not show submission comments if assignment is muted" do
+        @asn.ensure_post_policy(post_manually: true)
+        @sub.submission_comments.create!(comment: "good job")
+        user_session @students[0]
+        get "/courses/#{@course.id}/grades"
+        muted_row = f("tr#submission_#{@asn.id}")
+        expect(muted_row).to contain_jqcss("i[title='Instructor has not posted this grade']")
+        expect(f("a[aria-label='Read comments']").attribute("style")).to eq "visibility: hidden;"
+      end
     end
 
-    it "does not show submission comments if assignment is muted" do
-      @asn.ensure_post_policy(post_manually: true)
-      @sub.submission_comments.create!(comment: "good job")
-      user_session @students[0]
-      get "/courses/#{@course.id}/grades"
-      muted_row = f("tr#submission_#{@asn.id}")
-      expect(muted_row).to contain_jqcss("i[title='Instructor has not posted this grade']")
-      expect(f("a[aria-label='Read comments']").attribute("style")).to eq "visibility: hidden;"
+    context "when user is quantitative data restricted" do
+      before :once do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+      end
+
+      it "shows submission comments", ignore_js_errors: true do
+        @asn.grade_student(@students[0], grade: "10", grader: @teacher)
+        @sub.submission_comments.create!(comment: "good job")
+        user_session @students[0]
+        get "/courses/#{@course.id}/grades"
+        fj("tr button:contains('Submission Comments')").click
+        expect(f("[aria-label='Submission Comments Tray']").text).to include "good job"
+      end
+
+      it "has no submission comments button when muted" do
+        @asn.ensure_post_policy(post_manually: true)
+        @sub.submission_comments.create!(comment: "good job")
+        user_session @students[0]
+        get "/courses/#{@course.id}/grades"
+        expect(f("body")).not_to contain_jqcss("tr button:contains('Submission Comments')")
+        expect(f("svg[name='IconMuted']")).to be_present
+      end
     end
   end
 end
