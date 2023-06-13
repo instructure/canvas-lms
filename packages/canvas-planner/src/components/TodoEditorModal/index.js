@@ -22,7 +22,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import PropTypes from 'prop-types'
 import formatMessage from '../../format-message'
-import {UpdateItemTray as UpdateItemForm} from '../UpdateItemTray'
+import {UpdateItemTray_ as UpdateItemForm} from '../UpdateItemTray'
 import {alert} from '../../utilities/alertUtils'
 
 export default function TodoEditorModal({
@@ -33,7 +33,7 @@ export default function TodoEditorModal({
   onEdit,
   onClose,
   savePlannerItem,
-  deletePlannerItem
+  deletePlannerItem,
 }) {
   // tells dynamic-ui what just happened via onEdit/onClose
   useEffect(() => {
@@ -104,5 +104,5 @@ TodoEditorModal.propTypes = {
   onEdit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   savePlannerItem: PropTypes.func.isRequired,
-  deletePlannerItem: PropTypes.func.isRequired
+  deletePlannerItem: PropTypes.func.isRequired,
 }

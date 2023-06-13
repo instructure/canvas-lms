@@ -130,7 +130,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
       stacking="topmost"
       withArrow={true}
     >
-      <Animatable(Opportunities)
+      <Animatable(Opportunities_)
         courses={
           Array [
             Object {
@@ -207,7 +207,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
         size="small"
         type="button"
       />
-      <UpdateItemTray
+      <UpdateItemTray_
         courses={
           Array [
             Object {
@@ -440,7 +440,7 @@ exports[`new activity button shows when there is new activity 1`] = `
       stacking="topmost"
       withArrow={true}
     >
-      <Animatable(Opportunities)
+      <Animatable(Opportunities_)
         courses={
           Array [
             Object {
@@ -517,7 +517,7 @@ exports[`new activity button shows when there is new activity 1`] = `
         size="small"
         type="button"
       />
-      <UpdateItemTray
+      <UpdateItemTray_
         courses={
           Array [
             Object {
@@ -750,7 +750,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
       stacking="topmost"
       withArrow={true}
     >
-      <Animatable(Opportunities)
+      <Animatable(Opportunities_)
         courses={
           Array [
             Object {
@@ -827,7 +827,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
         size="small"
         type="button"
       />
-      <UpdateItemTray
+      <UpdateItemTray_
         courses={
           Array [
             Object {

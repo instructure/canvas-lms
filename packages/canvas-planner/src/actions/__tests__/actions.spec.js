@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+/* eslint-disable promise/catch-or-return */
 import moxios from 'moxios'
 import moment from 'moment-timezone'
 import {isPromise, moxiosWait, moxiosRespond} from 'jest-moxios-utils'
@@ -29,12 +30,12 @@ jest.mock('../../utilities/apiUtils', () => ({
   transformInternalToApiOverride: jest.fn(internal => ({
     ...internal.planner_override,
     marked_complete: null,
-    transformedToApiOverride: true
+    transformedToApiOverride: true,
   })),
   transformPlannerNoteApiToInternalItem: jest.fn(response => ({
     ...response,
-    transformedToInternal: true
-  }))
+    transformedToInternal: true,
+  })),
 }))
 
 const simpleItem = opts => ({some: 'data', date: moment('2018-03-28T13:14:00-04:00'), ...opts})
@@ -45,12 +46,12 @@ const getBasicState = () => ({
   timeZone: 'UTC',
   days: [
     ['2017-05-22', [{id: '42', dateBucketMoment: moment.tz('2017-05-22', 'UTC')}]],
-    ['2017-05-24', [{id: '42', dateBucketMoment: moment.tz('2017-05-24', 'UTC')}]]
+    ['2017-05-24', [{id: '42', dateBucketMoment: moment.tz('2017-05-24', 'UTC')}]],
   ],
   loading: {
     futureNextUrl: null,
     pastNextUrl: null,
-    allOpportunitiesLoaded: true
+    allOpportunitiesLoaded: true,
   },
   currentUser: {id: '1', displayName: 'Jane', avatarUrl: '/avatar/is/here', color: '#0B874B'},
   opportunities: {
@@ -63,10 +64,13 @@ const getBasicState = () => ({
       {id: 6, firstName: 'Randel', lastName: 'Flintstone', dismissed: false},
       {id: 7, firstName: 'Harry', lastName: 'Flintstone', dismissed: false},
       {id: 8, firstName: 'Tim', lastName: 'Flintstone', dismissed: false},
-      {id: 9, firstName: 'Sara', lastName: 'Flintstone', dismissed: false}
+      {id: 9, firstName: 'Sara', lastName: 'Flintstone', dismissed: false},
     ],
-    nextUrl: null
-  }
+    nextUrl: null,
+  },
+  ui: {
+    gradesTrayOpen: false,
+  },
 })
 
 describe('api actions', () => {
@@ -76,7 +80,7 @@ describe('api actions', () => {
     alertInitialize({
       visualSuccessCallback() {},
       visualErrorCallback() {},
-      srAlertCallback() {}
+      srAlertCallback() {},
     })
   })
 
@@ -101,12 +105,12 @@ describe('api actions', () => {
           .respondWith({
             status: 200,
             headers: {
-              link: `</>; rel="current"`
+              link: `</>; rel="current"`,
             },
             response: [
               {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
-              {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false}
-            ]
+              {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
+            ],
           })
           .then(() => {
             expect(mockDispatch).toHaveBeenCalledWith({
@@ -114,10 +118,10 @@ describe('api actions', () => {
               payload: {
                 items: [
                   {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
-                  {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false}
+                  {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
                 ],
-                nextUrl: null
-              }
+                nextUrl: null,
+              },
             })
           })
       })
@@ -146,12 +150,12 @@ describe('api actions', () => {
           .respondWith({
             status: 200,
             headers: {
-              link: `</>; rel="next"`
+              link: `</>; rel="next"`,
             },
             response: [
               {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
-              {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false}
-            ]
+              {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
+            ],
           })
           .then(() => {
             expect(mockDispatch).toHaveBeenCalledWith({
@@ -159,10 +163,10 @@ describe('api actions', () => {
               payload: {
                 items: [
                   {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
-                  {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false}
+                  {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
                 ],
-                nextUrl: '/'
-              }
+                nextUrl: '/',
+              },
             })
           })
       })
@@ -173,12 +177,12 @@ describe('api actions', () => {
       const plannerOverride = {
         id: '10',
         plannable_type: 'assignment',
-        dismissed: true
+        dismissed: true,
       }
       Actions.dismissOpportunity('6', plannerOverride)(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: '6',
-        type: 'START_DISMISSING_OPPORTUNITY'
+        type: 'START_DISMISSING_OPPORTUNITY',
       })
       return moxiosWait(() => {
         const request = moxios.requests.mostRecent()
@@ -187,16 +191,16 @@ describe('api actions', () => {
             status: 201,
             response: [
               {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'}
-            ]
+              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+            ],
           })
           .then(() => {
             expect(mockDispatch).toHaveBeenCalledWith({
               type: 'DISMISSED_OPPORTUNITY',
               payload: [
                 {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-                {id: 2, firstName: 'Wilma', lastName: 'Flintstone'}
-              ]
+                {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+              ],
             })
           })
       })
@@ -207,7 +211,7 @@ describe('api actions', () => {
       Actions.dismissOpportunity('6', {id: '6'})(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: '6',
-        type: 'START_DISMISSING_OPPORTUNITY'
+        type: 'START_DISMISSING_OPPORTUNITY',
       })
       return moxiosWait(() => {
         const request = moxios.requests.mostRecent()
@@ -216,16 +220,16 @@ describe('api actions', () => {
             status: 201,
             response: [
               {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'}
-            ]
+              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+            ],
           })
           .then(() => {
             expect(mockDispatch).toHaveBeenCalledWith({
               type: 'DISMISSED_OPPORTUNITY',
               payload: [
                 {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-                {id: 2, firstName: 'Wilma', lastName: 'Flintstone'}
-              ]
+                {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+              ],
             })
           })
       })
@@ -235,7 +239,7 @@ describe('api actions', () => {
       const plannerOverride = {
         id: '10',
         plannable_type: 'assignment',
-        dismissed: true
+        dismissed: true,
       }
       Actions.dismissOpportunity('6', plannerOverride)(() => {})
       return moxiosWait(request => {
@@ -249,7 +253,7 @@ describe('api actions', () => {
       const plannerOverride = {
         plannable_id: '10',
         dismissed: true,
-        plannable_type: 'assignment'
+        plannable_type: 'assignment',
       }
       Actions.dismissOpportunity('10', plannerOverride)(() => {})
       return moxiosWait(request => {
@@ -260,17 +264,16 @@ describe('api actions', () => {
     })
 
     it('calls the alert function when dismissing an opportunity fails', done => {
-      const mockDispatch = jest.fn()
       const fakeAlert = jest.fn()
       alertInitialize({
-        visualErrorCallback: fakeAlert
+        visualErrorCallback: fakeAlert,
       })
       Actions.dismissOpportunity('6', {id: '6'})(() => {})
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request
           .respondWith({
-            status: 400
+            status: 400,
           })
           .then(() => {
             expect(fakeAlert).toHaveBeenCalled()
@@ -283,14 +286,14 @@ describe('api actions', () => {
       const mockDispatch = jest.fn()
       const fakeAlert = jest.fn()
       alertInitialize({
-        visualErrorCallback: fakeAlert
+        visualErrorCallback: fakeAlert,
       })
       Actions.getInitialOpportunities()(mockDispatch, getBasicState)
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         request
           .respondWith({
-            status: 500
+            status: 500,
           })
           .then(() => {
             expect(fakeAlert).toHaveBeenCalled()
@@ -308,7 +311,7 @@ describe('api actions', () => {
       expect(isPromise(savePromise)).toBe(true)
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SAVING_PLANNER_ITEM',
-        payload: {item: plannerItem, isNewItem: true}
+        payload: {item: plannerItem, isNewItem: true},
       })
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
@@ -321,7 +324,7 @@ describe('api actions', () => {
       expect(isPromise(savePromise)).toBe(true)
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SAVING_PLANNER_ITEM',
-        payload: {item: plannerItem, isNewItem: false}
+        payload: {item: plannerItem, isNewItem: false},
       })
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'})
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
@@ -334,7 +337,7 @@ describe('api actions', () => {
       return moxiosWait(request => {
         expect(JSON.parse(request.config.data)).toMatchObject({
           some: 'data',
-          transformedToApi: true
+          transformedToApi: true,
         })
       })
     })
@@ -346,7 +349,7 @@ describe('api actions', () => {
       return moxiosRespond({some: 'response data'}, savePromise).then(result => {
         expect(result).toMatchObject({
           item: {some: 'response data', transformedToInternal: true},
-          isNewItem: true
+          isNewItem: true,
         })
       })
     })
@@ -364,7 +367,7 @@ describe('api actions', () => {
         expect(request.url).toBe('/api/v1/planner_notes')
         expect(JSON.parse(request.config.data)).toMatchObject({
           some: 'data',
-          transformedToApi: true
+          transformedToApi: true,
         })
       })
     })
@@ -383,7 +386,7 @@ describe('api actions', () => {
         expect(JSON.parse(request.config.data)).toMatchObject({
           id: '42',
           some: 'data',
-          transformedToApi: true
+          transformedToApi: true,
         })
       })
     })
@@ -392,12 +395,12 @@ describe('api actions', () => {
       const fakeAlert = jest.fn()
       const mockDispatch = jest.fn()
       alertInitialize({
-        visualErrorCallback: fakeAlert
+        visualErrorCallback: fakeAlert,
       })
 
       const plannerItem = simpleItem()
       const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, savePromise, {status: 500}).then(result => {
+      return moxiosRespond({some: 'response data'}, savePromise, {status: 500}).then(_result => {
         expect(fakeAlert).toHaveBeenCalled()
       })
     })
@@ -420,9 +423,9 @@ describe('api actions', () => {
             overrideId: '17',
             completed: true,
             show: true,
-            transformedToInternal: true
+            transformedToInternal: true,
           },
-          isNewItem: false
+          isNewItem: false,
         })
       })
     })
@@ -436,12 +439,12 @@ describe('api actions', () => {
       expect(isPromise(deletePromise)).toBe(true)
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'DELETING_PLANNER_ITEM',
-        payload: plannerItem
+        payload: plannerItem,
       })
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_UPDATE_TODO'})
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'DELETED_PLANNER_ITEM',
-        payload: deletePromise
+        payload: deletePromise,
       })
       expect(mockDispatch).toHaveBeenCalledWith(SidebarActions.maybeUpdateTodoSidebar)
     })
@@ -468,14 +471,16 @@ describe('api actions', () => {
       const fakeAlert = jest.fn()
       const mockDispatch = jest.fn()
       alertInitialize({
-        visualErrorCallback: fakeAlert
+        visualErrorCallback: fakeAlert,
       })
 
       const plannerItem = simpleItem()
       const deletePromise = Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, deletePromise, {status: 500}).then(result => {
-        expect(fakeAlert).toHaveBeenCalled()
-      })
+      return moxiosRespond({some: 'response data'}, deletePromise, {status: 500}).then(
+        __staticRouterHydrationDataresult => {
+          expect(fakeAlert).toHaveBeenCalled()
+        }
+      )
     })
   })
 
@@ -491,7 +496,7 @@ describe('api actions', () => {
       expect(isPromise(savePromise)).toBe(true)
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SAVING_PLANNER_ITEM',
-        payload: {item: savingItem, isNewItem: false, wasToggled: true}
+        payload: {item: savingItem, isNewItem: false, wasToggled: true},
       })
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
       expect(mockDispatch).toHaveBeenCalledWith(SidebarActions.maybeUpdateTodoSidebar)
@@ -505,7 +510,7 @@ describe('api actions', () => {
       return moxiosWait(request => {
         expect(JSON.parse(request.config.data)).toMatchObject({
           marked_complete: true,
-          transformedToApiOverride: true
+          transformedToApiOverride: true,
         })
       })
     })
@@ -519,7 +524,7 @@ describe('api actions', () => {
         expect(request.url).toBe('/api/v1/planner/overrides')
         expect(JSON.parse(request.config.data)).toMatchObject({
           marked_complete: true,
-          transformedToApiOverride: true
+          transformedToApiOverride: true,
         })
       })
     })
@@ -534,7 +539,7 @@ describe('api actions', () => {
         expect(JSON.parse(request.config.data)).toMatchObject({
           id: '5',
           marked_complete: true,
-          transformedToApiOverride: true
+          transformedToApiOverride: true,
         })
       })
     })
@@ -556,8 +561,8 @@ describe('api actions', () => {
             ...plannerItem,
             completed: false,
             overrideId: 'override_id',
-            show: true
-          }
+            show: true,
+          },
         })
       })
     })
@@ -566,12 +571,12 @@ describe('api actions', () => {
       const fakeAlert = jest.fn()
       const mockDispatch = jest.fn()
       alertInitialize({
-        visualErrorCallback: fakeAlert
+        visualErrorCallback: fakeAlert,
       })
 
       const plannerItem = {
         some: 'data',
-        planner_override: {id: 'override_id', marked_complete: false}
+        planner_override: {id: 'override_id', marked_complete: false},
       }
       const togglePromise = Actions.togglePlannerItemCompletion(plannerItem)(
         mockDispatch,
@@ -581,7 +586,7 @@ describe('api actions', () => {
         expect(fakeAlert).toHaveBeenCalled()
         expect(result).toMatchObject({
           item: {...plannerItem},
-          wasToggled: true
+          wasToggled: true,
         })
       })
     })
@@ -600,7 +605,7 @@ describe('api actions', () => {
     it('dispatches clearWeeklyItems and clearOpportunities actions', () => {
       const mockDispatch = jest.fn()
       Actions.clearItems()(mockDispatch, () => ({
-        weeklyDashboard: {}
+        weeklyDashboard: {},
       }))
       expect(mockDispatch).toHaveBeenCalledTimes(6)
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_WEEKLY_ITEMS'})
@@ -654,9 +659,18 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledTimes(4)
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: '6',
-        type: 'SELECTED_OBSERVEE'
+        type: 'SELECTED_OBSERVEE',
       })
       expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_ALL_OPPORTUNITIES'})
+    })
+
+    it('dispatches start if contextCodes are not present but observee id changed', async () => {
+      store.selectedObservee = '5'
+      store.ui.gradesTrayOpen = true
+
+      await Actions.reloadWithObservee('6')(mockDispatch, getState)
+      expect(mockDispatch).toHaveBeenCalledTimes(5)
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_GRADES_SAGA', payload: '6'})
     })
   })
 })

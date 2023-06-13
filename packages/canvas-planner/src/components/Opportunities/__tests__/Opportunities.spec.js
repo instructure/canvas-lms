@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import {Opportunities, OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID} from '../index'
+import {Opportunities_ as Opportunities, OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID} from '../index'
 
 function defaultProps() {
   return {
@@ -27,8 +27,8 @@ function defaultProps() {
         course_id: '1',
         due_at: '2017-03-09T20:40:35Z',
         html_url: 'http://www.non_default_url.com',
-        name: 'learning object title'
-      }
+        name: 'learning object title',
+      },
     ],
     dismissedOpportunities: [
       {
@@ -37,14 +37,14 @@ function defaultProps() {
         due_at: '2017-03109T20:40:35Z',
         html_url: 'http://www.non_default_url.com',
         name: 'another learning object title',
-        plannerOverride: {dismissed: true}
-      }
+        plannerOverride: {dismissed: true},
+      },
     ],
     courses: [{id: '1', shortName: 'Course Short Name'}],
     timeZone: 'America/Denver',
     dismiss: () => {},
     id: '6',
-    togglePopover: () => {}
+    togglePopover: () => {},
   }
 }
 
@@ -62,11 +62,11 @@ it('renders the right course with the right opportunity', () => {
     course_id: '2',
     html_url: 'http://www.non_default_url.com',
     due_at: '2017-03-09T20:40:35Z',
-    name: 'other learning object'
+    name: 'other learning object',
   })
   tempProps.courses = tempProps.courses.concat({
     id: '2',
-    shortName: 'A different Course Name'
+    shortName: 'A different Course Name',
   })
   const wrapper = shallow(<Opportunities {...tempProps} />)
   expect(wrapper).toMatchSnapshot()
@@ -89,7 +89,7 @@ it('calls toggle popover when escape is pressed', () => {
     keyCode: 27,
     which: 27,
     key: 'escape',
-    preventDefault: () => {}
+    preventDefault: () => {},
   })
   expect(tempProps.togglePopover).toHaveBeenCalled()
 })
@@ -106,10 +106,10 @@ it('registers itself as animatable', () => {
   )
   const instance = wrapper.instance()
   expect(fakeRegister).toHaveBeenCalledWith('opportunity', instance, -1, [
-    OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID
+    OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID,
   ])
   wrapper.unmount()
   expect(fakeDeregister).toHaveBeenCalledWith('opportunity', instance, [
-    OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID
+    OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID,
   ])
 })

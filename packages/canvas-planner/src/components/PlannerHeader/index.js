@@ -44,6 +44,7 @@ import {
   startLoadingGradesSaga,
   scrollToToday,
   scrollToNewActivity,
+  setGradesTrayState,
 } from '../../actions'
 import formatMessage from '../../format-message'
 import {notifier} from '../../dynamic-ui'
@@ -69,8 +70,10 @@ export class PlannerHeader extends Component {
     dismissOpportunity: PropTypes.func.isRequired,
     clearUpdateTodo: PropTypes.func.isRequired,
     startLoadingGradesSaga: PropTypes.func.isRequired,
+    setGradesTrayState: PropTypes.func.isRequired,
     firstNewActivityDate: momentObj,
     isObserving: PropTypes.bool,
+    selectedObservee: PropTypes.string,
     days: PropTypes.arrayOf(
       PropTypes.arrayOf(
         PropTypes.oneOfType([
@@ -234,8 +237,9 @@ export class PlannerHeader extends Component {
       !this.props.loading.loadingGrades &&
       !this.props.loading.gradesLoaded
     ) {
-      this.props.startLoadingGradesSaga()
+      this.props.startLoadingGradesSaga(this.props.isObserving ? this.props.selectedObservee : null)
     }
+    this.props.setGradesTrayState(!this.state.gradesTrayOpen)
     this.setState(prevState => ({gradesTrayOpen: !prevState.gradesTrayOpen}))
   }
 
@@ -526,6 +530,7 @@ const mapStateToProps = ({
   ui,
   firstNewActivityDate,
   isObserving: !!observedUserId({selectedObservee, currentUser}),
+  selectedObservee,
 })
 const mapDispatchToProps = {
   savePlannerItem,
@@ -538,6 +543,7 @@ const mapDispatchToProps = {
   startLoadingGradesSaga,
   scrollToToday,
   scrollToNewActivity,
+  setGradesTrayState,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader)
