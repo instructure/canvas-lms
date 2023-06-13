@@ -1079,16 +1079,18 @@ modules.initModuleManagement = function (duplicate) {
         )
       }
 
-      if (window.ENV?.FEATURES?.explicit_latex_typesetting === false) {
-        // new_math_equation_handling is always true for modules
-        // application_controller.rb:660
-        const mathml = new Mathml({new_math_equation_handling: true}, {locale: ENV?.locale || 'en'})
-        if (mathml.isMathMLOnPage()) {
-          if (mathml.isMathJaxLoaded()) {
-            mathml.reloadElement('content')
-          } else {
-            mathml.loadMathJax(undefined)
-          }
+      const mathml = new Mathml(
+        {
+          new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
+          explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
+        },
+        {locale: ENV?.LOCALE || 'en'}
+      )
+      if (mathml.isMathMLOnPage()) {
+        if (mathml.isMathJaxLoaded()) {
+          mathml.reloadElement('content')
+        } else {
+          mathml.loadMathJax(undefined)
         }
       }
     },

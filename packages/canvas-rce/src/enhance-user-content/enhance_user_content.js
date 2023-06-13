@@ -22,6 +22,7 @@ import {closest, getData, hide, insertAfter, setData, show} from './jqueryish_fu
 import {getTld, isExternalLink, showFilePreview, youTubeID} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
 import {addParentFrameContextToUrl} from '../rce/plugins/instructure_rce_external_tools/util/addParentFrameContextToUrl'
+import Mathml, {MathJaxDirective} from './mathml'
 
 // in jest the es directory doesn't exist so stub the undefined svg
 const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
@@ -152,6 +153,13 @@ export function enhanceUserContent(container = document, opts = {}) {
     canvasLinksTarget,
 
     /**
+     * For MathML configuration
+     */
+    new_math_equation_handling,
+    explicit_latex_typesetting,
+    locale,
+
+    /**
      * When used inside of an LTI tool, this contains the canvas global id of the tool.
      */
     containingCanvasLtiToolId,
@@ -164,11 +172,16 @@ export function enhanceUserContent(container = document, opts = {}) {
 
   const showFilePreviewEx = event => showFilePreview(event, {canvasOrigin, disableGooglePreviews})
 
-  content
-    .querySelectorAll('.user_content:not(.enhanced)')
-    .forEach(elem => elem.classList.add('unenhanced'))
+  content.querySelectorAll('.user_content:not(.enhanced)').forEach(elem => {
+    elem.classList.add('unenhanced')
+    explicit_latex_typesetting && elem.classList.add(MathJaxDirective.Process)
+  })
+
+  const mathml = new Mathml({new_math_equation_handling, explicit_latex_typesetting}, {locale})
 
   content.querySelectorAll('.unenhanced').forEach(unenhanced_elem => {
+    explicit_latex_typesetting && mathml.processNewMathInElem(unenhanced_elem)
+
     unenhanced_elem.querySelectorAll('img').forEach(img => {
       const src = img.getAttribute('src')
 

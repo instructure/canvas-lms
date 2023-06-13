@@ -17,6 +17,7 @@
  */
 
 import {enhanceUserContent} from '../enhance_user_content'
+import Mathml from '../mathml'
 
 jest.useFakeTimers()
 
@@ -298,6 +299,26 @@ describe('enhanceUserContent()', () => {
       const customFunc = jest.fn()
       enhanceUserContent(document, {customEnhanceFunc: customFunc})
       expect(customFunc).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('math rendering', () => {
+    beforeEach(() => {
+      jest.resetAllMocks()
+    })
+
+    it('processes math inside content when ELT is on', () => {
+      const processSpy = jest.spyOn(Mathml.prototype, 'processNewMathInElem')
+      subject('<p>anything</p>')
+      enhanceUserContent(document, {explicit_latex_typesetting: true})
+      expect(processSpy).toHaveBeenCalledWith(elem)
+    })
+
+    it('does not process math inside content when ELT is off', () => {
+      const processSpy = jest.spyOn(Mathml.prototype, 'processNewMathInElem')
+      subject('<p>anything</p>')
+      enhanceUserContent(document, {explicit_latex_typesetting: false})
+      expect(processSpy).not.toHaveBeenCalled()
     })
   })
 })

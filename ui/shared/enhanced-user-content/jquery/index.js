@@ -345,6 +345,9 @@ function enhanceUserContentWhenAsked() {
         canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin,
         kalturaSettings: INST.kalturaSettings,
         disableGooglePreviews: !!INST.disableGooglePreviews,
+        new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
+        explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
+        locale: ENV?.LOCALE ?? 'en',
       }),
     50
   )

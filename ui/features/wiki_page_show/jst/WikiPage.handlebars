@@ -90,7 +90,11 @@
 {{/if}}
 
 <div class="show-content user_content clearfix">
-  <h1 class="page-title">{{title}}</h1>
+  {{#if explicit_latex_typesetting}}
+    <h1 class="page-title mathjax_ignore">{{title}}</h1>
+  {{else}}
+    <h1 class="page-title">{{title}}</h1>
+  {{/if}}
   {{#if todo_date}}
     <b>{{#t "wiki.todo_date"}}To-Do Date:{{/t}} {{tDateToString todo_date "date_at_time"}}</b>
   {{/if}}

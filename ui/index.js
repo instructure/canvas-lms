@@ -100,8 +100,11 @@ function afterDocumentReady() {
 }
 
 function setupMathML() {
-  const features = {new_math_equation_handling: Boolean(ENV?.FEATURES?.new_math_equation_handling)}
-  const config = {locale: ENV?.locale || 'en'}
+  const features = {
+    new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
+    explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
+  }
+  const config = {locale: ENV?.LOCALE || 'en'}
 
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't
