@@ -19,6 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
@@ -33,6 +34,7 @@ import {
   GradebookUserSubmissionDetails,
 } from '../../../types'
 import {useSubmitScore} from '../../hooks/useSubmitScore'
+import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
 import {outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
 
@@ -42,15 +44,19 @@ type Props = {
   currentStudent?: GradebookStudentDetails
   studentSubmissions?: GradebookUserSubmissionDetails[]
   assignment?: AssignmentConnection
+  courseId: string
   gradebookOptions: GradebookOptions
+  loadingStudent: boolean
   onSubmissionSaved: (submission: GradebookUserSubmissionDetails) => void
 }
 
 export default function GradingResults({
   assignment,
+  courseId,
   currentStudent,
   studentSubmissions,
   gradebookOptions,
+  loadingStudent,
   onSubmissionSaved,
 }: Props) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
@@ -58,6 +64,10 @@ export default function GradingResults({
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
+  const {submissionComments, loadingComments, refetchComments} = useGetComments({
+    courseId,
+    submissionId: submission?.id,
+  })
 
   useEffect(() => {
     if (submission) {
@@ -87,6 +97,11 @@ export default function GradingResults({
     [modalOpen, onSubmissionSaved]
   )
 
+  const handlePostComment = useCallback(() => {
+    setModalOpen(false)
+    refetchComments()
+  }, [refetchComments])
+
   useEffect(() => {
     handleGradeChange({
       status: submitScoreStatus,
@@ -112,6 +127,10 @@ export default function GradingResults({
         </View>
       </>
     )
+  }
+
+  if (loadingStudent) {
+    return <LoadingIndicator />
   }
 
   const submitGrade = async () => {
@@ -188,12 +207,15 @@ export default function GradingResults({
       </View>
       <SubmissionDetailModal
         assignment={assignment}
+        comments={submissionComments}
         gradebookOptions={gradebookOptions}
         student={currentStudent}
         submission={submission}
+        loadingComments={loadingComments}
         modalOpen={modalOpen}
         handleClose={() => setModalOpen(false)}
         onGradeChange={handleGradeChange}
+        onPostComment={handlePostComment}
       />
     </>
   )

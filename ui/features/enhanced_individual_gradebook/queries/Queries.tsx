@@ -66,6 +66,8 @@ export const GRADEBOOK_QUERY = gql`
               pointsPossible
               submissionTypes
               dueAt
+              groupCategoryId
+              gradeGroupStudentsIndividually
             }
           }
         }
@@ -121,28 +123,36 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           latePolicyStatus
           missing
           userId
-          commentsConnection {
-            nodes {
-              id: _id
-              comment
-              mediaObject {
-                id: _id
-              }
-              attachments {
-                id: _id
-                displayName
-                mimeClass
-                url
-              }
-              author {
-                name
-                id: _id
-                avatarUrl
-                htmlUrl(courseId: $courseId)
-              }
-              updatedAt
-            }
+        }
+      }
+    }
+  }
+`
+
+export const GRADEBOOK_SUBMISSION_COMMENTS = gql`
+  query GradebookSubmissionCommentsQuery($courseId: ID!, $submissionId: ID!) {
+    submission(id: $submissionId) {
+      commentsConnection {
+        nodes {
+          id: _id
+          comment
+          mediaObject {
+            id: _id
+            mediaDownloadUrl
           }
+          attachments {
+            id: _id
+            displayName
+            mimeClass
+            url
+          }
+          author {
+            name
+            id: _id
+            avatarUrl
+            htmlUrl(courseId: $courseId)
+          }
+          updatedAt
         }
       }
     }

@@ -64,10 +64,8 @@ export default function EnhancedIndividualGradebook() {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
     studentIdQueryParam
   )
-  const {currentStudent, studentSubmissions, updateSubmissionDetails} = useCurrentStudentInfo(
-    courseId,
-    selectedStudentId
-  )
+  const {currentStudent, studentSubmissions, updateSubmissionDetails, loadingStudent} =
+    useCurrentStudentInfo(courseId, selectedStudentId)
 
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
 
@@ -219,9 +217,11 @@ export default function EnhancedIndividualGradebook() {
 
       <GradingResults
         assignment={selectedAssignment}
+        courseId={courseId}
         currentStudent={currentStudent}
         studentSubmissions={studentSubmissions}
         gradebookOptions={gradebookOptions}
+        loadingStudent={loadingStudent}
         onSubmissionSaved={handleSubmissionSaved}
       />
 
