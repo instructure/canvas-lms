@@ -150,9 +150,9 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         ...inputFormData,
       }
       updatedScheme.data.splice(index, 1)
-      if (updatedScheme.data.length === 1) {
-        // only one row remains. by definition it must be 100% high range and 0% low range
-        updatedScheme.data[0].value = 0
+      if (updatedScheme.data.length > 0) {
+        // the last data row always has a min range of 0
+        updatedScheme.data[updatedScheme.data.length - 1].value = 0
       }
       setInputFormData(updatedScheme)
     }

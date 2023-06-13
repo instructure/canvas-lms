@@ -127,6 +127,32 @@ describe('GradingSchemeInput', () => {
     })
   })
 
+  it('data is accurate when the last row is deleted', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormData={VALID_FORM_INPUT}
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+      />
+    )
+    const deleteRowButtons = screen.getAllByRole<HTMLInputElement>('button', {
+      name: /Remove letter grade row/,
+    })
+    expect(deleteRowButtons.length).toBe(5)
+    act(() => deleteRowButtons[4].click()) // delete the last row
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    expect(onSave).toHaveBeenCalledWith({
+      title: 'A Grading Scheme',
+      data: [
+        {name: 'A', value: 0.9},
+        {name: 'B', value: 0.8},
+        {name: 'C', value: 0.7},
+        {name: 'D', value: 0.0},
+      ],
+    })
+  })
+
   it('data is accurate when a new row is added', () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
