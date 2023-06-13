@@ -9304,6 +9304,16 @@ describe Assignment do
             expect(student_unread_count_counts).to eq 1
           end
 
+          it "does not update the unread_count for previously posted submissions" do
+            assignment.grade_student(student1, grade: 10, grader: teacher)
+            submission_id = assignment.submission_for_student(student1).id
+            assignment.post_submissions(submission_ids: [submission_id], skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 1
+            ContentParticipation.where(user_id: student1).update_all(workflow_state: "read")
+            assignment.post_submissions(skip_content_participation_refresh: false)
+            expect(student_unread_count_counts).to eq 0
+          end
+
           it "updates the unread_count if unread comment when posting" do
             student1_submission.add_comment(author: teacher, hidden: false, comment: "ok")
             assignment.post_submissions(skip_content_participation_refresh: false)

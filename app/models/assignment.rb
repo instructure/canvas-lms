@@ -3875,7 +3875,8 @@ class Assignment < ActiveRecord::Base
     delay_if_production.recalculate_module_progressions(submission_ids)
 
     unless skip_content_participation_refresh
-      submission_ids.each_slice(1000) do |submission_id_slice|
+      previously_unposted_submission_ids = previously_unposted_submissions.map(&:id)
+      previously_unposted_submission_ids.each_slice(1000) do |submission_id_slice|
         ContentParticipation
           .where(content_type: "Submission", content_id: submission_id_slice, content_item: "grade", workflow_state: "read")
           .update_all(workflow_state: "unread")
