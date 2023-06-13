@@ -414,6 +414,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
       end
 
       it 'renders math equations for inline math with "\("' do
+        Account.site_admin.disable_feature!(:explicit_latex_typesetting)
         title = "Assignment-Title with Math \\(x^2\\)"
         @assignment = @course.assignments.create!(name: title)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
@@ -422,11 +423,21 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
       end
 
       it "renders math equations for inline math with $$" do
+        Account.site_admin.disable_feature!(:explicit_latex_typesetting)
         title = "Assignment-Title with Math $$x^2$$"
         @assignment = @course.assignments.create!(name: title)
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
         wait_for_ajaximations
         expect(mathjax_element_exists_in_title?).to be true
+      end
+
+      it "does not render math equations for inline math with $$" do
+        Account.site_admin.enable_feature!(:explicit_latex_typesetting)
+        title = "Assignment-Title with Math $$x^2$$"
+        @assignment = @course.assignments.create!(name: title)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
+        wait_for_ajaximations
+        expect(mathjax_element_exists_in_title?).to be false
       end
     end
 
