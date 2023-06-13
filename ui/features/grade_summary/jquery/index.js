@@ -445,7 +445,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
       ? ENV.effective_final_score
       : calculatePercentGrade(finalScore, finalPossible)
 
-    const letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme)
+    const letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme) || I18n.t('N/A')
     $('.final_grade .letter_grade').text(letterGrade)
   }
 

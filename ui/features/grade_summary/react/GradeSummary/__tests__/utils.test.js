@@ -50,6 +50,7 @@ import {
   getAssignmentGroupTotalPoints,
   getAssignmentGroupEarnedPoints,
   getAssignmentGroupPercentage,
+  getAssignmentGroupPercentageWithPartialWeight,
   getAssignmentGroupLetterGrade,
   getGradingPeriodTotalPoints,
   getGradingPeriodEarnedPoints,
@@ -57,6 +58,7 @@ import {
   getCourseTotalPoints,
   getCourseEarnedPoints,
   getCoursePercentage,
+  calculateTotalPercentageWithPartialWeight,
   getTotal,
   sortAssignments,
   filteredAssignments,
@@ -654,6 +656,37 @@ describe('util', () => {
       })
     })
 
+    describe('getAssignmentGroupPercentageWithPartialWeight', () => {
+      it('should return the correct percentage for the assignment group', () => {
+        const assignmentGroups = AssignmentGroup.mock()
+        const assignments = mockAssignments()
+        expect(getAssignmentGroupPercentageWithPartialWeight([assignmentGroups], assignments)).toBe(
+          '77.5'
+        )
+      })
+
+      it('should return N/A when total points is not provided', () => {
+        const assignmentGroups = []
+        const assignments = []
+        expect(getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)).toBe(
+          ASSIGNMENT_NOT_APPLICABLE
+        )
+      })
+
+      it('should return N/A when assignments are not provided', () => {
+        const assignmentGroups = []
+        expect(getAssignmentGroupPercentageWithPartialWeight(assignmentGroups)).toBe(
+          ASSIGNMENT_NOT_APPLICABLE
+        )
+      })
+
+      it('should return N/A when assignments and assignment groups are undefined', () => {
+        expect(getAssignmentGroupPercentageWithPartialWeight(undefined, undefined)).toBe(
+          ASSIGNMENT_NOT_APPLICABLE
+        )
+      })
+    })
+
     describe('getAssignmentGroupPercentage', () => {
       describe('when the assignment group is not weighted', () => {
         it('should return the correct percentage for the assignment group', () => {
@@ -795,7 +828,7 @@ describe('util', () => {
           const assignmentGroup = AssignmentGroup.mock()
           expect(
             getGradingPeriodPercentage(gradingPeriod, assignments, [assignmentGroup], true)
-          ).toBe(`${77.5 * 0.5}`)
+          ).toBe('77.5')
         })
 
         it('should return N/A when total points is not provided', () => {
@@ -868,6 +901,45 @@ describe('util', () => {
   })
 
   describe('Course final total', () => {
+    describe('calculateTotalPercentageWithPartialWeight', () => {
+      const items = [{percentage: 20, groupWeight: 50}]
+
+      const getItemPercentage = item => item.percentage
+      const getItemWeight = item => item.groupWeight
+
+      it('should calculate the total percentage correctly', () => {
+        const totalPercentage = calculateTotalPercentageWithPartialWeight(
+          items,
+          getItemPercentage,
+          getItemWeight
+        )
+        expect(totalPercentage).toBe('20')
+      })
+
+      it('should handle empty items array', () => {
+        const totalPercentage = calculateTotalPercentageWithPartialWeight(
+          [],
+          getItemPercentage,
+          getItemWeight
+        )
+        expect(totalPercentage).toBe(ASSIGNMENT_NOT_APPLICABLE)
+      })
+
+      it('should handle items with N/A percentage', () => {
+        const itemsWithNAPercentage = [
+          {percentage: ASSIGNMENT_NOT_APPLICABLE, groupWeight: 30},
+          {percentage: 40, groupWeight: 25},
+        ]
+
+        const totalPercentage = calculateTotalPercentageWithPartialWeight(
+          itemsWithNAPercentage,
+          getItemPercentage,
+          getItemWeight
+        )
+        expect(totalPercentage).toBe('40')
+      })
+    })
+
     describe('getTotal', () => {
       describe('when the course is not weighted and there are no grading periods', () => {
         it('should return the correct total', () => {
@@ -889,7 +961,7 @@ describe('util', () => {
         it('should return the correct total', () => {
           const assignments = mockAssignments()
           const assignmentGroup = AssignmentGroup.mock()
-          expect(getTotal(assignments, [assignmentGroup], undefined, true)).toBe(`${77.5 * 0.5}`)
+          expect(getTotal(assignments, [assignmentGroup], undefined, true)).toBe('77.5')
         })
 
         it('should return N/A when total points is not provided', () => {
@@ -917,9 +989,7 @@ describe('util', () => {
         it('should return the correct total', () => {
           const assignments = mockAssignments()
           const gradingPeriods = [GradingPeriod.mock()]
-          expect(getTotal(assignments, undefined, gradingPeriods, false)).toBe(
-            `${77.5 * (GradingPeriod.mock().weight / 100)}`
-          )
+          expect(getTotal(assignments, undefined, gradingPeriods, false)).toBe('77.5')
         })
 
         it('should return 0 when total points is not provided', () => {
@@ -952,9 +1022,7 @@ describe('util', () => {
             const assignments = mockAssignments()
             const gradingPeriods = [GradingPeriod.mock()]
             const assignmentGroup = AssignmentGroup.mock()
-            expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(
-              `${77.5 * (assignmentGroup.groupWeight / 100) * (GradingPeriod.mock().weight / 100)}`
-            )
+            expect(getTotal(assignments, [assignmentGroup], gradingPeriods, true)).toBe(`77.5`)
           })
 
           it('should return 0 when assignments is an empty array', () => {

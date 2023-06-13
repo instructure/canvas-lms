@@ -197,6 +197,20 @@ QUnit.module('GradingSchemeHelper', () => {
   })
 
   QUnit.module('.scoreToGrade()', () => {
+    test('returns null when scheme is null or score is NaN', () => {
+      const gradingScheme = [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['E', 0.5],
+      ]
+      equal(GradingSchemeHelper.scoreToGrade(Number.NaN, gradingScheme), null)
+      equal(GradingSchemeHelper.scoreToGrade(40, null), null)
+      equal(GradingSchemeHelper.scoreToGrade('40', gradingScheme), null)
+      equal(GradingSchemeHelper.scoreToGrade('B', gradingScheme), null)
+    })
+
     test('returns the lowest grade to below-scale scores', () => {
       const gradingScheme = [
         ['A', 0.9],
