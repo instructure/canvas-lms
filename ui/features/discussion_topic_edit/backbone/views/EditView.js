@@ -557,7 +557,14 @@ EditView.prototype.getFormData = function () {
     // The controller checks for set_assignment on the assignment model,
     // so we can't make it undefined here for the case of discussion topics.
     data.assignment = this.model.createAssignment({
-      set_assignment: '0',
+      // there are no assignment params here, so sending a '0' will cause the
+      // @discussion_topic.assignment to be removed in the back end if it already
+      // exists. By sending a '1', you can preserve the assignment as-is.
+      set_assignment: this.permissions.CAN_CREATE_ASSIGNMENT
+        ? '0'
+        : this.permissions.CAN_UPDATE_ASSIGNMENT
+        ? '1'
+        : '0',
     })
   }
   // these options get passed to Backbone.sync in ValidatedFormView
