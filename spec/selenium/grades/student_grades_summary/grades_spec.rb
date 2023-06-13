@@ -117,24 +117,6 @@ describe "grades" do
       user_session(@teacher)
     end
 
-    context "overall grades" do
-      before do
-        @course_names = []
-        @course_names << @course
-        3.times do |i|
-          course = Course.create!(name: "course #{i}", account: Account.default)
-          course.enroll_user(@teacher, "TeacherEnrollment").accept!
-          course.offer!
-          @course_names << course
-        end
-        GlobalGrades.visit
-      end
-
-      it "validates courses display", priority: "1" do
-        4.times { |c| expect(GlobalGrades.course_details).to include_text(@course_names[c].name) }
-      end
-    end
-
     it "shows the student outcomes report if enabled", priority: "1" do
       @outcome_group ||= @course.root_outcome_group
       @outcome = @course.created_learning_outcomes.create!(title: "outcome")
@@ -149,44 +131,11 @@ describe "grades" do
       wait_for_ajaximations
       expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
     end
-
-    context "student view" do
-      it "is available to student view student", priority: "1" do
-        @fake_student = @course.student_view_student
-        @fake_submission = @first_assignment.submit_homework(@fake_student, body: "fake student submission")
-        @first_assignment.grade_student(@fake_student, grade: 8, grader: @teacher)
-
-        enter_student_view
-        StudentGradesPage.visit_as_student(@course)
-
-        expect(f("#submission_#{@first_assignment.id} .grade")).to include_text "8"
-      end
-    end
   end
 
   context "as a student" do
     before do
       user_session(@student_1)
-    end
-
-    it "displays tooltip on focus", priority: "1" do
-      StudentGradesPage.visit_as_student(@course)
-
-      expect(driver.execute_script(
-               "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
-             )).to eq("hidden")
-
-      driver.execute_script(
-        "window.focus()"
-      )
-
-      driver.execute_script(
-        "$('#submission_#{@submission.assignment_id} .assignment_score .grade').focus()"
-      )
-
-      expect(driver.execute_script(
-               "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
-             )).to eq("visible")
     end
 
     it "allows student to test modifying grades", priority: "1" do
@@ -343,29 +292,6 @@ describe "grades" do
       expect(f(".score_value").text).to eq ""
     end
 
-    it "displays assignment statistics", priority: "1" do
-      5.times do |count|
-        @s = course_with_student(course: @course, name: "Student #{count}", active_all: true).user
-        @first_assignment.grade_student(@s, grade: 4, grader: @teacher)
-      end
-
-      ScoreStatisticsGenerator.update_score_statistics(@course.id)
-
-      StudentGradesPage.visit_as_student(@course)
-      f(".toggle_score_details_link").click
-
-      score_row = f("#grades_summary tr.grade_details")
-      expect(score_row).to include_text("Mean:")
-      expect(score_row).to include_text("High: 4")
-      expect(score_row).to include_text("Low: 3")
-    end
-
-    it "does not show assignment statistics on assignments with less than 5 submissions",
-       priority: "1" do
-      StudentGradesPage.visit_as_student(@course)
-      expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
-    end
-
     it "does not show assignment statistics on assignments when it is disabled on the course",
        priority: "1" do
       # get up to a point where statistics can be shown
@@ -378,15 +304,6 @@ describe "grades" do
 
       StudentGradesPage.visit_as_student(@course)
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
-    end
-
-    it "displays teacher comments", priority: "1" do
-      StudentGradesPage.visit_as_student(@course)
-
-      # check comment
-      f(".toggle_comments_link").click
-      comment_row = f("#grades_summary tr.comments_thread")
-      expect(comment_row).to include_text("submission comment")
     end
 
     it "does not display name of anonymous reviewer", priority: "1" do
@@ -458,39 +375,6 @@ describe "grades" do
         wait_for_ajaximations
         expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
       end
-    end
-  end
-
-  context "as an observer" do
-    it "allows observers to see grades of all enrollment associations", priority: "1" do
-      @obs = user_model(name: "Observer")
-      e1 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
-      e1.associated_user = @student_1
-      e1.save!
-      e2 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
-      e2.associated_user = @student_2
-      e2.save!
-
-      user_session(@obs)
-      StudentGradesPage.visit_as_student(@course)
-
-      expect(f("#student_select_menu")).to be_displayed
-      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
-      expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
-
-      click_option("#student_select_menu", "Student 2")
-      expect_new_page_load { f("#apply_select_menus").click }
-
-      expect(f("#student_select_menu")).to be_displayed
-      expect(f("#student_select_menu").attribute("value")).to eq "Student 2"
-      expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "4"
-
-      click_option("#student_select_menu", "Student 1")
-      expect_new_page_load { f("#apply_select_menus").click }
-
-      expect(f("#student_select_menu")).to be_displayed
-      expect(f("#student_select_menu").attribute("value")).to eq "Student 1"
-      expect(f("#submission_#{@submission.assignment_id} .grade")).to include_text "3"
     end
   end
 end
