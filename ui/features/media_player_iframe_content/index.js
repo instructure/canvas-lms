@@ -37,6 +37,7 @@ ready(() => {
   const media_id = window.location.pathname.split('media_objects_iframe/').pop()
   const media_href_match = window.location.search.match(/mediahref=([^&]+)/)
   const media_object = ENV.media_object || {}
+  const is_attachment = ENV.attachment
   const parsed_loc = parse(window.location.href, true)
   const is_video =
     /video/.test(media_object?.media_type) || /type=video/.test(window.location.search)
@@ -98,6 +99,7 @@ ready(() => {
       media_tracks={mediaTracks}
       type={is_video ? 'video' : 'audio'}
       aria_label={aria_label}
+      is_attachment={is_attachment}
     />,
     document.getElementById('player_container')
   )

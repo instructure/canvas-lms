@@ -268,13 +268,14 @@ class MediaObjectsController < ApplicationController
     @exclude_account_js = true
     @embeddable = true
 
-    media_api_json = if @attachment
+    media_api_json = if @attachment && @media_object
                        media_attachment_api_json(@attachment, @media_object, @current_user, session)
                      elsif @media_object
                        media_object_api_json(@media_object, @current_user, session)
                      end
 
     js_env media_object: media_api_json if media_api_json
+    js_env attachment: !!@attachment
     js_bundle :media_player_iframe_content
     css_bundle :media_player
     render html: "<div id='player_container'>#{I18n.t("Loading...")}</div>".html_safe,

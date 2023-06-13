@@ -25,7 +25,7 @@ module FilesHelper
       return render_unauthorized_action unless @attachment&.media_entry_id
 
       @media_object = @attachment.media_object_by_media_id
-      @media_object.current_attachment = @attachment
+      @media_object.current_attachment = @attachment unless @media_object.nil?
       @media_id = @media_object&.id
     elsif params[:media_object_id].present?
       @media_id = params[:media_object_id]
