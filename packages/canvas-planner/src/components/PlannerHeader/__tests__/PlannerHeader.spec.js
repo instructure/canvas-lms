@@ -62,6 +62,7 @@ function defaultProps(options) {
     clearUpdateTodo: () => {},
     startLoadingGradesSaga: () => {},
     cancelEditingPlannerItem: () => {},
+    setGradesTrayState: () => {},
     ariaHideElement: document.createElement('div'),
     stickyZIndex: 3,
     stickyButtonId: 'new_activity_button',
@@ -636,13 +637,13 @@ it('edits new item in open tray', () => {
   // edit a PlannerItem
   wrapper.setProps({...defaultProps({todo: {updateTodoItem: todo1}})})
   expect(findEditTray(wrapper).prop('open')).toEqual(true)
-  expect(wrapper.find('UpdateItemTray').prop('noteItem')).toEqual(todo1)
+  expect(wrapper.find('UpdateItemTray_').prop('noteItem')).toEqual(todo1)
   expect(openEditingPlannerItem).toHaveBeenCalledTimes(1)
 
   // edit another PlannerItem in open tray
   wrapper.setProps({...defaultProps({todo: {updateTodoItem: todo2}})})
   expect(findEditTray(wrapper).props().open).toEqual(true)
-  expect(wrapper.find('UpdateItemTray').prop('noteItem')).toEqual(todo2)
+  expect(wrapper.find('UpdateItemTray_').prop('noteItem')).toEqual(todo2)
   expect(openEditingPlannerItem).toHaveBeenCalledTimes(2)
 })
 
@@ -658,7 +659,7 @@ it('sets the maxHeight on the Opportunities', () => {
   }
   // triggers a re-render
   wrapper.setState({opportunitiesOpen: true})
-  expect(wrapper.find('Animatable(Opportunities)').prop('maxHeight')).toEqual(640)
+  expect(wrapper.find('Animatable(Opportunities_)').prop('maxHeight')).toEqual(640)
 })
 
 it('opens the tray when it gets an updateTodoItem prop', () => {

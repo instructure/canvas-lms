@@ -34,7 +34,7 @@ import {courseShape} from '../plannerPropTypes'
 import styles from './styles.css'
 import theme from './theme'
 
-export class UpdateItemTray extends Component {
+export class UpdateItemTray_ extends Component {
   static propTypes = {
     courses: PropTypes.arrayOf(PropTypes.shape(courseShape)).isRequired,
     noteItem: PropTypes.object,
@@ -304,4 +304,4 @@ export class UpdateItemTray extends Component {
   }
 }
 
-export default themeable(theme, styles)(UpdateItemTray)
+export default themeable(theme, styles)(UpdateItemTray_)

@@ -24,9 +24,13 @@ function handleSetNaiAboveScreen(state, action) {
 
 export default handleActions(
   {
-    SET_NAI_ABOVE_SCREEN: handleSetNaiAboveScreen
+    SET_NAI_ABOVE_SCREEN: handleSetNaiAboveScreen,
+    SET_GRADES_TRAY_STATE: (state, action) => {
+      return {...state, gradesTrayOpen: action.payload}
+    },
   },
   {
-    naiAboveScreen: false
+    naiAboveScreen: false,
+    gradesTrayOpen: false,
   }
 )

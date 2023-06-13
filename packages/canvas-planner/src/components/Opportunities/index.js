@@ -35,7 +35,7 @@ import theme from './theme'
 
 export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opportunity')
 
-export class Opportunities extends Component {
+export class Opportunities_ extends Component {
   static propTypes = {
     newOpportunities: array.isRequired,
     dismissedOpportunities: array.isRequired,
@@ -231,4 +231,4 @@ export class Opportunities extends Component {
   }
 }
 
-export default animatable(themeable(theme, styles)(Opportunities))
+export default animatable(themeable(theme, styles)(Opportunities_))

@@ -189,7 +189,7 @@ function mockCourse(opts = {grade: '42.34'}) {
 
 describe('loadGradesSaga', () => {
   it('passes correct parameters to the api', () => {
-    const generator = loadGradesSaga()
+    const generator = loadGradesSaga({payload: null})
     expect(generator.next().value).toEqual(
       call(axios.get, '/api/v1/users/self/courses', {
         params: {
@@ -200,9 +200,27 @@ describe('loadGradesSaga', () => {
       })
     )
   })
+  it('passes correct observee parameters to the api', () => {
+    const generator = loadGradesSaga({payload: '17'})
+    expect(generator.next().value).toEqual(
+      call(axios.get, '/api/v1/users/self/courses', {
+        params: {
+          include: [
+            'total_scores',
+            'current_grading_period_scores',
+            'restrict_quantitative_data',
+            'observed_users',
+          ],
+          enrollment_type: 'student',
+          enrollment_state: 'active',
+          observed_user_id: '17',
+        },
+      })
+    )
+  })
 
   it('exhausts pagination', () => {
-    const generator = loadGradesSaga()
+    const generator = loadGradesSaga({payload: 'self'})
     generator.next()
     expect(
       generator.next({
@@ -215,7 +233,7 @@ describe('loadGradesSaga', () => {
   })
 
   it('puts gotGradesSuccess when all data is loaded', () => {
-    const generator = loadGradesSaga()
+    const generator = loadGradesSaga({payload: 'self'})
     const mockCourses = [mockCourse({id: '1', grade: '42.3'}), mockCourse({id: '2', grade: '34.4'})]
     generator.next()
     const putResult = generator.next({
@@ -234,7 +252,7 @@ describe('loadGradesSaga', () => {
   })
 
   it('puts gotGradesError if there is a loading error', () => {
-    const generator = loadGradesSaga()
+    const generator = loadGradesSaga({payload: 'self'})
     generator.next()
     expect(generator.throw('some-error').value).toEqual(put(gotGradesError('some-error')))
     expect(() => generator.next()).toThrow()

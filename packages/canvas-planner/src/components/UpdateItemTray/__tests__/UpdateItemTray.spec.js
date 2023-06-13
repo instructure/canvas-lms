@@ -18,7 +18,7 @@
 import moment from 'moment-timezone'
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import {UpdateItemTray} from '../index'
+import {UpdateItemTray_ as UpdateItemTray} from '../index'
 
 jest.useFakeTimers()
 

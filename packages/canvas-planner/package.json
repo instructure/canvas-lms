@@ -102,6 +102,7 @@
     "redux-promise": "^0.6",
     "redux-saga": "^0.16.0",
     "redux-thunk": "^2.2.0",
+    "sinon": "^7",
     "timezone": "^1.0.18",
     "velocity-animate": "^1.5.0"
   },
