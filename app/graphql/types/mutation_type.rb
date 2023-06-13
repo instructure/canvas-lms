@@ -78,6 +78,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :delete_discussion_topic, mutation: Mutations::DeleteDiscussionTopic
   field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
   field :set_module_item_completion, mutation: Mutations::SetModuleItemCompletion
+  field :create_discussion_topic, mutation: Mutations::CreateDiscussionTopic
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
   field :subscribe_to_discussion_topic, mutation: Mutations::SubscribeToDiscussionTopic
   field :update_discussion_read_state, mutation: Mutations::UpdateDiscussionReadState
