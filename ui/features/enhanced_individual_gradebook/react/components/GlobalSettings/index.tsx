@@ -23,6 +23,8 @@ import {GradebookOptions, GradebookSortOrder, SectionConnection} from '../../../
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import GradebookScoreExport from './GradebookScoreExport'
+import userSettings from '@canvas/user-settings'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconUploadLine} from '@instructure/ui-icons'
 
@@ -52,6 +54,26 @@ export default function GlobalSettings({
   onSortChange,
   onSectionChange,
 }: Props) {
+  const [viewUngraded, setViewUngraded] = React.useState(
+    gradebookOptions.saveViewUngradedAsZeroToServer && gradebookOptions.settings
+      ? gradebookOptions.settings.view_ungraded_as_zero === 'true'
+      : userSettings.contextGet('include_ungraded_assignments') || false
+  )
+  const [hideStudentNames, setHideStudentNames] = React.useState(
+    userSettings.contextGet('hide_student_names') || false
+  )
+  const [showConcludedEnrollments, setShowConcludedEnrollments] = React.useState(
+    gradebookOptions.settings?.show_concluded_enrollments
+      ? gradebookOptions.settings?.show_concluded_enrollments === 'true'
+      : false
+  )
+  const [showNotesColumn, setShowNotesColumn] = React.useState(
+    gradebookOptions.teacherNotes?.hidden ? !gradebookOptions.teacherNotes?.hidden : false
+  )
+  const [showTotalGradeAsPoints, setShowTotalGradeAsPoints] = React.useState(
+    gradebookOptions.showTotalGradeAsPoints ?? false
+  )
+
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortType = event.target.value as GradebookSortOrder
     onSortChange(sortType)
@@ -63,6 +85,86 @@ export default function GlobalSettings({
     onSectionChange(sectionId)
   }
 
+  const handleViewUngradedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked
+    setViewUngraded(checked)
+    userSettings.contextSet('include_ungraded_assignments', checked)
+    if (!gradebookOptions.saveViewUngradedAsZeroToServer) {
+      return
+    }
+    doFetchApi({
+      method: 'PUT',
+      path: `/api/v1/courses/${gradebookOptions.contextId}/gradebook_settings`,
+      body: {
+        gradebook_settings: {
+          view_ungraded_as_zero: checked ? 'true' : 'false',
+        },
+      },
+    })
+  }
+
+  const handleHideStudentNamesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked
+    userSettings.contextSet('hide_student_names', checked)
+    setHideStudentNames(checked)
+  }
+
+  const handleShowConcludedEnrollmentsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    doFetchApi({
+      method: 'PUT',
+      path: gradebookOptions.settingsUpdateUrl,
+      body: {
+        gradebook_settings: {
+          show_concluded_enrollments: event.target.checked,
+        },
+      },
+    })
+    setShowConcludedEnrollments(event.target.checked)
+  }
+
+  const handleShowNotesColumnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let url: string
+    let method: string
+    let body: {}
+    if (gradebookOptions.customColumnUrl && gradebookOptions.customColumnsUrl) {
+      if (gradebookOptions.teacherNotes) {
+        method = 'PUT'
+        url = gradebookOptions.customColumnUrl.replace(':id', gradebookOptions.teacherNotes?.id)
+        body = {column: {hidden: !event.target.checked}}
+      } else if (event.target.checked) {
+        url = gradebookOptions.customColumnsUrl
+        method = 'POST'
+        body = {
+          column: {
+            title: I18n.t('notes', 'Notes'),
+            position: 1,
+            teacher_notes: true,
+          },
+        }
+      } else {
+        return
+      }
+    } else {
+      return
+    }
+    doFetchApi({
+      method,
+      body,
+      path: url,
+    })
+    setShowNotesColumn(event.target.checked)
+  }
+
+  const handleShowTotalGradeAsPointsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    doFetchApi({
+      method: 'PUT',
+      path: gradebookOptions.settingUpdateUrl,
+      body: {
+        show_total_grade_as_points: event.target.checked,
+      },
+    })
+    setShowTotalGradeAsPoints(event.target.checked)
+  }
   return (
     <>
       <View as="div" className="row-fluid">
@@ -121,7 +223,13 @@ export default function GlobalSettings({
             style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
           >
             <label className="checkbox" htmlFor="ungraded_checkbox">
-              <input type="checkbox" id="ungraded_checkbox" name="ungraded_checkbox" />
+              <input
+                type="checkbox"
+                id="ungraded_checkbox"
+                name="ungraded_checkbox"
+                checked={viewUngraded}
+                onChange={handleViewUngradedChange}
+              />
               {I18n.t('View Ungraded as 0')}
             </label>
           </div>
@@ -130,7 +238,13 @@ export default function GlobalSettings({
             style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
           >
             <label className="checkbox" htmlFor="hide_names_checkbox">
-              <input type="checkbox" id="hide_names_checkbox" name="hide_names_checkbox" />
+              <input
+                type="checkbox"
+                id="hide_names_checkbox"
+                name="hide_names_checkbox"
+                checked={hideStudentNames}
+                onChange={handleHideStudentNamesChange}
+              />
               {I18n.t('Hide Student Names')}
             </label>
           </div>
@@ -143,6 +257,8 @@ export default function GlobalSettings({
                 type="checkbox"
                 id="concluded_enrollments_checkbox"
                 name="concluded_enrollments_checkbox"
+                checked={showConcludedEnrollments}
+                onChange={handleShowConcludedEnrollmentsChange}
               />
               {I18n.t('Show Concluded Enrollments')}
             </label>
@@ -152,7 +268,13 @@ export default function GlobalSettings({
             style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
           >
             <label className="checkbox" htmlFor="show_notes_checkbox">
-              <input type="checkbox" id="show_notes_checkbox" name="show_notes_checkbox" />
+              <input
+                type="checkbox"
+                id="show_notes_checkbox"
+                name="show_notes_checkbox"
+                checked={showNotesColumn}
+                onChange={handleShowNotesColumnChange}
+              />
               {I18n.t('Show Notes in Student Info')}
             </label>
           </div>
@@ -189,7 +311,13 @@ export default function GlobalSettings({
             style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
           >
             <label className="checkbox" htmlFor="show_total_as_points">
-              <input type="checkbox" id="show_total_as_points" name="show_total_as_points" />
+              <input
+                type="checkbox"
+                id="show_total_as_points"
+                name="show_total_as_points"
+                checked={showTotalGradeAsPoints}
+                onChange={handleShowTotalGradeAsPointsChange}
+              />
               {I18n.t('Show Totals as Points on Student Grade Page')}
             </label>
           </div>

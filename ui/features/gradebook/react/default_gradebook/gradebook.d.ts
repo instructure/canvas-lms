@@ -106,6 +106,8 @@ export type GradebookOptions = {
   current_grading_period_id: string
   currentUserId: string
   custom_column_datum_url: string
+  custom_column_url: string
+  custom_columns_url: string
   default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
   enhanced_gradebook_filters: boolean
@@ -143,6 +145,7 @@ export type GradebookOptions = {
   publish_to_sis_url: string
   re_upload_submissions_url: string
   reorder_custom_columns_url: string
+  save_view_ungraded_as_zero_to_server: boolean
   sections: Section[]
   setting_update_url: string
   settings_update_url: string

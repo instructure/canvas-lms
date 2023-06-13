@@ -34,7 +34,7 @@ const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
   lastGeneratedCsvAttachmentUrl: string | null | undefined
   gradebookCsvProgress: ProgressData | null | undefined
-  userId: string | undefined
+  userId?: string | null
   exportGradebookCsvUrl: string | undefined
 }
 export default function GradebookScoreExport({
@@ -68,7 +68,9 @@ export default function GradebookScoreExport({
   }, [lastGeneratedCsvLink, attachmentStatus])
 
   const exportGradebookCsv = async () => {
-    await exportGradebook(userId, exportGradebookCsvUrl)
+    if (userId) {
+      await exportGradebook(userId, exportGradebookCsvUrl)
+    }
   }
 
   const downloadText = (date: string) => {

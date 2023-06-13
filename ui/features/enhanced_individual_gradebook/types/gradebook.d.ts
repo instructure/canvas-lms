@@ -17,12 +17,25 @@
  */
 
 import {AssignmentConnection, UserConnection} from './queries'
-import {ProgressData} from 'features/gradebook/react/default_gradebook/gradebook'
+import {
+  ProgressData,
+  CourseSettingsType,
+  GradebookSettings,
+} from 'features/gradebook/react/default_gradebook/gradebook.d'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
   Alphabetical = 'alphabetical',
   AssignmentGroup = 'assignmentGroup',
+}
+
+export type teacherNotes = {
+  id: string
+  hidden: boolean
+  position: number
+  read_only: boolean
+  teacher_notes: boolean
+  title: string
 }
 
 export type GradebookOptions = {
@@ -33,8 +46,18 @@ export type GradebookOptions = {
   exportGradebookCsvUrl?: string
   lastGeneratedCsvAttachmentUrl?: string | null
   gradebookCsvProgress?: ProgressData | null
-  contextUrl?: string
-  userId?: string
+  contextUrl?: string | null
+  userId?: string | null
+  courseSettings?: CourseSettingsType | null
+  contextId?: string | null
+  customColumnUrl?: string | null
+  customColumnsUrl?: string | null
+  saveViewUngradedAsZeroToServer?: boolean | null
+  settingUpdateUrl?: string | null
+  settings?: GradebookSettings | null
+  settingsUpdateUrl?: string | null
+  teacherNotes?: teacherNotes | null
+  showTotalGradeAsPoints?: boolean | null
 }
 
 export type AssignmentDetailCalculationText = {

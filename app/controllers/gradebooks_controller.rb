@@ -549,16 +549,29 @@ class GradebooksController < ApplicationController
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
+    teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
     gradebook_options = {
-      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
       attachment_url: authenticated_download_url(last_exported_attachment),
+      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
+      course_settings: {
+        allow_final_grade_override: @context.allow_final_grade_override?,
+        filter_speed_grader_by_student_group: @context.filter_speed_grader_by_student_group?
+      },
       context_id: @context.id.to_s,
       context_url: named_context_url(@context, :context_url),
+      custom_column_url: api_v1_course_custom_gradebook_column_url(@context, ":id"),
+      custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
       export_gradebook_csv_url: course_gradebook_csv_url,
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_is_editable:,
       individual_gradebook_enhancements: true,
-      outcome_gradebook_enabled: outcome_gradebook_enabled?
+      outcome_gradebook_enabled: outcome_gradebook_enabled?,
+      save_view_ungraded_as_zero_to_server: allow_view_ungraded_as_zero?,
+      setting_update_url: api_v1_course_settings_url(@context),
+      settings: gradebook_settings(@context.global_id),
+      settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
+      show_total_grade_as_points: @context.show_total_grade_as_points?,
+      teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
     }
     js_env({
              GRADEBOOK_OPTIONS: gradebook_options
