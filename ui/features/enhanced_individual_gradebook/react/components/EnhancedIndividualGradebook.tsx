@@ -89,7 +89,17 @@ export default function EnhancedIndividualGradebook() {
     lastGeneratedCsvAttachmentUrl: ENV.GRADEBOOK_OPTIONS?.attachment_url,
     gradebookCsvProgress: ENV.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
     contextUrl: ENV.GRADEBOOK_OPTIONS?.context_url,
+    contextId: ENV.GRADEBOOK_OPTIONS?.context_id,
     userId: ENV.current_user_id,
+    courseSettings: ENV.GRADEBOOK_OPTIONS?.course_settings,
+    customColumnUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_url,
+    customColumnsUrl: ENV.GRADEBOOK_OPTIONS?.custom_columns_url,
+    saveViewUngradedAsZeroToServer: ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
+    settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
+    settings: ENV.GRADEBOOK_OPTIONS?.settings,
+    settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
+    teacherNotes: ENV.GRADEBOOK_OPTIONS?.teacher_notes,
+    showTotalGradeAsPoints: ENV.GRADEBOOK_OPTIONS?.show_total_grade_as_points,
   }
   const [gradebookOptions, setGradebookOptions] =
     useState<GradebookOptions>(defaultGradebookOptions)
