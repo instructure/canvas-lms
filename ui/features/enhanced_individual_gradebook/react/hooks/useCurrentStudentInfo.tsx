@@ -28,6 +28,7 @@ import {GRADEBOOK_STUDENT_QUERY} from '../../queries/Queries'
 type Response = {
   currentStudent?: GradebookStudentDetails
   studentSubmissions?: GradebookUserSubmissionDetails[]
+  loadingStudent: boolean
   updateSubmissionDetails: (submission: GradebookUserSubmissionDetails) => void
 }
 
@@ -35,7 +36,7 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
   const [currentStudent, setCurrentStudent] = useState<GradebookStudentDetails>()
   const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>()
 
-  const {data, error} = useQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
+  const {data, error, loading} = useQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
     variables: {courseId, userIds: userId},
     fetchPolicy: 'cache-and-network',
     skip: !userId,
@@ -73,5 +74,5 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
     [setStudentSubmissions]
   )
 
-  return {currentStudent, studentSubmissions, updateSubmissionDetails}
+  return {currentStudent, studentSubmissions, loadingStudent: loading, updateSubmissionDetails}
 }

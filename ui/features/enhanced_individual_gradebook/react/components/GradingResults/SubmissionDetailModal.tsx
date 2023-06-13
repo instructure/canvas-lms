@@ -18,13 +18,16 @@
 
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 // @ts-expect-error
-import {IconUserSolid} from '@instructure/ui-icons'
+import {IconAudioSolid, IconUserSolid} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
 // @ts-expect-error
 import {Modal} from '@instructure/ui-modal'
+// @ts-expect-error
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 // @ts-expect-error
@@ -38,6 +41,7 @@ import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {
   ApiCallStatus,
   AssignmentConnection,
+  Attachment,
   CommentConnection,
   GradebookOptions,
   GradebookStudentDetails,
@@ -45,6 +49,8 @@ import {
 } from '../../../types'
 import {submitterPreviewText, outOfText} from '../../../utils/gradebookUtils'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+import {usePostComment} from '../../hooks/useComments'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -63,8 +69,11 @@ type Props = {
   gradebookOptions: GradebookOptions
   student: GradebookStudentDetails
   submission: GradebookUserSubmissionDetails
+  comments: CommentConnection[]
   modalOpen: boolean
+  loadingComments: boolean
   onGradeChange: (updateEvent: GradeChangeApiUpdate) => void
+  onPostComment: () => void
   handleClose: () => void
 }
 
@@ -73,14 +82,13 @@ export default function SubmissionDetailModal({
   gradebookOptions,
   student,
   submission,
+  comments,
+  loadingComments,
   modalOpen,
   handleClose,
   onGradeChange,
+  onPostComment,
 }: Props) {
-  const {
-    commentsConnection: {nodes: comments},
-  } = submission
-
   const speedGraderUrl = () => {
     return `${gradebookOptions.contextUrl}/gradebook/speed_grader?assignment_id=${assignment.id}`
   }
@@ -124,7 +132,9 @@ export default function SubmissionDetailModal({
           <View as="b">{submitterPreviewText(submission)}</View>
         </View>
 
-        {comments.length > 0 && (
+        {loadingComments && <LoadingIndicator />}
+
+        {!loadingComments && comments.length > 0 && (
           <View as="div" margin="small 0">
             <Heading level="h3" margin="0 medium">
               {I18n.t('Comments')}
@@ -142,7 +152,11 @@ export default function SubmissionDetailModal({
           </View>
         )}
 
-        <PostCommentForm />
+        <PostCommentForm
+          assignment={assignment}
+          submission={submission}
+          onPostComment={onPostComment}
+        />
       </ModalBody>
     </Modal>
   )
@@ -153,7 +167,7 @@ type SubmissionCommentProps = {
   showDivider: boolean
 }
 function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
-  const {attachments, author} = comment
+  const {attachments, author, mediaObject} = comment
   return (
     <View
       as="div"
@@ -176,18 +190,20 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
             </Link>
           </Heading>
           <Text size="small">{comment.comment}</Text>
+          {mediaObject && (
+            <View as="div">
+              <Link
+                href={mediaObject.mediaDownloadUrl}
+                renderIcon={IconAudioSolid}
+                isWithinText={false}
+              >
+                {I18n.t('click here to view')}
+              </Link>
+            </View>
+          )}
+
           {attachments.length > 0 &&
-            attachments.map(attachment => (
-              <View as="div" key={attachment.id}>
-                <Link
-                  href={attachment.url}
-                  isWithinText={false}
-                  renderIcon={getIconByType(attachment.mimeClass)}
-                >
-                  <Text size="x-small">{attachment.displayName}</Text>
-                </Link>
-              </View>
-            ))}
+            attachments.map(attachment => <CommentAttachment attachment={attachment} />)}
         </FlexItem>
         <FlexItem align="start">
           <Heading level="h5">
@@ -197,6 +213,23 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
       </Flex>
 
       {showDivider && <hr key="hrcomment-{comment.id}" style={{margin: '.6rem 0'}} />}
+    </View>
+  )
+}
+
+type CommentAttachmentProps = {
+  attachment: Attachment
+}
+function CommentAttachment({attachment}: CommentAttachmentProps) {
+  return (
+    <View as="div" key={attachment.id}>
+      <Link
+        href={attachment.url}
+        isWithinText={false}
+        renderIcon={getIconByType(attachment.mimeClass)}
+      >
+        <Text size="x-small">{attachment.displayName}</Text>
+      </Link>
     </View>
   )
 }
@@ -266,14 +299,86 @@ function SubmissionGradeForm({assignment, submission, onGradeChange}: Submission
   )
 }
 
-function PostCommentForm() {
+type PostCommentFormProps = {
+  submission: GradebookUserSubmissionDetails
+  assignment: AssignmentConnection
+  onPostComment: () => void
+}
+function PostCommentForm({submission, assignment, onPostComment}: PostCommentFormProps) {
+  const {groupCategoryId, gradeGroupStudentsIndividually} = assignment
+  const [newComment, setNewComment] = useState<string>('')
+  const [isGroupComment, setIsGroupComment] = useState<boolean>(false)
+  const {postCommentError, postCommentStatus, submit} = usePostComment()
+
+  const submitComment = async () => {
+    let shouldSendGroupComment: boolean | undefined
+
+    if (groupCategoryId) {
+      shouldSendGroupComment = gradeGroupStudentsIndividually ? isGroupComment : true
+    }
+
+    await submit(assignment, submission, newComment, shouldSendGroupComment)
+  }
+
+  const groupRadioInputs = [
+    {value: '0', label: 'Send comment to this student only'},
+    {value: '1', label: 'Send comment to the whole group'},
+  ]
+
+  const handleGroupCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setIsGroupComment(event.target.value === '1')
+  }
+
+  useEffect(() => {
+    switch (postCommentStatus) {
+      case ApiCallStatus.COMPLETED:
+        setNewComment('')
+        onPostComment()
+        break
+      case ApiCallStatus.FAILED:
+        showFlashError(postCommentError)(new Error('Failed to add comment'))
+        break
+    }
+  }, [postCommentStatus, postCommentError, onPostComment])
+
   return (
     <div style={{backgroundColor: '#F2F2F2', borderTop: '1px solid #bbb'}}>
       <View as="div" padding="small medium">
-        <TextArea label={I18n.t('Add a comment')} maxHeight="4rem" />
-        <View as="div" margin="small 0 0 0" textAlign="end">
-          <Button>{I18n.t('Post Comment')}</Button>
-        </View>
+        <TextArea
+          label={I18n.t('Add a comment')}
+          maxHeight="4rem"
+          value={newComment}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewComment(e.target.value)}
+        />
+        <Flex margin="small 0 0 0">
+          <FlexItem padding="x-small" shouldShrink={true} shouldGrow={true}>
+            {groupCategoryId && (
+              <div>
+                {gradeGroupStudentsIndividually ? (
+                  <RadioInputGroup
+                    onChange={handleGroupCommentChange}
+                    defaultValue="0"
+                    name="groupComment"
+                    description={
+                      <ScreenReaderContent>{I18n.t('Send to all of group')}</ScreenReaderContent>
+                    }
+                  >
+                    {groupRadioInputs.map(input => (
+                      <RadioInput key={input.value} value={input.value} label={input.label} />
+                    ))}
+                  </RadioInputGroup>
+                ) : (
+                  <Text size="small">{I18n.t('All comments are sent to the whole group')}</Text>
+                )}
+              </div>
+            )}
+          </FlexItem>
+          <FlexItem align="start">
+            <Button disabled={postCommentStatus === ApiCallStatus.PENDING} onClick={submitComment}>
+              {I18n.t('Post Comment')}
+            </Button>
+          </FlexItem>
+        </Flex>
       </View>
     </div>
   )

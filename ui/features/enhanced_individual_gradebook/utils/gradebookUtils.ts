@@ -156,7 +156,6 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     userId: submission.user_id,
     submissionType: submission.submission_type,
     state: submission.workflow_state,
-    commentsConnection: {nodes: []},
   }
 }
 

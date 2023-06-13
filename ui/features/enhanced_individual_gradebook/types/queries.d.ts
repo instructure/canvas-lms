@@ -47,6 +47,8 @@ export type AssignmentConnection = {
   workflowState: WorkflowState
   gradingType: string
   dueAt?: string
+  groupCategoryId?: string
+  gradeGroupStudentsIndividually: boolean
 }
 
 export type AssignmentGroupConnection = {
@@ -77,18 +79,21 @@ export type SubmissionConnection = {
   grade?: string | null
 }
 
+export type Attachment = {
+  id: string
+  displayName: string
+  mimeClass: string
+  url: string
+}
+
 export type CommentConnection = {
   id: string
   comment: string
-  mediaObject: {
+  mediaObject?: {
     id: string
+    mediaDownloadUrl: string
   }
-  attachments: {
-    id: string
-    displayName: string
-    mimeClass: string
-    url: string
-  }[]
+  attachments: Attachment[]
   author: {
     avatarUrl: string
     id: string
@@ -142,9 +147,6 @@ export type GradebookUserSubmissionDetails = {
   latePolicyStatus?: string
   missing: boolean
   userId: string
-  commentsConnection: {
-    nodes: CommentConnection[]
-  }
 }
 
 export type GradebookStudentQueryResponse = {
@@ -154,6 +156,14 @@ export type GradebookStudentQueryResponse = {
     }
     submissionsConnection: {
       nodes: GradebookUserSubmissionDetails[]
+    }
+  }
+}
+
+export type GradebookSubmissionCommentsResponse = {
+  submission: {
+    commentsConnection: {
+      nodes: CommentConnection[]
     }
   }
 }
