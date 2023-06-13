@@ -116,14 +116,14 @@ def computeTestCount() {
       $REGISTRY_BASE/redis:alpine /bin/sh -c 'redis-cli -h $TEST_QUEUE_HOST -p 6379 --eval /iterscores.lua' | jq 'fromjson | ${jqAddCommand.join(' + ')}'
   """, returnStdout: true)
 
-  if (specTimings == 'null') {
-    echo "=== No Spec Timings Found! ==="
-  } else {
+  if (specTimings) {
     echo "=== Total Spec Time $specTimings"
 
     def newNodeTotal = Math.ceil(specTimings.toFloat() / (rspecqTargetTime * RSPEC_PROCESSES.toInteger()))
 
     summaryMessage += " (new: ${newNodeTotal})"
+  } else {
+    echo "=== No Spec Timings Found! ==="
   }
 }
 
