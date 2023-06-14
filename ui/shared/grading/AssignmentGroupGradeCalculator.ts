@@ -368,4 +368,5 @@ function calculate(
 
 export default {
   calculate,
+  dropAssignments,
 }
