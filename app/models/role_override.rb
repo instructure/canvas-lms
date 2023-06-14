@@ -438,7 +438,7 @@ class RoleOverride < ActiveRecord::Base
         label: -> { t("permissions.view_course_changes", "View Course Change Logs") },
         label_v2: -> { t("Courses - view change logs") },
         admin_tool: true,
-        account_only: true,
+        account_only: :root,
         available_to: [
           "AccountAdmin",
           "AccountMembership"

@@ -659,6 +659,19 @@ describe RoleOverride do
         expect(permission[:available_to]).to match_array %w[TeacherEnrollment AccountAdmin AccountMembership]
       end
     end
+
+    it "view_course_changes" do
+      root_account = @account.root_account
+      sub_account = root_account.sub_accounts.create!
+      root_admin = User.create!
+      sub_admin = User.create!
+      root_account.account_users.create!(user: root_admin)
+      sub_account.account_users.create!(user: sub_admin)
+
+      expect(root_account.grants_right?(root_admin, :view_course_changes)).to be true
+      expect(root_account.grants_right?(sub_admin, :view_course_changes)).to be false
+      expect(sub_account.grants_right?(sub_admin, :view_course_changes)).to be false
+    end
   end
 
   describe "caching" do
