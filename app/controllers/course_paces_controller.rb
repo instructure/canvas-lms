@@ -335,8 +335,7 @@ class CoursePacesController < ApplicationController
   end
 
   def paces_publishing
-    jobs_progress = Delayed::Job.where(tag: "CoursePace#publish").map do |job|
-      progress = Progress.find_by(delayed_job_id: job.id)
+    jobs_progress = Progress.where(tag: "course_pace_publish", context: @context.course_paces).is_pending.map do |progress|
       pace = progress.context
       if pace&.workflow_state == "active"
         {

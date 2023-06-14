@@ -222,6 +222,41 @@ describe CoursePacesController do
       assert_unauthorized
     end
 
+    context "paces publishing" do
+      before :once do
+        @course1 = course_factory
+        @teacher1 = User.create!
+        course_with_teacher(course: @course1, user: @teacher1, active_all: true)
+        @course1.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
+        @course1.root_account.enable_feature!(:course_paces)
+        @course1.enable_course_paces = true
+        @course1.save!
+        @course_pace1 = course_pace_model(course: @course1)
+
+        @course2 = course_factory
+        @teacher2 = User.create!
+        course_with_teacher(course: @course2, user: @teacher2, active_all: true)
+        @course2.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
+        @course2.root_account.enable_feature!(:course_paces)
+        @course2.enable_course_paces = true
+        @course2.save!
+        @course_pace2 = course_pace_model(course: @course2)
+      end
+
+      it "only gets paces publishing for the current course" do
+        @course_pace1.create_publish_progress
+        @course_pace2.create_publish_progress
+
+        user_session(@teacher1)
+
+        get :index, params: { course_id: @course1.id }
+        expect(response).to be_successful
+
+        js_env = controller.js_env
+        expect(js_env[:PACES_PUBLISHING].length).to eq(1)
+      end
+    end
+
     context "progress" do
       it "starts the progress' delayed job if queued" do
         progress = @course_pace.create_publish_progress
