@@ -244,6 +244,24 @@ describe "gradebook - logged in as a student" do
       expect(f("body")).not_to contain_jqcss("tr[data-testid='gradingPeriod-#{current_period.id}']")
     end
 
+    it "does not show assignment group total when no assignments are a part of the group" do
+      course_with_student(course: @course, name: "Hardworking Student", active_all: true)
+      group_1 = @course.assignment_groups.create!(name: "Group 1", group_weight: 50)
+      group_2 = @course.assignment_groups.create!(name: "Group 2", group_weight: 50)
+
+      assignment_1 = @course.assignments.create!(due_at: 1.week.from_now, title: "Assignment 1", assignment_group: group_1, grading_type: "points", points_possible: 10)
+      assignment_2 = @course.assignments.create!(due_at: 1.week.from_now, title: "Assignment 2", assignment_group: group_1, grading_type: "points", points_possible: 10)
+
+      assignment_1.grade_student(@student, grade: "10", grader: @teacher)
+      assignment_2.grade_student(@student, grade: "8", grader: @teacher)
+
+      user_session(@student)
+      StudentGradesPage.visit_as_student(@course)
+
+      expect(f("tr[data-testid='agtotal-#{group_1.name}']")).to be_displayed
+      expect(f("body")).not_to contain_jqcss("tr[data-testid='agtotal-#{group_2.name}']")
+    end
+
     it "displays N/A in the total sidebar when no asignments have been graded" do
       course_with_teacher(name: "Dedicated Teacher", active_course: true, active_user: true)
       course_with_student(course: @course, name: "Hardworking Student", active_all: true)

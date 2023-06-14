@@ -31,9 +31,15 @@ import {
 } from '../utils'
 
 export const assignmentGroupRow = (assignmentGroup, queryData) => {
+  const applicableAssignments = filteredAssignments(queryData).filter(assignment => {
+    return assignment?.assignmentGroup?._id === assignmentGroup?._id
+  })
+
+  if (applicableAssignments.length === 0) return null
+
   const assignmentGroupPercentage = getAssignmentGroupPercentage(
     assignmentGroup,
-    filteredAssignments(queryData),
+    applicableAssignments,
     false
   )
 
@@ -46,6 +52,9 @@ export const assignmentGroupRow = (assignmentGroup, queryData) => {
     assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE
       ? assignmentGroupPercentage
       : scorePercentageToLetterGrade(assignmentGroupPercentage, queryData?.gradingStandard)
+
+  const earnedPoints = getAssignmentGroupEarnedPoints(assignmentGroup, applicableAssignments, false)
+  const totalPoints = getAssignmentGroupTotalPoints(assignmentGroup, applicableAssignments, false)
 
   return (
     <Table.Row key={assignmentGroup?._id} data-testid={`agtotal-${assignmentGroup?.name}`}>
@@ -61,15 +70,7 @@ export const assignmentGroupRow = (assignmentGroup, queryData) => {
         <Text weight="bold">
           {ENV.restrict_quantitative_data
             ? letterGrade
-            : `${
-                formatNumber(
-                  getAssignmentGroupEarnedPoints(assignmentGroup, filteredAssignments(queryData))
-                ) || '-'
-              }/${
-                formatNumber(
-                  getAssignmentGroupTotalPoints(assignmentGroup, filteredAssignments(queryData))
-                ) || '-'
-              }`}
+            : `${formatNumber(earnedPoints) || '-'}/${formatNumber(totalPoints) || '-'}`}
         </Text>
       </Table.Cell>
     </Table.Row>
