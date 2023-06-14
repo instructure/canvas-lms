@@ -97,8 +97,9 @@ export default function FilterTray({
           <Flex as="div" margin="small">
             <FlexItem display="inline-block" width="100px" height="128px">
               <img
+                data-testid="friendly-panda"
                 src="/images/tutorial-tray-images/Panda_People.svg"
-                alt={I18n.t('Friendly panda')}
+                alt=""
                 style={{
                   width: '100px',
                   height: '128px',

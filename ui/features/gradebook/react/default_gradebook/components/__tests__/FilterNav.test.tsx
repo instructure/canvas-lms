@@ -285,17 +285,17 @@ describe('FilterNav', () => {
 
   it('shows friendly panda image when there are no filters', async () => {
     store.setState({filterPresets: [], stagedFilters: []})
-    const {getByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    const {getByTestId, getByText} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    expect(await getByAltText('Friendly panda')).toBeInTheDocument()
+    expect(await getByTestId('friendly-panda')).toBeInTheDocument()
   })
 
   it('hides friendly panda image when there are filters', async () => {
-    const {queryByAltText, getByText} = render(<FilterNav {...defaultProps} />)
+    const {queryByTestId, getByText} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    expect(await queryByAltText('Friendly panda')).toBeNull()
+    expect(await queryByTestId('friendly-panda')).toBeNull()
   })
 
   it('clicking Create New Filter Preset triggers onChange with filter', async () => {
