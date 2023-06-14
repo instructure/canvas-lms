@@ -24,7 +24,7 @@ import PropTypes from 'prop-types'
 import {Table} from '@instructure/ui-table'
 
 import {GradeSummaryContext} from './context'
-import {getGradingPeriodID, sortAssignments} from './utils'
+import {getGradingPeriodID, sortAssignments, listDroppedAssignments} from './utils'
 
 import {totalRow} from './AssignmentTableRows/TotalRow'
 import {assignmentGroupRow} from './AssignmentTableRows/AssignmentGroupRow'
@@ -48,6 +48,7 @@ const AssignmentTable = ({
   handleReadStateChange,
 }) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
+  const droppedAssignments = listDroppedAssignments(queryData, getGradingPeriodID() === '0')
 
   return (
     <Table caption={I18n.t('Student Grade Summary')} layout={layout} hover={true}>
@@ -68,6 +69,7 @@ const AssignmentTable = ({
       <Table.Body>
         {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)?.map(
           assignment => {
+            assignment.dropped = droppedAssignments.includes(assignment)
             return assignmentRow(
               assignment,
               queryData,
