@@ -209,3 +209,9 @@ authenticated_iframe_content:
   display_name: 'Authenticated IFrame Content'
   description: This flag changes the way RCE content is loaded in iframes to proxy the request through canvas.
   applies_to: SiteAdmin
+
+content_migration_asset_map_v2:
+  state: hidden
+  display_name: Content Migration Asset Map v2
+  description: Adds Additional Fields to the Content Migration Asset Map
+  applies_to: SiteAdmin

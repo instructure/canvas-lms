@@ -1159,6 +1159,20 @@ class ContentMigration < ActiveRecord::Base
 
   ASSET_ID_MAP_TYPES = %w[Assignment Announcement Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
+  def add_asset_pair_to_mapping(mapping, key, src_id, mig_id, destination_identifier)
+    # mig_ids are md5 hashes (eg they have 32 digits), so there should be zero overlap with
+    # the src_ids which are DB primary keys or global_ids and they can safely be stored on the same
+    # hash.
+    mapping[key][src_id.to_s] = destination_identifier.to_s
+
+    return unless Account.site_admin.feature_enabled?(:content_migration_asset_map_v2)
+
+    mapping[key][mig_id] = {
+      source: { id: src_id.to_s },
+      destination: { id: destination_identifier.to_s }
+    }
+  end
+
   def asset_id_mapping
     return nil unless (imported? || importing?) && source_course
 
@@ -1198,7 +1212,8 @@ class ContentMigration < ActiveRecord::Base
           src_ids.each do |src_id|
             global_asset_string = klass.asset_string(Shard.global_id_for(src_id, source_course.shard))
             mig_id = master_template.migration_id_for(global_asset_string)
-            mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id]
+
+            add_asset_pair_to_mapping(mapping, key, src_id, mig_id, mig_id_to_dest_id[mig_id][:id]) if mig_id_to_dest_id[mig_id]
           end
         else
           master_template.master_content_tags
@@ -1206,10 +1221,13 @@ class ContentMigration < ActiveRecord::Base
                                 migration_id: mig_id_to_dest_id.keys)
                          .pluck(:content_id, :migration_id)
                          .each do |src_id, mig_id|
-            if mig_id_to_dest_id[mig_id]
-              mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id][:id]
-              mapping["assignments"][klass.find(src_id.to_s).assignment_id] = mig_id_to_dest_id[mig_id][:shell_id].to_s if mig_id_to_dest_id[mig_id][:shell_id]
-            end
+            next unless mig_id_to_dest_id[mig_id]
+
+            add_asset_pair_to_mapping(mapping, key, src_id, mig_id, mig_id_to_dest_id[mig_id][:id]) if mig_id_to_dest_id[mig_id][:id]
+            src_assignment_id = mig_id_to_dest_id[mig_id][:shell_id] && klass.column_names.include?("assignment_id") && klass.find(src_id.to_s).assignment_id
+            next unless src_assignment_id
+
+            add_asset_pair_to_mapping(mapping, "assignments", src_assignment_id, mig_id, mig_id_to_dest_id[mig_id][:shell_id])
           end
         end
       else
@@ -1220,7 +1238,8 @@ class ContentMigration < ActiveRecord::Base
           src_ids.each do |src_id|
             asset_string = klass.asset_string(src_id)
             mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
-            mapping[key][src_id.to_s] = mig_id_to_dest_id[mig_id][:id].to_s if mig_id_to_dest_id[mig_id]
+
+            add_asset_pair_to_mapping(mapping, key, src_id, mig_id, mig_id_to_dest_id[mig_id][:id]) if mig_id_to_dest_id[mig_id]
           end
         end
       end
@@ -1249,6 +1268,7 @@ class ContentMigration < ActiveRecord::Base
     payload = {
       "source_host" => source_course.root_account.domain(ApplicationController.test_cluster_name),
       "source_course" => source_course_id.to_s,
+      "contains_migration_ids" => Account.site_admin.feature_enabled?(:content_migration_asset_map_v2),
       "resource_mapping" => data
     }
 
