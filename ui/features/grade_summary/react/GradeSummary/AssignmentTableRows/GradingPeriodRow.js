@@ -52,7 +52,7 @@ export const gradingPeriodRow = (gradingPeriod, queryData) => {
   }/${formatNumber(getGradingPeriodTotalPoints(gradingPeriod, filterByGradingPeriod)) || '-'}`
 
   return (
-    <Table.Row key={gradingPeriod._id}>
+    <Table.Row key={gradingPeriod._id} data-testid={'gradingPeriod-' + gradingPeriod._id}>
       <Table.Cell textAlign="start" colSpan="3">
         <Text weight="bold">{gradingPeriod.title}</Text>
       </Table.Cell>

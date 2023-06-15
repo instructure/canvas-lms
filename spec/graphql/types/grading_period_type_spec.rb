@@ -77,5 +77,25 @@ describe Types::GradingPeriodType do
         expect(grading_period_type.resolve("weight")).to be_nil
       end
     end
+
+    describe "when display_totals_for_all_grading_periods is true" do
+      before do
+        grading_period_group.update!(display_totals_for_all_grading_periods: true)
+      end
+
+      it "resolves to true" do
+        expect(grading_period_type.resolve("displayTotals")).to be true
+      end
+    end
+
+    describe "when display_totals_for_all_grading_periods is false" do
+      before do
+        grading_period_group.update!(display_totals_for_all_grading_periods: false)
+      end
+
+      it "resolves to false" do
+        expect(grading_period_type.resolve("displayTotals")).to be false
+      end
+    end
   end
 end

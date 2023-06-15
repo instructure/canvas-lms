@@ -84,7 +84,7 @@ const AssignmentTable = ({
               return assignmentGroupRow(assignmentGroup, queryData)
             })
           : queryData?.gradingPeriodsConnection?.nodes?.map(gradingPeriod => {
-              return gradingPeriodRow(gradingPeriod, queryData)
+              return gradingPeriod.displayTotals ? gradingPeriodRow(gradingPeriod, queryData) : null
             })}
         {totalRow(queryData)}
       </Table.Body>
