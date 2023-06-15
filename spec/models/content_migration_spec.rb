@@ -1219,70 +1219,112 @@ describe ContentMigration do
   end
 
   describe "asset_map_url" do
-    before :once do
-      # not actually doing a course copy here, just simulating a finished one
-      @src = course_factory
-      @dst = course_factory
-      @old = @src.assignments.create! title: "foo"
-      @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
-      @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
-      @cm.workflow_state = "imported"
-      @cm.source_course = @src
-      @cm.save!
+    context "when the :content_migration_asset_map_v2 flag is off" do
+      before :once do
+        # not actually doing a course copy here, just simulating a finished one
+        @src = course_factory
+        @dst = course_factory
+        @old = @src.assignments.create! title: "foo"
+        @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
+        @cm.workflow_state = "imported"
+        @cm.source_course = @src
+        @cm.save!
+      end
+
+      it "returns a url to a file containing the asset map" do
+        allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
+        url = @cm.asset_map_url(generate_if_needed: true)
+        @cm.reload
+        expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+        expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+        expect(@cm.asset_map_attachment.context).to eq @cm
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        expect(json).to eq({ "source_course" => @src.id.to_s,
+                             "source_host" => "pineapple.edu",
+                             "contains_migration_ids" => false,
+                             "resource_mapping" => {
+                               "assignments" => { @old.id.to_s => @new.id.to_s }
+                             } })
+      end
+
+      context "when not on a test cluster" do
+        let(:content_migration) do
+          @cm.update!(source_course:)
+
+          @cm
+        end
+        let(:source_course) { course_factory }
+
+        before do
+          allow(ApplicationController).to receive(:test_cluster_name).and_return nil
+          allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
+        end
+
+        it "uses the 'production' host" do
+          expect(content_migration.context.root_account).to receive(:domain).with(nil)
+
+          content_migration.asset_map_url(generate_if_needed: true)
+        end
+      end
+
+      context "when on a test cluster" do
+        let(:content_migration) do
+          @cm.update!(source_course:)
+
+          @cm
+        end
+        let(:source_course) { course_factory }
+
+        before do
+          allow(ApplicationController).to receive(:test_cluster_name).and_return "banana"
+          allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
+        end
+
+        it "uses the test host" do
+          expect(content_migration.context.root_account).to receive(:domain).with("banana")
+
+          content_migration.asset_map_url(generate_if_needed: true)
+        end
+      end
     end
 
-    it "returns a url to a file containing the asset map" do
-      allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
-      url = @cm.asset_map_url(generate_if_needed: true)
-      @cm.reload
-      expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
-      expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
-      expect(@cm.asset_map_attachment.context).to eq @cm
-      json = JSON.parse(@cm.asset_map_attachment.open.read)
-      expect(json).to eq({ "source_course" => @src.id.to_s,
-                           "source_host" => "pineapple.edu",
-                           "resource_mapping" => {
-                             "assignments" => { @old.id.to_s => @new.id.to_s }
-                           } })
-    end
-
-    context "when not on a test cluster" do
-      let(:content_migration) do
-        @cm.update!(source_course:)
-
-        @cm
-      end
-      let(:source_course) { course_factory }
-
-      before do
-        allow(ApplicationController).to receive(:test_cluster_name).and_return nil
-        allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
+    context "when the :content_migration_asset_map_v2 flag is on" do
+      before :once do
+        # not actually doing a course copy here, just simulating a finished one
+        @src = course_factory
+        @dst = course_factory
+        @old = @src.assignments.create! title: "foo"
+        @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+        @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
+        @cm.workflow_state = "imported"
+        @cm.source_course = @src
+        @cm.save!
       end
 
-      it "uses the 'production' host" do
-        expect(content_migration.context.root_account).to receive(:domain).with(nil)
-
-        content_migration.asset_map_url(generate_if_needed: true)
-      end
-    end
-
-    context "when on a test cluster" do
-      let(:content_migration) do
-        @cm.update!(source_course:)
-
-        @cm
-      end
-      let(:source_course) { course_factory }
-
-      before do
-        allow(ApplicationController).to receive(:test_cluster_name).and_return "banana"
-        allow(content_migration.context.root_account).to receive(:domain).and_return "pineapple.edu"
-      end
-
-      it "uses the test host" do
-        expect(content_migration.context.root_account).to receive(:domain).with("banana")
-
-        content_migration.asset_map_url(generate_if_needed: true)
+      it "returns a url to a file containing the asset map" do
+        allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
+        Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
+        url = @cm.asset_map_url(generate_if_needed: true)
+        Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
+        @cm.reload
+        expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+        expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+        expect(@cm.asset_map_attachment.context).to eq @cm
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        expect(json).to eq({ "source_course" => @src.id.to_s,
+                             "source_host" => "pineapple.edu",
+                             "contains_migration_ids" => true,
+                             "resource_mapping" => {
+                               "assignments" => {
+                                 @old.id.to_s => @new.id.to_s,
+                                 old_migration_id => {
+                                   "source" => { "id" => @old.id.to_s },
+                                   "destination" => { "id" => @new.id.to_s }
+                                 }
+                               }
+                             } })
       end
     end
   end
