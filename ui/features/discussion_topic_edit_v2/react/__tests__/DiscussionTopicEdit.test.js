@@ -18,11 +18,11 @@
 
 import {render} from '@testing-library/react'
 import React from 'react'
-import {DiscussionTopicEdit} from '../DiscussionTopicEdit'
+import {DiscussionTopicEdit} from '../index'
 
 describe('DiscussionTopicEdit', () => {
   test('renders', () => {
     const {getByText} = render(<DiscussionTopicEdit />)
-    expect(getByText('page coming soon')).toBeInTheDocument()
+    expect(getByText('Page coming soon')).toBeInTheDocument()
   })
 })

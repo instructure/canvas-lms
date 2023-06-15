@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {DiscussionTopicEdit} from './react/DiscussionTopicEdit'
+import {DiscussionTopicEdit} from './react/index'
 import React from 'react'
 import ReactDom from 'react-dom'
 
