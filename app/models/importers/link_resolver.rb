@@ -21,8 +21,11 @@ module Importers
   class LinkResolver
     include LinkParser::Helpers
 
-    def initialize(migration)
+    def initialize(migration, migration_id_converter)
+      # TODO: eventually, the reference to @migration here
+      # should be removed prior to being moved into the gem
       @migration = migration
+      @migration_id_converter = migration_id_converter
     end
 
     def resolve_links!(link_map)
@@ -35,19 +38,23 @@ module Importers
       end
     end
 
+    def context_path
+      @migration_id_converter.context_path
+    end
+
     # finds the :new_value to use to replace the placeholder
     def resolve_link!(link)
       case link[:link_type]
       when :wiki_page
-        if (linked_wiki_url = context.wiki_pages.where(migration_id: link[:migration_id]).limit(1).pluck(:url).first)
+        if (linked_wiki_url = @migration_id_converter.convert_wiki_page_migration_id_to_slug(link[:migration_id]))
           link[:new_value] = "#{context_path}/pages/#{linked_wiki_url}#{link[:query]}"
         end
       when :discussion_topic
-        if (linked_topic_id = context.discussion_topics.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first)
+        if (linked_topic_id = @migration_id_converter.convert_discussion_topic_migration_id(link[:migration_id]))
           link[:new_value] = "#{context_path}/discussion_topics/#{linked_topic_id}#{link[:query]}"
         end
       when :module_item
-        if (tag_id = context.context_module_tags.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first)
+        if (tag_id = @migration_id_converter.convert_context_module_tag_migration_id(link[:migration_id]))
           link[:new_value] = "#{context_path}/modules/items/#{tag_id}#{link[:query]}"
         end
       when :object
@@ -61,12 +68,12 @@ module Importers
           query = resolve_module_item_query(context, link[:query])
           link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
         elsif type == "attachments"
-          att_id = context.attachments.where(migration_id:).pick(:id)
+          att_id = @migration_id_converter.convert_attachment_migration_id(migration_id)
           if att_id
             link[:new_value] = "#{context_path}/files/#{att_id}/preview"
           end
         elsif type == "media_attachments_iframe"
-          att_id = context.attachments.where(migration_id:).pick(:id)
+          att_id = @migration_id_converter.convert_attachment_migration_id(migration_id)
           link[:new_value] = att_id ? "/media_attachments_iframe/#{att_id}#{link[:query]}" : link[:old_value]
         elsif context.respond_to?(type) && context.send(type).respond_to?(:scope)
           scope = context.send(type).scope
@@ -105,7 +112,7 @@ module Importers
         end
         link[:new_value] = new_url
       when :file_ref
-        file_id = context.attachments.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first
+        file_id = @migration_id_converter.convert_attachment_migration_id(link[:migration_id])
         if file_id
           rest = link[:rest].presence || "/preview"
 
@@ -121,23 +128,24 @@ module Importers
           end
         end
       else
-        raise "unrecognized link_type in unresolved link"
+        raise "unrecognized link_type (#{link[:link_type]}) in unresolved link"
       end
     end
 
-    def resolve_module_item_query(context, query)
+    def resolve_module_item_query(_context, query)
       return query unless query&.include?("module_item_id=")
 
       original_param = query.sub("?", "").split("&").detect { |p| p.include?("module_item_id=") }
       mig_id = original_param.split("=").last
-      tag = context.context_module_tags.where(migration_id: mig_id).first
-      return query unless tag
+      tag_id = @migration_id_converter.convert_context_module_tag_migration_id(mig_id)
+      return query unless tag_id
 
-      new_param = "module_item_id=#{tag.id}"
+      new_param = "module_item_id=#{tag_id}"
       query.sub(original_param, new_param)
     end
 
     def missing_relative_file_url(rel_path)
+      # TODO: abstract away Folder.root_folders
       # the rel_path should already be escaped
       File.join(URI::DEFAULT_PARSER.escape("#{context_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path.gsub(" ", "%20"))
     end
