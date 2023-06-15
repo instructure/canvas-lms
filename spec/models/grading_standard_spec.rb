@@ -74,7 +74,50 @@ describe GradingStandard do
 
         expect(standard).to be_valid
       end
+
+      it "is valid when scaling_factor other than 1 is set for a points based scheme" do
+        standard.data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.0]]
+        standard.points_based = true
+        standard.scaling_factor = 4.0
+        expect(standard).to be_valid
+      end
+
+      it "is invalid when scaling_factor other than 1 is set for a non points based scheme" do
+        standard.data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.0]]
+        standard.scaling_factor = 4.0
+        expect(standard).not_to be_valid
+      end
     end
+  end
+
+  it "defaults scaling_factor to 1.0" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard })
+    grading_standard.save
+    expect(grading_standard.scaling_factor).to eq 1.0
+  end
+
+  it "scaling_factor persists and retrieves" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard,
+                                                         scaling_factor: 4.0 })
+    grading_standard.save
+    expect(grading_standard.scaling_factor).to eq 4.0
+  end
+
+  it "defaults points_based properly" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard })
+    grading_standard.save
+    expect(grading_standard.points_based).to be false
+  end
+
+  it "points_based persists and retrieves" do
+    grading_standard = @course.grading_standards.build({ title: "My Scheme Title",
+                                                         data: GradingStandard.default_grading_standard,
+                                                         points_based: true })
+    grading_standard.save
+    expect(grading_standard.points_based).to be true
   end
 
   it "strips trailing whitespaces from scheme names" do

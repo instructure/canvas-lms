@@ -29,6 +29,7 @@ class GradingStandard < ActiveRecord::Base
   validates :data, presence: true
   validate :valid_grading_scheme_data
   validate :full_range_scheme
+  validate :scaling_factor_points_based
 
   # version 1 data is an array of [ letter, max_integer_value ]
   # we created a version 2 because this is ambiguous once we added support for
@@ -223,6 +224,10 @@ class GradingStandard < ActiveRecord::Base
     errors.add(:data, "grading scheme values cannot be negative") if data.present? && data.any? { |v| v[1] < 0 }
     errors.add(:data, "grading scheme cannot contain duplicate values") if data.present? && data.pluck(1) != data.pluck(1).uniq
     errors.add(:data, "a grading scheme name is too long") if data.present? && data.any? { |v| v[0].length > self.class.maximum_string_length }
+  end
+
+  def scaling_factor_points_based
+    errors.add(:scaling_factor, "must be 1 if scheme points_based is false") if !points_based && scaling_factor != 1
   end
 
   def full_range_scheme

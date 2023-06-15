@@ -442,7 +442,7 @@ module SchemaStatementsExtensions
     cd = td.new_column_definition(column_name, type, **options)
     schema = schema_creation
     schema.set_table_context(table_name)
-    schema.accept(AddColumnDefinition.new(cd))
+    schema.accept(ActiveRecord::ConnectionAdapters::AddColumnDefinition.new(cd))
   end
 end
 
