@@ -98,6 +98,7 @@ export default function EnhancedIndividualGradebook() {
     settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
     teacherNotes: ENV.GRADEBOOK_OPTIONS?.teacher_notes,
     showTotalGradeAsPoints: ENV.GRADEBOOK_OPTIONS?.show_total_grade_as_points,
+    messageAttachmentUploadFolderId: ENV.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
   }
   const [gradebookOptions, setGradebookOptions] =
     useState<GradebookOptions>(defaultGradebookOptions)
@@ -239,6 +240,7 @@ export default function EnhancedIndividualGradebook() {
       <AssignmentInformation
         assignment={selectedAssignment}
         gradebookOptions={gradebookOptions}
+        students={students}
         submissions={submissionsForSelectedAssignment}
       />
 

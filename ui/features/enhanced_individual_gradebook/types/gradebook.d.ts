@@ -58,6 +58,7 @@ export type GradebookOptions = {
   settingsUpdateUrl?: string | null
   teacherNotes?: teacherNotes | null
   showTotalGradeAsPoints?: boolean | null
+  messageAttachmentUploadFolderId?: string
 }
 
 export type AssignmentDetailCalculationText = {

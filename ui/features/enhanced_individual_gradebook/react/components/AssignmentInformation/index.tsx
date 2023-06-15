@@ -16,18 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useMemo, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
-import {AssignmentConnection, GradebookOptions, SubmissionConnection} from '../../../types'
+import {
+  AssignmentConnection,
+  GradebookOptions,
+  SortableStudent,
+  SubmissionConnection,
+} from '../../../types'
 import {computeAssignmentDetailText} from '../../../utils/gradebookUtils'
-import {Button} from '@instructure/ui-buttons'
+import MessageStudentsWhoModal from './MessageStudentsWhoModal'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   assignment?: AssignmentConnection
+  students?: SortableStudent[]
   submissions?: SubmissionConnection[]
   gradebookOptions: GradebookOptions // TODO: get this from gradebook settings
 }
@@ -35,6 +42,7 @@ type Props = {
 export default function AssignmentInformation({
   assignment,
   gradebookOptions,
+  students = [],
   submissions = [],
 }: Props) {
   const {gradedSubmissions, scores} = useMemo(
@@ -121,7 +129,12 @@ export default function AssignmentInformation({
 
           <AssignmentScoreDetails assignment={assignment} scores={scores} />
 
-          <AssignmentActions assignment={assignment} gradebookOptions={gradebookOptions} />
+          <AssignmentActions
+            assignment={assignment}
+            submissions={submissions}
+            students={students}
+            gradebookOptions={gradebookOptions}
+          />
         </View>
       </View>
     </View>
@@ -163,14 +176,33 @@ function AssignmentScoreDetails({assignment, scores}: AssignmentScoreDetailsProp
 
 type AssignmentActionsProps = {
   assignment: AssignmentConnection
+  students: SortableStudent[]
+  submissions: SubmissionConnection[]
   gradebookOptions: GradebookOptions
 }
-function AssignmentActions({assignment, gradebookOptions}: AssignmentActionsProps) {
+function AssignmentActions({
+  assignment,
+  students,
+  submissions,
+  gradebookOptions,
+}: AssignmentActionsProps) {
+  const [showMessageStudentsWhoModal, setShowMessageStudentsWhoModal] = useState(false)
+
   return (
     <>
       {!gradebookOptions.anonymizeStudents && (
         <View as="div" className="pad-box no-sides">
-          <Button color="secondary">{I18n.t('Message students who...')}</Button>
+          <Button color="secondary" onClick={() => setShowMessageStudentsWhoModal(true)}>
+            {I18n.t('Message students who...')}
+          </Button>
+          <MessageStudentsWhoModal
+            assignment={assignment}
+            gradebookOptions={gradebookOptions}
+            students={students}
+            submissions={submissions}
+            isOpen={showMessageStudentsWhoModal}
+            onClose={() => setShowMessageStudentsWhoModal(false)}
+          />
         </View>
       )}
       <View as="div" className="pad-box no-sides">

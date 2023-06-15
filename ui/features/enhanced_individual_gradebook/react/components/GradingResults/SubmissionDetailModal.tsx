@@ -203,7 +203,9 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
           )}
 
           {attachments.length > 0 &&
-            attachments.map(attachment => <CommentAttachment attachment={attachment} />)}
+            attachments.map(attachment => (
+              <CommentAttachment key={attachment.id} attachment={attachment} />
+            ))}
         </FlexItem>
         <FlexItem align="start">
           <Heading level="h5">
