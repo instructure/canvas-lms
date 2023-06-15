@@ -30,10 +30,11 @@ const I18n = useI18nScope('UploadMediaTrackForm')
 
 export default class UploadMediaTrackForm {
   // video url needs to be the url to mp4 version of the video.
-  constructor(mediaCommentId, video_url, attachmentId = null) {
+  constructor(mediaCommentId, video_url, attachmentId = null, lockedMediaAttachment = false) {
     this.mediaCommentId = mediaCommentId
     this.video_url = video_url
     this.attachmentId = attachmentId
+    this.lockedMediaAttachment = lockedMediaAttachment
     const templateVars = {
       languages: _.map(mejs.language.codes, (name, code) => ({name, code})),
       video_url: this.video_url,

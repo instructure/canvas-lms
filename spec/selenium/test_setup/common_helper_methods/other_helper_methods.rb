@@ -34,6 +34,7 @@ module OtherHelperMethods
     kal = double("CanvasKaltura::ClientV3")
     allow(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
+    kal
   end
 
   def page_view(opts = {})
