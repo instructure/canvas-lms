@@ -195,18 +195,24 @@ export default class EventDataSource {
   }
 
   eventInRange(event, start, end) {
-    let ref
+    // Want dated, have dated. but when comparing to the range, remember
+    // that we made start/end be unwrapped values (down in getEvents), so
+    // unwrap event.originalStart/originalEndDate too before comparing.
     if (!event.originalStart && !start) {
       // want undated, have undated, include it
       return true
     } else if (!event.originalStart || !start) {
       // want undated, have dated (or vice versa), skip it
       return false
+    } else if (event.originalStart && event.originalEndDate) {
+      // Returns true if the event date range contains dates between start date and end date.
+      return (
+        start <= fcUtil.unwrap(event.originalEndDate) && fcUtil.unwrap(event.originalStart) <= end
+      )
     } else {
-      // want dated, have dated. but when comparing to the range, remember
-      // that we made start/end be unwrapped values (down in getEvents), so
-      // unwrap event.originalStart too before comparing
-      return start <= (ref = fcUtil.unwrap(event.originalStart)) && ref < end
+      // Assignments, Planner Items or Planner notes don't have an end date
+      const originalStart = fcUtil.unwrap(event.originalStart)
+      return start <= originalStart && originalStart < end
     }
   }
 
