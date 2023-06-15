@@ -22,7 +22,9 @@
 <% js_bundle :external_tool_redirect if @redirect_return %>
 
 <%= render @prepend_template if @prepend_template %>
-<% provide :right_side, render(:partial => "assignments/assignment_sidebar") %>
+
+<% provide :right_side, render(:partial => "lti/conditional_submission_sidebar") %>
+
 
 <% if @lti_launch.resource_url.start_with?('http://') %>
     <div class="alert alert-error" id="insecure_content_msg">
