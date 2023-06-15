@@ -182,8 +182,8 @@ describe "gradebook - logged in as a student" do
       group.update(display_totals_for_all_grading_periods: true)
       group.save!
       term.update_attribute(:grading_period_group_id, group)
-      backend_period_helper.create_with_weeks_for_group(group, -8, -12, future_period_name)
-      backend_period_helper.create_with_weeks_for_group(group, 1, -3, current_period_name)
+      future_period = backend_period_helper.create_with_weeks_for_group(group, -8, -12, future_period_name)
+      current_period = backend_period_helper.create_with_weeks_for_group(group, 1, -3, current_period_name)
 
       # create assignments
       future_assignment = @course.assignments.create!(due_at: 10.weeks.from_now, title: future_assignment_name, grading_type: "points", points_possible: 10)
@@ -226,6 +226,24 @@ describe "gradebook - logged in as a student" do
 
       expect(fj(future_assignment_selector).text).to include "GRADED\nA\nYour grade has been updated"
       expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
+
+      # Make sure the grading period totals show because display_totals_for_all_grading_periods is true
+      expect(fj("tr[data-testid='gradingPeriod-#{future_period.id}']").text).to eq "Future Grading Period A"
+      expect(fj("tr[data-testid='gradingPeriod-#{current_period.id}']").text).to eq "Current Grading Period B-"
+
+      group.update(display_totals_for_all_grading_periods: false)
+      group.save!
+
+      StudentGradesPage.visit_as_student(@course)
+
+      f("#grading_period_select_menu").click
+      fj("li:contains('All Grading Periods')").click
+      fj("button:contains('Apply')").click
+      wait_for_ajaximations
+
+      # Make sure the grading period totals aren't shown because display_totals_for_all_grading_periods was changed to false
+      expect(f("body")).not_to contain_jqcss("tr[data-testid='gradingPeriod-#{future_period.id}']")
+      expect(f("body")).not_to contain_jqcss("tr[data-testid='gradingPeriod-#{current_period.id}']")
     end
 
     it "displays N/A in the total sidebar when no asignments have been graded" do
