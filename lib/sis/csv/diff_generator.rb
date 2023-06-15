@@ -55,32 +55,48 @@ module SIS
       def generate_csvs(previous_csvs, current_csvs)
         generated = []
         current_csvs.each do |(import_type, csvs)|
-          current_csv = csvs.first
-          previous_csv = previous_csvs[import_type].try(:first)
+          previous_csvs_of_type = previous_csvs[import_type] || []
 
-          if current_csv.nil? || previous_csv.nil?
+          if csvs.empty? || previous_csvs_of_type.empty?
             generated.concat(csvs)
             next
           end
 
-          if csvs.size > 1 || previous_csvs[import_type].size > 1
-            add_warning(current_csv,
-                        I18n.t("Can't perform diffing against more than one file of the same type"))
+          prev_csv_map = {}.compare_by_identity
+          if csvs.size == previous_csvs_of_type.size
+            if csvs.size == 1
+              # there's only one file of each type; diff them like we did before
+              prev_csv_map[csvs.first] = previous_csvs_of_type.first
+            elsif csvs.pluck(:file).uniq.size == csvs.size
+              # with multiple files, match them up by filename (assuming all filenames are distinct)
+              csvs.each do |csv|
+                match = previous_csvs_of_type.find { |p| p[:file] == csv[:file] }
+                prev_csv_map[csv] = match if match
+              end
+            end
+          end
+
+          if prev_csv_map.size != csvs.size
+            add_warning(csvs.first,
+                        I18n.t("Unable to perform diffing against mismatched previous and current %{type} imports", type: import_type))
             generated.concat(csvs)
             next
           end
 
           begin
-            status = @batch.options && @batch.options[:diffing_drop_status].presence
-            status = "deleted" unless import_type == :enrollment && VALID_ENROLLMENT_DROP_STATUS.include?(status)
-            diff = generate_diff(class_for_importer(import_type), previous_csv[:fullpath], current_csv[:fullpath], status)
-            io = diff[:file_io]
-            generated << {
-              row_count: diff[:row_count],
-              file: current_csv[:file],
-              fullpath: io.path,
-              tmpfile: io # returning the Tempfile alongside its path, to keep it in scope
-            }
+            csvs.each do |current_csv|
+              previous_csv = prev_csv_map[current_csv]
+              status = @batch.options && @batch.options[:diffing_drop_status].presence
+              status = "deleted" unless import_type == :enrollment && VALID_ENROLLMENT_DROP_STATUS.include?(status)
+              diff = generate_diff(class_for_importer(import_type), previous_csv[:fullpath], current_csv[:fullpath], status)
+              io = diff[:file_io]
+              generated << {
+                row_count: diff[:row_count],
+                file: current_csv[:file],
+                fullpath: io.path,
+                tmpfile: io # returning the Tempfile alongside its path, to keep it in scope
+              }
+            end
           rescue CsvDiff::Failure => e
             add_warning(current_csv, I18n.t("Couldn't generate diff: %{message}", message: e.message))
             generated.concat(csvs)

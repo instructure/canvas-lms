@@ -50,7 +50,7 @@ describe SIS::CSV::DiffGenerator do
       expect(@batch.sis_batch_errors).to be_empty
     end
 
-    it "skips diffing if previous has more than one file of type" do
+    it "skips diffing if previous has more files of type" do
       previous = {
         user: [{ file: "users1.csv" }, { file: "users2.csv" }],
       }
@@ -64,10 +64,10 @@ describe SIS::CSV::DiffGenerator do
                                                                       ])
       warning = @batch.sis_batch_errors.first
       expect(warning.file).to eq "users.csv"
-      expect(warning.message).to match(/diffing against more than one/)
+      expect(warning.message).to match(/mismatched previous and current/)
     end
 
-    it "skips diffing if current has more than one file of type" do
+    it "skips diffing if current has more files of type" do
       previous = {
         user: [{ file: "users.csv" }],
       }
@@ -81,7 +81,64 @@ describe SIS::CSV::DiffGenerator do
                                                                       ])
       warning = @batch.sis_batch_errors.first
       expect(warning.file).to eq "users1.csv"
-      expect(warning.message).to match(/diffing against more than one/)
+      expect(warning.message).to match(/mismatched previous and current/)
+    end
+
+    it "skips diffing if previous and current have the same number of files but names don't match" do
+      previous = {
+        user: [{ file: "users.csv" }, { file: "users2.csv" }],
+      }
+
+      current = {
+        user: [{ file: "users1.csv" }, { file: "users2.csv" }],
+      }
+
+      expect(subject.generate_csvs(previous, current)).to match_array([
+                                                                        { file: "users1.csv" }, { file: "users2.csv" },
+                                                                      ])
+      warning = @batch.sis_batch_errors.first
+      expect(warning.file).to eq "users1.csv"
+      expect(warning.message).to match(/mismatched previous and current/)
+    end
+
+    it "skips diffing if previous or current have ambiguous filenames" do
+      previous = {
+        user: [{ file: "users.csv" }, { file: "users.csv" }],
+      }
+
+      current = {
+        user: [{ file: "users.csv" }, { file: "users.csv" }],
+      }
+
+      expect(subject.generate_csvs(previous, current)).to match_array([
+                                                                        { file: "users.csv" }, { file: "users.csv" },
+                                                                      ])
+      warning = @batch.sis_batch_errors.first
+      expect(warning.file).to eq "users.csv"
+      expect(warning.message).to match(/mismatched previous and current/)
+    end
+
+    it "diffs multiple files of the same type if the names match" do
+      previous = {
+        enrollment: [
+          csv("student_enrollments", "section_id,user_id,role,status\nS0,bill,student,active\nS0,ted,student,active\n"),
+          csv("teacher_enrollments", "section_id,user_id,role,status\nS0,hans,teacher,active\nS0,franz,teacher,active\n")
+        ]
+      }
+      current = {
+        enrollment: [
+          csv("student_enrollments", "section_id,user_id,role,status\nS0,bill,student,active\nS0,melinda,student,active\n"),
+          csv("teacher_enrollments", "section_id,user_id,role,status\nS0,hans,teacher,active\nS0,harry,teacher,active\n")
+        ]
+      }
+      csvs = subject.generate_csvs(previous, current)
+      expect(csvs.size).to eq 2
+
+      student_enrollments = csvs.find { |f| f[:file] == "student_enrollments.csv" }
+      expect(File.read(student_enrollments[:fullpath])).to eq("section_id,user_id,role,status\nS0,melinda,student,active\nS0,ted,student,deleted\n")
+
+      teacher_enrollments = csvs.find { |f| f[:file] == "teacher_enrollments.csv" }
+      expect(File.read(teacher_enrollments[:fullpath])).to eq("section_id,user_id,role,status\nS0,harry,teacher,active\nS0,franz,teacher,deleted\n")
     end
 
     it "generates multiple diffs for different file types" do
