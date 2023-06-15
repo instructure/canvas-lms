@@ -918,6 +918,34 @@ module Lti
                        ASSIGNMENT_GUARD,
                        default_name: "com_instructure_assignment_anonymous_grading"
 
+    # returns true if the assignment restricts quantitative data.
+    # Assignment types: points, percentage, gpa_scale are all considered quantitative.
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "com.instructure.Assignment.restrict_quantitative_data",
+                       [],
+                       -> { @assignment.restrict_quantitative_data?(@current_user) },
+                       ASSIGNMENT_GUARD,
+                       default_name: "com_instructure_assignment_restrict_quantitative_data"
+
+    # returns the grading scheme data for the course
+    # it is an array of arrays of grade levels
+    # @example
+    #  ```
+    #  [
+    #    ["A", 94.0, 100.0],
+    #    ["A-", 90.0, 93.99],
+    #    ["B+", 87.0, 89.99],
+    #  ]
+    #  ```
+    register_expansion "com.instructure.Course.gradingScheme",
+                       [],
+                       -> { @context.grading_standard_or_default.data },
+                       COURSE_GUARD,
+                       default_name: "com_instructure_course_grading_scheme"
+
     # returns the current course membership roles
     # using the LIS v2 vocabulary.
     # @example
