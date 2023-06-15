@@ -138,6 +138,7 @@ export const DiscussionEntryContainer = props => {
         },
       }}
       render={responsiveProps => (
+        // If you change the left padding here, please update the DiscussionThreadContainer getReplyLeftMargin function
         <Flex direction="column" padding="0 0 small small">
           <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
             <Flex direction={props.isTopic ? responsiveProps.direction : 'row'}>
