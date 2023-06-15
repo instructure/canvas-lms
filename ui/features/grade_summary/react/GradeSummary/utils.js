@@ -276,44 +276,41 @@ export const filterDroppedAssignments = (
 }
 
 export const listDroppedAssignments = (queryData, byGradingPeriod) => {
+  const processAssignmentGroup = (data, checkAssignment) => {
+    return data?.assignmentGroupsConnection?.nodes
+      ?.map(assignmentGroup => {
+        const assignments = filterDroppedAssignments(
+          filteredAssignments(data).filter(assignment => {
+            return checkAssignment(assignment, assignmentGroup)
+          }),
+          assignmentGroup,
+          true
+        )
+        return assignments
+      })
+      .flat()
+  }
+
   return byGradingPeriod
     ? [
         ...new Set(
           queryData?.gradingPeriodsConnection?.nodes
             .map(gradingPeriod => {
-              return queryData?.assignmentGroupsConnection?.nodes
-                .map(assignmentGroup => {
-                  const assignments = filterDroppedAssignments(
-                    filteredAssignments(queryData).filter(assignment => {
-                      return (
-                        assignment?.gradingPeriodId === gradingPeriod._id &&
-                        assignment?.assignmentGroup?._id === assignmentGroup?._id
-                      )
-                    }),
-                    assignmentGroup,
-                    true
-                  )
-                  return assignments
-                })
-                .flat()
+              return processAssignmentGroup(queryData, (assignment, assignmentGroup) => {
+                return (
+                  assignment?.gradingPeriodId === gradingPeriod?._id &&
+                  assignment?.assignmentGroup?._id === assignmentGroup?._id
+                )
+              })
             })
             .flat()
         ),
       ]
     : [
         ...new Set(
-          queryData?.assignmentGroupsConnection?.nodes
-            .map(assignmentGroup => {
-              const assignments = filterDroppedAssignments(
-                filteredAssignments(queryData).filter(assignment => {
-                  return assignment?.assignmentGroup?._id === assignmentGroup?._id
-                }),
-                assignmentGroup,
-                true
-              )
-              return assignments
-            })
-            .flat()
+          processAssignmentGroup(queryData, (assignment, assignmentGroup) => {
+            return assignment?.assignmentGroup?._id === assignmentGroup?._id
+          })
         ),
       ]
 }
@@ -345,14 +342,17 @@ export const getAssignmentLetterGrade = (assignment, gradingStandard) => {
 
 // **************** ASSIGNMENT GROUPS **********************************************
 
+const removeNonGroupAssignments = (assignments, assignmentGroup) => {
+  return assignments?.filter(assignment => {
+    return assignment?.assignmentGroup?._id === assignmentGroup?._id
+  })
+}
+
 export const getAssignmentGroupTotalPoints = (assignmentGroup, assignments) => {
-  assignments = filterDroppedAssignments(
-    assignments?.filter(assignment => {
-      return assignment?.assignmentGroup?._id === assignmentGroup?._id
-    }),
+  return filterDroppedAssignments(
+    removeNonGroupAssignments(assignments, assignmentGroup),
     assignmentGroup
-  )
-  return assignments?.reduce((total, assignment) => {
+  )?.reduce((total, assignment) => {
     if (
       assignment?.submissionsConnection?.nodes.length > 0 &&
       assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'excused' &&
@@ -366,13 +366,10 @@ export const getAssignmentGroupTotalPoints = (assignmentGroup, assignments) => {
 }
 
 export const getAssignmentGroupEarnedPoints = (assignmentGroup, assignments) => {
-  assignments = filterDroppedAssignments(
-    assignments?.filter(assignment => {
-      return assignment?.assignmentGroup?._id === assignmentGroup?._id
-    }),
+  return filterDroppedAssignments(
+    removeNonGroupAssignments(assignments, assignmentGroup),
     assignmentGroup
-  )
-  return assignments?.reduce((total, assignment) => {
+  ).reduce((total, assignment) => {
     if (
       assignment?.submissionsConnection?.nodes.length > 0 &&
       assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'excused' &&
@@ -592,17 +589,25 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
   } else if (applyWeights) {
     returnTotal = getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
   } else {
-    returnTotal = assignmentGroups?.reduce((total, assignmentGroup) => {
-      const assignmentGroupPercentage = getAssignmentGroupPercentage(
-        assignmentGroup,
-        assignments,
-        false
-      )
+    const {possiblePoints, earnedPoints} = assignmentGroups?.reduce(
+      (coursePoints, assignmentGroup) => {
+        const groupTotalPoints = getAssignmentGroupTotalPoints(assignmentGroup, assignments)
+        const groupEarnedPoints = getAssignmentGroupEarnedPoints(assignmentGroup, assignments)
 
-      return assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE
-        ? total
-        : `${Number.parseFloat(total) + Number.parseFloat(assignmentGroupPercentage)}`
-    }, '0')
+        if (groupTotalPoints !== ASSIGNMENT_NOT_APPLICABLE) {
+          coursePoints.possiblePoints += Number.parseFloat(groupTotalPoints)
+        }
+
+        if (groupEarnedPoints !== ASSIGNMENT_NOT_APPLICABLE) {
+          coursePoints.earnedPoints += Number.parseFloat(groupEarnedPoints)
+        }
+
+        return coursePoints
+      },
+      {possiblePoints: 0, earnedPoints: 0}
+    )
+
+    returnTotal = `${(earnedPoints / possiblePoints) * 100}`
   }
   return returnTotal === '0' ? ASSIGNMENT_NOT_APPLICABLE : returnTotal
 }

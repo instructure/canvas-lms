@@ -69,9 +69,13 @@ const AssignmentTable = ({
       <Table.Body>
         {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)?.map(
           assignment => {
-            assignment.dropped = droppedAssignments.includes(assignment)
+            const modifiedAssignment = {
+              ...assignment,
+              dropped: droppedAssignments.includes(assignment),
+            }
+
             return assignmentRow(
-              assignment,
+              modifiedAssignment,
               queryData,
               setShowTray,
               setSelectedSubmission,

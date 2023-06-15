@@ -30,7 +30,7 @@ const defaultProps = {
     name: 'Course Name',
     _id: '1',
     assignmentsConnection: {nodes: [Assignment.mock()]},
-    assignmentsGroupsConnection: {nodes: [AssignmentGroup.mock()]},
+    assignmentGroupsConnection: {nodes: [AssignmentGroup.mock()]},
     gradingStandard: GradingStandard.mock(),
   },
   layout: 'fixed',

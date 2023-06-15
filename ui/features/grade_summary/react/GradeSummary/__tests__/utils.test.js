@@ -28,7 +28,6 @@ import {GradingPeriod} from '../../../graphql/GradingPeriod'
 import {Submission} from '../../../graphql/Submission'
 
 import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE, ASSIGNMENT_STATUS} from '../constants'
-import {nullGradingPeriod, mockDroppedAssignmentData} from './largeDataMocks'
 
 import {
   formatNumber,
@@ -61,7 +60,6 @@ import {
   calculateTotalPercentageWithPartialWeight,
   getTotal,
   sortAssignments,
-  filteredAssignments,
   getAssignmentPositionInModuleItems,
   getAssignmentSortKey,
   getAssignmentNoSubmissionStatus,
@@ -1050,10 +1048,160 @@ describe('util', () => {
         expect(listDroppedAssignments(assignments, false)).toEqual([])
       })
 
-      it('should return list of dropped assignments when returnDropped is true', () => {
-        expect(listDroppedAssignments(mockDroppedAssignmentData.queryData, false)).toEqual(
-          mockDroppedAssignmentData.expectedDroppedAssignments
-        )
+      describe('when dropLowest is 1', () => {
+        it('should return list of dropped assignments when returnDropped is true', () => {
+          const assignments = [
+            Assignment.mock({
+              _id: '11',
+              pointsPossible: 100,
+              assignmentGroup: {_id: '1'},
+              submissionsConnection: {
+                nodes: [Submission.mock({score: 80})],
+              },
+            }),
+            Assignment.mock({
+              _id: '12',
+              pointsPossible: 100,
+              assignmentGroup: {_id: '1'},
+              submissionsConnection: {
+                nodes: [Submission.mock({score: 40})],
+              },
+            }),
+          ]
+
+          const assignmentGroups = [
+            AssignmentGroup.mock({
+              _id: '1',
+              rules: {
+                dropLowest: 1,
+                dropHighest: null,
+                neverDrop: null,
+              },
+            }),
+          ]
+
+          const queryData = {
+            id: 'Q291cnNlLTE=',
+            name: 'Dragon Riding',
+            applyGroupWeights: true,
+            assignmentsConnection: {
+              nodes: assignments,
+            },
+            assignmentGroupsConnection: {
+              nodes: assignmentGroups,
+            },
+            gradingStandard: GradingStandard.mock(),
+            gradingPeriodsConnection: {
+              nodes: [],
+            },
+          }
+
+          expect(listDroppedAssignments(queryData, false)).toEqual([assignments[1]])
+        })
+      })
+
+      describe('when dropHighest is 1', () => {
+        it('should return list of dropped assignments when returnDropped is true', () => {
+          const assignments = [
+            Assignment.mock({
+              _id: '11',
+              pointsPossible: 100,
+              assignmentGroup: {_id: '1'},
+              submissionsConnection: {
+                nodes: [Submission.mock({score: 80})],
+              },
+            }),
+            Assignment.mock({
+              _id: '12',
+              pointsPossible: 100,
+              assignmentGroup: {_id: '1'},
+              submissionsConnection: {
+                nodes: [Submission.mock({score: 40})],
+              },
+            }),
+          ]
+
+          const assignmentGroups = [
+            AssignmentGroup.mock({
+              _id: '1',
+              rules: {
+                dropLowest: null,
+                dropHighest: 1,
+                neverDrop: null,
+              },
+            }),
+          ]
+
+          const queryData = {
+            id: 'Q291cnNlLTE=',
+            name: 'Dragon Riding',
+            applyGroupWeights: true,
+            assignmentsConnection: {
+              nodes: assignments,
+            },
+            assignmentGroupsConnection: {
+              nodes: assignmentGroups,
+            },
+            gradingStandard: GradingStandard.mock(),
+            gradingPeriodsConnection: {
+              nodes: [],
+            },
+          }
+
+          expect(listDroppedAssignments(queryData, false)).toEqual([assignments[0]])
+        })
+      })
+
+      describe('when dropHighest is 1 and never drop includes the hightest assignment id', () => {
+        it('should return list of dropped assignments when returnDropped is true', () => {
+          const assignments = [
+            Assignment.mock({
+              _id: '11',
+              pointsPossible: 100,
+              assignmentGroup: {_id: '1'},
+              submissionsConnection: {
+                nodes: [Submission.mock({score: 80})],
+              },
+            }),
+            Assignment.mock({
+              _id: '12',
+              pointsPossible: 100,
+              assignmentGroup: {_id: '1'},
+              submissionsConnection: {
+                nodes: [Submission.mock({score: 40})],
+              },
+            }),
+          ]
+
+          const assignmentGroups = [
+            AssignmentGroup.mock({
+              _id: '1',
+              rules: {
+                dropLowest: null,
+                dropHighest: 1,
+                neverDrop: ['11'],
+              },
+            }),
+          ]
+
+          const queryData = {
+            id: 'Q291cnNlLTE=',
+            name: 'Dragon Riding',
+            applyGroupWeights: true,
+            assignmentsConnection: {
+              nodes: assignments,
+            },
+            assignmentGroupsConnection: {
+              nodes: assignmentGroups,
+            },
+            gradingStandard: GradingStandard.mock(),
+            gradingPeriodsConnection: {
+              nodes: [],
+            },
+          }
+
+          expect(listDroppedAssignments(queryData, false)).toEqual([assignments[0]])
+        })
       })
     })
   })
@@ -1570,16 +1718,60 @@ describe('util', () => {
 
         describe('when the grading periods are not weighted', () => {
           it('should return the correct total', () => {
-            expect(
-              getTotal(
-                filteredAssignments({
-                  assignmentsConnection: {nodes: nullGradingPeriod.Assignments},
-                }),
-                nullGradingPeriod.AssignmentGroup,
-                nullGradingPeriod.GradingPeriods,
-                true
-              )
-            ).toBe('64.86346282522474')
+            const assignments = [
+              Assignment.mock({
+                pointsPossible: 100,
+                assignmentGroup: {_id: '1'},
+                submissionsConnection: {
+                  nodes: [Submission.mock({score: 10, gradingPeriodId: '1'})],
+                },
+              }),
+              Assignment.mock({
+                pointsPossible: 100,
+                assignmentGroup: {_id: '2'},
+                submissionsConnection: {
+                  nodes: [Submission.mock({score: 70, gradingPeriodId: '2'})],
+                },
+              }),
+              Assignment.mock({
+                pointsPossible: 100,
+                assignmentGroup: {_id: '2'},
+                submissionsConnection: {
+                  nodes: [Submission.mock({score: 80, gradingPeriodId: '2'})],
+                },
+              }),
+              Assignment.mock({
+                pointsPossible: 100,
+                assignmentGroup: {_id: '1'},
+                submissionsConnection: {
+                  nodes: [Submission.mock({score: 90, gradingPeriodId: '1'})],
+                },
+              }),
+            ]
+
+            const assignmentGroups = [
+              AssignmentGroup.mock({
+                _id: '1',
+                rules: null,
+              }),
+              AssignmentGroup.mock({
+                _id: '2',
+                rules: null,
+              }),
+            ]
+
+            const gradingPeriods = [
+              GradingPeriod.mock({
+                _id: '1',
+                weight: null,
+              }),
+              GradingPeriod.mock({
+                _id: '2',
+                weight: null,
+              }),
+            ]
+
+            expect(getTotal(assignments, assignmentGroups, gradingPeriods, true)).toBe('62.5')
           })
         })
       })
