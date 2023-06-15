@@ -339,6 +339,8 @@ CanvasRails::Application.routes.draw do
           controller: "lti/message",
           action: "resource",
           as: :resource_link_id
+
+      get :tool_launch
     end
 
     resources :grading_standards, only: %i[index create update destroy]
