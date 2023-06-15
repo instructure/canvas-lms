@@ -162,6 +162,7 @@ path "../gems" do
   gem "canvas_kaltura"
   gem "canvas_panda_pub"
   gem "canvas_partman"
+  gem "canvas_link_migrator"
   gem "canvas_mimetype_fu"
   gem "canvas_quiz_statistics"
   gem "canvas_sanitize"
