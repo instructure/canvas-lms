@@ -1,317 +1,464 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders nothing if no opportunities 1`] = `
-<div
-  className="Opportunities-styles__root"
-  id="opportunities_parent"
-  onKeyDown={[Function]}
-  style={
-    Object {
-      "maxHeight": "none",
-    }
+<Fragment>
+  <style>
+    
+  .Opportunities-styles__root {
+    padding: 0.5rem 0.75rem 0.75rem;
+    max-height: 36rem;
+    overflow: auto;
+    box-sizing: border-box;
+    width: 20rem;
+    max-width: 100%;
+    line-height: 1.25;
   }
->
-  <CloseButton
-    as="button"
-    cursor="pointer"
-    elementRef={[Function]}
-    margin="0"
-    offset="x-small"
-    onClick={[Function]}
-    placement="end"
-    screenReaderLabel="Close Opportunity Center popup"
-    size="small"
-    type="button"
-  />
-  <Tabs
-    elementRef={[Function]}
-    id="Opportunities-styles__tabs_container"
-    onRequestTabChange={[Function]}
-    shouldFocusOnRender={false}
-    tabOverflow="stack"
-    variant="default"
+  
+  .Opportunities-styles__header {
+    border-bottom: 0.0625rem solid #C7CDD1;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+  
+  .Opportunities-styles__list {
+    list-style-type: none;
+    color: undefined;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .Opportunities-styles__item {
+    margin: 0;
+    padding: 0;
+  }
+  .Opportunities-styles__item:not(:last-of-type) {
+    margin-bottom: 0.75rem;
+  }
+  .Opportunities-styles__item:not(:first-of-type) {
+    border-top: 0.0625rem solid #C7CDD1;
+    padding-top: 0.375rem;
+  }
+  
+  .Opportunities-styles__loading {
+    text-align: center;
+  }
+  
+  #Opportunities-styles__tabs_container &gt; div:first-child {
+    display: inline-block;
+  }
+  
+  </style>
+  <div
+    className="Opportunities-styles__root"
+    id="opportunities_parent"
+    onKeyDown={[Function]}
+    style={
+      Object {
+        "maxHeight": "none",
+      }
+    }
   >
-    <Panel
+    <CloseButton
+      as="button"
+      cursor="pointer"
       elementRef={[Function]}
-      isDisabled={false}
-      isSelected={true}
-      labelledBy={null}
-      maxHeight="auto"
-      padding="small"
-      renderTitle={
-        <AccessibleContent
-          alt="New Opportunities"
-          as="span"
-        >
-          New
-        </AccessibleContent>
-      }
-      textAlign="start"
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="end"
+      screenReaderLabel="Close Opportunity Center popup"
+      size="small"
+      type="button"
+    />
+    <Tabs
+      elementRef={[Function]}
+      id="Opportunities-styles__tabs_container"
+      onRequestTabChange={[Function]}
+      shouldFocusOnRender={false}
+      tabOverflow="stack"
       variant="default"
     >
-      <div>
-        Nothing new needs attention.
-      </div>
-    </Panel>
-    <Panel
-      elementRef={[Function]}
-      isDisabled={false}
-      isSelected={false}
-      labelledBy={null}
-      maxHeight="auto"
-      padding="small"
-      renderTitle={
-        <AccessibleContent
-          alt="Dismissed Opportunities"
-          as="span"
-        >
-          Dismissed
-        </AccessibleContent>
-      }
-      textAlign="start"
-      variant="default"
-    >
-      <div>
-        Nothing here needs attention.
-      </div>
-    </Panel>
-  </Tabs>
-</div>
+      <Panel
+        elementRef={[Function]}
+        isDisabled={false}
+        isSelected={true}
+        labelledBy={null}
+        maxHeight="auto"
+        padding="small"
+        renderTitle={
+          <AccessibleContent
+            alt="New Opportunities"
+            as="span"
+          >
+            New
+          </AccessibleContent>
+        }
+        textAlign="start"
+        variant="default"
+      >
+        <div>
+          Nothing new needs attention.
+        </div>
+      </Panel>
+      <Panel
+        elementRef={[Function]}
+        isDisabled={false}
+        isSelected={false}
+        labelledBy={null}
+        maxHeight="auto"
+        padding="small"
+        renderTitle={
+          <AccessibleContent
+            alt="Dismissed Opportunities"
+            as="span"
+          >
+            Dismissed
+          </AccessibleContent>
+        }
+        textAlign="start"
+        variant="default"
+      >
+        <div>
+          Nothing here needs attention.
+        </div>
+      </Panel>
+    </Tabs>
+  </div>
+</Fragment>
 `;
 
 exports[`renders the base component correctly with one of each kind of opportunity 1`] = `
-<div
-  className="Opportunities-styles__root"
-  id="opportunities_parent"
-  onKeyDown={[Function]}
-  style={
-    Object {
-      "maxHeight": "none",
-    }
+<Fragment>
+  <style>
+    
+  .Opportunities-styles__root {
+    padding: 0.5rem 0.75rem 0.75rem;
+    max-height: 36rem;
+    overflow: auto;
+    box-sizing: border-box;
+    width: 20rem;
+    max-width: 100%;
+    line-height: 1.25;
   }
->
-  <CloseButton
-    as="button"
-    cursor="pointer"
-    elementRef={[Function]}
-    margin="0"
-    offset="x-small"
-    onClick={[Function]}
-    placement="end"
-    screenReaderLabel="Close Opportunity Center popup"
-    size="small"
-    type="button"
-  />
-  <Tabs
-    elementRef={[Function]}
-    id="Opportunities-styles__tabs_container"
-    onRequestTabChange={[Function]}
-    shouldFocusOnRender={false}
-    tabOverflow="stack"
-    variant="default"
+  
+  .Opportunities-styles__header {
+    border-bottom: 0.0625rem solid #C7CDD1;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+  
+  .Opportunities-styles__list {
+    list-style-type: none;
+    color: undefined;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .Opportunities-styles__item {
+    margin: 0;
+    padding: 0;
+  }
+  .Opportunities-styles__item:not(:last-of-type) {
+    margin-bottom: 0.75rem;
+  }
+  .Opportunities-styles__item:not(:first-of-type) {
+    border-top: 0.0625rem solid #C7CDD1;
+    padding-top: 0.375rem;
+  }
+  
+  .Opportunities-styles__loading {
+    text-align: center;
+  }
+  
+  #Opportunities-styles__tabs_container &gt; div:first-child {
+    display: inline-block;
+  }
+  
+  </style>
+  <div
+    className="Opportunities-styles__root"
+    id="opportunities_parent"
+    onKeyDown={[Function]}
+    style={
+      Object {
+        "maxHeight": "none",
+      }
+    }
   >
-    <Panel
+    <CloseButton
+      as="button"
+      cursor="pointer"
       elementRef={[Function]}
-      isDisabled={false}
-      isSelected={true}
-      labelledBy={null}
-      maxHeight="auto"
-      padding="small"
-      renderTitle={
-        <AccessibleContent
-          alt="New Opportunities"
-          as="span"
-        >
-          New
-        </AccessibleContent>
-      }
-      textAlign="start"
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="end"
+      screenReaderLabel="Close Opportunity Center popup"
+      size="small"
+      type="button"
+    />
+    <Tabs
+      elementRef={[Function]}
+      id="Opportunities-styles__tabs_container"
+      onRequestTabChange={[Function]}
+      shouldFocusOnRender={false}
+      tabOverflow="stack"
       variant="default"
     >
-      <ol
-        className="Opportunities-styles__list"
+      <Panel
+        elementRef={[Function]}
+        isDisabled={false}
+        isSelected={true}
+        labelledBy={null}
+        maxHeight="auto"
+        padding="small"
+        renderTitle={
+          <AccessibleContent
+            alt="New Opportunities"
+            as="span"
+          >
+            New
+          </AccessibleContent>
+        }
+        textAlign="start"
+        variant="default"
       >
-        <li
-          className="Opportunities-styles__item"
-          key="1"
+        <ol
+          className="Opportunities-styles__list"
         >
-          <Animatable(undefined)
-            animatableIndex={0}
-            courseName="Course Short Name"
-            dismiss={[Function]}
-            dueAt="2017-03-09T20:40:35Z"
-            id="1"
-            opportunityTitle="learning object title"
-            timeZone="America/Denver"
-            url="http://www.non_default_url.com"
-          />
-        </li>
-      </ol>
-    </Panel>
-    <Panel
-      elementRef={[Function]}
-      isDisabled={false}
-      isSelected={false}
-      labelledBy={null}
-      maxHeight="auto"
-      padding="small"
-      renderTitle={
-        <AccessibleContent
-          alt="Dismissed Opportunities"
-          as="span"
-        >
-          Dismissed
-        </AccessibleContent>
-      }
-      textAlign="start"
-      variant="default"
-    >
-      <ol
-        className="Opportunities-styles__list"
+          <li
+            className="Opportunities-styles__item"
+            key="1"
+          >
+            <Animatable(undefined)
+              animatableIndex={0}
+              courseName="Course Short Name"
+              dismiss={[Function]}
+              dueAt="2017-03-09T20:40:35Z"
+              id="1"
+              opportunityTitle="learning object title"
+              timeZone="America/Denver"
+              url="http://www.non_default_url.com"
+            />
+          </li>
+        </ol>
+      </Panel>
+      <Panel
+        elementRef={[Function]}
+        isDisabled={false}
+        isSelected={false}
+        labelledBy={null}
+        maxHeight="auto"
+        padding="small"
+        renderTitle={
+          <AccessibleContent
+            alt="Dismissed Opportunities"
+            as="span"
+          >
+            Dismissed
+          </AccessibleContent>
+        }
+        textAlign="start"
+        variant="default"
       >
-        <li
-          className="Opportunities-styles__item"
-          key="2"
+        <ol
+          className="Opportunities-styles__list"
         >
-          <Animatable(undefined)
-            animatableIndex={0}
-            courseName="Course Short Name"
-            dismiss={null}
-            dueAt="2017-03109T20:40:35Z"
-            id="2"
-            opportunityTitle="another learning object title"
-            timeZone="America/Denver"
-            url="http://www.non_default_url.com"
-          />
-        </li>
-      </ol>
-    </Panel>
-  </Tabs>
-</div>
+          <li
+            className="Opportunities-styles__item"
+            key="2"
+          >
+            <Animatable(undefined)
+              animatableIndex={0}
+              courseName="Course Short Name"
+              dismiss={null}
+              dueAt="2017-03109T20:40:35Z"
+              id="2"
+              opportunityTitle="another learning object title"
+              timeZone="America/Denver"
+              url="http://www.non_default_url.com"
+            />
+          </li>
+        </ol>
+      </Panel>
+    </Tabs>
+  </div>
+</Fragment>
 `;
 
 exports[`renders the right course with the right opportunity 1`] = `
-<div
-  className="Opportunities-styles__root"
-  id="opportunities_parent"
-  onKeyDown={[Function]}
-  style={
-    Object {
-      "maxHeight": "none",
-    }
+<Fragment>
+  <style>
+    
+  .Opportunities-styles__root {
+    padding: 0.5rem 0.75rem 0.75rem;
+    max-height: 36rem;
+    overflow: auto;
+    box-sizing: border-box;
+    width: 20rem;
+    max-width: 100%;
+    line-height: 1.25;
   }
->
-  <CloseButton
-    as="button"
-    cursor="pointer"
-    elementRef={[Function]}
-    margin="0"
-    offset="x-small"
-    onClick={[Function]}
-    placement="end"
-    screenReaderLabel="Close Opportunity Center popup"
-    size="small"
-    type="button"
-  />
-  <Tabs
-    elementRef={[Function]}
-    id="Opportunities-styles__tabs_container"
-    onRequestTabChange={[Function]}
-    shouldFocusOnRender={false}
-    tabOverflow="stack"
-    variant="default"
+  
+  .Opportunities-styles__header {
+    border-bottom: 0.0625rem solid #C7CDD1;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+  
+  .Opportunities-styles__list {
+    list-style-type: none;
+    color: undefined;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .Opportunities-styles__item {
+    margin: 0;
+    padding: 0;
+  }
+  .Opportunities-styles__item:not(:last-of-type) {
+    margin-bottom: 0.75rem;
+  }
+  .Opportunities-styles__item:not(:first-of-type) {
+    border-top: 0.0625rem solid #C7CDD1;
+    padding-top: 0.375rem;
+  }
+  
+  .Opportunities-styles__loading {
+    text-align: center;
+  }
+  
+  #Opportunities-styles__tabs_container &gt; div:first-child {
+    display: inline-block;
+  }
+  
+  </style>
+  <div
+    className="Opportunities-styles__root"
+    id="opportunities_parent"
+    onKeyDown={[Function]}
+    style={
+      Object {
+        "maxHeight": "none",
+      }
+    }
   >
-    <Panel
+    <CloseButton
+      as="button"
+      cursor="pointer"
       elementRef={[Function]}
-      isDisabled={false}
-      isSelected={true}
-      labelledBy={null}
-      maxHeight="auto"
-      padding="small"
-      renderTitle={
-        <AccessibleContent
-          alt="New Opportunities"
-          as="span"
-        >
-          New
-        </AccessibleContent>
-      }
-      textAlign="start"
+      margin="0"
+      offset="x-small"
+      onClick={[Function]}
+      placement="end"
+      screenReaderLabel="Close Opportunity Center popup"
+      size="small"
+      type="button"
+    />
+    <Tabs
+      elementRef={[Function]}
+      id="Opportunities-styles__tabs_container"
+      onRequestTabChange={[Function]}
+      shouldFocusOnRender={false}
+      tabOverflow="stack"
       variant="default"
     >
-      <ol
-        className="Opportunities-styles__list"
+      <Panel
+        elementRef={[Function]}
+        isDisabled={false}
+        isSelected={true}
+        labelledBy={null}
+        maxHeight="auto"
+        padding="small"
+        renderTitle={
+          <AccessibleContent
+            alt="New Opportunities"
+            as="span"
+          >
+            New
+          </AccessibleContent>
+        }
+        textAlign="start"
+        variant="default"
       >
-        <li
-          className="Opportunities-styles__item"
-          key="1"
+        <ol
+          className="Opportunities-styles__list"
         >
-          <Animatable(undefined)
-            animatableIndex={0}
-            courseName="Course Short Name"
-            dismiss={[Function]}
-            dueAt="2017-03-09T20:40:35Z"
-            id="1"
-            opportunityTitle="learning object title"
-            timeZone="America/Denver"
-            url="http://www.non_default_url.com"
-          />
-        </li>
-        <li
-          className="Opportunities-styles__item"
-          key="2"
-        >
-          <Animatable(undefined)
-            animatableIndex={1}
-            courseName="A different Course Name"
-            dismiss={[Function]}
-            dueAt="2017-03-09T20:40:35Z"
-            id="2"
-            opportunityTitle="other learning object"
-            timeZone="America/Denver"
-            url="http://www.non_default_url.com"
-          />
-        </li>
-      </ol>
-    </Panel>
-    <Panel
-      elementRef={[Function]}
-      isDisabled={false}
-      isSelected={false}
-      labelledBy={null}
-      maxHeight="auto"
-      padding="small"
-      renderTitle={
-        <AccessibleContent
-          alt="Dismissed Opportunities"
-          as="span"
-        >
-          Dismissed
-        </AccessibleContent>
-      }
-      textAlign="start"
-      variant="default"
-    >
-      <ol
-        className="Opportunities-styles__list"
+          <li
+            className="Opportunities-styles__item"
+            key="1"
+          >
+            <Animatable(undefined)
+              animatableIndex={0}
+              courseName="Course Short Name"
+              dismiss={[Function]}
+              dueAt="2017-03-09T20:40:35Z"
+              id="1"
+              opportunityTitle="learning object title"
+              timeZone="America/Denver"
+              url="http://www.non_default_url.com"
+            />
+          </li>
+          <li
+            className="Opportunities-styles__item"
+            key="2"
+          >
+            <Animatable(undefined)
+              animatableIndex={1}
+              courseName="A different Course Name"
+              dismiss={[Function]}
+              dueAt="2017-03-09T20:40:35Z"
+              id="2"
+              opportunityTitle="other learning object"
+              timeZone="America/Denver"
+              url="http://www.non_default_url.com"
+            />
+          </li>
+        </ol>
+      </Panel>
+      <Panel
+        elementRef={[Function]}
+        isDisabled={false}
+        isSelected={false}
+        labelledBy={null}
+        maxHeight="auto"
+        padding="small"
+        renderTitle={
+          <AccessibleContent
+            alt="Dismissed Opportunities"
+            as="span"
+          >
+            Dismissed
+          </AccessibleContent>
+        }
+        textAlign="start"
+        variant="default"
       >
-        <li
-          className="Opportunities-styles__item"
-          key="2"
+        <ol
+          className="Opportunities-styles__list"
         >
-          <Animatable(undefined)
-            animatableIndex={0}
-            courseName="Course Short Name"
-            dismiss={null}
-            dueAt="2017-03109T20:40:35Z"
-            id="2"
-            opportunityTitle="another learning object title"
-            timeZone="America/Denver"
-            url="http://www.non_default_url.com"
-          />
-        </li>
-      </ol>
-    </Panel>
-  </Tabs>
-</div>
+          <li
+            className="Opportunities-styles__item"
+            key="2"
+          >
+            <Animatable(undefined)
+              animatableIndex={0}
+              courseName="Course Short Name"
+              dismiss={null}
+              dueAt="2017-03109T20:40:35Z"
+              id="2"
+              opportunityTitle="another learning object title"
+              timeZone="America/Denver"
+              url="http://www.non_default_url.com"
+            />
+          </li>
+        </ol>
+      </Panel>
+    </Tabs>
+  </div>
+</Fragment>
 `;

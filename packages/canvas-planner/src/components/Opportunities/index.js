@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
-import {themeable} from '@instructure/ui-themeable'
 import {scopeTab} from '@instructure/ui-a11y-utils'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import keycode from 'keycode'
@@ -29,9 +28,7 @@ import Opportunity from '../Opportunity'
 import {specialFallbackFocusId} from '../../dynamic-ui/util'
 import {animatable} from '../../dynamic-ui'
 import formatMessage from '../../format-message'
-
-import styles from './styles.css'
-import theme from './theme'
+import buildStyle from './style'
 
 export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opportunity')
 
@@ -64,6 +61,7 @@ export class Opportunities_ extends Component {
     }
     this.closeButtonRef = null
     this.tabPanelContentDiv = null
+    this.style = buildStyle()
   }
 
   handleTabChange = (event, {index, _id}) => {
@@ -135,9 +133,9 @@ export class Opportunities_ extends Component {
 
   renderOpportunities(opportunities, dismissed) {
     return (
-      <ol className={styles.list} ref={this.getTabPanelContentDivRefFromList}>
+      <ol className={this.style.classNames.list} ref={this.getTabPanelContentDivRefFromList}>
         {opportunities.map((opportunity, oppIndex) => (
-          <li key={opportunity.id} className={styles.item}>
+          <li key={opportunity.id} className={this.style.classNames.item}>
             <Opportunity
               id={opportunity.id}
               dueAt={opportunity.due_at}
@@ -199,36 +197,39 @@ export class Opportunities_ extends Component {
   render() {
     const {selectedIndex} = this.state
     return (
-      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-      <div
-        id="opportunities_parent"
-        className={styles.root}
-        onKeyDown={this.handleKeyDown}
-        ref={c => {
-          this._content = c
-        }}
-        style={{maxHeight: this.props.maxHeight}}
-      >
-        {this.renderCloseButton()}
-        <Tabs id={styles.tabs_container} onRequestTabChange={this.handleTabChange}>
-          <Tabs.Panel
-            renderTitle={this.renderTitle('new')}
-            maxHeight={this.state.innerMaxHeight}
-            isSelected={selectedIndex === 0}
-          >
-            {this.renderNewOpportunities()}
-          </Tabs.Panel>
-          <Tabs.Panel
-            renderTitle={this.renderTitle('dismissed')}
-            maxHeight={this.state.innerMaxHeight}
-            isSelected={selectedIndex === 1}
-          >
-            {this.renderDismissedOpportunities()}
-          </Tabs.Panel>
-        </Tabs>
-      </div>
+      <>
+        <style>{this.style.css}</style>
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+        <div
+          id="opportunities_parent"
+          className={this.style.classNames.root}
+          onKeyDown={this.handleKeyDown}
+          ref={c => {
+            this._content = c
+          }}
+          style={{maxHeight: this.props.maxHeight}}
+        >
+          {this.renderCloseButton()}
+          <Tabs id={this.style.classNames.tabs_container} onRequestTabChange={this.handleTabChange}>
+            <Tabs.Panel
+              renderTitle={this.renderTitle('new')}
+              maxHeight={this.state.innerMaxHeight}
+              isSelected={selectedIndex === 0}
+            >
+              {this.renderNewOpportunities()}
+            </Tabs.Panel>
+            <Tabs.Panel
+              renderTitle={this.renderTitle('dismissed')}
+              maxHeight={this.state.innerMaxHeight}
+              isSelected={selectedIndex === 1}
+            >
+              {this.renderDismissedOpportunities()}
+            </Tabs.Panel>
+          </Tabs>
+        </div>
+      </>
     )
   }
 }
 
-export default animatable(themeable(theme, styles)(Opportunities_))
+export default animatable(Opportunities_)
