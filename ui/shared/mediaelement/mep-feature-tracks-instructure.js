@@ -70,7 +70,10 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
     },
     buildtracks(player, controls, layers, media) {
       // INSTRUCTURE added code (the '&& !player.options.can_add_captions' part)
-      if (player.tracks.length == 0 && !player.options.can_add_captions) {
+      if (
+        player.tracks.length == 0 &&
+        (!player.options.can_add_captions || this.options.lockedMediaAttachment)
+      ) {
         return
       }
 
@@ -275,7 +278,8 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
       }
 
       // INSTRUCTURE added code
-      if (player.options.can_add_captions) player.addUploadTrackButton()
+      if (player.options.can_add_captions && !t.options.lockedMediaAttachment)
+        player.addUploadTrackButton()
 
       // start loading tracks
       player.loadNextTrack()

@@ -177,7 +177,13 @@ const mediaCommentActions = {
     return $.mediaComment.init(mediaType, initOpts)
   },
 
-  show_inline(id, mediaType = 'video', downloadUrl, attachmentId = null) {
+  show_inline(
+    id,
+    mediaType = 'video',
+    downloadUrl,
+    attachmentId = null,
+    lockedMediaAttachment = false
+  ) {
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
     const $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
     $holder.text(I18n.t('loading', 'Loading media...'))
@@ -191,6 +197,7 @@ const mediaCommentActions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
             mediaCommentId: id,
             attachmentId,
+            lockedMediaAttachment,
             menuTimeoutMouseLeave: 50,
             success(media) {
               holder.focus()
