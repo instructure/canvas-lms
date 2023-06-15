@@ -30,10 +30,11 @@ class ImportedHtmlConverter
 
   attr_reader :link_parser, :link_resolver, :link_replacer
 
-  def initialize(migration)
+  def initialize(migration, migration_id_converter)
     @migration = migration
+    @migration_id_converter = migration_id_converter
     @link_parser = Importers::LinkParser.new(migration)
-    @link_resolver = Importers::LinkResolver.new(migration)
+    @link_resolver = Importers::LinkResolver.new(migration, migration_id_converter)
     @link_replacer = Importers::LinkReplacer.new(migration)
   end
 
