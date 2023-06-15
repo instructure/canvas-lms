@@ -1180,10 +1180,6 @@ describe UsersController do
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
 
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
-
           get_grades!(all_grading_periods_id)
           expect(restrict_quantitative_data).to be true
           expect(grading_scheme).to eq course.grading_standard_or_default.data
@@ -1290,9 +1286,6 @@ describe UsersController do
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
 
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
         user_session(teacher)
         get_grades!(grading_period.id)
         expect(restrict_quantitative_data).to be true
@@ -1408,9 +1401,6 @@ describe UsersController do
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
 
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: observer_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
           get_grades!(grading_period.id)
           expect(restrict_quantitative_data).to be true
           expect(grading_scheme).to eq course.grading_standard_or_default.data

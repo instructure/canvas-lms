@@ -149,34 +149,13 @@ describe "Api::V1::Assignment" do
           teacher_in_course(course: @course, active_all: true)
         end
 
-        it "returns false when everything is truthy" do
+        it "returns false when everything is truthy for a teacher" do
           # truthy feature flag
           Account.default.enable_feature! :restrict_quantitative_data
 
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
-
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
-
-          my_session = user_session @teacher
-          json = api.assignment_json(assignment, @teacher, my_session)
-          expect(json["restrict_quantitative_data"]).to be_falsey
-        end
-
-        it "returns false even when only permission is falsey" do
-          # truthy feature flag
-          Account.default.enable_feature! :restrict_quantitative_data
-
-          # truthy setting
-          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-          Account.default.save!
-
-          # falsey permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: teacher_role, enabled: true, permission: "restrict_quantitative_data")
-          Account.default.reload
 
           my_session = user_session @teacher
           json = api.assignment_json(assignment, @teacher, my_session)
@@ -189,7 +168,7 @@ describe "Api::V1::Assignment" do
           student_in_course(course: @course, active_all: true)
         end
 
-        it "returns true when everything is truthy" do
+        it "returns true when everything is truthy for a student" do
           # truthy feature flag
           Account.default.enable_feature! :restrict_quantitative_data
 
@@ -197,26 +176,18 @@ describe "Api::V1::Assignment" do
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
 
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
-
           my_session = user_session @student
           json = api.assignment_json(assignment, @student, my_session)
           expect(json["restrict_quantitative_data"]).to be_truthy
         end
 
-        it "returns false even when only feature flag is falsey" do
+        it "returns false even when only feature flag is falsey for a student" do
           # falsey feature flag
           Account.default.disable_feature! :restrict_quantitative_data
 
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
-
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
 
           my_session = user_session @student
           json = api.assignment_json(assignment, @student, my_session)
@@ -230,10 +201,6 @@ describe "Api::V1::Assignment" do
           # falsey setting
           Account.default.settings[:restrict_quantitative_data] = { value: false, locked: true }
           Account.default.save!
-
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
 
           my_session = user_session @student
           json = api.assignment_json(assignment, @student, my_session)

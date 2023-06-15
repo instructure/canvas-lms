@@ -3631,8 +3631,22 @@ class Course < ActiveRecord::Base
     return unless user.is_a?(User)
 
     # When check_extra_permissions is true, return false for a teacher,ta, admin, or designer
-    can_read_as_admin = check_extra_permissions ? grants_right?(user, :read_as_admin) : false
-    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data && !grants_right?(user, :restrict_quantitative_data) && !can_read_as_admin
+    can_read_as_admin = if check_extra_permissions
+                          grants_any_right?(
+                            user,
+                            :read_as_admin,
+                            :manage_grades,
+                            *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS,
+                            :manage_content,
+                            *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+                          )
+                        else
+                          false
+                        end
+    is_account_admin = account.grants_right?(user, :manage)
+
+    # never restrict quantitative data for admins
+    root_account.feature_enabled?(:restrict_quantitative_data) && restrict_quantitative_data && !is_account_admin && !can_read_as_admin
   end
 
   def friendly_name

@@ -46,8 +46,6 @@ describe "context modules" do
       end
 
       it "hides points possible for student", priority: "1" do
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
         Account.default.reload
         course_with_student_logged_in(course: @course, active_enrollment: true)
         a = @course.assignments.create!(title: "some assignment", points_possible: 10)
@@ -60,8 +58,6 @@ describe "context modules" do
       end
 
       it "does not hide points possible for teacher", priority: "1" do
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
         Account.default.reload
         a = @course.assignments.create!(title: "some assignment", points_possible: 10)
         @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: "Graded Published Discussion")

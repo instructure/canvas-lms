@@ -11221,11 +11221,11 @@ describe Assignment do
           expect(@sub_course.restrict_quantitative_data).to be true
         end
 
-        it "restricts quantitative data by default for students" do
+        it "restricts quantitative data by default for students in subaccount setting" do
           expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be true
         end
 
-        it "does not restrict quantitative data by default for admins" do
+        it "does not restrict quantitative data by default for admins in subaccount setting" do
           expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
         end
       end
@@ -11236,11 +11236,11 @@ describe Assignment do
           @sub_course.save!
         end
 
-        it "restricts quantitative data by default for students" do
+        it "restricts quantitative data by default for students in course setting" do
           expect(@course_assignment.restrict_quantitative_data?(@student_1)).to be true
         end
 
-        it "does not restrict quantitative data by default for admins" do
+        it "does not restrict quantitative data by default for admins in course setting" do
           expect(@course_assignment.restrict_quantitative_data?(@admin)).to be false
         end
       end

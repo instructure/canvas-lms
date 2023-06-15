@@ -66,10 +66,6 @@ describe "speed grader - grade display" do
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
 
-      # truthy permission(since enabled is being "not"ed)
-      Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-      Account.default.reload
-
       Speedgrader.visit(@course.id, @assignment.id)
       expect(Speedgrader.average_grade.text).to eq "A-"
     end
@@ -84,10 +80,6 @@ describe "speed grader - grade display" do
       # truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
-
-      # truthy permission(since enabled is being "not"ed)
-      Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-      Account.default.reload
 
       Speedgrader.visit(@course.id, @assignment.id)
       expect(Speedgrader.average_grade.text).to eq ""
