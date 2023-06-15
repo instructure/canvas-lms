@@ -65,22 +65,122 @@ describe CalendarEventsApiController, type: :request do
     expected_reservation_fields = expected_reservation_event_fields - ["child_events"]
     expected_series_fields = expected_fields + ["series_natural_language"]
 
-    it "returns events within the given date range" do
-      @course.calendar_events.create(title: "1", start_at: "2012-01-07 12:00:00")
-      e2 = @course.calendar_events.create(title: "2", start_at: "2012-01-08 12:00:00")
-      @course.calendar_events.create(title: "3", start_at: "2012-01-19 12:00:00")
+    context "returns events" do
+      it "when start after and end before the given range dates" do
+        # Requested range |------------|
+        # Event range        |------|
+        e = @course.calendar_events.create(title: "my event", start_at: "2023-06-15 12:00:00", end_at: "2023-06-16 12:00:00")
 
-      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
-                        controller: "calendar_events_api",
-                        action: "index",
-                        format: "json",
-                        context_codes: ["course_#{@course.id}"],
-                        start_date: "2012-01-08",
-                        end_date: "2012-01-08"
-                      })
-      expect(json.size).to be 1
-      expect(json.first.keys).to match_array expected_fields
-      expect(json.first.slice("title", "start_at", "id")).to eql({ "id" => e2.id, "title" => "2", "start_at" => "2012-01-08T12:00:00Z" })
+        json = api_call(:get,
+                        "/api/v1/calendar_events?start_date=2023-05-28&end_date=2023-07-02&context_codes[]=course_#{@course.id}",
+                        {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2023-05-28",
+                          end_date: "2023-07-02"
+                        })
+        expect(json.size).to be 1
+        expect(json.first.keys).to match_array expected_fields
+        expect(json.first.slice("id", "title", "start_at", "end_at")).to eql({ "id" => e.id, "title" => "my event", "start_at" => "2023-06-15T12:00:00Z", "end_at" => "2023-06-16T12:00:00Z" })
+      end
+
+      it "when start before and end after the given range dates" do
+        # Requested range   |------------|
+        # Event range     |----------------|
+        e = @course.calendar_events.create(title: "my event", start_at: "2023-05-15 12:00:00", end_at: "2023-07-15 12:00:00")
+
+        json = api_call(:get,
+                        "/api/v1/calendar_events?start_date=2023-05-28&end_date=2023-07-02&context_codes[]=course_#{@course.id}",
+                        {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2023-05-28",
+                          end_date: "2023-07-02"
+                        })
+        expect(json.size).to be 1
+        expect(json.first.keys).to match_array expected_fields
+        expect(json.first.slice("id", "title", "start_at", "end_at")).to eql({ "id" => e.id, "title" => "my event", "start_at" => "2023-05-15T12:00:00Z", "end_at" => "2023-07-15T12:00:00Z" })
+      end
+
+      it "when start before given start date" do
+        # Requested range     |------------|
+        # Event range     |------|
+        e = @course.calendar_events.create(title: "my event", start_at: "2023-05-26 12:00:00", end_at: "2023-06-04 12:00:00")
+
+        json = api_call(:get,
+                        "/api/v1/calendar_events?start_date=2023-05-28&end_date=2023-07-02&context_codes[]=course_#{@course.id}",
+                        {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2023-05-28",
+                          end_date: "2023-07-02"
+                        })
+        expect(json.size).to be 1
+        expect(json.first.keys).to match_array expected_fields
+        expect(json.first.slice("id", "title", "start_at", "end_at")).to eql({ "id" => e.id, "title" => "my event", "start_at" => "2023-05-26T12:00:00Z", "end_at" => "2023-06-04T12:00:00Z" })
+      end
+
+      it "when end after the given end date" do
+        # Requested range |------------|
+        # Event range               |------|
+        e = @course.calendar_events.create(title: "my event", start_at: "2023-06-27 12:00:00", end_at: "2023-07-15 12:00:00")
+
+        json = api_call(:get,
+                        "/api/v1/calendar_events?start_date=2023-05-28&end_date=2023-07-02&context_codes[]=course_#{@course.id}",
+                        {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2023-05-28",
+                          end_date: "2023-07-02"
+                        })
+        expect(json.size).to be 1
+        expect(json.first.keys).to match_array expected_fields
+        expect(json.first.slice("id", "title", "start_at", "end_at")).to eql({ "id" => e.id, "title" => "my event", "start_at" => "2023-06-27T12:00:00Z", "end_at" => "2023-07-15T12:00:00Z" })
+      end
+
+      it "except end before given date range" do
+        # Requested range           |------------|
+        # Event range     |------|
+        @course.calendar_events.create(title: "my event", start_at: "2023-05-26 12:00:00", end_at: "2023-05-27 12:00:00")
+
+        json = api_call(:get,
+                        "/api/v1/calendar_events?start_date=2023-05-28&end_date=2023-07-02&context_codes[]=course_#{@course.id}",
+                        {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2023-05-28",
+                          end_date: "2023-07-02"
+                        })
+        expect(json.size).to be 0
+      end
+
+      it "except start after given date range" do
+        # Requested range |------------|
+        # Event range                     |------|
+        @course.calendar_events.create(title: "my event", start_at: "2023-07-05 12:00:00", end_at: "2023-07-06 12:00:00")
+
+        json = api_call(:get,
+                        "/api/v1/calendar_events?start_date=2023-05-28&end_date=2023-07-02&context_codes[]=course_#{@course.id}",
+                        {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2023-05-28",
+                          end_date: "2023-07-02"
+                        })
+        expect(json.size).to be 0
+      end
     end
 
     it "hides location attributes when user is not logged in a public course" do
@@ -94,7 +194,9 @@ describe CalendarEventsApiController, type: :request do
         location_name: "steven house"
       )
 
-      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
+      json = api_call(:get,
+                      "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}",
+                      {
                         controller: "calendar_events_api",
                         action: "index",
                         format: "json",
@@ -113,7 +215,9 @@ describe CalendarEventsApiController, type: :request do
         location_address: "test_address2",
         location_name: "steven house"
       )
-      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}", {
+      json = api_call(:get,
+                      "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-08&context_codes[]=course_#{@course.id}",
+                      {
                         controller: "calendar_events_api",
                         action: "index",
                         format: "json",
@@ -129,7 +233,9 @@ describe CalendarEventsApiController, type: :request do
       @course.calendar_events.create(title: "first", start_at: "2012-01-07 12:00:00")
       @course.calendar_events.create(title: "third", start_at: "2012-01-19 12:00:00")
 
-      json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}", {
+      json = api_call(:get,
+                      "/api/v1/calendar_events?start_date=2012-01-07&end_date=2012-01-19&context_codes[]=course_#{@course.id}",
+                      {
                         controller: "calendar_events_api",
                         action: "index",
                         format: "json",
@@ -280,7 +386,7 @@ describe CalendarEventsApiController, type: :request do
       contexts = [@course.asset_string]
       course_ids = create_courses(15, enroll_user: @me)
       now = Time.now.utc
-      create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: "Course", context_code: "course_#{id}", title: id, start_at: "2012-01-08 12:00:00", workflow_state: "active", created_at: now, updated_at: now } })
+      create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: "Course", context_code: "course_#{id}", title: id, start_at: "2012-01-08 12:00:00", end_at: "2012-01-08 12:00:00", workflow_state: "active", created_at: now, updated_at: now } })
       contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
                         controller: "calendar_events_api",
@@ -300,7 +406,7 @@ describe CalendarEventsApiController, type: :request do
       Account.default.save!
       course_ids = create_courses(20, enroll_user: @me)
       now = Time.now.utc
-      create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: "Course", context_code: "course_#{id}", title: id, start_at: "2012-01-08 12:00:00", workflow_state: "active", created_at: now, updated_at: now } })
+      create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: "Course", context_code: "course_#{id}", title: id, start_at: "2012-01-08 12:00:00", end_at: "2012-01-08 12:00:00", workflow_state: "active", created_at: now, updated_at: now } })
       contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
                         controller: "calendar_events_api",
