@@ -383,7 +383,9 @@ export default function CanvasContentTray(props) {
         padding="small medium"
         textAlign="end"
       >
-        <Button onClick={handleDismissTray}>{formatMessage('Cancel')}</Button>
+        <Button data-testid="cancel-replace-button" onClick={handleDismissTray}>
+          {formatMessage('Cancel')}
+        </Button>
         <Button
           margin="0 0 0 x-small"
           color="primary"
