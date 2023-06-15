@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {WorkflowState} from '../../../api'
+import {GradingType, WorkflowState} from '../../../api'
 
 export type UserConnection = {
   enrollments: {
@@ -45,10 +45,18 @@ export type AssignmentConnection = {
   anonymizeStudents: boolean
   omitFromFinalGrade: boolean
   workflowState: WorkflowState
-  gradingType: string
-  dueAt?: string
+  gradingType: GradingType
+  dueAt: string | null
   groupCategoryId?: string
   gradeGroupStudentsIndividually: boolean
+  allowedAttempts: number
+  anonymousGrading: boolean
+  courseId: string
+  gradesPublished: boolean
+  htmlUrl: string
+  moderatedGrading: boolean
+  postManually: boolean
+  published: boolean
 }
 
 export type AssignmentGroupConnection = {
@@ -77,6 +85,9 @@ export type SubmissionConnection = {
   id: string
   score?: number | null
   grade?: string | null
+  redoRequest: boolean
+  submittedAt: Date | null
+  userId: string
 }
 
 export type Attachment = {
@@ -140,13 +151,14 @@ export type GradebookUserSubmissionDetails = {
   assignmentId: string
   submissionType?: string | null
   proxySubmitter?: string | null
-  submittedAt?: Date | null
+  submittedAt: Date | null
   state: string
   excused: boolean
   late: boolean
   latePolicyStatus?: string
   missing: boolean
   userId: string
+  redoRequest: boolean
 }
 
 export type GradebookStudentQueryResponse = {

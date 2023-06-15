@@ -572,6 +572,7 @@ class GradebooksController < ApplicationController
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+      message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s
     }
     js_env({
              GRADEBOOK_OPTIONS: gradebook_options

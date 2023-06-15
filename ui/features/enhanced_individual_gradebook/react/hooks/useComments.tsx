@@ -19,6 +19,7 @@
 import {useCallback, useEffect, useState} from 'react'
 import {useQuery} from 'react-apollo'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {executeApiRequest} from '@canvas/util/apiRequest'
 
 import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../queries/Queries'
 import {
@@ -28,7 +29,6 @@ import {
   GradebookSubmissionCommentsResponse,
   GradebookUserSubmissionDetails,
 } from '../../types'
-import {executeApiRequest} from '../../utils/apiUtils'
 import {Submission} from '../../../../api.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')

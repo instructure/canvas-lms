@@ -43,6 +43,9 @@ export const GRADEBOOK_QUERY = gql`
           id: _id
           score
           assignmentId
+          redoRequest
+          submittedAt
+          userId
         }
       }
       assignmentGroupsConnection {
@@ -68,6 +71,14 @@ export const GRADEBOOK_QUERY = gql`
               dueAt
               groupCategoryId
               gradeGroupStudentsIndividually
+              allowedAttempts
+              anonymousGrading
+              courseId
+              gradesPublished
+              htmlUrl
+              moderatedGrading: moderatedGradingEnabled
+              postManually
+              published
             }
           }
         }

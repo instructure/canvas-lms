@@ -53,6 +53,11 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("anonymousInstructorAnnotations")).to eq assignment.anonymous_instructor_annotations
     expect(assignment_type.resolve("postToSis")).to eq assignment.post_to_sis
     expect(assignment_type.resolve("canUnpublish")).to eq assignment.can_unpublish?
+    expect(assignment_type.resolve("courseId")).to eq assignment.context_id.to_s
+    expect(assignment_type.resolve("gradesPublished")).to eq assignment.grades_published?
+    expect(assignment_type.resolve("moderatedGradingEnabled")).to eq assignment.moderated_grading?
+    expect(assignment_type.resolve("postManually")).to eq assignment.post_manually?
+    expect(assignment_type.resolve("published")).to eq assignment.published?
   end
 
   it_behaves_like "types with enumerable workflow states" do

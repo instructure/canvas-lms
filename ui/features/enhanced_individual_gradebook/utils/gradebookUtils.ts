@@ -151,6 +151,7 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     id: submission.id,
     late: submission.late,
     missing: submission.missing,
+    redoRequest: submission.redo_request,
     score: submission.score,
     submittedAt: submission.submitted_at,
     userId: submission.user_id,
