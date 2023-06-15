@@ -223,6 +223,24 @@ class AssignmentsController < ApplicationController
     render html: "", layout: true
   end
 
+  # Provide an easy entry point for A2 or other consumers to directly launch the LTI tool associated with
+  # an assignment, while reusing the authorization and business logic of #show.
+  # Hacky; relies on
+  #   - content_tag_redirect reads `display` directly for rendering the LTI tool
+  #   - assignments_2=false shortcircuits the A2 rendering in #show so that content_tag_redirect can be called
+  def tool_launch
+    @assignment = @context.assignments.find(params[:assignment_id])
+
+    unless @assignment.submission_types == "external_tool" && @assignment.external_tool_tag
+      flash[:error] = t "The assignment you requested is not associated with an LTI tool."
+      return redirect_to named_context_url(@context, :context_assignments_url)
+    end
+
+    params[:display] = "borderless" # render the LTI launch full screen, without any Canvas chrome
+    params[:assignments_2] = false # bypass A2 rendering to get to the call to content_tag_redirect
+    show
+  end
+
   def show
     unless request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request

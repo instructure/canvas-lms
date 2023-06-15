@@ -1698,6 +1698,40 @@ describe AssignmentsController do
     end
   end
 
+  describe "GET 'tool_launch'" do
+    subject { get "tool_launch", params: { course_id: @course.id, assignment_id: @assignment.id } }
+
+    context "with non-external_tool assignment" do
+      before do
+        @assignment.update(submission_types: "online_upload")
+      end
+
+      it "notifies user and redirects back to assignments page" do
+        subject
+        expect(response).to be_redirect
+        expect(flash[:error]).to match(/The assignment you requested is not associated with an LTI tool./)
+      end
+    end
+
+    context "with external_tool assignment" do
+      let(:url) { "http://example.com/test" }
+      let(:tool) { external_tool_model(context: @course, opts: { url:, assignment_selection: { enabled: true } }) }
+
+      before do
+        @assignment.update(submission_types: "external_tool")
+        @assignment.build_external_tool_tag(url:, content: tool)
+        @assignment.save!
+      end
+
+      it "renders the LTI tool launch associated with assignment" do
+        user_session(@student)
+        subject
+        expect(response).to be_successful
+        expect(assigns[:lti_launch]).to be_present
+      end
+    end
+  end
+
   describe "GET 'syllabus'" do
     it "requires authorization" do
       # controller.use_rails_error_handling!
