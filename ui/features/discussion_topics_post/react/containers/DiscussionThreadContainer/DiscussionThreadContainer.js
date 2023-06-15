@@ -206,7 +206,26 @@ export const DiscussionThreadContainer = props => {
   }
 
   const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
-  const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
+  const getReplyLeftMargin = responsiveProp => {
+    // If the entry is in threadMode, then we want the RCE to be aligned with the authorInfo
+    const threadMode = props.discussionEntry?.depth > 1
+    if (responsiveProp.padding === undefined || responsiveProp.padding === null || !threadMode) {
+      return `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
+    }
+    // This assumes that the responsive prop is using the css short hand for padding with 3 variables to get the left padding value
+    const responsiveLeftPadding = responsiveProp.padding.split(' ')[1] || ''
+    // The flex component uses the notation xx-small but the canvas theme saves the value as xxSmall
+    const camelCaseResponsiveLeftPadding = responsiveLeftPadding.replace(/-(.)/g, (_, nextLetter) =>
+      nextLetter.toUpperCase()
+    )
+    // Retrieve the css value based on the canvas theme variable
+    const discussionEditLeftPadding = theme.variables.spacing[camelCaseResponsiveLeftPadding] || '0'
+
+    // This assumes that the discussionEntryContainer left padding is small
+    const discussionEntryContainerLeftPadding = theme.variables.spacing.small || '0'
+
+    return `calc(${theme.variables.spacing.xxLarge} * ${props.depth} + ${discussionEntryContainerLeftPadding} + ${discussionEditLeftPadding})`
+  }
 
   const findDraftMessage = () => {
     let rootEntryDraftMessage = ''
@@ -411,6 +430,7 @@ export const DiscussionThreadContainer = props => {
       match="media"
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
+        // If you change the padding notation on these, please update the getReplyLeftMargin function
         mobile: {
           padding: 'small xx-small small',
         },
@@ -550,7 +570,7 @@ export const DiscussionThreadContainer = props => {
               </Flex>
             </div>
           </Highlight>
-          <div style={{marginLeft: replyMarginDepth}}>
+          <div style={{marginLeft: getReplyLeftMargin(responsiveProps)}}>
             {editorExpanded && !(ENV.isolated_view || splitScreenOn) && (
               <View
                 display="block"
