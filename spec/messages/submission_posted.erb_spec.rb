@@ -97,10 +97,6 @@ describe "submission_posted" do
         course_root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
         course_root_account.save!
 
-        # truthy permission(since enabled is being "not"ed)
-        course_root_account.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-        course_root_account.reload
-
         assignment.grade_student(student, score: 10, grader: teacher)
         asset.reload
         expect(message.body).to include "grade: A"

@@ -102,10 +102,6 @@ describe "Student Gradebook - Assignment Details" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
       end
 
       it "does not show grade distribution" do
@@ -157,10 +153,6 @@ describe "Student Gradebook - Assignment Details" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
       end
 
       it "shows submission comments", ignore_js_errors: true do

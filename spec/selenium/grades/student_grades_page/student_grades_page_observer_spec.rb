@@ -100,10 +100,6 @@ describe "gradebook" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: observer_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
       end
 
       it "can toggle between using and not using ungraded assignments" do

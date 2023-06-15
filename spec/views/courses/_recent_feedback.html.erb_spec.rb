@@ -71,10 +71,6 @@ describe "courses/_recent_feedback" do
       # truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
-
-      # truthy permission(since enabled is being "not"ed)
-      Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-      Account.default.reload
     end
 
     it "preserves complete / incomplete grade" do

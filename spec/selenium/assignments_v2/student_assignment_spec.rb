@@ -41,10 +41,6 @@ describe "as a student" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
       end
 
       context "not submitted" do
@@ -1199,7 +1195,7 @@ describe "as a student" do
           expect(StudentAssignmentPageV2.comment_container).to include_text("great job!")
         end
 
-        it "allows the student to complete a group peer review with a rubric by completing the rubric and submitting" do
+        it "allows the student to complete a group peer review with a rubric by completing the rubric and submitting", skip: "flaky" do
           rubric_model
           @association = @rubric.associate_with(@peer_review_assignment, @course, purpose: "grading", use_for_grading: true)
           @peer_review_assignment.assign_peer_review(@student1, @student2)

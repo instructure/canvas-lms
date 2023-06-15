@@ -267,10 +267,6 @@ describe Api::V1::Course do
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
 
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
-
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 
