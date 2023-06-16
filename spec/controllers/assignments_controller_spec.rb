@@ -259,6 +259,41 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
+    context "course grading scheme defaults" do
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to 0 in js_env if default canvas grading scheme is selected" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+
+        user_session @teacher
+        @course.update_attribute :grading_standard_id, 0
+        expect(@course.grading_standard_id).to eq 0
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq 0
+      end
+
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to grading scheme id in js_env if a grading scheme is selected" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+
+        user_session @teacher
+        @standard = @course.grading_standards.create!(title: "course standard", standard_data: { a: { name: "A", value: "95" }, b: { name: "B", value: "80" }, f: { name: "F", value: "" } })
+        @course.update_attribute :grading_standard, @standard
+        expect(@course.grading_standard_id).to eq @standard.id
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq @standard.id
+      end
+
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to nil in js_env if course grading schemes are not enabled" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+
+        user_session @teacher
+        expect(@course.grading_standard_id).to be_nil
+
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to be_nil
+      end
+    end
+
     context "draft state" do
       it "creates a default group if none exist" do
         user_session(@student)
