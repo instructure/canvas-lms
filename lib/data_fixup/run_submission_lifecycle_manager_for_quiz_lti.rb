@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module DataFixup::RunDueDateCacherForQuizLti
+module DataFixup::RunSubmissionLifecycleManagerForQuizLti
   def self.run(start_at, end_at)
     # The migration will have us at most a range of 100,000 items,
     # we'll break it down to a thousand at a time here.
@@ -32,7 +32,7 @@ module DataFixup::RunDueDateCacherForQuizLti
               .merge(ContextExternalTool.quiz_lti)
               .distinct
 
-      courses_to_recompute.each { |c| DueDateCacher.recompute_course(c, run_immediately: true) }
+      courses_to_recompute.each { |c| SubmissionLifecycleManager.recompute_course(c, run_immediately: true) }
     end
   end
 end

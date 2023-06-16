@@ -72,29 +72,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "0c4d7211e332f5ec64633589aa53c40035dd353b4ed99702ad0dda080eab7dcd",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/due_date_cacher.rb",
-      "line": 515,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.deleted.joins(\"INNER JOIN (VALUES #{batch.each_with_object([]) do\n next unless entry[5]\n(memo << \"(#{entry.first}, #{entry.second})\")\n end.join(\",\")})\\nAS vals(assignment_id, student_id)\\nON submissions.assignment_id = vals.assignment_id\\nAND submissions.user_id = vals.student_id\\n\".squish)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DueDateCacher",
-        "method": "handle_lti_deleted_submissions"
-      },
-      "user_input": "batch.each_with_object([]) do\n next unless entry[5]\n(memo << \"(#{entry.first}, #{entry.second})\")\n end.join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "0e15b8a6ab3d2158a04d098f25c49a631614b1fe6fea57e98d52dbe9052e3e80",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -319,6 +296,29 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "2d881ab88942d987968b9fe72f1e9963a90a2c4d2f2e04a5ddfc99e9e061c695",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/submission_lifecycle_manager.rb",
+      "line": 486,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.connection.execute(\"UPDATE #{Submission.quoted_table_name}\\n  SET\\n    cached_due_date = vals.due_date::timestamptz,\\n    grading_period_id = vals.grading_period_id::integer,\\n    workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (\\n      #{self.class.infer_submission_workflow_state_sql}\\n    )),\\n    anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),\\n    cached_quiz_lti = vals.cached_quiz_lti,\\n    updated_at = now() AT TIME ZONE 'UTC'\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  WHERE submissions.user_id = vals.student_id AND\\n        submissions.assignment_id = vals.assignment_id AND\\n        (\\n          (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR\\n          (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR\\n          (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),\\n            (#{self.class.infer_submission_workflow_state_sql})\\n          )) OR\\n          (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR\\n          (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)\\n        );\\nINSERT INTO #{Submission.quoted_table_name}\\n  (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,\\n  cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  SELECT\\n    assignments.id, vals.student_id, 'unsubmitted',\\n    now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',\\n    assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,\\n    vals.anonymous_id,\\n    vals.cached_quiz_lti,\\n    vals.root_account_id\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  INNER JOIN #{Assignment.quoted_table_name} assignments\\n    ON assignments.id = vals.assignment_id\\n  LEFT OUTER JOIN #{Submission.quoted_table_name} submissions\\n    ON submissions.assignment_id = assignments.id\\n    AND submissions.user_id = vals.student_id\\n  WHERE submissions.id IS NULL;\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SubmissionLifecycleManager",
+        "method": "perform_submission_upsert"
+      },
+      "user_input": "self.class.infer_submission_workflow_state_sql",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 114,
       "fingerprint": "2f29324268f96b4e21c0299738b67bc86028ddc1940f69cbf50c623cc3a4b87e",
@@ -482,29 +482,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "49d6924be10db58b5a5469276563f58598f27fe5b92e0403eaac76283ac8305c",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/due_date_cacher.rb",
-      "line": 380,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DueDateCacher",
-        "method": "record_due_date_changes_for_auditable_assignments!"
-      },
-      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "4a61f864c1ece2dda2f4ec6a12a7226b3d028c9da0e27e0fb276f3faebb41c2d",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -538,29 +515,6 @@
       "render_path": null,
       "location": null,
       "user_input": "apply_limits(clone, start, finish, order).except(:select).select(primary_key).to_sql.hash.abs",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "50e7b4f647fa048d2e4449e92b7b4a0cb5c8a2f1f054de88e3430d8b0b1d246b",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/due_date_cacher.rb",
-      "line": 369,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DueDateCacher",
-        "method": "current_cached_due_dates"
-      },
-      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -731,7 +685,7 @@
       "check_name": "Redirect",
       "message": "Possible unprotected redirect",
       "file": "app/controllers/courses_controller.rb",
-      "line": 3404,
+      "line": 3406,
       "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
       "code": "redirect_to((params[:continue_to] or course_url(@course)))",
       "render_path": null,
@@ -836,29 +790,6 @@
         89
       ],
       "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "7b3d84c4242c2d123a87b502f6cc1de154b3c111b3543c7c48f8aa7ad480a3f9",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/student_enrollment.rb",
-      "line": 88,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.joins(:assignment).where(:user_id => students.map(&:user_id), :workflow_state => \"deleted\", :assignments => ({ :context_id => course_id })).merge(Assignment.active).in_batches.update_all(\"workflow_state = #{DueDateCacher.infer_submission_workflow_state_sql}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "StudentEnrollment",
-        "method": "restore_deleted_submissions_for_enrollments"
-      },
-      "user_input": "DueDateCacher.infer_submission_workflow_state_sql",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "DueDateCacher.infer_submission_workflow_state_sql is safe"
     },
     {
       "warning_type": "Command Injection",
@@ -1001,6 +932,29 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "9b42b79c842d4fd260f8204a367999ddb93a8c6abe72445831f6a491b036eb7b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/submission_lifecycle_manager.rb",
+      "line": 369,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SubmissionLifecycleManager",
+        "method": "current_cached_due_dates"
+      },
+      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "9e213c3440080230acd65f00562b9bd0d1c1c2c673fd32a020d1ca3c6e2cdb82",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1051,7 +1005,7 @@
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `const_get` called with parameter value",
       "file": "app/controllers/application_controller.rb",
-      "line": 1425,
+      "line": 1429,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "Object.const_get((params[:feed_code].split(\"_\", 2) or [\"group_membership\", params[:feed_code].split(\"_\", 3)[-1]])[0].classify, false)",
       "render_path": null,
@@ -1074,7 +1028,7 @@
       "check_name": "RegexDoS",
       "message": "Model attribute used in regular expression",
       "file": "app/models/course.rb",
-      "line": 2711,
+      "line": 2715,
       "link": "https://brakemanscanner.org/docs/warning_types/denial_of_service/",
       "code": "/\\A#{(Folder.root_folders(self).first.name + \"/\")}/",
       "render_path": null,
@@ -1134,6 +1088,29 @@
       "confidence": "High",
       "cwe_id": [
         601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "b6944f1077661151ed28a4f2c1c874378a58ac2f622d61a3fec18f74e9db7d5b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/submission_lifecycle_manager.rb",
+      "line": 380,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SubmissionLifecycleManager",
+        "method": "record_due_date_changes_for_auditable_assignments!"
+      },
+      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -1203,6 +1180,29 @@
       "confidence": "High",
       "cwe_id": [
         601
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c76f489b64a73c0ca7d8a2e3c7e74d1571d1c5467816a496fa75d8af38eba2b7",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/submission_lifecycle_manager.rb",
+      "line": 515,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.deleted.joins(\"INNER JOIN (VALUES #{batch.each_with_object([]) do\n next unless entry[5]\n(memo << \"(#{entry.first}, #{entry.second})\")\n end.join(\",\")})\\nAS vals(assignment_id, student_id)\\nON submissions.assignment_id = vals.assignment_id\\nAND submissions.user_id = vals.student_id\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SubmissionLifecycleManager",
+        "method": "handle_lti_deleted_submissions"
+      },
+      "user_input": "batch.each_with_object([]) do\n next unless entry[5]\n(memo << \"(#{entry.first}, #{entry.second})\")\n end.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
@@ -1412,6 +1412,29 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "dd6db3053e7be079f424f6ae81ed82b590eff7e519cedc0e9c427748b6e4028d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/student_enrollment.rb",
+      "line": 88,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.joins(:assignment).where(:user_id => students.map(&:user_id), :workflow_state => \"deleted\", :assignments => ({ :context_id => course_id })).merge(Assignment.active).in_batches.update_all(\"workflow_state = #{SubmissionLifecycleManager.infer_submission_workflow_state_sql}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "StudentEnrollment",
+        "method": "restore_deleted_submissions_for_enrollments"
+      },
+      "user_input": "SubmissionLifecycleManager.infer_submission_workflow_state_sql",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "ded9e82288e144d1d531650c2d385aa95a6e3688d4d3ca04757c2c3a61db4119",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1472,29 +1495,6 @@
         "method": null
       },
       "user_input": "key",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "e8084034967915a4632d5b9349056626b64a9fe11b8d3866aad2bcb9b600b5d9",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "lib/due_date_cacher.rb",
-      "line": 486,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Submission.connection.execute(\"UPDATE #{Submission.quoted_table_name}\\n  SET\\n    cached_due_date = vals.due_date::timestamptz,\\n    grading_period_id = vals.grading_period_id::integer,\\n    workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (\\n      #{self.class.infer_submission_workflow_state_sql}\\n    )),\\n    anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),\\n    cached_quiz_lti = vals.cached_quiz_lti,\\n    updated_at = now() AT TIME ZONE 'UTC'\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  WHERE submissions.user_id = vals.student_id AND\\n        submissions.assignment_id = vals.assignment_id AND\\n        (\\n          (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR\\n          (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR\\n          (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),\\n            (#{self.class.infer_submission_workflow_state_sql})\\n          )) OR\\n          (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR\\n          (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)\\n        );\\nINSERT INTO #{Submission.quoted_table_name}\\n  (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,\\n  cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  SELECT\\n    assignments.id, vals.student_id, 'unsubmitted',\\n    now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',\\n    assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,\\n    vals.anonymous_id,\\n    vals.cached_quiz_lti,\\n    vals.root_account_id\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  INNER JOIN #{Assignment.quoted_table_name} assignments\\n    ON assignments.id = vals.assignment_id\\n  LEFT OUTER JOIN #{Submission.quoted_table_name} submissions\\n    ON submissions.assignment_id = assignments.id\\n    AND submissions.user_id = vals.student_id\\n  WHERE submissions.id IS NULL;\\n\".squish)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DueDateCacher",
-        "method": "perform_submission_upsert"
-      },
-      "user_input": "self.class.infer_submission_workflow_state_sql",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -1702,6 +1702,6 @@
       "note": ""
     }
   ],
-  "updated": "2023-06-05 10:10:36 -0500",
+  "updated": "2023-06-23 20:34:01 +0000",
   "brakeman_version": "5.4.1"
 }

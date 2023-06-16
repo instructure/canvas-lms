@@ -3348,7 +3348,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # Suspend any callbacks that could lead to DueDateCacher running.  This means, for now, the
+  # Suspend any callbacks that could lead to SubmissionLifecycleManager running.  This means, for now, the
   # update_cached_due_dates callbacks on:
   # * Assignment
   # * AssignmentOverride and
@@ -3377,7 +3377,7 @@ class Assignment < ActiveRecord::Base
     unless saved_by == :migration
       relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
-      DueDateCacher.recompute(self, update_grades: true)
+      SubmissionLifecycleManager.recompute(self, update_grades: true)
     end
   end
 
@@ -3408,7 +3408,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def apply_late_policy
-    return if update_cached_due_dates? # DueDateCacher already re-applies late policy so we shouldn't
+    return if update_cached_due_dates? # SubmissionLifecycleManager already re-applies late policy so we shouldn't
     return unless saved_change_to_grading_type?
 
     LatePolicyApplicator.for_assignment(self)
@@ -3611,7 +3611,7 @@ class Assignment < ActiveRecord::Base
                       false
                     end
 
-    DueDateCacher.recompute(self, update_grades:, executing_user: updating_user)
+    SubmissionLifecycleManager.recompute(self, update_grades:, executing_user: updating_user)
   end
 
   def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)

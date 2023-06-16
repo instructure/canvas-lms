@@ -709,7 +709,7 @@ describe ContentTag do
 
       tag = assignment.external_tool_tag
 
-      expect(DueDateCacher).to receive(:recompute).with(assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment)
 
       tag.destroy!
     end
@@ -730,7 +730,7 @@ describe ContentTag do
       )
       tag = assignment.external_tool_tag
 
-      expect(DueDateCacher).to_not receive(:recompute).with(assignment)
+      expect(SubmissionLifecycleManager).to_not receive(:recompute).with(assignment)
 
       tag.destroy!
     end
@@ -770,13 +770,13 @@ describe ContentTag do
     it "runs the due date cacher when saved if the content is Quizzes 2" do
       assignment = @course.assignments.create!(title: "some assignment", submission_types: "external_tool")
 
-      expect(DueDateCacher).to receive(:recompute).with(assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment)
 
       ContentTag.create!(content: tool, url: tool.url, context: assignment)
     end
 
     it "does not run the due date cacher when saved if the content is Quizzes 2 but the context is a course" do
-      expect(DueDateCacher).to_not receive(:recompute)
+      expect(SubmissionLifecycleManager).to_not receive(:recompute)
 
       ContentTag.create!(content: tool, url: tool.url, context: @course)
     end
@@ -792,7 +792,7 @@ describe ContentTag do
 
       assignment = @course.assignments.create!(title: "some assignment", submission_types: "external_tool")
 
-      expect(DueDateCacher).to_not receive(:recompute).with(assignment)
+      expect(SubmissionLifecycleManager).to_not receive(:recompute).with(assignment)
 
       ContentTag.create!(content: not_quizzes_tool, url: not_quizzes_tool.url, context: assignment)
     end

@@ -21,7 +21,7 @@ module DataFixup::InitializeSubmissionCachedDueDate
   def self.run
     Course.find_in_batches do |courses|
       courses.each do |course|
-        DueDateCacher.recompute_course(course, inst_jobs_opts: { priority: Delayed::LOWER_PRIORITY })
+        SubmissionLifecycleManager.recompute_course(course, inst_jobs_opts: { priority: Delayed::LOWER_PRIORITY })
       end
     end
   end

@@ -344,7 +344,7 @@ module Api::V1::AssignmentOverride
   end
 
   def update_assignment_override(override, override_data, updating_user: nil)
-    DueDateCacher.with_executing_user(updating_user) do
+    SubmissionLifecycleManager.with_executing_user(updating_user) do
       override_changed = false
       override.transaction do
         update_assignment_override_without_save(override, override_data)

@@ -227,7 +227,7 @@ class Enrollment::BatchStateUpdater
       user_ids -= ignore_due_date_caching_for[course] || []
       next if user_ids.empty?
 
-      DueDateCacher.recompute_users_for_course(
+      SubmissionLifecycleManager.recompute_users_for_course(
         studs.map(&:user_id),
         course
       )

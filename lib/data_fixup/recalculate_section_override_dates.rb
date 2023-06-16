@@ -77,7 +77,7 @@ module DataFixup::RecalculateSectionOverrideDates
           next if affected_assignments.empty?
 
           # ...and recompute the cached_due_date on their submissions.
-          DueDateCacher.recompute_course(
+          SubmissionLifecycleManager.recompute_course(
             course,
             assignments: affected_assignments.map(&:id),
             inst_jobs_opts: { priority: Delayed::LOWER_PRIORITY, strand: ["recalc_section_override_dates", Shard.current.database_server.id] }

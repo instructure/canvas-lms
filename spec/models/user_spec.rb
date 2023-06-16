@@ -3382,9 +3382,9 @@ describe User do
       2.times { @course.assignments.create! }
     end
 
-    it "batches DueDateCacher jobs" do
-      expect(DueDateCacher).not_to receive(:recompute)
-      expect(DueDateCacher).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
+    it "batches SubmissionLifecycleManager jobs" do
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy
       test_student.reload.enrollments.each { |e| expect(e).to be_deleted }

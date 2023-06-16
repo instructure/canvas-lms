@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,16 +16,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class RunDueDateCacherForQuizLti < ActiveRecord::Migration[5.1]
-  tag :postdeploy
-  disable_ddl_transaction!
+module SupportHelpers
+  class SubmissionLifecycleManageController < ApplicationController
+    include SupportHelpers::ControllerHelpers
 
-  def change
-    Course.find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
-      DataFixup::RunSubmissionLifecycleManagerForQuizLti.delay_if_production(priority: Delayed::LOW_PRIORITY,
-                                                                             n_strand: ["DataFixup::RunSubmissionLifecycleManagerForQuizLti", Shard.current.database_server.id]).run(start_at, end_at)
+    before_action :require_site_admin
+
+    protect_from_forgery with: :exception
+
+    def course
+      if params[:course_id]
+        run_fixer(SupportHelpers::SubmissionLifecycleManage::CourseFixer, params[:course_id].to_i, @current_user.id)
+      else
+        render plain: "Missing course id parameter", status: :bad_request
+      end
     end
   end
 end

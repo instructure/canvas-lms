@@ -703,7 +703,7 @@ class EnrollmentsApiController < ApplicationController
     params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].key?(:limit_privileges_to_course_section)
     params[:enrollment].slice!(:enrollment_state, :section, :limit_privileges_to_course_section, :associated_user_id, :role, :start_at, :end_at, :self_enrolled, :no_notify)
 
-    DueDateCacher.with_executing_user(@current_user) do
+    SubmissionLifecycleManager.with_executing_user(@current_user) do
       @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(allow_multiple_enrollments: true))
     end
 
@@ -736,7 +736,7 @@ class EnrollmentsApiController < ApplicationController
     @current_user.require_self_enrollment_code = true
     @current_user.self_enrollment_code = code
 
-    DueDateCacher.with_executing_user(@current_user) do
+    SubmissionLifecycleManager.with_executing_user(@current_user) do
       if @current_user.save
         render(json: enrollment_json(@current_user.self_enrollment, @current_user, session))
       else

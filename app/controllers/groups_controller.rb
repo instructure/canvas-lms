@@ -536,7 +536,7 @@ class GroupsController < ApplicationController
       end
       respond_to do |format|
         if @group.save
-          DueDateCacher.with_executing_user(@current_user) do
+          SubmissionLifecycleManager.with_executing_user(@current_user) do
             @group.add_user(@current_user, "accepted", true) if @group.should_add_creator?(@current_user)
           end
 
@@ -751,7 +751,7 @@ class GroupsController < ApplicationController
   def add_user
     @group = @context
     if authorized_action(@group, @current_user, :manage)
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         @membership = @group.add_user(User.find(params[:user_id]))
         if @membership.valid?
           @group.touch

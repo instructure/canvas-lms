@@ -18,18 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module SupportHelpers
-  class DueDateCacheController < ApplicationController
-    include SupportHelpers::ControllerHelpers
+  module SubmissionLifecycleManage
+    class CourseFixer < Fixer
+      def initialize(email, after_time, course_id, executing_user_id)
+        @course_id = course_id
+        @executing_user_id = executing_user_id
+        super(email, after_time)
+      end
 
-    before_action :require_site_admin
-
-    protect_from_forgery with: :exception
-
-    def course
-      if params[:course_id]
-        run_fixer(SupportHelpers::DueDateCache::CourseFixer, params[:course_id].to_i, @current_user.id)
-      else
-        render plain: "Missing course id parameter", status: :bad_request
+      def fix
+        course = Course.find(@course_id)
+        SubmissionLifecycleManager.recompute_course(course, update_grades: true, executing_user: @executing_user_id)
       end
     end
   end

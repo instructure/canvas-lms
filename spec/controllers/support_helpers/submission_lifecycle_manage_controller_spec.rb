@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe SupportHelpers::DueDateCacheController do
+describe SupportHelpers::SubmissionLifecycleManageController do
   describe "require_site_admin" do
     it "redirects to root url if current user is not a site admin" do
       account_admin_user
@@ -47,8 +47,8 @@ describe SupportHelpers::DueDateCacheController do
 
       context "course" do
         it "creates a new CourseFixer" do
-          fixer = SupportHelpers::DueDateCache::CourseFixer.new(@user.email, nil, 1234, @user.id)
-          expect(SupportHelpers::DueDateCache::CourseFixer).to receive(:new)
+          fixer = SupportHelpers::SubmissionLifecycleManage::CourseFixer.new(@user.email, nil, 1234, @user.id)
+          expect(SupportHelpers::SubmissionLifecycleManage::CourseFixer).to receive(:new)
             .with(@user.email, nil, 1234, @user.id).and_return(fixer)
           expect(fixer).to receive(:monitor_and_fix)
           get :course, params: { course_id: 1234 }

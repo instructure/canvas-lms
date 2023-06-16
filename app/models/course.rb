@@ -1406,7 +1406,7 @@ class Course < ActiveRecord::Base
   def update_cached_due_dates
     if saved_change_to_enrollment_term_id?
       recompute_student_scores
-      DueDateCacher.recompute_course(self)
+      SubmissionLifecycleManager.recompute_course(self)
     end
   end
 
@@ -3888,7 +3888,7 @@ class Course < ActiveRecord::Base
                     skip_touch_user: true)
       end
     end
-    DueDateCacher.recompute_users_for_course(fake_student.id, self)
+    SubmissionLifecycleManager.recompute_users_for_course(fake_student.id, self)
     fake_student.update_root_account_ids
     fake_student
   end

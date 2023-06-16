@@ -756,7 +756,7 @@ describe PlannerController do
           it "orders assignments with no overrides correctly" do
             assignment1 = assignment_model(course: @course, due_at: Time.zone.now)
             assignment2 = assignment_model(course: @course, due_at: 2.days.from_now)
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
@@ -771,7 +771,7 @@ describe PlannerController do
             assignment2 = assignment_model(course: @course, due_at: 2.days.from_now)
             assign2_override_due_at = Time.zone.now
             create_adhoc_override_for_assignment(assignment2, @student, { due_at: assign2_override_due_at })
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
@@ -801,7 +801,7 @@ describe PlannerController do
             topic2_assign = topic2.assignment
             topic2_assign.due_at = 2.days.ago
             topic2_assign.save!
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)
@@ -819,7 +819,7 @@ describe PlannerController do
             wiki_page_assignment_model(course: @course)
             @page.todo_date = Time.zone.now
             @page.save!
-            DueDateCacher.recompute_course(@course, run_immediately: true)
+            SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
 
             get :index, params: { start_date: 2.weeks.ago.iso8601, end_date: 2.weeks.from_now.iso8601 }
             response_json = json_parse(response.body)

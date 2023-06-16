@@ -59,7 +59,7 @@ module SIS
       end
       i.courses_to_recache_due_dates.to_a.in_groups_of(1000, false) do |batch|
         batch.each do |course_id, user_ids|
-          DueDateCacher.recompute_users_for_course(user_ids.uniq, course_id, nil, sis_import: true, update_grades: true)
+          SubmissionLifecycleManager.recompute_users_for_course(user_ids.uniq, course_id, nil, sis_import: true, update_grades: true)
         end
       end
       # We batch these up at the end because normally a user would get several enrollments, and there's no reason

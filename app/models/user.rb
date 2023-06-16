@@ -1147,7 +1147,7 @@ class User < ActiveRecord::Base
     end
     user_ids = enrollment_scope.pluck(:user_id).uniq
     courses_to_update.each do |course|
-      DueDateCacher.recompute_users_for_course(user_ids, course, nil, executing_user: updating_user)
+      SubmissionLifecycleManager.recompute_users_for_course(user_ids, course, nil, executing_user: updating_user)
     end
   end
 

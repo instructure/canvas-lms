@@ -22,7 +22,7 @@ module DataFixup
   module PopulateSubmissionAnonymousIds
     def self.run(start_at, end_at)
       Course.where(id: start_at..end_at).find_each do |course|
-        DueDateCacher.recompute_course(course, run_immediately: true)
+        SubmissionLifecycleManager.recompute_course(course, run_immediately: true)
       end
     end
   end
