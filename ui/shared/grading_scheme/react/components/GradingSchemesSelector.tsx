@@ -30,10 +30,9 @@ import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {useGradingSchemeSummaries} from '../hooks/useGradingSchemeSummaries'
-import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {GradingSchemesManagement} from './GradingSchemesManagement'
 
-import {GradingSchemeTemplate, GradingSchemeSummary} from '../../gradingSchemeApiModel'
+import {GradingSchemeSummary} from '../../gradingSchemeApiModel'
 import {GradingSchemeViewEditModal} from './GradingSchemeViewEditModal'
 import {GradingSchemeViewCopyTemplateModal} from './GradingSchemeViewCopyTemplateModal'
 
@@ -44,6 +43,7 @@ const {Item} = Flex as any
 interface ComponentProps {
   contextType: 'Course' | 'Account'
   contextId: string
+  courseDefaultSchemeId?: string
   initiallySelectedGradingSchemeId?: string
   onChange: (gradingStandardId?: string) => any
 }
@@ -52,6 +52,7 @@ export const GradingSchemesSelector = ({
   onChange,
   contextType,
   contextId,
+  courseDefaultSchemeId,
 }: ComponentProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
@@ -61,15 +62,11 @@ export const GradingSchemesSelector = ({
   const [gradingSchemeSummaries, setGradingSchemeSummaries] = useState<
     GradingSchemeSummary[] | undefined
   >(undefined)
-  const [defaultCanvasGradingScheme, setDefaultCanvasGradingScheme] = useState<
-    GradingSchemeTemplate | undefined
-  >(undefined)
 
   const [selectedGradingSchemeId, setSelectedGradingSchemeId] = useState<string | undefined>(
     initiallySelectedGradingSchemeId
   )
   const {loadGradingSchemeSummaries /* loadGradingSchemesStatus */} = useGradingSchemeSummaries()
-  const {loadDefaultGradingScheme /* loadGradingSchemesStatus */} = useDefaultGradingScheme()
 
   useEffect(() => {
     loadGradingSchemeSummaries(contextType, contextId)
@@ -79,20 +76,10 @@ export const GradingSchemesSelector = ({
       .catch(error => {
         showFlashError(I18n.t('There was an error while loading grading schemes'))(error)
       })
-    // defaultCanvasGradingScheme
-    loadDefaultGradingScheme(contextType, contextId)
-      .then(defaultGradingScheme => {
-        setDefaultCanvasGradingScheme(defaultGradingScheme)
-      })
-      .catch(error => {
-        showFlashError(
-          I18n.t('There was an error while loading the default canvas grading scheme')
-        )(error)
-      })
     return () => {
       // this is called when the component unmounts
     }
-  }, [loadGradingSchemeSummaries, loadDefaultGradingScheme, contextType, contextId])
+  }, [loadGradingSchemeSummaries, contextType, contextId])
 
   if (gradingSchemeSummaries && selectedGradingSchemeId) {
     const matchSelect = gradingSchemeSummaries.filter(
@@ -175,14 +162,29 @@ export const GradingSchemesSelector = ({
         showFlashError(I18n.t('There was an error while refreshing grading schemes'))(error)
       })
   }
-
-  if (!gradingSchemeSummaries || !defaultCanvasGradingScheme) {
+  if (!gradingSchemeSummaries) {
     return (
       <>
         <Spinner renderTitle="Loading" size="x-small" />
       </>
     )
   } else {
+    let defaultSchemeLabel: string
+    if (courseDefaultSchemeId) {
+      // look for a matching grading scheme id to get the 'default' scheme title
+      const matchingSummaries = gradingSchemeSummaries.filter(
+        gradingSchemeSummary => gradingSchemeSummary.id === courseDefaultSchemeId
+      )
+      if (courseDefaultSchemeId === '0') {
+        defaultSchemeLabel = I18n.t('Canvas Grading Scheme (course default)')
+      } else if (matchingSummaries.length > 0) {
+        defaultSchemeLabel = `${matchingSummaries[0].title} ${I18n.t('(course default)')}`
+      } else {
+        defaultSchemeLabel = I18n.t('Course Default Grading Scheme')
+      }
+    } else {
+      defaultSchemeLabel = I18n.t('Default Canvas Grading Scheme')
+    }
     return (
       <>
         <Flex
@@ -200,7 +202,7 @@ export const GradingSchemesSelector = ({
                   value={selectedGradingSchemeId || undefined}
                   onChange={onChangeSelectedGradingScheme}
                 >
-                  <option value="">{I18n.t('Default Canvas Grading Scheme')}</option>
+                  <option value="">{defaultSchemeLabel}</option>
                   {gradingSchemeSummaries.map(gradingSchemeSummary => (
                     <option key={gradingSchemeSummary.id} value={gradingSchemeSummary.id}>
                       {gradingSchemeSummary.title}
@@ -233,6 +235,15 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(selectedGradingSchemeId)}
+              />
+            ) : courseDefaultSchemeId && courseDefaultSchemeId !== '0' ? (
+              <GradingSchemeViewEditModal
+                contextType={contextType}
+                contextId={contextId}
+                gradingSchemeId={courseDefaultSchemeId}
+                onCancel={closeGradingSchemeViewEditModal}
+                onUpdate={handleUpdatedGradingScheme}
+                onDelete={() => handleDeletedGradingScheme(courseDefaultSchemeId)}
               />
             ) : (
               <GradingSchemeViewCopyTemplateModal
