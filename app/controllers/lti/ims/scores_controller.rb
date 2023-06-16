@@ -493,7 +493,7 @@ module Lti::IMS
         progress_url =
           if line_item.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
             lti_progress_show_url(
-              host: line_item.root_account.domain,
+              host: line_item.root_account.environment_specific_domain,
               id: preflight_json[:progress][:id]
             )
           else
@@ -555,7 +555,7 @@ module Lti::IMS
     def result_url
       if line_item.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
         lti_result_show_url(
-          host: line_item.root_account.domain,
+          host: line_item.root_account.environment_specific_domain,
           course_id: context.id,
           line_item_id: line_item.id,
           id: result.id

@@ -619,7 +619,7 @@ describe Lti::Messages::JwtMessage do
       context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is on" do
         it "sets the NRPS url using the Account#domain" do
           context.root_account.enable_feature! :consistent_ags_ids_based_on_account_principal_domain
-          allow_any_instance_of(Account).to receive(:domain).and_return("account_host")
+          expect_any_instance_of(Account).to receive(:environment_specific_domain).and_return("account_host")
           expect(lti_advantage_service_claim["context_memberships_url"]).to eq "polymorphic_url"
           expect(controller).to have_received(:polymorphic_url).with(
             [anything, :names_and_roles], host: "account_host"
@@ -669,7 +669,7 @@ describe Lti::Messages::JwtMessage do
 
     before do
       course.account.enable_feature!(:consistent_ags_ids_based_on_account_principal_domain)
-      allow_any_instance_of(Account).to receive(:domain).and_return("canonical_domain")
+      allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical_domain")
       allow(controller).to receive(:lti_line_item_index_url)
         .with({ host: "canonical_domain", course_id: course.id })
         .and_return("lti_line_item_index_url")

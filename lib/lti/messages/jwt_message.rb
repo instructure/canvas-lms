@@ -193,14 +193,14 @@ module Lti::Messages
     end
 
     # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim
-    # see ResourceLinkRequest#add_line_item_url_to_ags_claim! for adding the 'lineitem' propertys
+    # see ResourceLinkRequest#add_line_item_url_to_ags_claim! for adding the 'lineitem' properties
     def add_assignment_and_grade_service_claims!
       @message.assignment_and_grade_service.scope = @tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES
 
       @message.assignment_and_grade_service.lineitems =
         if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
           @expander.controller.lti_line_item_index_url(
-            host: @context.root_account.domain, course_id: course_id_for_ags_url
+            host: @context.root_account.environment_specific_domain, course_id: course_id_for_ags_url
           )
         else
           @expander.controller.lti_line_item_index_url(course_id: course_id_for_ags_url)
@@ -224,7 +224,7 @@ module Lti::Messages
         if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
           @expander.controller.polymorphic_url(
             [@context, :names_and_roles],
-            host: @context.root_account.domain
+            host: @context.root_account.environment_specific_domain
           )
         else
           @expander.controller.polymorphic_url([@context, :names_and_roles])
