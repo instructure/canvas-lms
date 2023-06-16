@@ -527,6 +527,9 @@
     "custom_6979cd81": {
         "message": "Personalitzat"
     },
+    "custom_width_and_height_pixels_946eea7c": {
+        "message": "Amplada i altura personalitzades (píxels)"
+    },
     "cyan_c1d5f68a": {
         "message": "Cian"
     },
@@ -855,7 +858,7 @@
         "message": "Un fòrum fascinant"
     },
     "excused_cf8792eb": {
-        "message": "Excusat"
+        "message": "Justificat"
     },
     "exists_2e62bdaa": {
         "message": "Existeix"
@@ -1356,7 +1359,7 @@
         "message": "Gran"
     },
     "late_2be42b88": {
-        "message": "Tardà"
+        "message": "Endarrerit"
     },
     "latvian_2bbb6aab": {
         "message": "Letó"
@@ -1712,6 +1715,9 @@
     "no_headers_9bc7dc7f": {
         "message": "No hi ha cap capçalera"
     },
+    "no_more_items_to_show_6a1333c6": {
+        "message": "No hi ha més elements que s’hagin de mostrar"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "No hi ha cap visualització prèvia disponible per a aquest fitxer."
     },
@@ -1801,6 +1807,9 @@
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
         "message": "Per desar una icona, cal afegir un dels estils següents: color de la icona, mida del contorn, text de la icona o imatge."
+    },
+    "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+        "message": "No s''han pogut enganxar un o més fitxers. Proveu de penjar o d’arrossegar i deixar anar els fitxers."
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Només es mostra el període de qualificació més recent."
