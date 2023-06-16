@@ -16,33 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {GradebookSettings} from '../../../../gradebook/react/default_gradebook/gradebook.d'
 import userSettings from '@canvas/user-settings'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {HandleCheckboxChange} from '../../../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   saveViewUngradedAsZeroToServer?: boolean | null
-  settings?: GradebookSettings | null
   contextId?: string | null
+  handleCheckboxChange: HandleCheckboxChange
+  includeUngradedAssignments: boolean
 }
 export default function IncludeUngradedAssignmentsCheckbox({
   saveViewUngradedAsZeroToServer,
-  settings,
   contextId,
+  handleCheckboxChange,
+  includeUngradedAssignments,
 }: Props) {
-  const [viewUngraded, setViewUngraded] = useState(
-    saveViewUngradedAsZeroToServer && settings
-      ? settings.view_ungraded_as_zero === 'true'
-      : userSettings.contextGet('include_ungraded_assignments') || false
-  )
-
   const handleViewUngradedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
-    setViewUngraded(checked)
+    handleCheckboxChange('includeUngradedAssignments', checked)
     userSettings.contextSet('include_ungraded_assignments', checked)
     if (!saveViewUngradedAsZeroToServer) {
       return
@@ -68,7 +64,7 @@ export default function IncludeUngradedAssignmentsCheckbox({
           type="checkbox"
           id="ungraded_checkbox"
           name="ungraded_checkbox"
-          checked={viewUngraded}
+          checked={includeUngradedAssignments}
           onChange={handleViewUngradedChange}
         />
         {I18n.t('View Ungraded as 0')}

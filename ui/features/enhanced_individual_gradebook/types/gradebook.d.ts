@@ -20,7 +20,6 @@ import {AssignmentConnection, UserConnection} from './queries'
 import {
   ProgressData,
   CourseSettingsType,
-  GradebookSettings,
 } from 'features/gradebook/react/default_gradebook/gradebook.d'
 
 export enum GradebookSortOrder {
@@ -29,7 +28,7 @@ export enum GradebookSortOrder {
   AssignmentGroup = 'assignmentGroup',
 }
 
-export type teacherNotes = {
+export type TeacherNotes = {
   id: string
   hidden: boolean
   position: number
@@ -38,8 +37,17 @@ export type teacherNotes = {
   title: string
 }
 
+export type CustomOptions = {
+  includeUngradedAssignments: boolean
+  hideStudentNames: boolean
+  showConcludedEnrollments: boolean
+  showNotesColumn: boolean
+  showTotalGradeAsPoints: boolean
+}
+
+export type HandleCheckboxChange = (key: keyof CustomOptions, value: boolean) => void
+
 export type GradebookOptions = {
-  includeUngradedAssignments?: boolean
   anonymizeStudents?: boolean
   sortOrder: GradebookSortOrder
   selectedSection?: string
@@ -54,9 +62,9 @@ export type GradebookOptions = {
   customColumnsUrl?: string | null
   saveViewUngradedAsZeroToServer?: boolean | null
   settingUpdateUrl?: string | null
-  settings?: GradebookSettings | null
   settingsUpdateUrl?: string | null
-  teacherNotes?: teacherNotes | null
+  teacherNotes?: TeacherNotes | null
+  customOptions: CustomOptions
   showTotalGradeAsPoints?: boolean | null
   messageAttachmentUploadFolderId?: string
 }
@@ -83,6 +91,7 @@ export type AssignmentSortContext = {
 
 export type SortableStudent = UserConnection & {
   sections: string[]
+  hiddenName?: string
 }
 
 export enum ApiCallStatus {

@@ -111,6 +111,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
               name
             }
           }
+          id: _id
           loginId
           name
         }

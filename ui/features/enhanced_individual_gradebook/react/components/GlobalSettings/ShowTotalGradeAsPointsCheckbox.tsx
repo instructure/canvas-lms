@@ -16,32 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {HandleCheckboxChange} from '../../../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
-  showTotalGradeAsPoints?: boolean | null
   settingUpdateUrl?: string | null
+  showTotalGradeAsPoints: boolean
+  handleCheckboxChange: HandleCheckboxChange
 }
 export default function ShowTotalGradesAsPointsCheckbox({
   showTotalGradeAsPoints,
   settingUpdateUrl,
+  handleCheckboxChange,
 }: Props) {
-  const [showTotalGradeAsPointsChecked, setShowTotalGradeAsPointsChecked] = useState(
-    showTotalGradeAsPoints ?? false
-  )
-
   const handleShowTotalGradeAsPointsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked
     doFetchApi({
       method: 'PUT',
       path: settingUpdateUrl,
       body: {
-        show_total_grade_as_points: event.target.checked,
+        show_total_grade_as_points: checked,
       },
     })
-    setShowTotalGradeAsPointsChecked(event.target.checked)
+    handleCheckboxChange('showTotalGradeAsPoints', checked)
   }
 
   return (
@@ -54,7 +54,7 @@ export default function ShowTotalGradesAsPointsCheckbox({
           type="checkbox"
           id="show_total_as_points"
           name="show_total_as_points"
-          checked={showTotalGradeAsPointsChecked}
+          checked={showTotalGradeAsPoints}
           onChange={handleShowTotalGradeAsPointsChange}
         />
         {I18n.t('Show Totals as Points on Student Grade Page')}

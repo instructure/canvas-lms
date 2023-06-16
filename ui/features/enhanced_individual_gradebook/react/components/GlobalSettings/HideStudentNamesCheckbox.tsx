@@ -16,21 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
+import {HandleCheckboxChange} from '../../../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
-export default function HideStudentNamesCheckbox() {
-  const [hideStudentNames, setHideStudentNames] = useState(
-    userSettings.contextGet('hide_student_names') || false
-  )
-
+type Props = {
+  handleCheckboxChange: HandleCheckboxChange
+  hideStudentNames: boolean
+}
+export default function HideStudentNamesCheckbox({handleCheckboxChange, hideStudentNames}: Props) {
   const handleHideStudentNamesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const checked = event.target.checked
     userSettings.contextSet('hide_student_names', checked)
-    setHideStudentNames(checked)
+    handleCheckboxChange('hideStudentNames', checked)
   }
 
   return (

@@ -16,31 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {GradebookSettings} from '../../../../gradebook/react/default_gradebook/gradebook.d'
+import {HandleCheckboxChange} from '../../../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
-  settings?: GradebookSettings | null
   settingsUpdateUrl?: string | null
+  handleCheckboxChange: HandleCheckboxChange
+  showConcludedEnrollments: boolean
 }
-export default function ShowConcludedEnrollmentsCheckbox({settings, settingsUpdateUrl}: Props) {
-  const [showConcludedEnrollments, setShowConcludedEnrollments] = useState(
-    settings?.show_concluded_enrollments ? settings.show_concluded_enrollments === 'true' : false
-  )
+export default function ShowConcludedEnrollmentsCheckbox({
+  settingsUpdateUrl,
+  handleCheckboxChange,
+  showConcludedEnrollments,
+}: Props) {
   const handleShowConcludedEnrollmentsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked
     doFetchApi({
       method: 'PUT',
       path: settingsUpdateUrl,
       body: {
         gradebook_settings: {
-          show_concluded_enrollments: String(event.target.checked),
+          show_concluded_enrollments: checked ? 'true' : 'false',
         },
       },
     })
-    setShowConcludedEnrollments(event.target.checked)
+    handleCheckboxChange('showConcludedEnrollments', checked)
   }
 
   return (

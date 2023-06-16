@@ -139,8 +139,10 @@ export type GradebookStudentDetails = {
       name: string
     }
   }[]
+  id: string
   loginId: string
   name: string
+  hiddenName: string
 }
 
 export type GradebookUserSubmissionDetails = {

@@ -27,6 +27,7 @@ import {
   AssignmentGroupConnection,
   EnrollmentConnection,
   GradebookSortOrder,
+  GradebookStudentDetails,
   GradebookUserSubmissionDetails,
   SortableAssignment,
   SortableStudent,
@@ -97,6 +98,13 @@ export function mapEnrollmentsToSortableStudents(
   }, {} as {[key: string]: SortableStudent})
 
   return Object.values(mappedEnrollments)
+}
+
+export function studentDisplayName(
+  student: SortableStudent | GradebookStudentDetails,
+  hideStudentNames: boolean
+): string {
+  return hideStudentNames ? student.hiddenName ?? I18n.t('Student') : student.name
 }
 
 export function sortAssignments(
