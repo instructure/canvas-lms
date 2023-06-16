@@ -28,7 +28,7 @@ const I18n = useI18nScope('pages')
 
 const deleted_page_title = $.cookie('deleted_page_title')
 if (deleted_page_title) {
-  $.cookie('deleted_page_title', null, {path: '/'})
+  $.removeCookie('deleted_page_title', {path: '/'})
   $.flashMessage(
     I18n.t('notices.page_deleted', 'The page "%{title}" has been deleted.', {
       title: deleted_page_title,
