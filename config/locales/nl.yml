@@ -104,6 +104,9 @@ nl:
     embed_from_external_tool: "Inhoud insluiten vanuit extern tool"
   ExternalToolsPlugin: 
     more_external_tools: "Meerdere externe tools"
+  GradingSchemeManagement: 
+    confirm: 
+      delete: "Weet je zeker dat je dit beoordelingsschema wilt verwijderen?"
   GroupDetailView: 
     delete_confirm: "Weet je zeker dat je deze groep wilt verwijderen?"
     flash: 
@@ -242,7 +245,9 @@ nl:
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Een tabel met de naam van het beoordelingsschema en pictogrammen om het schema te bewerken of te verwijderen. "
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Een tabel met de naam van het beoordelingsschema en iconen om het schema te bewerken of te verwijderen."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Een tabel met antwoorden en korte statistieken met betrekking tot antwoordkeuzes van cursisten."
+  a_table_that_contains_the_default_canvas_grading_s_7ba86ec6: "Een tabel die de gegevens voor het standaard Canvas-beoordelingsschema bevat.  Elke rij bevat een naam, een maximumpercentage en een minimumpercentage."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Een tabel met de data van het beoordelingsschema . Elke rij bevat een naam, een maximum percentage, en een minimum percentage. Elke rij heeft ook een pictogram om een nieuwe rij eronder toe te voegen en een pictogram on de huidige rij te verwijderen. "
+  a_table_that_contains_the_grading_scheme_data_each_e9031ad3: "Een tabel die de gegevens van het beoordelingsschema bevat.  Elke rij bevat een naam, een maximumpercentage en een minimumpercentage."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Een tabel met de data van het beoordelingsschema. Elke rij bevat een naam, een maximum percentage, en een minimum percentage. Elke rij heeft ook een knop om een nieuwe rij eronder toe te voegen en een knop om de huidige rij te verwijderen."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Een tabel die de gegevens van het beoordelingsschema bevat. Er is eerst een naam van het beoordelingsschema en knoppen om het schema te bewerken en te verwijderen. Elke rij bevat een naam, een maximumpercentage en een minimumpercentage. Bovendien heeft elke rij een knop om een nieuwe rij beneden toe te voegen en een knop om de huidige rij te verwijderen."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Er is een time-out opgetreden bij contact opnemen met externe verificatiedienst"
@@ -463,6 +468,7 @@ nl:
   account_default_time_8c7ab62d: "Accountstandaardinstelling (%{time})"
   account_domain_78f43049: Accountdomein
   account_domain_lookups_f9d1147e: "Zoekopdrachten voor accountdomein"
+  account_grading_settings_d683d62e: "Instellingen voor accountbeoordeling"
   account_groups_2f301732: Accountgroepen
   account_id_2c3b4f15: account-ID
   account_id_73966078: account_id
@@ -664,6 +670,7 @@ nl:
     types: 
       account_admin: Accountbeheerder
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
+  accountname_accountcount_accounts_e2c19840: "%{accountName}, %{accountCount} accounts"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "De accountnaam kan niet leeg zijn"
@@ -2112,10 +2119,12 @@ nl:
   add_2nd_review_ea988088: "Voeg 2e beoordeling toe"
   add_8523c19b: Toevoegen
   add_a_build_button_on_the_assignment_edit_page_for_6b895561: "Voeg een knop Samenstellen toe op de pagina Opdracht bewerken voor Opdrachten van Nieuwe toetsen"
+  add_a_comment_48994930: "Een opmerking toevoegen"
   add_a_comment_872470ac: "Een opmerking toevoegen"
   add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Voeg een opmerking toe om je peerbeoordeling te voltooien. Je ziet alleen opmerkingen die door jou geschreven zijn."
   add_a_course_b72b18d7: "Een cursus toevoegen"
   add_a_custom_help_link_4328252f: "Een aangepaste Help-link toevoegen"
+  add_a_letter_grade_c7b34199: "voeg een beoordeling in lettervorm toe"
   add_a_message_4fee743f: "Een bericht toevoegen "
   add_a_message_a5ed12bf: "Een bericht toevoegen"
   add_a_new_announcement_878b717f: "Een nieuwe aankondiging toevoegen"
@@ -2190,6 +2199,7 @@ nl:
   add_folder_ba50d107: "Map toevoegen"
   add_grading_period_6f774dc3: "Beoordelingsperiode toevoegen"
   add_grading_scheme_81e23c05: "Beoordelingsschema toevoegen"
+  add_grading_scheme_dfe4aba8: "Beoordelingsschema toevoegen"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Beoordelingsschema toevoegen aan cijferrapporten voor beheerders"
   add_granularity_to_permissions_around_managing_all_129149da: "Voegt details toe aan machtigingen rondom het beheer van alle andere cursusinhoud"
   add_granularity_to_permissions_around_managing_cou_1ee88f6: "Details toevoegen aan machtigingen rondom beheer van cursussen, zoals Toevoegen/Bewerken/Verwijderen"
@@ -2229,6 +2239,7 @@ nl:
   add_new_caption_or_subtitle_59d2d044: "Nieuwe ondertiteling of bijschrift toevoegen"
   add_new_domain_e097d4a0: "Nieuw domein toevoegen"
   add_new_group_7ac49f31: "Nieuwe groep toevoegen"
+  add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: "Voeg onder deze rij een nieuwe rij voor een beoordeling in lettervorm voor een beoordelingsschema toe"
   add_new_set_of_due_dates_e8e240f: "Nieuwe set van inleverdatums toevoegen"
   add_new_term_d2217c0d: "Nieuwe periode toevoegen"
   add_observers_to_courses_6f494a29: "Waarnemers aan cursussen toevoegen"
@@ -2258,6 +2269,7 @@ nl:
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Secties voor deze portfolio toevoegen, verwijderen of herschikken"
   add_review_2fb1590c: "Beoordeling toevoegen"
   add_role_3dc4d273: "Functie toevoegen"
+  add_row_action_a84eadc1: "Rij-actie toevoegen"
   add_rubric_3636d9a6: "Rubriek toevoegen"
   add_scope_a5208f8b: "Bereik toevoegen"
   add_section_8b027a1c: "Sectie toevoegen"
@@ -3287,6 +3299,7 @@ nl:
   allows_users_to_see_quantitative_numeric_grading_d_c96924f0: "Zorg dat gebruikers kwantitatieve (numerieke) beoordelingsgegevens kunnen zien. Als je deze machtiging uitschakelt, beperkt dat het aantal opties voor het maken van opdrachten voor docenten. Gebruikers krijgen alleen kwalitatieve gegevens te zien, zoals letterscores en opmerkingen."
   allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Laat gebruikers een gemiddelde gebruiken als berekeningsmethode voor een bepaald leerdoel."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Stelt gebruikers met internationale telefoonnummers in staat tekstberichten van Canvas te ontvangen."
+  alphabetically_60ab47e4: Alfabetisch
   already_belongs_to_an_assignment_override_99fc6f36: "hoort al bij overschrijving van een opdracht"
   already_have_a_canvas_account_c4368ac9: "Heb je al een Canvas-account?"
   also_note_that_microsoft_teams_is_unable_to_suppor_20d8f753: "Merk ook op dat Microsoft Teams geen cursussen kan ondersteunen met meer dan %{max_enrollments} inschrijvingen of meer dan %{max_owners} eigenaren. Als je een grote cursus hebt, is het mogelijk dat er synchronisatieproblemen zijn als deze plafonds worden bereikt."
@@ -5470,6 +5483,7 @@ nl:
     view_account_roster: "Accountrooster bekijken"
     view_course_roster: "Cursusrooster bekijken"
   buttons_and_icons_e66ee12c: "Knoppen en pictogrammen"
+  by_assignment_group_and_position_57a4be14: "Per opdrachtgroep en functie"
   by_b90c6b6f: Door
   by_client_id_4f2fe02c: "Door Client-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alle links zijn standaard voor een cursus ingeschakeld. Cursisten zullen links voor onderdelen zonder inhoud niet kunnen zien. Bijvoorbeeld, als je geen toetsen hebt gemaakt dan zullen ze de link voor de toetsen niet kunnen zien. Je kunt deze links sorteren en expliciet uitschakelen als er gebieden in de cursus zijn waarvan je niet wilt dat cursisten er toegang tot hebben."
@@ -5483,6 +5497,7 @@ nl:
   by_default_students_can_always_create_groups_in_a__60ca6e9e: "Standaard kunnen cursisten altijd groepen in een cursus maken."
   by_default_students_can_always_create_groups_in_a__af000dd: "Standaard kunnen cursisten altijd groepen in een cursus maken. Om cursisten te beperken in het maken van groepen, moet Cursussen beheren: Beheerder - beheren/bijwerken zijn ingeschakeld en het selectievakje Toestaan dat cursisten hun eigen groepen indelen in Cursusinstellingen moet uitgeschakeld zijn."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Standaard kunnen cursisten altijd groepen in een cursus maken. Om ervoor te zorgen dat cursisten geen groepen kunnen maken, moet Cursussen - beheren/bijwerken zijn ingeschakeld en het selectievakje Toestaan dat cursisten hun eigen groepen indelen in Cursusinstellingen moet uitgeschakeld zijn."
+  by_due_date_648d7f3b: "Per inleverdatum"
   by_lti_2_registration_url_e421e523: "Door LTI 2 Registratie URL"
   by_name_54daec42: "door %{name}"
   by_url_a163275e: "Door URL"
@@ -6001,6 +6016,9 @@ nl:
   cannot_grade_at_this_time_489744b0: "Kan momenteel niet beoordelen"
   cannot_have_a_blueprint_course_with_observers_d00b3deb: "Kan geen blauwdrukcursus met waarnemers bevatten"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Kan geen blauwdrukcursus met cursisten bevatten"
+  cannot_have_duplicate_or_empty_row_names_fix_the_n_4fce15dd: "Dubbele of lege rijnamen zijn niet toegestaan. Leg de namen vast en probeer nogmaals op 'Opslaan' te klikken."
+  cannot_have_negative_ranges_or_ranges_that_are_gre_1086d6db: "Negatieve bereiken of bereiken groter dan 100 zijn niet toegestaan. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken."
+  cannot_have_overlapping_or_empty_ranges_fix_the_ra_18ce528b: "Overlappende of lege bereiken zijn niet toegestaan. Leg de bereiken vast en probeer nogmaals op 'Opslaan' te klikken."
   cannot_import_a_root_group_d4654def: "kan een hoofdgroep niet importeren"
   cannot_import_to_other_courses_af885742: "Kan niet importeren naar andere cursussen"
   cannot_modify_fields_for_outcome_from_another_cont_dc001fe7: "Kan velden niet wijzigen voor leerdoel afkomstig uit andere context: %{changes}"
@@ -7493,6 +7511,9 @@ nl:
           one: "1 niveau inspringen"
           other: "%{count} niveaus inspringen"
           zero: "Niet inspringen"
+        one: "1 niveau inspringen"
+        other: "%{count} niveaus inspringen"
+        zero: "Niet inspringen"
       labels: 
         indent: Inspringen
         new_tab: "In een nieuw tabblad laden"
@@ -8513,6 +8534,7 @@ nl:
   course_pacing_40c14b61: Cursustempo
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Cursustempo voegt ondersteuning toe voor voortschrijdende inschrijvingen in Canvas; toestaan van magische verdeling van inleverdatums voor cursisten met verschillende startdatums gebaseerd op het tempo gedefinieerd door een cursusleider. Meer informatie verkrijgen en feedback geven door deelname aan de Gebruikersgroep voor cursustempo."
   course_pacing_blackout_dates_1dfc8b61: "Datums voor niet beschikbaar bij cursustempo"
+  course_pacing_cannot_be_used_with_homeroom_course_ca47ed1c: "Cursustempo kan niet samen met een cursus voor thuiswerken worden gebruikt"
   course_pacing_d3025ecf: "Cursustempo:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Functievoorbeeld van Cursustempo moet voor uw organisatie zijn ingeschakeld."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Cursustempo is een geautomatiseerde tool die een cursistenschema opstelt door voorgestelde uren per hoofdstuk, bezochte schooldagen en het totaalaantal uren te combineren om een datumschatting te maken."
@@ -9393,6 +9415,7 @@ nl:
     error_reports: Foutrapport
     files: Bestanden
     grades: Cijfers
+    grading_settings: Beoordeling
     grading_standards: Beoordeling
     groups: Groepen
     jobs: Taken
@@ -9770,6 +9793,7 @@ nl:
   deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Diepgeneste antwoorden worden niet langer ondersteund. Je antwoord wordt weergegeven op de pagina die momenteel geopend is."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Diepgeneste antwoorden worden niet langer ondersteund. Je antwoord verschijnt op de eerste pagina van deze thread."
   default_9db103d: Standaard
+  default_canvas_grading_scheme_ab769633: "Standaard Canvas-beoordelingsschema"
   default_conference_title: "%{course_name} vergadering"
   default_course_pace_ce0ba0f3: "Standaard cursustempo"
   default_course_pacing_d18b6cda: "Standaard cursustempo"
@@ -9831,6 +9855,7 @@ nl:
   delete_grading_period_dba36e59: "Beoordelingsperiode verwijderen"
   delete_grading_period_set_b35358dd: "Ingestelde beoordelingsperiode verwijderen"
   delete_grading_scheme_6b308832: "Beoordelingsschema verwijderen"
+  delete_grading_scheme_a1f8f5dc: "Beoordelingsschema verwijderen"
   delete_grading_scheme_title_215f0a40: "Beoordelingsschema %{title} verwijderen"
   delete_group_86c381ec: "Groep verwijderen"
   delete_groups_c637c07: "Groep verwijderen"
@@ -10857,6 +10882,8 @@ nl:
   ecollege_name: "Ecollege Converter"
   ecuador_593_dfcc235a: "Ecuador (+593)"
   ecuador_811f2a77: Ecuador
+  edit_a_copy_43ecaed6: "een kopie bewerken"
+  edit_a_copy_of_this_grading_scheme_807a86b9: "Bewerk een kopie van dit beoordelingsschema"
   edit_account_name_for_account_name_ae3633e8: "Naam van account bewerken voor %{account_name}"
   edit_all_other_course_content_c8dd98d3: "Alle andere cursusinhoud bewerken"
   edit_and_delete_their_own_posts_f4f7cc6: "Hun eigen berichten bewerken en verwijderen"
@@ -10895,6 +10922,7 @@ nl:
   edit_grading_period_e39af45d: "Beoordelingsperiode bewerken"
   edit_grading_period_set_c548f4df: "Ingestelde beoordelingsperiode bewerken"
   edit_grading_scheme_53091236: "Beoordelingsschema bewerken"
+  edit_grading_scheme_99c16fd8: "Beoordelingsschema bewerken"
   edit_grading_scheme_title_ff41d916: "Beoordelingsschema %{title} bewerken"
   edit_group_c8679dba: "Groep bewerken"
   edit_history_917c1e08: "Geschiedenis bewerken"
@@ -11094,6 +11122,7 @@ nl:
   enable_course_as_a_blueprint_course_8515ffd5: "Cursus inschakelen als Blauwdrukcursus"
   enable_course_as_a_course_template_5299afb6: "Cursus inschakelen als een cursussjabloon"
   enable_dashboard_images_for_courses_5af458b0: "Dashboard afbeeldingen inschakelen voor cursussen"
+  enable_distributed_internal_analytics_29e76618: "Gedistribueerde Internal Analytics inschakelen"
   enable_extra_filter_options_b52c23e6: "extra filteropties inschakelen"
   enable_face_to_face_connection_9df19b76: "Verbindingen van persoon tot persoon"
   enable_feature_title_987d8e9a: "Functie inschakelen: %{title}"
@@ -11117,6 +11146,7 @@ nl:
   enable_recording_for_this_conference_b8adff6: "Opnemen voor deze vergadering inschakelen"
   enable_reregistration_for_lti_2_b2a10444: "Nieuwe registratie voor LTI 2 inschakelen"
   enable_scope_ac28b832: "Bereik inschakelen"
+  enable_sending_oauth_consumer_key_5bb4bc5d: "Verzenden van oAuth-consumentensleutel inschakelen"
   enable_student_context_card_links_eba2f2c5: "Links naar contextkaart voor cursist inschakelen"
   enable_the_creation_of_blueprint_courses_79f91c30: "Het maken van blauwprintcursussen inschakelen"
   enable_the_creation_of_master_courses_8205b155: "Het maken van hoofdcursussen inschakelen"
@@ -12600,6 +12630,7 @@ nl:
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Voor ontwikkelaars van LTI 1.3-tools:* Volg de aanwijzingen in de sectie \"Wat moet u precies wijzigen?\" van het Community-artikel."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Voor handmatig geposte opdrachten geldt dat de aanwezigheid van een opmerking bij een inlevering die niet afkomstig is van degene die de inlevering heeft gedaan, de opdracht kan worden gepost. Voorheen was er een cijfer nodig om te kunnen posten."
   for_more_information_see_the_canvas_api_documentat_f07307bf: "Ga naar de *Canvas API-documentatie* voor meer informatie."
+  for_name_calendar_subscription_options_e60aa15f: "Voor %{name}-inschrijvingsopties voor kalenders"
   for_name_d5684bfd: "Voor %{name}"
   for_students_who_d0fd45d0: "Voor cursisten die..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -13492,7 +13523,7 @@ nl:
   graders_anonymous_to_graders_turned_on_6ccf213f: "Beoordelaars die anoniem zijn voor beoordelaars ingeschakeld"
   graders_can_view_each_other_s_comments_d836b848: "Beoordelaars kunnen elkaars opmerkingen bekijken"
   graders_cannot_see_student_names_5ebd3116: "Beoordelaars kunnen geen namen van cursisten zien"
-  graders_cannot_view_each_other_s_names_b1fa7899: "Beoordelaars kunnen elkaars opmerkingen niet bekijken"
+  graders_cannot_view_each_other_s_names_b1fa7899: "Beoordelaars kunnen elkaars namen niet bekijken"
   graders_cannot_view_student_names_2e8d3ff9: "Beoordelaars kunnen geen namen van cursisten bekijken"
   grades_a1b2bf3c: cijfers
   grades_a61eba0a: Cijfers
@@ -13670,7 +13701,13 @@ nl:
   grading_periods_must_not_overlap_f45336fb: "Beoordelingsperioden mogen niet overlappen"
   grading_scheme_deleted_7ae5a072: "Beoordelingsschema verwijderd"
   grading_scheme_f151d195: Beoordelingsschema
+  grading_scheme_name_97b0ba89: "Naam beoordelingsschema"
+  grading_scheme_name_is_required_add_a_name_and_try_8ca22d32: "Naam beoordelingsschema is vereist. Voeg een naam toe en probeer nogmaals op 'Opslaan' te klikken."
   grading_scheme_saved_85535151: "Beoordelingsschema opgeslagen"
+  grading_scheme_title_5786fa1f: "Titel beoordelingsschema"
+  grading_scheme_was_successfully_created_49fbec39: "Beoordelingsschema is gemaakt."
+  grading_scheme_was_successfully_removed_a2f98b4b: "Beoordelingsschema is verwijderd."
+  grading_scheme_was_successfully_saved_59607cb1: "Beoordelingsschema is opgeslagen."
   grading_schemes_1c3c3252: Beoordelingsschema's
   grading_standard: 
     unknown_grading_details: "Onbekende details"
@@ -14461,6 +14498,7 @@ nl:
   home_page_is_not_valid_2e8a25ae: "Startpagina is niet geldig"
   home_tutorial_tray_66826983: "Zelfstudiemenu Startpagina"
   homeroom_12546f9c: Klaslokaal
+  homeroom_course_cannot_be_used_with_course_pacing_be4e825f: "Cursus voor thuiswerken kan niet samen met Cursustempo worden gebruikt"
   homeroom_view_a676e270: Klas-weergave
   homework_submission_172e8354: "Huiswerk inzending"
   honduras_44052cf5: Honduras
@@ -14576,6 +14614,7 @@ nl:
   http_73849691: http
   http_response_code_832d6baa: "HTTP-reactie: %{code}"
   https_3a02e3fb: https
+  https_b8426ad8: "https://"
   hungarian_fc7d30c9: Hongaars
   hungary_36_cd3e515b: "Hongarije (+36)"
   hypothetical_end_date_117d81cf: "Hypothetische einddatum"
@@ -15376,6 +15415,7 @@ nl:
   invalid_freq_freq_84b0427d: "Ongeldige FREQ '%{freq}'"
   invalid_grade_9726cbc6: "Ongeldig cijfer"
   invalid_grade_passback_setting_a1d209d1: "Ongeldige grade_passback_setting"
+  invalid_grading_scheme_4a95ba92: "Ongeldig beoordelingsschema"
   invalid_hexcode_9124519f: "Ongeldige hex-code"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ongeldige hex-code. Voer hier een geldige hex-code in om een aangepaste kleur te gebruiken."
   invalid_hexcode_provided_522ba223: "Ongeldige hex-code geleverd"
@@ -15476,6 +15516,7 @@ nl:
   item_type_quiz_c894ddb1: "Itemtype: Toets"
   items_299a7626: "Items: "
   items_items_selected_5b55e566: "%{items} geselecteerde items"
+  items_last_accessed_before_date_may_not_be_shown_be840349: "Items die het laatst zijn geopend voor %{date} worden mogelijk niet weergegeven."
   items_selected_have_different_usage_rights_52b325cc: "Geselecteerde items hebben verschillende gebruiksrechten."
   j_5226008a: j
   january_9ca1eab1: Januari
@@ -16308,6 +16349,8 @@ nl:
   lowest_possible_grade_percent_20474418: "Laagst mogelijke beoordelingspercentage"
   lti: 
     lti_message: 
+      links: 
+        add_rubric: Rubriek
       load_tool_new_tab_button: "%{tool} in een nieuw venster laden"
       new_tab: "Deze tool moet in een nieuw browservenster geladen worden."
       new_tab_expired: "De sessie voor deze tool is verlopen. De pagina opnieuw laden om opnieuw toegang tot de tool te krijgen."
@@ -16384,6 +16427,7 @@ nl:
   manage_add_edit_delete_18963dbc: "Beheren (toevoegen/bewerken/verwijderen) "
   manage_add_edit_delete_course_files_162c1a65: "Cursusbestanden beheren (toevoegen/bewerken/verwijderen)"
   manage_add_edit_delete_pages_5c73f2fb: "Pagina's beheren (toevoegen/bewerken/verwijderen)"
+  manage_all_grading_schemes_f03f9310: "Alle beoordelingsschema's beheren"
   manage_all_other_course_content_d77de830: "Alle andere cursusinhoud beheren"
   manage_announcement_with_title_title_f2ce92de: "Beheren van aankondiging met titel %{title}"
   manage_app_list_994cc26c: "App lijst beheren"
@@ -18922,6 +18966,7 @@ nl:
   moodle_formula_warning_title: "Mogelijke antwoorden zullen voor formulevragen opnieuw gegenereerd moeten worden"
   more_cf9cc661: Meer
   more_courses_5ebbe998: "Meer cursussen"
+  more_details_in_the_speedgrader_8702f408: "Meer details in SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Het belangrijkste is dat je met Canvas leerdoelen  aan je beoordelingsrubrieken kunt toevoegen zodat je de resultaten kunt evalueren bij het beoordelen van opdrachten. Nadat je leerdoelen hebt ingesteld, klik je op Rubrieken beheren (Manage Rubrics) om deze leerdoelen te gebruiken bij beoordelingen."
   more_info_at_course_name_56dc8c10: "Meer informatie op %{course_name}"
   more_info_at_url_41b4764b: "Meer informatie op %{url}"
@@ -19247,6 +19292,7 @@ nl:
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Nieuwe cijferlijst schakelt een vroege vrijgave van nieuwe cijferlijstverbeteringen in."
   new_gradebook_history_b4367fc7: "Nieuwe geschiedenis van de cijferlijst"
   new_gradebook_plagiarism_indicator_8dd22971: "Plagiaatindicator Nieuwe cijferlijst"
+  new_grading_scheme_ab1a3301: "Nieuw beoordelingsschema"
   new_group_category_66be9cbd: "Nieuwe groepscategorie"
   new_group_set_7241a581: "Nieuwe groepsreeks"
   new_mention_ad04b872: "Nieuwe vermelding"
@@ -20219,6 +20265,7 @@ nl:
   out_of_pointspossible_3fb5ee20: "Max %{pointsPossible}"
   out_of_pointspossible_c163105a: "van %{pointsPossible}"
   out_of_pointspossible_pts_b2b73373: "Van de %{pointsPossible} punten"
+  out_of_score_12e519a7: "van (score)"
   outcome_alignment_summary_tab_431f4253: "Tabblad Overzicht Leerdoelen afstemmen"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Leerdoelen afstemmen op niet-scorende inhoud"
   outcome_average_calculation_method_54514372: "Berekeningsmethode leerdoelgemiddelde"
@@ -20478,6 +20525,7 @@ nl:
   page_pagenum_20dbfeb8: "Pagina %{pageNum}"
   page_pagenumber_31fe579f: "pagina %{pageNumber}"
   page_title_ascending_b5df950c: "Paginatitel: Oplopend"
+  page_title_d1a22bbf: Paginatitel
   page_title_descending_70c1483d: "Paginatitel: Aflopend"
   page_views: 
     browsers: 
@@ -20752,6 +20800,7 @@ nl:
   please_enter_a_url_d2c868b5: "Voer een URL in"
   please_enter_a_valid_search_term_5c69b0b0: "Voer een geldige zoekterm in"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Voer een geldige URL in (bijvoorbeeld http://voorbeeld.com)"
+  please_enter_a_valid_url_e_g_https_example_com_87675bca: "Voer een geldige URL in (bijvoorbeeld https://voorbeeld.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Voer een geldige URL in. Protocol is vereist (bijvoorbeeld http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__6dc0071c: "Voer een geldige URL in. Protocol is vereist (bijv. http://, https://, ftp://, tel:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Voer een geldig URL in. Protocol is verplicht (bijv. http://, https://, ftp://)."
@@ -23814,6 +23863,7 @@ nl:
   remove_icon_a4646413: "pictogram verwijderen"
   remove_image_341340b3: "Afbeelding verwijderen"
   remove_label_11d96b8f: "Verwijderen %{label}"
+  remove_letter_grade_row_a51f993a: "Rij voor beoordelingen in lettervorm verwijderen"
   remove_linked_student_name_52dc7fce: "Gekoppelde cursist verwijderen %{name}"
   remove_mastery_level_b1e8dcb0: "Vakbeheersingsniveau verwijderen"
   remove_media_attachment_d2926f1e: "Mediabijlage verwijderen"
@@ -24426,6 +24476,7 @@ nl:
   scheduler_shown_df77ca6f: "Planner weergegeven"
   scheduling_5a3327e7: Planning
   scheduling_sync_3f4a7cac: "Synchronisatie wordt gepland"
+  schemes_103aa474: Schema's
   school_of_rock_4b7b1fd0: "School of Rock"
   scope_9729c11e: "Omvang:"
   scope_c59afc8a: Omvang
@@ -25990,6 +26041,7 @@ nl:
   show_suggestions_when_typing_b72545de: "Toon suggesties bij typen"
   show_to_d57767f: "Weergeven aan"
   show_to_everyone_94d66d01: "Aan iedereen tonen"
+  show_totals_as_points_on_student_grade_page_d9cb4207: "Totalen als punten weergeven op de pagina met eindcijfer van de cursist"
   show_welcome_tour_a105aa2e: "Rondleiding weergeven"
   showing_1ac6ed70: "Wordt getoond:"
   showing_all_announcements_36ff0cec: "Alle aankondigingen tonen"
@@ -26524,6 +26576,7 @@ nl:
   student_filters_in_lmgb_13964502: "Cursistfilters in LMGB"
   student_first_name_aaa42cbc: "Voornaam van cursist"
   student_first_name_options_82f5685f: "Opties voor voornaam cursist"
+  student_grade_4122806e: Studentcijfer
   student_grade_summary_d7a5cac0: "Cijferoverzicht student"
   student_grades_4cbc59a1: "Cijfers cursist"
   student_group_75b86a9f: Cursistengroep
@@ -26766,6 +26819,7 @@ nl:
   submission_progress_323f5e7b: Inleveringsvoortgang
   submission_records_will_be_filtered_by_date_using__b3990a1: "Inleveringsrecords worden gefilterd op datum met gebruik van de \"submitted_at\" tijdstempel als deze beschikbaar is. Wanneer \"submitted_at\" niet beschikbaar is, wordt het \"graded_at\" veld gebruikt. Als geen van beide velden is ingevuld, zal het inleveringsrecord nooit in het rapport worden opgenomen bij het filteren op datum."
   submission_requirement_8ba1ee08: Inleveringsvereiste
+  submission_score_615cc591: "Score van inlevering"
   submission_score_b7a291e8: "score van inzending"
   submission_sent_3f0d2ee1: "Inlevering verzonden"
   submission_status_3079e730: Inzendingsstatus
@@ -27698,6 +27752,7 @@ nl:
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Er is een fout opgetreden bij het controleren van het plan voor de publicatiestatus."
   there_was_an_error_creating_a_new_filter_e93bb765: "Er is een fout opgetreden bij het maken van een nieuw filter."
   there_was_an_error_deleting_name_aa3050e5: "Er is een fout opgetreden bij het verwijderen van \"%{name}\"."
+  there_was_an_error_exporting_the_gradebook_30f4a95: "Er is een fout opgetreden bij het exporteren van de cijferlijst"
   there_was_an_error_fetching_assignment_groups_data_bdb14b5a: "Er is een fout opgetreden bij het ophalen van gegevens over opdrachtgroepen."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Er is een fout opgetreden bij het ophalen van cursusstatistieken"
   there_was_an_error_fetching_custom_column_data_for_3278acb4: "Er is een fout opgetreden bij het ophalen van aangepaste kolomgegevens voor Cijferlijst"
@@ -27747,7 +27802,15 @@ nl:
   there_was_an_error_uploading_the_media_6841a37b: "Er is een fout opgetreden bij het uploaden van de media."
   there_was_an_error_uploading_your_file_please_try__ce458566: "Er is een fout opgetreden bij het uploaden van je bestand. Probeer het opnieuw."
   there_was_an_error_upon_saving_your_conference_65e6b175: "Er is een fout opgetreden bij het opslaan van je vergadering"
+  there_was_an_error_while_creating_the_grading_sche_cb8ca0c9: "Er is een fout opgetreden bij het maken van het beoordelingsschema"
+  there_was_an_error_while_loading_grading_schemes_2ad6176d: "Er is een fout opgetreden bij het laden van beoordelingsschema's"
+  there_was_an_error_while_loading_the_default_canva_7782cecc: "Er is een fout opgetreden bij het laden van het standaard Canvas-beoordelingsschema"
+  there_was_an_error_while_loading_the_default_gradi_bb879ed1: "Er is een fout opgetreden bij het laden van het standaard beoordelingsschema"
+  there_was_an_error_while_refreshing_grading_scheme_ab1136b9: "Er is een fout opgetreden bij het vernieuwen van beoordelingsschema's"
+  there_was_an_error_while_removing_the_grading_sche_2a481e33: "Er is een fout opgetreden bij het verwijderen van het beoordelingsschema"
+  there_was_an_error_while_saving_the_grading_scheme_b6c1eb7: "Er is een fout opgetreden bij het opslaan van het beoordelingsschema"
   there_was_an_error_while_saving_your_changes_5fa5eb65: "Er is een fout opgetreden bij het opslaan van je wijzigingen"
+  there_was_an_error_while_updating_the_grading_sche_99608d3a: "Er is een fout opgetreden bij het bijwerken van het beoordelingsschema"
   there_was_an_error_with_your_import_please_examine_7b42f29d: "Er is een probleem met je import. Kijk nog eens goed naar je bestand en probeer het opnieuw te uploaden. Bekijk je e-mail voor meer informatie."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Er is een fout opgetreden bij je zoekopdracht, probeer een andere zoekopdracht"
   there_was_an_unexpected_error_creating_the_discuss_8811a868: "Er is een onverwachte fout opgetreden bij het maken van de discussie-invoer."
@@ -28163,6 +28226,7 @@ nl:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Deze gebruiker heeft momenteel geen toegang tot de cursus"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Deze gebruiker heeft momenteel geen toegang tot de cursus\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Deze gebruiker heeft acties uitgevoerd terwijl Anoniem was uitgeschakeld"
+  this_user_s_last_activity_in_the_course_was_dateti_74d3ac3b: "De laatste activiteit van de gebruiker in de cursus was %{datetime}"
   this_user_will_be_created_in_3b2a2b52: "Deze gebruiker wordt gemaakt in:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "De versie van de Cijferlijst wordt vervangen door een bijgewerkte Cijferlijst op of voor 18 januari 2020."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
@@ -29503,6 +29567,7 @@ nl:
   update_domain_account_lookup_9c89440d: "Zoekopdracht voor domeinaccount bijwerken"
   update_failed_2c87428c: "Bijwerken mislukt"
   update_file_links_to_prefer_preview_not_download_94535382: "Update bestandslinks zodat er een voorkeur is voor een voorbeeld en niet voor downloaden"
+  update_grade_b47eb3ff: "Cijfer bijwerken"
   update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Werk de tabel met het cijferoverzicht bij om een modern framework te gebruiken"
   update_how_we_process_sis_imports_8195bf77: "Bijwerken hoe SIS-importbewerkingen worden verwerkt"
   update_important_info_bcc01d6a: "Belangrijke informatie bijwerken"
@@ -30266,6 +30331,7 @@ nl:
   view_blackout_dates_1723673a: "Datums voor niet beschikbaar bekijken"
   view_canvas_insights_beta_fe446d71: "View Canvas Insights (bèta)"
   view_conditional_content_settings_a2dca270: "Instellingen voorwaardelijke inhoud bekijken"
+  view_copy_grading_scheme_3c2b17ac: "Beoordelingsschema bekijken/kopiëren"
   view_count_outcomes_9609792: 
     one: "1 leerdoel bekijken"
     other: "%{count} leerdoelen bekijken"
@@ -30274,6 +30340,8 @@ nl:
   view_coursename_s_assignment_group_totals_bd4b707: "%{courseName} opdrachtgroeptotalen bekijken"
   view_description_b6d8e52b: "Beschrijving bekijken"
   view_due_items_due_today_for_course_coursename_129e433: "%{due} items bekijken voor inlevering vandaag voor cursus %{courseName}"
+  view_edit_5e61d3e: Bekijken/bewerken
+  view_edit_grading_scheme_238d3028: "Beoordelingsschema weergeven/bewerken"
   view_faculty_journals_ad0e8c8f: "Faculteitsnieuws weergeven"
   view_feature_options_at_an_account_level_a84cedbe: "Functieopties bekijken op accountniveau"
   view_feature_settings_at_an_account_level_ec7f5e10: "Functie-instellingen bekijken op accountniveau"
@@ -30286,6 +30354,7 @@ nl:
   view_grades_8d3bae6c: "Cijfers weergeven"
   view_grades_for_name_45aeb2f2: "Cijfers bekijken voor %{name}"
   view_grading_history_e64bb8fe: "Beoordelingsgeschiedenis weergeven"
+  view_grading_scheme_ac66bcdd: "Beoordelingsschema weergeven"
   view_groups_47b5f60c: "Groepen bekijken"
   view_history_2dfb048: "Geschiedenis bekijken"
   view_important_dates_173c7e1b: "Belangrijke datums bekijken"
@@ -30495,8 +30564,13 @@ nl:
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Indien uitgeschakeld kunnen cursisten nog steeds afzonderlijke berichten naar cursusdocenten, onderwijsassistenten en cursisten sturen die deel uitmaken van dezelfde groepen op accountniveau."
   when_disabled_students_can_still_send_individual_m_567a911c: "Wanneer deze optie is uitgeschakeld, kunnen cursisten nog steeds afzonderlijke berichten naar cursusleiders, onderwijsassistenten en cursisen sturen die deel uitmaken van dezelfde groepen op accountniveau."
   when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "Indien ingeschakeld, worden AccessToken-leesacties opgeslagen in de cache (met MultiCache) tijdens de verificatie van een verzoek."
+  when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Indien ingeschakeld, verzamel statistieken van Internal Analytics met behulp van een gedistribueerd systeem."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Indien geactiveerd, kunnen global Javascript en CSS bestanden geüpload worden in de  *%{t_theme_editor}*."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Indien ingeschakeld, zal hierdoor de SMS-service vervallen."
+  when_enabled_lti_1_3_launches_that_would_be_associ_bfec33fb: |-
+      Indien ingeschakeld, bevatten LTI 1.3-launches die gekoppeld zouden zijn aan de LTI 1.1-tool
+      als de LTI 1.3-tool niet aanwezig zou zijn, de oauth_consumer_key en
+      oauth_consumer_key_sign kenmerken als onderdeel van de claimsectie van LTI 1.1.
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       Indien ingeschakeld, gebruikt Nieuwe toetsen de speciale gebruiker voor de
       sitebeheerservice en DeveloperKey om een toegangs- en vernieuwingstoken te genereren
