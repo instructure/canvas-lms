@@ -16,26 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {teacherNotes} from '../../../types/gradebook.d'
+import {HandleCheckboxChange, TeacherNotes} from '../../../types'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
-  teacherNotes?: teacherNotes | null
+  teacherNotes?: TeacherNotes | null
   customColumnsUrl?: string | null
   customColumnUrl?: string | null
+  handleCheckboxChange: HandleCheckboxChange
+  showNotesColumn: boolean
 }
 export default function ShowNotesColumnCheckbox({
   teacherNotes,
   customColumnsUrl,
   customColumnUrl,
+  handleCheckboxChange,
+  showNotesColumn,
 }: Props) {
-  const [showNotesColumn, setShowNotesColumn] = useState(
-    teacherNotes?.hidden !== undefined ? !teacherNotes?.hidden : false
-  )
   const handleShowNotesColumnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked
     let url: string
     let method: string
     let body: {}
@@ -43,8 +45,8 @@ export default function ShowNotesColumnCheckbox({
       if (teacherNotes) {
         method = 'PUT'
         url = customColumnUrl.replace(':id', teacherNotes?.id)
-        body = {column: {hidden: !event.target.checked}}
-      } else if (event.target.checked) {
+        body = {column: {hidden: !checked}}
+      } else if (checked) {
         url = customColumnsUrl
         method = 'POST'
         body = {
@@ -65,7 +67,7 @@ export default function ShowNotesColumnCheckbox({
       body,
       path: url,
     })
-    setShowNotesColumn(event.target.checked)
+    handleCheckboxChange('showNotesColumn', checked)
   }
 
   return (

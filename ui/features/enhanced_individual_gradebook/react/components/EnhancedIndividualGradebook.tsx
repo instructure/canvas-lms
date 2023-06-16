@@ -31,6 +31,7 @@ import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
   AssignmentSortContext,
+  CustomOptions,
   GradebookOptions,
   GradebookQueryResponse,
   GradebookSortOrder,
@@ -92,13 +93,27 @@ export default function EnhancedIndividualGradebook() {
     courseSettings: ENV.GRADEBOOK_OPTIONS?.course_settings,
     customColumnUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_url,
     customColumnsUrl: ENV.GRADEBOOK_OPTIONS?.custom_columns_url,
-    saveViewUngradedAsZeroToServer: ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
     settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
-    settings: ENV.GRADEBOOK_OPTIONS?.settings,
     settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
     teacherNotes: ENV.GRADEBOOK_OPTIONS?.teacher_notes,
-    showTotalGradeAsPoints: ENV.GRADEBOOK_OPTIONS?.show_total_grade_as_points,
+    saveViewUngradedAsZeroToServer: ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
     messageAttachmentUploadFolderId: ENV.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
+    customOptions: {
+      includeUngradedAssignments:
+        ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server &&
+        ENV.GRADEBOOK_OPTIONS?.settings
+          ? ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero === 'true'
+          : userSettings.contextGet('include_ungraded_assignments') || false,
+      hideStudentNames: userSettings.contextGet('hide_student_names') || false,
+      showConcludedEnrollments: ENV.GRADEBOOK_OPTIONS?.settings?.show_concluded_enrollments
+        ? ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments === 'true'
+        : false,
+      showNotesColumn:
+        ENV.GRADEBOOK_OPTIONS?.teacher_notes?.hidden !== undefined
+          ? !ENV.GRADEBOOK_OPTIONS.teacher_notes.hidden
+          : false,
+      showTotalGradeAsPoints: ENV.GRADEBOOK_OPTIONS?.show_total_grade_as_points ?? false,
+    },
   }
   const [gradebookOptions, setGradebookOptions] =
     useState<GradebookOptions>(defaultGradebookOptions)
@@ -108,6 +123,13 @@ export default function EnhancedIndividualGradebook() {
     fetchPolicy: 'no-cache',
     skip: !courseId,
   })
+  useEffect(() => {
+    if (!currentStudent || !students) {
+      return
+    }
+    const hiddenName = students?.find(s => s.id === currentStudent.id)?.hiddenName
+    currentStudent.hiddenName = hiddenName ?? I18n.t('Student')
+  }, [currentStudent, students])
 
   useEffect(() => {
     if (error) {
@@ -131,11 +153,14 @@ export default function EnhancedIndividualGradebook() {
       setSubmissions(submissionsConnection.nodes)
       setSections(sectionsConnection.nodes)
 
-      const mappedEnrollments = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
-      const sortableStudents = mappedEnrollments.sort((a, b) => {
+      const sortableStudents = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
+      const sortedStudents = sortableStudents.sort((a, b) => {
         return a.sortableName.localeCompare(b.sortableName)
       })
-      setStudents(sortableStudents)
+      sortedStudents.forEach(
+        (student, index) => (student.hiddenName = I18n.t('Student %{id}', {id: index + 1}))
+      )
+      setStudents(sortedStudents)
     }
   }, [data, error])
 
@@ -198,6 +223,12 @@ export default function EnhancedIndividualGradebook() {
         onSectionChange={sectionId => {
           const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
           setGradebookOptions(newGradebookOptions)
+        }}
+        handleCheckboxChange={(key: keyof CustomOptions, value: boolean) => {
+          setGradebookOptions(prevGradebookOptions => {
+            const newCustomOptions = {...prevGradebookOptions.customOptions, [key]: value}
+            return {...prevGradebookOptions, customOptions: newCustomOptions}
+          })
         }}
       />
 

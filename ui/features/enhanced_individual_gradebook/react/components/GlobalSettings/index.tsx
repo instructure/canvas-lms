@@ -19,7 +19,12 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {GradebookOptions, GradebookSortOrder, SectionConnection} from '../../../types'
+import {
+  GradebookOptions,
+  GradebookSortOrder,
+  HandleCheckboxChange,
+  SectionConnection,
+} from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import GradebookScoreExport from './GradebookScoreExport'
@@ -49,6 +54,7 @@ type Props = {
   gradebookOptions: GradebookOptions
   onSortChange: (sortType: GradebookSortOrder) => void
   onSectionChange: (sectionId?: string) => void
+  handleCheckboxChange: HandleCheckboxChange
 }
 
 export default function GlobalSettings({
@@ -56,6 +62,7 @@ export default function GlobalSettings({
   gradebookOptions,
   onSortChange,
   onSectionChange,
+  handleCheckboxChange,
 }: Props) {
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortType = event.target.value as GradebookSortOrder
@@ -123,21 +130,28 @@ export default function GlobalSettings({
         <View as="div" className="span8">
           <IncludeUngradedAssignmentsCheckbox
             saveViewUngradedAsZeroToServer={gradebookOptions.saveViewUngradedAsZeroToServer}
-            settings={gradebookOptions.settings}
             contextId={gradebookOptions.contextId}
+            handleCheckboxChange={handleCheckboxChange}
+            includeUngradedAssignments={gradebookOptions.customOptions.includeUngradedAssignments}
           />
 
-          <HideStudentNamesCheckbox />
+          <HideStudentNamesCheckbox
+            handleCheckboxChange={handleCheckboxChange}
+            hideStudentNames={gradebookOptions.customOptions.hideStudentNames}
+          />
 
           <ShowConcludedEnrollmentsCheckbox
-            settings={gradebookOptions.settings}
             settingsUpdateUrl={gradebookOptions.settingsUpdateUrl}
+            handleCheckboxChange={handleCheckboxChange}
+            showConcludedEnrollments={gradebookOptions.customOptions.showConcludedEnrollments}
           />
 
           <ShowNotesColumnCheckbox
             teacherNotes={gradebookOptions.teacherNotes}
             customColumnUrl={gradebookOptions.customColumnUrl}
             customColumnsUrl={gradebookOptions.customColumnsUrl}
+            handleCheckboxChange={handleCheckboxChange}
+            showNotesColumn={gradebookOptions.customOptions.showNotesColumn}
           />
           {/* {{#if finalGradeOverrideEnabled}}
             <View as="div" className="checkbox">
@@ -168,8 +182,9 @@ export default function GlobalSettings({
             </View>
           {{/unless}} */}
           <ShowTotalGradesAsPointsCheckbox
-            showTotalGradeAsPoints={gradebookOptions.showTotalGradeAsPoints}
             settingUpdateUrl={gradebookOptions.settingUpdateUrl}
+            showTotalGradeAsPoints={gradebookOptions.customOptions.showTotalGradeAsPoints}
+            handleCheckboxChange={handleCheckboxChange}
           />
         </View>
       </View>

@@ -27,6 +27,7 @@ import {
   useAssignmentDropdownOptions,
   useUserDropdownOptions,
 } from '../../hooks/useContentDropdownOptions'
+import {studentDisplayName} from '../../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -130,7 +131,7 @@ export default function ContentSelection({
     const selectedAssignment = assignmentDropdownOptions[selectedIndex]?.data
     onAssignmentChange(selectedAssignment?.id)
   }
-
+  const {hideStudentNames} = gradebookOptions.customOptions
   return (
     <>
       <View as="div" className="row-fluid">
@@ -153,7 +154,7 @@ export default function ContentSelection({
           >
             {studentDropdownOptions.map(option => (
               <option key={option.id} value={option.id}>
-                {option.name}
+                {option.data ? studentDisplayName(option.data, hideStudentNames) : option.name}
               </option>
             ))}
           </select>

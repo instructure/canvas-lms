@@ -36,7 +36,7 @@ import {
 import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
-import {outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
+import {studentDisplayName, outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -136,7 +136,7 @@ export default function GradingResults({
   const submitGrade = async () => {
     await submit(assignment, submission, gradeInput)
   }
-
+  const {hideStudentNames} = gradebookOptions.customOptions
   return (
     <>
       <View as="div">
@@ -147,17 +147,12 @@ export default function GradingResults({
           <View as="div" className="span8 pad-box top-only">
             <View as="div">
               <View as="span">
-                {gradebookOptions.anonymizeStudents ? (
-                  // TOOD: handle anonymous names
-                  <Text size="small">
-                    <View as="strong">Grade for: anonymous_name</View>
-                  </Text>
-                ) : (
-                  <Text size="small">
-                    <View as="strong">{`Grade for ${currentStudent?.name} - ${assignment.name}`}</View>
-                  </Text>
-                )}
-
+                <Text size="small">
+                  <View as="strong">{`${I18n.t('Grade for')} ${studentDisplayName(
+                    currentStudent,
+                    hideStudentNames
+                  )} - ${assignment.name}`}</View>
+                </Text>
                 <SubmissionStatus submission={submission} />
               </View>
             </View>

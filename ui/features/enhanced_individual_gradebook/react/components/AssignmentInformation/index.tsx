@@ -190,7 +190,7 @@ function AssignmentActions({
 
   return (
     <>
-      {!gradebookOptions.anonymizeStudents && (
+      {!gradebookOptions.customOptions.hideStudentNames && (
         <View as="div" className="pad-box no-sides">
           <Button color="secondary" onClick={() => setShowMessageStudentsWhoModal(true)}>
             {I18n.t('Message students who...')}
