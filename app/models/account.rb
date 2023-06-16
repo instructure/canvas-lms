@@ -690,6 +690,10 @@ class Account < ActiveRecord::Base
     HostUrl.context_host(self, current_host)
   end
 
+  def environment_specific_domain
+    domain(ApplicationController.test_cluster_name)
+  end
+
   def self.find_by_domain(domain)
     default if HostUrl.default_host == domain
   end

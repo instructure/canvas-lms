@@ -333,7 +333,7 @@ module Lti::IMS
     def find_memberships_page
       canonical_url = URI.parse(request.url)
       if context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
-        canonical_url.host = context.root_account.domain
+        canonical_url.host = context.root_account.environment_specific_domain
       end
       { url: canonical_url.to_s }.reverse_merge(new_provider.find)
     end

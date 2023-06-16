@@ -261,9 +261,9 @@ module Canvas::LiveEvents
       resource_map: assignment.resource_map
     }
     actl = assignment.assignment_configuration_tool_lookups.take
-    domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
+    domain = assignment.root_account&.environment_specific_domain
     event[:domain] = domain if domain
-    original_domain = assignment.duplicate_of&.root_account&.domain(ApplicationController.test_cluster_name)
+    original_domain = assignment.duplicate_of&.root_account&.environment_specific_domain
     event[:domain_duplicated_from] = original_domain if original_domain
     if actl && (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
       context: assignment.course,

@@ -47,6 +47,26 @@ describe Account do
     end
   end
 
+  context "environment_specific_domain" do
+    let(:root_account) { Account.create! }
+
+    before do
+      allow(HostUrl).to receive(:context_host).and_call_original
+      allow(HostUrl).to receive(:context_host).with(root_account, "beta").and_return("canvas.beta.instructure.com")
+      AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
+    end
+
+    it "retrieves correct beta domain" do
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      expect(root_account.environment_specific_domain).to eq "canvas.beta.instructure.com"
+    end
+
+    it "retrieves correct prod domain" do
+      allow(ApplicationController).to receive(:test_cluster_name).and_return(nil)
+      expect(root_account.environment_specific_domain).to eq "canvas.instructure.com"
+    end
+  end
+
   context "resolved_outcome_proficiency_method" do
     before do
       @root_account = Account.create!

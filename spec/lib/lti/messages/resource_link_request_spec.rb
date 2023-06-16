@@ -201,7 +201,7 @@ describe Lti::Messages::ResourceLinkRequest do
 
         describe "line_items and line_item urls" do
           before do
-            allow_any_instance_of(Account).to receive(:domain).and_return("canonical-account-domain")
+            allow_any_instance_of(Account).to receive(:environment_specific_domain).and_return("canonical-account-domain")
           end
 
           context "when the consistent_ags_ids_based_on_account_principal_domain feature flag is off" do

@@ -134,7 +134,7 @@ module Lti::Messages
       @message.assignment_and_grade_service.lineitem =
         if @context.root_account.feature_enabled?(:consistent_ags_ids_based_on_account_principal_domain)
           @expander.controller.lti_line_item_show_url(
-            host: @context.root_account.domain,
+            host: @context.root_account.environment_specific_domain,
             course_id: course_id_for_ags_url,
             id: line_item_for_assignment.id
           )
