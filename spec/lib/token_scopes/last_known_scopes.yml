@@ -1446,7 +1446,7 @@
 - verb: GET
   path: "/api/v1/support_helpers/crocodoc/submission"
 - verb: GET
-  path: "/api/v1/support_helpers/due_date_cache/course"
+  path: "/api/v1/support_helpers/submission_lifecycle_manage/course"
 - verb: GET
   path: "/api/v1/global/root_outcome_group"
 - verb: GET

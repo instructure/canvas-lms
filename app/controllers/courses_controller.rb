@@ -1735,7 +1735,7 @@ class CoursesController < ApplicationController
 
     disable_conditional_release if changes[:conditional_release]&.last == false
 
-    DueDateCacher.with_executing_user(@current_user) do
+    SubmissionLifecycleManager.with_executing_user(@current_user) do
       if @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
         render json: course_settings_json(@course)
@@ -1836,7 +1836,7 @@ class CoursesController < ApplicationController
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == "invited"
         GuardRail.activate(:primary) do
-          DueDateCacher.with_executing_user(@current_user) do
+          SubmissionLifecycleManager.with_executing_user(@current_user) do
             enrollment.accept!
           end
         end

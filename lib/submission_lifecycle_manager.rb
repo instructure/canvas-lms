@@ -19,7 +19,7 @@
 
 require "anonymity"
 
-class DueDateCacher
+class SubmissionLifecycleManager
   include Moderation
 
   thread_mattr_accessor :executing_users, instance_accessor: false
@@ -27,10 +27,10 @@ class DueDateCacher
   # These methods allow the caller to specify a user to whom due date
   # changes should be attributed (currently this is used for creating
   # audit events for anonymous or moderated assignments), and are meant
-  # to be used when DueDateCacher is invoked in a callback or a similar
+  # to be used when SubmissionLifecycleManager is invoked in a callback or a similar
   # place where directly specifying an executing user is impractical.
   #
-  # DueDateCacher.with_executing_user(a_user) do
+  # SubmissionLifecycleManager.with_executing_user(a_user) do
   #   # do something to update due dates, like saving an assignment override
   #   # any DDC calls that occur while an executing user is set will
   #   # attribute changes to that user
@@ -41,13 +41,13 @@ class DueDateCacher
   # credited (in which case audit events will not be recorded).
   #
   # You may also specify a user explicitly when calling the class methods:
-  #   DueDateCacher.recompute(assignment, update_grades: true, executing_user: a_user)
+  #   SubmissionLifecycleManager.recompute(assignment, update_grades: true, executing_user: a_user)
   #
   # An explicitly specified user will take precedence over any users specified
   # via with_executing_user, but will not otherwise affect the current "stack"
   # of executing users.
   #
-  # If you are calling DueDateCacher in a delayed job of your own making (e.g.,
+  # If you are calling SubmissionLifecycleManager in a delayed job of your own making (e.g.,
   # Assignment#run_if_overrides_changed_later!), you should pass a user
   # explicitly rather than relying on the user stored in with_executing_user
   # at the time you create the delayed job.
@@ -128,11 +128,11 @@ class DueDateCacher
     return if assignments_to_recompute.empty?
 
     executing_user ||= current_executing_user
-    due_date_cacher = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:)
+    submission_lifecycle_manager = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:)
     if run_immediately
-      due_date_cacher.recompute
+      submission_lifecycle_manager.recompute
     else
-      due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
+      submission_lifecycle_manager.delay_if_production(**inst_jobs_opts).recompute
     end
   end
 
@@ -153,23 +153,23 @@ class DueDateCacher
     executing_user = opts[:executing_user] || current_executing_user
 
     if opts[:sis_import]
-      running_jobs_count = Delayed::Job.running.where(shard_id: course.shard.id, tag: "DueDateCacher#recompute_for_sis_import").count
-      max_jobs = Setting.get("DueDateCacher#recompute_for_sis_import_num_strands", "10").to_i
+      running_jobs_count = Delayed::Job.running.where(shard_id: course.shard.id, tag: "SubmissionLifecycleManager#recompute_for_sis_import").count
+      max_jobs = Setting.get("SubmissionLifecycleManager#recompute_for_sis_import_num_strands", "10").to_i
 
       if running_jobs_count >= max_jobs
         # there are too many sis recompute jobs running concurrently now. let's check again in a bit to see if we can run.
         return delay_if_production(
           **inst_jobs_opts,
-          run_at: Setting.get("DueDateCacher#recompute_for_sis_import_requeue_delay", "10").to_i.seconds.from_now
+          run_at: Setting.get("SubmissionLifecycleManager#recompute_for_sis_import_requeue_delay", "10").to_i.seconds.from_now
         ).recompute_users_for_course(user_ids, course, assignments, opts)
       else
-        due_date_cacher = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
-        return due_date_cacher.delay_if_production(**inst_jobs_opts).recompute_for_sis_import
+        submission_lifecycle_manager = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
+        return submission_lifecycle_manager.delay_if_production(**inst_jobs_opts).recompute_for_sis_import
       end
     end
 
-    due_date_cacher = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
-    due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
+    submission_lifecycle_manager = new(course, assignments, user_ids, update_grades:, original_caller: current_caller, executing_user:)
+    submission_lifecycle_manager.delay_if_production(**inst_jobs_opts).recompute
   end
 
   def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false)
@@ -200,15 +200,15 @@ class DueDateCacher
   end
 
   # exists so that we can identify (and limit) jobs running specifically for sis imports
-  # Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import")
+  # Delayed::Job.where(tag: "SubmissionLifecycleManager#recompute_for_sis_import")
   def recompute_for_sis_import
     recompute
   end
 
   def recompute
-    Rails.logger.debug "DUE DATE CACHER STARTS: #{Time.zone.now.to_i}"
-    Rails.logger.debug "DDC#recompute() - original caller: #{@original_caller}"
-    Rails.logger.debug "DDC#recompute() - current caller: #{caller(1..1).first}"
+    Rails.logger.debug "SUBMISSION LIFECYCLE MANAGER STARTS: #{Time.zone.now.to_i}"
+    Rails.logger.debug "SLM#recompute() - original caller: #{@original_caller}"
+    Rails.logger.debug "SLM#recompute() - current caller: #{caller(1..1).first}"
 
     # in a transaction on the correct shard:
     @course.shard.activate do
@@ -310,7 +310,7 @@ class DueDateCacher
     if @assignment_ids.size == 1 && !@skip_late_policy_applicator
       # Only changes to LatePolicy or (sometimes) Assignment records can result in a re-calculation
       # of student scores.  No changes to the Course record can trigger such re-calculations so
-      # let's ensure this is triggered only when DueDateCacher is called for a Assignment-level
+      # let's ensure this is triggered only when SubmissionLifecycleManager is called for a Assignment-level
       # changes and not for Course-level changes
       assignment = @course.shard.activate { Assignment.find(@assignment_ids.first) }
 
@@ -486,10 +486,10 @@ class DueDateCacher
         Submission.connection.execute(query)
       end
     rescue ActiveRecord::RecordNotUnique => e
-      Canvas::Errors.capture_exception(:due_date_cacher, e, :warn)
+      Canvas::Errors.capture_exception(:submission_lifecycle_manager, e, :warn)
       raise Delayed::RetriableError, "Unique record violation when creating new submissions"
     rescue ActiveRecord::Deadlocked => e
-      Canvas::Errors.capture_exception(:due_date_cacher, e, :warn)
+      Canvas::Errors.capture_exception(:submission_lifecycle_manager, e, :warn)
       raise Delayed::RetriableError, "Deadlock when upserting submissions"
     end
   end
@@ -526,3 +526,5 @@ class DueDateCacher
     end
   end
 end
+
+DueDateCacher = SubmissionLifecycleManager

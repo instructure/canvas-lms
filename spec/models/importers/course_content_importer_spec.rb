@@ -283,22 +283,22 @@ describe Course do
       expect(migration.workflow_state).to eq("imported")
     end
 
-    it "runs DueDateCacher never if no assignments are imported" do
+    it "runs SubmissionLifecycleManager never if no assignments are imported" do
       params = { copy: { "everything" => true } }
       migration = build_migration(@course, params)
       @course.reload # seems to be holding onto saved_changes for some reason
 
-      expect(DueDateCacher).not_to receive(:recompute_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_course)
       setup_import(@course, "assessments.json", migration)
       expect(migration.workflow_state).to eq("imported")
     end
 
-    it "runs DueDateCacher once if assignments with dates are imported" do
+    it "runs SubmissionLifecycleManager once if assignments with dates are imported" do
       params = { copy: { "everything" => true } }
       migration = build_migration(@course, params)
       @course.reload
 
-      expect(DueDateCacher).to receive(:recompute_course).once
+      expect(SubmissionLifecycleManager).to receive(:recompute_course).once
       json = File.read(File.join(IMPORT_JSON_DIR, "assignment.json"))
       @data = { "assignments" => JSON.parse(json) }.with_indifferent_access
       Importers::CourseContentImporter.import_content(

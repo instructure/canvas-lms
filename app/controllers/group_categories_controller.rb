@@ -333,7 +333,7 @@ class GroupCategoriesController < ApplicationController
           if @group_category.root_account.grants_right?(@current_user, :manage_sis)
             @group_category.sis_source_id = sis_id
 
-            DueDateCacher.with_executing_user(@current_user) do
+            SubmissionLifecycleManager.with_executing_user(@current_user) do
               @group_category.save!
             end
           else
@@ -646,7 +646,7 @@ class GroupCategoriesController < ApplicationController
     args = api_request? ? params : (params[:category] || {})
     @group_category = GroupCategories::ParamsPolicy.new(@group_category, @context).populate_with(args)
 
-    DueDateCacher.with_executing_user(@current_user) do
+    SubmissionLifecycleManager.with_executing_user(@current_user) do
       unless @group_category.save
         render json: @group_category.errors, status: :bad_request
         return false
@@ -663,7 +663,7 @@ class GroupCategoriesController < ApplicationController
         new_group_category.sis_source_id = nil
         new_group_category.name = params[:name]
         begin
-          DueDateCacher.with_executing_user(@current_user) do
+          SubmissionLifecycleManager.with_executing_user(@current_user) do
             new_group_category.save!
             group_category.clone_groups_and_memberships(new_group_category)
           end

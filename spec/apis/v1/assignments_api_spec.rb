@@ -281,7 +281,7 @@ describe AssignmentsApiController, type: :request do
                                     set: @course.default_section,
                                     due_at: 3.months.from_now)
 
-          DueDateCacher.recompute_course(@course, run_immediately: true)
+          SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
         end
 
         describe "sharding" do
@@ -2725,7 +2725,7 @@ describe AssignmentsApiController, type: :request do
       expect(response).to have_http_status :bad_request
     end
 
-    it "calls DueDateCacher only once" do
+    it "calls SubmissionLifecycleManager only once" do
       student_in_course(course: @course, active_enrollment: true)
 
       @adhoc_due_at = 5.days.from_now
@@ -2760,10 +2760,10 @@ describe AssignmentsApiController, type: :request do
         course_id: @course.id.to_s
       }
 
-      due_date_cacher = instance_double(DueDateCacher)
-      allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+      submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+      allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-      expect(due_date_cacher).to receive(:recompute).once
+      expect(submission_lifecycle_manager).to receive(:recompute).once
 
       @json = api_call(
         :post,
@@ -4321,12 +4321,12 @@ describe AssignmentsApiController, type: :request do
           @assignment.reload
         end
 
-        describe "DueDateCacher" do
+        describe "SubmissionLifecycleManager" do
           it "is called only once when there are changes to overrides" do
-            due_date_cacher = instance_double(DueDateCacher)
-            allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+            submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+            allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-            expect(due_date_cacher).to receive(:recompute).once
+            expect(submission_lifecycle_manager).to receive(:recompute).once
 
             update_assignment
           end
@@ -4334,10 +4334,10 @@ describe AssignmentsApiController, type: :request do
           it "is not called when there are no changes to overrides or assignment" do
             update_assignment
 
-            due_date_cacher = instance_double(DueDateCacher)
-            allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+            submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+            allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-            expect(due_date_cacher).not_to receive(:recompute)
+            expect(submission_lifecycle_manager).not_to receive(:recompute)
 
             update_assignment
           end
@@ -4345,10 +4345,10 @@ describe AssignmentsApiController, type: :request do
           it "is called only once when there are changes to the assignment but not to the overrides" do
             update_assignment
 
-            due_date_cacher = instance_double(DueDateCacher)
-            allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+            submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+            allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-            expect(due_date_cacher).to receive(:recompute).once
+            expect(submission_lifecycle_manager).to receive(:recompute).once
 
             update_assignment_only
           end
@@ -6806,9 +6806,9 @@ describe AssignmentsApiController, type: :request do
     let(:course) { Account.default.courses.create!(workflow_state: "available") }
     let(:teacher) { course_with_teacher(course:, active_all: true).user }
 
-    it "calls DueDateCacher with update_grades: false when passed calculate_grades: false" do
+    it "calls SubmissionLifecycleManager with update_grades: false when passed calculate_grades: false" do
       update_grade_value = nil
-      expect(DueDateCacher).to receive(:recompute).once do |update_grades:, **|
+      expect(SubmissionLifecycleManager).to receive(:recompute).once do |update_grades:, **|
         update_grade_value = update_grades
       end
 
@@ -6833,9 +6833,9 @@ describe AssignmentsApiController, type: :request do
       expect(update_grade_value).to be false
     end
 
-    it "calls DueDateCacher with update_grades: true when passed calculate_grades: true" do
+    it "calls SubmissionLifecycleManager with update_grades: true when passed calculate_grades: true" do
       update_grade_value = nil
-      expect(DueDateCacher).to receive(:recompute).once do |update_grades:, **|
+      expect(SubmissionLifecycleManager).to receive(:recompute).once do |update_grades:, **|
         update_grade_value = update_grades
       end
 
@@ -6860,9 +6860,9 @@ describe AssignmentsApiController, type: :request do
       expect(update_grade_value).to be true
     end
 
-    it "calls DueDateCacher with update_grades: true when not passed calculate_grades" do
+    it "calls SubmissionLifecycleManager with update_grades: true when not passed calculate_grades" do
       update_grade_value = nil
-      expect(DueDateCacher).to receive(:recompute).once do |update_grades:, **|
+      expect(SubmissionLifecycleManager).to receive(:recompute).once do |update_grades:, **|
         update_grade_value = update_grades
       end
 

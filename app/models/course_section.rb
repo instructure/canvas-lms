@@ -315,7 +315,7 @@ class CourseSection < ActiveRecord::Base
       old_course.delay_if_production.update_account_associations
     end
 
-    DueDateCacher.recompute_users_for_course(
+    SubmissionLifecycleManager.recompute_users_for_course(
       user_ids,
       course,
       nil,

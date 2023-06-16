@@ -219,7 +219,7 @@ class CoursePace < ActiveRecord::Base
 
       # Clear caches
       Assignment.clear_cache_keys(assignments_to_refresh, :availability)
-      DueDateCacher.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
+      SubmissionLifecycleManager.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
 
       # Maintain the weights of the module items
       course_pace_module_items.each(&:restore_attributes)

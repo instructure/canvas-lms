@@ -2101,8 +2101,8 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/crocodoc/submission", action: :submission
     end
 
-    scope(controller: "support_helpers/due_date_cache") do
-      get "support_helpers/due_date_cache/course", action: :course
+    scope(controller: "support_helpers/submission_lifecycle_manage") do
+      get "support_helpers/submission_lifecycle_manage/course", action: :course
     end
 
     scope(controller: :outcome_groups_api) do

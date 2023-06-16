@@ -170,47 +170,47 @@ describe Assignment do
     end
 
     describe "update_cached_due_dates" do
-      it "invokes DueDateCacher if anonymous_grading is changed" do
+      it "invokes SubmissionLifecycleManager if anonymous_grading is changed" do
         attrs = assignment_valid_attributes.merge(anonymous_grading: true)
         assignment = @course.assignments.create!(attrs)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(anonymous_grading: false)
       end
 
-      it "invokes DueDateCacher if due_at is changed" do
+      it "invokes SubmissionLifecycleManager if due_at is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(due_at: assignment.due_at + 1.day)
       end
 
-      it "invokes DueDateCacher if workflow_state is changed" do
+      it "invokes SubmissionLifecycleManager if workflow_state is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.destroy
       end
 
-      it "invokes DueDateCacher if only_visible_to_overrides is changed" do
+      it "invokes SubmissionLifecycleManager if only_visible_to_overrides is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(only_visible_to_overrides: !assignment.only_visible_to_overrides?)
       end
 
-      it "invokes DueDateCacher if moderated_grading is changed" do
+      it "invokes SubmissionLifecycleManager if moderated_grading is changed" do
         assignment = @course.assignments.new(assignment_valid_attributes)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update!(moderated_grading: !assignment.moderated_grading, grader_count: 2)
       end
 
-      it "invokes DueDateCacher after save when moderated_grading becomes enabled" do
+      it "invokes SubmissionLifecycleManager after save when moderated_grading becomes enabled" do
         assignment = @course.assignments.create!(assignment_valid_attributes)
         assignment.reload
 
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.moderated_grading = true
         assignment.grader_count = 2
@@ -218,33 +218,33 @@ describe Assignment do
         assignment.update_cached_due_dates
       end
 
-      it "invokes DueDateCacher if called in a before_save context" do
+      it "invokes SubmissionLifecycleManager if called in a before_save context" do
         assignment = @course.assignments.new(assignment_valid_attributes)
         allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.save!
       end
 
-      it "invokes DueDateCacher if called in an after_save context" do
+      it "invokes SubmissionLifecycleManager if called in an after_save context" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
         Assignment.suspend_callbacks(:update_cached_due_dates) do
           assignment.update!(due_at: assignment.due_at + 1.day)
         end
 
-        expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
+        expect(SubmissionLifecycleManager).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update_cached_due_dates
       end
 
-      it "does not invoke DueDateCacher on an unchanged assignment in a before_save context" do
+      it "does not invoke SubmissionLifecycleManager on an unchanged assignment in a before_save context" do
         assignment = Assignment.suspend_callbacks(:update_cached_due_dates) do
           @course.assignments.create(assignment_valid_attributes)
         end
         assignment.reload
 
-        expect(DueDateCacher).not_to receive(:recompute)
+        expect(SubmissionLifecycleManager).not_to receive(:recompute)
         assignment.update_cached_due_dates
       end
     end
@@ -7312,29 +7312,29 @@ describe Assignment do
 
     it "triggers when assignment is created" do
       new_assignment = @course.assignments.build
-      expect(DueDateCacher).to receive(:recompute).with(new_assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(new_assignment, hash_including(update_grades: true))
       new_assignment.save
     end
 
     it "triggers when due_at changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = 1.week.from_now
       @assignment.save
     end
 
     it "triggers when due_at changes to nil" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.due_at = nil
       @assignment.save
     end
 
     it "triggers when assignment deleted" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment, hash_including(update_grades: true))
       @assignment.destroy
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
       @assignment.save
     end
   end
@@ -8015,7 +8015,7 @@ describe Assignment do
           )
           inactive_enrollment.deactivate
 
-          DueDateCacher.recompute_course(course, run_immediately: true)
+          SubmissionLifecycleManager.recompute_course(course, run_immediately: true)
         end
 
         context "without preloaded submissions" do

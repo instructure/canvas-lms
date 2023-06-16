@@ -321,7 +321,7 @@ describe CourseSection, "moving to new course" do
     expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
   end
 
-  it "calls DueDateCacher.recompute_users_for_course" do
+  it "calls SubmissionLifecycleManager.recompute_users_for_course" do
     account1 = Account.create!(name: "1")
     account2 = Account.create!(name: "2")
     course1 = account1.courses.create!
@@ -334,7 +334,7 @@ describe CourseSection, "moving to new course" do
     e.save!
     course1.reload
 
-    expect(DueDateCacher).to receive(:recompute_users_for_course)
+    expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course)
       .with([u.id], course2, nil, update_grades: true, executing_user: nil)
     cs.move_to_course(course2)
   end

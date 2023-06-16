@@ -147,7 +147,7 @@ class AssignmentOverride < ActiveRecord::Base
     if update_cached_due_dates?
       if assignment
         assignment.clear_cache_key(:availability)
-        DueDateCacher.recompute(assignment)
+        SubmissionLifecycleManager.recompute(assignment)
       end
       quiz&.clear_cache_key(:availability)
     end

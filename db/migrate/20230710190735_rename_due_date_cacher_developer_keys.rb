@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,19 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module SupportHelpers
-  module DueDateCache
-    class CourseFixer < Fixer
-      def initialize(email, after_time, course_id, executing_user_id)
-        @course_id = course_id
-        @executing_user_id = executing_user_id
-        super(email, after_time)
-      end
+class RenameDueDateCacherDeveloperKeys < ActiveRecord::Migration[7.0]
+  tag :postdeploy
+  disable_ddl_transaction!
 
-      def fix
-        course = Course.find(@course_id)
-        DueDateCacher.recompute_course(course, update_grades: true, executing_user: @executing_user_id)
-      end
-    end
+  def up
+    DataFixup::UpdateDeveloperKeyScopes.run
   end
 end

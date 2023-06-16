@@ -1028,7 +1028,7 @@ describe Enrollment do
           end
         end
 
-        # if a user is being restored to active, the DueDateCacher
+        # if a user is being restored to active, the SubmissionLifecycleManager
         # run will kick off a grade calculation, which will update
         # the score objects. To test we're not copying scores, we'll
         # restore to completed for these tests.
@@ -3207,27 +3207,27 @@ describe Enrollment do
 
     it "triggers a batch when enrollment is created" do
       added_user = user_factory
-      expect(DueDateCacher).to receive(:recompute_users_for_course).with(added_user.id, @course, nil, { update_grades: true })
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(added_user.id, @course, nil, { update_grades: true })
       @course.enroll_student(added_user)
     end
 
     it "does not trigger a batch when enrollment is not student" do
-      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_users_for_course)
       @course.enroll_teacher(user_factory)
     end
 
     it "triggers a batch when enrollment is deleted" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).with(@enrollment.user_id, @course, nil, { update_grades: false })
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(@enrollment.user_id, @course, nil, { update_grades: false })
       @enrollment.destroy
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_users_for_course)
       @enrollment.save
     end
 
     it "does not trigger when set_update_cached_due_dates callback is suspended" do
-      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_users_for_course)
       Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
         @course.enroll_student(user_factory)
       end
@@ -3236,8 +3236,8 @@ describe Enrollment do
     it "triggers once for enrollment.destroy" do
       override = assignment_override_model(assignment: @assignments.first)
       override.assignment_override_students.create(user: @student)
-      expect(DueDateCacher).to receive(:recompute_users_for_course).once
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).once
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
       @enrollment.destroy
     end
 

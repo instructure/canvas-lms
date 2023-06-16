@@ -149,7 +149,7 @@ class TermsController < ApplicationController
                     params.require(:enrollment_term).permit(*permitted_enrollment_term_attributes)
                   end
 
-    DueDateCacher.with_executing_user(@current_user) do
+    SubmissionLifecycleManager.with_executing_user(@current_user) do
       if validate_dates(@term, term_params, overrides) && @term.update(term_params)
         @term.set_overrides(@context, overrides)
         # Republish any courses with course paces that may be affected

@@ -415,7 +415,7 @@ describe "assignments" do
             end
           end
         end
-        # by enrolling a new user it will do all the DuedateCacher stuff we skipped above
+        # by enrolling a new user it will do all the SubmissionLifecycleManager stuff we skipped above
         course_with_student_logged_in(course: @course)
       end
 

@@ -41,7 +41,7 @@ module DataFixup
       "url:POST|/api/v1/accounts/:account_id/outcome_imports" => "url:POST|/api/v1/accounts/:account_id/outcome_imports(/group/:learning_outcome_group_id)",
       "url:GET|/api/v1/image_search" => "DELETED",
       "url:POST|/api/v1/image_selection/:id" => "DELETED",
-
+      "url:GET|/api/v1/support_helpers/due_date_cache/course" => "url:GET|/api/v1/support_helpers/submission_lifecycle_manage/course",
     }.freeze
 
     def self.create_scope_query(old_route)

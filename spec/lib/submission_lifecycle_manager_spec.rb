@@ -20,7 +20,7 @@
 
 require_relative "../spec_helper"
 
-describe DueDateCacher do
+describe SubmissionLifecycleManager do
   before(:once) do
     course_with_student(active_all: true)
     assignment_model(course: @course)
@@ -32,76 +32,76 @@ describe DueDateCacher do
     end
 
     it "doesn't call self.recompute_course if the assignment passed in hasn't been persisted" do
-      expect(DueDateCacher).not_to receive(:recompute_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_course)
 
       assignment = Assignment.new(course: @course, workflow_state: :published)
-      DueDateCacher.recompute(assignment)
+      SubmissionLifecycleManager.recompute(assignment)
     end
 
     it "wraps assignment in an array" do
-      expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false))
-                                            .and_return(@instance)
-      DueDateCacher.recompute(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false))
+                                                         .and_return(@instance)
+      SubmissionLifecycleManager.recompute(@assignment)
     end
 
     it "delegates to an instance" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute(@assignment)
+      SubmissionLifecycleManager.recompute(@assignment)
     end
 
     it "queues a delayed job in an assignment-specific singleton in production" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}:UpdateGrades:0",
               strand: "cached_due_date:calculator:Course:#{@assignment.context.global_id}",
               max_attempts: 10).and_return(@instance)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute(@assignment)
+      SubmissionLifecycleManager.recompute(@assignment)
     end
 
     it "calls recompute with the value of update_grades if it is set to true" do
-      expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: true))
-                                            .and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: true))
+                                                         .and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}:UpdateGrades:1",
               strand: "cached_due_date:calculator:Course:#{@assignment.context.global_id}",
               max_attempts: 10).and_return(@instance)
-      DueDateCacher.recompute(@assignment, update_grades: true)
+      SubmissionLifecycleManager.recompute(@assignment, update_grades: true)
     end
 
     it "calls recompute with the value of update_grades if it is set to false" do
-      expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false))
-                                            .and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false))
+                                                         .and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}:UpdateGrades:0",
               strand: "cached_due_date:calculator:Course:#{@assignment.context.global_id}",
               max_attempts: 10).and_return(@instance)
-      DueDateCacher.recompute(@assignment, update_grades: false)
+      SubmissionLifecycleManager.recompute(@assignment, update_grades: false)
     end
 
-    it "initializes a DueDateCacher with the value of executing_user if it is passed as an argument" do
-      expect(DueDateCacher).to receive(:new)
+    it "initializes a SubmissionLifecycleManager with the value of executing_user if it is passed as an argument" do
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, [@assignment.id], hash_including(executing_user: @student))
         .and_return(@instance)
-      DueDateCacher.recompute(@assignment, executing_user: @student)
+      SubmissionLifecycleManager.recompute(@assignment, executing_user: @student)
     end
 
-    it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
-      expect(DueDateCacher).to receive(:new)
+    it "initializes a SubmissionLifecycleManager with the user set by with_executing_user if executing_user is not passed" do
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, [@assignment.id], hash_including(executing_user: @student))
         .and_return(@instance)
 
-      DueDateCacher.with_executing_user(@student) do
-        DueDateCacher.recompute(@assignment)
+      SubmissionLifecycleManager.with_executing_user(@student) do
+        SubmissionLifecycleManager.recompute(@assignment)
       end
     end
 
-    it "initializes a DueDateCacher with a nil executing_user if no user has been specified at all" do
-      expect(DueDateCacher).to receive(:new)
+    it "initializes a SubmissionLifecycleManager with a nil executing_user if no user has been specified at all" do
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, [@assignment.id], hash_including(executing_user: nil))
         .and_return(@instance)
-      DueDateCacher.recompute(@assignment)
+      SubmissionLifecycleManager.recompute(@assignment)
     end
   end
 
@@ -113,37 +113,37 @@ describe DueDateCacher do
     end
 
     it "passes along the whole array" do
-      expect(DueDateCacher).to receive(:new).with(@course, @assignments, hash_including(update_grades: false))
-                                            .and_return(@instance)
-      DueDateCacher.recompute_course(@course, assignments: @assignments)
+      expect(SubmissionLifecycleManager).to receive(:new).with(@course, @assignments, hash_including(update_grades: false))
+                                                         .and_return(@instance)
+      SubmissionLifecycleManager.recompute_course(@course, assignments: @assignments)
     end
 
     it "defaults to all assignments in the context" do
-      expect(DueDateCacher).to receive(:new)
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, match_array(@assignments.map(&:id)), hash_including(update_grades: false)).and_return(@instance)
-      DueDateCacher.recompute_course(@course)
+      SubmissionLifecycleManager.recompute_course(@course)
     end
 
     it "delegates to an instance" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_course(@course, assignments: @assignments)
+      SubmissionLifecycleManager.recompute_course(@course, assignments: @assignments)
     end
 
     it "calls recompute with the value of update_grades if it is set to true" do
-      expect(DueDateCacher).to receive(:new)
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, match_array(@assignments.map(&:id)), hash_including(update_grades: true)).and_return(@instance)
-      DueDateCacher.recompute_course(@course, update_grades: true)
+      SubmissionLifecycleManager.recompute_course(@course, update_grades: true)
     end
 
     it "calls recompute with the value of update_grades if it is set to false" do
-      expect(DueDateCacher).to receive(:new)
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, match_array(@assignments.map(&:id)), hash_including(update_grades: false)).and_return(@instance)
-      DueDateCacher.recompute_course(@course, update_grades: false)
+      SubmissionLifecycleManager.recompute_course(@course, update_grades: false)
     end
 
     it "queues a delayed job in a singleton in production if assignments.nil" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
           singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0",
@@ -152,32 +152,32 @@ describe DueDateCacher do
         )
         .and_return(@instance)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_course(@course)
+      SubmissionLifecycleManager.recompute_course(@course)
     end
 
     it "queues a delayed job without a singleton if assignments is passed" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production).with(max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
                                                         .and_return(@instance)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_course(@course, assignments: @assignments)
+      SubmissionLifecycleManager.recompute_course(@course, assignments: @assignments)
     end
 
     it "does not queue a delayed job when passed run_immediately: true" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
       expect(@instance).not_to receive(:delay_if_production)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
+      SubmissionLifecycleManager.recompute_course(@course, assignments: @assignments, run_immediately: true)
     end
 
     it "calls the recompute method when passed run_immediately: true" do
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:recompute).with(no_args)
-      DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
+      SubmissionLifecycleManager.recompute_course(@course, assignments: @assignments, run_immediately: true)
     end
 
     it "operates on a course id" do
-      expect(DueDateCacher).to receive(:new)
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, match_array(@assignments.map(&:id).sort), hash_including(update_grades: false))
         .and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
@@ -188,31 +188,31 @@ describe DueDateCacher do
         )
         .and_return(@instance)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_course(@course.id)
+      SubmissionLifecycleManager.recompute_course(@course.id)
     end
 
-    it "initializes a DueDateCacher with the value of executing_user if it is passed in as an argument" do
-      expect(DueDateCacher).to receive(:new)
+    it "initializes a SubmissionLifecycleManager with the value of executing_user if it is passed in as an argument" do
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, match_array(@assignments.map(&:id)), hash_including(executing_user: @student))
         .and_return(@instance)
-      DueDateCacher.recompute_course(@course, executing_user: @student, run_immediately: true)
+      SubmissionLifecycleManager.recompute_course(@course, executing_user: @student, run_immediately: true)
     end
 
-    it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
-      expect(DueDateCacher).to receive(:new)
+    it "initializes a SubmissionLifecycleManager with the user set by with_executing_user if executing_user is not passed" do
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, match_array(@assignments.map(&:id)), hash_including(executing_user: @student))
         .and_return(@instance)
 
-      DueDateCacher.with_executing_user(@student) do
-        DueDateCacher.recompute_course(@course, run_immediately: true)
+      SubmissionLifecycleManager.with_executing_user(@student) do
+        SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
       end
     end
 
-    it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
-      expect(DueDateCacher).to receive(:new)
+    it "initializes a SubmissionLifecycleManager with a nil executing_user if no user has been specified" do
+      expect(SubmissionLifecycleManager).to receive(:new)
         .with(@course, match_array(@assignments.map(&:id)), hash_including(executing_user: nil))
         .and_return(@instance)
-      DueDateCacher.recompute_course(@course, run_immediately: true)
+      SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
     end
   end
 
@@ -226,9 +226,9 @@ describe DueDateCacher do
 
       it "calls recompute_for_sis_import in a delayed job" do
         expect do
-          DueDateCacher.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
+          SubmissionLifecycleManager.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
         end.to change {
-          Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import").count
+          Delayed::Job.where(tag: "SubmissionLifecycleManager#recompute_for_sis_import").count
         }.from(0).to(1)
       end
 
@@ -236,17 +236,17 @@ describe DueDateCacher do
         course_with_student(active_all: true)
         assignment_model(course: @course)
 
-        Setting.set("DueDateCacher#recompute_for_sis_import_num_strands", "1")
+        Setting.set("SubmissionLifecycleManager#recompute_for_sis_import_num_strands", "1")
         Delayed::Job.create!(
           locked_at: Time.zone.now,
           locked_by: "foo",
-          tag: "DueDateCacher#recompute_for_sis_import",
+          tag: "SubmissionLifecycleManager#recompute_for_sis_import",
           shard_id: @course.shard.id
         )
         expect do
-          DueDateCacher.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
+          SubmissionLifecycleManager.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
         end.not_to change {
-          Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import").count
+          Delayed::Job.where(tag: "SubmissionLifecycleManager#recompute_for_sis_import").count
         }.from(1)
       end
     end
@@ -259,57 +259,57 @@ describe DueDateCacher do
       let!(:student_1) { @student }
       let(:student_2) { student_in_course(course: @course) }
       let(:student_ids) { [student_1.id, student_2.id] }
-      let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+      let(:instance) { instance_double("SubmissionLifecycleManager", recompute: nil) }
 
       it "delegates to an instance" do
-        expect(DueDateCacher).to receive(:new).and_return(instance)
+        expect(SubmissionLifecycleManager).to receive(:new).and_return(instance)
         expect(instance).to receive(:recompute)
-        DueDateCacher.recompute_users_for_course(student_1.id, @course)
+        SubmissionLifecycleManager.recompute_users_for_course(student_1.id, @course)
       end
 
       it "passes along the whole user array" do
-        expect(DueDateCacher).to receive(:new).and_return(instance)
-                                              .with(@course,
-                                                    Assignment.active.where(context: @course).pluck(:id),
-                                                    student_ids,
-                                                    hash_including(update_grades: false))
-        DueDateCacher.recompute_users_for_course(student_ids, @course)
+        expect(SubmissionLifecycleManager).to receive(:new).and_return(instance)
+                                                           .with(@course,
+                                                                 Assignment.active.where(context: @course).pluck(:id),
+                                                                 student_ids,
+                                                                 hash_including(update_grades: false))
+        SubmissionLifecycleManager.recompute_users_for_course(student_ids, @course)
       end
 
       it "calls recompute with the value of update_grades if it is set to true" do
-        expect(DueDateCacher).to receive(:new)
+        expect(SubmissionLifecycleManager).to receive(:new)
           .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: true))
           .and_return(instance)
         expect(instance).to receive(:recompute)
-        DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: true)
+        SubmissionLifecycleManager.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: true)
       end
 
       it "calls recompute with the value of update_grades if it is set to false" do
-        expect(DueDateCacher).to receive(:new)
+        expect(SubmissionLifecycleManager).to receive(:new)
           .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: false))
           .and_return(instance)
         expect(instance).to receive(:recompute)
-        DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: false)
+        SubmissionLifecycleManager.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: false)
       end
 
       it "passes assignments if it has any specified" do
-        expect(DueDateCacher).to receive(:new).and_return(instance)
-                                              .with(@course, assignments, student_ids, hash_including(update_grades: false))
-        DueDateCacher.recompute_users_for_course(student_ids, @course, assignments)
+        expect(SubmissionLifecycleManager).to receive(:new).and_return(instance)
+                                                           .with(@course, assignments, student_ids, hash_including(update_grades: false))
+        SubmissionLifecycleManager.recompute_users_for_course(student_ids, @course, assignments)
       end
 
       it "handles being called with a course id" do
-        expect(DueDateCacher).to receive(:new).and_return(instance)
-                                              .with(@course,
-                                                    Assignment.active.where(context: @course).pluck(:id),
-                                                    student_ids,
-                                                    hash_including(update_grades: false))
-        DueDateCacher.recompute_users_for_course(student_ids, @course.id)
+        expect(SubmissionLifecycleManager).to receive(:new).and_return(instance)
+                                                           .with(@course,
+                                                                 Assignment.active.where(context: @course).pluck(:id),
+                                                                 student_ids,
+                                                                 hash_including(update_grades: false))
+        SubmissionLifecycleManager.recompute_users_for_course(student_ids, @course.id)
       end
 
       it "queues a delayed job in a singleton if given no assignments and no singleton option" do
         @instance = double
-        expect(DueDateCacher).to receive(:new).and_return(@instance)
+        expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
         expect(@instance).to receive(:delay_if_production)
           .with(
             singleton: "cached_due_date:calculator:Course:#{@course.global_id}:Users:#{Digest::SHA256.hexdigest(student_1.id.to_s)}:UpdateGrades:0",
@@ -318,42 +318,42 @@ describe DueDateCacher do
           )
           .and_return(@instance)
         expect(@instance).to receive(:recompute)
-        DueDateCacher.recompute_users_for_course(student_1.id, @course)
+        SubmissionLifecycleManager.recompute_users_for_course(student_1.id, @course)
       end
 
       it "queues a delayed job in a singleton if given no assignments and a singleton option" do
         @instance = double
-        expect(DueDateCacher).to receive(:new).and_return(@instance)
+        expect(SubmissionLifecycleManager).to receive(:new).and_return(@instance)
         expect(@instance).to receive(:delay_if_production)
           .with(singleton: "what:up:dog", max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
           .and_return(@instance)
         expect(@instance).to receive(:recompute)
-        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog", strand: "cached_due_date:calculator:Course:#{@course.global_id}")
+        SubmissionLifecycleManager.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog", strand: "cached_due_date:calculator:Course:#{@course.global_id}")
       end
 
-      it "initializes a DueDateCacher with the value of executing_user if set" do
-        expect(DueDateCacher).to receive(:new)
+      it "initializes a SubmissionLifecycleManager with the value of executing_user if set" do
+        expect(SubmissionLifecycleManager).to receive(:new)
           .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
           .and_return(instance)
 
-        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, executing_user: student_1)
+        SubmissionLifecycleManager.recompute_users_for_course(student_1.id, @course, nil, executing_user: student_1)
       end
 
-      it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
-        expect(DueDateCacher).to receive(:new)
+      it "initializes a SubmissionLifecycleManager with the user set by with_executing_user if executing_user is not passed" do
+        expect(SubmissionLifecycleManager).to receive(:new)
           .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
           .and_return(instance)
 
-        DueDateCacher.with_executing_user(student_1) do
-          DueDateCacher.recompute_users_for_course(student_1.id, @course, nil)
+        SubmissionLifecycleManager.with_executing_user(student_1) do
+          SubmissionLifecycleManager.recompute_users_for_course(student_1.id, @course, nil)
         end
       end
 
-      it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
-        expect(DueDateCacher).to receive(:new)
+      it "initializes a SubmissionLifecycleManager with a nil executing_user if no user has been specified" do
+        expect(SubmissionLifecycleManager).to receive(:new)
           .with(@course, match_array(assignments.map(&:id)), hash_including(executing_user: nil))
           .and_return(instance)
-        DueDateCacher.recompute_course(@course, run_immediately: true)
+        SubmissionLifecycleManager.recompute_course(@course, run_immediately: true)
       end
     end
   end
@@ -363,36 +363,36 @@ describe DueDateCacher do
     let(:other_student) { User.create! }
     let(:course) { Course.create! }
     let(:assignment) { course.assignments.create!(title: "hi") }
-    let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+    let(:instance) { instance_double("SubmissionLifecycleManager", recompute: nil) }
 
     it "accepts a User" do
       expect do
-        DueDateCacher.with_executing_user(student) do
-          DueDateCacher.recompute_course(course, run_immediately: true)
+        SubmissionLifecycleManager.with_executing_user(student) do
+          SubmissionLifecycleManager.recompute_course(course, run_immediately: true)
         end
       end.not_to raise_error
     end
 
     it "accepts a user ID" do
       expect do
-        DueDateCacher.with_executing_user(student.id) do
-          DueDateCacher.recompute_course(course, run_immediately: true)
+        SubmissionLifecycleManager.with_executing_user(student.id) do
+          SubmissionLifecycleManager.recompute_course(course, run_immediately: true)
         end
       end.not_to raise_error
     end
 
     it "accepts a nil value" do
       expect do
-        DueDateCacher.with_executing_user(nil) do
-          DueDateCacher.recompute_course(course, run_immediately: true)
+        SubmissionLifecycleManager.with_executing_user(nil) do
+          SubmissionLifecycleManager.recompute_course(course, run_immediately: true)
         end
       end.not_to raise_error
     end
 
     it "raises an error if no argument is given" do
       expect do
-        DueDateCacher.with_executing_user do
-          DueDateCacher.recompute_course(course, run_immediately: true)
+        SubmissionLifecycleManager.with_executing_user do
+          SubmissionLifecycleManager.recompute_course(course, run_immediately: true)
         end
       end.to raise_error(ArgumentError)
     end
@@ -403,34 +403,34 @@ describe DueDateCacher do
     let(:other_student) { User.create! }
 
     it "returns the user set by with_executing_user" do
-      DueDateCacher.with_executing_user(student) do
-        expect(DueDateCacher.current_executing_user).to eq student
+      SubmissionLifecycleManager.with_executing_user(student) do
+        expect(SubmissionLifecycleManager.current_executing_user).to eq student
       end
     end
 
     it "returns nil if no user has been set" do
-      expect(DueDateCacher.current_executing_user).to be_nil
+      expect(SubmissionLifecycleManager.current_executing_user).to be_nil
     end
 
     it "returns the user in the closest scope when multiple calls are nested" do
-      DueDateCacher.with_executing_user(student) do
-        DueDateCacher.with_executing_user(other_student) do
-          expect(DueDateCacher.current_executing_user).to eq other_student
+      SubmissionLifecycleManager.with_executing_user(student) do
+        SubmissionLifecycleManager.with_executing_user(other_student) do
+          expect(SubmissionLifecycleManager.current_executing_user).to eq other_student
         end
       end
     end
 
     it "does not consider users who are no longer in scope" do
-      DueDateCacher.with_executing_user(student) do
-        DueDateCacher.with_executing_user(other_student) { nil }
+      SubmissionLifecycleManager.with_executing_user(student) do
+        SubmissionLifecycleManager.with_executing_user(other_student) { nil }
 
-        expect(DueDateCacher.current_executing_user).to eq student
+        expect(SubmissionLifecycleManager.current_executing_user).to eq student
       end
     end
   end
 
   describe "#recompute" do
-    subject(:cacher) { DueDateCacher.new(@course, [@assignment]) }
+    subject(:cacher) { SubmissionLifecycleManager.new(@course, [@assignment]) }
 
     let(:submission) { submission_model(assignment: @assignment, user: first_student) }
     let(:first_student) { @student }
@@ -448,7 +448,7 @@ describe DueDateCacher do
 
       it "does not soft-delete assigned submissions when the assignment ID is passed as a global ID" do
         @shard2.activate do
-          expect { DueDateCacher.new(@course, [@assignment.id]).recompute }.not_to change {
+          expect { SubmissionLifecycleManager.new(@course, [@assignment.id]).recompute }.not_to change {
             @assignment.all_submissions.find_by(user: @student).workflow_state
           }.from("unsubmitted")
         end
@@ -456,7 +456,7 @@ describe DueDateCacher do
 
       it "does not soft-delete assigned submissions when the assignment ID is passed as a local ID" do
         @shard1.activate do
-          expect { DueDateCacher.new(@course, [@assignment.id]).recompute }.not_to change {
+          expect { SubmissionLifecycleManager.new(@course, [@assignment.id]).recompute }.not_to change {
             @assignment.all_submissions.find_by(user: @student).workflow_state
           }.from("unsubmitted")
         end
@@ -621,7 +621,7 @@ describe DueDateCacher do
           submission = @quiz_submission.submission
           submission.update_columns(grade: "5", workflow_state: "deleted")
 
-          expect { DueDateCacher.new(@course, @quiz.assignment).recompute }.to change {
+          expect { SubmissionLifecycleManager.new(@course, @quiz.assignment).recompute }.to change {
             submission.reload.workflow_state
           }.from("deleted").to("pending_review")
         end
@@ -647,7 +647,7 @@ describe DueDateCacher do
 
         submission.update_columns(grade: "5", workflow_state: "deleted")
 
-        expect { DueDateCacher.new(@course, @new_quiz).recompute }.to change {
+        expect { SubmissionLifecycleManager.new(@course, @new_quiz).recompute }.to change {
           submission.reload.workflow_state
         }.from("deleted").to("pending_review")
       end
@@ -660,7 +660,7 @@ describe DueDateCacher do
 
         submission.update_columns(grade: "5", workflow_state: "deleted")
 
-        expect { DueDateCacher.new(@course, @new_quiz).recompute }.to change {
+        expect { SubmissionLifecycleManager.new(@course, @new_quiz).recompute }.to change {
           submission.reload.workflow_state
         }.from("deleted").to("graded")
       end
@@ -674,7 +674,7 @@ describe DueDateCacher do
 
         submission.update_columns(grade: "5", workflow_state: "deleted")
 
-        expect { DueDateCacher.new(@course, @new_quiz).recompute }.to change {
+        expect { SubmissionLifecycleManager.new(@course, @new_quiz).recompute }.to change {
           submission.reload.workflow_state
         }.from("deleted").to("graded")
       end
@@ -687,13 +687,13 @@ describe DueDateCacher do
       end
 
       it "updates the updated_at when the due date of the assignment changed" do
-        allow(DueDateCacher).to receive(:recompute)
+        allow(SubmissionLifecycleManager).to receive(:recompute)
         submission.assignment.update!(due_at: 1.day.from_now)
         expect { cacher.recompute }.to change { submission.reload.updated_at }
       end
 
       it "updates the updated_at when the grading period changed" do
-        allow(DueDateCacher).to receive(:recompute_course)
+        allow(SubmissionLifecycleManager).to receive(:recompute_course)
         group = @course.grading_period_groups.create!
         group.grading_periods.create!(
           close_date: @assignment.due_at + 1.day,
@@ -807,7 +807,7 @@ describe DueDateCacher do
 
           Submission.delete_all
 
-          expect { DueDateCacher.recompute_course(@course) }.to change {
+          expect { SubmissionLifecycleManager.recompute_course(@course) }.to change {
             Submission.active.count
           }.from(0).to(1)
         end
@@ -816,7 +816,7 @@ describe DueDateCacher do
           student2 = user_factory
           @course.enroll_student(student2, enrollment_state: "active")
           student2.enrollments.find_by(course: @course).conclude
-          expect { DueDateCacher.recompute_course(@course) }.not_to change {
+          expect { SubmissionLifecycleManager.recompute_course(@course) }.not_to change {
             Submission.active.where(user_id: student2.id).count
           }
         end
@@ -1159,7 +1159,7 @@ describe DueDateCacher do
           @submission2 = submission_model(assignment: @assignment2, user: @student)
           Submission.update_all(cached_due_date: nil)
 
-          DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
+          SubmissionLifecycleManager.new(@course, [@assignment1, @assignment2]).recompute
         end
 
         it "applies to submission on the overridden assignment" do
@@ -1183,37 +1183,37 @@ describe DueDateCacher do
 
         expect(LatePolicyApplicator).not_to receive(:for_assignment)
 
-        DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
+        SubmissionLifecycleManager.new(@course, [@assignment1, @assignment2]).recompute
       end
 
       it "does not kick off a LatePolicyApplicator job when explicitly told not to" do
         expect(LatePolicyApplicator).not_to receive(:for_assignment)
 
-        DueDateCacher.new(@course, [@assignment], skip_late_policy_applicator: true).recompute
+        SubmissionLifecycleManager.new(@course, [@assignment], skip_late_policy_applicator: true).recompute
       end
 
       it "runs the GradeCalculator inline when update_grades is true" do
         expect(@course).to receive(:recompute_student_scores_without_send_later)
 
-        DueDateCacher.new(@course, [@assignment], update_grades: true).recompute
+        SubmissionLifecycleManager.new(@course, [@assignment], update_grades: true).recompute
       end
 
       it "runs the GradeCalculator inline with student ids when update_grades is true and students are given" do
         expect(@course).to receive(:recompute_student_scores_without_send_later).with([@student.id])
 
-        DueDateCacher.new(@course, [@assignment], [@student.id], update_grades: true).recompute
+        SubmissionLifecycleManager.new(@course, [@assignment], [@student.id], update_grades: true).recompute
       end
 
       it "does not run the GradeCalculator inline when update_grades is false" do
         expect(@course).not_to receive(:recompute_student_scores_without_send_later)
 
-        DueDateCacher.new(@course, [@assignment], update_grades: false).recompute
+        SubmissionLifecycleManager.new(@course, [@assignment], update_grades: false).recompute
       end
 
       it "does not run the GradeCalculator inline when update_grades is not specified" do
         expect(@course).not_to receive(:recompute_student_scores_without_send_later)
 
-        DueDateCacher.new(@course, [@assignment]).recompute
+        SubmissionLifecycleManager.new(@course, [@assignment]).recompute
       end
 
       context "when called for specific users" do
@@ -1244,7 +1244,7 @@ describe DueDateCacher do
           new_students = n_students_in_course(2, course: @course)
           new_student_ids = new_students.map(&:id)
 
-          ddc = DueDateCacher.new(@course, @assignment, new_student_ids)
+          ddc = SubmissionLifecycleManager.new(@course, @assignment, new_student_ids)
           ddc.recompute
 
           submission_count = Submission.active.where(assignment: @assignment, user_id: new_student_ids).count
@@ -1332,19 +1332,19 @@ describe DueDateCacher do
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
           expect do
-            DueDateCacher.recompute(assignment, executing_user: teacher)
+            SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           end.to change {
             AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
         it "includes the old due date in the payload" do
-          DueDateCacher.recompute(assignment, executing_user: teacher)
+          SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           expect(last_event.payload["due_at"].first).to eq original_due_at_formatted
         end
 
         it "includes the new due date in the payload" do
-          DueDateCacher.recompute(assignment, executing_user: teacher)
+          SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           expect(last_event.payload["due_at"].second).to eq due_at_formatted
         end
       end
@@ -1361,19 +1361,19 @@ describe DueDateCacher do
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
           expect do
-            DueDateCacher.recompute(assignment, executing_user: teacher)
+            SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           end.to change {
             AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
         it "includes nil as the old due date in the payload" do
-          DueDateCacher.recompute(assignment, executing_user: teacher)
+          SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           expect(last_event.payload["due_at"].first).to be_nil
         end
 
         it "includes the new due date in the payload" do
-          DueDateCacher.recompute(assignment, executing_user: teacher)
+          SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           expect(last_event.payload["due_at"].second).to eq due_at_formatted
         end
       end
@@ -1390,19 +1390,19 @@ describe DueDateCacher do
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
           expect do
-            DueDateCacher.recompute(assignment, executing_user: teacher)
+            SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           end.to change {
             AnonymousOrModerationEvent.where(assignment:, event_type:).count
           }.by(1)
         end
 
         it "includes the old due date in the payload" do
-          DueDateCacher.recompute(assignment, executing_user: teacher)
+          SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           expect(last_event.payload["due_at"].first).to eq original_due_at_formatted
         end
 
         it "includes nil as the new due date in the payload" do
-          DueDateCacher.recompute(assignment, executing_user: teacher)
+          SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
           expect(last_event.payload["due_at"].second).to be_nil
         end
       end
@@ -1417,7 +1417,7 @@ describe DueDateCacher do
         end
 
         expect do
-          DueDateCacher.recompute(assignment, executing_user: teacher)
+          SubmissionLifecycleManager.recompute(assignment, executing_user: teacher)
         end.not_to change {
           AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
         }
@@ -1431,7 +1431,7 @@ describe DueDateCacher do
       end
 
       expect do
-        DueDateCacher.recompute(assignment)
+        SubmissionLifecycleManager.recompute(assignment)
       end.not_to change {
         AnonymousOrModerationEvent.where(assignment:, event_type: "submission_updated").count
       }
@@ -1439,19 +1439,19 @@ describe DueDateCacher do
   end
 
   context "error trapping" do
-    let(:due_date_cacher) { DueDateCacher.new(@course, @assignment) }
+    let(:submission_lifecycle_manager) { SubmissionLifecycleManager.new(@course, @assignment) }
 
     describe ".perform_submission_upsert" do
       it "raises Delayed::RetriableError when deadlocked" do
         allow(Submission.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
 
-        expect { due_date_cacher.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
+        expect { submission_lifecycle_manager.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
       end
 
       it "raises Delayed::RetriableError when unique record violations occur" do
         allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::RecordNotUnique)
 
-        expect { due_date_cacher.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
+        expect { submission_lifecycle_manager.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
       end
     end
   end

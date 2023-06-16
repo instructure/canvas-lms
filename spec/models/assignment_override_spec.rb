@@ -837,7 +837,7 @@ describe AssignmentOverride do
     end
 
     it "triggers when applicable override is created" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       new_override = @assignment.assignment_overrides.build
       new_override.title = "New Override"
       new_override.override_due_at(3.days.from_now)
@@ -845,38 +845,38 @@ describe AssignmentOverride do
     end
 
     it "triggers when overridden due_at changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.override_due_at(5.days.from_now)
       @override.save
     end
 
     it "triggers when overridden due_at changes to nil" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.override_due_at(nil)
       @override.save
     end
 
     it "triggers when due_at_overridden changes" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.clear_due_at_override
       @override.save
     end
 
     it "triggers when applicable override deleted" do
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.destroy
     end
 
     it "triggers when applicable override undeleted" do
       @override.destroy
 
-      expect(DueDateCacher).to receive(:recompute).with(@assignment)
+      expect(SubmissionLifecycleManager).to receive(:recompute).with(@assignment)
       @override.workflow_state = "active"
       @override.save
     end
 
     it "triggers when override without a due_date is created" do
-      expect(DueDateCacher).to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute)
       @assignment.assignment_overrides.create
     end
 
@@ -884,7 +884,7 @@ describe AssignmentOverride do
       @override.clear_due_at_override
       @override.save
 
-      expect(DueDateCacher).to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute)
       @override.destroy
     end
 
@@ -892,13 +892,13 @@ describe AssignmentOverride do
       @override.clear_due_at_override
       @override.destroy
 
-      expect(DueDateCacher).to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute)
       @override.workflow_state = "active"
       @override.save
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
       @override.save
     end
   end

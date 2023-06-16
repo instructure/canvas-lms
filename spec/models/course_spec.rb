@@ -62,10 +62,10 @@ describe Course do
       it_behaves_like "a learning outcome context"
     end
 
-    it "re-runs DueDateCacher if enrollment term changes" do
+    it "re-runs SubmissionLifecycleManager if enrollment term changes" do
       @course.save!
       @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
-      expect(DueDateCacher).to receive(:recompute_course).with(@course)
+      expect(SubmissionLifecycleManager).to receive(:recompute_course).with(@course)
       @course.save!
     end
 
@@ -109,9 +109,9 @@ describe Course do
       }.from(90).to(92)
     end
 
-    it "does not re-run DueDateCacher if enrollment term does not change" do
+    it "does not re-run SubmissionLifecycleManager if enrollment term does not change" do
       @course.save!
-      expect(DueDateCacher).not_to receive(:recompute_course)
+      expect(SubmissionLifecycleManager).not_to receive(:recompute_course)
       @course.save!
     end
 

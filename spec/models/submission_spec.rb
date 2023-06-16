@@ -471,7 +471,7 @@ describe Submission do
 
     it "gets initialized during submission creation" do
       # create an invited user, so that the submission is not automatically
-      # created by the DueDateCacher
+      # created by the SubmissionLifecycleManager
       student_in_course(active_all: true)
       @assignment.update_attribute(:due_at, 1.day.ago)
 
@@ -1553,7 +1553,7 @@ describe Submission do
         @assignment.submit_homework(@student, body: "a body")
         @assignment.update!(points_possible: 10)
         @assignment.grade_student(@student, grade: 10, grader: @teacher)
-        DueDateCacher.recompute(@assignment, update_grades: true)
+        SubmissionLifecycleManager.recompute(@assignment, update_grades: true)
         expect(submission.score).to be 9.76
       end
     end

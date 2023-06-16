@@ -1998,7 +1998,7 @@ describe Quizzes::QuizzesController do
       expect(quiz.reload.description).to eq "foobar"
     end
 
-    describe "DueDateCacher" do
+    describe "SubmissionLifecycleManager" do
       before do
         user_session(@teacher)
         @quiz = @course.quizzes.build(title: "Update Overrides Quiz", workflow_state: "edited")
@@ -2062,50 +2062,50 @@ describe Quizzes::QuizzesController do
         }
       end
 
-      it "runs DueDateCacher only once when overrides are updated" do
-        due_date_cacher = instance_double(DueDateCacher)
-        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+      it "runs SubmissionLifecycleManager only once when overrides are updated" do
+        submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+        allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-        expect(due_date_cacher).to receive(:recompute).once
+        expect(submission_lifecycle_manager).to receive(:recompute).once
 
         post "update", params: @overrides_only
       end
 
-      it "runs DueDateCacher only once when quiz due date is updated" do
-        due_date_cacher = instance_double(DueDateCacher)
-        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+      it "runs SubmissionLifecycleManager only once when quiz due date is updated" do
+        submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+        allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-        expect(due_date_cacher).to receive(:recompute).once
+        expect(submission_lifecycle_manager).to receive(:recompute).once
 
         post "update", params: @quiz_only
       end
 
-      it "runs DueDateCacher only once when quiz due date and overrides are updated" do
-        due_date_cacher = instance_double(DueDateCacher)
-        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+      it "runs SubmissionLifecycleManager only once when quiz due date and overrides are updated" do
+        submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+        allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-        expect(due_date_cacher).to receive(:recompute).once
+        expect(submission_lifecycle_manager).to receive(:recompute).once
 
         post "update", params: @quiz_and_overrides
       end
 
-      it "runs DueDateCacher when transitioning a 'created' quiz to 'edited'" do
-        due_date_cacher = instance_double(DueDateCacher)
-        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+      it "runs SubmissionLifecycleManager when transitioning a 'created' quiz to 'edited'" do
+        submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+        allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-        expect(due_date_cacher).to receive(:recompute).once
+        expect(submission_lifecycle_manager).to receive(:recompute).once
 
         @quiz.update_attribute(:workflow_state, "created")
         post "update", params: @no_changes
         expect(@quiz.reload).to be_edited
       end
 
-      it "runs DueDateCacher when transitioning from ungraded quiz to graded" do
+      it "runs SubmissionLifecycleManager when transitioning from ungraded quiz to graded" do
         @quiz.update!(quiz_type: "practice_quiz")
-        due_date_cacher = instance_double(DueDateCacher)
-        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+        submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+        allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-        expect(due_date_cacher).to receive(:recompute).once
+        expect(submission_lifecycle_manager).to receive(:recompute).once
 
         post "update", params: {
           course_id: @course.id,
@@ -2116,11 +2116,11 @@ describe Quizzes::QuizzesController do
         }
       end
 
-      it "does not runs DueDateCacher when nothing is updated" do
-        due_date_cacher = instance_double(DueDateCacher)
-        allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
+      it "does not runs SubmissionLifecycleManager when nothing is updated" do
+        submission_lifecycle_manager = instance_double(SubmissionLifecycleManager)
+        allow(SubmissionLifecycleManager).to receive(:new).and_return(submission_lifecycle_manager)
 
-        expect(due_date_cacher).not_to receive(:recompute)
+        expect(submission_lifecycle_manager).not_to receive(:recompute)
 
         post "update", params: @no_changes
       end
