@@ -36,7 +36,6 @@ import {
   getDisplayStatus,
   getDisplayScore,
   getZeroPointAssignmentDisplayScore,
-  getNoSubmissionStatus,
   scorePercentageToLetterGrade,
   convertSubmissionToDroppableSubmission,
   camelCaseToSnakeCase,
@@ -608,6 +607,30 @@ describe('util', () => {
       const expectedOutput = <Pill>Not Graded</Pill>
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
+
+    it('should return "Missing" status when dueDate is in the past and there is no submissionsConnection nodes', () => {
+      const assignment = {
+        dueAt: getTime(true),
+        submissionsConnection: {
+          nodes: [],
+        },
+      }
+
+      const expectedOutput = <Pill color="danger">Missing</Pill>
+      expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
+
+    it('should return "Not Submitted" status when dueDate is in the future and there is no submissionsConnection nodes', () => {
+      const assignment = {
+        dueAt: getTime(false),
+        submissionsConnection: {
+          nodes: [],
+        },
+      }
+
+      const expectedOutput = <Pill color="primary">Not Submitted</Pill>
+      expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
   })
 
   describe('getDisplayScore', () => {
@@ -756,20 +779,6 @@ describe('util', () => {
       const result = getZeroPointAssignmentDisplayScore(score, gradingStatus, gradingStandard)
 
       expect(result).toEqual('-10/0')
-    })
-  })
-
-  describe('getNoSubmissionStatus', () => {
-    it('should return "Missing" status when dueDate is in the past', () => {
-      const dueDate = getTime(true)
-      const expectedOutput = <Pill color="danger">Missing</Pill>
-      expect(getNoSubmissionStatus(dueDate)).toStrictEqual(expectedOutput)
-    })
-
-    it('should return "Not Submitted" status when dueDate is in the future', () => {
-      const dueDate = getTime(false)
-      const expectedOutput = <Pill color="primary">Not Submitted</Pill>
-      expect(getNoSubmissionStatus(dueDate)).toStrictEqual(expectedOutput)
     })
   })
 
