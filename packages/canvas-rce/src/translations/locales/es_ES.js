@@ -240,6 +240,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Imagen actual" },
   "current_volume_level_c55ab825": { "message": "Nivel de volumen actual" },
   "custom_6979cd81": { "message": "Personalizar" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Ancho y alto personalizado (píxeles)"
+  },
   "cyan_c1d5f68a": { "message": "Turquesa" },
   "dagger_57e0f4e5": { "message": "Involución" },
   "date_added_ed5ad465": { "message": "Fecha en la que se añadió" },
@@ -720,6 +723,9 @@ const locale = {
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Debes añadir uno de los siguientes estilos para guardar un icono: color del icono, tamaño del contorno, texto del icono o imagen"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "No se han podido pegar uno o más archivos. Intenta subir o arrastrar y soltar archivos."
   },
   "open_circle_e9bd069": { "message": "Círculo abierto" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
