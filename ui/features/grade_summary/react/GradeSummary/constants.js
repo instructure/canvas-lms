@@ -16,6 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('grade_summary')
+
 export const ASSIGNMENT_SORT_OPTIONS = {
   ASSIGNMENT_GROUP: 'Assignment Group',
   DUE_DATE: 'Due Date',
@@ -24,3 +28,41 @@ export const ASSIGNMENT_SORT_OPTIONS = {
 }
 
 export const ASSIGNMENT_NOT_APPLICABLE = 'N/A'
+
+export const ASSIGNMENT_STATUS = {
+  EXCUSED: {
+    id: 'excused',
+    label: I18n.t('Excused'),
+    color: 'primary',
+  },
+  DROPPED: {
+    id: 'dropped',
+    label: I18n.t('Dropped'),
+    color: 'primary',
+  },
+  MISSING: {
+    id: 'missing',
+    label: I18n.t('Missing'),
+    color: 'danger',
+  },
+  NOT_SUBMITTED: {
+    id: 'not_submitted',
+    label: I18n.t('Not Submitted'),
+    color: 'primary',
+  },
+  LATE: {
+    id: 'late',
+    label: I18n.t('Late'),
+    color: 'warning',
+  },
+  GRADED: {
+    id: 'graded',
+    label: I18n.t('Graded'),
+    color: 'success',
+  },
+  NOT_GRADED: {
+    id: 'not_graded',
+    label: I18n.t('Not Graded'),
+    color: 'primary',
+  },
+}

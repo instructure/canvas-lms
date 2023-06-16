@@ -17,14 +17,11 @@
  */
 
 import React from 'react'
-import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE} from './constants'
+import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE, ASSIGNMENT_STATUS} from './constants'
 import {IconCheckLine, IconXLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
-import {useScope as useI18nScope} from '@canvas/i18n'
 
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
-
-const I18n = useI18nScope('grade_summary')
 
 export const getGradingPeriodID = () => {
   return window?.location?.search
@@ -111,32 +108,37 @@ export const submissionCommentsPresent = assignment => {
   )
 }
 
-export const getDisplayStatus = assignment => {
+export const getAssignmentStatus = assignment => {
   if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused') {
-    return <Pill>{I18n.t('Excused')}</Pill>
+    return ASSIGNMENT_STATUS.EXCUSED
   } else if (assignment?.dropped) {
-    return <Pill>{I18n.t('Dropped')}</Pill>
+    return ASSIGNMENT_STATUS.DROPPED
   } else if (assignment?.gradingType === 'not_graded') {
-    return <Pill>{I18n.t('Not Graded')}</Pill>
+    return ASSIGNMENT_STATUS.NOT_GRADED
   } else if (assignment?.submissionsConnection?.nodes?.length === 0) {
-    return getNoSubmissionStatus(assignment?.dueAt)
+    return getAssignmentNoSubmissionStatus(assignment?.dueAt)
   } else if (assignment?.submissionsConnection?.nodes[0]?.late) {
-    return <Pill color="warning">{I18n.t('Late')}</Pill>
+    return ASSIGNMENT_STATUS.LATE
   } else if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'graded') {
-    return <Pill color="success">{I18n.t('Graded')}</Pill>
+    return ASSIGNMENT_STATUS.GRADED
   } else {
-    return <Pill>{I18n.t('Not Graded')}</Pill>
+    return ASSIGNMENT_STATUS.NOT_GRADED
   }
 }
 
-export const getNoSubmissionStatus = dueDate => {
+export const getAssignmentNoSubmissionStatus = dueDate => {
   const assignmentDueDate = new Date(dueDate)
   const currentDate = new Date()
   if (dueDate && assignmentDueDate < currentDate) {
-    return <Pill color="danger">{I18n.t('Missing')}</Pill>
+    return ASSIGNMENT_STATUS.MISSING
   } else {
-    return <Pill>{I18n.t('Not Submitted')}</Pill>
+    return ASSIGNMENT_STATUS.NOT_SUBMITTED
   }
+}
+
+export const getDisplayStatus = assignment => {
+  const status = getAssignmentStatus(assignment)
+  return <Pill color={status.color}>{status.label}</Pill>
 }
 
 export const getDisplayScore = (assignment, gradingStandard) => {
