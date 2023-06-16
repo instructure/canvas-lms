@@ -271,6 +271,9 @@ const OutcomeManagementPanel = ({
         openOutcomeEditModal()
       } else if (action === 'move') {
         openOutcomeMoveModal()
+      } else if (action === 'alignments') {
+        // redirect to alignment details page for selected outcome
+        window.open('outcomes/' + edge.node._id)
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

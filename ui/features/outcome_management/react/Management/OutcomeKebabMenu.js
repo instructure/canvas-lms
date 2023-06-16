@@ -24,11 +24,12 @@ import {IconButton} from '@instructure/ui-buttons'
 import {
   IconMoreLine,
   IconEditLine,
-  IconTrashLine,
+  IconXLine,
   IconMoveEndLine,
   IconInfoLine,
   IconSearchLine,
   IconImportLine,
+  IconOutcomesLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
@@ -64,12 +65,14 @@ const OutcomeKebabMenu = ({
           {I18n.t('Edit')}
         </View>
       </Menu.Item>
-      <Menu.Item disabled={!canDestroy} value="remove">
-        <IconTrashLine size="x-small" />
-        <View padding="0 small" data-testid="outcome-kebab-menu-remove">
-          {I18n.t('Remove')}
-        </View>
-      </Menu.Item>
+      {!isGroup && (
+        <Menu.Item value="alignments">
+          <IconOutcomesLine size="x-small" />
+          <View padding="0 x-large 0 small" data-testid="outcome-kebab-menu-alignments">
+            {I18n.t('Alignments')}
+          </View>
+        </Menu.Item>
+      )}
       <Menu.Item value="move">
         <IconMoveEndLine size="x-small" />
         <View padding="0 x-large 0 small" data-testid="outcome-kebab-menu-move">
@@ -88,6 +91,12 @@ const OutcomeKebabMenu = ({
           <View padding="0 small">{I18n.t('Import Outcomes')}</View>
         </Menu.Item>
       )}
+      <Menu.Item disabled={!canDestroy} value="remove">
+        <IconXLine size="x-small" />
+        <View padding="0 small" data-testid="outcome-kebab-menu-remove">
+          {I18n.t('Remove')}
+        </View>
+      </Menu.Item>
       {isGroup && <Menu.Separator />}
       {isGroup && (
         <Menu.Item value="description" disabled={!hasDescription}>

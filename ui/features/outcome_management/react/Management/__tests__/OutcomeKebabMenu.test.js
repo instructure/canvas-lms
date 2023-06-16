@@ -98,6 +98,20 @@ describe('OutcomeKebabMenu', () => {
     expect(getByText('Import Outcomes')).toBeInTheDocument()
   })
 
+  it('renders Alignments in Kebab menu if a isGroup is not provided and menu button clicked', () => {
+    const {getByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: false})} />)
+    const menuButton = getByText(groupMenuTitle)
+    fireEvent.click(menuButton)
+    expect(getByText('Alignments')).toBeInTheDocument()
+  })
+
+  it('does not render Alignments in Kebab menu if a isGroup is provided and menu button clicked', () => {
+    const {queryByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: true})} />)
+    const menuButton = queryByText(groupMenuTitle)
+    fireEvent.click(menuButton)
+    expect(queryByText('Alignments')).not.toBeInTheDocument()
+  })
+
   describe('with Kebab menu open', () => {
     it('handles click on Edit item', () => {
       const {getByText} = render(<OutcomeKebabMenu {...defaultProps()} />)
@@ -127,6 +141,16 @@ describe('OutcomeKebabMenu', () => {
       fireEvent.click(menuItem)
       expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
       expect(onMenuHandlerMock.mock.calls[0][1]).toBe('move')
+    })
+
+    it('handles click on Alignments item', () => {
+      const {getByText} = render(<OutcomeKebabMenu {...defaultProps()} />)
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('Alignments')
+      fireEvent.click(menuItem)
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('alignments')
     })
 
     it('handles click on Add Outcomes item', () => {
