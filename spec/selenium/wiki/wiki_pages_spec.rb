@@ -159,6 +159,17 @@ describe "Wiki Pages" do
       get "/courses/#{@course.id}/pages/deleted"
       expect_flash_message :info
     end
+
+    it "shows notification once after deleting a page" do
+      page = @course.wiki_pages.create!(title: "hello")
+      get "/courses/#{@course.id}/pages/#{page.url}"
+      f(".page-toolbar .al-trigger").click
+      f(".delete_page").click
+      expect_new_page_load { fj('button:contains("Delete")').click }
+      expect_flash_message :success, 'The page "hello" has been deleted.'
+      get "/courses/#{@course.id}/pages"
+      expect(f("#flash_message_holder").property("innerHTML")).to eq ""
+    end
   end
 
   context "Index Page as a student" do
