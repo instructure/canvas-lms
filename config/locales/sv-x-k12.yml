@@ -100,6 +100,9 @@ sv-x-k12:
     embed_from_external_tool: "Bädda in innehåll från externt verktyg"
   ExternalToolsPlugin: 
     more_external_tools: "Fler externa verktyg"
+  GradingSchemeManagement: 
+    confirm: 
+      delete: "Vill du radera det här bedömningsschemat?"
   GroupDetailView: 
     delete_confirm: "Vill du ta bort den här gruppen?"
     flash: 
@@ -233,6 +236,8 @@ sv-x-k12:
   a_sync_is_currently_running_please_wait_for_curren_55ccf501: "Synkronisering utförs. Vänta på att synkroniseringen har slutförts innan du påbörjar en ny."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "En tabell som innehåller namnet på bedömningsschemat och knappar för att redigera eller ta bort schemat."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "En tabell över svar och sammanfattande statistik om elevers svarsalternativ."
+  a_table_that_contains_the_default_canvas_grading_s_7ba86ec6: "En tabell som innehåller data för Canvas standardbedömningsschema.  Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal."
+  a_table_that_contains_the_grading_scheme_data_each_e9031ad3: "En tabell som innehåller data för bedömningsschema.  Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "En tabell som innehåller data för bedömningsschema. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "En tabell som innehåller data för bedömningsschema. Först visas bedömningsschemats namn och knappar för redigering och borttagning av schemat. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "En timeout inträffade när den externa autentiseringstjänsten kontaktades."
@@ -437,6 +442,7 @@ sv-x-k12:
   account_default_time_8c7ab62d: "Konto (standard) (%{time})"
   account_domain_78f43049: Kontodomän
   account_domain_lookups_f9d1147e: "Uppslag för kontodomän"
+  account_grading_settings_d683d62e: "Inställningar för bedömning av konto"
   account_groups_2f301732: Kontogrupper
   account_id_2c3b4f15: konto-Id
   account_id_73966078: account_id
@@ -632,6 +638,7 @@ sv-x-k12:
     types: 
       account_admin: "Kontots admin"
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
+  accountname_accountcount_accounts_e2c19840: "%{accountName}, %{accountCount} konton"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "Kontonamnet får inte vara tomt"
@@ -1949,9 +1956,11 @@ sv-x-k12:
   add_2nd_review_ea988088: "Lägg till 2:a bedömning"
   add_8523c19b: "Lägg till"
   add_a_build_button_on_the_assignment_edit_page_for_6b895561: "Lägg till en versionsknapp på  redigeringssidan för New Quizzes-uppgifter"
+  add_a_comment_48994930: "Lägg till en kommentar"
   add_a_comment_872470ac: "Lägg till en kommentar"
   add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Lägg till en kommentar för att slutföra din kamratrespons. Du kommer endast att se frågor som du skrivit."
   add_a_course_b72b18d7: "Lägg till en kurs"
+  add_a_letter_grade_c7b34199: "lägg till ett bokstavsbedömning"
   add_a_message_4fee743f: "Lägg till ett meddelande "
   add_a_message_a5ed12bf: "Lägg till ett meddelande"
   add_a_new_course_4a041207: "Lägg till en ny kurs"
@@ -2025,6 +2034,7 @@ sv-x-k12:
   add_folder_ba50d107: "Lägg till mapp"
   add_grading_period_6f774dc3: "Lägg till bedömningsperiod"
   add_grading_scheme_81e23c05: " Lägg till bedömningsschema"
+  add_grading_scheme_dfe4aba8: "Lägg till bedömningsschema"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Lägg till omdömesschema till administratörsomdömesrapport"
   add_granularity_to_permissions_around_managing_all_129149da: "Lägg till granularitet till behörigheter för hantering av allt annat kursinnehåll"
   add_granularity_to_permissions_around_managing_cou_1ee88f6: "Lägg till granulära behörigheter för hantering av kurser, t.ex. Lägg till/Redigera/Ta bort"
@@ -2058,6 +2068,7 @@ sv-x-k12:
   add_new_caption_or_subtitle_59d2d044: "Lägg till ny undertext eller undertitel"
   add_new_domain_e097d4a0: "Lägg till ny domän"
   add_new_group_7ac49f31: "Lägg till en ny grupp"
+  add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: "Lägg till en ny rad för ett bokstavsbedömning i bedömningsschemat efter denna rad"
   add_new_set_of_due_dates_e8e240f: "Lägg till en ny uppsättning inlämningsdatum"
   add_new_term_d2217c0d: "Lägg till ny termin"
   add_observers_to_courses_6f494a29: "Lägg till observatörer i kurser"
@@ -2087,6 +2098,7 @@ sv-x-k12:
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Lägg till, ta bort eller arrangera om sektioner i denna portfolio"
   add_review_2fb1590c: "Lägg till bedömning"
   add_role_3dc4d273: "Lägg till roll"
+  add_row_action_a84eadc1: "Lägg till åtgärd för raden"
   add_rubric_3636d9a6: "Lägg till matris"
   add_scope_a5208f8b: "Lägg till avgränsning"
   add_section_8b027a1c: "Lägg till sektion"
@@ -3091,6 +3103,7 @@ sv-x-k12:
   allows_users_to_see_quantitative_numeric_grading_d_c96924f0: "Tillåt användare att se kvantitativa (i siffror) bedömningsdata. Om du inaktiverar den här behörigheten begränsas alternativen för att skapa uppgifter för lärare. Användare kan endast se kvalitativa data, däribland bokstavsbedömning och kommentarer."
   allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Ger användare möjlighet att använda genomsnitt som beräkningsmetod för ett visst lärandemål"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Tillåt användare med internationella telefonnummer att ta emot meddelanden från Canvas."
+  alphabetically_60ab47e4: Alfabetisk
   already_belongs_to_an_assignment_override_99fc6f36: "tillhör redan en uppgiftsåsidosättning"
   already_have_a_canvas_account_c4368ac9: "Har du redan ett Canvas-konto?"
   also_note_that_microsoft_teams_is_unable_to_suppor_20d8f753: "Märk att Microsoft Teams inte stöder kurser med fler än %{max_enrollments} registreringar eller som har fler än %{max_owners} ägare. Om du har en stor kurs kan du uppleva synkroniseringsproblem om dessa trösklar uppnås."
@@ -5039,6 +5052,7 @@ sv-x-k12:
     unpublished: Avpublicerad
     update: Uppdatera
   buttons_and_icons_e66ee12c: "Knappar och ikoner"
+  by_assignment_group_and_position_57a4be14: "Efter uppgiftsgrupp och position"
   by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Efter klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alla länkar är som standard aktiverade för en kurs.  Elever ser inte länkar till sektioner som saknar innehåll.  Om du exempelvis inte har skapat några quiz kommer de inte att se quizlänkarna.  Du kan sortera och uttryckligen inaktivera dessa länkar om det finns delar av kursen som inte du vill att eleverna ska ha tillgång till."
@@ -5052,6 +5066,7 @@ sv-x-k12:
   by_default_students_can_always_create_groups_in_a__60ca6e9e: "Elever kan alltid som standard skapa grupper i en kurs."
   by_default_students_can_always_create_groups_in_a__af000dd: "Elever kan alltid som standard skapa grupper i en kurs. För att hindra elever från att skapa grupper, måste Hantera kurser: Administratör – hantera/uppdatera vara aktiverad och kryssrutan Låt användare ordna sina egna grupper i kursinställningarna måste vara omarkerad."
   by_default_students_can_always_create_groups_in_a__dac761d3: "Elever kan alltid som standard skapa grupper i en kurs. För att hindra att elever skapar grupper måste även Kurser – hantera/uppdatera vara aktiverad och kryssrutan Låt elever ordna sina egna grupper i kursinställningarna måste vara inaktiverad."
+  by_due_date_648d7f3b: "Efter inlämningsdatum"
   by_lti_2_registration_url_e421e523: "Efter registrerings-URL för LTI 2"
   by_name_54daec42: "av %{name}"
   by_url_a163275e: "Efter URL"
@@ -5532,6 +5547,9 @@ sv-x-k12:
   cannot_grade_at_this_time_489744b0: "Det går inte att bedömas just nu"
   cannot_have_a_blueprint_course_with_observers_d00b3deb: "Blueprint-kurser kan inte ha observatörer"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Det går inte att ha en blueprint med elever"
+  cannot_have_duplicate_or_empty_row_names_fix_the_n_4fce15dd: "Det får inte finnas radnamn som är dubbletter eller tomma. Åtgärda namnen och försök klicka på ”Spara” igen."
+  cannot_have_negative_ranges_or_ranges_that_are_gre_1086d6db: "Det får inte finnas negativa intervall eller intervall som är större än 100. Åtgärda intervallen och försök klicka på ”Spara” igen."
+  cannot_have_overlapping_or_empty_ranges_fix_the_ra_18ce528b: "Det får inte finnas överlappande eller tomma intervall. Åtgärda intervallen och försök klicka på ”Spara” igen."
   cannot_import_a_root_group_d4654def: "Det går inte att importera en rotgrupp"
   cannot_import_to_other_courses_af885742: "Det går inte att importera till andra kurser"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "Det går inte att ändra lärandemål från ett annat kontext: %{changes}; lärandemål måste ändras i %{context}"
@@ -7797,6 +7815,7 @@ sv-x-k12:
   course_pacing_40c14b61: Kurstakt
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Kurstakt lägger till stöd för rullande registrering i Canvas. Detta möjliggör en magisk distribution av inlämningsdatum för elever med olika startdatum som baseras på den takt som läraren har definierat. Läs mer och få återkoppling i användargruppen Kurstakt."
   course_pacing_blackout_dates_1dfc8b61: "Blackout-datum för kurstakt"
+  course_pacing_cannot_be_used_with_homeroom_course_ca47ed1c: "Det går inte att använda kurstakt med fjärrundervisningskurs"
   course_pacing_d3025ecf: "Kurstakt:"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Förhandsvisningen av funktionen Kurstakt måste aktiveras för din institution."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Kurstakt är en ett automatiseringsverktyg som skapar ett elevschema genom att kombinera föreslagna timmar per kapitel, närvarodagar och totalt antal timmar för att generera en datumberäkning."
@@ -8519,6 +8538,7 @@ sv-x-k12:
     error_reports: Felrapporter
     files: Filer
     grades: Bedömningar
+    grading_settings: Bedömning
     grading_standards: Bedömning
     groups: Grupper
     jobs: Jobb
@@ -8876,6 +8896,7 @@ sv-x-k12:
   deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Djup inkapslade svar stöds inte längre. Ditt svar visas på den sida du för närvarande har öppen."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Djup inkapslade svar stöds inte längre. Ditt svar visas på första sidan av den här tråden."
   default_9db103d: Standard
+  default_canvas_grading_scheme_ab769633: "Canvas standardbedömningsschema"
   default_conference_title: "%{course_name} Konferens"
   default_course_pace_ce0ba0f3: Standardkurstakt
   default_course_pacing_d18b6cda: Standardkurstakt
@@ -8934,6 +8955,7 @@ sv-x-k12:
   delete_from_all_accounts_a1c5e621: "Ta bort från ALLA konton"
   delete_grading_period_dba36e59: "Raderar bedömningsperiod"
   delete_grading_scheme_6b308832: "Radera bedömningsschema"
+  delete_grading_scheme_a1f8f5dc: "Radera bedömningsschema"
   delete_grading_scheme_title_215f0a40: "Ta bort bedömningsschema %{title}"
   delete_group_86c381ec: "Radera grupp"
   delete_groups_c637c07: "Ta bort grupper"
@@ -9856,6 +9878,8 @@ sv-x-k12:
   ecollege_file_description: Ecollege
   ecollege_name: Ecollege-konverterare
   ecuador_593_dfcc235a: "Ecuador (+593)"
+  edit_a_copy_43ecaed6: "redigera en kopia"
+  edit_a_copy_of_this_grading_scheme_807a86b9: "Redigera en kopia av det här bedömningsschemat"
   edit_account_name_for_account_name_ae3633e8: "Redigera kontonamn för %{account_name}"
   edit_all_other_course_content_c8dd98d3: "Redigera allt annat kursinnehåll"
   edit_and_delete_their_own_posts_f4f7cc6: "Redigera eller radera sina egna inlägg"
@@ -9892,6 +9916,7 @@ sv-x-k12:
   edit_disabled_e6a5ea0a: "Redigera (inaktiverad)"
   edit_discussion_settings_1bbb03d: "Redigera diskussionsinställningar"
   edit_grading_scheme_53091236: "Redigera bedömningsschema"
+  edit_grading_scheme_99c16fd8: "Redigera bedömningsschema"
   edit_grading_scheme_title_ff41d916: "Redigera bedömningsschema %{title}"
   edit_group_c8679dba: "Redigera grupp"
   edit_history_917c1e08: "Redigera historik"
@@ -10074,6 +10099,7 @@ sv-x-k12:
   enable_course_as_a_blueprint_course_8515ffd5: "Möjliggör som valbar blueprint för andra kurser"
   enable_course_as_a_course_template_5299afb6: "Möjliggör som valbar kursmall för andra kurser"
   enable_dashboard_images_for_courses_5af458b0: "Aktivera översiktsbilder för kurserna"
+  enable_distributed_internal_analytics_29e76618: "Aktivera distribuerad intern analys"
   enable_extra_filter_options_b52c23e6: "aktivera extra filteralternativ"
   enable_face_to_face_connection_9df19b76: "Aktivera videoanslutning"
   enable_feature_title_987d8e9a: "Aktivera funktion: %{title}"
@@ -10092,6 +10118,7 @@ sv-x-k12:
   enable_recording_for_this_conference_b8adff6: "Aktivera inspelning för den här konferensen"
   enable_reregistration_for_lti_2_b2a10444: "Aktivera omregistrering för LTI 2"
   enable_scope_ac28b832: "Aktivera omfattning"
+  enable_sending_oauth_consumer_key_5bb4bc5d: "Aktivera sändning av OAuth-konsumentnyckel"
   enable_student_context_card_links_eba2f2c5: "Aktivera länkar på kontextuellt elevkort"
   enable_the_creation_of_blueprint_courses_79f91c30: "Aktivera skapande av kursplaner"
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: "Aktivera utfasning av fakultetsjournalsfunktionerna."
@@ -11374,6 +11401,7 @@ sv-x-k12:
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*För utvecklare av LTI 1.3-verktyg:* Följ anvisningarna i sektionen ”Vad exakt behöver du ändra?” i Community-artikeln."
   for_manually_posted_assignments_the_presence_of_a__8aabf3cc: "Uppgiften kan publiceras för manuellt publicerade uppgifter med inlämningskommentar från någon annan än inlämnaren. Tidigare krävdes ett omdöme innan publiceringen kunde göras."
   for_more_information_see_the_canvas_api_documentat_f07307bf: "För mer information, se *Canvas API dokumentation*."
+  for_name_calendar_subscription_options_e60aa15f: "För prenumerationsalternativ för %{name}-kalender"
   for_name_d5684bfd: "För %{name}"
   for_students_who_d0fd45d0: "För elever som ..."
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -12087,7 +12115,13 @@ sv-x-k12:
   grading_periods_must_not_overlap_f45336fb: "Bedömningsperioder får inte överlappa varandra"
   grading_scheme_deleted_7ae5a072: "Bedömningsschemat har raderats"
   grading_scheme_f151d195: Bedömningsschema
+  grading_scheme_name_97b0ba89: "Namn på bedömningsschema"
+  grading_scheme_name_is_required_add_a_name_and_try_8ca22d32: "Namn på bedömningsschema krävs Lägg till ett namn och försök klicka på ”Spara” igen."
   grading_scheme_saved_85535151: "Bedömningsschemat har sparats"
+  grading_scheme_title_5786fa1f: "Titel på bedömningsschema"
+  grading_scheme_was_successfully_created_49fbec39: "Bedömningsschemat skapades."
+  grading_scheme_was_successfully_removed_a2f98b4b: "Bedömningsschemat togs bort."
+  grading_scheme_was_successfully_saved_59607cb1: "Bedömningsschemat sparades."
   grading_schemes_1c3c3252: Bedömningsscheman
   grading_standard: 
     unknown_grading_details: "Okända detaljer"
@@ -12709,6 +12743,7 @@ sv-x-k12:
   home_page_is_not_valid_2e8a25ae: "Startsidan är inte giltig"
   home_tutorial_tray_66826983: "Självstudiefack för startsidor"
   homeroom_12546f9c: Hemrum
+  homeroom_course_cannot_be_used_with_course_pacing_be4e825f: "Det går inte att använda fjärrundervisningskurs med kurstakt"
   homeroom_view_a676e270: "Vy för fjärrundervisningsrum"
   homework_submission_172e8354: Läxinlämning
   honduras_504_af7aa636: "Honduras (+504)"
@@ -12818,6 +12853,7 @@ sv-x-k12:
   http_73849691: http
   http_response_code_832d6baa: "HTTP-svar: %{code}"
   https_3a02e3fb: https
+  https_b8426ad8: "https://"
   hungarian_fc7d30c9: Ungerska
   hungary_36_cd3e515b: "Ungern (+36)"
   hypothetical_end_date_117d81cf: "Hypotetiskt slutdatum"
@@ -13567,6 +13603,7 @@ sv-x-k12:
   invalid_freq_freq_84b0427d: "Ogiltigt FREQ '%{freq}'"
   invalid_grade_9726cbc6: "Ogiltig bedömning"
   invalid_grade_passback_setting_a1d209d1: "Ogiltig grade_passback_setting"
+  invalid_grading_scheme_4a95ba92: "Ogiltigt bedömningsschema"
   invalid_hexcode_9124519f: "Ogiltig hexadecimal kod"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ogiltig hexadecimal kod. Ange en giltig hexadecimal kod här för att använda en anpassad färg."
   invalid_hexcode_provided_522ba223: "Ogiltig hexadecimal kod tillhandahölls"
@@ -13661,6 +13698,7 @@ sv-x-k12:
   item_type_quiz_c894ddb1: "Typ av objekt: Quiz"
   items_299a7626: "Objekt: "
   items_items_selected_5b55e566: "%{items} objekt valda"
+  items_last_accessed_before_date_may_not_be_shown_be840349: "Det går kanske inte att visa objekt som öppnats före %{date}."
   items_selected_have_different_usage_rights_52b325cc: "De valda objekten har olika användningsrättigheter."
   j_5226008a: j
   january_9ca1eab1: Januari
@@ -14428,6 +14466,8 @@ sv-x-k12:
   lowest_possible_grade_percent_20474418: "Lägsta möjliga omdömesprocent"
   lti: 
     lti_message: 
+      links: 
+        add_rubric: Matris
       load_tool_new_tab_button: "Ladda %{tool} i ett nytt fönster"
       new_tab: "Det här verktyget måste laddas i ett nytt webbläsarfönster"
       new_tab_expired: "Sessionen för verktyget har gått ut. Uppdatera sidan för att använda verktyget igen"
@@ -14495,6 +14535,7 @@ sv-x-k12:
   manage_add_edit_delete_18963dbc: "Hantera – (lägg till/redigera/ta bort) "
   manage_add_edit_delete_course_files_162c1a65: "Hantera (lägg till/redigera/radera) kursfiler"
   manage_add_edit_delete_pages_5c73f2fb: "Hantera (lägg till/redigera/radera) sidor"
+  manage_all_grading_schemes_f03f9310: "Hantera alla bedömningsscheman"
   manage_all_other_course_content_d77de830: "Hantera allt annat kursinnehåll"
   manage_announcement_with_title_title_f2ce92de: "Hantera tillkännagivande med titel %{title}"
   manage_app_list_994cc26c: "Hantera applista"
@@ -16723,6 +16764,7 @@ sv-x-k12:
   moodle_formula_warning_title: "Möjliga svar måste genereras på nytt för formulärfrågor"
   more_cf9cc661: Mer
   more_courses_5ebbe998: "Fler kurser"
+  more_details_in_the_speedgrader_8702f408: "Fler detaljer i SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Dessutom gör Canvas det möjligt att koppla lärandemål till dina bedömningsmatriser så att du kan utvärdera måluppfyllelse när du bedömer uppgifter. När du i så fall har lagt in dina lärandemål klickar du på Matriser för att kunna koppla dem och därefter använda dem för bedömning."
   more_info_at_course_name_56dc8c10: "Mer information på %{course_name}"
   more_info_at_url_41b4764b: "Mer information på %{url}"
@@ -17014,6 +17056,7 @@ sv-x-k12:
   new_gradebook_297f7e2d: "Ny bedömningsöversikt"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Med Ny bedömningsöversikt kan du använda nyss utgivna förbättringar av bedömningsöversikten."
   new_gradebook_plagiarism_indicator_8dd22971: "Plagiatindikering för nya omdömesboken"
+  new_grading_scheme_ab1a3301: "Nytt bedömningsschema"
   new_group_category_66be9cbd: "Ny gruppuppsättning"
   new_group_set_7241a581: "Ny gruppuppsättning"
   new_mention_ad04b872: "Nytt omnämnande"
@@ -17918,6 +17961,7 @@ sv-x-k12:
   out_of_pointspossible_3fb5ee20: "Av %{pointsPossible}"
   out_of_pointspossible_c163105a: "av %{pointsPossible}"
   out_of_pointspossible_pts_b2b73373: "Av %{pointsPossible} poäng"
+  out_of_score_12e519a7: "av (poäng)"
   outcome_alignment_summary_tab_431f4253: "Fliken Sammanfattning av lärandemålsjusteringar"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Koppling av lärandemål för innehåll som inte ges poäng"
   outcome_average_calculation_method_54514372: "Beräkningsmetod för genomsnittliga lärandemål"
@@ -18167,6 +18211,7 @@ sv-x-k12:
   page_page_59070cd8: "Sida %{page}"
   page_pagenum_20dbfeb8: "Sida %{pageNum}"
   page_title_ascending_b5df950c: "Sidtitel: Stigande"
+  page_title_d1a22bbf: "Sidans titel"
   page_title_descending_70c1483d: "Sidtitel: Fallande"
   page_views: 
     browsers: 
@@ -18422,6 +18467,7 @@ sv-x-k12:
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Ange en sökterm med minst tre tecken"
   please_enter_a_valid_search_term_5c69b0b0: "Ange en giltig sökterm"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Ange en giltig URL (t.ex. http://example.com)"
+  please_enter_a_valid_url_e_g_https_example_com_87675bca: "Ange en giltig URL (t.ex. https://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Ange en giltig URL. Protokoll är obligatoriskt (dvs.http://, https://, ftp://, tel:, mailto:)."
   please_enter_your_label_name_7745272d: "Uppge ditt %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Uppge ditt %{label_name} och lösenord:"
@@ -18978,6 +19024,7 @@ sv-x-k12:
   possible_pts_b63dff4c: "%{possible} poäng"
   possible_score_5e0a328e: "Möjlig: %{score}"
   post_1e445890: Offentliggör
+  post_comment_a5a430a6: "Publicera kommentar"
   post_grades_39c52870: "Publicera omdömen"
   post_grades_3e692d46: "Publicera omdömen"
   post_grades_description: |-
@@ -21094,6 +21141,7 @@ sv-x-k12:
   remove_icon_a4646413: "ta bort ikon"
   remove_image_341340b3: "Ta bort bild"
   remove_label_11d96b8f: "Ta bort %{label}"
+  remove_letter_grade_row_a51f993a: "Ta bort raden för bokstavsbedömningen"
   remove_linked_student_name_52dc7fce: "Ta bort den länkade eleven %{name}"
   remove_mastery_level_b1e8dcb0: "Ta bort måluppfyllelse"
   remove_media_attachment_d2926f1e: "Ta bort mediebilaga"
@@ -21666,6 +21714,7 @@ sv-x-k12:
   scheduler_shown_df77ca6f: "Schemabokare visas"
   scheduling_5a3327e7: Schemaläggning
   scheduling_sync_3f4a7cac: "Schemalägger synkronisering"
+  schemes_103aa474: Scheman
   school_of_rock_4b7b1fd0: "School of Rock"
   scope_9729c11e: "Omfattning:"
   scope_c59afc8a: Omfattning
@@ -23013,6 +23062,7 @@ sv-x-k12:
   show_suggestions_when_typing_b72545de: "Visa förslag när du skriver"
   show_to_d57767f: "Visa för"
   show_to_everyone_94d66d01: "Visa för alla"
+  show_totals_as_points_on_student_grade_page_d9cb4207: "Visa totalsummor som poäng på elevens bedömningssida"
   show_welcome_tour_a105aa2e: "Visa välkomstgenomgång"
   showing_1ac6ed70: "Visar:"
   showing_all_announcements_36ff0cec: "Visar alla meddelanden"
@@ -23491,6 +23541,7 @@ sv-x-k12:
   student_filters_in_lmgb_13964502: "Elevfilter i LMGB"
   student_first_name_aaa42cbc: "Elevens förnamn"
   student_first_name_options_82f5685f: "Alternativ för elevens förnamn"
+  student_grade_4122806e: Elevbedömning
   student_grade_summary_d7a5cac0: "Sammanfattning av elevbedömningar"
   student_grades_4cbc59a1: "Elevers omdömen"
   student_group_75b86a9f: Elevgrupp
@@ -23717,6 +23768,7 @@ sv-x-k12:
   submission_preview_383473ec: "Förhandsgranskning för inlämning"
   submission_progress_323f5e7b: Inlämningsförlopp
   submission_records_will_be_filtered_by_date_using__b3990a1: "Inlämningsposter filtreras efter datum med hjälp av tidsstämpeln ”submitted_at” om den finns tillgänglig. Om ”submitted_at” inte är tillgänglig används fältet \"graded_at\". Om inget av fälten är ifyllt kommer inte inlämningsposten att inkluderas i rapporten vid filtrering med datum."
+  submission_score_615cc591: Inlämningspoäng
   submission_score_b7a291e8: "inlämningens resultat"
   submission_sent_3f0d2ee1: "Inlämningen skickad"
   submission_submit_on_behalf_of_student_f0ed14e4: "Inlämning – Lämna in för elevens räkning"
@@ -23868,7 +23920,7 @@ sv-x-k12:
   submitted_by_name_dab6d5e1: "Inlämnad av: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Inlämnad av %{proxy} den %{date}"
   submitted_by_submitter_1dcd07a1: "Inlämnad av %{submitter}"
-  submitted_d5ba370a: "Skickad:"
+  submitted_d5ba370a: "Inlämnad:"
   submitted_date_ba55b0ae: "Skickad %{date}"
   submitted_datetime_fa2e9287: "Skickad: %{dateTime}"
   submitted_files_82dd3009: "Skickade filer"
@@ -24593,6 +24645,7 @@ sv-x-k12:
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Ett fel inträffade vid kontroll av status för planpublicering"
   there_was_an_error_creating_a_new_filter_e93bb765: "Det gick inte att skapa ett nytt filter."
   there_was_an_error_deleting_name_aa3050e5: "Det gick inte att radera ”%{name}”."
+  there_was_an_error_exporting_the_gradebook_30f4a95: "Ett fel inträffade vid export av bedömningsboken."
   there_was_an_error_fetching_assignment_groups_data_bdb14b5a: "Ett fel inträffade när studentdata för uppgiften skulle hämtas."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Det gick inte att hämta kursstatistiken"
   there_was_an_error_fetching_custom_column_data_for_3278acb4: "Ett fel inträffade när data skulle hämtas från anpassad kolumn till bedömningsboken"
@@ -24641,7 +24694,15 @@ sv-x-k12:
   there_was_an_error_uploading_the_media_6841a37b: "Ett fel inträffade vid uppladdning av mediefiler."
   there_was_an_error_uploading_your_file_please_try__ce458566: "Ett fel uppstod vid uppladdning av din fil. Försök igen."
   there_was_an_error_upon_saving_your_conference_65e6b175: "Ett fel inträffade när din konferens skulle sparas."
+  there_was_an_error_while_creating_the_grading_sche_cb8ca0c9: "Ett fel inträffade när bedömningsschemat skapades."
+  there_was_an_error_while_loading_grading_schemes_2ad6176d: "Ett fel inträffade när bedömningsscheman lästes in."
+  there_was_an_error_while_loading_the_default_canva_7782cecc: "Ett fel inträffade när Canvas standardbedömningsschema lästes in."
+  there_was_an_error_while_loading_the_default_gradi_bb879ed1: "Ett fel inträffade när standardbedömningsschemat lästes in."
+  there_was_an_error_while_refreshing_grading_scheme_ab1136b9: "Ett fel inträffade när bedömningsscheman uppdaterades."
+  there_was_an_error_while_removing_the_grading_sche_2a481e33: "Ett fel inträffade när bedömningsschemat togs bort."
+  there_was_an_error_while_saving_the_grading_scheme_b6c1eb7: "Ett fel inträffade när bedömningsschemat sparades."
   there_was_an_error_while_saving_your_changes_5fa5eb65: "Ett fel inträffade när dina ändringar skulle sparas"
+  there_was_an_error_while_updating_the_grading_sche_99608d3a: "Ett fel inträffade när bedömningsschemat uppdaterades."
   there_was_an_error_with_your_import_please_examine_7b42f29d: "Ett fel uppstod med din import. Granska din fil och försök ladda upp den igen. Kontrollera din e-post för mer information."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Ett fel uppstod med din förfrågan, försök att söka efter något annat"
   there_was_an_unexpected_error_creating_the_discuss_8811a868: "Ett oväntat fel inträffade när diskussionsinlägget skapades."
@@ -25023,6 +25084,7 @@ sv-x-k12:
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Den här användaren har ännu inte accepterat inbjudan till kursen"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Den här användaren har för tillfället inte tillgång till kursen"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Den här användaren har för tillfället inte tillgång till kursen\""
+  this_user_s_last_activity_in_the_course_was_dateti_74d3ac3b: "Den här användarens senaste aktivitet i kursen var %{datetime}"
   this_user_will_be_created_in_3b2a2b52: "Den här användaren kommer att skapas i:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "Den här versionen av omdömesboken håller på att ersättas av en uppdaterad omdömesbok på eller före 18 januari 2020.."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
@@ -26294,6 +26356,7 @@ sv-x-k12:
   unsynced_changes_4ddaec76: "Osynkroniserade ändringar"
   until_4a1f8cda: Till
   until_6437a827: " tills"
+  until_8bdea3de: tills
   until_date_949017c4: "Tills %{date}"
   until_date_must_be_after_the_available_date_8670dfcd: "Tills-datumet måste infalla efter tillgänglighetsdatumet"
   until_date_must_be_after_the_due_date_d961566c: "Tills-datumet måste infalla efter inlämningsdatumet"
@@ -26316,6 +26379,7 @@ sv-x-k12:
   update_domain_account_lookup_9c89440d: "Uppdatera kontouppslag för domän"
   update_failed_2c87428c: "Uppdateringen misslyckades"
   update_file_links_to_prefer_preview_not_download_94535382: "Uppdatera fillänkar för förhandsgranskning, inte nedladdning"
+  update_grade_b47eb3ff: "Uppdatera bedömning"
   update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Uppdatera bedömningssammanfattningstabell för att använda ett modernt ramverk"
   update_important_info_bcc01d6a: "Uppdatera viktig information"
   update_inbox_page_to_use_react_instui_4d343fd: "Uppdatera inkorgssidan för att använda React/InstUI"
@@ -26994,6 +27058,7 @@ sv-x-k12:
   view_ba339f93: Visa
   view_blackout_dates_1723673a: "Visa blackout-datum"
   view_canvas_insights_beta_fe446d71: "Visa Canvas Insights (beta)"
+  view_copy_grading_scheme_3c2b17ac: "Visa/kopiera bedömningsschema"
   view_count_outcomes_9609792: 
     one: "Visa 1 lärandemål"
     other: "Visa %{count} lärandemål"
@@ -27002,6 +27067,8 @@ sv-x-k12:
   view_coursename_s_assignment_group_totals_bd4b707: "Visa totalt antal uppgiftsgrupper för %{courseName}"
   view_description_b6d8e52b: "Visa beskrivning"
   view_due_items_due_today_for_course_coursename_129e433: "Visa %{due} objekt som ska lämnas in i dag för kursen %{courseName}"
+  view_edit_5e61d3e: Visa/redigera
+  view_edit_grading_scheme_238d3028: "Visa/redigera bedömningsschema"
   view_faculty_journals_ad0e8c8f: "Visa lärarjournaler"
   view_feature_options_at_an_account_level_a84cedbe: "Visa funktionsalternativ på kontonivå"
   view_feature_settings_at_an_account_level_ec7f5e10: "Visa funktionsinställningar på kontonivå"
@@ -27013,6 +27080,7 @@ sv-x-k12:
   view_gradebook_history_a9272918: "Visa historik för bedömningsöversikt"
   view_grades_8d3bae6c: "Visa omdömen"
   view_grades_for_name_45aeb2f2: "Visa omdömen för %{name}"
+  view_grading_scheme_ac66bcdd: "Visa bedömningsschema"
   view_groups_47b5f60c: "Visa Grupper"
   view_history_2dfb048: "Visa historik"
   view_important_dates_173c7e1b: "Visa viktiga datum"
@@ -27205,7 +27273,12 @@ sv-x-k12:
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Om inaktiverad, kan elever ändå skicka individuella meddelanden till kursen lärare, lärarassistenter och elever som hör hemma i samma kontonivågrupper."
   when_disabled_students_can_still_send_individual_m_567a911c: "Även om den här inställningen är inaktiverad kan elever ändå skicka enskilda meddelanden till kursens lärare, lärarassistenter och elever som tillhör grupper på samma kontonivå."
   when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "Om den aktiveras cachelagras AccessToken läsningar (med MultiCache) under begärandeautentisering."
+  when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Om aktiverat, samla mätvärden för intern analys med hjälp av ett distribuerat system."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "När aktiverad fasar den ut SMS-tjänsten (Short Message Service)."
+  when_enabled_lti_1_3_launches_that_would_be_associ_bfec33fb: |-
+      Om aktiverat, LTI 1.3-lanseringar som är kopplade till LTI 1.1-verktyget
+      om LTI 1.3-verktyget inte var närvarande, kommer att  inkludera egenskaperna oauth_consumer_key och
+      oauth_consumer_key_sign som en del av LTI 1.1-anspråkssektion.
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       Om den aktiveras använder New Quizzes-etableringar den dedikerade webbplatsadministratörens
       tjänstanvändare och DeveloperKey för att generera en åtkomst- och uppdateringstoken.
