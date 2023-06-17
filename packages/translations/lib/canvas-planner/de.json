@@ -197,6 +197,9 @@
     "message": "Keine Fälligkeitsdaten zugewiesen"
   },
   "no_grade_3b4d7f3e": { "message": "Keine Note" },
+  "no_more_items_to_show_6a1333c6": {
+    "message": "Es werden keine weiteren Elemente angezeigt"
+  },
   "nothing_due_this_week_d45c9ef9": {
     "message": "Für diese Woche nichts fällig"
   },

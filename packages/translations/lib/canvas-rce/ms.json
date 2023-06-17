@@ -203,6 +203,9 @@
   "current_image_f16c249c": { "message": "Imej Semasa" },
   "current_volume_level_c55ab825": { "message": "Tahap Volum Semasa" },
   "custom_6979cd81": { "message": "Tersuai" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Sesuaikan lebar dan tinggi (Piksel)"
+  },
   "cyan_c1d5f68a": { "message": "Sian" },
   "dagger_57e0f4e5": { "message": "Pisau Belati" },
   "date_added_ed5ad465": { "message": "Tarikh Ditambah" },
@@ -663,6 +666,9 @@
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Salah satu daripada gaya berikut mesti ditambah untuk menyimpan ikon: Warna Ikon, Saiz Garis Luar, Teks Ikon atau Imej"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Satu atau lebih fail gagal ditampalkan. Sila cuba muat naik atau seret dan lepas fail."
   },
   "open_circle_e9bd069": { "message": "Bulatan Terbuka" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

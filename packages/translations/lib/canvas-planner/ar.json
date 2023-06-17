@@ -181,6 +181,7 @@
     "message": "لم يتم تعيين تواريخ الاستحقاق"
   },
   "no_grade_3b4d7f3e": { "message": "لا توجد أي درجة" },
+  "no_more_items_to_show_6a1333c6": { "message": "لا توجد عناصر إضافية للعرض" },
   "nothing_due_this_week_d45c9ef9": { "message": "لا شيء مستحق هذا الأسبوع" },
   "nothing_for_now_e3e3ce2a": { "message": "لا شيء موجود الآن" },
   "nothing_here_needs_attention_c4eaded6": {

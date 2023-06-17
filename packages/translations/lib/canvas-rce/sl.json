@@ -213,6 +213,9 @@
   "current_image_f16c249c": { "message": "Trenutna slika" },
   "current_volume_level_c55ab825": { "message": "Trenutna raven glasnosti" },
   "custom_6979cd81": { "message": "Po meri" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Širina in višina po meri (slikovne pike)"
+  },
   "cyan_c1d5f68a": { "message": "Cijan" },
   "dagger_57e0f4e5": { "message": "Bodalo" },
   "date_added_ed5ad465": { "message": "Datum dodajanja" },
@@ -671,6 +674,9 @@
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Za shranjevanje ikone je treba dodati enega od naslednjih slogov: Barva ikone, velikost orisa, besedilo ikone ali slika"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Lepljenje ene ali več datotek ni uspelo. Poskusite naložiti ali povleči in spustiti datoteke."
   },
   "open_circle_e9bd069": { "message": "Odprti krog" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

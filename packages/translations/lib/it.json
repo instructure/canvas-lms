@@ -527,6 +527,9 @@
     "custom_6979cd81": {
         "message": "Personalizzato"
     },
+    "custom_width_and_height_pixels_946eea7c": {
+        "message": "Larghezza e altezza personalizzate (Pixel)"
+    },
     "cyan_c1d5f68a": {
         "message": "Ciano"
     },
@@ -1712,6 +1715,9 @@
     "no_headers_9bc7dc7f": {
         "message": "Nessuna intestazione"
     },
+    "no_more_items_to_show_6a1333c6": {
+        "message": "Nessun altro elemento da mostrare"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Nessuna anteprima disponibile per questo file."
     },
@@ -1801,6 +1807,9 @@
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
         "message": "Per salvare un’icona è necessario aggiungere uno dei seguenti stili: Colore icona, Dimensione struttura, Testo icona o Immagine"
+    },
+    "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+        "message": "Impossibile incollare uno o più file. Provare a caricare o a selezionare e trascinare i file."
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Viene mostrato solo il periodo di valutazione più recente."
