@@ -193,6 +193,9 @@
     "message": "Ingen afleveringsdatoer tildelt"
   },
   "no_grade_3b4d7f3e": { "message": "Ingen karakter" },
+  "no_more_items_to_show_6a1333c6": {
+    "message": "Der er ikke flere elementer at vise"
+  },
   "nothing_due_this_week_d45c9ef9": {
     "message": "Intet skal afleveres denne uge"
   },

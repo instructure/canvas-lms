@@ -203,6 +203,9 @@
   "current_image_f16c249c": { "message": "Nuværende billede" },
   "current_volume_level_c55ab825": { "message": "Nuværende lydstyrke" },
   "custom_6979cd81": { "message": "Brugerdefineret" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Brugerdefineret bredde og højde (pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Kors" },
   "date_added_ed5ad465": { "message": "Dato tilføjet" },
@@ -663,6 +666,9 @@
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "En af følgende stilarter skal tilføjes for at gemme et ikon: Ikonfarve, konturstørrelse, ikontekst eller billede"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "En eller flere filer kunne ikke indsættes. Prøv at uploade eller trække og slippe filer."
   },
   "open_circle_e9bd069": { "message": "Åben cirkel" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

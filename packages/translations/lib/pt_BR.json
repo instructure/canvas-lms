@@ -527,6 +527,9 @@
     "custom_6979cd81": {
         "message": "Personalizar"
     },
+    "custom_width_and_height_pixels_946eea7c": {
+        "message": "Largura e altura personalizadas (Pixels)"
+    },
     "cyan_c1d5f68a": {
         "message": "Ciano"
     },
@@ -1712,6 +1715,9 @@
     "no_headers_9bc7dc7f": {
         "message": "Sem cabeçalhos"
     },
+    "no_more_items_to_show_6a1333c6": {
+        "message": "Não há mais itens para mostrar"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Nenhuma pré-visualização disponível para esse arquivo."
     },
@@ -1801,6 +1807,9 @@
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
         "message": "Um dos seguintes estilos deve ser adicionado para salvar um ícone: Cor do ícone, tamanho do contorno, texto do ícone ou imagem"
+    },
+    "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+        "message": "Falha ao colar um ou mais arquivos. Por favor, tente carregar ou arrastar e soltar arquivos."
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Apenas o período de avaliação mais recente é exibido."

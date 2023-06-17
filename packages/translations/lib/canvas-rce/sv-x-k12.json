@@ -207,6 +207,9 @@
   "current_image_f16c249c": { "message": "Aktuell bild" },
   "current_volume_level_c55ab825": { "message": "Aktuell volymnivå" },
   "custom_6979cd81": { "message": "Anpassa" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Anpassad bredd och höjd (pixlar)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dolk" },
   "date_added_ed5ad465": { "message": "Tillagt datum" },
@@ -669,6 +672,9 @@
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "En av följande stilar måste läggas till för att spara en ikon: Ikonfärg, konturstorlek, ikontext eller bild"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "En eller fler filer klistrades inte in. Försök ladda upp eller dra och släpp filer."
   },
   "open_circle_e9bd069": { "message": "Öppen cirkel" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
