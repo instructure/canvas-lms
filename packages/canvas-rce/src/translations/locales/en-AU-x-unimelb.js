@@ -218,6 +218,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Current Image" },
   "current_volume_level_c55ab825": { "message": "Current Volume Level" },
   "custom_6979cd81": { "message": "Custom" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Custom width and height (Pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dagger" },
   "date_added_ed5ad465": { "message": "Date Added" },
@@ -672,6 +675,9 @@ const locale = {
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "One of the following styles must be added to save an icon: Icon Colour, Outline Size, Icon Text, or Image"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "One or more files failed to paste. Please try uploading or dragging and dropping files."
   },
   "open_circle_e9bd069": { "message": "Open Circle" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

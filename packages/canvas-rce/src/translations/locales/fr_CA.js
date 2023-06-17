@@ -236,6 +236,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Image actuelle" },
   "current_volume_level_c55ab825": { "message": "Niveau de volume actuel" },
   "custom_6979cd81": { "message": "Personnalisé" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Largeur et hauteur personnalisées (pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Poignard" },
   "date_added_ed5ad465": { "message": "Date ajoutée" },
@@ -712,6 +715,9 @@ const locale = {
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "L’un des styles suivants doit être ajouté pour enregistrer une icône : Couleur de l’icône, taille du contour, texte de l’icône ou image"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Un ou plusieurs fichiers n’ont pas pu être collés. Veuillez essayer de téléverser ou de glisser-déposer des fichiers."
   },
   "open_circle_e9bd069": { "message": "Cercle ouvert" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
