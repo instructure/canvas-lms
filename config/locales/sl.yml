@@ -101,6 +101,9 @@ sl:
     embed_from_external_tool: "Vdelaj vsebino iz zunanjega orodja"
   ExternalToolsPlugin: 
     more_external_tools: "Več zunanjih orodij"
+  GradingSchemeManagement: 
+    confirm: 
+      delete: "Ali ste prepričani, da želite izbrisati to ocenjevalno shemo?"
   GroupDetailView: 
     delete_confirm: "Ali ste prepričani, da želite odstraniti to skupino?"
     flash: 
@@ -222,6 +225,8 @@ sl:
   a_sync_is_currently_running_please_wait_for_curren_55ccf501: "Trenutno poteka sinhronizacija. Počakajte, da se trenutna sinhronizacija zaključi, preden začnete drugo."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Preglednica, ki vsebuje ime ocenjevalne sheme in gumbe za urejanje ali odstranjevanje sheme."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Preglednica z odgovori in s kratkim statističnim pregledom glede študentovega izbora odgovorov."
+  a_table_that_contains_the_default_canvas_grading_s_7ba86ec6: "Preglednica, ki vsebuje podatke o ocenjevalni shemi Canvas.  V vsaki vrstici so ime ter največji in najmanjši odstotek."
+  a_table_that_contains_the_grading_scheme_data_each_e9031ad3: "Preglednica, ki vsebuje podatke o ocenjevalni shemi.  V vsaki vrstici so ime ter največji in najmanjši odstotek."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Preglednica, ki vsebuje podatke o ocenjevalni shemi. V vsaki vrstici so ime ter največji in najmanjši odstotek. Poleg tega sta v vsaki vrstici gumb za dodajanje nove vrstice spodaj in gumb za brisanje trenutne vrstice."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Preglednica, ki vsebuje podatke o ocenjevalni shemi. Na prvem mestu je ime ocenjevalne sheme in gumbe za urejanje in odstranjevanje sheme. V vsaki vrstici so ime ter največji in najmanjši odstotek. Poleg tega sta v vsaki vrstici gumb za dodajanje nove vrstice spodaj in gumb za brisanje trenutne vrstice."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Potekla časovna omejitev pri vzpostavljanju stika z zunanjo storitvijo za preverjanje pristnosti"
@@ -319,6 +324,7 @@ sl:
   account_default_time_8c7ab62d: "Privzeta vrednost za račun (%{time})"
   account_domain_78f43049: "Domena računa"
   account_domain_lookups_f9d1147e: "Iskanja domene računa"
+  account_grading_settings_d683d62e: "Nastavitve ocenjevanja za račun"
   account_groups_2f301732: "Skupine računov"
   account_id_2c3b4f15: "id računa"
   account_id_73966078: account_id
@@ -511,6 +517,7 @@ sl:
     types: 
       account_admin: "Skrbnik računa"
   accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
+  accountname_accountcount_accounts_e2c19840: "%{accountName}, %{accountCount} računi(-ov)"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "Ime računa ne more biti prazno."
@@ -1787,9 +1794,11 @@ sl:
   add_2nd_review_ea988088: "Dodaj 2. pregled"
   add_8523c19b: Dodaj
   add_a_build_button_on_the_assignment_edit_page_for_6b895561: "Na strani za urejanje nalog dodajte gumb za izdelavo novih kvizov in nalog"
+  add_a_comment_48994930: "Dodaj komentar"
   add_a_comment_872470ac: "Dodaj komentar"
   add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Dodajte komentar, da zaključite ocenjevanje kolegov. Videli boste samo komentarje, ki ste jih napisali sami."
   add_a_course_b72b18d7: "Dodaj predmet"
+  add_a_letter_grade_c7b34199: "dodaj črkovno oceno"
   add_a_message_4fee743f: "Dodaj sporočilo "
   add_a_message_a5ed12bf: "Dodaj sporočilo"
   add_a_new_course_4a041207: "Dodaj nov predmet"
@@ -1853,6 +1862,7 @@ sl:
   add_folder_ba50d107: "Dodaj mapo"
   add_grading_period_6f774dc3: "Dodaj ocenjevalno obdobje"
   add_grading_scheme_81e23c05: " Dodaj ocenjevalno shemo"
+  add_grading_scheme_dfe4aba8: "Dodaj ocenjevalno shemo"
   add_granularity_to_permissions_around_managing_all_129149da: "Doda posamezne elemente dovoljenjem glede upravljanja vseh ostalih vsebin predmeta"
   add_granularity_to_permissions_around_managing_cou_e18d7f97: "Dovoljenjem za upravljanje predmetov, tj. dodaj / objavi / zaključi / odstrani, dodajte posamezne elemente."
   add_granularity_to_permissions_around_managing_gro_ef410a72: "Doda posamezne elemente dovoljenjem glede upravljanja skupin v kontekstu računa ali predmeta"
@@ -1881,6 +1891,7 @@ sl:
   add_new_caption_or_subtitle_59d2d044: "Dodaj novo spremno besedilo ali podnapise"
   add_new_domain_e097d4a0: "Dodaj novo domeno"
   add_new_group_7ac49f31: "Dodaj novo skupino"
+  add_new_row_for_a_letter_grade_to_grading_scheme_a_1472479e: "Za to vrstico v shemo ocenjevanja dodajte novo vrstico za črkovno oceno"
   add_new_set_of_due_dates_e8e240f: "Dodaj nov nabor rokov"
   add_new_term_d2217c0d: "Dodaj nov semester"
   add_observers_to_courses_6f494a29: "Dodaj skrite bralce v predmete"
@@ -1904,6 +1915,7 @@ sl:
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Dodaj, odstrani ali preuredi sekcije za ta portfelj"
   add_review_2fb1590c: "Dodaj pregled"
   add_role_3dc4d273: "Dodaj vlogo"
+  add_row_action_a84eadc1: "Dodaj dejanje vrstice"
   add_rubric_3636d9a6: "Dodaj ocenjevalni vodnik"
   add_scope_a5208f8b: "Dodaj obseg"
   add_section_8b027a1c: "Dodaj sekcijo"
@@ -2736,6 +2748,7 @@ sl:
   allows_users_to_see_quantitative_numeric_grading_d_c96924f0: "Uporabnikom omogoča ogled kvantitativnih (številčnih) podatkov o ocenjevanju. Če onemogočite to dovoljenje, boste omejili možnosti ustvarjanja nalog za učitelje. Uporabniki bodo videli le kvalitativne podatke, ki vključujejo črkovne ocene in komentarje."
   allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Uporabnikom dovoli uporabo povprečja kot načina izračuna za zadevni izid."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Dovoljuje uporabniku z mednarodnimi telefonskimi številkami, da prejemajo besedilna sporočila iz sistema Canvas."
+  alphabetically_60ab47e4: "Abecedni vrstni red"
   already_belongs_to_an_assignment_override_99fc6f36: "že pripada preglasitvi dodelitve"
   already_have_a_canvas_account_c4368ac9: "Ali že imate račun Canvas?"
   also_note_that_microsoft_teams_is_unable_to_suppor_20d8f753: "Upoštevajte tudi, da Microsoft Teams ne more podpirati tečajev z več kot %{max_enrollments} vpisi ali z več kot %{max_owners} lastniki. Če je vaš predmet velik, boste imeli pri doseganju teh pragov morda težave s sinhronizacijo."
@@ -4505,6 +4518,7 @@ sl:
     unpublished: Neobjavljeno
     update: Posodobi
   buttons_and_icons_e66ee12c: "Gumbi in ikone"
+  by_assignment_group_and_position_57a4be14: "Glede na skupino nalog in položaj"
   by_b90c6b6f: po
   by_client_id_4f2fe02c: "Po ID odjemalca"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Privzeto so omogočene vse povezave za predmet.  Študenti ne bodo videli povezav na sekcije, ki nimajo vsebine.  Če na primer niste ustvarili nobenih kvizov, ne bodo videli povezav na kvize.  Te povezave lahko razvrščate in jih izrecno onemogočate, če obstajajo področja predmeta, za katere ne želite, da bi vaši študenti dostopali do njih."
@@ -4514,6 +4528,7 @@ sl:
       skupin, razveljavite potrditev polja »Dovoli študentom, da organizirajo svoje skupine« v nastavitvah predmeta.
   by_default_students_can_always_create_groups_in_a__149d08b7: "Privzeto lahko študenti vedno ustvarjajo skupine pri predmetu. Če želite študentom omejiti ustvarjanje skupin, mora biti omogočeno dovoljenje »Predmeti – dodaj/uredi/izbriši«, polje »Dovoli študentom, da organizirajo svoje skupine« pa ne sme biti potrjeno."
   by_default_students_can_always_create_groups_in_a__5727f4cf: "Privzeto lahko študenti vedno ustvarjajo skupine pri predmetu. Če želite študentom omejiti ustvarjanje skupin, mora biti omogočeno dovoljenje »Predmeti – upravljaj«, polje »Dovoli študentom, da organizirajo svoje skupine« pa ne sme biti potrjeno."
+  by_due_date_648d7f3b: "Glede na rok"
   by_lti_2_registration_url_e421e523: "Z naslovom URL za registracijo LTI 2"
   by_name_54daec42: "po %{name}"
   by_url_a163275e: "Z naslovom URL"
@@ -4959,6 +4974,9 @@ sl:
   cannot_grade_at_this_time_489744b0: "Ocenjevanje trenutno ni mogoče."
   cannot_have_a_blueprint_course_with_observers_d00b3deb: "Izvajanje šablonskega predmeta s skritimi bralci"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Izvajanje šablonskega predmeta s študenti ni mogoče."
+  cannot_have_duplicate_or_empty_row_names_fix_the_n_4fce15dd: "Imena vrstic ne smejo biti podvojena ali prazna. Popravite imena in poskusite znova klikniti »Shrani«."
+  cannot_have_negative_ranges_or_ranges_that_are_gre_1086d6db: "Ne more imeti negativnih razponov ali razponov, ki so večji od 100. Popravite razpone in poskusite znova klikniti »Shrani«."
+  cannot_have_overlapping_or_empty_ranges_fix_the_ra_18ce528b: "Ne sme imeti prekrivajočih se ali praznih razponov. Popravite razpone in poskusite znova klikniti »Shrani«."
   cannot_import_a_root_group_d4654def: "Ni mogoče uvoziti korenske skupine"
   cannot_import_to_other_courses_af885742: "Uvoz v v druge predmete ni mogoč"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "Ni mogoče spreminjati izida iz drugega konteksta: %{changes}; izid je treba spremeniti v %{context}"
@@ -7101,6 +7119,7 @@ sl:
   course_pacing_40c14b61: "Hitrost napredovanja pri predmetu"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Funkcija hitrosti napredovanja pri predmetu sistemu Canvas doda podporo za tekoče vpise; omogoča čarobno porazdelitev rokov za študente z različnimi začetnimi datumi glede na izvajalčevo opredeljeno hitrost. Več informacij in povratne informacije z včlanitvijo v skupino uporabnikov zadevne hitrosti napredovanja pri predmetu."
   course_pacing_blackout_dates_1dfc8b61: "Zatemnjeni datumi za hitrosti napredovanja pri predmetu"
+  course_pacing_cannot_be_used_with_homeroom_course_ca47ed1c: "Funkcije različnih hitrosti napredovanja pri predmetu ni mogoče uporabiti pri matičnem predmetu"
   course_pacing_d3025ecf: "Hitrost napredovanja pri predmetu"
   course_pacing_feature_preview_must_be_enabled_in_y_ffb94287: "Predogled funkcije različnih hitrosti napredovanja pri predmetu mora biti omogočen na ravni vaše ustanove."
   course_pacing_is_an_automated_tool_that_creates_a__c617557e: "Funkcija različnih hitrosti napredovanja pri predmetu je avtomatizirano orodje, ki ustvari razpored študentov s kombiniranjem predlaganih ur glede na poglavje, šolske dni v razredu in skupne ure za ustvarjanje ocenjevalca datumov."
@@ -7785,6 +7804,7 @@ sl:
     error_reports: "Poročila o napakah"
     files: Datoteke
     grades: Ocene
+    grading_settings: Ocenjevanje
     grading_standards: Ocenjevanje
     groups: Skupine
     jobs: Opravila
@@ -8137,6 +8157,7 @@ sl:
   deeply_nested_replies_are_no_longer_supported_your_cfe125da: "Globoko ugnezdeni odgovori niso več podprti. Vaš odgovor bo prikazan na strani, na kateri se trenutno nahajate."
   deeply_nested_replies_are_no_longer_supported_your_e84c6796: "Globoko ugnezdeni odgovori niso več podprti. Vaš odgovor bo prikazan na prvi strani tega pogovora."
   default_9db103d: Privzeto
+  default_canvas_grading_scheme_ab769633: "Privzeta ocenjevalna shema Canvas"
   default_conference_title: "%{course_name} Konferenca"
   default_course_pace_ce0ba0f3: "Privzeta hitrost napredovanja pri predmetu"
   default_course_pacing_d18b6cda: "Privzeta hitrost napredovanja pri predmetu"
@@ -8194,6 +8215,7 @@ sl:
   delete_from_all_accounts_a1c5e621: "Izbriši iz VSEH računov"
   delete_grading_period_dba36e59: "Izbriši ocenjevalno obdobje"
   delete_grading_scheme_6b308832: "Izbriši ocenjevalno shemo"
+  delete_grading_scheme_a1f8f5dc: "Odstrani ocenjevalno shemo"
   delete_grading_scheme_title_215f0a40: "Izbriši ocenjevalno shemo %{title}"
   delete_group_86c381ec: "Izbriši skupino"
   delete_groups_c637c07: "Izbriši skupine"
@@ -8913,6 +8935,8 @@ sl:
   eastern_gateway_student_submissions_ebad06a9: "Oddaje študentov Eastern Gateway"
   ecollege_file_description: "Sistem eCollege"
   ecollege_name: "Pretvornik sistema eCollege"
+  edit_a_copy_43ecaed6: "Uredi kopijo"
+  edit_a_copy_of_this_grading_scheme_807a86b9: "Uredite kopijo te ocenjevalne sheme"
   edit_account_name_for_account_name_ae3633e8: "Uredi ime računa za %{account_name}"
   edit_all_other_course_content_c8dd98d3: "Uredite vso ostalo vsebino predmeta"
   edit_and_delete_their_own_posts_f4f7cc6: "Uredi in izbriši lastne objave"
@@ -8946,6 +8970,7 @@ sl:
   edit_disabled_e6a5ea0a: "Uredi (onemogočeno)"
   edit_discussion_settings_1bbb03d: "Uredi nastavitve razprave"
   edit_grading_scheme_53091236: "Uredi ocenjevalno shemo"
+  edit_grading_scheme_99c16fd8: "Uredi ocenjevalno shemo"
   edit_grading_scheme_title_ff41d916: "Uredi ocenjevalno shemo %{title}"
   edit_group_c8679dba: "Uredi skupino"
   edit_history_917c1e08: "Uredi zgodovino"
@@ -9118,6 +9143,7 @@ sl:
   enable_course_as_a_blueprint_course_8515ffd5: "Omogoči predmet kot šablonski predmet."
   enable_course_as_a_course_template_5299afb6: "Predmet omogoči kot predlogo predmeta"
   enable_dashboard_images_for_courses_5af458b0: "Omogoči slike preglednice za predmete"
+  enable_distributed_internal_analytics_29e76618: "Omogoči porazdeljeno notranjo analitiko"
   enable_extra_filter_options_b52c23e6: "omogoči možnosti dodatnih filtrov"
   enable_face_to_face_connection_9df19b76: "Omogoči osebno povezavo"
   enable_feature_title_987d8e9a: "Omogoči funkcionalnost: %{title}"
@@ -9133,6 +9159,7 @@ sl:
   enable_recording_for_this_conference_b8adff6: "Omogoči snemanje za to konferenco"
   enable_reregistration_for_lti_2_b2a10444: "Omogoči registracijo za LTI 2"
   enable_scope_ac28b832: "Omogoči obseg"
+  enable_sending_oauth_consumer_key_5bb4bc5d: "Omogoči pošiljanje uporabniškega ključa Oauth"
   enable_student_context_card_links_eba2f2c5: "Omogoči povezave študentskih kontekstnih kartic"
   enable_the_deprecation_of_the_faculty_journal_func_78b3344d: "Omogoči zastaranje funkcionalnosti dnevnika fakultete."
   enable_the_module_publish_menus_to_make_mass_publi_b32f0c52: "Omogočite menije za objavo modula, da olajšate množično objavo in preklic objave."
@@ -10282,6 +10309,7 @@ sl:
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Pri uporabnikih na ravni predmeta je brisanje predmeta del možnosti »Stanje predmeta – urejaj dovoljenje«. Pri uporabnikih na ravni računa pa je za brisanje predmeta potrebno to dovoljenje in možnost »Predmet – dodaj/uredi/izbriši«. "
   for_lti_1_3_tool_developers_follow_the_directions__f7648c74: "*Za programerje orodij LTI 1.3:* Upoštevajte navodila v razdelku »Kaj točno boste morali spremeniti?« članka skupnosti."
   for_more_information_see_the_canvas_api_documentat_f07307bf: "Za več informacij glejte *Dokumentacija Canvas API*."
+  for_name_calendar_subscription_options_e60aa15f: "Za možnosti naročnine na koledar %{name}"
   for_name_d5684bfd: "Za %{name}"
   for_students_who_d0fd45d0: "Za študente, ki …"
   for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
@@ -10928,7 +10956,13 @@ sl:
   grading_periods_must_not_overlap_f45336fb: "Ocenjevalna obdobja se ne smejo prekrivati."
   grading_scheme_deleted_7ae5a072: "Ocenjevalna shema je izbrisana."
   grading_scheme_f151d195: "Ocenjevalna shema"
+  grading_scheme_name_97b0ba89: "Ime ocenjevalne sheme"
+  grading_scheme_name_is_required_add_a_name_and_try_8ca22d32: "Ime ocenjevalne sheme je obvezno Popravite ime in poskusite znova klikniti »Shrani«."
   grading_scheme_saved_85535151: "Ocenjevalna shema je shranjena."
+  grading_scheme_title_5786fa1f: "Naslov ocenjevalne sheme"
+  grading_scheme_was_successfully_created_49fbec39: "Ocenjevalna shema je bila uspešno ustvarjena."
+  grading_scheme_was_successfully_removed_a2f98b4b: "Ocenjevalna shema je bila uspešno odstranjena."
+  grading_scheme_was_successfully_saved_59607cb1: "Ocenjevalna shema je bila uspešno shranjena."
   grading_schemes_1c3c3252: "Ocenjevalne sheme"
   grading_standard: 
     unknown_grading_details: "Neznane podrobnosti"
@@ -11525,6 +11559,7 @@ sl:
   home_page_is_not_valid_2e8a25ae: "Glavna stran ni veljavna."
   home_tutorial_tray_66826983: "Trak vadnice za glavno stran"
   homeroom_12546f9c: Matični
+  homeroom_course_cannot_be_used_with_course_pacing_be4e825f: "Matičnega predmeta ni mogoče uporabiti s funkcijo različnih hitrosti napredovanja pri predmetu"
   homeroom_view_a676e270: "Pogled matičnega razreda"
   homework_submission_172e8354: "Oddaja domače naloge"
   honduras_504_af7aa636: "Honduras (+504)"
@@ -11635,6 +11670,7 @@ sl:
   http_73849691: http
   http_response_code_832d6baa: "Odziv HTTP: %{code}"
   https_3a02e3fb: https
+  https_b8426ad8: "https://"
   hungarian_fc7d30c9: madžarščina
   hungary_36_cd3e515b: "Madžarska (+36)"
   hypothetical_end_date_117d81cf: "Hipotetični datum konca"
@@ -12262,6 +12298,7 @@ sl:
   invalid_freq_freq_84b0427d: "Neveljaven FREQ '%{freq}'"
   invalid_grade_9726cbc6: "Neveljavna ocena"
   invalid_grade_passback_setting_a1d209d1: "Neveljavna nastavitev grade_passback_setting"
+  invalid_grading_scheme_4a95ba92: "Neveljavna ocenjevalna shema"
   invalid_hexcode_9124519f: "Neveljavna šestnajstiška koda"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Neveljavna šestnajstiška koda. Če želite uporabiti barvo po meri, tu vnesite veljavno šestnajstiško kodo."
   invalid_hexcode_provided_522ba223: "Vnesena šestnajstiška koda ni veljavna"
@@ -12352,6 +12389,7 @@ sl:
   item_type_quiz_c894ddb1: "Vrsta elementa: Kviz"
   items_299a7626: "Elementi: "
   items_items_selected_5b55e566: "izbranih %{items} elementov"
+  items_last_accessed_before_date_may_not_be_shown_be840349: "Elementi, do katerih ste nazadnje dostopali pred %{date}, morda ne bodo prikazani."
   items_selected_have_different_usage_rights_52b325cc: "Izbrani elementi imajo različne pravice uporabe."
   j_5226008a: j
   january_9ca1eab1: januar
@@ -13099,6 +13137,8 @@ sl:
   lowest_possible_grade_percent_20474418: "Najnižja možna ocena v odstotkih"
   lti: 
     lti_message: 
+      links: 
+        add_rubric: "Ocenjevalni vodnik"
       load_tool_new_tab_button: "Naloži orodje %{tool} v novem oknu"
       new_tab: "To orodje je treba naložiti v novem oknu brskalnika."
       new_tab_expired: "Seji za to orodje se je iztekel čas. Znova naložite stran, da boste spet lahko dostopali do orodja."
@@ -13166,6 +13206,7 @@ sl:
   manage_account_level_course_actions_1a9d2385: "Urejaj dejanja na ravni računa"
   manage_add_edit_delete_18963dbc: "Urejaj (dodaj/uredi/izbriši) "
   manage_add_edit_delete_pages_5c73f2fb: "Urejaj (dodaj/uredi/izbriši) strani"
+  manage_all_grading_schemes_f03f9310: "Upravljaj vse ocenjevalne sheme"
   manage_all_other_course_content_d77de830: "Urejaj vso drugo vsebino predmeta"
   manage_app_list_994cc26c: "Urejaj seznam aplikacij"
   manage_assignment_31a132fb: "Urejaj nalogo"
@@ -15346,6 +15387,7 @@ sl:
   moodle_formula_warning_title: "Za vprašanje z obrazcem bo treba obnoviti možne odgovore."
   more_cf9cc661: Več
   more_courses_5ebbe998: "Več predmetov"
+  more_details_in_the_speedgrader_8702f408: "Več podrobnosti je v SpeedGrader"
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Še pomembneje je, da sistem Canvas omogoča dodajanje učnih izidov v ocenjevalne vodnike, ki jih uporabljate pri ocenjevanju, tako da lahko med ocenjevanjem nalog ovrednotite doseganje učnih ciljev. Da boste lahko začeli uporabljati učne izide za ocenjevanje, kliknite »Uredi ocenjevalne vodnike«, ko nastavite učne izide."
   more_info_at_course_name_56dc8c10: "Več informacij na %{course_name}"
   more_info_at_url_41b4764b: "Več informacij na %{url}"
@@ -15622,6 +15664,7 @@ sl:
   new_gradebook_297f7e2d: "Nova redovalnica"
   new_gradebook_enables_an_early_release_of_new_grad_76b8bf45: "Nova redovalnica omogoča predčasno izdajo izboljšav nove redovalnice."
   new_gradebook_plagiarism_indicator_8dd22971: "Nov kazalnik plagiatorstva v redovalnici"
+  new_grading_scheme_ab1a3301: "Nova ocenjevalna shema"
   new_group_category_66be9cbd: "Nova kategorija skupine"
   new_group_set_7241a581: "Nov nabor skupine"
   new_mention_ad04b872: "Nova omemba"
@@ -16487,6 +16530,7 @@ sl:
   out_of_pointspossible_3fb5ee20: "Od %{pointsPossible}"
   out_of_pointspossible_c163105a: "od %{pointsPossible}"
   out_of_pointspossible_pts_b2b73373: "Od %{pointsPossible} točk"
+  out_of_score_12e519a7: "od (rezultat)"
   outcome_alignment_summary_tab_431f4253: "Zavihek za povzetek poravnave rezultatov"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Poravnava izidov z vsebino, ki se ne ocenjuje"
   outcome_average_calculation_method_54514372: "Metoda izračuna povprečja izida"
@@ -16707,6 +16751,7 @@ sl:
   page_page_59070cd8: "Stran %{page}"
   page_pagenum_20dbfeb8: "Stran %{pageNum}"
   page_title_ascending_b5df950c: "Naslov strani: Naraščajoče"
+  page_title_d1a22bbf: "Naslov strani"
   page_title_descending_70c1483d: "Naslov strani: Padajoče"
   page_views: 
     browsers: 
@@ -16945,6 +16990,7 @@ sl:
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Vnesite iskalno besedo s tremi ali več znaki."
   please_enter_a_valid_search_term_5c69b0b0: "Vnesite veljavno iskalno besedo"
   please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Vnesite veljaven naslov (npr. http://primer.si)"
+  please_enter_a_valid_url_e_g_https_example_com_87675bca: "Vnesite veljaven URL (npr. https://primer.si)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Vnesite veljaven naslov URL. Zahtevan je protokol (npr. http://, https://, ftp://, tel:, mailto:)."
   please_enter_your_label_name_7745272d: "Vnesite %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Vnesite %{label_name} in geslo:"
@@ -17486,6 +17532,7 @@ sl:
   possible_score_5e0a328e: "Možno: %{score}"
   possiblepoints_points_possible_5217ce4a: "%{possiblePoints} mogoče točke"
   post_1e445890: Objavi
+  post_comment_a5a430a6: "Objavi komentar"
   post_grades_39c52870: "Pošlji ocene v SIS"
   post_grades_3e692d46: "Objavljanje ocen"
   post_grades_description: |-
@@ -19572,6 +19619,7 @@ sl:
   remove_icon_a4646413: "odstrani ikono"
   remove_image_341340b3: "Odstrani sliko"
   remove_label_11d96b8f: "Odstrani %{label}"
+  remove_letter_grade_row_a51f993a: "Odstrani vrstico s črkovno oceno"
   remove_linked_student_name_52dc7fce: "Odstrani povezanega študenta %{name}"
   remove_mastery_level_b1e8dcb0: "Odstrani raven doseganja učnih ciljev"
   remove_media_attachment_d2926f1e: "Odstrani medijsko prilogo"
@@ -20086,6 +20134,7 @@ sl:
   scheduler_shown_df77ca6f: "Prikazan razporejevalnik"
   scheduling_5a3327e7: Razporejanje
   scheduling_sync_3f4a7cac: "Načrtovanje sinhronizacije"
+  schemes_103aa474: Sheme
   school_of_rock_4b7b1fd0: "School of Rock"
   scope_9729c11e: "Obseg:"
   scope_c59afc8a: Obseg
@@ -21362,6 +21411,7 @@ sl:
   show_suggestions_when_typing_b72545de: "Med vnosom pokaži predloge"
   show_to_d57767f: Prikaži
   show_to_everyone_94d66d01: "Prikaži vsem"
+  show_totals_as_points_on_student_grade_page_d9cb4207: "Prikaži vsote kot točke na strani z ocenami študenta"
   show_welcome_tour_a105aa2e: "Prikaži pozdravno predstavitev"
   showing_1ac6ed70: "Prikazovanje:"
   showing_all_sets_of_grading_periods_6c160874: "Prikazovanje vseh naborov ocenjevalnih obdobij"
@@ -21815,6 +21865,7 @@ sl:
   student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Za ponovno dodelitev so potrebne povratne informacije o študentu v v zgornjih komentarjih."
   student_first_name_aaa42cbc: "Ime študenta"
   student_first_name_options_82f5685f: "Možnosti imena študenta"
+  student_grade_4122806e: "Ocene študentov"
   student_grade_summary_d7a5cac0: "Povzetek ocen študenta"
   student_grades_4cbc59a1: "Ocene študentov"
   student_group_75b86a9f: "Skupina študentov"
@@ -22038,6 +22089,7 @@ sl:
   submission_preview_383473ec: "Predogled oddaje"
   submission_progress_323f5e7b: "Napredovanje oddaje"
   submission_records_will_be_filtered_by_date_using__b3990a1: "Zapisi o oddaji bodo filtrirani po datumu z uporabo časovnega žiga »submitted_at«, če je ta na voljo. Če »submitted_at« ni na voljo, bo uporabljeno polje »graded_at«. Če nobeno polje ni izpolnjeno, pri filtriranju po datumu zapis o oddaji ne bo nikoli vključen v poročilo."
+  submission_score_615cc591: "Rezultat oddaje"
   submission_score_b7a291e8: "rezultat oddaje"
   submission_sent_3f0d2ee1: "Oddaja je poslana"
   submission_submit_on_behalf_of_student_f0ed14e4: "Oddaja – oddaj v imenu študenta"
@@ -22177,6 +22229,7 @@ sl:
   submitted_by_name_dab6d5e1: "Oddal(a): %{name}"
   submitted_by_proxy_on_date_569cbae9: "Oddal(a) %{proxy} dne %{date}"
   submitted_by_submitter_1dcd07a1: "Oddal(a) %{submitter}"
+  submitted_d5ba370a: "Poslano:"
   submitted_date_ba55b0ae: "Poslano %{date}"
   submitted_datetime_fa2e9287: "Poslano: %{dateTime}"
   submitted_files_82dd3009: "Poslane datoteke"
@@ -22835,6 +22888,7 @@ sl:
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "Pri preverjanju statusa objave načrta za preverjanje je prišlo do napake."
   there_was_an_error_creating_a_new_filter_e93bb765: "Pri ustvarjanju novega filtra je prišlo do napake."
   there_was_an_error_deleting_name_aa3050e5: "Pri odstranjevanju »%{name}« je prišlo do napake."
+  there_was_an_error_exporting_the_gradebook_30f4a95: "Pri izvozu redovalnice je prišlo do napake"
   there_was_an_error_fetching_assignment_groups_data_bdb14b5a: "Pri pridobivanju podatkov o skupinah nalog je prišlo do napake."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Prišlo je do napake pri pridobivanju statističnega pregleda"
   there_was_an_error_fetching_custom_column_data_for_3278acb4: "Prišlo je do napake pri pridobivanju podatkov v stolpcih po meri za redovalnico"
@@ -22882,7 +22936,15 @@ sl:
   there_was_an_error_uploading_the_media_6841a37b: "Pri nalaganju medija je prišlo do napake."
   there_was_an_error_uploading_your_file_please_try__ce458566: "Prišlo je do napake pri nalaganju vaše datoteke. Poskusite znova."
   there_was_an_error_upon_saving_your_conference_65e6b175: "Pri shranjevanju konference je prišlo do napake"
+  there_was_an_error_while_creating_the_grading_sche_cb8ca0c9: "Pri ustvarjanju ocenjevalne sheme je prišlo do napake"
+  there_was_an_error_while_loading_grading_schemes_2ad6176d: "Pri nalaganju ocenjevalne sheme je prišlo do napake"
+  there_was_an_error_while_loading_the_default_canva_7782cecc: "Pri nalaganju privzete ocenjevalne sheme Canvas je prišlo do napake"
+  there_was_an_error_while_loading_the_default_gradi_bb879ed1: "Pri nalaganju privzete ocenjevalne sheme je prišlo do napake"
+  there_was_an_error_while_refreshing_grading_scheme_ab1136b9: "Pri osveževanju ocenjevalnih shem je prišlo do napake"
+  there_was_an_error_while_removing_the_grading_sche_2a481e33: "Pri odstranjevanju ocenjevalne sheme je prišlo do napake"
+  there_was_an_error_while_saving_the_grading_scheme_b6c1eb7: "Pri shranjevanju ocenjevalne sheme je prišlo do napake"
   there_was_an_error_while_saving_your_changes_5fa5eb65: "Pri shranjevanju sprememb je prišlo do napake"
+  there_was_an_error_while_updating_the_grading_sche_99608d3a: "Pri posodabljanju ocenjevalne sheme je prišlo do napake"
   there_was_an_error_with_your_import_please_examine_7b42f29d: "Prišlo je do napake pri uvozu; preverite datoteko in poskusite naložiti znova. Za več podrobnosti preverite svojo e-pošto."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Prišlo je do napake pri vaši poizvedbi, poskusite z drugačnim iskanjem."
   there_was_an_unexpected_error_creating_the_discuss_8811a868: "Pri ustvarjanju vnosa v razpravi je prišlo do nepričakovane napake."
@@ -23197,6 +23259,7 @@ sl:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Ta uporabnik trenutno ne more dostopati do predmeta."
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Ta uporabnik trenutno ne more dostopati do predmeta.\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Ta uporabnik je izvedel dejanja, medtem ko je bil anonimni način izklopljen"
+  this_user_s_last_activity_in_the_course_was_dateti_74d3ac3b: "Zadnja dejavnost tega uporabnika v predmetu je bila %{datetime}"
   this_user_will_be_created_in_3b2a2b52: "Ta uporabnik bo ustvarjen v:"
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       To se je že dogajalo za zadevne slike, ne pa tudi za odgovore,
@@ -24227,6 +24290,7 @@ sl:
   unsynced_changes_4ddaec76: "Nesinhronizirane spremembe"
   until_4a1f8cda: Do
   until_6437a827: " do"
+  until_8bdea3de: do
   until_date_949017c4: "Do %{date}"
   until_date_must_be_after_the_available_date_8670dfcd: "Datum »Do« mora biti po datumu »Na voljo«"
   until_date_must_be_after_the_due_date_d961566c: "Datum »Do« mora biti po datumu »Roki«"
@@ -24246,6 +24310,7 @@ sl:
   update_criterion_edcbd330: "Posodobi merilo"
   update_domain_account_lookup_9c89440d: "Posodobite iskanje računa domene"
   update_failed_2c87428c: "Posodobitev ni uspela"
+  update_grade_b47eb3ff: "Posodobi oceno"
   update_grade_summary_table_to_use_a_modern_framewo_b4cccf7: "Posodobite preglednico s povzetkom ocen za uporabo sodobnega ogrodja"
   update_important_info_bcc01d6a: "Posodobi pomembne informacije"
   update_inbox_page_to_use_react_instui_4d343fd: "Za uporabo react/instui posodobite stran Pošta"
@@ -24899,6 +24964,7 @@ sl:
   view_assignment_group_totals_c8db16b2: "Prikaz skupnih vrednosti za skupino nalog"
   view_availability_963f62ff: "Prikaži razpoložljivost"
   view_ba339f93: Ogled
+  view_copy_grading_scheme_3c2b17ac: "Ogled/kopiranje ocenjevalne sheme"
   view_count_outcomes_9609792: 
     one: "Prikaz 1 izida"
     other: "Prikaz %{count} izidov"
@@ -24907,6 +24973,8 @@ sl:
   view_coursename_s_assignment_group_totals_bd4b707: "Prikaz skupnih vrednosti za skupino nalog %{courseName}"
   view_description_b6d8e52b: "Prikaz opisa"
   view_due_items_due_today_for_course_coursename_129e433: "Oglejte si %{due} elementov za predmet %{courseName}, ki potečejo danes"
+  view_edit_5e61d3e: Ogled/urejanje
+  view_edit_grading_scheme_238d3028: "Ogled/urejanje ocenjevalne sheme"
   view_faculty_journals_ad0e8c8f: "Ogled dnevnikov učiteljev"
   view_feature_options_at_an_account_level_a84cedbe: "Prikaži dodatne funkcionalnosti na ravni računa"
   view_feature_settings_at_an_account_level_ec7f5e10: "Prikaži nastavitve funkcionalnosti na ravni računa"
@@ -24918,6 +24986,7 @@ sl:
   view_gradebook_history_a9272918: "Ogled zgodovine redovalnice"
   view_grades_8d3bae6c: "Ogled ocen"
   view_grades_for_name_45aeb2f2: "Ogled ocen za %{name}"
+  view_grading_scheme_ac66bcdd: "Ogled ocenjevalne sheme"
   view_groups_47b5f60c: "Ogled skupin"
   view_history_2dfb048: "Prikaz zgodovine"
   view_important_dates_173c7e1b: "Prikaži pomembne datume"
@@ -25097,6 +25166,11 @@ sl:
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Če je onemogočeno, lahko študenti vseeno pošiljajo posamezna sporočila izvajalcem predmetov, demonstratorjem pri predmetih in študentom, ki pripadajo istim skupinam na ravni računa."
   when_disabled_students_can_still_send_individual_m_567a911c: "Če je onemogočeno, lahko študenti vseeno pošiljajo posamezna sporočila izvajalcem predmetov, demonstratorjem pri predmetih in študentom, ki pripadajo istim skupinam na ravni računa."
   when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "Če je to omogočeno, bodo branja AccessToken med overitvijo zahteve shranjena v predpomnilnik (z uporabo MultiCache)."
+  when_enabled_collect_internal_analytics_metrics_us_88e81ee5: "Ko je ta možnost omogočena, z uporabo porazdeljenega sistema zbiramo notranje analitične metrike."
+  when_enabled_lti_1_3_launches_that_would_be_associ_bfec33fb: |-
+      Ko je ta možnost omogočena, se zažene LTI 1.3, ki bi bil povezan z orodjem LTI 1.1,
+      če orodje LTI 1.3 ni bilo prisotno pa vključuje lastnosti oauth_consumer_key in
+      oauth_consumer_key_sign  kot del sekcije zahtevkov LTI 1.1.
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       Če je ta mehanizem omogočen, bodo funkcije Novi kvizi uporabljale namenskega uporabnika storitve skrbnika mesta
       in DeveloperKey za ustvarjanje žetona za dostop in osvežitev
