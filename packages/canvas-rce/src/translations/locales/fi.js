@@ -234,6 +234,9 @@ const locale = {
     "message": "Nykyinen äänenvoimakkuuden taso"
   },
   "custom_6979cd81": { "message": "Mukauta" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Mukautettu leveys ja korkeus (pikseliä)"
+  },
   "cyan_c1d5f68a": { "message": "Syaani" },
   "dagger_57e0f4e5": { "message": "Tikari" },
   "date_added_ed5ad465": { "message": "Lisäyspäivämäärä" },
@@ -702,6 +705,9 @@ const locale = {
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Yksi seuraavista tyyleistä täytyy lisätä, jotta kuvake voidaan tallentaa: Kuvakkeen väri, ääriviivan koko, kuvakkeen teksti tai kuva"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Yhtä tai useampaa tiedostoa ei lisätty. Yritä ladata tai vetää ja pudottaa tiedostoja."
   },
   "open_circle_e9bd069": { "message": "Avoin ympyrä" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

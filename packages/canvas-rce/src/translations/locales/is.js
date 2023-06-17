@@ -219,6 +219,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Núverandi mynd" },
   "current_volume_level_c55ab825": { "message": "Núverandi stig hljóðstyrks" },
   "custom_6979cd81": { "message": "Sérsníða" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Sérsniðin breidd og hæð (punktar)"
+  },
   "cyan_c1d5f68a": { "message": "Blágrænn" },
   "dagger_57e0f4e5": { "message": "Tvíkross" },
   "date_added_ed5ad465": { "message": "Dagsetning bætt við" },
@@ -671,6 +674,9 @@ const locale = {
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Einum af eftirfarandi stílum verður að bæta við til að vista tákn: Táknlitur, útlínustærð, tákntexti eða mynd"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Ekki tókst að líma eina eða fleiri skrár. Vinsamlegast reyndu að hlaða upp eða draga og sleppa skrám."
   },
   "open_circle_e9bd069": { "message": "Opinn hringur" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

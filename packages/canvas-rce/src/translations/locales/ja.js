@@ -228,6 +228,9 @@ const locale = {
   "current_image_f16c249c": { "message": "現在の画像" },
   "current_volume_level_c55ab825": { "message": "現在の音量のレベル" },
   "custom_6979cd81": { "message": "カスタム" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "幅と高さをカスタマイズsuる（ピクセル）"
+  },
   "cyan_c1d5f68a": { "message": "シアン" },
   "dagger_57e0f4e5": { "message": "短剣" },
   "date_added_ed5ad465": { "message": "追加された日付" },
@@ -668,6 +671,9 @@ const locale = {
   "omega_8f2c3463": { "message": "オメガ" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "アイコンを保存するには、以下のいずれかのスタイルを追加する必要があります：アイコンの色、輪郭サイズ、アイコンのテキスト、画像"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "1つまたは複数のファイルの貼り付けに失敗しました。ファイルのアップロードまたはドラッグ＆ドロップを試してみてください。"
   },
   "open_circle_e9bd069": { "message": "オープンサークル" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

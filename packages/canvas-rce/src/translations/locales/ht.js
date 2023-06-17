@@ -209,6 +209,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Imaj Aktyèl" },
   "current_volume_level_c55ab825": { "message": "Nivo Volim Aktyèl" },
   "custom_6979cd81": { "message": "Pèsonalize" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Lajè ak wotè pèsonalize (Piksèl)"
+  },
   "cyan_c1d5f68a": { "message": "Blesyèl" },
   "dagger_57e0f4e5": { "message": "Ponya" },
   "date_added_ed5ad465": { "message": "Dat Ajoute" },
@@ -653,6 +656,9 @@ const locale = {
   "omega_8f2c3463": { "message": "Omega" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Yonn nan stil annapre yo dwe ajoute pou anrejistre yon ikòn: Koulè Ikòn nan, Gwosè Kontou li, Tèks Ikòn nan oswa Imaj"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Gen yonn oswa plizyè fichye ki paka kole. Tanpri eseye monte  fichye yo oswa rale yo lage yo."
   },
   "open_circle_e9bd069": { "message": "Sèk Ouvè" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {

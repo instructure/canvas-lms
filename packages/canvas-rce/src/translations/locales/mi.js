@@ -231,6 +231,9 @@ const locale = {
     "message": "Taumata o te rōrahi ōnāianei"
   },
   "custom_6979cd81": { "message": "Tikanga" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Ritenga whanui me te teitei (Pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Kawariki" },
   "dagger_57e0f4e5": { "message": "Te hoari" },
   "date_added_ed5ad465": { "message": "Rā kua tāpiritia" },
@@ -695,6 +698,9 @@ const locale = {
   "omega_8f2c3463": { "message": "Omeka" },
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Ko tetahi o nga momo e whai ake nei me taapiri hei tiaki i tetahi tohu Tohu Tae, Whakahuahua Rahi, Tohu Kuputuhi, ranei Whakaahua"
+  },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Kotahi neke atu ranei nga konae i rahua ki te whakapiri. Tena koa ngana ki te tuku, ki te toia me te tuku i nga konae."
   },
   "open_circle_e9bd069": { "message": "Porowhita Tuwhera" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
