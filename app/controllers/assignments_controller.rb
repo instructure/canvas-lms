@@ -271,6 +271,13 @@ class AssignmentsController < ApplicationController
         @locked = @assignment.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
 
+        if @assignment.submission_types == "external_tool" && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
+          tag = @assignment.external_tool_tag
+          @tool = ContextExternalTool.find_external_tool(tag.url, @context, tag.content_id)
+
+          js_env({ LTI_TOOL: "true" })
+        end
+
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
           GuardRail.activate(:primary) do
             @assignment.context_module_action(@current_user, :read)

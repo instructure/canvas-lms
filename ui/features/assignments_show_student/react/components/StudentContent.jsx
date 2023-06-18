@@ -40,6 +40,8 @@ import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
 import UnavailablePeerReview from '../UnavailablePeerReview'
 import VisualOnFocusMessage from './VisualOnFocusMessage'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
+import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('assignments_2_student_content')
@@ -153,6 +155,8 @@ function renderContentBaseOnAvailability(
     const onMarkAsDoneError = () =>
       alertContext.setOnFailure(I18n.t('Error updating status of module item'))
 
+    const launchURL = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}/tool_launch`
+
     return (
       <>
         <Flex alignItems="start">
@@ -194,6 +198,15 @@ function renderContentBaseOnAvailability(
           />
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
+        )}
+
+        {ENV.LTI_TOOL === 'true' && (
+          <ToolLaunchIframe
+            allow={iframeAllowances()}
+            src={launchURL}
+            data-testid="lti-external-tool"
+            title={I18n.t('Tool content')}
+          />
         )}
         {ENV.enrollment_state === 'completed' && <EnrollmentConcludedNotice />}
       </>

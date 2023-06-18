@@ -8161,6 +8161,7 @@ describe Assignment do
     before do
       allow(@course).to receive(:feature_enabled?) { false }
       allow(@course).to receive(:feature_enabled?).with(:assignments_2_student) { true }
+      Account.site_admin.disable_feature!(:external_tools_for_a2)
     end
 
     let(:assignment) do
@@ -8203,6 +8204,17 @@ describe Assignment do
         assignment.submission_types = type
         expect(assignment).to be_a2_enabled
       end
+    end
+
+    it "returns true if when LTI external tool feature flag is enabled" do
+      Account.site_admin.enable_feature!(:external_tools_for_a2)
+
+      assignment.build_wiki_page
+      assignment.build_discussion_topic
+      assignment.build_quiz
+      assignment.submission_types = "external_tool"
+
+      expect(assignment).to be_a2_enabled
     end
 
     describe "peer reviews enabled" do
