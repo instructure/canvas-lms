@@ -3925,7 +3925,9 @@ class Assignment < ActiveRecord::Base
 
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
-    return false if external_tool? || quiz? || discussion_topic? || wiki_page? || (peer_reviews? && !course.feature_enabled?(:peer_reviews_for_a2))
+    return false if quiz? || discussion_topic? || wiki_page?
+    return false if peer_reviews? && !course.feature_enabled?(:peer_reviews_for_a2)
+    return false if external_tool? && !Account.site_admin.feature_enabled?(:external_tools_for_a2)
 
     true
   end

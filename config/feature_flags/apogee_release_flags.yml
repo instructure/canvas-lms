@@ -302,3 +302,13 @@ default_account_grading_scheme:
       state: allowed_on # enable for automated testing builds and local testing
     development:
       state: allowed_on # enable for local development
+external_tools_for_a2:
+  state: hidden
+  display_name: External tools in Assignment Enhancements
+  description: Allow for Assignment Enhancements to be used for external LTI tools
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development

@@ -223,6 +223,27 @@ describe('Assignment Student Content View', () => {
       expect(queryByTestId('assignment-2-student-content-tabs')).not.toBeInTheDocument()
     })
 
+    it('renders LTI Launch Iframe when LTI_TOOL is true', async () => {
+      window.ENV.LTI_TOOL = 'true'
+
+      const {getByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      const lti_external_tool = getByTestId('lti-external-tool')
+      expect(lti_external_tool).toBeInTheDocument()
+    })
+
+    it('does not renders LTI Launch Iframe when LTI_TOOL is false', async () => {
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByTestId('lti-external-tool')).not.toBeInTheDocument()
+    })
+
     it('renders a "Mark as Done" button if the assignment is part of a module with a mark-as-done requirement', async () => {
       window.ENV.CONTEXT_MODULE_ITEM = {
         done: false,
