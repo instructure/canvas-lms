@@ -1,6 +1,6 @@
 # Basic Outcomes
 
-Also known as Grade Passback, this is the the IMS-blessed method of grading for 1.1 tools.
+Also known as Grade Passback, this is the IMS-blessed method of grading for 1.1 tools.
 
 A great overview can be found in the [Canvas API Docs](https://canvas.instructure.com/doc/api/file.assignment_tools.html#outcomes_service),
 and in the [LTI 1.1 Spec](http://www.imsglobal.org/specs/ltiv1p1/implementation-guide#toc-6).

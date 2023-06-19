@@ -104,7 +104,7 @@ describe ProgressRunner do
     expect(@progress.message).to eql "2 items processed\nprocessing error: 3, 4"
   end
   # These are also tested above
-  # it "should accumulate like errors into a single mesage line"
+  # it "should accumulate like errors into a single message line"
   # it "should complete progress if only some records fail"
 
   it "fails progress if all records fail" do

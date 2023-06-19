@@ -13,7 +13,7 @@ up Canvas.
 
 Docker has lots of info getting up and running [here](https://www.docker.com/products/docker). The info below should still get you going though.
 
-## Docker Destkop on macOS
+## Docker Desktop on macOS
 
 Make sure you have the following installed:
 

@@ -17,7 +17,7 @@ with **migration_selection** in the XML (LTI 1.0, 1.1, and 1.2) or JSON
 ### Advantages
 - Tools can import large quantities and types of content into the Canvas.
 - Tools, particularly content publishers, can provide a custom UI that allows 
-course designers to currate content on the tool side before importing.
+course designers to curate content on the tool side before importing.
 
 
 ### Limitations/Challenges
@@ -38,7 +38,7 @@ button on the right sidebar. In the **Content Type** dropdown, any tool with the
 user can click the **Find Course** button. When clicked, 
 Canvas initiates an LTI launch to the tool and indicates that a deep linking 
 selection request is happening. The tool can then present the user with a UI 
-(specifcally an iframe in a modal) to select and/or create common cartridge files
+(specifically an iframe in a modal) to select and/or create common cartridge files
  and return a file download url to Canvas. The user then has the option to select
  all of the content or select just some. When the **Import** button is clicked,
  Canvas downloads the file from the url, and initiates a course import process using
@@ -49,7 +49,7 @@ All of these settings are contained for the **migration_selection** placement:
 
 -   url: &lt;url&gt; (optional)
 
-    This is the URL that will be POSTed to when users click the  **Find Course** 
+    This is the URL that will be POSTed to when users click the **Find Course** 
     button. It can be the same as the tool's URL, or something different. Domain
     and URL matching are not enforced for migration_selection launches; however,
     if LTI links are returned, Domain and URL matching is enforced. In order to prevent 
@@ -77,7 +77,7 @@ All of these settings are contained for the **migration_selection** placement:
 -   message_type: &lt;an IMS LTI message type&gt; (optional)
 
     Sets the message_type to be sent during the LTI launch. It is expected that 
-    the tool use this to determine if a Deep Linking flow is being requested by
+    the tool uses this to determine if a Deep Linking flow is being requested by
     Canvas and present an appropriate UI. A Deep Linking flow is highly recommended
     for this placement, but is not required. See the 
     <a href="file.content_item.html" target=_"blank">Deep Linking 

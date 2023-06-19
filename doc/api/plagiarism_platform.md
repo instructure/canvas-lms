@@ -38,7 +38,7 @@ Canvas requires that the TP use the following restricted capabilities/services:
 * `vnd.Canvas.submission` service
 * `Canvas.placements.similarityDetection` capability
 
-To retrieve a TCP with these restricted services/capabilities first retrieve a JWT access token as described in <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0. These tokens are associated with a single developer key which, in turn, are associated with a single custom TCP. Include this token in the authorization header of the request to retrieve the TCP:
+To retrieve a TCP with these restricted services/capabilities first retrieve a JWT access token as described in <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0. These tokens are associated with a single developer key which, in turn, is associated with a single custom TCP. Include this token in the authorization header of the request to retrieve the TCP:
 
 ```
 Authorization Bearer <JWT access token>
@@ -127,7 +127,7 @@ To register a Tool Proxy that uses restricted capabilities/services (like the or
 
 Standard LTI2 registration requires requests to be signed with a temporary `reg_key` and `reg_password` (see [LTI@ implementation guide](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-60)). When using a JWT access token in the authorization header this is not necessary (see <a href="jwt_access_tokens.html">JWT access tokens</a> section 1.0).
 
-Once a Tool Proxy is created Canvas will automatically create a subscription to notify the tool when submissions are created by students(see section 2.2).
+Once a Tool Proxy is created Canvas will automatically create a subscription to notify the tool when submissions are created by students (see section 2.2).
 
 ### 2. Tool Launch
 Tools configured as described in section 1 of this document will be launchable from the assignment create/edit page in Canvas (see section 2.1).
@@ -237,7 +237,7 @@ The `LtiLink.custom.url` variable expansion should be used in the same message h
 ...
 ```
 
-Canvas will then create a Tool Setting for the TP associated with the assignment when the `Canvas.placements.similarityDetection` launch occurs for the first time. This Tool Setting can be used to store TP specific assignment-level configuration that will be copied to the new context during a course copy.
+Canvas will then create a Tool Setting for the TP associated with the assignment when the `Canvas.placements.similarityDetection` launch occurs for the first time. This Tool Setting can be used to store TP-specific assignment-level configuration that will be copied to the new context during a course copy.
 
 ##### 2. Store assignment-level custom configuration in Tool Settings
 ```
@@ -263,7 +263,7 @@ This endpoint is defined in the tool consumer profile.
 When a `submission_created` webhook is received for an assignment the TP has not seen before, it means that the submission is for an assignment that was copied from an assignment the TP _was_ configured on within another course. The TP should still process the submission. To fetch assignment information for a submission that has not been seen before, use the <a href="plagiarism_detection_platform_assignments.html">Canvas LTI Assignments API</a>
 
 ##### 4. use the `lti_assignment_id` and the Tool Setting Service to retrieve TP assignment-level configuration
-If the TP has been leveraging Tool Settings in Canvas to store TP specific assignment-level configurations, those Tool Settings will be copied to the new assignment as well. To access the Tool Setting note the `lti_assignment_id` in the `submission_created` webhook. The Tool Setting that should be requested will have a `resource_link_id` that matches this value:
+If the TP has been leveraging Tool Settings in Canvas to store TP-specific assignment-level configurations, those Tool Settings will be copied to the new assignment as well. To access the Tool Setting note the `lti_assignment_id` in the `submission_created` webhook. The Tool Setting that should be requested will have a `resource_link_id` that matches this value:
 ```
 GET
 /api/lti/tool_proxy/<tool proxy guid>/courses/24/resource_link_id/<lti assignment id>/tool_setting

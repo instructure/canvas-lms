@@ -4,7 +4,7 @@ The GraphQL spec describes a top-level errors key
 (https://facebook.github.io/graphql/June2018/#sec-Errors).  It is useful
 for fatal errors that prevent an operation from returning data.  The Ruby
 GraphQL gem automatically populates `errors` whenever there is a
-synatactical error, or when a resolver returns a `GraphQL::ExecutionError`.
+syntactical error, or when a resolver returns a `GraphQL::ExecutionError`.
 
 ## Mutation Errors
 

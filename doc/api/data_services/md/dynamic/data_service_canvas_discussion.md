@@ -139,7 +139,7 @@ Discussion
 
 <h2 id="discussion_topic_created">discussion_topic_created</h2>
 
-**Definition:** The event is emitted anytime an new discussion topic is created by an end user or API request.
+**Definition:** The event is emitted anytime a new discussion topic is created by an end user or API request.
 
 **Trigger:** Triggered when a new discussion topic is created in a course. Also triggered when a new course announcement is created with `is_announcement` set to TRUE.
 

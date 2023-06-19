@@ -273,14 +273,14 @@ module.exports = {
       files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
-        // stuff and use real realitive paths it will tell you to do the wrong thing
+        // stuff and use real relative paths it will tell you to do the wrong thing
         'import/first': ['error', 'disable-absolute-first'],
 
         'import/no-amd': 'error',
         'import/no-commonjs': 'warn',
         'import/no-extraneous-dependencies': 'off', // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
         'import/no-nodejs-modules': 'error',
-        'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
+        'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once everything is in the same dir
         'import/no-unresolved': 'off',
         'import/no-webpack-loader-syntax': 'off',
 

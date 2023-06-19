@@ -20,7 +20,7 @@ should be passed in postMessage calls if it's present.
 **Note: Previous versions of this documentation recommended always sending messages to `window.top`.**
 **This is no longer recommended, as tools should target the parent window they are embedded in.**
 
-If the LTI tool is launched in a iframe, as is most common, then postMessages should be sent to the window
+If the LTI tool is launched in an iframe, as is most common, then postMessages should be sent to the window
 embedding the LTI tool (usually accessible by `window.parent`). However, if the tool is launched in a new tab,
 window, or popup, then postMessages should be directed to `window.opener`. The examples will use `window.parent`,
 but in practice, the target recipient can sometimes also be `window.opener`.
@@ -33,7 +33,7 @@ This is also defined in the [Platform Storage spec](https://www.imsglobal.org/sp
 
 ### Message Responses
 
-Most message handlers will respond with a postMessage with a subject that matches the intial subject,
+Most message handlers will respond with a postMessage with a subject that matches the initial subject,
 with `.response` appended. If an error occurs during message handling, the response postMessage will
 contain an `error` property with a `code` and a `message`.
 
@@ -326,7 +326,7 @@ window.parent.postMessage({subject: 'lti.scrollToTop'}, '*')
 
 ## lti.setUnloadMessage
 
-Sets a message to be shown in a browser dialog before page closes (ie
+Sets a message to be shown in a browser dialog before the page closes (ie
 "Do you really want to leave this page?")
 
 **Required properties:**

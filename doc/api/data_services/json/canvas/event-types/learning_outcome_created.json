@@ -18,7 +18,7 @@
       "description": "Also the title of the outcome.",
       "mastery_points": "The number of points necessary for a rating to be considered mastery.",
       "points_possible": "The maximum level of points of any rating.",
-      "ratings": "Array of objects with (points, description) describing each of the outcoming ratings."
+      "ratings": "Array of objects with (points, description) describing each of the outcome ratings."
     }
   },
   "examples": [

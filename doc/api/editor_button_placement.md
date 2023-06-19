@@ -20,7 +20,7 @@ basic URLs).
 - Tools can determine the presentation style and size of the content.
 - Tools can return an array of different content types in a single message.
 - Many different types of users can access the RCE from many different locations
-such as assignment descriptions, discussions posts, and wiki pages.
+such as assignment descriptions, discussion posts, and wiki pages.
 
 
 ### Limitations/Challenges
@@ -90,7 +90,7 @@ All of these settings are contained for the **editor_button** placement:
 -   message_type: &lt;an IMS LTI message type&gt; (optional)
 
     Sets the message_type to be sent during the LTI launch. It is expected that
-    the tool use this to determine if a Deep Linking flow is being requested by
+    the tool uses this to determine if a Deep Linking flow is being requested by
     Canvas and present an appropriate UI. A Deep Linking flow is highly recommended
     for this placement, but is not required. See the
     <a href="file.content_item.html" target=_"blank">Deep Linking

@@ -1,5 +1,5 @@
 # LTI 1.1 Launches
-See [the LTI launches document](./03_lti_launches.md) document for an overview of all LTI version launches.
+See [the LTI launches document](./03_lti_launches.md) for an overview of all LTI version launches.
 
 For notes on LTI 1.1 Implementation, see [LTI 1.1 Implementation](./09_lti_1_1_implementation).
 ## Overview
@@ -11,14 +11,14 @@ Parameters sent in the LTI launch help the tool provider identify the current us
 There are three categories of parameters:
 1. Standard parameters - the parameters defined in the specification. Sent by default in most LTI 1.1 launches.
 2. Extension parameters - parameters not defined in the specification, but sent by default in most LTI 1.1 launches. These parameters begin with the `ext_` prefix.
-3. Custom parameters - these are parameters can be either defined in the standard, or not. They must be specifically requested by the tool provider in the configuration XML in order to be sent in the launch. See [custom parameters](./08_custom_parameters.md) for more details.
+3. Custom parameters - these parameters can be either defined in the standard or not. They must be specifically requested by the tool provider in the configuration XML in order to be sent in the launch. See [custom parameters](./08_custom_parameters.md) for more details.
 
 As noted above, the first and second types of parameters are sent by default in _most_ LTI 1.1 launches, but not all. The set of parameters sent in the LTI 1.1 launch is determined by the "privacy level" of the tool.
 
 There are four privacy levels that determine which standard and extension parameters as sent by default in a tool. The privacy level is determined by the `workflow_state` of the `ContextExternalTool` being launched:
 
 ### Public (`workflow_state == 'public'`)
-This is the tier that send all standard and extend parameters + any custom parameters the tool provider has requested in their configuration (See [tool installation](./02_tool_installation.md)).
+This is the tier that sends all standard and extend parameters + any custom parameters the tool provider has requested in their configuration (See [tool installation](./02_tool_installation.md)).
 
 When the tool's privacy level is public, the LTI launch will include all standard and extension parameters. This includes parameters that include user PII. For example:
 

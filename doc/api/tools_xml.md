@@ -768,7 +768,7 @@ included in the `Authorization` header using the `Bearer` scheme, it is signed
 using the shared secret for the tool and will include the stored consumer key
 in the `kid` field of the token's header object.
 
-If any action needs to performed by the tool it MUST respond with a success
+If any action needs to be performed by the tool it MUST respond with a success
 HTTP status code and the body MUST include two urls, one for checking the
 progress of the export and one to retrieve the JSON to be returned to the tool
 upon import. In the event there is nothing to be exported respond with an empty
@@ -785,7 +785,7 @@ upon import.
 ```
 
 The `status_url` will be polled to determine when the content should be
-retreived. The response MUST include a `status` key; this key will be used to
+retrieved. The response MUST include a `status` key; this key will be used to
 determine when the tool considers the export process to be completed whether it
 has been successful or not. When this field contains `complete` Canvas will then
 attempt to use the `fetch_url` to retrieve the exported data. In the case of
@@ -806,7 +806,7 @@ display to the user.
 ```
 
 #### Exporting a Subset of Course Content
-If the user has chosen to migrate a subset of the source course's content an
+If the user has chosen to migrate a subset of the source course's content then
 this will be indicated to the tool by inclusion of an additional field in the
 post body called `custom_exported_assets`. This will be an array of asset
 identifiers in the form of `<asset type key>_<asset_id>` (e.g. `assignment_42`)
@@ -815,11 +815,11 @@ tool provider has no content to export for a subset export either return an
 empty JSON object in the response or a status code outside the 200 range.
 
 #### Exported Data Including Canvas Record IDs.
-If in the process of importing your tool needs to receive record identifers for
-newly created items in Canavs the source IDs may be included in the export data
+If in the process of importing your tool needs to receive record identifiers for
+newly created items in Canvas the source IDs may be included in the export data
 with keys matching the pattern `/^\$canvas_(\w+)_id$/`. Example export data
-including an assignment ID with the orignial being assignment #42 and the newly
-created one for import being #84.
+including an assignment ID with the original being assignment #42 and the newly
+created one for import being #84 is below.
 
 Exported data:
 ```

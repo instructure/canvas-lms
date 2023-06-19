@@ -17,13 +17,13 @@ Tracking patterns using the old quizzes events will allow instructors to underst
 
 * How much time is required to submit an assessment?
 * If test-taking times are flexible, when do students submit their assessments?
-* How much time does it take to grade an assessment after a students submits it?
+* How much time does it take to grade an assessment after a student submits it?
 * How often are assessments being revised by instructors?
 * How often are instructors relying on external assessment content or re-using assessment content (imported via QTI) when building their assessments?
 
 ### User Sessions
 
-A session is a group of user interactions in the Canvas Learning Platform that take place within a given timeframe, e.g. a single session can contain multiple page views, submission events, discussion entries, and assignment content interaction. We can think of a session as a container for the actions a user takes in Canvas. A single user can open multiple sessions. Those sessions can occur on the same day, or over several days, weeks, or months. Sessions are limited based on time limit.
+A session is a group of user interactions in the Canvas Learning Platform that takes place within a given timeframe, e.g. a single session can contain multiple page views, submission events, discussion entries, and assignment content interaction. We can think of a session as a container for the actions a user takes in Canvas. A single user can open multiple sessions. Those sessions can occur on the same day, or over several days, weeks, or months. Sessions are limited based on time limit.
 
 * What is my average user session duration?
 * Number of sessions by type of canvas user.
@@ -38,7 +38,7 @@ A session is a group of user interactions in the Canvas Learning Platform that t
 
 This event data could help instructors to gather insight about the relationship between students and their assignments.
 
-* What type of assignments are typically gradable?
+* What types of assignments are typically gradable?
 * How long does it take to submit something that has been assigned?
 * What assignments present the biggest challenge, e.g. which need the most retake attempts?
 

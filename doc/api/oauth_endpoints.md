@@ -1,7 +1,7 @@
 OAuth2 Endpoints
 ================
 
-<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1 hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
+<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1-hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens">refresh tokens</a> to generate new access tokens.</div>
 
 - [GET login/oauth2/auth](#get-login-oauth2-auth)
 - [POST login/oauth2/token](#post-login-oauth2-token)

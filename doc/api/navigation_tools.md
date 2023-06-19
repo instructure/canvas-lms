@@ -144,7 +144,7 @@ All of these settings are contained under "course_navigation"
 
 -   text: &lt;text&gt; (optional)
 
-    This is the default text that will be shown in the left hand navigation as the text of the link. This can be overridden by language-specific settings if desired by using the labels setting.
+    This is the default text that will be shown in the left-hand navigation as the text of the link. This can be overridden by language-specific settings if desired by using the labels setting.
     This is required if a text value is not set on the main tool configuration.
 
 -   labels: &lt;set of locale-label pairs&gt; (optional)
@@ -179,7 +179,7 @@ All of these settings are contained under "course_navigation"
 
 -   windowTarget: \_blank (optional)
 
-    When set to \_blank, the windowTarget propety allows you to configure a launch to happen in a new
+    When set to \_blank, the windowTarget property allows you to configure a launch to happen in a new
     tab instead of in an iframe. Omit this if you want to launch in frame.
 
 <a name="account_navigation"></a>
@@ -260,7 +260,7 @@ All of these settings are contained under "account_navigation"
 
 -   windowTarget: \_blank (optional)
 
-    When set to \_blank, the windowTarget propety allows you to configure a launch to happen in a new
+    When set to \_blank, the windowTarget property allows you to configure a launch to happen in a new
     tab instead of in an iframe. Omit this if you want to launch in frame.
 
 -   root_account_only: &lt;boolean&gt; (optional)
@@ -316,7 +316,7 @@ All of these settings are contained under "user_navigation"
 
 -   text: &lt;text&gt; (optional)
 
-    This is the default text that will be shown in the left hand navigation as the text of the link. This can be overridden by language-specific settings if desired by using the labels setting.
+    This is the default text that will be shown in the left-hand navigation as the text of the link. This can be overridden by language-specific settings if desired by using the labels setting.
     This is required if a text value is not set on the main tool configuration.
 
 -   labels: &lt;set of locale-label pairs&gt; (optional)

@@ -46,8 +46,7 @@ For more information checkout [Developing with Docker](developing_with_docker.md
 
 If a URL is long enough, you may see a Gateway 502 error. This problem
 has been patched in [dinghy-http-proxy#36](https://github.com/codekitchen/dinghy-http-proxy/pull/36)
-however until a new release is cut the follow can be done as a work
-around:
+however until a new release is cut the following can be done as a workaround:
 
 In `~/.dinghy/proxy.conf` add the following:
 

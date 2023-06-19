@@ -3,7 +3,7 @@ Learning
 
 <h2 id="learning_outcome_created">learning_outcome_created</h2>
 
-**Definition:** The event is emitted anytime a outcome is created in the account by an end user or API request.
+**Definition:** The event is emitted anytime an outcome is created in the account by an end user or API request.
 
 **Trigger:** Triggered when a new learning outcome is created.
 
@@ -81,7 +81,7 @@ Learning
 | **title** | The title of the learning outcome or learning outcome group. |
 | **vendor_guid** | A custom GUID for the learning standard. |
 | **workflow_state** | Workflow status of the learning outcome (e.g. active, deleted). |
-| **rubric_criterion** | {"description"=>"Also the title of the outcome.", "mastery_points"=>"The number of points necessary for a rating to be considered mastery.", "points_possible"=>"The maximum level of points of any rating.", "ratings"=>"Array of objects with (points, description) describing each of the outcoming ratings."} |
+| **rubric_criterion** | {"description"=>"Also the title of the outcome.", "mastery_points"=>"The number of points necessary for a rating to be considered mastery.", "points_possible"=>"The maximum level of points of any rating.", "ratings"=>"Array of objects with (points, description) describing each of the outcome ratings."} |
 
 
 
@@ -130,7 +130,7 @@ Learning
 |-|-|
 | **context_id** | The ID of the context the learning outcome is used in. |
 | **context_type** | The type of context the learning outcome is used in, usually Course. |
-| **description** | Description of the learnning outcome group. |
+| **description** | Description of the learning outcome group. |
 | **learning_outcome_group_id** | The local Canvas ID of the learning outcome group. |
 | **parent_outcome_group_id** | The local Canvas ID of the group's parent outcome group. |
 | **title** | Title of the learning outcome group. |
@@ -141,7 +141,7 @@ Learning
 
 <h2 id="learning_outcome_group_updated">learning_outcome_group_updated</h2>
 
-**Definition:** The event is emitted anytime an existing outcome group  is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.
+**Definition:** The event is emitted anytime an existing outcome group is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.
 
 **Trigger:** Triggered when a group of learning outcomes is modified.
 
@@ -185,7 +185,7 @@ Learning
 |-|-|
 | **context_id** | The ID of the context the learning outcome is used in. |
 | **context_type** | The type of context the learning outcome is used in, usually Course. |
-| **description** | Description of the learnning outcome group. |
+| **description** | Description of the learning outcome group. |
 | **learning_outcome_group_id** | The local Canvas ID of the learning outcome group. |
 | **parent_outcome_group_id** | The local Canvas ID of the group's parent outcome group. |
 | **title** | Title of the learning outcome group. |
@@ -199,7 +199,7 @@ Learning
 
 **Definition:** The event is emitted anytime an outcome is linked to a context by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.
 
-**Trigger:** Triggered when an outcome is linked inside of a context.
+**Trigger:** Triggered when an outcome is linked inside a context.
 
 
 
@@ -265,7 +265,7 @@ Learning
 
 **Definition:** The event is emitted anytime an outcome context link is changed by an end user or API request.
 
-**Trigger:** Triggered when an outcome link is changed inside of a context.
+**Trigger:** Triggered when an outcome link is changed inside a context.
 
 
 
@@ -333,9 +333,9 @@ Learning
 
 **Definition:** The event is emitted anytime a submission is assessed against an outcome. The following setup should be enabled in Canvas in order for the event to be triggered:
 1. Administrator has set up learning outcomes at the account/sub-account level
-2. Instructor has added outcome to assignment rubric
-3. Student submitted a rubric based assignment
-4. Instructor graded a rubric based assignment at the outcome level => there is a result associated with assignment outcome
+2. Instructor has added outcome to the assignment rubric
+3. Student submitted a rubric-based assignment
+4. Instructor graded a rubric-based assignment at the outcome level => there is a result associated with the assignment outcome
 
 **Trigger:** Triggered when a submission is rated against an outcome.
 
@@ -397,7 +397,7 @@ Learning
 
 <h2 id="learning_outcome_result_updated">learning_outcome_result_updated</h2>
 
-**Definition:** The event is emitted anytime a existing outcome rating for a submission is updated. Only changes to the fields included in the body of the event payload will emit the `updated` event.
+**Definition:** The event is emitted anytime an existing outcome rating for a submission is updated. Only changes to the fields included in the body of the event payload will emit the `updated` event.
 
 **Trigger:** Triggered when a submission outcome rating is updated.
 
@@ -560,7 +560,7 @@ Learning
 | **updated_at** | The time at which this outcome was last modified in any way. |
 | **vendor_guid** | A custom GUID for the learning standard. |
 | **workflow_state** | Workflow status of the learning outcome. Defaults to active |
-| **rubric_criterion** | {"description"=>"Also the title of the outcome.", "mastery_points"=>"The number of points necessary for a rating to be considered mastery.", "points_possible"=>"The maximum level of points of any rating.", "ratings"=>"Array of objects with (points, description) describing each of the outcoming ratings."} |
+| **rubric_criterion** | {"description"=>"Also the title of the outcome.", "mastery_points"=>"The number of points necessary for a rating to be considered mastery.", "points_possible"=>"The maximum level of points of any rating.", "ratings"=>"Array of objects with (points, description) describing each of the outcome ratings."} |
 
 
 

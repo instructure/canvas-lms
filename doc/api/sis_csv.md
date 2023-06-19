@@ -76,7 +76,7 @@ Canvas will mark the user as deleted.
 If user C is created by import 1, and the exact same information
 is specified for user C in import 2, Canvas will mark that nothing has changed
 for that CSV row and skip looking up user C entirely. This can greatly speed
-up SIS imports with thousands of rows that change rarely.
+up SIS imports with thousands of rows that rarely change.
 
 It is important to note that if any SIS data was changed outside of that
 previous CSV import, the changes will not be noticed by the diffing
@@ -413,7 +413,7 @@ terms.csv
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>A unique identifier used to reference terms in the enrollments data.
+<td>A unique identifier used to reference terms in the enrollment data.
 This identifier must not change for the account, and must be globally unique. In the user
 interface, this is called the SIS ID.</td>
 </tr>
@@ -732,7 +732,7 @@ enrollments.csv
 <td>text</td>
 <td>✓&#42;</td>
 <td></td>
-<td>The User identifier from users.csv, required to identify user.
+<td>The User identifier from users.csv, required to identify the user.
  If the user_integration_id is present, this field will be ignored.</td>
 </tr>
 <tr>
@@ -740,7 +740,7 @@ enrollments.csv
 <td>text</td>
 <td>✓&#42;</td>
 <td></td>
-<td>The integration_id of the user from users.csv required to identify user if
+<td>The integration_id of the user from users.csv required to identify the user if
  the user_id is not present.</td>
 </tr>
 <tr>
@@ -749,7 +749,7 @@ enrollments.csv
 <td>✓&#42;</td>
 <td></td>
 <td>student, teacher, ta, observer, designer, or a custom role defined
-by the account. When using a custom role, the name is case sensitive.</td></tr>
+by the account. When using a custom role, the name is case-sensitive.</td></tr>
 <tr>
 <td>role_id</td>
 <td>text</td>
@@ -804,10 +804,10 @@ Ignored for any role other than observer</td>
 
 &#42;&#42; deleted_last_completed is not a state, but it combines the deleted
  and completed states in a function that will delete an enrollment from a course
- if there are at least one other active enrollment in the course. If it is the
+ if there is at least one other active enrollment in the course. If it is the
  last enrollment in the course it will complete it. This may be useful for when
- a user moves to a different section of a course in which there are section
- specific assignments. It offloads the logic required to determine if the
+ a user moves to a different section of a course in which there are section-specific
+ assignments. It offloads the logic required to determine if the
  enrollment is the users last enrollment in the given course or not.
 
 When an enrollment is in a 'completed' state the student is limited to read-only access to the
@@ -1038,7 +1038,7 @@ provide more information about the cross-listed course, please do so in courses.
 
 While the xlists.csv does not have any sticky fields, the sections.csv does have
 course_id as a sticky field. If the section's course_id is "sticky", the import
-will not cross list the section to another course unless it is run with the
+will not cross-list the section to another course unless it is run with the
 Override UI option on the sis import.
 
 Sample:
@@ -1119,7 +1119,7 @@ admins.csv
 <td>text</td>
 <td>✓</td>
 <td></td>
-<td>The account identifier from accounts.csv. Uses the root_account if left blank. The collumn is required even when importing for the root_account and the value is blank.</td>
+<td>The account identifier from accounts.csv. Uses the root_account if left blank. The column is required even when importing for the root_account and the value is blank.</td>
 </tr>
 <tr>
 <td>role_id</td>
@@ -1134,7 +1134,7 @@ admins.csv
 <td>✓&#42;</td>
 <td></td>
 <td>AccountAdmin, or a custom role defined by the account.
- When using a custom role, the name is case sensitive.</td>
+ When using a custom role, the name is case-sensitive.</td>
 </tr>
 <tr>
 <td>status</td>

@@ -160,7 +160,7 @@ describe MicrosoftSync::GraphService::Http do
         context "when the special case's value is a class descending from StandardError" do
           let(:special_case_value) { custom_error_class }
 
-          it 'increments "expected" counters and raises an new error of the class' do
+          it 'increments "expected" counters and raises a new error of the class' do
             expect { result }.to raise_error(custom_error_class)
             expect(InstStatsd::Statsd).to have_received(:increment)
               .with("microsoft_sync.graph_service.expected",

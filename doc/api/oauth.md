@@ -1,7 +1,7 @@
 OAuth2
 ======
 <a name="top"></a>
-<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1 hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens" target="_blank">refresh tokens</a> to generate new access tokens.</div>
+<div class="warning-message"> Developer keys issued after Oct 2015 generate tokens with a 1-hour expiration. Applications must use <a href="file.oauth.html#using-refresh-tokens" target="_blank">refresh tokens</a> to generate new access tokens.</div>
 
 <a href="http://oauth.net/2" target="_blank">OAuth2</a> is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's
@@ -118,7 +118,7 @@ For Canvas Cloud (hosted by Instructure), developer keys are
 
 <b>NOTE for LTI providers:</b> Since developer keys are scoped to the institution they are issued
 from, tool providers that serve multiple institutions should store and look up the correct
-developer key based on the launch parameters (eg. custom_canvas_api_domain) sent during the LTI
+developer key based on the launch parameters (e.g. custom_canvas_api_domain) sent during the LTI
 launch.
 
 For <a href="https://github.com/instructure/canvas-lms/wiki" target="_blank">open source Canvas users</a>,
@@ -231,7 +231,7 @@ with the following parameters:
   </tbody>
 </table>
 
-Note that the once the code issued in step 2 is used in a POST request
+Note that once the code issued in step 2 is used in a POST request
 to this endpoint, it is invalidated and further requests for tokens
 with the same code will fail.
 
@@ -263,7 +263,7 @@ curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
 ## [Using a Refresh Token to get a new Access Token](#using-refresh-tokens)
 <small><a href="#top">Back to Top</a></small>
 
-Access tokens have a 1 hour lifespan. When the refresh flow is taken, Canvas
+Access tokens have a 1-hour lifespan. When the refresh flow is taken, Canvas
 will update the access token to a new value, reset the expiration timer, and
 return the new access token as part of the response. When refreshing tokens the
 user will not be asked to authorize the application again.

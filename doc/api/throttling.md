@@ -1,7 +1,7 @@
 Throttling
 ==========
 
-Canvas includes a built in dynamic throttling mechanism to prevent a single
+Canvas includes a built-in dynamic throttling mechanism to prevent a single
 user from abusing the system and causing adverse effects for others. It
 works by having a rate limit, and a cost for every request. Each request
 subtracts from your quota, and the quota is automatically replenished over

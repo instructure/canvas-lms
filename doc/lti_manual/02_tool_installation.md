@@ -9,7 +9,7 @@ Canvas's implementation of tool configuration allows tools to be configured once
 LTI 1.1 tool installation is much more simple than 1.3 or 2, since tools are directly installed in the context they are available in, and LTI 1.1's use of OAuth 1 means the only configuration information needed is a name, key and secret, and placements. The LTI 1.1 spec doesn't really define a format for configuring tools directly, but it does provide a format for importing external tools using Common Cartridge ([see spec, section 5](https://www.imsglobal.org/specs/ltiv1p1/implementation-guide)). Canvas and other Tool Consumers use this format to allow users to configure external tools, and we provide some Canvas-specific extensions to the format, including placements, and domain. This format is documented in the Canvas API docs [here](https://canvas.instructure.com/doc/api/file.tools_xml.html).
 
 1. Go to the context in which you wish to install the tool. This can be a Course or Account.
-2. Go to the Settings page in the left hand nav.
+2. Go to the Settings page in the left-hand nav.
 3. Go to the Apps tab, and click View App Configurations -> +App.
 4. For LTI 1.1 tools, you can choose Manual Entry, By URL, or Paste XML. They all do effectively the same thing.
 5. Provide the tool name, key, and secret, and other information needed, and click Submit.
@@ -33,15 +33,15 @@ To facilitate this sharing of information and to keep all tool configuration opt
 The actual tool configuration for LTI 1.3 is a custom JSON specification, detailed [here](https://canvas.instructure.com/doc/api/file.lti_dev_key_config.html#anatomy-of-a-json-configuration). This specification is pretty Canvas-specific, but includes ideas from the [OpenID Connect Registration flow ](https://connect2id.com/products/server/docs/guides/client-registration) as well as the [section of the LTI spec](http://www.imsglobal.org/spec/lti/v1p3/#cclinks) that deals with importing in the Common Cartridge format. The Canvas API docs do a pretty good job of explaining each field, but the `extensions` field is worth highlighting for this important lesson: The LTI spec includes `extensions` fields in many schemas, to allow Platforms and Tools to do custom things and allow for domain-specific behavior. In Canvas's case, the `extensions` field is where the bulk of the configuration lives, as that field contains a list of placements and the details of how to display the tool at each placement. It's recommended for tools to provide this JSON via an easily-accessible URL, which is provided during creation of the `DeveloperKey`. This configuration is stored in an `Lti::ToolConfiguration` record linked to the tool's `Developer Key`, and is retrieved whenever the tool is installed into a new context.
 
 1. Go to the account in which you wish to install the tool - for a globally-available tool, this should be Site Admin. Otherwise, it can be a root account.
-2. Go to the Developer Keys page in the left hand nav.
+2. Go to the Developer Keys page in the left-hand nav.
 3. Click +Developer Key -> +LTI Key to add a new developer key.
 4. Provide the tool name. In the Redirect URIs box, enter the `target_link_uri` from the JSON configuration.
 5. Choose Manual Entry, Paste JSON, or Enter JSON URL and complete the form. Click Submit.
 6. Take note of the ID of your `DeveloperKey`, since your tool will need to compare that `client_id` against the ID Token's `aud` claim (spec [here](https://www.imsglobal.org/spec/security/v1p0/#id-token)), and you will need it to install the tool in the context(s) of your choice.
 7. Go to the context in which you wish to install the tool (Course or Account).
-8. Go to the Settings page in the left hand nav.
+8. Go to the Settings page in the left-hand nav.
 9. Go to the Apps tab and click View App Configurations -> +App.
-10. Choose By Client ID , and paste the ID of the `DeveloperKey` you just created.
+10. Choose By Client ID, and paste the ID of the `DeveloperKey` you just created.
 11. The tool is now installed!
 
 ### Relevant Code

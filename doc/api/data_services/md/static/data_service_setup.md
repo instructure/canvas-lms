@@ -4,7 +4,7 @@ Creating a New Data Stream
 These instructions, and a guide to the rest of Live Events/Canvas Data Services, are hosted in the Canvas Community and are found [here](https://community.canvaslms.com/t5/Admin-Guide/How-do-I-subscribe-to-Live-Events-using-Canvas-Data-Services/ta-p/227).
 
 1. Click on +ADD button to launch a new subscription form
-2. Add Subscription Name - use a distinct name to identify your subscription purpose or type e.g : Blackboard Ally Integration
+2. Add Subscription Name - use a distinct name to identify your subscription purpose or type e.g. : Blackboard Ally Integration
 3. Choose Delivery Method
   * SQS - AWS Simple Queue Services
         - URL - AWS SQS URL
@@ -19,7 +19,7 @@ These instructions, and a guide to the rest of Live Events/Canvas Data Services,
 5. Find and select a single or multiple events
 6. Save your new data stream
 
-Your new subscription will be listed on the Settings page. You will be able to edit, duplicate or deactivate your new subscription record by using right side kebab menu.
+Your new subscription will be listed on the Settings page. You will be able to edit, duplicate or deactivate your new subscription record by using the right side kebab menu.
 
 ### Note: HTTPS Delivery and AWS API Gateway
 

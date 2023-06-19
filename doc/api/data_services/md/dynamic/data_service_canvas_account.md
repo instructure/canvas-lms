@@ -3,7 +3,7 @@ Account
 
 <h2 id="account_notification_created">account_notification_created</h2>
 
-**Definition:** The event is emitted anytime an account level notification is created by and end user or API request.
+**Definition:** The event is emitted anytime an account level notification is created by an end user or API request.
 
 **Trigger:** Triggered anytime a new account notification is created.
 

@@ -19,7 +19,7 @@ end
 ```
 
 This will sample every 1000 microseconds (1 millisecond), and write the
-output to the specificed "out" file.  See the stackprof docs linked above for more
+output to the specified "out" file.  See the stackprof docs linked above for more
 details on configuration options
 
 Once you've produced a dumpfile, you can produce a report on the results

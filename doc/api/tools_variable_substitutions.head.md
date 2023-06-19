@@ -17,7 +17,7 @@ it detects requested variable substitutions and sends the appropriate data where
 Adding variable substitutions is exactly the same as adding custom variables, except the values
 are variables instead of constants.  This is denoted by prefixing the value with a $.  If the
 tool consumer doesn't recognize, or can't substitute, the value it will just send the variable
-as if it were are regular custom variable (i.e. the name of the substitution variable will be
+as if it were a regular custom variable (i.e. the name of the substitution variable will be
 sent rather than the value).
 
 This allows Canvas to expose data as LTI launch parameters during the LTI launch rather than
@@ -72,7 +72,7 @@ curl 'https://<domain>.instructure.com/api/v1/courses/<course_id>/external_tools
 ## Via JSON Configuration (LTI 1.3)
 JSON can be used to <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140" target="_blank">configure an LTI 1.3 Developer Key</a>.
 
-The following JSON would create a developer key with the a placement specfic custom field and a tool-level custom field:
+The following JSON would create a developer key with a placement-specific custom field and a tool-level custom field:
 
 ```
 {  

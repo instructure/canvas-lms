@@ -992,7 +992,7 @@ class DiscussionTopicsController < ApplicationController
 
   # @API Create a new discussion topic
   #
-  # Create an new discussion topic for the course or group.
+  # Create a new discussion topic for the course or group.
   #
   # @argument title [String]
   #

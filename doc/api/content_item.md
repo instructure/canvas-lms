@@ -21,7 +21,7 @@ directly from the tool.
 > **partner sandbox account by partner support, or for your**
 > **institution through your CSM.**
 
-*   Using an external tool to create multiple pieces of content directly from,
+*   Using an external tool to create multiple pieces of content directly from
 the tool, whether ungraded (like module items), or graded (like assignments),
 and return them to Canvas in bulk.
 > **This is a new feature currently being tested, and can be turned on for your**
@@ -305,8 +305,8 @@ The main points of interest here is the `content_items` parameter. It contains a
  content-item objects.
 
 The content-item object in this example is sending back a single LTI link that
-is to be launched in the current frame. the `url` specifies the lti launch point
-, and the `mediaType` specifies that it is an lti launch.
+is to be launched in the current frame. the `url` specifies the lti launch point, 
+and the `mediaType` specifies that it is an lti launch.
 
 
 ## Configuring Content-item

@@ -149,8 +149,8 @@ Grade
 | **assignment_id** | The Canvas id of the assignment associated with the submission. |
 | **grade** | The new grade. |
 | **grader_id** | The Canvas id of the user making the grade change. Null if this was the result of automatic grading. |
-| **grading_complete** | The boolean state that the submission is completely graded.  False if the assignment is only partially graded, for example a quiz with automatically and manuall... |
-| **muted** | The boolean muted state of the submissions's assignment.  Muted grade changes should not be published to students. |
+| **grading_complete** | The boolean state that the submission is completely graded.  False if the assignment is only partially graded, for example a quiz with automatically and manually... |
+| **muted** | The boolean muted state of the submission's assignment.  Muted grade changes should not be published to students. |
 | **old_grade** | The previous grade, if there was one. |
 | **old_points_possible** | The maximum points possible for the previous grade. |
 | **old_score** | The previous score. |
@@ -165,7 +165,7 @@ Grade
 
 <h2 id="grade_override">grade_override</h2>
 
-**Definition:** The event is emitted anytime a student course grade is overriden. Typically grade override feature is used to edit student course grade
+**Definition:** The event is emitted anytime a student course grade is overridden. Typically, the grade override feature is used to edit student course grades
 
 **Trigger:** Triggered when the final grade override has been changed. Only triggered when the override changes the existing score.
 

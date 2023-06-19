@@ -18,7 +18,7 @@ accepted.  This extension adds the following parameters to the LTI
 launch event:
 
 -   <b>ext\_content\_intended\_use:</b> This describes what the content will be used
-    for once it is returned to Canvas. For a homework submission tools the
+    for once it is returned to Canvas. For a homework submission tool the
     value will be "homework".
 
 -   <b>ext\_content\_return\_types:</b> A comma separated list of the possible return

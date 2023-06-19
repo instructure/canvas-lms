@@ -8,7 +8,7 @@ can be surfaced <a href="file.link_selection_placement.html" target="_blank">as 
 course modules</a> or used to <a href="file.assignment_selection_placement.html"
 target="_blank">deliver custom assignment experiences</a>. Canvas supports some
 additional integration points using LTI (see the "Placements" dropdown in the
-left hand navigation here) to offer a more integrated experience and to allow
+left-hand navigation here) to offer a more integrated experience and to allow
 for more customization of the Canvas product. This is accomplished by <a
 href="file.lti_dev_key_config.html" target="_blank">configuring additional settings</a>
 on external tools used inside of Canvas and by leveraging <a
@@ -73,7 +73,7 @@ href="file.content_item.html" target="_blank">LTI deep links</a>:
 
   Example use cases might include:
 
-  - adding a button to  <a href="file.editor_button_placement.html"
+  - adding a button to <a href="file.editor_button_placement.html"
     target="_blank">embed content to the Rich Content Editor</a>:
 
    * Embedding resources from campus video/image repository
@@ -117,7 +117,7 @@ target="_blank">configure the tool by a tool-provided URL</a>
 (recommended), or <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-XML/ta-p/221"
 target="_blank">paste in the XML</a> that the tool provides.
 
-For information on how to programmatically configured external tools, so users
+For information on how to programmatically configure external tools, so users
 don't have to copy and paste URLs or XML, please see the Canvas
 <a href="external_tools.html">external tools API</a>.
 

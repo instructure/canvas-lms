@@ -22,7 +22,7 @@ This is a very simple tool that allows you to test 1.1 Grade Passback (also call
 
 Installation instructions are found in the repository's README file, and should still work with only a couple of small changes:
 
-- omit the `-rubygems` from the start up command
+- omit the `-rubygems` from the start-up command
 - you may need to point your dockerized canvas at your computer's localhost, but this worked out of the box for me.
 - the Canvas screenshots for configuring are out of date but the instructions still work.
 

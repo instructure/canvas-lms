@@ -4,7 +4,7 @@ In its history, Canvas has had 3 options for plagiarism detection.
 
 ## Canvas Plugin
 Created initially for TurnItIn and then VeriCite was added at a later point.
-In this version, when a student submitted to an assignment that had plagiarism data associated with it, Canvas would create a delayed job with to contact the plagiarism vendor and request the plagiarism report.  This version was problematic because the job would finish somewhere around 20 hours after the submission was created and if the vendor hadn't created the report for some reason (they were delayed or their settings required waiting to an arranged time to create the report), the report would never show up.
+In this version, when a student submitted to an assignment that had plagiarism data associated with it, Canvas would create a delayed job that contacted the plagiarism vendor and requested the plagiarism report.  This version was problematic because the job would finish somewhere around 20 hours after the submission was created and if the vendor hadn't created the report for some reason (they were delayed or their settings required waiting until an arranged time to create the report), the report would never show up.
 Plagiarism report data is saved on the student's submission record.
 Theoretically this should be out of use, but we seem to keep running into it occasionally.
 
@@ -29,7 +29,7 @@ LTI 2.0's data model is complex and messy in Canvas.  This is part of why LTI 2.
 
 Plagiarism Platform requires an Lti::ToolConsumerProfile to be set up with extra LTI capabilities that allow Canvas.placements.similarityDetection and vnd.Canvas.OriginalityReport.url.  Those have been created by engineers directly and the UUID for the profile is given to the tool developer.
 
-Assignments associated with the plagiarism platform have an AssignmentConfigurationToolLookup associated to them that contains a vendor code, a product code and a resource type code.  These are used to search for an associated Lti::ToolProxy that is installed.  (Thus allowing a school/vendor to reinstall a new version of the tool and have the links still work).  See `Lti::ToolProxy.proxies_in_order_by_codes`(app/models/lti/tool_proxy.rb) for the logic about how these are queried.
+Assignments associated with the plagiarism platform have an AssignmentConfigurationToolLookup associated with them that contains a vendor code, a product code and a resource type code.  These are used to search for an associated Lti::ToolProxy that is installed.  (Thus allowing a school/vendor to reinstall a new version of the tool and have the links still work).  See `Lti::ToolProxy.proxies_in_order_by_codes`(app/models/lti/tool_proxy.rb) for the logic about how these are queried.
 
 When the Lti::ToolProxy is created, we create a webhook subscription for that tool.  Since Lti::ToolProxies are mostly installed at the root account and not all assignments use the Plagiarism Platform, the Lti::ToolProxy has an associated_integration_id added on creation.  We add this associated_integration_id to the live event subscription, and then when an event is received in the live events publisher from Canvas, any subscriptions that have an associated_integration_id will not receive any event without a matching associated_integration_id.  To add the appropriate associated_integration_id when an event is created, we have to look up the closest currently installed tool to the assignment using the assignment configuration tool and the tool proxy lookup code.
 

@@ -58,7 +58,7 @@ the **Add** dropdown.
 3. Canvas then performs a Deep Linking launch request (if configured) to the
 tool and the user is presented with a tool-side UI to select or create a
 single LTI resource.
-4. The tool then returns the LTI deep linking message back to Canvas with a URL for
+4. The tool then returns the LTI deep-linking message back to Canvas with a URL for
 the LTI resource. Usually this message contains a URL with resource identifiers in the url.
 5. When students view the module item, Canvas launches to the URL returned by the tool.
 6. If a resource identifier was provided in Step 4, then the tool will receive this in the
@@ -69,7 +69,7 @@ All of these settings are contained for the **link_selection** placement:
 
 -   url: &lt;url&gt; (optional)
 
-    This is the URL that will be POSTed to when users click selects the tool from
+    This is the URL that will be POSTed to when users click to select the tool from
     the module item creation view. It can be the same as the tool's
     URL, something different. Domain and URL matching are not enforced for
     link_selection launches; however, if LTI links are returned, Domain and
@@ -98,7 +98,7 @@ All of these settings are contained for the **link_selection** placement:
 -   message_type: &lt;an IMS LTI message type&gt; (optional)
 
     Sets the message_type to be sent during the LTI launch. It is expected that
-    the tool use this to determine if a Deep Linking flow is being requested by
+    the tool uses this to determine if a Deep Linking flow is being requested by
     Canvas and present an appropriate UI. A Deep Linking flow is highly recommended
     for this placement, but is not required. See the
     <a href="file.content_item.html" target=_"blank">Deep Linking

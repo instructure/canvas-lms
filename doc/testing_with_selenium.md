@@ -57,7 +57,7 @@ prepare
 
 You might encounter problems with some Ruby dependencies. The ["Dependency
 Installation" section](https://github.com/instructure/canvas-lms/wiki/Quick-Start#dependency-installation)
-in the public Canvas LMS Github wiki has some useful tips.
+in the public Canvas LMS GitHub wiki has some useful tips.
 
 4.a. Optional. Run delayed jobs in the foreground (not all Selenium tests need
 this but some do):

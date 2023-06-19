@@ -1,7 +1,7 @@
 {
   "name": "conversation_message_created",
   "definition": "The event is emitted anytime a new conversation message is added to a conversation.",
-  "trigger": "Triggered when a new conversation mesage is created.",
+  "trigger": "Triggered when a new conversation message is created.",
   "schema": {
     "author_id": "The Canvas id of the author.",
     "conversation_id": "The Canvas id of the conversation.",

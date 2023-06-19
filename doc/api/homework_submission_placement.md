@@ -78,7 +78,7 @@ All of these settings are contained for the **homework_submission** placement:
 -   message_type: &lt;an IMS LTI message type&gt; (optional)
 
     Sets the message_type to be sent during the LTI launch. It is expected that
-    the tool use this to determine if a Deep Linking flow is being requested by
+    the tool uses this to determine if a Deep Linking flow is being requested by
     Canvas and present an appropriate UI. A Deep Linking flow is highly recommended
     for this placement, but is not required. See the
     <a href="file.content_item.html" target=_"blank">Deep Linking
@@ -87,7 +87,7 @@ All of these settings are contained for the **homework_submission** placement:
 -   icon_url &lt;url&gt; (optional)
 
     The URL for an icon that identifies your tool in the RCE toolbar. It is
-    it is recommended that this icon be at least 16 x 16 px and png or svg format
+    recommended that this icon be at least 16 x 16 px and png or svg format
     the url should be secured over SSL (https). This icon only appears if a tool
     is listed in the "More" tab (i.e. the 4th or greater installed tool that uses
     this placement).

@@ -111,7 +111,7 @@ Conversation
 
 **Definition:** The event is emitted anytime a new conversation message is added to a conversation.
 
-**Trigger:** Triggered when a new conversation mesage is created.
+**Trigger:** Triggered when a new conversation message is created.
 
 
 

@@ -78,12 +78,12 @@ class DataServicesEventsLoader
 
   def event_types
     @event_types ||= files
-                     .group_by { |file_path| extrat_category_from_file_path(file_path) }
+                     .group_by { |file_path| extract_category_from_file_path(file_path) }
                      .sort
                      .to_h
   end
 
-  def extrat_category_from_file_path(file_path)
+  def extract_category_from_file_path(file_path)
     CUSTOM_EVENTS_CATEGORIES[file_path] || file_path.split("/").last.split("_").first
   end
 

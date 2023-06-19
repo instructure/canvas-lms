@@ -24,7 +24,7 @@ Canvas and IMS have historically worked hand-in-hand to develop new features and
 
 **Status: Deprecated**
 
-The original LTI standard. LTI 1.0 was originally released in 2010 and provided a very simple mechanism for launching Tools from an LMS. This standard uses **OAuth 1** signing for authentication, and the data sent to the tool is contained in the form body of the HTTP POST request. LTI 1.1 was released in 2011 and provided the spec for Tools to send data back to the Tool Consumer, called the **Outcomes Service**. Standards for communicating with **LIS** (IMS Learning Information Services) were also included in this release, which provides methods to commmunicate enrollment information between Tool Providers, Tool Consumers, and SISs (Student Information Systems, enrollment and data systems commonly owned by the school).
+The original LTI standard. LTI 1.0 was originally released in 2010 and provided a very simple mechanism for launching Tools from an LMS. This standard uses **OAuth 1** signing for authentication, and the data sent to the tool is contained in the form body of the HTTP POST request. LTI 1.1 was released in 2011 and provided the spec for Tools to send data back to the Tool Consumer, called the **Outcomes Service**. Standards for communicating with **LIS** (IMS Learning Information Services) were also included in this release, which provides methods to communicate enrollment information between Tool Providers, Tool Consumers, and SISs (Student Information Systems, enrollment and data systems commonly owned by the school).
 
 - [LTI 1.1 Specification](https://www.imsglobal.org/specs/ltiv1p1/implementation-guide)
 - [More information about LIS](https://www.imsglobal.org/activity/onerosterlis)
@@ -50,7 +50,7 @@ There are a _lot_ of new concepts in this standard, and they are best defined in
 
 #### General Implementation Notes
 
-For the the most case, LTI 2.0 implementation in Canvas is completely separate from the LTI 1.1 implementation. The team made a clean break when implementing 2.0 (with some exceptions, see [LTI Launches](./03_lti_launches.md) for more details).
+For most cases, LTI 2.0 implementation in Canvas is completely separate from the LTI 1.1 implementation. The team made a clean break when implementing 2.0 (with some exceptions, see [LTI Launches](./03_lti_launches.md) for more details).
 
 One of the downfalls of this decision was that LTI 2.0 never reached feature parity with LTI 1.1 in Canvas. Because of this (and the general complexity of LTI 2.0), it was rarely used in Canvas.
 
@@ -60,7 +60,7 @@ At the time of writing, the [plagiarism detection platform](./04_plagiarism_dete
 
 **Status: Current**
 
-The advent of LTI 1.3 in 2019 promised all the same functionality as previous versions, a brand new security model, and many more services that allowed greater communication between Tool and Platform. It is the current and long-term LTI Core version. The largest change was to move to **OpenID Connect** and **OAuth 2** workflows for authentication, and data is sent to the tool in a signed **JWT** instead of in the request body. This means that instead of the simple one-request flow of 1.1, a couple of additional redirects/requests are needed. In addition, 3 new services for sending data from Tool to Platform were standardized under the **LTI Advantage** umbrella, which will be talked about in detail later. This is the most important version to understand, since all new LTI development in Canvas falls under this category.
+The advent of LTI 1.3 in 2019 promised all the same functionality as previous versions, a brand-new security model, and many more services that allowed greater communication between Tool and Platform. It is the current and long-term LTI Core version. The largest change was to move to **OpenID Connect** and **OAuth 2** workflows for authentication, and data is sent to the tool in a signed **JWT** instead of in the request body. This means that instead of the simple one-request flow of 1.1, a couple of additional redirects/requests are needed. In addition, 3 new services for sending data from Tool to Platform were standardized under the **LTI Advantage** umbrella, which will be talked about in detail later. This is the most important version to understand, since all new LTI development in Canvas falls under this category.
 
 - [LTI 1.3 Specification](http://www.imsglobal.org/spec/lti/v1p3)
 - [LTI Advantage Overview](http://www.imsglobal.org/spec/lti/v1p3/impl)
@@ -77,7 +77,7 @@ The advent of LTI 1.3 in 2019 promised all the same functionality as previous ve
 - **Message**: One of the two main integrations between Platform and Tool. A Message comes from a user and their actions within their browser, such as clicking on an embedded link for an LTI Resource. This action initiates an OpenID login, which results in the platform passing the Message (a JWT) to the tool.
 - **Service**: One of the two main integrations between Platform and Tool. A Service allows a Tool to directly communicate with a Platform. The LTI Advantage services are an example of this integration type.
 
-More information about these are found in the spec [here](http://www.imsglobal.org/spec/lti/v1p3/#key-concepts-and-elements).
+More information about these is found in the spec [here](http://www.imsglobal.org/spec/lti/v1p3/#key-concepts-and-elements).
 
 #### General Implementation Notes
 

@@ -22,7 +22,7 @@ parameters to create custom URL that will be used as the link.
 URLs returned in this manner will not circumvent the standard LTI 
 URL/domain checking procedure, which is important to remember when 
 returning URLs to add to the course. In general, it is best to make 
-the these type of tools as domain-matching tool and only return URLs
+these type of tools as domain-matching tools and only return URLs
 whose domain matches the tool's specified domain.
 
 When tools are loaded as link selectors, Canvas sends an additional 

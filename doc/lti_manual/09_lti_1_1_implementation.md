@@ -50,7 +50,7 @@ Once a tool has been added to Canvas in the form of a `ContextExternalTool` reco
 ## Tool Launches
 For a conceptual overview of LTI 1.1 launches, see [LTI 1.1 Launches](doc/lti_manual/05_lti_1_1_launches.md)
 
-LTI 1.1 launches use have five primary components in play:
+LTI 1.1 launches have five primary components in play:
 - The user's browser
 - Rails Controller Actions
 - LTI Outbound Adapter / Related Factories
@@ -108,7 +108,7 @@ The client can then make a follow-up request to the `sessionless_launch` endpoin
 
 **Action Summary**
 
-While these actions differ in a few ways, they each perform similar steps do launch the LTI tool. Each of the above actions to the following:
+While these actions differ in a few ways, they each perform similar steps to launch the LTI tool. Each of the above actions to the following:
 
 **I. Lookup the correct ContextExternalTool record**.
 
@@ -284,7 +284,7 @@ and
 )
 ```
 
-As can bee seen, the lti-context, lti_user, lti_tool, and lti_account models are used to create an instance of `LtiOutbound::ToolLaunch`, which will be used to generate the launch parameters in the generate_post_payload_for*` methods.
+As can be seen, the lti-context, lti_user, lti_tool, and lti_account models are used to create an instance of `LtiOutbound::ToolLaunch`, which will be used to generate the launch parameters in the generate_post_payload_for*` methods.
 
 **II. LtiOutboundAdapter#generate_post_payload**
 

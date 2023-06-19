@@ -121,7 +121,7 @@ Canvas supports the following AGS services:
 Before a tool can run AGS requests, it must be available in the course that it
 wishes to interact with, and also complete the
 <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">
-OAuth2 Client Credentials</a> grant to obtain an access token. This covered in
+OAuth2 Client Credentials</a> grant to obtain an access token. This is covered in
 depth in the <a href="https://www.imsglobal.org/spec/security/v1p0/#securing_web_services" target="_blank">
 IMS LTI Security Framework, SEC 4</a>.
 

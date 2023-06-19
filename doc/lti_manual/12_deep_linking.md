@@ -44,7 +44,7 @@ If the return url has an id appended to it, Canvas interprets this as an "edit" 
 
 [`Lti::ContentItemSelectionRequest`](/lib/lti/content_item_selection_request.rb) builds the parameters for the content item selection request, and houses per-placement configuration of those parameters.
 [`ExternalContentController`](/app/controllers/external_content_controller.rb) exposes the content item return url and creates content items.
-[`ExternalContentSuccess` (UI)](/ui/features/external_content_success/index.js) rendered by the above controller, sends postMessage containing content items to main Canvas window.
+[`ExternalContentSuccess` (UI)](/ui/features/external_content_success/index.js) rendered by the above controller, sends postMessage containing content items to the main Canvas window.
 
 ## Deep Linking and LTI 1.3
 

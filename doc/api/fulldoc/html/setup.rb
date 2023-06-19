@@ -38,7 +38,7 @@ module YARD::Templates::Helpers::BaseHelper
     #  # @see api:Assignments#create
     #  # => <a href="assignments.html#method.assignments_api.create">create</a>
     #
-    # @example Inline reference with an overriden title
+    # @example Inline reference with an overridden title
     #   # Here's a link to absolute {api:Assignments#destroy destruction}
     #   # => <a href="assignments.html#method.assignments_api.destroy">destruction</a>
     #
@@ -63,7 +63,7 @@ module YARD::Templates::Helpers::BaseHelper
     #   # @see api:Assignments:Assignment
     #   # => <a href="assignments.html#Assignment">Assignment</a>
     #
-    # @example Explicit resource reference with an overriden title
+    # @example Explicit resource reference with an overridden title
     #   # @return api:Assignments:AssignmentOverride An Assignment Override
     #   # => <a href="assignments.html#Assignment">An Assignment Override</a>
     elsif args.first.is_a?(String) && args.first =~ /^api:([^:]+):(.*)/

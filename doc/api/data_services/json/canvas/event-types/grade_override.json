@@ -1,6 +1,6 @@
 {
   "name": "grade_override",
-  "definition": "The event is emitted anytime a student course grade is overriden. Typically grade override feature is used to edit student course grade",
+  "definition": "The event is emitted anytime a student course grade is overridden. Typically grade override feature is used to edit student course grade",
   "trigger": "Triggered when the final grade override has been changed. Only triggered when the override changes the existing score.",
   "schema": {
     "score_id": "Canvas Id of Score record",

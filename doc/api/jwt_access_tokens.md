@@ -84,7 +84,7 @@ We highly recommend using a library to create and sign these tokens.
 Next make a request to the authorization endpoint to retrieve your JWT access token. The URL you should use to make this request if sent in the initial registration request sent from Canvas as a parameter named `oauth2_access_token_url`.
 
 
-This signed JWT should be used as the `assertion` parameter and the `grant_type` parameter  should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
+This signed JWT should be used as the `assertion` parameter and the `grant_type` parameter should be set to `urn:ietf:params:oauth:grant-type:jwt-bearer`
 
 **Example request:**
 ```

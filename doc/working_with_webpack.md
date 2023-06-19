@@ -16,14 +16,14 @@ environments.
 
 3) Start using webpack by default instead of require_js by default in all environments.
 
-4) Leverage ES6, no AMD, etc in app code, and start deleting some of our crazy
+4) Leverage ES6, no AMD, etc. in app code, and start deleting some of our crazy
 webpack loaders that were built to deal with some of the require-js specific
 hoops we ran into over the years.
 
 ### Where things are
 
 In order to make webpack able to consume our currently-somewhat-disorganized build structure,
-we've build a series of loaders and plugins for webpack that extend webpack to digest
+we've built a series of loaders and plugins for webpack that extend webpack to digest
 canvas JS and Coffeescript as-it-stands.  These are all in the "frontend_build" folder, and
 are commented where it's deemed helpful.
 
@@ -35,7 +35,7 @@ for test and production can simply extend to add or remove elements as necessary
 
 If you look at package.json, you can see there are 2 scripts for building
 your assets with webpack (webpack and webpack-production). If you want to include
-the translations (eg when you run webpack-production), make sure you've
+the translations (e.g. when you run webpack-production), make sure you've
 run "rake i18nliner:generate_js" first so translations are in place,
 webpack depends on those already existing. You can use these scripts with "yarn run":
 
@@ -51,7 +51,7 @@ This uglifies the resulting bundles, and takes longer.  Don't use for developmen
 
 ### Running js tests with webpack
 
-Lets say you are working on the “dashboard_cards” feature, just run:
+Let's say you are working on the “dashboard_cards” feature, just run:
  `yarn run jspec-watch spec/javascripts/jsx/dashboard_card`
 While you write code and it will have a watcher that catches
 any changes and re-runs just the dashboard_card specs if you save any
@@ -74,7 +74,7 @@ To run all the tests, you can run:
 `yarn test`
 
 If you are using docker and want to run them all in a headless container you can 
-do so with with:
+do so with :
 
 `docker-compose run --rm js-tests`
 
@@ -97,7 +97,7 @@ source ~/canvas-lms/ui-build/webpack/webpackHooks/macNotifications.sh
 to execute commands on specific hooks during the build process.
 
 If you use Linux, or would like to setup your own custom Webpack notifications,
-you can take a at how `macNotifications.sh` works and write your own hooks.
+you can take a look at how `macNotifications.sh` works and write your own hooks.
 
 ### FAQ!
 
@@ -109,9 +109,9 @@ the right file; see if you can apply those ideas to your own loader if need be.
 
 *Webpack says it can't find some "translations/" modules.  What should I do?*
 Run `rake i18n:generate_js`.  Webpack doesn't know how to generate the
-translations files yet, though we may tackle that in the future.  For now
+translation files yet, though we may tackle that in the future.  For now
 that extract task needs to run before the first webpack build.  When in doubt,
-just run `rake canvas:compile_assets` for a fully up to date build.
+just run `rake canvas:compile_assets` for a fully up-to-date build.
 
 ## TODO List (update as needed):
 
@@ -145,9 +145,9 @@ it duplicates from prepare_hbs to a function both can use.
 
 [ ] kill the auto-css-in-handlebars imports (make them explicit) and remove that loader
 
-[ ] plugins that need to be extended should have explicit extension points and let plugin register itself
+[ ] plugins that need to be extended should have explicit extension points and let the plugin register itself
 
-[ ] audit all loaders to find dumb things we had to do for require
+[ ] audit all loaders to find dumb things we had to do or require
 
 [ ] {low-priority} in chunks, take AMD requires off of our js files
 

@@ -17,9 +17,9 @@ service like LDAP or SAML.
 Users can receive notifications for different types of events (if an assignment
 is graded, if a new announcement is made, etc.).  They can specify where and how
 often they would like those messages sent.  A user has multiple
-CommunicationChannels, each of which are a route for messaging.  They can register
+CommunicationChannels, each of which is a route for messaging.  They can register
 email, sms, or facebook communication channels and then have certain types of
-notifications send out immediately, daily, weekly or never to those channels.
+notifications sent out immediately, daily, weekly or never to those channels.
 Each notification type is a Notification record, and a user specifies 
 NotificationPolicy records that state where and how often to send each 
 type of notification.  Some notification types also show up on the user's 
@@ -75,7 +75,7 @@ Every course, group, and individual user gets a place to hold files.  They
 can organize them into folders, lock and unlock files for student access, 
 import batches of files as a single zip, etc.  The default is a simple
 javascript uploader, but if flash is enabled then a multi-file uploader
-is overlaid and used instead.  If you have edit priveleges, you can drag a 
+is overlaid and used instead.  If you have edit privileges, you can drag a
 folder to another context and copy its contents without having to re-upload
 all the files.  Files (Attachment is the name of the model) are namespaced
 by the root account, and if a user uploads a file that matches some other file
@@ -84,10 +84,10 @@ This makes it harder for us if we want to delete old files, but keeps storage
 down.
 
 # Wiki
-Every course and group gets a wiki.  They can set edit priveleges to only
-teachers, or students as well.  There's no wiki words, instead there's a
+Every course and group gets a wiki.  They can set edit privileges to only
+teachers, or students as well.  There are no wiki words, instead there's a
 WYSIWYG editor and a sidebar with all the links you could possibly want.  In
-fact, every editable page inside of Instructure gets the same sidebar, so it's
+fact, every editable page inside Instructure gets the same sidebar, so it's
 easy to link from an assignment page to a forum, a file, a wiki page, etc.
 Wiki pages are accessed by name, and created on demand (/courses/5/pages/new_page
 would be created if it didn't exist and you went to it).
@@ -96,8 +96,8 @@ would be created if it didn't exist and you went to it).
 Teachers can build online quizzes for students to take.  They can be graded
 or ungraded.  There are a few quiz question types, including multiple choice,
 true-false, fill-in-the-blank, missing word, short answer, numerical answer,
-and short essay.  A teacher builds a set of questions, assigns each question 
-points, and students can then take the quiz.  Questions answers are keyed randomly
+and short essay.  A teacher builds a set of questions, assigns points to each
+question, and students can then take the quiz.  The answers to questions are keyed randomly
 to prevent cheating, and all grading is done server-side.
 
 Quizzes can also include question groups.  This is easiest to explain with an
@@ -114,7 +114,7 @@ from that bank to any course they manage.
 The calendar view shows assignment due dates and calendar events overlaid on
 a monthly calendar.  A user can see all their courses, groups, and personal
 events overlaid on the same calendar a la Google Calendar.  Those with edit
-priveleges can drag and drop, rename events, etc.  A user can subscribe to their
+privileges can drag and drop, rename events, etc.  A user can subscribe to their
 calendars using an external tool via the ical feed link on their calendar
 page.
 

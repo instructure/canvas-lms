@@ -5,7 +5,7 @@ GraphQL API
 
 GraphQL is a query API language that executes queries by using a type system
 based on defined input data. GraphQL provides more specific inquiries with
-faster results and populate multiple inputs into one query.
+faster results and populates multiple inputs into one query.
 
 Note: GraphQL endpoint permissions mirror permissions for the REST API. A
 user is only granted access to view grades based on that user’s permissions.
@@ -36,7 +36,7 @@ The Canvas REST API will continue to be available.
 
 Fields are being added to the GraphQL API on an as-needed basis.  The GraphQL
 API does not include everything that is currently in the REST API.  Feel free
-to submit pull requests on github to add additional features or talk about it
+to submit pull requests on GitHub to add additional features or talk about it
 in the `#canvas-lms` channel on libera.chat.
 
 ## GraphQL Endpoint

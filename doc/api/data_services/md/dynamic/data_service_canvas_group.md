@@ -258,7 +258,7 @@ Group
 
 <h2 id="group_membership_updated">group_membership_updated</h2>
 
-**Definition:** The event is emitted anytime an existing group membership  is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.
+**Definition:** The event is emitted anytime an existing group membership is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.
 
 **Trigger:** Triggered when a existing group membership is modified.
 

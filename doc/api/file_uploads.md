@@ -28,7 +28,7 @@ you want to create the file. For example, to <a href="courses.html">add a file t
 POST to `/api/v1/courses/:course_id/files`. Or to <a href="submissions.html">upload a file as part of a student homework submission</a>, as the student you'd POST to
 `/api/v1/courses/:course_id/assignments/:assignment_id/submissions/self/files` or `/api/v1/courses/:course_id/assignments/:assignment_id/submissions/comments/self/files` for submission comments.
 
-Note* The endpoint you choose to post files to will change the permissions set on the file. i.e. only files posted to the submissions comments endpoint can be attached to a submissions comment.
+Note* The endpoint you choose to post files to will change the permissions set on the file. i.e. only files posted to the submission's comments endpoint can be attached to a submission's comment.
 
 Arguments:
 
@@ -37,7 +37,7 @@ Arguments:
   <dt>size</dt> <dd>The size of the file, in bytes. This field is recommended, as it will let you find out if there's a quota issue before uploading the raw file.</dd>
   <dt>content_type</dt> <dd>The content type of the file. If not given, it will be guessed based on the file extension.</dd>
   <dt>parent_folder_id</dt><dd>The id of the folder to store the file in. An error will be returned if this does not correspond to an existing folder. If this and parent_folder_path are sent an error will be returned. If neither is given, a default folder will be used.</dd>
-  <dt>parent_folder_path</dt> <dd>The path of the folder to store the file in. The path separator is the forward slash `/`, never a back slash. The folder will be created if it does not already exist. This parameter only applies to file uploads in a context that has folders, such as a user, a course, or a group. If this and parent_folder_id are sent an error will be returned. If neither is given, a default folder will be used.</dd>
+  <dt>parent_folder_path</dt> <dd>The path of the folder to store the file in. The path separator is the forward slash `/`, never a backslash. The folder will be created if it does not already exist. This parameter only applies to file uploads in a context that has folders, such as a user, a course, or a group. If this and parent_folder_id are sent an error will be returned. If neither is given, a default folder will be used.</dd>
   <dt>folder</dt> <dd>[deprecated] Use parent_folder_path instead.</dd>
   <dt>on_duplicate</dt> <dd>How to handle duplicate filenames. If `overwrite`, then this file upload will overwrite any other file in the folder with the same name. If `rename`, then this file will be renamed if another file in the folder exists with the given name. If no parameter is given, the default is `overwrite`. This doesn't apply to file uploads in a context that doesn't have folders.</dd>
   <dt>success_include[]</dt> <dd>An array of additional information to include in the upload success response. See <a href="files.html#method.files.api_show">Files API</a> for more information.</dd>
@@ -78,13 +78,13 @@ upload the actual file data, by POSTing a specially formulated request to
 the URL given in the `upload_url` field of the response.
 
 Depending on how Canvas is configured, this upload URL might be another URL
-in the same domain, or a Amazon S3 bucket, or some other URL. In order to
+in the same domain, or an Amazon S3 bucket, or some other URL. In order to
 work with all Canvas installations, applications should be very careful to
 follow this documentation and not make any undocumented assumptions about
 the upload workflow.
 
 This second request must be POSTed as a multipart/form-data request to
-accomodate the file data. The parameters POSTed with this request come
+accommodate the file data. The parameters POSTed with this request come
 directly from the `upload_params` part of the JSON response in Step 1.
 
 The only addition is the `file` parameter which *must* be posted as the
@@ -106,7 +106,7 @@ Example Response:
     HTTP/1.1 301 Moved Permanently
     Location: https://<canvas>/api/v1/files/1234/create_success?uuid=ABCDE
 
-IMPORTANT:  The request is signed, and will be denied if any parameters
+IMPORTANT: The request is signed, and will be denied if any parameters
 from the `upload_params` response are added, removed or modified.  The
 parameters in `upload_params` may vary over time, and between Canvas
 installs. It's important for the application to copy over all of the
@@ -129,7 +129,7 @@ REST semantics, a GET is required for forwards compatibility with the
 Canvas again, and needs to be authenticated using the normal API access
 token authentication.
 
-In the case of a 201 Created, the upload has been complete and the
+In the case of a 201 Created, the upload has been completed and the
 Canvas JSON representation of the file can be retrieved with a GET from
 the provided Location.
 

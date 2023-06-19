@@ -229,7 +229,7 @@ Enrollment
     "type": "StudentEnrollment",
     "updated_at": "2018-10-09T21:07:33Z",
     "user_id": "21070000000020064",
-    "user_name": "Isaac Netwon",
+    "user_name": "Isaac Newton",
     "workflow_state": "invited"
   }
 }

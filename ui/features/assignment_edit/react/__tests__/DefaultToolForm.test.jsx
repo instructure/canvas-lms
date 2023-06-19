@@ -56,7 +56,7 @@ describe('DefaultToolForm', () => {
     SelectContentDialog.Events.onContextExternalToolSelect.mockRestore()
   })
 
-  it('renders the information mesage', () => {
+  it('renders the information message', () => {
     wrapper = mount(<DefaultToolForm {...newProps()} />)
     expect(wrapper.find('Alert').html()).toContain('Click the button above to add content')
   })

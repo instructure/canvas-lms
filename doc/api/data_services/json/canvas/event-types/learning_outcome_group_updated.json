@@ -5,7 +5,7 @@
   "schema": {
     "context_id": "The ID of the context the learning outcome is used in.",
     "context_type": "The type of context the learning outcome is used in, usually Course.",
-    "description": "Description of the learnning outcome group.",
+    "description": "Description of the learning outcome group.",
     "learning_outcome_group_id": "The local Canvas ID of the learning outcome group.",
     "parent_outcome_group_id": "The local Canvas ID of the group's parent outcome group.",
     "title": "Title of the learning outcome group.",

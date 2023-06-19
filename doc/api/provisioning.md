@@ -25,20 +25,20 @@ As with the other LTI Advantage service, tools must complete a specific <a href=
 
 ### Using NRPS
 
-Once an access token is obtained, tools may begin to <a href="names_and_role.html" target="_blank">synchronize data using NRPS</a>. Using endpoint require knowledge of the context_memberships_url, which can either be obtained during the LTI launch in the <a href=https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration target="_blank">Names and Role Service claim</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
+Once an access token is obtained, tools may begin to <a href="names_and_role.html" target="_blank">synchronize data using NRPS</a>. Using endpoint requires knowledge of the context_memberships_url, which can either be obtained during the LTI launch in the <a href=https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration target="_blank">Names and Role Service claim</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
 
 ### Advantages
 - Canvas REST API access is not required (i.e. no additional authorization UI)
 - Interoperable
 - Can provision all users in an entire course/group as long as the tool knows the context_memberships_url. This is easily obtained in the LTI payload.
-- Can easily deterine if users have been removed from a course
+- Can easily determine if users have been removed from a course
 
 ### Limitations/Challenges
 - Must have knowledge of the Canvas course_id/group_id or context_memberships_url
 - Unidirectional: cannot push new enrollments to Canvas
 
 ### Workflow
-- Step 1: Configure a tool that support NRPS in Canvas
+- Step 1: Configure a tool that supports NRPS in Canvas
 - Step 2: Launch the tool
 - Step 3: Tool consumes the Names and Role service claim as described in the<a href="https://www.imsglobal.org/spec/lti-nrps/v2p0#lti-1-3-integration" target="blank">NRPS specification</a>, or by substituting the desired course_id/group_id in the <a href="names_and_role.html" target="_blank">Names and Role API</a>.
 - Step 4: Tool obtains <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">a client_credentials access token</a> (this can actually happen any time before the next step)
@@ -89,7 +89,7 @@ Accessing Canvas Data also has its own authentication system that is <a href="ht
 ### Limitations/Challenges
 - Requires implementation of additional authentication systems.
 - Results in non-interoperable integrations.
-- If using Canvas APIs to sync entire accounts, can be slow for large accounts due to <a href="file.throttling.html" target="_blank">API throttling</a> and the sheer volume of requests being made
+- If using Canvas APIs to sync entire accounts, it can be slow for large accounts due to <a href="file.throttling.html" target="_blank">API throttling</a> and the sheer volume of requests being made
 - Reports can take hours to generate for large accounts; breaking into many smaller reports broken by term or object is recommended.
 - Canvas Data is not updated in real-time.
 
