@@ -41,7 +41,7 @@ function defaultProps(option = {}) {
     toggleCompletion: () => {},
     updateTodo: () => {},
     currentUser: user,
-    ...option
+    ...option,
   }
 }
 
@@ -59,7 +59,7 @@ function noteProps(option) {
     updateTodo: () => {},
     currentUser: user,
     dateStyle: 'todo',
-    ...option
+    ...option,
   }
 }
 
@@ -75,7 +75,7 @@ function groupProps() {
       id: '9',
       title: 'Account-level group 1',
       color: '#F06291',
-      url: '/groups/9'
+      url: '/groups/9',
     },
     date: DEFAULT_DATE,
     associated_item: 'Page',
@@ -85,7 +85,7 @@ function groupProps() {
     badges: [],
     toggleCompletion: () => {},
     updateTodo: () => {},
-    currentUser: user
+    currentUser: user,
   }
 }
 
@@ -102,7 +102,7 @@ it('renders Quiz correctly with everything', () => {
         completed: true,
         title: 'I am a Quiz',
         points: 4,
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -116,7 +116,7 @@ it('renders Quiz correctly with just points', () => {
         associated_item: 'Quiz',
         completed: false,
         title: 'I am a Quiz',
-        points: 2
+        points: 2,
       })}
     />
   )
@@ -129,7 +129,7 @@ it('renders Quiz correctly without right side content', () => {
       {...defaultProps({
         associated_item: 'Quiz',
         completed: false,
-        title: 'I am a Quiz'
+        title: 'I am a Quiz',
       })}
     />
   )
@@ -143,7 +143,7 @@ it('renders Quiz correctly with just date', () => {
         associated_item: 'Quiz',
         completed: false,
         title: 'I am a Quiz',
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -159,7 +159,7 @@ it('renders Assignment correctly with everything', () => {
         title: 'I am an Assignment',
         points: 4,
         html_url: 'http://www.non_default_url.com',
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -173,7 +173,7 @@ it('renders Assignment correctly with just points', () => {
         associated_item: 'Assignment',
         completed: false,
         title: 'I am an Assignment',
-        points: 2
+        points: 2,
       })}
     />
   )
@@ -186,7 +186,7 @@ it('renders Assignment correctly without right side content', () => {
       {...defaultProps({
         associated_item: 'Assignment',
         completed: false,
-        title: 'I am an Assignment'
+        title: 'I am an Assignment',
       })}
     />
   )
@@ -200,7 +200,7 @@ it('renders Assignment correctly with just date', () => {
         associated_item: 'Assignment',
         completed: false,
         title: 'I am an Assignment',
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -212,7 +212,7 @@ it('renders assignment peer reviews correctly', () => {
     <PlannerItem
       {...defaultProps({
         associated_item: 'Peer Review',
-        title: 'some reviewable assignment'
+        title: 'some reviewable assignment',
       })}
     />
   )
@@ -227,7 +227,7 @@ it('renders Discussion correctly with everything', () => {
         completed: true,
         title: 'I am a Discussion',
         points: 4,
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -241,7 +241,7 @@ it('renders Discussion correctly with just points', () => {
         associated_item: 'Discussion',
         completed: false,
         title: 'I am a Discussion',
-        points: 2
+        points: 2,
       })}
     />
   )
@@ -254,7 +254,7 @@ it('renders Discussion correctly without right side content', () => {
       {...defaultProps({
         associated_item: 'Discussion',
         completed: false,
-        title: 'I am a Discussion'
+        title: 'I am a Discussion',
       })}
     />
   )
@@ -268,7 +268,7 @@ it('renders Discussion correctly with just date', () => {
         associated_item: 'Discussion',
         completed: false,
         title: 'I am a Discussion',
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -283,7 +283,7 @@ it('renders Announcement correctly with everything', () => {
         completed: true,
         title: 'I am an Announcement',
         points: 4,
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -297,7 +297,7 @@ it('renders Announcement correctly with just points', () => {
         associated_item: 'Announcement',
         completed: false,
         title: 'I am an Announcement',
-        points: 2
+        points: 2,
       })}
     />
   )
@@ -310,7 +310,7 @@ it('renders Announcement correctly without right side content', () => {
       {...defaultProps({
         associated_item: 'Announcement',
         completed: false,
-        title: 'I am an Announcement'
+        title: 'I am an Announcement',
       })}
     />
   )
@@ -324,7 +324,7 @@ it('renders Announcement correctly with just date', () => {
         associated_item: 'Announcement',
         completed: false,
         title: 'I am an Announcement',
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -340,7 +340,7 @@ it('renders Calendar Event correctly with everything', () => {
         title: 'I am a Calendar Event',
         points: 4,
         date: DEFAULT_DATE,
-        dateStyle: 'due'
+        dateStyle: 'due',
       })}
     />
   )
@@ -354,7 +354,7 @@ it('renders Calendar Event correctly without right side content', () => {
         associated_item: 'Calendar Event',
         completed: false,
         title: 'I am a Calendar Event',
-        dateStyle: 'due'
+        dateStyle: 'due',
       })}
     />
   )
@@ -369,7 +369,7 @@ it('renders Calendar Event correctly with just date', () => {
         completed: false,
         title: 'I am a Calendar Event',
         date: DEFAULT_DATE,
-        dateStyle: 'due'
+        dateStyle: 'due',
       })}
     />
   )
@@ -385,7 +385,7 @@ it('renders Calendar Event correctly with start and end time', () => {
         title: 'I am a Calendar Event',
         date: DEFAULT_DATE,
         endTime: DEFAULT_DATE.clone().add(2, 'hours'),
-        dateStyle: 'due'
+        dateStyle: 'due',
       })}
     />
   )
@@ -400,7 +400,7 @@ it('renders Calendar Event correctly with an all day date', () => {
         completed: false,
         title: 'I am a Calendar Event',
         date: DEFAULT_DATE,
-        allDay: true
+        allDay: true,
       })}
     />
   )
@@ -415,7 +415,7 @@ it('renders Page correctly with everything', () => {
         completed: true,
         title: 'I am a Page',
         points: 4,
-        date: DEFAULT_DATE
+        date: DEFAULT_DATE,
       })}
     />
   )
@@ -429,7 +429,7 @@ it('renders Page correctly with just points', () => {
         associated_item: 'Page',
         completed: false,
         title: 'I am a Page',
-        points: 2
+        points: 2,
       })}
     />
   )
@@ -442,7 +442,7 @@ it('renders Page correctly without right side content', () => {
       {...defaultProps({
         associated_item: 'Page',
         completed: false,
-        title: 'I am a Page'
+        title: 'I am a Page',
       })}
     />
   )
@@ -455,7 +455,7 @@ it('renders Page correctly with just date', () => {
     completed: false,
     title: 'I am a Page',
     date: DEFAULT_DATE,
-    timeZone: 'America/Denver'
+    timeZone: 'America/Denver',
   })
   props.courseName = null
   const wrapper = shallow(<PlannerItem {...props} />)
@@ -470,7 +470,7 @@ it('renders Note correctly with everything', () => {
         completed: true,
         title: 'I am a Note',
         date: DEFAULT_DATE,
-        courseName: 'Math 101'
+        courseName: 'Math 101',
       })}
     />
   )
@@ -483,7 +483,7 @@ it('renders Note correctly without Course', () => {
       {...noteProps({
         associated_item: 'To Do',
         completed: false,
-        title: 'I am a Note'
+        title: 'I am a Note',
       })}
     />
   )
@@ -498,7 +498,7 @@ it('renders user-created Todo correctly', () => {
         completed: false,
         title: 'do that one thing',
         courseName: 'To Do',
-        color: null
+        color: null,
       })}
     />
   )
@@ -537,7 +537,7 @@ it('disables the checkbox when toggleAPIPending is true', () => {
   const wrapper = shallow(
     <PlannerItem
       {...defaultProps({points: 35, date: DEFAULT_DATE})}
-      toggleAPIPending
+      toggleAPIPending={true}
       toggleCompletion={mock}
     />
   )
@@ -583,8 +583,8 @@ it('renders feedback if available', () => {
       author_avatar_url: '/avatar/is/here/',
       author_name: 'Boyd Crowder',
       comment: 'Death will not be the end of your suffering.',
-      is_media: false
-    }
+      is_media: false,
+    },
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -592,7 +592,7 @@ it('renders feedback if available', () => {
 
 it('renders the location if available', () => {
   const props = defaultProps({
-    location: 'Columbus, OH'
+    location: 'Columbus, OH',
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -601,9 +601,9 @@ it('renders the location if available', () => {
 it('renders feedback anonymously according to the assignment settings', () => {
   const props = defaultProps({
     feedback: {
-      comment: 'Open the pod bay doors, HAL.'
+      comment: 'Open the pod bay doors, HAL.',
     },
-    location: 'NYC'
+    location: 'NYC',
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -615,9 +615,9 @@ it('prefers to render feedback if it and the location are available', () => {
     feedback: {
       author_avatar_url: '/avatar/is/here/',
       author_name: 'Dr. David Bowman',
-      comment: 'Open the pod bay doors, HAL.'
+      comment: 'Open the pod bay doors, HAL.',
     },
-    location: 'NYC'
+    location: 'NYC',
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -626,7 +626,7 @@ it('prefers to render feedback if it and the location are available', () => {
 it('renders the end time if available', () => {
   const props = defaultProps({
     associated_item: 'Calendar Event',
-    endTime: DEFAULT_DATE.clone().add(2, 'hours')
+    endTime: DEFAULT_DATE.clone().add(2, 'hours'),
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -635,7 +635,7 @@ it('renders the end time if available', () => {
 it('does not render end time if the same as start time', () => {
   const props = defaultProps({
     associated_item: 'Calendar Event',
-    endTime: DEFAULT_DATE.clone()
+    endTime: DEFAULT_DATE.clone(),
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -647,8 +647,8 @@ it('renders media feedback if available', () => {
       author_avatar_url: '/avatar/is/here/',
       author_name: 'Howard Stern',
       comment: 'This is a media comment.',
-      is_media: true
-    }
+      is_media: true,
+    },
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
@@ -656,7 +656,7 @@ it('renders media feedback if available', () => {
 
 describe('with isObserving', () => {
   it('renders the checkbox as disabled when isObserving', () => {
-    const wrapper = shallow(<PlannerItem {...defaultProps()} isObserving />)
+    const wrapper = shallow(<PlannerItem {...defaultProps()} isObserving={true} />)
     expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
   })
 
@@ -666,9 +666,9 @@ describe('with isObserving', () => {
         {...defaultProps({
           associated_item: 'To Do',
           completed: false,
-          title: 'I am a to do'
+          title: 'I am a to do',
         })}
-        isObserving
+        isObserving={true}
       />
     )
     expect(wrapper.find('[data-testid="edit-event-button"]').exists()).toBeFalsy()
@@ -685,7 +685,7 @@ it('shows the "Join" button for zoom calendar events', () => {
         title: 'I am a Calendar Event',
         date: DEFAULT_DATE,
         dateStyle: 'due',
-        onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+        onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
       })}
     />
   )
@@ -724,7 +724,7 @@ describe('with simplifiedControls', () => {
               date: moment().add(1, 'days'),
               allDay: true,
               dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
           />
         )
@@ -742,7 +742,7 @@ describe('with simplifiedControls', () => {
               date: moment().add(1, 'hours'),
               allDay: false,
               dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
           />
         )
@@ -761,7 +761,7 @@ describe('with simplifiedControls', () => {
               end_time: moment().add(2, 'hours'),
               allDay: false,
               dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
           />
         )
@@ -793,7 +793,7 @@ describe('with simplifiedControls', () => {
               date: today,
               allDay: true,
               dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
           />
         )
@@ -812,7 +812,7 @@ describe('with simplifiedControls', () => {
               date: today.add(-1, 'hour'),
               allDay: false,
               dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
           />
         )
@@ -831,7 +831,7 @@ describe('with simplifiedControls', () => {
               end_time: moment().add(1, 'hour'),
               allDay: false,
               dateStyle: 'due',
-              onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+              onlineMeetingURL: 'https://foo.zoom.us/j/123456789',
             })}
           />
         )

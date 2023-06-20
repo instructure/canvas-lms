@@ -19,7 +19,7 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
 import {colors} from '@instructure/canvas-theme'
-import {themeable, ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {
   AccessibleContent,
   ScreenReaderContent,
@@ -28,7 +28,7 @@ import {
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 import {Avatar} from '@instructure/ui-avatar'
-import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {
@@ -50,14 +50,13 @@ import {momentObj} from 'react-moment-proptypes'
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import BadgeList from '../BadgeList'
 import CalendarEventModal from '../CalendarEventModal'
-import styles from './styles.css'
-import theme from './theme'
 import {badgeShape, userShape, statusShape, sizeShape, feedbackShape} from '../plannerPropTypes'
 import {getDynamicFullDateAndTime} from '../../utilities/dateUtils'
 import {showPillForOverdueStatus} from '../../utilities/statusUtils'
 import {assignmentType as getAssignmentType} from '../../utilities/contentUtils'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
+import buildStyle from './style'
 
 export class PlannerItem_raw extends Component {
   static propTypes = {
@@ -113,6 +112,7 @@ export class PlannerItem_raw extends Component {
       calendarEventModalOpen: false,
       completed: props.completed,
     }
+    this.style = buildStyle()
   }
 
   componentDidMount() {
@@ -323,7 +323,7 @@ export class PlannerItem_raw extends Component {
   renderTitle() {
     if (['To Do', 'Calendar Event'].includes(this.props.associated_item)) {
       return (
-        <div className={styles.title} style={{position: 'relative'}}>
+        <div className={this.style.classNames.title} style={{position: 'relative'}}>
           <Link
             isWithinText={false}
             theme={{
@@ -386,7 +386,7 @@ export class PlannerItem_raw extends Component {
   renderItemSubMetric = () => {
     if (this.props.points) {
       return (
-        <div className={styles.score}>
+        <div className={this.style.classNames.score}>
           <Text size="large">{this.props.points}</Text>
           <Text size="x-small">
             &nbsp;
@@ -397,11 +397,13 @@ export class PlannerItem_raw extends Component {
     }
     if (this.props.associated_item === 'To Do' && !this.props.isObserving) {
       return (
-        <div className={styles.editButton}>
-          <ApplyTheme
+        <div className={this.style.classNames.editButton}>
+          <InstUISettingsProvider
             theme={{
-              [IconButton.theme]: {
-                iconColor: this.props.simplifiedControls ? undefined : this.props.color,
+              componentOverrides: {
+                IconButton: {
+                  iconColor: this.props.simplifiedControls ? undefined : this.props.color,
+                },
               },
             }}
           >
@@ -413,7 +415,7 @@ export class PlannerItem_raw extends Component {
               onClick={this.toDoLinkClick}
               screenReaderLabel={formatMessage('Edit')}
             />
-          </ApplyTheme>
+          </InstUISettingsProvider>
         </div>
       )
     }
@@ -422,16 +424,18 @@ export class PlannerItem_raw extends Component {
 
   renderItemMetrics = () => {
     const secondaryClasses = classnames(
-      styles.secondary,
-      !this.hasBadges() ? styles.secondary_no_badges : ''
+      this.style.classNames.secondary,
+      !this.hasBadges() ? this.style.classNames.secondary_no_badges : ''
     )
-    const metricsClasses = classnames(styles.metrics, {[styles.with_end_time]: this.showEndTime()})
+    const metricsClasses = classnames(this.style.classNames.metrics, {
+      [this.style.classNames.with_end_time]: this.showEndTime(),
+    })
     return (
       <div className={secondaryClasses}>
-        <div className={styles.badges}>{this.renderBadges()}</div>
+        <div className={this.style.classNames.badges}>{this.renderBadges()}</div>
         <div className={metricsClasses}>
           {this.renderItemSubMetric()}
-          <div className={styles.due}>
+          <div className={this.style.classNames.due}>
             <Text size="x-small">
               <PresentationContent>{this.renderDateField()}</PresentationContent>
             </Text>
@@ -471,10 +475,13 @@ export class PlannerItem_raw extends Component {
   renderItemDetails = () => {
     return (
       <div
-        className={classnames(styles.details, !this.hasBadges() ? styles.details_no_badges : '')}
+        className={classnames(
+          this.style.classNames.details,
+          !this.hasBadges() ? this.style.classNames.details_no_badges : ''
+        )}
       >
         {!this.props.simplifiedControls && (
-          <div className={styles.type}>
+          <div className={this.style.classNames.type}>
             <Text size="x-small" color="secondary">
               {this.renderType()}
             </Text>
@@ -489,7 +496,7 @@ export class PlannerItem_raw extends Component {
     if (this.props.responsiveSize === 'small') {
       return (
         <>
-          <div className={styles.moreDetails}>
+          <div className={this.style.classNames.moreDetails}>
             {this.renderTitle()}
             {this.renderOnlineMeeting()}
           </div>
@@ -523,7 +530,7 @@ export class PlannerItem_raw extends Component {
       const IndicatorComponent = newItem ? NewActivityIndicator : MissingIndicator
       return (
         <NotificationBadge responsiveSize={this.props.responsiveSize}>
-          <div className={styles.activityIndicator}>
+          <div className={this.style.classNames.activityIndicator}>
             <IndicatorComponent
               title={this.props.title}
               itemIds={[this.props.uniqueId]}
@@ -556,8 +563,8 @@ export class PlannerItem_raw extends Component {
         ? formatMessage('You have media feedback.')
         : feedback.comment
       return (
-        <div className={styles.feedback}>
-          <span className={styles.feedbackAvatar}>
+        <div className={this.style.classNames.feedback}>
+          <span className={this.style.classNames.feedbackAvatar}>
             <Avatar
               name={feedback.author_name || '?'}
               src={feedback.author_avatar_url}
@@ -565,7 +572,7 @@ export class PlannerItem_raw extends Component {
               data-fs-exclude={true}
             />
           </span>
-          <span className={styles.feedbackComment}>
+          <span className={this.style.classNames.feedbackComment}>
             <Text fontStyle="italic">{comment}</Text>
           </span>
         </div>
@@ -574,7 +581,7 @@ export class PlannerItem_raw extends Component {
     const location = this.props.location
     if (location) {
       return (
-        <div className={styles.location}>
+        <div className={this.style.classNames.location}>
           <Text>{location}</Text>
         </div>
       )
@@ -585,7 +592,7 @@ export class PlannerItem_raw extends Component {
   renderCompletedCheckbox() {
     if (this.props.isMissingItem) {
       return (
-        <div className={styles.completed}>
+        <div className={this.style.classNames.completed}>
           <IconWarningLine color="error" />
         </div>
       )
@@ -603,10 +610,12 @@ export class PlannerItem_raw extends Component {
         })
 
     return (
-      <div className={styles.completed}>
-        <ApplyTheme
+      <div className={this.style.classNames.completed}>
+        <InstUISettingsProvider
           theme={{
-            [CheckboxFacade.theme]: this.getCheckboxTheme(),
+            componentOverrides: {
+              CheckboxFacade: this.getCheckboxTheme(),
+            },
           }}
         >
           <Checkbox
@@ -617,7 +626,7 @@ export class PlannerItem_raw extends Component {
             disabled={this.props.toggleAPIPending || this.props.isObserving}
             readOnly={this.props.readOnly}
           />
-        </ApplyTheme>
+        </InstUISettingsProvider>
       </div>
     )
   }
@@ -633,7 +642,7 @@ export class PlannerItem_raw extends Component {
         ? formatMessage('join active online meeting')
         : formatMessage('join online meeting')
       return (
-        <div className={styles.onlineMeeting}>
+        <div className={this.style.classNames.onlineMeeting}>
           <Button
             data-testid={enabled ? 'join-button-hot' : 'join-button'}
             size="small"
@@ -653,40 +662,46 @@ export class PlannerItem_raw extends Component {
 
   render() {
     return (
-      <div
-        className={classnames(
-          styles.root,
-          styles[this.getLayout()],
-          'planner-item',
-          {
-            [styles.missingItem]: this.props.isMissingItem,
-          },
-          this.props.simplifiedControls ? styles.k5Layout : ''
-        )}
-        ref={this.registerRootDivRef}
-      >
-        {this.renderNotificationBadge()}
-        {this.renderCompletedCheckbox()}
+      <>
+        <style>{this.style.css}</style>
         <div
-          className={this.props.associated_item === 'To Do' ? styles.avatar : styles.icon}
-          style={{color: this.props.simplifiedControls ? undefined : this.props.color}}
-          aria-hidden="true"
+          className={classnames(
+            this.style.classNames.root,
+            this.style.classNames[this.getLayout()],
+            'planner-item',
+            {
+              [this.style.classNames.missingItem]: this.props.isMissingItem,
+            },
+            this.props.simplifiedControls ? this.style.classNames.k5Layout : ''
+          )}
+          ref={this.registerRootDivRef}
         >
-          {this.renderIcon()}
-        </div>
-        <div className={styles.layout}>
-          <div className={styles.innerLayout}>
-            {this.renderItemDetails()}
-            {this.renderItemMetrics()}
+          {this.renderNotificationBadge()}
+          {this.renderCompletedCheckbox()}
+          <div
+            className={
+              this.props.associated_item === 'To Do'
+                ? this.style.classNames.avatar
+                : this.style.classNames.icon
+            }
+            style={{color: this.props.simplifiedControls ? undefined : this.props.color}}
+            aria-hidden="true"
+          >
+            {this.renderIcon()}
           </div>
-          {this.renderExtraInfo()}
+          <div className={this.style.classNames.layout}>
+            <div className={this.style.classNames.innerLayout}>
+              {this.renderItemDetails()}
+              {this.renderItemMetrics()}
+            </div>
+            {this.renderExtraInfo()}
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 }
 
-const ThemeablePlannerItem = themeable(theme, styles)(PlannerItem_raw)
-const AnimatablePlannerItem = animatable(ThemeablePlannerItem)
-AnimatablePlannerItem.theme = ThemeablePlannerItem.theme
+const AnimatablePlannerItem = animatable(PlannerItem_raw)
+AnimatablePlannerItem.theme = PlannerItem_raw.theme
 export default AnimatablePlannerItem

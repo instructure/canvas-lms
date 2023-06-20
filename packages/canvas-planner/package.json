@@ -44,6 +44,7 @@
   ],
   "dependencies": {
     "@instructure/canvas-theme": "7",
+    "@instructure/emotion": "^8.38.1",
     "@instructure/js-utils": "*",
     "@instructure/ui-a11y-content": "7",
     "@instructure/ui-a11y-utils": "7",
@@ -112,6 +113,10 @@
     "@instructure/babel-plugin-themeable-styles": "7.19.0-canvas",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@sheerun/mutationobserver-shim": "^0.3.2",
+    "@testing-library/dom": "^8",
+    "@testing-library/jest-dom": "^5",
+    "@testing-library/react": "^12",
+    "@testing-library/user-event": "^12",
     "babel-jest": "^26",
     "enzyme": "^3",
     "enzyme-adapter-react-16": "^1",
@@ -126,11 +131,7 @@
     "lint-staged": "^9",
     "mockdate": "^2.0.2",
     "moxios": "^0.4.0",
-    "redux-devtools-extension": "^2.13.2",
-    "@testing-library/dom": "^8",
-    "@testing-library/jest-dom": "^5",
-    "@testing-library/react": "^12",
-    "@testing-library/user-event": "^12"
+    "redux-devtools-extension": "^2.13.2"
   },
   "lint-staged": {
     "*.js": "eslint"
