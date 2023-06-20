@@ -658,7 +658,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-        <p>Allows role-based access control based on the built-in Canvas user roles AND the custom roles that you may have created in Canvas. This parameter can be a comma-separated string of one or more required permissions. As expected, if "required_permissions" is included in the configuration, the user will need to have the role listed (or all the roles listed, if multiple) to access the tool. To learn more about roles and to see the roles available for this parameter visit the <a href="roles.html" target="blank">Roles API docs</a>.
+        <p>Allows role-based access control based on the built-in Canvas user roles AND the custom roles that you may have created in Canvas. This parameter can be a comma-separated string of one or more required permissions. As expected, if "required_permissions" is included in the configuration, the user will need to have a role with the permissions listed (or all the permissions listed, if multiple) to access the tool. To learn more about roles and permissions, and to see the permissions available for this parameter visit the <a href="roles.html" target="blank">Roles API docs</a>.
         </p>
 
 
