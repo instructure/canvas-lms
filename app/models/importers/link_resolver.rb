@@ -21,10 +21,8 @@ module Importers
   class LinkResolver
     include LinkParser::Helpers
 
-    def initialize(migration, migration_id_converter)
-      # TODO: eventually, the reference to @migration here
+    def initialize(_migration, migration_id_converter)
       # should be removed prior to being moved into the gem
-      @migration = migration
       @migration_id_converter = migration_id_converter
     end
 
@@ -65,7 +63,7 @@ module Importers
         type = "context_modules" if type == "modules"
         type = "pages" if type == "wiki"
         if type == "pages"
-          query = resolve_module_item_query(context, link[:query])
+          query = resolve_module_item_query(nil, link[:query])
           link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
         elsif type == "attachments"
           att_id = @migration_id_converter.convert_attachment_migration_id(migration_id)
@@ -75,11 +73,10 @@ module Importers
         elsif type == "media_attachments_iframe"
           att_id = @migration_id_converter.convert_attachment_migration_id(migration_id)
           link[:new_value] = att_id ? "/media_attachments_iframe/#{att_id}#{link[:query]}" : link[:old_value]
-        elsif context.respond_to?(type) && context.send(type).respond_to?(:scope)
-          scope = context.send(type).scope
-          if scope.klass.columns_hash["migration_id"] &&
-             (object_id = scope.where(migration_id:).limit(1).pluck(:id).first)
-            query = resolve_module_item_query(context, link[:query])
+        else
+          object_id = @migration_id_converter.convert_migration_id(type, migration_id)
+          if object_id
+            query = resolve_module_item_query(nil, link[:query])
             link[:new_value] = "#{context_path}/#{type_for_url}/#{object_id}#{query}"
           end
         end
@@ -145,9 +142,8 @@ module Importers
     end
 
     def missing_relative_file_url(rel_path)
-      # TODO: abstract away Folder.root_folders
       # the rel_path should already be escaped
-      File.join(URI::DEFAULT_PARSER.escape("#{context_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path.gsub(" ", "%20"))
+      File.join(URI::DEFAULT_PARSER.escape("#{context_path}/file_contents/#{@migration_id_converter.root_folder_name}"), rel_path.gsub(" ", "%20"))
     end
 
     def find_file_in_context(rel_path)
@@ -155,17 +151,17 @@ module Importers
       # This is for backward-compatibility: canvas attachment filenames are escaped
       # with '+' for spaces and older exports have files with that instead of %20
       alt_rel_path = rel_path.tr("+", " ")
-      if @migration.attachment_path_id_lookup
-        mig_id ||= @migration.attachment_path_id_lookup[rel_path]
-        mig_id ||= @migration.attachment_path_id_lookup[alt_rel_path]
+      if @migration_id_converter.attachment_path_id_lookup
+        mig_id ||= @migration_id_converter.attachment_path_id_lookup[rel_path]
+        mig_id ||= @migration_id_converter.attachment_path_id_lookup[alt_rel_path]
       end
-      if !mig_id && @migration.attachment_path_id_lookup_lower
-        mig_id ||= @migration.attachment_path_id_lookup_lower[rel_path.downcase]
-        mig_id ||= @migration.attachment_path_id_lookup_lower[alt_rel_path.downcase]
+      if !mig_id && @migration_id_converter.attachment_path_id_lookup_lower
+        mig_id ||= @migration_id_converter.attachment_path_id_lookup_lower[rel_path.downcase]
+        mig_id ||= @migration_id_converter.attachment_path_id_lookup_lower[alt_rel_path.downcase]
       end
 
       # This md5 comparison is here to handle faulty cartridges with the migration_id equivalent of an empty string
-      mig_id && mig_id != "gd41d8cd98f00b204e9800998ecf8427e" && context.attachments.where(migration_id: mig_id).first
+      mig_id && mig_id != "gd41d8cd98f00b204e9800998ecf8427e" && @migration_id_converter.lookup_attachment_by_migration_id(mig_id)
     end
 
     def resolve_relative_file_url(rel_path)
