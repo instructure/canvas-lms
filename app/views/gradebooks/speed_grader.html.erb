@@ -32,7 +32,11 @@
   add_body_class 'ic-no-flex-layout full-width'
   @can_edit_anything = !@context.completed?
   @emojis_enabled = @context.feature_enabled?(:submission_comment_emojis)
+
+  # for _grading_box_extended
+  @assignment.grading_type = 'letter_grade' if @context&.restrict_quantitative_data?(@current_user) && ['percent','points'].include?(@assignment.grading_type)
 %>
+
 
 <% provide :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
 <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;display: flex;flex-direction: column;">
