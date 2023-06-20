@@ -941,7 +941,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def html_converter
-    @html_converter ||= ImportedHtmlConverter.new(self, Importers::DbMigrationQueryService.new(context))
+    @html_converter ||= ImportedHtmlConverter.new(self, Importers::DbMigrationQueryService.new(context, self))
   end
 
   def convert_html(*args)

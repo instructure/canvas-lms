@@ -25,8 +25,17 @@ module Importers
   # Each function returns exactly one id (if available), and nil if an id
   # cannot be resolved
   class DbMigrationQueryService
-    def initialize(context)
+    def initialize(context, migration)
       @context = context
+      @migration = migration
+    end
+
+    def attachment_path_id_lookup
+      @migration.attachment_path_id_lookup
+    end
+
+    def attachment_path_id_lookup_lower
+      @migration.attachment_path_id_lookup_lower
     end
 
     # Returns the path for the context, for a course, it should return something like
@@ -51,6 +60,20 @@ module Importers
 
     def convert_attachment_migration_id(migration_id)
       @context.attachments.where(migration_id:).limit(1).pick(:id)
+    end
+
+    def convert_migration_id(type, migration_id)
+      if Importers::LinkParser::KNOWN_REFERENCE_TYPES.include? type
+        @context.send(type).scope.where(migration_id:).limit(1).pick(:id)
+      end
+    end
+
+    def lookup_attachment_by_migration_id(migration_id)
+      @context.attachments.where(migration_id:).first
+    end
+
+    def root_folder_name
+      Folder.root_folders(@context).first.name
     end
   end
 end
