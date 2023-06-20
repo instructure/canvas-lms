@@ -2463,4 +2463,10 @@ class Account < ActiveRecord::Base
       self.course_template_id = nil
     end
   end
+
+  def enable_user_notes
+    return false if Account.site_admin.feature_enabled?(:deprecate_faculty_journal)
+
+    read_attribute(:enable_user_notes)
+  end
 end

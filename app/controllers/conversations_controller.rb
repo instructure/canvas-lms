@@ -479,7 +479,7 @@ class ConversationsController < ApplicationController
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.legacy")
         end
-        if params[:user_note] == "1"
+        if !Account.site_admin.feature_enabled?(:deprecate_faculty_journal) && params[:user_note] == "1"
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.legacy")
         end
         if params[:bulk_message] == "1"

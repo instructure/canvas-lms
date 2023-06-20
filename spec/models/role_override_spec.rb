@@ -566,13 +566,28 @@ describe RoleOverride do
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to eq []
       end
 
-      it "allows with account_allows on" do
-        Account.default.tap do |a|
-          a.enable_user_notes = true
-          a.save!
+      context "when the deprecate_faculty_journal flag is disabled" do
+        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+        it "allows with account_allows on" do
+          Account.default.tap do |a|
+            a.enable_user_notes = true
+            a.save!
+          end
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
         end
-        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
-        expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
+      end
+
+      context "when the deprecated_faculty_journal flag is enabled" do
+        it "does not allow with account_allows on" do
+          Account.default.tap do |a|
+            a.enable_user_notes = true
+            a.save!
+          end
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to eq []
+          expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to eq []
+        end
       end
     end
   end

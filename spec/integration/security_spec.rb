@@ -633,52 +633,102 @@ describe "security" do
         expect(response.body).to match(/Statistics/)
       end
 
-      it "manage_user_notes" do
-        Account.default.update_attribute(:enable_user_notes, true)
-        course_with_teacher
-        student_in_course
-        @student.update_account_associations
-        @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
+      context "when the deprecate_faculty_journal feature flag is disabled" do
+        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
 
-        get "/accounts/#{Account.default.id}/user_notes"
-        assert_status(401)
+        it "manage_user_notes" do
+          Account.default.update_attribute(:enable_user_notes, true)
+          course_with_teacher
+          student_in_course
+          @student.update_account_associations
+          @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
 
-        get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_successful
-        expect(response.body).not_to match(/Faculty Journal/)
+          get "/accounts/#{Account.default.id}/user_notes"
+          assert_status(401)
 
-        get "/users/#{@student.id}/user_notes"
-        assert_status(401)
+          get "/accounts/#{Account.default.id}/settings"
+          expect(response).to be_successful
+          expect(response.body).not_to match(/Faculty Journal/)
 
-        post "/users/#{@student.id}/user_notes"
-        assert_status(401)
+          get "/users/#{@student.id}/user_notes"
+          assert_status(401)
 
-        get "/users/#{@student.id}/user_notes/#{@user_note.id}"
-        assert_status(401)
+          post "/users/#{@student.id}/user_notes"
+          assert_status(401)
 
-        delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
-        assert_status(401)
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
 
-        add_permission :manage_user_notes
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
 
-        get "/accounts/#{Account.default.id}/user_notes"
-        expect(response).to be_successful
+          add_permission :manage_user_notes
 
-        get "/accounts/#{Account.default.id}/settings"
-        expect(response).to be_successful
-        expect(response.body).to match(/Faculty Journal/)
+          get "/accounts/#{Account.default.id}/user_notes"
+          expect(response).to be_successful
 
-        get "/users/#{@student.id}/user_notes"
-        expect(response).to be_successful
+          get "/accounts/#{Account.default.id}/settings"
+          expect(response).to be_successful
+          expect(response.body).to match(/Faculty Journal/)
 
-        post "/users/#{@student.id}/user_notes.json"
-        expect(response).to be_successful
+          get "/users/#{@student.id}/user_notes"
+          expect(response).to be_successful
 
-        get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
-        expect(response).to be_successful
+          post "/users/#{@student.id}/user_notes.json"
+          expect(response).to be_successful
 
-        delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
-        expect(response).to be_successful
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          expect(response).to be_successful
+
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          expect(response).to be_successful
+        end
+      end
+
+      context "when the deprecate_faculty_journal feature flag is enabled" do
+        it "manage_user_notes" do
+          Account.default.update_attribute(:enable_user_notes, true)
+          course_with_teacher
+          student_in_course
+          @student.update_account_associations
+          @user_note = UserNote.create!(creator: @teacher, user: @student, root_account_id: Account.default.id)
+
+          get "/accounts/#{Account.default.id}/user_notes"
+          assert_status(401)
+
+          get "/accounts/#{Account.default.id}/settings"
+          expect(response).to be_successful
+          expect(response.body).not_to match(/Faculty Journal/)
+
+          get "/users/#{@student.id}/user_notes"
+          assert_status(401)
+
+          post "/users/#{@student.id}/user_notes"
+          assert_status(401)
+
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
+
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}"
+          assert_status(401)
+
+          add_permission :manage_user_notes
+
+          get "/accounts/#{Account.default.id}/user_notes"
+          assert_status(401)
+
+          get "/users/#{@student.id}/user_notes"
+          assert_status(401)
+
+          post "/users/#{@student.id}/user_notes.json"
+          assert_status(401)
+
+          get "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          assert_status(401)
+
+          delete "/users/#{@student.id}/user_notes/#{@user_note.id}.json"
+          assert_status(401)
+        end
       end
 
       it "view_jobs" do
