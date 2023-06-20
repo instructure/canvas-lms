@@ -2828,7 +2828,7 @@ describe Submission do
 
       it "returns true for group reports" do
         user_two = test_student.dup
-        user_two.update!(lti_context_id: SecureRandom.uuid)
+        user_two.update!(lti_context_id: SecureRandom.uuid, lti_id: SecureRandom.uuid, uuid: CanvasSlug.generate_securish_uuid)
         assignment.course.enroll_student(user_two)
 
         group = group_model(context: assignment.course)

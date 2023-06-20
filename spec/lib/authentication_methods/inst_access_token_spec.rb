@@ -56,30 +56,6 @@ describe AuthenticationMethods::InstAccessToken do
       expect(ctx[:current_pseudonym]).to eq(@pseudonym)
     end
 
-    it "chooses the local user when a local and shadow user share the same UUID" do
-      user = @shard2.activate { User.create!(name: "some user", uuid: "a-shared-uuid-between-users") }
-      user.save_shadow_record(target_shard: Shard.default)
-      account = Account.default
-      user_with_pseudonym(active_all: true)
-      @user.uuid = "a-shared-uuid-between-users"
-      @user.save!
-      token_obj = InstAccess::Token.for_user(user_uuid: "a-shared-uuid-between-users", account_uuid: account.uuid)
-      ctx = AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
-      expect(ctx[:current_user]).to eq(@user)
-      expect(ctx[:current_pseudonym]).to eq(@pseudonym)
-    end
-
-    it "prefer the active user object if sharing the same UUID" do
-      account = Account.default
-      user_model(uuid: "a-shared-uuid-between-users", workflow_state: "deleted")
-      user_with_pseudonym(active_all: true)
-      @user.update!(uuid: "a-shared-uuid-between-users")
-      token_obj = InstAccess::Token.for_user(user_uuid: "a-shared-uuid-between-users", account_uuid: account.uuid)
-      ctx = AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
-      expect(ctx[:current_user]).to eq(@user)
-      expect(ctx[:current_pseudonym]).to eq(@pseudonym)
-    end
-
     it "returns an empty hash when the user identified by the token does not exist" do
       account = Account.default
       token_obj = InstAccess::Token.for_user(user_uuid: "inexplicably-untied-to-any-user", account_uuid: account.uuid)
