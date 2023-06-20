@@ -35,8 +35,6 @@ import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('calendar_weekday_picker')
 
-const {Item: FlexItem} = Flex as any
-
 export type WeekArray = [string, string, string, string, string, string, string]
 export type WeekDaysSpec = {
   dayNames: WeekArray
@@ -142,10 +140,6 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
   )
 }
 
-const OneDayLabelStyle = {
-  margin: 0,
-}
-
 export type OneDayProps = {
   readonly label: string
   readonly screenreaderLabel: string
@@ -161,37 +155,38 @@ export function OneDay({label, screenreaderLabel, value, checked, onChange}: One
   const [focused, setFocused] = useState<boolean>(false)
 
   return (
-    <View
-      as="div"
-      background={bgcolor}
-      borderRadius="pill"
-      display="inline-block"
-      margin="xx-small"
-      minHeight="2.75rem"
-      minWidth="2.75rem"
-      padding="small"
-      position="relative"
-      withFocusOutline={focused}
-    >
-      <Flex as="div" alignItems="center" justifyItems="center" height="100%">
-        <FlexItem>
-          <input
-            id={id}
-            value={value}
-            type="checkbox"
-            style={{opacity: 0.0001, position: 'absolute', left: 0, top: 0}}
-            checked={checked}
-            onChange={onChange}
-            onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-          />
-          <label htmlFor={id} style={OneDayLabelStyle}>
-            <AccessibleContent alt={screenreaderLabel}>
-              <Text color={checked ? 'primary-inverse' : 'primary'}>{label}</Text>
-            </AccessibleContent>
-          </label>
-        </FlexItem>
-      </Flex>
-    </View>
+    // it does by virtue of wrapping it
+    // eslint-disable-next-line jsx-a11y/label-has-associated-control
+    <label>
+      <View
+        as="div"
+        background={bgcolor}
+        borderRadius="pill"
+        display="flex"
+        margin="xx-small x-small xx-small 0"
+        minHeight="3rem"
+        minWidth="3rem"
+        padding="small"
+        position="relative"
+        withFocusOutline={focused}
+      >
+        <input
+          id={id}
+          value={value}
+          type="checkbox"
+          style={{opacity: 0.0001, position: 'absolute', left: 0, top: 0, pointerEvents: 'none'}}
+          checked={checked}
+          aria-checked={checked}
+          onChange={onChange}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        />
+        <span style={{margin: '0 auto'}}>
+          <AccessibleContent alt={screenreaderLabel}>
+            <Text color={checked ? 'primary-inverse' : 'primary'}>{label}</Text>
+          </AccessibleContent>
+        </span>
+      </View>
+    </label>
   )
 }
