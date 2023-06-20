@@ -676,6 +676,8 @@ describe Types::AssignmentType do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
+        course.restrict_quantitative_data = true
+        course.save!
       end
 
       context "default RQD state" do

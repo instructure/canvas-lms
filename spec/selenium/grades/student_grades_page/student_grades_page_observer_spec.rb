@@ -100,6 +100,8 @@ describe "gradebook" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
+        @observed_courses.first.restrict_quantitative_data = true
+        @observed_courses.first.save!
       end
 
       it "can toggle between using and not using ungraded assignments" do

@@ -337,7 +337,7 @@ describe "course settings" do
         expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
       end
 
-      it "is not shown when both restrict_quantitative_data account locked setting and feature flags are ON" do
+      it "is shown when only restrict_quantitative_data account locked setting and feature flags are ON" do
         root_account = @course.root_account
         root_account.enable_feature! :restrict_quantitative_data
         root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
@@ -347,8 +347,8 @@ describe "course settings" do
         more_options_link = f(".course_form_more_options_link")
         more_options_link.click
         wait_for_ajaximations
-        expect(f("body")).not_to contain_jqcss("#course_hide_distribution_graphs")
-        expect(f("body")).not_to contain_jqcss("#course_hide_final_grades")
+        expect(f("#course_hide_distribution_graphs")).to be_present
+        expect(f("#course_hide_final_grades")).to be_present
       end
 
       it "is shown when restrict_quantitative_data feature flag is on but course setting is off" do

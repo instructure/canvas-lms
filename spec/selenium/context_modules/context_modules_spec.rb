@@ -43,6 +43,8 @@ describe "context modules" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
+        @course.restrict_quantitative_data = true
+        @course.save!
       end
 
       it "hides points possible for student", priority: "1" do

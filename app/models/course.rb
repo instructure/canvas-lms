@@ -294,6 +294,7 @@ class Course < ActiveRecord::Base
 
   after_create :set_default_post_policy
   after_create :copy_from_course_template
+  after_create :set_restrict_quantitative_data_when_needed
 
   after_update :clear_cached_short_name, if: :saved_change_to_course_code?
   after_update :log_create_to_publish_time, if: :saved_change_to_workflow_state?
@@ -3596,7 +3597,7 @@ class Course < ActiveRecord::Base
   add_setting :is_public_to_auth_users, boolean: true, default: false
   add_setting :overridden_course_visibility
 
-  add_setting :restrict_quantitative_data, boolean: true, default: false, inherited: true
+  add_setting :restrict_quantitative_data, boolean: true, default: false
   add_setting :restrict_student_future_view, boolean: true, inherited: true
   add_setting :restrict_student_past_view, boolean: true, inherited: true
 
@@ -4365,6 +4366,15 @@ class Course < ActiveRecord::Base
       content_migration.workflow_state = "importing"
       content_migration.save!
       content_migration.queue_migration
+    end
+  end
+
+  def set_restrict_quantitative_data_when_needed
+    if account.feature_enabled?(:restrict_quantitative_data) &&
+       account.restrict_quantitative_data[:value] == true &&
+       account.restrict_quantitative_data[:locked] == true
+      self.restrict_quantitative_data = true
+      save!
     end
   end
 

@@ -260,13 +260,10 @@ describe Api::V1::Course do
       end
 
       it "includes computed_current_letter_grade for rqd enabled user who does not have instructor typical permissions" do
-        # truthy feature flag
-        Account.default.enable_feature! :restrict_quantitative_data
-
-        # truthy setting
-        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-        Account.default.save!
-
+        # truthy settings
+        @course1.root_account.enable_feature! :restrict_quantitative_data
+        @course1.restrict_quantitative_data = true
+        @course1.save!
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 

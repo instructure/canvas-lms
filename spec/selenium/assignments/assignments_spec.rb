@@ -1007,7 +1007,8 @@ describe "assignments" do
         Account.default.enable_feature! :restrict_quantitative_data
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-        Account.default.reload
+        @course.restrict_quantitative_data = true
+        @course.save!
       end
 
       context "index" do

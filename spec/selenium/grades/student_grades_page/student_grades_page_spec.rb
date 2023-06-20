@@ -151,19 +151,21 @@ describe "gradebook - logged in as a student" do
   end
 
   context "when student is quantitative data restricted" do
-    before :once do
+    before do
+      course_with_teacher(name: "Dedicated Teacher", active_course: true, active_user: true)
+      course_with_student(course: @course, name: "Hardworking Student", active_all: true)
+
       # truthy feature flag
       Account.default.enable_feature! :restrict_quantitative_data
 
       # truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
+      @course.restrict_quantitative_data = true
+      @course.save!
     end
 
     it "does not show quantitative data" do
-      course_with_teacher(name: "Dedicated Teacher", active_course: true, active_user: true)
-      course_with_student(course: @course, name: "Hardworking Student", active_all: true)
-
       future_period_name = "Future Grading Period"
       current_period_name = "Current Grading Period"
       future_assignment_name = "Future Assignment"
@@ -245,6 +247,8 @@ describe "gradebook - logged in as a student" do
     it "displays N/A in the total sidebar when no asignments have been graded" do
       course_with_teacher(name: "Dedicated Teacher", active_course: true, active_user: true)
       course_with_student(course: @course, name: "Hardworking Student", active_all: true)
+      @course.restrict_quantitative_data = true
+      @course.save!
       @course.assignments.create!(due_at: 1.week.from_now, title: "Current Assignment", grading_type: "points", points_possible: 10)
       user_session(@student)
       get "/courses/#{@course.id}/grades/#{@student.id}"

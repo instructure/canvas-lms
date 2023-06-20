@@ -96,6 +96,8 @@ describe "submission_posted" do
         # truthy setting
         course_root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
         course_root_account.save!
+        assignment.course.restrict_quantitative_data = true
+        assignment.course.save!
 
         assignment.grade_student(student, score: 10, grader: teacher)
         asset.reload
