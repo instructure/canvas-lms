@@ -190,3 +190,10 @@ resource_link_uuid_in_custom_substitution:
     Changes the $ResourceLink.id substitution parameter's behavior
     to include the resource_link_uuid, instead of the resource_id for the line item
   applies_to: RootAccount
+instui_for_tool_configuration_forms:
+  state: hidden
+  display_name: Use InstUI for tool installation and configuration forms
+  description: |-
+    If enabled, the tool installation and configuration forms located on the Account and Course settings pages will use
+    InstUI components, as opposed to the older, less accessible homegrown components.
+  applies_to: SiteAdmin

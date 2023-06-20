@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import '@canvas/rails-flash-notifications'
 import store from '../lib/ExternalAppsStore'
-import ConfigurationForm from './ConfigurationForm'
+import ConfigurationForm from './configuration_forms/ConfigurationForm'
 import Lti2Edit from './Lti2Edit'
 
 const I18n = useI18nScope('external_tools')

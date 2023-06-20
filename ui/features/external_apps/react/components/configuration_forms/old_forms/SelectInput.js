@@ -16,26 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'underscore'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
-import InputMixin from '../mixins/InputMixin'
+import InputMixin from '../../../mixins/InputMixin'
 
 // eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
-  displayName: 'TextInput',
+  displayName: 'SelectInput',
 
   mixins: [InputMixin],
 
   propTypes: {
     defaultValue: PropTypes.string,
-    renderLabel: PropTypes.string,
+    allowBlank: PropTypes.bool,
+    values: PropTypes.object,
+    label: PropTypes.string,
     id: PropTypes.string,
-    isRequired: PropTypes.bool,
+    required: PropTypes.bool,
     hintText: PropTypes.string,
-    placeholder: PropTypes.string,
     errors: PropTypes.object,
-    name: PropTypes.string,
+  },
+
+  renderSelectOptions() {
+    const options = _.map(this.props.values, (v, k) => (
+      <option key={k} value={k}>
+        {v}
+      </option>
+    ))
+    if (this.props.allowBlank) {
+      // eslint-disable-next-line jsx-a11y/control-has-associated-label
+      options.unshift(<option key="NO_VALUE" value={null} />)
+    }
+    return options
+  },
+
+  handleSelectChange(e) {
+    e.preventDefault()
+    // eslint-disable-next-line react/no-unused-state
+    this.setState({value: e.target.value})
   },
 
   render() {
@@ -43,18 +63,17 @@ export default createReactClass({
       <div className={this.getClassNames()}>
         {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label>
-          {this.props.renderLabel}
-          <input
+          {this.props.label}
+          <select
             ref="input"
-            type="text"
-            defaultValue={this.state.value}
             className="form-control input-block-level"
-            placeholder={this.props.placeholder || this.props.renderLabel}
-            required={this.props.isRequired ? 'required' : null}
-            onChange={this.handleChange}
+            defaultValue={this.props.defaultValue}
+            required={this.props.required ? 'required' : null}
+            onChange={this.handleSelectChange}
             aria-invalid={!!this.getErrorMessage()}
-            name={this.props.name || null}
-          />
+          >
+            {this.renderSelectOptions()}
+          </select>
           {this.renderHint()}
         </label>
       </div>

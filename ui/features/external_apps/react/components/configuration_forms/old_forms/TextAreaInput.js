@@ -16,46 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
-import InputMixin from '../mixins/InputMixin'
+import InputMixin from '../../../mixins/InputMixin'
 
 // eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
-  displayName: 'SelectInput',
+  displayName: 'TextAreaInput',
 
   mixins: [InputMixin],
 
   propTypes: {
     defaultValue: PropTypes.string,
-    allowBlank: PropTypes.bool,
-    values: PropTypes.object,
     label: PropTypes.string,
     id: PropTypes.string,
+    rows: PropTypes.number,
     required: PropTypes.bool,
     hintText: PropTypes.string,
     errors: PropTypes.object,
-  },
-
-  renderSelectOptions() {
-    const options = _.map(this.props.values, (v, k) => (
-      <option key={k} value={k}>
-        {v}
-      </option>
-    ))
-    if (this.props.allowBlank) {
-      // eslint-disable-next-line jsx-a11y/control-has-associated-label
-      options.unshift(<option key="NO_VALUE" value={null} />)
-    }
-    return options
-  },
-
-  handleSelectChange(e) {
-    e.preventDefault()
-    // eslint-disable-next-line react/no-unused-state
-    this.setState({value: e.target.value})
   },
 
   render() {
@@ -64,16 +43,17 @@ export default createReactClass({
         {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label>
           {this.props.label}
-          <select
+          <textarea
             ref="input"
-            className="form-control input-block-level"
+            rows={this.props.rows || 3}
             defaultValue={this.props.defaultValue}
+            className="form-control input-block-level"
+            placeholder={this.props.label}
+            id={this.props.id}
             required={this.props.required ? 'required' : null}
-            onChange={this.handleSelectChange}
+            onChange={this.handleChange}
             aria-invalid={!!this.getErrorMessage()}
-          >
-            {this.renderSelectOptions()}
-          </select>
+          />
           {this.renderHint()}
         </label>
       </div>

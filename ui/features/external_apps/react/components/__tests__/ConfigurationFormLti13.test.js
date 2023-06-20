@@ -16,9 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @todo Convert this to react-testing-library and Typescript. See ConfigurationForm.test.tsx
+ * for prior art.
+ */
 import React from 'react'
 import {mount} from 'enzyme'
-import ConfigurationFormLti13 from '../ConfigurationFormLti13'
+import ConfigurationFormLti13 from '../configuration_forms/ConfigurationFormLti13'
 
 let wrapper
 

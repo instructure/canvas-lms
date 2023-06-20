@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2014 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,38 +19,43 @@
 import React from 'react'
 import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
-import InputMixin from '../mixins/InputMixin'
+import InputMixin from '../../../mixins/InputMixin'
 
 // eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
-  displayName: 'CheckboxInput',
+  displayName: 'TextInput',
 
   mixins: [InputMixin],
 
   propTypes: {
     defaultValue: PropTypes.string,
-    checked: PropTypes.bool,
-    label: PropTypes.string,
+    renderLabel: PropTypes.string,
     id: PropTypes.string,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
+    hintText: PropTypes.string,
+    placeholder: PropTypes.string,
     errors: PropTypes.object,
     name: PropTypes.string,
   },
 
   render() {
     return (
-      <div className={`checkbox ${this.getClassNames()}`}>
+      <div className={this.getClassNames()}>
         {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label>
+          {this.props.renderLabel}
           <input
-            type="checkbox"
             ref="input"
-            defaultChecked={this.props.checked}
-            onChange={this.handleCheckChange}
+            type="text"
+            defaultValue={this.state.value}
+            className="form-control input-block-level"
+            placeholder={this.props.placeholder || this.props.renderLabel}
+            required={this.props.isRequired ? 'required' : null}
+            onChange={this.handleChange}
             aria-invalid={!!this.getErrorMessage()}
             name={this.props.name || null}
           />
-          {this.props.label}
+          {this.renderHint()}
         </label>
       </div>
     )
