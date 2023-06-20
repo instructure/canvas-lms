@@ -484,7 +484,7 @@ const rubricEditing = {
     // rubric page or quiz page) but we need to audit uses of the add rubric
     // dialog before we make it that restrictive
     const $assignPoints = $(
-      '#assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible'
+      '#assignment_show, #assignment_show .points_possible,#rubrics.rubric_dialog .assignment_points_possible'
     )
     const $quizPage = $('#quiz_show,#quiz_edit_wrapper')
     $form.find('.rubric_grading').showIf($assignPoints.length > 0 && $quizPage.length === 0)
@@ -1290,11 +1290,18 @@ rubricEditing.init = function () {
       ) {
         skipPointsUpdate = true
       } else if (data['rubric_association[use_for_grading]'] === '1') {
-        let assignmentPoints = numberHelper.parse(
-          $(
-            '#assignment_show .points_possible, #rubrics.rubric_dialog .assignment_points_possible'
-          ).text()
-        )
+        const externalToolPoints = $('#tool_form #custom_canvas_assignment_points_possible').val()
+        let assignmentPoints
+        if (externalToolPoints) {
+          assignmentPoints = numberHelper.parse(externalToolPoints)
+        } else {
+          assignmentPoints = numberHelper.parse(
+            $(
+              '#assignment_show .points_possible, #rubrics.rubric_dialog .assignment_points_possible'
+            ).text()
+          )
+        }
+
         if (Number.isNaN(assignmentPoints)) {
           // For N.Q assignments, we show the rubric from the assignment edit screen instead of
           // the show screen used for other assignments.
