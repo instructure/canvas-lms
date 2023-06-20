@@ -145,23 +145,35 @@ describe ContextController do
         a.save!
       end
 
-      it "sets manage_user_notes permission ENV var to true for teachers" do
-        user_session(@teacher)
-        get :roster, params: { course_id: @course.id }
-        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be true
+      context "when the deprecate_faculty_journal flag is disabled" do
+        before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+        it "sets manage_user_notes permission ENV var to true for teachers" do
+          user_session(@teacher)
+          get :roster, params: { course_id: @course.id }
+          expect(assigns[:js_env][:permissions][:manage_user_notes]).to be true
+        end
+
+        it "sets manage_user_notes permission ENV var to true for account admins" do
+          account_admin_user
+          user_session(@admin)
+          get :roster, params: { course_id: @course.id }
+          expect(assigns[:js_env][:permissions][:manage_user_notes]).to be true
+        end
+
+        it "sets manage_user_notes permission ENV var to false for students" do
+          user_session(@student)
+          get :roster, params: { course_id: @course.id }
+          expect(assigns[:js_env][:permissions][:manage_user_notes]).to be false
+        end
       end
 
-      it "sets manage_user_notes permission ENV var to true for account admins" do
-        account_admin_user
-        user_session(@admin)
-        get :roster, params: { course_id: @course.id }
-        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be true
-      end
-
-      it "sets manage_user_notes permission ENV var to false for students" do
-        user_session(@student)
-        get :roster, params: { course_id: @course.id }
-        expect(assigns[:js_env][:permissions][:manage_user_notes]).to be false
+      context "when the deprecated_faculty_journal flag is enabled" do
+        it "sets manage_user_notes permission ENV var to false for teachers" do
+          user_session(@teacher)
+          get :roster, params: { course_id: @course.id }
+          expect(assigns[:js_env][:permissions][:manage_user_notes]).to be false
+        end
       end
     end
 

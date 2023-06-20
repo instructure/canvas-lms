@@ -2765,4 +2765,26 @@ describe Account do
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("account.settings.restrict_quantitative_data.disabled")
     end
   end
+
+  describe "#enable_user_notes" do
+    let(:account) { account_model(enable_user_notes: true) }
+
+    context "when the deprecate_faculty_journal flag is enabled" do
+      before { Account.site_admin.enable_feature!(:deprecate_faculty_journal) }
+
+      it "returns false" do
+        expect(account.enable_user_notes).to be false
+      end
+    end
+
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "returns the value stored on the account model" do
+        expect(account.enable_user_notes).to be true
+        account.update_attribute(:enable_user_notes, false)
+        expect(account.enable_user_notes).to be false
+      end
+    end
+  end
 end

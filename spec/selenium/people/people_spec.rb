@@ -194,14 +194,18 @@ describe "people" do
       expect(f("#content")).not_to contain_link("Student Interactions Report")
     end
 
-    it "has a working Faculty Journal menu option" do
-      a = Account.default
-      a.enable_user_notes = true
-      a.save!
-      get "/courses/#{@course.id}/users"
-      open_dropdown_menu("tr[id=user_#{@student_1.id}]")
-      wait_for_new_page_load { f("a[href='/users/#{@student_1.id}/user_notes']").click }
-      expect(fj("h1:contains('Faculty Journal for #{@student_1.name}')")).to be_present
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "has a working Faculty Journal menu option" do
+        a = Account.default
+        a.enable_user_notes = true
+        a.save!
+        get "/courses/#{@course.id}/users"
+        open_dropdown_menu("tr[id=user_#{@student_1.id}]")
+        wait_for_new_page_load { f("a[href='/users/#{@student_1.id}/user_notes']").click }
+        expect(fj("h1:contains('Faculty Journal for #{@student_1.name}')")).to be_present
+      end
     end
 
     it "focuses on the + Group Set button after the tabs" do
