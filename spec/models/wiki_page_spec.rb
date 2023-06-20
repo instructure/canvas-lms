@@ -1016,4 +1016,40 @@ describe WikiPage do
       expect(good_yaml).to include("<a id=\\\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\\\"")
     end
   end
+
+  describe "url" do
+    before :once do
+      course_factory(active_all: true)
+      @page = @course.wiki_pages.create!(title: "original-name")
+      @lookup = @page.wiki_page_lookups.create!(slug: "new-name")
+      @page.current_lookup = @lookup
+      @page.save!
+    end
+
+    context "when permanent_page_links flag is disabled" do
+      before :once do
+        Account.site_admin.disable_feature!(:permanent_page_links)
+      end
+
+      it "returns the page's url attribute" do
+        expect(@page.url).to eq("original-name")
+      end
+    end
+
+    context "when permanent_page_links flag is enabled" do
+      before :once do
+        Account.site_admin.enable_feature!(:permanent_page_links)
+      end
+
+      it "returns the page's current lookup's slug" do
+        expect(@page.url).to eq("new-name")
+      end
+
+      it "returns the page's url attribute if current lookup is nil" do
+        @page.current_lookup = nil
+        @page.save!
+        expect(@page.url).to eq("original-name")
+      end
+    end
+  end
 end
