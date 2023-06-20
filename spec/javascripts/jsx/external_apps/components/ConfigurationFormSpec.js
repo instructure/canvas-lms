@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ConfigurationForm from 'ui/features/external_apps/react/components/ConfigurationForm'
+import ConfigurationForm from 'ui/features/external_apps/react/components/configuration_forms/ConfigurationForm'
 
 const wrapper = document.getElementById('fixtures')
 
@@ -274,7 +274,7 @@ test('sets the target of the form to the iframe for lti2', () => {
     tool: {},
     showConfigurationSelector: true,
   }
-  const nodes = getDOMNodes(data)
+  getDOMNodes(data)
   equal(document.querySelector('form').getAttribute('target'), 'lti2_registration_frame')
 })
 
@@ -285,18 +285,8 @@ test('sets the form method to post', () => {
     tool: {},
     showConfigurationSelector: true,
   }
-  const nodes = getDOMNodes(data)
+  getDOMNodes(data)
   equal(document.querySelector('form').getAttribute('method'), 'post')
-})
-
-QUnit.module('ConfigurationForm#defaultState')
-
-test('returns object where allow_membership_service_access is false', () => {
-  const component = TestUtils.renderIntoDocument(
-    <ConfigurationForm handleSubmit={() => {}} tool={{}} configurationType="manual" />
-  )
-  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm)
-  equal(app.defaultState().allow_membership_service_access, false)
 })
 
 QUnit.module('ConfigurationForm#reset')
@@ -307,7 +297,7 @@ test('resets internal state of component', () => {
       handleSubmit={() => {}}
       tool={{}}
       configurationType="goofy"
-      showConfigurationSelector
+      showConfigurationSelector={true}
     />
   )
   const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm)
@@ -332,13 +322,21 @@ test('resets internal state of component', () => {
 
 QUnit.module('ConfigurationForm#defaultState')
 
+test('returns object where allow_membership_service_access is false', () => {
+  const component = TestUtils.renderIntoDocument(
+    <ConfigurationForm handleSubmit={() => {}} tool={{}} configurationType="manual" />
+  )
+  const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm)
+  equal(app.defaultState().allow_membership_service_access, false)
+})
+
 test('returns a default state', () => {
   const component = TestUtils.renderIntoDocument(
     <ConfigurationForm
       handleSubmit={() => {}}
       tool={{}}
       configurationType="goofy"
-      showConfigurationSelector
+      showConfigurationSelector={true}
     />
   )
   const app = TestUtils.findRenderedComponentWithType(component, ConfigurationForm)

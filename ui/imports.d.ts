@@ -20,6 +20,8 @@ type HTMLElement = import('react').HTMLElement
 type FC = import('react').FC
 type KeyboardEventHandler = import('react').KeyboardEventHandler
 type MouseEventHandler = import('react').MouseEventHandler
+type ReactNode = import('react').ReactNode
+type ChangeEvent = import('react').ChangeEvent
 
 // These are special webpack-processed imports that Typescript doesn't understand
 // by default. Declaring them as wildcard modules allows TS to recognize them as
@@ -81,9 +83,26 @@ declare module '@instructure/ui-motion' {
   }>
 }
 
+declare module '@instructure/ui-form-field' {
+  export interface FormMessage {
+    text: ReactNode
+    type: 'error' | 'hint' | 'success' | 'screenreader-only'
+  }
+
+  export const FormField: FC<{
+    theme: symbol
+  }>
+
+  export const FormFieldGroup: FC<{
+    theme: symbol
+  }>
+}
+
 declare module '@instructure/ui-text-input' {
-  export interface TextInputProps extends MissingInputProps {
+  export interface TextInputProps extends MissingInputProps, MissingThemeableProps {
     defaultValue?: string
+    messages?: import('@instructure/ui-form-field').FormMessage[]
+    onChange?: (event: ChangeEvent<HTMLInputElement>, value: string) => void
   }
 
   export const TextInput: FC<{
