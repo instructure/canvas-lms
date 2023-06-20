@@ -580,6 +580,15 @@ class ApplicationController < ActionController::Base
         canAutoPublishCourses: can_manage
       )
     end
+
+    if is_child && Account.site_admin.feature_enabled?(:media_links_use_attachment_id)
+      mig_id_map = MasterCourses::ChildContentTag.where(content_id: @context.attachments.pluck(:id)).pluck(:content_id, :migration_id).to_h
+      master_tags = MasterCourses::MasterContentTag.where(migration_id: mig_id_map.values).each_with_object({}) do |mt, h|
+        h[mt.migration_id] = !!mt.restrictions[:content] || !!mt.restrictions[:all]
+      end
+      js_env CHILD_COURSE_ATTACHMENTS_LOCKED_STATUSES: mig_id_map.transform_values { |mig_id| master_tags[mig_id] }
+    end
+
     js_env BLUEPRINT_COURSES_DATA: bc_data
     if is_master && js_env.key?(:NEW_USER_TUTORIALS)
       js_env[:NEW_USER_TUTORIALS][:is_enabled] = false

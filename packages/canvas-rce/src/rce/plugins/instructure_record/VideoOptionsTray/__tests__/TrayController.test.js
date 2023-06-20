@@ -272,6 +272,17 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       expect(updateMediaObject).not.toHaveBeenCalled()
     })
 
+    it('does not try to save data to the db on a locked media attachment', () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        isLocked: true,
+        media_object_id: 'm_somevideo',
+        updateMediaObject,
+      })
+      expect(updateMediaObject).not.toHaveBeenCalled()
+    })
+
     it('replaces the video with a link', () => {
       const updateMediaObject = jest.fn().mockResolvedValue()
       const ed = editors[0]

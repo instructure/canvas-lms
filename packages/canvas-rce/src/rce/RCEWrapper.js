@@ -338,6 +338,7 @@ class RCEWrapper extends React.Component {
       locale: normalizeLocale(this.props.language),
       flashAlertTimeout: this.props.flashAlertTimeout,
       timezone: this.props.timezone,
+      lockedAttachments: this.props.lockedAttachments,
     }
   }
 
