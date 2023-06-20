@@ -621,6 +621,7 @@ describe "Common Cartridge exporting" do
 
     context "media_links_use_attachment_id feature enabled" do
       before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_return false
         allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
       end
 
@@ -675,6 +676,7 @@ describe "Common Cartridge exporting" do
 
     context "media_links_use_attachment_id feature disabled" do
       before do
+        allow(Account.site_admin).to receive(:feature_enabled?).and_return false
         allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return false
       end
 

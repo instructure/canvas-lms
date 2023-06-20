@@ -122,6 +122,12 @@ class WikiPage < ActiveRecord::Base
     end
   end
 
+  def url
+    return read_attribute(:url) unless Account.site_admin.feature_enabled?(:permanent_page_links)
+
+    current_lookup&.slug || read_attribute(:url)
+  end
+
   def should_create_lookup?
     # covers page creation and title changes, and undeletes
     saved_change_to_title? || (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
