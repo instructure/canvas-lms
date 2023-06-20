@@ -49,13 +49,22 @@ const Template: Story<WeekdayPickerProps> = args => {
 
   return (
     <div>
-      <View as="div" margin="small">
+      <style>
+        button:focus {'{'} outline: 2px solid dodgerblue; {'}'}
+      </style>
+      <button type="button" onClick={e => e.target.focus()}>
+        tab stop before
+      </button>
+      <View as="div" margin="small" padding="medium" borderWidth="small 0" borderColor="default">
         <WeekdayPicker
           locale={locale}
           selectedDays={currSelectedDays}
           onChange={handleDaysChange}
         />
       </View>
+      <button type="button" onClick={e => e.target.focus()}>
+        tab stop after
+      </button>
       <View as="div" margin="small">
         <Text>{currSelectedDays.join(', ')}</Text>
       </View>
