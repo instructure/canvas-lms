@@ -318,19 +318,4 @@ describe "root account basic settings" do
       end
     end
   end
-
-  context "Course with Faculty Journal not enabled" do
-    before do
-      site_admin_logged_in
-    end
-
-    it "allows a site admin to enable faculty journal", priority: "2" do
-      get account_settings_url
-      f("#account_enable_user_notes").click
-      f('.Button.Button--primary[type="submit"]').click
-      wait_for_ajaximations
-      expect(is_checked("#account_enable_user_notes")).to be_truthy
-      expect(@course.account[:enable_user_notes]).to be_truthy
-    end
-  end
 end

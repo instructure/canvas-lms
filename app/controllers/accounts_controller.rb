@@ -1062,7 +1062,6 @@ class AccountsController < ApplicationController
         end
 
         params[:account][:turnitin_host] = validated_turnitin_host(params[:account][:turnitin_host])
-        enable_user_notes = params[:account].delete :enable_user_notes
         allow_sis_import = params[:account].delete :allow_sis_import
         params[:account].delete :default_user_storage_quota_mb unless @account.root_account? && !@account.site_admin?
         unless @account.grants_right? @current_user, :manage_storage_quotas
@@ -1103,7 +1102,6 @@ class AccountsController < ApplicationController
             @account.settings[:google_docs_domain] = google_docs_domain.presence
           end
 
-          @account.enable_user_notes = enable_user_notes if enable_user_notes
           @account.allow_sis_import = allow_sis_import if allow_sis_import && @account.root_account?
           if @account.site_admin? && params[:account][:settings]
             # these shouldn't get set for the site admin account

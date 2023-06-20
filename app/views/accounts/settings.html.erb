@@ -595,10 +595,6 @@
                 </div> -->
                 <% unless @account.site_admin? %>
                   <div>
-                    <%= f.check_box :enable_user_notes, :checked => @account.enable_user_notes %>
-                    <%= f.label :enable_user_notes, :en => "Faculty Journal" %>
-                  </div>
-                  <div>
                     <%= settings.check_box :enable_eportfolios, :checked => @account.settings[:enable_eportfolios] != false %>
                     <%= settings.label :enable_eportfolios, :en => "ePortfolios" %>
                   </div>
