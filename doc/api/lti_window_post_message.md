@@ -38,10 +38,11 @@ with `.response` appended. If an error occurs during message handling, the respo
 contain an `error` property with a `code` and a `message`.
 
 Sample code for receiving the response messages:
+
 ```js
-window.addEventListener('message', function(event) {
-    // Process response
-});
+window.addEventListener('message', function (event) {
+  // Process response
+})
 ```
 
 Messages sent by a tool that has been launched from a Canvas mobile app will not receive any response messages.
@@ -54,7 +55,7 @@ Messages sent by a tool that has been launched from a Canvas mobile app will not
 **as of January 2023, and so the specifics of this message are subject to change.**
 
 **At one point, this message type was named 'org.imsglobal.lti.capabilities', but the prefix**
-**was dropped before finalizing the spec. Canvas will support both formats until July 1, 2023.**
+**was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
 
 Responds with a list of subjects that Canvas will respond to, and if necessary the named
 frame to address each subject to. Part of the LTI Platform Storage spec, defined
@@ -81,7 +82,7 @@ window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 **as of January 2023, and so the specifics of this message are subject to change.**
 
 **At one point, this message type was named 'org.imsglobal.lti.put_data', but the prefix**
-**was dropped before finalizing the spec. Canvas will support both formats until July 1, 2023.**
+**was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
 
 Stores the provided `value` at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
@@ -89,8 +90,9 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-(which for Canvas means the `iss`, `canvas.instructure.com`). Currently, Canvas does not yet
-support this use case, and the wildcard origin `*` should still be used.
+as defined [here](file.lti_dev_key_config.html#step-2). Currently, Canvas does not yet
+support this use case, and the wildcard origin `*` should still be used. Full support for the target
+origin will be enabled on August 19, 2023 (July 17 for Beta), as described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677).
 
 **Required properties:**
 
@@ -124,7 +126,7 @@ window.parent.postMessage(
 **as of January 2023, and so the specifics of this message are subject to change.**
 
 **At one point, this message type was named 'org.imsglobal.lti.get_data', but the prefix**
-**was dropped before finalizing the spec. Canvas will support both formats until July 1, 2023.**
+**was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
 
 Fetches the value stored at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
@@ -132,8 +134,9 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-(which for Canvas means the `iss`, `canvas.instructure.com`). Currently, Canvas does not yet
-support this use case, and the wildcard origin `*` should still be used.
+as defined [here](file.lti_dev_key_config.html#step-2). Currently, Canvas does not yet
+support this use case, and the wildcard origin `*` should still be used. Full support for the target
+origin will be enabled on August 19, 2023 (July 17 for Beta), as described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677).
 
 **Required properties:**
 

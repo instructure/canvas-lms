@@ -102,6 +102,14 @@ To complete authentication, tools are expected to send back an <a href="http://w
 - `https://canvas.beta.instructure.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
 - `https://canvas.test.instructure.com/api/lti/authorize_redirect` (if launched from a **test** environment)
 
+> **Note:** As of August 19, 2023 (July 17 for Beta), these endpoints will change to:
+
+> - `https://sso.canvaslms.com/api/lti/authorize_redirect` (if launched from a **production** environment)
+> - `https://sso.beta.canvaslms.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
+> - `https://sso.test.canvaslms.com/api/lti/authorize_redirect` (if launched from a **test** environment)
+
+> The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools are expected to change this endpoint in their configuration store by August 19, 2023, and should make that change as soon as possible (and can right now). Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
+
 Among the <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">required variables</a> the request should include:
 
 - a `redirect_uri`, which must match at least one configured on the developer key.
@@ -132,6 +140,7 @@ In Step 2, instead of storing the `state` parameter in a cookie, the tool should
 In Step 4, instead of comparing the `state` parameter to the stored value in the cookie, the tool should retrieve it using the `lti.get_data` postMessage. Since this comparison has to happen in Javascript instead of on the server, the tool should render _something_, then check these values. If the values don't match, the tool can then log the user out or render an error.
 
 **Note** that Canvas supports most of the spec, including all message types, but does not currently support using the OIDC Auth URI as the target origin. Tools that want to use these postMessages to set and get data for launches or for other uses must currently direct all messages to the parent Canvas window, using the `*` wildcard origin.
+<a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">This Canvas Community article</a> has a section at the end that details the exact state of Canvas's support of this API. Full support of this API will be enabled in Beta on July 17, 2023, and in Production on August 19, 2023.
 
 Other LTI Platform Storage spec docs:
 
@@ -154,12 +163,20 @@ Tools will need to be aware of some Canvas-specific settings in order to accept 
 
 - **Canvas Public JWKs**: When the tool receives the authentication response ([Step 3](#step-3)), tools must <a href="http://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation" target="_blank">validate that the request is actually coming from Canvas</a>. Canvas' public keys are environment-specific, but not domain-specific (the same key set can be used across all client accounts):
 
-- Production: `https://canvas.instructure.com/api/lti/security/jwks`
-- Beta: `https://canvas.beta.instructure.com/api/lti/security/jwks`
-- Test: `https://canvas.test.instructure.com/api/lti/security/jwks`
+> - Production: `https://canvas.instructure.com/api/lti/security/jwks`
+> - Beta: `https://canvas.beta.instructure.com/api/lti/security/jwks`
+> - Test: `https://canvas.test.instructure.com/api/lti/security/jwks`
+
+> **Note:** As of August 19, 2023 (July 17 for Beta), these endpoints will change to:
+
+> - Production: `https://sso.canvaslms.com/api/lti/security/jwks`
+> - Beta: `https://sso.beta.canvaslms.com/api/lti/security/jwks`
+> - Test: `https://sso.test.canvaslms.com/api/lti/security/jwks`
+
+> The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools are expected to change this endpoint in their configuration store by August 19, and should make that change as soon as possible (and can right now). Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
 
 - **Authorization Redirect URL**: The values and use of this are described in [Step 2](#step-2). Since the URL is static, you will want to configure this in your tool. Tools that wish to utilize [Step 1.5](#login-redirect) need to include _all_ possible
-  redirect URLs here.
+  redirect URLs here. Remember that this endpoint is also changing on August 19, 2023, and you will need to update this in your tool's configuration.
 
 - **Client ID**: The `client_id` of the Developer Key that's been configured in Canvas. Your tool will need to use this in the authentication response to Canvas ([Step 2](#step-2)) and it is also used during the <a href="" target="_blank">Client Credentials Grant</a> to access <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">LTI Advantage Services</a>.
 
