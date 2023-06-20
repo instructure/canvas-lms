@@ -7838,6 +7838,30 @@ describe Course do
         @root.enable_feature!(:restrict_quantitative_data)
       end
 
+      context "relation to acount restrict_quantitative_data setting" do
+        it "is unaffected by account setting for existing courses" do
+          expect(@course.restrict_quantitative_data).to be false
+          @course.account.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          @course.account.save!
+          @course.reload
+          expect(@course.restrict_quantitative_data).to be false
+        end
+
+        it "sets restrict_quantitative_data to true for newly created courses when account setting is true and locked" do
+          Account.default.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          Account.default.save!
+          crs = Course.create!(account: Account.default)
+          expect(crs.restrict_quantitative_data).to be true
+        end
+
+        it "does not set restrict_quantitative_data for newly created courses when account setting is true and not locked" do
+          Account.default.settings[:restrict_quantitative_data] = { locked: false, value: true }
+          Account.default.save!
+          crs = Course.create!(account: Account.default)
+          expect(crs.restrict_quantitative_data).to be false
+        end
+      end
+
       describe "updates metric if setting is enabled/disabled" do
         before do
           allow(InstStatsd::Statsd).to receive(:increment)
@@ -7874,24 +7898,11 @@ describe Course do
           expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled")
           expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled")
         end
-
-        it "doesn't increment when account setting propagates enabled" do
-          expect(@course.restrict_quantitative_data).to be false
-          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
-          @root.save!
-          expect(@course.restrict_quantitative_data).to be true
-          @root.settings[:restrict_quantitative_data] = { locked: true, value: false }
-          @root.save!
-          expect(@course.restrict_quantitative_data).to be false
-
-          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.enabled")
-          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.settings.restrict_quantitative_data.disabled")
-        end
       end
 
       describe "with setting turned on" do
         before do
-          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @course.restrict_quantitative_data = true
           @course.save!
         end
 
@@ -7964,6 +7975,10 @@ describe Course do
     end
 
     describe "with feature flag off" do
+      it "sets restrict_quantitative_data setting to false by default" do
+        expect(@course.restrict_quantitative_data).to be false
+      end
+
       describe "with setting turned on" do
         before do
           @course.settings = @course.settings.merge(restrict_quantitative_data: true)

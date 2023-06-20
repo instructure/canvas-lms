@@ -1179,6 +1179,8 @@ describe UsersController do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
+          @course.restrict_quantitative_data = true
+          @course.save!
 
           get_grades!(all_grading_periods_id)
           expect(restrict_quantitative_data).to be true
@@ -1285,6 +1287,8 @@ describe UsersController do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
+        @course.restrict_quantitative_data = true
+        @course.save!
 
         user_session(teacher)
         get_grades!(grading_period.id)
@@ -1400,6 +1404,8 @@ describe UsersController do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
+          @course.restrict_quantitative_data = true
+          @course.save!
 
           get_grades!(grading_period.id)
           expect(restrict_quantitative_data).to be true

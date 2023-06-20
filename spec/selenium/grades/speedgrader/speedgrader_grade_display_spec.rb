@@ -65,6 +65,8 @@ describe "speed grader - grade display" do
       # truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
+      @course.restrict_quantitative_data = true
+      @course.save!
 
       Speedgrader.visit(@course.id, @assignment.id)
       expect(Speedgrader.average_grade.text).to eq "A-"
@@ -80,6 +82,8 @@ describe "speed grader - grade display" do
       # truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
+      @course.restrict_quantitative_data = true
+      @course.save!
 
       Speedgrader.visit(@course.id, @assignment.id)
       expect(Speedgrader.average_grade.text).to eq ""

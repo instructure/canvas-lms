@@ -132,6 +132,8 @@ describe "student k5 dashboard schedule" do
       # now truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
+      @subject_course.restrict_quantitative_data = true
+      @subject_course.save!
 
       get "/#schedule"
 

@@ -79,6 +79,8 @@ describe "submission_graded" do
       # truthy setting
       course_root_account.settings[:restrict_quantitative_data] = { value: true, locked: true }
       course_root_account.save!
+      @assignment.course.restrict_quantitative_data = true
+      @assignment.course.save!
 
       summary = generate_message(:submission_graded, :summary, asset, user: @student)
       expect(summary.body).to include("grade: A")
