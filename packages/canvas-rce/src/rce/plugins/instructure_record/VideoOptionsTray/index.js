@@ -45,6 +45,7 @@ import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 import {parsedStudioOptionsPropType} from '../../shared/StudioLtiSupportUtils'
+import RCEGlobals from '../../../RCEGlobals'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
@@ -71,8 +72,10 @@ export default function VideoOptionsTray({
   const [minWidth] = useState(MIN_WIDTH_VIDEO)
   const [minHeight] = useState(Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO))
   const [minPercentage] = useState(MIN_PERCENTAGE)
+  const lock_statuses = RCEGlobals.getConfig()?.lockedAttachments
 
   const isStudio = !!studioOptions
+  const isLocked = !!lock_statuses && !!lock_statuses[videoOptions.attachmentId]
   const showDisplayOptions = !isStudio || studioOptions.convertibleToLink
   const showSizeControls = !isStudio || studioOptions.resizable
 
@@ -115,6 +118,7 @@ export default function VideoOptionsTray({
       displayAs,
       subtitles,
       updateMediaObject,
+      isLocked,
     })
   }
   const tooltipText = formatMessage('Used by screen readers to describe the video')
@@ -198,27 +202,29 @@ export default function VideoOptionsTray({
               <Flex justifyItems="space-between" direction="column" height="100%">
                 <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
                   <Flex direction="column">
-                    <Flex.Item padding="small">
-                      {isStudio ? (
-                        <Flex direction="column">
-                          <Flex.Item>
-                            <Text weight="bold">{formatMessage('Media Title')}</Text>
-                          </Flex.Item>
-                          <Flex.Item padding="small none none small">{titleText}</Flex.Item>
-                        </Flex>
-                      ) : (
-                        <TextArea
-                          aria-describedby="alt-text-label-tooltip"
-                          disabled={displayAs === 'link'}
-                          height="4rem"
-                          label={textAreaLabel}
-                          onChange={handleTitleTextChange}
-                          placeholder={formatMessage('(Describe the video)')}
-                          resize="vertical"
-                          value={titleText}
-                        />
-                      )}
-                    </Flex.Item>
+                    {!isLocked && (
+                      <Flex.Item padding="small">
+                        {isStudio ? (
+                          <Flex direction="column">
+                            <Flex.Item>
+                              <Text weight="bold">{formatMessage('Media Title')}</Text>
+                            </Flex.Item>
+                            <Flex.Item padding="small none none small">{titleText}</Flex.Item>
+                          </Flex>
+                        ) : (
+                          <TextArea
+                            aria-describedby="alt-text-label-tooltip"
+                            disabled={displayAs === 'link'}
+                            height="4rem"
+                            label={textAreaLabel}
+                            onChange={handleTitleTextChange}
+                            placeholder={formatMessage('(Describe the video)')}
+                            resize="vertical"
+                            value={titleText}
+                          />
+                        )}
+                      </Flex.Item>
+                    )}
                     {showDisplayOptions && (
                       <Flex.Item margin="small none none none" padding="small">
                         <RadioInputGroup
@@ -273,7 +279,7 @@ export default function VideoOptionsTray({
                         )}
                       </Flex.Item>
                     )}
-                    {!isStudio && (
+                    {!isStudio && !isLocked && (
                       <Flex.Item padding="small">
                         <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>
                           <ClosedCaptionPanel
@@ -317,7 +323,7 @@ export default function VideoOptionsTray({
 
 VideoOptionsTray.propTypes = {
   videoOptions: shape({
-    titleText: string.isRequired,
+    titleText: string,
     appliedHeight: number,
     appliedWidth: number,
     naturalHeight: number.isRequired,
