@@ -90,15 +90,19 @@ export const usePostComment = () => {
         },
       }
 
-      const {status} = await executeApiRequest<Submission>({
-        path,
-        body: requestBody,
-        method: 'PUT',
-      })
+      try {
+        const {status} = await executeApiRequest<Submission>({
+          path,
+          body: requestBody,
+          method: 'PUT',
+        })
 
-      if (status === 200) {
-        setpostCommentStatus(ApiCallStatus.COMPLETED)
-      } else {
+        if (status === 200) {
+          setpostCommentStatus(ApiCallStatus.COMPLETED)
+        } else {
+          throw new Error()
+        }
+      } catch (error) {
         setpostCommentError(I18n.t('Something went wrong'))
         setpostCommentStatus(ApiCallStatus.FAILED)
       }

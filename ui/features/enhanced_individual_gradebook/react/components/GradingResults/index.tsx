@@ -87,14 +87,12 @@ export default function GradingResults({
             return
           }
           onSubmissionSaved(newSubmission)
-          if (modalOpen) {
-            setModalOpen(false)
-          }
+          setModalOpen(false)
           showFlashSuccess(I18n.t('Grade saved'))()
           break
       }
     },
-    [modalOpen, onSubmissionSaved]
+    [onSubmissionSaved]
   )
 
   const handlePostComment = useCallback(() => {

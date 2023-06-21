@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentConnection, UserConnection} from './queries'
+import {
+  AssignmentConnection,
+  UserConnection,
+  GradebookUserSubmissionDetails,
+  SubmissionConnection,
+} from './queries'
 import {
   ProgressData,
   CourseSettingsType,
@@ -101,3 +106,24 @@ export enum ApiCallStatus {
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
 }
+
+export type AssignmentSubmissionsMap = {
+  [assignmentId: string]: {
+    [submissionId: string]: SubmissionConnection
+  }
+}
+
+export type SubmissionGradeChange = Pick<
+  GradebookUserSubmissionDetails,
+  | 'id'
+  | 'assignmentId'
+  | 'score'
+  | 'enteredScore'
+  | 'missing'
+  | 'excused'
+  | 'late'
+  | 'grade'
+  | 'state'
+  | 'submittedAt'
+  | 'userId'
+>
