@@ -3029,7 +3029,7 @@ class UsersController < ApplicationController
   def api_show_includes
     allowed_includes = ["uuid", "last_login"]
     allowed_includes << "avatar_state" if @user.grants_right?(@current_user, :manage_user_details)
-    includes = %w[locale avatar_url permissions email effective_locale]
+    includes = %w[first_name last_name locale avatar_url permissions email effective_locale]
     includes += Array.wrap(params[:include]) & allowed_includes
     includes
   end
