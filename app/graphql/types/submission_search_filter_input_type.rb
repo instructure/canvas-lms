@@ -34,6 +34,11 @@ module Types
       address; non-administrative queries will only be compared against name.
     MD
 
+    argument :user_id, ID, <<~MD, required: false
+      Return only submissions related to the given user_id
+      There is no character restriction on this field
+    MD
+
     argument :scored_less_than, Float, "Limit results to submissions that scored below the specified value", required: false
     argument :scored_more_than, Float, "Limit results to submissions that scored above the specified value", required: false
     argument :late, Boolean, "Limit results to submissions that are late", required: false
