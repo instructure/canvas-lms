@@ -1911,6 +1911,8 @@ CanvasRails::Application.routes.draw do
       put "groups/:group_id/pages/:url_or_id", action: :update
       delete "courses/:course_id/pages/:url_or_id", action: :destroy
       delete "groups/:group_id/pages/:url_or_id", action: :destroy
+      get "courses/:course_id/page_title_availability", action: :check_title_availability, as: "course_page_title_availability"
+      get "groups/:group_id/page_title_availability", action: :check_title_availability, as: "group_page_title_availability"
     end
 
     scope(controller: :context_modules_api) do
