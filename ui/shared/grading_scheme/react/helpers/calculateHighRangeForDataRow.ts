@@ -22,6 +22,6 @@ export const calculateHighRangeForDataRow = (
   rowIndex: number,
   gradingSchemeData: GradingSchemeDataRow[]
 ): number => {
-  // if this is the first row, maxScore is 100.  For all other rows, the max score is just the prior data row's min score
+  // if this is the first row, high range is 1 (ie, 100%).  For all other rows, the high range is just the prior data row's low range
   return rowIndex === 0 ? 1 : gradingSchemeData[rowIndex - 1].value
 }

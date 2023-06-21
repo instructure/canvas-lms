@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState, useRef, useCallback} from 'react'
+
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -28,88 +29,140 @@ import {Flex} from '@instructure/ui-flex'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Tooltip} from '@instructure/ui-tooltip'
 
-import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
-import {decimalToRoundedPercent} from '../../helpers/decimalToRoundedPercent'
-import {roundToTwoDecimalPlaces} from '../../helpers/roundToTwoDecimalPlaces'
-
 const I18n = useI18nScope('GradingSchemeManagement')
 
 // Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
 const {Item} = Flex as any
 
 interface ComponentProps {
-  dataRow: GradingSchemeDataRow
-  highRange: number
+  letterGrade: string
+  lowRangeDefaultDisplay: string
+  highRangeDefaultDisplay: string
   isFirstRow: boolean
   isLastRow: boolean
   onRowLetterGradeChange: (letterGrade: string) => any
-  onLowRangeChange: (lowRange: number) => any
-  onLowRangeInputInvalidNumber: () => any
+  onLowRangeChange: (lowRangeDisplay: string) => any
+  onLowRangeBlur: (lowRangeDisplay: string) => any
+  onHighRangeChange: (highRangeDisplay: string) => any
+  onHighRangeBlur: (highRangeDisplay: string) => any
   onRowDeleteRequested: () => any
   onRowAddRequested: () => any
+  pointsBased: boolean
+  displayScalingFactor: number
 }
 
 export const GradingSchemeDataRowInput = ({
-  dataRow,
-  highRange,
+  letterGrade,
+  lowRangeDefaultDisplay,
+  highRangeDefaultDisplay,
   isFirstRow,
   isLastRow,
   onLowRangeChange,
-  onLowRangeInputInvalidNumber,
+  onLowRangeBlur,
+  onHighRangeChange,
+  onHighRangeBlur,
   onRowLetterGradeChange,
   onRowAddRequested,
   onRowDeleteRequested,
+  pointsBased,
+  displayScalingFactor,
 }: ComponentProps) => {
-  const [lowRange, setLowRange] = useState<number>(dataRow.value)
-  const [lowRangeInputBuffer, setLowRangeInputBuffer] = useState<string | undefined>(undefined)
-  const [lowRangeInvalid, setLowRangeInvalid] = useState<boolean>(false)
+  const [lowRangeValid, setLowRangeValid] = useState<boolean>(true)
+  const [highRangeValid, setHighRangeValid] = useState<boolean>(true)
   const [addButtonHovering, setAddButtonHovering] = useState<boolean>(false)
 
+  const lowRangeInputRef = useRef<HTMLInputElement>()
+  const highRangeInputRef = useRef<HTMLInputElement>()
+
+  const validateLowRange = useCallback(
+    (lowRange: number) => {
+      if (Number.isNaN(lowRange)) {
+        setLowRangeValid(false)
+      } else if (lowRange > displayScalingFactor) {
+        setLowRangeValid(false)
+      } else if (lowRange < 0) {
+        setLowRangeValid(false)
+      } else {
+        setLowRangeValid(true)
+      }
+    },
+    [displayScalingFactor]
+  )
+
+  const validateHighRange = useCallback((highRange: number) => {
+    if (Number.isNaN(highRange)) {
+      setHighRangeValid(false)
+    } else if (highRange > 100) {
+      setHighRangeValid(false)
+    } else if (highRange < 0) {
+      setHighRangeValid(false)
+    } else {
+      setHighRangeValid(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (lowRangeInputRef.current) {
+      if (lowRangeDefaultDisplay !== lowRangeInputRef.current.value) {
+        lowRangeInputRef.current.value = lowRangeDefaultDisplay
+        const lowRange = numberHelper._parseNumber(lowRangeDefaultDisplay)
+        validateLowRange(lowRange)
+      }
+    }
+  }, [lowRangeDefaultDisplay, validateLowRange])
+
+  useEffect(() => {
+    if (highRangeInputRef.current) {
+      if (highRangeDefaultDisplay !== highRangeInputRef.current.value) {
+        highRangeInputRef.current.value = highRangeDefaultDisplay
+        const highRange = numberHelper._parseNumber(highRangeDefaultDisplay)
+        validateHighRange(highRange)
+      }
+    }
+  }, [highRangeDefaultDisplay, validateHighRange])
+
   // @ts-expect-error -- TODO: remove once we're on InstUI 8
-  const triggerLetterGradeChange = event => {
+  const handleLetterGradeChange = event => {
     onRowLetterGradeChange(event.target.value)
   }
 
-  const triggerRowLowRangeBlur = () => {
-    if (!lowRangeInputBuffer) return
-
-    const inputVal = numberHelper.parse(lowRangeInputBuffer)
-
-    if (!Number.isNaN(Number(inputVal)) && inputVal >= 0 && inputVal <= 100) {
-      setLowRangeInvalid(false)
-      const lowRangeRounded = roundToTwoDecimalPlaces(Number(inputVal))
-      setLowRangeInputBuffer(undefined)
-      setLowRange(lowRangeRounded / 100)
-      onLowRangeChange(lowRangeRounded / 100)
-    } else {
-      setLowRangeInvalid(true)
-      onLowRangeInputInvalidNumber()
-    }
+  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  const handleRowLowRangeChange = event => {
+    const lowRangeInputAsString = event.target.value
+    const lowRange = numberHelper._parseNumber(lowRangeInputAsString)
+    validateLowRange(lowRange)
+    onLowRangeChange(lowRangeInputAsString)
   }
 
   // @ts-expect-error -- TODO: remove once we're on InstUI 8
-  const triggerRowLowRangeChange = event => {
-    const scoreInput = event.target.value
-    setLowRangeInputBuffer(scoreInput)
+  const handleLowRangeBlur = event => {
+    const lowRangeInputAsString = event.target.value
+    const lowRange = numberHelper._parseNumber(lowRangeInputAsString)
+    validateLowRange(lowRange)
+    onLowRangeBlur(lowRangeInputAsString)
+  }
 
-    const inputVal = numberHelper.parse(scoreInput)
-    if (!Number.isNaN(Number(inputVal)) && inputVal >= 0 && inputVal <= 100) {
-      setLowRangeInvalid(false)
-      onLowRangeChange(Number(inputVal) / 100)
-    } else {
-      setLowRangeInvalid(true)
-      onLowRangeInputInvalidNumber()
+  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  const handleRowHighRangeChange = event => {
+    if (!isFirstRow) {
+      throw Error('Only first row can set the (scheme) high range')
     }
+    if (!pointsBased) {
+      throw Error('Only points based schemes can set the high range (scaling factor)')
+    }
+    const highRangeInputAsString = event.target.value
+    const highRange = numberHelper._parseNumber(highRangeInputAsString)
+    validateHighRange(highRange)
+    onHighRangeChange(highRangeInputAsString)
   }
 
-  function renderLowRange() {
-    return String(
-      // TODO JS: I18n for numbers (decimals)?
-      lowRangeInputBuffer !== undefined ? lowRangeInputBuffer : decimalToRoundedPercent(lowRange)
-    )
+  // @ts-expect-error -- TODO: remove once we're on InstUI 8
+  const handleHighRangeBlur = event => {
+    const highRangeInputAsString = event.target.value
+    const highRange = numberHelper._parseNumber(highRangeInputAsString)
+    validateHighRange(highRange)
+    onHighRangeBlur(highRangeInputAsString)
   }
-
-  const lowRangeValidationMessageState = lowRangeInvalid ? 'error' : 'hint'
 
   return (
     <>
@@ -139,27 +192,50 @@ export const GradingSchemeDataRowInput = ({
             renderLabel={<ScreenReaderContent>{I18n.t('Letter Grade')}</ScreenReaderContent>}
             display="inline-block"
             width="6rem"
-            onChange={triggerLetterGradeChange}
-            defaultValue={dataRow.name}
+            onChange={handleLetterGradeChange}
+            defaultValue={letterGrade}
             messages={[{text: <></>, type: 'hint'}]}
           />
         </td>
         <td style={{width: '25%'}}>
           <span aria-label={I18n.t('Upper limit of range')}>
-            {isFirstRow ? '' : '< '}
-            {decimalToRoundedPercent(highRange)}%
+            {isFirstRow && pointsBased ? (
+              <>
+                <TextInput
+                  inputRef={(ref: HTMLInputElement) => (highRangeInputRef.current = ref)}
+                  isRequired={true}
+                  renderLabel={
+                    <ScreenReaderContent>{I18n.t('Upper limit of range')}</ScreenReaderContent>
+                  }
+                  display="inline-block"
+                  width="4.5rem"
+                  htmlSize={3}
+                  onChange={handleRowHighRangeChange}
+                  onBlur={handleHighRangeBlur}
+                  defaultValue={highRangeDefaultDisplay}
+                  messages={[{text: <></>, type: highRangeValid ? 'hint' : 'error'}]}
+                />
+              </>
+            ) : (
+              <>
+                {isFirstRow ? '' : '< '}
+                {highRangeDefaultDisplay}
+              </>
+            )}
+            {pointsBased ? <></> : <>%</>}
           </span>
         </td>
         <td style={{width: '25%'}}>
           <Flex display="inline-flex">
-            <Item padding="x-small">{I18n.t('to')}</Item>
+            <Item padding="x-small">{I18n.t('to')} </Item>
             <Item>
               <span aria-label={I18n.t('Lower limit of range')}>
                 {isLastRow ? (
-                  <>0%</>
+                  <>0{pointsBased ? <></> : <>%</>}</>
                 ) : (
                   <>
                     <TextInput
+                      inputRef={(ref: HTMLInputElement) => (lowRangeInputRef.current = ref)}
                       isRequired={true}
                       renderLabel={
                         <ScreenReaderContent>{I18n.t('Lower limit of range')}</ScreenReaderContent>
@@ -167,12 +243,12 @@ export const GradingSchemeDataRowInput = ({
                       display="inline-block"
                       width="4.5rem"
                       htmlSize={3}
-                      onChange={triggerRowLowRangeChange}
-                      onBlur={triggerRowLowRangeBlur}
-                      value={renderLowRange()}
-                      messages={[{text: <></>, type: lowRangeValidationMessageState}]}
+                      onChange={handleRowLowRangeChange}
+                      onBlur={handleLowRangeBlur}
+                      defaultValue={lowRangeDefaultDisplay}
+                      messages={[{text: <></>, type: lowRangeValid ? 'hint' : 'error'}]}
                     />
-                    %
+                    {pointsBased ? <></> : <>%</>}
                   </>
                 )}
               </span>

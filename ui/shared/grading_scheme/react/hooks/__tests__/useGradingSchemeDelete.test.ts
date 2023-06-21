@@ -52,6 +52,8 @@ describe('useGradingSchemeDeleteHook', () => {
     const gradingSchemeTemplate: GradingSchemeTemplate = {
       data: [],
       title: 'My Course Grading Scheme',
+      scaling_factor: 1.0,
+      points_based: false,
     }
 
     doFetchApi.mockResolvedValue({
@@ -73,6 +75,8 @@ describe('useGradingSchemeDeleteHook', () => {
     const gradingSchemeTemplate: GradingSchemeTemplate = {
       data: [],
       title: 'My Account Grading Scheme',
+      scaling_factor: 1.0,
+      points_based: false,
     }
 
     doFetchApi.mockResolvedValue({

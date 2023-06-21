@@ -23,20 +23,27 @@ import {GradingSchemeDataRowInput} from '../GradingSchemeDataRowInput'
 
 const onRowLetterGradeChange = jest.fn()
 const onLowRangeChange = jest.fn()
+const onLowRangeBlur = jest.fn()
+const onHighRangeChange = jest.fn()
+const onHighRangeBlur = jest.fn()
 const onRowDeleteRequested = jest.fn()
 const onRowAddRequested = jest.fn()
-const onLowRangeInputInvalidNumber = jest.fn()
 
 const testProps = {
-  dataRow: {name: 'B', value: 0.8},
-  highRange: 0.9,
+  letterGrade: 'B',
+  lowRangeDefaultDisplay: '80',
+  highRangeDefaultDisplay: '90',
   isFirstRow: false,
   isLastRow: false,
   onRowLetterGradeChange,
-  onLowRangeInputInvalidNumber,
   onLowRangeChange,
+  onLowRangeBlur,
+  onHighRangeChange,
+  onHighRangeBlur,
   onRowDeleteRequested,
   onRowAddRequested,
+  pointsBased: false,
+  displayScalingFactor: 1,
 }
 
 describe('GradingSchemeDataRowInput', () => {
@@ -78,7 +85,7 @@ describe('GradingSchemeDataRowInput', () => {
     expect(onRowLetterGradeChange).toHaveBeenCalledWith('X')
   })
 
-  it('onRowMinScoreChange callback is invoked on changing min score input to valid number', () => {
+  it('onRowMinScoreChange callback is invoked on changing low range input to valid number', async () => {
     render(
       <table>
         <tbody>
@@ -89,12 +96,15 @@ describe('GradingSchemeDataRowInput', () => {
     const rangeInput = screen.getByRole<HTMLInputElement>('textbox', {
       name: /Lower limit of range/,
     })
+
     fireEvent.change(rangeInput, {target: {value: '75'}})
-    fireEvent.blur(rangeInput)
-    expect(onLowRangeChange).toHaveBeenCalledWith(0.75)
+    expect(onLowRangeChange).toHaveBeenCalledWith('75')
+
+    fireEvent.blur(rangeInput, {target: {value: '76'}})
+    expect(onLowRangeBlur).toHaveBeenCalledWith('76')
   })
 
-  it('onRowMinScoreChange callback is invoked with rounded value on changing min score input to number with > 2 decimal places', () => {
+  it('onRowMinScoreChange callback is invoked with rounded value on changing low range input to number with > 2 decimal places', () => {
     render(
       <table>
         <tbody>
@@ -106,11 +116,12 @@ describe('GradingSchemeDataRowInput', () => {
       name: /Lower limit of range/,
     })
     fireEvent.change(rangeInput, {target: {value: '75.555'}})
-    fireEvent.blur(rangeInput)
-    expect(onLowRangeChange).toHaveBeenCalledWith(0.7556)
+    expect(onLowRangeChange).toHaveBeenCalledWith('75.555')
+    fireEvent.blur(rangeInput, {target: {value: '75.555'}})
+    expect(onLowRangeBlur).toHaveBeenCalledWith('75.555')
   })
 
-  it('onRowMinScoreChange callback is not invoked on changing min score input to invalid number', () => {
+  it('onRowMinScoreChange callback is invoked on changing low range input to invalid number', () => {
     render(
       <table>
         <tbody>
@@ -122,11 +133,13 @@ describe('GradingSchemeDataRowInput', () => {
       name: /Lower limit of range/,
     })
     fireEvent.change(rangeInput, {target: {value: '555'}})
-    fireEvent.blur(rangeInput)
-    expect(onLowRangeChange).not.toHaveBeenCalled()
+    expect(onLowRangeChange).toHaveBeenCalledWith('555')
+
+    fireEvent.blur(rangeInput, {target: {value: '555'}})
+    expect(onLowRangeBlur).toHaveBeenCalledWith('555')
   })
 
-  it('onRowMinScoreChange callback is not invoked on changing min score input to non numeric value', () => {
+  it('onRowMinScoreChange callback is invoked on changing low range input to non numeric value', () => {
     render(
       <table>
         <tbody>
@@ -138,8 +151,9 @@ describe('GradingSchemeDataRowInput', () => {
       name: /Lower limit of range/,
     })
     fireEvent.change(rangeInput, {target: {value: 'foo'}})
-    fireEvent.blur(rangeInput)
-    expect(onLowRangeChange).not.toHaveBeenCalled()
+    expect(onLowRangeChange).toHaveBeenCalledWith('foo')
+    fireEvent.blur(rangeInput, {target: {value: 'foo'}})
+    expect(onLowRangeBlur).toHaveBeenCalledWith('foo')
   })
 
   it('delete callback is invoked on delete row button press', () => {
@@ -170,5 +184,42 @@ describe('GradingSchemeDataRowInput', () => {
     })
     act(() => addRowButton.click())
     expect(onRowAddRequested).toHaveBeenCalled()
+  })
+
+  it('grade by points exploration', () => {
+    const gradeByPointsComponentProps = {
+      letterGrade: 'C',
+      lowRangeDefaultDisplay: '1',
+      highRangeDefaultDisplay: '2',
+      isFirstRow: false,
+      isLastRow: false,
+      onRowLetterGradeChange,
+      onLowRangeChange,
+      onLowRangeBlur,
+      onHighRangeChange,
+      onHighRangeBlur,
+      onRowDeleteRequested,
+      onRowAddRequested,
+      pointsBased: true,
+      displayScalingFactor: 3.0,
+    }
+
+    render(
+      <table>
+        <tbody>
+          <GradingSchemeDataRowInput {...gradeByPointsComponentProps} />
+        </tbody>
+      </table>
+    )
+
+    const letterGradeInput = screen.getByRole<HTMLInputElement>('textbox', {
+      name: /Letter Grade/,
+    })
+    expect(letterGradeInput.value).toBe('C')
+
+    const rangeInput = screen.getByRole<HTMLInputElement>('textbox', {
+      name: /Lower limit of range/,
+    })
+    expect(rangeInput.value).toBe('1')
   })
 })

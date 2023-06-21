@@ -16,11 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {roundToTwoDecimalPlaces} from './roundToTwoDecimalPlaces'
-
-export function decimalToRoundedPercent(value: number): number {
-  if (value > 1.0) {
-    throw new Error(`value ${value} must be a decimal`)
-  }
-  return roundToTwoDecimalPlaces(value * 100)
-}
+export const roundToTwoDecimalPlaces = (value: number) => Math.round(value * 100) / 100
+export const roundToFourDecimalPlaces = (value: number) => Math.round(value * 10000) / 10000

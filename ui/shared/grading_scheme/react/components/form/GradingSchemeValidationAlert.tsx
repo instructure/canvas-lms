@@ -20,19 +20,24 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {GradingSchemeFormDataWithUniqueRowIds} from './GradingSchemeInput'
 
 import {
   gradingSchemeIsValid,
   rowNamesAreValid,
   rowDataIsValid,
-  rowDataIsValidNumber,
+  rowDataIsValidNumbers,
 } from './validations/gradingSchemeValidations'
+import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
 
 const I18n = useI18nScope('GradingSchemes')
 
 export interface ComponentProps {
-  formData: GradingSchemeFormDataWithUniqueRowIds
+  formData: {
+    title: string
+    data: GradingSchemeDataRow[]
+    scalingFactor: number
+    pointsBased: boolean
+  }
   onClose: () => any
 }
 
@@ -58,7 +63,7 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
         {gradingSchemeIsValid(formData) ? (
           // grading scheme did initially have validation error(s), but errors have since been corrected
           <>{I18n.t('Looks great!')}</>
-        ) : !rowDataIsValidNumber(formData) ? (
+        ) : !rowDataIsValidNumbers(formData) ? (
           <>
             {I18n.t(
               "Cannot have negative ranges or ranges that are greater than 100. Fix the ranges and try clicking 'Save' again."

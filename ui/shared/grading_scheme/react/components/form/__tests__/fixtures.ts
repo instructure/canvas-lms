@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingSchemeFormInput} from '../GradingSchemeInput'
+import {GradingSchemeEditableData} from '../GradingSchemeInput'
 
-export const VALID_FORM_INPUT: GradingSchemeFormInput = {
+export const VALID_FORM_INPUT: GradingSchemeEditableData = {
   data: [
     {name: 'A', value: 0.9},
     {name: 'B', value: 0.8},
@@ -27,17 +27,43 @@ export const VALID_FORM_INPUT: GradingSchemeFormInput = {
     {name: 'F', value: 0.0},
   ],
   title: 'A Grading Scheme',
+  scalingFactor: 1,
+  pointsBased: false,
 }
 
-export const SHORT_FORM_INPUT: GradingSchemeFormInput = {
+export const VALID_FORM_INPUT_POINTS_BASED: GradingSchemeEditableData = {
+  data: [
+    {name: 'A', value: 0.75},
+    {name: 'B', value: 0.5},
+    {name: 'C', value: 0.25},
+    {name: 'D', value: 0},
+  ],
+  title: 'A Points Grading Scheme',
+  scalingFactor: 4,
+  pointsBased: true,
+}
+
+export const SHORT_FORM_INPUT: GradingSchemeEditableData = {
   data: [
     {name: 'P', value: 0.5},
     {name: 'F', value: 0.0},
   ],
   title: 'A Grading Scheme',
+  scalingFactor: 1,
+  pointsBased: false,
 }
 
-export const FORM_INPUT_MISSING_TITLE: GradingSchemeFormInput = {
+export const SHORT_FORM_INPUT_POINTS_BASED: GradingSchemeEditableData = {
+  data: [
+    {name: 'P', value: 0.5},
+    {name: 'F', value: 0.0},
+  ],
+  title: 'A Grading Scheme',
+  scalingFactor: 4,
+  pointsBased: true,
+}
+
+export const FORM_INPUT_MISSING_TITLE: GradingSchemeEditableData = {
   data: [
     {name: 'A', value: 0.9},
     {name: 'B', value: 0.8},
@@ -46,9 +72,11 @@ export const FORM_INPUT_MISSING_TITLE: GradingSchemeFormInput = {
     {name: 'F', value: 0.0},
   ],
   title: '',
+  scalingFactor: 1,
+  pointsBased: false,
 }
 
-export const FORM_INPUT_OVERLAPPING_RANGES: GradingSchemeFormInput = {
+export const FORM_INPUT_OVERLAPPING_RANGES: GradingSchemeEditableData = {
   data: [
     {name: 'A', value: 0.8},
     {name: 'B', value: 0.8},
@@ -57,4 +85,6 @@ export const FORM_INPUT_OVERLAPPING_RANGES: GradingSchemeFormInput = {
     {name: 'F', value: 0.0},
   ],
   title: 'A Grading Scheme',
+  scalingFactor: 1,
+  pointsBased: false,
 }

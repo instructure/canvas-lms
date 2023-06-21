@@ -56,6 +56,8 @@ describe('useGradingSchemeUpdateHook', () => {
       id: 'some-id',
       data,
       title: 'My Course Grading Scheme',
+      points_based: false,
+      scaling_factor: 1.0,
     }
 
     const gradingScheme: GradingScheme = {
@@ -97,6 +99,8 @@ describe('useGradingSchemeUpdateHook', () => {
       id: 'some-id',
       data,
       title: 'My Account Grading Scheme',
+      points_based: false,
+      scaling_factor: 1.0,
     }
     const gradingScheme: GradingScheme = {
       ...gradingSchemeUpdateRequest,

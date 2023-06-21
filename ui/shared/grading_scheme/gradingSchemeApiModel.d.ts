@@ -18,6 +18,8 @@
 export interface GradingSchemeTemplate {
   title: string
   data: GradingSchemeDataRow[]
+  scaling_factor: number
+  points_based: boolean
 }
 
 export interface GradingScheme {
@@ -29,12 +31,16 @@ export interface GradingScheme {
   context_name: string
   permissions: {manage: boolean}
   assessed_assignment: boolean
+  scaling_factor: number
+  points_based: boolean
 }
 
 export interface GradingSchemeUpdateRequest {
   id: string
   title: string
   data: GradingSchemeDataRow[]
+  scaling_factor: number
+  points_based: boolean
 }
 
 export interface GradingSchemeDataRow {

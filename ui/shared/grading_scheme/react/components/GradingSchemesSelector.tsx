@@ -30,9 +30,10 @@ import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {useGradingSchemeSummaries} from '../hooks/useGradingSchemeSummaries'
+import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {GradingSchemesManagement} from './GradingSchemesManagement'
 
-import {GradingSchemeSummary} from '../../gradingSchemeApiModel'
+import {GradingSchemeTemplate, GradingSchemeSummary} from '../../gradingSchemeApiModel'
 import {GradingSchemeViewEditModal} from './GradingSchemeViewEditModal'
 import {GradingSchemeViewCopyTemplateModal} from './GradingSchemeViewCopyTemplateModal'
 
@@ -45,6 +46,7 @@ interface ComponentProps {
   contextId: string
   courseDefaultSchemeId?: string
   initiallySelectedGradingSchemeId?: string
+  pointsBasedGradingSchemesEnabled: boolean
   onChange: (gradingStandardId?: string) => any
 }
 export const GradingSchemesSelector = ({
@@ -53,6 +55,7 @@ export const GradingSchemesSelector = ({
   contextType,
   contextId,
   courseDefaultSchemeId,
+  pointsBasedGradingSchemesEnabled,
 }: ComponentProps) => {
   if (initiallySelectedGradingSchemeId === '0' || initiallySelectedGradingSchemeId === '') {
     initiallySelectedGradingSchemeId = undefined
@@ -62,11 +65,15 @@ export const GradingSchemesSelector = ({
   const [gradingSchemeSummaries, setGradingSchemeSummaries] = useState<
     GradingSchemeSummary[] | undefined
   >(undefined)
+  const [defaultCanvasGradingScheme, setDefaultCanvasGradingScheme] = useState<
+    GradingSchemeTemplate | undefined
+  >(undefined)
 
   const [selectedGradingSchemeId, setSelectedGradingSchemeId] = useState<string | undefined>(
     initiallySelectedGradingSchemeId
   )
   const {loadGradingSchemeSummaries /* loadGradingSchemesStatus */} = useGradingSchemeSummaries()
+  const {loadDefaultGradingScheme /* loadGradingSchemesStatus */} = useDefaultGradingScheme()
 
   useEffect(() => {
     loadGradingSchemeSummaries(contextType, contextId)
@@ -76,10 +83,20 @@ export const GradingSchemesSelector = ({
       .catch(error => {
         showFlashError(I18n.t('There was an error while loading grading schemes'))(error)
       })
+    // defaultCanvasGradingScheme
+    loadDefaultGradingScheme(contextType, contextId)
+      .then(defaultGradingScheme => {
+        setDefaultCanvasGradingScheme(defaultGradingScheme)
+      })
+      .catch(error => {
+        showFlashError(
+          I18n.t('There was an error while loading the default canvas grading scheme')
+        )(error)
+      })
     return () => {
       // this is called when the component unmounts
     }
-  }, [loadGradingSchemeSummaries, contextType, contextId])
+  }, [loadGradingSchemeSummaries, loadDefaultGradingScheme, contextType, contextId])
 
   if (gradingSchemeSummaries && selectedGradingSchemeId) {
     const matchSelect = gradingSchemeSummaries.filter(
@@ -162,7 +179,7 @@ export const GradingSchemesSelector = ({
         showFlashError(I18n.t('There was an error while refreshing grading schemes'))(error)
       })
   }
-  if (!gradingSchemeSummaries) {
+  if (!gradingSchemeSummaries || !defaultCanvasGradingScheme) {
     return (
       <>
         <Spinner renderTitle="Loading" size="x-small" />
@@ -235,6 +252,7 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(selectedGradingSchemeId)}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             ) : courseDefaultSchemeId && courseDefaultSchemeId !== '0' ? (
               <GradingSchemeViewEditModal
@@ -244,6 +262,7 @@ export const GradingSchemesSelector = ({
                 onCancel={closeGradingSchemeViewEditModal}
                 onUpdate={handleUpdatedGradingScheme}
                 onDelete={() => handleDeletedGradingScheme(courseDefaultSchemeId)}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             ) : (
               <GradingSchemeViewCopyTemplateModal
@@ -252,6 +271,7 @@ export const GradingSchemesSelector = ({
                 contextType={contextType}
                 onCancel={closeGradingSchemeViewEditModal}
                 onCreate={handleCreatedGradingScheme}
+                pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
               />
             )}
           </>
@@ -281,6 +301,7 @@ export const GradingSchemesSelector = ({
                   contextId={contextId}
                   contextType={contextType}
                   onGradingSchemesChanged={handleGradingSchemesChanged}
+                  pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                 />
               </>
             </Modal.Body>

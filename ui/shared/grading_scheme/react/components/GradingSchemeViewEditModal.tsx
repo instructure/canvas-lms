@@ -19,6 +19,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Modal} from '@instructure/ui-modal'
+import {Spinner} from '@instructure/ui-spinner'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
@@ -29,10 +30,16 @@ import {useGradingSchemeDelete} from '../hooks/useGradingSchemeDelete'
 import {useGradingScheme} from '../hooks/useGradingScheme'
 import {
   GradingSchemeInput,
-  GradingSchemeFormInput,
+  GradingSchemeEditableData,
   GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
-import {GradingScheme, GradingSchemeSummary} from '../../gradingSchemeApiModel'
+import {
+  GradingScheme,
+  GradingSchemeSummary,
+  GradingSchemeTemplate,
+} from '../../gradingSchemeApiModel'
+import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
+import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -40,6 +47,7 @@ export interface ComponentProps {
   contextType: 'Account' | 'Course'
   contextId: string
   gradingSchemeId: string
+  pointsBasedGradingSchemesEnabled: boolean
   onUpdate?: (gradingSchemeSummary: GradingSchemeSummary) => any
   onCancel: () => any
   onDelete?: () => any
@@ -49,6 +57,7 @@ export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
   contextType,
   contextId,
   gradingSchemeId,
+  pointsBasedGradingSchemesEnabled,
   onUpdate,
   onCancel,
   onDelete,
@@ -56,6 +65,10 @@ export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
   const {updateGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeUpdate()
   const {deleteGradingScheme /* deleteGradingSchemeStatus */} = useGradingSchemeDelete()
   const {loadGradingScheme /* deleteGradingSchemeStatus */} = useGradingScheme()
+  const {loadDefaultGradingScheme /* deleteGradingSchemeStatus */} = useDefaultGradingScheme()
+  const [defaultCanvasGradingSchemeTemplate, setDefaultCanvasGradingSchemeTemplate] = useState<
+    GradingSchemeTemplate | undefined
+  >(undefined)
   const [gradingScheme, setGradingScheme] = useState<GradingScheme | undefined>(undefined)
   const [editing, setEditing] = useState<boolean>(false)
   const toggleEditing = () => {
@@ -71,11 +84,21 @@ export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
       .catch(error => {
         showFlashError(I18n.t('There was an error while loading grading schemes'))(error)
       })
+
+    loadDefaultGradingScheme(contextType, contextId)
+      .then(defaultCanvasTemplate => {
+        setDefaultCanvasGradingSchemeTemplate(defaultCanvasTemplate)
+      })
+      .catch(error => {
+        showFlashError(
+          I18n.t('There was an error while loading the default canvas grading scheme')
+        )(error)
+      })
     return () => {
       // this is called when the component unmounts
     }
-  }, [contextType, contextId, loadGradingScheme, gradingSchemeId])
-  const handleUpdateScheme = async (gradingSchemeFormInput: GradingSchemeFormInput) => {
+  }, [contextType, contextId, loadGradingScheme, gradingSchemeId, loadDefaultGradingScheme])
+  const handleUpdateScheme = async (gradingSchemeFormInput: GradingSchemeEditableData) => {
     if (!gradingScheme) return
     // TODO: if (!saving) {
 
@@ -85,6 +108,8 @@ export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
         gradingScheme.context_id,
         {
           ...gradingSchemeFormInput,
+          points_based: gradingSchemeFormInput.pointsBased,
+          scaling_factor: gradingSchemeFormInput.scalingFactor,
           id: gradingScheme.id,
         }
       )
@@ -143,41 +168,56 @@ export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
     return !scheme.assessed_assignment
   }
 
-  const canManage = canManageScheme(gradingScheme)
-
   return (
     <>
-      {gradingScheme ? (
-        <Modal
-          open={true}
-          size="medium"
-          label={canManage ? I18n.t('View/Edit Grading Scheme') : I18n.t('View Grading Scheme')}
-          shouldCloseOnDocumentClick={true}
-        >
-          <Modal.Header>
-            <CloseButton
-              placement="end"
-              offset="small"
-              onClick={cancelPressed}
-              screenReaderLabel={I18n.t('Close')}
-            />
-            <Heading>
-              {canManage ? I18n.t('View/Edit Grading Scheme') : I18n.t('View Grading Scheme')}
-            </Heading>
-          </Modal.Header>
-          <Modal.Body>
+      <Modal
+        open={true}
+        size="medium"
+        label={I18n.t('View/Edit Grading Scheme')}
+        shouldCloseOnDocumentClick={true}
+      >
+        <Modal.Header>
+          <CloseButton
+            placement="end"
+            offset="small"
+            onClick={cancelPressed}
+            screenReaderLabel={I18n.t('Close')}
+          />
+          <Heading>{I18n.t('View/Edit Grading Scheme')}</Heading>
+        </Modal.Header>
+        <Modal.Body>
+          {gradingScheme && defaultCanvasGradingSchemeTemplate ? (
             <>
               {editing ? (
                 <GradingSchemeInput
                   ref={gradingSchemeUpdateRef}
-                  initialFormData={{
-                    data: gradingScheme.data,
-                    title: gradingScheme.title,
+                  schemeInputType={gradingScheme.points_based ? 'points' : 'percentage'}
+                  initialFormDataByInputType={{
+                    percentage: {
+                      data: gradingScheme.points_based
+                        ? defaultCanvasGradingSchemeTemplate.data
+                        : gradingScheme.data,
+                      title: gradingScheme.title,
+                      pointsBased: false,
+                      scalingFactor: 1.0,
+                    },
+                    points: {
+                      data: gradingScheme.points_based
+                        ? gradingScheme.data
+                        : defaultPointsGradingScheme.data,
+                      title: gradingScheme.title,
+                      pointsBased: true,
+                      scalingFactor: gradingScheme.points_based
+                        ? gradingScheme.scaling_factor
+                        : defaultPointsGradingScheme.scaling_factor,
+                    },
                   }}
                   onSave={modifiedGradingScheme => handleUpdateScheme(modifiedGradingScheme)}
+                  pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesEnabled}
                 />
               ) : (
                 <GradingSchemeView
+                  pointsBasedGradingSchemesEnabled={pointsBasedGradingSchemesEnabled}
                   disableEdit={!canManageScheme(gradingScheme)}
                   disableDelete={!canManageScheme(gradingScheme)}
                   onEditRequested={toggleEditing}
@@ -187,31 +227,33 @@ export const GradingSchemeViewEditModal: React.FC<ComponentProps> = ({
                 />
               )}
             </>
-          </Modal.Body>
-          <Modal.Footer>
-            {editing ? (
-              <>
-                <Button onClick={toggleEditing} margin="0 x-small 0 0">
-                  {I18n.t('Cancel')}
-                </Button>
-                <Button
-                  onClick={() => gradingSchemeUpdateRef.current?.savePressed()}
-                  color="primary"
-                  type="submit"
-                >
-                  {I18n.t('Save')}
-                </Button>
-              </>
-            ) : (
-              <Button onClick={cancelPressed} margin="0 x-small 0 0">
-                {I18n.t('Close')}
+          ) : (
+            <>
+              <Spinner renderTitle="Loading" size="x-small" />
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          {gradingScheme && defaultCanvasGradingSchemeTemplate && editing ? (
+            <>
+              <Button onClick={toggleEditing} margin="0 x-small 0 0">
+                {I18n.t('Cancel')}
               </Button>
-            )}
-          </Modal.Footer>
-        </Modal>
-      ) : (
-        <></>
-      )}
+              <Button
+                onClick={() => gradingSchemeUpdateRef.current?.savePressed()}
+                color="primary"
+                type="submit"
+              >
+                {I18n.t('Save')}
+              </Button>
+            </>
+          ) : (
+            <Button onClick={cancelPressed} margin="0 x-small 0 0">
+              {I18n.t('Close')}
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }

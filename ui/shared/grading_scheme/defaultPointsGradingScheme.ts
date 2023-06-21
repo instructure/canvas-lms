@@ -16,4 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const roundToTwoDecimalPlaces = (value: number) => Math.round(value * 100) / 100
+import {GradingSchemeTemplate} from './gradingSchemeApiModel'
+
+export const defaultPointsGradingScheme: GradingSchemeTemplate = {
+  data: [
+    {name: 'A', value: 0.75},
+    {name: 'B', value: 0.5},
+    {name: 'C', value: 0.25},
+    {name: 'D', value: 0},
+  ],
+  points_based: true,
+  scaling_factor: 4.0,
+  title: '',
+}

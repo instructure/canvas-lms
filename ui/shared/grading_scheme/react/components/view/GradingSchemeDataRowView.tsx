@@ -16,26 +16,45 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
-import {decimalToRoundedPercent} from '../../helpers/decimalToRoundedPercent'
 import {Table} from '@instructure/ui-table'
 import {GradingSchemeDataRow} from '@canvas/grading-scheme'
+import {roundToTwoDecimalPlaces} from '../../helpers/roundDecimalPlaces'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
 interface ComponentProps {
+  schemeScaleFactor: number
   dataRow: GradingSchemeDataRow
-  maxScore: number
+  highRange: number
   isFirstRow: boolean
+  viewAsPercentage: boolean
 }
 
 // Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
 const {Item} = Flex as any
 const {Row, Cell} = Table as any
 
-const GradingSchemeDataRowView: React.FC<ComponentProps> = ({dataRow, maxScore, isFirstRow}) => {
+const GradingSchemeDataRowView: React.FC<ComponentProps> = ({
+  dataRow,
+  highRange,
+  isFirstRow,
+  schemeScaleFactor,
+  viewAsPercentage,
+}) => {
+  const [entryScale /* setEntryScale */] = useState<number>(
+    schemeScaleFactor * (viewAsPercentage ? 100 : 1)
+  )
+  function renderHighRange() {
+    return String(roundToTwoDecimalPlaces(highRange * entryScale))
+  }
+
+  function renderLowRange() {
+    return String(roundToTwoDecimalPlaces(dataRow.value * entryScale))
+  }
+
   return (
     <>
       <Row theme={{borderColor: 'transparent'}}>
@@ -45,7 +64,8 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({dataRow, maxScore, 
             <Item>
               <span aria-label={I18n.t('Upper limit of range')}>
                 {isFirstRow ? '' : '< '}
-                {decimalToRoundedPercent(maxScore)}%
+                {renderHighRange()}
+                {viewAsPercentage ? <>%</> : <></>}
               </span>
             </Item>
           </Flex>
@@ -55,7 +75,8 @@ const GradingSchemeDataRowView: React.FC<ComponentProps> = ({dataRow, maxScore, 
             <Item padding="x-small">{I18n.t('to')}</Item>
             <Item>
               <span aria-label={I18n.t('Lower limit of range')}>
-                {decimalToRoundedPercent(dataRow.value)}%
+                {renderLowRange()}
+                {viewAsPercentage ? <>%</> : <></>}
               </span>
             </Item>
           </Flex>

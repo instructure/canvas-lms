@@ -28,6 +28,8 @@ class AccountGradingSettingsController < ApplicationController
   before_action :require_user
 
   def index
+    # TODO: remove after grading_scheme_updates flag is removed
+    js_env({ POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes) })
     js_bundle :react_content_router
     css_bundle :grading_period_sets, :enrollment_terms
     render html: "".html_safe, layout: true

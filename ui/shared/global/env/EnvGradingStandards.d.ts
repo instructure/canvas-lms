@@ -28,6 +28,9 @@ export interface EnvGradingStandardsCommon {
   DEFAULT_GRADING_STANDARD_DATA: GradingStandard
   CONTEXT_SETTINGS_URL: string
   COURSE_DEFAULT_GRADING_SCHEME_ID: string | undefined
+  GRADING_SCHEME_UPDATES_ENABLED: boolean
+  POINTS_BASED_GRADING_SCHEMES_ENABLED: boolean
+
   /**
    * NOTE: Only present if the context is not Account
    */

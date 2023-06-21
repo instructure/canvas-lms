@@ -16,29 +16,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingSchemeFormDataWithUniqueRowIds} from '../GradingSchemeInput'
-import {roundToTwoDecimalPlaces} from '../../../helpers/roundToTwoDecimalPlaces'
+import {GradingSchemeDataRow} from '../../../../gradingSchemeApiModel'
 
-export const gradingSchemeIsValid = (
-  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
-): boolean => {
+export const gradingSchemeIsValid = (gradingSchemeFormData: {
+  data: {name: string; value: number}[]
+  scalingFactor: number
+  pointsBased: boolean
+  title: string
+}): boolean => {
   return (
     gradingSchemeFormData.title?.trim().length > 0 &&
-    rowDataIsValidNumber(gradingSchemeFormData) &&
+    rowDataIsValidNumbers(gradingSchemeFormData) &&
     rowDataIsValid(gradingSchemeFormData) &&
     rowNamesAreValid(gradingSchemeFormData)
   )
 }
 
-export const rowDataIsValidNumber = (
-  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
-): boolean => {
-  return gradingSchemeFormData.data.filter(data => data.minRangeNotValidNumber).length === 0
+export const rowDataIsValidNumbers = (gradingSchemeFormData: {
+  title: string
+  data: GradingSchemeDataRow[]
+  scalingFactor: number
+  pointsBased: boolean
+}): boolean => {
+  if (
+    Number.isNaN(gradingSchemeFormData.scalingFactor) ||
+    gradingSchemeFormData.scalingFactor < 0
+  ) {
+    return false
+  }
+  if (gradingSchemeFormData.pointsBased && gradingSchemeFormData.scalingFactor > 100) {
+    return false
+  }
+  if (!gradingSchemeFormData.pointsBased && gradingSchemeFormData.scalingFactor !== 1.0) {
+    return false
+  }
+  return (
+    gradingSchemeFormData.data.filter(dataRow => {
+      // filter out the rows with invalid minRanges
+      return !Number.isNaN(dataRow.value) && dataRow.value >= 0
+    }).length === gradingSchemeFormData.data.length
+  )
 }
 
-export const rowDataIsValid = (
-  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
-): boolean => {
+export const rowDataIsValid = (gradingSchemeFormData: {
+  title: string
+  data: GradingSchemeDataRow[]
+}): boolean => {
   if (gradingSchemeFormData.data.length <= 1) return true
   const rowValues = gradingSchemeFormData.data.map(dataRow => String(dataRow.value).trim())
   const sanitizedRowValues = [...new Set(rowValues.filter(v => v))] // get the unique set of only truthy values
@@ -46,15 +69,16 @@ export const rowDataIsValid = (
 
   return gradingSchemeFormData.data.every((dataRow, idx, rows) => {
     if (idx === 0) return true
-    const thisMinScore = roundToTwoDecimalPlaces(dataRow.value)
-    const priorRowMinScore = roundToTwoDecimalPlaces(rows[idx - 1].value)
-    return thisMinScore < priorRowMinScore
+    const thisMinRange = dataRow.value
+    const priorRowMinRange = rows[idx - 1].value
+    return thisMinRange < priorRowMinRange
   })
 }
 
-export const rowNamesAreValid = (
-  gradingSchemeFormData: GradingSchemeFormDataWithUniqueRowIds
-): boolean => {
+export const rowNamesAreValid = (gradingSchemeFormData: {
+  title: string
+  data: GradingSchemeDataRow[]
+}): boolean => {
   const rowValues = gradingSchemeFormData.data.map(dataRow => String(dataRow.name).trim())
   const sanitizedRowNames = [...new Set(rowValues.filter(v => v))] // get the unique set of only truthy values
   return sanitizedRowNames.length === gradingSchemeFormData.data.length
