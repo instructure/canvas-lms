@@ -18,19 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe Loaders::CourseOutcomeAlignmentStatsLoader do
-  def mock_os_aligned_outcomes(outcomes, associated_asset_id)
-    (outcomes || []).to_h do |o|
-      [o.id.to_s,
-       [{
-         artifact_type: "quizzes.quiz",
-         artifact_id: "1",
-         associated_asset_type: "canvas.assignment.quizzes",
-         associated_asset_id: associated_asset_id.to_s
-       }]]
-    end
-  end
+require_relative "../../outcome_alignments_spec_helper"
 
+describe Loaders::CourseOutcomeAlignmentStatsLoader do
   context "with only direct alignments" do
     before :once do
       outcome_alignment_stats_model
@@ -75,7 +65,57 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
         @new_quiz = @course.assignments.create!(title: "new quiz - aligned in OS", submission_types: "external_tool")
         allow_any_instance_of(OutcomesServiceAlignmentsHelper)
           .to receive(:get_os_aligned_outcomes)
-          .and_return(mock_os_aligned_outcomes([@outcome2], @new_quiz.id))
+          .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome2], @new_quiz.id))
+      end
+
+      context "when outcome is aligned in both Canvas and Outcomes-Service" do
+        it "returns correct alignment stats if outcome is aligned to a New Quiz only at the quiz level" do
+          GraphQL::Batch.batch do
+            Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+              expect(stats).not_to be_nil
+              expect(stats[:total_outcomes]).to eq 2
+              expect(stats[:aligned_outcomes]).to eq 2
+              expect(stats[:total_alignments]).to eq 4
+              expect(stats[:total_artifacts]).to eq 5
+              expect(stats[:aligned_artifacts]).to eq 3
+              expect(stats[:artifact_alignments]).to eq 3
+            end
+          end
+        end
+
+        it "returns correct alignment stats if outcome is aligned to a New Quiz only at the item level" do
+          allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+            .to receive(:get_os_aligned_outcomes)
+            .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome2], @new_quiz.id, with_quiz: false, with_items: true))
+          GraphQL::Batch.batch do
+            Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+              expect(stats).not_to be_nil
+              expect(stats[:total_outcomes]).to eq 2
+              expect(stats[:aligned_outcomes]).to eq 2
+              expect(stats[:total_alignments]).to eq 5
+              expect(stats[:total_artifacts]).to eq 5
+              expect(stats[:aligned_artifacts]).to eq 3
+              expect(stats[:artifact_alignments]).to eq 4
+            end
+          end
+        end
+
+        it "returns correct alignment stats if outcome is aligned to a New Quiz at both the quiz and item levels" do
+          allow_any_instance_of(OutcomesServiceAlignmentsHelper)
+            .to receive(:get_os_aligned_outcomes)
+            .and_return(OutcomeAlignmentsSpecHelper.mock_os_aligned_outcomes([@outcome2], @new_quiz.id, with_items: true))
+          GraphQL::Batch.batch do
+            Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+              expect(stats).not_to be_nil
+              expect(stats[:total_outcomes]).to eq 2
+              expect(stats[:aligned_outcomes]).to eq 2
+              expect(stats[:total_alignments]).to eq 6
+              expect(stats[:total_artifacts]).to eq 5
+              expect(stats[:aligned_artifacts]).to eq 3
+              expect(stats[:artifact_alignments]).to eq 5
+            end
+          end
+        end
       end
 
       it "returns alignments stats for outcome alignments in both Canvas and Outcomes-Service" do
