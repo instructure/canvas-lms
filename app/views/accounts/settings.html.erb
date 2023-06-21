@@ -312,7 +312,7 @@
                     <% unless disabled %>
                       <tr>
                         <td colspan="2" class="sub_checkbox">
-                          <%= r.check_box :locked, :checked => hash[:locked] %>
+                          <%= r.check_box :locked, :checked => hash[:locked] && hash[:value], :disabled => !hash[:value] %>
                           <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
                         </td>
                       </tr>

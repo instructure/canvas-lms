@@ -76,16 +76,36 @@ describe "root account basic settings" do
       expect(Account.default.reload.settings[:restrict_quantitative_data][:value]).to be true
     end
 
-    it "lets admins enable restrict_quantitative_data_lock on root account settings", ignore_js_errors: true do
-      account.settings[:restrict_quantitative_data] = { value: false, locked: false }
-      account.save!
+    context "restrict_quantitative_data enabled" do
+      it "lets admins enable restrict_quantitative_data_lock on root account settings", ignore_js_errors: true do
+        account.settings[:restrict_quantitative_data] = { value: false, locked: false }
+        account.save!
 
-      user_session(@admin)
-      get account_settings_url
-      f("#account_settings_restrict_quantitative_data_locked").click
-      submit_form("#account_settings")
-      wait_for_ajaximations
-      expect(Account.default.reload.settings[:restrict_quantitative_data][:locked]).to be true
+        user_session(@admin)
+        get account_settings_url
+
+        # restrict_quantitative_data is initially false, then locked is disabled & unchecked
+        expect(is_checked("#account_settings_restrict_quantitative_data_value")).to be_falsey
+        expect(f("#account_settings_restrict_quantitative_data_locked")).to be_disabled
+        expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_falsey
+
+        # restrict_quantitative_data true, then locked is enabled
+        f("#account_settings_restrict_quantitative_data_value").click
+        expect(f("#account_settings_restrict_quantitative_data_locked")).to be_enabled
+        f("#account_settings_restrict_quantitative_data_locked").click
+        expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_truthy
+
+        # restrict_quantitative_data clicked false, then locked is disabled & unchecked
+        f("#account_settings_restrict_quantitative_data_value").click
+        expect(f("#account_settings_restrict_quantitative_data_locked")).to be_disabled
+        expect(is_checked("#account_settings_restrict_quantitative_data_locked")).to be_falsey
+
+        f("#account_settings_restrict_quantitative_data_value").click
+        f("#account_settings_restrict_quantitative_data_locked").click
+        submit_form("#account_settings")
+        wait_for_ajaximations
+        expect(Account.default.reload.settings[:restrict_quantitative_data][:locked]).to be true
+      end
     end
   end
 
