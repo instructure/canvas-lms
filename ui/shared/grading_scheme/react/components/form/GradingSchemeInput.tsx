@@ -199,8 +199,8 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
                 <th style={{width: '5%'}}>
                   <ScreenReaderContent>{I18n.t('Add row action')}</ScreenReaderContent>
                 </th>
-                <th style={{width: '30%'}}>{I18n.t('Letter Grade')}</th>
-                <th colSpan={2} style={{width: '50%'}}>
+                <th style={{width: '30%', textAlign: 'start'}}>{I18n.t('Letter Grade')}</th>
+                <th colSpan={2} style={{width: '50%', textAlign: 'start'}}>
                   {I18n.t('Range')}
                 </th>
                 <th style={{width: '15%'}}>
