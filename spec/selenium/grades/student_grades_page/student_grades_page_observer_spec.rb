@@ -108,30 +108,57 @@ describe "gradebook" do
         user_session @observer
         get "/courses/#{@observed_courses.first.id}/grades/"
         expect(f(".student_assignment.final_grade").text).to eq "Total: A"
-        # TODO: wait for VICE-3565 and VICE-3566 before proceeding
+        # TODO: wait for VICE-3594 before proceeding
         # verify assignment group total and course final total is also A
         # uncheck the use only graded assignments checkbox
         # verify students get the letter grade equivalent of 33%
       end
 
-      # it "can change the student filter" do
-      #   # TODO: wait for VICE-3565 and VICE-3566 before proceeding
-      #   # verify assignment group total and course final total is the equivalent of 80%
-      #   # upon selecting the next student
-      # end
+      it "can change the student filter" do
+        user_session @observer
+        get "/courses/#{@observed_courses.first.id}/grades/"
+        f("#student_select_menu").click
+        fj("li:contains('Student 1')").click
+        fj("button:contains('Apply')").click
+        wait_for_ajaximations
+        expect(f(".student_assignment.final_grade").text).to eq "Total: B-"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total B-"
+        expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B-"
+      end
 
-      # it "can change the course filter" do
-      #   # TODO: wait for VICE-3565 and VICE-3566 before proceeding
-      #   # verify assignment group total and course final total is the equivalent of 90%
-      #   # upon selecting the next course
-      # end
+      it "can change the course filter" do
+        user_session @observer
+        # Going from a Non RQD to RQD course
+        get "/courses/#{@observed_courses.last.id}/grades/"
 
-      # it "keeps selected user when changing course filter" do
-      #   # TODO: wait for VICE-3565 and VICE-3566 before proceeding
-      #   # append the next student id to the end of the url, and visit
-      #   # verify assignment group total and course final total is the equivalent of 70%
-      #   # upon selecting the next course
-      # end
+        # Verify that non RQD Courses show non RQD grades
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n90%\n9.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n90%\n9.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n90%\n9.00 / 10.00"
+        # Switch to RQD course
+        f("#course_select_menu").click
+        fj("li:contains('OC0')").click
+        fj("button:contains('Apply')").click
+        wait_for_ajaximations
+        # Verify RQD grades are shown
+        expect(f(".student_assignment.final_grade").text).to eq "Total: A"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total A"
+        expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments A"
+      end
+
+      it "keeps selected user when changing course filter" do
+        user_session @observer
+        get "/courses/#{@observed_courses.first.id}/grades/#{@students[1].id}"
+        f("#course_select_menu").click
+        fj("li:contains('OC1')").click
+        fj("button:contains('Apply')").click
+        wait_for_ajaximations
+        # Verify that the selected user did not change, and the correct assignments are shown
+        # Since the course went from RQD to a non-RQD course, the grades should be shown as percentages
+        expect(f(".student_assignment.final_grade").text).to eq "Total\n70%\n7.00 / 10.00"
+        expect(f("tr.group_total").text).to eq "Assignments\n70%\n7.00 / 10.00"
+        expect(f("tr#submission_final-grade").text).to eq "Total\n70%\n7.00 / 10.00"
+      end
     end
   end
 end
