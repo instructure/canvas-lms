@@ -79,7 +79,7 @@ class PageView
         pager.replace(fetch(user_id,
                             start_time: oldest,
                             end_time: newest,
-                            last_page_view_id: last_page_view_id,
+                            last_page_view_id:,
                             limit: pager.per_page))
         pager.has_more! unless pager.empty?
         pager

@@ -35,7 +35,7 @@ class Quizzes::QuizStatisticsService
                                                  options,
                                                  quiz.current_statistics_for("student_analysis", {
                                                                                includes_all_versions: all_versions,
-                                                                               includes_sis_ids: includes_sis_ids
+                                                                               includes_sis_ids:
                                                                              }),
                                                  quiz.current_statistics_for("item_analysis"))
   end

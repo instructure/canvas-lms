@@ -22,7 +22,7 @@ describe DataFixup::ReclaimInstfsAttachments do
     let(:file_contents) { "file contents" }
     let(:instfs_uuid) { "uuid" }
     let(:instfs_body) { StringIO.new(file_contents) }
-    let(:attachment) { attachment_model(instfs_uuid: instfs_uuid) }
+    let(:attachment) { attachment_model(instfs_uuid:) }
 
     before do
       # this method is only called during the `instfs_hosted?` branch of
@@ -92,7 +92,7 @@ describe DataFixup::ReclaimInstfsAttachments do
       question = course.assessment_question_banks.create!.assessment_questions.create!
       folder = folder_model(context: course)
       submission = submission_model(assignment: assignment_model(context: course), user: user_model)
-      quiz = quiz_model(course: course, assignment: assignment_model(course: course))
+      quiz = quiz_model(course:, assignment: assignment_model(course:))
 
       attachment1 = attachment_model(context: course, instfs_uuid: "uuid1")
       attachment2 = attachment_model(context: question, instfs_uuid: "uuid2")

@@ -36,7 +36,7 @@ describe Lti::TokenController do
         shared_secret: "secret",
         name: "test tool",
         url: "http://www.tool.com/launch",
-        developer_key: developer_key,
+        developer_key:,
         lti_version: "1.3",
         workflow_state: "public"
       )
@@ -47,7 +47,7 @@ describe Lti::TokenController do
     let(:params) { {} }
 
     def send_request
-      get :advantage_access_token, params: params, as: :json
+      get :advantage_access_token, params:, as: :json
     end
 
     context "when user is not logged in" do
@@ -184,7 +184,7 @@ describe Lti::TokenController do
     let(:params) { {} }
 
     def send_request
-      get :lti_2_token, params: params, as: :json
+      get :lti_2_token, params:, as: :json
     end
 
     context "when user is not logged in" do

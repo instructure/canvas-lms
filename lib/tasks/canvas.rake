@@ -7,9 +7,9 @@ $canvas_tasks_loaded ||= false
 unless $canvas_tasks_loaded
   $canvas_tasks_loaded = true
 
-  def log_time(name, &block)
+  def log_time(name, &)
     puts "--> Starting: '#{name}'"
-    time = Benchmark.realtime(&block)
+    time = Benchmark.realtime(&)
     puts "--> Finished: '#{name}' in #{time.round(2)}s"
     time
   end

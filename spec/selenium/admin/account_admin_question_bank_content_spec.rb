@@ -31,7 +31,7 @@ describe "account admin question bank" do
   end
 
   def create_question_bank(title = "question bank 1")
-    Account.default.assessment_question_banks.create!(title: title)
+    Account.default.assessment_question_banks.create!(title:)
   end
 
   def create_question(name = "question 1", bank = @question_bank)
@@ -40,7 +40,7 @@ describe "account admin question bank" do
       answer = { text: "incorrect answer", weight: 0 }
       answers.push answer
     end
-    data = { question_text: "what is the answer to #{name}?", question_type: "multiple_choice_question", answers: answers }
+    data = { question_text: "what is the answer to #{name}?", question_type: "multiple_choice_question", answers: }
     data[:question_name] = name
     question = AssessmentQuestion.create(question_data: data)
     bank.assessment_questions << question
@@ -49,7 +49,7 @@ describe "account admin question bank" do
 
   def create_outcome(short_description = "good student")
     outcome = Account.default.learning_outcomes.create!(
-      short_description: short_description,
+      short_description:,
       rubric_criterion: {
         description: "test description",
         points_possible: 10,
@@ -66,7 +66,7 @@ describe "account admin question bank" do
   end
 
   def verify_added_question(name, question_text, chosen_question_type)
-    question = AssessmentQuestion.where(name: name).first
+    question = AssessmentQuestion.where(name:).first
     expect(question).to be_present
     question_data = question.question_data
     expect(question_data[:question_type]).to eq chosen_question_type

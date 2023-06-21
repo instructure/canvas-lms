@@ -75,7 +75,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
       it "returns an empty array if users are no longer linked" do
         observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
-        observer_alert_threshold_model(observer: observer,
+        observer_alert_threshold_model(observer:,
                                        student: @student,
                                        alert_type: "course_grade_high",
                                        threshold: 90)
@@ -123,7 +123,7 @@ describe ObserverAlertThresholdsApiController, type: :request do
 
       it "returns an empty array if users are no longer linked" do
         observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
-        observer_alert_threshold_model(observer: observer,
+        observer_alert_threshold_model(observer:,
                                        student: @student,
                                        alert_type: "course_grade_high",
                                        threshold: 90)

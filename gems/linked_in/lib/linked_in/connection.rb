@@ -28,7 +28,7 @@ module LinkedIn
         consumer,
         request_token,
         request_secret
-      ).get_access_token(oauth_verifier: oauth_verifier)
+      ).get_access_token(oauth_verifier:)
       new(access_token)
     end
 
@@ -58,7 +58,7 @@ module LinkedIn
     end
 
     def self.request_token(oauth_callback)
-      consumer.get_request_token(oauth_callback: oauth_callback)
+      consumer.get_request_token(oauth_callback:)
     end
 
     def self.consumer(key = nil, secret = nil)

@@ -24,7 +24,7 @@ describe Quizzes::QuizGroup do
       course_factory
       quiz = @course.quizzes.create!(title: "some quiz")
       group = quiz.quiz_groups.create!(name: "question group", pick_count: 1, question_points: 5.0)
-      group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+      group.quiz_questions.create!(quiz:, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
       quiz.published_at = Time.now
       quiz.publish!
       expect(quiz.unpublished_changes?).to be_falsey
@@ -42,8 +42,8 @@ describe Quizzes::QuizGroup do
         course_factory
         quiz = @course.quizzes.create!(title: "some quiz")
         group = quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
-        group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
-        group.quiz_questions.create!(quiz: quiz, question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
+        group.quiz_questions.create!(quiz:, question_data: { "name" => "test question", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+        group.quiz_questions.create!(quiz:, question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
         expect(group.quiz_questions.active.size).to eq 2
 
         expect(group.pick_count).to eq 3

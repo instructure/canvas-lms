@@ -37,13 +37,13 @@ module DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall
     return unless root_accounts.count == 1
 
     root_account_id = root_accounts.first.id
-    return if Course.where.not(root_account_id: root_account_id).any?
+    return if Course.where.not(root_account_id:).any?
 
     populate_missing_root_account_ids(root_account_id)
   end
 
   def populate_missing_root_account_ids(root_account_id)
-    if Group.where.not(root_account_id: root_account_id).none?
+    if Group.where.not(root_account_id:).none?
       possibly_group_related_tables.each do |table|
         populate_nils_on_table(table, :root_account_id, root_account_id)
       end

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import {GradesDisplay} from '../index'
+import GradesDisplay from '../index'
 
 it('renders some course grades', () => {
   const mockCourses = [
@@ -29,7 +29,7 @@ it('renders some course grades', () => {
       href: '/courses/1',
       score: null,
       grade: null,
-      hasGradingPeriods: true
+      hasGradingPeriods: true,
     },
     {
       id: '2',
@@ -38,7 +38,7 @@ it('renders some course grades', () => {
       href: '/courses/2',
       score: 42.34,
       grade: 'D',
-      hasGradingPeriods: false
+      hasGradingPeriods: false,
     },
     {
       id: '3',
@@ -47,8 +47,8 @@ it('renders some course grades', () => {
       href: '/courses/3',
       score: 'blahblah',
       grade: null,
-      hasGradingPeriods: false
-    }
+      hasGradingPeriods: false,
+    },
   ]
   const wrapper = shallow(<GradesDisplay courses={mockCourses} />)
   expect(wrapper).toMatchSnapshot()
@@ -64,8 +64,8 @@ it('does not render caveat if no courses have grading periods', () => {
       score: null,
       grade: null,
       hasGradingPeriods: false,
-      enrollmentType: 'StudentEnrollment'
-    }
+      enrollmentType: 'StudentEnrollment',
+    },
   ]
   const wrapper = shallow(<GradesDisplay courses={mockCourses} />)
   expect(wrapper).toMatchSnapshot()
@@ -80,7 +80,7 @@ it('renders a loading spinner when loading', () => {
       href: '/courses/1',
       score: null,
       grade: null,
-      hasGradingPeriods: true
+      hasGradingPeriods: true,
     },
     {
       id: '2',
@@ -89,16 +89,16 @@ it('renders a loading spinner when loading', () => {
       href: '/courses/2',
       score: 42.34,
       grade: 'D',
-      hasGradingPeriods: false
-    }
+      hasGradingPeriods: false,
+    },
   ]
-  const wrapper = shallow(<GradesDisplay loading courses={mockCourses} />)
+  const wrapper = shallow(<GradesDisplay loading={true} courses={mockCourses} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('renders an ErrorAlert if there is an error loading grades', () => {
   const mockCourses = [
-    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1'}
+    {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1'},
   ]
   const wrapper = shallow(<GradesDisplay courses={mockCourses} loadingError="There was an error" />)
   expect(wrapper).toMatchSnapshot()

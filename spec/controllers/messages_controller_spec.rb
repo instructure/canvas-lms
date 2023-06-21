@@ -34,8 +34,8 @@ describe MessagesController do
         secure_id, message_id = ["secure_id", 42]
         expect_any_instance_of(IncomingMailProcessor::IncomingMessageProcessor).to receive(:process_single)
           .with(anything, "#{secure_id}-#{message_id}")
-        post "create", params: { secure_id: secure_id,
-                                 message_id: message_id,
+        post "create", params: { secure_id:,
+                                 message_id:,
                                  subject: "subject",
                                  message: "message",
                                  from: "test@example.com",

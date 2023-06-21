@@ -163,6 +163,8 @@ class Account < ActiveRecord::Base
 
   after_update :clear_cached_short_name, if: :saved_change_to_name?
 
+  after_update :log_rqd_setting_enable_or_disable
+
   after_create :create_default_objects
 
   serialize :settings, Hash
@@ -596,7 +598,7 @@ class Account < ActiveRecord::Base
       throw :abort
     end
 
-    scope = root_account.all_accounts.where(sis_source_id: sis_source_id)
+    scope = root_account.all_accounts.where(sis_source_id:)
     scope = scope.where("id<>?", self) unless new_record?
 
     return true unless scope.exists?
@@ -640,9 +642,9 @@ class Account < ActiveRecord::Base
     shard.activate do
       if xlog_location
         timeout = Setting.get("account_cache_clear_replication_timeout", "60").to_i.seconds
-        unless self.class.wait_for_replication(start: xlog_location, timeout: timeout)
+        unless self.class.wait_for_replication(start: xlog_location, timeout:)
           delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
-            .clear_downstream_caches(*keys_to_clear, xlog_location: xlog_location, is_retry: true)
+            .clear_downstream_caches(*keys_to_clear, xlog_location:, is_retry: true)
           # we still clear, but only the first time; after that we just keep waiting
           return if is_retry
         end
@@ -658,7 +660,7 @@ class Account < ActiveRecord::Base
       nil
     else
       OpenObject.new({
-                       endpoint: endpoint,
+                       endpoint:,
                        default_action: settings[:equella_action] || "selectOrAdd",
                        teaser: settings[:equella_teaser]
                      })
@@ -1189,7 +1191,7 @@ class Account < ActiveRecord::Base
     relation_with_select = relation_with_select.select("*") if relation_with_select.select_values.empty?
 
     "WITH RECURSIVE t AS (
-       #{relation_with_ids.where(parent_account_id: parent_account_id).to_sql}
+       #{relation_with_ids.where(parent_account_id:).to_sql}
        UNION
        #{relation_with_ids.joins("INNER JOIN t ON accounts.parent_account_id=t.id").to_sql}
      )
@@ -1743,7 +1745,7 @@ class Account < ActiveRecord::Base
       # match the "batch" size in Course.update_account_associations
       scopes.each do |scope|
         scope.select([:id, :account_id]).find_in_batches(batch_size: 500) do |courses|
-          all_user_ids.merge Course.update_account_associations(courses, skip_user_account_associations: true, account_chain_cache: account_chain_cache)
+          all_user_ids.merge Course.update_account_associations(courses, skip_user_account_associations: true, account_chain_cache:)
         end
       end
 
@@ -1754,7 +1756,7 @@ class Account < ActiveRecord::Base
       end
 
       # Update the users' associations as well
-      User.update_account_associations(all_user_ids.to_a, account_chain_cache: account_chain_cache)
+      User.update_account_associations(all_user_ids.to_a, account_chain_cache:)
     end
   end
 
@@ -1853,8 +1855,15 @@ class Account < ActiveRecord::Base
   TAB_RELEASE_NOTES = 17
 
   def external_tool_tabs(opts, user)
-    tools = Lti::ContextToolFinder.new(self, type: :account_navigation).all_tools_scope_union.to_unsorted_array
-                                  .select { |t| t.permission_given?(:account_navigation, user, self) && t.feature_flag_enabled?(self) }
+    tools = Lti::ContextToolFinder
+            .new(self, type: :account_navigation)
+            .all_tools_scope_union.to_unsorted_array
+            .select { |t| t.permission_given?(:account_navigation, user, self) && t.feature_flag_enabled?(self) }
+
+    unless root_account?
+      tools.reject! { |t| t.account_navigation[:root_account_only].to_s.downcase == "true" }
+    end
+
     Lti::ExternalToolTab.new(self, :account_navigation, tools, opts[:language]).tabs
   end
 
@@ -1880,7 +1889,13 @@ class Account < ActiveRecord::Base
       if can_see_rubrics_tab?(user)
         tabs << { id: TAB_RUBRICS, label: t("#account.tab_rubrics", "Rubrics"), css_class: "rubrics", href: :account_rubrics_path }
       end
-      tabs << { id: TAB_GRADING_STANDARDS, label: t("#account.tab_grading_standards", "Grading"), css_class: "grading_standards", href: :account_grading_standards_path } if user && grants_right?(user, :manage_grades)
+
+      grading_settings_href = if Account.site_admin.feature_enabled?(:grading_scheme_updates)
+                                :account_grading_settings_path
+                              else
+                                :account_grading_standards_path
+                              end
+      tabs << { id: TAB_GRADING_STANDARDS, label: t("#account.tab_grading_standards", "Grading"), css_class: "grading_standards", href: grading_settings_href } if user && grants_right?(user, :manage_grades)
       tabs << { id: TAB_QUESTION_BANKS, label: t("#account.tab_question_banks", "Question Banks"), css_class: "question_banks", href: :account_question_banks_path } if user && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       tabs << { id: TAB_SUB_ACCOUNTS, label: t("#account.tab_sub_accounts", "Sub-Accounts"), css_class: "sub_accounts", href: :account_sub_accounts_path } if manage_settings
       tabs << { id: TAB_ACCOUNT_CALENDARS, label: t("Account Calendars"), css_class: "account_calendars", href: :account_calendar_settings_path } if user && grants_right?(user, :manage_account_calendar_visibility)
@@ -2358,5 +2373,22 @@ class Account < ActiveRecord::Base
 
   def student_reporting?
     false
+  end
+
+  def log_rqd_setting_enable_or_disable
+    return unless saved_changes.key?("settings") # Skip if no settings were changed
+
+    setting_changes = saved_changes[:settings]
+    old_rqd_setting = setting_changes[0].dig(:restrict_quantitative_data, :value)
+    new_rqd_setting = setting_changes[1].dig(:restrict_quantitative_data, :value)
+
+    return unless old_rqd_setting != new_rqd_setting # Skip if RQD setting was not changed
+
+    # If an account's RQD setting hasn't been changed before, old_rqd_setting will be nil
+    if (old_rqd_setting == false || old_rqd_setting.nil?) && new_rqd_setting == true
+      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.enabled")
+    elsif old_rqd_setting == true && new_rqd_setting == false
+      InstStatsd::Statsd.increment("account.settings.restrict_quantitative_data.disabled")
+    end
   end
 end

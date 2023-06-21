@@ -27,13 +27,13 @@ module Services
       return unless queue_url.present?
 
       notification_sqs.send_message(message_body: {
-        global_id: global_id,
-        type: type,
+        global_id:,
+        type:,
         message: body,
         target: to,
         request_id: RequestContextGenerator.request_id
       }.to_json,
-                                    queue_url: queue_url)
+                                    queue_url:)
     end
 
     class << self
@@ -56,7 +56,7 @@ module Services
             queue_name = conf[queue_name_key]
             next unless queue_name.present?
 
-            @queue_urls[key] = sqs.get_queue_url(queue_name: queue_name).queue_url
+            @queue_urls[key] = sqs.get_queue_url(queue_name:).queue_url
           end
           sqs
         end

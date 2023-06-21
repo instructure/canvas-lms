@@ -124,7 +124,7 @@ describe "Grading quizzes" do
             question_type: "text_only_question"
           }
         ]
-        @quiz = seed_quiz_with_submission(1, student: @student, question_data: question_data)
+        @quiz = seed_quiz_with_submission(1, student: @student, question_data:)
       end
 
       it "doesn't show the 'Q' icon for spacer text-only questions", priority: "1" do

@@ -27,7 +27,7 @@ module Lti::IMS
     let(:test_request_host) { "www.example.com" }
     let(:context) { course }
     let(:assignment) do
-      opts = { course: course }
+      opts = { course: }
       if tool.present? && tool.use_1_3?
         opts[:submission_types] = "external_tool"
         opts[:external_tool_tag_attributes] = {
@@ -40,13 +40,13 @@ module Lti::IMS
       if assignment.external_tool? && tool.use_1_3?
         assignment.line_items.first
       else
-        line_item_model(course: course)
+        line_item_model(course:)
       end
     end
-    let(:user) { student_in_course(course: course, active_all: true).user }
+    let(:user) { student_in_course(course:, active_all: true).user }
     let(:line_item_id) { line_item.id }
     let(:result) do
-      lti_result_model line_item: line_item, user: user, scoreGiven: nil, scoreMaximum: nil
+      lti_result_model line_item:, user:, scoreGiven: nil, scoreMaximum: nil
     end
     let(:submission) { nil }
     let(:access_token_scopes) { "https://purl.imsglobal.org/spec/lti-ags/scope/score" }
@@ -54,8 +54,8 @@ module Lti::IMS
     let(:line_item_params) do
       {
         course_id: context_id,
-        line_item_id: line_item_id,
-        userId: userId,
+        line_item_id:,
+        userId:,
         activityProgress: "Completed",
         gradingProgress: "FullyGraded",
         timestamp: Time.zone.now.iso8601(3)
@@ -98,7 +98,7 @@ module Lti::IMS
 
       context "when line_item is an assignment and instfs is enabled" do
         let(:folder) { Folder.create!(name: "test", context: user) }
-        let(:progress) { Progress.create!(context: assignment, user: user, tag: :upload_via_url) }
+        let(:progress) { Progress.create!(context: assignment, user:, tag: :upload_via_url) }
         let(:submitted_at) { 5.minutes.ago.iso8601(3) }
 
         before do
@@ -113,7 +113,7 @@ module Lti::IMS
           attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
           expect(result.submission.attachments.count).to eq 0
 
-          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items, submitted_at: submitted_at }
+          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items:, submitted_at: }
           upload_url = nil
           upload_params = nil
           # get params sent to instfs for easier mocking of the instfs return request
@@ -121,7 +121,7 @@ module Lti::IMS
             upload_url, upload_params, _ = args
             double(class: Net::HTTPCreated, code: 201, body: {})
           end
-          post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
+          post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers:)
           # instfs return url posting
           post_instfs_progress(upload_url, upload_params)
 
@@ -137,14 +137,14 @@ module Lti::IMS
       context "when submitting after a previous submission" do
         it "submits a file, and then can submit something else" do
           expect(result.submission.attachments.count).to eq 0
-          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
+          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: }
 
-          post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
+          post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers:)
           run_jobs
           expect(result.reload.submission.attachments.count).to eq 1
 
           line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { submission_type: "external_tool" }
-          post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
+          post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers:)
           run_jobs
           expect(result.reload.submission.attachments.count).to eq 0
         end

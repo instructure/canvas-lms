@@ -39,7 +39,7 @@ module Factories
     end
 
     def create_for_enrollment_term_and_account!(enrollment_term, account, title: TITLE)
-      group = account.grading_period_groups.create!(title: title)
+      group = account.grading_period_groups.create!(title:)
       group.enrollment_terms << enrollment_term
       group
     end

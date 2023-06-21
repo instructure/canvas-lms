@@ -34,8 +34,8 @@ module Lti
         tcp = Lti::ToolConsumerProfileCreator.new(
           context,
           tp.tool_consumer_profile,
-          developer_key: developer_key,
-          tcp_uuid: tcp_uuid
+          developer_key:,
+          tcp_uuid:
         ).create
         ToolProxyValidator.new(tool_proxy: tp, tool_consumer_profile: tcp).validate!
       rescue Lti::Errors::InvalidToolProxyError
@@ -44,13 +44,13 @@ module Lti
       tool_proxy = nil
       ToolProxy.transaction do
         product_family = create_product_family(tp, context.root_account, developer_key)
-        tool_proxy = create_tool_proxy(tp: tp,
-                                       context: context,
-                                       product_family: product_family,
+        tool_proxy = create_tool_proxy(tp:,
+                                       context:,
+                                       product_family:,
                                        tool_proxy:
                                        tool_proxy_to_update,
-                                       registration_url: registration_url,
-                                       developer_key: developer_key)
+                                       registration_url:,
+                                       developer_key:)
         process_resources(tp, tool_proxy)
         create_proxy_binding(tool_proxy, context)
         create_or_update_tool_settings(tp, tool_proxy)
@@ -62,7 +62,7 @@ module Lti
     def create_secret(tp)
       security_contract = tp.security_contract
       tp_half_secret = security_contract.tp_half_shared_secret
-      if (tp.enabled_capabilities & ["OAuth.splitSecret", "Security.splitSecret"]).present? && tp_half_secret.present?
+      if tp.enabled_capabilities.intersect?(["OAuth.splitSecret", "Security.splitSecret"]) && tp_half_secret.present?
         @tc_half_secret ||= SecureRandom.hex(64)
         tc_half_secret + tp_half_secret
       else
@@ -113,7 +113,7 @@ module Lti
     def create_product_family(tp, account, developer_key)
       vendor_code = tp.tool_profile.product_instance.product_info.product_family.vendor.code
       product_code = tp.tool_profile.product_instance.product_info.product_family.code
-      unless (product_family = ProductFamily.where(vendor_code: vendor_code, product_code: product_code, developer_key: developer_key).first)
+      unless (product_family = ProductFamily.where(vendor_code:, product_code:, developer_key:).first)
         product_family = ProductFamily.new
         product_family.vendor_code = vendor_code
         product_family.product_code = product_code
@@ -193,11 +193,7 @@ module Lti
         placement.destroy unless ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include? placement.placement
       end
 
-      if (mh.enabled_capabilities & ResourcePlacement::PLACEMENT_LOOKUP.keys).blank?
-        ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each do |p|
-          message_handler.placements.where(placement: p).first_or_create!
-        end
-      else
+      if mh.enabled_capabilities.intersect?(ResourcePlacement::PLACEMENT_LOOKUP.keys)
 
         mhp = mh.enabled_capability.map { |p| ResourcePlacement::PLACEMENT_LOOKUP[p] }
         message_handler.placements.each do |placement|
@@ -207,12 +203,16 @@ module Lti
         mhp.each do |p|
           message_handler.placements.where(placement: p).first_or_create! if p
         end
+      else
+        ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.each do |p|
+          message_handler.placements.where(placement: p).first_or_create!
+        end
       end
     end
 
     def create_or_update_tool_settings(tp, tool_proxy)
       if tp.custom.present?
-        tool_setting = ToolSetting.where(tool_proxy: tool_proxy).first_or_create!
+        tool_setting = ToolSetting.where(tool_proxy:).first_or_create!
         custom = tool_setting.custom || {}
         tool_setting.update(custom: custom.merge(tp.custom))
       end

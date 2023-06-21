@@ -28,13 +28,13 @@ describe Canvas::RequestForgeryProtection do
     request = double("request",
                      cookies_same_site_protection: proc { false },
                      host_with_port: "example.com:80",
-                     headers: headers,
+                     headers:,
                      get?: false,
                      head?: false)
     cookies = ActionDispatch::Cookies::CookieJar.new(request)
     @controller = double("controller",
-                         request: request,
-                         cookies: cookies,
+                         request:,
+                         cookies:,
                          protect_against_forgery?: true,
                          api_request?: false,
                          in_app?: true,

@@ -95,7 +95,7 @@ class AccountNotificationsController < ApplicationController
   # @returns [AccountNotification]
   def user_index
     include_past = value_to_boolean(params[:include_past])
-    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: include_past)
+    notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past:)
     render json: account_notifications_json(notifications, @current_user, session)
   end
 
@@ -228,7 +228,7 @@ class AccountNotificationsController < ApplicationController
         end
       end
 
-      @notification.account_notification_roles.build(roles.map { |role| { role: role } })
+      @notification.account_notification_roles.build(roles.map { |role| { role: } })
     end
     respond_to do |format|
       if @notification.save

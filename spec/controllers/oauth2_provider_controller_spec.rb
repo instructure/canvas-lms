@@ -137,7 +137,7 @@ describe OAuth2ProviderController do
 
         redis = double("Redis")
         allow(redis).to receive(:setex)
-        allow(Canvas).to receive_messages(redis: redis)
+        allow(Canvas).to receive_messages(redis:)
       end
 
       it "redirects to the confirm url if the user has no token" do
@@ -207,7 +207,7 @@ describe OAuth2ProviderController do
 
         it "redirects to the redirect uri if the user already has remember-me token" do
           @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil })
-          get :auth, params: params
+          get(:auth, params:)
           expect(response).to be_redirect
           expect(response.location).to match(%r{https://example.com})
         end
@@ -215,13 +215,13 @@ describe OAuth2ProviderController do
         it "redirects to the redirect uri if the developer key is trusted" do
           key.trusted = true
           key.save!
-          get :auth, params: params
+          get(:auth, params:)
           expect(response).to be_redirect
           expect(response.location).to match(%r{https://example.com})
         end
 
         it 'redirects with "interaction_required" if the current session cannot be used without a prompt' do
-          get :auth, params: params
+          get(:auth, params:)
           expect(response).to be_redirect
           expect(response.location).to match(%r{https://example.com})
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
@@ -242,7 +242,7 @@ describe OAuth2ProviderController do
         end
 
         it 'redirects with "unauthorized_client" if binding for the account is set to "allow"' do
-          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
+          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account:)
           binding.update!(workflow_state: "allow")
           get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code", state: "value" }
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
@@ -251,7 +251,7 @@ describe OAuth2ProviderController do
         end
 
         it 'redirects with "unauthorized_client" if binding for the account is set to "off"' do
-          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
+          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account:)
           binding.update!(workflow_state: "off")
           get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code", state: "value" }
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
@@ -260,7 +260,7 @@ describe OAuth2ProviderController do
         end
 
         it 'redirects to confirmation page when the binding for the account is set to "on"' do
-          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
+          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account:)
           binding.update!(workflow_state: "on")
           get :auth, params: { client_id: account_developer_key.id, redirect_uri: "https://example.com", response_type: "code" }
           expect(response.location).to eq "http://test.host/login/oauth2/confirm"
@@ -363,9 +363,9 @@ describe OAuth2ProviderController do
     let(:client_secret) { key.api_key }
     let(:base_params) do
       {
-        client_id: client_id,
-        client_secret: client_secret,
-        grant_type: grant_type,
+        client_id:,
+        client_secret:,
+        grant_type:,
         redirect_uri: "https://example.com"
       }
     end
@@ -481,7 +481,7 @@ describe OAuth2ProviderController do
         redis
       end
 
-      before { allow(Canvas).to receive_messages(redis: redis) }
+      before { allow(Canvas).to receive_messages(redis:) }
 
       it_behaves_like "common oauth2 token checks" do
         let(:success_params) { { code: valid_code } }
@@ -538,7 +538,7 @@ describe OAuth2ProviderController do
       let(:refresh_token) { old_token.plaintext_refresh_token }
 
       it_behaves_like "common oauth2 token checks" do
-        let(:success_params) { { refresh_token: refresh_token } }
+        let(:success_params) { { refresh_token: } }
         let(:success_token_keys) { %w[access_token user expires_in token_type canvas_region] }
       end
 
@@ -548,25 +548,25 @@ describe OAuth2ProviderController do
       end
 
       it "generates a new access_token" do
-        post :token, params: base_params.merge(refresh_token: refresh_token)
+        post :token, params: base_params.merge(refresh_token:)
         json = response.parsed_body
         expect(json["access_token"]).to_not eq old_token.full_token
       end
 
       it "errors with a mismatched client id and refresh_token" do
-        post :token, params: base_params.merge(client_id: other_key.id, client_secret: other_key.api_key, refresh_token: refresh_token)
+        post :token, params: base_params.merge(client_id: other_key.id, client_secret: other_key.api_key, refresh_token:)
         assert_status(400)
         expect(response.body).to include "invalid_grant"
       end
 
       it "is able to regenerate access_token multiple times" do
-        post :token, params: base_params.merge(refresh_token: refresh_token)
+        post :token, params: base_params.merge(refresh_token:)
         expect(response).to be_successful
         json = response.parsed_body
         expect(json["access_token"]).to_not eq old_token.full_token
 
         access_token = json["access_token"]
-        post :token, params: base_params.merge(refresh_token: refresh_token)
+        post :token, params: base_params.merge(refresh_token:)
         expect(response).to be_successful
         json = response.parsed_body
         expect(json["access_token"]).to_not eq access_token
@@ -583,9 +583,9 @@ describe OAuth2ProviderController do
         {
           iss: "someiss",
           sub: client_id,
-          aud: aud,
-          iat: iat,
-          exp: exp,
+          aud:,
+          iat:,
+          exp:,
           jti: SecureRandom.uuid
         }
       end
@@ -706,8 +706,8 @@ describe OAuth2ProviderController do
         context "with symmetric client identification" do
           let(:client_credentials_params) do
             {
-              client_id: client_id,
-              client_secret: client_secret,
+              client_id:,
+              client_secret:,
               redirect_uri: "https://example.com",
               scope: TokenScopes::USER_INFO_SCOPE[:scope]
             }
@@ -748,7 +748,7 @@ describe OAuth2ProviderController do
     it "saves the requested scopes with the code" do
       scopes = "userinfo"
       session_hash[:oauth2][:scopes] = scopes
-      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes: scopes, remember_access: nil, purpose: nil }).and_return("code")
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes:, remember_access: nil, purpose: nil }).and_return("code")
       oauth_accept
     end
 
@@ -831,12 +831,12 @@ describe OAuth2ProviderController do
       let(:session) { { login_aac: ap.global_id } }
 
       it "includes forward URL when possible" do
-        delete :destroy, params: { access_token: token.full_token, expire_sessions: true }, session: session
+        delete(:destroy, params: { access_token: token.full_token, expire_sessions: true }, session:)
         expect(response.parsed_body).to eq({ "forward_url" => "somewhere" })
       end
 
       it "does not include forward URL when not ending sessions" do
-        delete :destroy, params: { access_token: token.full_token }, session: session
+        delete(:destroy, params: { access_token: token.full_token }, session:)
         expect(response.parsed_body).to eq({})
       end
     end

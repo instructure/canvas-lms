@@ -24,14 +24,14 @@ describe "Section Paces API" do
   let(:teacher_enrollment) { course_with_teacher(active_all: true) }
   let(:course) { teacher_enrollment.course }
   let(:teacher) { teacher_enrollment.user }
-  let(:section) { add_section("Section One", course: course) }
-  let(:section_two) { add_section("Section Two", course: course) }
-  let(:section_three) { add_section("Section Three", course: course) }
+  let(:section) { add_section("Section One", course:) }
+  let(:section_two) { add_section("Section Two", course:) }
+  let(:section_three) { add_section("Section Three", course:) }
   let(:unrelated_section) { add_section("Section Three", course: course_factory) }
 
   before do
     Account.site_admin.enable_feature!(:course_paces_redesign)
-    2.times { multiple_student_enrollment(user_model, section_two, course: course) }
+    2.times { multiple_student_enrollment(user_model, section_two, course:) }
     course.enroll_student(@user = user_factory, enrollment_state: "active")
     user_session(teacher)
   end
@@ -44,7 +44,7 @@ describe "Section Paces API" do
 
   describe "show" do
     it "returns the pace for the requested section" do
-      section_pace = section_pace_model(section: section)
+      section_pace = section_pace_model(section:)
       Progress.create!(context: section_pace, tag: "course_pace_publish")
       get api_v1_section_pace_path(course, section), params: { format: :json }
       expect(response).to have_http_status :ok
@@ -53,7 +53,7 @@ describe "Section Paces API" do
     end
 
     context "the section does not have a pace, but the course does" do
-      before { course_pace_model(course: course, workflow_state: "published") }
+      before { course_pace_model(course:, workflow_state: "published") }
 
       it "falls back to the course pace" do
         get api_v1_section_pace_path(course, section), params: { format: :json }
@@ -107,7 +107,7 @@ describe "Section Paces API" do
     end
 
     context "when the section already has a pace" do
-      let!(:section_pace) { section_pace_model(section: section) }
+      let!(:section_pace) { section_pace_model(section:) }
 
       it "returns the existing pace" do
         expect do
@@ -125,7 +125,7 @@ describe "Section Paces API" do
   end
 
   describe "update" do
-    let!(:pace) { section_pace_model(section: section) }
+    let!(:pace) { section_pace_model(section:) }
 
     it "updates the pace" do
       expect do
@@ -165,7 +165,7 @@ describe "Section Paces API" do
 
   describe "delete" do
     it "marks the pace as deleted" do
-      pace = section_pace_model(section: section)
+      pace = section_pace_model(section:)
 
       expect do
         delete api_v1_delete_section_pace_path(course, section), params: { format: :json }
@@ -196,8 +196,8 @@ describe "Section Paces API" do
     end
 
     describe "show" do
-      let(:section_pace) { section_pace_model(section: section) }
-      let(:course_pace) { course_pace_model(course: course) }
+      let(:section_pace) { section_pace_model(section:) }
+      let(:course_pace) { course_pace_model(course:) }
 
       it "returns 404" do
         get api_v1_section_pace_path(course.id, section_pace.id), params: { format: :json }
@@ -213,7 +213,7 @@ describe "Section Paces API" do
     end
 
     describe "update" do
-      before { section_pace_model(section: section) }
+      before { section_pace_model(section:) }
 
       it "returns 404" do
         patch api_v1_patch_section_pace_path(course, section), params: {
@@ -228,7 +228,7 @@ describe "Section Paces API" do
 
     describe "delete" do
       it "returns 404" do
-        pace = section_pace_model(section: section)
+        pace = section_pace_model(section:)
         delete api_v1_delete_section_pace_path(course, section, pace), params: { format: :json }
         expect(response).to have_http_status :not_found
       end

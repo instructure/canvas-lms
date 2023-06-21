@@ -331,12 +331,12 @@ describe CollaborationsController do
 
       context "with the deep linking extension" do
         subject do
-          post :create, params: params
+          post(:create, params:)
           Collaboration.find(assigns[:collaboration].id)
         end
 
         let(:teacher) { @teacher }
-        let(:student) { student_in_course(course: course, active_all: true).user }
+        let(:student) { student_in_course(course:, active_all: true).user }
         let(:course) { @course }
         let(:params) { { course_id: course.id, contentItems: [content_item].to_json } }
         let(:content_item) do
@@ -354,7 +354,7 @@ describe CollaborationsController do
         before { user_session(teacher) }
 
         context "with a group set" do
-          let(:group) { group_model(course: course) }
+          let(:group) { group_model(course:) }
           let(:content_item) do
             super().merge(
               Collaboration::DEEP_LINKING_EXTENSION => {

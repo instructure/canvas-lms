@@ -110,9 +110,9 @@ describe "assignment groups" do
   it "edits group details", priority: "1" do
     assignment_group = @course.assignment_groups.create!(name: "first test group")
     4.times do
-      @course.assignments.create(title: "other assignment", assignment_group: assignment_group)
+      @course.assignments.create(title: "other assignment", assignment_group:)
     end
-    assignment = @course.assignments.create(title: "assignment with rubric", assignment_group: assignment_group)
+    assignment = @course.assignments.create(title: "assignment with rubric", assignment_group:)
 
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations

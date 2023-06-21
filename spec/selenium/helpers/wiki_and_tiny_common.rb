@@ -89,7 +89,7 @@ module WikiAndTinyCommon
 
   def create_wiki_page(title, unpublished, edit_roles)
     wiki_page =
-      @course.wiki_pages.create(title: title, editing_roles: edit_roles, notify_of_update: true)
+      @course.wiki_pages.create(title:, editing_roles: edit_roles, notify_of_update: true)
     wiki_page.unpublish! if unpublished
     wiki_page
   end

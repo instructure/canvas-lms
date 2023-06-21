@@ -93,7 +93,7 @@ module Factories
       if (ro = account.role_overrides.where(permission: permission.to_s, role_id: role.id).first)
         ro.update_attribute(:enabled, enabled)
       else
-        account.role_overrides.create(permission: permission.to_s, enabled: enabled, role: role)
+        account.role_overrides.create(permission: permission.to_s, enabled:, role:)
       end
     end
   end

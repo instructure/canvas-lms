@@ -42,7 +42,7 @@ describe LiveAssessments::ResultsController, type: :request do
 
   def result_hashes
     [student, another_student].map do |s|
-      { passed: true, assessed_at: assessed_at, links: { user: s.id } }
+      { passed: true, assessed_at:, links: { user: s.id } }
     end
   end
 
@@ -103,7 +103,7 @@ describe LiveAssessments::ResultsController, type: :request do
     context "as a teacher" do
       it "returns all the results for the assessment" do
         [student, another_student].each do |s|
-          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at: assessed_at)
+          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at:)
         end
         index_results({})
         data = json_parse
@@ -120,7 +120,7 @@ describe LiveAssessments::ResultsController, type: :request do
 
       it "filters the results by user" do
         [student, another_student].each do |s|
-          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at: assessed_at)
+          assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at:)
         end
         index_results({ user_id: another_student.id })
         data = json_parse

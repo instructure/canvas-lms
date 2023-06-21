@@ -109,8 +109,8 @@ describe Courses::TimetableEventBuilder do
       start_at = 1.day.from_now
       end_at = 1.day.from_now + 2.hours
       event_hashes = [
-        { start_at: start_at, end_at: end_at },
-        { start_at: start_at, end_at: end_at }
+        { start_at:, end_at: },
+        { start_at:, end_at: }
       ]
       builder.process_and_validate_event_hashes(event_hashes)
       expect(builder.errors).to eq ["events (or codes) are not unique"]

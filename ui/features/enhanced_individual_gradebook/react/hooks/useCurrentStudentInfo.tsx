@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import {useQuery} from 'react-apollo'
 import {
   GradebookStudentDetails,
@@ -27,17 +27,26 @@ import {GRADEBOOK_STUDENT_QUERY} from '../../queries/Queries'
 
 type Response = {
   currentStudent?: GradebookStudentDetails
-  studentSubmissions: GradebookUserSubmissionDetails[]
+  studentSubmissions?: GradebookUserSubmissionDetails[]
+  updateSubmissionDetails: (submission: GradebookUserSubmissionDetails) => void
 }
 
-export function useCurrentStudentInfo(courseId: string, userId?: string | null): Response {
+export const useCurrentStudentInfo = (courseId: string, userId?: string | null): Response => {
   const [currentStudent, setCurrentStudent] = useState<GradebookStudentDetails>()
-  const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>([])
+  const [studentSubmissions, setStudentSubmissions] = useState<GradebookUserSubmissionDetails[]>()
+
   const {data, error} = useQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
     variables: {courseId, userIds: userId},
     fetchPolicy: 'cache-and-network',
     skip: !userId,
   })
+
+  useEffect(() => {
+    if (!userId) {
+      setCurrentStudent(undefined)
+      setStudentSubmissions(undefined)
+    }
+  }, [userId])
 
   useEffect(() => {
     if (error) {
@@ -50,5 +59,19 @@ export function useCurrentStudentInfo(courseId: string, userId?: string | null):
     }
   }, [data, error])
 
-  return {currentStudent, studentSubmissions}
+  const updateSubmissionDetails = useCallback(
+    (newSubmission: GradebookUserSubmissionDetails) => {
+      setStudentSubmissions(submissions => {
+        if (!submissions) return
+        const index = submissions.findIndex(s => s.id === newSubmission.id)
+        if (index > -1) {
+          submissions[index] = newSubmission
+        }
+        return [...submissions]
+      })
+    },
+    [setStudentSubmissions]
+  )
+
+  return {currentStudent, studentSubmissions, updateSubmissionDetails}
 }

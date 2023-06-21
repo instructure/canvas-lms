@@ -46,7 +46,7 @@ module Latex
       cache_key = MathMan.cache_key_for(escaped, target)
 
       Rails.cache.fetch(cache_key) do
-        url = MathMan.url_for(latex: escaped, target: target)
+        url = MathMan.url_for(latex: escaped, target:)
         request_id = RequestContextGenerator.request_id.to_s
         request_id_signature = CanvasSecurity.sign_hmac_sha512(request_id)
         val = Canvas.timeout_protection("mathman") do

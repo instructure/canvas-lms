@@ -1274,7 +1274,7 @@ describe ConversationsController do
 
     it "includes part the message text in the title" do
       message = "Sending a test message to some random users, in the hopes that it really works."
-      conversation(message: message)
+      conversation(message:)
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
@@ -1284,7 +1284,7 @@ describe ConversationsController do
 
     it "includes the message in the content" do
       message = "Sending a test message to some random users, in the hopes that it really works."
-      conversation(message: message)
+      conversation(message:)
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
@@ -1293,7 +1293,7 @@ describe ConversationsController do
 
     it "includes context about the conversation" do
       message = "Sending a test message to some random users, in the hopes that it really works."
-      conversation(num_other_users: 4, message: message)
+      conversation(num_other_users: 4, message:)
       get "public_feed", params: { feed_code: @student.feed_code }, format: "atom"
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil

@@ -146,7 +146,7 @@ class SubmissionCommentsApiController < ApplicationController
           end
         else # author is a student or admin
           # always notify instructor
-          broadcast_annotation_notification(submission: submission, to_list: instructors, data: broadcast_data(author))
+          broadcast_annotation_notification(submission:, to_list: instructors, data: broadcast_data(author))
         end
 
         submissions_by_user_id = if submission.group_id
@@ -164,7 +164,7 @@ class SubmissionCommentsApiController < ApplicationController
                                 .select("users.id, associated_user_id").group_by(&:associated_user_id)
         submissions_by_user_id.each_value do |sub|
           to_list = Array(observers_by_user[sub.user_id]) + ["user_#{sub.user_id}"] - ["user_#{author.id}"]
-          broadcast_annotation_notification(submission: sub, to_list: to_list, data: broadcast_data(author), teacher: false)
+          broadcast_annotation_notification(submission: sub, to_list:, data: broadcast_data(author), teacher: false)
         end
 
         render json: {}, status: :ok

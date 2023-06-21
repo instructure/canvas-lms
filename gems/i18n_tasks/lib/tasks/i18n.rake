@@ -391,7 +391,7 @@ namespace :i18n do
 
     puts({
       language: import.language,
-      errors: errors,
+      errors:,
     }.to_json)
   end
 

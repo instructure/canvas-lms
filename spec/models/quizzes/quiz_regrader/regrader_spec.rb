@@ -40,13 +40,13 @@ describe Quizzes::QuizRegrader::Regrader do
     double(quiz_questions: questions,
            id: 1,
            version_number: 1,
-           current_quiz_question_regrades: current_quiz_question_regrades,
+           current_quiz_question_regrades:,
            quiz_submissions: submissions)
   end
 
-  let(:quiz_regrade) { double(id: 1, quiz: quiz) }
+  let(:quiz_regrade) { double(id: 1, quiz:) }
 
-  let(:quiz_regrader) { Quizzes::QuizRegrader::Regrader.new(quiz: quiz) }
+  let(:quiz_regrader) { Quizzes::QuizRegrader::Regrader.new(quiz:) }
 
   before do
     allow(quiz).to receive(:current_regrade).and_return quiz_regrade
@@ -61,7 +61,7 @@ describe Quizzes::QuizRegrader::Regrader do
 
     it "takes an optional submissions argument" do
       submissions = []
-      expect(Quizzes::QuizRegrader::Regrader.new(quiz: quiz, submissions: submissions)
+      expect(Quizzes::QuizRegrader::Regrader.new(quiz:, submissions:)
         .submissions).to eq submissions
     end
   end
@@ -70,7 +70,7 @@ describe Quizzes::QuizRegrader::Regrader do
     it "finds the passed version of the quiz if present" do
       quiz_stub = double
       options = {
-        quiz: quiz,
+        quiz:,
         version_number: 2
       }
 

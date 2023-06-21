@@ -29,7 +29,7 @@ module Lti
         it 'renders "application/vnd.ims.lti.v2.toolconsumerprofile+json"' do
           tool_consumer_profile_id = "a_made_up_id"
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}",
-              params: { tool_consumer_profile_id: tool_consumer_profile_id,
+              params: { tool_consumer_profile_id:,
                         account_id: account.id }
           expect(response.media_type.to_s).to eq "application/vnd.ims.lti.v2.toolconsumerprofile+json"
         end
@@ -37,7 +37,7 @@ module Lti
         it "returns the consumer profile JSON" do
           tool_consumer_profile_id = "a_made_up_id"
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}",
-              params: { tool_consumer_profile_id: tool_consumer_profile_id,
+              params: { tool_consumer_profile_id:,
                         account_id: account.id }
           profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
           expect(profile.type).to eq "ToolConsumerProfile"
@@ -48,7 +48,7 @@ module Lti
                                "339b6700-e4cb-47c5-a54f-3ee0064921a9#vnd.Canvas.OriginalityReport"
           tool_consumer_profile_id = "a_made_up_id"
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}",
-              params: { tool_consumer_profile_id: tool_consumer_profile_id,
+              params: { tool_consumer_profile_id:,
                         account_id: account.id }
           profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
           expect(profile.services_offered.to_s).not_to include restricted_service
@@ -59,7 +59,7 @@ module Lti
 
           tool_consumer_profile_id = "a_made_up_id"
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}",
-              params: { tool_consumer_profile_id: tool_consumer_profile_id,
+              params: { tool_consumer_profile_id:,
                         account_id: account.id }
           profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
 

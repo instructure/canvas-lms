@@ -246,7 +246,7 @@ class Quizzes::QuizReportsController < ApplicationController
              serialize_json(stats, includes)
            end
 
-    render json: json
+    render json:
   end
 
   def serialize_json(stats, includes = [])
@@ -256,7 +256,7 @@ class Quizzes::QuizReportsController < ApplicationController
                                           root: false,
                                           include_root: false,
                                           scope: @current_user,
-                                          includes: includes
+                                          includes:
                                         }).as_json
     end
 
@@ -270,7 +270,7 @@ class Quizzes::QuizReportsController < ApplicationController
                                                       scope: @current_user,
                                                       root: false,
                                                       include_root: false,
-                                                      includes: includes,
+                                                      includes:,
                                                       meta: {
                                                         primaryCollection: "quiz_reports"
                                                       }

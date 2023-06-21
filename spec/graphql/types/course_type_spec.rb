@@ -478,8 +478,8 @@ describe Types::CourseType do
       context "loginId" do
         def pseud_params(unique_id, account = Account.default)
           {
-            account: account,
-            unique_id: unique_id,
+            account:,
+            unique_id:,
           }
         end
 

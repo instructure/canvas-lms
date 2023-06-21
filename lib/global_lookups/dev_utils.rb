@@ -28,7 +28,7 @@ module GlobalLookups
     end
 
     def self.initialize_ddb_for_development!(recreate: false)
-      GlobalLookups::DevUtils.new.initialize_ddb_for_development!(recreate: recreate)
+      GlobalLookups::DevUtils.new.initialize_ddb_for_development!(recreate:)
     end
   end
 end

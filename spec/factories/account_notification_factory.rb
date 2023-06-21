@@ -24,7 +24,7 @@ module Factories
     message = opts[:message] || "hi there"
     subj = opts[:subject] || "this is a subject"
     @account = opts[:account] || Account.default
-    @announcement = @account.announcements.build(subject: subj, message: message, required_account_service: req_service)
+    @announcement = @account.announcements.build(subject: subj, message:, required_account_service: req_service)
     @announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
     @announcement.end_at = opts[:end_at] || 1.day.from_now.utc
     @announcement.user = opts[:user] || User.create!
@@ -41,7 +41,7 @@ module Factories
     message = opts[:message] || "hi there"
     subj = opts[:subject] || "sub account notification"
     account = opts[:account] || Account.default
-    sub_account_announcement = account.announcements.build(subject: subj, message: message, required_account_service: req_service)
+    sub_account_announcement = account.announcements.build(subject: subj, message:, required_account_service: req_service)
     sub_account_announcement.start_at = opts[:start_at] || 5.minutes.ago.utc
     sub_account_announcement.end_at = opts[:end_at] || 1.day.from_now.utc
     sub_account_announcement.user = opts[:user] || User.create!

@@ -30,7 +30,7 @@ class Mutations::SubscribeToDiscussionTopic < Mutations::BaseMutation
     discussion_topic.change_subscribed_state(input[:subscribed], current_user)
 
     {
-      discussion_topic: discussion_topic
+      discussion_topic:
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"

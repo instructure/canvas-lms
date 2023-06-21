@@ -54,7 +54,7 @@ describe TermsController do
   it "doesn't overwrite stuck sis fields" do
     account = Account.default
     user = user_factory(active_all: true)
-    account.account_users.create!(user: user)
+    account.account_users.create!(user:)
     user_session(@user)
 
     term = account.default_enrollment_term

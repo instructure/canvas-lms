@@ -59,7 +59,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     result = CanvasSchema.execute(
       mutation_str(**opts),
       context: {
-        current_user: current_user,
+        current_user:,
         domain_root_account: @discussion_entry.discussion_topic.root_account,
         request: ActionDispatch::TestRequest.create
       }

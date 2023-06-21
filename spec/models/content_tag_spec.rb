@@ -310,12 +310,12 @@ describe ContentTag do
                                                     name: "tool",
                                                     consumer_key: "key",
                                                     shared_secret: "secret",
-                                                    url: url
+                                                    url:
                                                   })
     assignment = @course.assignments.create!(
       title: "some assignment",
       submission_types: "external_tool",
-      external_tool_tag_attributes: { url: url }
+      external_tool_tag_attributes: { url: }
     )
     expect(assignment.external_tool_tag.content).to eq(tool)
   end
@@ -895,7 +895,7 @@ describe ContentTag do
       tag = ContentTag.create!(context: @course)
       expect(ContentTag.can_have_assignment).not_to include(tag)
       ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"].each do |content_type|
-        tag.update(content_type: content_type)
+        tag.update(content_type:)
         expect(ContentTag.can_have_assignment).to include(tag)
       end
     end
@@ -907,7 +907,7 @@ describe ContentTag do
       tag = ContentTag.create!(context: @course)
       expect(tag.can_have_assignment?).to be(false)
       ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"].each do |content_type|
-        tag.update(content_type: content_type)
+        tag.update(content_type:)
         expect(tag.can_have_assignment?).to be(true)
       end
     end

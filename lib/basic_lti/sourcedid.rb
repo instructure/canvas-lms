@@ -20,7 +20,7 @@
 
 module BasicLTI
   class Sourcedid
-    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/.freeze
+    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/
 
     attr_reader :tool, :course, :assignment, :user
 

@@ -271,7 +271,7 @@ RSpec.shared_examples "DiscussionType" do
   context "graded discussion" do
     it "allows querying the assignment type on a discussion" do
       Assignment::ALLOWED_GRADING_TYPES.each do |grading_type|
-        discussion.assignment.update!(grading_type: grading_type)
+        discussion.assignment.update!(grading_type:)
         expect(discussion_type.resolve("assignment { gradingType }")).to eq grading_type
       end
     end
@@ -769,10 +769,10 @@ describe Types::DiscussionType do
     let_once(:discussion) do
       course = @course || course_factory(active_all: true)
       group_category = course.group_categories.create!(name: "category")
-      course.groups.create!(name: "group 10", group_category: group_category)
-      course.groups.create!(name: "group 2", group_category: group_category)
-      course.groups.create!(name: "group 1", group_category: group_category)
-      course.groups.create!(name: "group 11", group_category: group_category)
+      course.groups.create!(name: "group 10", group_category:)
+      course.groups.create!(name: "group 2", group_category:)
+      course.groups.create!(name: "group 1", group_category:)
+      course.groups.create!(name: "group 11", group_category:)
 
       topic = course.discussion_topics.build(title: "topic")
       topic.group_category = group_category

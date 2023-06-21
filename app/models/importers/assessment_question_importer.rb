@@ -149,12 +149,12 @@ module Importers
       end
 
       if (id = hash["assessment_question_id"])
-        AssessmentQuestion.where(id: id).update_all(name: hash[:question_name],
-                                                    question_data: hash,
-                                                    workflow_state: "active",
-                                                    created_at: Time.now.utc,
-                                                    updated_at: Time.now.utc,
-                                                    assessment_question_bank_id: bank.id)
+        AssessmentQuestion.where(id:).update_all(name: hash[:question_name],
+                                                 question_data: hash,
+                                                 workflow_state: "active",
+                                                 created_at: Time.now.utc,
+                                                 updated_at: Time.now.utc,
+                                                 assessment_question_bank_id: bank.id)
       else
         sql = <<~SQL.squish
           INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id, root_account_id)

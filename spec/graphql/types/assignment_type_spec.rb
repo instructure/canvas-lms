@@ -24,8 +24,8 @@ require_relative "./shared_examples/types_with_enumerable_workflow_states"
 describe Types::AssignmentType do
   let_once(:course) { course_factory(active_all: true) }
 
-  let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
-  let_once(:student) { student_in_course(course: course, active_all: true).user }
+  let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
+  let_once(:student) { student_in_course(course:, active_all: true).user }
 
   let(:assignment) do
     course.assignments.create(title: "some assignment",
@@ -53,7 +53,6 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("anonymousInstructorAnnotations")).to eq assignment.anonymous_instructor_annotations
     expect(assignment_type.resolve("postToSis")).to eq assignment.post_to_sis
     expect(assignment_type.resolve("canUnpublish")).to eq assignment.can_unpublish?
-    expect(assignment_type.resolve("muted")).to eq assignment.muted?
   end
 
   it_behaves_like "types with enumerable workflow states" do
@@ -158,8 +157,8 @@ describe Types::AssignmentType do
   end
 
   it "returns assessment requests for the current user" do
-    student2 = student_in_course(course: course, name: "Matthew Lemon", active_all: true).user
-    student3 = student_in_course(course: course, name: "Rob Orton", active_all: true).user
+    student2 = student_in_course(course:, name: "Matthew Lemon", active_all: true).user
+    student3 = student_in_course(course:, name: "Rob Orton", active_all: true).user
 
     assignment.assign_peer_review(student, student2)
     assignment.assign_peer_review(student2, student3)
@@ -249,7 +248,7 @@ describe Types::AssignmentType do
   end
 
   describe "submissionsConnection" do
-    let_once(:other_student) { student_in_course(course: course, active_all: true).user }
+    let_once(:other_student) { student_in_course(course:, active_all: true).user }
 
     # This is kind of a catch-all test the assignment.submissionsConnection
     # graphql plumbing. The submission search specs handle testing the
@@ -577,7 +576,7 @@ describe Types::AssignmentType do
     it "works for adhoc students" do
       adhoc_override = assignment.assignment_overrides.new(set_type: "ADHOC")
       adhoc_override.assignment_override_students.build(
-        assignment: assignment,
+        assignment:,
         user: student,
         assignment_override: adhoc_override
       )

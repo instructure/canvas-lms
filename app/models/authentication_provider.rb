@@ -264,7 +264,7 @@ class AuthenticationProvider < ActiveRecord::Base
     user = pseudonym.user
 
     canvas_attributes = translate_provider_attributes(provider_attributes,
-                                                      purpose: purpose)
+                                                      purpose:)
     given_name = canvas_attributes.delete("given_name")
     surname = canvas_attributes.delete("surname")
     if given_name || surname
@@ -292,7 +292,7 @@ class AuthenticationProvider < ActiveRecord::Base
         account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
         account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) }
         roles_to_add.each do |role|
-          account.account_users.create!(user: user, role: role)
+          account.account_users.create!(user:, role:)
         end
         account_users_to_delete.each(&:destroy)
         account_users_to_activate.each(&:reactivate)

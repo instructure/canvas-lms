@@ -301,7 +301,7 @@ class CoursePacesController < ApplicationController
       @context.context_module_tags.not_deleted.each do |module_item|
         next unless module_item.assignment
 
-        @course_pace.course_pace_module_items.new module_item: module_item, duration: 0
+        @course_pace.course_pace_module_items.new module_item:, duration: 0
       end
     end
 
@@ -415,7 +415,7 @@ class CoursePacesController < ApplicationController
         @course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
           next unless module_item.assignment
 
-          @course_pace.course_pace_module_items.new module_item: module_item, duration: 0
+          @course_pace.course_pace_module_items.new module_item:, duration: 0
         end
       end
     end
@@ -554,12 +554,12 @@ class CoursePacesController < ApplicationController
       return render json: { success: false, errors: "End date cannot be before start date" }, status: :unprocessable_entity
     end
 
-    compressed_module_items = @course_pace.compress_dates(save: false, start_date: start_date)
+    compressed_module_items = @course_pace.compress_dates(save: false, start_date:)
                                           .sort_by { |ppmi| ppmi.module_item.position }
                                           .group_by { |ppmi| ppmi.module_item.context_module }
                                           .sort_by { |context_module, _items| context_module.position }
                                           .to_h.values.flatten
-    compressed_dates = CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, start_date: start_date)
+    compressed_dates = CoursePaceDueDatesCalculator.new(@course_pace).get_due_dates(compressed_module_items, start_date:)
 
     render json: compressed_dates.to_json
   end

@@ -213,7 +213,7 @@ class AssetUserAccess < ActiveRecord::Base
     return unless correct_context && Context::CONTEXT_TYPES.include?(correct_context.class_name.to_sym)
 
     GuardRail.activate(:secondary) do
-      @access = AssetUserAccess.where(user: user,
+      @access = AssetUserAccess.where(user:,
                                       asset_code: accessed_asset[:code],
                                       context: correct_context).first_or_initialize
     end
@@ -328,6 +328,24 @@ class AssetUserAccess < ActiveRecord::Base
 
   def readable_category
     ICON_MAP[asset_category.to_sym]&.[](1) || ""
+  end
+
+  def self.expiration_date
+    cutoff = Setting.get("asset_user_accesses_retain_for", 1.year.to_s).to_i
+    cutoff.seconds.ago
+  end
+
+  def self.delete_old_records
+    batch_size = Setting.get("asset_user_accesses_delete_batch_size", "10000").to_i
+    batch_sleep = Setting.get("asset_user_accesses_delete_batch_sleep", "0").to_f
+    loop do
+      count = AssetUserAccess.connection.with_max_update_limit(batch_size) do
+        where(last_access: ..expiration_date).limit(batch_size).delete_all
+      end
+      break if count.zero?
+
+      sleep(batch_sleep) if batch_sleep > 0 # rubocop:disable Lint/NoSleep
+    end
   end
 
   private

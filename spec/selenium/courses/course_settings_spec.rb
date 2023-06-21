@@ -562,9 +562,9 @@ describe "course settings" do
     user_factory(active_all: true)
     user_session(@user)
     role = custom_account_role("role", account: @account)
-    @account.role_overrides.create!(permission: "read_course_content", role: role, enabled: true)
-    @account.role_overrides.create!(permission: "manage_content", role: role, enabled: false)
-    @course.account.account_users.create!(user: @user, role: role)
+    @account.role_overrides.create!(permission: "read_course_content", role:, enabled: true)
+    @account.role_overrides.create!(permission: "manage_content", role:, enabled: false)
+    @course.account.account_users.create!(user: @user, role:)
 
     get "/courses/#{@course.id}/settings"
 

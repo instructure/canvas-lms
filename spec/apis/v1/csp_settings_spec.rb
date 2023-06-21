@@ -40,7 +40,7 @@ describe "CSP Settings API", type: :request do
                  "#{context.class.name.downcase}_id": context.id.to_s },
                {},
                {},
-               { expected_status: expected_status })
+               { expected_status: })
     end
 
     it "requires authorization" do
@@ -137,7 +137,7 @@ describe "CSP Settings API", type: :request do
                  status: csp_status },
                {},
                {},
-               { expected_status: expected_status })
+               { expected_status: })
     end
 
     context "setting on courses" do
@@ -221,7 +221,7 @@ describe "CSP Settings API", type: :request do
                  settings_locked: lock_status },
                {},
                {},
-               { expected_status: expected_status })
+               { expected_status: })
     end
 
     context "setting on accounts" do
@@ -255,10 +255,10 @@ describe "CSP Settings API", type: :request do
                  action: "add_domain",
                  format: "json",
                  account_id: account.id.to_s,
-                 domain: domain },
+                 domain: },
                {},
                {},
-               { expected_status: expected_status })
+               { expected_status: })
     end
 
     it "adds domains even if csp isn't enabled yet" do
@@ -282,10 +282,10 @@ describe "CSP Settings API", type: :request do
                  action: "add_multiple_domains",
                  format: "json",
                  account_id: account.id.to_s,
-                 domains: domains },
+                 domains: },
                {},
                {},
-               { expected_status: expected_status })
+               { expected_status: })
     end
 
     it "adds domains even if csp isn't enabled yet" do
@@ -311,10 +311,10 @@ describe "CSP Settings API", type: :request do
                  action: "remove_domain",
                  format: "json",
                  account_id: account.id.to_s,
-                 domain: domain },
+                 domain: },
                {},
                {},
-               { expected_status: expected_status })
+               { expected_status: })
     end
 
     it "removes domains even if csp isn't enabled yet" do
@@ -338,7 +338,7 @@ describe "CSP Settings API", type: :request do
                  account_id: account.id.to_param },
                {},
                {},
-               { expected_status: expected_status })
+               { expected_status: })
     end
 
     it "400s for a subaccount" do

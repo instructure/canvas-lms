@@ -412,7 +412,7 @@ describe "BundlerLockfileExtensions" do
   def invoke_bundler(subcommand, env: {})
     output = nil
     bundler_version = ENV.fetch("BUNDLER_VERSION")
-    command = "bundle _#{bundler_version}_ #{subcommand}"
+    command = "#{Gem.bin_path("bundler", "bundler", bundler_version)} #{subcommand}"
     Bundler.with_unbundled_env do
       output, status = Open3.capture2e(env, command)
 

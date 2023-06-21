@@ -66,7 +66,7 @@ module Factories
     @attributes_res = {
       context: @context,
       size: 100,
-      folder: folder,
+      folder:,
       content_type: "application/unknown",
       filename: "unknown.example"
     }

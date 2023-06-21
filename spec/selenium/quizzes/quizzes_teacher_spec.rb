@@ -190,7 +190,7 @@ describe "quizzes" do
 
       it "shows a warning for groups picking too many questions from a bank", priority: "2" do
         bank = @course.assessment_question_banks.create!
-        assessment_question_model(bank: bank)
+        assessment_question_model(bank:)
 
         get "/courses/#{@course.id}/quizzes"
         click_new_quiz_button

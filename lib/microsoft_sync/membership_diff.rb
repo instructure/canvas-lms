@@ -54,9 +54,9 @@ module MicrosoftSync
       }
     end
 
-    def additions_in_slices_of(slice_size, &blk)
+    def additions_in_slices_of(slice_size, &)
       members_to_add, owners_to_add = additions.values_at(:members, :owners)
-      self.class.in_slices_of owners_to_add, members_to_add, slice_size, &blk
+      self.class.in_slices_of(owners_to_add, members_to_add, slice_size, &)
     end
 
     def removals
@@ -66,9 +66,9 @@ module MicrosoftSync
       }
     end
 
-    def removals_in_slices_of(slice_size, &blk)
+    def removals_in_slices_of(slice_size, &)
       members_to_remove, owners_to_remove = removals.values_at(:members, :owners)
-      self.class.in_slices_of owners_to_remove, members_to_remove, slice_size, &blk
+      self.class.in_slices_of(owners_to_remove, members_to_remove, slice_size, &)
     end
 
     def max_enrollment_members_reached?
@@ -79,7 +79,7 @@ module MicrosoftSync
       @local_owners.size > MAX_ENROLLMENT_OWNERS
     end
 
-    def self.in_slices_of(owners, members, slice_size, &_blk)
+    def self.in_slices_of(owners, members, slice_size, &)
       members = members.to_a # Convert from Set so we can 'shift'
 
       owners.each_slice(slice_size) do |owners_slice|

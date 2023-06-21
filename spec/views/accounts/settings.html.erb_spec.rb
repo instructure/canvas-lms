@@ -152,7 +152,7 @@ describe "accounts/settings" do
   describe "Admin setting allow_gradebook_show_first_last_names" do
     context "site admin user" do
       let_once(:account) { Account.site_admin }
-      let_once(:admin) { account_admin_user(account: account) }
+      let_once(:admin) { account_admin_user(account:) }
 
       before do
         view_context(account, admin)
@@ -180,7 +180,7 @@ describe "accounts/settings" do
 
     context "account admin user" do
       let_once(:account) { Account.default }
-      let_once(:admin) { account_admin_user(account: account) }
+      let_once(:admin) { account_admin_user(account:) }
 
       before do
         view_context(account, admin)
@@ -459,7 +459,7 @@ describe "accounts/settings" do
       role = custom_account_role("CustomAdmin", account: Account.site_admin)
       account_admin_user_with_role_changes(
         account: Account.site_admin,
-        role: role,
+        role:,
         role_changes: { manage_account_memberships: true }
       )
       view_context(Account.default, @user)
@@ -582,7 +582,7 @@ describe "accounts/settings" do
 
   context "privacy" do
     let(:account) { account_model }
-    let(:account_admin) { account_admin_user(account: account) }
+    let(:account_admin) { account_admin_user(account:) }
     let(:dom) { Nokogiri::HTML5(response) }
     let(:enable_fullstory) { dom.at_css("#account_settings_enable_fullstory") }
     let(:site_admin) { site_admin_user }
@@ -638,7 +638,7 @@ describe "accounts/settings" do
 
   context "course templates" do
     let_once(:account) { Account.default }
-    let_once(:admin) { account_admin_user(account: account) }
+    let_once(:admin) { account_admin_user(account:) }
 
     before do
       account.enable_feature!(:course_templates)

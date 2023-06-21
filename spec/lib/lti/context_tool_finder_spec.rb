@@ -27,7 +27,7 @@ describe Lti::ContextToolFinder do
 
   def create_tool(context, name, opts)
     context.context_external_tools.create!(
-      { name: name, consumer_key: "12345", shared_secret: "secret" }.merge(opts)
+      { name:, consumer_key: "12345", shared_secret: "secret" }.merge(opts)
     )
   end
 
@@ -64,7 +64,7 @@ describe Lti::ContextToolFinder do
       tool3.settings[:resource_selection] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
       tool3.save!
       placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ["resource_selection"]
-      expect(method_returning_scope.call(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
+      expect(method_returning_scope.call(@course, placements:).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
     it "honors only_visible option" do

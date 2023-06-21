@@ -165,8 +165,8 @@ RSpec.describe AnonymousSubmissionsController do
     let(:submission) { assignment.submit_homework(student, attachments: [attachment]) }
     let!(:originality_report) do
       OriginalityReport.create!(
-        attachment: attachment,
-        submission: submission,
+        attachment:,
+        submission:,
         originality_score: 0.5,
         originality_report_url: "http://www.instructure.com"
       )
@@ -316,7 +316,7 @@ RSpec.describe AnonymousSubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: "{ anonymous_id }",
-        asset_string: asset_string
+        asset_string:
       }
       expect(response).to have_http_status(:bad_request)
     end
@@ -331,7 +331,7 @@ RSpec.describe AnonymousSubmissionsController do
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
-          asset_string: asset_string
+          asset_string:
         }
         expect(response).to redirect_to(/#{retrieve_course_external_tools_url(course.id)}/)
       end
@@ -341,7 +341,7 @@ RSpec.describe AnonymousSubmissionsController do
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
-          asset_string: asset_string
+          asset_string:
         }
         expect(response).to redirect_to(/MY_GREAT_REPORT/)
       end
@@ -352,7 +352,7 @@ RSpec.describe AnonymousSubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: submission.anonymous_id,
-        asset_string: asset_string
+        asset_string:
       }
 
       speed_grader_url = speed_grader_course_gradebook_url(
@@ -368,7 +368,7 @@ RSpec.describe AnonymousSubmissionsController do
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: submission.anonymous_id,
-        asset_string: asset_string
+        asset_string:
       }
 
       expect(flash[:error]).to be_present

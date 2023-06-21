@@ -91,10 +91,10 @@ module Api::V1::OutcomeResults
         o,
         @current_user,
         session,
-        assessed_outcomes: assessed_outcomes,
+        assessed_outcomes:,
         rating_percents: percents[o.id],
-        context: context,
-        friendly_descriptions: friendly_descriptions
+        context:,
+        friendly_descriptions:
       )
       hash[:alignments] = alignment_asset_string_map[o.id]
       hash
@@ -112,7 +112,7 @@ module Api::V1::OutcomeResults
   #
   # Returns a Hash containing serialized outcome links.
   def outcome_results_include_outcome_links_json(outcome_links, context)
-    outcome_links_json(outcome_links, @current_user, session, { context: context })
+    outcome_links_json(outcome_links, @current_user, session, { context: })
   end
 
   # Public: Returns an Array of serialized Course objects for linked hash.
@@ -262,8 +262,8 @@ module Api::V1::OutcomeResults
       outcomes.each do |outcome|
         pathParts = outcome_paths.find { |x| x[:id] == outcome.id }[:parts]
         path = pathParts.pluck(:name).join(" > ")
-        row << I18n.t(:outcome_path_result, "%{path} result", path: path)
-        row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", path: path)
+        row << I18n.t(:outcome_path_result, "%{path} result", path:)
+        row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", path:)
       end
       csv << row
       mastery_points = @context.root_account.feature_enabled?(:account_level_mastery_scales) && @context.resolved_outcome_proficiency&.mastery_points

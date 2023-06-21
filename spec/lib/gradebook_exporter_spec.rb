@@ -682,11 +682,11 @@ describe GradebookExporter do
         )
 
         enrollment_term = @course.root_account.enrollment_terms.create!(grading_period_group: group)
-        @course.update!(enrollment_term: enrollment_term)
+        @course.update!(enrollment_term:)
 
         assignment_group = @course.assignment_groups.create!(name: "my group")
         @course.assignments.create!(
-          assignment_group: assignment_group,
+          assignment_group:,
           due_at: 1.day.after(@last_grading_period.start_date),
           title: "my assignment"
         )
@@ -754,7 +754,7 @@ describe GradebookExporter do
       it "updates progress.completion to 90 when finished" do
         progress = Progress.create!(context: @course, tag: "gradebook_to_csv")
         exporter_options = {
-          progress: progress
+          progress:
         }
         GradebookExporter.new(@course, @teacher, exporter_options).to_csv
         expect(progress.reload.completion).to be(90.0)
@@ -764,7 +764,7 @@ describe GradebookExporter do
         progress = Progress.create!(context: @course, tag: "gradebook_to_csv")
         progress.update!(workflow_state: "failed")
         exporter_options = {
-          progress: progress
+          progress:
         }
         GradebookExporter.new(@course, @teacher, exporter_options).to_csv
         expect(progress.reload.completion).to be(50.0)
@@ -775,7 +775,7 @@ describe GradebookExporter do
   context "a course with a student whose name starts with an equals sign" do
     let(:student) do
       user = user_factory(name: "=sum(A)", active_user: true)
-      course_with_student(course: @course, user: user)
+      course_with_student(course: @course, user:)
       user
     end
     let(:course) { @course }

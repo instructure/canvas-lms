@@ -182,7 +182,7 @@ class OutcomesController < ApplicationController
     else
       @group.add_outcome(@outcome)
     end
-    render json: @outcome.as_json(methods: :cached_context_short_name, permissions: { user: @current_user, session: session })
+    render json: @outcome.as_json(methods: :cached_context_short_name, permissions: { user: @current_user, session: })
   end
 
   def align
@@ -191,7 +191,7 @@ class OutcomesController < ApplicationController
     @outcome = @context.linked_learning_outcomes.find(params[:outcome_id])
     @asset = @context.find_asset(params[:asset_string])
     mastery_type = @asset.is_a?(Assignment) ? "points" : "none"
-    @alignment = @outcome.align(@asset, @context, mastery_type: mastery_type) if @asset
+    @alignment = @outcome.align(@asset, @context, mastery_type:) if @asset
     render json: @alignment.as_json(include: :learning_outcome)
   end
 
@@ -252,7 +252,7 @@ class OutcomesController < ApplicationController
         @submission.quiz_id,
         quiz_submission_id: @submission.id,
         version: @submission_version.version_number,
-        anchor: anchor
+        anchor:
       )
     else
       flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || "nil"}"

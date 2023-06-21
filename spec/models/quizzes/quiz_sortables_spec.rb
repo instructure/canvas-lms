@@ -22,16 +22,16 @@ describe Quizzes::QuizSortables do
   describe ".initialize" do
     it "assigns the quiz" do
       quiz = Quizzes::Quiz.new
-      sortables = Quizzes::QuizSortables.new(quiz: quiz, order: [])
+      sortables = Quizzes::QuizSortables.new(quiz:, order: [])
 
       expect(sortables.quiz).to eq quiz
     end
 
     it "assigns the group and quiz" do
       quiz  = double
-      group = double(quiz: quiz)
+      group = double(quiz:)
 
-      sortables = Quizzes::QuizSortables.new(group: group, order: [])
+      sortables = Quizzes::QuizSortables.new(group:, order: [])
 
       expect(sortables.group).to eq group
       expect(sortables.quiz).to  eq quiz
@@ -51,7 +51,7 @@ describe Quizzes::QuizSortables do
       order = [{ "type" => "group",    "id" => "234" },
                { "type" => "question", "id" => "123" }]
 
-      sortables = Quizzes::QuizSortables.new(quiz: quiz, order: order)
+      sortables = Quizzes::QuizSortables.new(quiz:, order:)
       expect(sortables.items).to eq [group, question]
     end
 
@@ -64,7 +64,7 @@ describe Quizzes::QuizSortables do
       order = [{ "type" => "group",    "id" => "234" },
                { "type" => "question", "id" => "123" }]
 
-      sortables = Quizzes::QuizSortables.new(quiz: quiz, order: order)
+      sortables = Quizzes::QuizSortables.new(quiz:, order:)
       expect(sortables.items).to eq []
     end
   end

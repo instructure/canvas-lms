@@ -223,7 +223,7 @@ module Lti::IMS
 
       json = {}
       preflights_and_attachments = compute_preflights_and_attachments(
-        ags_scores_multiple_files: ags_scores_multiple_files
+        ags_scores_multiple_files:
       )
       attachments = preflights_and_attachments.pluck(:attachment)
       json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: preflights_and_attachments.pluck(:json) }
@@ -248,7 +248,7 @@ module Lti::IMS
       update_or_create_result
       json[:resultUrl] = result_url
 
-      render json: json, content_type: MIME_TYPE
+      render json:, content_type: MIME_TYPE
     end
 
     private
@@ -275,7 +275,7 @@ module Lti::IMS
         end
       end
 
-      render json: json, content_type: MIME_TYPE
+      render json:, content_type: MIME_TYPE
     end
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
@@ -421,7 +421,7 @@ module Lti::IMS
     def submit_homework(attachments = [])
       return unless line_item.assignment_line_item?
 
-      submission_opts = { submitted_at: submitted_at }
+      submission_opts = { submitted_at: }
       if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
         submission_opts[:submission_type] = submission_type
         case submission_type
@@ -443,7 +443,7 @@ module Lti::IMS
         submission = score_submission
         if result.nil?
           @_result = line_item.results.create!(
-            scores_params.merge(created_at: timestamp, updated_at: timestamp, user: user, submission: submission)
+            scores_params.merge(created_at: timestamp, updated_at: timestamp, user:, submission:)
           )
         else
           result.update!(scores_params.merge(updated_at: timestamp))
@@ -470,8 +470,8 @@ module Lti::IMS
           check_quota: false, # we don't check quota when uploading a file for assignment submission
           folder: user.submissions_folder(context), # organize attachment into the course submissions folder
           assignment: line_item.assignment,
-          submit_assignment: submit_assignment,
-          precreate_attachment: precreate_attachment,
+          submit_assignment:,
+          precreate_attachment:,
           return_json: true,
           override_logged_in_user: true,
           override_current_user_with: user,
@@ -507,8 +507,8 @@ module Lti::IMS
             title: item[:title],
             progress: progress_url
           },
-          preflight_json: preflight_json,
-          attachment: attachment
+          preflight_json:,
+          attachment:
         }
       end
     end
@@ -545,7 +545,7 @@ module Lti::IMS
     end
 
     def result
-      @_result ||= Lti::Result.active.where(line_item: line_item, user: user).first
+      @_result ||= Lti::Result.active.where(line_item:, user:).first
     end
 
     def timestamp

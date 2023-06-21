@@ -29,13 +29,13 @@ module MicrosoftSync
       end
 
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
-      def list_members(group_id, options = {}, &blk)
-        get_paginated_list("groups/#{group_id}/members", quota: [3, 0], **options, &blk)
+      def list_members(group_id, options = {}, &)
+        get_paginated_list("groups/#{group_id}/members", quota: [3, 0], **options, &)
       end
 
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
-      def list_owners(group_id, options = {}, &blk)
-        get_paginated_list("groups/#{group_id}/owners", quota: [2, 0], **options, &blk)
+      def list_owners(group_id, options = {}, &)
+        get_paginated_list("groups/#{group_id}/owners", quota: [2, 0], **options, &)
       end
 
       BATCH_REMOVE_USERS_SPECIAL_CASES = [
@@ -71,7 +71,7 @@ module MicrosoftSync
         ignored_request_hash = run_batch(
           "group_remove_users",
           reqs,
-          quota: quota,
+          quota:,
           special_cases: BATCH_REMOVE_USERS_SPECIAL_CASES
         )
         create_membership_change_result(ignored_request_hash)
@@ -152,7 +152,7 @@ module MicrosoftSync
         response = request(
           :patch,
           "groups/#{group_id}",
-          body: body,
+          body:,
           quota: [1, write_quota],
           special_cases: add_users_special_cases(group_id)
         )

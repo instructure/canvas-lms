@@ -33,7 +33,7 @@ describe Turnitin::Client do
 
   def stub_net_http_to_return(partial_body, return_code = 1)
     body = "<returndata>#{partial_body}<rcode>#{return_code}</rcode></returndata>"
-    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(double(body: body))
+    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(double(body:))
   end
 
   describe "#state_from_similarity_score" do

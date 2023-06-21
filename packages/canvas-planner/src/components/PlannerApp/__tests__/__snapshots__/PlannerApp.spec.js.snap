@@ -34,7 +34,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-24"
     isObserving={false}
@@ -46,7 +46,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={2}
     day="2017-04-25"
     isObserving={false}
@@ -66,7 +66,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     responsiveSize="large"
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={4}
     day="2017-04-29"
     isObserving={false}
@@ -130,7 +130,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-19"
     isObserving={false}
@@ -148,7 +148,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={2}
     day="2017-04-23"
     isObserving={false}
@@ -160,7 +160,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={3}
     day="2017-04-24"
     isObserving={false}
@@ -172,7 +172,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={4}
     day="2017-04-25"
     isObserving={false}
@@ -192,7 +192,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     responsiveSize="large"
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={6}
     day="2017-04-29"
     isObserving={false}
@@ -256,7 +256,7 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-24"
     isObserving={false}
@@ -320,7 +320,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-24"
     isObserving={false}
@@ -338,7 +338,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={2}
     day="2017-04-25"
     isObserving={false}
@@ -364,7 +364,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     responsiveSize="large"
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={4}
     day="2017-04-29"
     isObserving={false}
@@ -428,7 +428,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-18"
     isObserving={false}
@@ -446,7 +446,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={2}
     day="2017-04-20"
     isObserving={false}
@@ -464,7 +464,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={3}
     day="2017-04-23"
     isObserving={false}
@@ -476,7 +476,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={4}
     day="2017-04-24"
     isObserving={false}
@@ -534,7 +534,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-24"
     isObserving={false}
@@ -552,7 +552,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={2}
     day="2017-04-25"
     isObserving={false}
@@ -570,7 +570,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={3}
     day="2017-04-26"
     isObserving={false}
@@ -582,7 +582,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={4}
     day="2017-04-27"
     isObserving={false}
@@ -594,7 +594,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={5}
     day="2017-04-28"
     isObserving={false}
@@ -658,7 +658,7 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-24"
     isObserving={false}
@@ -722,7 +722,7 @@ exports[`PlannerApp renders base component 1`] = `
     allPastItemsLoaded={false}
     loadingPast={false}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-24"
     isObserving={false}
@@ -740,7 +740,7 @@ exports[`PlannerApp renders base component 1`] = `
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={2}
     day="2017-04-25"
     isObserving={false}
@@ -758,7 +758,7 @@ exports[`PlannerApp renders base component 1`] = `
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={3}
     day="2017-04-26"
     isObserving={false}
@@ -958,7 +958,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     allPastItemsLoaded={false}
     loadingPast={true}
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={1}
     day="2017-04-24"
     isObserving={false}
@@ -976,7 +976,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={2}
     day="2017-04-25"
     isObserving={false}
@@ -994,7 +994,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
     singleCourseView={false}
     timeZone="Asia/Tokyo"
   />
-  <Animatable(Day)
+  <Animatable(undefined)
     animatableIndex={3}
     day="2017-04-26"
     isObserving={false}

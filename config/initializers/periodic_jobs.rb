@@ -56,13 +56,13 @@ class PeriodicJobs
       current_shard = Shard.current(connection_class)
       strand = "#{klass}.#{method}:#{current_shard.database_server.id}"
       # TODO: allow this to work with redis jobs
-      next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: current_shard.id, locked_by: nil).exists?
+      next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand:, shard_id: current_shard.id, locked_by: nil).exists?
 
       dj_params = {
-        strand: strand,
+        strand:,
         priority: 40
       }
-      dj_params[:run_at] = compute_run_at(jitter: jitter, local_offset: local_offset)
+      dj_params[:run_at] = compute_run_at(jitter:, local_offset:)
 
       current_shard.activate do
         klass.delay(**dj_params).__send__(method, *args)
@@ -79,8 +79,8 @@ def with_each_job_cluster(klass, method, *args, jitter: nil, local_offset: false
     klass,
     method,
     *args,
-    jitter: jitter,
-    local_offset: local_offset,
+    jitter:,
+    local_offset:,
     connection_class: Delayed::Backend::ActiveRecord::AbstractJob
   )
 end
@@ -93,10 +93,10 @@ def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset:
     klass,
     method,
     *args,
-    jitter: jitter,
-    local_offset: local_offset,
+    jitter:,
+    local_offset:,
     connection_class: ActiveRecord::Base,
-    error_callback: error_callback
+    error_callback:
   )
 end
 

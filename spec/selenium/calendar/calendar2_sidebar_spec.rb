@@ -136,7 +136,7 @@ describe "calendar2" do
 
         it "removes calendar item if calendar is unselected", priority: "1" do
           title = "blarg"
-          make_event context: @course, start: Time.now, title: title
+          make_event(context: @course, start: Time.now, title:)
           load_month_view
 
           # expect event to be on the calendar

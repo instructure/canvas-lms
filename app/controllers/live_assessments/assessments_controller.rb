@@ -99,7 +99,7 @@ module LiveAssessments
           if @outcome
             criterion = @outcome.rubric_criterion
             mastery_score = criterion && (criterion[:mastery_points] / criterion[:points_possible])
-            @outcome.align(assessment, @context, mastery_type: "none", mastery_score: mastery_score)
+            @outcome.align(assessment, @context, mastery_type: "none", mastery_score:)
           end
           @assessments << assessment
         end
@@ -126,7 +126,7 @@ module LiveAssessments
       @assessments = Assessment.for_context(@context)
       @assessments, meta = Api.jsonapi_paginate(@assessments, self, polymorphic_url([:api_v1, @context, :live_assessments]))
 
-      render json: serialize_jsonapi(@assessments).merge(meta: meta)
+      render json: serialize_jsonapi(@assessments).merge(meta:)
     end
 
     protected

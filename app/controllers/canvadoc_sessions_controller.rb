@@ -90,7 +90,7 @@ class CanvadocSessionsController < ApplicationController
       submission_id = blob["submission_id"]
       if submission_id
         submission = Submission.preload(:assignment).find(submission_id)
-        options = { submission: submission }
+        options = { submission: }
 
         if blob["annotation_context"]
           attempt = submission.canvadocs_annotation_contexts.find_by(launch_id: blob["annotation_context"])&.submission_attempt
@@ -99,7 +99,7 @@ class CanvadocSessionsController < ApplicationController
 
         user_session_params = Canvadocs.user_session_params(@current_user, **options)
       else
-        user_session_params = Canvadocs.user_session_params(@current_user, attachment: attachment)
+        user_session_params = Canvadocs.user_session_params(@current_user, attachment:)
       end
 
       if opts[:enable_annotations]

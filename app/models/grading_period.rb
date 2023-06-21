@@ -68,7 +68,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def self.date_in_closed_grading_period?(course:, date:, periods: nil)
-    period = for_date_in_course(date: date, course: course, periods: periods)
+    period = for_date_in_course(date:, course:, periods:)
     period.present? && period.closed?
   end
 
@@ -104,7 +104,7 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   def assignments_for_student(course, assignments, student, includes: [])
-    assignment_ids = GradebookGradingPeriodAssignments.new(course, student: student, includes: includes).to_h.fetch(id, [])
+    assignment_ids = GradebookGradingPeriodAssignments.new(course, student:, includes:).to_h.fetch(id, [])
     if assignment_ids.empty?
       []
     else
@@ -168,7 +168,7 @@ class GradingPeriod < ActiveRecord::Base
   def as_json_with_user_permissions(user)
     as_json(
       only: %i[id title start_date end_date close_date weight],
-      permissions: { user: user },
+      permissions: { user: },
       methods: [:is_last, :is_closed]
     ).fetch(:grading_period)
   end
@@ -242,13 +242,13 @@ class GradingPeriod < ActiveRecord::Base
 
   def siblings
     grading_periods = self.class.where(
-      grading_period_group_id: grading_period_group_id
+      grading_period_group_id:
     )
 
     if new_record?
       grading_periods
     else
-      grading_periods.where.not(id: id)
+      grading_periods.where.not(id:)
     end
   end
 

@@ -54,9 +54,9 @@ class CanvasLogger < ActiveSupport::Logger
     old_logdev.close
   end
 
-  def capture_messages(&block)
+  def capture_messages(&)
     CanvasLogger.prepend Capture unless CanvasLogger.include?(Capture)
-    capture_messages(&block)
+    capture_messages(&)
   end
 
   def capture_messages!

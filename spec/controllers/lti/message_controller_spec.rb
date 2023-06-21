@@ -35,7 +35,7 @@ module Lti
       ResourceHandler.create!(
         resource_type_code: "instructure.com:default",
         name: "resource name",
-        tool_proxy: tool_proxy
+        tool_proxy:
       )
     end
 
@@ -293,7 +293,7 @@ module Lti
         end
 
         context "when secure params are given" do
-          subject { get "basic_lti_launch_request", params: params }
+          subject { get "basic_lti_launch_request", params: }
 
           let(:due_at) { Time.zone.now }
 
@@ -305,12 +305,12 @@ module Lti
             {
               course_id: course.id,
               message_handler_id: message_handler.id,
-              secure_params: secure_params
+              secure_params:
             }
           end
 
           before do
-            assignment.update!(due_at: due_at)
+            assignment.update!(due_at:)
 
             message_handler.update!(
               parameters: [
@@ -353,7 +353,7 @@ module Lti
 
     describe "GET #basic_lti_launch_request" do
       before do
-        course_with_student(account: account, active_all: true)
+        course_with_student(account:, active_all: true)
         user_session(@student)
       end
 
@@ -418,7 +418,7 @@ module Lti
           end
 
           let_once(:course) { course_model }
-          let_once(:assignment) { assignment_model(course: course) }
+          let_once(:assignment) { assignment_model(course:) }
 
           before { message_handler.update!(capabilities: ["com.instructure.Assignment.anonymous_grading"]) }
 
@@ -484,7 +484,7 @@ module Lti
               message = orig_new.call(*args)
             end
 
-            ToolSetting.create(tool_proxy: tool_proxy,
+            ToolSetting.create(tool_proxy:,
                                context_id: nil,
                                context_type: nil,
                                resource_link_id: nil,
@@ -612,7 +612,7 @@ module Lti
         end
 
         it "returns tool settings in the launch" do
-          ToolSetting.create(tool_proxy: tool_proxy,
+          ToolSetting.create(tool_proxy:,
                              context_id: nil,
                              context_type: nil,
                              resource_link_id: nil,
@@ -625,7 +625,7 @@ module Lti
         end
 
         it "does not do variable substitutions for tool settings" do
-          ToolSetting.create(tool_proxy: tool_proxy,
+          ToolSetting.create(tool_proxy:,
                              context_id: nil,
                              context_type: nil,
                              resource_link_id: nil,
@@ -639,7 +639,7 @@ module Lti
 
         it "adds params from secure_params" do
           lti_assignment_id = SecureRandom.uuid
-          jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
+          jwt = Canvas::Security.create_jwt({ lti_assignment_id: })
           get "basic_lti_launch_request", params: { account_id: account.id,
                                                     message_handler_id: message_handler.id,
                                                     secure_params: jwt }
@@ -649,7 +649,7 @@ module Lti
 
         it "uses the lti_assignment_id as the resource_link_id" do
           lti_assignment_id = SecureRandom.uuid
-          jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
+          jwt = Canvas::Security.create_jwt({ lti_assignment_id: })
           get "basic_lti_launch_request", params: { account_id: account.id,
                                                     message_handler_id: message_handler.id,
                                                     secure_params: jwt }

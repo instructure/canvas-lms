@@ -156,7 +156,7 @@ class Feature
       @features[feature] = if attrs[:state] == STATE_DISABLED
                              DISABLED_FEATURE
                            else
-                             Feature.new({ feature: feature }.merge(attrs))
+                             Feature.new({ feature: }.merge(attrs))
                            end
     end
   end

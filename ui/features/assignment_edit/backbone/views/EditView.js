@@ -928,9 +928,24 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
   this.selectedTool = _.find(this.model.submissionTypeSelectionTools(), function (tool) {
     return toolId === tool.id
   })
-  if (!this.$externalToolExternalData.val()) {
+
+  const hasNoExtToolData = !this.$externalToolExternalData.val()
+  const toolIdsMatch = toolId === this.assignment.selectedSubmissionTypeToolId()
+  const extToolUrlsMatch = this.$externalToolsUrl.val() === this.assignment.externalToolUrl()
+
+  if (hasNoExtToolData && !(toolIdsMatch && extToolUrlsMatch)) {
+    // Set the URL of the tool, but only if we haven't just come back from a
+    // deep linking response (so we'll have a URL from the deep linking
+    // response); also don't set if we are just editing the assignment (in this
+    // case the URL [this.$externalToolsUrl] will be the assignment URL)
     this.$externalToolsUrl.val(this.selectedTool.external_url)
+    // Ensure that custom params & other stuff left over from another previous
+    // deep link response get cleared out when the user chooses a tool:
+    this.$externalToolsCustomParams.val('')
+    this.$externalToolsIframeWidth.val('')
+    this.$externalToolsIframeHeight.val('')
   }
+
   this.$externalToolPlacementLaunchButtonText.text(this.selectedTool.title)
   return this.$externalToolPlacementLaunchButton.click(
     (function (_this) {

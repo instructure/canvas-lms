@@ -40,14 +40,14 @@ module AdheresToPolicy
     def self.fetch(key, use_rails_cache: true)
       return [yield, :bypass_generated] unless key
 
-      value, how_it_got_it = read(key, use_rails_cache: use_rails_cache)
+      value, how_it_got_it = read(key, use_rails_cache:)
       if value.nil? && block_given?
         how_it_got_it = :generated
         start_time = Time.now
         value = yield
         elapsed = Time.now - start_time
         Thread.current[:last_cache_generate] = elapsed # so we can record it in the logs
-        write(key, value, use_rails_cache: use_rails_cache)
+        write(key, value, use_rails_cache:)
       end
 
       [value, how_it_got_it]

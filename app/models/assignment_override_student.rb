@@ -95,7 +95,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
                         .pluck(:user_id)
 
     AssignmentOverrideStudent
-      .where(assignment: assignment)
+      .where(assignment:)
       .where.not(user_id: valid_student_ids)
       .each do |aos|
       aos.assignment_override.skip_broadcasts = true

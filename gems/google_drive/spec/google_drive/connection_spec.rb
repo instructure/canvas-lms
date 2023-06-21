@@ -112,7 +112,7 @@ describe GoogleDrive::Connection do
         stub_request(:get, url)
           .to_return(
             status: http_status,
-            body: body,
+            body:,
             headers: { "Content-Type" => "application/json" }
           )
       end

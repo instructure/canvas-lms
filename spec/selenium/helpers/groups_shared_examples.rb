@@ -339,7 +339,7 @@ shared_examples "conferences_page" do |context|
     skip_if_chrome("issue with invite_all_but_one_user method")
     title = "test conference"
     get conferences_page
-    create_conference(title: title)
+    create_conference(title:)
     expect(f("#new-conference-list .ig-title").text).to include(title)
   end
 

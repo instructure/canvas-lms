@@ -91,6 +91,7 @@ export type GradebookOptions = {
   assignment_missing_shortcut: boolean
   attachment_url: null | string
   attachment: null | AttachmentData
+  change_grade_url: string
   change_gradebook_version_url: string
   colors: StatusColors
   context_allows_gradebook_uploads: boolean
@@ -434,6 +435,8 @@ export type AssignmentWithOverride = {
 export type Progress = {
   id: string
   workflow_state: string
+  message?: string
+  updated_at?: string
 }
 
 export type ProgressCamelized = {

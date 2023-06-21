@@ -45,7 +45,7 @@ class NotificationMessageCreator
     root_account_id = @message_data&.dig(:root_account_id)
     if course_ids.any? && root_account_id
       @account = Account.find_cached(root_account_id)
-      @courses = course_ids.map { |id| Course.new(id: id, root_account_id: @account&.id) }
+      @courses = course_ids.map { |id| Course.new(id:, root_account_id: @account&.id) }
     end
   end
 
@@ -68,7 +68,7 @@ class NotificationMessageCreator
       # date is different for a specific user when using variable due dates.
       next unless (asset = asset_applied_to(user))
 
-      user_locale = infer_locale(user: user, context: user_asset_context(asset), ignore_browser_locale: true)
+      user_locale = infer_locale(user:, context: user_asset_context(asset), ignore_browser_locale: true)
       I18n.with_locale(user_locale) do
         # the channels in this method are all the users active channels or the
         # channels that were provided in the to_list.
@@ -322,7 +322,7 @@ class NotificationMessageCreator
       subject: @notification.subject,
       notification: @notification,
       notification_name: @notification.name,
-      user: user,
+      user:,
       context: user_asset,
     }
 

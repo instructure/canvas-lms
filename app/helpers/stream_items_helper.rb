@@ -92,7 +92,7 @@ module StreamItemsHelper
   def extract_updated_at(category, item, user)
     case category
     when "Conversation"
-      item.data.conversation_participants.find_by(user: user)&.last_message_at
+      item.data.conversation_participants.find_by(user:)&.last_message_at
     else
       item.data.respond_to?(:updated_at) ? item.data.updated_at : nil
     end
@@ -118,7 +118,7 @@ module StreamItemsHelper
     when "AssessmentRequest"
       submission = item.data.asset
       Submission::ShowPresenter.new(
-        submission: submission,
+        submission:,
         current_user: user,
         assessment_request: item.data
       ).submission_data_url

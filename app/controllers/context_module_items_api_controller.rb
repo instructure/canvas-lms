@@ -740,7 +740,7 @@ class ContextModuleItemsApiController < ApplicationController
           assignment_id: new_tag.assignment.try(:id),
           is_duplicate_able: new_tag.duplicate_able?
         )
-        render json: json
+        render json:
       else
         render status: :bad_request, json: { message: t("Item cannot be duplicated") }
       end

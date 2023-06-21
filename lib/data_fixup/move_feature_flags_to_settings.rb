@@ -85,7 +85,7 @@ module DataFixup::MoveFeatureFlagsToSettings
 
     unless override_value.nil?
       if context.is_a?(Account)
-        context.settings[setting_name] = inherited ? { locked: locked, value: override_value } : override_value
+        context.settings[setting_name] = inherited ? { locked:, value: override_value } : override_value
       else
         context.settings_frd[setting_name] = override_value
       end

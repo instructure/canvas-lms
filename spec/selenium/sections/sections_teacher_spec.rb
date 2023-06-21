@@ -47,7 +47,7 @@ describe "sections" do
       course_with_teacher_logged_in(active_course: true, active_user: true)
       custom_student = user_factory(name: "Señor Chang")
       role = custom_student_role("CustomStudentRole", account: @course.account)
-      @course.enroll_user(custom_student, "StudentEnrollment", role: role)
+      @course.enroll_user(custom_student, "StudentEnrollment", role:)
 
       get "/courses/#{@course.id}/sections/#{@course.default_section.id}"
       wait_for_ajaximations

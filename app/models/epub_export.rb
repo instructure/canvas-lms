@@ -111,7 +111,7 @@ class EpubExport < ActiveRecord::Base
 
   def export
     create_content_export!({
-                             user: user,
+                             user:,
                              export_type: ContentExport::COMMON_CARTRIDGE,
                              selected_content: { everything: true },
                              progress: 0,
@@ -214,7 +214,7 @@ class EpubExport < ActiveRecord::Base
   def set_locale
     I18n.locale = infer_locale(
       context: course,
-      user: user,
+      user:,
       root_account: course.root_account
     )
   end

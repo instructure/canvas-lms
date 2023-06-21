@@ -23,7 +23,8 @@ import PropTypes from 'prop-types'
 
 import {Table} from '@instructure/ui-table'
 
-import {getGradingPeriodID} from './utils'
+import {GradeSummaryContext} from './context'
+import {getGradingPeriodID, sortAssignments} from './utils'
 
 import {totalRow} from './AssignmentTableRows/TotalRow'
 import {assignmentGroupRow} from './AssignmentTableRows/AssignmentGroupRow'
@@ -33,10 +34,10 @@ import {assignmentRow} from './AssignmentTableRows/AssignmentRow'
 const I18n = useI18nScope('grade_summary')
 
 const headers = [
-  {key: 'name', value: I18n.t('Name'), id: nanoid()},
-  {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid()},
-  {key: 'status', value: I18n.t('Status'), id: nanoid()},
-  {key: 'score', value: I18n.t('Score'), id: nanoid()},
+  {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},
+  {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid(), alignment: 'start', width: '20%'},
+  {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '10%'},
+  {key: 'score', value: I18n.t('Score'), id: nanoid(), alignment: 'center', width: '10%'},
 ]
 
 const AssignmentTable = ({
@@ -46,27 +47,36 @@ const AssignmentTable = ({
   setSelectedSubmission,
   handleReadStateChange,
 }) => {
+  const {assignmentSortBy} = React.useContext(GradeSummaryContext)
+
   return (
     <Table caption={I18n.t('Student Grade Summary')} layout={layout} hover={true}>
       <Table.Head>
         <Table.Row>
           {(headers || []).map(header => (
-            <Table.ColHeader key={header?.key} id={header?.id}>
+            <Table.ColHeader
+              key={header?.key}
+              id={header?.id}
+              textAlign={header?.alignment}
+              width={header?.width}
+            >
               {header?.value}
             </Table.ColHeader>
           ))}
         </Table.Row>
       </Table.Head>
       <Table.Body>
-        {queryData?.assignmentsConnection?.nodes?.map(assignment => {
-          return assignmentRow(
-            assignment,
-            queryData,
-            setShowTray,
-            setSelectedSubmission,
-            handleReadStateChange
-          )
-        })}
+        {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)?.map(
+          assignment => {
+            return assignmentRow(
+              assignment,
+              queryData,
+              setShowTray,
+              setSelectedSubmission,
+              handleReadStateChange
+            )
+          }
+        )}
         {getGradingPeriodID() !== '0'
           ? queryData?.assignmentGroupsConnection?.nodes?.map(assignmentGroup => {
               return assignmentGroupRow(assignmentGroup, queryData)

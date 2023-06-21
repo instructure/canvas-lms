@@ -54,7 +54,7 @@ describe "Canvas::Twilio" do
     client = double("Canvas::Twilio.client")
     allow(client).to receive(:lookups).and_return(lookups)
     allow(client).to receive(:api).and_return(
-      double("Canvas::Twilio.client.api", account: account)
+      double("Canvas::Twilio.client.api", account:)
     )
     allow(Canvas::Twilio).to receive(:client).and_return(client)
   end

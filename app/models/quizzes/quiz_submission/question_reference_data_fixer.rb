@@ -115,7 +115,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
                                                     }).select([:id, :question_data])
 
     quiz_questions = Quizzes::QuizQuestion.where({
-                                                   quiz_id: quiz_id,
+                                                   quiz_id:,
                                                    assessment_question_id: assessment_questions.map(&:id)
                                                  }).select(%i[id quiz_id assessment_question_id]).to_a
 

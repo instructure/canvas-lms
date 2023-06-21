@@ -25,6 +25,7 @@ import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('k5_utils')
 
@@ -217,6 +218,25 @@ export const getAssignmentGroupTotals = (
     }
   })
 }
+// Take an assignment and submission and output the expected value when Restrict_quantitative_data is enabled
+const formatGradeToRQD = (assignment, submission) => {
+  if (!ENV.RESTRICT_QUANTITATIVE_DATA) return
+  let rqdFormattedGrade = ''
+  // When RQD is on and score and points possible === 0, we have a special case where we want the grade to be displayed as "complete"
+  if (submission?.score === 0 && assignment?.points_possible === 0) {
+    rqdFormattedGrade = 'complete'
+  } else {
+    rqdFormattedGrade = GradeFormatHelper.formatGrade(submission?.grade, {
+      gradingType: assignment.grading_type,
+      pointsPossible: assignment.points_possible,
+      score: submission?.score,
+      restrict_quantitative_data: ENV.RESTRICT_QUANTITATIVE_DATA,
+      grading_scheme: ENV.GRADING_SCHEME,
+    })
+  }
+
+  return rqdFormattedGrade
+}
 
 /* Takes raw response from assignment_groups API and returns an array of assignments with
    grade information, sorted by due date. */
@@ -225,6 +245,10 @@ export const getAssignmentGrades = (data, observedUserId) => {
     .map(group =>
       group.assignments.map(a => {
         const submission = getSubmission(a, observedUserId)
+        const rqd_grading_type = !['not_graded', 'pass_fail', 'gpa_scale'].includes(a.grading_type)
+          ? 'letter_grade'
+          : a.grading_type
+        const rqdFormattedGrade = formatGradeToRQD(a, submission)
         return {
           id: a.id,
           assignmentName: a.name,
@@ -233,10 +257,10 @@ export const getAssignmentGrades = (data, observedUserId) => {
           assignmentGroupName: group.name,
           assignmentGroupId: group.id,
           pointsPossible: a.points_possible,
-          gradingType: a.grading_type,
-          restrictQuantitativeData: a.restrict_quantitative_data,
+          gradingType: ENV.RESTRICT_QUANTITATIVE_DATA ? rqd_grading_type : a.grading_type,
+          restrictQuantitativeData: ENV.RESTRICT_QUANTITATIVE_DATA,
           score: submission?.score,
-          grade: submission?.grade,
+          grade: ENV.RESTRICT_QUANTITATIVE_DATA ? rqdFormattedGrade : submission?.grade,
           submissionDate: submission?.submitted_at,
           unread: submission?.read_state === 'unread',
           late: submission?.late,

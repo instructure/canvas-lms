@@ -117,7 +117,7 @@ module AssignmentUtil
     def apply
       submissions.find_each do |submission|
         unless seen_assignment_recently?(submission.student)
-          yield assignment: assignment, submission: submission
+          yield assignment:, submission:
         end
       end
     end

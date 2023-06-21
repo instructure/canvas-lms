@@ -27,7 +27,7 @@ class SubAccountsController < ApplicationController
   # authorized to act on all its sub-accounts too.
 
   def sub_accounts_of(account, current_depth = 0)
-    account_data = @accounts[account.id] = { account: account, course_count: 0 }
+    account_data = @accounts[account.id] = { account:, course_count: 0 }
     sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key("name")).limit(101) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100

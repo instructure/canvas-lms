@@ -32,8 +32,8 @@ class Quizzes::QuizRegrader::Submission
     # regrade all previous versions
     submission.attempts.last_versions.each do |version|
       Quizzes::QuizRegrader::AttemptVersion.new(
-        version: version,
-        question_regrades: question_regrades
+        version:,
+        question_regrades:
       ).regrade!
     end
 

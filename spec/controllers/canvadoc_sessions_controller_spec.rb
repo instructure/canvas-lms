@@ -66,7 +66,7 @@ describe CanvadocSessionsController do
 
     it "is unauthorized for teachers attempting to access a draft" do
       user_session(@teacher)
-      post :create, params: params
+      post(:create, params:)
       expect(response).to have_http_status(:unauthorized)
     end
 
@@ -79,7 +79,7 @@ describe CanvadocSessionsController do
 
     it "renders unauthorized if the assignment is not annotatable" do
       @assignment.update!(annotatable_attachment_id: nil)
-      post :create, params: params
+      post(:create, params:)
       expect(response).to have_http_status(:unauthorized)
     end
 
@@ -97,7 +97,7 @@ describe CanvadocSessionsController do
       @assignment.update!(allowed_attempts: 2)
       @submission.update!(attempt: 2)
 
-      post :create, params: params
+      post(:create, params:)
 
       aggregate_failures do
         expect(response).to have_http_status(:bad_request)
@@ -122,34 +122,34 @@ describe CanvadocSessionsController do
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
       user_session(observer)
 
-      post :create, params: params
+      post(:create, params:)
       expect(response).to have_http_status(:ok)
     end
 
     it "contains a canvadocs_session_url in the response" do
-      post :create, params: params
+      post(:create, params:)
       expect(json_parse(response.body)["canvadocs_session_url"]).not_to be_nil
     end
 
     it "contains the annotation context launch id in the response" do
-      post :create, params: params
+      post(:create, params:)
 
       launch_id = @submission.annotation_context(draft: true).launch_id
       expect(json_parse(response.body)["annotation_context_launch_id"]).to eq(launch_id)
     end
 
     it "contains a blob param in the returned canvadocs_session_url" do
-      post :create, params: params
+      post(:create, params:)
       expect(canvadocs_session_url_params["blob"]).not_to be_nil
     end
 
     it "contains an hmac param in the returned canvadocs_session_url" do
-      post :create, params: params
+      post(:create, params:)
       expect(canvadocs_session_url_params["hmac"]).not_to be_nil
     end
 
     it "successfully signed the blob" do
-      post :create, params: params
+      post(:create, params:)
       expect do
         extract_blob(canvadocs_session_url_params["hmac"], canvadocs_session_url_params["blob"])
       end.not_to raise_error
@@ -183,17 +183,17 @@ describe CanvadocSessionsController do
       end
 
       it "contains the attachment_id" do
-        post :create, params: params
+        post(:create, params:)
         expect(blob["attachment_id"]).to be @attachment.id
       end
 
       it "contains the submission_id" do
-        post :create, params: params
+        post(:create, params:)
         expect(blob["submission_id"]).to be @submission.id
       end
 
       it "disables the annotation notifications" do
-        post :create, params: params
+        post(:create, params:)
         expect(blob["disable_annotation_notifications"]).to be true
       end
 
@@ -201,7 +201,7 @@ describe CanvadocSessionsController do
         observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
         user_session(observer)
 
-        post :create, params: params
+        post(:create, params:)
         expect(blob["enable_annotations"]).to be false
       end
     end
@@ -243,7 +243,7 @@ describe CanvadocSessionsController do
                                      context: @course
       @blob[:attachment_id] = attachment2.id
 
-      get :show, params: { blob: @blob.to_json, hmac: hmac }
+      get :show, params: { blob: @blob.to_json, hmac: }
       assert_status(401)
     end
 
@@ -423,7 +423,7 @@ describe CanvadocSessionsController do
     it "needs to be run by the blob user" do
       @blob[:user_id] = @student.global_id
       blob = @blob.to_json
-      get :show, params: { blob: blob, hmac: Canvas::Security.hmac_sha1(blob) }
+      get :show, params: { blob:, hmac: Canvas::Security.hmac_sha1(blob) }
       assert_status(401)
     end
 
@@ -437,7 +437,7 @@ describe CanvadocSessionsController do
       remove_user_session
       @blob[:user_id] = nil
       blob = @blob.to_json
-      get :show, params: { blob: blob, hmac: Canvas::Security.hmac_sha1(blob) }
+      get :show, params: { blob:, hmac: Canvas::Security.hmac_sha1(blob) }
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end
 
@@ -461,7 +461,7 @@ describe CanvadocSessionsController do
 
       user_session(@student)
 
-      get :show, params: { blob: blob, hmac: Canvas::Security.hmac_sha1(blob) }
+      get :show, params: { blob:, hmac: Canvas::Security.hmac_sha1(blob) }
 
       @attachment1.reload
       expect(@attachment1.viewed_at).not_to eq(last_viewed_at)
@@ -478,7 +478,7 @@ describe CanvadocSessionsController do
 
       user_session(@student)
 
-      get :show, params: { blob: blob, hmac: hmac }
+      get :show, params: { blob:, hmac: }
 
       attachment.reload
       expect(attachment.viewed_at).not_to eq(last_viewed_at)
@@ -627,7 +627,7 @@ describe CanvadocSessionsController do
         url = submission_docviewer_audit_events_url(@submission.id)
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(audit_url: url))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "sends along the audit url when annotations are enabled and assignment is moderated" do
@@ -635,7 +635,7 @@ describe CanvadocSessionsController do
         url = submission_docviewer_audit_events_url(@submission.id)
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(audit_url: url))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "does not send the audit url when annotations are enabled but assignment is neither anonymous nor moderated" do
@@ -643,7 +643,7 @@ describe CanvadocSessionsController do
         url = "https://#{domain}/submissions/#{@submission.id}/docviewer_audit_events"
         expect(@attachment.canvadoc).not_to receive(:session_url).with(hash_including(audit_url: url))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "disables submission annotations when passed enable_annotations false" do
@@ -657,20 +657,20 @@ describe CanvadocSessionsController do
       it "enables submission annotations when passed enable_annotations true" do
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(enable_annotations: true))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "marks unread annotations read" do
         @student.mark_submission_annotations_unread!(@submission)
         expect(@student.unread_submission_annotations?(@submission)).to be true
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
         expect(@student.unread_submission_annotations?(@submission)).to be false
       end
 
       it "passes use_cloudfront as true" do
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: true))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "passes send_usage_metrics as true" do
@@ -680,14 +680,14 @@ describe CanvadocSessionsController do
 
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(send_usage_metrics: true))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "passes user information based on the submission (if past submission / missing attachment assocation)" do
         @submission.attachment_associations.destroy_all
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(user_id: @student.global_id.to_s))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "sends anonymous_instructor_annotations when true in the blob" do
@@ -696,7 +696,7 @@ describe CanvadocSessionsController do
         expect_any_instance_of(Canvadoc).to receive(:session_url)
           .with(hash_including(anonymous_instructor_annotations: true))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "doesn't send anonymous_instructor_annotations when false in the blob" do
@@ -705,21 +705,21 @@ describe CanvadocSessionsController do
         expect_any_instance_of(Canvadoc).to receive(:session_url)
           .with(hash_excluding(:anonymous_instructor_annotations))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "doesn't send anonymous_instructor_annotations when missing" do
         expect_any_instance_of(Canvadoc).to receive(:session_url)
           .with(hash_excluding(:anonymous_instructor_annotations))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       it "gets the user role if not passed as a parameter" do
         expect_any_instance_of(Canvadoc).to receive(:session_url)
           .with(hash_including(enrollment_type: "student"))
 
-        get :show, params: { blob: blob.to_json, hmac: hmac }
+        get :show, params: { blob: blob.to_json, hmac: }
       end
 
       context "when the attachment belongs to a non-anonymously-graded assignment" do
@@ -727,7 +727,7 @@ describe CanvadocSessionsController do
           expect_any_instance_of(Canvadoc).to receive(:session_url)
             .with(hash_including(enable_annotations: true))
 
-          get :show, params: { blob: blob.to_json, hmac: hmac }
+          get :show, params: { blob: blob.to_json, hmac: }
         end
 
         it "disables submission annotations if enable_annotations is false" do

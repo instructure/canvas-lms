@@ -22,7 +22,7 @@ if Qti.migration_executable
   describe "Converting a cengage QTI" do
     it "gets the question bank name and id" do
       qti_data = file_as_string(cengage_question_dir, "question_with_bank.xml")
-      hash = Qti::AssessmentItemConverter.create_instructure_question(qti_data: qti_data)
+      hash = Qti::AssessmentItemConverter.create_instructure_question(qti_data:)
       expect(hash[:question_bank_name]).to eq "Practice Test Chapter 2"
       expect(hash[:question_bank_id]).to eq "res00013"
     end

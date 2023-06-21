@@ -44,9 +44,9 @@ describe AddressBook::MessageableUser do
       section1 = course.course_sections.create!
       section2 = course.course_sections.create!
 
-      student1 = student_in_course(user: @sender, course: course, active_all: true, section: section1, limit_privileges_to_course_section: true).user
-      student2 = student_in_course(course: course, active_all: true, section: section2, limit_privileges_to_course_section: true).user
-      student3 = student_in_course(course: course, active_all: true, section: section2, limit_privileges_to_course_section: true).user
+      student1 = student_in_course(user: @sender, course:, active_all: true, section: section1, limit_privileges_to_course_section: true).user
+      student2 = student_in_course(course:, active_all: true, section: section2, limit_privileges_to_course_section: true).user
+      student3 = student_in_course(course:, active_all: true, section: section2, limit_privileges_to_course_section: true).user
 
       group = group_with_user(user: student1, group_context: course).group
       group.add_user(student2)
@@ -61,8 +61,8 @@ describe AddressBook::MessageableUser do
       course = course_factory(active_all: true)
       topic = course.discussion_topics.create!
 
-      student1 = student_in_course(user: @sender, course: course, active_all: true).user
-      student2 = student_in_course(course: course, active_all: true).user
+      student1 = student_in_course(user: @sender, course:, active_all: true).user
+      student2 = student_in_course(course:, active_all: true).user
 
       address_book = AddressBook::MessageableUser.new(student1)
       known_users = address_book.known_users([student2], context: topic)
@@ -72,9 +72,9 @@ describe AddressBook::MessageableUser do
     it "works for a group discussion topic" do
       course = course_factory(active_all: true)
 
-      student1 = student_in_course(user: @sender, course: course, active_all: true).user
-      student2 = student_in_course(course: course, active_all: true).user
-      student3 = student_in_course(course: course, active_all: true).user
+      student1 = student_in_course(user: @sender, course:, active_all: true).user
+      student2 = student_in_course(course:, active_all: true).user
+      student3 = student_in_course(course:, active_all: true).user
       group = group_with_user(user: student1, group_context: course).group
       group.add_user(student2)
       topic = group.discussion_topics.create!
@@ -164,7 +164,7 @@ describe AddressBook::MessageableUser do
         # doesn't know of recipient's participation, likely because of section
         # limited enrollment.
         section = @course3.course_sections.create!
-        teacher_in_course(user: @sender, course: @course3, active_all: true, section: section, limit_privileges_to_course_section: true)
+        teacher_in_course(user: @sender, course: @course3, active_all: true, section:, limit_privileges_to_course_section: true)
         expect(@address_book.known_users([@recipient], context: @course3)).to be_empty
         expect(@address_book.common_courses(@recipient)).not_to include(@course3.id)
       end
@@ -209,7 +209,7 @@ describe AddressBook::MessageableUser do
         teacher = enrollment.user
         course = enrollment.course
         student = @shard2.activate { user_factory(active_all: true) }
-        student_in_course(course: course, user: student, active_all: true)
+        student_in_course(course:, user: student, active_all: true)
         address_book = AddressBook::MessageableUser.new(teacher)
         known_users = address_book.known_users([student])
         expect(known_users.map(&:id)).to include(student.id)
@@ -404,7 +404,7 @@ describe AddressBook::MessageableUser do
       student = enrollment.user
       course = enrollment.course
       section = course.course_sections.create!
-      teacher_in_course(user: admin, course: course, active_all: true, section: section, limit_privileges_to_course_section: true)
+      teacher_in_course(user: admin, course:, active_all: true, section:, limit_privileges_to_course_section: true)
       address_book = AddressBook::MessageableUser.new(admin)
       known_users = address_book.search_users(search: "Bob", context: course.asset_string).paginate(per_page: 10)
       expect(known_users.map(&:id)).not_to include(student.id)

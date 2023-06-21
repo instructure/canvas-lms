@@ -100,7 +100,7 @@ module DifferentiatedAssignments
       submission_types: "online_text_entry",
       only_visible_to_overrides: true
     )
-    @da_discussion = @course.discussion_topics.create!(title: "DA Discussion", assignment: assignment)
+    @da_discussion = @course.discussion_topics.create!(title: "DA Discussion", assignment:)
     @da_discussion
   end
 

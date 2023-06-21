@@ -31,7 +31,7 @@ class Mutations::UpdateDiscussionReadState < Mutations::BaseMutation
     discussion_topic.change_all_read_state(read_state, current_user, forced: false)
 
     {
-      discussion_topic: discussion_topic
+      discussion_topic:
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"

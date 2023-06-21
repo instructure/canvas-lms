@@ -158,7 +158,7 @@ class PlannerOverridesController < ApplicationController
   def create
     plannable_type = PlannerHelper::PLANNABLE_TYPES[params[:plannable_type]]
     plannable = plannable_type.constantize.find(params[:plannable_id])
-    planner_override = PlannerOverride.new(plannable: plannable,
+    planner_override = PlannerOverride.new(plannable:,
                                            marked_complete: value_to_boolean(params[:marked_complete]),
                                            user: @current_user,
                                            dismissed: value_to_boolean(params[:dismissed]))

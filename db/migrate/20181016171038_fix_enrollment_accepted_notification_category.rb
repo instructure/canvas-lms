@@ -90,7 +90,7 @@ class FixEnrollmentAcceptedNotificationCategory < ActiveRecord::Migration[5.1]
         NotificationPolicy
           .where(notification_id: n.id)
           .where(communication_channel_id: communication_channel_ids)
-          .update_all(frequency: frequency)
+          .update_all(frequency:)
       end
     end
   end

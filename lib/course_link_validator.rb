@@ -247,7 +247,7 @@ class CourseLinkValidator
     end
 
     unless result == :success
-      invalid_link = { url: url, reason: result }
+      invalid_link = { url:, reason: result }
       yield invalid_link
     end
   end

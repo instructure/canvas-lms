@@ -217,7 +217,7 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@assignment_group, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url, @assignment_group.context_id)) }
-        format.json { render json: @assignment_group.as_json(permissions: { user: @current_user, session: session }) }
+        format.json { render json: @assignment_group.as_json(permissions: { user: @current_user, session: }) }
       end
     end
   end
@@ -234,7 +234,7 @@ class AssignmentGroupsController < ApplicationController
           @assignment_group.insert_at(1)
           flash[:notice] = t "notices.created", "Assignment Group was successfully created."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.json { render json: @assignment_group.as_json(permissions: { user: @current_user, session: session }), status: :created }
+          format.json { render json: @assignment_group.as_json(permissions: { user: @current_user, session: }), status: :created }
         else
           format.json { render json: @assignment_group.errors, status: :bad_request }
         end
@@ -255,7 +255,7 @@ class AssignmentGroupsController < ApplicationController
           @assignment_group = updated
           flash[:notice] = t "notices.updated", "Assignment Group was successfully updated."
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.json { render json: @assignment_group.as_json(permissions: { user: @current_user, session: session }), status: :ok }
+          format.json { render json: @assignment_group.as_json(permissions: { user: @current_user, session: }), status: :ok }
         else
           format.json { render json: @assignment_group.errors, status: :bad_request }
         end
@@ -385,12 +385,12 @@ class AssignmentGroupsController < ApplicationController
         assignments: group_assignments,
         assignment_visibilities: assignment_visibilities(context, assignments),
         exclude_response_fields: assignment_excludes,
-        include_overrides: include_overrides,
-        include_score_statistics: include_score_statistics,
-        submissions: submissions,
-        closed_grading_period_hash: closed_grading_period_hash,
+        include_overrides:,
+        include_score_statistics:,
+        submissions:,
+        closed_grading_period_hash:,
         master_course_status: mc_status,
-        include_assessment_requests: include_assessment_requests
+        include_assessment_requests:
       }
 
       assignment_group_json(group, current_user, session, overwritten_includes, options)
@@ -427,7 +427,7 @@ class AssignmentGroupsController < ApplicationController
       context,
       groups,
       includes: assignment_includes,
-      assignment_ids: assignment_ids
+      assignment_ids:
     )
 
     if value_to_boolean(params[:hide_zero_point_quizzes])

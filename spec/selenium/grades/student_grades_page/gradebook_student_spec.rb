@@ -84,7 +84,7 @@ describe "Student Gradebook" do
         observer = user_factory(name: "Observer", active_all: true, active_state: "active")
         [course1, course2, course3].each do |course|
           enrollment = ObserverEnrollment.new(user: observer,
-                                              course: course,
+                                              course:,
                                               workflow_state: "active")
 
           enrollment.associated_user_id = student
@@ -124,7 +124,7 @@ describe "Student Gradebook" do
     ]
 
     grades.each_with_index do |grade, index|
-      assignments[index / 3].grade_student @students[index % 3], grade: grade, grader: @teacher
+      assignments[index / 3].grade_student @students[index % 3], grade:, grader: @teacher
     end
 
     get "/courses/#{@course.id}/grades/#{@students[0].id}"
@@ -181,28 +181,6 @@ describe "Student Gradebook" do
     f("#only_consider_graded_assignments_wrapper").click
     expect(f(".final_grade").text).to eq "Total\n66.67%\n40.00 / 60.00"
     expect(f("#final_letter_grade_text").text).to eq "D"
-  end
-
-  it "coerces total to letter-grade when user is quantitative data restricted" do
-    # truthy feature flag
-    Account.default.enable_feature! :restrict_quantitative_data
-
-    # truthy setting
-    Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-    Account.default.save!
-
-    # truthy permission(since enabled is being "not"ed)
-    Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-    Account.default.reload
-
-    init_course_with_students
-    user_session(@teacher)
-
-    assignments[0].grade_student @students[0], grade: 20, grader: @teacher
-    assignments[1].grade_student @students[0], grade: 20, grader: @teacher
-
-    get "/courses/#{@course.id}/grades/#{@students[0].id}"
-    expect(f(".final_grade").text).to eq("Total: A")
   end
 
   it "follows grade dropping rules", priority: "1" do
@@ -323,7 +301,7 @@ describe "Student Gradebook" do
       )
 
       @discussion = @course.discussion_topics.create!(
-        assignment: assignment,
+        assignment:,
         title: "Physics Beta Discussion"
       )
 

@@ -173,11 +173,11 @@ class Announcement < DiscussionTopic
       student = enrollment.associated_user
       next unless visible_for?(student)
 
-      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: "course_announcement", student: student).first
+      threshold = ObserverAlertThreshold.where(observer:, alert_type: "course_announcement", student:).first
       next unless threshold
 
-      ObserverAlert.create!(observer: observer,
-                            student: student,
+      ObserverAlert.create!(observer:,
+                            student:,
                             observer_alert_threshold: threshold,
                             context: self,
                             alert_type: "course_announcement",

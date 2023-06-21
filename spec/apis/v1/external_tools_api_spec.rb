@@ -362,7 +362,7 @@ describe ExternalToolsController, type: :request do
           let(:tool) do
             t = super()
             t.settings[:environments] = {
-              domain: domain
+              domain:
             }
             t.save!
             t
@@ -747,14 +747,14 @@ describe ExternalToolsController, type: :request do
   def index_call_with_placement(context, placement)
     type = context.class.table_name
     tool_with_everything(context).update(name: "tool 1")
-    et_with_placement = tool_with_everything(context, { placement: placement })
+    et_with_placement = tool_with_everything(context, { placement: })
 
     json = api_call(:get,
                     "/api/v1/#{type}/#{context.id}/external_tools.json",
                     { controller: "external_tools",
                       action: "index",
                       format: "json",
-                      placement: placement,
+                      placement:,
                       "#{type.singularize}_id": context.id.to_s })
 
     expect(json.size).to eq 1

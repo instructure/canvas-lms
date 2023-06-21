@@ -120,7 +120,7 @@ class GoogleDocsCollaboration < Collaboration
   private
 
   def google_user_service(user, service_domain = GOOGLE_DRIVE_SERVICE)
-    google_services = user.user_services.where(service_domain: service_domain).to_a
+    google_services = user.user_services.where(service_domain:).to_a
     google_services.find(&:service_user_id)
   end
 

@@ -453,6 +453,9 @@
   "icon_preview_1782a1d9": { "message": "Aperçu de l’icône" },
   "icon_shape_30b61e7": { "message": "Forme de l’icône" },
   "icon_size_9353edea": { "message": "Taille de l’icône" },
+  "if_left_empty_link_text_will_display_as_course_lin_2a34eedb": {
+    "message": "Si ce champ est vide, le texte du lien s''affichera comme le nom du lien du cours."
+  },
   "if_usage_rights_are_required_the_file_will_not_pub_841e276e": {
     "message": "Si les Droits d’utilisation sont requis, le fichier ne sera pas publié tant qu’il n’aura pas été activé sur la page des Fichiers."
   },

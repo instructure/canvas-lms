@@ -892,7 +892,7 @@ describe "ZipPackage" do
           context: @course,
           content_type: "video/mp4"
         )
-        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id: media_id))
+        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
         allow_any_instance_of(CC::Exporter::WebZip::ZipPackage).to receive(:create_tree_data).and_return(file_data)
 
         path = CGI.escape(att.full_path)
@@ -902,7 +902,7 @@ describe "ZipPackage" do
           @course.wiki_pages.create!(
             title: "Home Page",
             wiki: @course.wiki,
-            body: body
+            body:
           )
         @module.content_tags.create!(content: page, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
@@ -920,7 +920,7 @@ describe "ZipPackage" do
           context: @course,
           content_type: "video/mp4"
         )
-        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id: media_id))
+        allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
         allow_any_instance_of(CC::Exporter::WebZip::ZipPackage).to receive(:create_tree_data).and_return(file_data)
 
         path = CGI.escape(att.full_path)
@@ -929,7 +929,7 @@ describe "ZipPackage" do
           @course.wiki_pages.create!(
             title: "Home Page",
             wiki: @course.wiki,
-            body: body
+            body:
           )
         @module.content_tags.create!(content: page, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
@@ -991,7 +991,7 @@ describe "ZipPackage" do
         due_at = 1.day.ago
         file = add_file(fixture_file_upload("cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
         survey = @course.quizzes.create!(title: "Survey 1",
-                                         due_at: due_at,
+                                         due_at:,
                                          quiz_type: "survey",
                                          description: "<img src=\"/courses/#{@course.id}/files/#{file.id}\" />")
         survey.publish!

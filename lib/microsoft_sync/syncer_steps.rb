@@ -54,10 +54,10 @@ module MicrosoftSync
     MAX_PARTIAL_SYNC_CHANGES = 500
 
     STATSD_NAME = "microsoft_sync.syncer_steps"
-    STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
-    STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
+    STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches".freeze
+    STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total".freeze
     STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS =
-      "#{STATSD_NAME}.deleted_mappings_for_missing_users"
+      "#{STATSD_NAME}.deleted_mappings_for_missing_users".freeze
 
     # Can happen when User disables sync on account-level when jobs are running:
     class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
@@ -121,7 +121,7 @@ module MicrosoftSync
     def retry_object_for_error(e, **extra_args)
       delay_amount = e.retry_after_seconds if e.is_a?(Errors::Throttled)
       delay_amount ||= STANDARD_RETRY_DELAY
-      StateMachineJob::Retry.new(error: e, delay_amount: delay_amount, **extra_args)
+      StateMachineJob::Retry.new(error: e, delay_amount:, **extra_args)
     end
 
     def step_initial(job_type, _job_state_data)
@@ -190,7 +190,7 @@ module MicrosoftSync
     # Microsoft doesn't have a user for the calculated ULUV, skips that user.
     def step_ensure_enrollments_user_mappings_filled(_mem_data, _job_state_data)
       MicrosoftSync::UserMapping.find_enrolled_user_ids_without_mappings(
-        course: course, batch_size: ENROLLMENTS_ULUV_FETCHING_BATCH_SIZE
+        course:, batch_size: ENROLLMENTS_ULUV_FETCHING_BATCH_SIZE
       ) do |user_ids|
         ensure_user_mappings(user_ids)
       end
@@ -249,10 +249,10 @@ module MicrosoftSync
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
                         "Skipping #{type} for #{n_total}: #{change_result.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
-                                   tags: { sync_type: sync_type })
+                                   tags: { sync_type: })
       InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}",
                                n_total,
-                               tags: { sync_type: sync_type })
+                               tags: { sync_type: })
     end
 
     # Run the API calls to add/remove users.
@@ -365,7 +365,7 @@ module MicrosoftSync
     # Returns array of arrays of [user_id, change_enrollment_type, updated_at]
     # [[234, 'member', timestamp1], [456, 'member', timestamp2], [456, 'owner', timestamp3]]
     def load_partial_sync_changes
-      PartialSyncChange.where(course: course).limit(MAX_PARTIAL_SYNC_CHANGES + 1)
+      PartialSyncChange.where(course:).limit(MAX_PARTIAL_SYNC_CHANGES + 1)
                        .pluck(:user_id, :enrollment_type, :updated_at)
     end
 
@@ -415,7 +415,7 @@ module MicrosoftSync
 
       users_with_mappings = mappings.map(&:first)
       enrollments = Enrollment.microsoft_sync_relevant
-                              .where(course: course, user_id: users_with_mappings)
+                              .where(course:, user_id: users_with_mappings)
                               .pluck(:user_id, :type)
       enrollments.each { |user_id, enrollment_type| diff.set_local_member(user_id, enrollment_type) }
 
@@ -425,7 +425,7 @@ module MicrosoftSync
       diff.log_all_actions
       execute_diff(diff)
       PartialSyncChange
-        .where(course: course)
+        .where(course:)
         .with_values_in(%w[user_id enrollment_type updated_at], changes)
         .delete_all
 
@@ -482,7 +482,7 @@ module MicrosoftSync
     end
 
     def graph_service_helpers
-      @graph_service_helpers ||= tenant && GraphServiceHelpers.new(tenant, sync_type: sync_type)
+      @graph_service_helpers ||= tenant && GraphServiceHelpers.new(tenant, sync_type:)
     end
 
     def graph_service

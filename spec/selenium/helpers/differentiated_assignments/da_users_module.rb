@@ -89,7 +89,7 @@ module DifferentiatedAssignments
       include Factories
 
       def create_user(username)
-        user_with_pseudonym(username: username, name: username, active_all: true)
+        user_with_pseudonym(username:, name: username, active_all: true)
       end
 
       def create_student_group(group_name)
@@ -158,7 +158,7 @@ module DifferentiatedAssignments
       def enroll_student_in_section(student, section)
         DifferentiatedAssignments.the_course.self_enroll_student(
           student,
-          section: section,
+          section:,
           allow_multiple_enrollments: true
         )
       end

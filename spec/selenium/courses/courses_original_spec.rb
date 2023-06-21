@@ -210,8 +210,8 @@ describe "courses" do
       # Set up the test
       course_factory(active_course: true)
       %w[One Two].each do |name|
-        section = @course.course_sections.create!(name: name)
-        @course.enroll_student(user_factory, section: section).accept!
+        section = @course.course_sections.create!(name:)
+        @course.enroll_student(user_factory, section:).accept!
       end
       user_logged_in
       enrollment = @course.enroll_ta(@user)

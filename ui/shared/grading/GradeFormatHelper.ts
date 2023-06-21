@@ -117,7 +117,7 @@ function formatPercentageGrade(score, options) {
 }
 
 function formatGradingSchemeGrade(score, grade, options) {
-  if (ENV.restrict_quantitative_data && options.pointsPossible === 0 && score >= 0) {
+  if (options?.restrict_quantitative_data && options.pointsPossible === 0 && score >= 0) {
     return scoreToGrade(100, options.gradingScheme)
   }
   if (options.pointsPossible) {
@@ -196,14 +196,15 @@ const GradeFormatHelper = {
         parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade)
         formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete')
       } else if (
-        ENV.restrict_quantitative_data &&
+        options.restrict_quantitative_data &&
         options.score != null &&
         options.pointsPossible != null
       ) {
         // at this stage, gradingType is either points or mercent, or the passed grade is a number
         formattedGrade = formatGradingSchemeGrade(options.score, null, {
-          gradingScheme: ENV.grading_scheme,
+          gradingScheme: options.grading_scheme,
           pointsPossible: options.pointsPossible,
+          restrict_quantitative_data: options.restrict_quantitative_data,
         })
       } else {
         const roundedGrade = round(parsedGrade, options.precision || 2)
@@ -211,33 +212,35 @@ const GradeFormatHelper = {
       }
     }
     if (
-      !ENV.restrict_quantitative_data &&
+      !options.restrict_quantitative_data &&
       options.gradingType === POINTS &&
       options.formatType === POINTS_OUT_OF_FRACTION
     ) {
       formattedGrade = formatPointsOutOf(grade, options.pointsPossible)
     }
     if (
-      ENV.restrict_quantitative_data &&
+      options.restrict_quantitative_data &&
       options.score != null &&
       options.pointsPossible != null &&
       options.gradingType === GPA_SCALE
     ) {
       formattedGrade = formatGradingSchemeGrade(options.score, null, {
-        gradingScheme: ENV.grading_scheme,
+        gradingScheme: options.grading_scheme,
         pointsPossible: options.pointsPossible,
+        restrict_quantitative_data: options.restrict_quantitative_data,
       })
     }
 
     if (
-      ENV.restrict_quantitative_data &&
+      options.restrict_quantitative_data &&
       options.score != null &&
       options.pointsPossible === 0 &&
       options.gradingType === 'letter_grade'
     ) {
       formattedGrade = formatGradingSchemeGrade(options.score, null, {
-        gradingScheme: ENV.grading_scheme,
+        gradingScheme: options.grading_scheme,
         pointsPossible: options.pointsPossible,
+        restrict_quantitative_data: options.restrict_quantitative_data,
       })
     }
     return formattedGrade

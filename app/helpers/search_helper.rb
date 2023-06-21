@@ -294,7 +294,7 @@ module SearchHelper
       ret = {
         id: context[:asset_string],
         name: context[:name],
-        avatar_url: avatar_url,
+        avatar_url:,
         type: :context,
         user_count: user_counts[context[:asset_string]] || 0,
         permissions: context[:permissions],
@@ -358,9 +358,9 @@ def synthetic_contexts_for(course, context, base_url)
       enrollment_counts[role] += 1
     end
   end
-  avatar_url = avatar_url_for_group(base_url: base_url)
+  avatar_url = avatar_url_for_group(base_url:)
   result = []
-  synthetic_context = { avatar_url: avatar_url, type: :context, permissions: course[:permissions] }
+  synthetic_context = { avatar_url:, type: :context, permissions: course[:permissions] }
   result << synthetic_context.merge({ id: "#{context}_teachers", name: I18n.t(:enrollments_teachers, "Teachers"), user_count: enrollment_counts["TeacherEnrollment"] }) if enrollment_counts["TeacherEnrollment"].to_i > 0
   result << synthetic_context.merge({ id: "#{context}_tas", name: I18n.t(:enrollments_tas, "Teaching Assistants"), user_count: enrollment_counts["TaEnrollment"] }) if enrollment_counts["TaEnrollment"].to_i > 0
   result << synthetic_context.merge({ id: "#{context}_students", name: I18n.t(:enrollments_students, "Students"), user_count: enrollment_counts["StudentEnrollment"] }) if enrollment_counts["StudentEnrollment"].to_i > 0

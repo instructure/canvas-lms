@@ -465,21 +465,21 @@ describe AssignmentOverridesController, type: :request do
         before :once do
           names = ["Adam Aardvark", "Ben Banana", "Chipmunk Charlie", "Donald Duck", "Erik Erikson", "Freddy Frog"]
           @students = names.map do |name|
-            student_in_course(course: @course, user: user_with_pseudonym(name: name)).user
+            student_in_course(course: @course, user: user_with_pseudonym(name:)).user
           end
           @course.reload
         end
 
         it "concats students names if there are fewer than 4" do
           student_ids = @students[0..1].map(&:id)
-          api_create_override(@course, @assignment, assignment_override: { student_ids: student_ids })
+          api_create_override(@course, @assignment, assignment_override: { student_ids: })
           @override = @assignment.assignment_overrides.reload.first
           expect(@override.title).to eq("2 students")
         end
 
         it "adds an others count if there are more than 4" do
           student_ids = @students.map(&:id)
-          api_create_override(@course, @assignment, assignment_override: { student_ids: student_ids })
+          api_create_override(@course, @assignment, assignment_override: { student_ids: })
           @override = @assignment.assignment_overrides.reload.first
           expect(@override.title).to eq("6 students")
         end
@@ -498,7 +498,7 @@ describe AssignmentOverridesController, type: :request do
           api_create_override(
             @course,
             @assignment,
-            assignment_override: { student_ids: student_ids, title: "Preferred Title" }
+            assignment_override: { student_ids:, title: "Preferred Title" }
           )
           @override = @assignment.assignment_overrides.reload.first
           expect(@override.title).to eq("Preferred Title")

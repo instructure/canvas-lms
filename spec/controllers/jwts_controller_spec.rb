@@ -83,13 +83,13 @@ describe JwtsController do
       let(:params) { { workflows: ["ui", "rich_content"], context_type: "Course", context_id: @context_id } }
 
       it "generates a token that has course context_id" do
-        post "create", params: params, format: "json"
+        post "create", params:, format: "json"
         decrypted_token_body = translate_token.call(response)
         expect(decrypted_token_body[:context_id]).to eq(@context_id.to_s)
       end
 
       it "generates a token that has course context_type" do
-        post "create", params: params, format: "json"
+        post "create", params:, format: "json"
         decrypted_token_body = translate_token.call(response)
         expect(decrypted_token_body[:context_type]).to eq("Course")
       end
@@ -167,7 +167,7 @@ describe JwtsController do
         it "context is unauthorized" do
           generic_user = user_factory
           user_session(generic_user)
-          post "create", params: params, format: "json"
+          post "create", params:, format: "json"
           assert_unauthorized
         end
 
@@ -221,7 +221,7 @@ describe JwtsController do
         user_session(real_user)
         services_jwt = class_double(CanvasSecurity::ServicesJwt).as_stubbed_const
         expect(services_jwt).to receive(:refresh_for_user)
-          .with("testjwt", "testhost", other_user, real_user: real_user, symmetric: true)
+          .with("testjwt", "testhost", other_user, real_user:, symmetric: true)
           .and_return("refreshedjwt")
         post "refresh", params: { jwt: "testjwt", as_user_id: other_user.id }, format: "json"
         token = response.parsed_body["token"]

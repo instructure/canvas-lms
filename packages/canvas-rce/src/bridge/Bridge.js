@@ -158,7 +158,7 @@ export default class Bridge {
         node: selection.getNode(),
         range: selection.getRng(),
       }
-      if (!link.text) {
+      if (!link.text || link.text.trim().length === 0) {
         link.text = link.title || link.href
       }
       this.focusedEditor.insertLink(link)

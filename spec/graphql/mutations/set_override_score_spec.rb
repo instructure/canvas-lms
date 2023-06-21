@@ -77,63 +77,63 @@ describe Mutations::SetOverrideScore do
 
     describe "returned values" do
       it "returns the ID of the grading period in the gradingPeriodId field if the score has a grading period" do
-        result = CanvasSchema.execute(mutation_str(grading_period_id: grading_period.id), context: context)
+        result = CanvasSchema.execute(mutation_str(grading_period_id: grading_period.id), context:)
         expect(result.dig("data", "setOverrideScore", "grades", "gradingPeriod", "_id")).to eq grading_period.id.to_s
       end
 
       it "does not return a value for gradingPeriod if the score has no grading period" do
-        result = CanvasSchema.execute(mutation_str, context: context)
+        result = CanvasSchema.execute(mutation_str, context:)
         expect(result.dig("data", "setOverrideScore", "grades", "gradingPeriod")).to be_nil
       end
 
       it "returns the newly-set score in the overrideScore field" do
-        result = CanvasSchema.execute(mutation_str, context: context)
+        result = CanvasSchema.execute(mutation_str, context:)
         expect(result.dig("data", "setOverrideScore", "grades", "overrideScore")).to eq 45.0
       end
 
       it "returns a null value for the newly-set score in the overrideScore field if the score is cleared" do
-        result = CanvasSchema.execute(mutation_str(override_score: nil), context: context)
+        result = CanvasSchema.execute(mutation_str(override_score: nil), context:)
         expect(result.dig("data", "setOverrideScore", "grades", "overrideScore")).to be_nil
       end
 
       it "creates a live event" do
         expect(Canvas::LiveEvents).to receive(:grade_override)
-        CanvasSchema.execute(mutation_str(override_score: 100.0), context: context)
+        CanvasSchema.execute(mutation_str(override_score: 100.0), context:)
       end
     end
 
     describe "model changes" do
       it "updates the score belonging to a given enrollment ID with no grading period specified" do
-        CanvasSchema.execute(mutation_str, context: context)
+        CanvasSchema.execute(mutation_str, context:)
         expect(score_for_enrollment.override_score).to eq 45.0
       end
 
       it "updates the score belonging to a given enrollment ID with a grading period specified" do
-        CanvasSchema.execute(mutation_str(grading_period_id: grading_period.id), context: context)
+        CanvasSchema.execute(mutation_str(grading_period_id: grading_period.id), context:)
         expect(score_for_grading_period.override_score).to eq 45.0
       end
 
       it "nullifies the override_score for the associated score object if a null value is passed" do
         score_for_enrollment.update!(override_score: 99.0)
-        CanvasSchema.execute(mutation_str(override_score: nil), context: context)
+        CanvasSchema.execute(mutation_str(override_score: nil), context:)
         expect(score_for_enrollment.reload.override_score).to be_nil
       end
     end
 
     describe "error handling" do
       it "returns an error if passed an invalid enrollment ID" do
-        result = CanvasSchema.execute(mutation_str(enrollment_id: 0), context: context)
+        result = CanvasSchema.execute(mutation_str(enrollment_id: 0), context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
 
       it "returns an error if passed a valid enrollment ID but an invalid grading period ID" do
-        result = CanvasSchema.execute(mutation_str(grading_period_id: 0), context: context)
+        result = CanvasSchema.execute(mutation_str(grading_period_id: 0), context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
 
       it "returns an error if the passed-in enrollment is deleted" do
         student_enrollment.update!(workflow_state: "deleted")
-        result = CanvasSchema.execute(mutation_str, context: context)
+        result = CanvasSchema.execute(mutation_str, context:)
         expect(result.dig("errors", 0, "message")).to eq "not found"
       end
     end
@@ -144,13 +144,13 @@ describe Mutations::SetOverrideScore do
 
       it "updates all enrollments for the student, not just the requested one" do
         second_enrollment
-        CanvasSchema.execute(mutation_str, context: context)
+        CanvasSchema.execute(mutation_str, context:)
         expect(score_for_second_enrollment.override_score).to eq 45.0
       end
 
       it "ignores deleted enrollments" do
         second_enrollment.update!(workflow_state: "deleted")
-        CanvasSchema.execute(mutation_str, context: context)
+        CanvasSchema.execute(mutation_str, context:)
         expect(score_for_second_enrollment.override_score).to be_nil
       end
     end
@@ -174,7 +174,7 @@ describe Mutations::SetOverrideScore do
             expect(grade_change.score).to eq score_for_grading_period
           end
 
-          CanvasSchema.execute(mutation_str(grading_period_id: grading_period.id), context: context)
+          CanvasSchema.execute(mutation_str(grading_period_id: grading_period.id), context:)
         end
       end
     end

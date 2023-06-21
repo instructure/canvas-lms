@@ -273,10 +273,10 @@ class ReleaseNote
 
   def to_hash
     {
-      id: id,
-      show_ats: show_ats,
-      target_roles: target_roles,
-      published: published,
+      id:,
+      show_ats:,
+      target_roles:,
+      published:,
       langs: @langs
     }
   end
@@ -297,7 +297,7 @@ class ReleaseNote
 
       raise ActiveRecord::RecordNotFound unless res.responses[ddb_table_name].length == ids_arr.length
 
-      ret = load_raw_records(res.responses[ddb_table_name], include_langs: include_langs)
+      ret = load_raw_records(res.responses[ddb_table_name], include_langs:)
       ids.is_a?(Array) ? ret.sort_by { |note| ids_arr.index(note.id) } : ret.first
     end
 
@@ -319,7 +319,7 @@ class ReleaseNote
           exclusive_start_key: start
         )
 
-        pager.replace(load_raw_records(res.items, include_langs: include_langs))
+        pager.replace(load_raw_records(res.items, include_langs:))
         pager.has_more! unless res.last_evaluated_key.nil?
         pager
       end
@@ -333,7 +333,7 @@ class ReleaseNote
         },
         key_condition_expression: "PartitionKey = :id AND RangeKey <= :sort",
         table_name: ddb_table_name,
-        limit: limit,
+        limit:,
         scan_index_forward: false
       )
       load_raw_records(res.items)

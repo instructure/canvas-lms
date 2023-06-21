@@ -177,6 +177,7 @@ ToDoItem.propTypes = {
     course_id: string,
     date: object, // moment
     points: number,
+    restrict_quantitative_data: bool,
   }),
   courses: arrayOf(object).isRequired,
   handleDismissClick: func.isRequired,

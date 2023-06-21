@@ -68,7 +68,7 @@ describe "conversations new" do
 
       it "allows admins with read_roster permission to send a message without picking a context", priority: "1" do
         user = account_admin_user
-        user_logged_in({ user: user })
+        user_logged_in({ user: })
         conversations
         compose to: [@s1], subject: "context-free", body: "hallo!"
         c = @s1.conversations.last.conversation
@@ -79,7 +79,7 @@ describe "conversations new" do
       it "does not allow admins without read_roster permission to send a message without picking a context", priority: "1" do
         user = account_admin_user
         RoleOverride.manage_role_override(Account.default, admin_role, "read_roster", override: false, locked: false)
-        user_logged_in({ user: user })
+        user_logged_in({ user: })
         conversations
         f("#compose-btn").click
         wait_for_animations

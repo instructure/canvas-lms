@@ -254,7 +254,7 @@ describe ConditionalRelease::Service do
 
       it "releases mastery paths assigned ungraded quizzes" do
         quiz = quiz_model(course: @course, quiz_type: "survey", only_visible_to_overrides: true)
-        assignment_override_model(quiz: quiz,
+        assignment_override_model(quiz:,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
                                   set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
         tag = @module.add_item(id: quiz.id, type: "quiz")

@@ -31,7 +31,7 @@ shared_examples_for "question bank basic tests" do
     expect(question_bank_title).to be_displayed
     question_bank_title.send_keys(title, :return)
     wait_for_ajaximations
-    question_bank = AssessmentQuestionBank.where(title: title).first
+    question_bank = AssessmentQuestionBank.where(title:).first
     expect(question_bank).to be_present
     expect(question_bank.workflow_state).to eq "active"
     expect(f("#question_bank_adding .title")).to include_text title

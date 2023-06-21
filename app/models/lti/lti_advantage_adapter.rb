@@ -177,10 +177,10 @@ module Lti
 
       req = LtiAdvantage::Messages::LoginRequest.new(
         iss: Canvas::Security.config["lti_iss"],
-        login_hint: login_hint,
+        login_hint:,
         client_id: @tool.global_developer_key_id,
         deployment_id: @tool.deployment_id,
-        target_link_uri: target_link_uri,
+        target_link_uri:,
         lti_message_hint: message_hint,
         canvas_environment: ApplicationController.test_cluster_name || "prod",
         canvas_region: @context.shard.database_server.config[:region] || "not_configured"
@@ -193,7 +193,7 @@ module Lti
       verifier = cache_launch(lti_params, @context)
       Canvas::Security.create_jwt(
         {
-          verifier: verifier,
+          verifier:,
           canvas_domain: @opts[:domain],
           context_type: @context.class,
           context_id: @context.global_id,
@@ -229,7 +229,7 @@ module Lti
 
     def option_overrides
       {
-        target_link_uri: target_link_uri
+        target_link_uri:
       }
     end
 

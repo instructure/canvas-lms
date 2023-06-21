@@ -482,7 +482,7 @@ describe SupportHelpers::Tii do
   end
 
   def generate_assignment(settings = {})
-    assignment = assignment_model(course: course)
+    assignment = assignment_model(course:)
     assignment.turnitin_settings = Turnitin::Client.default_assignment_turnitin_settings
     settings.each { |k, v| assignment.turnitin_settings[k] = v }
     assignment.save
@@ -490,7 +490,7 @@ describe SupportHelpers::Tii do
   end
 
   def generate_submission(settings = {}, assignment = generate_assignment)
-    submission = submission_model(assignment: assignment)
+    submission = submission_model(assignment:)
     settings.each { |k, v| submission.turnitin_data[k] = v }
     submission.save
     submission

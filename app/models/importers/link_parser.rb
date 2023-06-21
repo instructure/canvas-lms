@@ -37,6 +37,35 @@ module Importers
 
     REFERENCE_KEYWORDS = %w[CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE IMS-CC-FILEBASE].freeze
     LINK_PLACEHOLDER = "LINK.PLACEHOLDER"
+    KNOWN_REFERENCE_TYPES = %w[
+      announcements
+      appointment_participants
+      assignment_groups
+      assignments
+      attachments
+      calendar_events
+      context_external_tools
+      context_module_tags
+      context_modules
+      course_paces
+      created_learning_outcomes
+      discussion_entries
+      discussion_topics
+      external_feeds
+      grading_standards
+      groups
+      learning_outcome_groups
+      learning_outcome_links
+      learning_outcomes
+      linked_learning_outcomes
+      media_attachments_iframe
+      modules
+      pages
+      quizzes
+      rubrics
+      wiki
+      wiki_pages
+    ].freeze
 
     attr_reader :unresolved_link_map
 
@@ -123,7 +152,7 @@ module Importers
     end
 
     def resolved(new_url = nil)
-      { resolved: true, new_url: new_url }
+      { resolved: true, new_url: }
     end
 
     # returns a hash with resolution status and data to hold onto if unresolved
@@ -140,8 +169,17 @@ module Importers
                    rest: $2,
                    in_media_iframe: attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^?]*)(\?.*)?}
-        unresolved(:object, type: $1, migration_id: $2, query: $3)
-
+        if KNOWN_REFERENCE_TYPES.include?($1)
+          unresolved(:object, type: $1, migration_id: $2, query: $3)
+        else
+          # If the `type` is not known, there's something amiss...
+          Sentry.with_scope do |scope|
+            scope.set_tags(type: $1)
+            scope.set_tags(url:)
+            Sentry.capture_message("Link Parser failed to validate type", level: :warning)
+          end
+          resolved(url)
+        end
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
         resolved("#{context_path}/#{$1}")
 
@@ -149,9 +187,9 @@ module Importers
         rel_path = URI::DEFAULT_PARSER.unescape($1)
         if (attr == "href" && node["class"]&.include?("instructure_inline_media_comment")) ||
            (attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
-          unresolved(:media_object, rel_path: rel_path)
+          unresolved(:media_object, rel_path:)
         else
-          unresolved(:file, rel_path: rel_path)
+          unresolved(:file, rel_path:)
         end
       elsif (attr == "href" && node["class"]&.include?("instructure_inline_media_comment")) ||
             (attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
@@ -185,13 +223,13 @@ module Importers
       md5 = Digest::MD5.hexdigest image_data
       folder_name = I18n.t("embedded_images")
       @folder ||= Folder.root_folders(context).first.sub_folders
-                        .where(name: folder_name, workflow_state: "hidden", context: context).first_or_create!
+                        .where(name: folder_name, workflow_state: "hidden", context:).first_or_create!
       filename = "#{md5}.#{extension}"
       file = Tempfile.new([md5, ".#{extension}"])
       file.binmode
       file.write(image_data)
       file.close
-      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5: md5)
+      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5:)
       resolved("#{context_path}/files/#{attachment.id}/preview")
     rescue
       unresolved(:file, rel_path: "#{folder_name}/#{filename}")

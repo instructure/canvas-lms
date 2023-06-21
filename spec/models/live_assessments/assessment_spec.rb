@@ -47,15 +47,15 @@ describe LiveAssessments::Assessment do
 
     it "doesn't create a submission for users with no results" do
       outcome.align(assessment, assessment_context, mastery_type: "none", mastery_score: 0.6)
-      assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
+      assessment.results.create!(user: assessment_user, assessor:, passed: true, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user, another_assessment_user])
       expect(assessment.submissions.count).to eq 1
     end
 
     it "creates a submission for each given user" do
       outcome.align(assessment, assessment_context, mastery_type: "none", mastery_score: 0.6)
-      assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
-      assessment.results.create!(user: another_assessment_user, assessor: assessor, passed: false, assessed_at: Time.now)
+      assessment.results.create!(user: assessment_user, assessor:, passed: true, assessed_at: Time.now)
+      assessment.results.create!(user: another_assessment_user, assessor:, passed: false, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user, another_assessment_user])
       expect(assessment.submissions.count).to eq 2
       expect(assessment.submissions[0].possible).to eq 1
@@ -66,13 +66,13 @@ describe LiveAssessments::Assessment do
 
     it "updates existing submission" do
       outcome.align(assessment, assessment_context, mastery_type: "none", mastery_score: 0.6)
-      assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
+      assessment.results.create!(user: assessment_user, assessor:, passed: true, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user])
       expect(assessment.submissions.count).to eq 1
       submission = assessment.submissions.first
       expect(submission.possible).to eq 1
       expect(submission.score).to eq 1
-      assessment.results.create!(user: assessment_user, assessor: assessor, passed: false, assessed_at: Time.now)
+      assessment.results.create!(user: assessment_user, assessor:, passed: false, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user])
       expect(assessment.submissions.count).to eq 1
       expect(submission.reload.possible).to eq 2
@@ -84,7 +84,7 @@ describe LiveAssessments::Assessment do
       alignment2 = another_outcome.align(assessment, assessment_context, mastery_type: "none", mastery_score: 0.5)
       expect_any_instance_of(LiveAssessments::Submission).to receive(:create_outcome_result).with(alignment1)
       expect_any_instance_of(LiveAssessments::Submission).to receive(:create_outcome_result).with(alignment2)
-      assessment.results.create!(user: assessment_user, assessor: assessor, passed: true, assessed_at: Time.now)
+      assessment.results.create!(user: assessment_user, assessor:, passed: true, assessed_at: Time.now)
       assessment.generate_submissions_for([assessment_user])
     end
   end

@@ -1665,8 +1665,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'assignment.url',
         }
         deepEqual(value, expectedState)
-        equal($.fn.addClass.callCount, 1)
-        equal($.fn.removeClass.callCount, 1)
+        equal($.fn.addClass.callCount, 2)
+        equal($.fn.removeClass.callCount, 2)
       })
       test('should open tray with different prior assignmentId', () => {
         sandbox.stub(useStore, 'getState').returns({
@@ -1689,10 +1689,10 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'assignment.url',
         }
         deepEqual(value, expectedState)
-        equal($.fn.addClass.callCount, 1)
-        equal($.fn.removeClass.callCount, 1)
+        equal($.fn.addClass.callCount, 2)
+        equal($.fn.removeClass.callCount, 2)
       })
-      test('should close tray if same assignmentId and trey is open', () => {
+      test('should close tray if same assignmentId and tray is open', () => {
         sandbox.stub(useStore, 'getState').returns({
           submissionTrayAssignmentId: '17',
           submissionTrayOpen: true,
@@ -1711,7 +1711,7 @@ QUnit.module('GradeSummary', () => {
         }
         deepEqual(value, expectedState)
         equal($.fn.addClass.callCount, 0)
-        equal($.fn.removeClass.callCount, 1)
+        equal($.fn.removeClass.callCount, 2)
       })
       test('should keep tray open and switch assignmentId for different assignment and tray open', () => {
         sandbox.stub(useStore, 'getState').returns({
@@ -1734,8 +1734,8 @@ QUnit.module('GradeSummary', () => {
           submissionTrayAssignmentUrl: 'assignment.url',
         }
         deepEqual(value, expectedState)
-        equal($.fn.addClass.callCount, 1)
-        equal($.fn.removeClass.callCount, 1)
+        equal($.fn.addClass.callCount, 2)
+        equal($.fn.removeClass.callCount, 2)
       })
     })
   })

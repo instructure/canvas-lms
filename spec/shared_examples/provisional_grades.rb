@@ -33,7 +33,7 @@ RSpec.shared_examples "a provisional grades status action" do |controller|
                          { student_id: @submission.user_id }
                        end
       @params = {
-        controller: controller,
+        controller:,
         action: :status,
         format: :json,
         course_id: @course.to_param,

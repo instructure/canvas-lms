@@ -36,7 +36,7 @@ describe GradebookImporter do
       upload = GradebookUpload.new
       expect { GradebookImporter.new(upload) }
         .to raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
-      upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
+      upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress:)
       expect { GradebookImporter.new(upload, valid_gradebook_contents, user, progress) }
         .not_to raise_error
     end
@@ -48,7 +48,7 @@ describe GradebookImporter do
 
     it "requires the contents of an upload" do
       progress = Progress.create!(tag: "test", context: @user)
-      upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
+      upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress:)
       expect { GradebookImporter.new(upload) }
         .to raise_error(ArgumentError, "Must provide attachment.")
     end
@@ -93,7 +93,7 @@ describe GradebookImporter do
       user = user_model
       progress = Progress.create!(tag: "test", context: @user)
       upload = GradebookUpload.new
-      upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
+      upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress:)
       expect do
         GradebookImporter.create_from(progress, upload, user, invalid_gradebook_contents)
       end.to raise_error(Delayed::RetriableError)
@@ -263,7 +263,7 @@ describe GradebookImporter do
       let(:progress) { Progress.create!(tag: "test", context: gradebook_user) }
 
       let(:upload) do
-        GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
+        GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress:)
       end
 
       let(:importer) { new_gradebook_importer(attachment, upload, gradebook_user, progress) }
@@ -507,7 +507,7 @@ describe GradebookImporter do
     course = course_model
     user = user_model
     progress = Progress.create!(tag: "test", context: @user)
-    upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
+    upload = GradebookUpload.create!(course:, user: @user, progress:)
     importer = GradebookImporter.new(
       upload, valid_gradebook_contents_with_sis_login_id, user, progress
     )
@@ -519,7 +519,7 @@ describe GradebookImporter do
     course = course_model
     user = user_model
     progress = Progress.create!(tag: "test", context: @user)
-    upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
+    upload = GradebookUpload.create!(course:, user: @user, progress:)
     new_gradebook_importer(
       attachment_with_rows(
         "Student;ID;Section;An Assignment",
@@ -537,7 +537,7 @@ describe GradebookImporter do
     course = course_model
     user = user_model
     progress = Progress.create!(tag: "test", context: @user)
-    upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
+    upload = GradebookUpload.create!(course:, user: @user, progress:)
     new_gradebook_importer(
       attachment_with_rows(
         "Student,ID,Section,An Assignment",
@@ -982,7 +982,7 @@ describe GradebookImporter do
 
     it "allows importing grades of assignments when user is final grader" do
       @existing_moderated_assignment.update!(final_grader: user)
-      upload = GradebookUpload.create!(course: course, user: user, progress: progress)
+      upload = GradebookUpload.create!(course:, user:, progress:)
       new_gradebook_importer(
         attachment_with_rows(
           "Student;ID;Section;An Assignment",
@@ -997,7 +997,7 @@ describe GradebookImporter do
     end
 
     it "does not allow importing grades of assignments when user is not final grader" do
-      upload = GradebookUpload.create!(course: course, user: user, progress: progress)
+      upload = GradebookUpload.create!(course:, user:, progress:)
       new_gradebook_importer(
         attachment_with_rows(
           "Student;ID;Section;An Assignment",
@@ -1318,7 +1318,7 @@ describe GradebookImporter do
 
   describe "#translate_pass_fail" do
     let(:account) { Account.default }
-    let(:course) { Course.create! account: account }
+    let(:course) { Course.create! account: }
     let(:student) do
       student = User.create
       student
@@ -1331,7 +1331,7 @@ describe GradebookImporter do
     let(:assignments) { [assignment] }
     let(:students) { [student] }
     let(:progress) { Progress.create tag: "test", context: student }
-    let(:gradebook_upload) { GradebookUpload.create!(course: course, user: student, progress: progress) }
+    let(:gradebook_upload) { GradebookUpload.create!(course:, user: student, progress:) }
     let(:importer) { GradebookImporter.new(gradebook_upload, "", student, progress) }
 
     it "translates positive score in gradebook_importer_assignments grade to complete" do
@@ -1385,7 +1385,7 @@ describe GradebookImporter do
 
   describe "importing submissions as excused from CSV" do
     let(:account) { Account.default }
-    let(:course) { Course.create! account: account }
+    let(:course) { Course.create! account: }
     let(:student) { User.create! }
     let(:teacher) do
       teacher = User.create!
@@ -1402,7 +1402,7 @@ describe GradebookImporter do
     let(:assignments) { [assignment] }
     let(:students) { [student] }
     let(:progress) { Progress.create! tag: "test", context: student }
-    let(:gradebook_upload) { GradebookUpload.create!(course: course, user: student, progress: progress) }
+    let(:gradebook_upload) { GradebookUpload.create!(course:, user: student, progress:) }
     let(:importer) { GradebookImporter.new(gradebook_upload, "", student, progress) }
 
     it "changes incomplete submission to excused when marked as 'EX' in CSV" do
@@ -1480,7 +1480,7 @@ describe GradebookImporter do
         points_possible: 10
       )
       course.enroll_student(student, enrollment_state: "active")
-      upload = GradebookUpload.create!(course: course, user: teacher, progress: progress)
+      upload = GradebookUpload.create!(course:, user: teacher, progress:)
       importer = new_gradebook_importer(
         attachment_with_rows(
           "Student;ID;Section;Assignment 3",
@@ -1500,7 +1500,7 @@ describe GradebookImporter do
       course = course_model
       user = user_model
       progress = Progress.create!(tag: "test", context: @user)
-      upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
+      upload = GradebookUpload.create!(course:, user: @user, progress:)
       importer = GradebookImporter.new(
         upload, valid_gradebook_contents_with_last_and_first_names, user, progress
       )
@@ -1740,7 +1740,7 @@ describe GradebookImporter do
     context "for a course with grading periods" do
       before do
         enrollment_term = @course.root_account.enrollment_terms.create!
-        @course.update!(enrollment_term: enrollment_term)
+        @course.update!(enrollment_term:)
 
         grading_period_group = @course.root_account.grading_period_groups.create!
         grading_period_group.enrollment_terms << enrollment_term
@@ -1932,7 +1932,7 @@ describe GradebookImporter do
       let(:grading_period_2) { grading_period_group.grading_periods.second }
 
       before do
-        @course.enrollment_term.update!(grading_period_group: grading_period_group)
+        @course.enrollment_term.update!(grading_period_group:)
       end
 
       describe "top-level override score content" do

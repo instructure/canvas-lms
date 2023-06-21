@@ -74,7 +74,7 @@ module Api::V1::Quiz
     if accepts_jsonapi?
       Canvas::APIArraySerializer.new([quiz],
                                      scope: user,
-                                     session: session,
+                                     session:,
                                      root: :quizzes,
                                      each_serializer: Quizzes::QuizApiSerializer,
                                      controller: self,
@@ -82,7 +82,7 @@ module Api::V1::Quiz
     else
       (serializer || Quizzes::QuizSerializer).new(quiz,
                                                   scope: user,
-                                                  session: session,
+                                                  session:,
                                                   root: false,
                                                   controller: self,
                                                   serializer_options: options).as_json
@@ -109,7 +109,7 @@ module Api::V1::Quiz
                                    controller: self,
                                    root: :quizzes,
                                    self_quiz_submissions: @quiz_submissions,
-                                   meta: meta,
+                                   meta:,
                                    each_serializer: Quizzes::QuizSerializer,
                                    include_root: false).as_json
   end

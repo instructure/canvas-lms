@@ -88,7 +88,7 @@ module Services
       end
 
       def index(jwt_body, opts = {}, query: {})
-        options = { headers: headers(jwt_body, opts), query: query }
+        options = { headers: headers(jwt_body, opts), query: }
         request(:get, "/api/root_account_subscriptions", options)
       end
 

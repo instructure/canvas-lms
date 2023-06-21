@@ -134,6 +134,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -2749,7 +2750,20 @@ EG = {
         outOf = [' / ', I18n.n(window.jsonData.points_possible), ' (', percent, ')'].join('')
       }
 
-      $average_score.text([I18n.n(roundWithPrecision(avg(scores), 2)) + outOf].join(''))
+      if (ENV.restrict_quantitative_data) {
+        if (!window.jsonData.points_possible) {
+          $average_score_wrapper.hide()
+        } else {
+          const letterGradeAverage = scoreToGrade(
+            Math.round(100 * (avg(scores) / window.jsonData.points_possible)),
+            ENV.grading_scheme
+          )
+
+          $average_score.text(letterGradeAverage, ENV.grading_scheme)
+        }
+      } else {
+        $average_score.text([I18n.n(roundWithPrecision(avg(scores), 2)) + outOf].join(''))
+      }
     } else {
       // there are no submissions that have been graded.
       $average_score_wrapper.hide()

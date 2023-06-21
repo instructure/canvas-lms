@@ -20,7 +20,7 @@
 module Lti
   class PermissionChecker
     def self.authorized_lti2_action?(tool:, context:)
-      perm_checker = new(tool: tool, context: context)
+      perm_checker = new(tool:, context:)
       perm_checker.tool_installed_in_context?
     end
 

@@ -403,7 +403,7 @@ module AuthenticationMethods
         message = I18n.t("lib.auth.authentication_required", "user authorization required")
       end
     end
-    render status: code, json: { status: status, errors: [{ message: message }] }
+    render status: code, json: { status:, errors: [{ message: }] }
   end
 
   def add_www_authenticate_header

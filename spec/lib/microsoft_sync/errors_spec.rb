@@ -206,7 +206,7 @@ describe MicrosoftSync::Errors do
     subject do
       described_class.for(
         service: "my api",
-        response: double(code: code, body: body, headers: HTTParty::Response::Headers.new(headers)),
+        response: double(code:, body:, headers: HTTParty::Response::Headers.new(headers)),
         tenant: "mytenant"
       )
     end

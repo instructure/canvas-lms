@@ -25,9 +25,9 @@ module SIS
 
     let(:enrollment) do
       SIS::Models::Enrollment.new(
-        course_id: course_id,
-        section_id: section_id,
-        user_id: user_id,
+        course_id:,
+        section_id:,
+        user_id:,
         role: "student",
         status: "active",
         start_date: Time.zone.today,

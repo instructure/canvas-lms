@@ -185,5 +185,59 @@ describe('AccountCalendarSettings', () => {
       const modalTitle = queryByRole('heading', {name: 'Apply Changes'})
       expect(modalTitle).not.toBeInTheDocument()
     })
+
+    describe('fires confirmation dialog when', () => {
+      beforeEach(() => {
+        fetchMock.restore()
+        fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_1)
+        fetchMock.get(
+          /\/api\/v1\/accounts\/1\/visible_calendars_count.*/,
+          RESPONSE_ACCOUNT_1.length
+        )
+      })
+
+      it('calendar visibility changes', async () => {
+        const {findByText, getByRole} = render(<AccountCalendarSettings {...defaultProps} />)
+        expect(await findByText('University (25)')).toBeInTheDocument()
+        const universityCheckbox = getByRole('checkbox', {
+          name: 'Show account calendar for University',
+        })
+
+        act(() => universityCheckbox.click())
+
+        const event = new Event('beforeunload')
+        event.preventDefault = jest.fn()
+        window.dispatchEvent(event)
+        expect(event.preventDefault).toHaveBeenCalled()
+
+        act(() => universityCheckbox.click())
+
+        event.preventDefault = jest.fn()
+        window.dispatchEvent(event)
+        expect(event.preventDefault).not.toHaveBeenCalled()
+      })
+
+      it('calendar subscription type changes', async () => {
+        const {findByText, getByText, getAllByTestId} = render(
+          <AccountCalendarSettings {...defaultProps} />
+        )
+        expect(await findByText('University (25)')).toBeInTheDocument()
+
+        act(() => getAllByTestId('subscription-dropdown')[0].click())
+        act(() => getByText('Auto subscribe').click())
+
+        const event = new Event('beforeunload')
+        event.preventDefault = jest.fn()
+        window.dispatchEvent(event)
+        expect(event.preventDefault).toHaveBeenCalled()
+
+        act(() => getAllByTestId('subscription-dropdown')[0].click())
+        act(() => getByText('Manual subscribe').click())
+
+        event.preventDefault = jest.fn()
+        window.dispatchEvent(event)
+        expect(event.preventDefault).not.toHaveBeenCalled()
+      })
+    })
   })
 })

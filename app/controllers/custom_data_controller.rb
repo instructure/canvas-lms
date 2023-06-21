@@ -264,7 +264,7 @@ class CustomDataController < ApplicationController
     rescue ArgumentError => e
       render(json: { message: e.message }, status: :bad_request) and return
     end
-    render(json: { data: data })
+    render(json: { data: })
   end
 
   # @API Delete custom data

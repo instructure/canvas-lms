@@ -86,19 +86,19 @@ module SIS
       end
 
       def row_info
-        [course_id: course_id,
-         section_id: section_id,
-         user_id: user_id,
-         user_integration_id: user_integration_id,
-         role: role,
-         status: status,
-         associated_user_id: associated_user_id,
-         root_account_id: root_account_id,
-         role_id: role_id,
-         limit_section_privileges: limit_section_privileges,
-         notify: notify,
-         start_date: start_date,
-         end_date: end_date].to_s
+        [course_id:,
+         section_id:,
+         user_id:,
+         user_integration_id:,
+         role:,
+         status:,
+         associated_user_id:,
+         root_account_id:,
+         role_id:,
+         limit_section_privileges:,
+         notify:,
+         start_date:,
+         end_date:].to_s
       end
     end
   end

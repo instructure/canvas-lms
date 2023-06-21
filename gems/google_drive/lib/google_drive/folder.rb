@@ -34,15 +34,15 @@ module GoogleDrive
       @folders << folder
     end
 
-    def select(&block)
+    def select(&)
       Folder.new(@name,
-                 @folders.map { |f| f.select(&block) }.reject { |f| f.files.empty? },
-                 @files.select(&block))
+                 @folders.map { |f| f.select(&) }.reject { |f| f.files.empty? },
+                 @files.select(&))
     end
 
-    def map(&block)
-      @folders.map { |f| f.map(&block) }.flatten +
-        @files.map(&block)
+    def map(&)
+      @folders.map { |f| f.map(&) }.flatten +
+        @files.map(&)
     end
 
     def flatten

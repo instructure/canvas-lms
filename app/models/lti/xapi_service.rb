@@ -22,7 +22,7 @@ module Lti
     def self.log_page_view(token, params)
       duration = params[:result] ? params[:result]["duration"] : nil
       url = params[:object] ? params[:object][:id] : nil
-      Lti::AnalyticsService.log_page_view(token, { duration: duration, url: url })
+      Lti::AnalyticsService.log_page_view(token, { duration:, url: })
     end
   end
 end

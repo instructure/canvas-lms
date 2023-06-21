@@ -29,7 +29,7 @@ describe "shared/errors/404_message" do
     rescue => e
       exception = assign(:exception, e)
     end
-    render "shared/errors/404_message", locals: { exception: exception, status: "" }
+    render "shared/errors/404_message", locals: { exception:, status: "" }
     expect(response).not_to be_nil
   end
 end

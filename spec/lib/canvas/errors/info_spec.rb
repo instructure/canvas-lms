@@ -37,7 +37,7 @@ module Canvas
       let(:auth_header) { "OAuth oauth_body_hash=\"2jmj7l5rSw0yVb%2FvlWAYkK%2FYBwk%3D\", oauth_consumer_key=\"test_key\", oauth_nonce=\"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8\", oauth_signature=\"QUfER7WBKsq0nzIjJ8Y7iTcDaq0%3D\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"1445980405\", oauth_version=\"1.0\"" }
       let(:account) { double(global_id: 1_122_334_455) }
       let(:user) { double(global_id: 5_544_332_211) }
-      let(:opts) { { request_context_id: request_context_id, type: "core_meltdown" } }
+      let(:opts) { { request_context_id:, type: "core_meltdown" } }
 
       describe "initialization" do
         it "grabs the request context id if not provided" do

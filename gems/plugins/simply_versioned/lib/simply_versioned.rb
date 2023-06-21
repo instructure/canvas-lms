@@ -172,8 +172,8 @@ module SimplyVersioned
       end
     end
 
-    def without_versioning(&block)
-      with_versioning(false, &block)
+    def without_versioning(&)
+      with_versioning(false, &)
     end
 
     def unversioned?
@@ -253,7 +253,7 @@ module SimplyVersioned
     # Anything that returns a Version should have its versionable pre-
     # populated. This is basically a way of getting around the fact that
     # ActiveRecord doesn't have a polymorphic :inverse_of option.
-    def method_missing(method, *a, &b)
+    def method_missing(method, *a, &)
       case method
       when :minimum, :maximum, :exists?, :all, :find_all, :each
         populate_versionables(super)
@@ -282,7 +282,7 @@ module SimplyVersioned
 
     # Get the Version instance corresponding to this models for the specified version number.
     def get_version(number)
-      populate_versionable where(number: number).first
+      populate_versionable where(number:).first
     end
     alias_method :get, :get_version
 

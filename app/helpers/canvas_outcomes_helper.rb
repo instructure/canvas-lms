@@ -100,7 +100,7 @@ module CanvasOutcomesHelper
   def get_request_page(context, domain, endpoint, jwt, params, page_num, per_page = 200)
     retry_count = 0
     pagination_params = {
-      per_page: per_page,
+      per_page:,
       page: page_num
     }
     params = params.merge(pagination_params)
@@ -135,7 +135,7 @@ module CanvasOutcomesHelper
             attempt[:metadata] = attempt[:metadata].deep_symbolize_keys unless attempt[:metadata].nil?
           end
         end
-        { results: results, total_pages: total_pages }
+        { results:, total_pages: }
       rescue
         raise OSFetchError, "Error parsing JSON results from Outcomes Service: #{response.body}"
       end
@@ -145,7 +145,7 @@ module CanvasOutcomesHelper
   end
 
   def outcome_has_authoritative_results?(outcome, context)
-    assignments = Assignment.active.where(context: context).quiz_lti
+    assignments = Assignment.active.where(context:).quiz_lti
 
     return false if assignments.blank?
 
@@ -185,11 +185,11 @@ module CanvasOutcomesHelper
 
     js_env(
       canvas_outcomes: {
-        artifact_type: artifact_type,
+        artifact_type:,
         artifact_id: artifact.id,
         context_uuid: context.uuid,
         host: host_url,
-        jwt: jwt,
+        jwt:,
         **props
       }
     )
@@ -205,8 +205,8 @@ module CanvasOutcomesHelper
       domain = settings[domain_key]
       payload = {
         host: domain,
-        consumer_key: consumer_key,
-        scope: scope,
+        consumer_key:,
+        scope:,
         exp: 1.day.from_now.to_i,
         **props
       }

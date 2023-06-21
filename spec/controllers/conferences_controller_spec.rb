@@ -242,7 +242,7 @@ describe ConferencesController do
 
           enrollment = student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
           group_category = @course.group_categories.create(name: "category 1")
-          group = @course.groups.create(name: "some group", group_category: group_category)
+          group = @course.groups.create(name: "some group", group_category:)
           group.add_user enrollment.user, "accepted"
           group.add_user concluded_enrollment.user, "accepted"
 
@@ -334,7 +334,7 @@ describe ConferencesController do
           title: "Something else"
         },
       }
-      post :update, params: params, format: :json
+      post :update, params:, format: :json
       body = response.parsed_body
       expect(body["user_ids"]).to include(@teacher.id)
       expect(body["user_ids"]).to include(@student.id)
@@ -354,7 +354,7 @@ describe ConferencesController do
         },
       }
       user_session(@teacher)
-      post :update, params: params, format: :json
+      post :update, params:, format: :json
       body = response.parsed_body
       expect(body["user_ids"]).to include(@teacher.id)
       expect(body["user_ids"]).to include(@student.id)
@@ -382,7 +382,7 @@ describe ConferencesController do
         },
       }
 
-      post :update, params: params, format: "json"
+      post :update, params:, format: "json"
 
       created_conference = WebConference.find(@conference.id)
       created_calendar_event = created_conference.calendar_event
@@ -412,7 +412,7 @@ describe ConferencesController do
         },
       }
 
-      post :update, params: params, format: "json"
+      post :update, params:, format: "json"
 
       created_conference = WebConference.find(@conference.id)
       created_calendar_event = created_conference.calendar_event
@@ -443,7 +443,7 @@ describe ConferencesController do
         },
       }
 
-      post :update, params: params, format: "json"
+      post :update, params:, format: "json"
       created_conference = WebConference.find(@conference.id)
       created_calendar_event = created_conference.calendar_event
 

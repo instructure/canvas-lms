@@ -33,8 +33,8 @@ module Lti
 
         jwt = Canvas::Security.create_jwt({
                                             initiated_at: current_time,
-                                            user_id: user_id,
-                                            root_account_uuid: root_account_uuid
+                                            user_id:,
+                                            root_account_uuid:
                                           })
 
         redirection_url = Addressable::URI.parse(tool_registration_url)

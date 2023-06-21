@@ -141,7 +141,7 @@ describe MicrosoftSync::GraphService::Http do
         ]
       end
       let(:special_case_value) { :foo }
-      let(:result) { subject.request(:get, url, special_cases: special_cases) }
+      let(:result) { subject.request(:get, url, special_cases:) }
 
       shared_examples_for "when a special case is matched" do
         it "returns the special case's value" do
@@ -405,10 +405,10 @@ describe MicrosoftSync::GraphService::Http do
     before do
       WebMock.disable_net_connect!
       WebMock.stub_request(:post, "https://graph.microsoft.com/v1.0/$batch")
-             .with(body: { requests: requests })
+             .with(body: { requests: })
              .and_return(
                status: status_code,
-               body: { responses: responses }.to_json,
+               body: { responses: }.to_json,
                headers: { "Content-type" => "application/json" }
              )
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
@@ -424,7 +424,7 @@ describe MicrosoftSync::GraphService::Http do
     end
     let(:status_code) { 200 }
     let(:run_batch) do
-      subject.run_batch("wombat", requests, quota: [3, 4], special_cases: special_cases)
+      subject.run_batch("wombat", requests, quota: [3, 4], special_cases:)
     end
     let(:special_cases) { [] }
     let(:responses) { [] }

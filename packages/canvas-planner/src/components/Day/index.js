@@ -19,15 +19,13 @@
 import React, {Component} from 'react'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
-import {themeable} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {itemShape, sizeShape, userShape} from '../plannerPropTypes'
-import styles from './styles.css'
-import theme from './theme'
 import {getDynamicFullDate, getFriendlyDate, isToday} from '../../utilities/dateUtils'
+import buildStyle from './style'
 // eslint-disable-next-line import/no-named-as-default
 import MissingAssignments from '../MissingAssignments'
 // eslint-disable-next-line import/no-named-as-default
@@ -64,10 +62,12 @@ export class Day extends Component {
 
   constructor(props) {
     super(props)
+    this.style = buildStyle()
 
     const tzMomentizedDate = moment.tz(props.day, props.timeZone)
     this.friendlyName = getFriendlyDate(tzMomentizedDate, moment().tz(props.timeZone))
     this.date = getDynamicFullDate(tzMomentizedDate, props.timeZone)
+    this.thisIsToday = isToday(this.props.day)
   }
 
   componentDidMount() {
@@ -151,21 +151,24 @@ export class Day extends Component {
     return groupings
   }
 
-  render() {
-    const thisIsToday = isToday(this.props.day)
-
-    return (
-      <div className={classnames(styles.root, 'planner-day', {'planner-today': thisIsToday})}>
+  render = () => (
+    <>
+      <style>{this.style.css}</style>
+      <div
+        className={classnames(this.style.classNames.root, 'planner-day', {
+          'planner-today': this.thisIsToday,
+        })}
+      >
         <Heading border={this.hasItems() ? 'none' : 'bottom'}>
-          {thisIsToday ? (
+          {this.thisIsToday ? (
             <>
               <Text as="div" size="large" weight="bold">
                 {this.friendlyName}
               </Text>
-              <div className={styles.secondary}>{this.date}</div>
+              <div className={this.style.classNames.secondary}>{this.date}</div>
             </>
           ) : (
-            <div className={styles.secondary}>
+            <div className={this.style.classNames.secondary}>
               {this.friendlyName}, {this.date}
             </div>
           )}
@@ -180,18 +183,17 @@ export class Day extends Component {
             </View>
           )}
         </div>
-        {thisIsToday && this.props.showMissingAssignments && (
+        {this.thisIsToday && this.props.showMissingAssignments && (
           <MissingAssignments
             timeZone={this.props.timeZone}
             responsiveSize={this.props.responsiveSize}
           />
         )}
       </div>
-    )
-  }
+    </>
+  )
 }
 
-const ThemeableDay = themeable(theme, styles)(Day)
-const AnimatableDay = animatable(ThemeableDay)
-AnimatableDay.theme = ThemeableDay.theme
+const AnimatableDay = animatable(Day)
+AnimatableDay.theme = Day.theme
 export default AnimatableDay

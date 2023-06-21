@@ -130,9 +130,18 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
     end
 
+    it "translates RCE media attachment iframes to relevant HTML tags" do
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_attachments_iframe/135?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
+      translated = @exporter.html_content(html)
+      expect(translated).to include %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde" data-is-media-attachment="true">)
+      expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
+      expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
+    end
+
     it "links media to exported file if it exists" do
       folder = folder_model(name: "something", context: @course)
-      att = attachment_model(display_name: "lolcats.mp4", context: @course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      att = attachment_model(display_name: "lolcats.mp4", context: @course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @obj.attachment = att
       @obj.save!
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
@@ -144,10 +153,10 @@ describe CC::CCHelper do
     it "links media to proper file via related_attachment links" do
       disposable_course = Course.create!
       folder = folder_model(name: "something", context: disposable_course)
-      att = attachment_model(display_name: "lolcats.mp4", context: disposable_course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      att = attachment_model(display_name: "lolcats.mp4", context: disposable_course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @obj.attachment = att
       @obj.save!
-      attachment_model(root_attachment: att, display_name: "lolcats.mp4", context: @course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      attachment_model(root_attachment: att, display_name: "lolcats.mp4", context: @course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
@@ -158,7 +167,7 @@ describe CC::CCHelper do
       temp = @course
       other_course = course_factory
       folder = folder_model(name: "something", context: other_course)
-      att = attachment_model(display_name: "lolcats.mp4", context: other_course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      att = attachment_model(display_name: "lolcats.mp4", context: other_course, folder:, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
       @obj.attachment = att
       @obj.save!
       @course = temp

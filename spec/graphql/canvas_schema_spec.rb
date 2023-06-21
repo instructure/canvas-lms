@@ -21,7 +21,7 @@
 require_relative "./graphql_spec_helper"
 
 describe CanvasSchema do
-  before(:once) { course_with_student(active_all: true, course_name: course_name) }
+  before(:once) { course_with_student(active_all: true, course_name:) }
 
   let(:course_name) { "Kiteboarding 101" }
   let(:entities_query) do
@@ -55,7 +55,7 @@ describe CanvasSchema do
   end
 
   it "does not expose Apollo Federation special types" do
-    result = CanvasSchema.execute(entities_query, variables: variables, context: gql_context)
+    result = CanvasSchema.execute(entities_query, variables:, context: gql_context)
     error_messages = result["errors"].pluck("message")
     expect(error_messages).to include("Field '_entities' doesn't exist on type 'Query'")
     expect(result["data"]).to be_nil
@@ -68,7 +68,7 @@ describe CanvasSchema do
     end
 
     it "exposes Apollo Federation special types" do
-      result = CanvasSchema.for_federation.execute(entities_query, variables: variables, context: gql_context)
+      result = CanvasSchema.for_federation.execute(entities_query, variables:, context: gql_context)
       expect(result["data"]).to eq({ "_entities" => [{ "name" => course_name }] })
     end
   end

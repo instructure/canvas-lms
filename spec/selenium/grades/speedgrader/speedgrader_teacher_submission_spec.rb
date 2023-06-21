@@ -435,7 +435,7 @@ describe "speed grader submissions" do
         let!(:group) do
           group = submission_one.assignment.course.groups.create!(name: "group one")
           group.add_user(submission_one.user)
-          submission_one.update!(group: group)
+          submission_one.update!(group:)
           group
         end
 

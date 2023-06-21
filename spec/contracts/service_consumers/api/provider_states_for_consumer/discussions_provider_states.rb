@@ -56,8 +56,8 @@ PactConfig::Consumers::ALL.each do |consumer|
 
         # Add section to course
         section = course.course_sections.create!(name: "section1", start_at: 2.weeks.ago, end_at: 2.weeks.from_now)
-        course.enroll_teacher(teacher, section: section, allow_multiple_enrollments: true).accept!
-        course.enroll_student(student, section: section, allow_multiple_enrollments: true).accept!
+        course.enroll_teacher(teacher, section:, allow_multiple_enrollments: true).accept!
+        course.enroll_student(student, section:, allow_multiple_enrollments: true).accept!
 
         # Create an assignment
         assignment = course.assignments.create!(

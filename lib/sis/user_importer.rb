@@ -27,7 +27,7 @@ module SIS
           Pseudonym.process_as_sis(@sis_options) do
             yield importer
             while importer.any_left_to_process?
-              importer.process_batch(login_only: login_only)
+              importer.process_batch(login_only:)
             end
           end
         end
@@ -77,7 +77,7 @@ module SIS
         end
 
         @batched_users << user
-        process_batch(login_only: login_only) if @batched_users.size >= Setting.get("sis_user_batch_size", "100").to_i
+        process_batch(login_only:) if @batched_users.size >= Setting.get("sis_user_batch_size", "100").to_i
       end
 
       def any_left_to_process?
@@ -533,9 +533,9 @@ module SIS
 
       def generate_user_warning(message, user_id, login_id)
         generate_readable_error_message(
-          message: message,
-          user_id: user_id,
-          login_id: login_id
+          message:,
+          user_id:,
+          login_id:
         )
       end
 

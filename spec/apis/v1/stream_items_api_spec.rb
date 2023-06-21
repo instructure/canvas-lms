@@ -818,8 +818,8 @@ describe UsersController, type: :request do
 
   it "formats AssessmentRequest" do
     assignment = assignment_model(course: @course)
-    submission = submission_model(assignment: assignment, user: @student)
-    assessor_submission = submission_model(assignment: assignment, user: @user)
+    submission = submission_model(assignment:, user: @student)
+    assessor_submission = submission_model(assignment:, user: @user)
     assessment_request = AssessmentRequest.create!(assessor: @user,
                                                    asset: submission,
                                                    user: @student,

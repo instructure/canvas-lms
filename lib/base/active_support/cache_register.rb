@@ -62,7 +62,7 @@ module ActiveSupport
 
         private
 
-        def fetch_with_cache_register(name, batch_object, batched_keys, options, &block)
+        def fetch_with_cache_register(name, batch_object, batched_keys, options, &)
           options = merged_options(options)
           key = normalize_key(name, options)
           key += "/#{batch_object.model_name.cache_key}/#{batch_object.id}"
@@ -95,7 +95,7 @@ module ActiveSupport
           if entry
             get_entry_value(entry, name, options)
           else
-            result = instrument(:generate, name, options, &block)
+            result = instrument(:generate, name, options, &)
             instrument(:write, name, options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               redis.set(frd_key, Marshal.dump(entry), options.merge(raw: true)) # write to the key generated in the lua script

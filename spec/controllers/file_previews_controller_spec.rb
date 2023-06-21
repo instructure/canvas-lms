@@ -60,7 +60,7 @@ describe FilePreviewsController do
     attachment_model
     file_id = @attachment.id
     @attachment.destroy_permanently!
-    get :show, params: { course_id: @course.id, file_id: file_id }
+    get :show, params: { course_id: @course.id, file_id: }
     expect(response).to have_http_status :not_found
     expect(assigns["headers"]).to be false
     expect(assigns["show_left_side"]).to be false

@@ -42,7 +42,7 @@ class CreateStateTheme < ActiveRecord::Migration[4.2]
       "ic-brand-Login-footer-link-color-hover" => "#cccccc",
       "ic-brand-Login-instructure-logo" => "#cccccc"
     }
-    bc = BrandConfig.new(variables: variables)
+    bc = BrandConfig.new(variables:)
     bc.name = NAME
     bc.share = true
     bc.save!

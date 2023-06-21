@@ -60,9 +60,9 @@ module AssignmentOverridesSeleniumHelper
   def create_assignment!
     @course.assignments.create!(
       title: "due tomorrow",
-      due_at: due_at,
-      unlock_at: unlock_at,
-      lock_at: lock_at
+      due_at:,
+      unlock_at:,
+      lock_at:
     )
   end
 

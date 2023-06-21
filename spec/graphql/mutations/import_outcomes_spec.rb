@@ -58,7 +58,7 @@ describe Mutations::ImportOutcomes do
   end
 
   def execute_query(query, context)
-    CanvasSchema.execute(query, context: context)
+    CanvasSchema.execute(query, context:)
   end
 
   def exec_graphql(**attrs)
@@ -66,8 +66,8 @@ describe Mutations::ImportOutcomes do
       mutation_str(
         **attrs.reverse_merge(
           target_group_id: target_group.id,
-          source_context_id: source_context_id,
-          source_context_type: source_context_type
+          source_context_id:,
+          source_context_type:
         )
       ),
       ctx
@@ -77,22 +77,23 @@ describe Mutations::ImportOutcomes do
   def exec(**attrs)
     attrs.reverse_merge!(
       target_group_id: target_group.id,
-      source_context_id: source_context_id,
-      source_context_type: source_context_type
+      source_context_id:,
+      source_context_type:
     )
     source_context = attrs[:source_context_type].constantize.find_by(id: attrs[:source_context_id]) if attrs[:source_context_type]
     group = LearningOutcomeGroup.find_by(id: attrs[:group_id]) if attrs[:group_id]
     target_group = LearningOutcomeGroup.find_by(id: attrs[:target_group_id])
     outcome_id = attrs[:outcome_id]
+
     described_class.execute(progress, source_context, group, outcome_id, target_group)
   end
 
   def find_group(title)
-    LearningOutcomeGroup.find_by(title: title)
+    LearningOutcomeGroup.find_by(title:)
   end
 
   def get_outcome_id(title, context = Account.default)
-    LearningOutcome.find_by(context: context, short_description: title).id
+    LearningOutcome.find_by(context:, short_description: title).id
   end
 
   let(:target_context) { @course }
@@ -101,7 +102,7 @@ describe Mutations::ImportOutcomes do
   end
   let(:source_context_id) { Account.default.id }
   let(:source_context_type) { "Account" }
-  let(:ctx) { { domain_root_account: Account.default, current_user: current_user } }
+  let(:ctx) { { domain_root_account: Account.default, current_user: } }
   let(:current_user) { @teacher }
   let(:progress) { @course.progresses.create!(tag: "import_outcomes") }
 
@@ -145,7 +146,11 @@ describe Mutations::ImportOutcomes do
       title = group[:title]
       childs = group[:groups]
 
-      db_group = db_parent_group.child_outcome_groups.find_by!(title: title)
+      # root_account_id should match the context of the db_parent_group.context root_account_id
+      log_db_root_account_id = LearningOutcomeGroup.find_by(context: db_parent_group.context, title:).root_account_id
+      expect(log_db_root_account_id).to eq(db_parent_group.context.resolved_root_account_id)
+
+      db_group = db_parent_group.child_outcome_groups.find_by!(title:)
 
       db_outcomes = db_group.child_outcome_links.map(&:content)
 
@@ -700,6 +705,9 @@ describe Mutations::ImportOutcomes do
                             outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
                           }],
                          @course.root_outcome_group)
+
+      expect(LearningOutcomeGroup.find_by(context: @course, title: "Group B").root_account_id).to eq(@course.root_account_id)
+      expect(LearningOutcomeGroup.find_by(context: @course, title: "Group B").root_account_id).to eq(@course.root_account_id)
     end
 
     it "reactivate previous imported deleted group" do
@@ -716,6 +724,8 @@ describe Mutations::ImportOutcomes do
 
       expect(groupc.workflow_state).to eql("active")
       expect(groupd.workflow_state).to eql("active")
+      expect(groupc.root_account_id).to eq(@course.resolved_root_account_id)
+      expect(groupd.root_account_id).to eq(@course.resolved_root_account_id)
     end
   end
 
@@ -738,13 +748,14 @@ describe Mutations::ImportOutcomes do
           global: true
         )
 
+        # account level import
         exec(
           outcome_id: get_outcome_id("0 Root Group A outcome", nil),
           source_context_id: nil,
           source_context_type: nil,
           target_group_id: Account.default.root_outcome_group.id
         )
-
+        # course level import
         exec(group_id: Account.default.root_outcome_group.child_outcome_groups.find_by(title: "Root Group A").id)
       end
 
@@ -785,7 +796,6 @@ describe Mutations::ImportOutcomes do
       end
 
       it "handles source_outcome_group_id" do
-        @root_group.reload
         account_imported_group = Account.default.root_outcome_group.child_outcome_groups.find_by(title: "Root Group A")
         course_imported_group = @course.root_outcome_group.child_outcome_groups.find_by(title: "Root Group A")
 
@@ -797,9 +807,13 @@ describe Mutations::ImportOutcomes do
     context "multiple imports" do
       before do
         root_group = LearningOutcomeGroup.find_or_create_root(nil, true)
+        @root_group = outcome_group_model(
+          title: "Root Group",
+          outcome_group_id: root_group.id
+        )
         group_a = outcome_group_model(
           title: "Root Group A",
-          outcome_group_id: root_group.id
+          outcome_group_id: @root_group.id
         )
         group_b = outcome_group_model(
           title: "Root Group B",
@@ -820,6 +834,7 @@ describe Mutations::ImportOutcomes do
           global: true
         )
 
+        # account level
         exec(
           group_id: find_group("Root Group B").id,
           source_context_id: nil,
@@ -827,6 +842,7 @@ describe Mutations::ImportOutcomes do
           target_group_id: Account.default.root_outcome_group.id
         )
 
+        # account level
         exec(
           group_id: find_group("Root Group C").id,
           source_context_id: nil,
@@ -868,7 +884,7 @@ describe Mutations::ImportOutcomes do
                                        }]
                             }],
                            Account.default.root_outcome_group)
-
+        # course level
         exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: "Root Group B").id)
         exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: "Root Group C").id)
 

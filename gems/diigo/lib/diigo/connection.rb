@@ -66,7 +66,7 @@ module Diigo
     end
 
     def self.diigo_post_bookmark(service, url, title, desc, tags)
-      form_data = { title: title, url: url, tags: tags.join(","), desc: desc }
+      form_data = { title:, url:, tags: tags.join(","), desc: }
       response = diigo_generate_request(diigo_url(service), "POST", service.service_user_name, service.decrypted_password, form_data)
       ActiveSupport::JSON.decode(response.body)
     end

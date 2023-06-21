@@ -53,7 +53,7 @@ describe Mutations::PostAssignmentGrades do
   end
 
   def execute_query(mutation_str, context)
-    CanvasSchema.execute(mutation_str, context: context)
+    CanvasSchema.execute(mutation_str, context:)
   end
 
   context "when user has grade permission" do
@@ -328,7 +328,7 @@ describe Mutations::PostAssignmentGrades do
     let(:submissions_posted_messages) do
       Message.where(
         communication_channel: teacher.email_channel,
-        notification: notification
+        notification:
       )
     end
 

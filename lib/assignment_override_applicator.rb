@@ -204,9 +204,9 @@ module AssignmentOverrideApplicator
     return nil unless group_category_id
 
     group = if assignment_or_quiz.context.user_has_been_student?(user)
-              user.current_groups.shard(assignment_or_quiz.shard).where(group_category_id: group_category_id).first
+              user.current_groups.shard(assignment_or_quiz.shard).where(group_category_id:).first
             else
-              assignment_or_quiz.context.groups.where(group_category_id: group_category_id).first
+              assignment_or_quiz.context.groups.where(group_category_id:).first
             end
 
     if group

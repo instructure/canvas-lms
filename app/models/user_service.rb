@@ -45,7 +45,7 @@ class UserService < ActiveRecord::Base
       cc.save!
     end
     if user_id && service
-      UserService.where(user_id: user_id, service: service).where("id<>?", self).delete_all
+      UserService.where(user_id:, service:).where("id<>?", self).delete_all
     end
     true
   end
@@ -104,7 +104,7 @@ class UserService < ActiveRecord::Base
     domain = opts[:service_domain] || "google.com"
     service = opts[:service] || "google_docs"
     protocol = opts[:protocol] || "oauth"
-    user_service = opts[:user].user_services.where(service: service, protocol: protocol).first_or_initialize
+    user_service = opts[:user].user_services.where(service:, protocol:).first_or_initialize
     user_service.service_domain = domain
     user_service.token = token
     user_service.secret = secret

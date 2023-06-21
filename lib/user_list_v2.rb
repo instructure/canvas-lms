@@ -115,12 +115,12 @@ class UserListV2
         user_id = Shard.relative_id_for(user_id, Shard.current, original_shard)
         account_id = Shard.relative_id_for(account_id, Shard.current, original_shard)
       end
-      @all_results << { address: address,
-                        user_id: user_id,
+      @all_results << { address:,
+                        user_id:,
                         user_token: User.token(user_id, user_uuid),
-                        user_name: user_name,
-                        account_id: account_id,
-                        account_name: account_name }
+                        user_name:,
+                        account_id:,
+                        account_name: }
     end
   end
 

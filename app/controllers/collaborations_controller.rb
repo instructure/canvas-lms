@@ -302,7 +302,7 @@ class CollaborationsController < ApplicationController
         # After saved, update the members
         @collaboration.update_members(users, group_ids)
         format.html { redirect_to @collaboration.url }
-        format.json { render json: @collaboration.as_json(methods: [:collaborator_ids], permissions: { user: @current_user, session: session }) }
+        format.json { render json: @collaboration.as_json(methods: [:collaborator_ids], permissions: { user: @current_user, session: }) }
       else
         Lti::ContentItemUtil.new(content_item).failure_callback if content_item
         flash[:error] = t "errors.create_failed", "Collaboration creation failed"
@@ -338,7 +338,7 @@ class CollaborationsController < ApplicationController
               methods: [:collaborator_ids],
               permissions: {
                 user: @current_user,
-                session: session
+                session:
               }
             )
           end
@@ -456,7 +456,7 @@ class CollaborationsController < ApplicationController
   def external_tool_launch_url(url, resource_link_lookup_uuid)
     polymorphic_url(
       [:retrieve, @context, :external_tools],
-      url: url,
+      url:,
       display: "borderless",
       resource_link_lookup_id: resource_link_lookup_uuid
     )

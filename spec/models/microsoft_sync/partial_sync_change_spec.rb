@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe MicrosoftSync::PartialSyncChange do
-  subject { described_class.create(course: course, user: user, enrollment_type: "owner") }
+  subject { described_class.create(course:, user:, enrollment_type: "owner") }
 
   let(:user) { user_model }
-  let(:course) { course_with_user("TeacherEnrollment", user: user).course }
+  let(:course) { course_with_user("TeacherEnrollment", user:).course }
 
   it { is_expected.to be_a described_class }
   it { is_expected.to be_valid }

@@ -907,7 +907,7 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                               action: "update",
                                                                               course_id: @course.to_param,
-                                                                              tab_id: tab_id,
+                                                                              tab_id:,
                                                                               format: "json",
                                                                               hidden: true })
       expect(json["hidden"]).to be true
@@ -937,7 +937,7 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                               action: "update",
                                                                               course_id: @course.to_param,
-                                                                              tab_id: tab_id,
+                                                                              tab_id:,
                                                                               format: "json",
                                                                               hidden: false })
       expect(json["hidden"]).to be_nil
@@ -967,7 +967,7 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                               action: "update",
                                                                               course_id: @course.to_param,
-                                                                              tab_id: tab_id,
+                                                                              tab_id:,
                                                                               format: "json",
                                                                               hidden: true })
       expect(json["hidden"]).to be true
@@ -980,7 +980,7 @@ describe TabsController, type: :request do
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                               action: "update",
                                                                               course_id: @course.to_param,
-                                                                              tab_id: tab_id,
+                                                                              tab_id:,
                                                                               format: "json",
                                                                               position: 2 })
       expect(json["position"]).to eq 2
@@ -993,7 +993,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                                     action: "update",
                                                                                     course_id: @course.to_param,
-                                                                                    tab_id: tab_id,
+                                                                                    tab_id:,
                                                                                     format: "json",
                                                                                     hidden: true })
       expect(result).to eq 400
@@ -1005,7 +1005,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                                     action: "update",
                                                                                     course_id: @course.to_param,
-                                                                                    tab_id: tab_id,
+                                                                                    tab_id:,
                                                                                     format: "json",
                                                                                     position: 1 })
       expect(result).to eq 400
@@ -1017,7 +1017,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                                     action: "update",
                                                                                     course_id: @course.to_param,
-                                                                                    tab_id: tab_id,
+                                                                                    tab_id:,
                                                                                     format: "json",
                                                                                     position: 400 })
       expect(result).to eq 400
@@ -1029,7 +1029,7 @@ describe TabsController, type: :request do
       result = raw_api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                                     action: "update",
                                                                                     course_id: @course.to_param,
-                                                                                    tab_id: tab_id,
+                                                                                    tab_id:,
                                                                                     format: "json",
                                                                                     position: 4 })
       expect(result).to eq 401
@@ -1059,9 +1059,9 @@ describe TabsController, type: :request do
 
       json = api_call(:put, "/api/v1/courses/#{@course.id}/tabs/#{tab_id}", { controller: "tabs",
                                                                               action: "update",
-                                                                              position: position,
+                                                                              position:,
                                                                               course_id: @course.to_param,
-                                                                              tab_id: tab_id,
+                                                                              tab_id:,
                                                                               format: "json" })
       expect(json["position"]).to eq position
     end

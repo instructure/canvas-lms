@@ -140,9 +140,9 @@ class DelayedMessage < ActiveRecord::Base
         subject: notification.subject,
         to: to.path,
         notification_name: notification.name,
-        notification: notification,
+        notification:,
         from: path,
-        user: user
+        user:
       )
       message.delayed_messages = delayed_messages
       message.context = context

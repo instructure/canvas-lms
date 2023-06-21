@@ -27,7 +27,7 @@ describe CanvasSecurity::JWTWorkflow do
 
   describe "register/state_for" do
     it "uses block registerd with workflow to build state" do
-      CanvasSecurity::JWTWorkflow.register(:foo) { |c, u| { c: c, u: u } }
+      CanvasSecurity::JWTWorkflow.register(:foo) { |c, u| { c:, u: } }
       state = CanvasSecurity::JWTWorkflow.state_for(%i[foo], @c, @u)
       expect(state[:c]).to be(@c)
       expect(state[:u]).to be(@u)

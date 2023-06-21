@@ -59,10 +59,10 @@ module CoursesHelper
                     [t("#courses.recent_event.no_submissions", "no submissions")] + event_type
                   # all received submissions graded (but not all turned in)
                   elsif recent_event.submitted_count < context.students.size &&
-                        !current_user.assignments_needing_grading(contexts: contexts).include?(recent_event)
+                        !current_user.assignments_needing_grading(contexts:).include?(recent_event)
                     [t("#courses.recent_event.no_new_submissions", "no new submissions")] + event_type
                   # all submissions turned in and graded
-                  elsif !current_user.assignments_needing_grading(contexts: contexts).include?(recent_event)
+                  elsif !current_user.assignments_needing_grading(contexts:).include?(recent_event)
                     [t("#courses.recent_event.all_graded", "all graded")] + event_type
                   # assignments need grading
                   else
@@ -104,7 +104,7 @@ module CoursesHelper
   def course_permission_to?(perm_name, account = nil)
     account ||= @domain_root_account.manually_created_courses_account
     course = Course.new(account_id: account.id)
-    TeacherEnrollment.new(user: @current_user, course: course)
+    TeacherEnrollment.new(user: @current_user, course:)
     account.grants_right?(@current_user, perm_name.to_sym)
   end
 
@@ -126,7 +126,7 @@ module CoursesHelper
   end
 
   def user_type(course, user, enrollments = nil)
-    enrollment = enrollments ? enrollments[user.id] : course.enrollments.find_by(user: user)
+    enrollment = enrollments ? enrollments[user.id] : course.enrollments.find_by(user:)
 
     if enrollment.nil?
       return course.account_membership_allows(user) ? "admin" : nil

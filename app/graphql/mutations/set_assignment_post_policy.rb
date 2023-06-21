@@ -44,7 +44,7 @@ class Mutations::SetAssignmentPostPolicy < Mutations::BaseMutation
       end
     end
 
-    policy = PostPolicy.find_or_create_by(course: course, assignment: assignment)
+    policy = PostPolicy.find_or_create_by(course:, assignment:)
     policy.update!(post_manually: input[:post_manually])
 
     { post_policy: policy }

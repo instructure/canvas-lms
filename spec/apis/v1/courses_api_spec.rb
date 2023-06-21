@@ -36,7 +36,7 @@ class TestCourseApi
   end
 end
 
-def each_copy_option(&block)
+def each_copy_option(&)
   [[:assignments, :assignments],
    [:external_tools, :context_external_tools],
    [:files, :attachments],
@@ -44,7 +44,7 @@ def each_copy_option(&block)
    [:calendar_events, :calendar_events],
    [:quizzes, :quizzes],
    [:modules, :context_modules],
-   [:outcomes, :created_learning_outcomes]].each(&block)
+   [:outcomes, :created_learning_outcomes]].each(&)
 end
 
 describe Api::V1::Course do
@@ -143,7 +143,7 @@ describe Api::V1::Course do
 
     it "counts students with multiple enrollments once in 'total students'" do
       section = @course2.course_sections.create! name: "other section"
-      @course2.enroll_student @student, section: section, allow_multiple_enrollments: true
+      @course2.enroll_student @student, section:, allow_multiple_enrollments: true
       expect(@course2.student_enrollments.count).to eq 2
 
       json = @test_api.course_json(@course2, @me, {}, ["total_students"], [])
@@ -205,6 +205,7 @@ describe Api::V1::Course do
           "enrollment_state" => "active",
           "limit_privileges_to_course_section" => false,
           "computed_current_score" => 95.0,
+          "computed_current_letter_grade" => nil, # this is nil because restrict_quantitative_data is off for user
           "computed_final_score" => 85.0,
           "computed_current_grade" => "A",
           "computed_final_grade" => "B",
@@ -220,22 +221,35 @@ describe Api::V1::Course do
                                                })
       end
 
+      let(:expected_result_without_unposted_with_rqd_enabled) do
+        expected_result_without_unposted.merge({ "computed_current_letter_grade" => "A" })
+      end
+
+      let(:expected_result_without_unposted_without_letter_grade) do
+        expected_result_without_unposted.except("computed_current_letter_grade")
+      end
+
+      let(:expected_result_with_unposted_without_letter_grade) do
+        expected_result_with_unposted.except("computed_current_letter_grade")
+      end
+
       it "includes computed scores" do
-        expect(json["enrollments"]).to eq [expected_result_with_unposted]
+        # since this user is a teacher, they will not get computed_current_letter_grade with their default permissions
+        expect(json["enrollments"]).to eq [expected_result_with_unposted_without_letter_grade]
       end
 
       it "includes unposted scores if user has :manage_grades" do
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: true)
 
-        expect(json["enrollments"]).to eq [expected_result_with_unposted]
+        expect(json["enrollments"]).to eq [expected_result_with_unposted_without_letter_grade]
       end
 
       it "includes unposted scores if user has :view_all_grades" do
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: true)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 
-        expect(json["enrollments"]).to eq [expected_result_with_unposted]
+        expect(json["enrollments"]).to eq [expected_result_with_unposted_without_letter_grade]
       end
 
       it "does not include unposted scores if user does not have permission" do
@@ -243,6 +257,24 @@ describe Api::V1::Course do
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 
         expect(json["enrollments"]).to eq [expected_result_without_unposted]
+      end
+
+      it "includes computed_current_letter_grade for rqd enabled user who does not have instructor typical permissions" do
+        # truthy feature flag
+        Account.default.enable_feature! :restrict_quantitative_data
+
+        # truthy setting
+        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+        Account.default.save!
+
+        # truthy permission(since enabled is being "not"ed)
+        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
+        Account.default.reload
+
+        @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
+        @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
+
+        expect(json["enrollments"]).to eq [expected_result_without_unposted_with_rqd_enabled]
       end
     end
 
@@ -951,9 +983,9 @@ describe CoursesController, type: :request do
 
       let(:item2) { course.assignments.create!(title: "Assignment #{SecureRandom.alphanumeric(10)}", workflow_state: "published") }
 
-      let(:designer) { designer_in_course(course: course, active_all: true).user }
+      let(:designer) { designer_in_course(course:, active_all: true).user }
 
-      let(:teacher) { teacher_in_course(course: course, active_all: true).user }
+      let(:teacher) { teacher_in_course(course:, active_all: true).user }
 
       it "denies access to a caller without rights to view course grades" do
         api_call_as_user(designer,
@@ -1023,8 +1055,8 @@ describe CoursesController, type: :request do
 
           it "returns a json representation of enrolled users and their progress to a user with rights to view course grades" do
             # Enroll two students
-            student1 = student_in_course(course: course, active_all: true)
-            student2 = student_in_course(course: course, active_all: true)
+            student1 = student_in_course(course:, active_all: true)
+            student2 = student_in_course(course:, active_all: true)
 
             # Have one of the students complete the course
             student1_progress = CourseProgress.new(course, student1.user)
@@ -1062,8 +1094,8 @@ describe CoursesController, type: :request do
           end
 
           it "paginates the list of user progress" do
-            student_in_course(course: course, active_all: true)
-            student_in_course(course: course, active_all: true)
+            student_in_course(course:, active_all: true)
+            student_in_course(course:, active_all: true)
 
             json = api_call_as_user(teacher,
                                     :get,
@@ -2223,21 +2255,21 @@ describe CoursesController, type: :request do
 
         it "deletes multiple courses" do
           expect(Auditors::Course).to receive(:record_deleted).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "delete", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "delete", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_deleted }
         end
 
         it "concludes multiple courses" do
           expect(Auditors::Course).to receive(:record_concluded).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "conclude", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "conclude", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_completed }
         end
 
         it "publishes multiple courses" do
           expect(Auditors::Course).to receive(:record_published).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
@@ -2245,7 +2277,7 @@ describe CoursesController, type: :request do
         it "accepts sis ids" do
           course_ids = ["sis_course_id:course1", "sis_course_id:course2", "sis_course_id:course3"]
           expect(Auditors::Course).to receive(:record_published).exactly(course_ids.length).times
-          api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           [@course1, @course2, @course3].each { |c| expect(c.reload).to be_available }
         end
@@ -2357,7 +2389,7 @@ describe CoursesController, type: :request do
         it "succeeds when publishing already published courses" do
           @course1.offer!
           expect(Auditors::Course).to receive(:record_published).twice
-          json = api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress.message).to be_include "3 courses processed"
@@ -2368,7 +2400,7 @@ describe CoursesController, type: :request do
           @course1.complete!
           @course2.complete!
           expect(Auditors::Course).to receive(:record_concluded).once
-          json = api_call(:put, @path, @params, { event: "conclude", course_ids: course_ids })
+          json = api_call(:put, @path, @params, { event: "conclude", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress.message).to be_include "3 courses processed"
@@ -2379,7 +2411,7 @@ describe CoursesController, type: :request do
           @course1.complete!
           @course2.complete!
           expect(Auditors::Course).to receive(:record_unconcluded).twice
-          json = api_call(:put, @path, @params, { event: "offer", course_ids: course_ids })
+          json = api_call(:put, @path, @params, { event: "offer", course_ids: })
           run_jobs
           progress = Progress.find(json["id"])
           expect(progress.message).to be_include "3 courses processed"
@@ -3706,7 +3738,7 @@ describe CoursesController, type: :request do
             role.base_role_type = "StudentEnrollment"
             role.save!
             @student3 = user_factory(name: "S3")
-            @student3_enroll = @course1.enroll_user(@student3, "StudentEnrollment", { role: role })
+            @student3_enroll = @course1.enroll_user(@student3, "StudentEnrollment", { role: })
           end
 
           it "returns all student types with ?enrollment_type=student" do
@@ -4761,7 +4793,7 @@ describe CoursesController, type: :request do
         json = api_call(:post,
                         "/api/v1/courses/#{@course.id}/preview_html",
                         { controller: "courses", action: "preview_html", course_id: @course.to_param, format: "json" },
-                        { html: html })
+                        { html: })
 
         returned_html = json["html"]
         expect(returned_html).not_to include("<script>")

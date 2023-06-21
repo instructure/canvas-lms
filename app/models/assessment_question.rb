@@ -133,7 +133,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
     unless file_substitutions[id_or_path]
       if id
-        file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
+        file = Attachment.where(context_type:, context_id:, id: id_or_path).first
       elsif path
         path = URI::DEFAULT_PARSER.unescape(id_or_path)
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
@@ -267,7 +267,7 @@ class AssessmentQuestion < ActiveRecord::Base
     # cache all the known quiz_questions
     scope = Quizzes::QuizQuestion
             .shard(Shard.shard_for(quiz_id))
-            .where(quiz_id: quiz_id, workflow_state: "generated")
+            .where(quiz_id:, workflow_state: "generated")
     # we search for nil quiz_group_id and duplicate_index to find older questions
     # generated before we added proper race condition checking
     existing_quiz_questions = scope
@@ -289,8 +289,8 @@ class AssessmentQuestion < ActiveRecord::Base
           end
         rescue ActiveRecord::RecordNotUnique
           qq = scope.where(assessment_question_id: aq,
-                           quiz_group_id: quiz_group_id,
-                           duplicate_index: duplicate_index).take!
+                           quiz_group_id:,
+                           duplicate_index:).take!
           qq.update_assessment_question!(aq, quiz_group_id, duplicate_index)
         end
       end

@@ -52,8 +52,8 @@ module Workflow
       @states = {}
     end
 
-    def add(&specification)
-      instance_eval(&specification)
+    def add(&)
+      instance_eval(&)
     end
 
     private
@@ -67,9 +67,9 @@ module Workflow
     end
     alias_method :workflow_state, :state
 
-    def event(name, args = {}, &action)
+    def event(name, args = {}, &)
       @scoped_state.events[name.to_sym] =
-        Event.new(name, args[:transitions_to], &action)
+        Event.new(name, args[:transitions_to], &)
     end
 
     def on_entry(&proc)
@@ -125,13 +125,13 @@ module Workflow
       @workflow_states ||= OpenStruct.new(workflow_spec.states.transform_values { |val| val.name.to_s })
     end
 
-    def workflow(&specification)
+    def workflow(&)
       unless const_defined?(:WorkflowMethods, false)
         const_set(:WorkflowMethods, Module.new)
       end
       workflow_methods = const_get(:WorkflowMethods, false)
       self.workflow_spec ||= Specification.new
-      self.workflow_spec.add(&specification)
+      self.workflow_spec.add(&)
       self.workflow_spec.states.each_value do |state|
         state_name = state.name
         workflow_methods.module_eval do

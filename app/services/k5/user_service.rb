@@ -133,10 +133,10 @@ class K5::UserService
       if @course_ids.present?
         # Use only provided course_ids' account ids if passed
         provided_account_ids = provided_global_account_ids.select { |account_id| Shard.shard_for(account_id) == Shard.current }.map { |global_id| Shard.local_id_for(global_id)[0] }
-        break true if (provided_account_ids & k5_account_ids).any?
+        break true if provided_account_ids.intersect?(k5_account_ids)
 
         provided_account_chain_ids = Account.multi_account_chain_ids(provided_account_ids)
-        break true if (provided_account_chain_ids & k5_account_ids).any?
+        break true if provided_account_chain_ids.intersect?(k5_account_ids)
       else
         # If course_ids isn't passed, check all their (non-observer and unlinked observer) enrollments and account_users
         # i.e., ignore observer enrollments with a linked student - the observer picker filters out these courses
@@ -144,13 +144,13 @@ class K5::UserService
         enrolled_courses_scope = enrolled_courses_scope.not_of_observer_type.or(enrolled_courses_scope.of_observer_type.where(associated_user_id: nil))
         enrolled_course_ids = enrolled_courses_scope.select(:course_id)
         enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
-        break true if (enrolled_account_ids & k5_account_ids).any?
+        break true if enrolled_account_ids.intersect?(k5_account_ids)
 
         enrolled_account_ids += @user.account_users.shard(Shard.current).active.pluck(:account_id)
-        break true if (enrolled_account_ids & k5_account_ids).any?
+        break true if enrolled_account_ids.intersect?(k5_account_ids)
 
         enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
-        break true if (enrolled_account_chain_ids & k5_account_ids).any?
+        break true if enrolled_account_chain_ids.intersect?(k5_account_ids)
       end
     end
     k5_associations == true

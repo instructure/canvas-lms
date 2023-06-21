@@ -31,8 +31,8 @@ describe CoursePacing::PaceContextsService do
 
     context "for type 'section'" do
       let!(:default_section) { course.default_section }
-      let!(:section_one) { add_section("Section One", course: course) }
-      let!(:inactive_section) { add_section("Section Two", course: course) }
+      let!(:section_one) { add_section("Section One", course:) }
+      let!(:inactive_section) { add_section("Section Two", course:) }
 
       before { inactive_section.destroy! }
 
@@ -42,7 +42,7 @@ describe CoursePacing::PaceContextsService do
 
       it "returns specific sections" do
         params = { contexts: [default_section.id] }
-        filtered_contexts = subject.contexts_of_type("section", params: params)
+        filtered_contexts = subject.contexts_of_type("section", params:)
         expect(filtered_contexts).to match_array [default_section]
         expect(filtered_contexts).not_to include section_one
       end
@@ -65,7 +65,7 @@ describe CoursePacing::PaceContextsService do
 
       it "returns specific student enrollments" do
         params = { contexts: [enrollment_two.id] }
-        filtered_contexts = subject.contexts_of_type("student_enrollment", params: params)
+        filtered_contexts = subject.contexts_of_type("student_enrollment", params:)
         expect(filtered_contexts).to match_array [enrollment_two]
         expect(filtered_contexts).not_to include enrollment
       end
@@ -80,7 +80,7 @@ describe CoursePacing::PaceContextsService do
       end
 
       context "when a user has multiple enrollment sources in a course" do
-        let(:section_one) { add_section("Section One", course: course) }
+        let(:section_one) { add_section("Section One", course:) }
 
         before do
           Timecop.freeze(2.weeks.ago) do

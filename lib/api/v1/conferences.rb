@@ -61,8 +61,8 @@ module Api::V1::Conferences
     cs = conferences.map do |c|
       c.as_json(
         permissions: {
-          user: user,
-          session: session,
+          user:,
+          session:,
         },
         url: named_context_url(context, :context_conference_url, c)
       )
@@ -83,8 +83,8 @@ module Api::V1::Conferences
 
     conference.as_json(
       permissions: {
-        user: user,
-        session: session,
+        user:,
+        session:,
       },
       url: named_context_url(context, :context_conferences_url)
     )

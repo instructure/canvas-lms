@@ -27,7 +27,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       product_code: "turnitin-lti",
       vendor_name: "TurnItIn",
       root_account: account,
-      developer_key: developer_key
+      developer_key:
     )
   end
 
@@ -73,12 +73,12 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
           "tool_profile" => { "service_offered" => [{ "endpoint" => "endpoint", "@id" => "#vnd.Canvas.SubmissionEvent" }] },
         },
         subscription_id: "id",
-        context: course_factory(account: account),
+        context: course_factory(account:),
         shared_secret: "shared_secret",
         guid: "guid",
         product_version: "1.0beta",
         lti_version: "LTI-2p0",
-        product_family: product_family,
+        product_family:,
         workflow_state: "active"
       )
       tool_proxy2.update_columns(subscription_id: nil)
@@ -100,12 +100,12 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
           "tool_profile" => { "service_offered" => [{ "endpoint" => "endpoint", "@id" => "#vnd.Canvas.SubmissionEvent" }] },
         },
         subscription_id: "id3",
-        context: course_factory(account: account),
+        context: course_factory(account:),
         shared_secret: "shared_secret",
         guid: "guid",
         product_version: "1.0beta",
         lti_version: "LTI-2p0",
-        product_family: product_family,
+        product_family:,
         workflow_state: "active"
       )
       tool_proxy.raw_data["enabled_capability"] = [placement]
@@ -126,12 +126,12 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
           "tool_profile" => { "service_offered" => [{ "endpoint" => "yoyo.ma", "@id" => "#vnd.Canvas.SubmissionEvent" }] },
         },
         subscription_id: "id3",
-        context: course_factory(account: account),
+        context: course_factory(account:),
         shared_secret: "shared_secret",
         guid: "guid",
         product_version: "1.0beta",
         lti_version: "LTI-2p0",
-        product_family: product_family,
+        product_family:,
         workflow_state: "active"
       )
       tool_proxy.raw_data["enabled_capability"] = [placement]

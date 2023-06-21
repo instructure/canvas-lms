@@ -236,7 +236,7 @@ class LatePolicyController < ApplicationController
   def record_already_exists
     status = :bad_request
     message = "only one late policy per course is allowed"
-    render json: { status: status, errors: [{ message: message }] }, status: status
+    render json: { status:, errors: [{ message: }] }, status:
   end
 
   class RecordAlreadyExists < ActiveRecord::ActiveRecordError; end

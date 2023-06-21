@@ -31,7 +31,7 @@ module DataFixup::AddRoleOverridesForNewPermission
     end
 
     rel = RoleOverride.where(permission: base_permission)
-    rel = rel.joins(:role).where(roles: { base_role_type: base_role_type }) if base_role_type
+    rel = rel.joins(:role).where(roles: { base_role_type: }) if base_role_type
     rel.find_in_batches do |base_overrides|
       # just in case
       new_overrides = RoleOverride.where(permission: new_permission, context_id: base_overrides.map(&:context_id))

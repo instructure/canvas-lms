@@ -337,7 +337,7 @@ class SubmissionsController < SubmissionsBaseController
           if api_request?
             includes = %(submission_comments attachments)
             json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
-            render json: json,
+            render json:,
                    status: :created,
                    location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
           else
@@ -390,7 +390,7 @@ class SubmissionsController < SubmissionsBaseController
       format.json do
         render json: {
                  audit_events: audit_events.as_json(include_root: false),
-                 users: audit_event_data(data: user_data, submission: submission),
+                 users: audit_event_data(data: user_data, submission:),
                  tools: audit_event_data(data: tool_data, role: "grader"),
                  quizzes: audit_event_data(data: quiz_data, role: "grader", name_field: :title),
                },
@@ -404,7 +404,7 @@ class SubmissionsController < SubmissionsBaseController
       {
         id: datum.id,
         name: datum.public_send(name_field),
-        role: role.presence || auditing_user_role(user: datum, submission: submission)
+        role: role.presence || auditing_user_role(user: datum, submission:)
       }
     end
   end
@@ -436,8 +436,8 @@ class SubmissionsController < SubmissionsBaseController
     params[:submission][:attachments] = []
 
     attachment_ids.each do |id|
-      params[:submission][:attachments] << @submission_user.attachments.active.where(id: id).first if @submission_user
-      params[:submission][:attachments] << @group.attachments.active.where(id: id).first if @group
+      params[:submission][:attachments] << @submission_user.attachments.active.where(id:).first if @submission_user
+      params[:submission][:attachments] << @group.attachments.active.where(id:).first if @group
       params[:submission][:attachments].compact!
     end
   end
@@ -622,7 +622,7 @@ class SubmissionsController < SubmissionsBaseController
     # Homework submission is done by API request, but I saw other parts of code
     # that are handling HTML and JSON format. So, I kept the same logic here...
     if api_request?
-      render(json: { message: message }, status: :bad_request)
+      render(json: { message: }, status: :bad_request)
     else
       flash[:error] = message
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)

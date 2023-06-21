@@ -35,7 +35,7 @@ describe Types::ModuleItemType do
   end
 
   context "permissions" do
-    let_once(:student) { student_in_course(course: course).user }
+    let_once(:student) { student_in_course(course:).user }
 
     it "requires read permission on context module" do
       module1.workflow_state = "unpublished"
@@ -103,13 +103,13 @@ describe Types::ModuleItemType do
     end
 
     it "works for quizzes" do
-      quiz = quiz_model({ course: course })
+      quiz = quiz_model({ course: })
       module_item = module1.add_item({ type: "Quiz", id: quiz.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end
 
     it "works for pages" do
-      page = wiki_page_model({ course: course })
+      page = wiki_page_model({ course: })
       module_item = module1.add_item({ type: "WikiPage", id: page.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end

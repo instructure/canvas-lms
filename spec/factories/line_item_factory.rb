@@ -46,7 +46,7 @@ module Factories
     {
       score_maximum: 10,
       label: "Test Line Item",
-      assignment: assignment,
+      assignment:,
       client_id: developer_key&.global_id
     }
   end

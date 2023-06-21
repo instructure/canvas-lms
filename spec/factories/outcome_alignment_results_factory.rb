@@ -50,19 +50,19 @@ module Factories
 
     LearningOutcomeResult.create!(
       learning_outcome: @outcome,
-      user: user,
+      user:,
       context: @course,
       alignment: @alignment,
       associated_asset: @assignment,
       association_type: "Assignment",
       association_id: @assignment.id,
-      title: title,
-      score: score,
+      title:,
+      score:,
       possible: @outcome.points_possible,
-      mastery: mastery,
+      mastery:,
       created_at: submitted_at,
       updated_at: submitted_at,
-      submitted_at: submitted_at,
+      submitted_at:,
       assessed_at: submitted_at
     )
   end
@@ -73,22 +73,22 @@ module Factories
     submitted_at = args[:submitted_at] || time
 
     association_object = rubric_association_model({ association_object: @assignment })
-    rubric_assessment_model(user: user, context: @course, rubric_association: association_object)
+    rubric_assessment_model(user:, context: @course, rubric_association: association_object)
 
     LearningOutcomeResult.create!(
       artifact: @rubric_assessment,
       learning_outcome: @outcome,
-      user: user,
+      user:,
       context: @course,
       alignment: @alignment,
       association_type: "RubricAssociation",
-      title: title,
-      score: score,
+      title:,
+      score:,
       possible: @outcome.points_possible,
-      mastery: mastery,
+      mastery:,
       created_at: submitted_at,
       updated_at: submitted_at,
-      submitted_at: submitted_at,
+      submitted_at:,
       assessed_at: submitted_at
     )
   end

@@ -102,7 +102,7 @@ module Utils
     end
 
     def present_date(date)
-      Utils::DatePresenter.new(date.to_date, zone, with_weekday: with_weekday).as_string(date_style)
+      Utils::DatePresenter.new(date.to_date, zone, with_weekday:).as_string(date_style)
     end
 
     def finish

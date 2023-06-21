@@ -88,8 +88,8 @@ describe "master courses - course picker" do
   let(:term_filter) { "#termsFilter" }
   let(:sub_account_filter) { "#subAccountsFilter" }
 
-  def wait_for_spinner(&block)
-    wait_for_transient_element(loading, &block)
+  def wait_for_spinner(&)
+    wait_for_transient_element(loading, &)
   end
 
   # enter search term into the filter text box and wait for the response

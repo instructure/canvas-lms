@@ -22,7 +22,7 @@ describe AuthenticationProvidersController do
   let!(:account) { Account.create! }
 
   before do
-    admin = account_admin_user(account: account)
+    admin = account_admin_user(account:)
     user_session(admin)
   end
 

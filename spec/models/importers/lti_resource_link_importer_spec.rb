@@ -23,7 +23,7 @@ describe Importers::LtiResourceLinkImporter do
 
   let!(:source_course) { course_model }
   let!(:destination_course) { course_model }
-  let!(:migration) { ContentMigration.create(context: destination_course, source_course: source_course) }
+  let!(:migration) { ContentMigration.create(context: destination_course, source_course:) }
   let!(:tool) { external_tool_1_3_model(context: destination_course) }
 
   context "when `lti_resource_links` is not given" do
@@ -63,7 +63,7 @@ describe Importers::LtiResourceLinkImporter do
         Lti::ResourceLink.create!(
           context_external_tool: tool,
           context: assignment,
-          lookup_uuid: lookup_uuid,
+          lookup_uuid:,
           custom: nil,
           url: "http://www.example.com/launch"
         )
@@ -96,7 +96,7 @@ describe Importers::LtiResourceLinkImporter do
           destination_course.lti_resource_links.create!(
             context_external_tool: tool,
             custom: nil,
-            lookup_uuid: lookup_uuid
+            lookup_uuid:
           )
         end
 

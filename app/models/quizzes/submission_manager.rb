@@ -52,7 +52,7 @@ module Quizzes
     def generate_build_hash(query_hash, user)
       return query_hash unless query_hash[:user_id]
 
-      { user: user }
+      { user: }
     end
   end
 end

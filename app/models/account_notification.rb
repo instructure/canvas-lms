@@ -85,7 +85,7 @@ class AccountNotification < ActiveRecord::Base
   def self.for_user_and_account(user, root_account, include_past: false)
     GuardRail.activate(:secondary) do
       if root_account.site_admin?
-        current = for_account(root_account, include_past: include_past)
+        current = for_account(root_account, include_past:)
       else
         course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
@@ -95,7 +95,7 @@ class AccountNotification < ActiveRecord::Base
                                .joins(:account).where(accounts: { workflow_state: "active" })
                                .distinct.pluck(:account_id).uniq
         all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
-        current = for_account(root_account, all_account_ids, include_past: include_past)
+        current = for_account(root_account, all_account_ids, include_past:)
       end
 
       user_role_ids = {}
@@ -141,7 +141,7 @@ class AccountNotification < ActiveRecord::Base
           user_role_ids[announcement.account_id] |= account_users.map { |au| au.role.role_for_root_account_id(root_account.id).id }
         end
 
-        role_ids.empty? || (role_ids & user_role_ids[announcement.account_id]).present?
+        role_ids.empty? || role_ids.intersect?(user_role_ids[announcement.account_id])
       end
 
       user.shard.activate do

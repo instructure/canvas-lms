@@ -34,12 +34,12 @@ describe PostPolicy do
     let(:assignment) { course.assignments.create!(title: "!!!") }
 
     it "is valid if a valid course and assignment are specified" do
-      post_policy = PostPolicy.new(course: course, assignment: assignment)
+      post_policy = PostPolicy.new(course:, assignment:)
       expect(post_policy).to be_valid
     end
 
     it "is valid if a valid course is specified without an assignment" do
-      post_policy = PostPolicy.new(course: course)
+      post_policy = PostPolicy.new(course:)
       expect(post_policy).to be_valid
     end
 
@@ -95,7 +95,7 @@ describe PostPolicy do
 
   describe "root account ID" do
     let_once(:root_account) { Account.create! }
-    let_once(:subaccount) { Account.create(root_account: root_account) }
+    let_once(:subaccount) { Account.create(root_account:) }
     let_once(:course) { Course.create!(account: subaccount) }
 
     context "for a post policy associated with a course" do

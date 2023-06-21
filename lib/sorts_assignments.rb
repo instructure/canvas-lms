@@ -30,11 +30,11 @@ class SortsAssignments
     @requested_user = requested_user
   end
 
-  def assignments(bucket, &block)
+  def assignments(bucket, &)
     raise InvalidBucketError if VALID_BUCKETS.exclude?(bucket)
 
     @now = Time.zone.now
-    filter(bucket, &block)
+    filter(bucket, &)
   end
 
   private
@@ -72,7 +72,7 @@ class SortsAssignments
       due_in_future: ->(scope) { scope.where("submissions.cached_due_date IS NULL OR submissions.cached_due_date >= ?", @now) },
       due_soon: ->(scope) { scope.where("submissions.cached_due_date >= ? AND submissions.cached_due_date <= ?", @now, 1.week.from_now(@now)) },
       expects_submission: lambda do |additional_excludes: ["external_tool"]|
-        ->(scope) { scope.expecting_submission(additional_excludes: additional_excludes) }
+        ->(scope) { scope.expecting_submission(additional_excludes:) }
       end,
       needs_grading: ->(scope) { scope.where(Submission.needs_grading_conditions) },
       not_submitted_or_graded: ->(scope) { scope.merge(Submission.not_submitted_or_graded) },

@@ -17,31 +17,23 @@
  */
 
 import React from 'react'
-import {Outlet, useParams} from 'react-router-dom'
-
-const CourseContextOutlet = () => {
-  const {courseId} = useParams()
-  return <Outlet context={{contextId: courseId, contextType: 'courses'}} />
-}
-
-const AccountContextOutlet = () => {
-  const {accountId} = useParams()
-  return <Outlet context={{contextId: accountId, contextType: 'accounts'}} />
-}
+import {Outlet} from 'react-router-dom'
+import {accountGradingSettingsRoutes} from '../../account_grading_settings/routes/accountGradingSettingsRoutes'
 
 export const routes = [
   {
     path: '/courses/:courseId',
-    element: <CourseContextOutlet />,
+    element: <Outlet />,
     children: [
-      /* ...fooRoutes, ...barRoutes */
+      /* ...fooRoutes */
     ],
   },
   {
     path: '/accounts/:accountId',
-    element: <AccountContextOutlet />,
+    element: <Outlet />,
     children: [
-      /* ...fooRoutes, ...barRoutes */
+      ...accountGradingSettingsRoutes,
+      /* ...fooRoutes */
     ],
   },
 ]

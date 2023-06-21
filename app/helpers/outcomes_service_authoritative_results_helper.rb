@@ -57,7 +57,7 @@ module OutcomesServiceAuthoritativeResultsHelper
       content: assignment,
       tag_type: "learning_outcome",
       learning_outcome_id: authoritative_result[:external_outcome_id],
-      context: context
+      context:
     )
 
     # Retrieves the appropriate proficiency ratings for the outcome at the current context
@@ -77,17 +77,17 @@ module OutcomesServiceAuthoritativeResultsHelper
         title: "#{student_user.name}, #{assignment.name}", # title is needed; so we need the assignment (see rollup_score_aggregator_help:latest_result)
         user: student_user,
         user_uuid: student_user.uuid,
-        alignment: alignment,
-        context: context,
-        root_account: root_account,
-        possible: possible,
-        score: score,
+        alignment:,
+        context:,
+        root_account:,
+        possible:,
+        score:,
         # mastery is computed after the call for calculate_percent!
         original_possible: possible,
         original_score: score,
         created_at: submitted_at,
         updated_at: submitted_at,
-        submitted_at: submitted_at,
+        submitted_at:,
         assessed_at: submitted_at
       )
 
@@ -116,7 +116,7 @@ module OutcomesServiceAuthoritativeResultsHelper
       content: assignment,
       tag_type: "learning_outcome",
       learning_outcome: outcome,
-      context: context
+      context:
     )
 
     # Retrieves the appropriate proficiency ratings for the outcome at the current context
@@ -136,17 +136,17 @@ module OutcomesServiceAuthoritativeResultsHelper
         title: "#{student_user.name}, #{assignment.name}",
         user: student_user,
         user_uuid: student_user.uuid,
-        alignment: alignment,
-        context: context,
-        root_account: root_account,
-        possible: possible,
-        score: score,
+        alignment:,
+        context:,
+        root_account:,
+        possible:,
+        score:,
         # mastery is computed after the call for calculate_percent!
         original_possible: possible,
         original_score: score,
         created_at: submitted_at,
         updated_at: submitted_at,
-        submitted_at: submitted_at,
+        submitted_at:,
         assessed_at: submitted_at
       )
 
@@ -170,21 +170,21 @@ module OutcomesServiceAuthoritativeResultsHelper
 
     question_result =
       LearningOutcomeQuestionResult.new(
-        learning_outcome_result: learning_outcome_result,
+        learning_outcome_result:,
         learning_outcome: learning_outcome_result.learning_outcome,
         associated_asset_id: question_metadata[:quiz_item_id],
         associated_asset_type: "NewQuizQuestion",
         attempt: attempt_number,
         title: "#{learning_outcome_result.title}: #{question_metadata[:quiz_item_title]}",
         root_account: learning_outcome_result.root_account,
-        possible: possible,
-        score: score,
+        possible:,
+        score:,
         # mastery is computed after the call for calculate_percent!
         original_possible: possible,
         original_score: score,
         created_at: submitted_at,
         updated_at: submitted_at,
-        submitted_at: submitted_at,
+        submitted_at:,
         assessed_at: submitted_at
       )
 

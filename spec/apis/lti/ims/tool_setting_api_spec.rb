@@ -30,25 +30,25 @@ module Lti
           context: account,
           guid: SecureRandom.uuid,
           shared_secret: "abc",
-          product_family: product_family,
+          product_family:,
           product_version: "1",
           workflow_state: "disabled",
           raw_data: { "proxy" => "value" },
           lti_version: "1"
         )
       end
-      let(:resource_handler) { ResourceHandler.create!(resource_type_code: "code", name: "name", tool_proxy: tool_proxy) }
-      let(:message_handler) { MessageHandler.create(message_type: "basic-lti-launch-request", launch_path: "https://samplelaunch/blti", resource_handler: resource_handler) }
+      let(:resource_handler) { ResourceHandler.create!(resource_type_code: "code", name: "name", tool_proxy:) }
+      let(:message_handler) { MessageHandler.create(message_type: "basic-lti-launch-request", launch_path: "https://samplelaunch/blti", resource_handler:) }
       let(:access_token) { Lti::OAuth2::AccessToken.create_jwt(aud: nil, sub: tool_proxy.guid).to_s }
 
       before do
         allow_any_instance_of(ToolSettingController).to receive_messages(oauth_authenticated_request?: true)
         allow_any_instance_of(ToolSettingController).to receive_messages(authenticate_body_hash: true)
         allow_any_instance_of(ToolSettingController).to receive_messages(oauth_consumer_key: tool_proxy.guid)
-        allow(AuthenticationMethods).to receive_messages(access_token: access_token)
-        @link_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: "abc", custom: { link: :setting, a: 1, b: 2, c: 3 })
-        @binding_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, custom: { binding: :setting, a: 1, b: 2, d: 4 })
-        @proxy_setting = ToolSetting.create(tool_proxy: tool_proxy, custom: { proxy: :setting, a: 1, c: 3, d: 4 })
+        allow(AuthenticationMethods).to receive_messages(access_token:)
+        @link_setting = ToolSetting.create(tool_proxy:, context: account, resource_link_id: "abc", custom: { link: :setting, a: 1, b: 2, c: 3 })
+        @binding_setting = ToolSetting.create(tool_proxy:, context: account, custom: { binding: :setting, a: 1, b: 2, d: 4 })
+        @proxy_setting = ToolSetting.create(tool_proxy:, custom: { proxy: :setting, a: 1, c: 3, d: 4 })
       end
 
       describe "#show" do
@@ -144,9 +144,9 @@ module Lti
             resource_link_id = SecureRandom.uuid
             custom = { test: "value" }.with_indifferent_access
             Lti::ToolSetting.create!(
-              tool_proxy: tool_proxy,
-              resource_link_id: resource_link_id,
-              custom: custom,
+              tool_proxy:,
+              resource_link_id:,
+              custom:,
               context: tool_proxy.context
             )
             get "/api/lti/tool_proxy/#{tool_proxy.guid}/accounts/#{tool_proxy.context.id}/resource_link_id/#{resource_link_id}/tool_setting",
@@ -262,7 +262,7 @@ module Lti
 
       describe "#update" do
         it "returns as a bad request when bubble is set" do
-          tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: "resource_link")
+          tool_setting = ToolSetting.create(tool_proxy:, context: account, resource_link_id: "resource_link")
           params = { "link" => "settings" }
           put "/api/lti/tool_settings/#{tool_setting.id}.json?bubble=all",
               params: params.to_json,
@@ -273,7 +273,7 @@ module Lti
         end
 
         it "returns as a bad request when there is more than one @graph item" do
-          tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: "resource_link")
+          tool_setting = ToolSetting.create(tool_proxy:, context: account, resource_link_id: "resource_link")
           params = {
             "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolSettings",
             "@graph" => [
@@ -298,7 +298,7 @@ module Lti
         end
 
         it "updates a tool_setting with a single graph element" do
-          tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: "resource_link")
+          tool_setting = ToolSetting.create(tool_proxy:, context: account, resource_link_id: "resource_link")
           params = {
             "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolSettings",
             "@graph" => [
@@ -319,7 +319,7 @@ module Lti
 
         context "lti_link" do
           it "creates a new lti link tool setting" do
-            tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: "resource_link")
+            tool_setting = ToolSetting.create(tool_proxy:, context: account, resource_link_id: "resource_link")
             params = { "link" => "settings" }
             put "/api/lti/tool_settings/#{tool_setting.id}.json",
                 params: params.to_json,
@@ -332,7 +332,7 @@ module Lti
 
         context "binding" do
           it "creates a new binding tool setting" do
-            tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account)
+            tool_setting = ToolSetting.create(tool_proxy:, context: account)
             params = { "binding" => "settings" }
             put "/api/lti/tool_settings/#{tool_setting.id}.json",
                 params: params.to_json,
@@ -345,7 +345,7 @@ module Lti
 
         context "proxy" do
           it "creates a new tool_proxy tool setting" do
-            tool_setting = ToolSetting.create(tool_proxy: tool_proxy)
+            tool_setting = ToolSetting.create(tool_proxy:)
             params = { "tool_proxy" => "settings" }
             put "/api/lti/tool_settings/#{tool_setting.id}.json",
                 params: params.to_json,

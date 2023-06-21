@@ -50,7 +50,7 @@ class SubmissionsBaseController < ApplicationController
                  outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
                  rubric: rubric ? rubric_json(rubric, @current_user, session, style: "full") : nil,
                  rubricAssociation: rubric_association_json ? rubric_association_json["rubric_association"] : nil,
-                 outcome_proficiency: outcome_proficiency,
+                 outcome_proficiency:,
                  media_comment_asset_string: @current_user.asset_string,
                  EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
                  EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list]
@@ -86,7 +86,7 @@ class SubmissionsBaseController < ApplicationController
                     except: submission_json_exclusions,
                     permissions: {
                       user: @current_user,
-                      session: session,
+                      session:,
                       include_permissions: false
                     }
                   })
@@ -96,7 +96,7 @@ class SubmissionsBaseController < ApplicationController
   end
 
   def update
-    permissions = { user: @current_user, session: session, include_permissions: false }
+    permissions = { user: @current_user, session:, include_permissions: false }
     provisional = @assignment.moderated_grading? && params[:submission][:provisional]
     submission_json_exclusions = []
 
@@ -114,7 +114,7 @@ class SubmissionsBaseController < ApplicationController
     if params[:submission][:student_entered_score] && @submission.grants_right?(@current_user, session, :comment)
       update_student_entered_score(params[:submission][:student_entered_score])
 
-      render json: @submission.as_json(except: submission_json_exclusions, permissions: permissions)
+      render json: @submission.as_json(except: submission_json_exclusions, permissions:)
       return
     end
 
@@ -145,7 +145,7 @@ class SubmissionsBaseController < ApplicationController
           assessment_request: @request,
           group_comment: params[:submission][:group_comment],
           hidden: @submission.hide_grade_from_student? && admin_in_context,
-          provisional: provisional,
+          provisional:,
           final: params[:submission][:final],
           draft_comment: Canvas::Plugin.value_to_boolean(params[:submission][:draft_comment])
         }
@@ -173,7 +173,7 @@ class SubmissionsBaseController < ApplicationController
 
           json_args = Submission.json_serialization_full_parameters({
                                                                       except: [:quiz_submission, :submission_history]
-                                                                    }).merge(except: submission_json_exclusions, permissions: permissions)
+                                                                    }).merge(except: submission_json_exclusions, permissions:)
           json_args[:methods] << :provisional_grade_id if provisional
 
           submissions_json = @submissions.map do |submission|

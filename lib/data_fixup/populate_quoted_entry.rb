@@ -19,7 +19,7 @@
 #
 module DataFixup::PopulateQuotedEntry
   def self.run(start_at, end_at)
-    DiscussionEntry.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |min_id, max_id|
+    DiscussionEntry.find_ids_in_ranges(start_at:, end_at:) do |min_id, max_id|
       DiscussionEntry.where(id: min_id..max_id, include_reply_preview: true).update_all("quoted_entry_id = parent_id")
     end
   end

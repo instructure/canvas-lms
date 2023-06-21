@@ -382,7 +382,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                      "quiz" => quiz,
                      "wiki_page" => page }
       type_pairs.each do |content_type, obj|
-        api_call(:put, @url, @params, { content_type: content_type, content_id: obj.id, restricted: "1" }, {}, { expected_status: 200 })
+        api_call(:put, @url, @params, { content_type:, content_id: obj.id, restricted: "1" }, {}, { expected_status: 200 })
         mc_tag = @template.content_tag_for(obj)
         expect(mc_tag.restrictions).to eq @template.default_restrictions
         expect(mc_tag.use_default_restrictions).to be_truthy

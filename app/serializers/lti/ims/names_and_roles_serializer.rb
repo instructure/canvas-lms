@@ -65,7 +65,7 @@ module Lti::IMS
         {
           current_user: Lti::IMS::Providers::MembershipsProvider.unwrap(enrollment.user),
           tool: page[:tool],
-          enrollment: enrollment,
+          enrollment:,
           variable_whitelist: %w[
             Caliper.url
             Canvas.course.endAt
@@ -141,7 +141,7 @@ module Lti::IMS
           tool: page[:tool],
           context: unwrap(page[:context]),
           user: enrollment.user,
-          expander: expander,
+          expander:,
           return_url: nil,
           opts: {
             # See #variable_expander for additional constraints on custom param expansion

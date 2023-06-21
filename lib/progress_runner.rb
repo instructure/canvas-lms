@@ -93,9 +93,9 @@ class ProgressRunner
 
   private
 
-  def update_batch(batch, &process_element)
+  def update_batch(batch, &)
     batch.each do |element|
-      update_element(element, &process_element)
+      update_element(element, &)
     end
   end
 

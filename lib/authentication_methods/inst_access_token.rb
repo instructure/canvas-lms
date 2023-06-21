@@ -90,7 +90,7 @@ module AuthenticationMethods
     # user or similar exists, the local user
     # gets preferred.
     def self.find_user_by_uuid_prefer_local(uuid)
-      User.active.where(uuid: uuid).order(:id).first
+      User.active.where(uuid:).order(:id).first
     end
     private_class_method :find_user_by_uuid_prefer_local
   end

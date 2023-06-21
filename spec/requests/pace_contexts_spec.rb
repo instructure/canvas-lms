@@ -29,7 +29,7 @@ describe "Pace Contexts API" do
     course
   end
   let(:teacher) { teacher_enrollment.user }
-  let!(:default_pace) { course_pace_model(course: course) }
+  let!(:default_pace) { course_pace_model(course:) }
 
   before do
     Account.site_admin.enable_feature!(:course_paces_redesign)
@@ -77,7 +77,7 @@ describe "Pace Contexts API" do
     end
 
     context "when the section type is specified" do
-      let!(:section_one) { add_section("Section One", course: course) }
+      let!(:section_one) { add_section("Section One", course:) }
 
       it "returns an array containing the sections" do
         get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
@@ -163,7 +163,7 @@ describe "Pace Contexts API" do
       end
 
       context "when students have multiple enrollments in the same course" do
-        let(:section_one) { add_section("Section One", course: course) }
+        let(:section_one) { add_section("Section One", course:) }
         let!(:enrollment_two) { course.enroll_student(student_two, allow_multiple_enrollments: true, section: section_one, enrollment_state: "active") }
 
         before do
@@ -186,12 +186,12 @@ describe "Pace Contexts API" do
       end
 
       context "when a the student enrollments have more granular paces" do
-        let(:section) { add_section("Section One", course: course) }
-        let!(:enrollment_two) { multiple_student_enrollment(student_two, section, course: course) }
+        let(:section) { add_section("Section One", course:) }
+        let!(:enrollment_two) { multiple_student_enrollment(student_two, section, course:) }
 
         before do
           student_enrollment_pace_model(student_enrollment: enrollment)
-          section_pace_model(section: section)
+          section_pace_model(section:)
         end
 
         it "specifies the correct applied_pace" do
@@ -271,9 +271,9 @@ describe "Pace Contexts API" do
     context "when an order is specified" do
       context "sections" do
         let(:default_section) { course.default_section }
-        let!(:section_one) { add_section("Section One", course: course) }
-        let!(:section_two) { add_section("Section Two", course: course) }
-        let!(:section_three) { add_section("Section Three", course: course) }
+        let!(:section_one) { add_section("Section One", course:) }
+        let!(:section_two) { add_section("Section Two", course:) }
+        let!(:section_three) { add_section("Section Three", course:) }
 
         it "orders the results in descending order with desc specified" do
           get api_v1_pace_contexts_path(course.id), params: { type: "section", order: "desc", format: :json }
@@ -327,9 +327,9 @@ describe "Pace Contexts API" do
     context "when a sort is specified" do
       context "sections" do
         before do
-          add_section("Section C", course: course)
-          add_section("Section A", course: course)
-          add_section("Section B", course: course)
+          add_section("Section C", course:)
+          add_section("Section A", course:)
+          add_section("Section B", course:)
         end
 
         it "sorts by the section name" do
@@ -374,9 +374,9 @@ describe "Pace Contexts API" do
     context "when a search_term is specified" do
       context "sections" do
         before do
-          add_section("Section A", course: course)
-          add_section("Section B", course: course)
-          add_section("Section C", course: course)
+          add_section("Section A", course:)
+          add_section("Section B", course:)
+          add_section("Section C", course:)
         end
 
         it "filters by the section name" do
@@ -407,9 +407,9 @@ describe "Pace Contexts API" do
     context "when contexts are specified" do
       context "sections" do
         before do
-          @section_a = add_section("Section A", course: course)
-          @section_b = add_section("Section B", course: course)
-          @section_c = add_section("Section C", course: course)
+          @section_a = add_section("Section A", course:)
+          @section_b = add_section("Section B", course:)
+          @section_c = add_section("Section C", course:)
         end
 
         it "filters by context ids" do

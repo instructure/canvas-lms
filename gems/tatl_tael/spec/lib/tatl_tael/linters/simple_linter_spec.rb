@@ -19,7 +19,7 @@ describe TatlTael::Linters::SimpleLinter do
   let(:pretty_config) { TatlTael::Linters.underscore_and_symbolize_keys(config) }
   let(:changes) { double }
 
-  let(:simple_linter) { described_class.new(config: pretty_config, changes: changes) }
+  let(:simple_linter) { described_class.new(config: pretty_config, changes:) }
 
   describe "#run" do
     context "precondition NOT met" do
@@ -114,7 +114,7 @@ describe TatlTael::Linters::SimpleLinter do
       end
       let(:simple_linter) do
         described_class.new(config: config_with_pretty_requirement,
-                            changes: changes)
+                            changes:)
       end
 
       context "changes exist for the requirement query" do

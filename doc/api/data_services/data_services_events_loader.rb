@@ -63,7 +63,7 @@ class DataServicesEventsLoader
   def data
     @data ||= event_types.collect do |event_category, event_files|
       {
-        event_category: event_category,
+        event_category:,
         page_title: page_tile_formatter(event_category),
         event_payloads: load_json_events(event_files.sort)
       }

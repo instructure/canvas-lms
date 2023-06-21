@@ -43,20 +43,20 @@ module Lti::IMS
 
     let(:registration) do
       r = Registration.new({
-        application_type: application_type,
-        grant_types: grant_types,
-        response_types: response_types,
-        redirect_uris: redirect_uris,
-        initiate_login_uri: initiate_login_uri,
-        client_name: client_name,
-        jwks_uri: jwks_uri,
-        logo_uri: logo_uri,
-        client_uri: client_uri,
-        tos_uri: tos_uri,
-        policy_uri: policy_uri,
-        token_endpoint_auth_method: token_endpoint_auth_method,
-        lti_tool_configuration: lti_tool_configuration,
-        scopes: scopes
+        application_type:,
+        grant_types:,
+        response_types:,
+        redirect_uris:,
+        initiate_login_uri:,
+        client_name:,
+        jwks_uri:,
+        logo_uri:,
+        client_uri:,
+        tos_uri:,
+        policy_uri:,
+        token_endpoint_auth_method:,
+        lti_tool_configuration:,
+        scopes:
       }.compact)
       r.developer_key = developer_key
       r

@@ -54,7 +54,7 @@ class Lti::IMS::Registration < ApplicationRecord
   belongs_to :developer_key, inverse_of: :lti_registration
 
   def new_external_tool(context, existing_tool: nil)
-    tool = existing_tool || ContextExternalTool.new(context: context)
+    tool = existing_tool || ContextExternalTool.new(context:)
     Importers::ContextExternalToolImporter.import_from_migration(
       importable_configuration,
       context,

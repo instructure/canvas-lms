@@ -39,10 +39,10 @@ module DataFixup::BackfillModerationGraders
           anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids[assignment_id])
           existing_anonymous_ids[assignment_id] << anonymous_id
           {
-            anonymous_id: anonymous_id,
-            assignment_id: assignment_id,
+            anonymous_id:,
+            assignment_id:,
             user_id: grader_id,
-            created_at: created_at,
+            created_at:,
             updated_at: created_at
           }
         end

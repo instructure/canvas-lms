@@ -25,6 +25,7 @@ const defaultProps: ComponentProps = {
   autoSubscription: false,
   disabled: false,
   onChange: jest.fn(),
+  accountName: 'Test',
 }
 
 describe('SubscriptionDropDown', () => {

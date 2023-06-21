@@ -54,9 +54,9 @@ describe Quizzes::QuizExtensionSerializer do
 
   let :serializer do
     Quizzes::QuizExtensionSerializer.new(quiz_extension,
-                                         controller: controller,
+                                         controller:,
                                          scope: user,
-                                         session: session)
+                                         session:)
   end
 
   before do

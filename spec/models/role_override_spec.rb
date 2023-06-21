@@ -25,7 +25,7 @@ describe RoleOverride do
     role = teacher_role
     RoleOverride.create!(context: @account,
                          permission: "moderate_forum",
-                         role: role,
+                         role:,
                          enabled: false)
     permissions = RoleOverride.permission_for(Account.default, :moderate_forum, role)
     expect(permissions[:enabled]).to be_truthy
@@ -46,11 +46,11 @@ describe RoleOverride do
     role = teacher_role(root_account_id: a1.id)
     RoleOverride.create!(context: a1,
                          permission: "moderate_forum",
-                         role: role,
+                         role:,
                          enabled: false)
     RoleOverride.create!(context: a2,
                          permission: "moderate_forum",
-                         role: role,
+                         role:,
                          enabled: true)
 
     permissions = RoleOverride.permission_for(a1, :moderate_forum, role)
@@ -77,17 +77,17 @@ describe RoleOverride do
 
     role = custom_student_role("some role", account: a1)
     u1 = user_factory
-    c1.enroll_student(u1, role: role)
+    c1.enroll_student(u1, role:)
     u2 = user_factory
-    c2.enroll_student(u2, role: role)
+    c2.enroll_student(u2, role:)
 
     ro = RoleOverride.create!(context: a1,
                               permission: "moderate_forum",
-                              role: role,
+                              role:,
                               enabled: true)
     RoleOverride.create!(context: a2,
                          permission: "moderate_forum",
-                         role: role,
+                         role:,
                          enabled: false)
 
     expect(c1.grants_right?(u1, :moderate_forum)).to be_truthy
@@ -115,7 +115,7 @@ describe RoleOverride do
     role = teacher_role
     role_override = RoleOverride.create!(context: account,
                                          permission: "moderate_forum",
-                                         role: role,
+                                         role:,
                                          enabled: false)
     role.update!(updated_at: 1.day.ago)
     old_updated_at = role.updated_at
@@ -295,8 +295,8 @@ describe RoleOverride do
     def create_override(role, enabled)
       RoleOverride.create!(context: @account,
                            permission: @permission.to_s,
-                           role: role,
-                           enabled: enabled)
+                           role:,
+                           enabled:)
     end
 
     it "does not mark a permission as explicit in a sub account when it's explicit in the root" do
@@ -507,7 +507,7 @@ describe RoleOverride do
 
       it "finds site-admin role overrides on a non-current shard" do
         role = custom_account_role("custom", account: Account.site_admin)
-        Account.site_admin.role_overrides.create!(permission: "become_user", enabled: true, role: role)
+        Account.site_admin.role_overrides.create!(permission: "become_user", enabled: true, role:)
         @shard1.activate do
           @account = Account.create!
         end
@@ -523,7 +523,7 @@ describe RoleOverride do
       role.save!
       ro = RoleOverride.new(context: Account.site_admin,
                             permission: "manage_role_overrides",
-                            role: role,
+                            role:,
                             enabled: true)
       ro.applies_to_self = false
       ro.save!
@@ -541,7 +541,7 @@ describe RoleOverride do
       role.save!
       ro = RoleOverride.new(context: Account.site_admin,
                             permission: "manage_role_overrides",
-                            role: role,
+                            role:,
                             enabled: true)
       ro.applies_to_descendants = false
       ro.save!
@@ -710,7 +710,7 @@ describe RoleOverride do
       expect(RoleOverride).to receive(:uncached_permission_for).twice.and_call_original
       @sub_account = Account.default.sub_accounts.create!
       course = course_factory(active_all: true, account: @sub_account)
-      student_in_course(active_all: true, course: course)
+      student_in_course(active_all: true, course:)
 
       expect(course.grants_right?(@student, :read_forum)).to be true
       Account.default.role_overrides.create!(role: student_role, permission: :read_forum, enabled: false)
@@ -723,7 +723,7 @@ describe RoleOverride do
       expect(RoleOverride).to receive(:uncached_permission_for).twice.and_call_original
       @sub_account1 = Account.default.sub_accounts.create!
       course = course_factory(active_all: true, account: @sub_account1)
-      student_in_course(active_all: true, course: course)
+      student_in_course(active_all: true, course:)
       @sub_account2 = Account.default.sub_accounts.create!
       @sub_account2.role_overrides.create!(role: student_role, permission: :read_forum, enabled: false)
 

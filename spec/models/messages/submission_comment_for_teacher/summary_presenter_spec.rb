@@ -22,12 +22,12 @@ require "spec_helper"
 
 describe Messages::SubmissionCommentForTeacher::SummaryPresenter do
   let_once(:course) { course_model(name: "MATH-101") }
-  let_once(:teacher) { course_with_teacher(course: course, active_all: true).user }
+  let_once(:teacher) { course_with_teacher(course:, active_all: true).user }
   let_once(:submitter) do
-    course_with_user("StudentEnrollment", course: course, name: "Adam Jones", active_all: true).user
+    course_with_user("StudentEnrollment", course:, name: "Adam Jones", active_all: true).user
   end
   let_once(:commenter) do
-    course_with_user("StudentEnrollment", course: course, name: "Betty Ford", active_all: true).user
+    course_with_user("StudentEnrollment", course:, name: "Betty Ford", active_all: true).user
   end
 
   let(:assignment) { course.assignments.create!(name: "Introductions", due_at: 1.day.ago) }

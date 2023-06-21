@@ -55,7 +55,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)
-    entry_participant = new(discussion_entry: entry, user: user)
+    entry_participant = new(discussion_entry: entry, user:)
     error_message = "Null value in column '#{column}' violates not-null constraint"
     entry_participant.errors.add(column, error_message)
     entry_participant
@@ -78,8 +78,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     batch ||= [entry_or_topic]
     entry_or_topic.shard.activate do
       raise(ArgumentError) if batch.count > 1_000
-      return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
-      return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
+      return not_null_column_object(column: :entry, entry: entry_or_topic, user:) unless entry_or_topic
+      return not_null_column_object(column: :user, entry: entry_or_topic, user:) unless user
 
       insert_columns = %w[discussion_entry_id user_id root_account_id workflow_state read_at]
       update_columns = []
@@ -136,7 +136,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
       # if there are no values in the update_columns, there is no point to
       # creating the record. A non-existent record is treated as an unread record.
-      return not_null_column_object(column: :workflow_state, entry: entry_or_topic, user: user) if update_columns.empty?
+      return not_null_column_object(column: :workflow_state, entry: entry_or_topic, user:) if update_columns.empty?
 
       # takes two ruby arrays and makes into a sql update statement.
       # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
@@ -177,16 +177,16 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.upsert_for_root_entry_and_descendants(root_entry, user, new_state: nil, forced: nil, rating: nil)
-    DiscussionEntry.where(root_entry: root_entry)
+    DiscussionEntry.where(root_entry:)
                    .or(DiscussionEntry.where(id: root_entry))
                    .active.find_ids_in_batches do |batch|
-      upsert_for_entries(root_entry, user, batch: batch, new_state: new_state, forced: forced, rating: rating)
+      upsert_for_entries(root_entry, user, batch:, new_state:, forced:, rating:)
     end
   end
 
   def self.upsert_for_topic(topic, user, new_state: nil, forced: nil, rating: nil)
     topic.discussion_entries.active.find_ids_in_batches do |batch|
-      upsert_for_entries(topic, user, batch: batch, new_state: new_state, forced: forced, rating: rating)
+      upsert_for_entries(topic, user, batch:, new_state:, forced:, rating:)
     end
   end
 

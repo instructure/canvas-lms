@@ -92,10 +92,10 @@ module Canvas::Twilio
     unless country == outbound_country
       InstStatsd::Statsd.increment("notifications.twilio.no_outbound_numbers_for.#{country}",
                                    short_stat: "notifications.twilio.no_outbound_numbers",
-                                   tags: { country: country })
+                                   tags: { country: })
     end
 
     # Then send the message.
-    client.api.account.messages.create(from: outbound_number, to: recipient_number, body: body)
+    client.api.account.messages.create(from: outbound_number, to: recipient_number, body:)
   end
 end

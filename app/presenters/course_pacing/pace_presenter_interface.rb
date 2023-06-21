@@ -43,8 +43,8 @@ class CoursePacing::PacePresenterInterface
       published_at: pace.published_at,
       root_account_id: pace.root_account_id,
       modules: modules_json,
-      context_id: context_id,
-      context_type: context_type
+      context_id:,
+      context_type:
     }.merge(pace.start_date(with_context: true)).merge(pace.effective_end_date(with_context: true))
   end
 

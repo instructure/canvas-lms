@@ -350,7 +350,7 @@ module Lti
         guid: SecureRandom.uuid,
         product_version: "1.0beta",
         lti_version: "LTI-2p0",
-        product_family: product_family,
+        product_family:,
         workflow_state: "active",
         raw_data: "some raw data"
       }
@@ -364,7 +364,7 @@ module Lti
       return unless tool_proxy.persisted?
 
       Lti::ResourceHandler.create!(
-        tool_proxy: tool_proxy,
+        tool_proxy:,
         name: "resource_handler",
         resource_type_code: "resource-type-code"
       )
@@ -377,7 +377,7 @@ module Lti
           guid: "guid",
           product_version: "1.0beta",
           lti_version: "LTI-2p0",
-          product_family: product_family,
+          product_family:,
           context: account,
           workflow_state: "active",
           raw_data: "some raw data"
@@ -715,19 +715,19 @@ module Lti
             "tool_profile" => { "service_offered" => [{ "endpoint" => "endpoint", "@id" => "#vnd.Canvas.SubmissionEvent" }] },
           },
           subscription_id: "id",
-          context: course_factory(account: account),
+          context: course_factory(account:),
           shared_secret: "shared_secret",
           guid: "guid",
           product_version: "1.0beta",
           lti_version: "LTI-2p0",
-          product_family: product_family,
+          product_family:,
           workflow_state: "active"
         )
 
         psh = double("PlagiarismSubscriptionsHelper")
         expect(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
         expect(psh).to receive(:create_subscription).and_return("subscription_id2")
-        tool_proxy.context = course_factory(account: account)
+        tool_proxy.context = course_factory(account:)
         tool_proxy.raw_data["enabled_capability"] = [placement]
         tool_proxy.save!
         expect(tool_proxy.subscription_id).to eq "subscription_id2"

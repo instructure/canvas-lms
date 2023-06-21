@@ -25,7 +25,7 @@ module Services
     end
 
     def snapshot_url_to_file(url, tmpfile)
-      url_params = { url: url }.to_query
+      url_params = { url: }.to_query
       full_url = "#{@config[:url]}?#{url_params}"
       CanvasHttp.get(full_url, { "X-API-Key" => @config[:key] }) do |http_response|
         if http_response.code.to_i == 200

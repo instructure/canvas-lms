@@ -273,8 +273,8 @@ describe Context do
 
   describe ".rubric_contexts" do
     def add_rubric(context)
-      r = Rubric.create!(context: context, title: "testing")
-      RubricAssociation.create!(context: context, rubric: r, purpose: :bookmark, association_object: context)
+      r = Rubric.create!(context:, title: "testing")
+      RubricAssociation.create!(context:, rubric: r, purpose: :bookmark, association_object: context)
     end
 
     it "returns rubric for concluded course enrollment" do

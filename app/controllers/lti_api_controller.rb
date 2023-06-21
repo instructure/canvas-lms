@@ -53,7 +53,7 @@ class LtiApiController < ApplicationController
       end
     end
 
-    render body: lti_response.to_xml, content_type: "application/xml", status: status
+    render body: lti_response.to_xml, content_type: "application/xml", status:
   end
 
   # this similar API implements the older work-in-process BLTI 0.0.4 outcome

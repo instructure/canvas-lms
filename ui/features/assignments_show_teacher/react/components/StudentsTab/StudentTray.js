@@ -29,7 +29,6 @@ import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Avatar} from '@instructure/ui-avatar'
 import {Tray} from '@instructure/ui-tray'
-/* import {DateTimeInput} from '@instructure/ui-forms' */
 import OverrideAttempts from '../Overrides/OverrideAttempts'
 import {
   IconArrowOpenEndLine,

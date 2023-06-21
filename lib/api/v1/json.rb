@@ -30,13 +30,13 @@ module Api::V1::Json
   # render :json => hash
   # and it'll be stringified properly.
   def api_json(obj, user, session, opts = {}, permissions_to_return = [])
-    permissions = { user: user, session: session, include_permissions: false }
+    permissions = { user:, session:, include_permissions: false }
     if permissions_to_return.present?
       permissions[:include_permissions] = true
       permissions[:policies] = Array(permissions_to_return)
     end
 
     obj.as_json({ include_root: false,
-                  permissions: permissions }.merge(opts))
+                  permissions: }.merge(opts))
   end
 end

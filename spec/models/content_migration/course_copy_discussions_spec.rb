@@ -110,7 +110,7 @@ describe ContentMigration do
 
     it "copies group setting" do
       group_category = @copy_from.group_categories.create!(name: "blah")
-      topic = @copy_from.discussion_topics.create! group_category: group_category
+      topic = @copy_from.discussion_topics.create!(group_category:)
 
       run_course_copy
 
@@ -121,7 +121,7 @@ describe ContentMigration do
 
     it "assigns group discussions to a group with a matching name in the destination course" do
       group_category = @copy_from.group_categories.create!(name: "blah")
-      topic = @copy_from.discussion_topics.create! group_category: group_category
+      topic = @copy_from.discussion_topics.create!(group_category:)
       @copy_to.group_categories.create!(name: "blah")
 
       run_course_copy

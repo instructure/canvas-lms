@@ -80,7 +80,7 @@ describe CrocodocSessionsController do
       hmac = Canvas::Security.hmac_sha1(blob)
       last_viewed_at = attachment.viewed_at
 
-      get :show, params: { blob: blob, hmac: hmac }
+      get :show, params: { blob:, hmac: }
 
       attachment.reload
       expect(attachment.viewed_at).not_to eq(last_viewed_at)

@@ -76,7 +76,7 @@ class AuthenticationProvider::SAML::Federation < AuthenticationProvider::SAML::M
         raise "Problem with validUntil: #{entities.valid_until}"
       end
       raise "Not signed!" unless entities.signed?
-      unless entities.valid_signature?(cert: cert)
+      unless entities.valid_signature?(cert:)
         raise "Invalid signature!"
       end
 

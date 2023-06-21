@@ -30,7 +30,7 @@ module DataFixup::CreateSubscriptionsForPlagiarismTools
                                             .where("raw_data like #{Lti::ToolProxy.connection.quote("%endpoint: #{endpoint}%")}")
         subscription_id = Lti::ToolProxy.where.not(subscription_id: nil).find_by(id: tools_with_endpoint)&.subscription_id
         subscription_id ||= Lti::PlagiarismSubscriptionsHelper.new(tools_with_endpoint.take).create_subscription
-        Lti::ToolProxy.active.where(id: tools_with_endpoint, subscription_id: nil).update_all(subscription_id: subscription_id)
+        Lti::ToolProxy.active.where(id: tools_with_endpoint, subscription_id: nil).update_all(subscription_id:)
       rescue
         next
       end

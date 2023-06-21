@@ -39,7 +39,7 @@ describe SearchController, type: :request do
   def student_in_course(options = {})
     section = options.delete(:section)
     u = User.create(options)
-    enrollment = @course.enroll_user(u, "StudentEnrollment", section: section)
+    enrollment = @course.enroll_user(u, "StudentEnrollment", section:)
     enrollment.workflow_state = "active"
     enrollment.save
     u
@@ -180,7 +180,7 @@ describe SearchController, type: :request do
         section = options.delete(:section)
         associated_user = options.delete(:associated_user)
         u = User.create(options)
-        enrollment = @course.enroll_user(u, "ObserverEnrollment", section: section)
+        enrollment = @course.enroll_user(u, "ObserverEnrollment", section:)
         enrollment.associated_user = associated_user
         enrollment.workflow_state = "active"
         enrollment.save

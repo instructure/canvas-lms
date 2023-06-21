@@ -39,7 +39,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::BaseMutation
     end
 
     {
-      discussion_topic: discussion_topic
+      discussion_topic:
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"

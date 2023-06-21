@@ -102,9 +102,9 @@ module CyoeHelper
     choose_url = modules_url + "/items/" + tag_id + "/choose"
     modules_disabled = @context.tabs_available(@current_user).select { |tabs| tabs[:label] == "Modules" }.blank?
     data.merge!({
-                  awaiting_choice: awaiting_choice,
-                  modules_url: modules_url,
-                  choose_url: choose_url,
+                  awaiting_choice:,
+                  modules_url:,
+                  choose_url:,
                   modules_tab_disabled: modules_disabled
                 })
   end

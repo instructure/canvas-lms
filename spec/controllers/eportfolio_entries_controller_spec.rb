@@ -241,7 +241,7 @@ describe EportfolioEntriesController do
       @student = @user
       course = Course.create!
       course.enroll_student(@student).accept(true)
-      teacher = teacher_in_course(course: course, active_all: true).user
+      teacher = teacher_in_course(course:, active_all: true).user
       @assignment = course.assignments.create!
       @submission = @assignment.submissions.find_by(user: @student)
       @assignment.grade_student(@student, grader: teacher, score: 5)

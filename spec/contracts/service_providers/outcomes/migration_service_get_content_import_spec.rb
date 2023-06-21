@@ -50,7 +50,7 @@ RSpec.describe "Outcomes Service - GET Content Import", :pact do
       }
     end
     let!(:course) { course_factory(active_course: true) }
-    let(:import_data) { { course: course, import_id: 1 } }
+    let(:import_data) { { course:, import_id: 1 } }
 
     before do
       outcomes.given("a provisioned outcomes service account with a completed content import")

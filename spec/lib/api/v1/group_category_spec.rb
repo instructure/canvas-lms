@@ -94,11 +94,13 @@ describe "Api::V1::GroupCategory" do
       end
 
       context "when 'groups' is specified as an include key" do
-        it "are included if active" do
+        it "are included if active and sorted by creation date" do
           json = CategoryHarness.new.group_category_json(category, user, nil, { include: ["groups"] })
           json_group_ids = json["groups"].pluck("id")
+          json_group_dates = json["groups"].pluck("created_at")
 
           expect(json_group_ids).to match_array(category.groups.pluck(:id))
+          expect(json_group_dates).to eq(json_group_dates.sort)
         end
 
         it "are not included if deleted" do

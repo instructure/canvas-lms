@@ -235,7 +235,7 @@ describe SIS::CSV::AccountImporter do
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active",
-      batch: batch
+      batch:
     )
     a1 = @account.sub_accounts.where(sis_source_id: "A001").first
     expect(a1).not_to be_nil

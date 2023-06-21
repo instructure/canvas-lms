@@ -409,7 +409,7 @@ describe "Files API", type: :request do
         size: 2.megabytes,
         name: "test.txt",
         content_type: "text/plain",
-        instfs_uuid: instfs_uuid,
+        instfs_uuid:,
         quota_exempt: true,
         folder_id: folder.id,
         on_duplicate: "overwrite",
@@ -465,7 +465,7 @@ describe "Files API", type: :request do
       api_call(:post,
                "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
-      attachment = Attachment.where(instfs_uuid: instfs_uuid).first
+      attachment = Attachment.where(instfs_uuid:).first
       expect(attachment.locked).to be true
     end
 
@@ -475,7 +475,7 @@ describe "Files API", type: :request do
       api_call(:post,
                "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
-      attachment = Attachment.where(instfs_uuid: instfs_uuid).first
+      attachment = Attachment.where(instfs_uuid:).first
       expect(attachment.locked).to be false
     end
 
@@ -483,7 +483,7 @@ describe "Files API", type: :request do
       params = base_params.merge(on_duplicate: "overwrite")
       existing = Attachment.create!(
         context: @course,
-        folder: folder,
+        folder:,
         uploaded_data: StringIO.new("existing"),
         filename: params[:name],
         display_name: params[:name]
@@ -492,7 +492,7 @@ describe "Files API", type: :request do
                "/api/v1/files/capture?#{base_params.to_query}",
                base_params.merge(controller: "files", action: "api_capture", format: "json"))
       existing.reload
-      attachment = Attachment.where(instfs_uuid: instfs_uuid).first
+      attachment = Attachment.where(instfs_uuid:).first
       expect(attachment.display_name).to eq params[:name]
       expect(existing).to be_deleted
       expect(existing.replacement_attachment).to eq attachment
@@ -542,10 +542,10 @@ describe "Files API", type: :request do
     end
 
     context "with 'category' not present in params" do
-      subject { Attachment.find_by(instfs_uuid: instfs_uuid) }
+      subject { Attachment.find_by(instfs_uuid:) }
 
       let(:category) { "" }
-      let(:params) { base_params.merge(category: category, controller: "files", action: "api_capture", format: "json") }
+      let(:params) { base_params.merge(category:, controller: "files", action: "api_capture", format: "json") }
 
       it "uses the default category" do
         raw_api_call(
@@ -559,10 +559,10 @@ describe "Files API", type: :request do
     end
 
     context "with 'category' present in params" do
-      subject { Attachment.find_by(instfs_uuid: instfs_uuid) }
+      subject { Attachment.find_by(instfs_uuid:) }
 
       let(:category) { Attachment::ICON_MAKER_ICONS }
-      let(:params) { base_params.merge(category: category, controller: "files", action: "api_capture", format: "json") }
+      let(:params) { base_params.merge(category:, controller: "files", action: "api_capture", format: "json") }
 
       it "sets the attachment category" do
         raw_api_call(
@@ -764,7 +764,7 @@ describe "Files API", type: :request do
           uploaded_data: StringIO.new("file"),
           folder: root_folder,
           context: user,
-          user: user
+          user:
         )
       end
       let(:request_params) do
@@ -843,7 +843,7 @@ describe "Files API", type: :request do
       let(:uncategorized) { @a2 }
 
       before do
-        icon_maker.update!(category: category)
+        icon_maker.update!(category:)
 
         @files_path_options[:category] = category
       end
@@ -1507,8 +1507,8 @@ describe "Files API", type: :request do
             def request(*)
               super do |response|
                 response.instance_eval do
-                  def read_body(*, &block)
-                    @body.each_char(&block)
+                  def read_body(*, &)
+                    @body.each_char(&)
                   end
                 end
                 yield response if block_given?

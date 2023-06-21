@@ -29,10 +29,10 @@ module Lti
     serialize :custom_parameters
 
     def message_handler(context)
-      MessageHandler.by_resource_codes(vendor_code: vendor_code,
-                                       product_code: product_code,
-                                       resource_type_code: resource_type_code,
-                                       context: context)
+      MessageHandler.by_resource_codes(vendor_code:,
+                                       product_code:,
+                                       resource_type_code:,
+                                       context:)
     end
 
     def originality_report

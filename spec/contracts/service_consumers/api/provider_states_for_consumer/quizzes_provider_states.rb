@@ -22,14 +22,14 @@ PactConfig::Consumers::ALL.each do |consumer|
     provider_state "a quiz" do
       set_up do
         course = Pact::Canvas.base_state.course
-        quiz_model(course: course)
+        quiz_model(course:)
       end
     end
 
     provider_state "a migrated quiz" do
       set_up do
         course = Pact::Canvas.base_state.course
-        quiz = quiz_model(course: course)
+        quiz = quiz_model(course:)
         quiz.migration_id = "i09d7615b43e5f35589cc1e2647dd345f"
         quiz.save!
       end

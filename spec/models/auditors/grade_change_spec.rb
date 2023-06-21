@@ -26,7 +26,7 @@ describe Auditors::GradeChange do
   let(:request_id) { 42 }
 
   before do
-    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id:)
 
     shard_class = Class.new do
       define_method(:activate) { |&b| b.call }
@@ -68,12 +68,12 @@ describe Auditors::GradeChange do
 
   it "inserts override grade change records" do
     expect(Auditors::GradeChange::Stream).to receive(:insert).once
-    Auditors::GradeChange.record(override_grade_change: override_grade_change)
+    Auditors::GradeChange.record(override_grade_change:)
   end
 
   it "does not accept both a submission and an override in the same call" do
     expect do
-      Auditors::GradeChange.record(submission: @submission, override_grade_change: override_grade_change)
+      Auditors::GradeChange.record(submission: @submission, override_grade_change:)
     end.to raise_error(ArgumentError)
   end
 
@@ -89,13 +89,13 @@ describe Auditors::GradeChange do
 
   it "returns override grade changes in results" do
     expect(course_grade_changes(@course).count).to eq 1
-    Auditors::GradeChange.record(override_grade_change: override_grade_change)
+    Auditors::GradeChange.record(override_grade_change:)
     expect(course_grade_changes(@course).count).to eq 2
   end
 
   it "stores override grade changes in the database" do
     expect do
-      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+      Auditors::GradeChange.record(override_grade_change:)
     end.to change {
       Auditors::ActiveRecord::GradeChangeRecord.where(
         context_id: @course.id,
@@ -106,7 +106,7 @@ describe Auditors::GradeChange do
 
   it "can restrict results to override grades" do
     Auditors::GradeChange.record(submission: @submission)
-    Auditors::GradeChange.record(override_grade_change: override_grade_change)
+    Auditors::GradeChange.record(override_grade_change:)
 
     records = Auditors::GradeChange.for_course_and_other_arguments(
       @course,
@@ -123,7 +123,7 @@ describe Auditors::GradeChange do
 
   it "can return results restricted to override grades in combination with other filters" do
     Auditors::GradeChange.record(submission: @submission)
-    Auditors::GradeChange.record(override_grade_change: override_grade_change)
+    Auditors::GradeChange.record(override_grade_change:)
 
     other_teacher = @course.enroll_teacher(User.create!, workflow_state: "active").user
     other_override = Auditors::GradeChange::OverrideGradeChange.new(
@@ -169,7 +169,7 @@ describe Auditors::GradeChange do
 
     it "saves the grading period ID for override grade changes" do
       override_grade_change.score.update!(grading_period_id: grading_period.id)
-      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+      Auditors::GradeChange.record(override_grade_change:)
       expect(Auditors::ActiveRecord::GradeChangeRecord.last.grading_period_id).to eq grading_period.id
     end
   end
@@ -220,7 +220,7 @@ describe Auditors::GradeChange do
           title: "a"
         )
 
-        @submission.update!(grading_period: grading_period)
+        @submission.update!(grading_period:)
         event = Auditors::GradeChange.record(submission: @submission)
         expect(event).to be_in_grading_period
       end

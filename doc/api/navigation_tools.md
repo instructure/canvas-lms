@@ -263,6 +263,11 @@ All of these settings are contained under "account_navigation"
     When set to \_blank, the windowTarget propety allows you to configure a launch to happen in a new
     tab instead of in an iframe. Omit this if you want to launch in frame.
 
+-   root_account_only: &lt;boolean&gt; (optional)
+
+    If set to true, the tool will not be shown in the account navigation for
+    subaccounts. Defaults to false (show in root account and all subaccounts).
+
 <a name="user_navigation"></a>
 User navigation links
 =================

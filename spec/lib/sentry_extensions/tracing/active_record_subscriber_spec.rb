@@ -39,7 +39,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
   end
 
   def perform_transaction(sampled: true)
-    transaction = Sentry::Transaction.new(sampled: sampled, hub: Sentry.get_current_hub)
+    transaction = Sentry::Transaction.new(sampled:, hub: Sentry.get_current_hub)
     Sentry.get_current_scope.set_span(transaction)
 
     yield

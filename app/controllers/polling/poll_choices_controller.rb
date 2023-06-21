@@ -195,7 +195,7 @@ module Polling
                                        each_serializer: Polling::PollChoiceSerializer,
                                        controller: self,
                                        root: :poll_choices,
-                                       meta: meta,
+                                       meta:,
                                        scope: @current_user,
                                        include_root: false
                                      }).as_json

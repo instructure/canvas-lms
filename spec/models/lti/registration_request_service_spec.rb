@@ -41,7 +41,7 @@ module Lti
           expect_any_instance_of(::IMS::LTI::Models::Messages::RegistrationRequest).to receive(:generate_key_and_password)
             .and_return(["key", "password"])
           expect(Rails.cache).to receive(:write)
-            .with("lti_registration_request/Account/#{account.global_id}/key", { reg_password: "password", registration_url: registration_url }, anything)
+            .with("lti_registration_request/Account/#{account.global_id}/key", { reg_password: "password", registration_url: }, anything)
 
           described_class.create_request(account, "profile_url", -> { "return_url" }, registration_url, tool_proxy_service_url)
         end

@@ -24,7 +24,7 @@ describe CourseForMenuPresenter do
   include K5Common
 
   let_once(:account) { Account.default }
-  let_once(:course) { Course.create!(account: account) }
+  let_once(:course) { Course.create!(account:) }
   let_once(:user) { User.create! }
 
   let(:dashboard_card_tabs) { UsersController::DASHBOARD_CARD_TABS }
@@ -80,7 +80,7 @@ describe CourseForMenuPresenter do
 
     it "sets isFavorited to true if course is favorited" do
       course.enroll_student(user)
-      Favorite.create!(user: user, context: course)
+      Favorite.create!(user:, context: course)
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
       expect(h[:isFavorited]).to be true

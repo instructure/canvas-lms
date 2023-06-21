@@ -33,10 +33,10 @@ module DataFixup::DeleteInvalidCommunicationChannels
       end
 
       r1.each do |id, user_id, path|
-        if scope.by_path(path.strip).where(user_id: user_id).exists?
+        if scope.by_path(path.strip).where(user_id:).exists?
           r2 << [id, user_id, path]
         else
-          CommunicationChannel.where(id: id).update_all(path: path.strip)
+          CommunicationChannel.where(id:).update_all(path: path.strip)
         end
       end
 

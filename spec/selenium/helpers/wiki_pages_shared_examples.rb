@@ -22,7 +22,7 @@ RSpec.shared_examples "course_pages_granular_permissions" do
     RoleOverride.create!(
       permission: permission.to_s,
       enabled: is_enabled,
-      role: role,
+      role:,
       account: @course.root_account
     )
   end

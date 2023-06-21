@@ -40,8 +40,8 @@ module GoogleDrive
       "google_drive"
     end
 
-    def with_timeout_protection(&block)
-      Timeout.timeout(@timeout || 30, &block)
+    def with_timeout_protection(&)
+      Timeout.timeout(@timeout || 30, &)
     rescue Timeout::Error
       raise ConnectionException, "Google Drive connection timed out"
     end

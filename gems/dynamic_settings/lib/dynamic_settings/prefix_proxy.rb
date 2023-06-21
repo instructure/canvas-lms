@@ -86,7 +86,7 @@ module DynamicSettings
       # Within a given request, no reason to talk to redis/consul multiple times for the same key in the same tree
       # The TTL is only relevant for the underlying cache-within a request we don't exceed the ttl boundary
       DynamicSettings.request_cache.cache(CACHE_KEY_PREFIX + full_key(key)) do
-        fetch_without_request_cache(key, ttl: ttl, **kwargs)
+        fetch_without_request_cache(key, ttl:, **kwargs)
       end
     end
     alias_method :[], :fetch
@@ -101,11 +101,11 @@ module DynamicSettings
     def for_prefix(prefix_extension, default_ttl: @default_ttl)
       self.class.new(
         "#{@prefix}/#{prefix_extension}",
-        tree: tree,
-        service: service,
-        environment: environment,
-        cluster: cluster,
-        default_ttl: default_ttl,
+        tree:,
+        service:,
+        environment:,
+        cluster:,
+        default_ttl:,
         data_center: @data_center
       )
     end
@@ -122,7 +122,7 @@ module DynamicSettings
         {
           "KV" => {
             "Verb" => "set",
-            "Key" => full_key(k, global: global),
+            "Key" => full_key(k, global:),
             "Value" => v,
           }
         }
@@ -273,7 +273,7 @@ module DynamicSettings
     end
 
     def populate_cache(subtree, ttl)
-      cache.write_set(subtree.to_h { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }, ttl: ttl)
+      cache.write_set(subtree.to_h { |st| [CACHE_KEY_PREFIX + st[:key], st[:value]] }, ttl:)
     end
   end
 end

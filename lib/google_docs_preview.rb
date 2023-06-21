@@ -53,6 +53,6 @@ module GoogleDocsPreview
 
   def self.url_for(attachment)
     expires_in = Setting.get("google_docs_previews.link_duration_minutes", "5").to_i.minutes
-    attachment.public_url(expires_in: expires_in)
+    attachment.public_url(expires_in:)
   end
 end

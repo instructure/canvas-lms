@@ -61,12 +61,12 @@ class SisBatchRollBackData < ActiveRecord::Base
     old_state = (context.id_before_last_save.nil? ? "non-existent" : context.workflow_state_before_last_save)
     sis_batch.shard.activate do
       SisBatchRollBackData.new(sis_batch_id: sis_batch.id,
-                               context: context,
+                               context:,
                                previous_workflow_state: old_state,
                                updated_workflow_state: context.workflow_state,
                                created_at: Time.zone.now,
                                updated_at: Time.zone.now,
-                               batch_mode_delete: batch_mode_delete,
+                               batch_mode_delete:,
                                workflow_state: "active")
     end
   end
@@ -78,12 +78,12 @@ class SisBatchRollBackData < ActiveRecord::Base
     contexts.each do |context|
       sis_batch.shard.activate do
         data << SisBatchRollBackData.new(sis_batch_id: sis_batch.id,
-                                         context: context,
+                                         context:,
                                          previous_workflow_state: context.workflow_state,
                                          updated_workflow_state: updated_state,
                                          created_at: Time.zone.now,
                                          updated_at: Time.zone.now,
-                                         batch_mode_delete: batch_mode_delete,
+                                         batch_mode_delete:,
                                          workflow_state: "active")
       end
     end

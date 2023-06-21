@@ -32,12 +32,12 @@ module CanvasDynamoDB
     end
 
     def put(table_name, *items)
-      vals = items.map { |item| { put_request: { item: item } } }
+      vals = items.map { |item| { put_request: { item: } } }
       add(table_name, *vals)
     end
 
     def delete(table_name, *keys)
-      vals = keys.map { |key| { delete_request: { key: key } } }
+      vals = keys.map { |key| { delete_request: { key: } } }
       add(table_name, *vals)
     end
 

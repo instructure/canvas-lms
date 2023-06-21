@@ -46,7 +46,7 @@ module QuizQuestionsCommon
     data = { question_name: name,
              points_possible: 1,
              question_text: question,
-             answers: answers,
+             answers:,
              question_type: "multiple_choice_question" }
 
     @quiz.quiz_questions.create!(question_data: data)

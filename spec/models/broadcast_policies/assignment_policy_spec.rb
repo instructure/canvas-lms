@@ -26,7 +26,7 @@ module BroadcastPolicies
       ctx
     end
     let(:assignment) do
-      double(context: context,
+      double(context:,
              published?: true,
              muted?: false,
              created_at: 4.hours.ago,

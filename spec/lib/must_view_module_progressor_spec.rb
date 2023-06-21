@@ -78,7 +78,7 @@ describe "MustViewModuleProgressor" do
     mod.require_sequential_progress = true
     mod.save!
     {
-      mod: mod,
+      mod:,
       initial_page: { item: initial_page, tag: initial_page_tag },
       assignment: { item: assignment, tag: assignment_tag },
       final_page: { item: final_page, tag: final_page_tag },

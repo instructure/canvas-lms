@@ -87,11 +87,11 @@ module Api::V1::Submission
       hash["provisional_grades"] =
         submission_provisional_grades_json(
           course: context,
-          assignment: assignment,
-          submission: submission,
-          current_user: current_user,
-          avatars: avatars,
-          includes: includes
+          assignment:,
+          submission:,
+          current_user:,
+          avatars:,
+          includes:
         )
     end
 
@@ -468,18 +468,18 @@ module Api::V1::Submission
     includes: []
   )
     speedgrader_url =
-      speed_grader_url(submission: submission, assignment: assignment, current_user: current_user)
-    json = provisional_grade.grade_attributes.merge(speedgrader_url: speedgrader_url)
+      speed_grader_url(submission:, assignment:, current_user:)
+    json = provisional_grade.grade_attributes.merge(speedgrader_url:)
 
     if includes.include?("submission_comments")
       json["submission_comments"] =
         anonymous_moderated_submission_comments_json(
-          course: course,
-          assignment: assignment,
+          course:,
+          assignment:,
           submissions: [submission],
           submission_comments: provisional_grade.submission_comments,
-          current_user: current_user,
-          avatars: avatars
+          current_user:,
+          avatars:
         )
     end
 
@@ -523,13 +523,13 @@ module Api::V1::Submission
 
     provisional_grades.map do |provisional_grade|
       provisional_grade_json(
-        course: course,
-        assignment: assignment,
-        submission: submission,
-        provisional_grade: provisional_grade,
-        avatars: avatars,
-        current_user: current_user,
-        includes: includes
+        course:,
+        assignment:,
+        submission:,
+        provisional_grade:,
+        avatars:,
+        current_user:,
+        includes:
       )
     end
   end

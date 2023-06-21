@@ -22,7 +22,7 @@ class Enrollment
   describe RecentActivity do
     describe "initialization" do
       let(:context) { double("enrollment context") }
-      let(:enrollment) { double(context: context) }
+      let(:enrollment) { double(context:) }
 
       it "defaults to the enrollments context" do
         expect(RecentActivity.new(enrollment).context).to eq(context)

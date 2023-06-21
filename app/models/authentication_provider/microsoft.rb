@@ -86,7 +86,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def scope
     result = []
     requested_attributes = [login_attribute] + federated_attributes.values.pluck("attribute")
-    result << "profile" unless (requested_attributes & %w[name oid preferred_username]).empty?
+    result << "profile" if requested_attributes.intersect?(%w[name oid preferred_username])
     result << "email" if requested_attributes.include?("email")
     result.join(" ")
   end

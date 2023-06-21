@@ -113,7 +113,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
       {
         id: id.to_s,
         text: text.to_s,
-        correct: correct,
+        correct:,
         responses: 0,
         user_ids: [],
         user_names: []

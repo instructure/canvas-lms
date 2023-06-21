@@ -87,7 +87,7 @@ module Factories
       group.grading_periods.create!({
                                       start_date: start_weeks_ago.weeks.ago,
                                       end_date: end_weeks_ago.weeks.ago,
-                                      title: title
+                                      title:
                                     })
     end
 

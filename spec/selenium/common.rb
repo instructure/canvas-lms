@@ -36,7 +36,7 @@ elsif ENV["TESTRAIL_ENTRY_RUN_ID"]
   end
 end
 
-Dir[File.dirname(__FILE__) + "/test_setup/common_helper_methods/*.rb"].sort.each { |file| require file }
+Dir[File.dirname(__FILE__) + "/test_setup/common_helper_methods/*.rb"].each { |file| require file }
 
 RSpec.configure do |config|
   config.before :suite do

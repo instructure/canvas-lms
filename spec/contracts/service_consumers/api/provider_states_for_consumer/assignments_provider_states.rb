@@ -185,9 +185,9 @@ PactConfig::Consumers::ALL.each do |consumer|
                                      artifact: submission,
                                      assessment_type: "grading",
                                      assessor: mteacher,
-                                     rubric: rubric,
+                                     rubric:,
                                      user: mstudent,
-                                     rubric_association: rubric_association,
+                                     rubric_association:,
                                      data: [{ points: 10.0, comments: "hey" }]
                                    })
           # Unfortunately, the rubric assessment above will not actually assign a grade

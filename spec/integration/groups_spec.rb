@@ -24,7 +24,7 @@ describe GroupsController do
   it "generates the correct 'Add Announcement' link" do
     course_with_teacher_logged_in(active_all: true, user: user_with_pseudonym)
     group_category = @course.group_categories.build(name: "worldCup")
-    @group = Group.create!(name: "group1", group_category: group_category, context: @course)
+    @group = Group.create!(name: "group1", group_category:, context: @course)
 
     get "/courses/#{@course.id}/groups/#{@group.id}"
     expect(response).to be_successful

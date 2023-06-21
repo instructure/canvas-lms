@@ -36,7 +36,7 @@ describe "graphql student context cards" do
                            submission_type: "online_url",
                            url: "http://www.google.com"
                          })
-    @ass.grade_student(student, grade: 5, grader: grader)
+    @ass.grade_student(student, grade: 5, grader:)
   end
 
   context "with graphql enabled as a teacher" do

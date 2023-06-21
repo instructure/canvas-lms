@@ -26,9 +26,9 @@ describe CC::LtiResourceLinks do
   let(:resource_link) do
     Lti::ResourceLink.create!(
       context: tool.context,
-      lookup_uuid: lookup_uuid,
+      lookup_uuid:,
       context_external_tool: tool,
-      custom: custom,
+      custom:,
       url: resource_link_url
     )
   end

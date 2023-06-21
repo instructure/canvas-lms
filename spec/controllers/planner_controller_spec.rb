@@ -251,7 +251,7 @@ describe PlannerController do
         submission_model(assignment: @assignment, user: reviewee)
         assessment_request = @assignment.assign_peer_review(@current_user, reviewee)
         PlannerOverride.create!(user: @current_user, plannable_id: assessment_request.id, plannable_type: "AssessmentRequest", marked_complete: false)
-        @submission.add_comment(comment: "comment", author: @current_user, assessment_request: assessment_request)
+        @submission.add_comment(comment: "comment", author: @current_user, assessment_request:)
         assessment_request.save!
         get :index, params: { start_date: @start_date, end_date: @end_date }
         response_json = json_parse(response.body)
@@ -840,7 +840,7 @@ describe PlannerController do
         it "allows a linked observer to query a student's planner items" do
           observer = user_with_pseudonym
           user_session(observer)
-          UserObservationLink.create_or_restore(observer: observer, student: @student, root_account: Account.default)
+          UserObservationLink.create_or_restore(observer:, student: @student, root_account: Account.default)
           get :index, params: { user_id: @student.to_param, per_page: 1 }
           expect(response).to be_successful
           link = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }

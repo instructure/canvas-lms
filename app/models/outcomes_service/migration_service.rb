@@ -34,7 +34,7 @@ module OutcomesService
           context_id: course.id.to_s,
           export_settings: {
             format: "canvas",
-            artifacts: artifacts
+            artifacts:
           }
         }
         content_exports_url = "#{OutcomesService::Service.url(course)}/api/content_exports"
@@ -46,7 +46,7 @@ module OutcomesService
         )
         if /^2/.match?(response.code.to_s)
           json = JSON.parse(response.body)
-          { export_id: json["id"], course: course }
+          { export_id: json["id"], course: }
         else
           raise "Error queueing export for Outcomes Service: #{response.body}"
         end
@@ -108,7 +108,7 @@ module OutcomesService
         )
         if /^2/.match?(response.code.to_s)
           json = JSON.parse(response.body)
-          { import_id: json["id"], course: course, content_migration: content_migration }
+          { import_id: json["id"], course:, content_migration: }
         else
           raise "Error sending import for Outcomes Service: #{response.body}"
         end
@@ -168,7 +168,7 @@ module OutcomesService
 
       def headers_for(course, scope, overrides = {})
         {
-          "Authorization" => OutcomesService::Service.jwt(course, scope, overrides: overrides)
+          "Authorization" => OutcomesService::Service.jwt(course, scope, overrides:)
         }
       end
 

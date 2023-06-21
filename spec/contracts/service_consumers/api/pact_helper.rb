@@ -38,7 +38,7 @@ Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
       )
 
     honours_pact_with consumer do
-      pact_uri PactConfig.pact_uri(pact_path: pact_path)
+      pact_uri PactConfig.pact_uri(pact_path:)
       app_version PactConfig::Providers::CANVAS_API_VERSION
       publish_verification_results true
     end

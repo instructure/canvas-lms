@@ -86,7 +86,7 @@ class GraphQLTypeTester
         }
       }
     GQL
-    result = CanvasSchema.execute(query, context: field_context, variables: variables)
+    result = CanvasSchema.execute(query, context: field_context, variables:)
 
     if result["errors"]
       raise Error, result["errors"].inspect

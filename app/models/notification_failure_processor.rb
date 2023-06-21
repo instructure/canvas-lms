@@ -106,7 +106,7 @@ class NotificationFailureProcessor
     conf.delete(:initial_timeout) # old, no longer supported poll param
     queue_name = conf.delete(:notification_failure_queue_name)
     sqs = Aws::SQS::Client.new(conf)
-    queue_url = sqs.get_queue_url(queue_name: queue_name).queue_url
+    queue_url = sqs.get_queue_url(queue_name:).queue_url
     @notification_failure_queue = Aws::SQS::QueuePoller.new(queue_url, client: sqs)
   end
 end

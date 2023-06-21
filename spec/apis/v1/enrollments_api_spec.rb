@@ -920,13 +920,13 @@ describe EnrollmentsApiController, type: :request do
           group = @course.groups.create(name: "A Group")
 
           GroupMembership.create!(
-            group: group,
+            group:,
             user: @s1_user,
             workflow_state: "accepted"
           )
 
           GroupMembership.create!(
-            group: group,
+            group:,
             user: @s2_user,
             workflow_state: "accepted"
           )
@@ -1626,7 +1626,7 @@ describe EnrollmentsApiController, type: :request do
       it "does not return enrollments from other accounts" do
         # enroll the user in a course in another account
         account = Account.create!(name: "Account Two")
-        course = course_factory(account: account, course_name: "Account Two Course", active_course: true)
+        course = course_factory(account:, course_name: "Account Two Course", active_course: true)
         course.enroll_user(@student).accept!
 
         json = api_call(:get, @user_path, @user_params)
@@ -1742,7 +1742,7 @@ describe EnrollmentsApiController, type: :request do
             role.base_role_type = "StudentEnrollment"
             role.save!
             @original_student = @student
-            student_in_course(course: @course, role: role)
+            student_in_course(course: @course, role:)
           end
 
           it "includes derived roles when called with type=StudentEnrollment" do
@@ -2468,7 +2468,7 @@ describe EnrollmentsApiController, type: :request do
             @enrolled_user = user_factory(active_user: true)
 
             account = Account.create!
-            @cs_course = Course.create!(account: account)
+            @cs_course = Course.create!(account:)
             @cs_course.enroll_user(@user, "ObserverEnrollment", enrollment_state: "active")
             @cs_course.enroll_user(@enrolled_user, "StudentEnrollment", enrollment_state: "active")
           end
@@ -3085,8 +3085,8 @@ describe EnrollmentsApiController, type: :request do
       course = course_factory({ active_course: true })
       s1 = course.course_sections.create
       s2 = course.course_sections.create
-      en1 = course_with_student(active_user: true, course: course, section: s1, enrollment_state: "invited")
-      en2 = course_with_student(course: course, section: s2, enrollment_state: "invited", allow_multiple_enrollments: true, user: @student)
+      en1 = course_with_student(active_user: true, course:, section: s1, enrollment_state: "invited")
+      en2 = course_with_student(course:, section: s2, enrollment_state: "invited", allow_multiple_enrollments: true, user: @student)
 
       json = api_call_as_user(@student,
                               :post,

@@ -68,7 +68,7 @@ module BasicLTI
     # gives instfs about 7 hours to have an outage and eventually take the file
     MAX_ATTEMPTS = 10
 
-    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/.freeze
+    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
@@ -151,7 +151,7 @@ module BasicLTI
       def result_data_download_url
         url = @lti_request&.at_css("imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > downloadUrl").try(:content)
         name = @lti_request&.at_css("imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > documentName").try(:content)
-        return { url: url, name: name } if url && name
+        return { url:, name: } if url && name
       end
 
       def result_data_launch_url
@@ -232,7 +232,7 @@ module BasicLTI
         op = operation_ref_identifier.underscore
         return false unless respond_to?("handle_#{op}", true)
 
-        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.requests", tags: { op: op, type: request_type })
+        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.requests", tags: { op:, type: request_type })
 
         # Write results are disabled for concluded users, read results are still allowed
         if op != "read_result" && !user_enrollment_active?(assignment, user)
@@ -340,7 +340,7 @@ module BasicLTI
             workflow_state: "unattached",
             filename: result_data[:name],
             display_name: result_data[:name],
-            user: user
+            user:
           )
 
           submission_hash[:attachments] = [attachment]
@@ -384,8 +384,8 @@ module BasicLTI
 
         if !failure? && assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
           unless (submission = existing_submission)
-            submission = Submission.create!(submission_hash.merge(user: user,
-                                                                  assignment: assignment))
+            submission = Submission.create!(submission_hash.merge(user:,
+                                                                  assignment:))
           end
           submission.submission_comments.create!(comment: I18n.t("lib.basic_lti.no_points_comment", <<~TEXT, grade: submission_hash[:grade]))
             An external tool attempted to grade this assignment as %{grade}, but was unable

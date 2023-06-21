@@ -36,7 +36,7 @@ class Mutations::CreateGroupInSet < Mutations::BaseMutation
     end
     group = set.groups.build(name: input[:name], context: set.context)
     if group.save
-      { group: group }
+      { group: }
     else
       errors_for(group)
     end

@@ -136,11 +136,11 @@ module DynamicSettings
       if use_consul
         PrefixProxy.new(
           prefix,
-          tree: tree,
-          service: service,
+          tree:,
+          service:,
           environment: @environment,
-          cluster: cluster,
-          default_ttl: default_ttl,
+          cluster:,
+          default_ttl:,
           data_center: data_center || @data_center,
           query_logging: @config.fetch("query_logging", true),
           retry_limit: @config.fetch("retry_limit", 1),

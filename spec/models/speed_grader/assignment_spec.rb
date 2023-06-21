@@ -211,7 +211,7 @@ describe SpeedGrader::Assignment do
       context: @course,
       moderated_grading: true,
       grader_count: 2,
-      final_grader: final_grader
+      final_grader:
     )
     assignment.submit_homework(@user, { submission_type: "online_text_entry", body: "blah" })
     submission = assignment.submissions.first
@@ -381,7 +381,7 @@ describe SpeedGrader::Assignment do
 
     context "DocViewer" do
       let(:course) { student_in_course(active_all: true).course }
-      let(:assignment) { assignment_model(course: course) }
+      let(:assignment) { assignment_model(course:) }
       let(:attachment) do
         attachment_model(
           context: @student,
@@ -400,7 +400,7 @@ describe SpeedGrader::Assignment do
 
       it "creates a non-annotatable DocViewer session for Discussion attachments" do
         assignment.anonymous_grading = true
-        topic = course.discussion_topics.create!(assignment: assignment)
+        topic = course.discussion_topics.create!(assignment:)
         entry = topic.reply_from(user: @student, text: "entry")
         entry.attachment = attachment
         entry.save!
@@ -411,7 +411,7 @@ describe SpeedGrader::Assignment do
 
       it "creates DocViewer session anonymous instructor annotations if assignment has it set" do
         assignment.anonymous_instructor_annotations = true
-        topic = course.discussion_topics.create!(assignment: assignment)
+        topic = course.discussion_topics.create!(assignment:)
         entry = topic.reply_from(user: @student, text: "entry")
         entry.attachment = attachment
         entry.save!
@@ -421,7 +421,7 @@ describe SpeedGrader::Assignment do
       end
 
       it "passes enrollment type to DocViewer" do
-        topic = course.discussion_topics.create!(assignment: assignment)
+        topic = course.discussion_topics.create!(assignment:)
         entry = topic.reply_from(user: @student, text: "entry")
         entry.attachment = attachment
         entry.save!
@@ -521,8 +521,8 @@ describe SpeedGrader::Assignment do
 
       let(:course) { Course.create! }
       let(:assignment) { course.assignments.create!(title: "test", points_possible: 10) }
-      let(:student) { course_with_student(course: course).user }
-      let(:teacher) { course_with_teacher(course: course).user }
+      let(:student) { course_with_student(course:).user }
+      let(:teacher) { course_with_teacher(course:).user }
       let(:attachment) do
         student.attachments.create!(uploaded_data: stub_png_data, filename: "file.png", viewed_at: viewed_at_time)
       end
@@ -832,7 +832,7 @@ describe SpeedGrader::Assignment do
 
         reps = @assignment.representatives(user: @teacher, includes: [:completed])
         user = reps.find { |u| u.name == @first_group.name }
-        expect(enrollments.find_by(user: user)).to be_present
+        expect(enrollments.find_by(user:)).to be_present
       end
 
       it "does not include concluded students when included" do
@@ -850,7 +850,7 @@ describe SpeedGrader::Assignment do
 
         reps = @assignment.representatives(user: @teacher, includes: [:inactive])
         user = reps.find { |u| u.name == @first_group.name }
-        expect(enrollments.find_by(user: user)).to be_present
+        expect(enrollments.find_by(user:)).to be_present
       end
 
       it "does not include inactive students when included" do
@@ -1118,7 +1118,7 @@ describe SpeedGrader::Assignment do
       end
     end
 
-    let(:final_grader) { course_with_teacher(course: course, name: "final grader", active_all: true).user }
+    let(:final_grader) { course_with_teacher(course:, name: "final grader", active_all: true).user }
     let(:final_grader_comment) do
       submission.add_comment(author: final_grader, comment: "comment by final grader", provisional: false)
     end
@@ -1126,7 +1126,7 @@ describe SpeedGrader::Assignment do
       submission.add_comment(author: final_grader, comment: "comment by final grader", provisional: true)
     end
 
-    let(:teacher) { course_with_teacher(course: course, active_all: true, name: "Teacher").user }
+    let(:teacher) { course_with_teacher(course:, active_all: true, name: "Teacher").user }
     let(:teacher_comment) do
       submission.add_comment(author: teacher, comment: "comment by teacher", provisional: false)
     end
@@ -1134,7 +1134,7 @@ describe SpeedGrader::Assignment do
       submission.add_comment(author: teacher, comment: "provisional comment by teacher", provisional: true)
     end
 
-    let(:ta) { course_with_ta(course: course, name: "ta", active_all: true).user }
+    let(:ta) { course_with_ta(course:, name: "ta", active_all: true).user }
     let(:ta_comment) do
       submission.add_comment(author: ta, comment: "comment by ta", provisional: false)
     end
@@ -1142,11 +1142,11 @@ describe SpeedGrader::Assignment do
       submission.add_comment(author: ta, comment: "provisional comment by ta", provisional: true)
     end
 
-    let(:student) { course_with_student(course: course, name: "student", active_all: true).user }
+    let(:student) { course_with_student(course:, name: "student", active_all: true).user }
     let(:teacher_pg) do
       submission.provisional_grade(teacher).tap do |pg|
         pg.update!(score: 2)
-        selection = assignment.moderated_grading_selections.find_by!(student: student)
+        selection = assignment.moderated_grading_selections.find_by!(student:)
         selection.update!(provisional_grade: pg)
       end
     end
@@ -1188,7 +1188,7 @@ describe SpeedGrader::Assignment do
       end
     end
     let(:student_comment) do
-      SubmissionComment.find_by!(submission: submission, author: student, comment: "comment by student")
+      SubmissionComment.find_by!(submission:, author: student, comment: "comment by student")
     end
 
     before do
@@ -1313,11 +1313,11 @@ describe SpeedGrader::Assignment do
 
   describe "moderated grading" do
     let(:course) { Course.create! }
-    let(:ta) { course_with_ta(course: course, name: "Ta", active_all: true).user }
-    let(:second_ta) { course_with_user("TaEnrollment", course: course, active_all: true, name: "Second Ta").user }
-    let(:third_ta) { course_with_user("TaEnrollment", course: course, active_all: true, name: "Third Ta").user }
-    let(:teacher) { course_with_teacher(course: course, name: "Teacher", active_all: true).user }
-    let(:student) { course_with_student(course: course, name: "student", active_all: true).user }
+    let(:ta) { course_with_ta(course:, name: "Ta", active_all: true).user }
+    let(:second_ta) { course_with_user("TaEnrollment", course:, active_all: true, name: "Second Ta").user }
+    let(:third_ta) { course_with_user("TaEnrollment", course:, active_all: true, name: "Third Ta").user }
+    let(:teacher) { course_with_teacher(course:, name: "Teacher", active_all: true).user }
+    let(:student) { course_with_student(course:, name: "student", active_all: true).user }
     let(:assignment) do
       course.assignments.create!(
         submission_types: "online_text_entry",
@@ -1368,13 +1368,13 @@ describe SpeedGrader::Assignment do
     let(:teacher_pg) do
       submission.provisional_grade(teacher).tap do |pg|
         pg.update!(score: 2)
-        selection = assignment.moderated_grading_selections.find_by!(student: student)
+        selection = assignment.moderated_grading_selections.find_by!(student:)
         selection.update!(provisional_grade: pg)
       end
     end
 
     let(:final_grader) do
-      course_with_teacher(course: course, active_all: true, name: "Final Grader").user
+      course_with_teacher(course:, active_all: true, name: "Final Grader").user
     end
 
     let(:ta_pg) { submission.provisional_grade(ta).tap { |pg| pg.update!(score: 3) } }
@@ -1435,7 +1435,7 @@ describe SpeedGrader::Assignment do
       assignment.moderation_graders.create!(user: teacher, anonymous_id: "ababa")
       assignment.moderation_graders.create!(user: ta, anonymous_id: "atata")
 
-      other_ta = course_with_ta(course: course, active_all: true).user
+      other_ta = course_with_ta(course:, active_all: true).user
 
       attachment = attachment_model(
         context: student,
@@ -1617,7 +1617,7 @@ describe SpeedGrader::Assignment do
     it "includes the OriginalityReport in the json" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
       submission.update_attribute(:turnitin_data, { blah: 1 })
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       tii_data = json["submissions"].first["submission_history"].first["submission"]["turnitin_data"]
       expect(tii_data[attachment.asset_string]["state"]).to eq "acceptable"
@@ -1626,7 +1626,7 @@ describe SpeedGrader::Assignment do
     it "includes 'has_originality_report' in the json for text entry submissions" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
       submission.update_attribute(:turnitin_data, { blah: 1 })
-      OriginalityReport.create!(originality_score: "1", submission: submission)
+      OriginalityReport.create!(originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       has_report = json["submissions"].first["submission_history"].first["submission"]["has_originality_report"]
       expect(has_report).to be_truthy
@@ -1644,10 +1644,10 @@ describe SpeedGrader::Assignment do
       assignment.submit_homework(user_two, submission_type: "online_upload", attachments: [attachment])
 
       assignment.submissions.each do |s|
-        s.update!(group: group, turnitin_data: { blah: 1 })
+        s.update!(group:, turnitin_data: { blah: 1 })
       end
 
-      report = OriginalityReport.create!(originality_score: "1", submission: submission, attachment: attachment)
+      report = OriginalityReport.create!(originality_score: "1", submission:, attachment:)
       report.copy_to_group_submissions!
 
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
@@ -1659,7 +1659,7 @@ describe SpeedGrader::Assignment do
     it "includes 'has_originality_report' in the json" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
       submission.update_attribute(:turnitin_data, { blah: 1 })
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       has_report = json["submissions"].first["submission_history"].first["submission"]["has_originality_report"]
       expect(has_report).to be_truthy
@@ -1670,7 +1670,7 @@ describe SpeedGrader::Assignment do
       submission.update_attribute(:turnitin_data, { blah: 1 })
 
       AssignmentConfigurationToolLookup.create!(
-        assignment: assignment,
+        assignment:,
         tool_vendor_code: product_family.vendor_code,
         tool_product_code: product_family.product_code,
         tool_resource_type_code: resource_handler.resource_type_code,
@@ -1685,7 +1685,7 @@ describe SpeedGrader::Assignment do
     it 'includes "has_originality_score" if the originality report includes an originality score' do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
       submission.update_attribute(:turnitin_data, { blah: 1 })
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       has_score = json["submissions"].first["submission_history"].first["submission"]["has_originality_score"]
       expect(has_score).to be_truthy
@@ -1694,8 +1694,8 @@ describe SpeedGrader::Assignment do
     it "includes originality data" do
       submission = assignment.submit_homework(test_student, submission_type: "online_upload", attachments: [attachment])
       submission.update_attribute(:turnitin_data, { blah: 1 })
-      OriginalityReport.create!(attachment: attachment, originality_score: "1", submission: submission)
-      OriginalityReport.create!(originality_score: "1", submission: submission)
+      OriginalityReport.create!(attachment:, originality_score: "1", submission:)
+      OriginalityReport.create!(originality_score: "1", submission:)
       json = SpeedGrader::Assignment.new(assignment, test_teacher).json
       keys = json["submissions"].first["submission_history"].first["submission"]["turnitin_data"].keys
       expect(keys).to include(
@@ -1790,7 +1790,7 @@ describe SpeedGrader::Assignment do
     let_once(:course) { course_with_teacher(active_all: true, name: "Teacher").course }
     let_once(:teacher) { @teacher }
     let_once(:ta) do
-      course_with_ta(course: course, active_all: true)
+      course_with_ta(course:, active_all: true)
       @ta
     end
 
@@ -2135,11 +2135,11 @@ describe SpeedGrader::Assignment do
     let_once(:course) { course_with_teacher(active_all: true, name: "Teacher").course }
     let_once(:teacher) { @teacher }
     let_once(:ta) do
-      course_with_ta(course: course, active_all: true)
+      course_with_ta(course:, active_all: true)
       @ta
     end
     let_once(:final_grader) do
-      course_with_teacher(course: course, active_all: true, name: "Final Grader")
+      course_with_teacher(course:, active_all: true, name: "Final Grader")
       @teacher
     end
 
@@ -2173,7 +2173,7 @@ describe SpeedGrader::Assignment do
     let(:final_grader_anonymous_id) { assignment.moderation_graders.find_by(user: final_grader).anonymous_id }
 
     before :once do
-      course.enroll_student(student, section: section).accept!
+      course.enroll_student(student, section:).accept!
       assignment.update_submission(student, comment: "comment by student", commenter: student)
 
       assignment.grade_student(student, grader: teacher, provisional: true, score: 10)

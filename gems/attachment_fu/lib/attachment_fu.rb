@@ -267,7 +267,7 @@ module AttachmentFu # :nodoc:
       thumbnailable? || raise(ThumbnailError, "Can't create a thumbnail if the content type is not an image or there is no parent_id column")
       find_or_initialize_thumbnail(file_name_suffix).tap do |thumb|
         thumb.attributes = {
-          content_type: content_type,
+          content_type:,
           filename: thumbnail_name_for(file_name_suffix),
           temp_path: temp_file,
           thumbnail_resize_options: size
@@ -414,7 +414,7 @@ module AttachmentFu # :nodoc:
       shard.activate do
         GuardRail.activate(:secondary) do
           if md5.present? && (ns = infer_namespace)
-            scope = Attachment.where(md5: md5, namespace: ns, root_attachment_id: nil, content_type: content_type)
+            scope = Attachment.where(md5:, namespace: ns, root_attachment_id: nil, content_type:)
             scope = scope.where.not(filename: nil)
             scope = scope.where.not(id: self) unless new_record?
             scope.detect { |a| a.store.exists? }
@@ -493,8 +493,8 @@ module AttachmentFu # :nodoc:
     #     self.data = img.thumbnail(100, 100).to_blob
     #   end
     #
-    def with_image(&block)
-      self.class.with_image(temp_path, &block)
+    def with_image(&)
+      self.class.with_image(temp_path, &)
     end
 
     protected

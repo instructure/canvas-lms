@@ -102,7 +102,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
   # Returns true if the record was updated (i.e. record exists and is not deleted).
   def update_unless_deleted(attrs = {})
     records_updated = self.class
-                          .where(id: id).where.not(workflow_state: "deleted").update_all(attrs)
+                          .where(id:).where.not(workflow_state: "deleted").update_all(attrs)
     if records_updated == 0
       # It could actually be that the record was hard-deleted and not
       # workflow_state=deleted, but whatever

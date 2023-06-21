@@ -559,7 +559,7 @@ describe "Jobs V2 API", type: :request do
         start_date = 6.hours.from_now.iso8601
         json = api_call(:get,
                         "/api/v1/jobs2/future/by_tag?start_date=#{start_date}",
-                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "future", group: "tag", start_date: start_date },
+                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "future", group: "tag", start_date: },
                         {},
                         {},
                         expected_status: 200)
@@ -638,7 +638,7 @@ describe "Jobs V2 API", type: :request do
         end_date = 6.hours.ago.iso8601
         json = api_call(:get,
                         "/api/v1/jobs2/failed?end_date=#{end_date}",
-                        { controller: "jobs_v2", action: "list", format: "json", bucket: "failed", end_date: end_date },
+                        { controller: "jobs_v2", action: "list", format: "json", bucket: "failed", end_date: },
                         {},
                         {},
                         expected_status: 200)

@@ -1021,16 +1021,16 @@ describe "Outcomes API", type: :request do
             alignments = [
               {
                 id: 30,
-                artifact_type: artifact_type,
-                artifact_id: artifact_id,
+                artifact_type:,
+                artifact_id:,
                 alignment_set_id: 36,
                 aligned_at: "2022-11-03T15:37:19.343Z",
                 created_at: "2022-11-03T15:35:53.240Z",
                 updated_at: "2022-11-03T15:37:25.566Z",
                 deleted_at: nil,
                 context_id: nil,
-                associated_asset_id: associated_asset_id,
-                associated_asset_type: associated_asset_type
+                associated_asset_id:,
+                associated_asset_type:
               }
             ]
           end
@@ -1043,13 +1043,13 @@ describe "Outcomes API", type: :request do
             title: "Outcome title",
             description: "",
             external_id: outcome.id,
-            alignments: alignments
+            alignments:
           }
         end
 
         def mock_get_lmgb_results(student, outcome, artifact_type, artifact_id, metadata, associated_asset_id, associated_asset_type)
           if metadata.nil?
-            metadata =  {
+            metadata = {
               quiz_metadata: {
                 quiz_id: "1",
                 title: "Quiz title",
@@ -1083,12 +1083,12 @@ describe "Outcomes API", type: :request do
               created_at: "2022-09-16T04:17:18.153Z",
               updated_at: "2022-09-16T04:17:18.153Z",
               submitted_at: "2022-09-16T04:17:18.153Z",
-              metadata: metadata
+              metadata:
             }],
-            associated_asset_type: associated_asset_type,
-            associated_asset_id: associated_asset_id,
-            artifact_type: artifact_type,
-            artifact_id: artifact_id,
+            associated_asset_type:,
+            associated_asset_id:,
+            artifact_type:,
+            artifact_id:,
             mastery: nil
           }
         end

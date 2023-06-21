@@ -22,11 +22,11 @@ module CanvasSecurity
     attr_reader :public_key, :private_key, :alg, :use
 
     def to_jwk
-      private_key.to_jwk(kid: kid, alg: alg, use: use)
+      private_key.to_jwk(kid:, alg:, use:)
     end
 
     def public_jwk
-      private_key.public_key.to_jwk(kid: kid, alg: alg, use: use)
+      private_key.public_key.to_jwk(kid:, alg:, use:)
     end
 
     # Must match up with #kid below

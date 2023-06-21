@@ -128,7 +128,7 @@ class GradebooksController < ApplicationController
 
       if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
         json[:submission_comments] = submission.visible_submission_comments.map do |comment|
-          {
+          comment_map = {
             id: comment.id,
             attachments: comment.cached_attachments.map do |attachment|
               {
@@ -145,8 +145,10 @@ class GradebooksController < ApplicationController
             updated_at: comment.updated_at,
             comment: comment.comment,
             display_updated_at: datetime_string(comment.updated_at),
-            is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?)
+            is_read: comment.read?(@current_user) || (!@presenter.student_is_user? && !@presenter.user_an_observer_of_student?),
           }
+          comment_map[:media_object] = SubmissionComment.serialize_media_comment(comment.media_comment_id) if comment.media_comment?
+          comment_map
         end.as_json
         json[:assignment_url] = context_url(@context, :context_assignment_url, submission.assignment_id)
       end
@@ -170,10 +172,10 @@ class GradebooksController < ApplicationController
       current_grading_period_id: @current_grading_period_id,
       current_assignment_sort_order: @presenter.assignment_order,
       grading_period_set: grading_period_group_json,
-      grading_period: grading_period,
+      grading_period:,
       grading_periods: @grading_periods,
       courses_with_grades: courses_with_grades_json,
-      effective_due_dates: effective_due_dates,
+      effective_due_dates:,
       exclude_total: @exclude_total,
       gradebook_non_scoring_rubrics_enabled: root_account.feature_enabled?(:non_scoring_rubrics),
       rubric_assessments: rubric_assessments_json(@presenter.rubric_assessments, @current_user, session, style: "full"),
@@ -182,7 +184,7 @@ class GradebooksController < ApplicationController
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
-      outcome_proficiency: outcome_proficiency,
+      outcome_proficiency:,
       outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
     }
 
@@ -481,8 +483,8 @@ class GradebooksController < ApplicationController
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
       enhanced_gradebook_filters: @context.feature_enabled?(:enhanced_gradebook_filters),
       hide_zero_point_quizzes: Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option),
-      enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
-      enrollments_with_concluded_url: custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
+      enrollments_url: custom_course_enrollments_api_url(per_page:),
+      enrollments_with_concluded_url: custom_course_enrollments_api_url(include_concluded: true, per_page:),
       export_gradebook_csv_url: course_gradebook_csv_url,
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
       gradebook_column_order_settings: @current_user.get_preference(:gradebook_column_order, @context.global_id),
@@ -492,9 +494,9 @@ class GradebooksController < ApplicationController
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_score_to_ungraded_progress: last_score_to_ungraded,
       gradebook_import_url: new_course_gradebook_upload_path(@context),
-      gradebook_is_editable: gradebook_is_editable,
+      gradebook_is_editable:,
       grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
-      graded_late_submissions_exist: graded_late_submissions_exist,
+      graded_late_submissions_exist:,
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
@@ -507,7 +509,7 @@ class GradebooksController < ApplicationController
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
       post_grades_feature: post_grades_feature?,
-      post_grades_ltis: post_grades_ltis,
+      post_grades_ltis:,
       post_manually: @context.post_manually?,
       proxy_submissions_allowed: Account.site_admin.feature_enabled?(:proxy_file_uploads) && @context.grants_right?(@current_user, session, :proxy_assignment_submission),
       publish_to_sis_enabled: (
@@ -545,10 +547,16 @@ class GradebooksController < ApplicationController
 
   def set_enhanced_individual_gradebook_env
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
+    last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
+    last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
     gradebook_options = {
+      change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
+      attachment_url: authenticated_download_url(last_exported_attachment),
       context_id: @context.id.to_s,
       context_url: named_context_url(@context, :context_url),
-      gradebook_is_editable: gradebook_is_editable,
+      export_gradebook_csv_url: course_gradebook_csv_url,
+      gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
+      gradebook_is_editable:,
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?
     }
@@ -605,14 +613,14 @@ class GradebooksController < ApplicationController
 
       course_url: api_v1_course_url(@context),
       current_grading_period_id: @current_grading_period_id,
-      custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page: per_page),
+      custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page:),
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
       custom_column_url: api_v1_course_custom_gradebook_column_url(@context, ":id"),
       custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
       default_grading_standard: grading_standard.data,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
-      enrollments_url: custom_course_enrollments_api_url(per_page: per_page),
-      enrollments_with_concluded_url: custom_course_enrollments_api_url(include_concluded: true, per_page: per_page),
+      enrollments_url: custom_course_enrollments_api_url(per_page:),
+      enrollments_with_concluded_url: custom_course_enrollments_api_url(include_concluded: true, per_page:),
       export_gradebook_csv_url: course_gradebook_csv_url,
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
       gradebook_column_order_settings: @current_user.get_preference(:gradebook_column_order, @context.global_id),
@@ -621,9 +629,9 @@ class GradebooksController < ApplicationController
       gradebook_column_size_settings_url: change_gradebook_column_size_course_gradebook_url,
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_import_url: new_course_gradebook_upload_path(@context),
-      gradebook_is_editable: gradebook_is_editable,
+      gradebook_is_editable:,
       grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
-      graded_late_submissions_exist: graded_late_submissions_exist,
+      graded_late_submissions_exist:,
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
@@ -687,7 +695,7 @@ class GradebooksController < ApplicationController
                context_id: @context.id.to_s,
                context_url: named_context_url(@context, :context_url),
                ACCOUNT_LEVEL_MASTERY_SCALES: root_account.feature_enabled?(:account_level_mastery_scales),
-               outcome_proficiency: outcome_proficiency,
+               outcome_proficiency:,
                sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
                settings: gradebook_settings(@context.global_id),
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
@@ -840,14 +848,14 @@ class GradebooksController < ApplicationController
           format.html { redirect_to course_gradebook_url(@assignment.context) }
           format.json do
             render(
-              json: submissions_json(submissions: @submissions, assignments: assignments),
+              json: submissions_json(submissions: @submissions, assignments:),
               status: :created,
               location: course_gradebook_url(@assignment.context)
             )
           end
           format.text do
             render(
-              json: submissions_json(submissions: @submissions, assignments: assignments),
+              json: submissions_json(submissions: @submissions, assignments:),
               status: :created,
               location: course_gradebook_url(@assignment.context),
               as_text: true
@@ -889,7 +897,7 @@ class GradebooksController < ApplicationController
         submission_json[:submission_comments] = anonymous_moderated_submission_comments_json(
           assignment: submission.assignment,
           avatars: service_enabled?(:avatars),
-          submissions: submissions,
+          submissions:,
           submission_comments: submission.visible_submission_comments_for(@current_user),
           current_user: @current_user,
           course: @context
@@ -996,7 +1004,7 @@ class GradebooksController < ApplicationController
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: "full") : nil,
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
           outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit), # for outcome-based rubrics
-          outcome_proficiency: outcome_proficiency, # for outcome-based rubrics
+          outcome_proficiency:, # for outcome-based rubrics
           group_comments_per_attempt: @assignment.a2_enabled?,
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: true,
@@ -1264,7 +1272,7 @@ class GradebooksController < ApplicationController
 
     options = ::Gradebook::ApplyScoreToUngradedSubmissions::Options.new(
       percent: percent_value,
-      excused: excused,
+      excused:,
       mark_as_missing: Canvas::Plugin.value_to_boolean(params[:mark_as_missing]),
       only_apply_to_past_due: Canvas::Plugin.value_to_boolean(params[:only_past_due])
     )
@@ -1278,7 +1286,7 @@ class GradebooksController < ApplicationController
     progress = ::Gradebook::ApplyScoreToUngradedSubmissions.queue_apply_score(
       course: @context,
       grader: @current_user,
-      options: options
+      options:
     )
     render json: progress_json(progress, @current_user, session)
   end
@@ -1317,7 +1325,7 @@ class GradebooksController < ApplicationController
       .pluck("group_categories.id", "group_categories.name", Arel.sql("json_agg(json_build_object('id', groups.id, 'name', groups.name))"))
       .map do |category_id, category_name, original_groups|
         groups = original_groups.select { |g| g["id"] }.map(&:with_indifferent_access)
-        { id: category_id, name: category_name, groups: groups }.with_indifferent_access
+        { id: category_id, name: category_name, groups: }.with_indifferent_access
       end
   end
 
@@ -1513,7 +1521,7 @@ class GradebooksController < ApplicationController
       include: %i[avatar_url group_ids enrollments],
       enrollment_type: %w[student student_view],
       enrollment_state: state,
-      per_page: per_page
+      per_page:
     )
   end
 
@@ -1525,8 +1533,8 @@ class GradebooksController < ApplicationController
       @context,
       include: %i[avatar_url group_ids],
       type: %w[StudentEnrollment StudentViewEnrollment],
-      state: state,
-      per_page: per_page
+      state:,
+      per_page:
     )
   end
 
@@ -1578,7 +1586,7 @@ class GradebooksController < ApplicationController
       provisional_grade = submission.provisional_grade(
         @current_user,
         preloaded_grades: grades_by_submission_id,
-        final: final,
+        final:,
         default_to_null_grade: false
       )
       submission.apply_provisional_grade_filter!(provisional_grade) if provisional_grade

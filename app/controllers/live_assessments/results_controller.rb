@@ -154,7 +154,7 @@ module LiveAssessments
       @results = @results.for_user(params[:user_id]) if params[:user_id]
       @results, meta = Api.jsonapi_paginate(@results, self, polymorphic_url([:api_v1, @context, :live_assessment_results], assessment_id: @assessment.id))
 
-      render json: serialize_jsonapi(@results).merge(meta: meta)
+      render json: serialize_jsonapi(@results).merge(meta:)
     end
 
     protected

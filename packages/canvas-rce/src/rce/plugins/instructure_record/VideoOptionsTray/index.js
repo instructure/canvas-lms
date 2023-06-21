@@ -267,6 +267,7 @@ export default function VideoOptionsTray({
                               minHeight={minHeight}
                               minWidth={minWidth}
                               minPercentage={minPercentage}
+                              hidePercentage={true}
                             />
                           </View>
                         )}

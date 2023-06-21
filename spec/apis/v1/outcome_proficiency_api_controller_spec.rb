@@ -201,7 +201,7 @@ describe OutcomeProficiencyApiController, type: :request do
             course_id: @course.id.to_s
           },
           {
-            ratings: ratings
+            ratings:
           }
         )
       end
@@ -339,7 +339,7 @@ describe OutcomeProficiencyApiController, type: :request do
             account_id: @account.id.to_s
           },
           {
-            ratings: ratings
+            ratings:
           }
         )
       end

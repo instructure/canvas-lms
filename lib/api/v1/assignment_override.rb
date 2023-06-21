@@ -355,10 +355,10 @@ module Api::V1::AssignmentOverride
         if override.set_type == "ADHOC" && override.changed_student_ids.present?
           override.assignment.run_if_overrides_changed_later!(
             student_ids: override.changed_student_ids.to_a,
-            updating_user: updating_user
+            updating_user:
           )
         else
-          override.assignment.run_if_overrides_changed_later!(updating_user: updating_user)
+          override.assignment.run_if_overrides_changed_later!(updating_user:)
         end
       end
     end
@@ -381,7 +381,7 @@ module Api::V1::AssignmentOverride
       overrides.each(&:save!)
     end
     overrides.map(&:assignment).uniq.each do |assignment|
-      assignment.run_if_overrides_changed_later!(updating_user: updating_user)
+      assignment.run_if_overrides_changed_later!(updating_user:)
     end
   rescue ActiveRecord::RecordInvalid
     false
@@ -443,10 +443,10 @@ module Api::V1::AssignmentOverride
     overrides_to_create, overrides_to_update = overrides_to_save.partition(&:new_record?)
 
     {
-      overrides_to_create: overrides_to_create,
-      overrides_to_update: overrides_to_update,
-      overrides_to_delete: overrides_to_delete,
-      override_errors: override_errors
+      overrides_to_create:,
+      overrides_to_update:,
+      overrides_to_delete:,
+      override_errors:
     }
   end
 
@@ -471,7 +471,7 @@ module Api::V1::AssignmentOverride
 
     assignment.touch # invalidate cached list of overrides for the assignment
     assignment.assignment_overrides.reset # unload the obsolete association
-    assignment.run_if_overrides_changed_later!(updating_user: updating_user)
+    assignment.run_if_overrides_changed_later!(updating_user:)
   end
 
   def batch_update_assignment_overrides(assignment, overrides_params, user)

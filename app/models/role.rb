@@ -85,7 +85,7 @@ class Role < ActiveRecord::Base
   def ensure_unique_name_for_account
     if active?
       scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", name, account_id, "active")
-      if new_record? ? scope.exists? : scope.where.not(id: id).exists?
+      if new_record? ? scope.exists? : scope.where.not(id:).exists?
         errors.add(:label, t(:duplicate_role, "A role with this name already exists"))
         false
       end
@@ -93,7 +93,7 @@ class Role < ActiveRecord::Base
   end
 
   def ensure_non_built_in_name
-    if !built_in? && Role.built_in_roles(root_account_id: root_account_id).map(&:label).include?(name)
+    if !built_in? && Role.built_in_roles(root_account_id:).map(&:label).include?(name)
       errors.add(:label, t(:duplicate_role, "A role with this name already exists"))
       false
     end
@@ -136,22 +136,22 @@ class Role < ActiveRecord::Base
   end
 
   def self.built_in_course_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select(&:course_role?)
+    built_in_roles(root_account_id:).select(&:course_role?)
   end
 
   def self.visible_built_in_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select(&:visible?)
+    built_in_roles(root_account_id:).select(&:visible?)
   end
 
   def self.get_role_by_id(id)
     return nil unless id
     return nil if id.is_a?(String) && id !~ Api::ID_REGEX
 
-    Role.where(id: id).take # giving up on built-in role caching because it's silly now and we should just preload more
+    Role.where(id:).take # giving up on built-in role caching because it's silly now and we should just preload more
   end
 
   def self.get_built_in_role(name, root_account_id:)
-    built_in_roles(root_account_id: root_account_id).detect { |role| role.name == name }
+    built_in_roles(root_account_id:).detect { |role| role.name == name }
   end
 
   def ==(other_role)

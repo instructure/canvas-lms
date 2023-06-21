@@ -29,7 +29,7 @@ describe CoursePacing::PaceServiceFactory do
 
     it "returns a reference to CoursePacing::SectionPaceService for a CourseSection" do
       expect(
-        CoursePacing::PaceServiceFactory.for(add_section("Section", course: course))
+        CoursePacing::PaceServiceFactory.for(add_section("Section", course:))
       ).to eq CoursePacing::SectionPaceService
     end
 

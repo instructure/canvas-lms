@@ -457,8 +457,8 @@ class ConversationsController < ApplicationController
                                            @recipients,
                                            mode,
                                            subject: params[:subject],
-                                           context_type: context_type,
-                                           context_id: context_id,
+                                           context_type:,
+                                           context_id:,
                                            tags: @tags,
                                            group: batch_group_messages)
 
@@ -493,7 +493,7 @@ class ConversationsController < ApplicationController
         visibility_map = infer_visibility(conversations)
         render json: conversations.map { |c| conversation_json(c, @current_user, session, include_participant_avatars: false, include_participant_contexts: false, visible: visibility_map[c.conversation_id]) }, status: :created
       else
-        @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, subject: params[:subject], context_type: context_type, context_id: context_id)
+        @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, subject: params[:subject], context_type:, context_id:)
         @conversation.add_message(message, tags: @tags, update_for_sender: false, cc_author: true)
         InstStatsd::Statsd.increment("inbox.conversation.created.legacy")
         InstStatsd::Statsd.increment("inbox.message.sent.legacy")
@@ -662,7 +662,7 @@ class ConversationsController < ApplicationController
               else
                 "default"
               end
-      return redirect_to conversations_path(scope: scope, id: @conversation.conversation_id, message: params[:message])
+      return redirect_to conversations_path(scope:, id: @conversation.conversation_id, message: params[:message])
     end
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
@@ -677,7 +677,7 @@ class ConversationsController < ApplicationController
                                    session,
                                    include_participant_contexts: value_to_boolean(params.fetch(:include_participant_contexts, true)),
                                    include_indirect_participants: true,
-                                   messages: messages,
+                                   messages:,
                                    submissions: [],
                                    include_beta: params[:include_beta],
                                    include_context_name: true,
@@ -972,7 +972,7 @@ class ConversationsController < ApplicationController
       conversation: @conversation,
       context: @conversation.conversation.context,
       current_user: @current_user,
-      session: session,
+      session:,
       recipients: params[:recipients],
       context_code: params[:context_code],
       message_ids: params[:included_messages],
@@ -1149,10 +1149,10 @@ class ConversationsController < ApplicationController
 
   def render_error(attribute, message, status = :bad_request)
     render json: [{
-      attribute: attribute,
-      message: message,
+      attribute:,
+      message:,
     }],
-           status: status
+           status:
   end
 
   def infer_scope

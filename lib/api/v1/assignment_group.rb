@@ -93,9 +93,9 @@ module Api::V1::AssignmentGroup
                                include_score_statistics: includes.include?("score_statistics"),
                                assignment_visibilities: opts[:assignment_visibilities].try(:[], assignment.id),
                                exclude_response_fields: exclude_fields,
-                               overrides: overrides,
+                               overrides:,
                                include_overrides: opts[:include_overrides],
-                               needs_grading_course_proxy: needs_grading_course_proxy,
+                               needs_grading_course_proxy:,
                                submission: includes.include?("submission") ? opts[:submissions][assignment.id] : nil,
                                master_course_status: opts[:master_course_status],
                                include_assessment_requests: includes.include?("assessment_requests"))

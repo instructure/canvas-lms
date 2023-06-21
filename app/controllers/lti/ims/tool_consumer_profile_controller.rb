@@ -37,7 +37,7 @@ module Lti
         profile = Lti::ToolConsumerProfileCreator.new(
           @context,
           tcp_url,
-          tcp_uuid: tcp_uuid,
+          tcp_uuid:,
           developer_key: dev_key
         ).create
         render json: profile.to_json, content_type: "application/vnd.ims.lti.v2.toolconsumerprofile+json"

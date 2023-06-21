@@ -27,7 +27,7 @@ describe Api::V1::Group do
   describe "group_json" do
     before :once do
       context = course_model
-      @group = Group.create(name: "group1", context: context)
+      @group = Group.create(name: "group1", context:)
       @group.add_user(@user)
       @user.enrollments.first.deactivate
     end
@@ -71,7 +71,7 @@ describe Api::V1::Group do
   describe "group_membership_json" do
     before :once do
       context = course_model
-      @group = Group.create(name: "group1", context: context)
+      @group = Group.create(name: "group1", context:)
       @group.add_user(@user)
       @user.enrollments.first.deactivate
     end

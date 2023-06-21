@@ -99,9 +99,9 @@ module Quizzes
       users_json = Canvas::APIArraySerializer.new(@users, {
                                                     quiz: @quiz,
                                                     root: :users,
-                                                    meta: meta,
-                                                    quiz_submissions: quiz_submissions,
-                                                    includes: includes,
+                                                    meta:,
+                                                    quiz_submissions:,
+                                                    includes:,
                                                     controller: self,
                                                     each_serializer: Quizzes::QuizSubmissionUserSerializer
                                                   })

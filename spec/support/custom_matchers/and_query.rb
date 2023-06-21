@@ -21,7 +21,7 @@ RSpec::Matchers.define :and_query do |expected|
   match do |actual|
     query = Rack::Utils.parse_query(URI(actual).query)
 
-    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected: expected)
+    expected_as_strings = RSpec::Matchers::Helpers.cast_to_strings(expected:)
     values_match?(expected_as_strings, query)
   end
 end

@@ -119,7 +119,7 @@ export function mediaPlayerURLFromFile(file, canvasOrigin) {
   }
 
   if (isAudioOrVideo(content_type)) {
-    const mediaEntryId = file.media_entry_id || file.embed?.id
+    const mediaEntryId = file.media_entry_id || file.embed?.id || file.mediaEntryId
 
     if (mediaEntryId && mediaEntryId !== 'maybe') {
       return `/media_objects_iframe/${mediaEntryId}?type=${type}`

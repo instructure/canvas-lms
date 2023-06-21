@@ -32,6 +32,11 @@ export type UserConnection = {
   sortableName: string
 }
 
+export type EnrollmentConnection = {
+  user: UserConnection
+  courseSectionId: string
+}
+
 export type AssignmentConnection = {
   id: string
   name: string
@@ -40,8 +45,8 @@ export type AssignmentConnection = {
   anonymizeStudents: boolean
   omitFromFinalGrade: boolean
   workflowState: WorkflowState
-  muted: boolean
   gradingType: string
+  dueAt?: string
 }
 
 export type AssignmentGroupConnection = {
@@ -60,20 +65,25 @@ export type AssignmentGroupConnection = {
   }
 }
 
+export type SectionConnection = {
+  id: string
+  name: string
+}
+
 export type SubmissionConnection = {
   assignmentId: string
-  user: UserConnection
   id: string
-  score: number
-  grade: string
+  score?: number | null
+  grade?: string | null
 }
 
 export type GradebookQueryResponse = {
   course: {
     enrollmentsConnection: {
-      nodes: {
-        user: UserConnection
-      }[]
+      nodes: EnrollmentConnection[]
+    }
+    sectionsConnection: {
+      nodes: SectionConnection[]
     }
     submissionsConnection: {
       nodes: SubmissionConnection[]
@@ -97,16 +107,20 @@ export type GradebookStudentDetails = {
 }
 
 export type GradebookUserSubmissionDetails = {
-  grade: string
+  grade: string | null
   id: string
-  score: number
-  enteredScore: number
+  score: number | null
+  enteredScore?: number | null
   assignmentId: string
-  submissionType: string
-  proxySubmitter: string
-  submittedAt: string
+  submissionType?: string | null
+  proxySubmitter?: string | null
+  submittedAt?: Date | null
   state: string
   excused: boolean
+  late: boolean
+  latePolicyStatus?: string
+  missing: boolean
+  userId: string
 }
 
 export type GradebookStudentQueryResponse = {

@@ -248,7 +248,7 @@ class OutcomeResultsController < ApplicationController
       json = outcome_results_json(@outcome_service_results)
     end
     json[:linked] = linked_include_collections if params[:include].present?
-    render json: json
+    render json:
   end
 
   # @API Get outcome result rollups
@@ -361,13 +361,13 @@ class OutcomeResultsController < ApplicationController
     # if not, apply exclude_muted_associations to the assignment query
     @new_quiz_assignments =
       if context.grants_any_right?(@current_user, :manage_grades, :view_all_grades)
-        Assignment.active.where(context: context).quiz_lti
+        Assignment.active.where(context:).quiz_lti
       else
         # return if there is more than one user in users as this would indicate
         # user with insufficient permissions accessing the LMGB
         return if @users.length > 1
 
-        Assignment.active.where(context: context).quiz_lti.exclude_muted_associations_for_user(@users[0])
+        Assignment.active.where(context:).quiz_lti.exclude_muted_associations_for_user(@users[0])
       end
   end
 
@@ -457,10 +457,10 @@ class OutcomeResultsController < ApplicationController
     @results = @results.preload(:user)
     ActiveRecord::Associations.preload(@results, :learning_outcome)
     if @outcome_service_results.nil?
-      outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
+      outcome_results_rollups(results: @results, users: @users, excludes:, context: @context)
     else
       @outcome_service_results.push(@results).flatten!
-      outcome_results_rollups(results: @outcome_service_results, users: @users, excludes: excludes, context: @context)
+      outcome_results_rollups(results: @outcome_service_results, users: @users, excludes:, context: @context)
     end
   end
 
@@ -745,7 +745,7 @@ class OutcomeResultsController < ApplicationController
   def build_outcome_paths
     @outcome_paths = @outcome_links.map do |link|
       parts = outcome_group_prefix(link.associated_asset).push({ name: link.learning_outcome_content.title })
-      { id: link.learning_outcome_content.id, parts: parts }
+      { id: link.learning_outcome_content.id, parts: }
     end
   end
 

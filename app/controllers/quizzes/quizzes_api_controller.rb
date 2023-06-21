@@ -328,7 +328,7 @@ class Quizzes::QuizzesApiController < ApplicationController
 
         if accepts_jsonapi?
           {
-            json: jsonapi_quizzes_json(scope: scope, api_route: api_route)
+            json: jsonapi_quizzes_json(scope:, api_route:)
           }
         else
           @quizzes = Api.paginate(scope, self, api_route)
@@ -590,13 +590,13 @@ class Quizzes::QuizzesApiController < ApplicationController
   end
 
   def render_create_error(status)
-    render json: @quiz.errors, status: status
+    render json: @quiz.errors, status:
   end
 
   def render_update_error(status)
     errors = @quiz.errors.as_json[:errors]
     errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-    render json: { errors: errors }, status: status
+    render json: { errors: }, status:
   end
 
   def quiz_params

@@ -290,7 +290,7 @@ module AttachmentFu # :nodoc:
       def save_to_storage
         if save_attachment_from_temp_path?
           options = {
-            content_type: content_type,
+            content_type:,
             acl: attachment_options[:s3_access]
           }
           options.merge!(attachment_options.slice(:cache_control, :expires, :metadata))

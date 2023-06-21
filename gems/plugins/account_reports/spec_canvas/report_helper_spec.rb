@@ -31,7 +31,7 @@ end
 describe "report helper" do
   let(:account) { Account.default }
   let(:user) { User.create }
-  let(:account_report) { AccountReport.new(report_type: "test_report", account: account, user: user) }
+  let(:account_report) { AccountReport.new(report_type: "test_report", account:, user:) }
   let(:report) { AccountReports::TestReport.new(account_report) }
 
   it "handles basic math" do
@@ -73,14 +73,14 @@ describe "report helper" do
 
   describe "load pseudonyms" do
     before(:once) do
-      @user = user_with_pseudonym(active_all: true, account: account, user: user)
+      @user = user_with_pseudonym(active_all: true, account:, user:)
       course = account.courses.create!(name: "reports")
       role = Enrollment.get_built_in_role_for_type("StudentEnrollment", root_account_id: account.resolved_root_account_id)
       @enrollmnent = course.enrollments.create!(user: @user,
                                                 workflow_state: "active",
                                                 sis_pseudonym: @pseudonym,
                                                 type: "StudentEnrollment",
-                                                role: role)
+                                                role:)
     end
 
     it "does one query for pseudonyms" do

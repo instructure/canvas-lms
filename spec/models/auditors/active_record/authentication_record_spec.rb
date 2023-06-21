@@ -22,7 +22,7 @@ describe Auditors::ActiveRecord::AuthenticationRecord do
   let(:request_id) { "abcde-12345" }
 
   before do
-    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id:)
   end
 
   it "appropriately connected to a table" do
