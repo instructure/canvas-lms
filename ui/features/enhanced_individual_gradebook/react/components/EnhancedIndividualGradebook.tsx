@@ -31,6 +31,7 @@ import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
   AssignmentSortContext,
+  AssignmentSubmissionsMap,
   CustomOptions,
   GradebookOptions,
   GradebookQueryResponse,
@@ -39,11 +40,12 @@ import {
   SectionConnection,
   SortableAssignment,
   SortableStudent,
-  SubmissionConnection,
+  SubmissionGradeChange,
 } from '../../types'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
 import {
   mapAssignmentGroupQueryResults,
+  mapAssignmentSubmissions,
   mapEnrollmentsToSortableStudents,
 } from '../../utils/gradebookUtils'
 import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
@@ -55,11 +57,12 @@ const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 
 export default function EnhancedIndividualGradebook() {
   const [sections, setSections] = useState<SectionConnection[]>([])
-  const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
+  const [assignmentSubmissionsMap, setAssignmentSubmissionsMap] =
+    useState<AssignmentSubmissionsMap>({})
   const [students, setStudents] = useState<SortableStudent[]>()
   const [assignments, setAssignments] = useState<SortableAssignment[]>()
 
-  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
+  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || ''
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
@@ -74,11 +77,12 @@ export default function EnhancedIndividualGradebook() {
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
     assignmentIdQueryParam
   )
-  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
-  const submissionsForSelectedAssignment = submissions.filter(
-    submission => submission.assignmentId === selectedAssignmentId
-  )
 
+  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
+  const submissionsMap = selectedAssignment ? assignmentSubmissionsMap[selectedAssignment.id] : {}
+  const submissionsForSelectedAssignment = Object.values(submissionsMap)
+
+  // TODO: move this into helper function
   const defaultAssignmentSort: GradebookSortOrder =
     userSettings.contextGet<AssignmentSortContext>('sort_grade_columns_by')?.sortType ??
     GradebookSortOrder.Alphabetical
@@ -150,7 +154,7 @@ export default function EnhancedIndividualGradebook() {
 
       setAssignmentGroupMap(mappedAssignmentGroupMap)
       setAssignments(mappedAssignments)
-      setSubmissions(submissionsConnection.nodes)
+      setAssignmentSubmissionsMap(mapAssignmentSubmissions(submissionsConnection.nodes))
       setSections(sectionsConnection.nodes)
 
       const sortableStudents = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
@@ -186,19 +190,40 @@ export default function EnhancedIndividualGradebook() {
 
   const handleSubmissionSaved = useCallback(
     (newSubmission: GradebookUserSubmissionDetails) => {
-      setSubmissions(prevSubmissions => {
-        const index = prevSubmissions.findIndex(s => s.id === newSubmission.id)
-        if (index > -1) {
-          prevSubmissions[index] = newSubmission
-        } else {
-          prevSubmissions.push(newSubmission)
-        }
-        return [...prevSubmissions]
+      setAssignmentSubmissionsMap(prevAssignmentSubmissions => {
+        const {assignmentId, id: submissionId} = newSubmission
+        prevAssignmentSubmissions[assignmentId][submissionId] = newSubmission
+        return {...prevAssignmentSubmissions}
       })
 
       updateSubmissionDetails(newSubmission)
     },
-    [updateSubmissionDetails]
+    [updateSubmissionDetails, setAssignmentSubmissionsMap]
+  )
+
+  const handleSetGrades = useCallback(
+    (updatedSubmissions: SubmissionGradeChange[]) => {
+      setAssignmentSubmissionsMap(prevAssignmentSubmissions => {
+        updatedSubmissions.forEach(submission => {
+          const {assignmentId, id: submissionId} = submission
+          const existingSubmission = prevAssignmentSubmissions[assignmentId][submissionId]
+          if (existingSubmission) {
+            prevAssignmentSubmissions[assignmentId][submissionId] = {
+              ...existingSubmission,
+              ...submission,
+            }
+          }
+        })
+        return {...prevAssignmentSubmissions}
+      })
+
+      const submissionForUser = updatedSubmissions.find(s => s.userId === selectedStudentId)
+
+      if (submissionForUser) {
+        updateSubmissionDetails(submissionForUser)
+      }
+    },
+    [selectedStudentId, updateSubmissionDetails]
   )
 
   return (
@@ -273,6 +298,7 @@ export default function EnhancedIndividualGradebook() {
         gradebookOptions={gradebookOptions}
         students={students}
         submissions={submissionsForSelectedAssignment}
+        handleSetGrades={handleSetGrades}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

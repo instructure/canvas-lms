@@ -22,6 +22,7 @@ import {
   GradebookStudentDetails,
   GradebookStudentQueryResponse,
   GradebookUserSubmissionDetails,
+  SubmissionGradeChange,
 } from '../../types'
 import {GRADEBOOK_STUDENT_QUERY} from '../../queries/Queries'
 
@@ -29,7 +30,7 @@ type Response = {
   currentStudent?: GradebookStudentDetails
   studentSubmissions?: GradebookUserSubmissionDetails[]
   loadingStudent: boolean
-  updateSubmissionDetails: (submission: GradebookUserSubmissionDetails) => void
+  updateSubmissionDetails: (submission: SubmissionGradeChange) => void
 }
 
 export const useCurrentStudentInfo = (courseId: string, userId?: string | null): Response => {
@@ -61,12 +62,12 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
   }, [data, error])
 
   const updateSubmissionDetails = useCallback(
-    (newSubmission: GradebookUserSubmissionDetails) => {
+    (newSubmission: SubmissionGradeChange) => {
       setStudentSubmissions(submissions => {
         if (!submissions) return
         const index = submissions.findIndex(s => s.id === newSubmission.id)
         if (index > -1) {
-          submissions[index] = newSubmission
+          submissions[index] = {...submissions[index], ...newSubmission}
         }
         return [...submissions]
       })

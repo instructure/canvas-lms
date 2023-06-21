@@ -37,7 +37,9 @@ export const GRADEBOOK_QUERY = gql`
           name
         }
       }
-      submissionsConnection {
+      submissionsConnection(
+        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+      ) {
         nodes {
           grade
           id: _id
@@ -46,6 +48,7 @@ export const GRADEBOOK_QUERY = gql`
           redoRequest
           submittedAt
           userId
+          state
         }
       }
       assignmentGroupsConnection {

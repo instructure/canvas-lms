@@ -25,12 +25,15 @@ import {
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGroupConnection,
+  AssignmentSubmissionsMap,
   EnrollmentConnection,
   GradebookSortOrder,
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
   SortableAssignment,
   SortableStudent,
+  SubmissionConnection,
+  SubmissionGradeChange,
 } from '../types'
 import {Submission} from '../../../api.d'
 import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
@@ -78,6 +81,20 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
       mappedAssignmentGroupMap: {} as AssignmentGroupCriteriaMap,
     }
   )
+}
+
+export function mapAssignmentSubmissions(
+  submissions: SubmissionConnection[]
+): AssignmentSubmissionsMap {
+  return submissions.reduce((submissionMap, submission) => {
+    const {assignmentId, id: submissionId} = submission
+    if (!submissionMap[assignmentId]) {
+      submissionMap[assignmentId] = {}
+    }
+
+    submissionMap[assignmentId][submissionId] = submission
+    return submissionMap
+  }, {} as AssignmentSubmissionsMap)
 }
 
 export function mapEnrollmentsToSortableStudents(
@@ -201,6 +218,22 @@ export function outOfText(
     return I18n.t('No points possible')
   } else {
     return I18n.t('(out of %{points})', {points: I18n.n(pointsPossible)})
+  }
+}
+
+export function mapToSubmissionGradeChange(submission: Submission): SubmissionGradeChange {
+  return {
+    assignmentId: submission.assignment_id,
+    enteredScore: submission.entered_score,
+    excused: submission.excused,
+    grade: submission.grade,
+    id: submission.id,
+    late: submission.late,
+    missing: submission.missing,
+    score: submission.score,
+    submittedAt: submission.submitted_at,
+    state: submission.workflow_state,
+    userId: submission.user_id,
   }
 }
 
