@@ -298,4 +298,107 @@ describe WikiPagesApiController, type: :request do
       expect(json["title"]).to eq "Assignment Wiki Copy"
     end
   end
+
+  describe "GET 'check_title_availability'" do
+    before do
+      course_with_teacher(active_all: true)
+      wiki_page_model({ title: "Learning Foundations" })
+    end
+
+    context "with the flag off" do
+      before do
+        Account.site_admin.disable_feature!(:permanent_page_links)
+      end
+
+      it "404s" do
+        api_call_as_user(@teacher,
+                         :get,
+                         "/api/v1/courses/#{@course.id}/page_title_availability",
+                         { controller: "wiki_pages_api",
+                           action: "check_title_availability",
+                           format: "json",
+                           course_id: @course.id.to_s },
+                         {},
+                         {},
+                         { expected_status: 404 })
+      end
+    end
+
+    context "with the flag on" do
+      before do
+        Account.site_admin.enable_feature!(:permanent_page_links)
+      end
+
+      it "401s for unauthorized users" do
+        new_user = User.create!
+        api_call_as_user(new_user,
+                         :get,
+                         "/api/v1/courses/#{@course.id}/page_title_availability",
+                         { controller: "wiki_pages_api",
+                           action: "check_title_availability",
+                           format: "json",
+                           course_id: @course.id.to_s },
+                         {},
+                         {},
+                         { expected_status: 401 })
+      end
+
+      it "400s if missing title field in request body" do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                {},
+                                {},
+                                { expected_status: 400 })
+        expect(json["errors"][0]["message"]).to eq "title is missing"
+      end
+
+      it "correctly indicates conflicts" do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                { title: @page.title },
+                                {},
+                                { expected_status: 200 })
+        expect(json["conflict"]).to be true
+      end
+
+      it "correctly indicates lack of conflicts" do
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                { title: "Einzigartig" },
+                                {},
+                                { expected_status: 200 })
+        expect(json["conflict"]).to be false
+      end
+
+      it "doesn't indicate conflict for deleted page titles" do
+        @page.destroy
+        json = api_call_as_user(@teacher,
+                                :get,
+                                "/api/v1/courses/#{@course.id}/page_title_availability",
+                                { controller: "wiki_pages_api",
+                                  action: "check_title_availability",
+                                  format: "json",
+                                  course_id: @course.id.to_s },
+                                { title: @page.title },
+                                {},
+                                { expected_status: 200 })
+        expect(json["conflict"]).to be false
+      end
+    end
+  end
 end

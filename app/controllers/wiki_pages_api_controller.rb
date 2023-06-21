@@ -157,9 +157,9 @@
 #
 class WikiPagesApiController < ApplicationController
   before_action :require_context
-  before_action :get_wiki_page, except: [:create, :index]
-  before_action :require_wiki_page, except: %i[create update update_front_page index]
-  before_action :was_front_page, except: [:index]
+  before_action :get_wiki_page, except: %i[create index check_title_availability]
+  before_action :require_wiki_page, except: %i[create update update_front_page index check_title_availability]
+  before_action :was_front_page, except: [:index, :check_title_availability]
   before_action only: %i[show update destroy revisions show_revision revert] do
     check_differentiated_assignments(@page) if @context.conditional_release?
   end
@@ -577,6 +577,15 @@ class WikiPagesApiController < ApplicationController
         render json: @page.errors, status: :bad_request
       end
     end
+  end
+
+  def check_title_availability
+    return render status: :not_found, json: { errors: [message: "The specified resource does not exist."] } unless Account.site_admin.feature_enabled?(:permanent_page_links)
+
+    return render_json_unauthorized unless @context.wiki.grants_right?(@current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
+
+    title = params.require(:title)
+    render json: { conflict: @context.wiki.wiki_pages.not_deleted.where(title:).count > 0 }
   end
 
   protected
