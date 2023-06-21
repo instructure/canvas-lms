@@ -26,6 +26,8 @@ import {Table} from '@instructure/ui-table'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
+import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 
 import {calculateHighRangeForDataRow} from '../../helpers/calculateHighRangeForDataRow'
 import {GradingSchemeDataRowView} from './GradingSchemeDataRowView'
@@ -36,6 +38,7 @@ const I18n = useI18nScope('GradingSchemes')
 
 interface ComponentProps {
   gradingScheme: GradingScheme
+  pointsBasedGradingSchemesEnabled: boolean
   disableEdit: boolean
   disableDelete: boolean
   onEditRequested?: () => any
@@ -48,6 +51,7 @@ const {Head, Row, ColHeader, Body} = Table as any
 
 export const GradingSchemeView: React.FC<ComponentProps> = ({
   gradingScheme,
+  pointsBasedGradingSchemesEnabled,
   disableEdit = false,
   disableDelete = false,
   onEditRequested,
@@ -91,6 +95,24 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
           </IconButton>
         </Item>
       </Flex>
+      <View>
+        {pointsBasedGradingSchemesEnabled ? (
+          <View as="div" padding="none none small none" withVisualDebug={false}>
+            <RadioInputGroup
+              layout="columns"
+              name={`points_based_${gradingScheme.id}`}
+              defaultValue={String(gradingScheme.points_based)}
+              description={I18n.t('Grade by')}
+              disabled={true}
+            >
+              <RadioInput value="false" label={I18n.t('Percentage')} />
+              <RadioInput value="true" label={I18n.t('Points')} />
+            </RadioInputGroup>
+          </View>
+        ) : (
+          <></>
+        )}
+      </View>
       <Flex>
         <Item>
           <Table
@@ -115,8 +137,12 @@ export const GradingSchemeView: React.FC<ComponentProps> = ({
                 <GradingSchemeDataRowView
                   key={shortid()}
                   dataRow={dataRow}
-                  maxScore={calculateHighRangeForDataRow(idx, array)}
+                  highRange={calculateHighRangeForDataRow(idx, array)}
                   isFirstRow={idx === 0}
+                  schemeScaleFactor={
+                    pointsBasedGradingSchemesEnabled ? gradingScheme.scaling_factor : 1.0
+                  }
+                  viewAsPercentage={!gradingScheme.points_based}
                 />
               ))}
             </Body>

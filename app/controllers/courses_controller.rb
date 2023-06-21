@@ -1551,7 +1551,9 @@ class CoursesController < ApplicationController
                MSFT_SYNC_CAN_BYPASS_COOLDOWN: Account.site_admin.account_users_for(@current_user).present?,
                MSFT_SYNC_MAX_ENROLLMENT_MEMBERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS,
                MSFT_SYNC_MAX_ENROLLMENT_OWNERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS,
-               COURSE_PACES_ENABLED: @context.enable_course_paces?
+               COURSE_PACES_ENABLED: @context.enable_course_paces?,
+               POINTS_BASED_GRADING_SCHEMES_ENABLED:
+                 Account.site_admin.feature_enabled?(:points_based_grading_schemes)
              })
 
       set_tutorial_js_env

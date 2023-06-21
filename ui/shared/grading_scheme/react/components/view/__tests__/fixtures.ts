@@ -33,6 +33,8 @@ export const MOCK_COURSE_GRADING_SCHEME: GradingScheme = {
   permissions: {manage: true},
   title: 'A Grading Scheme',
   id: '30',
+  points_based: false,
+  scaling_factor: 1.0,
 }
 
 export const MOCK_DEFAULT_GRADING_SCHEME: GradingSchemeTemplate = {
@@ -44,4 +46,6 @@ export const MOCK_DEFAULT_GRADING_SCHEME: GradingSchemeTemplate = {
     {name: 'F', value: 0.0},
   ],
   title: 'A Grading Scheme',
+  points_based: false,
+  scaling_factor: 1.0,
 }

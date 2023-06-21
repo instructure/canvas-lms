@@ -23,31 +23,32 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+// @ts-expect-error -- TODO: remove once we're on InstUI 8
+import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import numberHelper from '@canvas/i18n/numberHelper'
 
-import {calculateHighRangeForDataRow} from '../../helpers/calculateHighRangeForDataRow'
 import {GradingSchemeDataRowInput} from './GradingSchemeDataRowInput'
 import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
 import {GradingSchemeValidationAlert} from './GradingSchemeValidationAlert'
 import {gradingSchemeIsValid} from './validations/gradingSchemeValidations'
+import {roundToTwoDecimalPlaces, roundToFourDecimalPlaces} from '../../helpers/roundDecimalPlaces'
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
 export interface ComponentProps {
-  initialFormData: GradingSchemeFormInput
-  onSave: (gradingSchemeFormInput: GradingSchemeFormInput) => any
+  initialFormDataByInputType: {
+    percentage: GradingSchemeEditableData
+    points: GradingSchemeEditableData
+  }
+  onSave: (updatedGradingSchemeData: GradingSchemeEditableData) => any
+  pointsBasedGradingSchemesFeatureEnabled: boolean
+  schemeInputType: 'percentage' | 'points'
 }
-export interface GradingSchemeFormInput {
+export interface GradingSchemeEditableData {
   title: string
   data: GradingSchemeDataRow[]
-}
-
-export interface GradingSchemeFormDataWithUniqueRowIds {
-  title: string
-  data: GradingSchemeDataRowWithUniqueId[]
-}
-interface GradingSchemeDataRowWithUniqueId extends GradingSchemeDataRow {
-  uniqueId: string
-  minRangeNotValidNumber: boolean
+  scalingFactor: number
+  pointsBased: boolean
 }
 
 export type GradingSchemeInputHandle = {
@@ -55,7 +56,7 @@ export type GradingSchemeInputHandle = {
 }
 
 /**
- * Form input fields for creating or updating GradingSchemes.
+ * Form input for creating or updating GradingSchemes.
  *
  * This form input component is an imperative component because its
  * 'save' button is located in an external component (such as a modal
@@ -67,134 +68,314 @@ export type GradingSchemeInputHandle = {
  */
 
 export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, ComponentProps>(
-  ({initialFormData, onSave}, ref) => {
-    const [showAlert, setShowAlert] = React.useState<boolean>(false)
-    const [inputFormData, setInputFormData] = useState<GradingSchemeFormDataWithUniqueRowIds>({
-      title: initialFormData.title,
-      // deep clone the template's row data. (we don't want to modify the provided data by reference)
-      data: initialFormData.data.map(dataRow => {
-        return {
-          ...dataRow,
-          uniqueId: shortid(),
-          minRangeNotValidNumber: false,
-        }
-      }),
-    })
+  (
+    {initialFormDataByInputType, schemeInputType, onSave, pointsBasedGradingSchemesFeatureEnabled},
+    ref
+  ) => {
+    interface GradingSchemeInputState {
+      title: string
+      rows: GradingSchemeRowState[]
+      scalingFactor: number
+      pointsBased: boolean
+    }
+
+    interface GradingSchemeRowState {
+      uniqueId: string
+      letterGrade: string
+      minRangeDisplay: string
+      maxRangeDisplay: string
+    }
+
+    const [showAlert, setShowAlert] = useState<boolean>(false)
+
+    const formStateByType = {
+      percentage: initializeFormState(initialFormDataByInputType.percentage),
+      points: initializeFormState(initialFormDataByInputType.points),
+    }
+
+    const [formState, setFormState] = useState<GradingSchemeInputState>(
+      schemeInputType === 'points' ? formStateByType.points : formStateByType.percentage
+    )
+
+    function decimalRangeToDisplayString(percentageValue: number, displayScalingFactor: number) {
+      return String(roundToTwoDecimalPlaces(percentageValue * displayScalingFactor))
+    }
+
+    function rangeDisplayStringToDecimal(rangeString: string, displayScalingFactor: number) {
+      const inputVal = numberHelper.parse(rangeString)
+      if (Number.isNaN(Number(inputVal))) return NaN
+      return roundToFourDecimalPlaces(roundToTwoDecimalPlaces(inputVal) / displayScalingFactor)
+    }
+
+    function initializeFormState(formInput: GradingSchemeEditableData): GradingSchemeInputState {
+      const scalingFactorDisplay = formInput.scalingFactor * (formInput.pointsBased ? 1 : 100)
+      return {
+        title: formInput.title,
+        // deep clone the template's row data. (we don't want to modify the provided data by reference)
+        rows: formInput.data.map((dataRow, idx, arr) => {
+          return {
+            uniqueId: shortid(),
+            letterGrade: dataRow.name,
+            minRangeDisplay: decimalRangeToDisplayString(dataRow.value, scalingFactorDisplay),
+            maxRangeDisplay: decimalRangeToDisplayString(
+              idx === 0 ? 1 : arr[idx - 1].value,
+              scalingFactorDisplay
+            ),
+            pointsBased: formInput.pointsBased,
+          }
+        }),
+        scalingFactor: scalingFactorDisplay,
+        pointsBased: formInput.pointsBased,
+      }
+    }
 
     useImperativeHandle(ref, () => ({
       savePressed: () => {
-        const isValid = gradingSchemeIsValid(inputFormData)
+        const data = formState.rows.map(row => ({
+          name: row.letterGrade,
+          value: rangeDisplayStringToDecimal(row.minRangeDisplay, formState.scalingFactor),
+        }))
+
+        const dataToSave = {
+          title: formState.title,
+          data,
+          scalingFactor: formState.scalingFactor / (formState.pointsBased ? 1 : 100),
+          pointsBased: formState.pointsBased,
+        }
+        const isValid = gradingSchemeIsValid(dataToSave)
+
         setShowAlert(!isValid)
         if (isValid) {
-          const dataWithoutIds = inputFormData.data.map(rowWithUniqueId => ({
-            name: rowWithUniqueId.name,
-            value: rowWithUniqueId.value,
-          }))
-          onSave({title: inputFormData.title, data: dataWithoutIds})
+          onSave(dataToSave)
         }
       },
     }))
 
-    const changeRowLetterGrade = (rowIndex: number, newRowName: string) => {
-      const updatedScheme = {
-        ...inputFormData,
+    const handlePointsBasedChanged = (newValue: string) => {
+      if (formState.pointsBased && newValue === 'percentage') {
+        setFormState(
+          initializeFormState({...initialFormDataByInputType.percentage, title: formState.title})
+        )
+      } else if (!formState.pointsBased && newValue === 'points') {
+        setFormState(
+          initializeFormState({...initialFormDataByInputType.points, title: formState.title})
+        )
       }
-      updatedScheme.data[rowIndex].name = newRowName
-      updatedScheme.data[rowIndex].minRangeNotValidNumber = false
-      setInputFormData(updatedScheme)
     }
 
-    const handleRowInvalidRangeInput = (rowIndex: number) => {
+    const changeRowLetterGrade = (rowIndex: number, newLetterGrade: string) => {
       const updatedScheme = {
-        ...inputFormData,
+        ...formState,
       }
-      updatedScheme.data[rowIndex].minRangeNotValidNumber = true
-      setInputFormData(updatedScheme)
+      updatedScheme.rows[rowIndex].letterGrade = newLetterGrade
+      setFormState(updatedScheme)
     }
 
-    const handleChangeRowLowRange = (rowIndex: number, rowLowRange: number) => {
-      const updatedScheme = {
-        ...inputFormData,
+    const handleBlurRowLowRange = (rowIndex: number, lowRangeInputAsString: string) => {
+      const lowRange = numberHelper._parseNumber(lowRangeInputAsString)
+      let lowRangeAsString = lowRangeInputAsString
+      if (!Number.isNaN(lowRange)) {
+        lowRangeAsString = String(roundToTwoDecimalPlaces(lowRange))
       }
-      updatedScheme.data[rowIndex].value = rowLowRange
-      updatedScheme.data[rowIndex].minRangeNotValidNumber = false
-      setInputFormData(updatedScheme)
+
+      const updatedScheme = {
+        ...formState,
+        rows: formState.rows.map((row, idx) => {
+          if (rowIndex === idx) {
+            return {
+              ...row,
+              minRangeDisplay: lowRangeAsString,
+            }
+          } else if (rowIndex === idx - 1) {
+            return {
+              ...row,
+              maxRangeDisplay: lowRangeAsString,
+            }
+          } else {
+            return row
+          }
+        }),
+      }
+      setFormState(updatedScheme)
     }
+
+    const handleRowLowRangeChanged = (rowIndex: number, lowRangeDisplay: string) => {
+      const updatedScheme = {
+        ...formState,
+        rows: formState.rows.map((row, idx) => {
+          if (rowIndex === idx) {
+            return {
+              ...row,
+              minRangeDisplay: lowRangeDisplay,
+            }
+          } else if (rowIndex === idx - 1) {
+            return {
+              ...row,
+              maxRangeDisplay: lowRangeDisplay,
+            }
+          } else {
+            return row
+          }
+        }),
+      }
+      setFormState(updatedScheme)
+    }
+
+    const handleBlurRowHighRange = (rowIndex: number, highRangeInputAsString: string) => {
+      if (rowIndex !== 0) {
+        throw Error('scaling factor may only be changed on the first row')
+      }
+      const updatedScheme = {
+        ...formState,
+      }
+      const highRange = numberHelper._parseNumber(highRangeInputAsString)
+      let highRangeAsString = highRangeInputAsString
+      if (!Number.isNaN(highRange)) {
+        updatedScheme.scalingFactor = roundToTwoDecimalPlaces(highRange)
+        highRangeAsString = String(updatedScheme.scalingFactor)
+      } else {
+        updatedScheme.scalingFactor = NaN
+      }
+      updatedScheme.rows[rowIndex].maxRangeDisplay = highRangeAsString
+      setFormState(updatedScheme)
+    }
+
+    const handleRowHighRangeChanged = (rowIndex: number, highRangeDisplay: string) => {
+      if (rowIndex !== 0) {
+        throw Error('scaling factor may only be changed on the first row')
+      }
+      const updatedScheme = {
+        ...formState,
+      }
+      updatedScheme.rows[rowIndex].maxRangeDisplay = highRangeDisplay
+
+      const inputVal = numberHelper.parse(highRangeDisplay)
+      if (!Number.isNaN(Number(inputVal))) {
+        updatedScheme.scalingFactor = roundToTwoDecimalPlaces(inputVal)
+      } else {
+        updatedScheme.scalingFactor = NaN
+      }
+      setFormState(updatedScheme)
+    }
+
     const changeTitle = (e: ChangeEvent<HTMLInputElement>) => {
       const title = e.currentTarget.value.trim()
       const updatedScheme = {
-        ...inputFormData,
+        ...formState,
         title,
       }
-      setInputFormData(updatedScheme)
+      setFormState(updatedScheme)
     }
-    const addDataRow = (index: number) => {
-      const [rowBefore, rowAfter] = inputFormData.data.slice(index, index + 2)
-      const score = rowAfter ? (rowBefore.value - rowAfter.value) / 2 + rowAfter.value : 0
-      inputFormData.data.splice(index + 1, 0, {
-        uniqueId: shortid(),
-        name: '',
-        value: score,
-        minRangeNotValidNumber: false,
-      })
+    const addDataRowAfterRow = (rowIndex: number) => {
+      const [rowBefore, rowAfter] = formState.rows.slice(rowIndex, rowIndex + 2)
+
+      const rowBeforeLowRangeAsPercentage = rangeDisplayStringToDecimal(
+        rowBefore.minRangeDisplay,
+        formState.scalingFactor
+      )
+      const rowAfterLowRangeAsPercentage = rowAfter
+        ? rangeDisplayStringToDecimal(rowAfter.minRangeDisplay, formState.scalingFactor)
+        : 0
+
+      const lowRangeForNewRowAsPercentage =
+        (rowBeforeLowRangeAsPercentage - rowAfterLowRangeAsPercentage) / 2 +
+        rowAfterLowRangeAsPercentage
+      const lowRangeForNewRowScaledForDisplay = rangeScaledForDisplay(
+        lowRangeForNewRowAsPercentage,
+        formState.scalingFactor
+      )
 
       const updatedScheme = {
-        ...inputFormData,
-        data: inputFormData.data,
+        ...formState,
       }
-      setInputFormData(updatedScheme)
+
+      updatedScheme.rows.splice(rowIndex + 1, 0, {
+        uniqueId: shortid(),
+        letterGrade: '',
+        minRangeDisplay: lowRangeForNewRowScaledForDisplay,
+        maxRangeDisplay: rowBefore.minRangeDisplay,
+      })
+
+      setFormState(updatedScheme)
     }
 
     const removeDataRow = (index: number) => {
       const updatedScheme = {
-        ...inputFormData,
+        ...formState,
       }
-      updatedScheme.data.splice(index, 1)
-      if (updatedScheme.data.length > 0) {
+      updatedScheme.rows.splice(index, 1)
+      if (updatedScheme.rows.length > 0) {
         // the last data row always has a min range of 0
-        updatedScheme.data[updatedScheme.data.length - 1].value = 0
+        updatedScheme.rows[updatedScheme.rows.length - 1].minRangeDisplay = '0'
       }
-      setInputFormData(updatedScheme)
+      if (updatedScheme.rows.length === 1) {
+        // only one row remains. by definition it must be 100% high range and 0% low range
+        updatedScheme.rows[0].minRangeDisplay = '0'
+      }
+      setFormState(updatedScheme)
+    }
+
+    function rangeScaledForDisplay(range: number, displayScalingFactor: number): string {
+      return String(roundToTwoDecimalPlaces(range * displayScalingFactor))
     }
 
     return (
       <View>
-        {showAlert && inputFormData ? (
+        {showAlert && formState ? (
           <GradingSchemeValidationAlert
-            formData={inputFormData}
+            formData={{
+              title: formState.title,
+              data: formState.rows.map(row => ({
+                name: row.letterGrade,
+                value: rangeDisplayStringToDecimal(row.minRangeDisplay, formState.scalingFactor),
+              })),
+              scalingFactor: formState.scalingFactor,
+              pointsBased: formState.pointsBased,
+            }}
             onClose={() => setShowAlert(false)}
           />
         ) : (
           <></>
         )}
 
-        <View as="div">
+        <View as="div" withVisualDebug={false}>
+          <View as="div" padding="none none small none" withVisualDebug={false}>
+            <View as="div" padding="small none small none">
+              <TextInput
+                isRequired={true}
+                width="23rem"
+                renderLabel={I18n.t('Grading Scheme Name')}
+                onChange={changeTitle}
+                defaultValue={formState.title}
+                placeholder={I18n.t('New Grading Scheme')}
+              />
+            </View>
+            {pointsBasedGradingSchemesFeatureEnabled ? (
+              <View as="div" padding="none none small none" withVisualDebug={false}>
+                <RadioInputGroup
+                  layout="columns"
+                  name={`pointsBased_${shortid()}`}
+                  defaultValue={formState.pointsBased ? 'points' : 'percentage'}
+                  description={I18n.t('Grade by')}
+                  onChange={(event: any, newValue: string) => handlePointsBasedChanged(newValue)}
+                >
+                  <RadioInput value="percentage" label={I18n.t('Percentage')} />
+                  <RadioInput value="points" label={I18n.t('Points')} />
+                </RadioInputGroup>
+              </View>
+            ) : (
+              <></>
+            )}
+          </View>
           <table style={{width: '100%'}}>
             <caption>
               <ScreenReaderContent>
                 {I18n.t(
-                  'A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
+                  'A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
                 )}
               </ScreenReaderContent>
             </caption>
             <thead>
-              <tr>
-                <th>
-                  <></>
-                </th>
-                <th colSpan={4}>
-                  <View as="div" padding="small none small none">
-                    <TextInput
-                      isRequired={true}
-                      width="23rem"
-                      renderLabel={I18n.t('Grading Scheme Name')}
-                      onChange={changeTitle}
-                      defaultValue={initialFormData.title}
-                      placeholder={I18n.t('New Grading Scheme')}
-                    />
-                  </View>
-                </th>
-              </tr>
               <tr>
                 <th style={{width: '5%'}}>
                   <ScreenReaderContent>{I18n.t('Add row action')}</ScreenReaderContent>
@@ -209,18 +390,23 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
               </tr>
             </thead>
             <tbody>
-              {inputFormData.data.map((dataRow, idx, array) => (
-                <Fragment key={dataRow.uniqueId}>
+              {formState.rows.map((row, idx, array) => (
+                <Fragment key={row.uniqueId}>
                   <GradingSchemeDataRowInput
-                    dataRow={{name: dataRow.name, value: dataRow.value}}
-                    highRange={calculateHighRangeForDataRow(idx, array)}
+                    letterGrade={row.letterGrade}
+                    lowRangeDefaultDisplay={row.minRangeDisplay}
+                    highRangeDefaultDisplay={row.maxRangeDisplay}
                     isFirstRow={idx === 0}
-                    onLowRangeChange={lowRangeValue => handleChangeRowLowRange(idx, lowRangeValue)}
-                    onLowRangeInputInvalidNumber={() => handleRowInvalidRangeInput(idx)}
+                    onLowRangeChange={lowRangeValue => handleRowLowRangeChanged(idx, lowRangeValue)}
+                    onLowRangeBlur={lowRangeValue => handleBlurRowLowRange(idx, lowRangeValue)}
                     onRowLetterGradeChange={letterGrade => changeRowLetterGrade(idx, letterGrade)}
                     onRowDeleteRequested={() => removeDataRow(idx)}
-                    onRowAddRequested={() => addDataRow(idx)}
+                    onRowAddRequested={() => addDataRowAfterRow(idx)}
                     isLastRow={idx === array.length - 1}
+                    pointsBased={formState.pointsBased}
+                    displayScalingFactor={formState.scalingFactor}
+                    onHighRangeChange={it => handleRowHighRangeChanged(idx, it)}
+                    onHighRangeBlur={highRangeValue => handleBlurRowHighRange(idx, highRangeValue)}
                   />
                 </Fragment>
               ))}

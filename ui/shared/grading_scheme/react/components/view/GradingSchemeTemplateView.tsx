@@ -102,8 +102,10 @@ export const GradingSchemeTemplateView: React.FC<ComponentProps> = ({
                 <GradingSchemeDataRowView
                   key={shortid()}
                   dataRow={dataRow}
-                  maxScore={calculateHighRangeForDataRow(idx, array)}
+                  highRange={calculateHighRangeForDataRow(idx, array)}
                   isFirstRow={idx === 0}
+                  schemeScaleFactor={1.0}
+                  viewAsPercentage={true}
                 />
               ))}
             </Body>
