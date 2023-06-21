@@ -403,8 +403,9 @@ class AccountsController < ApplicationController
   end
 
   # @API Settings
-  # Returns settings for the specified account as a JSON object. The caller must be an Account
-  # admin with the manage_account_settings permission.
+  # Returns a JSON object containing a subset of settings for the specified account.
+  # It's possible an empty set will be returned if no settings are applicable.
+  # The caller must be an Account admin with the manage_account_settings permission.
   #
   # @example_request
   #     curl https://<canvas>/api/v1/accounts/<account_id>/settings \
@@ -415,7 +416,12 @@ class AccountsController < ApplicationController
   def show_settings
     return render_unauthorized_action unless @account.grants_right?(@current_user, session, :manage_account_settings)
 
-    public_attrs = %i[microsoft_sync_enabled microsoft_sync_tenant microsoft_sync_login_attribute microsoft_sync_login_attribute_suffix microsoft_sync_remote_attribute]
+    public_attrs = %i[microsoft_sync_enabled
+                      microsoft_sync_tenant
+                      microsoft_sync_login_attribute
+                      microsoft_sync_login_attribute_suffix
+                      microsoft_sync_remote_attribute]
+
     render json: public_attrs.index_with { |key| @account.settings[key] }.compact
   end
 
