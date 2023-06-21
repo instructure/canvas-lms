@@ -1011,60 +1011,23 @@ describe Lti::Messages::JwtMessage do
   end
 
   describe "lti1p1 claims" do
-    subject { decoded_jwt[lti1p1_claim] }
-
     let(:lti1p1_claim) { "https://purl.imsglobal.org/spec/lti/claim/lti1p1" }
 
     context "when user does not have lti_context_id" do
-      subject { decoded_jwt }
-
       before do
         allow(user).to receive(:lti_context_id).and_return(nil)
       end
 
-      it { is_expected.not_to include lti1p1_claim }
+      it "does not include the claim" do
+        expect(decoded_jwt).to_not include lti1p1_claim
+      end
     end
 
     context "when user has lti_context_id" do
+      let(:message_lti1p1) { decoded_jwt[lti1p1_claim] }
+
       it "adds user_id" do
-        expect(subject["user_id"]).to eq user.lti_context_id
-      end
-    end
-
-    context "when there is an associated LTI 1.1 tool" do
-      let!(:associated_1_1_tool) { external_tool_model(context: course, opts: { url: "http://www.example.com/basic_lti" }) }
-
-      before do
-        allow(Lti::Helpers::JwtMessageHelper).to receive(:generate_oauth_consumer_key_sign).and_return("avalidsignature")
-      end
-
-      context "the include_oauth_consumer_key_in_lti_launch flag is enabled" do
-        before do
-          Account.site_admin.enable_feature!(:include_oauth_consumer_key_in_lti_launch)
-        end
-
-        it "includes the oauth_consumer_key related claims" do
-          expect(subject["oauth_consumer_key"]).to eq associated_1_1_tool.consumer_key
-          expect(subject["oauth_consumer_key_sign"]).to eq "avalidsignature"
-        end
-      end
-
-      context "the include_oauth_consumer_key_in_lti_launch flag is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:include_oauth_consumer_key_in_lti_launch)
-        end
-
-        it "doesn't include the oauth_consumer_key related claims" do
-          expect(subject).not_to include "oauth_consumer_key"
-          expect(subject).not_to include "oauth_consumer_key_sign"
-        end
-      end
-    end
-
-    context "when there isn't an associated LTI 1.1 tool" do
-      it "doesn't include the oauth_consumer_key related claims" do
-        expect(subject).not_to include "oauth_consumer_key"
-        expect(subject).not_to include "oauth_consumer_key_sign"
+        expect(message_lti1p1["user_id"]).to eq user.lti_context_id
       end
     end
   end
