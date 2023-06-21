@@ -1569,7 +1569,7 @@ class SubmissionsApiController < ApplicationController
   def change_topic_read_state(new_state)
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
-    @submission = @assignment.submissions.find_or_create_by!(user: @user)
+    @submission = @assignment.find_or_create_submission(@user, skip_grader_check: true)
 
     render_state_change_result @submission.change_read_state(new_state, @current_user)
   end
