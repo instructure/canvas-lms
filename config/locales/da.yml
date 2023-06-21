@@ -30696,7 +30696,7 @@ da:
       toolbar_menu: 
         settings: Indstillinger
       unpublished_indicator: "Ikke offentliggjort"
-      view_page_history_wiki: "Vis sideoversigt"
+      view_page_history_wiki: "Vis sidehistorik"
       wiki: 
         todo_date: "Dato for opgaveliste:"
     wiki_page_content: 
