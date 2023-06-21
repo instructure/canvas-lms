@@ -55,6 +55,11 @@ class SubmissionSearch
                      .where("submissions.user_id IN (SELECT id FROM (#{user_search_scope.to_sql}) AS user_search_ids)")
     end
 
+    if @options[:user_id]
+      # Since user_id requires an ID and not just a partial name, the user_search_scope is not needed and the 3 characters limit is not applied
+      search_scope = search_scope.where(user_id: @options[:user_id])
+    end
+
     if @options[:enrollment_types].present?
       search_scope = search_scope.where(user_id:
         @course.enrollments.select(:user_id).where(type: @options[:enrollment_types]))
