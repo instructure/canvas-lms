@@ -174,10 +174,6 @@ module Lti::Messages
 
     def add_lti1p1_claims!
       @message.lti1p1.user_id = @user&.lti_context_id
-      if (associated_tool = @tool&.associated_1_1_tool(@context, @launch_url).presence) && Account.site_admin.feature_enabled?(:include_oauth_consumer_key_in_lti_launch)
-        @message.lti1p1.oauth_consumer_key = associated_tool.consumer_key
-        @message.lti1p1.oauth_consumer_key_sign = Lti::Helpers::JwtMessageHelper.generate_oauth_consumer_key_sign(associated_tool, @message)
-      end
     end
 
     # Following the spec https://www.imsglobal.org/spec/lti/v1p3/migr#remapping-parameters
@@ -185,9 +181,7 @@ module Lti::Messages
     # platform MUST include the parameter and its LTI 1.1 value. Otherwise the
     # platform MAY omit that attribute.
     def include_lti1p1_claims?
-      user_ids_differ = @user&.lti_context_id && @user.lti_context_id != @user.lti_id
-
-      user_ids_differ || @tool&.associated_1_1_tool(@context, @launch_url).present?
+      @user&.lti_context_id && @user.lti_context_id != @user.lti_id
     end
 
     # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim
