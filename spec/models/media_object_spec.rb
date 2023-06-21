@@ -399,6 +399,24 @@ describe MediaObject do
           @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
         end
 
+        context "with media_links_use_attachment_id feature flag enabled" do
+          before do
+            Account.site_admin.enable_feature!(:media_links_use_attachment_id)
+          end
+
+          it "allows teachers to add captions if they have permission to update attachment" do
+            course_with_teacher
+            second_course = Course.create!(name: "second course")
+
+            mo = media_object(context: second_course)
+            mo.user = nil
+            mo.attachment = attachment_model
+
+            expect(mo.grants_right?(@teacher, :add_captions)).to be true
+            expect(mo.grants_right?(@teacher, :delete_captions)).to be true
+          end
+        end
+
         it "allows course admin users to add_captions to userless objects" do
           course_with_teacher
           mo = media_object
