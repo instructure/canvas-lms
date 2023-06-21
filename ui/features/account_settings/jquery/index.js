@@ -288,6 +288,15 @@ $(document).ready(function () {
     .tabs({active: initialTab >= 0 ? initialTab : null})
     .show()
 
+  $('#account_settings_restrict_quantitative_data_value').click(event => {
+    const lockbox = $('#account_settings_restrict_quantitative_data_locked')
+    if (event.target.checked) {
+      lockbox.attr('disabled', false)
+    } else {
+      lockbox.attr('checked', false)
+      lockbox.attr('disabled', true)
+    }
+  })
   $('.add_ip_filter_link').click(event => {
     event.preventDefault()
     const $filter = $('.ip_filter.blank:first').clone(true).removeClass('blank')
