@@ -135,8 +135,8 @@ class WikiPage < ActiveRecord::Base
 
   def create_lookup
     new_record = id_changed?
-    lookup = wiki_page_lookups.find_by(slug: url) unless new_record
-    lookup ||= wiki_page_lookups.build(slug: url)
+    lookup = wiki_page_lookups.find_by(slug: read_attribute(:url)) unless new_record
+    lookup ||= wiki_page_lookups.build(slug: read_attribute(:url))
     lookup.save
     # this is kind of circular so we want to avoid triggering callbacks again
     update_column(:current_lookup_id, lookup.id)
@@ -151,7 +151,7 @@ class WikiPage < ActiveRecord::Base
     return if deleted?
 
     to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/) { $1.capitalize }.strip }
-    self.title ||= to_cased_title.call(url || "page")
+    self.title ||= to_cased_title.call(read_attribute(:url) || "page")
     # TODO: i18n (see wiki.rb)
 
     if self.title == "Front Page" && new_record?
@@ -198,13 +198,18 @@ class WikiPage < ActiveRecord::Base
       )
     end
 
-    conditions = [wildcard(url_attribute.to_s, base_url, type: :right)]
+    url_conditions = [wildcard(url_attribute.to_s, base_url, type: :right)]
     unless new_record?
-      conditions.first << " and id != ?"
-      conditions << id
+      url_conditions.first << " and id != ?"
+      url_conditions << id
+    end
+    urls = context.wiki_pages.where(*url_conditions).not_deleted.pluck(:url)
+
+    if Account.site_admin.feature_enabled?(:permanent_page_links)
+      lookup_conditions = [wildcard("slug", base_url, type: :right)]
+      urls += context.wiki_page_lookups.where(*lookup_conditions).where.not(wiki_page_id: id).pluck(:slug)
     end
 
-    urls = context.wiki_pages.where(*conditions).not_deleted.pluck(:url)
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created
     # We modify it to allow "front-page" and start the indexing at "front-page-2"
