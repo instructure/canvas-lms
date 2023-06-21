@@ -211,3 +211,9 @@ account_calendars_planner_support:
   display_name: 'Planner support for account calendars'
   description: This flag allows events from account calendars to be displayed on the canvas planner.
   applies_to: SiteAdmin
+
+authenticated_iframe_content:
+  state: hidden
+  display_name: 'Authenticated IFrame Content'
+  description: This flag changes the way RCE content is loaded in iframes to proxy the request through canvas.
+  applies_to: SiteAdmin
