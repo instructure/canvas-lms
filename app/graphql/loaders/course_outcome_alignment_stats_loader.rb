@@ -22,8 +22,7 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
   include OutcomesFeaturesHelper
   include OutcomesServiceAlignmentsHelper
 
-  # Should add support for NQ questions after OUT-5474 is merged
-  SUPPORTED_OS_ALIGNMENTS = %w[quizzes.quiz].freeze
+  SUPPORTED_OS_ALIGNMENTS = %w[quizzes.quiz quizzes.item].freeze
 
   def perform(courses)
     courses.each do |course|
