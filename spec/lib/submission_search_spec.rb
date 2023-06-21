@@ -30,6 +30,12 @@ describe SubmissionSearch do
     TeacherEnrollment.create!(user: teacher, course:, workflow_state: "active")
     teacher
   end
+  let_once(:observer) do
+    observer = User.create!(name: "Observer")
+    observer_enrollment = ObserverEnrollment.create!(user: observer, course:, workflow_state: "active")
+    observer_enrollment.update_attribute(:associated_user_id, amanda.id)
+    observer
+  end
   let_once(:assignment) do
     Assignment.create!(
       course:,
@@ -132,6 +138,11 @@ describe SubmissionSearch do
     submission.save!
     results = SubmissionSearch.new(assignment, teacher, nil, grading_status: "graded").search
     expect(results).to eq [submission]
+  end
+
+  it "limits results to just associated student submissions if the user is an observer" do
+    results = SubmissionSearch.new(assignment, observer, nil, {}).search
+    expect(results).to eq [Submission.find_by(user: amanda)]
   end
 
   it "limits results to just the user's submission if the user is a student" do
