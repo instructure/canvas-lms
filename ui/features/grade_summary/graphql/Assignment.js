@@ -35,11 +35,6 @@ export const Assignment = {
         name
         groupWeight
       }
-      submissionsConnection {
-        nodes {
-          ...Submission
-        }
-      }
       modules {
         _id
         name

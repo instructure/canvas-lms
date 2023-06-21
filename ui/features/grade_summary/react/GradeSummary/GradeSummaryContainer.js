@@ -47,7 +47,8 @@ const GradeSummaryContainer = () => {
   const [selectedSubmission, setSelectedSubmission] = useState('')
   const [submissionIdsForUpdate, setSubmissionIdsForUpdate] = useState([])
 
-  const gradingPeriod = getGradingPeriodID()
+  const gradingPeriod = ENV?.grading_period?.id || getGradingPeriodID()
+  const viewingUserId = ENV?.student_id
 
   const variables = {
     courseID: ENV.course_id,
@@ -55,6 +56,10 @@ const GradeSummaryContainer = () => {
 
   if (gradingPeriod !== undefined) {
     variables.gradingPeriodID = gradingPeriod && gradingPeriod !== '0' ? gradingPeriod : null
+  }
+
+  if (viewingUserId !== undefined) {
+    variables.studentId = viewingUserId
   }
 
   const assignmentQuery = useQuery(ASSIGNMENTS, {
