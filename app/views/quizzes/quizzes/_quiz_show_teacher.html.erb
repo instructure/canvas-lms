@@ -235,7 +235,7 @@
   </fieldset>
 </form>
 
-<% if @context.enable_course_paces? && @quiz.is_module_item? %>
+<% if @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces? && @quiz.is_module_item? %>
   <div id="course_paces_due_date_notice"></div>
 <% else %>
   <table class="ic-Table assignment_dates">

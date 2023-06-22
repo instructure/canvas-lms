@@ -199,6 +199,13 @@ describe QuizzesNext::QuizSerializer do
       expect(result[:in_paced_course]).to be(true)
     end
 
+    it "when enabled, but feature is off quiz is not 'in_paced_course'" do
+      context.account.disable_feature!(:course_paces)
+      context.enable_course_paces = true
+      result = quiz_serializer.as_json
+      expect(result[:in_paced_course]).to be(false)
+    end
+
     it "when disabled, quiz is not 'in_paced_course'" do
       context.enable_course_paces = false
       result = quiz_serializer.as_json

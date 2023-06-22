@@ -152,7 +152,7 @@ module Api::V1::Assignment
     hash["due_date_required"] = assignment.due_date_required?
     hash["max_name_length"] = assignment.max_name_length
     hash["allowed_attempts"] = -1 if assignment.allowed_attempts.nil?
-    paced_course = Course.find_by(id: assignment.context_id)&.enable_course_paces?
+    paced_course = assignment.course.account.feature_enabled?(:course_paces) && Course.find_by(id: assignment.context_id)&.enable_course_paces?
     hash["in_paced_course"] = paced_course if paced_course
 
     unless opts[:exclude_response_fields].include?("in_closed_grading_period")

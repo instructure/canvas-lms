@@ -215,7 +215,6 @@ describe "editing a quiz" do
 
     context "in a paced course" do
       before(:once) do
-        Account.site_admin.enable_feature!(:course_paces)
         @course.enable_course_paces = true
         @course.save!
       end
@@ -227,6 +226,16 @@ describe "editing a quiz" do
         get "/courses/#{@course.id}/quizzes/#{item.content_id}/edit"
         expect(f(quiz_edit_form)).not_to contain_css(due_date_container)
         expect(f(quiz_edit_form)).to contain_css(course_pacing_notice)
+      end
+
+      it "does not display the course pacing notice when feature is off in the account" do
+        @course.account.disable_feature!(:course_paces)
+        @quiz = create_quiz_with_due_date
+        item = add_quiz_to_module
+
+        get "/courses/#{@course.id}/quizzes/#{item.content_id}/edit"
+        expect(f(quiz_edit_form)).to contain_css(due_date_container)
+        expect(f(quiz_edit_form)).not_to contain_css(course_pacing_notice)
       end
     end
   end

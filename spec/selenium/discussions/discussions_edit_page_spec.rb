@@ -382,6 +382,13 @@ describe "discussions" do
           get url
           expect(Discussion.course_pacing_notice).to be_displayed
         end
+
+        it "does not show the course pacing notice on a graded discussion when feature off in account" do
+          course.account.disable_feature!(:course_paces)
+
+          get url
+          expect(element_exists?(Discussion.course_pacing_notice_selector)).to be_falsey
+        end
       end
     end
   end

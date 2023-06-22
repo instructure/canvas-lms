@@ -223,6 +223,15 @@ describe "assignment groups" do
           expect(f("#content")).not_to contain_css("table.assignment_dates")
         end
 
+        it "does not show the course pacing notice when feature flag is off" do
+          @course.account.disable_feature!(:course_paces)
+          assignment = create_assignment!
+          assignment.context_module_tags.create! context_module: @context_module, context: @course, tag_type: "context_module"
+          get "/courses/#{@course.id}/assignments/#{assignment.id}"
+          expect(element_exists?(AssignmentPage.course_pacing_notice_selector)).to be_falsey
+          expect(f("#content")).to contain_css("table.assignment_dates")
+        end
+
         it "does not show the course pacing notice for a non-moduled assignment" do
           assignment = create_assignment!
           get "/courses/#{@course.id}/assignments/#{assignment.id}"
@@ -238,6 +247,15 @@ describe "assignment groups" do
           get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
           expect(AssignmentPage.course_pacing_notice).to be_displayed
           expect(f("#content")).not_to contain_css(".ContainerDueDate")
+        end
+
+        it "does not show the course pacing notice for a module item assignment when feature flag is off" do
+          @course.account.disable_feature!(:course_paces)
+          assignment = create_assignment!
+          assignment.context_module_tags.create! context_module: @context_module, context: @course, tag_type: "context_module"
+          get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+          expect(element_exists?(AssignmentPage.course_pacing_notice_selector)).to be_falsey
+          expect(f("#content")).to contain_css(".ContainerDueDate")
         end
 
         it "does not show the course pacing notice for a non-moduled assignment" do
