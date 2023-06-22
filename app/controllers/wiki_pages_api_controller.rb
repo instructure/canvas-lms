@@ -68,7 +68,7 @@
 #           "$ref": "User"
 #         },
 #         "body": {
-#           "description": "the page content, in HTML (present when requesting a single page; omitted when listing pages)",
+#           "description": "the page content, in HTML (present when requesting a single page; optionally included when listing pages)",
 #           "example": "<p>Page Content</p>",
 #           "type": "string"
 #         },
@@ -254,6 +254,8 @@ class WikiPagesApiController < ApplicationController
   #   If true, include only published paqes. If false, exclude published
   #   pages. If not present, do not filter on published status.
   #
+  # @argument include[] [String, "body"]
+  #   - "enrollments": Optionally include the page body with each Page.
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
@@ -264,8 +266,10 @@ class WikiPagesApiController < ApplicationController
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
       log_api_asset_access(["pages", @context], "pages", "other")
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
-      # omit body from selection, since it's not included in index results
-      scope = @context.wiki_pages.select(WikiPage.column_names - ["body"]).preload(:user)
+      includes = Array(params[:include])
+      scope_columns = WikiPage.column_names
+      scope_columns -= ["body"] unless includes.include?("body")
+      scope = @context.wiki_pages.select(scope_columns).preload(:user)
       scope = if params.key?(:published)
                 value_to_boolean(params[:published]) ? scope.published : scope.unpublished
               else
@@ -299,7 +303,7 @@ class WikiPagesApiController < ApplicationController
       if @context.wiki.grants_right?(@current_user, :update)
         mc_status = setup_master_course_restrictions(wiki_pages, @context)
       end
-      render json: wiki_pages_json(wiki_pages, @current_user, session, master_course_status: mc_status)
+      render json: wiki_pages_json(wiki_pages, @current_user, session, includes.include?("body"), master_course_status: mc_status)
     end
   end
 

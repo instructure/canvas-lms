@@ -60,8 +60,8 @@ module Api::V1::WikiPage
     hash
   end
 
-  def wiki_pages_json(wiki_pages, current_user, session, opts = {})
-    wiki_pages.map { |page| wiki_page_json(page, current_user, session, false, opts) }
+  def wiki_pages_json(wiki_pages, current_user, session, include_body = false, opts = {})
+    wiki_pages.map { |page| wiki_page_json(page, current_user, session, include_body, opts) }
   end
 
   def wiki_page_revision_json(version, _current_user, _session, include_content = true, latest_version = nil)
