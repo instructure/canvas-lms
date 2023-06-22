@@ -185,6 +185,7 @@ export default function FilterTrayPreset({
       onToggle={(_event: React.MouseEvent, expanded: boolean) => {
         onToggle(expanded)
       }}
+      data-testid={`${filterPreset.name || 'create-filter-preset'}-dropdown`}
       expanded={isExpanded}
       summary={
         <Flex margin="0 0 0 xxx-small">
@@ -220,6 +221,7 @@ export default function FilterTrayPreset({
             <TextInput
               inputRef={(ref: HTMLInputElement) => (inputRef.current = ref)}
               width="100%"
+              data-testid="filter-preset-name-input"
               renderLabel={I18n.t('Filter preset name')}
               placeholder={I18n.t('Give your filter preset a name')}
               value={name}

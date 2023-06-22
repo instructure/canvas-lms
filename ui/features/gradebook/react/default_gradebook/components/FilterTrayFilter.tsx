@@ -140,7 +140,7 @@ export default function ({
     <>
       {(items.length > 0 || itemGroups.length > 0) && (
         <SimpleSelect
-          data-testid="select-filter"
+          data-testid={`select-filter-${filterTypeLabels.get(filter.type || 'assignment-group')}`}
           key={filter.type} // resets dropdown when filter type is changed
           renderLabel={filterTypeLabels.get(filter.type || 'assignment-group')}
           placeholder="--"
@@ -179,7 +179,7 @@ export default function ({
       {['start-date', 'end-date'].includes(filter.type || '') && (
         <CanvasDateInput
           size="small"
-          dataTestid="date-input"
+          dataTestid={`${filter.type}-input`}
           renderLabel={dateLabels[filter.type as 'start-date' | 'end-date']}
           selectedDate={filter.value}
           formatDate={formatDate}
@@ -197,7 +197,7 @@ export default function ({
           key={filter.type} // resets dropdown when filter type is changed
           renderLabel={I18n.t('Submissions')}
           size="small"
-          data-testid="submissions-input"
+          data-testid="select-filter-Submissions"
           placeholder="--"
           value={filter.value || '_'}
           onChange={(_event, {value}) => {
