@@ -201,7 +201,8 @@ module AttachmentFu # :nodoc:
       def full_filename(thumbnail = nil)
         # the old AWS::S3 gem would not encode +'s, causing S3 to interpret
         # them as spaces. Continue that behavior.
-        basename = thumbnail_name_for(thumbnail).tr("+", " ")
+        basename = thumbnail_name_for(thumbnail) || ""
+        basename = basename.tr("+", " ")
         File.join(base_path, basename)
       end
 
