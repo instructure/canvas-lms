@@ -1304,6 +1304,7 @@ describe ContentMigration do
 
       it "returns a url to a file containing the asset map" do
         allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
+        allow(HostUrl).to receive(:context_hosts).and_return(["apple.edu", "kiwi.edu:8080"])
         Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
         url = @cm.asset_map_url(generate_if_needed: true)
         Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
@@ -1316,6 +1317,7 @@ describe ContentMigration do
         expect(json).to eq({ "source_course" => @src.id.to_s,
                              "source_host" => "pineapple.edu",
                              "contains_migration_ids" => true,
+                             "destination_hosts" => ["apple.edu", "kiwi.edu"],
                              "resource_mapping" => {
                                "assignments" => {
                                  @old.id.to_s => @new.id.to_s,
