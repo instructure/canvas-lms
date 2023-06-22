@@ -60,7 +60,7 @@ const dateTests = (testType: string) => {
     const {getByTestId} = render(
       <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
     )
-    const dateComponent: Partial<HTMLInputElement> = getByTestId('date-input')
+    const dateComponent: Partial<HTMLInputElement> = getByTestId(`${filter.type}-input`)
     expect(dateComponent).toBeInTheDocument()
   })
 
@@ -70,7 +70,7 @@ const dateTests = (testType: string) => {
     const {getByTestId} = render(
       <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
     )
-    const dateComponent: Partial<HTMLInputElement> = getByTestId('date-input')
+    const dateComponent: Partial<HTMLInputElement> = getByTestId(`${filter.type}-input`)
     expect(dateComponent.value).toContain('Dec 3, 2021')
   })
 
@@ -78,7 +78,7 @@ const dateTests = (testType: string) => {
     const {getByTestId} = render(
       <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
     )
-    const dateComponent = getByTestId('date-input')
+    const dateComponent = getByTestId(`${filter.type}-input`)
     fireEvent.change(dateComponent, {
       target: {value: 'Fri Dec 04 2021 02:00:00 GMT-0500 (Colombia Standard Time)'},
     })

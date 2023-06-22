@@ -40,6 +40,9 @@ module Gradebook
   # Menu Items
   MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'
 
+  # Keyboard keys
+  BACKSPACE_KEY = "\u0008"
+
   def self.gradebook_settings_cog
     f('[data-test-id="gradebook-settings-button"]')
   end
@@ -871,4 +874,114 @@ module Gradebook
   end
 
   delegate :click, to: :save_button, prefix: true
+
+  # ENHANCED GRADEBOOK FILTERS
+
+  def self.apply_filters_button
+    f('[data-testid="apply-filters-button"]')
+  end
+
+  def self.students_filter_select
+    f('[data-testid="students-filter-select"]')
+  end
+
+  def self.assignments_filter_select
+    f('[data-testid="assignments-filter-select"]')
+  end
+
+  def self.remove_student_or_assignment_filter(name)
+    f("[title='Remove #{name}']").click
+  end
+
+  def self.select_filter_type_menu_item(item_name)
+    f("[data-testid=\"#{item_name}-filter-type\"]").click
+  end
+
+  def self.select_filter_menu_item(item_name)
+    f("[data-testid=\"#{item_name}-filter\"]").click
+  end
+
+  def self.select_filter_dropdown_back_button
+    f('[data-testid="back-button"]').click
+  end
+
+  def self.select_sorted_filter_menu_item(item_name)
+    f("[data-testid=\"#{item_name}-sorted-filter\"]").click
+  end
+
+  def self.start_date_input
+    f("[data-testid='start-date-input']")
+  end
+
+  def self.end_date_input
+    f("[data-testid='end-date-input']")
+  end
+
+  def self.input_start_date(date)
+    start_date_input.send_keys(date.to_s)
+  end
+
+  def self.input_end_date(date)
+    end_date_input.send_keys(date.to_s)
+  end
+
+  def self.apply_date_filter
+    f("[data-testid='apply-date-filter']").click
+  end
+
+  def self.clear_start_date_input
+    start_date_input.send_keys(BACKSPACE_KEY * start_date_input.attribute("value").length)
+  end
+
+  def self.clear_end_date_input
+    end_date_input.send_keys(BACKSPACE_KEY * end_date_input.attribute("value").length)
+  end
+
+  def self.clear_filter(filter_name)
+    f("[data-testid='applied-filter-#{filter_name}']").click
+  end
+
+  def self.filter_pill(filter_name)
+    f("[data-testid='applied-filter-#{filter_name}']")
+  end
+
+  def self.manage_filter_presets_button
+    f("[data-testid='manage-filter-presets-button']")
+  end
+
+  def self.create_filter_preset_dropdown
+    f("[data-testid='create-filter-preset-dropdown']").find_element(:css, "button")
+  end
+
+  def self.filter_preset_dropdown_type(filter_type)
+    f("[data-testid='select-filter-#{filter_type}']")
+  end
+
+  def self.select_filter_preset_dropdown_option(filter_type, filter_option)
+    click_option(f("[data-testid='select-filter-#{filter_type}']"), filter_option)
+  end
+
+  def self.input_preset_filter_name(name)
+    f("[data-testid='filter-preset-name-input']").send_keys(name)
+  end
+
+  def self.save_filter_preset
+    f("[data-testid='save-filter-button']").click
+  end
+
+  def self.delete_filter_preset_button
+    f("[data-testid='delete-filter-preset-button']")
+  end
+
+  def self.filter_preset_dropdown(name)
+    f("[data-testid='#{name}-dropdown']").find_element(:css, "button")
+  end
+
+  def self.enable_filter_preset(name)
+    f("[data-testid='#{name}-enable-preset']").click
+  end
+
+  def self.clear_all_filters
+    f("[data-testid='clear-all-filters']").click
+  end
 end

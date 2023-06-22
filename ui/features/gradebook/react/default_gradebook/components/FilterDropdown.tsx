@@ -114,6 +114,7 @@ const FilterDropdown = ({
   const backButton = (
     <MenuItem
       as="div"
+      data-testid="back-button"
       onClick={() => {
         setItemId(currentObj.parentId)
       }}
@@ -170,7 +171,7 @@ const FilterDropdown = ({
               >
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div">
+                    <MenuItem key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
                       <TruncateText position="middle">{a.name}</TruncateText>
                     </MenuItem>
                   )
@@ -180,7 +181,7 @@ const FilterDropdown = ({
 
             <MenuItem
               as="div"
-              test-id="manage-filter-presets-button"
+              data-testid="manage-filter-presets-button"
               onSelect={() => {
                 setIsOpen(false)
                 onOpenTray()
@@ -205,6 +206,7 @@ const FilterDropdown = ({
                       }
                     }}
                     selected={item.isSelected}
+                    data-testid={`${item.name}-filter-type`}
                   >
                     <Flex as="div" justifyItems="space-between">
                       <TruncateText position="middle">{item.name}</TruncateText>
@@ -259,7 +261,7 @@ const FilterDropdown = ({
                       // (-_-)
                       const unescapedName = unescape(item.name)
                       return (
-                        <MenuItem key={item.id} as="div">
+                        <MenuItem data-testid={`${item.name}-sorted-filter`} key={item.id} as="div">
                           <Flex as="div" justifyItems="space-between">
                             <TruncateText position="middle">{unescapedName}</TruncateText>
                           </Flex>
@@ -290,7 +292,7 @@ const FilterDropdown = ({
                 <MenuSeparator />
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div">
+                    <MenuItem data-testid={`${a.name}-filter`} key={a.id} as="div">
                       <TruncateWithTooltip>{a.name}</TruncateWithTooltip>
                     </MenuItem>
                   )

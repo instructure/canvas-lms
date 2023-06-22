@@ -265,11 +265,13 @@ describe('FilterNav', () => {
         },
       ],
     })
-    const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
-    expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('Module 1')
+    const {getByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(await getByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toHaveTextContent(
+      defaultProps.modules[0].name
+    )
   })
 
-  it('render All Grading Periods filter', async () => {
+  it('render All Grading Periods filter', () => {
     store.setState({
       appliedFilters: [
         {
@@ -280,8 +282,10 @@ describe('FilterNav', () => {
         },
       ],
     })
-    const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
-    expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('All Grading Periods')
+    const {getByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(getByTestId('applied-filter-All Grading Periods')).toHaveTextContent(
+      'All Grading Periods'
+    )
   })
 
   it('opens tray', () => {
@@ -346,33 +350,33 @@ describe('Filter dropdown', () => {
     const {getByText, getByTestId, queryByTestId} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Filter Preset 1'))
-    expect(getByTestId('applied-filter-tag')).toBeVisible()
+    expect(getByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toBeVisible()
     userEvent.click(getByText('Filter Preset 1'))
-    expect(queryByTestId('applied-filter-tag')).toBeNull()
+    expect(queryByTestId(`applied-filter-${defaultProps.modules[0].name}`)).toBeNull()
   })
 
   it('Clicking filter activates condition', async () => {
     const {getByText, getByTestId, queryByTestId, getByRole} = render(
       <FilterNav {...defaultProps} />
     )
-    expect(queryByTestId('applied-filter-tag')).toBeNull()
+    expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
     userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
-    expect(getByTestId('applied-filter-tag')).toBeVisible()
+    expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
   })
 
   it('Clicking "Clear All Filters" removes all applied filters', async () => {
     const {getByText, getByTestId, queryByTestId, getByRole} = render(
       <FilterNav {...defaultProps} />
     )
-    expect(queryByTestId('applied-filter-tag')).toBeNull()
+    expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
     userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
-    expect(getByTestId('applied-filter-tag')).toBeVisible()
+    expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeVisible()
     userEvent.click(getByText('Clear All Filters'))
-    expect(queryByTestId('applied-filter-tag')).toBeNull()
+    expect(queryByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toBeNull()
   })
 
   it('Clicking "Clear All Filters" focuses apply filters button', async () => {
@@ -389,7 +393,9 @@ describe('Filter dropdown', () => {
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
     userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
-    expect(getByTestId('applied-filter-tag')).toHaveTextContent('Remove Section 7 Filter')
+    expect(getByTestId(`applied-filter-${defaultProps.sections[0].name}`)).toHaveTextContent(
+      'Remove Section 7 Filter'
+    )
   })
 
   it('selecting a filter and deselecting the same filter from the filter dropdown triggers screenreader alerts', async () => {
@@ -407,7 +413,7 @@ describe('Filter dropdown', () => {
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
     userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
-    userEvent.click(getByTestId('applied-filter-tag'))
+    userEvent.click(getByTestId(`applied-filter-${defaultProps.sections[0].name}`))
     expect(getByText('Removed Section 7 Filter')).toBeInTheDocument()
   })
 

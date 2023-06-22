@@ -87,7 +87,7 @@ export default function FilterNav({
 
     return (
       <Tag
-        data-testid="applied-filter-tag"
+        data-testid={`applied-filter-${label}`}
         key={`staged-filter-${filter.id}`}
         text={
           <AccessibleContent alt={I18n.t('Remove %{filterName} Filter', {filterName: label})}>
@@ -160,7 +160,13 @@ export default function FilterNav({
 
       <FlexItem>
         {activeFilterComponents.length > 0 && (
-          <Link isWithinText={false} as="button" margin="0" onClick={handleClearFilters}>
+          <Link
+            isWithinText={false}
+            as="button"
+            margin="0"
+            onClick={handleClearFilters}
+            data-testid="clear-all-filters"
+          >
             {I18n.t('Clear All Filters')}
           </Link>
         )}
