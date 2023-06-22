@@ -62,6 +62,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "And" },
   "angle_c5b4ec50": { "message": "Angle" },
+  "announcement_fb4cb645": { "message": "Announcement" },
   "announcement_list_da155734": { "message": "Announcement List" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
   "apply_781a2546": { "message": "Apply" },
@@ -79,6 +80,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
   },
+  "assignment_976578a8": { "message": "Assignment" },
   "assignments_1e02582c": { "message": "Assignments" },
   "asterisk_82255584": { "message": "Asterisk" },
   "attributes_963ba262": { "message": "Attributes" },
@@ -216,6 +218,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Current Image" },
   "current_volume_level_c55ab825": { "message": "Current Volume Level" },
   "custom_6979cd81": { "message": "Custom" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Custom width and height (Pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Dagger" },
   "date_added_ed5ad465": { "message": "Date Added" },
@@ -248,6 +253,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Directionality" },
   "directly_edit_latex_b7e9235b": { "message": "Directly Edit LaTeX" },
   "disable_preview_222bdf72": { "message": "Disable Preview" },
+  "discussion_6719c51d": { "message": "Discussion" },
   "discussions_a5f96392": { "message": "Discussions" },
   "discussions_index_6c36ced": { "message": "Discussions Index" },
   "disjoint_union_e74351a8": { "message": "Disjoint Union" },
@@ -670,6 +676,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "One of the following styles must be added to save an icon: Icon Colour, Outline Size, Icon Text, or Image"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "One or more files failed to paste. Please try uploading or dragging and dropping files."
+  },
   "open_circle_e9bd069": { "message": "Open Circle" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open this keyboard shortcuts dialog"
@@ -691,6 +700,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted"
   },
+  "page_50c4823d": { "message": "Page" },
   "pages_e5414c2c": { "message": "Pages" },
   "paragraph_5e5ad8eb": { "message": "Paragraph" },
   "paragraph_starting_with_start_a59923f8": {
@@ -748,6 +758,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Pumpkin" },
   "purple_7678a9fc": { "message": "Purple" },
   "quaternions_877024e0": { "message": "Quaternions" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quizzes" },
   "rational_numbers_80ddaa4a": { "message": "Rational Numbers" },
   "real_numbers_7c99df94": { "message": "Real Numbers" },

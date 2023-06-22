@@ -819,6 +819,10 @@ class AssignmentsController < ApplicationController
       if context.is_a?(Course)
         hash[:allow_self_signup] = true # for group creation
         hash[:group_user_type] = "student"
+
+        if Account.site_admin.feature_enabled?(:grading_scheme_updates)
+          hash[:COURSE_DEFAULT_GRADING_SCHEME_ID] = context.grading_standard_id
+        end
       end
 
       if @assignment.annotatable_attachment_id.present?

@@ -60,7 +60,8 @@ class SubmissionSearch
         @course.enrollments.select(:user_id).where(type: @options[:enrollment_types]))
     end
 
-    search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades)
+    search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades) || @course.participating_observers.map(&:id).include?(@searcher.id)
+                     # a user with manage_grades, view_all_grades, or an observer can see other users' submissions
                      # TODO: may want to add a preloader for this
                      allowed_user_ids = @course.users_visible_to(@searcher)
                      search_scope.where(user_id: allowed_user_ids)

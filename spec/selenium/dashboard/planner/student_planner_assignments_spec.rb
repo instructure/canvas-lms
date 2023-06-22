@@ -116,6 +116,8 @@ describe "student planner" do
       # now truthy setting
       Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
       Account.default.save!
+      @course.restrict_quantitative_data = true
+      @course.save!
 
       go_to_list_view
       expect(f("body")).not_to contain_jqcss(".PlannerItem-styles__score")

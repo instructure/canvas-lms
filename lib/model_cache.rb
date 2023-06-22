@@ -143,7 +143,7 @@ module ModelCache
   end
 
   def self.included(klass)
-    klass.send :include, InstanceMethods
+    klass.include InstanceMethods
     klass.extend ClassMethods
     klass.after_create :add_to_caches
     klass.after_update :update_in_caches

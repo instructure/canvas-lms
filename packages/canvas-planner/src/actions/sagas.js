@@ -124,13 +124,18 @@ export function* peekIntoPastSaga() {
   yield* loadingLoop(fromMomentPast, consumePeekIntoPast, {mode: 'past', perPage: 1})
 }
 
-export function* loadGradesSaga() {
+export function* loadGradesSaga(action) {
+  const userid = action.payload
   const loadingOptions = {
     params: {
       include: ['total_scores', 'current_grading_period_scores', 'restrict_quantitative_data'],
       enrollment_type: 'student',
       enrollment_state: 'active',
     },
+  }
+  if (userid !== null) {
+    loadingOptions.params.include.push('observed_users')
+    loadingOptions.params.observed_user_id = userid
   }
   try {
     // exhaust pagination because we really do need all the grades.

@@ -527,6 +527,9 @@
     "custom_6979cd81": {
         "message": "Angepasst"
     },
+    "custom_width_and_height_pixels_946eea7c": {
+        "message": "Benutzerdefinierte Breite und Höhe (Pixel)"
+    },
     "cyan_c1d5f68a": {
         "message": "Cyan"
     },
@@ -1712,6 +1715,9 @@
     "no_headers_9bc7dc7f": {
         "message": "Keine Header"
     },
+    "no_more_items_to_show_6a1333c6": {
+        "message": "Es werden keine weiteren Elemente angezeigt"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Für diese Datei ist keine Vorschau verfügbar."
     },
@@ -1801,6 +1807,9 @@
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
         "message": "Zum Speichern eines Symbols muss einer der folgenden Stile hinzugefügt werden: Symbolfarbe, Umrissgröße, Symboltext oder Bild"
+    },
+    "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+        "message": "Eine oder mehrere Dateien konnten nicht eingefügt werden. Versuchen Sie, die Dateien hochzuladen oder zu ziehen und abzulegen."
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "* Nur der letzte Benotungszeitraum wird angezeigt."

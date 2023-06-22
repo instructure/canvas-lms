@@ -28,10 +28,15 @@ module Importers
       media_attachments = migration.context.attachments.where.not(media_entry_id: nil).preload(:media_object_by_media_id)
       data.each do |file_id, track_list|
         media_attachment = media_attachments.find { |ma| ma.migration_id == file_id }
+        media_attachment.mark_as_importing!(migration)
         next unless (media_object = media_attachment&.media_object_by_media_id)
 
         track_list.each do |track|
           import_from_migration(media_attachment, media_object, track, migration)
+        end
+
+        if media_attachment.editing_restricted?(:content)
+          media_attachment.media_tracks.where.not(locale: track_list.pluck("locale")).destroy_all
         end
       end
     end
@@ -46,10 +51,9 @@ module Importers
         file.open { |data| content << data }
       end
 
-      mt = media_object.media_tracks.find_or_initialize_by(attachment_id: attachment, locale: track["locale"])
-      return if migration.for_master_course_import? &&
-                migration.master_course_subscription.content_tag_for(mt)&.downstream_changes&.include?("content") &&
-                !attachment.editing_restricted?(:content)
+      mt = attachment.media_tracks.find_or_initialize_by(media_object:, locale: track["locale"])
+      mt.mark_as_importing!(migration)
+      return if attachment.downstream_changes?(migration, "media_tracks_content") && !attachment.editing_restricted?(:content)
 
       mt.kind = track["kind"]
       mt.content = content

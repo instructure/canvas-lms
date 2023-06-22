@@ -220,7 +220,7 @@ module Importers
         end
         migration.update_import_progress(97)
 
-        insert_into_module(course, migration)
+        insert_into_module(course, migration, data)
         migration.update_import_progress(98)
 
         move_to_assignment_group(course, migration)
@@ -266,12 +266,17 @@ module Importers
       ActiveRecord::Base.skip_touch_context(false)
     end
 
-    def self.insert_into_module(course, migration)
+    def self.insert_into_module(course, migration, data)
       module_id = migration.migration_settings[:insert_into_module_id]
       return unless module_id.present?
 
       mod = course.context_modules.find_by(id: module_id)
       return unless mod
+
+      items = (data[:modules] || []).pluck(:items).flatten! || []
+      items.each do |hash|
+        Importers::ContextModuleImporter.add_module_item_from_migration(mod, hash, 0, migration.context, {}, migration)
+      end
 
       imported_items = migration.imported_migration_items_for_insert_type
       return unless imported_items.any?

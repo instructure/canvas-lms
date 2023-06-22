@@ -1413,13 +1413,11 @@ describe GradebooksController do
             # truthy feature flag
             Account.default.enable_feature! :restrict_quantitative_data
 
-            # truthy setting
+            # truthy settings
             Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
             Account.default.save!
-
-            # truthy permission(since enabled is being "not"ed)
-            Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-            Account.default.reload
+            @course.restrict_quantitative_data = true
+            @course.save!
           end
 
           it "returns true when teacher views gradebook" do

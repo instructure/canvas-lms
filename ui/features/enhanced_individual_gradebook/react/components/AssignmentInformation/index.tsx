@@ -16,26 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useCallback, useMemo, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
-import {AssignmentConnection, GradebookOptions, SubmissionConnection} from '../../types'
-import {computeAssignmentDetailText} from '../../utils/gradebookUtils'
-import {Button} from '@instructure/ui-buttons'
+import {
+  AssignmentConnection,
+  GradebookOptions,
+  SortableStudent,
+  SubmissionConnection,
+  SubmissionGradeChange,
+} from '../../../types'
+import {computeAssignmentDetailText} from '../../../utils/gradebookUtils'
+import MessageStudentsWhoModal from './MessageStudentsWhoModal'
+import DefaultGradeModal from './DefaultGradeModal'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   assignment?: AssignmentConnection
+  students?: SortableStudent[]
   submissions?: SubmissionConnection[]
-  gradebookOptions: GradebookOptions // TODO: get this from gradebook settings
+  gradebookOptions: GradebookOptions
+  handleSetGrades: (updatedSubmissions: SubmissionGradeChange[]) => void
 }
 
 export default function AssignmentInformation({
   assignment,
   gradebookOptions,
+  students = [],
   submissions = [],
+  handleSetGrades,
 }: Props) {
   const {gradedSubmissions, scores} = useMemo(
     () => ({
@@ -121,7 +133,13 @@ export default function AssignmentInformation({
 
           <AssignmentScoreDetails assignment={assignment} scores={scores} />
 
-          <AssignmentActions assignment={assignment} gradebookOptions={gradebookOptions} />
+          <AssignmentActions
+            assignment={assignment}
+            submissions={submissions}
+            students={students}
+            gradebookOptions={gradebookOptions}
+            handleSetGrades={handleSetGrades}
+          />
         </View>
       </View>
     </View>
@@ -163,18 +181,62 @@ function AssignmentScoreDetails({assignment, scores}: AssignmentScoreDetailsProp
 
 type AssignmentActionsProps = {
   assignment: AssignmentConnection
+  students: SortableStudent[]
+  submissions: SubmissionConnection[]
   gradebookOptions: GradebookOptions
+  handleSetGrades: (updatedSubmissions: SubmissionGradeChange[]) => void
 }
-function AssignmentActions({assignment, gradebookOptions}: AssignmentActionsProps) {
+function AssignmentActions({
+  assignment,
+  students,
+  submissions,
+  gradebookOptions,
+  handleSetGrades,
+}: AssignmentActionsProps) {
+  const [showMessageStudentsWhoModal, setShowMessageStudentsWhoModal] = useState(false)
+  const [showSetDefaultGradeModal, setShowSetDefaultGradeModal] = useState(false)
+
+  const onSetGrades = useCallback(
+    updatedSubmissions => {
+      setShowSetDefaultGradeModal(false)
+      if (updatedSubmissions.length) {
+        handleSetGrades(updatedSubmissions)
+      }
+    },
+    [handleSetGrades]
+  )
+
   return (
     <>
-      {!gradebookOptions.anonymizeStudents && (
+      {!gradebookOptions.customOptions.hideStudentNames && (
         <View as="div" className="pad-box no-sides">
-          <Button color="secondary">{I18n.t('Message students who...')}</Button>
+          <Button color="secondary" onClick={() => setShowMessageStudentsWhoModal(true)}>
+            {I18n.t('Message students who...')}
+          </Button>
+          <MessageStudentsWhoModal
+            assignment={assignment}
+            gradebookOptions={gradebookOptions}
+            students={students}
+            submissions={submissions}
+            isOpen={showMessageStudentsWhoModal}
+            onClose={() => setShowMessageStudentsWhoModal(false)}
+          />
         </View>
       )}
       <View as="div" className="pad-box no-sides">
-        <Button color="secondary">{I18n.t('Set default grade')}</Button>
+        <>
+          <Button color="secondary" onClick={() => setShowSetDefaultGradeModal(true)}>
+            {I18n.t('Set default grade')}
+          </Button>
+          <DefaultGradeModal
+            assignment={assignment}
+            gradebookOptions={gradebookOptions}
+            submissions={submissions}
+            modalOpen={showSetDefaultGradeModal}
+            handleClose={() => setShowSetDefaultGradeModal(false)}
+            handleSetGrades={onSetGrades}
+          />
+        </>
         {/* {{#if disableAssignmentGrading}}
           {{#t}}Unable to set default grade because this assignment is due in a closed grading period for at least one student{{/t}}
           {{/if}} */}

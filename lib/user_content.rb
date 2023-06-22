@@ -150,6 +150,7 @@ module UserContent
       "discussion_topics" => :DiscussionTopic,
       "collaborations" => :Collaboration,
       "files" => :Attachment,
+      "media_attachments_iframe" => :Attachment,
       "conferences" => :WebConference,
       "quizzes" => :"Quizzes::Quiz",
       "groups" => :Group,
@@ -213,7 +214,7 @@ module UserContent
         _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]
         next url if !@contextless_types.include?(type) && prefix != @context_prefix && url != @context_prefix
 
-        if type != "wiki" && type != "pages"
+        if type != "wiki" && type != "pages" && type != "media_attachments_iframe"
           if obj_id.to_i > 0
             obj_id = obj_id.to_i
           else

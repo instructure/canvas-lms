@@ -92,7 +92,11 @@ describe('compressImage()', () => {
   })
 
   it('returns compressed blob image', async () => {
-    const result = await compressImage('data:image/jpeg;base64,abcdefhijk==')
+    const result = await compressImage({
+      encodedImage: 'data:image/jpeg;base64,abcdefhijk==',
+      previewWidth: 200,
+      previewHeight: 400,
+    })
     expect(result).toEqual('data:image/jpeg;base64,SGVsbG8sIFdvcmxkIQ==')
   })
 })

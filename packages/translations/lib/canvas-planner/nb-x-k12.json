@@ -193,6 +193,9 @@
     "message": "Ingen forfallsdatoer tildelt"
   },
   "no_grade_3b4d7f3e": { "message": "Ingen vurdering" },
+  "no_more_items_to_show_6a1333c6": {
+    "message": "Ingen flere elementer å vise"
+  },
   "nothing_due_this_week_d45c9ef9": {
     "message": "Ingenting må leveres denne uken"
   },

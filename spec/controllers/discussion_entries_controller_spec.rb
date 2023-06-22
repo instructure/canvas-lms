@@ -210,6 +210,22 @@ describe DiscussionEntriesController do
       @entry.destroy
     end
 
+    before do
+      @mock_kaltura = double("CanvasKaltura::ClientV3")
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
+      allow(@mock_kaltura).to receive(:media_sources).and_return(
+        [{ height: "240",
+           bitrate: "382",
+           isOriginal: "0",
+           width: "336",
+           content_type: "video/mp4",
+           containerFormat: "isom",
+           url: "https://kaltura.example.com/some/url",
+           size: "204",
+           fileExt: "mp4" }]
+      )
+    end
+
     it "requires authorization" do
       get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code + "x" }, format: "rss"
       expect(assigns[:problem]).to eql("The verification code does not match any currently enrolled user.")

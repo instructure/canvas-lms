@@ -757,6 +757,63 @@ describe ContentMigration do
         kaltura_double = double("kaltura")
         allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_double)
         allow(kaltura_double).to receive(:startSession)
+        allow(kaltura_double).to receive(:flavorAssetGetByEntryId).and_return([
+                                                                                {
+                                                                                  isOriginal: 1,
+                                                                                  containerFormat: "mp4",
+                                                                                  fileExt: "mp4",
+                                                                                  id: "one",
+                                                                                  size: 15,
+                                                                                }
+                                                                              ])
+        allow(kaltura_double).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_double.flavorAssetGetByEntryId.first)
+      end
+
+      it "updates media attachment links" do
+        media_id = "0_deadbeef"
+        @copy_from.media_objects.create!(media_id:)
+        att = @copy_from.attachments.where(media_entry_id: media_id).first
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>)
+        run_course_copy
+        new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/media_attachments_iframe/#{att.id}", "/media_attachments_iframe/#{new_att.id}")
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "updates media attachment links with shortened global ids" do
+          media_id = "0_deadbeef"
+          @copy_from.media_objects.create!(media_id:)
+          att = @copy_from.attachments.where(media_entry_id: media_id).first
+          short_id = Shard.short_id_for(att.global_id)
+          @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{short_id}?type=video"></iframe></p>)
+          run_course_copy
+          new_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+          expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/media_attachments_iframe/#{short_id}", "/media_attachments_iframe/#{new_att.id}")
+        end
+      end
+
+      it "does not update media attachment links from a different course" do
+        media_id = "0_deadbeef"
+        course_with_teacher(course_name: "from course", active_all: true)
+        @course.media_objects.create!(media_id:)
+        att = @course.attachments.where(media_entry_id: media_id).first
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>)
+        run_course_copy
+        expect(@copy_to.attachments.count).to eq 0
+        expect(@copy_to.media_objects.count).to eq 0
+        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body
+      end
+
+      it "does not update media attachment links from user media" do
+        media_id = "0_deadbeef"
+        att = attachment_model(display_name: "lolcats.mp4", context: @user, media_entry_id: media_id)
+        @copy_from.syllabus_body = %(<p><iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" data-media-id="#{media_id}" allowfullscreen="allowfullscreen" allow="fullscreen" src="/media_attachments_iframe/#{att.id}?type=video"></iframe></p>)
+        run_course_copy
+        expect(@copy_to.attachments.count).to eq 0
+        expect(@copy_to.media_objects.count).to eq 0
+        expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body
       end
 
       it "re-uses kaltura media objects" do

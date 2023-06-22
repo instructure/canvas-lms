@@ -159,7 +159,7 @@ module CC
     end
 
     def attachments_for_export(folder)
-      opts = { exporter: @manifest.exporter, referenced_files: @html_exporter.referenced_files }
+      opts = { exporter: @manifest.exporter, referenced_files: @html_exporter.referenced_files, ignore_updated_at: true }
       attachments_for_export = []
       attachments_for_export += content_zipper.folder_attachments_for_export(folder, opts)
       folder.active_sub_folders.each do |sub_folder|

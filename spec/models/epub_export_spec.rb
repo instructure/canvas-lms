@@ -287,21 +287,18 @@ describe EpubExport do
 
     it "sets locale based on user preference" do
       @student.update_attribute(:locale, "es")
-      epub_export.reload.send(:set_locale)
-      expect(I18n.locale).to eq :es
+      expect(epub_export.reload.send(:set_locale)).to eq "es"
     end
 
     it "sets locale based on course override" do
       @course.update_attribute(:locale, "da")
-      epub_export.reload.send(:set_locale)
-      expect(I18n.locale).to eq :da
+      expect(epub_export.reload.send(:set_locale)).to eq "da"
     end
 
     it "allows course locale to override user locale" do
       @student.update_attribute(:locale, "es")
       @course.update_attribute(:locale, "da")
-      epub_export.reload.send(:set_locale)
-      expect(I18n.locale).to eq :da
+      expect(epub_export.reload.send(:set_locale)).to eq "da"
     end
   end
 

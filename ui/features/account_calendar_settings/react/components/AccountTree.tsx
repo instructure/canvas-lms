@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useCallback, useRef, useState, useEffect} from 'react'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Flex} from '@instructure/ui-flex'
@@ -30,7 +29,15 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {addAccountsToTree} from '../utils'
 import {AccountCalendarItemToggleGroup} from './AccountCalendarItemToggleGroup'
-import {Account, Collection, AccountData, VisibilityChange, SubscriptionChange} from '../types'
+import {
+  Account,
+  Collection,
+  AccountData,
+  VisibilityChange,
+  SubscriptionChange,
+  ExpandedAccounts,
+  FetchAccountDataResponse,
+} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings_account_tree')
 
@@ -38,8 +45,10 @@ type ComponentProps = {
   readonly originAccountId: number
   readonly visibilityChanges: VisibilityChange[]
   readonly subscriptionChanges: SubscriptionChange[]
+  readonly expandedAccounts: ExpandedAccounts
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
+  readonly onAccountExpandedToggled: (id: number, expanded: boolean) => void
   readonly autoSubscriptionEnabled: boolean
 }
 
@@ -47,56 +56,78 @@ export const AccountTree = ({
   originAccountId,
   visibilityChanges,
   subscriptionChanges,
+  expandedAccounts,
   onAccountToggled,
   onAccountSubscriptionToggled,
+  onAccountExpandedToggled,
   autoSubscriptionEnabled,
 }: ComponentProps) => {
   const [collections, setCollections] = useState<Collection>({})
-  const [loadingCollectionIds, setLoadingCollectionIds] = useState<number[]>([originAccountId])
+  // ref because we need this to be updated syncronously so we can be sure
+  // we're not fetching the same account multiple times
+  const loadingCollectionIds = useRef<number[]>([])
+  const [loadingCollectionIdState, setLoadingCollectionIdState] = useState<number[]>([]) // but also need in state for re-render
 
-  const receivedAccountData = accounts => {
-    setCollections(addAccountsToTree(accounts, collections))
-  }
-
-  const fetchAccountData = (
-    accountId,
-    nextLink?: string,
-    accumulatedResults: AccountData[] = []
-  ) => {
-    setLoadingCollectionIds([...loadingCollectionIds, accountId])
-    doFetchApi({
-      path: nextLink || `/api/v1/accounts/${accountId}/account_calendars`,
-      params: {
-        ...(nextLink == null && {per_page: 100}),
-      },
+  const receivedAccountData = useCallback((accounts: AccountData[]) => {
+    setCollections((prevCollections: Collection) => {
+      const newColls = addAccountsToTree(accounts, prevCollections)
+      return newColls
     })
-      .then(({json, link}) => {
-        const accountData = accumulatedResults.concat(json || [])
-        if (link?.next) {
-          fetchAccountData(accountId, link.next.url, accountData)
-        } else {
-          receivedAccountData(accountData)
-          setLoadingCollectionIds(loadingCollectionIds.filter(id => id !== accountId))
-        }
+  }, [])
+
+  const fetchInFlight = useCallback((id: number) => loadingCollectionIds.current.includes(id), [])
+
+  const fetchAccountData = useCallback(
+    (accountId: number, nextLink?: string, accumulatedResults: AccountData[] = []) => {
+      loadingCollectionIds.current = [...loadingCollectionIds.current, accountId]
+      setLoadingCollectionIdState(loadingCollectionIds.current)
+      doFetchApi({
+        path: nextLink || `/api/v1/accounts/${accountId}/account_calendars`,
+        params: {
+          ...(nextLink == null && {per_page: 100}),
+        },
       })
-      .catch(showFlashError(I18n.t("Couldn't load account calendar settings")))
-  }
+        .then((response: FetchAccountDataResponse) => {
+          const {json, link} = response
+          const accountData = accumulatedResults.concat(json || [])
+          if (link?.next) {
+            fetchAccountData(accountId, link.next.url, accountData)
+          } else {
+            receivedAccountData(accountData)
+            loadingCollectionIds.current = loadingCollectionIds.current.filter(
+              id => id !== accountId
+            )
+            setLoadingCollectionIdState(loadingCollectionIds.current)
+          }
+        })
+        .catch(showFlashError(I18n.t("Couldn't load account calendar settings")))
+    },
+    [receivedAccountData]
+  )
 
   useEffect(() => {
-    fetchAccountData(originAccountId)
-    // this should run on first render
+    for (const id of expandedAccounts) {
+      fetchAccountData(id)
+    }
+    // this should onlyrun on first render
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleToggle = (account: Account, expanded) => {
-    if (
-      expanded &&
-      collections[account.id].sub_account_count > 0 &&
-      account.id !== originAccountId
-    ) {
-      fetchAccountData(account.id)
-    }
-  }
+  const handleToggle = useCallback(
+    (account: Account, expanded: boolean) => {
+      if (
+        expanded &&
+        !fetchInFlight(account.id) &&
+        // because children include the account itself + sub accounts
+        collections[account.id].sub_account_count >= collections[account.id].children.length &&
+        account.id !== originAccountId
+      ) {
+        fetchAccountData(account.id)
+      }
+      onAccountExpandedToggled(account.id, expanded)
+    },
+    [collections, fetchAccountData, fetchInFlight, onAccountExpandedToggled, originAccountId]
+  )
 
   if (!collections[originAccountId]) {
     return (
@@ -113,8 +144,9 @@ export const AccountTree = ({
           <AccountCalendarItemToggleGroup
             parentId={null}
             accountGroup={[originAccountId]}
-            defaultExpanded={true}
+            expandedAccounts={expandedAccounts}
             collections={collections}
+            loadingCollectionIds={loadingCollectionIdState}
             handleToggle={handleToggle}
             visibilityChanges={visibilityChanges}
             subscriptionChanges={subscriptionChanges}

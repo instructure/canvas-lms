@@ -86,12 +86,11 @@ describe "discussions" do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
+          course.restrict_quantitative_data = true
+          course.save!
         end
 
         it "hides points possible" do
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
           wait_for_ajaximations
           expect(f("#discussion_container").text).to include("This is a graded discussion")
@@ -191,12 +190,11 @@ describe "discussions" do
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
+          course.restrict_quantitative_data = true
+          course.save!
         end
 
         it "does not hide points possible" do
-          # truthy permission(since enabled is being "not"ed)
-          Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-          Account.default.reload
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/"
           wait_for_ajaximations
           expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")

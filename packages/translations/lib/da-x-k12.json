@@ -527,6 +527,9 @@
     "custom_6979cd81": {
         "message": "Brugerdefineret"
     },
+    "custom_width_and_height_pixels_946eea7c": {
+        "message": "Brugerdefineret bredde og højde (pixels)"
+    },
     "cyan_c1d5f68a": {
         "message": "Cyan"
     },
@@ -1712,6 +1715,9 @@
     "no_headers_9bc7dc7f": {
         "message": "Ingen overskrifter"
     },
+    "no_more_items_to_show_6a1333c6": {
+        "message": "Der er ikke flere elementer at vise"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Der findes ikke forhåndsvisning for denne fil."
     },
@@ -1801,6 +1807,9 @@
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
         "message": "En af følgende stilarter skal tilføjes for at gemme et ikon: Ikonfarve, konturstørrelse, ikontekst eller billede"
+    },
+    "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+        "message": "En eller flere filer kunne ikke indsættes. Prøv at uploade eller trække og slippe filer."
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Kun seneste vurderingsperiode vist."

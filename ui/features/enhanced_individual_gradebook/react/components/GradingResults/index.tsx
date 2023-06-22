@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import $ from 'jquery'
-import DateHelper from '@canvas/datetime/dateHelper'
+import React, {useCallback, useEffect, useState} from 'react'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button} from '@instructure/ui-buttons'
+import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
@@ -28,37 +30,44 @@ import {
   ApiCallStatus,
   AssignmentConnection,
   GradebookOptions,
+  GradebookStudentDetails,
   GradebookUserSubmissionDetails,
 } from '../../../types'
-import {useCurrentStudentInfo} from '../../hooks/useCurrentStudentInfo'
-import {Pill} from '@instructure/ui-pill'
-import {Button} from '@instructure/ui-buttons'
 import {useSubmitScore} from '../../hooks/useSubmitScore'
-import SubmissionDetailModal from './SubmissionDetailModal'
+import {useGetComments} from '../../hooks/useComments'
+import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
+import {studentDisplayName, outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
-  courseId: string
-  studentId?: string | null
+  currentStudent?: GradebookStudentDetails
+  studentSubmissions?: GradebookUserSubmissionDetails[]
   assignment?: AssignmentConnection
+  courseId: string
   gradebookOptions: GradebookOptions
+  loadingStudent: boolean
   onSubmissionSaved: (submission: GradebookUserSubmissionDetails) => void
 }
 
 export default function GradingResults({
   assignment,
   courseId,
+  currentStudent,
+  studentSubmissions,
   gradebookOptions,
-  studentId,
+  loadingStudent,
   onSubmissionSaved,
 }: Props) {
-  const {currentStudent, studentSubmissions} = useCurrentStudentInfo(courseId, studentId)
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
   const [gradeInput, setGradeInput] = useState<string>('')
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
+  const {submissionComments, loadingComments, refetchComments} = useGetComments({
+    courseId,
+    submissionId: submission?.id,
+  })
 
   useEffect(() => {
     if (submission) {
@@ -66,21 +75,40 @@ export default function GradingResults({
     }
   }, [submission])
 
-  useEffect(() => {
-    switch (submitScoreStatus) {
-      case ApiCallStatus.FAILED:
-        $.flashError(submitScoreError)
-        break
-      case ApiCallStatus.COMPLETED:
-        if (!savedSubmission) {
-          return
-        }
-        onSubmissionSaved(savedSubmission)
-        break
-    }
-  }, [submitScoreError, submitScoreStatus, savedSubmission, onSubmissionSaved])
+  const handleGradeChange = useCallback(
+    (updateEvent: GradeChangeApiUpdate) => {
+      const {status, newSubmission, error} = updateEvent
+      switch (status) {
+        case ApiCallStatus.FAILED:
+          showFlashError(error)(new Error('Failed to submit score'))
+          break
+        case ApiCallStatus.COMPLETED:
+          if (!newSubmission) {
+            return
+          }
+          onSubmissionSaved(newSubmission)
+          setModalOpen(false)
+          showFlashSuccess(I18n.t('Grade saved'))()
+          break
+      }
+    },
+    [onSubmissionSaved]
+  )
 
-  if (!submission || !assignment) {
+  const handlePostComment = useCallback(() => {
+    setModalOpen(false)
+    refetchComments()
+  }, [refetchComments])
+
+  useEffect(() => {
+    handleGradeChange({
+      status: submitScoreStatus,
+      newSubmission: savedSubmission,
+      error: submitScoreError,
+    })
+  }, [submitScoreStatus, savedSubmission, submitScoreError, handleGradeChange])
+
+  if (!submission || !assignment || !currentStudent) {
     return (
       <>
         <View as="div">
@@ -99,43 +127,14 @@ export default function GradingResults({
     )
   }
 
-  const submitterPreviewText = () => {
-    if (!submission.submissionType) {
-      return I18n.t('Has not submitted')
-    }
-    const formattedDate = DateHelper.formatDatetimeForDisplay(submission.submittedAt)
-    if (submission.proxySubmitter) {
-      return I18n.t('Submitted by %{proxy} on %{date}', {
-        proxy: submission.proxySubmitter,
-        date: formattedDate,
-      })
-    }
-    return I18n.t('Submitted on %{date}', {date: formattedDate})
-  }
-
-  const outOfText = () => {
-    const {gradingType, pointsPossible} = assignment
-
-    if (submission.excused) {
-      return I18n.t('Excused')
-    } else if (gradingType === 'gpa_scale') {
-      return ''
-    } else if (gradingType === 'letter_grade' || gradingType === 'pass_fail') {
-      return I18n.t('(%{score} out of %{points})', {
-        points: I18n.n(pointsPossible),
-        score: submission.enteredScore,
-      })
-    } else if (pointsPossible === null || pointsPossible === undefined) {
-      return I18n.t('No points possible')
-    } else {
-      return I18n.t('(out of %{points})', {points: I18n.n(pointsPossible)})
-    }
+  if (loadingStudent) {
+    return <LoadingIndicator />
   }
 
   const submitGrade = async () => {
     await submit(assignment, submission, gradeInput)
   }
-
+  const {hideStudentNames} = gradebookOptions.customOptions
   return (
     <>
       <View as="div">
@@ -146,22 +145,17 @@ export default function GradingResults({
           <View as="div" className="span8 pad-box top-only">
             <View as="div">
               <View as="span">
-                {gradebookOptions.anonymizeStudents ? (
-                  // TOOD: handle anonymous names
-                  <Text size="small">
-                    <View as="strong">Grade for: anonymous_name</View>
-                  </Text>
-                ) : (
-                  <Text size="small">
-                    <View as="strong">{`Grade for ${currentStudent?.name} - ${assignment.name}`}</View>
-                  </Text>
-                )}
-
+                <Text size="small">
+                  <View as="strong">{`${I18n.t('Grade for')} ${studentDisplayName(
+                    currentStudent,
+                    hideStudentNames
+                  )} - ${assignment.name}`}</View>
+                </Text>
                 <SubmissionStatus submission={submission} />
               </View>
             </View>
             <View as="span">
-              <Text size="small">{submitterPreviewText()}</Text>
+              <Text size="small">{submitterPreviewText(submission)}</Text>
             </View>
 
             <View as="div" className="grade">
@@ -175,7 +169,7 @@ export default function GradingResults({
                 onBlur={() => submitGrade()}
               />
               <View as="span" margin="0 0 0 small">
-                {outOfText()}
+                {outOfText(assignment, submission)}
               </View>
             </View>
 
@@ -204,7 +198,18 @@ export default function GradingResults({
           </View>
         </View>
       </View>
-      <SubmissionDetailModal modalOpen={modalOpen} handleClose={() => setModalOpen(false)} />
+      <SubmissionDetailModal
+        assignment={assignment}
+        comments={submissionComments}
+        gradebookOptions={gradebookOptions}
+        student={currentStudent}
+        submission={submission}
+        loadingComments={loadingComments}
+        modalOpen={modalOpen}
+        handleClose={() => setModalOpen(false)}
+        onGradeChange={handleGradeChange}
+        onPostComment={handlePostComment}
+      />
     </>
   )
 }

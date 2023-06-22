@@ -52,6 +52,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :root_account, class_name: "Account"
 
+  belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
 
   acts_as_url :title, sync_url: true
@@ -69,6 +70,8 @@ class WikiPage < ActiveRecord::Base
   after_save  :touch_context
   after_save  :update_assignment,
               if: proc { context.try(:conditional_release?) }
+  after_save :create_lookup, if: :should_create_lookup?
+  after_save :delete_lookups, if: -> { saved_change_to_workflow_state? && deleted? }
 
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")
@@ -117,6 +120,25 @@ class WikiPage < ActiveRecord::Base
     if !published? && is_front_page?
       errors.add(:published, t(:cannot_unpublish_front_page, "cannot unpublish front page"))
     end
+  end
+
+  def should_create_lookup?
+    # covers page creation and title changes, and undeletes
+    saved_change_to_title? || (saved_change_to_workflow_state? && workflow_state_before_last_save == "deleted")
+  end
+
+  def create_lookup
+    new_record = id_changed?
+    lookup = wiki_page_lookups.find_by(slug: url) unless new_record
+    lookup ||= wiki_page_lookups.build(slug: url)
+    lookup.save
+    # this is kind of circular so we want to avoid triggering callbacks again
+    update_column(:current_lookup_id, lookup.id)
+  end
+
+  def delete_lookups
+    update_column(:current_lookup_id, nil)
+    wiki_page_lookups.delete_all(:delete_all)
   end
 
   def ensure_unique_title
@@ -300,7 +322,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def context_module_tag_for(context)
-    @tag ||= context_module_tags.where(context_id: context, context_type: context.class.base_class.name).first
+    @context_module_tag_for ||= context_module_tags.where(context_id: context, context_type: context.class.base_class.name).first
   end
 
   def context_module_action(user, context, action)

@@ -86,6 +86,7 @@ function Assignment() {
   this.failedToMigrate = this.failedToMigrate.bind(this)
   this.failedToDuplicate = this.failedToDuplicate.bind(this)
   this.isMigrating = this.isMigrating.bind(this)
+  this.isMasterCourseChildContent = this.isMasterCourseChildContent.bind(this)
   this.isDuplicating = this.isDuplicating.bind(this)
   this.canDuplicate = this.canDuplicate.bind(this)
   this.singleSectionDueDate = this.singleSectionDueDate.bind(this)
@@ -1120,6 +1121,10 @@ Assignment.prototype.isMigrating = function () {
   return this.get('workflow_state') === 'migrating'
 }
 
+Assignment.prototype.isMasterCourseChildContent = function () {
+  return !!this.get('is_master_course_child_content')
+}
+
 Assignment.prototype.failedToDuplicate = function () {
   return this.get('workflow_state') === 'failed_to_duplicate'
 }
@@ -1223,6 +1228,7 @@ Assignment.prototype.toView = function () {
     'isLetterGraded',
     'isMasteryConnectTool',
     'isMigrating',
+    'isMasterCourseChildContent',
     'isNonPlacementExternalTool',
     'isNotGraded',
     'isOnlineSubmission',

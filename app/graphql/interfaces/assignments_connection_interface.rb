@@ -5,6 +5,10 @@ module Interfaces::AssignmentsConnectionInterface
 
   class AssignmentFilterInputType < Types::BaseInputObject
     graphql_name "AssignmentFilter"
+    argument :user_id, ID, <<~MD, required: false
+      only return assignments for the given user. Defaults to
+      the current user.
+    MD
     argument :grading_period_id, ID, <<~MD, required: false
       only return assignments for the given grading period. Defaults to
       the current grading period. Pass `null` to return all assignments
@@ -12,8 +16,14 @@ module Interfaces::AssignmentsConnectionInterface
     MD
   end
 
-  def assignments_scope(course, grading_period_id, has_grading_periods = nil)
-    assignments = Assignments::ScopedToUser.new(course, current_user).scope
+  def assignments_scope(course, grading_period_id, has_grading_periods = nil, user_id = nil)
+    scoped_user = user_id.nil? ? current_user : User.find(user_id)
+    assignments = Assignments::ScopedToUser.new(course, scoped_user).scope
+    unless can_current_user_read_given_user_submissions(course, scoped_user)
+      # current_user lacks permissions to view the submissions of the scoped_user
+      return assignments.none
+    end
+
     if grading_period_id
       assignments
         .joins(:submissions)
@@ -43,18 +53,25 @@ module Interfaces::AssignmentsConnectionInterface
   end
 
   def assignments_connection(filter: {}, course:)
-    if filter.key?(:grading_period_id)
+    if filter.key?(:grading_period_id) || filter.key?(:user_id)
       apply_order(
-        assignments_scope(course, filter[:grading_period_id])
+        assignments_scope(course, filter[:grading_period_id], nil, filter[:user_id])
       )
     else
       Loaders::CurrentGradingPeriodLoader.load(course)
                                          .then do |gp, has_grading_periods|
         apply_order(
-          assignments_scope(course, gp&.id, has_grading_periods)
+          assignments_scope(course, gp&.id, has_grading_periods, filter[:user_id])
         )
       end
     end
+  end
+
+  def can_current_user_read_given_user_submissions(course, user)
+    is_current_user = user.id == current_user.id
+    course_submission_read_permissions = course.grants_any_right?(current_user, session, :manage_courses, :read_as_admin, :manage_grades)
+    observer_permissions = ObserverEnrollment.observed_students(course, current_user, include_restricted_access: false).keys.any? { |observed_user| observed_user.id == user.id }
+    is_current_user || course_submission_read_permissions || observer_permissions
   end
 
   def apply_order(assignments)

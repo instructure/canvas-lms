@@ -16,8 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssignmentConnection, UserConnection} from './queries'
-import {ProgressData} from 'features/gradebook/react/default_gradebook/gradebook'
+import {
+  AssignmentConnection,
+  UserConnection,
+  GradebookUserSubmissionDetails,
+  SubmissionConnection,
+} from './queries'
+import {
+  ProgressData,
+  CourseSettingsType,
+} from 'features/gradebook/react/default_gradebook/gradebook.d'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
@@ -25,16 +33,45 @@ export enum GradebookSortOrder {
   AssignmentGroup = 'assignmentGroup',
 }
 
+export type TeacherNotes = {
+  id: string
+  hidden: boolean
+  position: number
+  read_only: boolean
+  teacher_notes: boolean
+  title: string
+}
+
+export type CustomOptions = {
+  includeUngradedAssignments: boolean
+  hideStudentNames: boolean
+  showConcludedEnrollments: boolean
+  showNotesColumn: boolean
+  showTotalGradeAsPoints: boolean
+}
+
+export type HandleCheckboxChange = (key: keyof CustomOptions, value: boolean) => void
+
 export type GradebookOptions = {
-  includeUngradedAssignments?: boolean
   anonymizeStudents?: boolean
   sortOrder: GradebookSortOrder
   selectedSection?: string
   exportGradebookCsvUrl?: string
   lastGeneratedCsvAttachmentUrl?: string | null
   gradebookCsvProgress?: ProgressData | null
-  contextUrl?: string
-  userId?: string
+  contextUrl?: string | null
+  userId?: string | null
+  courseSettings?: CourseSettingsType | null
+  contextId?: string | null
+  customColumnUrl?: string | null
+  customColumnsUrl?: string | null
+  saveViewUngradedAsZeroToServer?: boolean | null
+  settingUpdateUrl?: string | null
+  settingsUpdateUrl?: string | null
+  teacherNotes?: TeacherNotes | null
+  customOptions: CustomOptions
+  showTotalGradeAsPoints?: boolean | null
+  messageAttachmentUploadFolderId?: string
 }
 
 export type AssignmentDetailCalculationText = {
@@ -59,6 +96,7 @@ export type AssignmentSortContext = {
 
 export type SortableStudent = UserConnection & {
   sections: string[]
+  hiddenName?: string
 }
 
 export enum ApiCallStatus {
@@ -68,3 +106,24 @@ export enum ApiCallStatus {
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
 }
+
+export type AssignmentSubmissionsMap = {
+  [assignmentId: string]: {
+    [submissionId: string]: SubmissionConnection
+  }
+}
+
+export type SubmissionGradeChange = Pick<
+  GradebookUserSubmissionDetails,
+  | 'id'
+  | 'assignmentId'
+  | 'score'
+  | 'enteredScore'
+  | 'missing'
+  | 'excused'
+  | 'late'
+  | 'grade'
+  | 'state'
+  | 'submittedAt'
+  | 'userId'
+>

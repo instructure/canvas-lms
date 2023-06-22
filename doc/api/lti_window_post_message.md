@@ -175,6 +175,8 @@ Launches the tool that sent the event in a full-window context (ie not inside a 
 - data.url: a url for relaunching the tool
 - data.placement: the Canvas placement that the tool was launched in. Provided in the 1.3 id token
   under the custom claim section (`https://www.instructure.com/placement`).
+- data.resource_link_id: the Canvas resource_link_id for the resource launched. Provided in the 1.3
+  id token under the `resource_link` claim (`https://purl.imsglobal.org/spec/lti/claim/resource_link#id`).
 
 **Optional properties:**
 

@@ -130,8 +130,6 @@ describe MicrosoftSync::Errors do
     let(:t_calls_args) { [] }
 
     before do
-      @orig_locale = I18n.locale
-      I18n.locale = :en
       orig_t = I18n.method(:t!)
       allow(I18n).to receive(:t!) do |*args|
         # I18n.t! mutates the second arg, so can't use normal expect().to have_received,
@@ -140,8 +138,6 @@ describe MicrosoftSync::Errors do
         orig_t.call(*args)
       end
     end
-
-    after { I18n.locale = @orig_locale }
 
     context "with a serialized non-PublicError" do
       let(:error) { MicrosoftSync::TestErrorNotPublic.new("foo") }

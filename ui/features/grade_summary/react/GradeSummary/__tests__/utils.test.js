@@ -28,11 +28,7 @@ import {GradingPeriod} from '../../../graphql/GradingPeriod'
 import {Submission} from '../../../graphql/Submission'
 
 import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE} from '../constants'
-import {
-  nullGradingPeriodAssignments,
-  nullGradingPeriodAssignmentGroup,
-  nullGradingPeriodGradingPeriods,
-} from './largeDataMocks'
+import {nullGradingPeriod, mockDroppedAssignmentData} from './largeDataMocks'
 
 import {
   formatNumber,
@@ -40,8 +36,12 @@ import {
   getDisplayStatus,
   getDisplayScore,
   getZeroPointAssignmentDisplayScore,
-  getNoSubmissionStatus,
   scorePercentageToLetterGrade,
+  convertSubmissionToDroppableSubmission,
+  camelCaseToSnakeCase,
+  convertAssignmentGroupRules,
+  filterDroppedAssignments,
+  listDroppedAssignments,
   getAssignmentTotalPoints,
   getAssignmentEarnedPoints,
   getAssignmentPercentage,
@@ -62,6 +62,8 @@ import {
   getTotal,
   sortAssignments,
   filteredAssignments,
+  getAssignmentPositionInModuleItems,
+  getAssignmentSortKey,
 } from '../utils'
 
 const createAssignment = (score, pointsPossible) => {
@@ -189,6 +191,256 @@ describe('util', () => {
         ])
       })
     })
+
+    describe('by module', () => {
+      it('getAssignmentPositionInModuleItems should return the position of the assignment in the module items', () => {
+        const moduleItems = [
+          {
+            _id: '6',
+            content: {
+              name: 'B3',
+              _id: '21',
+            },
+          },
+          {
+            _id: '8',
+            content: {
+              name: 'B1',
+              _id: '23',
+            },
+          },
+          {
+            _id: '7',
+            content: {
+              name: 'B2',
+              _id: '22',
+            },
+          },
+        ]
+
+        expect(getAssignmentPositionInModuleItems('21', moduleItems)).toBe(1)
+        expect(getAssignmentPositionInModuleItems('22', moduleItems)).toBe(3)
+        expect(getAssignmentPositionInModuleItems('23', moduleItems)).toBe(2)
+      })
+
+      it('getAssignmentSortKey should return the appropriate sort key for the assignment', () => {
+        const assignment1 = Assignment.mock({
+          _id: '22',
+          modules: [
+            {
+              _id: '7',
+              name: 'C - Third',
+              __typename: 'Module',
+              position: 1,
+              moduleItems: [
+                {
+                  _id: '6',
+                  content: {
+                    name: 'B3',
+                    _id: '21',
+                  },
+                },
+                {
+                  _id: '8',
+                  content: {
+                    name: 'B1',
+                    _id: '23',
+                  },
+                },
+                {
+                  _id: '7',
+                  content: {
+                    name: 'B2',
+                    _id: '22',
+                  },
+                },
+              ],
+            },
+          ],
+        })
+
+        const assignment2 = Assignment.mock({
+          _id: '21',
+          modules: [
+            {
+              _id: '7',
+              name: 'C - Third',
+              __typename: 'Module',
+              position: 3,
+              moduleItems: [
+                {
+                  _id: '6',
+                  content: {
+                    name: 'B3',
+                    _id: '21',
+                  },
+                },
+                {
+                  _id: '8',
+                  content: {
+                    name: 'B1',
+                    _id: '23',
+                  },
+                },
+                {
+                  _id: '7',
+                  content: {
+                    name: 'B2',
+                    _id: '22',
+                  },
+                },
+              ],
+            },
+          ],
+        })
+
+        expect(getAssignmentSortKey(assignment1)).toBe(100003)
+        expect(getAssignmentSortKey(assignment2)).toBe(300001)
+      })
+
+      it('should sort assignments by first module item ascending and put the ones without module at the end', () => {
+        const assignments = [
+          Assignment.mock({
+            _id: '21',
+            modules: [
+              {
+                _id: '1',
+                position: 3,
+                name: 'Module C',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'C3',
+                      _id: '23',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C2',
+                      _id: '22',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C1',
+                      _id: '21',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '23',
+            modules: [
+              {
+                _id: '1',
+                position: 3,
+                name: 'Module C',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'C3',
+                      _id: '23',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C2',
+                      _id: '22',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C1',
+                      _id: '21',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '22',
+            modules: [
+              {
+                _id: '1',
+                position: 3,
+                name: 'Module C',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'C3',
+                      _id: '23',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C2',
+                      _id: '22',
+                    },
+                  },
+                  {
+                    content: {
+                      name: 'C1',
+                      _id: '21',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '24',
+            modules: [
+              {
+                _id: '1',
+                position: 1,
+                name: 'Module A',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'A1',
+                      _id: '24',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({
+            _id: '25',
+            modules: [
+              {
+                _id: '1',
+                position: 2,
+                name: 'Module B',
+                moduleItems: [
+                  {
+                    content: {
+                      name: 'B1',
+                      _id: '25',
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+          Assignment.mock({modules: []}),
+        ]
+
+        const sortedAssignments = sortAssignments(ASSIGNMENT_SORT_OPTIONS.MODULE, assignments)
+
+        expect(sortedAssignments).toEqual([
+          assignments[3],
+          assignments[4],
+          assignments[1],
+          assignments[2],
+          assignments[0],
+          assignments[5],
+        ])
+      })
+    })
   })
 
   describe('formatNumber', () => {
@@ -295,6 +547,14 @@ describe('util', () => {
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
 
+    it('should return "Dropped" assignment is marked as dropped', () => {
+      const assignment = {
+        dropped: true,
+      }
+      const expectedOutput = <Pill color="primary">Dropped</Pill>
+      expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
+
     it('should return "Not Graded" status when gradingType is "not_graded"', () => {
       const assignment = {
         gradingType: 'not_graded',
@@ -345,6 +605,30 @@ describe('util', () => {
     it('should return "Not Graded" status for other cases', () => {
       const assignment = {}
       const expectedOutput = <Pill>Not Graded</Pill>
+      expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
+
+    it('should return "Missing" status when dueDate is in the past and there is no submissionsConnection nodes', () => {
+      const assignment = {
+        dueAt: getTime(true),
+        submissionsConnection: {
+          nodes: [],
+        },
+      }
+
+      const expectedOutput = <Pill color="danger">Missing</Pill>
+      expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
+
+    it('should return "Not Submitted" status when dueDate is in the future and there is no submissionsConnection nodes', () => {
+      const assignment = {
+        dueAt: getTime(false),
+        submissionsConnection: {
+          nodes: [],
+        },
+      }
+
+      const expectedOutput = <Pill color="primary">Not Submitted</Pill>
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
     })
   })
@@ -498,20 +782,6 @@ describe('util', () => {
     })
   })
 
-  describe('getNoSubmissionStatus', () => {
-    it('should return "Missing" status when dueDate is in the past', () => {
-      const dueDate = getTime(true)
-      const expectedOutput = <Pill color="danger">Missing</Pill>
-      expect(getNoSubmissionStatus(dueDate)).toStrictEqual(expectedOutput)
-    })
-
-    it('should return "Not Submitted" status when dueDate is in the future', () => {
-      const dueDate = getTime(false)
-      const expectedOutput = <Pill color="primary">Not Submitted</Pill>
-      expect(getNoSubmissionStatus(dueDate)).toStrictEqual(expectedOutput)
-    })
-  })
-
   describe('scorePercentageToLetterGrade', () => {
     const gradingStandard = GradingStandard.mock()
 
@@ -536,6 +806,227 @@ describe('util', () => {
       expect(scorePercentageToLetterGrade(undefined, gradingStandard)).toBeNull()
       expect(scorePercentageToLetterGrade('not a number', gradingStandard)).toBeNull()
       expect(scorePercentageToLetterGrade('', gradingStandard)).toBeNull()
+    })
+  })
+
+  describe('Drop Assignment', () => {
+    describe('convertSubmissionToDroppableSubmission', () => {
+      it('should return the correct object with all properties when assignment and submission are provided', () => {
+        const assignment = {
+          _id: 'assignment123',
+          pointsPossible: 100,
+        }
+        const submission = {
+          _id: 'submission456',
+          score: 80,
+          grade: 'B',
+          gradingStatus: 'graded',
+          late: false,
+        }
+        const expected = {
+          score: 80,
+          grade: 'B',
+          total: 100,
+          assignment_id: 'assignment123',
+          workflow_state: 'graded',
+          excused: false,
+          id: 'submission456',
+          submission: {assignment_id: 'assignment123'},
+        }
+
+        expect(convertSubmissionToDroppableSubmission(assignment, submission)).toEqual(expected)
+      })
+    })
+
+    describe('camelCaseToSnakeCase', () => {
+      it('should convert camelCase string to snake_case', () => {
+        const input = 'helloWorld'
+        const expected = 'hello_world'
+
+        expect(camelCaseToSnakeCase(input)).toBe(expected)
+      })
+
+      it('should convert PascalCase string to snake_case', () => {
+        const input = 'HelloWorld'
+        const expected = 'hello_world'
+
+        expect(camelCaseToSnakeCase(input)).toBe(expected)
+      })
+
+      it('should convert mixedCase string to snake_case', () => {
+        const input = 'helloWorldFooBar'
+        const expected = 'hello_world_foo_bar'
+
+        expect(camelCaseToSnakeCase(input)).toBe(expected)
+      })
+
+      it('should return an empty string when input is an empty string', () => {
+        const input = ''
+        const expected = ''
+
+        expect(camelCaseToSnakeCase(input)).toBe(expected)
+      })
+
+      it('should convert a single uppercase letter to lowercase', () => {
+        const input = 'A'
+        const expected = 'a'
+
+        expect(camelCaseToSnakeCase(input)).toBe(expected)
+      })
+    })
+
+    describe('convertAssignmentGroupRules', () => {
+      it('should return null when assignmentGroup or rules are not provided', () => {
+        const assignmentGroup1 = {
+          rules: null,
+        }
+        const assignmentGroup2 = {
+          rules: {
+            dropLowest: null,
+            dropHighest: null,
+            neverDrop: null,
+          },
+        }
+
+        expect(convertAssignmentGroupRules(undefined)).toBeNull()
+        expect(convertAssignmentGroupRules(assignmentGroup1)).toBeNull()
+        expect(convertAssignmentGroupRules(assignmentGroup2)).toBeNull()
+      })
+
+      it('should convert rules keys to snake_case and map never_drop assignments', () => {
+        const assignmentGroup = {
+          rules: {
+            dropLowest: 1,
+            dropHighest: 2,
+            neverDrop: [{_id: 'assignment1'}, {_id: 'assignment2'}],
+          },
+        }
+        const expected = {
+          drop_lowest: 1,
+          drop_highest: 2,
+          never_drop: ['assignment1', 'assignment2'],
+        }
+
+        expect(convertAssignmentGroupRules(assignmentGroup)).toEqual(expected)
+      })
+
+      it('should convert rules keys to snake_case without mapping never_drop assignments if null', () => {
+        const assignmentGroup = {
+          rules: {
+            dropLowest: 1,
+            dropHighest: 2,
+            neverDrop: null,
+          },
+        }
+        const expected = {
+          drop_lowest: 1,
+          drop_highest: 2,
+          never_drop: null,
+        }
+
+        expect(convertAssignmentGroupRules(assignmentGroup)).toEqual(expected)
+      })
+    })
+
+    describe('filterDroppedAssignments', () => {
+      it('should return an empty array when assignments are not provided', () => {
+        const assignments = undefined
+
+        expect(filterDroppedAssignments(assignments)).toEqual([])
+      })
+
+      it('should return an empty array when assignments array is empty', () => {
+        const assignments = []
+
+        expect(filterDroppedAssignments(assignments)).toEqual([])
+      })
+
+      it('should filter assignments based on gradingType and score', () => {
+        const assignmentGroup = {}
+        const assignments = [
+          {
+            _id: 'assignment1',
+            gradingType: 'graded',
+            submissionsConnection: {
+              nodes: [{score: 80}],
+            },
+          },
+          {
+            _id: 'assignment2',
+            gradingType: 'not_graded',
+            submissionsConnection: {
+              nodes: [{score: 100}],
+            },
+          },
+          {
+            _id: 'assignment3',
+            gradingType: 'graded',
+            submissionsConnection: {
+              nodes: [{score: null}],
+            },
+          },
+        ]
+        const expected = [
+          {
+            _id: 'assignment1',
+            gradingType: 'graded',
+            submissionsConnection: {
+              nodes: [{score: 80}],
+            },
+          },
+        ]
+
+        expect(filterDroppedAssignments(assignments, assignmentGroup)).toEqual(expected)
+      })
+
+      it('should return all assignments if rules are null and returnDropped is false', () => {
+        const assignmentGroup = {
+          rules: null,
+        }
+        const assignments = [
+          {
+            _id: 'assignment1',
+          },
+          {
+            _id: 'assignment2',
+          },
+        ]
+        const expected = assignments
+
+        expect(filterDroppedAssignments(assignments, assignmentGroup)).toEqual(expected)
+      })
+
+      it('should return dropped assignments if rules are null and returnDropped is true', () => {
+        const assignmentGroup = {
+          rules: null,
+        }
+        const assignments = [
+          {
+            _id: 'assignment1',
+          },
+          {
+            _id: 'assignment2',
+          },
+        ]
+        const expected = []
+
+        expect(filterDroppedAssignments(assignments, assignmentGroup, true)).toEqual(expected)
+      })
+    })
+
+    describe('listDroppedAssignments', () => {
+      it('should return an empty array when assignments are not provided', () => {
+        const assignments = undefined
+
+        expect(listDroppedAssignments(assignments, true)).toEqual([])
+        expect(listDroppedAssignments(assignments, false)).toEqual([])
+      })
+
+      it('should return list of dropped assignments when returnDropped is true', () => {
+        expect(listDroppedAssignments(mockDroppedAssignmentData.queryData, false)).toEqual(
+          mockDroppedAssignmentData.expectedDroppedAssignments
+        )
+      })
     })
   })
 
@@ -631,9 +1122,9 @@ describe('util', () => {
         expect(getAssignmentGroupTotalPoints(assignmentGroup, assignments)).toBe(0)
       })
 
-      it('should return undefined when assignments are not provided', () => {
+      it('should return 0 when assignments are not provided', () => {
         const assignmentGroup = {}
-        expect(getAssignmentGroupTotalPoints(assignmentGroup)).toBe(undefined)
+        expect(getAssignmentGroupTotalPoints(assignmentGroup)).toBe(0)
       })
     })
 
@@ -650,9 +1141,9 @@ describe('util', () => {
         expect(getAssignmentGroupEarnedPoints(assignmentGroup, assignments)).toBe(0)
       })
 
-      it('should return undefined when assignments are not provided', () => {
+      it('should return 0 when assignments are not provided', () => {
         const assignmentGroup = {}
-        expect(getAssignmentGroupEarnedPoints(assignmentGroup)).toBe(undefined)
+        expect(getAssignmentGroupEarnedPoints(assignmentGroup)).toBe(0)
       })
     })
 
@@ -802,22 +1293,27 @@ describe('util', () => {
         it('should return the correct percentage for the grading period', () => {
           const gradingPeriod = GradingPeriod.mock()
           const assignments = mockAssignments()
-          expect(getGradingPeriodPercentage(gradingPeriod, assignments, false)).toBe('77.5')
+          const assignmentGroups = [AssignmentGroup.mock()]
+          expect(
+            getGradingPeriodPercentage(gradingPeriod, assignments, assignmentGroups, false)
+          ).toBe('77.5')
         })
 
         it('should return N/A when total points is not provided', () => {
           const gradingPeriod = {}
           const assignments = []
-          expect(getGradingPeriodPercentage(gradingPeriod, assignments, false)).toBe(
-            ASSIGNMENT_NOT_APPLICABLE
-          )
+          const assignmentGroups = [AssignmentGroup.mock()]
+          expect(
+            getGradingPeriodPercentage(gradingPeriod, assignments, assignmentGroups, false)
+          ).toBe(ASSIGNMENT_NOT_APPLICABLE)
         })
 
         it('should return N/A when assignments are not provided', () => {
           const gradingPeriod = {}
-          expect(getGradingPeriodPercentage(gradingPeriod, undefined, false)).toBe(
-            ASSIGNMENT_NOT_APPLICABLE
-          )
+          const assignmentGroups = [AssignmentGroup.mock()]
+          expect(
+            getGradingPeriodPercentage(gradingPeriod, undefined, assignmentGroups, false)
+          ).toBe(ASSIGNMENT_NOT_APPLICABLE)
         })
       })
 
@@ -944,7 +1440,8 @@ describe('util', () => {
       describe('when the course is not weighted and there are no grading periods', () => {
         it('should return the correct total', () => {
           const assignments = mockAssignments()
-          expect(getTotal(assignments, undefined, undefined, false)).toBe('77.5')
+          const assignmentGroups = [AssignmentGroup.mock()]
+          expect(getTotal(assignments, assignmentGroups, undefined, false)).toBe('77.5')
         })
 
         it('should return N/A when total points is not provided', () => {
@@ -989,7 +1486,8 @@ describe('util', () => {
         it('should return the correct total', () => {
           const assignments = mockAssignments()
           const gradingPeriods = [GradingPeriod.mock()]
-          expect(getTotal(assignments, undefined, gradingPeriods, false)).toBe('77.5')
+          const assignmentGroups = [AssignmentGroup.mock()]
+          expect(getTotal(assignments, assignmentGroups, gradingPeriods, false)).toBe('77.5')
         })
 
         it('should return 0 when total points is not provided', () => {
@@ -1046,9 +1544,11 @@ describe('util', () => {
           it('should return the correct total', () => {
             expect(
               getTotal(
-                filteredAssignments({assignmentsConnection: {nodes: nullGradingPeriodAssignments}}),
-                nullGradingPeriodAssignmentGroup,
-                nullGradingPeriodGradingPeriods,
+                filteredAssignments({
+                  assignmentsConnection: {nodes: nullGradingPeriod.Assignments},
+                }),
+                nullGradingPeriod.AssignmentGroup,
+                nullGradingPeriod.GradingPeriods,
                 true
               )
             ).toBe('64.86346282522474')

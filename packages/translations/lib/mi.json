@@ -527,6 +527,9 @@
     "custom_6979cd81": {
         "message": "Tikanga"
     },
+    "custom_width_and_height_pixels_946eea7c": {
+        "message": "Ritenga whanui me te teitei (Pixels)"
+    },
     "cyan_c1d5f68a": {
         "message": "Kawariki"
     },
@@ -1712,6 +1715,9 @@
     "no_headers_9bc7dc7f": {
         "message": "Kaore ngā pane"
     },
+    "no_more_items_to_show_6a1333c6": {
+        "message": "Karekau he tuemi hei whakaatu"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Ko te wātea hoki tēnei kōnae he arokite."
     },
@@ -1801,6 +1807,9 @@
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
         "message": "Ko tetahi o nga momo e whai ake nei me taapiri hei tiaki i tetahi tohu Tohu Tae, Whakahuahua Rahi, Tohu Kuputuhi, ranei Whakaahua"
+    },
+    "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+        "message": "Kotahi neke atu ranei nga konae i rahua ki te whakapiri. Tena koa ngana ki te tuku, ki te toia me te tuku i nga konae."
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "* Ko te wā poto noa kua whakāturia."

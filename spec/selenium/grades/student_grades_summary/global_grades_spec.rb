@@ -163,10 +163,10 @@ describe "Global Grades" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: student_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
+        @course_with_gp.restrict_quantitative_data = true
+        @course_with_gp.save!
+        @course_no_gp.restrict_quantitative_data = true
+        @course_no_gp.save!
       end
 
       it "shows score as letter grade for students" do
@@ -230,10 +230,10 @@ describe "Global Grades" do
         # truthy setting
         Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
         Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
+        @course_with_gp.restrict_quantitative_data = true
+        @course_with_gp.save!
+        @course_no_gp.restrict_quantitative_data = true
+        @course_no_gp.save!
       end
 
       it "shows average score as letter grade for students" do

@@ -111,18 +111,39 @@ describe CalendarsController do
 
     it "sets viewed_auto_subscribed_account_calendars for viewed auto-subscribed account calendars" do
       Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
-      account = @user.account
+      account = @student.account
       account.account_calendar_visible = true
       account.account_calendar_subscription_type = "auto"
       account.save!
       @admin = account_admin_user(account:, active_all: true)
       @admin.set_preference(:enabled_account_calendars, account.id)
       get "show"
-      expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:viewed_auto_subscribed_account_calendars]).to be(false)
+      expect(@student.get_preference(:viewed_auto_subscribed_account_calendars)).to eql([account.global_id])
+    end
 
-      @user.set_preference(:viewed_auto_subscribed_account_calendars, [account.global_id])
+    it "does not set viewed_auto_subscribed_account_calendars for viewed manual-subscribed account calendars" do
+      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+      account = @user.account
+      account.account_calendar_visible = true
+      account.account_calendar_subscription_type = "manual"
+      account.save!
+      @admin = account_admin_user(account:, active_all: true)
+      @admin.set_preference(:enabled_account_calendars, account.id)
       get "show"
-      expect(assigns[:contexts_json].find { |c| c[:type] == "account" }[:viewed_auto_subscribed_account_calendars]).to be(true)
+      expect(@student.get_preference(:viewed_auto_subscribed_account_calendars)).to eql([])
+    end
+
+    it "includes unviewed, auto subscribed calendars to be selected" do
+      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+      account = @user.account
+      account.account_calendar_visible = true
+      account.account_calendar_subscription_type = "auto"
+      account.save!
+      @admin = account_admin_user(account:, active_all: true)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      @student.set_preference(:selected_calendar_contexts, [])
+      get "show"
+      expect(assigns[:selected_contexts]).to eql([account.asset_string])
     end
 
     it "sets context.course_sections.can_create_ag based off :manage_calendar permission" do

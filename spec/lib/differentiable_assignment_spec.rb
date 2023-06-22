@@ -19,6 +19,7 @@
 #
 
 shared_examples_for "a differentiable_object" do
+  specs_require_sharding
   before do
     teacher_in_course(active_all: true, course: differentiable.context)
   end
@@ -51,6 +52,17 @@ shared_examples_for "a differentiable_object" do
       it "without a visibility should be false" do
         allow(differentiable_view).to receive(:where).and_return([])
         expect(differentiable.visible_to_user?(@user)).to be_falsey
+      end
+    end
+
+    context "cross-shard student" do
+      before { student_in_course(course: @course) }
+
+      it "with visibility should be true no matter the active shard" do
+        allow(differentiable_view).to receive(:where).and_return([:a_record])
+        @shard2.activate do
+          expect(differentiable.visible_to_user?(@user)).to be_truthy
+        end
       end
     end
 

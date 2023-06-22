@@ -1,7 +1,5 @@
-/* Global variables (colors, typography, spacing, etc.) are defined in lib/themes */
-
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -9,7 +7,7 @@
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation, version 3 of the License.
  *
- * Canvas is distributed in the hope that they will be useful, but WITHOUT ANY
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
@@ -17,13 +15,26 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export default function generator({colors, typography}) {
-  return {
-    fontSize: typography.fontSizeMedium,
-    fontFamily: typography.fontFamily,
-    fontWeight: typography.fontWeightNormal,
 
-    color: colors.oxford,
-    background: colors.white
+import doFetchApi from '@canvas/do-fetch-api-effect'
+
+export type ApiResponse<T> = {
+  data: T
+  status: number
+}
+
+export type ApiRequest = {
+  path: string
+  method: string
+  body?: string | object
+  headers?: Record<string, string>
+}
+
+export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
+  const {json, response} = await doFetchApi(request)
+
+  return {
+    data: json as T,
+    status: (response as Response).status,
   }
 }

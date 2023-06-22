@@ -23,13 +23,18 @@ import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
 import {maybeUpdateTodoSidebar} from './sidebar-actions'
-import {getPlannerItems, getWeeklyPlannerItems, clearLoading} from './loading-actions'
+import {
+  getPlannerItems,
+  getWeeklyPlannerItems,
+  clearLoading,
+  startLoadingGradesSaga,
+} from './loading-actions'
 import {
   transformInternalToApiItem,
   transformInternalToApiOverride,
   transformPlannerNoteApiToInternalItem,
   getResponseHeader,
-  buildURL
+  buildURL,
 } from '../utilities/apiUtils'
 
 configureAxios(axios)
@@ -50,6 +55,7 @@ export const {
   clearUpdateTodo,
   openEditingPlannerItem,
   setNaiAboveScreen,
+  setGradesTrayState,
   scrollToNewActivity,
   scrollToToday,
   toggleMissingItems,
@@ -58,7 +64,7 @@ export const {
   clearOpportunities,
   clearDays,
   clearCourses,
-  clearSidebar
+  clearSidebar,
 } = createActions(
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
@@ -75,6 +81,7 @@ export const {
   'CLEAR_UPDATE_TODO',
   'OPEN_EDITING_PLANNER_ITEM',
   'SET_NAI_ABOVE_SCREEN',
+  'SET_GRADES_TRAY_STATE',
   'SCROLL_TO_NEW_ACTIVITY',
   'SCROLL_TO_TODAY',
   'TOGGLE_MISSING_ITEMS',
@@ -93,7 +100,7 @@ function saveExistingPlannerItem(apiItem) {
   return axios({
     method: 'put',
     url: `/api/v1/planner_notes/${apiItem.id}`,
-    data: apiItem
+    data: apiItem,
   })
 }
 
@@ -101,7 +108,7 @@ function saveNewPlannerItem(apiItem) {
   return axios({
     method: 'post',
     url: '/api/v1/planner_notes',
-    data: apiItem
+    data: apiItem,
   })
 }
 
@@ -111,14 +118,14 @@ export const getNextOpportunities = () => {
     if (getState().opportunities.nextUrl) {
       axios({
         method: 'get',
-        url: getState().opportunities.nextUrl
+        url: getState().opportunities.nextUrl,
       })
         .then(response => {
           if (parseLinkHeader(getResponseHeader(response, 'link')).next) {
             dispatch(
               addOpportunities({
                 items: response.data,
-                nextUrl: parseLinkHeader(getResponseHeader(response, 'link')).next.url
+                nextUrl: parseLinkHeader(getResponseHeader(response, 'link')).next.url,
               })
             )
           } else {
@@ -148,7 +155,7 @@ export const getInitialOpportunities = () => {
         observed_user_id: selectedObservee,
         course_ids: selectedObservee
           ? courses.map(c => c.id).sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))
-          : undefined
+          : undefined,
       })
     const request = asAxios(getPrefetchedXHR(url)) || axios({method: 'get', url})
 
@@ -200,7 +207,7 @@ export const savePlannerItem = plannerItem => {
         )
         return {
           item: updateOverrideDataOnItem(apiItem, overrideData),
-          isNewItem
+          isNewItem,
         }
       })
       .catch(() => alert(formatMessage('Failed to save to do'), true))
@@ -215,7 +222,7 @@ export const deletePlannerItem = plannerItem => {
     dispatch(deletingPlannerItem(plannerItem))
     const promise = axios({
       method: 'delete',
-      url: `/api/v1/planner_notes/${plannerItem.id}`
+      url: `/api/v1/planner_notes/${plannerItem.id}`,
     })
       .then(response =>
         transformPlannerNoteApiToInternalItem(
@@ -245,7 +252,7 @@ function saveExistingPlannerOverride(apiOverride) {
   return axios({
     method: 'put',
     url: `/api/v1/planner/overrides/${apiOverride.id}`,
-    data: apiOverride
+    data: apiOverride,
   })
 }
 
@@ -253,7 +260,7 @@ function saveNewPlannerOverride(apiOverride) {
   return axios({
     method: 'post',
     url: '/api/v1/planner/overrides',
-    data: apiOverride
+    data: apiOverride,
   })
 }
 
@@ -270,14 +277,14 @@ export const togglePlannerItemCompletion = plannerItem => {
       .then(response => ({
         item: updateOverrideDataOnItem(plannerItem, response.data),
         isNewItem: false,
-        wasToggled: true
+        wasToggled: true,
       }))
       .catch(() => {
         alert(formatMessage('Unable to mark as complete.'), true)
         return {
           item: plannerItem,
           isNewItem: false,
-          wasToggled: true
+          wasToggled: true,
         }
       })
     dispatch(savedPlannerItem(promise))
@@ -301,7 +308,7 @@ function updateOverrideDataOnItem(plannerItem, apiOverride) {
 function getOverrideDataOnItem(plannerItem) {
   return {
     id: plannerItem.overrideId,
-    marked_complete: plannerItem.completed
+    marked_complete: plannerItem.completed,
   }
 }
 
@@ -330,6 +337,9 @@ export const reloadWithObservee = observeeId => {
       } else {
         return dispatch(getPlannerItems(getState().today)).then(() => {
           dispatch(startLoadingAllOpportunities())
+          if (getState().ui.gradesTrayOpen) {
+            dispatch(startLoadingGradesSaga(observeeId))
+          }
         })
       }
     }

@@ -354,7 +354,6 @@ class ApplicationController < ActionController::Base
     explicit_latex_typesetting
     dev_key_oidc_alert
     rce_new_external_tool_dialog_in_canvas
-    rce_show_studio_media_options
     media_links_use_attachment_id
     auto_subscribe_account_calendars
     account_calendars_planner_support
@@ -748,6 +747,9 @@ class ApplicationController < ActionController::Base
     assign_localizer
     yield if block_given?
   ensure
+    # this resets any locale set in set_locale_with_localizer (implicitly called
+    # on any translation call)
+    I18n.locale = I18n.default_locale # rubocop:disable Rails/I18nLocaleAssignment
     I18n.localizer = nil
   end
 

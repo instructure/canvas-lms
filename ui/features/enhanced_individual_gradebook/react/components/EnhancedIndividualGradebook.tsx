@@ -31,6 +31,8 @@ import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
   AssignmentSortContext,
+  AssignmentSubmissionsMap,
+  CustomOptions,
   GradebookOptions,
   GradebookQueryResponse,
   GradebookSortOrder,
@@ -38,11 +40,12 @@ import {
   SectionConnection,
   SortableAssignment,
   SortableStudent,
-  SubmissionConnection,
+  SubmissionGradeChange,
 } from '../../types'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
 import {
   mapAssignmentGroupQueryResults,
+  mapAssignmentSubmissions,
   mapEnrollmentsToSortableStudents,
 } from '../../utils/gradebookUtils'
 import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
@@ -54,20 +57,19 @@ const ASSIGNMENT_SEARCH_PARAM = 'assignment'
 
 export default function EnhancedIndividualGradebook() {
   const [sections, setSections] = useState<SectionConnection[]>([])
-  const [submissions, setSubmissions] = useState<SubmissionConnection[]>([])
+  const [assignmentSubmissionsMap, setAssignmentSubmissionsMap] =
+    useState<AssignmentSubmissionsMap>({})
   const [students, setStudents] = useState<SortableStudent[]>()
   const [assignments, setAssignments] = useState<SortableAssignment[]>()
 
-  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || '' // TODO: get from somewhere else?
+  const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || ''
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
     studentIdQueryParam
   )
-  const {currentStudent, studentSubmissions, updateSubmissionDetails} = useCurrentStudentInfo(
-    courseId,
-    selectedStudentId
-  )
+  const {currentStudent, studentSubmissions, updateSubmissionDetails, loadingStudent} =
+    useCurrentStudentInfo(courseId, selectedStudentId)
 
   const [assignmentGroupMap, setAssignmentGroupMap] = useState<AssignmentGroupCriteriaMap>({})
 
@@ -75,11 +77,12 @@ export default function EnhancedIndividualGradebook() {
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null | undefined>(
     assignmentIdQueryParam
   )
-  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
-  const submissionsForSelectedAssignment = submissions.filter(
-    submission => submission.assignmentId === selectedAssignmentId
-  )
 
+  const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
+  const submissionsMap = selectedAssignment ? assignmentSubmissionsMap[selectedAssignment.id] : {}
+  const submissionsForSelectedAssignment = Object.values(submissionsMap)
+
+  // TODO: move this into helper function
   const defaultAssignmentSort: GradebookSortOrder =
     userSettings.contextGet<AssignmentSortContext>('sort_grade_columns_by')?.sortType ??
     GradebookSortOrder.Alphabetical
@@ -89,7 +92,32 @@ export default function EnhancedIndividualGradebook() {
     lastGeneratedCsvAttachmentUrl: ENV.GRADEBOOK_OPTIONS?.attachment_url,
     gradebookCsvProgress: ENV.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
     contextUrl: ENV.GRADEBOOK_OPTIONS?.context_url,
+    contextId: ENV.GRADEBOOK_OPTIONS?.context_id,
     userId: ENV.current_user_id,
+    courseSettings: ENV.GRADEBOOK_OPTIONS?.course_settings,
+    customColumnUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_url,
+    customColumnsUrl: ENV.GRADEBOOK_OPTIONS?.custom_columns_url,
+    settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
+    settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
+    teacherNotes: ENV.GRADEBOOK_OPTIONS?.teacher_notes,
+    saveViewUngradedAsZeroToServer: ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
+    messageAttachmentUploadFolderId: ENV.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
+    customOptions: {
+      includeUngradedAssignments:
+        ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server &&
+        ENV.GRADEBOOK_OPTIONS?.settings
+          ? ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero === 'true'
+          : userSettings.contextGet('include_ungraded_assignments') || false,
+      hideStudentNames: userSettings.contextGet('hide_student_names') || false,
+      showConcludedEnrollments: ENV.GRADEBOOK_OPTIONS?.settings?.show_concluded_enrollments
+        ? ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments === 'true'
+        : false,
+      showNotesColumn:
+        ENV.GRADEBOOK_OPTIONS?.teacher_notes?.hidden !== undefined
+          ? !ENV.GRADEBOOK_OPTIONS.teacher_notes.hidden
+          : false,
+      showTotalGradeAsPoints: ENV.GRADEBOOK_OPTIONS?.show_total_grade_as_points ?? false,
+    },
   }
   const [gradebookOptions, setGradebookOptions] =
     useState<GradebookOptions>(defaultGradebookOptions)
@@ -99,6 +127,13 @@ export default function EnhancedIndividualGradebook() {
     fetchPolicy: 'no-cache',
     skip: !courseId,
   })
+  useEffect(() => {
+    if (!currentStudent || !students) {
+      return
+    }
+    const hiddenName = students?.find(s => s.id === currentStudent.id)?.hiddenName
+    currentStudent.hiddenName = hiddenName ?? I18n.t('Student')
+  }, [currentStudent, students])
 
   useEffect(() => {
     if (error) {
@@ -119,14 +154,17 @@ export default function EnhancedIndividualGradebook() {
 
       setAssignmentGroupMap(mappedAssignmentGroupMap)
       setAssignments(mappedAssignments)
-      setSubmissions(submissionsConnection.nodes)
+      setAssignmentSubmissionsMap(mapAssignmentSubmissions(submissionsConnection.nodes))
       setSections(sectionsConnection.nodes)
 
-      const mappedEnrollments = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
-      const sortableStudents = mappedEnrollments.sort((a, b) => {
+      const sortableStudents = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
+      const sortedStudents = sortableStudents.sort((a, b) => {
         return a.sortableName.localeCompare(b.sortableName)
       })
-      setStudents(sortableStudents)
+      sortedStudents.forEach(
+        (student, index) => (student.hiddenName = I18n.t('Student %{id}', {id: index + 1}))
+      )
+      setStudents(sortedStudents)
     }
   }, [data, error])
 
@@ -152,19 +190,40 @@ export default function EnhancedIndividualGradebook() {
 
   const handleSubmissionSaved = useCallback(
     (newSubmission: GradebookUserSubmissionDetails) => {
-      setSubmissions(prevSubmissions => {
-        const index = prevSubmissions.findIndex(s => s.id === newSubmission.id)
-        if (index > -1) {
-          prevSubmissions[index] = newSubmission
-        } else {
-          prevSubmissions.push(newSubmission)
-        }
-        return [...prevSubmissions]
+      setAssignmentSubmissionsMap(prevAssignmentSubmissions => {
+        const {assignmentId, id: submissionId} = newSubmission
+        prevAssignmentSubmissions[assignmentId][submissionId] = newSubmission
+        return {...prevAssignmentSubmissions}
       })
 
       updateSubmissionDetails(newSubmission)
     },
-    [updateSubmissionDetails]
+    [updateSubmissionDetails, setAssignmentSubmissionsMap]
+  )
+
+  const handleSetGrades = useCallback(
+    (updatedSubmissions: SubmissionGradeChange[]) => {
+      setAssignmentSubmissionsMap(prevAssignmentSubmissions => {
+        updatedSubmissions.forEach(submission => {
+          const {assignmentId, id: submissionId} = submission
+          const existingSubmission = prevAssignmentSubmissions[assignmentId][submissionId]
+          if (existingSubmission) {
+            prevAssignmentSubmissions[assignmentId][submissionId] = {
+              ...existingSubmission,
+              ...submission,
+            }
+          }
+        })
+        return {...prevAssignmentSubmissions}
+      })
+
+      const submissionForUser = updatedSubmissions.find(s => s.userId === selectedStudentId)
+
+      if (submissionForUser) {
+        updateSubmissionDetails(submissionForUser)
+      }
+    },
+    [selectedStudentId, updateSubmissionDetails]
   )
 
   return (
@@ -190,6 +249,12 @@ export default function EnhancedIndividualGradebook() {
           const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
           setGradebookOptions(newGradebookOptions)
         }}
+        handleCheckboxChange={(key: keyof CustomOptions, value: boolean) => {
+          setGradebookOptions(prevGradebookOptions => {
+            const newCustomOptions = {...prevGradebookOptions.customOptions, [key]: value}
+            return {...prevGradebookOptions, customOptions: newCustomOptions}
+          })
+        }}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
@@ -210,8 +275,10 @@ export default function EnhancedIndividualGradebook() {
       <GradingResults
         assignment={selectedAssignment}
         courseId={courseId}
-        studentId={selectedStudentId}
+        currentStudent={currentStudent}
+        studentSubmissions={studentSubmissions}
         gradebookOptions={gradebookOptions}
+        loadingStudent={loadingStudent}
         onSubmissionSaved={handleSubmissionSaved}
       />
 
@@ -229,7 +296,9 @@ export default function EnhancedIndividualGradebook() {
       <AssignmentInformation
         assignment={selectedAssignment}
         gradebookOptions={gradebookOptions}
+        students={students}
         submissions={submissionsForSelectedAssignment}
+        handleSetGrades={handleSetGrades}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

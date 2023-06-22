@@ -461,7 +461,6 @@ RSpec.configure do |config|
   def reset_all_the_things!
     LocalCache.reset
     ReadOnlySecondaryStub.reset
-    I18n.locale = :en
     Time.zone = "UTC"
     LoadAccount.force_special_account_reload = true
     Account.clear_special_account_cache!(true)
@@ -773,7 +772,7 @@ RSpec.configure do |config|
 
       # make sure we have all the backends
       BACKENDS.each do |backend|
-        base.send(:include, backend) unless base.ancestors.include?(backend)
+        base.include(backend) unless base.ancestors.include?(backend)
       end
       # remove the duplicate callbacks added by multiple backends
       base.before_update.uniq!
@@ -972,14 +971,12 @@ module I18nStubs
     unless new_locales.empty?
       I18n.config.available_locales = I18n.config.available_locales + new_locales
     end
-    old_locale = I18n.locale
     yield
   ensure
     @stubs = nil
     unless new_locales.empty?
       I18n.config.available_locales = I18n.config.available_locales - new_locales
     end
-    I18n.locale = old_locale
   end
 
   def lookup(locale, key, scope = [], options = {})

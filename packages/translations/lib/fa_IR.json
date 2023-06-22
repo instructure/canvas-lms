@@ -512,6 +512,9 @@
     "missing_1a256b3b": {
         "message": "جا افتاده"
     },
+    "module_90d9fd32": {
+        "message": "ماژول"
+    },
     "modules_c4325335": {
         "message": "ماژول ها"
     },
@@ -521,8 +524,14 @@
     "name_1aed4a1b": {
         "message": "نام"
     },
+    "navigation_ee9af92d": {
+        "message": "پیمایش"
+    },
     "new_13daf639": {
         "message": "جدید"
+    },
+    "new_quiz_34aacba6": {
+        "message": "آزمون جدید"
     },
     "next_40e12421": {
         "message": "بعدی"

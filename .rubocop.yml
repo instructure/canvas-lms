@@ -1,4 +1,5 @@
 require:
+  - rubocop-factory_bot
   - rubocop-graphql
   - rubocop-rails
   - rubocop-rake
@@ -311,8 +312,6 @@ Rails/FindById:
 Rails/FindEach:
   Severity: convention
   AutoCorrect: false
-Rails/I18nLocaleAssignment:
-  Severity: convention
 Rails/InverseOf:
   Severity: convention
 Rails/LexicallyScopedActionFilter:

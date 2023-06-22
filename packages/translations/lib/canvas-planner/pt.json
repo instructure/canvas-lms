@@ -193,6 +193,9 @@
     "message": "Nenhuma data limite atribuída"
   },
   "no_grade_3b4d7f3e": { "message": "Sem classificação" },
+  "no_more_items_to_show_6a1333c6": {
+    "message": "Não há mais itens para mostrar"
+  },
   "nothing_due_this_week_d45c9ef9": { "message": "Nada de devido esta semana" },
   "nothing_for_now_e3e3ce2a": { "message": "Nada de momento" },
   "nothing_here_needs_attention_c4eaded6": {

@@ -325,6 +325,22 @@ describe "admin_tools" do
           options.map!(&:text)
           expect(options).not_to include("Course Activity")
         end
+
+        it "does not include course change activity option for sub-account admins" do
+          sub_account = @account.sub_accounts.create!(name: "sub-account")
+          sub_admin = account_admin_user(account: sub_account)
+          user_with_pseudonym(user: sub_admin, account: sub_account)
+          user_session(sub_admin)
+
+          get "/accounts/#{sub_account.id}/admin_tools"
+          wait_for_ajaximations
+
+          click_view_tab "logging"
+
+          options = ff("#loggingType > option")
+          options.map!(&:text)
+          expect(options).not_to include("Course Activity")
+        end
       end
     end
   end

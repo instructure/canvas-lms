@@ -527,6 +527,9 @@
     "custom_6979cd81": {
         "message": "Niestandardowe"
     },
+    "custom_width_and_height_pixels_946eea7c": {
+        "message": "Niestandardowa szerokość i wysokość (piksele)"
+    },
     "cyan_c1d5f68a": {
         "message": "Cyjan"
     },
@@ -1712,6 +1715,9 @@
     "no_headers_9bc7dc7f": {
         "message": "Brak nagłówków"
     },
+    "no_more_items_to_show_6a1333c6": {
+        "message": "Brak pozycji do wyświetlenia"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Nie ma możliwości podglądu tego pliku."
     },
@@ -1801,6 +1807,9 @@
     },
     "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
         "message": "Aby zapisać ikonę, należy dodać jeden z następujących stylów: Kolor ikony, Rozmiar konturu, Tekst ikony lub Obraz"
+    },
+    "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+        "message": "Nie udało się wkleić co najmniej jednego pliku. Spróbuj przesłać lub przeciągnąć i upuścić pliki."
     },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Pokazano tylko najnowszy okres oceniania."

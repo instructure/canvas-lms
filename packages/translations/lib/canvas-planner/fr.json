@@ -201,6 +201,9 @@
     "message": "Pas de dates limites de rendu"
   },
   "no_grade_3b4d7f3e": { "message": "Aucune note" },
+  "no_more_items_to_show_6a1333c6": {
+    "message": "Plus d’autres éléments à montrer"
+  },
   "nothing_due_this_week_d45c9ef9": {
     "message": "Rien à rendre cette semaine"
   },

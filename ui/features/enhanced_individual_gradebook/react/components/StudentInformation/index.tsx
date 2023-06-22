@@ -25,7 +25,7 @@ import {
   GradebookOptions,
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
-} from '../../types'
+} from '../../../types'
 import {AssignmentGroupCriteriaMap, SubmissionGradeCriteria} from '@canvas/grading/grading'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
@@ -83,7 +83,9 @@ export default function StudentInformation({
     'points',
     true
   )
-  const {includeUngradedAssignments} = gradebookOptions
+  const {
+    customOptions: {includeUngradedAssignments, hideStudentNames},
+  } = gradebookOptions
   const gradeToDisplay = includeUngradedAssignments ? final : current
   const finalGradePercent = scoreToPercentage(gradeToDisplay.score, gradeToDisplay.possible)
 
@@ -95,7 +97,11 @@ export default function StudentInformation({
         </View>
         <View as="div" className="span8">
           <View as="h3" className="student_selection">
-            <a href="studentUrl"> {student.name}</a>
+            {hideStudentNames ? (
+              <>{student.hiddenName}</>
+            ) : (
+              <a href="studentUrl"> {student.name}</a>
+            )}
           </View>
 
           <View as="div">
@@ -103,7 +109,7 @@ export default function StudentInformation({
               {I18n.t('Secondary ID:')}
               <View as="span" className="secondary_id">
                 {' '}
-                {student.loginId}
+                {hideStudentNames ? <View as="em">{I18n.t('hidden')}</View> : student.loginId}
               </View>
             </View>
           </View>
@@ -158,7 +164,8 @@ export default function StudentInformation({
             {I18n.t('Final Grade:')}
             <View as="span" className="total-grade">
               {' '}
-              {finalGradePercent}% ({gradeToDisplay.score} / {gradeToDisplay.possible} points)
+              {Number.isNaN(Number(finalGradePercent)) ? '-' : finalGradePercent}% (
+              {gradeToDisplay.score} / {gradeToDisplay.possible} points)
             </View>
           </View>
         </View>

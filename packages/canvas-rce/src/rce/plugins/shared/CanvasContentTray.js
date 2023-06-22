@@ -31,7 +31,6 @@ import Filter, {useFilterSettings} from './Filter'
 import {getTrayHeight} from './trayUtils'
 import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 import {getLinkContentFromEditor} from './ContentSelection'
-import {getIcon} from './linkUtils'
 import {LinkDisplay} from './LinkDisplay'
 
 /**
@@ -254,7 +253,6 @@ export default function CanvasContentTray(props) {
   const [link, setLink] = useState(null)
   const [linkText, setLinkText] = useState(null)
   const [placeholderText, setPlaceholderText] = useState(null)
-  const Icon = getIcon(link?.type)
 
   const {bridge, editor, mountNode, onTrayClosing, storeProps} = {...props}
 
@@ -385,7 +383,9 @@ export default function CanvasContentTray(props) {
         padding="small medium"
         textAlign="end"
       >
-        <Button onClick={handleDismissTray}>{formatMessage('Cancel')}</Button>
+        <Button data-testid="cancel-replace-button" onClick={handleDismissTray}>
+          {formatMessage('Cancel')}
+        </Button>
         <Button
           margin="0 0 0 x-small"
           color="primary"
@@ -489,11 +489,11 @@ export default function CanvasContentTray(props) {
             {isEditTray && (
               <LinkDisplay
                 linkText={linkText}
-                Icon={Icon}
                 placeholderText={link?.title || placeholderText}
                 linkFileName={link?.title || ''}
                 published={link?.published || false}
                 handleTextChange={setLinkText}
+                linkType={link?.type}
               />
             )}
             <Filter

@@ -904,7 +904,7 @@ describe MediaObjectsController do
 
   describe "GET 'media_attachments_iframe'" do
     before do
-      @obj = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
         [{ url: "whatever man", bitrate: 12_345 }]
       )
@@ -912,7 +912,7 @@ describe MediaObjectsController do
 
     it "returns an error if the media is locked" do
       user_session(@student)
-      attachment = @obj.attachment
+      attachment = @media_object.attachment
       attachment.update(locked: true)
 
       get "iframe_media_player", params: { attachment_id: attachment.id }
@@ -921,13 +921,93 @@ describe MediaObjectsController do
 
     it "finds a replaced file" do
       user_session(@student)
-      old = @obj.attachment
+      old = @media_object.attachment
       old.file_state = "deleted"
-      old.replacement_attachment = attachment_model(media_entry_id: "0_deadbeef", filename: "blah.flv", media_object: @obj)
+      old.replacement_attachment = attachment_model(media_entry_id: "0_deadbeef", filename: "blah.flv", media_object: @media_object)
       old.save!
 
       get "iframe_media_player", params: { attachment_id: old.id }
       assert_status(200)
+    end
+
+    it "returns media tracks urls in the javascript environment" do
+      user_session(@student)
+      expect(controller).to receive(:media_attachment_api_json).and_call_original
+      get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
+      assert_status(200)
+    end
+  end
+
+  describe "#media_attachment_api_json" do
+    before do
+      @media_object = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
+      @attachment = @media_object.attachment
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
+    end
+
+    it "returns parent-inherited media tracks" do
+      original_attachment = @attachment
+      en_track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher)
+      other_attachment = attachment_model(media_entry_id: @media_object.media_id, filename: "blah2.flv")
+      fra_track = other_attachment.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr new", user_id: @teacher)
+      expect(other_attachment.media_tracks_include_originals).to match [en_track, fra_track]
+      user_session(@student)
+      media_attachment_api_json = controller.media_attachment_api_json(other_attachment, @media_object, @student, session)
+      expect(media_attachment_api_json["media_tracks"].pluck("locale")).to include("en", "fr")
+      media_attachment_api_json = controller.media_attachment_api_json(original_attachment, @media_object, @student, session)
+      expect(media_attachment_api_json["media_tracks"].pluck("locale")).to eq(["en"])
+    end
+
+    it "returns media_attachment_iframe_url for the embedded_iframe_url" do
+      user_session(@student)
+      media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @student, session)
+      expect(media_attachment_api_json["embedded_iframe_url"]).to eq("http://test.host/media_attachments_iframe/#{@attachment.id}")
+    end
+
+    context "can_add_captions" do
+      it "returns true if the user can add captions to the media object and update the attachment" do
+        user_session(@teacher)
+        expect(@attachment.grants_right?(@teacher, :update)).to be(true)
+        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(true)
+
+        media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
+        expect(media_attachment_api_json["can_add_captions"]).to be(true)
+      end
+
+      it "returns false if the user cannot add captions to the media object" do
+        teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: "manage_content",
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
+        expect(@attachment.grants_right?(@teacher, :update)).to be(true)
+        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(false)
+
+        user_session(@teacher)
+        media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
+        expect(media_attachment_api_json["can_add_captions"]).to be(false)
+      end
+
+      it "returns false if the user cannot update the attachment" do
+        teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)
+        RoleOverride.create!(
+          permission: "manage_files_edit",
+          enabled: false,
+          role: teacher_role,
+          account: @course.root_account
+        )
+        user_session(@teacher)
+        expect(@attachment.grants_right?(@teacher, :update)).to be(false)
+        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(true)
+
+        user_session(@teacher)
+        media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
+        expect(media_attachment_api_json["can_add_captions"]).to be(false)
+      end
     end
   end
 

@@ -260,17 +260,10 @@ describe Api::V1::Course do
       end
 
       it "includes computed_current_letter_grade for rqd enabled user who does not have instructor typical permissions" do
-        # truthy feature flag
-        Account.default.enable_feature! :restrict_quantitative_data
-
-        # truthy setting
-        Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-        Account.default.save!
-
-        # truthy permission(since enabled is being "not"ed)
-        Account.default.role_overrides.create!(role: teacher_role, enabled: false, permission: "restrict_quantitative_data")
-        Account.default.reload
-
+        # truthy settings
+        @course1.root_account.enable_feature! :restrict_quantitative_data
+        @course1.restrict_quantitative_data = true
+        @course1.save!
         @course.root_account.role_overrides.create!(permission: "view_all_grades", role: teacher_role, enabled: false)
         @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
 
@@ -3022,8 +3015,12 @@ describe CoursesController, type: :request do
         @student = user_factory(active_all: true)
         @student_enroll = @course1.enroll_user(@student, "StudentEnrollment")
         @student_enroll.accept!
+        @student2 = user_factory(active_all: true)
+        @student2_enroll = @course1.enroll_user(@student2, "StudentEnrollment")
+        @student2_enroll.accept!
         @observer = user_factory(active_all: true)
         @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id)
+        @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
 
         json = api_call_as_user(@observer,
                                 :get,
@@ -3035,9 +3032,11 @@ describe CoursesController, type: :request do
                                   include: ["observed_users"],
                                   enrollment_state: "active" })
 
-        expect(json.first["enrollments"].count).to eq 2
-        student_enroll_json = json.first["enrollments"].detect { |e| e["type"] == "student" }
-        expect(student_enroll_json["user_id"]).to eq @student.id
+        expect(json.first["enrollments"].count).to eq 4
+        student_enroll_json = json.first["enrollments"].select { |e| e["type"] == "student" }
+        expect(student_enroll_json.count).to eq 2
+        expect(student_enroll_json.first["user_id"]).to eq @student.id
+        expect(student_enroll_json.second["user_id"]).to eq @student2.id
 
         @student_enroll.start_at = 3.days.ago
         @student_enroll.end_at = 2.days.ago
@@ -3053,7 +3052,35 @@ describe CoursesController, type: :request do
                                   include: ["observed_users"],
                                   enrollment_state: "active" })
 
-        expect(json.first["enrollments"].count).to eq 1
+        expect(json.first["enrollments"].count).to eq 3 # the 2 observer enrollments + the 1 active student
+      end
+
+      it "returns only specified observed student enrollments if requested" do
+        @student = user_factory(active_all: true)
+        @student_enroll = @course1.enroll_user(@student, "StudentEnrollment")
+        @student_enroll.accept!
+        @student2 = user_factory(active_all: true)
+        @student2_enroll = @course1.enroll_user(@student2, "StudentEnrollment")
+        @student2_enroll.accept!
+        @observer = user_factory(active_all: true)
+        @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id)
+        @course1.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
+
+        json = api_call_as_user(@observer,
+                                :get,
+                                "/api/v1/courses.json?include[]=observed_users&enrollment_state=active",
+                                { controller: "courses",
+                                  action: "index",
+                                  id: @observer_course.to_param,
+                                  format: "json",
+                                  include: ["observed_users"],
+                                  observed_user_id: @student2.id,
+                                  enrollment_state: "active" })
+
+        expect(json.first["enrollments"].count).to eq 3
+        student_enroll_json = json.first["enrollments"].select { |e| e["type"] == "student" }
+        expect(student_enroll_json.count).to eq 1
+        expect(student_enroll_json.first["user_id"]).to eq @student2.id
       end
     end
 

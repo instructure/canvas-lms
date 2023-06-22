@@ -223,7 +223,16 @@ class Wiki < ActiveRecord::Base
             else
               wiki_pages.not_deleted
             end
-    scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
+    lookup = if Account.site_admin.feature_enabled?(:permanent_page_links)
+               # Just want to look at the WikiPageLookups associated with the pages in this wiki
+               wiki_lookups = WikiPageLookup.by_wiki_id(id)
+               wiki_lookups.where(slug: [param.to_s, param.to_url]).first
+             end
+    if lookup
+      scope.where(id: lookup.wiki_page_id).first
+    else
+      scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
+    end
   end
 
   def path

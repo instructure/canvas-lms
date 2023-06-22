@@ -155,6 +155,7 @@
   "next_month_749b1778": { "message": "下個月" },
   "no_due_dates_assigned_e8f5bac8": { "message": "無指定截止日期" },
   "no_grade_3b4d7f3e": { "message": "無評分" },
+  "no_more_items_to_show_6a1333c6": { "message": "沒有要顯示的項目" },
   "nothing_due_this_week_d45c9ef9": { "message": "無本週截止事項" },
   "nothing_for_now_e3e3ce2a": { "message": "未有內容" },
   "nothing_here_needs_attention_c4eaded6": { "message": "這裡暫無事項。" },

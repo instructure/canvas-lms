@@ -641,7 +641,6 @@ describe "threaded discussions" do
           end
 
           it "quotes third_reply correctly" do
-            skip("Until VICE-3243")
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
             ff("button[data-testid='thread-actions-menu']")[2].click
@@ -664,12 +663,10 @@ describe "threaded discussions" do
 
             # Verify that the correct quote is created after submission
             expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
-            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
+            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
           end
 
           it "quotes fourth_reply correctly" do
-            skip("Until VICE-3243")
-
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
             wait_for_ajaximations
@@ -869,10 +866,14 @@ describe "threaded discussions" do
           end
 
           it "quotes third_reply correctly" do
-            skip("until VICE-3243")
+            # Open split-screen view
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
-            ff("button[data-testid='thread-actions-menu']")[3].click
+            # Open second level replies
+            ff("button[data-testid='expand-button']").last.click
+            wait_for_ajaximations
+            # Quote the 3rd level reply
+            ff("button[data-testid='thread-actions-menu']").last.click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
 
@@ -893,15 +894,21 @@ describe "threaded discussions" do
             # Verify that the correct quote is created after submission
             expect(fj("div[data-testid='reply-preview']:contains('#{@third_reply.summary}')")).to be_present
             # Verify that the correct @mentions is created
-            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>replying to 3rd level reply</p>"
+            expect(new_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@#{@third_reply.author_name}</span>quoting 3rd level reply</p>"
           end
 
           it "quotes fourth_reply correctly" do
-            skip("until VICE-3243")
+            # Open split-screen view
             f("button[data-testid='expand-button']").click
             wait_for_ajaximations
+            # Open second level replies
+            ff("button[data-testid='expand-button']").last.click
             wait_for_ajaximations
-            ff("button[data-testid='thread-actions-menu']")[3].click
+            # Open third level replies
+            ff("button[data-testid='expand-button']").last.click
+            wait_for_ajaximations
+            # Quotes the fourst level reply
+            ff("button[data-testid='thread-actions-menu']").last.click
             f("span[data-testid='quote']").click
             wait_for_ajaximations
 

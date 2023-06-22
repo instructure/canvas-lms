@@ -742,6 +742,36 @@ describe NotificationMessageCreator do
       NotificationMessageCreator.new(@notification, @user, to_list: @user).create_message
       expect(@cc.notification_policies.reload.count).to eq 1
     end
+
+    it "cancels duplicate messages" do
+      # we only cancel messages in Production because in test the table may not exist. we should skip this test if it becomes flaky see patchset: /246496
+      skip("cancel_pending_duplicate_messages required to test") unless ENV["RAILS_LOAD_CANCEL_PENDING_DUPLICATE_MESSAGES"]
+
+      allow_any_instance_of(Message).to receive(:get_template).and_return("template")
+      # we make the messages immediate, because cancellation occurs when delay has finished.
+      allow_any_instance_of(NotificationMessageCreator).to receive(:immediate_policy?).and_return(true)
+
+      @shard1.activate do
+        @user = User.create!
+        communication_channel(@user, { username: "user@example.com", active_cc: true })
+      end
+
+      @shard2.activate do
+        @user2 = User.create!
+        communication_channel(@user2, { username: "user2@example.com", active_cc: true })
+      end
+
+      notification_model({ subject: "test", name: "Test Name", category: "Submission Graded" })
+      # two messages for user shard1 and two messages for user2 shard2
+      NotificationMessageCreator.new(@notification, @user, to_list: [@user, @user2]).create_message
+      NotificationMessageCreator.new(@notification, @user, to_list: [@user, @user2]).create_message
+      NotificationMessageCreator.new(@notification, @user, to_list: [@user, @user2]).create_message
+
+      expect(@user.messages.length).to be(3)
+      expect(@user.messages.where("messages.workflow_state='cancelled'").length).to be(2)
+      expect(@user2.messages.length).to be(3)
+      expect(@user2.messages.where("messages.workflow_state='cancelled'").length).to be(2)
+    end
   end
 
   describe "#cancel_pending_duplicate_messages" do
@@ -761,6 +791,11 @@ describe NotificationMessageCreator do
         end
         allow(Message.connection).to receive(:table_exists?).and_return(true)
         expect(scope).to receive(:update_all).ordered
+
+        user = User.create!
+        to_user_channels = Hash.new([])
+        to_user_channels[user] = user.communication_channels
+        subject.instance_variable_set(:@to_user_channels, to_user_channels)
       end
 
       it "targets a single partition by default" do

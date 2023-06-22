@@ -28,7 +28,7 @@ module SimpleTags
     end
 
     def self.included(klass)
-      klass.send :extend, ClassMethods
+      klass.extend ClassMethods
     end
   end
 
@@ -106,7 +106,7 @@ module SimpleTags
   end
 
   def self.included(klass)
-    klass.send :include, ReaderInstanceMethods
-    klass.send :include, WriterInstanceMethods
+    klass.include ReaderInstanceMethods
+    klass.include WriterInstanceMethods
   end
 end

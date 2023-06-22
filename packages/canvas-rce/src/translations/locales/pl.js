@@ -60,6 +60,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Oraz" },
   "angle_c5b4ec50": { "message": "Kąt" },
+  "announcement_fb4cb645": { "message": "Ogłoszenie" },
   "announcement_list_da155734": { "message": "Lista ogłoszeń" },
   "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
   "apply_781a2546": { "message": "Zastosuj" },
@@ -77,6 +78,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Współczynnik proporcji zostanie zachowany"
   },
+  "assignment_976578a8": { "message": "Zadanie" },
   "assignments_1e02582c": { "message": "Zadania" },
   "asterisk_82255584": { "message": "Gwiazdka" },
   "attributes_963ba262": { "message": "Właściwości" },
@@ -222,6 +224,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Bieżący obraz" },
   "current_volume_level_c55ab825": { "message": "Bieżący poziom głośności" },
   "custom_6979cd81": { "message": "Niestandardowe" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Niestandardowa szerokość i wysokość (piksele)"
+  },
   "cyan_c1d5f68a": { "message": "Cyjan" },
   "dagger_57e0f4e5": { "message": "Krzyżyk" },
   "date_added_ed5ad465": { "message": "Data dodania" },
@@ -254,6 +259,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Kierunkowość" },
   "directly_edit_latex_b7e9235b": { "message": "Edytuj bezpośrednio w LaTeX" },
   "disable_preview_222bdf72": { "message": "Wyłącz podgląd" },
+  "discussion_6719c51d": { "message": "Dyskusja" },
   "discussions_a5f96392": { "message": "Dyskusje" },
   "discussions_index_6c36ced": { "message": "Spis dyskusji" },
   "disjoint_union_e74351a8": { "message": "Suma rozłączna" },
@@ -684,6 +690,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Aby zapisać ikonę, należy dodać jeden z następujących stylów: Kolor ikony, Rozmiar konturu, Tekst ikony lub Obraz"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Nie udało się wkleić co najmniej jednego pliku. Spróbuj przesłać lub przeciągnąć i upuścić pliki."
+  },
   "open_circle_e9bd069": { "message": "Otwarty okrąg" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Otwórz to okno dialogowe skrótów klawiatury"
@@ -705,6 +714,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } nie jest prawidłowym protokołem; wymagany jest  ftp, http, https, mailto, skype, tel lub można go pominąć"
   },
+  "page_50c4823d": { "message": "Strona" },
   "pages_e5414c2c": { "message": "Strony" },
   "paragraph_5e5ad8eb": { "message": "Akapit" },
   "paragraph_starting_with_start_a59923f8": {
@@ -766,6 +776,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Dynia" },
   "purple_7678a9fc": { "message": "Fioletowy" },
   "quaternions_877024e0": { "message": "Kwaterniony" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Testy" },
   "rational_numbers_80ddaa4a": { "message": "Liczby wymierne" },
   "real_numbers_7c99df94": { "message": "Liczby rzeczywiste" },

@@ -81,7 +81,7 @@ class Attachment < ActiveRecord::Base
   include ContextModuleItem
   include SearchTermHelper
   include MasterCourses::Restrictor
-  restrict_columns :content, [:display_name, :uploaded_data]
+  restrict_columns :content, %i[display_name uploaded_data media_track_content]
   restrict_columns :settings, %i[folder_id locked lock_at unlock_at usage_rights_id]
   restrict_columns :state, [:locked, :file_state]
 

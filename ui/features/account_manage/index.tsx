@@ -16,25 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {generateActionTemplates} from '../generateActionTemplates'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {AccountContainer} from './react/AccountContainer'
+import ready from '@instructure/ready'
 
-const I18n = useI18nScope('permissions_templates_78')
-
-export const template = generateActionTemplates(
-  // Account what_it_does
-  [],
-  // Account additional_considerations
-  [],
-  // Course what_it_does
-  [
-    {
-      title: I18n.t('Grades'),
-      description: I18n.t(
-        'Allows users to see quantitative (numeric) grading data. Disabling this permission will limit assignment creation options for teachers. Users will only see qualitative data, which includes letter grades and comments.'
-      ),
-    },
-  ],
-  // Course additional_considerations
-  []
-)
+ready(() => {
+  if (document.getElementById('context_list') !== null) {
+    ReactDOM.render(<AccountContainer />, document.getElementById('context_list'))
+  }
+})

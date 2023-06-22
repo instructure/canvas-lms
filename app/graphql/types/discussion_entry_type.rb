@@ -70,6 +70,8 @@ module Types
     def quoted_entry
       if object.deleted?
         nil
+      elsif object.quoted_entry_id
+        load_association(:quoted_entry)
       elsif object.include_reply_preview
         load_association(:parent_entry)
       end

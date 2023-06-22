@@ -227,7 +227,7 @@ class CalendarEvent < ActiveRecord::Base
 
   scope :undated, -> { where(start_at: nil, end_at: nil) }
 
-  scope :between, ->(start, ending) { where(start_at: start..ending) }
+  scope :between, ->(start, ending) { where(start_at: ..ending, end_at: start..) }
   scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now) }
   scope :updated_after, lambda { |*args|
     if args.first

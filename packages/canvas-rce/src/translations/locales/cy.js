@@ -62,6 +62,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "A" },
   "angle_c5b4ec50": { "message": "Ongl" },
+  "announcement_fb4cb645": { "message": "Cyhoeddiad" },
   "announcement_list_da155734": { "message": "Rhestr Cyhoeddiadau" },
   "announcements_a4b8ed4a": { "message": "Cyhoeddiadau" },
   "apply_781a2546": { "message": "Rhoi ar waith" },
@@ -79,6 +80,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bydd y gymhareb agwedd yn cael ei chadw"
   },
+  "assignment_976578a8": { "message": "Aseiniad" },
   "assignments_1e02582c": { "message": "Aseiniadau" },
   "asterisk_82255584": { "message": "Seren" },
   "attributes_963ba262": { "message": "Priodoleddau" },
@@ -228,6 +230,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Delwedd Bresennol" },
   "current_volume_level_c55ab825": { "message": "Lefel Sain Bresennol" },
   "custom_6979cd81": { "message": "Personol" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Lled ac uchder personol (Picseli)"
+  },
   "cyan_c1d5f68a": { "message": "Cyan" },
   "dagger_57e0f4e5": { "message": "Cyllell" },
   "date_added_ed5ad465": { "message": "Dyddiad Ychwanegu" },
@@ -260,6 +265,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Cyfeirioldeb" },
   "directly_edit_latex_b7e9235b": { "message": "Golygu LaTeX yn Uniongyrchol" },
   "disable_preview_222bdf72": { "message": "Analluogi Rhagolwg" },
+  "discussion_6719c51d": { "message": "Trafodaeth" },
   "discussions_a5f96392": { "message": "Trafodaethau" },
   "discussions_index_6c36ced": { "message": "Mynegai Trafodaethau" },
   "disjoint_union_e74351a8": { "message": "Uniad Arwahan" },
@@ -696,6 +702,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Rhaid ychwanegu un o’r arddulliau canlynol i gadw eicon: Lliw Eicon, Maint Amlinell, Testun Eicon, neu Ddelwedd"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Wedi methu gludo un neu ragor o ffeiliau i fyny. Rhowch gynnig ar lwytho i fyny neu lusgo a gollwng ffeiliau."
+  },
   "open_circle_e9bd069": { "message": "Cylch Agored" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Agor y ddeialog bysellau hwylus"
@@ -715,6 +724,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "Dydy { p } ddim yn brotocol dilys, rhaid iddo fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
   },
+  "page_50c4823d": { "message": "Tudalen" },
   "pages_e5414c2c": { "message": "Tudalennau" },
   "paragraph_5e5ad8eb": { "message": "Paragraff" },
   "paragraph_starting_with_start_a59923f8": {
@@ -774,6 +784,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Pumpkin" },
   "purple_7678a9fc": { "message": "Porffor" },
   "quaternions_877024e0": { "message": "Cwaternion" },
+  "quiz_e0dcce8f": { "message": "Cwis" },
   "quizzes_7e598f57": { "message": "Cwisiau" },
   "rational_numbers_80ddaa4a": { "message": "Rhifau Rhesymegol" },
   "real_numbers_7c99df94": { "message": "Rhifau Go Iawn" },

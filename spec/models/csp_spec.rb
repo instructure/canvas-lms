@@ -24,6 +24,10 @@ describe Csp do
     context.context_external_tools.create!({ name: "a", consumer_key: "12345", shared_secret: "secret" }.merge(attrs))
   end
 
+  before do
+    allow(HostUrl).to receive(:context_host).with(Account.default, anything).and_return(nil)
+  end
+
   describe "account setting inheritance" do
     before :once do
       @root = Account.create!

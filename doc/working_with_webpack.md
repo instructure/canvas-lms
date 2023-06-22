@@ -87,9 +87,10 @@ If you use macOS, you can setup system notifications for when the Webpack build
 starts and ends so that you don't have to constantly watch the terminal for it.
 
 To do so, add the following to your .bashrc or .zshrc:
+
 ```
 export ENABLE_CANVAS_WEBPACK_HOOKS=1
-source ~/canvas-lms/frontend_build/webpackHooks/macNotifications.sh
+source ~/canvas-lms/ui-build/webpack/webpackHooks/macNotifications.sh
 ```
 
 `macNotifications.sh` simply defines some shell variables that Webpack will use

@@ -43,5 +43,10 @@ module Types
     def weight
       object.grading_period_group.weighted ? object.weight.to_f : nil
     end
+
+    field :display_totals, Boolean, null: false
+    def display_totals
+      object.grading_period_group.display_totals_for_all_grading_periods
+    end
   end
 end

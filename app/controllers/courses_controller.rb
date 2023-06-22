@@ -3838,8 +3838,11 @@ class CoursesController < ApplicationController
     # render view
   end
 
-  def retrieve_observed_enrollments(enrollments, active_by_date: false)
+  def retrieve_observed_enrollments(enrollments, active_by_date: false, observed_user_id: nil)
     observer_enrolls = enrollments.select(&:assigned_observer?)
+    unless observed_user_id.nil?
+      observer_enrolls = observer_enrolls.select { |e| e.associated_user_id == observed_user_id.to_i }
+    end
     ObserverEnrollment.observed_enrollments_for_enrollments(observer_enrolls, active_by_date:)
   end
 
@@ -3889,7 +3892,7 @@ class CoursesController < ApplicationController
 
     if include_observed
       enrollments.concat(
-        retrieve_observed_enrollments(enrollments, active_by_date: (params[:enrollment_state] == "active"))
+        retrieve_observed_enrollments(enrollments, active_by_date: (params[:enrollment_state] == "active"), observed_user_id: params[:observed_user_id])
       )
     end
 

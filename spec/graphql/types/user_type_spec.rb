@@ -111,6 +111,13 @@ describe Types::UserType do
     end
   end
 
+  context "htmlUrl" do
+    it "returns the user's profile url" do
+      html_url = user_type.resolve(%|htmlUrl(courseId: "#{@course.id}")|)
+      expect(html_url.end_with?("courses/#{@course.id}/users/#{@student.id}")).to be_truthy
+    end
+  end
+
   context "pronouns" do
     it "returns user pronouns" do
       @student.account.root_account.settings[:can_add_pronouns] = true

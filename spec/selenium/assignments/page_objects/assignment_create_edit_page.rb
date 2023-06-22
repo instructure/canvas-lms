@@ -96,6 +96,14 @@ class AssignmentCreateEditPage
       f("#unauthorized_message")
     end
 
+    def hide_from_gradebooks_checkbox
+      f("#assignment_hide_in_gradebook")
+    end
+
+    def omit_from_final_grade_checkbox
+      f("#assignment_omit_from_final_grade")
+    end
+
     # Methods & Actions
     def visit_assignment_edit_page(course, assignment)
       get "/courses/#{course}/assignments/#{assignment}/edit"

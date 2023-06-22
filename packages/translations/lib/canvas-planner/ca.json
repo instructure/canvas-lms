@@ -107,7 +107,7 @@
     "message": "S''ha produït un error en carregar els elements anteriors"
   },
   "exciting_discussion_9f67bd0a": { "message": "Un fòrum fascinant" },
-  "excused_cf8792eb": { "message": "Excusat" },
+  "excused_cf8792eb": { "message": "Justificat" },
   "extended_9a58dcb6": { "message": "Ampliada" },
   "failed_getting_course_list_49846a93": {
     "message": "No s’ha pogut obtenir la llista d''assignatures"
@@ -165,7 +165,7 @@
   },
   "jump_to_today_254ccf41": { "message": "Avui" },
   "language_arts_35b79a8b": { "message": "Arts lingüístiques" },
-  "late_2be42b88": { "message": "Tardà" },
+  "late_2be42b88": { "message": "Endarrerit" },
   "load_more_a36f9cf9": { "message": "Carrega''n més" },
   "load_prior_dates_f2b0f6f0": { "message": "Carrega les dates anteriors" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
@@ -201,6 +201,9 @@
     "message": "No hi ha cap data de lliurament assignada"
   },
   "no_grade_3b4d7f3e": { "message": "Sense nota" },
+  "no_more_items_to_show_6a1333c6": {
+    "message": "No hi ha més elements que s’hagin de mostrar"
+  },
   "nothing_due_this_week_d45c9ef9": {
     "message": "No hi ha res que venci aquesta setmana"
   },

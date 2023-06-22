@@ -61,6 +61,8 @@ module Types
 
     field :grading_period_id, ID, null: true
 
+    field :redo_request, Boolean, null: true
+
     field :user_id, ID, null: false
 
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do

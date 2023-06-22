@@ -54,7 +54,7 @@ describe "calendar2" do
       end
 
       it "displays a flash alert if no calendar is selected when trying to create an event" do
-        @user.set_preference(:selected_calendar_contexts, "[]")
+        @user.set_preference(:selected_calendar_contexts, [])
         get "/calendar2"
         wait_for_ajaximations
 

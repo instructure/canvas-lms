@@ -172,16 +172,44 @@ module Lti
       end
     end
 
+    def resource_link_id
+      @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items&.present?
+                              if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
+                                @assignment.line_items.first&.resource_link&.resource_link_uuid
+                              else
+                                @assignment.line_items.first&.resource_id
+                              end
+                            elsif @resource_link
+                              @resource_link.resource_link_uuid
+                            elsif @content_tag&.associated_asset.present?
+                              resource_link = @content_tag.associated_asset
+                              if resource_link.respond_to?(:resource_link_uuid)
+                                resource_link.resource_link_uuid
+                              end
+                            end
+    end
+
+    # This method should be removed when resource_link_uuid_in_custom_substitution is turned on for all
+    def resource_link_id_is_present
+      @resource_link_id_is_present ||=
+        if @assignment&.submission_types == "external_tool"
+          if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
+            resource_link_id.present?
+          else
+            @assignment&.line_items.present?
+          end
+        else
+          resource_link_id.present?
+        end
+    end
+
     # LTI - Custom parameter substitution: ResourceLink.id
     # Returns the LTI value for the resource_link.id property
     # Returns "$ResourceLink.id" otherwise
     register_expansion "ResourceLink.id",
                        [],
-                       lambda {
-                         line_item = @assignment.line_items.first
-                         line_item&.resource_id
-                       },
-                       -> { @assignment && @assignment.submission_types == "external_tool" && @assignment.line_items.present? },
+                       -> { resource_link_id },
+                       -> { resource_link_id_is_present },
                        default_name: "resourcelink_id"
 
     # LTI - Custom parameter substitution: ResourceLink.description
@@ -917,6 +945,34 @@ module Lti
                        -> { @assignment.anonymous_grading },
                        ASSIGNMENT_GUARD,
                        default_name: "com_instructure_assignment_anonymous_grading"
+
+    # returns true if the assignment restricts quantitative data.
+    # Assignment types: points, percentage, gpa_scale are all considered quantitative.
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "com.instructure.Assignment.restrict_quantitative_data",
+                       [],
+                       -> { @assignment.restrict_quantitative_data?(@current_user) },
+                       ASSIGNMENT_GUARD,
+                       default_name: "com_instructure_assignment_restrict_quantitative_data"
+
+    # returns the grading scheme data for the course
+    # it is an array of arrays of grade levels
+    # @example
+    #  ```
+    #  [
+    #    ["A", 94.0, 100.0],
+    #    ["A-", 90.0, 93.99],
+    #    ["B+", 87.0, 89.99],
+    #  ]
+    #  ```
+    register_expansion "com.instructure.Course.gradingScheme",
+                       [],
+                       -> { @context.grading_standard_or_default.data },
+                       COURSE_GUARD,
+                       default_name: "com_instructure_course_grading_scheme"
 
     # returns the current course membership roles
     # using the LIS v2 vocabulary.

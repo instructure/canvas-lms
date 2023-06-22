@@ -4332,8 +4332,15 @@ describe User do
     end
 
     describe "all_account_calendars" do
-      it "returns only accounts associated to the user where the calendar is visible" do
+      it "returns accounts associated to the user where the calendar is visible" do
         expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
+      end
+
+      it "returns accounts associated to the user and from active account users where the calendar is visible" do
+        @account_user = @root_account.account_users.create!(account_id: @root_account.id, user: @user)
+        @account_user_subaccount = @associated_subaccount.sub_accounts.create!(account_calendar_visible: true)
+        course_with_student(account: @account_user_subaccount, user: @user)
+        expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account_user_subaccount.id)
       end
 
       describe "sharding" do
@@ -4348,6 +4355,13 @@ describe User do
 
         it "includes cross-shard accounts" do
           expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account2.id)
+        end
+
+        it "includes cross-shard accounts and from active account users where the calendar is visible" do
+          @account_user = @root_account.account_users.create!(account_id: @root_account.id, user: @user)
+          @account_user_subaccount = @associated_subaccount.sub_accounts.create!(account_calendar_visible: true)
+          course_with_student(account: @account_user_subaccount, user: @user)
+          expect(@user.all_account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account2.id, @account_user_subaccount.id)
         end
       end
     end

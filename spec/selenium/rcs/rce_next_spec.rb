@@ -598,6 +598,70 @@ describe "RCE next tests", ignore_js_errors: true do
       end
     end
 
+    context "edit course link sidebar with rce_ux_improvements enabled" do
+      before do
+        Account.site_admin.enable_feature!(:rce_ux_improvements)
+        @wiki_page_title1 = "test_page"
+        @wiki_page_title2 = "test_page2"
+        unpublished = false
+        edit_roles = "public"
+        @wiki_page1 = create_wiki_page(@wiki_page_title1, unpublished, edit_roles)
+        @wiki_page2 = create_wiki_page(@wiki_page_title2, unpublished, edit_roles)
+      end
+
+      it "keeps the link label when updating the link reference" do
+        visit_front_page_edit(@course)
+        create_wiki_page_link(@wiki_page_title2)
+        open_edit_link_tray
+        # default name
+        expect(current_link_label).to include_text(@wiki_page_title2)
+        # changing link reference
+        click_course_item_link(@wiki_page_title1)
+        expect(current_link_label).to include_text(@wiki_page_title1)
+        click_replace_link_button
+        # keeps the name but updates the link reference
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.text).to eq @wiki_page_title2
+          expect(wiki_body_anchor.attribute("href")).to include course_wiki_page_path(@course, @wiki_page1)
+        end
+      end
+
+      it "keeps the link reference when updating the link label" do
+        link_text = "custom title"
+        visit_front_page_edit(@course)
+        create_wiki_page_link(@wiki_page_title2)
+        open_edit_link_tray
+        # default name
+        expect(current_link_label).to include_text(@wiki_page_title2)
+        # changing link text
+        change_link_text_input(link_text)
+        click_replace_link_button
+        # changes the link text but keeps the reference
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.text).to eq link_text
+          expect(wiki_body_anchor.attribute("href")).to include course_wiki_page_path(@course, @wiki_page2)
+        end
+      end
+
+      it "does not modify the link when canceling" do
+        visit_front_page_edit(@course)
+        create_wiki_page_link(@wiki_page_title2)
+        open_edit_link_tray
+
+        expect(current_link_label).to include_text(@wiki_page_title2)
+        open_edit_link_tray
+        # change title
+        change_link_text_input("different title")
+        # change reference
+        click_course_item_link(@wiki_page_title1)
+        click_cancel_replace_button
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.text).to eq @wiki_page_title2
+          expect(wiki_body_anchor.attribute("href")).to include course_wiki_page_path(@course, @wiki_page2)
+        end
+      end
+    end
+
     context "sidebar search" do
       it "searches for wiki course link to create link in body", ignore_js_errors: true do
         title = "test_page"

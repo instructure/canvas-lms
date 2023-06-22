@@ -381,6 +381,8 @@ module Interfaces::SubmissionInterface
 
   field :extra_attempts, Integer, null: true
 
+  field :proxy_submitter_id, ID, null: true
+
   field :proxy_submitter, String, null: true
   def proxy_submitter
     object.proxy_submitter&.short_name

@@ -195,6 +195,9 @@
   "next_month_749b1778": { "message": "Następny miesiąc" },
   "no_due_dates_assigned_e8f5bac8": { "message": "Brak ustawionych terminów" },
   "no_grade_3b4d7f3e": { "message": "Brak oceny" },
+  "no_more_items_to_show_6a1333c6": {
+    "message": "Brak pozycji do wyświetlenia"
+  },
   "nothing_due_this_week_d45c9ef9": {
     "message": "Brak terminów w tym tygodniu"
   },

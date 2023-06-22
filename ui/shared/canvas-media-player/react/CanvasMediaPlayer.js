@@ -186,11 +186,19 @@ export default function CanvasMediaPlayer(props) {
 
   function renderNoPlayer() {
     if (mediaObjNetworkErr) {
-      return (
-        <Alert key="erralert" variant="error" margin="small" liveRegion={liveRegion}>
-          {I18n.t('Failed retrieving media sources.')}
-        </Alert>
-      )
+      if (props.is_attachment) {
+        return (
+          <Alert key="bepatientalert" variant="info" margin="x-small" liveRegion={liveRegion}>
+            {I18n.t('Your media has been uploaded and will appear here after processing.')}
+          </Alert>
+        )
+      } else {
+        return (
+          <Alert key="erralert" variant="error" margin="small" liveRegion={liveRegion}>
+            {I18n.t('Failed retrieving media sources.')}
+          </Alert>
+        )
+      }
     }
     if (retryAttempt >= MAX_RETRY_ATTEMPTS) {
       // this should be very rare
@@ -319,6 +327,7 @@ CanvasMediaPlayer.propTypes = {
   MAX_RETRY_ATTEMPTS: number,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number,
   aria_label: string,
+  is_attachment: bool,
 }
 
 CanvasMediaPlayer.defaultProps = {
@@ -329,4 +338,5 @@ CanvasMediaPlayer.defaultProps = {
   MAX_RETRY_ATTEMPTS: DEFAULT_MAX_RETRY_ATTEMPTS,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS,
   aria_label: '',
+  is_attachment: false,
 }

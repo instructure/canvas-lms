@@ -157,8 +157,8 @@ module CC
       @content_export ? @content_export.create_key(*args) : CCHelper.create_key(*args)
     end
 
-    def export_object?(obj, asset_type = nil)
-      @content_export ? @content_export.export_object?(obj, asset_type) : true
+    def export_object?(obj, asset_type: nil, ignore_updated_at: false)
+      @content_export ? @content_export.export_object?(obj, asset_type:, ignore_updated_at:) : true
     end
 
     def add_exported_asset(obj)

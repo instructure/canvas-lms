@@ -176,11 +176,13 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
   if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.GRADING_SCHEME_UPDATES_ENABLED : void 0)) {
     return
   }
+  // Is there a default for the course?
+  const courseDefaultGradingSchemeId = ENV.COURSE_DEFAULT_GRADING_SCHEME_ID
   const props = {
     initiallySelectedGradingSchemeId: this.parentModel.gradingStandardId()
       ? this.parentModel.gradingStandardId()
       : undefined,
-    // TODO JS: readOnly: !!this.lockedItems.settings,
+    courseDefaultSchemeId: courseDefaultGradingSchemeId,
     onChange: this.handleGradingStandardIdChanged,
     contextId: ENV.COURSE_ID,
     contextType: 'Course',

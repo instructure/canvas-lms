@@ -132,26 +132,25 @@ module Lti::IMS
     def message(enrollment, expander)
       return {} if page[:opts].blank? || page[:opts][:rlid].blank?
 
-      orig_locale = I18n.locale
       orig_time_zone = Time.zone
       begin
-        I18n.locale = enrollment.user.locale || orig_locale
-        Time.zone = enrollment.user.time_zone || orig_time_zone
-        launch = Lti::Messages::ResourceLinkRequest.new(
-          tool: page[:tool],
-          context: unwrap(page[:context]),
-          user: enrollment.user,
-          expander:,
-          return_url: nil,
-          opts: {
-            # See #variable_expander for additional constraints on custom param expansion
-            claim_group_whitelist: %i[public i18n custom_params],
-            extension_whitelist: [:canvas_user_id, :canvas_user_login_id],
-            resource_link: page[:opts][:rlid].present? ? Lti::ResourceLink.find_by(resource_link_uuid: page[:opts][:rlid]) : nil
-          }
-        ).generate_post_payload_message(validate_launch: false)
+        launch = I18n.with_locale(enrollment.user.locale) do
+          Time.zone = enrollment.user.time_zone || orig_time_zone
+          Lti::Messages::ResourceLinkRequest.new(
+            tool: page[:tool],
+            context: unwrap(page[:context]),
+            user: enrollment.user,
+            expander:,
+            return_url: nil,
+            opts: {
+              # See #variable_expander for additional constraints on custom param expansion
+              claim_group_whitelist: %i[public i18n custom_params],
+              extension_whitelist: [:canvas_user_id, :canvas_user_login_id],
+              resource_link: page[:opts][:rlid].present? ? Lti::ResourceLink.find_by(resource_link_uuid: page[:opts][:rlid]) : nil
+            }
+          ).generate_post_payload_message(validate_launch: false)
+        end
       ensure
-        I18n.locale = orig_locale
         Time.zone = orig_time_zone
       end
 

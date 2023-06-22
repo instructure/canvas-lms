@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE} from './constants'
+import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE, ASSIGNMENT_STATUS} from './constants'
 import {IconCheckLine, IconXLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
-import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('grade_summary')
+import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 export const getGradingPeriodID = () => {
   return window?.location?.search
@@ -40,6 +39,24 @@ export const filteredAssignments = data => {
   )
 }
 
+export const getAssignmentPositionInModuleItems = (assignmentId, moduleItems) => {
+  return (
+    moduleItems?.findIndex(moduleItem => {
+      return moduleItem?.content?._id === assignmentId
+    }) + 1
+  )
+}
+
+export const getAssignmentSortKey = assignment => {
+  const assignmentId = assignment?._id
+  const firstModule = assignment?.modules[0]
+
+  return (
+    firstModule?.position * 100000 +
+    getAssignmentPositionInModuleItems(assignmentId, firstModule?.moduleItems)
+  )
+}
+
 export const sortAssignments = (sortBy, assignments) => {
   if (sortBy === ASSIGNMENT_SORT_OPTIONS.NAME) {
     assignments = [...assignments]?.sort((a, b) => a?.name?.localeCompare(b?.name))
@@ -53,6 +70,13 @@ export const sortAssignments = (sortBy, assignments) => {
     assignments = [...assignments]?.sort((a, b) =>
       a?.assignmentGroup?.name?.localeCompare(b?.assignmentGroup?.name)
     )
+  } else if (sortBy === ASSIGNMENT_SORT_OPTIONS.MODULE) {
+    const assignmentsWithModules = assignments
+      ?.filter(a => a?.modules?.length > 0)
+      ?.sort((a, b) => getAssignmentSortKey(a) - getAssignmentSortKey(b))
+    const assignmentsWithoutModules = assignments?.filter(a => a?.modules?.length === 0)
+
+    assignments = [...assignmentsWithModules, ...assignmentsWithoutModules]
   }
   return assignments
 }
@@ -84,30 +108,37 @@ export const submissionCommentsPresent = assignment => {
   )
 }
 
-export const getDisplayStatus = assignment => {
+export const getAssignmentStatus = assignment => {
   if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused') {
-    return <Pill>{I18n.t('Excused')}</Pill>
+    return ASSIGNMENT_STATUS.EXCUSED
+  } else if (assignment?.dropped) {
+    return ASSIGNMENT_STATUS.DROPPED
   } else if (assignment?.gradingType === 'not_graded') {
-    return <Pill>{I18n.t('Not Graded')}</Pill>
+    return ASSIGNMENT_STATUS.NOT_GRADED
   } else if (assignment?.submissionsConnection?.nodes?.length === 0) {
-    return getNoSubmissionStatus(assignment?.dueAt)
+    return getAssignmentNoSubmissionStatus(assignment?.dueAt)
   } else if (assignment?.submissionsConnection?.nodes[0]?.late) {
-    return <Pill color="warning">{I18n.t('Late')}</Pill>
+    return ASSIGNMENT_STATUS.LATE
   } else if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'graded') {
-    return <Pill color="success">{I18n.t('Graded')}</Pill>
+    return ASSIGNMENT_STATUS.GRADED
   } else {
-    return <Pill>{I18n.t('Not Graded')}</Pill>
+    return ASSIGNMENT_STATUS.NOT_GRADED
   }
 }
 
-export const getNoSubmissionStatus = dueDate => {
+export const getAssignmentNoSubmissionStatus = dueDate => {
   const assignmentDueDate = new Date(dueDate)
   const currentDate = new Date()
   if (dueDate && assignmentDueDate < currentDate) {
-    return <Pill color="danger">{I18n.t('Missing')}</Pill>
+    return ASSIGNMENT_STATUS.MISSING
   } else {
-    return <Pill>{I18n.t('Not Submitted')}</Pill>
+    return ASSIGNMENT_STATUS.NOT_SUBMITTED
   }
+}
+
+export const getDisplayStatus = assignment => {
+  const status = getAssignmentStatus(assignment)
+  return <Pill color={status.color}>{status.label}</Pill>
 }
 
 export const getDisplayScore = (assignment, gradingStandard) => {
@@ -171,6 +202,123 @@ export const scorePercentageToLetterGrade = (score, gradingStandard) => {
   return letter
 }
 
+// **************************** DROP ASSIGNMENT FROM ASSIGNMENT GROUP ****************************
+
+export const convertSubmissionToDroppableSubmission = (assignment, submission) => {
+  return {
+    score: submission?.score,
+    grade: submission?.grade,
+    total: assignment?.pointsPossible,
+    assignment_id: assignment?._id,
+    workflow_state: submission?.gradingStatus,
+    excused: submission?.late,
+    id: submission?._id,
+    submission: {assignment_id: assignment?._id},
+  }
+}
+
+export const camelCaseToSnakeCase = str => {
+  return str.replace(/([A-Z])/g, (_match, letter) => `_${letter.toLowerCase()}`).replace(/^_/, '')
+}
+
+export const convertAssignmentGroupRules = assignmentGroup => {
+  if (
+    !assignmentGroup?.rules ||
+    (assignmentGroup?.rules?.dropLowest === null &&
+      assignmentGroup?.rules?.dropHighest === null &&
+      assignmentGroup?.rules?.neverDrop === null)
+  )
+    return null
+  const rules = {}
+  Object.keys(assignmentGroup?.rules).forEach(key => {
+    rules[camelCaseToSnakeCase(key)] = assignmentGroup.rules[key]
+  })
+
+  if (rules.never_drop !== null) {
+    rules.never_drop = rules.never_drop.map(assignment => assignment._id)
+  }
+  return rules
+}
+
+export const filterDroppedAssignments = (
+  assignments = [],
+  assignmentGroup,
+  returnDropped = false
+) => {
+  if (!assignments || !assignments.length) return []
+
+  assignments = assignments?.filter(assignment => {
+    return (
+      assignment?.gradingType !== 'not_graded' &&
+      assignment?.submissionsConnection?.nodes[0]?.score !== null
+    )
+  })
+
+  const relevantSubmissions = assignments.map(assignment => {
+    return convertSubmissionToDroppableSubmission(
+      assignment,
+      assignment?.submissionsConnection?.nodes[0]
+    )
+  })
+
+  const rules = convertAssignmentGroupRules(assignmentGroup)
+  if (rules === null) return returnDropped ? [] : assignments
+
+  const assignmentsIdsToKeep = gradingHelpers
+    .dropAssignments(relevantSubmissions, rules)
+    .map(submission => submission?.submission?.assignment_id)
+
+  return assignments.filter(assignment => {
+    return returnDropped
+      ? !assignmentsIdsToKeep.includes(assignment._id)
+      : assignmentsIdsToKeep.includes(assignment._id)
+  })
+}
+
+export const listDroppedAssignments = (queryData, byGradingPeriod) => {
+  return byGradingPeriod
+    ? [
+        ...new Set(
+          queryData?.gradingPeriodsConnection?.nodes
+            .map(gradingPeriod => {
+              return queryData?.assignmentGroupsConnection?.nodes
+                .map(assignmentGroup => {
+                  const assignments = filterDroppedAssignments(
+                    filteredAssignments(queryData).filter(assignment => {
+                      return (
+                        assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId ===
+                          gradingPeriod._id &&
+                        assignment?.assignmentGroup?._id === assignmentGroup?._id
+                      )
+                    }),
+                    assignmentGroup,
+                    true
+                  )
+                  return assignments
+                })
+                .flat()
+            })
+            .flat()
+        ),
+      ]
+    : [
+        ...new Set(
+          queryData?.assignmentGroupsConnection?.nodes
+            .map(assignmentGroup => {
+              const assignments = filterDroppedAssignments(
+                filteredAssignments(queryData).filter(assignment => {
+                  return assignment?.assignmentGroup?._id === assignmentGroup?._id
+                }),
+                assignmentGroup,
+                true
+              )
+              return assignments
+            })
+            .flat()
+        ),
+      ]
+}
+
 // **************** ASSIGNMENTS ***************************************************
 
 export const getAssignmentTotalPoints = assignment => {
@@ -199,6 +347,12 @@ export const getAssignmentLetterGrade = (assignment, gradingStandard) => {
 // **************** ASSIGNMENT GROUPS **********************************************
 
 export const getAssignmentGroupTotalPoints = (assignmentGroup, assignments) => {
+  assignments = filterDroppedAssignments(
+    assignments?.filter(assignment => {
+      return assignment?.assignmentGroup?._id === assignmentGroup?._id
+    }),
+    assignmentGroup
+  )
   return assignments?.reduce((total, assignment) => {
     if (
       assignment?.submissionsConnection?.nodes.length > 0 &&
@@ -213,6 +367,12 @@ export const getAssignmentGroupTotalPoints = (assignmentGroup, assignments) => {
 }
 
 export const getAssignmentGroupEarnedPoints = (assignmentGroup, assignments) => {
+  assignments = filterDroppedAssignments(
+    assignments?.filter(assignment => {
+      return assignment?.assignmentGroup?._id === assignmentGroup?._id
+    }),
+    assignmentGroup
+  )
   return assignments?.reduce((total, assignment) => {
     if (
       assignment?.submissionsConnection?.nodes.length > 0 &&
@@ -233,6 +393,7 @@ export const getAssignmentGroupPercentage = (assignmentGroup, assignments, apply
     assignments?.length === 0
   )
     return ASSIGNMENT_NOT_APPLICABLE
+
   const earned = getAssignmentGroupEarnedPoints(assignmentGroup, assignments)
   const total = getAssignmentGroupTotalPoints(assignmentGroup, assignments)
 
@@ -305,12 +466,31 @@ export const getGradingPeriodPercentage = (
 ) => {
   if (!assignments || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
+  assignments = assignments?.filter(assignment => {
+    return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === gradingPeriod?._id
+  })
+
   if (applyGroupWeights) {
     return getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
   }
 
-  const gradingPeriodEarnedPoints = getGradingPeriodEarnedPoints(gradingPeriod, assignments)
-  const gradingPeriodTotalPoints = getGradingPeriodTotalPoints(gradingPeriod, assignments)
+  const [gradingPeriodEarnedPoints, gradingPeriodTotalPoints] = assignmentGroups?.reduce(
+    ([earnedPoints, totalPoints], assignmentGroup) => {
+      const earnedPointsValue = getAssignmentGroupEarnedPoints(assignmentGroup, assignments, false)
+      const totalPointsValue = getAssignmentGroupTotalPoints(assignmentGroup, assignments, false)
+
+      if (earnedPointsValue !== ASSIGNMENT_NOT_APPLICABLE) {
+        earnedPoints += parseFloat(earnedPointsValue)
+      }
+
+      if (totalPointsValue !== ASSIGNMENT_NOT_APPLICABLE) {
+        totalPoints += parseFloat(totalPointsValue)
+      }
+
+      return [earnedPoints, totalPoints]
+    },
+    [0, 0]
+  )
 
   if (gradingPeriodTotalPoints === 0 && gradingPeriodEarnedPoints === 0)
     return ASSIGNMENT_NOT_APPLICABLE
@@ -413,7 +593,17 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
   } else if (applyWeights) {
     returnTotal = getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
   } else {
-    returnTotal = `${getCoursePercentage(assignments)}`
+    returnTotal = assignmentGroups?.reduce((total, assignmentGroup) => {
+      const assignmentGroupPercentage = getAssignmentGroupPercentage(
+        assignmentGroup,
+        assignments,
+        false
+      )
+
+      return assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE
+        ? total
+        : `${Number.parseFloat(total) + Number.parseFloat(assignmentGroupPercentage)}`
+    }, '0')
   }
   return returnTotal === '0' ? ASSIGNMENT_NOT_APPLICABLE : returnTotal
 }

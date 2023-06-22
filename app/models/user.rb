@@ -3405,7 +3405,16 @@ class User < ActiveRecord::Base
   end
 
   def all_account_calendars
-    unordered_associated_accounts.shard(in_region_associated_shards).active.where(account_calendar_visible: true)
+    account_user_account_ids = []
+    active_account_users = account_users.active
+    if active_account_users.any?
+      active_accounts = Account.active.where(id: active_account_users.select(:account_id), account_calendar_visible: true)
+      account_user_account_ids = active_accounts.reduce([]) do |descendants, account|
+        descendants.concat(Account.sub_account_ids_recursive(account.id))
+      end
+    end
+    associated_accounts_ids = unordered_associated_accounts.shard(in_region_associated_shards).select(:id)
+    Account.active.where(id: [associated_accounts_ids + account_user_account_ids], account_calendar_visible: true)
   end
 
   def enabled_account_calendars

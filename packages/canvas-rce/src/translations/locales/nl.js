@@ -60,6 +60,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "En" },
   "angle_c5b4ec50": { "message": "Hoek" },
+  "announcement_fb4cb645": { "message": "Aankondiging" },
   "announcement_list_da155734": { "message": "Lijst met aankondiging" },
   "announcements_a4b8ed4a": { "message": "Aankondigingen" },
   "apply_781a2546": { "message": "Toepassen" },
@@ -77,6 +78,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Beeldverhouding blijft behouden"
   },
+  "assignment_976578a8": { "message": "Opdracht" },
   "assignments_1e02582c": { "message": "Opdrachten" },
   "asterisk_82255584": { "message": "Asterisk" },
   "attributes_963ba262": { "message": "Kenmerken" },
@@ -226,6 +228,9 @@ const locale = {
   "current_image_f16c249c": { "message": "Huidige afbeelding" },
   "current_volume_level_c55ab825": { "message": "Huidig volumeniveau" },
   "custom_6979cd81": { "message": "Aangepast" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "Aangepaste breedte en hoogte (in pixels)"
+  },
   "cyan_c1d5f68a": { "message": "Cyaan" },
   "dagger_57e0f4e5": { "message": "Dolk" },
   "date_added_ed5ad465": { "message": "Datum toegevoegd" },
@@ -258,6 +263,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "richting" },
   "directly_edit_latex_b7e9235b": { "message": "LaTeX rechtstreeks bewerken" },
   "disable_preview_222bdf72": { "message": "Voorbeeld uitschakelen" },
+  "discussion_6719c51d": { "message": "Discussie" },
   "discussions_a5f96392": { "message": "Discussies" },
   "discussions_index_6c36ced": { "message": "Discussieoverzicht" },
   "disjoint_union_e74351a8": { "message": "Disjuncte verbinding" },
@@ -698,6 +704,9 @@ const locale = {
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "Een van de volgende stijlen moet worden toegevoegd om een pictogram op te slaan: Pictogramkleur, omtrekgrootte, pictogramtekst of afbeelding"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "Een of meer bestanden kunnen niet worden geplakt. Probeer bestanden te uploaden, of gebruik anders slepen en neerzetten."
+  },
   "open_circle_e9bd069": { "message": "Open cirkel" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open dit dialoogvenster met sneltoetsen"
@@ -719,6 +728,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } is geen geldig protocol; dat moet ftp, http, https, mailto, skype of tel zijn, of het kan worden weggelaten"
   },
+  "page_50c4823d": { "message": "Pagina" },
   "pages_e5414c2c": { "message": "Pagina''s" },
   "paragraph_5e5ad8eb": { "message": "Alinea" },
   "paragraph_starting_with_start_a59923f8": {
@@ -780,6 +790,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Pompoen" },
   "purple_7678a9fc": { "message": "Paars" },
   "quaternions_877024e0": { "message": "Quaternionen" },
+  "quiz_e0dcce8f": { "message": "Toets" },
   "quizzes_7e598f57": { "message": "Toetsen" },
   "rational_numbers_80ddaa4a": { "message": "Rationele getallen" },
   "real_numbers_7c99df94": { "message": "Reële getallen" },

@@ -105,6 +105,31 @@ describe MediaObject do
   end
 
   describe "#transcoded_details" do
+    before do
+      @mock_kaltura = double("CanvasKaltura::ClientV3")
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
+      allow(@mock_kaltura).to receive(:media_sources).and_return(
+        [{ height: "240",
+           bitrate: "382",
+           isOriginal: "0",
+           width: "336",
+           content_type: "video/mp4",
+           containerFormat: "isom",
+           url: "https://kaltura.example.com/some/url",
+           size: "204",
+           fileExt: "mp4" },
+         { height: "240",
+           bitrate: "382",
+           isOriginal: "0",
+           width: "336",
+           content_type: "audio/mpeg",
+           containerFormat: "isom",
+           url: "https://kaltura.example.com/some/url",
+           size: "204",
+           fileExt: "mp3" }]
+      )
+    end
+
     it "returns the mp3 info" do
       mo = MediaObject.create!(context: user_factory, media_id: "test")
       expect(mo.transcoded_details).to be_nil
@@ -119,9 +144,57 @@ describe MediaObject do
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       expect(mo.transcoded_details).to eq(id: "t-yyy")
     end
+
+    it "returns the mp3 info if the mp3 and mp4 extensions are present" do
+      mo = MediaObject.create!(context: user_factory, media_id: "test")
+      mo.data = { extensions: { mp3: { id: "t-yyy", fileExt: "mp3" }, mp4: { id: "t-zzz", fileExt: "mp4" } } }
+      expect(mo.transcoded_details).to eq({ id: "t-yyy", fileExt: "mp3" })
+    end
+
+    it "returns the mp4 info if the mp3 extension is present but media source is not available" do
+      allow(@mock_kaltura).to receive(:media_sources).and_return(
+        [{ height: "240",
+           bitrate: "382",
+           isOriginal: "0",
+           width: "336",
+           content_type: "video/mp4",
+           containerFormat: "isom",
+           url: "https://kaltura.example.com/some/url",
+           size: "204",
+           fileExt: "mp4" }]
+      )
+      mo = MediaObject.create!(context: user_factory, media_id: "test")
+      mo.data = { extensions: { mp3: { id: "t-yyy", fileExt: "mp3" }, mp4: { id: "t-zzz", fileExt: "mp4" } } }
+      expect(mo.transcoded_details).to eq({ id: "t-zzz", fileExt: "mp4" })
+    end
   end
 
   describe "#retrieve_details_ensure_codecs" do
+    before do
+      @mock_kaltura = double("CanvasKaltura::ClientV3")
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
+      allow(@mock_kaltura).to receive(:media_sources).and_return(
+        [{ height: "240",
+           bitrate: "382",
+           isOriginal: "0",
+           width: "336",
+           content_type: "video/mp4",
+           containerFormat: "isom",
+           url: "https://kaltura.example.com/some/url",
+           size: "204",
+           fileExt: "mp4" },
+         { height: "240",
+           bitrate: "382",
+           isOriginal: "0",
+           width: "336",
+           content_type: "audio/mpeg",
+           containerFormat: "isom",
+           url: "https://kaltura.example.com/some/url",
+           size: "204",
+           fileExt: "mp3" }]
+      )
+    end
+
     it "retries later when the transcode isn't available" do
       Timecop.freeze do
         mo = MediaObject.create!(context: user_factory, media_id: "test")

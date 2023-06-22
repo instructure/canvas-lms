@@ -121,7 +121,7 @@ module CanvasPartman::Concerns
       # Monkey patch the relation we'll use for queries.
       def unscoped
         super.tap do |relation|
-          relation.send :extend, CanvasPartman::DynamicRelation
+          relation.extend CanvasPartman::DynamicRelation
         end
       end
 

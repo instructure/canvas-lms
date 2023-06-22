@@ -359,6 +359,31 @@ module Types
       load_association(:context)
     end
 
+    field :course_id, ID, null: true
+    def course_id
+      assignment.context_id
+    end
+
+    field :grades_published, Boolean, null: true
+    def grades_published
+      assignment.grades_published?
+    end
+
+    field :moderated_grading_enabled, Boolean, null: true
+    def moderated_grading_enabled
+      assignment.moderated_grading?
+    end
+
+    field :post_manually, Boolean, null: true
+    def post_manually
+      assignment.post_manually?
+    end
+
+    field :published, Boolean, null: true
+    def published
+      assignment.published?
+    end
+
     field :assignment_group, AssignmentGroupType, null: true
     def assignment_group
       load_association(:assignment_group)

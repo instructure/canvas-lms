@@ -41,7 +41,7 @@ describe "API", type: :request do
 
     it "does attribute filtering if obj responds" do
       course_with_teacher
-      @course.send(:extend, RSpec::Matchers)
+      @course.extend RSpec::Matchers
       def @course.filter_attributes_for_user(hash, user, session)
         expect(user).to eq teachers.first
         expect(session).to be_nil

@@ -37,12 +37,18 @@ export const GRADEBOOK_QUERY = gql`
           name
         }
       }
-      submissionsConnection {
+      submissionsConnection(
+        filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
+      ) {
         nodes {
           grade
           id: _id
           score
           assignmentId
+          redoRequest
+          submittedAt
+          userId
+          state
         }
       }
       assignmentGroupsConnection {
@@ -66,6 +72,16 @@ export const GRADEBOOK_QUERY = gql`
               pointsPossible
               submissionTypes
               dueAt
+              groupCategoryId
+              gradeGroupStudentsIndividually
+              allowedAttempts
+              anonymousGrading
+              courseId
+              gradesPublished
+              htmlUrl
+              moderatedGrading: moderatedGradingEnabled
+              postManually
+              published
             }
           }
         }
@@ -98,6 +114,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
               name
             }
           }
+          id: _id
           loginId
           name
         }
@@ -121,6 +138,36 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           latePolicyStatus
           missing
           userId
+        }
+      }
+    }
+  }
+`
+
+export const GRADEBOOK_SUBMISSION_COMMENTS = gql`
+  query GradebookSubmissionCommentsQuery($courseId: ID!, $submissionId: ID!) {
+    submission(id: $submissionId) {
+      commentsConnection {
+        nodes {
+          id: _id
+          comment
+          mediaObject {
+            id: _id
+            mediaDownloadUrl
+          }
+          attachments {
+            id: _id
+            displayName
+            mimeClass
+            url
+          }
+          author {
+            name
+            id: _id
+            avatarUrl
+            htmlUrl(courseId: $courseId)
+          }
+          updatedAt
         }
       }
     }

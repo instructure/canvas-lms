@@ -462,6 +462,93 @@ module Lti
         end
       end
 
+      context "$com.instructure.Assignment.restrict_quantitative_data" do
+        let(:exp_hash) { { test: "$com.instructure.Assignment.restrict_quantitative_data" } }
+
+        it "is false if restrict_quantitative_data is falsy for current user" do
+          course.save!
+          managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
+          login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
+          course.enroll_user(user, "StudentEnrollment", sis_pseudonym_id: login.id, enrollment_state: "active")
+          my_assignment = course.assignments.create!(title: "my assignment", description: "desc")
+
+          variable_expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: my_assignment
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to be false
+        end
+
+        it "is true if restrict_quantitative_data is truthy for current user" do
+          # truthy feature flag
+          Account.default.enable_feature! :restrict_quantitative_data
+
+          # truthy setting
+          Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
+          Account.default.save!
+
+          course.save!
+          managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
+          login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
+          course.enroll_user(user, "StudentEnrollment", sis_pseudonym_id: login.id, enrollment_state: "active")
+          my_assignment = course.assignments.create!(title: "my assignment", description: "desc")
+
+          variable_expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: my_assignment
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to be true
+        end
+      end
+
+      context "$com.instructure.Course.gradingScheme" do
+        let(:exp_hash) { { test: "$com.instructure.Course.gradingScheme" } }
+
+        it "is the grading scheme for the course" do
+          course.save!
+          grading_standard = course.grading_standards.create!(title: "my grading scheme", data: { "A" => 90, "B" => 80, "C" => 70, "D" => 60, "F" => 0 })
+          course.grading_standard_enabled = true
+          course.grading_standard_id = grading_standard.id
+          course.save!
+
+          variable_expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq [["A", 90], ["B", 80], ["C", 70], ["D", 60], ["F", 0]]
+        end
+
+        it "provides the default grading standard if no specific one is set" do
+          course.save!
+
+          variable_expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq [["A", 0.94], ["A-", 0.9], ["B+", 0.87], ["B", 0.84], ["B-", 0.8], ["C+", 0.77], ["C", 0.74], ["C-", 0.7], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]]
+        end
+      end
+
       context "com.instructure.Account.usage_metrics_enabled" do
         subject { variable_expander.expand_variables!(exp_hash) }
 
@@ -1570,6 +1657,9 @@ module Lti
         let(:right_now) { Time.zone.now }
 
         context "when the assignment has external_tool as a submission_type" do
+          let(:resource_link_uuid) do
+            SecureRandom.uuid
+          end
           let(:assignment) do
             opts = {
               course:,
@@ -1590,6 +1680,16 @@ module Lti
             assignment = assignment_model opts
 
             line_item = assignment.line_items.first
+            line_item.resource_link = Lti::ResourceLink.new(
+              resource_link_uuid:,
+              context_external_tool_id: tool.id,
+              workflow_state: "active",
+              root_account_id: course.root_account.id,
+              context_id: course.id,
+              context_type: "Course",
+              custom: {},
+              lookup_uuid: SecureRandom.uuid
+            )
             line_item.update!(
               {
                 resource_id: "abc",
@@ -1607,6 +1707,18 @@ module Lti
               controller,
               assignment:
             )
+          end
+
+          context "when the resource_link_uuid_in_custom_substitution feature flag is on" do
+            before :once do
+              Account.site_admin.enable_feature!(:resource_link_uuid_in_custom_substitution)
+            end
+
+            it "substitutes the resource_link_uuid for $ResourceLink.id" do
+              exp_hash = { test: "$ResourceLink.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq resource_link_uuid
+            end
           end
 
           it "has substitution for $ResourceLink.id" do
@@ -1649,19 +1761,42 @@ module Lti
         context "when there is no assignment" do
           let(:assignment) { nil }
 
+          let(:resource_link_uuid) do
+            SecureRandom.uuid
+          end
+
+          let(:resource_link) do
+            Lti::ResourceLink.new(
+              resource_link_uuid:,
+              context_external_tool_id: tool.id,
+              workflow_state: "active",
+              root_account_id: course.root_account.id,
+              context_id: course.id,
+              context_type: "Course",
+              custom: {},
+              lookup_uuid: SecureRandom.uuid
+            )
+          end
+
+          let(:content_tag) do
+            double("content_tag")
+          end
+
           let(:variable_expander) do
             VariableExpander.new(
               root_account,
               course,
               controller,
-              assignment:
+              assignment:,
+              content_tag:
             )
           end
 
           it "has substitution for $ResourceLink.id" do
+            allow(content_tag).to receive(:associated_asset).and_return(resource_link)
             exp_hash = { test: "$ResourceLink.id" }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq "$ResourceLink.id"
+            expect(exp_hash[:test]).to eq resource_link_uuid
           end
 
           it "has substitution for $ResourceLink.description" do

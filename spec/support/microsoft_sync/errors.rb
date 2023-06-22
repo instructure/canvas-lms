@@ -34,14 +34,8 @@ module MicrosoftSync::Matchers
         actual.class.public_message
         @calls_i18n = have_received(:t).matches?(I18n)
 
-        orig_locale = I18n.locale
-        begin
-          I18n.locale = :en
-          serialized = MicrosoftSync::Errors.serialize(actual)
-          msg = MicrosoftSync::Errors.deserialize_and_localize(serialized)
-        ensure
-          I18n.locale = orig_locale
-        end
+        serialized = MicrosoftSync::Errors.serialize(actual)
+        msg = MicrosoftSync::Errors.deserialize_and_localize(serialized)
         @msg_equals_matcher = match(expected_matched_message)
         @msg_equals = @msg_equals_matcher.matches?(msg)
       end

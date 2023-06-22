@@ -34,13 +34,16 @@ module DifferentiableAssignment
                    (opts[:differentiated_assignments] == true && !only_visible_to_overrides) ||
                    !differentiated_assignments_applies? # checks if DA enabled on course and then only_visible_to_overrides
 
-    # will add users if observer and only filter based on DA when necessary (not for teachers/some observers)
-    visible_instances = DifferentiableAssignment.filter([self], user, context) do |_, user_ids|
-      conditions = { user_id: user_ids }
-      conditions[column_name] = id
-      visibility_view.where(conditions)
+    is_visible = false
+    Shard.with_each_shard(user.associated_shards) do
+      visible_instances = DifferentiableAssignment.filter([self], user, context) do |_, user_ids|
+        conditions = { user_id: user_ids }
+        conditions[column_name] = id
+        visibility_view.where(conditions)
+      end
+      is_visible = true if visible_instances.any?
     end
-    visible_instances.any?
+    is_visible
   end
 
   def visibility_view

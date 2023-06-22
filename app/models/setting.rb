@@ -81,7 +81,7 @@ class Setting < Switchman::UnshardedRecord
   # this cache doesn't get invalidated by other rails processes, obviously, so
   # use this only for relatively unchanging data
   def self.cache
-    @cache ||= ActiveSupport::Cache.lookup_store(:memory_store)
+    @cache ||= ActiveSupport::Cache.lookup_store(:memory_store, namespace: -> {})
   end
 
   def self.reset_cache!

@@ -334,6 +334,40 @@ describe "better_file_browsing" do
     end
   end
 
+  context "Preview Media Attachments" do
+    before do
+      course_with_teacher_logged_in
+      allow_any_instance_of(MediaObject).to receive(:grants_right?).with(anything, anything, :add_captions).and_return(true)
+
+      Account.site_admin.enable_feature!(:media_links_use_attachment_id)
+      @att = Attachment.create! filename: "file.mp4", context: @course, media_entry_id: "mediaentryid", uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
+      MediaObject.create! media_id: "mediaentryid", attachment: @att
+
+      @bp_course = Course.create!
+      @bogus_parent_att = Attachment.create! filename: "file.mp4", context: @bp_course, uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
+
+      @kaltura = stub_kaltura
+      expect(@kaltura).to receive(:media_sources).and_return([{ attachment_id: @att.id, content_type: "video/mp4", url: "/a.mp4" }])
+    end
+
+    it "will show CC options normally" do
+      get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
+      wait_for_ajaximations
+      expect(f('[title="Captions/Subtitles"]')).to be_present
+    end
+
+    it "will hide CC options for locked attachments" do
+      mt = MasterCourses::MasterTemplate.set_as_master_course(@bp_course)
+      cs = MasterCourses::ChildSubscription.create! child_course: @course, master_template: mt
+      MasterCourses::ChildContentTag.create! content_type: "Attachment", content_id: @att.id, migration_id: "matchedmigid", child_subscription: cs
+      mct = MasterCourses::MasterContentTag.create! master_template: mt, content: @bogus_parent_att, restrictions: { content: true }
+      mct.update! migration_id: "matchedmigid"
+      get "/courses/#{@course.id}/files/#{@att.id}/file_preview"
+      wait_for_ajaximations
+      expect(f(".mejs-controls")).not_to contain_jqcss('[title="Captions/Subtitles"]')
+    end
+  end
+
   context "File Preview" do
     before do
       course_with_teacher_logged_in

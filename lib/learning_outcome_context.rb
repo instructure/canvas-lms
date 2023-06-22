@@ -24,7 +24,7 @@ module LearningOutcomeContext
       klass.has_many :linked_learning_outcomes, -> { distinct.where(content_tags: { content_type: "LearningOutcome" }) }, through: :learning_outcome_links, source: :learning_outcome_content
       klass.has_many :created_learning_outcomes, class_name: "LearningOutcome", as: :context, inverse_of: :context
       klass.has_many :learning_outcome_groups, as: :context, inverse_of: :context
-      klass.send :include, InstanceMethods
+      klass.include InstanceMethods
 
       klass.after_save :update_root_outcome_group_name, if: -> { saved_change_to_name? }
     end

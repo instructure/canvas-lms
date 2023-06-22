@@ -210,7 +210,7 @@ module CC
         @media_object_flavor = opts[:media_object_flavor]
         @used_media_objects = Set.new
         @media_object_infos = {}
-        @rewriter = UserContent::HtmlRewriter.new(course, user, contextless_types: ["files"])
+        @rewriter = UserContent::HtmlRewriter.new(course, user, contextless_types: ["files", "media_attachments_iframe"])
         @course = course
         @user = user
         @track_referenced_files = opts[:track_referenced_files]
@@ -288,6 +288,16 @@ module CC
           item = ContentTag.find(match.obj_id)
           migration_id = @key_generator.create_key(item)
           "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}#{match.query}"
+        end
+        @rewriter.set_handler("media_attachments_iframe") do |match|
+          att = @course.attachments.find_by(id: match.obj_id) if match.obj_id
+          if att
+            migration_id = @key_generator.create_key(att)
+            query = translate_module_item_query(match.query)
+            "#{OBJECT_TOKEN}/#{match.type}/#{migration_id}#{query}"
+          else
+            match.url
+          end
         end
         @rewriter.set_default_handler do |match|
           new_url = match.url
@@ -375,6 +385,8 @@ module CC
 
         # process new RCE media iframes too
         doc.css("iframe[data-media-id]").each do |iframe|
+          next if iframe["src"].include?("/media_attachments_iframe/")
+
           media_id = iframe["data-media-id"]
           obj = MediaObject.active.by_media_id(media_id).take
           next unless obj && @key_generator.create_key(obj)
@@ -382,9 +394,7 @@ module CC
           @used_media_objects << obj
           info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
-          if iframe["src"].match?(%r{/media_attachments_iframe/(\d+)})
-            iframe["data-is-media-attachment"] = true
-          end
+
           iframe["src"] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
 

@@ -49,7 +49,7 @@ const updateExtraTime = function ($studentBlock, extraTime) {
   const $extraTime = $studentBlock.find('.extra_time_allowed')
 
   if (extraTime > 0) {
-    $extraTime.text($extraTime.text().replace(/\s\d+\s/, ' ' + extraTime + ' '))
+    $extraTime.text($extraTime.text().replace(/\d(.*\d)?/, I18n.n(extraTime)))
   }
 
   $extraTime.toggle(extraTime > 0)

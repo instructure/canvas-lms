@@ -217,9 +217,9 @@ describe Lti::Messages::JwtMessage do
 
   describe "i18n claims" do
     it "sets the locale" do
-      expected_locale = "ca"
-      allow(I18n).to receive(:locale).and_return expected_locale
-      expect(decoded_jwt["locale"]).to eq expected_locale
+      I18n.with_locale(:ca) do
+        expect(decoded_jwt["locale"]).to eq "ca"
+      end
     end
 
     context "when i18n claim group disabled" do
@@ -312,9 +312,9 @@ describe Lti::Messages::JwtMessage do
       end
 
       it "sets the locale" do
-        expected_locale = "ca"
-        allow(I18n).to receive(:locale).and_return expected_locale
-        expect(message_launch_presentation["locale"]).to eq expected_locale
+        I18n.with_locale(:ca) do
+          expect(message_launch_presentation["locale"]).to eq "ca"
+        end
       end
     end
 

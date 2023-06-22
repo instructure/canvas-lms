@@ -27,7 +27,7 @@ export interface EnvGradingStandardsCommon {
   HAS_GRADING_PERIODS: boolean
   DEFAULT_GRADING_STANDARD_DATA: GradingStandard
   CONTEXT_SETTINGS_URL: string
-
+  COURSE_DEFAULT_GRADING_SCHEME_ID: string | undefined
   /**
    * NOTE: Only present if the context is not Account
    */

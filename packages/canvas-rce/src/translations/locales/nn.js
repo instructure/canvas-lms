@@ -57,6 +57,7 @@ const locale = {
   },
   "and_7fcc2911": { "message": "Og" },
   "angle_c5b4ec50": { "message": "Vinkel" },
+  "announcement_fb4cb645": { "message": "Kunngjering" },
   "announcement_list_da155734": { "message": "Kunngjeringsliste" },
   "announcements_a4b8ed4a": { "message": "Kunngjeringar" },
   "apply_781a2546": { "message": "Bruk" },
@@ -74,6 +75,7 @@ const locale = {
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Storleiksforhold vil bli behalden"
   },
+  "assignment_976578a8": { "message": "Oppgåve" },
   "assignments_1e02582c": { "message": "Oppgåver" },
   "asterisk_82255584": { "message": "Stjerne" },
   "attributes_963ba262": { "message": "Attributt" },
@@ -240,6 +242,7 @@ const locale = {
   "directionality_26ae9e08": { "message": "Retningsgivande" },
   "directly_edit_latex_b7e9235b": { "message": "Rediger LaTeX direkte" },
   "disable_preview_222bdf72": { "message": "Deaktiver førehandsvising" },
+  "discussion_6719c51d": { "message": "Diskusjon" },
   "discussions_a5f96392": { "message": "Diskusjonar" },
   "discussions_index_6c36ced": { "message": "Diskusjonsoversikt" },
   "disjoint_union_e74351a8": { "message": "Disjunkt union" },
@@ -582,6 +585,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Pluss" },
   "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Diverse" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Modular" },
   "mu_37223b8b": { "message": "Mu" },
   "multi_color_image_63d7372f": { "message": "Fleirfargebilde" },
@@ -599,8 +603,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gjennom menyen eller verktøylinja"
   },
+  "navigation_ee9af92d": { "message": "Navigasjon" },
   "nested_greater_than_d852e60d": { "message": "Nøsta større enn" },
   "nested_less_than_27d17e58": { "message": "Nøsta mindre enn" },
+  "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Neste" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ingen problem med tilgjengeligheit funne"
@@ -656,6 +662,7 @@ const locale = {
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } er ikkje ein gyldig protokoll. Den må vere anten ftp, http, https, mailto, skype, tel, eller utelatast"
   },
+  "page_50c4823d": { "message": "Side" },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },
   "paragraph_starting_with_start_a59923f8": {
@@ -710,6 +717,7 @@ const locale = {
   "pumpkin_904428d5": { "message": "Gresskar" },
   "purple_7678a9fc": { "message": "Lilla" },
   "quaternions_877024e0": { "message": "Kvaternion" },
+  "quiz_e0dcce8f": { "message": "Quiz" },
   "quizzes_7e598f57": { "message": "Quizar" },
   "rational_numbers_80ddaa4a": { "message": "Rasjonelle tal" },
   "real_numbers_7c99df94": { "message": "Reelle tal" },

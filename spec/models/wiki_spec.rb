@@ -182,6 +182,33 @@ describe Wiki do
     end
   end
 
+  context "find_page by lookup" do
+    before :once do
+      Account.site_admin.enable_feature!(:permanent_page_links)
+      @page1 = @course.wiki_pages.create!(title: "Current Page")
+      @lookup1 = @page1.current_lookup
+      @lookup2 = WikiPageLookup.create!(slug: "old-url", wiki_page: @page1, root_account_id: @page1.root_account_id, context_id: @page1.context_id, context_type: @page1.context_type)
+    end
+
+    it "finds page by title" do
+      expect(@wiki.find_page("Current Page")).to eq @page1
+    end
+
+    it "finds page by stale url" do
+      expect(@wiki.find_page("old-url")).to eq @page1
+    end
+
+    it "doesn't include deleted page" do
+      @page1.destroy
+      expect(@wiki.find_page("Current Page")).to be_nil
+    end
+
+    it "can find deleted page if requested" do
+      @page1.destroy
+      expect(@wiki.find_page("Current Page", include_deleted: true)).to eq @page1
+    end
+  end
+
   it "#context_loaded?" do
     group
     wiki = @group.wiki

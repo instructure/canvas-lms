@@ -302,7 +302,11 @@ class MediaObject < ActiveRecord::Base
   end
 
   def transcoded_details
-    data = self.data && self.data[:extensions] && self.data[:extensions][:mp3]
+    sources = media_sources
+    return unless sources.present?
+
+    mp3_media_source = sources.find { |s| s[:fileExt] == "mp3" }
+    data = self.data && self.data[:extensions] && self.data[:extensions][:mp3] if mp3_media_source
     data ||= self.data && self.data[:extensions] && self.data[:extensions][:mp4]
     data
   end

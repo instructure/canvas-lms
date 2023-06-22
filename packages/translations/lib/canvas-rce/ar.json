@@ -39,6 +39,7 @@
   },
   "and_7fcc2911": { "message": "و" },
   "angle_c5b4ec50": { "message": "زاوية" },
+  "announcement_fb4cb645": { "message": "الإعلان" },
   "announcement_list_da155734": { "message": "قائمة الإعلانات" },
   "announcements_a4b8ed4a": { "message": "الإعلانات" },
   "apply_781a2546": { "message": "تطبيق" },
@@ -56,6 +57,7 @@
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
   },
+  "assignment_976578a8": { "message": "المهمة" },
   "assignments_1e02582c": { "message": "المهام" },
   "asterisk_82255584": { "message": "نجمة" },
   "attributes_963ba262": { "message": "السمات" },
@@ -191,6 +193,9 @@
   "current_image_f16c249c": { "message": "الصورة الحالية" },
   "current_volume_level_c55ab825": { "message": "مستوى الصوت الحالي" },
   "custom_6979cd81": { "message": "مخصص" },
+  "custom_width_and_height_pixels_946eea7c": {
+    "message": "العرض والارتفاع المخصصان (بالبكسل)"
+  },
   "cyan_c1d5f68a": { "message": "سماوي" },
   "dagger_57e0f4e5": { "message": "Dagger" },
   "date_added_ed5ad465": { "message": "تاريخ الإضافة" },
@@ -223,6 +228,7 @@
   "directionality_26ae9e08": { "message": "الاتجاهية" },
   "directly_edit_latex_b7e9235b": { "message": "تحرير LaTeX مباشرةً" },
   "disable_preview_222bdf72": { "message": "تعطيل المعاينة" },
+  "discussion_6719c51d": { "message": "النقاش" },
   "discussions_a5f96392": { "message": "النقاشات" },
   "discussions_index_6c36ced": { "message": "فهرس المناقشات" },
   "disjoint_union_e74351a8": { "message": "Disjoint Union" },
@@ -639,6 +645,9 @@
   "one_of_the_following_styles_must_be_added_to_save__1de769aa": {
     "message": "يجب إضافة أحد الأنماط التالية لحفظ الأيقونة: لون الأيقونة، حجم الإطار، نص الأيقونة، الصورة"
   },
+  "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
+    "message": "تعذر لصق ملف واحد أو أكثر يرجى تحميل الملفات أو سحبها وإفلاتها."
+  },
   "open_circle_e9bd069": { "message": "دائرة مفتوحة" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
@@ -658,6 +667,7 @@
   "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
     "message": "{ p } ليس بروتوكولاً صالحًا الذي يجب أن يكون ftp وhttp وhttps وmailto وskype وإلا سيتم حذفه"
   },
+  "page_50c4823d": { "message": "صفحة" },
   "pages_e5414c2c": { "message": "الصفحات" },
   "paragraph_5e5ad8eb": { "message": "الفقرة" },
   "paragraph_starting_with_start_a59923f8": {
@@ -715,6 +725,7 @@
   "pumpkin_904428d5": { "message": "يقطين" },
   "purple_7678a9fc": { "message": "أرجواني" },
   "quaternions_877024e0": { "message": "الرباعيات" },
+  "quiz_e0dcce8f": { "message": "الاختبار الموجز" },
   "quizzes_7e598f57": { "message": "الاختبارات الموجزة" },
   "rational_numbers_80ddaa4a": { "message": "أعداد جذرية" },
   "real_numbers_7c99df94": { "message": "أعداد حقيقية" },

@@ -32,8 +32,7 @@ values displayed in purple text identify the value as an input argument.
 
 ### REST vs GraphQL
 
-The Canvas REST API will continue to be available.  New Canvas features will be
-developed primarily in GraphQL and may not be back-ported to the REST API.
+The Canvas REST API will continue to be available.
 
 Fields are being added to the GraphQL API on an as-needed basis.  The GraphQL
 API does not include everything that is currently in the REST API.  Feel free

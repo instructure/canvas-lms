@@ -15,22 +15,31 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import _ from 'lodash'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import tz from '@canvas/timezone'
-import _ from 'lodash'
 
 import {
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGroupConnection,
+  AssignmentSubmissionsMap,
   EnrollmentConnection,
   GradebookSortOrder,
+  GradebookStudentDetails,
   GradebookUserSubmissionDetails,
   SortableAssignment,
   SortableStudent,
+  SubmissionConnection,
+  SubmissionGradeChange,
 } from '../types'
 import {Submission} from '../../../api.d'
 import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
+import DateHelper from '@canvas/datetime/dateHelper'
+
+const I18n = useI18nScope('enhanced_individual_gradebook')
 
 export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupConnection[]): {
   mappedAssignments: SortableAssignment[]
@@ -74,6 +83,20 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
   )
 }
 
+export function mapAssignmentSubmissions(
+  submissions: SubmissionConnection[]
+): AssignmentSubmissionsMap {
+  return submissions.reduce((submissionMap, submission) => {
+    const {assignmentId, id: submissionId} = submission
+    if (!submissionMap[assignmentId]) {
+      submissionMap[assignmentId] = {}
+    }
+
+    submissionMap[assignmentId][submissionId] = submission
+    return submissionMap
+  }, {} as AssignmentSubmissionsMap)
+}
+
 export function mapEnrollmentsToSortableStudents(
   enrollments: EnrollmentConnection[]
 ): SortableStudent[] {
@@ -92,6 +115,13 @@ export function mapEnrollmentsToSortableStudents(
   }, {} as {[key: string]: SortableStudent})
 
   return Object.values(mappedEnrollments)
+}
+
+export function studentDisplayName(
+  student: SortableStudent | GradebookStudentDetails,
+  hideStudentNames: boolean
+): string {
+  return hideStudentNames ? student.hiddenName ?? I18n.t('Student') : student.name
 }
 
 export function sortAssignments(
@@ -146,11 +176,64 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     id: submission.id,
     late: submission.late,
     missing: submission.missing,
+    redoRequest: submission.redo_request,
     score: submission.score,
     submittedAt: submission.submitted_at,
     userId: submission.user_id,
     submissionType: submission.submission_type,
     state: submission.workflow_state,
+  }
+}
+
+export function submitterPreviewText(submission: GradebookUserSubmissionDetails): string {
+  if (!submission.submissionType) {
+    return I18n.t('Has not submitted')
+  }
+  const formattedDate = DateHelper.formatDatetimeForDisplay(submission.submittedAt)
+  if (submission.proxySubmitter) {
+    return I18n.t('Submitted by %{proxy} on %{date}', {
+      proxy: submission.proxySubmitter,
+      date: formattedDate,
+    })
+  }
+  return I18n.t('Submitted on %{date}', {date: formattedDate})
+}
+
+export function outOfText(
+  assignment: AssignmentConnection,
+  submission: GradebookUserSubmissionDetails
+): string {
+  const {gradingType, pointsPossible} = assignment
+
+  if (submission.excused) {
+    return I18n.t('Excused')
+  } else if (gradingType === 'gpa_scale') {
+    return ''
+  } else if (gradingType === 'letter_grade' || gradingType === 'pass_fail') {
+    return I18n.t('(%{score} out of %{points})', {
+      points: I18n.n(pointsPossible),
+      score: submission.enteredScore,
+    })
+  } else if (pointsPossible === null || pointsPossible === undefined) {
+    return I18n.t('No points possible')
+  } else {
+    return I18n.t('(out of %{points})', {points: I18n.n(pointsPossible)})
+  }
+}
+
+export function mapToSubmissionGradeChange(submission: Submission): SubmissionGradeChange {
+  return {
+    assignmentId: submission.assignment_id,
+    enteredScore: submission.entered_score,
+    excused: submission.excused,
+    grade: submission.grade,
+    id: submission.id,
+    late: submission.late,
+    missing: submission.missing,
+    score: submission.score,
+    submittedAt: submission.submitted_at,
+    state: submission.workflow_state,
+    userId: submission.user_id,
   }
 }
 
