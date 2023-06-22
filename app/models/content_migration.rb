@@ -1272,10 +1272,20 @@ class ContentMigration < ActiveRecord::Base
       "resource_mapping" => data
     }
 
+    if Account.site_admin.feature_enabled?(:content_migration_asset_map_v2)
+      payload["destination_hosts"] = destination_hosts
+    end
+
     self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")
     Attachments::Storage.store_for_attachment(asset_map_attachment, StringIO.new(payload.to_json))
     asset_map_attachment.save!
     save!
+  end
+
+  def destination_hosts
+    return [] unless context
+
+    HostUrl.context_hosts(context.root_account).map { |h| h.split(":").first }
   end
 
   set_broadcast_policy do |p|
