@@ -1672,7 +1672,7 @@ describe CalendarEventsApiController, type: :request do
                 title: "ohai",
                 start_at: start_at.iso8601,
                 end_at: end_at.iso8601,
-                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=201"
+                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=401"
               }
             }
           )

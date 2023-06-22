@@ -26,7 +26,7 @@ end
 
 # rubocop:disable Style/IfInsideElse
 module RruleHelper
-  RECURRING_EVENT_LIMIT = 200
+  RECURRING_EVENT_LIMIT = 400
 
   def rrule_to_natural_language(rrule)
     rropts = rrule_parse(rrule)

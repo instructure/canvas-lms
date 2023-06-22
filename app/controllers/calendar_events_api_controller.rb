@@ -308,7 +308,7 @@ class CalendarEventsApiController < ApplicationController
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_authorization, only: %w[index user_index]
 
-  RECURRING_EVENT_LIMIT = RruleHelper::RECURRING_EVENT_LIMIT
+  RECURRING_EVENT_LIMIT = 200
 
   DEFAULT_INCLUDES = %w[child_events].freeze
 
@@ -976,7 +976,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     events = events.to_a
-    update_limit = rrule_changed ? RECURRING_EVENT_LIMIT : events.length
+    update_limit = rrule_changed ? RruleHelper::RECURRING_EVENT_LIMIT : events.length
 
     error = nil
     CalendarEvent.skip_touch_context
@@ -1817,7 +1817,7 @@ class CalendarEventsApiController < ApplicationController
     first_start_at = Time.parse(event_attributes[:start_at]) if event_attributes[:start_at]
     first_end_at = Time.parse(event_attributes[:end_at]) if event_attributes[:end_at]
     duration = first_end_at - first_start_at if first_start_at && first_end_at
-    dtstart_list = rrule.all(limit: RECURRING_EVENT_LIMIT)
+    dtstart_list = rrule.all(limit: RruleHelper::RECURRING_EVENT_LIMIT)
 
     InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dtstart_list.length)
 
@@ -1880,11 +1880,11 @@ class CalendarEventsApiController < ApplicationController
     end
     # If RRULE generates a lot of events, rr.count can take a very long time to compute.
     # Asking it for 1 too many results is fast and gets the job done
-    if rr.all(limit: RECURRING_EVENT_LIMIT + 1).length > RECURRING_EVENT_LIMIT
+    if rr.all(limit: RruleHelper::RECURRING_EVENT_LIMIT + 1).length > RruleHelper::RECURRING_EVENT_LIMIT
       InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", rr.count)
       render json: {
                message: t("A maximum of %{limit} events may be created",
-                          limit: RECURRING_EVENT_LIMIT)
+                          limit: RruleHelper::RECURRING_EVENT_LIMIT)
              },
              status: :bad_request
       return nil

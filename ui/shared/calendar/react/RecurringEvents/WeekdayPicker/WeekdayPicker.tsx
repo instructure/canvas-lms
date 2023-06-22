@@ -33,7 +33,9 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope} from '@canvas/i18n'
 
-const I18n = useScope('calendar_weekday_picker')
+import {RRULEDayValue, SelectedDaysArray} from '../types'
+
+const I18n = useScope('calendar_custom_recurring_event_weekday_picker')
 
 export type WeekArray = [string, string, string, string, string, string, string]
 export type WeekDaysSpec = {
@@ -41,9 +43,6 @@ export type WeekDaysSpec = {
   dayAbbreviations: WeekArray
   dayRRULEValues: WeekArray
 }
-
-export type RRULEDayValue = 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA'
-export type SelectedDaysArray = RRULEDayValue[]
 
 export type OnDaysChange = (selectedDays: SelectedDaysArray) => void
 
@@ -54,8 +53,6 @@ export type WeekdayPickerProps = {
 }
 
 const defaultWeekDayAbbreviations = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-// useful for testing, though it is used in storybook
-// ['星期日', '週一', '週二', '週三', '週四', '週五', '星期六']
 
 export default function WeekdayPicker({locale, selectedDays = [], onChange}: WeekdayPickerProps) {
   const [weekDays, setWeekDays] = useState<WeekDaysSpec>({

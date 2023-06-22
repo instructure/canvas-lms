@@ -71,7 +71,7 @@ function CanvasModal({
           <FlexItem grow={true}>
             <Heading>{title}</Heading>
           </FlexItem>
-          <FlexItem>
+          <FlexItem margin="0 0 0 x-small">
             <CloseButton
               onClick={onDismiss}
               size={closeButtonSize}
