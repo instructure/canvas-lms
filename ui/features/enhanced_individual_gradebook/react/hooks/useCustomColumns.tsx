@@ -16,31 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {useEffect, useState} from 'react'
+import {CustomColumn} from '../../types'
+import {executeApiRequest} from '@canvas/util/apiRequest'
 
-export type ApiResponse<T> = {
-  data: T
-  status: number
-  link?: {
-    next?: {
-      url: string
+export const useCustomColumns = (getCustomColumnsUrl?: string | null) => {
+  const [customColumns, setCustomColumns] = useState<CustomColumn[] | null>(null)
+  useEffect(() => {
+    const fetchCustomColumns = async () => {
+      if (!getCustomColumnsUrl) {
+        return
+      }
+      const {data} = await executeApiRequest<CustomColumn[]>({
+        method: 'GET',
+        path: getCustomColumnsUrl,
+      })
+      setCustomColumns(data)
     }
-  }
-}
-
-export type ApiRequest = {
-  path: string
-  method: string
-  body?: string | object
-  headers?: Record<string, string>
-}
-
-export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
-  const {json, response, link} = await doFetchApi(request)
-
+    fetchCustomColumns()
+  }, [getCustomColumnsUrl])
   return {
-    data: json as T,
-    status: (response as Response).status,
-    link,
+    customColumns,
   }
 }

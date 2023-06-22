@@ -119,6 +119,7 @@ export default function SubmissionDetailModal({
         <SubmissionGradeForm
           assignment={assignment}
           submission={submission}
+          changeGradeUrl={gradebookOptions.changeGradeUrl}
           onGradeChange={onGradeChange}
         />
 
@@ -247,11 +248,18 @@ function SubmissionCommentAvatar({comment}: {comment: CommentConnection}) {
 type SubmissionGradeFormProps = {
   assignment: AssignmentConnection
   submission: GradebookUserSubmissionDetails
+  changeGradeUrl?: string | null
   onGradeChange: (updateEvent: GradeChangeApiUpdate) => void
 }
-function SubmissionGradeForm({assignment, submission, onGradeChange}: SubmissionGradeFormProps) {
+function SubmissionGradeForm({
+  assignment,
+  submission,
+  changeGradeUrl,
+  onGradeChange,
+}: SubmissionGradeFormProps) {
   const [gradeInput, setGradeInput] = useState<string>('')
-  const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
+  const {submit, submitScoreError, submitScoreStatus, savedSubmission} =
+    useSubmitScore(changeGradeUrl)
 
   useEffect(() => {
     onGradeChange({

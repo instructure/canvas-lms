@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {useScope as useI18nScope} from '@canvas/i18n'
-
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {
   GradebookOptions,
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
+  ApiCallStatus,
 } from '../../../types'
 import {AssignmentGroupCriteriaMap, SubmissionGradeCriteria} from '@canvas/grading/grading'
+import Notes from './Notes'
+import {useGradebookNotes} from '../../hooks/useGradebookNotes'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -34,15 +37,35 @@ type Props = {
   student?: GradebookStudentDetails
   submissions?: GradebookUserSubmissionDetails[]
   assignmentGroupMap: AssignmentGroupCriteriaMap
-  gradebookOptions: GradebookOptions // TODO: get this from gradebook settings
+  studentNotesColumnId?: string | null
+  gradebookOptions: GradebookOptions
 }
 
 export default function StudentInformation({
   assignmentGroupMap,
+  studentNotesColumnId,
   gradebookOptions,
   student,
   submissions,
 }: Props) {
+  const {
+    customOptions: {includeUngradedAssignments, hideStudentNames, showNotesColumn},
+    customColumnsUrl,
+    customColumnDataUrl,
+    customColumnDatumUrl,
+  } = gradebookOptions
+  const {submitNotesError, submitNotesStatus, studentNotes, getNotesStatus, submit} =
+    useGradebookNotes(
+      studentNotesColumnId,
+      customColumnsUrl,
+      customColumnDataUrl,
+      customColumnDatumUrl
+    )
+  useEffect(() => {
+    if (submitNotesError && submitNotesStatus === ApiCallStatus.FAILED) {
+      showFlashError(I18n.t('Error updating notes'))(new Error(submitNotesError))
+    }
+  }, [submitNotesError, submitNotesStatus])
   if (!student || !submissions) {
     return (
       <View as="div">
@@ -59,7 +82,6 @@ export default function StudentInformation({
       </View>
     )
   }
-
   const gradeCriteriaSubmissions: SubmissionGradeCriteria[] = submissions.map(submission => {
     return {
       assignment_id: submission.assignmentId,
@@ -83,12 +105,12 @@ export default function StudentInformation({
     'points',
     true
   )
-  const {
-    customOptions: {includeUngradedAssignments, hideStudentNames},
-  } = gradebookOptions
-  const gradeToDisplay = includeUngradedAssignments ? final : current
-  const finalGradePercent = scoreToPercentage(gradeToDisplay.score, gradeToDisplay.possible)
 
+  const gradeToDisplay = includeUngradedAssignments ? final : current
+  const finalGradePercent = gradeToDisplay
+    ? scoreToPercentage(gradeToDisplay.score, gradeToDisplay.possible)
+    : null
+  const currentStudentNotes = studentNotes[student.id] ?? ''
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -119,9 +141,17 @@ export default function StudentInformation({
               {student.enrollments.map(enrollment => enrollment.section.name).join(', ')}
             </View>
           </View>
-
+          {showNotesColumn && (
+            <Notes
+              currentStudentNotes={currentStudentNotes}
+              disabled={
+                getNotesStatus === ApiCallStatus.PENDING ||
+                submitNotesStatus === ApiCallStatus.PENDING
+              }
+              handleSubmitNotes={notes => submit(notes, student.id)}
+            />
+          )}
           <View as="h4">{I18n.t('Grades')}</View>
-
           <View as="div" className="ic-Table-responsive-x-scroll">
             <table className="ic-Table">
               <thead>

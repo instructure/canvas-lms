@@ -20,10 +20,12 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {
+  CustomColumn,
   GradebookOptions,
   GradebookSortOrder,
   HandleCheckboxChange,
   SectionConnection,
+  TeacherNotes,
 } from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
@@ -51,18 +53,22 @@ const assignmentSortOptions: DropDownOption<GradebookSortOrder>[] = [
 
 type Props = {
   sections: SectionConnection[]
+  customColumns?: CustomColumn[] | null
   gradebookOptions: GradebookOptions
   onSortChange: (sortType: GradebookSortOrder) => void
   onSectionChange: (sectionId?: string) => void
   handleCheckboxChange: HandleCheckboxChange
+  onTeacherNotesCreation: (teacherNotes: TeacherNotes) => void
 }
 
 export default function GlobalSettings({
   sections,
+  customColumns,
   gradebookOptions,
   onSortChange,
   onSectionChange,
   handleCheckboxChange,
+  onTeacherNotesCreation,
 }: Props) {
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sortType = event.target.value as GradebookSortOrder
@@ -148,10 +154,13 @@ export default function GlobalSettings({
 
           <ShowNotesColumnCheckbox
             teacherNotes={gradebookOptions.teacherNotes}
+            customColumns={customColumns}
             customColumnUrl={gradebookOptions.customColumnUrl}
             customColumnsUrl={gradebookOptions.customColumnsUrl}
+            reorderCustomColumnsUrl={gradebookOptions.reorderCustomColumnsUrl}
             handleCheckboxChange={handleCheckboxChange}
             showNotesColumn={gradebookOptions.customOptions.showNotesColumn}
+            onTeacherNotesCreation={onTeacherNotesCreation}
           />
           {/* {{#if finalGradeOverrideEnabled}}
             <View as="div" className="checkbox">

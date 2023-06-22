@@ -550,6 +550,7 @@ class GradebooksController < ApplicationController
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
+    per_page = Setting.get("api_max_per_page", "50").to_i
     gradebook_options = {
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
@@ -559,6 +560,8 @@ class GradebooksController < ApplicationController
       },
       context_id: @context.id.to_s,
       context_url: named_context_url(@context, :context_url),
+      custom_column_data_url: api_v1_course_custom_gradebook_column_data_url(@context, ":id", per_page:),
+      custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
       custom_column_url: api_v1_course_custom_gradebook_column_url(@context, ":id"),
       custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
       export_gradebook_csv_url: course_gradebook_csv_url,
@@ -566,6 +569,7 @@ class GradebooksController < ApplicationController
       gradebook_is_editable:,
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
+      reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
       save_view_ungraded_as_zero_to_server: allow_view_ungraded_as_zero?,
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),
