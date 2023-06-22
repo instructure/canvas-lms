@@ -123,7 +123,6 @@ describe CourseForMenuPresenter do
 
     context "useClassicFont" do
       before :once do
-        Account.site_admin.enable_feature! :k5_font_selection
         @account = course.account
         toggle_k5_setting(@account)
       end

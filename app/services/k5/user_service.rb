@@ -45,7 +45,6 @@ class K5::UserService
   end
 
   def use_classic_font?
-    return false unless Account.site_admin.feature_enabled?(:k5_font_selection)
     return false unless @actual_user
     return false unless k5_user?
 

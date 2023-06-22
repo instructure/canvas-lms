@@ -38,7 +38,6 @@ describe K5Mode do
     student_in_course(active_all: true)
     account_admin_user(account: @course.account)
     toggle_k5_setting(@course.account)
-    Account.site_admin.enable_feature! :k5_font_selection
   end
 
   describe "set_k5_mode" do
