@@ -23,7 +23,9 @@ class Discussion
     include SeleniumDependencies
 
     # ---------------------- Selectors ---------------------
-
+    def course_pacing_notice_selector
+      "[data-testid='CoursePacingNotice']"
+    end
     # ---------------------- Elements ----------------------
 
     def discussion_page_body
@@ -63,7 +65,7 @@ class Discussion
     end
 
     def course_pacing_notice
-      f("[data-testid='CoursePacingNotice']")
+      f(course_pacing_notice_selector)
     end
 
     # ---------------------- Actions ----------------------

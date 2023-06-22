@@ -218,7 +218,8 @@ module Api::V1::DiscussionTopics
     fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id:, group_id: } }
 
     fields[:context_code] = topic.context_code if opts[:include_context_code]
-    paced_course = Course.find_by(id: topic.context_id)&.enable_course_paces?
+    topic_course = context.is_a?(Course) ? context : Course.find_by(id: context.context_id)
+    paced_course = topic_course.account.feature_enabled?(:course_paces) && topic_course.enable_course_paces?
     fields[:in_paced_course] = paced_course if paced_course
 
     locked_json(fields, topic, user, "topic", check_policies: true, deep_check_if_needed: true)

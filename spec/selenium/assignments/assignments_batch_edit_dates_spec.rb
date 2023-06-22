@@ -166,12 +166,26 @@ describe "assignment batch edit" do
       course_with_teacher_logged_in
       @course.enable_course_paces = true
       @course.save!
+
+      @course.assignments.create!(
+        title: "Overrides Assignment",
+        points_possible: 10,
+        submission_types: "online_url,online_upload,online_text_entry"
+      )
     end
 
     it "does not include Edit Assignment Dates in the page menu" do
       visit_assignments_index_page(@course.id)
       course_assignments_settings_button.click
       expect(f("body")).not_to contain_jqcss(bulk_edit_dates_menu_jqselector)
+      expect(assignment_groups_weight).to be_displayed
+    end
+
+    it "does include Edit Assignment Dates in page menu when feature off" do
+      @course.account.disable_feature!(:course_paces)
+      visit_assignments_index_page(@course.id)
+      course_assignments_settings_button.click
+      expect(f("body")).to contain_jqcss(bulk_edit_dates_menu_jqselector)
       expect(assignment_groups_weight).to be_displayed
     end
   end
