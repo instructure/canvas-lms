@@ -30,7 +30,7 @@ I18n.translations['zh-Hant'] = {
 }
 
 export default {
-  title: 'Examples/Calendar/WeekdayPicker',
+  title: 'Examples/Calendar/RecurringEvents/WeekdayPicker',
   component: WeekdayPicker,
 } as Meta
 

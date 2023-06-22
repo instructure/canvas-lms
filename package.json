@@ -85,6 +85,7 @@
     "@instructure/ui-tooltip": "^7",
     "@instructure/ui-tray": "^7",
     "@instructure/ui-tree-browser": "^7",
+    "@instructure/ui-utils": "^7",
     "@instructure/ui-view": "^7",
     "@instructure/uid": "^7",
     "@instructure/updown": "^1.3",

@@ -1,0 +1,53 @@
+\d calendar_events
+\d accounts
+select auto_subscribe_calendar from Accounts
+;
+select account_calendar_subscription_type from Accounts;
+select account_calendar_subscription_type from Accounts;
+select account_calendar_subscription_type from accounts;
+\d calendars
+Account.find(2)
+quit
+\q
+\d Account
+\d Accounts
+select id from Accounts where auto_subscribe_account_calendar=true
+;
+select id from Accounts where Accounts.auto_subscribe_account_calendar=true
+;
+\t discussion_topics
+\t
+\t
+\d discussion_topics
+select id, title, type, context_id, context_type from discussion_topics;
+select id, title, type, context_id, context_type, workflow_state from discussion_topics;
+select id, title, type, context_id, context_type, workflow_state from assigments;
+select id, title, type, context_id, context_type, workflow_state from assignments;;
+\d assignment
+\d assignments
+select id, title, type, context_id, context_type, workflow_state from assignments;
+select id, title, context_id, context_type, workflow_state from assignments;
+\d assignment;
+\d assignments
+select submission_type from assignments limit 5;
+select submission_types from assignments limit 5;
+select uniquer submission_types from assignments;
+select unique submission_types from assignments;
+select unique(submission_types) from assignments;
+select distinct submission_types from assignments;
+select distinct external_tool_tag from assignments;
+select external_tool_tag from assignments;
+\s assignments
+\d assignments
+\d assignments
+\d content_tags
+\q
+SELECT "access_tokens".* FROM "public"."access_tokens" WHERE "access_tokens"."workflow_state" = 'active' AND "access_tokens"."crypted_token" IN ('2da3562da04da9158d2256c74fabf937df27f024', '724e3eb48297f03d9676f73be0e320b6150e8d12') ORDER BY "access_tokens"."id" ASC LIMIT 1
+;
+SELECT "access_tokens".* FROM "public"."access_tokens" WHERE "access_tokens"."workflow_state" = 'active' 
+;
+SELECT "access_tokens".* FROM "public"."access_tokens" WHERE "access_tokens"."workflow_state" = 'active' AND "access_tokens"."crypted_token" IN ('2da3562da04da9158d2256c74fabf937df27f024', '724e3eb48297f03d9676f73be0e320b6150e8d12') ORDER BY "access_tokens"."id" ASC LIMIT 1
+;
+\d calendar_events
+select cancel_reason from calendar_events;
+\s Courses
