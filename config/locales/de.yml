@@ -8900,8 +8900,8 @@ de:
         update_course: "Kursdetails aktualisieren"
       course_conclude_at_warning_message: "Derzeit ist festgelegt, dass der Kurs um Mitternacht endet., d. h. der vorherige Tag ist der letzte Tag, an dem der Kurs aktiv ist."
       course_conclude_at_warning_title: "Kurs endet um Mitternacht"
-      course_open_enrollment: "Für diesen Kurs ist die offene Einschreibung aktiviert. Die Studierenden können sich selbst für den Kurs einschreiben, wenn Sie den folgenden URL an sie weiterleiten: *%{url}*. Alternativ dazu können sie sich unter *%{url2}* anmelden und folgenden Teilnahmecode verwenden: *%{code}*"
-      course_open_enrollment_without_code: "Für diesen Kurs ist die offene Einschreibung aktiviert. Die Studierenden können sich selbst für den Kurs einschreiben, wenn Sie den folgenden URL an sie weiterleiten: *%{url}*"
+      course_open_enrollment: "Für diesen Kurs ist die offene Einschreibung aktiviert. Die Studierenden können sich selbst für den Kurs anmelden, wenn Sie den folgenden URL an sie weiterleiten: *%{url}*. Alternativ dazu können sie sich unter *%{url2}* anmelden und folgenden Teilnahmecode verwenden: *%{code}*"
+      course_open_enrollment_without_code: "Für diesen Kurs ist die offene Einschreibung aktiviert. Die Studierenden können sich selbst für den Kurs anmelden, wenn Sie den folgenden URL an sie weiterleiten: *%{url}*"
       course_overrides_term: "Hierdurch werden alle Verfügbarkeitseinstellungen des Semesters außer Kraft gesetzt."
       course_settings_title: Kurseinstellungen
       deatils: 
@@ -11179,7 +11179,7 @@ de:
   enhanced_rce_paste_from_clipboard_30ddb011: "Verbessertes RCE-Einfügen aus der Zwischenablage"
   enhances_the_canvas_experience_within_the_learning_8031b650: "Verbessert die Canvas-Erfahrung im Notenbuch des Lernleistungsziels."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Erhöht den Farbkontrast von Text, Schaltflächen usw."
-  enroll_in_subject_9c1f1c18: "In Fach einschreiben"
+  enroll_in_subject_9c1f1c18: "In Fach anmelden"
   enrolled_a6a517cd: Eingeschrieben
   enrolled_as_272da3b9: "Eingeschrieben als"
   enrolled_as_enrollment_type_a008e44a: "Angemeldet als: %{enrollment_type}"
@@ -24892,14 +24892,14 @@ de:
         go_to_dashboard: "Zu Ihrem Dashboard wechseln"
     authenticate: 
       buttons: 
-        enroll_in_course: "Für Kurs einschreiben"
+        enroll_in_course: "Für Kurs anmelden"
         next: Nächste/r
       getting_started: "Sie sind im Begriff, sich für **%{course}** einzuschreiben."
       labels: 
         password: Kennwort
     authenticate_or_register: 
       buttons: 
-        enroll_in_course: "Für Kurs einschreiben"
+        enroll_in_course: "Für Kurs anmelden"
         next: Nächste/r
       existing_user: "Ich verfüge bereits über eine %{institution_name}-Zugangskennung."
       getting_started: "Sie sind im Begriff, sich für **%{course}** einzuschreiben."
@@ -24909,7 +24909,7 @@ de:
       new_user: "Ich bin ein/e neue/r Benutzer\\*in"
     confirm_enrollments: 
       buttons: 
-        enroll_in_course: "Für Kurs einschreiben"
+        enroll_in_course: "Für Kurs anmelden"
         next: Nächste/r
       getting_started: "Sie sind im Begriff, sich für **%{course}** einzuschreiben."
     course_full: 
@@ -24918,7 +24918,7 @@ de:
       enrollment_is_closed: "Einschreibung für **%{course}** ist nicht mehr möglich."
     new: 
       titles: 
-        course_enrollment: "Für %{course} einschreiben"
+        course_enrollment: "Für %{course} anmelden"
     successfully_enrolled: 
       already_enrolled: "Sie haben sich erfolgreich für **%{course}** eingeschrieben."
       buttons: 
@@ -30140,7 +30140,7 @@ de:
           Du hast dich in einem oder mehreren Kursen eingeschrieben, die noch nicht begonnen haben. Sobald
           diese Kurse verfügbar sind, findest du Informationen darüber hier
           und in der Navigation auf der linken Seite. In der Zwischenzeit, kannst du dich für
-          weitere Kurse einschreiben oder dein Profil einrichten.
+          weitere Kurse anmelden oder dein Profil einrichten.
       welcome_to_happiness: "Willkommen bei Canvas!"
   users_act_as_d922940: "Benutzer\\*innen – handeln als"
   users_add_remove_observers_d1273d9: "Benutzer – Beobachter hinzufügen / entfernen"
@@ -30821,7 +30821,7 @@ de:
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Sie können die Gruppe durch Anklicken dieses Links %{link} auschecken."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Sie können die Gruppe durch Anklicken dieses Links %{link} auschecken."
   you_can_close_this_dialog_box_to_continue_working__7b19e320: "Sie können dieses Dialogfeld schließen, um die Arbeit fortzusetzen, falls Sie nicht warten möchten. Die Zuweisung wird im Hintergrund fortgesetzt."
-  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Sie können Gruppen erstellen, in die sich Studierende selbständig einschreiben können. Die Studierenden sind zwar immer noch darauf beschränkt, nur in einer Gruppe des Sets zu sein, aber auf diese Weise können sich die Studierenden selbst in Gruppen organisieren, anstatt den Lehrenden mit der Arbeit zu beauftragen."
+  you_can_create_sets_of_groups_where_students_can_s_15da1b8c: "Sie können Gruppen erstellen, in die sich Studierende selbständig anmelden können. Die Studierenden sind zwar immer noch darauf beschränkt, nur in einer Gruppe des Sets zu sein, aber auf diese Weise können sich die Studierenden selbst in Gruppen organisieren, anstatt den Lehrenden mit der Arbeit zu beauftragen."
   you_can_create_sets_of_groups_where_students_can_s_b8cb5a25: |-
       Sie können Gruppensets erstellen, bei denen sich die Studierenden selbst anmelden können. Die Studierenden\
                     sind immer noch auf ein Gruppenset beschränkt, aber auf diese Weise können sich die Studierenden selbst in Gruppen organisieren\
