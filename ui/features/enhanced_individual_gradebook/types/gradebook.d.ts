@@ -50,6 +50,19 @@ export type CustomOptions = {
   showTotalGradeAsPoints: boolean
 }
 
+export type CustomColumn = {
+  id: string
+  teacher_notes: boolean
+  position: number
+  title: string
+  read_only: boolean
+}
+
+export type CustomColumnDatum = {
+  content: string
+  user_id: string
+}
+
 export type HandleCheckboxChange = (key: keyof CustomOptions, value: boolean) => void
 
 export type GradebookOptions = {
@@ -63,8 +76,12 @@ export type GradebookOptions = {
   userId?: string | null
   courseSettings?: CourseSettingsType | null
   contextId?: string | null
+  changeGradeUrl?: string | null
+  customColumnDataUrl?: string | null
+  customColumnDatumUrl?: string | null
   customColumnUrl?: string | null
   customColumnsUrl?: string | null
+  reorderCustomColumnsUrl?: string | null
   saveViewUngradedAsZeroToServer?: boolean | null
   settingUpdateUrl?: string | null
   settingsUpdateUrl?: string | null

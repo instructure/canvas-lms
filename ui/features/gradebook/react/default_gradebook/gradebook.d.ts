@@ -105,6 +105,7 @@ export type GradebookOptions = {
   course_url: string
   current_grading_period_id: string
   currentUserId: string
+  custom_column_data_url: string
   custom_column_datum_url: string
   custom_column_url: string
   custom_columns_url: string

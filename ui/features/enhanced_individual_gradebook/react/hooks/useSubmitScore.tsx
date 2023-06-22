@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from '@canvas/axios'
+import {executeApiRequest} from '@canvas/util/apiRequest'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -28,7 +28,7 @@ import {Submission} from '../../../../api.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 
-export const useSubmitScore = () => {
+export const useSubmitScore = (changeGradeUrl?: string | null) => {
   const [submitScoreStatus, setSubmitScoreStatus] = useState<ApiCallStatus>(
     ApiCallStatus.NOT_STARTED
   )
@@ -37,7 +37,7 @@ export const useSubmitScore = () => {
     null
   )
 
-  const gradeChangeUrl = ENV.GRADEBOOK_OPTIONS?.change_grade_url || ''
+  const gradeChangeUrl = changeGradeUrl || ''
 
   const submit = useCallback(
     async (
@@ -77,8 +77,11 @@ export const useSubmitScore = () => {
         },
       }
 
-      const {data, status} = await axios.put<Submission>(url ?? '', requestBody)
-
+      const {data, status} = await executeApiRequest<Submission>({
+        method: 'PUT',
+        path: url,
+        body: requestBody,
+      })
       if (status === 200) {
         setSavedSubmission(mapUnderscoreSubmission(data))
         setSubmitScoreStatus(ApiCallStatus.COMPLETED)

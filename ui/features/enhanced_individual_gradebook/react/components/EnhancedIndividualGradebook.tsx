@@ -41,6 +41,8 @@ import {
   SortableAssignment,
   SortableStudent,
   SubmissionGradeChange,
+  TeacherNotes,
+  CustomColumn,
 } from '../../types'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
 import {
@@ -49,6 +51,7 @@ import {
   mapEnrollmentsToSortableStudents,
 } from '../../utils/gradebookUtils'
 import {useCurrentStudentInfo} from '../hooks/useCurrentStudentInfo'
+import {useCustomColumns} from '../hooks/useCustomColumns'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -94,9 +97,13 @@ export default function EnhancedIndividualGradebook() {
     contextUrl: ENV.GRADEBOOK_OPTIONS?.context_url,
     contextId: ENV.GRADEBOOK_OPTIONS?.context_id,
     userId: ENV.current_user_id,
+    changeGradeUrl: ENV.GRADEBOOK_OPTIONS?.change_grade_url,
     courseSettings: ENV.GRADEBOOK_OPTIONS?.course_settings,
+    customColumnDatumUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_datum_url,
+    customColumnDataUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_data_url,
     customColumnUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_url,
     customColumnsUrl: ENV.GRADEBOOK_OPTIONS?.custom_columns_url,
+    reorderCustomColumnsUrl: ENV.GRADEBOOK_OPTIONS?.reorder_custom_columns_url,
     settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
     settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
     teacherNotes: ENV.GRADEBOOK_OPTIONS?.teacher_notes,
@@ -127,6 +134,12 @@ export default function EnhancedIndividualGradebook() {
     fetchPolicy: 'no-cache',
     skip: !courseId,
   })
+
+  const {customColumns} = useCustomColumns(gradebookOptions.customColumnsUrl)
+  const studentNotesColumnId = customColumns?.find(
+    (column: CustomColumn) => column.teacher_notes
+  )?.id
+
   useEffect(() => {
     if (!currentStudent || !students) {
       return
@@ -240,6 +253,7 @@ export default function EnhancedIndividualGradebook() {
       <GlobalSettings
         sections={sections}
         gradebookOptions={gradebookOptions}
+        customColumns={customColumns}
         onSortChange={sortType => {
           userSettings.contextSet('sort_grade_columns_by', {sortType})
           const newGradebookOptions = {...gradebookOptions, sortOrder: sortType}
@@ -253,6 +267,11 @@ export default function EnhancedIndividualGradebook() {
           setGradebookOptions(prevGradebookOptions => {
             const newCustomOptions = {...prevGradebookOptions.customOptions, [key]: value}
             return {...prevGradebookOptions, customOptions: newCustomOptions}
+          })
+        }}
+        onTeacherNotesCreation={(teacherNotes: TeacherNotes) => {
+          setGradebookOptions(prevGradebookOptions => {
+            return {...prevGradebookOptions, teacherNotes}
           })
         }}
       />
@@ -289,6 +308,7 @@ export default function EnhancedIndividualGradebook() {
         submissions={studentSubmissions}
         assignmentGroupMap={assignmentGroupMap}
         gradebookOptions={gradebookOptions}
+        studentNotesColumnId={studentNotesColumnId}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

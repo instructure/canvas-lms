@@ -63,7 +63,9 @@ export default function GradingResults({
   const [gradeInput, setGradeInput] = useState<string>('')
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
-  const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
+  const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore(
+    gradebookOptions.changeGradeUrl
+  )
   const {submissionComments, loadingComments, refetchComments} = useGetComments({
     courseId,
     submissionId: submission?.id,
