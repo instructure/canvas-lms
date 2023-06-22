@@ -563,18 +563,16 @@
                       To learn more about Canvas for Elementary, please refer to <a href="<%= t(:'#community.canvas_for_elementary') %>" target="_blank">our documentation</a>.
                     <% end %>
                   </p>
-                  <% if Account.site_admin.feature_enabled?(:k5_font_selection) %>
-                    <% font_settings = @account.use_classic_font_in_k5 %>
-                    <%= settings.fields_for :use_classic_font_in_k5 do |font| %>
-                      <div>
-                        <span class="screenreader-only"><%= t('Canvas for Elementary Font Selection') %></span>
-                        <%= font.radio_button :value, false, checked: !font_settings[:value], disabled: disabled, id: "k5_font_disabled_radio" %>
-                        <%= font.label :value, t("Large Balsamiq Font"), for: "k5_font_disabled_radio", style: "margin-bottom: 0;" %>
-                        <br />
-                        <%= font.radio_button :value, true, checked: font_settings[:value], disabled: disabled, id: "k5_font_enabled_radio" %>
-                        <%= font.label :value, t("Regular Lato Font"), for: "k5_font_enabled_radio" %>
-                      </div>
-                    <% end %>
+                  <% font_settings = @account.use_classic_font_in_k5 %>
+                  <%= settings.fields_for :use_classic_font_in_k5 do |font| %>
+                    <div>
+                      <span class="screenreader-only"><%= t('Canvas for Elementary Font Selection') %></span>
+                      <%= font.radio_button :value, false, checked: !font_settings[:value], disabled: disabled, id: "k5_font_disabled_radio" %>
+                      <%= font.label :value, t("Large Balsamiq Font"), for: "k5_font_disabled_radio", style: "margin-bottom: 0;" %>
+                      <br />
+                      <%= font.radio_button :value, true, checked: font_settings[:value], disabled: disabled, id: "k5_font_enabled_radio" %>
+                      <%= font.label :value, t("Regular Lato Font"), for: "k5_font_enabled_radio" %>
+                    </div>
                   <% end %>
                 </div>
               </div>

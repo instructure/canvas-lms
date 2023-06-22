@@ -174,14 +174,6 @@ module_publish_menu:
   description: Enable the module publish menus to make mass publishing and unpublishing easier.
   applies_to: SiteAdmin
 
-k5_font_selection:
-  state: hidden
-  display_name: 'Allow Font Selection in C4E Accounts'
-  description: |-
-    Adds an account setting to select the classic (Lato) or elementary (Balsamiq Sans) font in Canvas for Elementary
-    accounts.
-  applies_to: SiteAdmin
-
 auto_subscribe_account_calendars:
   state: hidden
   display_name: 'Allow auto-subscription to account calendars'

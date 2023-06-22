@@ -25,7 +25,6 @@ describe CoursesController do
 
   describe "GET 'index'" do
     before do
-      Account.site_admin.enable_feature! :k5_font_selection
       controller.instance_variable_set(:@domain_root_account, Account.default)
     end
 
@@ -1783,7 +1782,6 @@ describe CoursesController do
 
     describe "when account is enabled as k5 account" do
       before :once do
-        Account.site_admin.enable_feature! :k5_font_selection
         toggle_k5_setting(@course.account)
       end
 
