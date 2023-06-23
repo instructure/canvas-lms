@@ -75,5 +75,61 @@ module Importers
     def root_folder_name
       Folder.root_folders(@context).first.name
     end
+
+    def process_domain_substitutions(url)
+      @migration.process_domain_substitutions(url)
+    end
+
+    def context_hosts
+      if (account = @migration&.context&.root_account)
+        HostUrl.context_hosts(account)
+      else
+        []
+      end
+    end
+
+    def report_link_parse_warning(ref_type)
+      Sentry.with_scope do |scope|
+        scope.set_tags(type: ref_type)
+        scope.set_tags(url:)
+        Sentry.capture_message("Link Parser failed to validate type", level: :warning)
+      end
+    end
+
+    def supports_embedded_images
+      true
+    end
+
+    # Returns a link with a boolean "resolved" property indicating whether the link
+    # was actually resolved, or if needs further processing.
+    def link_embedded_image(info_match)
+      extension = MIME::Types[info_match[:mime_type]]&.first&.extensions&.first
+      image_data = Base64.decode64(info_match[:image])
+      md5 = Digest::MD5.hexdigest image_data
+      folder_name = I18n.t("embedded_images")
+      @folder ||= Folder.root_folders(@context).first.sub_folders
+                        .where(name: folder_name, workflow_state: "hidden", context: @context).first_or_create!
+      filename = "#{md5}.#{extension}"
+      file = Tempfile.new([md5, ".#{extension}"])
+      file.binmode
+      file.write(image_data)
+      file.close
+      attachment = FileInContext.attach(@context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5:)
+      {
+        resolved: true,
+        url: "#{context_path}/files/#{attachment.id}/preview",
+      }
+    rescue
+      {
+        resolved: false,
+        url: "#{folder_name}/#{filename}"
+      }
+    end
+
+    def fix_relative_urls?
+      # For course copies don't try to fix relative urls. Any url we can
+      # correctly alter was changed during the 'export' step
+      !@migration&.for_course_copy?
+    end
   end
 end

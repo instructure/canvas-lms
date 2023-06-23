@@ -33,9 +33,9 @@ class ImportedHtmlConverter
   def initialize(migration, migration_id_converter)
     @migration = migration
     @migration_id_converter = migration_id_converter
-    @link_parser = Importers::LinkParser.new(migration)
-    @link_resolver = Importers::LinkResolver.new(migration, migration_id_converter)
-    @link_replacer = Importers::LinkReplacer.new(migration)
+    @link_parser = Importers::LinkParser.new(migration_id_converter)
+    @link_resolver = Importers::LinkResolver.new(migration_id_converter)
+    @link_replacer = Importers::LinkReplacer.new(migration, migration_id_converter)
   end
 
   def convert(html, item_type, mig_id, field, opts = {})

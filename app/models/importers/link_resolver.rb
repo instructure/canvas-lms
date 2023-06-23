@@ -19,10 +19,7 @@
 
 module Importers
   class LinkResolver
-    include LinkParser::Helpers
-
-    def initialize(_migration, migration_id_converter)
-      # should be removed prior to being moved into the gem
+    def initialize(migration_id_converter)
       @migration_id_converter = migration_id_converter
     end
 

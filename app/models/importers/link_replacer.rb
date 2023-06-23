@@ -30,10 +30,17 @@ module Importers
       wiki_page: WikiPage
     }.freeze
 
-    include LinkParser::Helpers
-
-    def initialize(migration)
+    def initialize(migration, migration_query_service)
       @migration = migration
+      @migration_query_service = migration_query_service
+    end
+
+    def context_path
+      @migration_query_service.context_path
+    end
+
+    def context
+      @migration.context
     end
 
     def replace_placeholders!(link_map)
