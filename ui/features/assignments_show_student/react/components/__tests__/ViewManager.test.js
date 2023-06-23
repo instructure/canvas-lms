@@ -101,7 +101,7 @@ describe('ViewManager', () => {
     }
   })
 
-  describe('Try Again Button', () => {
+  describe('New Attempt Button', () => {
     describe('behaves correctly', () => {
       it('by creating a new dummy submission when clicked', async () => {
         const props = await makeProps({currentAttempt: 1})
@@ -110,7 +110,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        const newAttemptButton = getByText('Try Again')
+        const newAttemptButton = getByText('New Attempt')
         fireEvent.click(newAttemptButton)
         expect(getByDisplayValue('Attempt 2')).toBeInTheDocument()
       })
@@ -122,9 +122,9 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        const newAttemptButton = getByText('Try Again')
+        const newAttemptButton = getByText('New Attempt')
         fireEvent.click(newAttemptButton)
-        expect(queryByText('Try Again')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
     })
 
@@ -136,7 +136,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Try Again')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
     })
 
@@ -148,7 +148,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Try Again')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
 
       it('is displayed on the latest submitted attempt', async () => {
@@ -158,7 +158,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Try Again')).toBeInTheDocument()
+        expect(queryByText('New Attempt')).toBeInTheDocument()
       })
 
       it('sets focus on the assignment toggle details when clicked', async () => {
@@ -174,7 +174,7 @@ describe('ViewManager', () => {
         }
         document.querySelector = jest.fn().mockReturnValue(mockElement)
 
-        const newButton = getByText('Try Again')
+        const newButton = getByText('New Attempt')
         fireEvent.click(newButton)
 
         await waitFor(() => {
@@ -192,7 +192,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Try Again')).toBeInTheDocument()
+        expect(queryByText('New Attempt')).toBeInTheDocument()
       })
 
       it('is not displayed if the enrollment state is something other than active', async () => {
@@ -204,7 +204,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Try Again')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
     })
   })

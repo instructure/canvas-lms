@@ -725,8 +725,12 @@ const SubmissionManager = ({assignment, submission, reviewerSubmission}) => {
         shouldRender: () => shouldRenderNewAttempt(),
         render: () => {
           return (
-            <Button data-testid="try-again-button" color="primary" onClick={startNewAttemptAction}>
-              {I18n.t('Try Again')}
+            <Button
+              data-testid="new-attempt-button"
+              color="primary"
+              onClick={startNewAttemptAction}
+            >
+              {I18n.t('New Attempt')}
             </Button>
           )
         },
