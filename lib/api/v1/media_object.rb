@@ -59,6 +59,9 @@ module Api::V1::MediaObject
 
   def media_sources_json(media_object)
     media_object.media_sources&.map do |mo|
+      if Account.site_admin.feature_enabled?(:authenticated_iframe_content)
+        mo[:url] = media_object_redirect_url(media_object.id, bitrate: mo[:bitrate])
+      end
       mo[:src] = mo[:url]
       mo[:label] = "#{(mo[:bitrate].to_i / 1024).floor} kbps"
       mo
