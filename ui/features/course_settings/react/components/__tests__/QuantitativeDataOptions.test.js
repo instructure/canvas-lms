@@ -41,7 +41,6 @@ function setupWindowEnv() {
 function renderComponent(wrapper, overrides = {}) {
   const options = {
     canManage: true,
-    restrictQuantitativeData: false,
     ...overrides,
   }
 
@@ -66,15 +65,15 @@ describe('QuantitativeDataOptions', () => {
     document.body.removeChild(wrapper)
   })
 
-  describe('restrict quantitative data', () => {
+  describe('can manage', () => {
     it('renders restrict quantitative data checkbox', () => {
       const {getByLabelText} = renderComponent(wrapper)
       expect(getByLabelText('Restrict view of quantitative data')).toBeInTheDocument()
     })
 
-    it('restrict quantitative data checkbox is disabled when restrictQuantitativeData is true', () => {
+    it('restrict quantitative data checkbox is disabled when can manage is false', () => {
       const {getByLabelText, getByTestId} = renderComponent(wrapper, {
-        restrictQuantitativeData: true,
+        canManage: false,
       })
       expect(getByLabelText('Restrict view of quantitative data')).toBeInTheDocument()
       expect(getByTestId('restrict-quantitative-data-checkbox')).toHaveAttribute('disabled')
