@@ -271,9 +271,16 @@ module CC
           # WikiPagesController allows loosely-matching URLs; fix them before exporting
           if match.obj_id.present?
             url_or_title = match.obj_id
-            page = @course.wiki_pages.deleted_last.where(url: url_or_title).first ||
-                   @course.wiki_pages.deleted_last.where(url: url_or_title.to_url).first ||
-                   @course.wiki_pages.where(id: url_or_title.to_i).first
+            lookup = if Account.site_admin.feature_enabled?(:permanent_page_links)
+                       @course.wiki_page_lookups.where(slug: url_or_title.to_url).first
+                     end
+            page = if lookup
+                     @course.wiki_pages.deleted_last.where(id: lookup.wiki_page_id).first
+                   else
+                     @course.wiki_pages.deleted_last.where(url: url_or_title).first ||
+                       @course.wiki_pages.deleted_last.where(url: url_or_title.to_url).first ||
+                       @course.wiki_pages.where(id: url_or_title.to_i).first
+                   end
           end
           if page
             query = translate_module_item_query(match.query)
