@@ -34,7 +34,7 @@ describe ImportedHtmlConverter do
       link_map = @converter.link_parser.unresolved_link_map
       @converter.link_resolver.resolve_links!(link_map)
       if link_map.present?
-        @converter.link_replacer.sub_placeholders!(html, link_map.values.map(&:values).flatten)
+        Importers::LinkReplacer.sub_placeholders!(html, link_map.values.map(&:values).flatten)
       end
       html
     end
