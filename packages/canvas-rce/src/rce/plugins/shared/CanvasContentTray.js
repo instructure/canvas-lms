@@ -32,6 +32,7 @@ import {getTrayHeight} from './trayUtils'
 import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 import {getLinkContentFromEditor} from './ContentSelection'
 import {LinkDisplay} from './LinkDisplay'
+import {showFlashAlert} from '../../../common/FlashAlert'
 
 /**
  * Returns the translated tray label
@@ -373,6 +374,11 @@ export default function CanvasContentTray(props) {
     }
 
     bridge.insertLink(newLink)
+    showFlashAlert({
+      message: formatMessage('Updated link'),
+      type: 'success',
+      srOnly: true,
+    })
   }
 
   function renderFooter() {
