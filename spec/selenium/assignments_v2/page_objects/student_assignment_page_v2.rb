@@ -223,8 +223,8 @@ class StudentAssignmentPageV2
       f("div[data-testid='online_text_entry']")
     end
 
-    def try_again_button
-      f("button[data-testid='try-again-button']")
+    def new_attempt_button
+      f("button[data-testid='new-attempt-button']")
     end
 
     def cancel_attempt_button

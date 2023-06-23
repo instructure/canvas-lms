@@ -839,7 +839,7 @@ describe('SubmissionManager', () => {
           </MockedProvider>
         )
 
-        expect(getByTestId('try-again-button')).toBeInTheDocument()
+        expect(getByTestId('new-attempt-button')).toBeInTheDocument()
       })
 
       it('is not rendered for observers', async () => {
@@ -855,7 +855,7 @@ describe('SubmissionManager', () => {
             <SubmissionManager {...props} />
           </MockedProvider>
         )
-        expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+        expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
       })
 
       it('is not rendered if changes cannot be made to the submission', async () => {
@@ -868,7 +868,7 @@ describe('SubmissionManager', () => {
             <SubmissionManager {...props} />
           </MockedProvider>
         )
-        expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+        expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
       })
     })
 
@@ -879,7 +879,7 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+      expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if the student has been graded before submitting', async () => {
@@ -894,7 +894,7 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+      expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if excused', async () => {
@@ -906,7 +906,7 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+      expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if the assignment is locked', async () => {
@@ -919,7 +919,7 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+      expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if there are no more attempts', async () => {
@@ -932,7 +932,7 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+      expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
 
     it('accounts for any extra attempts awarded to the student', async () => {
@@ -948,7 +948,7 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByTestId('try-again-button')).toBeInTheDocument()
+      expect(queryByTestId('new-attempt-button')).toBeInTheDocument()
     })
 
     it('is not shown when looking at prevous attempts when all allowed attempts have been used', async () => {
@@ -964,7 +964,7 @@ describe('SubmissionManager', () => {
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
+      expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
   })
 

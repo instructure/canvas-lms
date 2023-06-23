@@ -344,8 +344,8 @@ describe "as a student" do
         expect(StudentAssignmentPageV2.late_pill).to be_displayed
       end
 
-      it "changes the submit assignment button to try again button after the first submission is made" do
-        expect(StudentAssignmentPageV2.try_again_button).to be_displayed
+      it "changes the submit assignment button to new attempt button after the first submission is made" do
+        expect(StudentAssignmentPageV2.new_attempt_button).to be_displayed
       end
 
       it "shows submission workflow tracker status as submitted after the student submits" do
@@ -381,13 +381,13 @@ describe "as a student" do
       end
 
       it "shows Cancel Attempt X button when a subsequent submission is in progress but not submitted" do
-        StudentAssignmentPageV2.try_again_button.click
+        StudentAssignmentPageV2.new_attempt_button.click
 
         expect(StudentAssignmentPageV2.cancel_attempt_button).to be_displayed
       end
 
       it "cancels attempt when Cancel Attempt button is selected during subsequent attempt" do
-        StudentAssignmentPageV2.try_again_button.click
+        StudentAssignmentPageV2.new_attempt_button.click
         expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("IN PROGRESS")
         StudentAssignmentPageV2.cancel_attempt_button.click
 
