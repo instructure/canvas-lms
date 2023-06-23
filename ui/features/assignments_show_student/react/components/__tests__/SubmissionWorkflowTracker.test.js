@@ -38,8 +38,16 @@ describe('when a submission is graded', () => {
 
       const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
       expect(getByTestId('submission-workflow-tracker-subtitle')).toHaveTextContent(
-        'Submitted on Jun 1, 2021 7:27pm'
+        'SUBMITTED: Jun 1, 2021 7:27pm'
       )
+    })
+
+    it('renders the time submitted subtitle text in success color', async () => {
+      const submission = await mockSubmission({Submission: SubmissionMocks.graded})
+      submission.submittedAt = tz.parse('2021-06-01T19:27:54Z')
+
+      const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
+      expect(getByTestId('submission-workflow-tracker-subtitle')).toHaveStyle('color: success')
     })
 
     it('does not render a subtitle if the student has not submitted', async () => {

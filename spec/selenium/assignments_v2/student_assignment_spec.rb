@@ -294,7 +294,7 @@ describe "as a student" do
       end
 
       it "shows submission workflow tracker status as Inprogress with no submission" do
-        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("IN PROGRESS")
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("In Progress")
       end
 
       it "shows assignment title" do
@@ -349,7 +349,7 @@ describe "as a student" do
       end
 
       it "shows submission workflow tracker status as submitted after the student submits" do
-        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("SUBMITTED")
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("Submitted")
       end
 
       it "shows the file name of the submitted file and an option to download" do
@@ -377,7 +377,7 @@ describe "as a student" do
       end
 
       it "shows submission workflow tracker status as review feedback after the student is graded" do
-        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("REVIEW FEEDBACK")
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("Review Feedback")
       end
 
       it "shows Cancel Attempt X button when a subsequent submission is in progress but not submitted" do
@@ -388,10 +388,10 @@ describe "as a student" do
 
       it "cancels attempt when Cancel Attempt button is selected during subsequent attempt" do
         StudentAssignmentPageV2.new_attempt_button.click
-        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("IN PROGRESS")
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("In Progress")
         StudentAssignmentPageV2.cancel_attempt_button.click
 
-        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("REVIEW FEEDBACK")
+        expect(StudentAssignmentPageV2.submission_workflow_tracker).to include_text("Review Feedback")
       end
     end
 

@@ -29,8 +29,8 @@ const I18n = useI18nScope('assignments_2_student_header')
 const possibleStates = {
   inProgress: {
     value: 1,
-    title: <Text transform="uppercase">{I18n.t('In Progress')}</Text>,
-    subtitle: I18n.t('Next Up: Submit Assignment'),
+    title: <Text>{I18n.t('In Progress')}</Text>,
+    subtitle: I18n.t('NEXT UP: Submit Assignment'),
   },
   submitted: {
     value: 2,
@@ -43,16 +43,16 @@ const possibleStates = {
         <FriendlyDatetime
           dateTime={submission.submittedAt}
           format={I18n.t('#date.formats.full')}
-          prefix={I18n.t('SUBMITTED on')}
+          prefix={I18n.t('Submitted on')}
           showTime={true}
         />
       )
     },
-    subtitle: I18n.t('Next Up: Review Feedback'),
+    subtitle: I18n.t('NEXT UP: Review Feedback'),
   },
   completed: {
     value: 3,
-    title: <Text transform="uppercase">{I18n.t('Review Feedback')}</Text>,
+    title: <Text>{I18n.t('Review Feedback')}</Text>,
     subtitle: submission => {
       const {attempt, submittedAt} = submission
 
@@ -68,7 +68,7 @@ const possibleStates = {
         <FriendlyDatetime
           dateTime={submittedAt}
           format={I18n.t('#date.formats.full')}
-          prefix={I18n.t('Submitted on')}
+          prefix={I18n.t('SUBMITTED: ')}
           showTime={true}
         />
       )
@@ -117,12 +117,7 @@ export default function SubmissionWorkflowTracker({submission}) {
           />
         </Flex.Item>
         <Flex.Item shouldGrow={true}>
-          <Text
-            as="div"
-            color="success"
-            data-testid="submission-workflow-tracker-title"
-            weight="bold"
-          >
+          <Text as="div" data-testid="submission-workflow-tracker-title">
             {renderStateText(submission, state.title)}
           </Text>
           {submission.proxySubmitter && (
@@ -136,7 +131,12 @@ export default function SubmissionWorkflowTracker({submission}) {
             </Text>
           )}
           {subtitle && (
-            <Text as="div" data-testid="submission-workflow-tracker-subtitle">
+            <Text
+              as="div"
+              color="success"
+              weight="bold"
+              data-testid="submission-workflow-tracker-subtitle"
+            >
               {subtitle}
             </Text>
           )}
