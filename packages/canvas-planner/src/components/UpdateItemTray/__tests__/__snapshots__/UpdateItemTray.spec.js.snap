@@ -1,581 +1,617 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the item to update if provided 1`] = `
-<div
-  className="UpdateItemTray-styles__root"
->
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    overflowX="visible"
-    overflowY="visible"
-    padding="large medium medium"
-    position="static"
-    shouldAnimateFocus={true}
-    withVisualDebug={false}
+<Fragment>
+  <style>
+    
+  .UpdateItemTray-styles__root {
+    background: #FFFFFF;
+    width: 19rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  </style>
+  <div
+    className="UpdateItemTray-styles__root"
   >
-    <FormFieldGroup
-      as="fieldset"
-      colSpacing="small"
-      description={
-        <ScreenReaderContent
-          as="span"
-        >
-          <h2>
-            Edit Planner Item
-          </h2>
-        </ScreenReaderContent>
-      }
-      disabled={false}
-      rowSpacing="small"
-      vAlign="middle"
-    >
-      <TextInput
-        data-testid="title"
-        display="block"
-        inputContainerRef={[Function]}
-        inputRef={[Function]}
-        isRequired={false}
-        messages={Array []}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        renderLabel={[Function]}
-        shouldNotWrap={false}
-        size="medium"
-        textAlign="start"
-        type="text"
-        value="Planner Item"
-      />
-      <DateTimeInput
-        allowNonStepInput={true}
-        colSpacing="medium"
-        dateFormat="LL"
-        dateRenderLabel="Date"
-        description={
-          <ScreenReaderContent
-            as="span"
-          >
-            The date and time this to do is due
-          </ScreenReaderContent>
-        }
-        invalidDateTimeMessage={[Function]}
-        isRequired={false}
-        layout="stacked"
-        locale="en"
-        messageFormat="LLLL"
-        messages={Array []}
-        nextMonthLabel="Next Month"
-        onChange={[Function]}
-        prevMonthLabel="Previous Month"
-        required={true}
-        rowSpacing="small"
-        timeRenderLabel="Time"
-        timeStep={30}
-        timezone="Asia/Tokyo"
-        value="2017-04-25T08:49:00.000Z"
-      />
-      <SimpleSelect
-        assistiveText="Use arrow keys to navigate options."
-        constrain="window"
-        id="to-do-item-course-select"
-        inputRef={[Function]}
-        isInline={false}
-        isRequired={false}
-        listRef={[Function]}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        onHideOptions={[Function]}
-        onShowOptions={[Function]}
-        placeholder={null}
-        placement="bottom stretch"
-        renderAfterInput={null}
-        renderBeforeInput={null}
-        renderEmptyOption="---"
-        renderLabel="Course"
-        size="medium"
-        value="1"
-        visibleOptionsCount={8}
-      >
-        <Option
-          id="none"
-          isDisabled={false}
-          key="none"
-          value="none"
-        >
-          Optional: Add Course
-        </Option>
-        <Option
-          id="1"
-          isDisabled={false}
-          key="1"
-          value="1"
-        >
-          a course
-        </Option>
-      </SimpleSelect>
-      <TextArea
-        autoGrow={false}
-        data-testid="details"
-        disabled={false}
-        height="10rem"
-        inline={false}
-        label="Details"
-        layout="stacked"
-        messages={Array []}
-        onChange={[Function]}
-        readOnly={false}
-        required={false}
-        resize="none"
-        size="medium"
-        textareaRef={[Function]}
-        value="You made this item to remind you of something, but you forgot what."
-      />
-    </FormFieldGroup>
     <View
       as="div"
       borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
+      padding="large medium medium"
       position="static"
       shouldAnimateFocus={true}
-      textAlign="end"
       withVisualDebug={false}
     >
-      <Button
-        as="button"
-        color="primary-inverse"
-        cursor="pointer"
-        data-testid="delete"
-        display="inline-block"
-        elementRef={[Function]}
-        margin="0 x-small 0 0"
-        onClick={[Function]}
-        size="medium"
-        textAlign="center"
-        type="button"
-        withBackground={true}
+      <FormFieldGroup
+        as="fieldset"
+        colSpacing="small"
+        description={
+          <ScreenReaderContent
+            as="span"
+          >
+            <h2>
+              Edit Planner Item
+            </h2>
+          </ScreenReaderContent>
+        }
+        disabled={false}
+        rowSpacing="small"
+        vAlign="middle"
       >
-        Delete
-      </Button>
-      <Button
-        as="button"
-        color="primary"
-        cursor="pointer"
-        data-testid="save"
-        display="inline-block"
-        elementRef={[Function]}
-        interaction="enabled"
-        margin="0 0 0 x-small"
-        onClick={[Function]}
-        size="medium"
-        textAlign="center"
-        type="button"
-        withBackground={true}
+        <TextInput
+          data-testid="title"
+          display="block"
+          inputContainerRef={[Function]}
+          inputRef={[Function]}
+          isRequired={false}
+          messages={Array []}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          renderLabel={[Function]}
+          shouldNotWrap={false}
+          size="medium"
+          textAlign="start"
+          type="text"
+          value="Planner Item"
+        />
+        <DateTimeInput
+          allowNonStepInput={true}
+          colSpacing="medium"
+          dateFormat="LL"
+          dateRenderLabel="Date"
+          description={
+            <ScreenReaderContent
+              as="span"
+            >
+              The date and time this to do is due
+            </ScreenReaderContent>
+          }
+          invalidDateTimeMessage={[Function]}
+          isRequired={false}
+          layout="stacked"
+          locale="en"
+          messageFormat="LLLL"
+          messages={Array []}
+          nextMonthLabel="Next Month"
+          onChange={[Function]}
+          prevMonthLabel="Previous Month"
+          required={true}
+          rowSpacing="small"
+          timeRenderLabel="Time"
+          timeStep={30}
+          timezone="Asia/Tokyo"
+          value="2017-04-25T08:49:00.000Z"
+        />
+        <SimpleSelect
+          assistiveText="Use arrow keys to navigate options."
+          constrain="window"
+          id="to-do-item-course-select"
+          inputRef={[Function]}
+          isInline={false}
+          isRequired={false}
+          listRef={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onHideOptions={[Function]}
+          onShowOptions={[Function]}
+          placeholder={null}
+          placement="bottom stretch"
+          renderAfterInput={null}
+          renderBeforeInput={null}
+          renderEmptyOption="---"
+          renderLabel="Course"
+          size="medium"
+          value="1"
+          visibleOptionsCount={8}
+        >
+          <Option
+            id="none"
+            isDisabled={false}
+            key="none"
+            value="none"
+          >
+            Optional: Add Course
+          </Option>
+          <Option
+            id="1"
+            isDisabled={false}
+            key="1"
+            value="1"
+          >
+            a course
+          </Option>
+        </SimpleSelect>
+        <TextArea
+          autoGrow={false}
+          data-testid="details"
+          disabled={false}
+          height="10rem"
+          inline={false}
+          label="Details"
+          layout="stacked"
+          messages={Array []}
+          onChange={[Function]}
+          readOnly={false}
+          required={false}
+          resize="none"
+          size="medium"
+          textareaRef={[Function]}
+          value="You made this item to remind you of something, but you forgot what."
+        />
+      </FormFieldGroup>
+      <View
+        as="div"
+        borderColor="primary"
+        display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        margin="small 0 0"
+        overflowX="visible"
+        overflowY="visible"
+        position="static"
+        shouldAnimateFocus={true}
+        textAlign="end"
+        withVisualDebug={false}
       >
-        Save
-      </Button>
+        <Button
+          as="button"
+          color="primary-inverse"
+          cursor="pointer"
+          data-testid="delete"
+          display="inline-block"
+          elementRef={[Function]}
+          margin="0 x-small 0 0"
+          onClick={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        >
+          Delete
+        </Button>
+        <Button
+          as="button"
+          color="primary"
+          cursor="pointer"
+          data-testid="save"
+          display="inline-block"
+          elementRef={[Function]}
+          interaction="enabled"
+          margin="0 0 0 x-small"
+          onClick={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        >
+          Save
+        </Button>
+      </View>
     </View>
-  </View>
-</div>
+  </div>
+</Fragment>
 `;
 
 exports[`updates state when new note is passed in 1`] = `
-<div
-  className="UpdateItemTray-styles__root"
->
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    overflowX="visible"
-    overflowY="visible"
-    padding="large medium medium"
-    position="static"
-    shouldAnimateFocus={true}
-    withVisualDebug={false}
+<Fragment>
+  <style>
+    
+  .UpdateItemTray-styles__root {
+    background: #FFFFFF;
+    width: 19rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  </style>
+  <div
+    className="UpdateItemTray-styles__root"
   >
-    <FormFieldGroup
-      as="fieldset"
-      colSpacing="small"
-      description={
-        <ScreenReaderContent
-          as="span"
-        >
-          <h2>
-            Edit Planner Item 1
-          </h2>
-        </ScreenReaderContent>
-      }
-      disabled={false}
-      rowSpacing="small"
-      vAlign="middle"
-    >
-      <TextInput
-        data-testid="title"
-        display="block"
-        inputContainerRef={[Function]}
-        inputRef={[Function]}
-        isRequired={false}
-        messages={Array []}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        renderLabel={[Function]}
-        shouldNotWrap={false}
-        size="medium"
-        textAlign="start"
-        type="text"
-        value="Planner Item 1"
-      />
-      <DateTimeInput
-        allowNonStepInput={true}
-        colSpacing="medium"
-        dateFormat="LL"
-        dateRenderLabel="Date"
-        description={
-          <ScreenReaderContent
-            as="span"
-          >
-            The date and time this to do is due
-          </ScreenReaderContent>
-        }
-        invalidDateTimeMessage={[Function]}
-        isRequired={false}
-        layout="stacked"
-        locale="en"
-        messageFormat="LLLL"
-        messages={Array []}
-        nextMonthLabel="Next Month"
-        onChange={[Function]}
-        prevMonthLabel="Previous Month"
-        required={true}
-        rowSpacing="small"
-        timeRenderLabel="Time"
-        timeStep={30}
-        timezone="Asia/Tokyo"
-        value="2017-04-28T11:00:00.000Z"
-      />
-      <SimpleSelect
-        assistiveText="Use arrow keys to navigate options."
-        constrain="window"
-        id="to-do-item-course-select"
-        inputRef={[Function]}
-        isInline={false}
-        isRequired={false}
-        listRef={[Function]}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        onHideOptions={[Function]}
-        onShowOptions={[Function]}
-        placeholder={null}
-        placement="bottom stretch"
-        renderAfterInput={null}
-        renderBeforeInput={null}
-        renderEmptyOption="---"
-        renderLabel="Course"
-        size="medium"
-        value="1"
-        visibleOptionsCount={8}
-      >
-        <Option
-          id="none"
-          isDisabled={false}
-          key="none"
-          value="none"
-        >
-          Optional: Add Course
-        </Option>
-        <Option
-          id="1"
-          isDisabled={false}
-          key="1"
-          value="1"
-        >
-          first course
-        </Option>
-        <Option
-          id="2"
-          isDisabled={false}
-          key="2"
-          value="2"
-        >
-          second course
-        </Option>
-      </SimpleSelect>
-      <TextArea
-        autoGrow={false}
-        data-testid="details"
-        disabled={false}
-        height="10rem"
-        inline={false}
-        label="Details"
-        layout="stacked"
-        messages={Array []}
-        onChange={[Function]}
-        readOnly={false}
-        required={false}
-        resize="none"
-        size="medium"
-        textareaRef={[Function]}
-        value="You made this item to remind you of something, but you forgot what."
-      />
-    </FormFieldGroup>
     <View
       as="div"
       borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
+      padding="large medium medium"
       position="static"
       shouldAnimateFocus={true}
-      textAlign="end"
       withVisualDebug={false}
     >
-      <Button
-        as="button"
-        color="primary-inverse"
-        cursor="pointer"
-        data-testid="delete"
-        display="inline-block"
-        elementRef={[Function]}
-        margin="0 x-small 0 0"
-        onClick={[Function]}
-        size="medium"
-        textAlign="center"
-        type="button"
-        withBackground={true}
+      <FormFieldGroup
+        as="fieldset"
+        colSpacing="small"
+        description={
+          <ScreenReaderContent
+            as="span"
+          >
+            <h2>
+              Edit Planner Item 1
+            </h2>
+          </ScreenReaderContent>
+        }
+        disabled={false}
+        rowSpacing="small"
+        vAlign="middle"
       >
-        Delete
-      </Button>
-      <Button
-        as="button"
-        color="primary"
-        cursor="pointer"
-        data-testid="save"
-        display="inline-block"
-        elementRef={[Function]}
-        interaction="enabled"
-        margin="0 0 0 x-small"
-        onClick={[Function]}
-        size="medium"
-        textAlign="center"
-        type="button"
-        withBackground={true}
+        <TextInput
+          data-testid="title"
+          display="block"
+          inputContainerRef={[Function]}
+          inputRef={[Function]}
+          isRequired={false}
+          messages={Array []}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          renderLabel={[Function]}
+          shouldNotWrap={false}
+          size="medium"
+          textAlign="start"
+          type="text"
+          value="Planner Item 1"
+        />
+        <DateTimeInput
+          allowNonStepInput={true}
+          colSpacing="medium"
+          dateFormat="LL"
+          dateRenderLabel="Date"
+          description={
+            <ScreenReaderContent
+              as="span"
+            >
+              The date and time this to do is due
+            </ScreenReaderContent>
+          }
+          invalidDateTimeMessage={[Function]}
+          isRequired={false}
+          layout="stacked"
+          locale="en"
+          messageFormat="LLLL"
+          messages={Array []}
+          nextMonthLabel="Next Month"
+          onChange={[Function]}
+          prevMonthLabel="Previous Month"
+          required={true}
+          rowSpacing="small"
+          timeRenderLabel="Time"
+          timeStep={30}
+          timezone="Asia/Tokyo"
+          value="2017-04-28T11:00:00.000Z"
+        />
+        <SimpleSelect
+          assistiveText="Use arrow keys to navigate options."
+          constrain="window"
+          id="to-do-item-course-select"
+          inputRef={[Function]}
+          isInline={false}
+          isRequired={false}
+          listRef={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onHideOptions={[Function]}
+          onShowOptions={[Function]}
+          placeholder={null}
+          placement="bottom stretch"
+          renderAfterInput={null}
+          renderBeforeInput={null}
+          renderEmptyOption="---"
+          renderLabel="Course"
+          size="medium"
+          value="1"
+          visibleOptionsCount={8}
+        >
+          <Option
+            id="none"
+            isDisabled={false}
+            key="none"
+            value="none"
+          >
+            Optional: Add Course
+          </Option>
+          <Option
+            id="1"
+            isDisabled={false}
+            key="1"
+            value="1"
+          >
+            first course
+          </Option>
+          <Option
+            id="2"
+            isDisabled={false}
+            key="2"
+            value="2"
+          >
+            second course
+          </Option>
+        </SimpleSelect>
+        <TextArea
+          autoGrow={false}
+          data-testid="details"
+          disabled={false}
+          height="10rem"
+          inline={false}
+          label="Details"
+          layout="stacked"
+          messages={Array []}
+          onChange={[Function]}
+          readOnly={false}
+          required={false}
+          resize="none"
+          size="medium"
+          textareaRef={[Function]}
+          value="You made this item to remind you of something, but you forgot what."
+        />
+      </FormFieldGroup>
+      <View
+        as="div"
+        borderColor="primary"
+        display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        margin="small 0 0"
+        overflowX="visible"
+        overflowY="visible"
+        position="static"
+        shouldAnimateFocus={true}
+        textAlign="end"
+        withVisualDebug={false}
       >
-        Save
-      </Button>
+        <Button
+          as="button"
+          color="primary-inverse"
+          cursor="pointer"
+          data-testid="delete"
+          display="inline-block"
+          elementRef={[Function]}
+          margin="0 x-small 0 0"
+          onClick={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        >
+          Delete
+        </Button>
+        <Button
+          as="button"
+          color="primary"
+          cursor="pointer"
+          data-testid="save"
+          display="inline-block"
+          elementRef={[Function]}
+          interaction="enabled"
+          margin="0 0 0 x-small"
+          onClick={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        >
+          Save
+        </Button>
+      </View>
     </View>
-  </View>
-</div>
+  </div>
+</Fragment>
 `;
 
 exports[`updates state when new note is passed in 2`] = `
-<div
-  className="UpdateItemTray-styles__root"
->
-  <View
-    as="div"
-    borderColor="primary"
-    display="auto"
-    focusColor="info"
-    focusPosition="offset"
-    overflowX="visible"
-    overflowY="visible"
-    padding="large medium medium"
-    position="static"
-    shouldAnimateFocus={true}
-    withVisualDebug={false}
+<Fragment>
+  <style>
+    
+  .UpdateItemTray-styles__root {
+    background: #FFFFFF;
+    width: 19rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  </style>
+  <div
+    className="UpdateItemTray-styles__root"
   >
-    <FormFieldGroup
-      as="fieldset"
-      colSpacing="small"
-      description={
-        <ScreenReaderContent
-          as="span"
-        >
-          <h2>
-            Edit Planner Item 2
-          </h2>
-        </ScreenReaderContent>
-      }
-      disabled={false}
-      rowSpacing="small"
-      vAlign="middle"
-    >
-      <TextInput
-        data-testid="title"
-        display="block"
-        inputContainerRef={[Function]}
-        inputRef={[Function]}
-        isRequired={false}
-        messages={Array []}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        renderLabel={[Function]}
-        shouldNotWrap={false}
-        size="medium"
-        textAlign="start"
-        type="text"
-        value="Planner Item 2"
-      />
-      <DateTimeInput
-        allowNonStepInput={true}
-        colSpacing="medium"
-        dateFormat="LL"
-        dateRenderLabel="Date"
-        description={
-          <ScreenReaderContent
-            as="span"
-          >
-            The date and time this to do is due
-          </ScreenReaderContent>
-        }
-        invalidDateTimeMessage={[Function]}
-        isRequired={false}
-        layout="stacked"
-        locale="en"
-        messageFormat="LLLL"
-        messages={Array []}
-        nextMonthLabel="Next Month"
-        onChange={[Function]}
-        prevMonthLabel="Previous Month"
-        required={true}
-        rowSpacing="small"
-        timeRenderLabel="Time"
-        timeStep={30}
-        timezone="Asia/Tokyo"
-        value="2017-04-28T11:00:00.000Z"
-      />
-      <SimpleSelect
-        assistiveText="Use arrow keys to navigate options."
-        constrain="window"
-        id="to-do-item-course-select"
-        inputRef={[Function]}
-        isInline={false}
-        isRequired={false}
-        listRef={[Function]}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onFocus={[Function]}
-        onHideOptions={[Function]}
-        onShowOptions={[Function]}
-        placeholder={null}
-        placement="bottom stretch"
-        renderAfterInput={null}
-        renderBeforeInput={null}
-        renderEmptyOption="---"
-        renderLabel="Course"
-        size="medium"
-        value="2"
-        visibleOptionsCount={8}
-      >
-        <Option
-          id="none"
-          isDisabled={false}
-          key="none"
-          value="none"
-        >
-          Optional: Add Course
-        </Option>
-        <Option
-          id="1"
-          isDisabled={false}
-          key="1"
-          value="1"
-        >
-          first course
-        </Option>
-        <Option
-          id="2"
-          isDisabled={false}
-          key="2"
-          value="2"
-        >
-          second course
-        </Option>
-      </SimpleSelect>
-      <TextArea
-        autoGrow={false}
-        data-testid="details"
-        disabled={false}
-        height="10rem"
-        inline={false}
-        label="Details"
-        layout="stacked"
-        messages={Array []}
-        onChange={[Function]}
-        readOnly={false}
-        required={false}
-        resize="none"
-        size="medium"
-        textareaRef={[Function]}
-        value="This is another reminder"
-      />
-    </FormFieldGroup>
     <View
       as="div"
       borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
+      padding="large medium medium"
       position="static"
       shouldAnimateFocus={true}
-      textAlign="end"
       withVisualDebug={false}
     >
-      <Button
-        as="button"
-        color="primary-inverse"
-        cursor="pointer"
-        data-testid="delete"
-        display="inline-block"
-        elementRef={[Function]}
-        margin="0 x-small 0 0"
-        onClick={[Function]}
-        size="medium"
-        textAlign="center"
-        type="button"
-        withBackground={true}
+      <FormFieldGroup
+        as="fieldset"
+        colSpacing="small"
+        description={
+          <ScreenReaderContent
+            as="span"
+          >
+            <h2>
+              Edit Planner Item 2
+            </h2>
+          </ScreenReaderContent>
+        }
+        disabled={false}
+        rowSpacing="small"
+        vAlign="middle"
       >
-        Delete
-      </Button>
-      <Button
-        as="button"
-        color="primary"
-        cursor="pointer"
-        data-testid="save"
-        display="inline-block"
-        elementRef={[Function]}
-        interaction="enabled"
-        margin="0 0 0 x-small"
-        onClick={[Function]}
-        size="medium"
-        textAlign="center"
-        type="button"
-        withBackground={true}
+        <TextInput
+          data-testid="title"
+          display="block"
+          inputContainerRef={[Function]}
+          inputRef={[Function]}
+          isRequired={false}
+          messages={Array []}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          renderLabel={[Function]}
+          shouldNotWrap={false}
+          size="medium"
+          textAlign="start"
+          type="text"
+          value="Planner Item 2"
+        />
+        <DateTimeInput
+          allowNonStepInput={true}
+          colSpacing="medium"
+          dateFormat="LL"
+          dateRenderLabel="Date"
+          description={
+            <ScreenReaderContent
+              as="span"
+            >
+              The date and time this to do is due
+            </ScreenReaderContent>
+          }
+          invalidDateTimeMessage={[Function]}
+          isRequired={false}
+          layout="stacked"
+          locale="en"
+          messageFormat="LLLL"
+          messages={Array []}
+          nextMonthLabel="Next Month"
+          onChange={[Function]}
+          prevMonthLabel="Previous Month"
+          required={true}
+          rowSpacing="small"
+          timeRenderLabel="Time"
+          timeStep={30}
+          timezone="Asia/Tokyo"
+          value="2017-04-28T11:00:00.000Z"
+        />
+        <SimpleSelect
+          assistiveText="Use arrow keys to navigate options."
+          constrain="window"
+          id="to-do-item-course-select"
+          inputRef={[Function]}
+          isInline={false}
+          isRequired={false}
+          listRef={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onHideOptions={[Function]}
+          onShowOptions={[Function]}
+          placeholder={null}
+          placement="bottom stretch"
+          renderAfterInput={null}
+          renderBeforeInput={null}
+          renderEmptyOption="---"
+          renderLabel="Course"
+          size="medium"
+          value="2"
+          visibleOptionsCount={8}
+        >
+          <Option
+            id="none"
+            isDisabled={false}
+            key="none"
+            value="none"
+          >
+            Optional: Add Course
+          </Option>
+          <Option
+            id="1"
+            isDisabled={false}
+            key="1"
+            value="1"
+          >
+            first course
+          </Option>
+          <Option
+            id="2"
+            isDisabled={false}
+            key="2"
+            value="2"
+          >
+            second course
+          </Option>
+        </SimpleSelect>
+        <TextArea
+          autoGrow={false}
+          data-testid="details"
+          disabled={false}
+          height="10rem"
+          inline={false}
+          label="Details"
+          layout="stacked"
+          messages={Array []}
+          onChange={[Function]}
+          readOnly={false}
+          required={false}
+          resize="none"
+          size="medium"
+          textareaRef={[Function]}
+          value="This is another reminder"
+        />
+      </FormFieldGroup>
+      <View
+        as="div"
+        borderColor="primary"
+        display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        margin="small 0 0"
+        overflowX="visible"
+        overflowY="visible"
+        position="static"
+        shouldAnimateFocus={true}
+        textAlign="end"
+        withVisualDebug={false}
       >
-        Save
-      </Button>
+        <Button
+          as="button"
+          color="primary-inverse"
+          cursor="pointer"
+          data-testid="delete"
+          display="inline-block"
+          elementRef={[Function]}
+          margin="0 x-small 0 0"
+          onClick={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        >
+          Delete
+        </Button>
+        <Button
+          as="button"
+          color="primary"
+          cursor="pointer"
+          data-testid="save"
+          display="inline-block"
+          elementRef={[Function]}
+          interaction="enabled"
+          margin="0 0 0 x-small"
+          onClick={[Function]}
+          size="medium"
+          textAlign="center"
+          type="button"
+          withBackground={true}
+        >
+          Save
+        </Button>
+      </View>
     </View>
-  </View>
-</div>
+  </div>
+</Fragment>
 `;

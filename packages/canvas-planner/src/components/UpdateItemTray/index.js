@@ -17,7 +17,6 @@
  */
 import React, {Component} from 'react'
 import _ from 'lodash'
-import {themeable} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-view'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -31,8 +30,7 @@ import moment from 'moment-timezone'
 import formatMessage from '../../format-message'
 
 import {courseShape} from '../plannerPropTypes'
-import styles from './styles.css'
-import theme from './theme'
+import buildStyle from './style'
 
 export class UpdateItemTray_ extends Component {
   static propTypes = {
@@ -52,6 +50,7 @@ export class UpdateItemTray_ extends Component {
       titleMessages: [],
       dateMessages: [],
     }
+    this.style = buildStyle()
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -281,9 +280,10 @@ export class UpdateItemTray_ extends Component {
     }
   }
 
-  render() {
-    return (
-      <div className={styles.root}>
+  render = () => (
+    <>
+      <style>{this.style.css}</style>
+      <div className={this.style.classNames.root}>
         <View as="div" padding="large medium medium">
           <FormFieldGroup
             rowSpacing="small"
@@ -300,8 +300,8 @@ export class UpdateItemTray_ extends Component {
           </View>
         </View>
       </div>
-    )
-  }
+    </>
+  )
 }
 
-export default themeable(theme, styles)(UpdateItemTray_)
+export default UpdateItemTray_
