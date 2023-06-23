@@ -3172,9 +3172,9 @@ class User < ActiveRecord::Base
     Rails.cache.delete(adminable_accounts_cache_key)
   end
 
-  def adminable_accounts_scope
+  def adminable_accounts_scope(shard_scope: in_region_associated_shards)
     # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
-    account_ids = account_users.active.shard(in_region_associated_shards).distinct.pluck(:account_id)
+    account_ids = account_users.active.shard(shard_scope).distinct.pluck(:account_id)
     Account.active.where(id: account_ids)
   end
 

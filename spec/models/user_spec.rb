@@ -246,6 +246,54 @@ describe User do
     expect(@user.recent_stream_items.size).to eq 0
   end
 
+  describe "#adminable_accounts_scope" do
+    specs_require_sharding
+
+    subject { user.adminable_accounts_scope }
+
+    let(:shard_one_account) { @shard1.activate { Account.create!(name: "Shard One Account") } }
+    let(:shard_two_account) { @shard2.activate { Account.create!(name: "Shard Two Account") } }
+    let(:user) { user_model }
+
+    context "when the user has no account users" do
+      before do
+        user.account_users.map(&:destroy)
+        user.clear_adminable_accounts_cache!
+      end
+
+      it "returns an empty scope" do
+        expect(subject).to be_empty
+      end
+    end
+
+    context "when the user has account users on multiple shards" do
+      before do
+        user.associate_with_shard(shard_one_account.shard)
+        user.associate_with_shard(shard_two_account.shard)
+
+        shard_one_account.shard.activate do
+          AccountUser.create!(account: shard_one_account, user:)
+        end
+
+        shard_two_account.shard.activate do
+          AccountUser.create!(account: shard_two_account, user:)
+        end
+      end
+
+      it "returns the adminable accounts on all shards" do
+        expect(subject).to match_array [shard_one_account, shard_two_account]
+      end
+
+      context "and a shard scope is provided" do
+        subject { user.adminable_accounts_scope(shard_scope: [shard_one_account.shard]) }
+
+        it "limits results to the specified shard scope" do
+          expect(subject).to eq [shard_one_account]
+        end
+      end
+    end
+  end
+
   describe "#recent_stream_items" do
     it "skips submission stream items" do
       course_with_teacher(active_all: true)
