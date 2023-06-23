@@ -22,7 +22,7 @@ require_relative "mock_migration_query_service"
 
 describe Importers::LinkResolver do
   def course_based_converter(assets = LinkConverters::MockMigrationQueryService.default_assets)
-    Importers::LinkResolver.new(nil, LinkConverters::MockMigrationQueryService.new(context_path: "/courses/1", assets:))
+    Importers::LinkResolver.new(LinkConverters::MockMigrationQueryService.new(context_path: "/courses/1", assets:))
   end
 
   describe "resolve_link!" do

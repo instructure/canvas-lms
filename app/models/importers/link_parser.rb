@@ -19,22 +19,6 @@
 
 module Importers
   class LinkParser
-    module Helpers
-      def context
-        @context ||= @migration.context
-      end
-
-      def context_path
-        @context_path ||= "/#{context.class.to_s.underscore.pluralize}/#{context.id}"
-      end
-
-      def relative_url?(url)
-        ImportedHtmlConverter.relative_url?(url)
-      end
-    end
-
-    include Helpers
-
     REFERENCE_KEYWORDS = %w[CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE IMS-CC-FILEBASE].freeze
     LINK_PLACEHOLDER = "LINK.PLACEHOLDER"
     KNOWN_REFERENCE_TYPES = %w[
@@ -67,10 +51,10 @@ module Importers
       wiki_pages
     ].freeze
 
-    attr_reader :unresolved_link_map
+    attr_reader :unresolved_link_map, :migration_query_service
 
-    def initialize(migration)
-      @migration = migration
+    def initialize(migration_query_service)
+      @migration_query_service = migration_query_service
       reset!
     end
 
@@ -106,24 +90,22 @@ module Importers
       if result[:resolved]
         # resolved, just replace and carry on
         new_url = result[:new_url] || url
-        if @migration && !relative_url?(new_url)
+        unless ImportedHtmlConverter.relative_url?(new_url)
           # perform configured substitutions
-          if (processed_url = @migration.process_domain_substitutions(new_url))
+          if (processed_url = @migration_query_service.process_domain_substitutions(new_url))
             new_url = processed_url
           end
           # relative-ize absolute links outside the course but inside our domain
           # (analogous to what is done in Api#process_incoming_html_content)
-          if (account = @migration&.context&.root_account)
-            begin
-              uri = URI.parse(new_url)
-              account_hosts = HostUrl.context_hosts(account).map { |h| h.split(":").first }
-              if account_hosts.include?(uri.host)
-                uri.scheme = uri.host = uri.port = nil
-                new_url = uri.to_s
-              end
-            rescue URI::InvalidURIError, URI::InvalidComponentError
-              nil
+          begin
+            uri = URI.parse(new_url)
+            account_hosts = @migration_query_service.context_hosts.map { |h| h.split(":").first }
+            if account_hosts.include?(uri.host)
+              uri.scheme = uri.host = uri.port = nil
+              new_url = uri.to_s
             end
+          rescue URI::InvalidURIError, URI::InvalidComponentError
+            nil
           end
         end
         node[attr] = new_url
@@ -173,15 +155,11 @@ module Importers
           unresolved(:object, type: $1, migration_id: $2, query: $3)
         else
           # If the `type` is not known, there's something amiss...
-          Sentry.with_scope do |scope|
-            scope.set_tags(type: $1)
-            scope.set_tags(url:)
-            Sentry.capture_message("Link Parser failed to validate type", level: :warning)
-          end
+          @migration_query_service.report_link_parse_warning($1)
           resolved(url)
         end
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
-        resolved("#{context_path}/#{$1}")
+        resolved("#{@migration_query_service.context_path}/#{$1}")
 
       elsif url =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
         rel_path = URI::DEFAULT_PARSER.unescape($1)
@@ -195,8 +173,13 @@ module Importers
             (attr == "src" && ["iframe", "source"].include?(node.name) && node["data-media-id"])
         # Course copy media reference, leave it alone
         resolved
-      elsif attr == "src" && (info_match = url.match(%r{\Adata:(?<mime_type>[-\w]+/[-\w+.]+)?;base64,(?<image>.*)}m))
-        link_embedded_image(info_match)
+      elsif @migration_query_service.supports_embedded_images && attr == "src" && (info_match = url.match(%r{\Adata:(?<mime_type>[-\w]+/[-\w+.]+)?;base64,(?<image>.*)}m))
+        result = @migration_query_service.link_embedded_image(info_match)
+        if result[:resolved]
+          resolved(result[:url])
+        else
+          unresolved(:file, rel_path: result[:url])
+        end
       elsif # rubocop:disable Lint/DuplicateBranch
             # Equation image, leave it alone
             (attr == "src" && node["class"] && node["class"].include?("equation_image")) || # rubocop:disable Layout/ConditionPosition
@@ -204,35 +187,15 @@ module Importers
             url =~ %r{\A/assessment_questions/\d+/files/\d+} ||
             # This points to a specific file already, leave it alone
             url =~ %r{\A/courses/\d+/files/\d+} ||
-            # For course copies don't try to fix relative urls. Any url we can
-            # correctly alter was changed during the 'export' step
-            @migration&.for_course_copy? ||
+            !@migration_query_service.fix_relative_urls? ||
             # It's just a link to an anchor, leave it alone
             url.start_with?("#")
         resolved
-      elsif relative_url?(url)
+      elsif ImportedHtmlConverter.relative_url?(url)
         unresolved(:file, rel_path: URI::DEFAULT_PARSER.unescape(url))
       else # rubocop:disable Lint/DuplicateBranch
         resolved
       end
-    end
-
-    def link_embedded_image(info_match)
-      extension = MIME::Types[info_match[:mime_type]]&.first&.extensions&.first
-      image_data = Base64.decode64(info_match[:image])
-      md5 = Digest::MD5.hexdigest image_data
-      folder_name = I18n.t("embedded_images")
-      @folder ||= Folder.root_folders(context).first.sub_folders
-                        .where(name: folder_name, workflow_state: "hidden", context:).first_or_create!
-      filename = "#{md5}.#{extension}"
-      file = Tempfile.new([md5, ".#{extension}"])
-      file.binmode
-      file.write(image_data)
-      file.close
-      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5:)
-      resolved("#{context_path}/files/#{attachment.id}/preview")
-    rescue
-      unresolved(:file, rel_path: "#{folder_name}/#{filename}")
     end
   end
 end
