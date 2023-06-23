@@ -131,5 +131,131 @@ module Importers
       # correctly alter was changed during the 'export' step
       !@migration&.for_course_copy?
     end
+
+    # Allows the implementation to preload items that will be used by the replacer
+    def preload_items_for_replacer(link_map)
+      # these don't get added to the list of imported migration items
+      load_questions!(link_map)
+    end
+
+    LINK_TYPE_TO_CLASS = {
+      announcement: Announcement,
+      assessment_question: AssessmentQuestion,
+      assignment: Assignment,
+      calendar_event: CalendarEvent,
+      discussion_topic: DiscussionTopic,
+      quiz: Quizzes::Quiz,
+      learning_outcome: LearningOutcome,
+      wiki_page: WikiPage
+    }.freeze
+
+    def retrieve_item(link_type, migration_id)
+      klass = LINK_TYPE_TO_CLASS[link_type]
+      return unless klass
+
+      item = @migration.find_imported_migration_item(klass, migration_id)
+      raise "item not found" unless item
+
+      item
+    end
+
+    def load_questions!(link_map)
+      aq_item_keys = link_map.keys.select { |item_key| item_key[:type] == :assessment_question }
+      aq_item_keys.each_slice(100) do |item_keys|
+        @context.assessment_questions.where(migration_id: item_keys.pluck(:migration_id)).preload(:assessment_question_bank).each do |aq|
+          item_keys.detect { |ikey| ikey[:migration_id] == aq.migration_id }[:item] = aq
+        end
+      end
+
+      qq_item_keys = link_map.keys.select { |item_key| item_key[:type] == :quiz_question }
+      qq_item_keys.each_slice(100) do |item_keys|
+        @context.quiz_questions.where(migration_id: item_keys.pluck(:migration_id)).each do |qq|
+          item_keys.detect { |ikey| ikey[:migration_id] == qq.migration_id }[:item] = qq
+        end
+      end
+    end
+
+    def replace_syllabus_placeholders!(_item_key, field_links)
+      syllabus = @context.syllabus_body
+      if LinkReplacer.sub_placeholders!(syllabus, field_links)
+        @context.class.where(id: @context.id).update_all(syllabus_body: syllabus)
+      end
+    end
+
+    def replace_assessment_question_placeholders!(aq, links)
+      # we have to do a little bit more here because the question_data can get copied all over
+      quiz_ids = []
+      Quizzes::QuizQuestion.where(assessment_question_id: aq.id).find_each do |qq|
+        if LinkReplacer.recursively_sub_placeholders!(qq["question_data"], links)
+          Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
+          quiz_ids << qq.quiz_id
+        end
+      end
+
+      if quiz_ids.any?
+        Quizzes::Quiz.where(id: quiz_ids.uniq).where.not(quiz_data: nil).find_each do |quiz|
+          if LinkReplacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
+            Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
+          end
+        end
+      end
+
+      # we have to do some special link translations for files in assessment questions
+      # because we stopped doing them in the regular importer
+      # basically just moving them to the question context
+      links.each do |link|
+        next unless link[:new_value]
+
+        link[:new_value] = aq.translate_file_link(link[:new_value])
+      end
+
+      if LinkReplacer.recursively_sub_placeholders!(aq["question_data"], links)
+        AssessmentQuestion.where(id: aq.id).update_all(question_data: aq["question_data"])
+      end
+    end
+
+    def replace_quiz_question_placeholders!(qq, links)
+      if LinkReplacer.recursively_sub_placeholders!(qq["question_data"], links)
+        Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
+      end
+
+      quiz = Quizzes::Quiz.where(id: qq.quiz_id).where.not(quiz_data: nil).first
+      if quiz && LinkReplacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
+        Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
+      end
+    end
+
+    def replace_item_placeholders!(item, field_links)
+      item_updates = {}
+      field_links.each do |field, links|
+        html = item.read_attribute(field)
+        if LinkReplacer.sub_placeholders!(html, links)
+          item_updates[field] = html
+        end
+      end
+      item_updates
+    end
+
+    def update_all_items(item, item_updates)
+      item.class.where(id: item.id).update_all(item_updates)
+      # we don't want the placeholders sticking around in any
+      # version we've created.
+      rewrite_item_version!(item)
+    end
+
+    def rewrite_item_version!(item)
+      if (version = (item.current_version rescue nil))
+        # if there's a current version of this thing, it has placeholders
+        # in it.  rather than replace them in the yaml, which is finnicky, let's just
+        # make sure the current version is represented by the current model state
+        # by overwritting it
+        version.model = item.reload
+        version.save
+      end
+    end
+
+    def get_context_path_for_item(item)
+      item.class.to_s.demodulize.underscore.pluralize
+    end
   end
 end
