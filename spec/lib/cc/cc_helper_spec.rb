@@ -324,6 +324,21 @@ describe CC::CCHelper do
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 
+    it "copies pages correctly when the url is an old slug" do
+      Account.site_admin.enable_feature! :permanent_page_links
+      allow(HostUrl).to receive(:protocol).and_return("http")
+      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
+      page = @course.wiki_pages.create(title: "9000, the level is over")
+      page.wiki_page_lookups.create!(slug: "old-url")
+      html = <<~HTML
+        <a href="/courses/#{@course.id}/wiki/old-url">This course's wiki page</a>
+      HTML
+      doc = Nokogiri::HTML5(@exporter.html_content(html))
+      urls = doc.css("a").pluck(:href)
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
+    end
+
     it "uses the key_generator to translate links" do
       allow(HostUrl).to receive(:protocol).and_return("http")
       allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
