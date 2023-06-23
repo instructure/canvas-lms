@@ -25,6 +25,7 @@ import initialState from '../../../../sidebar/store/initialState'
 import sidebarHandlers from '../../../../sidebar/containers/sidebarHandlers'
 import CanvasContentTray from '../CanvasContentTray'
 import {LinkDisplay} from '../LinkDisplay'
+import {destroyContainer} from '../../../../common/FlashAlert'
 
 jest.useFakeTimers()
 jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
@@ -125,6 +126,10 @@ describe('RCE Plugins > CanvasContentTray', () => {
       await showTrayForPlugin('course_link_edit')
     })
 
+    afterEach(() => {
+      destroyContainer()
+    })
+
     it('is labeled with "Edit Course Link"', async () => {
       await waitFor(() => {
         const header = getTray().querySelector('[data-cid="Heading"]').textContent
@@ -162,6 +167,12 @@ describe('RCE Plugins > CanvasContentTray', () => {
           {}
         )
       })
+    })
+
+    it('creates a SR alert when the link is updated', async () => {
+      const button = await component.findByTestId('replace-link-button')
+      fireEvent.click(button)
+      expect(component.getByText('Updated link')).toBeInTheDocument()
     })
   })
 
