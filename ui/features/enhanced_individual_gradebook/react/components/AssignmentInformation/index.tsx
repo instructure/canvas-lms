@@ -31,6 +31,7 @@ import {
 import {computeAssignmentDetailText} from '../../../utils/gradebookUtils'
 import MessageStudentsWhoModal from './MessageStudentsWhoModal'
 import DefaultGradeModal from './DefaultGradeModal'
+import {CurveGradesModal} from './CurveGradesModal'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -197,7 +198,7 @@ function AssignmentActions({
   const [showSetDefaultGradeModal, setShowSetDefaultGradeModal] = useState(false)
 
   const onSetGrades = useCallback(
-    updatedSubmissions => {
+    (updatedSubmissions: SubmissionGradeChange[]) => {
       setShowSetDefaultGradeModal(false)
       if (updatedSubmissions.length) {
         handleSetGrades(updatedSubmissions)
@@ -243,7 +244,12 @@ function AssignmentActions({
       </View>
       <View as="div" className="pad-box no-sides">
         {assignment.pointsPossible ? (
-          <Button color="secondary">{I18n.t('Curve Grades')}</Button>
+          <CurveGradesModal
+            assignment={assignment}
+            submissions={submissions}
+            handleGradeChange={onSetGrades}
+            contextUrl={gradebookOptions.contextUrl}
+          />
         ) : null}
 
         {/* {{#if disableAssignmentGrading}}
