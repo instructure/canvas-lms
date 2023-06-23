@@ -19,14 +19,10 @@ import React, {Component} from 'react'
 import {findDOMNode} from 'react-dom'
 import {node, object, func} from 'prop-types'
 
-import {themeable} from '@instructure/ui-themeable'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import styles from './styles.css'
-import theme from './theme'
-
-class ShowOnFocusButton extends Component {
+export default class ShowOnFocusButton extends Component {
   static propTypes = {
     buttonProps: object,
     srProps: object,
@@ -95,5 +91,3 @@ class ShowOnFocusButton extends Component {
     }
   }
 }
-
-export default themeable(theme, styles)(ShowOnFocusButton)
