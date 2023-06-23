@@ -35,6 +35,8 @@
   blueprint_subscription = @context.master_course_subscriptions.active.first
   master_course = blueprint_subscription&.master_template&.course
 
+  can_see_restrict_quantitative_setting = ((@context&.restrict_quantitative_data || @context&.account&.restrict_quantitative_data[:value]) && @context&.root_account&.feature_enabled?(:restrict_quantitative_data))
+
   if @context.elementary_subject_course?
     navigation_help_text = t("help.edit_navigation_k5", "Drag and drop items to reorder them in the subject navigation.")
     disabled_tab_text = t("tab_hidden_if_disabled_k5", "Tab disabled, won't appear in subject navigation")
@@ -332,7 +334,7 @@
           <%= f.hidden_field :restrict_student_future_view %>
         </div>
       </div>
-      <% if @context.root_account.feature_enabled?(:restrict_quantitative_data) %>
+      <% if can_see_restrict_quantitative_setting %>
       <div class="form-row course-quantitative-data-row">
         <div class="form-label"><label for="restrict_quantitative_data_options"><%= f.blabel :restrict_quantitative_data, :en => "Quantitative Data Options" %></label></div>
         <div class="nobr">

@@ -7838,6 +7838,42 @@ describe Course do
         @root.enable_feature!(:restrict_quantitative_data)
       end
 
+      describe "restrict_quantitative_data_setting_changeable?" do
+        it "returns false if the feature flag is off" do
+          @root.disable_feature!(:restrict_quantitative_data)
+          expect(@course.restrict_quantitative_data_setting_changeable?).to be_falsey
+        end
+
+        it "returns false if the account setting is on and locked and the course setting is on" do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          expect(@course.restrict_quantitative_data_setting_changeable?).to be_falsey
+        end
+
+        it "returns false if the account setting is off and the course setting is false" do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: false)
+          @root.settings[:restrict_quantitative_data] = { locked: false, value: false }
+          expect(@course.restrict_quantitative_data_setting_changeable?).to be_falsey
+        end
+
+        it "returns true if the account setting is on and unlocked" do
+          @root.settings[:restrict_quantitative_data] = { locked: false, value: true }
+          expect(@course.restrict_quantitative_data_setting_changeable?).to be_truthy
+        end
+
+        it "returns true if the account setting is on and locked and the course setting is false" do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: false)
+          @root.settings[:restrict_quantitative_data] = { locked: true, value: true }
+          expect(@course.restrict_quantitative_data_setting_changeable?).to be_truthy
+        end
+
+        it "returns true if the account setting is off and the course setting is true" do
+          @course.settings = @course.settings.merge(restrict_quantitative_data: true)
+          @root.settings[:restrict_quantitative_data] = { locked: false, value: false }
+          expect(@course.restrict_quantitative_data_setting_changeable?).to be_truthy
+        end
+      end
+
       context "relation to acount restrict_quantitative_data setting" do
         it "is unaffected by account setting for existing courses" do
           expect(@course.restrict_quantitative_data).to be false

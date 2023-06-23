@@ -25,7 +25,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('quantitative_data_options')
 
-export default function QuantitativeDataOptions({canManage, restrictQuantitativeData}) {
+export default function QuantitativeDataOptions({canManage}) {
   const FORM_IDS = {
     RESTRICT_QUANTITATIVE_DATA: 'course_restrict_quantitative_data',
   }
@@ -54,7 +54,7 @@ export default function QuantitativeDataOptions({canManage, restrictQuantitative
           label={I18n.t('Restrict view of quantitative data')}
           size="small"
           data-testid="restrict-quantitative-data-checkbox"
-          disabled={!canManage || restrictQuantitativeData}
+          disabled={!canManage}
           checked={viewQuantitativeData}
           onChange={e => {
             setFormValue(FORM_IDS.RESTRICT_QUANTITATIVE_DATA, e.target.checked)
@@ -68,5 +68,4 @@ export default function QuantitativeDataOptions({canManage, restrictQuantitative
 
 QuantitativeDataOptions.propTypes = {
   canManage: bool.isRequired,
-  restrictQuantitativeData: bool.isRequired,
 }

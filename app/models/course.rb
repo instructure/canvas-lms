@@ -3629,6 +3629,25 @@ class Course < ActiveRecord::Base
     !homeroom_course? && elementary_enabled?
   end
 
+  def restrict_quantitative_data_setting_changeable?
+    feature_enabled = root_account.feature_enabled?(:restrict_quantitative_data)
+    course_setting = restrict_quantitative_data
+    account_setting = account.restrict_quantitative_data[:value]
+    account_lock_state = account.restrict_quantitative_data[:locked]
+
+    # If the feature flag is off, then the setting is not visible nor has any effect
+    return false unless feature_enabled
+    # If the RQD setting is on and not locked, courses can turn it on and off at will
+    return true if account_setting && !account_lock_state
+    # If the course setting is off but the account setting is on and locked, then the course setting can be turned on
+    return true if !course_setting && account_setting && account_lock_state
+    # If the course setting is on, but the account setting is off, then the course can turn it off, but not back on
+    return true if course_setting && !account_setting
+
+    # Otherwise the RQD setting can not be changed
+    false
+  end
+
   def restrict_quantitative_data?(user = nil, check_extra_permissions = false)
     return unless user.is_a?(User)
 
