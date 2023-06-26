@@ -37,8 +37,12 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const I18n = useI18nScope('MasteryScale')
 
+const defaultCalculationMethod = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
+  ? 'weighted_average'
+  : 'decaying_average'
+
 export const defaultProficiencyCalculation = {
-  calculationMethod: 'decaying_average',
+  calculationMethod: defaultCalculationMethod,
   calculationInt: 65,
 }
 
@@ -277,6 +281,20 @@ const ProficiencyCalculation = ({
   setError,
   calcIntInputRef,
 }) => {
+  const newDecayingAverageFF = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
+
+  if (newDecayingAverageFF) {
+    method.calculationMethod =
+      method.calculationMethod === 'decaying_average'
+        ? 'weighted_average'
+        : method.calculationMethod
+  } else {
+    method.calculationMethod =
+      method.calculationMethod === 'standard_decaying_average'
+        ? 'decaying_average'
+        : method.calculationMethod
+  }
+
   const {contextType, outcomeAllowAverageCalculationFF} = useCanvasContext()
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
 

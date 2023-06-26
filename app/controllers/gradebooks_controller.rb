@@ -774,7 +774,8 @@ class GradebooksController < ApplicationController
                individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
              },
              OUTCOME_AVERAGE_CALCULATION: root_account.feature_enabled?(:outcome_average_calculation),
-             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
+             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?,
+             OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
            })
   end
 

@@ -40,7 +40,7 @@ class LearningOutcome < ActiveRecord::Base
            foreign_key: "copied_from_outcome_id"
   serialize :data
 
-  before_validation :infer_default_calculation_method, :adjust_calculation_int
+  before_validation :adjust_calculation_method, :infer_default_calculation_method, :adjust_calculation_int
   before_save :infer_defaults
   before_save :infer_root_account_ids
   after_save :propagate_changes_to_rubrics
@@ -175,13 +175,49 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
 
+  def new_decaying_average_calculation_ff_enabled?
+    return context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation) if context
+
+    LoadAccount.default_domain_root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
+  end
+
+  # We have redefined the calculation methods as follows:
+  # weighted_average - This is the preferred way to describe legacy decaying_average.
+  # decaying_average - This is the deprecated way to describe legacy decaying_average.
+  # standard_decaying_average - This is the preferred way to describe the new decaying_average.
+  # if this FF is ENABLED then on user facing side(Only UI)
+  # end-user will use "weighted_average" for old "decaying_average"
+  # and "decaying_average" for "standard_decaying_average"
+  # eg:
+  # |User Facing Name | DB Value                                                                           |
+  # |------------------------------------------------------------------------------------------------------|
+  # |decaying_average | standard_decaying_average [after data migration will be named as decaying_average] |
+  # |weighted_average | decaying_average [after data migration this old decaying_average                   |
+  # |                 | will be named as weighted_average]                                                 |
+  # |------------------------------------------------------------------------------------------------------|
+  def adjust_calculation_method(method = self.calculation_method)
+    if new_decaying_average_calculation_ff_enabled?
+      self.calculation_method = "decaying_average" if method == "weighted_average"
+    elsif method == "standard_decaying_average"
+      # If FF is disabled “decaying_average” and “standard_decaying_average”
+      # will all be treated the same and calculate using the legacy approach.
+      # Any time a learning outcome is updated / saved it will have the calculation_method
+      # updated back to being “decaying_average”.
+      self.calculation_method = "decaying_average"
+    end
+  end
+
   def default_calculation_method
-    "decaying_average"
+    if new_decaying_average_calculation_ff_enabled?
+      "weighted_average"
+    else
+      "decaying_average"
+    end
   end
 
   def default_calculation_int(method = self.calculation_method)
     case method
-    when "decaying_average" then 65
+    when "decaying_average", "standard_decaying_average", "weighted_average" then 65
     when "n_mastery" then 5
     else nil
     end

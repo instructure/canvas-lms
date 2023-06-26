@@ -48,7 +48,7 @@ module RollupScoreAggregatorHelper
   end
 
   def scaled_score_from_result(result)
-    if %w[decaying_average latest average].include?(@calculation_method)
+    if %w[decaying_average latest average standard_decaying_average weighted_average].include?(@calculation_method)
       result_aggregates = get_aggregates(result)
       alignment_aggregate_score(result_aggregates)
     else
@@ -111,7 +111,7 @@ module RollupScoreAggregatorHelper
   def score_sets
     @score_sets || begin
       case @calculation_method
-      when "decaying_average"
+      when "decaying_average", "standard_decaying_average", "weighted_average"
         @score_sets = retrieve_scores(@aggregate ? @outcome_results : sorted_results)
       when "n_mastery", "highest", "average"
         @score_sets = retrieve_scores(@outcome_results)

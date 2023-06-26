@@ -7,3 +7,4 @@ canvas_id,vendor_guid,object_type,title,description,display_name,calculation_met
 ,f,outcome,F,FFF,here,decaying_average,40,active,b,2,Good,1,,,,,
 ,g,outcome,G,GGG,here,n_mastery,3,active,b,1,,,,,,,
 ,h,outcome,H,HHH,here,average,,active,a,2,Good,1,,,,,
+,i,outcome,I,III,here,standard_decaying_average,65,active,b,2,Good,1,,,,,
