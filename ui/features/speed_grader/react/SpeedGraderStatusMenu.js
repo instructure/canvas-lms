@@ -25,6 +25,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TimeLateInput from '@canvas/grading/TimeLateInput'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 
 const I18n = useI18nScope('speed_grader')
 
@@ -88,16 +89,26 @@ export default function SpeedGraderStatusMenu(props) {
         </Flex.Item>
       </Flex>
       {props.selection === 'late' && (
-        <div style={{position: 'absolute', right: '24px'}}>
-          <TimeLateInput
-            lateSubmissionInterval={props.lateSubmissionInterval}
-            locale={props.locale}
-            renderLabelBefore={true}
-            secondsLate={props.secondsLate}
-            onSecondsLateUpdated={props.updateSubmission}
-            width="5rem"
-          />
-        </div>
+        <>
+          <div style={{position: 'absolute', right: '24px'}}>
+            <TimeLateInput
+              lateSubmissionInterval={props.lateSubmissionInterval}
+              locale={props.locale}
+              renderLabelBefore={true}
+              secondsLate={props.secondsLate}
+              onSecondsLateUpdated={props.updateSubmission}
+              width="5rem"
+            />
+            {props.cachedDueDate ? (
+              <FriendlyDatetime
+                data-test-id="original-due-date"
+                prefix={I18n.t('Due:')}
+                format={I18n.t('#date.formats.full_with_weekday')}
+                dateTime={props.cachedDueDate}
+              />
+            ) : null}
+          </div>
+        </>
       )}
     </>
   )
@@ -109,4 +120,5 @@ SpeedGraderStatusMenu.propTypes = {
   secondsLate: number.isRequired,
   selection: string.isRequired,
   updateSubmission: func.isRequired,
+  cachedDueDate: string,
 }

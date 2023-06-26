@@ -1289,6 +1289,7 @@ function statusMenuComponent(submission) {
       secondsLate={submission.seconds_late || 0}
       selection={determineSubmissionSelection(submission)}
       updateSubmission={updateSubmissionAndPageEffects}
+      cachedDueDate={submission.cached_due_date}
     />
   )
 }
