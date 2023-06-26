@@ -98,11 +98,12 @@ export default function EnhancedIndividualGradebook() {
     contextId: ENV.GRADEBOOK_OPTIONS?.context_id,
     userId: ENV.current_user_id,
     changeGradeUrl: ENV.GRADEBOOK_OPTIONS?.change_grade_url,
-    courseSettings: ENV.GRADEBOOK_OPTIONS?.course_settings,
     customColumnDatumUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_datum_url,
     customColumnDataUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_data_url,
     customColumnUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_url,
     customColumnsUrl: ENV.GRADEBOOK_OPTIONS?.custom_columns_url,
+    gradesAreWeighted: ENV.GRADEBOOK_OPTIONS?.grades_are_weighted,
+    finalGradeOverrideEnabled: ENV.GRADEBOOK_OPTIONS?.final_grade_override_enabled,
     reorderCustomColumnsUrl: ENV.GRADEBOOK_OPTIONS?.reorder_custom_columns_url,
     settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
     settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
@@ -110,6 +111,8 @@ export default function EnhancedIndividualGradebook() {
     saveViewUngradedAsZeroToServer: ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
     messageAttachmentUploadFolderId: ENV.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
     customOptions: {
+      allowFinalGradeOverride:
+        ENV.GRADEBOOK_OPTIONS?.course_settings.allow_final_grade_override ?? false,
       includeUngradedAssignments:
         ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server &&
         ENV.GRADEBOOK_OPTIONS?.settings

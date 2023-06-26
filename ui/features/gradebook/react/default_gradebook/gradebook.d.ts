@@ -128,6 +128,7 @@ export type GradebookOptions = {
   gradebook_is_editable: boolean
   gradebook_score_to_ungraded_progress: null | ProgressData
   graded_late_submissions_exist: boolean
+  grades_are_weighted: boolean
   grading_period_set: GradingPeriodSet
   grading_schemes: GradingScheme[]
   grading_standard: boolean

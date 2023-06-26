@@ -22,10 +22,7 @@ import {
   GradebookUserSubmissionDetails,
   SubmissionConnection,
 } from './queries'
-import {
-  ProgressData,
-  CourseSettingsType,
-} from 'features/gradebook/react/default_gradebook/gradebook.d'
+import {ProgressData} from 'features/gradebook/react/default_gradebook/gradebook.d'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
@@ -48,6 +45,7 @@ export type CustomOptions = {
   showConcludedEnrollments: boolean
   showNotesColumn: boolean
   showTotalGradeAsPoints: boolean
+  allowFinalGradeOverride: boolean
 }
 
 export type CustomColumn = {
@@ -74,13 +72,14 @@ export type GradebookOptions = {
   gradebookCsvProgress?: ProgressData | null
   contextUrl?: string | null
   userId?: string | null
-  courseSettings?: CourseSettingsType | null
   contextId?: string | null
   changeGradeUrl?: string | null
   customColumnDataUrl?: string | null
   customColumnDatumUrl?: string | null
   customColumnUrl?: string | null
   customColumnsUrl?: string | null
+  gradesAreWeighted?: boolean | null
+  finalGradeOverrideEnabled?: boolean | null
   reorderCustomColumnsUrl?: string | null
   saveViewUngradedAsZeroToServer?: boolean | null
   settingUpdateUrl?: string | null

@@ -198,6 +198,17 @@ export default function StudentInformation({
               {gradeToDisplay.score} / {gradeToDisplay.possible} points)
             </View>
           </View>
+          {gradebookOptions.finalGradeOverrideEnabled &&
+            gradebookOptions.customOptions.allowFinalGradeOverride && (
+              <>
+                <View as="div">
+                  <label htmlFor="final-grade-override-input">
+                    <strong>{I18n.t('Final Grade Override')}</strong>
+                  </label>
+                </View>
+                <input id="final-grade-override-input" type="text" />
+              </>
+            )}
         </View>
       </View>
     </View>
