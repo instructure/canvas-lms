@@ -35,11 +35,8 @@ import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Que
 import {decodeQueryString} from '@canvas/query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
 
-import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
-import {IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('conversations_2')
@@ -65,6 +62,7 @@ const CanvasInbox = () => {
   const [urlUserRecipient, setUrlUserRecepient] = useState()
   const [selectedIds, setSelectedIds] = useState([])
   const [maxGroupRecipientsMet, setMaxGroupRecipientsMet] = useState(false)
+  const [conversationIdToGoBackTo, setConversationIdToGoBackTo] = useState(null)
 
   const setFilterStateToCurrentWindowHash = () => {
     const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
@@ -223,6 +221,17 @@ const CanvasInbox = () => {
     )
     conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
     cache.writeQuery({...conversationsQueryOption, data: conversationsFromCache})
+  }
+
+  const handleBack = () => {
+    // clear conversation selection then use timeout to give time
+    // for the conversation list to appear for mobile
+    setSelectedConversations([])
+    setTimeout(() => {
+      document
+        .querySelector(`[data-testid="open-conversation-for-${conversationIdToGoBackTo}"]`)
+        .focus()
+    }, 0)
   }
 
   const handleArchive = () => {
@@ -666,6 +675,7 @@ const CanvasInbox = () => {
                       commonQueryVariables={commonQueryVariables}
                       conversationsQuery={conversationsQuery}
                       submissionCommentsQuery={submissionCommentsQuery}
+                      setConversationIdToGoBackTo={setConversationIdToGoBackTo}
                     />
                   </Flex.Item>
                 )}
@@ -683,63 +693,35 @@ const CanvasInbox = () => {
                     {!conversationsQuery.loading &&
                     !submissionCommentsQuery.loading &&
                     selectedConversations.length > 0 ? (
-                      <>
-                        {matches.includes('mobile') && (
-                          <View
-                            as="div"
-                            borderWidth="none none small none"
-                            padding="none none none xx-small"
-                          >
-                            <Flex>
-                              <Flex.Item
-                                shouldGrow={true}
-                                border={true}
-                                padding="medium none medium none"
-                              >
-                                <Link
-                                  data-testid="message-detail-back-button"
-                                  isWithinText={false}
-                                  as="button"
-                                  renderIcon={<IconArrowOpenStartLine size="x-small" />}
-                                  onClick={() => {
-                                    setSelectedConversations([])
-                                  }}
-                                >
-                                  <Text>{I18n.t('Back')}</Text>
-                                </Link>
-                              </Flex.Item>
-                            </Flex>
-                          </View>
-                        )}
-                        <MessageDetailContainer
-                          setCanReply={setCanReply}
-                          conversation={selectedConversations[0]}
-                          onReply={conversationMessage => onReply({conversationMessage})}
-                          onReplyAll={conversationMessage =>
-                            onReply({conversationMessage, replyAll: true})
-                          }
-                          onArchive={displayUnarchiveButton ? undefined : handleArchive}
-                          onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
-                          onDelete={handleDelete}
-                          onForward={conversationMessage => onForward({conversationMessage})}
-                          onStar={
-                            !firstConversationIsStarred
-                              ? () => {
-                                  handleStar(true)
-                                }
-                              : null
-                          }
-                          onUnstar={
-                            firstConversationIsStarred
-                              ? () => {
-                                  handleStar(false)
-                                }
-                              : null
-                          }
-                          onReadStateChange={handleReadState}
-                          scope={scope}
-                        />
-                      </>
+                      <MessageDetailContainer
+                        setCanReply={setCanReply}
+                        conversation={selectedConversations[0]}
+                        onReply={conversationMessage => onReply({conversationMessage})}
+                        onReplyAll={conversationMessage =>
+                          onReply({conversationMessage, replyAll: true})
+                        }
+                        onArchive={displayUnarchiveButton ? undefined : handleArchive}
+                        onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
+                        onDelete={handleDelete}
+                        onBack={handleBack}
+                        onForward={conversationMessage => onForward({conversationMessage})}
+                        onStar={
+                          !firstConversationIsStarred
+                            ? () => {
+                                handleStar(true)
+                              }
+                            : null
+                        }
+                        onUnstar={
+                          firstConversationIsStarred
+                            ? () => {
+                                handleStar(false)
+                              }
+                            : null
+                        }
+                        onReadStateChange={handleReadState}
+                        scope={scope}
+                      />
                     ) : (
                       <View padding="small">
                         <NoSelectedConversation />
