@@ -918,6 +918,9 @@ describe ContentMigrationsController, type: :request do
       @quiz = @src.quizzes.create! title: "a quiz", quiz_type: "assignment"
       @file = @src.attachments.create! filename: "teh_file.txt", uploaded_data: StringIO.new("data")
 
+      @media_object = @src.media_objects.create!(media_id: "m1234_fish_and_wildlife", title: "fish_and_wildlife.mp4")
+      @media_file = @media_object.attachment
+
       @dst = course_factory active_all: true
       @user = @dst.teachers.first
     end
@@ -935,17 +938,28 @@ describe ContentMigrationsController, type: :request do
       expect(@dst.attachments.find(json["files"][@file.id.to_s]).filename).to eq "teh_file.txt"
     end
 
+    # accepts block which should return the migration id
     def test_asset_migration_id_mapping(json)
       expect(@dst.announcements.find(json["announcements"][yield(@ann)]["destination"]["id"]).title).to eq "ann"
       expect(@dst.assignments.find(json["assignments"][yield(@assign)]["destination"]["id"]).name).to eq "assign"
       expect(@dst.assignments.find(json["assignments"][yield(@shell_assign)]["destination"]["id"]).description).to eq "assigned"
       expect(@dst.context_modules.find(json["modules"][yield(@mod)]["destination"]["id"]).name).to eq "mod"
       expect(@dst.context_module_tags.find(json["module_items"][yield(@tag)]["destination"]["id"]).title).to eq "blah"
+
+      dst_page = @dst.wiki_pages.find(json["pages"][yield(@page)]["destination"]["id"])
+      expect(dst_page.title).to eq "der page"
+      expect(json["pages"][yield(@page)]["destination"]["url"]).to eq "der-page"
+      expect(dst_page.url).to eq "der-page"
+
       expect(@dst.wiki_pages.find(json["pages"][yield(@page)]["destination"]["id"]).title).to eq "der page"
       expect(@dst.discussion_topics.find(json["discussion_topics"][yield(@topic)]["destination"]["id"]).message).to eq "some topic"
       expect(@dst.discussion_topics.find(json["discussion_topics"][yield(@assign_topic)]["destination"]["id"]).message).to eq "assigned"
       expect(@dst.quizzes.find(json["quizzes"][yield(@quiz)]["destination"]["id"]).title).to eq "a quiz"
       expect(@dst.attachments.find(json["files"][yield(@file)]["destination"]["id"]).filename).to eq "teh_file.txt"
+
+      dst_media_attachment = @dst.attachments.find(json["files"][yield(@media_file)]["destination"]["id"])
+      expect(dst_media_attachment.filename).to eq "fish_and_wildlife.mp4"
+      expect(json["files"][yield(@media_file)]["destination"]["media_entry_id"]).to eq "m1234_fish_and_wildlife"
     end
 
     def test_asset_migration_id_mapping_nil(json)

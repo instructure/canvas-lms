@@ -51,6 +51,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :assignment_group
   belongs_to :root_account, class_name: "Account"
   has_many :ignores, as: :asset
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :quiz
 
   validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :title, length: { maximum: maximum_string_length, allow_nil: true }

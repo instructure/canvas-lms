@@ -161,6 +161,7 @@ class Assignment < ActiveRecord::Base
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: "trigger_assignment_id", inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :assignment
 
   scope :assigned_to_student, ->(student_id) { joins(:submissions).where(submissions: { user_id: student_id }) }
   scope :anonymous, -> { where(anonymous_grading: true) }

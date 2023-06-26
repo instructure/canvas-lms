@@ -1317,7 +1317,9 @@ describe ContentMigration do
         expect(json).to eq({ "source_course" => @src.id.to_s,
                              "source_host" => "pineapple.edu",
                              "contains_migration_ids" => true,
+                             "destination_course" => @dst.id.to_s,
                              "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                             "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
                              "resource_mapping" => {
                                "assignments" => {
                                  @old.id.to_s => @new.id.to_s,
