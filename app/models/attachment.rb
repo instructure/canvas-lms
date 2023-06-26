@@ -136,6 +136,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :usage_rights
   has_many :canvadocs_annotation_contexts, inverse_of: :attachment
   has_many :discussion_entry_drafts, inverse_of: :attachment
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :attachment
 
   before_save :set_root_account_id
   before_save :infer_display_name

@@ -54,6 +54,7 @@ class WikiPage < ActiveRecord::Base
 
   belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
+  has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
 
   acts_as_url :title, sync_url: true
 
