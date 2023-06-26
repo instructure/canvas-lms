@@ -27,7 +27,7 @@ import {GradingStandard} from '../../../graphql/GradingStandard'
 import {GradingPeriod} from '../../../graphql/GradingPeriod'
 import {Submission} from '../../../graphql/Submission'
 
-import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE} from '../constants'
+import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE, ASSIGNMENT_STATUS} from '../constants'
 import {nullGradingPeriod, mockDroppedAssignmentData} from './largeDataMocks'
 
 import {
@@ -64,6 +64,7 @@ import {
   filteredAssignments,
   getAssignmentPositionInModuleItems,
   getAssignmentSortKey,
+  getAssignmentNoSubmissionStatus,
 } from '../utils'
 
 const createAssignment = (score, pointsPossible) => {
@@ -630,6 +631,33 @@ describe('util', () => {
 
       const expectedOutput = <Pill color="primary">Not Submitted</Pill>
       expect(getDisplayStatus(assignment)).toStrictEqual(expectedOutput)
+    })
+  })
+
+  describe('getAssignmentNoSubmissionStatus', () => {
+    it('should return MISSING status when the due date is in the past', () => {
+      const pastDueDate = new Date()
+      pastDueDate.setDate(pastDueDate.getDate() - 1)
+      const result = getAssignmentNoSubmissionStatus(pastDueDate.toISOString())
+      expect(result).toEqual(ASSIGNMENT_STATUS.MISSING)
+    })
+
+    it('should return NOT_SUBMITTED status when the due date is in the future', () => {
+      const futureDueDate = new Date()
+      futureDueDate.setDate(futureDueDate.getDate() + 1)
+      const result = getAssignmentNoSubmissionStatus(futureDueDate.toISOString())
+      expect(result).toEqual(ASSIGNMENT_STATUS.NOT_SUBMITTED)
+    })
+
+    it('should return MISSING status when the due date is today', () => {
+      const today = new Date().toISOString().split('T')[0]
+      const result = getAssignmentNoSubmissionStatus(today)
+      expect(result).toEqual(ASSIGNMENT_STATUS.MISSING)
+    })
+
+    it('should return NOT_SUBMITTED status when no due date is provided', () => {
+      const result = getAssignmentNoSubmissionStatus(undefined)
+      expect(result).toEqual(ASSIGNMENT_STATUS.NOT_SUBMITTED)
     })
   })
 
