@@ -28,7 +28,14 @@ import {Submission} from '../../../../api.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 
-export const useSubmitScore = (changeGradeUrl?: string | null) => {
+type SubmitScoreRequestBody = {
+  submission: {
+    posted_grade?: string
+    excuse?: boolean | string
+  }
+}
+
+export const useSubmitScore = () => {
   const [submitScoreStatus, setSubmitScoreStatus] = useState<ApiCallStatus>(
     ApiCallStatus.NOT_STARTED
   )
@@ -37,23 +44,27 @@ export const useSubmitScore = (changeGradeUrl?: string | null) => {
     null
   )
 
-  const gradeChangeUrl = changeGradeUrl || ''
-
   const submit = useCallback(
     async (
       assignment: AssignmentConnection,
       submission: GradebookUserSubmissionDetails,
-      gradeInput: string
+      gradeInput: string,
+      submitScoreUrl?: string | null
     ) => {
+      if (!submitScoreUrl) {
+        setSubmitScoreError(I18n.t('Unable to submit score'))
+        setSubmitScoreStatus(ApiCallStatus.FAILED)
+        return
+      }
       const {gradingType} = assignment
       const delocalizedGrade = GradeFormatHelper.delocalizeGrade(gradeInput)
-      const url = gradeChangeUrl
-        .replace(':assignment', assignment.id)
-        .replace(':submission', submission.userId)
+      const isExcusedText =
+        gradeInput?.toUpperCase() === 'EXCUSED' || gradeInput?.toUpperCase() === 'EX'
 
       if (
         delocalizedGrade === submission.grade ||
-        ((delocalizedGrade === '-' || delocalizedGrade === '') && submission.grade === null)
+        ((delocalizedGrade === '-' || delocalizedGrade === '') && submission.grade === null) ||
+        (isExcusedText && submission.excused)
       ) {
         setSubmitScoreStatus(ApiCallStatus.NO_CHANGE)
         return
@@ -61,7 +72,7 @@ export const useSubmitScore = (changeGradeUrl?: string | null) => {
 
       setSubmitScoreStatus(ApiCallStatus.PENDING)
 
-      if (gradingType === 'points' || gradingType === 'percent') {
+      if ((!isExcusedText && gradingType === 'points') || gradingType === 'percent') {
         const formattedGrade = numberHelper.parse(delocalizedGrade?.replace(/%/g, '')).toString()
 
         if (formattedGrade === 'NaN') {
@@ -71,32 +82,71 @@ export const useSubmitScore = (changeGradeUrl?: string | null) => {
         }
       }
 
-      const requestBody = {
-        submission: {
-          posted_grade: delocalizedGrade,
-        },
+      const requestBody: SubmitScoreRequestBody = {submission: {}}
+
+      if (isExcusedText) {
+        requestBody.submission.excuse = true
+      } else {
+        requestBody.submission.posted_grade = delocalizedGrade
       }
 
+      try {
+        const {data, status} = await executeApiRequest<Submission>({
+          method: 'PUT',
+          path: submitScoreUrl,
+          body: requestBody,
+        })
+        if (status === 200) {
+          setSavedSubmission(mapUnderscoreSubmission(data))
+          setSubmitScoreStatus(ApiCallStatus.COMPLETED)
+        } else {
+          throw new Error()
+        }
+      } catch (error) {
+        setSubmitScoreError(I18n.t('Something went wrong'))
+        setSubmitScoreStatus(ApiCallStatus.FAILED)
+      }
+    },
+    []
+  )
+
+  const submitExcused = useCallback(async (excused: boolean, submitScoreUrl?: string | null) => {
+    if (!submitScoreUrl) {
+      setSubmitScoreError(I18n.t('Unable to submit score'))
+      setSubmitScoreStatus(ApiCallStatus.FAILED)
+      return
+    }
+
+    const requestBody: SubmitScoreRequestBody = {
+      submission: {
+        excuse: excused.toString(),
+      },
+    }
+
+    try {
+      setSubmitScoreStatus(ApiCallStatus.PENDING)
       const {data, status} = await executeApiRequest<Submission>({
         method: 'PUT',
-        path: url,
+        path: submitScoreUrl,
         body: requestBody,
       })
       if (status === 200) {
         setSavedSubmission(mapUnderscoreSubmission(data))
         setSubmitScoreStatus(ApiCallStatus.COMPLETED)
       } else {
-        setSubmitScoreError(I18n.t('Something went wrong'))
-        setSubmitScoreStatus(ApiCallStatus.FAILED)
+        throw new Error()
       }
-    },
-    [gradeChangeUrl]
-  )
+    } catch (error) {
+      setSubmitScoreError(I18n.t('Something went wrong'))
+      setSubmitScoreStatus(ApiCallStatus.FAILED)
+    }
+  }, [])
 
   return {
     submitScoreError,
     submitScoreStatus,
     savedSubmission,
+    submitExcused,
     submit,
   }
 }

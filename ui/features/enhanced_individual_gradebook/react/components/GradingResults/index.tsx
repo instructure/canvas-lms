@@ -61,11 +61,11 @@ export default function GradingResults({
 }: Props) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
   const [gradeInput, setGradeInput] = useState<string>('')
+  const [excusedChecked, setExcusedChecked] = useState<boolean>(false)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
-  const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore(
-    gradebookOptions.changeGradeUrl
-  )
+  const {submit, submitExcused, submitScoreError, submitScoreStatus, savedSubmission} =
+    useSubmitScore()
   const {submissionComments, loadingComments, refetchComments} = useGetComments({
     courseId,
     submissionId: submission?.id,
@@ -73,7 +73,8 @@ export default function GradingResults({
 
   useEffect(() => {
     if (submission) {
-      setGradeInput(submission?.grade ?? '-')
+      setExcusedChecked(submission.excused)
+      setGradeInput(submission.excused ? I18n.t('Excused') : submission.grade ?? '-')
     }
   }, [submission])
 
@@ -133,10 +134,26 @@ export default function GradingResults({
     return <LoadingIndicator />
   }
 
-  const submitGrade = async () => {
-    await submit(assignment, submission, gradeInput)
+  const {
+    changeGradeUrl,
+    customOptions: {hideStudentNames},
+  } = gradebookOptions
+
+  const submitScoreUrl = (changeGradeUrl ?? '')
+    .replace(':assignment', assignment.id)
+    .replace(':submission', submission.userId)
+
+  const markExcused = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {
+      target: {checked},
+    } = event
+    await submitExcused(checked, submitScoreUrl)
   }
-  const {hideStudentNames} = gradebookOptions.customOptions
+
+  const submitGrade = async () => {
+    await submit(assignment, submission, gradeInput, submitScoreUrl)
+  }
+
   return (
     <>
       <View as="div">
@@ -181,7 +198,14 @@ export default function GradingResults({
                 style={{padding: 12, margin: '15px 0 0 0', background: '#eee', borderRadius: 5}}
               >
                 <label className="checkbox" htmlFor="excuse_assignment">
-                  <input type="checkbox" id="excuse_assignment" name="excuse_assignment" />
+                  <input
+                    type="checkbox"
+                    id="excuse_assignment"
+                    name="excuse_assignment"
+                    checked={excusedChecked}
+                    disabled={submitScoreStatus === ApiCallStatus.PENDING}
+                    onChange={markExcused}
+                  />
                   {I18n.t('Excuse This Assignment for the Selected Student')}
                 </label>
               </div>
@@ -208,6 +232,7 @@ export default function GradingResults({
         submission={submission}
         loadingComments={loadingComments}
         modalOpen={modalOpen}
+        submitScoreUrl={submitScoreUrl}
         handleClose={() => setModalOpen(false)}
         onGradeChange={handleGradeChange}
         onPostComment={handlePostComment}

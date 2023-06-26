@@ -72,6 +72,7 @@ type Props = {
   comments: CommentConnection[]
   modalOpen: boolean
   loadingComments: boolean
+  submitScoreUrl: string
   onGradeChange: (updateEvent: GradeChangeApiUpdate) => void
   onPostComment: () => void
   handleClose: () => void
@@ -85,6 +86,7 @@ export default function SubmissionDetailModal({
   comments,
   loadingComments,
   modalOpen,
+  submitScoreUrl,
   handleClose,
   onGradeChange,
   onPostComment,
@@ -119,7 +121,7 @@ export default function SubmissionDetailModal({
         <SubmissionGradeForm
           assignment={assignment}
           submission={submission}
-          changeGradeUrl={gradebookOptions.changeGradeUrl}
+          submitScoreUrl={submitScoreUrl}
           onGradeChange={onGradeChange}
         />
 
@@ -155,7 +157,7 @@ export default function SubmissionDetailModal({
 
         <PostCommentForm
           assignment={assignment}
-          submission={submission}
+          submitScoreUrl={submitScoreUrl}
           onPostComment={onPostComment}
         />
       </ModalBody>
@@ -248,18 +250,17 @@ function SubmissionCommentAvatar({comment}: {comment: CommentConnection}) {
 type SubmissionGradeFormProps = {
   assignment: AssignmentConnection
   submission: GradebookUserSubmissionDetails
-  changeGradeUrl?: string | null
+  submitScoreUrl?: string | null
   onGradeChange: (updateEvent: GradeChangeApiUpdate) => void
 }
 function SubmissionGradeForm({
   assignment,
   submission,
-  changeGradeUrl,
+  submitScoreUrl,
   onGradeChange,
 }: SubmissionGradeFormProps) {
   const [gradeInput, setGradeInput] = useState<string>('')
-  const {submit, submitScoreError, submitScoreStatus, savedSubmission} =
-    useSubmitScore(changeGradeUrl)
+  const {submit, submitScoreError, submitScoreStatus, savedSubmission} = useSubmitScore()
 
   useEffect(() => {
     onGradeChange({
@@ -271,12 +272,12 @@ function SubmissionGradeForm({
 
   useEffect(() => {
     if (submission) {
-      setGradeInput(submission?.grade ?? '-')
+      setGradeInput(submission.excused ? I18n.t('EX') : submission.grade ?? '-')
     }
   }, [submission])
 
   const submitGrade = async () => {
-    await submit(assignment, submission, gradeInput)
+    await submit(assignment, submission, gradeInput, submitScoreUrl)
   }
 
   return (
@@ -310,11 +311,11 @@ function SubmissionGradeForm({
 }
 
 type PostCommentFormProps = {
-  submission: GradebookUserSubmissionDetails
   assignment: AssignmentConnection
+  submitScoreUrl?: string | null
   onPostComment: () => void
 }
-function PostCommentForm({submission, assignment, onPostComment}: PostCommentFormProps) {
+function PostCommentForm({assignment, submitScoreUrl, onPostComment}: PostCommentFormProps) {
   const {groupCategoryId, gradeGroupStudentsIndividually} = assignment
   const [newComment, setNewComment] = useState<string>('')
   const [isGroupComment, setIsGroupComment] = useState<boolean>(false)
@@ -327,7 +328,7 @@ function PostCommentForm({submission, assignment, onPostComment}: PostCommentFor
       shouldSendGroupComment = gradeGroupStudentsIndividually ? isGroupComment : true
     }
 
-    await submit(assignment, submission, newComment, shouldSendGroupComment)
+    await submit(newComment, shouldSendGroupComment, submitScoreUrl)
   }
 
   const groupRadioInputs = [
