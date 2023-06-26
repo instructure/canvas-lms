@@ -144,7 +144,7 @@ describe('DeveloperKeys App', () => {
       })
 
       it('renders a pre OIDC change warning when the feature flag is on and today date is before changeDate', () => {
-        const alertBox = queryByTestId('OIDC_warning')
+        const alertBox = queryByTestId('OIDC_alert')
         const preFlipText = queryByTestId('preFlipText')
         expect(alertBox).toBeInTheDocument()
         expect(preFlipText).toBeInTheDocument()
@@ -164,7 +164,7 @@ describe('DeveloperKeys App', () => {
       })
 
       it('renders a post OIDC change warning when the feature flag is on and today date is after changeDate', () => {
-        const alertBox = queryByTestId('OIDC_warning')
+        const alertBox = queryByTestId('OIDC_alert')
         const postFlipText = queryByTestId('postFlipText')
         expect(alertBox).toBeInTheDocument()
         expect(postFlipText).toBeInTheDocument()
@@ -180,7 +180,7 @@ describe('DeveloperKeys App', () => {
       afterEach(() => (ENV = {}))
 
       it('does not render the warning', () => {
-        const alertBox = queryByTestId('OIDC_warning')
+        const alertBox = queryByTestId('OIDC_alert')
         expect(alertBox).not.toBeInTheDocument()
       })
     })
