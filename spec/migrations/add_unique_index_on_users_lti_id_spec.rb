@@ -16,43 +16,43 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-require_relative "../../db/migrate/20230616223539_add_unique_index_on_users_uuid"
 
-describe "AddUniqueIndexOnUsersUuid" do
-  subject { AddUniqueIndexOnUsersUuid.new }
+require_relative "../../db/migrate/20230626174031_add_unique_index_on_users_lti_id"
+
+describe "AddUniqueIndexOnUsersLtiId" do
+  subject { AddUniqueIndexOnUsersLtiId.new }
 
   context "with no non-deleted users" do
     it "prioritizes the most recently updated user" do
       subject.down
-      u1 = User.create!(uuid: "123", workflow_state: "deleted")
-      u2 = User.create!(uuid: "123", workflow_state: "deleted")
+      u1 = User.create!(lti_id: "123", workflow_state: "deleted")
+      u2 = User.create!(lti_id: "123", workflow_state: "deleted")
       u2.update_attribute(:updated_at, 1.day.ago)
 
       subject.up
-      expect(u1.reload.read_attribute(:uuid)).to eq "123"
-      expect(u2.reload.read_attribute(:uuid)).to be_nil
+      expect(u1.reload.read_attribute(:lti_id)).to eq "123"
+      expect(u2.reload.read_attribute(:lti_id)).to be_nil
     end
   end
 
   context "with one non-deleted user" do
     it "prioritizes the non-deleted user" do
       subject.down
-      u1 = User.create!(uuid: "123", workflow_state: "deleted")
-      u2 = User.create!(uuid: "123", workflow_state: "active")
+      u1 = User.create!(lti_id: "123", workflow_state: "deleted")
+      u2 = User.create!(lti_id: "123", workflow_state: "active")
       u2.update_attribute(:updated_at, 1.day.ago)
 
       subject.up
-      expect(u1.reload.read_attribute(:uuid)).to be_nil
-      expect(u2.reload.read_attribute(:uuid)).to eq "123"
+      expect(u1.reload.read_attribute(:lti_id)).to be_nil
+      expect(u2.reload.read_attribute(:lti_id)).to eq "123"
     end
   end
 
   context "multiple non-deleted users" do
     before do
       subject.down
-      @u1 = User.create!(uuid: "123", workflow_state: "active")
-      @u2 = User.create!(uuid: "123", workflow_state: "active")
+      @u1 = User.create!(lti_id: "123", workflow_state: "active")
+      @u2 = User.create!(lti_id: "123", workflow_state: "active")
       @u2.update_attribute(:updated_at, 1.day.ago)
     end
 
@@ -64,8 +64,8 @@ describe "AddUniqueIndexOnUsersUuid" do
     it "modifies non-deleted records if ENV['AGGRESSIVE_UUID_CLEANUP'] is set" do
       expect(ENV).to receive(:fetch).with("AGGRESSIVE_UUID_CLEANUP", "0").and_return("1")
       subject.up
-      expect(@u1.reload.read_attribute(:uuid)).to eq "123"
-      expect(@u2.reload.read_attribute(:uuid)).to be_nil
+      expect(@u1.reload.read_attribute(:lti_id)).to eq "123"
+      expect(@u2.reload.read_attribute(:lti_id)).to be_nil
     end
   end
 end

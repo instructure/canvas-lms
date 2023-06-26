@@ -26,13 +26,13 @@ module DataFixup::ResolveDuplicateUserUuids
     updated_at DESC
   SQL
 
-  def self.run(modify_non_deleted_users: false)
-    dup_uuids = User.where.not(uuid: nil).group(:uuid).having("count(uuid)>1").pluck(:uuid)
+  def self.run(modify_non_deleted_users: false, column: :uuid)
+    dup_uuids = User.where.not(column => nil).group(column).having("count(*)>1").pluck(column)
     dup_uuids.each do |uuid|
-      canonical_user_id = User.where(uuid:).order(Arel.sql(ORDER_SQL)).pick(:id)
-      update_scope = User.where(uuid:).where("id<>?", canonical_user_id) # intentionally avoiding switchman magic
+      canonical_user_id = User.where(column => uuid).order(Arel.sql(ORDER_SQL)).pick(:id)
+      update_scope = User.where(column => uuid).where("id<>?", canonical_user_id) # intentionally avoiding switchman magic
       update_scope = update_scope.where(workflow_state: "deleted") unless modify_non_deleted_users
-      update_scope.in_batches.update_all(uuid: nil) # will be regenerated on demand if/when user is undeleted
+      update_scope.in_batches.update_all(column => nil) # will be regenerated on demand if/when user is undeleted
     end
   end
 end
