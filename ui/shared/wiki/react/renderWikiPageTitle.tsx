@@ -25,6 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type JQuery from 'jquery'
 import type WikiPageEditView from '../backbone/views/WikiPageEditView'
+import {checkForTitleConflictDebounced} from '../utils/titleConflicts'
 
 const I18n = useI18nScope('pages_edit_title')
 
@@ -35,7 +36,7 @@ interface ComponentProps {
   validationCallback: (data: Record<string, unknown>) => ValidationResult
 }
 
-interface InputError {
+export interface Message {
   text: string
   type: string
 }
@@ -52,7 +53,7 @@ interface ValidationResult {
 export type Props = TextInputProps & ComponentProps
 
 const EditableContent = (props: Props) => {
-  const [errors, setErrors] = useState<InputError[]>([])
+  const [messages, setMessages] = useState<Message[]>([])
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -66,7 +67,7 @@ const EditableContent = (props: Props) => {
           text: error.message,
           type: 'error',
         }))
-        setErrors(parsedErrors)
+        setMessages(parsedErrors)
         return false
       }
     }
@@ -83,6 +84,15 @@ const EditableContent = (props: Props) => {
     }
   }, [props])
 
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {value} = e.target
+    if (value === props.defaultValue || value.trim().length === 0) {
+      setMessages([])
+      return
+    }
+    checkForTitleConflictDebounced(value, setMessages)
+  }
+
   return props.isContentLocked ? (
     <>
       <Heading data-testid="wikipage-locked-title" level="h1">
@@ -95,7 +105,8 @@ const EditableContent = (props: Props) => {
       <TextInput
         data-testid="wikipage-title-input"
         inputRef={(ref: HTMLInputElement | null) => (inputRef.current = ref)}
-        messages={errors}
+        messages={messages}
+        onChange={handleOnChange}
         renderLabel={() => (
           <Text size="small" weight="normal">
             {I18n.t('Page Title')}

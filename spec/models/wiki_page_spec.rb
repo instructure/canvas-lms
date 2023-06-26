@@ -180,6 +180,16 @@ describe WikiPage do
     expect { @course.wiki_pages.create!(title: "MAT-1104") }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
+  it "allows users to reuse titles if permanent_page_links is enabled" do
+    Account.site_admin.enable_feature! :permanent_page_links
+    course_factory(active_all: true)
+    title = "Doppelgänger"
+    p1 = @course.wiki_pages.create!(title:)
+    p2 = @course.wiki_pages.create!(title:)
+    expect(p1.title).to eq(title)
+    expect(p2.title).to eq(title)
+  end
+
   it "creates a unique url if title is taken by an existing lookup when permanent_page_links is enabled" do
     Account.site_admin.enable_feature! :permanent_page_links
     course_factory(active_all: true)
