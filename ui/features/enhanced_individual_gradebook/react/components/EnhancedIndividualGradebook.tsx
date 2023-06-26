@@ -104,6 +104,8 @@ export default function EnhancedIndividualGradebook() {
     customColumnsUrl: ENV.GRADEBOOK_OPTIONS?.custom_columns_url,
     gradesAreWeighted: ENV.GRADEBOOK_OPTIONS?.grades_are_weighted,
     finalGradeOverrideEnabled: ENV.GRADEBOOK_OPTIONS?.final_grade_override_enabled,
+    publishToSisEnabled: ENV.GRADEBOOK_OPTIONS?.publish_to_sis_enabled,
+    publishToSisUrl: ENV.GRADEBOOK_OPTIONS?.publish_to_sis_url,
     reorderCustomColumnsUrl: ENV.GRADEBOOK_OPTIONS?.reorder_custom_columns_url,
     settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
     settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,

@@ -80,6 +80,8 @@ export type GradebookOptions = {
   customColumnsUrl?: string | null
   gradesAreWeighted?: boolean | null
   finalGradeOverrideEnabled?: boolean | null
+  publishToSisEnabled?: boolean | null
+  publishToSisUrl?: string | null
   reorderCustomColumnsUrl?: string | null
   saveViewUngradedAsZeroToServer?: boolean | null
   settingUpdateUrl?: string | null

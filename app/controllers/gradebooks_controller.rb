@@ -571,6 +571,10 @@ class GradebooksController < ApplicationController
       grades_are_weighted: grading_period_group_json&.weighted || @context.group_weighting_scheme.present? || false,
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
+      publish_to_sis_enabled: (
+        !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
+      ),
+      publish_to_sis_url: context_url(@context, :context_details_url, anchor: "tab-grade-publishing"),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
       save_view_ungraded_as_zero_to_server: allow_view_ungraded_as_zero?,
       setting_update_url: api_v1_course_settings_url(@context),

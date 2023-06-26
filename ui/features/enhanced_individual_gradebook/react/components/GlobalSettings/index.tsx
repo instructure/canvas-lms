@@ -207,12 +207,13 @@ export default function GlobalSettings({
 
           <View as="div" className="pad-box bottom-only">
             <View as="div">
-              {/* {{#if publishToSisEnabled}}
-                <a href="{{ unbound publishToSisURL }}">
-                  {{#t}}Sync grades to SIS{{/t}}
-                </a>
-              {{/if}} */}
+              {gradebookOptions.publishToSisEnabled && gradebookOptions.publishToSisUrl && (
+                <Link href={gradebookOptions.publishToSisUrl} isWithinText={false}>
+                  {I18n.t('Sync grades to SIS')}
+                </Link>
+              )}
             </View>
+
             <View as="div">
               <Link href={`${gradebookOptions.contextUrl}/gradebook/history`} isWithinText={false}>
                 {I18n.t('View Gradebook History')}
