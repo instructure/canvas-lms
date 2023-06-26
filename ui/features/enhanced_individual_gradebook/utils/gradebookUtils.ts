@@ -101,11 +101,12 @@ export function mapEnrollmentsToSortableStudents(
   enrollments: EnrollmentConnection[]
 ): SortableStudent[] {
   const mappedEnrollments = enrollments.reduce((prev, enrollment) => {
-    const {user, courseSectionId} = enrollment
+    const {user, courseSectionId, state} = enrollment
     if (!prev[user.id]) {
       prev[user.id] = {
         ...user,
         sections: [courseSectionId],
+        state,
       }
     } else {
       prev[user.id].sections.push(courseSectionId)

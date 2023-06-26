@@ -35,6 +35,7 @@ export type UserConnection = {
 export type EnrollmentConnection = {
   user: UserConnection
   courseSectionId: string
+  state: string
 }
 
 export type AssignmentConnection = {

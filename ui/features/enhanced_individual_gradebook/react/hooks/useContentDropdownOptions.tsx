@@ -44,9 +44,12 @@ const DEFAULT_ASSIGNMENT_DROPDOWN_TEXT = I18n.t('No Assignment Selected')
 const defaultStudentDropdownOptions = {id: '-1', name: DEFAULT_STUDENT_DROPDOWN_TEXT}
 const defaultAssignmentDropdownOptions = {id: '-1', name: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT}
 
+const defaultAllowedEnrollmentStates = ['active', 'invited']
+
 type UserDropdownProps = {
   students?: SortableStudent[]
   selectedSection?: string | null
+  showConcludedEnrollments: boolean
 }
 
 type UserDropdownResponse = {
@@ -56,6 +59,7 @@ type UserDropdownResponse = {
 export const useUserDropdownOptions = ({
   students,
   selectedSection,
+  showConcludedEnrollments,
 }: UserDropdownProps): UserDropdownResponse => {
   const [studentDropdownOptions, setStudentDropdownOptions] = useState<StudentDropdownOption>()
 
@@ -63,10 +67,15 @@ export const useUserDropdownOptions = ({
     if (!students) {
       return
     }
-
-    const filteredStudents = selectedSection
-      ? students.filter(student => student.sections.includes(selectedSection))
-      : students
+    const filteredStates = [
+      ...defaultAllowedEnrollmentStates,
+      ...(showConcludedEnrollments ? ['completed'] : []),
+    ]
+    const filteredStudents = students.filter(
+      student =>
+        filteredStates.includes(student.state) &&
+        (selectedSection ? student.sections.includes(selectedSection) : true)
+    )
     const studentOptions: StudentDropdownOption = [
       defaultStudentDropdownOptions,
       ...filteredStudents.map(student => ({
@@ -76,7 +85,7 @@ export const useUserDropdownOptions = ({
       })),
     ]
     setStudentDropdownOptions(studentOptions)
-  }, [students, selectedSection, setStudentDropdownOptions])
+  }, [students, selectedSection, setStudentDropdownOptions, showConcludedEnrollments])
 
   return {studentDropdownOptions}
 }

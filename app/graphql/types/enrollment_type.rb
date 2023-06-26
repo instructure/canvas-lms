@@ -49,6 +49,7 @@ module Types
              prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
              required: false,
              default_value: []
+    argument :states, [EnrollmentWorkflowState], required: false, default_value: nil
   end
 
   class EnrollmentType < ApplicationObjectType

@@ -737,6 +737,18 @@ describe Types::CourseType do
             )
           ).to eq [observer_enrollment.id.to_s]
         end
+
+        it "returns only enrollments with the specified states if included" do
+          inactive_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "inactive").user
+          deleted_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "deleted").user
+          rejected_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "rejected").user
+          expect(
+            course_type.resolve(
+              "enrollmentsConnection(filter: {states: [inactive, deleted, rejected]}) { nodes { _id } }",
+              current_user: @teacher
+            )
+          ).to eq [inactive_student.enrollments.first.id.to_s, deleted_student.enrollments.first.id.to_s, rejected_student.enrollments.first.id.to_s]
+        end
       end
     end
   end
