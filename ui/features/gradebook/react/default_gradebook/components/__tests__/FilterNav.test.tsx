@@ -353,6 +353,14 @@ describe('Filter dropdown', () => {
     userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
     expect(getByTestId('applied-filter-tag')).toBeVisible()
   })
+
+  it('Check for accessbility text to remove filter', async () => {
+    const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByTestId('applied-filter-tag')).toHaveTextContent('Remove Section 7 Filter')
+  })
 })
 
 describe('FilterNav (save)', () => {
