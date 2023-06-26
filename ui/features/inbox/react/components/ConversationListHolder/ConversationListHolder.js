@@ -140,6 +140,7 @@ export const ConversationListHolder = ({
         setSelectedMessages(prevSelectedMessages => [...prevSelectedMessages, _id])
       } else {
         setSelectedMessages([_id])
+        props.setConversationIdToGoBackTo(_id)
       }
     }
   }
@@ -311,9 +312,11 @@ ConversationListHolder.propTypes = {
   hasMoreMenuData: PropTypes.bool,
   isError: PropTypes.object,
   truncateSize: PropTypes.number,
+  setConversationIdToGoBackTo: PropTypes.func,
 }
 
 ConversationListHolder.defaultProps = {
   onSelect: () => {},
   onStar: () => {},
+  setConversationIdToGoBackTo: () => {},
 }

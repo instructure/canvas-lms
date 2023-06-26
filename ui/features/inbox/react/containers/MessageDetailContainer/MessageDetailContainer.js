@@ -316,6 +316,7 @@ export const MessageDetailContainer = props => {
   return (
     <>
       <MessageDetailHeader
+        onBack={props.onBack}
         focusRef={setMessageRef}
         text={props.conversation.subject || I18n.t('(No subject)')}
         onForward={props.onForward}
@@ -351,6 +352,7 @@ MessageDetailContainer.propTypes = {
   onStar: PropTypes.func,
   onUnstar: PropTypes.func,
   onReadStateChange: PropTypes.func,
+  onBack: PropTypes.func,
   setCanReply: PropTypes.func,
   scope: PropTypes.string,
 }

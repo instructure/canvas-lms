@@ -49,6 +49,15 @@ describe "conversations new" do
         @convo.add_message(@teacher, "second Message")
       end
 
+      it "returns to conversations list on button click" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        fj("button:contains('Return to Conversation List')").click
+        wait_for_ajaximations
+        expect(fj("button:contains('Open Conversation')")).to be_present
+      end
+
       it "forwards conversations via the top bar menu" do
         get "/conversations"
         f("div[data-testid='conversation']").click

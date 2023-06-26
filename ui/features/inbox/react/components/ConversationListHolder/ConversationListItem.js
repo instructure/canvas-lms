@@ -239,6 +239,7 @@ export const ConversationListItem = ({...props}) => {
                     {({focused}) => {
                       return focused ? (
                         <Button
+                          data-testid={`open-conversation-for-${props.conversation._id}`}
                           display="block"
                           textAlign="center"
                           size="small"
@@ -250,7 +251,10 @@ export const ConversationListItem = ({...props}) => {
                           {I18n.t('Open Conversation')}
                         </Button>
                       ) : (
-                        <ScreenReaderContent tabIndex="0">
+                        <ScreenReaderContent
+                          tabIndex="0"
+                          data-testid={`open-conversation-for-${props.conversation._id}`}
+                        >
                           {I18n.t('Open Conversation')}
                         </ScreenReaderContent>
                       )
