@@ -21,7 +21,12 @@ import gql from 'graphql-tag'
 export const GRADEBOOK_QUERY = gql`
   query GradebookQuery($courseId: ID!) {
     course(id: $courseId) {
-      enrollmentsConnection(filter: {types: [StudentEnrollment, StudentViewEnrollment]}) {
+      enrollmentsConnection(
+        filter: {
+          states: [active, invited, completed]
+          types: [StudentEnrollment, StudentViewEnrollment]
+        }
+      ) {
         nodes {
           user {
             id: _id
@@ -29,6 +34,7 @@ export const GRADEBOOK_QUERY = gql`
             sortableName
           }
           courseSectionId
+          state
         }
       }
       sectionsConnection {

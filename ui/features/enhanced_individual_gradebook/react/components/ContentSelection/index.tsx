@@ -56,9 +56,17 @@ export default function ContentSelection({
   const [selectedAssignmentIndex, setSelectedAssignmentIndex] = useState<number>(0)
   const {studentSubmissions} = useCurrentStudentInfo(courseId, selectedStudentId)
 
-  const {sortOrder, selectedSection} = gradebookOptions
+  const {
+    sortOrder,
+    selectedSection,
+    customOptions: {showConcludedEnrollments},
+  } = gradebookOptions
 
-  const {studentDropdownOptions} = useUserDropdownOptions({students, selectedSection})
+  const {studentDropdownOptions} = useUserDropdownOptions({
+    students,
+    selectedSection,
+    showConcludedEnrollments,
+  })
   const {assignmentDropdownOptions} = useAssignmentDropdownOptions({
     assignments,
     sortOrder,

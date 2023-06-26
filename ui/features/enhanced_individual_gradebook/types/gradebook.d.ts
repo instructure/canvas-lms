@@ -115,6 +115,7 @@ export type AssignmentSortContext = {
 export type SortableStudent = UserConnection & {
   sections: string[]
   hiddenName?: string
+  state: string
 }
 
 export enum ApiCallStatus {
