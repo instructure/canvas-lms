@@ -138,7 +138,7 @@ describe "conversations new" do
         get "/conversations"
         f("div[data-testid='conversation']").click
         wait_for_ajaximations
-        expect(f("button[data-testid='message-detail-back-button']")).to be_present
+        expect(fj("button:contains('Return to Conversation List')")).to be_present
         f("button[data-testid='message-detail-header-reply-btn']").click
         f("textarea[data-testid='message-body']").send_keys("hello friends")
         f("button[data-testid='send-button']").click

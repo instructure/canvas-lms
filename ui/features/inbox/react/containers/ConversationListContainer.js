@@ -37,6 +37,7 @@ const ConversationListContainer = ({
   commonQueryVariables,
   conversationsQuery,
   submissionCommentsQuery,
+  setConversationIdToGoBackTo,
 }) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
@@ -193,6 +194,7 @@ const ConversationListContainer = ({
             isLoading={conversationsQuery.loading || submissionCommentsQuery.loading}
             isError={conversationsQuery.error || submissionCommentsQuery.error}
             truncateSize={responsiveProps.truncateSize}
+            setConversationIdToGoBackTo={setConversationIdToGoBackTo}
           />
         )}
       />
@@ -210,9 +212,11 @@ ConversationListContainer.propTypes = {
   commonQueryVariables: PropTypes.object,
   conversationsQuery: PropTypes.object,
   submissionCommentsQuery: PropTypes.object,
+  setConversationIdToGoBackTo: PropTypes.func,
 }
 
 ConversationListContainer.defaultProps = {
   scope: 'inbox',
   onSelectConversation: () => {},
+  setConversationIdToGoBackTo: () => {},
 }

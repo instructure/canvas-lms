@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
+import {IconMoreLine, IconReplyLine, IconArrowStartLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
@@ -57,7 +57,6 @@ export const MessageDetailHeader = ({...props}) => {
       render={responsiveProps => (
         <Flex padding="small">
           <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <span tabIndex="-1" ref={ref => props.focusRef(ref)} />
             <Heading
               level={responsiveProps.level}
               as={responsiveProps.as}
@@ -74,6 +73,20 @@ export const MessageDetailHeader = ({...props}) => {
                 props.text
               )}
             </Heading>
+          </Flex.Item>
+          <Flex.Item>
+            <Tooltip renderTip={I18n.t('Return to Conversation List')} on={['hover', 'focus']}>
+              <IconButton
+                ref={ref => props.focusRef(ref)}
+                margin="0 x-small 0 0"
+                screenReaderLabel={I18n.t('Return to Conversation List')}
+                onClick={() => props.onBack()}
+                withBackground={false}
+                withBorder={false}
+              >
+                <IconArrowStartLine />
+              </IconButton>
+            </Tooltip>
           </Flex.Item>
           {props.onReply && (
             <Flex.Item>
@@ -165,6 +178,7 @@ MessageDetailHeader.propTypes = {
   onForward: PropTypes.func,
   submissionCommentURL: PropTypes.string,
   scope: PropTypes.string,
+  onBack: PropTypes.func,
 }
 
 MessageDetailHeader.defaultProps = {
