@@ -1801,7 +1801,10 @@ class ApplicationController < ActionController::Base
     begin
       status_code = interpret_status(response_code)
       status = status_code
-      status = "AUT" if exception.is_a?(ActionController::InvalidAuthenticityToken)
+      if exception.is_a?(ActionController::InvalidAuthenticityToken)
+        status = "AUT"
+        Rails.logger.warn "Cookie token is #{request.cookies[:_csrf_token]}"
+      end
       type = nil
       type = "404" if status == "404 Not Found"
       opts = { type: }
@@ -1849,6 +1852,8 @@ class ApplicationController < ActionController::Base
       reset_session
       nil
     else
+      js_env SENTRY_BOOT_MESSAGE: "Invalid authenticity token on post" if ActionController::InvalidAuthenticityToken
+
       request.format = :html
       template = exception.error_template if exception.respond_to?(:error_template)
       unless template
