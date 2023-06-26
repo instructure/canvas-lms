@@ -37,6 +37,7 @@ import HideStudentNamesCheckbox from './HideStudentNamesCheckbox'
 import ShowConcludedEnrollmentsCheckbox from './ShowConcludedEnrollmentsCheckbox'
 import ShowNotesColumnCheckbox from './ShowNotesColumnCheckbox'
 import ShowTotalGradesAsPointsCheckbox from './ShowTotalGradeAsPointsCheckbox'
+import AllowFinalGradeOverrideCheckbox from './AllowFinalGradeOverrideCheckbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -162,39 +163,22 @@ export default function GlobalSettings({
             showNotesColumn={gradebookOptions.customOptions.showNotesColumn}
             onTeacherNotesCreation={onTeacherNotesCreation}
           />
-          {/* {{#if finalGradeOverrideEnabled}}
-            <View as="div" className="checkbox">
-              <label className="checkbox">
-              {{
-                input
-                type="checkbox"
-                id="allow_final_grade_override"
-                name="allow_final_grade_override"
-                checked=allowFinalGradeOverride
-              }}
-              {{#t}}Allow Final Grade Override{{/t}}
-              </label>
-            </View>
-          {{/if}} */}
-          {/* {{#unless gradesAreWeighted}}
-            <View as="div" className="checkbox">
-              <label className="checkbox">
-              {{
-                input
-                type="checkbox"
-                id="show_total_as_points"
-                name="show_total_as_points"
-                checked=showTotalAsPoints
-              }}
-              {{#t "show_total_as_points"}}Show Totals as Points on Student Grade Page{{/t}}
-              </label>
-            </View>
-          {{/unless}} */}
-          <ShowTotalGradesAsPointsCheckbox
-            settingUpdateUrl={gradebookOptions.settingUpdateUrl}
-            showTotalGradeAsPoints={gradebookOptions.customOptions.showTotalGradeAsPoints}
-            handleCheckboxChange={handleCheckboxChange}
-          />
+
+          {gradebookOptions.finalGradeOverrideEnabled && (
+            <AllowFinalGradeOverrideCheckbox
+              contextId={gradebookOptions.contextId}
+              allowFinalGradeOverride={gradebookOptions.customOptions.allowFinalGradeOverride}
+              handleCheckboxChange={handleCheckboxChange}
+            />
+          )}
+
+          {!gradebookOptions.gradesAreWeighted && (
+            <ShowTotalGradesAsPointsCheckbox
+              settingUpdateUrl={gradebookOptions.settingUpdateUrl}
+              showTotalGradeAsPoints={gradebookOptions.customOptions.showTotalGradeAsPoints}
+              handleCheckboxChange={handleCheckboxChange}
+            />
+          )}
         </View>
       </View>
 
