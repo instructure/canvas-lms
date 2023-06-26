@@ -16,11 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import WikiPage from '../../backbone/models/WikiPage'
 import WikiPageEditView from '../../backbone/views/WikiPageEditView'
 import renderWikiPageTitle, {Props as ComponentProps} from '../renderWikiPageTitle'
 import type JQuery from 'jquery'
+import {checkForTitleConflictDebounced} from '../../utils/titleConflicts'
+
+jest.mock('../../utils/titleConflicts')
 
 const wikiPageModel = new WikiPage()
 wikiPageModel.initialize({url: 'page-1'}, {contextAssetString: 'course_1'})
@@ -75,5 +78,39 @@ describe('renderWikiPageTitle', () => {
     props.viewElement.submit()
     expect(getByText(titleErrors[0].message)).toBeInTheDocument()
     expect(callback).toHaveBeenCalled()
+  })
+
+  describe('handleOnChange', () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('calls checkForTitleConflictDebounced onChange', () => {
+      const {getByTestId} = render(renderWikiPageTitle(getProps()))
+      const input = getByTestId('wikipage-title-input')
+      fireEvent.change(input, {target: {value: 'New Title'}})
+      expect(checkForTitleConflictDebounced).toHaveBeenCalledWith('New Title', expect.any(Function))
+    })
+
+    it('does not call checkForTitleConflictDebounced when new value is the same as old value', () => {
+      const {getByTestId} = render(renderWikiPageTitle(getProps()))
+      const input = getByTestId('wikipage-title-input')
+      fireEvent.change(input, {target: {value: getProps().defaultValue}})
+      expect(checkForTitleConflictDebounced).not.toHaveBeenCalled()
+    })
+
+    it('does not call checkForTitleConflictDebounced when new value is the empty string', () => {
+      const {getByTestId} = render(renderWikiPageTitle(getProps()))
+      const input = getByTestId('wikipage-title-input')
+      fireEvent.change(input, {target: {value: ''}})
+      expect(checkForTitleConflictDebounced).not.toHaveBeenCalled()
+    })
+
+    it('does not call checkForTitleConflictDebounced when new value is whitepace', () => {
+      const {getByTestId} = render(renderWikiPageTitle(getProps()))
+      const input = getByTestId('wikipage-title-input')
+      fireEvent.change(input, {target: {value: '       '}})
+      expect(checkForTitleConflictDebounced).not.toHaveBeenCalled()
+    })
   })
 })

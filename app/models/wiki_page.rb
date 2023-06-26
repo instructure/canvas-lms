@@ -149,7 +149,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def ensure_unique_title
-    return if deleted?
+    return if deleted? || Account.site_admin.feature_enabled?(:permanent_page_links)
 
     to_cased_title = ->(string) { string.gsub(/[^\w]+/, " ").gsub(/\b('?[a-z])/) { $1.capitalize }.strip }
     self.title ||= to_cased_title.call(read_attribute(:url) || "page")

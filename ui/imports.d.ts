@@ -204,3 +204,15 @@ declare module '@instructure/ui-badge' {
     }
   }
 }
+
+declare module '@instructure/debounce' {
+  type Function = (...args: any[]) => any
+
+  interface Options {
+    leading?: boolean
+    maxWait?: number
+    trailing?: boolean
+  }
+
+  export function debounce(func: Function, wait = 0, options?: Options): Function
+}
