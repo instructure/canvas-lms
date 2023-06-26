@@ -210,7 +210,18 @@ class OAuth2ProviderController < ApplicationController
   def special_confirm_message(provider)
     commons_dk_id = Setting.get("commons_developer_key_id", nil)
     if commons_dk_id.present? && commons_dk_id.to_s == provider.key.global_id.to_s
-      mt "Please note: Instructure hosts Canvas Commons in the USA. This means that when you use Canvas Commons your personal data will be stored and processed in the USA. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
+      case provider.redirect_uri
+      when /commons\.ca-central\.canvaslms\.com/
+        mt "Instructure hosts Canvas Commons in the region chosen by your institution, which is Canada. This means that when you use Canvas Commons your personal data will be stored and processed in Canada. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
+      when /commons\.eu-central\.canvaslms\.com/
+        mt "Instructure hosts Canvas Commons in the region chosen by your institution, which is Europe. This means that when you use Canvas Commons your personal data will be stored and processed in Germany. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
+      when /commons\.sydney\.canvaslms\.com/
+        mt "Instructure hosts Canvas Commons in the region chosen by your institution, which is Australia. This means that when you use Canvas Commons your personal data will be stored and processed in Australia. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
+      when /commons\.singapore\.canvaslms\.com/
+        mt "Instructure hosts Canvas Commons in the region chosen by your institution, which is Asia Pacific. This means that when you use Canvas Commons your personal data will be stored and processed in Singapore. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
+      else
+        mt "Instructure hosts Canvas Commons in the region chosen by your institution, which is the US. This means that when you use Canvas Commons your personal data will be stored and processed in the United States. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
+      end
     end
   end
 end
