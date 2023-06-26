@@ -626,6 +626,36 @@ describe LearningOutcome do
       end
     end
 
+    context "should set calculation_int to default if the calculation_method is changed and calculation_int isn't set when outcomes_new_decaying_average_calculation FF ON" do
+      before do
+        @outcome.context.root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
+      end
+
+      method_to_int = {
+        "decaying_average" => { default: 65, testval: nil, altmeth: "latest" },
+        "standard_decaying_average" => { default: 65, testval: nil, altmeth: "latest" },
+        "n_mastery" => { default: 5, testval: nil, altmeth: "highest" },
+        "highest" => { default: nil, testval: 4, altmeth: "n_mastery" },
+        "latest" => { default: nil, testval: 72, altmeth: "decaying_average" },
+        "average" => { default: nil, testval: 3, altmeth: "n_mastery" },
+      }
+
+      method_to_int.each do |method, set|
+        it "sets calculation_int to #{set[:default].nil? ? "nil" : set[:default]} if the calculation_method is changed to #{method} and calculation_int isn't set" do
+          @outcome.calculation_method = set[:altmeth]
+          @outcome.calculation_int = set[:testval]
+          @outcome.save!
+          expect(@outcome.calculation_method).to eq(set[:altmeth])
+          expect(@outcome.calculation_int).to eq(set[:testval])
+          @outcome.calculation_method = method
+          @outcome.save!
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq(method)
+          expect(@outcome.calculation_int).to eq(set[:default])
+        end
+      end
+    end
+
     it "destroys provided alignment" do
       @alignment = ContentTag.create({
                                        content: @outcome,
@@ -1114,6 +1144,34 @@ describe LearningOutcome do
             expect(ratings.pluck(:color)).to eq [nil, nil, nil, nil, nil]
           end
         end
+      end
+    end
+
+    context "with the outcomes_new_decaying_average_calculation FF enabled" do
+      before do
+        LoadAccount.default_domain_root_account.enable_feature!(:outcomes_new_decaying_average_calculation)
+      end
+
+      it "defaults calculation_method to weighted_average" do
+        @outcome = LearningOutcome.create!(title: "outcome")
+        expect(@outcome.calculation_method).to eql("weighted_average")
+        expect(@outcome.calculation_int).to be 65
+      end
+
+      it "allows standard_decaying_average as a calculation_method" do
+        @outcome = LearningOutcome.create!(title: "outcome", calculation_method: "standard_decaying_average")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
+        expect(@outcome.calculation_int).to be 65
+      end
+
+      it "rejects if calculation_int not with in the valid range for calculation_method standard_decaying_average" do
+        @outcome = LearningOutcome.create!(title: "outcome", calculation_method: "standard_decaying_average")
+        expect(@outcome.calculation_method).to eql("standard_decaying_average")
+        expect(@outcome.calculation_int).to be 65
+        @outcome.calculation_int = 49
+        @outcome.save
+        expect(@outcome).to have(1).error_on(:calculation_int)
+        expect(outcome_errors(:calculation_int).first).to include("The value must be between '50' and '99'")
       end
     end
   end

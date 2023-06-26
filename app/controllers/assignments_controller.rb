@@ -405,6 +405,7 @@ class AssignmentsController < ApplicationController
                  EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
                  EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
                  USER_ASSET_STRING: @current_user&.asset_string,
+                 OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation),
                })
 
         set_master_course_js_env_data(@assignment, @context)
@@ -783,7 +784,9 @@ class AssignmentsController < ApplicationController
         GRADING_SCHEME_UPDATES_ENABLED:
           Account.site_admin.feature_enabled?(:grading_scheme_updates),
         POINTS_BASED_GRADING_SCHEMES_ENABLED:
-          Account.site_admin.feature_enabled?(:points_based_grading_schemes)
+          Account.site_admin.feature_enabled?(:points_based_grading_schemes),
+        OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION:
+          @context.root_account.feature_enabled?(:outcomes_new_decaying_average_calculation)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?

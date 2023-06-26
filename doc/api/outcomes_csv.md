@@ -96,7 +96,11 @@ This value does not apply to learning outcome groups.</td>
 <td></td>
 <td>Must be one of "decaying_average", "n_mastery", "highest", "latest", "average" or blank.
 This field must be blank for learning outcome groups. If not provided and this
-is a learning outcome, then the calculation method defaults to "decaying_average". If the Account and Course Level Outcome Mastery Scales flag is enabled, the calculation_method field does not need to be defined in the imported .csv. The calculation_method field will be determined by the account and course settings.</td>
+is a learning outcome, then the calculation method defaults to "decaying_average". If the Account and Course Level Outcome Mastery Scales flag is enabled, the calculation_method field does not need to be defined in the imported .csv. The calculation_method field will be determined by the account and course settings.
+If Outcomes New Decaying Average Calculation Method feature flag is enabled then
+we will have one more calculation method "weighted_average" and it would be 
+the default calculation method.
+</td>
 </tr>
 <tr>
 <td>calculation_int</td>
@@ -104,7 +108,11 @@ is a learning outcome, then the calculation method defaults to "decaying_average
 <td></td>
 <td>Valid values depend on the "calculation_method". For "decaying_average", the value must
 be between 1 and 99, inclusive. For "n_mastery", the value must be between 1 and 10, inclusive.
-For "highest", "latest" and "average", this field must be blank. If the Account and Course Level Outcome Mastery Scales flag is enabled, the calculation_int field does not need to be defined in the imported .csv. The calculation_int field will be determined by the account and course settings.</td>
+For "highest", "latest" and "average", this field must be blank. If the Account and Course Level Outcome Mastery Scales flag is enabled, the calculation_int field does not need to be defined in the imported .csv. The calculation_int field will be determined by the account and course settings.
+If Outcomes New Decaying Average Calculation Method feature flag is enabled then
+For "weighted_average", the value must be between 1 and 99, inclusive.
+For "standard_decaying_average", the value must be between 50 and 99, inclusive.
+</td>
 </tr>
 <tr>
 <td>parent_guids</td>

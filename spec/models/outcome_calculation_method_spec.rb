@@ -55,6 +55,34 @@ describe OutcomeCalculationMethod do
         end
       end
 
+      context "standard_decaying_average" do
+        before do
+          account.enable_feature!(:outcomes_new_decaying_average_calculation)
+        end
+
+        let(:calculation_method) { "standard_decaying_average" }
+        let(:calculation_int) { 65 }
+
+        it do
+          expect(subject).to allow_values(
+            50,
+            72,
+            99
+          ).for(:calculation_int)
+        end
+
+        it do
+          expect(subject).not_to allow_values(
+            -1,
+            0,
+            49,
+            100,
+            1000,
+            nil
+          ).for(:calculation_int)
+        end
+      end
+
       context "n_mastery" do
         let(:calculation_method) { "n_mastery" }
         let(:calculation_int) { 3 }
@@ -115,6 +143,15 @@ describe OutcomeCalculationMethod do
 
   describe "find_or_create_default!" do
     it "creates the default calculation method if one doesnt exist" do
+      calculation_method = OutcomeCalculationMethod.find_or_create_default!(account)
+      expect(calculation_method.calculation_method).to eq "highest"
+      expect(calculation_method.workflow_state).to eq "active"
+      expect(calculation_method.calculation_int).to be_nil
+      expect(calculation_method.context).to eq account
+    end
+
+    it "creates the default calculation method if outcomes_new_decaying_average_calculation FF enabled" do
+      account.enable_feature!(:outcomes_new_decaying_average_calculation)
       calculation_method = OutcomeCalculationMethod.find_or_create_default!(account)
       expect(calculation_method.calculation_method).to eq "highest"
       expect(calculation_method.workflow_state).to eq "active"

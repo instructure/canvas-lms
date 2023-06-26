@@ -802,6 +802,133 @@ describe "Outcomes API", type: :request do
         end
       end
     end
+
+    context "with the outcomes_new_decaying_average_calculation FF enabled" do
+      before :once do
+        @account.enable_feature!(:outcomes_new_decaying_average_calculation)
+      end
+
+      describe "show" do
+        it "returns the outcome json" do
+          json = api_call(:get,
+                          "/api/v1/outcomes/#{@outcome.id}",
+                          controller: "outcomes_api",
+                          action: "show",
+                          id: @outcome.id.to_s,
+                          format: "json")
+          expect(json).to eq({
+                               "id" => @outcome.id,
+                               "context_id" => @account.id,
+                               "context_type" => "Account",
+                               "calculation_int" => 65,
+                               "calculation_method" => "decaying_average",
+                               "title" => @outcome.title,
+                               "display_name" => nil,
+                               "friendly_description" => nil,
+                               "url" => api_v1_outcome_path(id: @outcome.id),
+                               "vendor_guid" => "vendorguid9000",
+                               "can_edit" => true,
+                               "has_updateable_rubrics" => false,
+                               "description" => @outcome.description,
+                               "assessed" => false,
+                               "mastery_points" => @outcome.mastery_points,
+                               "points_possible" => @outcome.points_possible,
+                               "ratings" => @outcome.rubric_criterion[:ratings].map(&:stringify_keys)
+                             })
+        end
+
+        it "returns updated calculation_method name" do
+          @outcome.calculation_method = "standard_decaying_average"
+          @outcome.save!
+
+          expect(@outcome.calculation_method).to eq("standard_decaying_average")
+          json = api_call(:get,
+                          "/api/v1/outcomes/#{@outcome.id}",
+                          controller: "outcomes_api",
+                          action: "show",
+                          id: @outcome.id.to_s,
+                          format: "json")
+          expect(json["calculation_method"]).to eq("standard_decaying_average")
+        end
+      end
+
+      describe "update" do
+        it "updates the outcome" do
+          api_call(:put,
+                   "/api/v1/outcomes/#{@outcome.id}",
+                   { controller: "outcomes_api",
+                     action: "update",
+                     id: @outcome.id.to_s,
+                     format: "json" },
+                   { title: "Updated Outcome",
+                     description: "Description of updated outcome",
+                     mastery_points: 5,
+                     ratings: [
+                       { points: 10, description: "Exceeds Expectations" },
+                       { points: 5, description: "Meets Expectations" },
+                       { points: 0, description: "Does Not Meet Expectations" }
+                     ] })
+          @outcome.reload
+          expect(@outcome.title).to eq "Updated Outcome"
+          expect(@outcome.description).to eq "Description of updated outcome"
+          expect(@outcome.data[:rubric_criterion]).to eq({
+                                                           description: "Updated Outcome",
+                                                           mastery_points: 5,
+                                                           points_possible: 10,
+                                                           ratings: [
+                                                             { points: 10, description: "Exceeds Expectations" },
+                                                             { points: 5, description: "Meets Expectations" },
+                                                             { points: 0, description: "Does Not Meet Expectations" }
+                                                           ]
+                                                         })
+        end
+
+        it "calculation_method to decaying_average" do
+          api_call(:put,
+                   "/api/v1/outcomes/#{@outcome.id}",
+                   { controller: "outcomes_api",
+                     action: "update",
+                     id: @outcome.id.to_s,
+                     format: "json" },
+                   { calculation_method: "decaying_average",
+                     calculation_int: 70 })
+
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq "decaying_average"
+          expect(@outcome.calculation_int).to eq(70)
+        end
+
+        it "calculation_method to standard_decaying_average" do
+          api_call(:put,
+                   "/api/v1/outcomes/#{@outcome.id}",
+                   { controller: "outcomes_api",
+                     action: "update",
+                     id: @outcome.id.to_s,
+                     format: "json" },
+                   { calculation_method: "standard_decaying_average",
+                     calculation_int: 75 })
+
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq "standard_decaying_average"
+          expect(@outcome.calculation_int).to eq(75)
+        end
+
+        it "calculation_method to weighted_average will translate to decaying_average" do
+          api_call(:put,
+                   "/api/v1/outcomes/#{@outcome.id}",
+                   { controller: "outcomes_api",
+                     action: "update",
+                     id: @outcome.id.to_s,
+                     format: "json" },
+                   { calculation_method: "weighted_average",
+                     calculation_int: 75 })
+
+          @outcome.reload
+          expect(@outcome.calculation_method).to eq "decaying_average"
+          expect(@outcome.calculation_int).to eq(75)
+        end
+      end
+    end
   end
 
   context "course outcomes" do
