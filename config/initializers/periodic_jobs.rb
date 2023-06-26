@@ -267,6 +267,10 @@ Rails.configuration.after_initialize do
     end
   end
 
+  Delayed::Periodic.cron "AuthenticationProvider::LDAP.ensure_tls_cert_validity", "30 0 * * *" do
+    with_each_shard_by_database(AuthenticationProvider::LDAP, :ensure_tls_cert_validity, local_offset: true)
+  end
+
   Delayed::Periodic.cron "SisBatchError.cleanup_old_errors", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(SisBatchError, :cleanup_old_errors)
   end

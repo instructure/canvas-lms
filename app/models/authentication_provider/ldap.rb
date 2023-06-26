@@ -25,6 +25,26 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     "ldap"
   end
 
+  def self.ensure_tls_cert_validity
+    active.each do |provider|
+      Sentry.with_scope do |scope|
+        scope.set_tags(verify_host: "#{provider.auth_host}:#{provider.auth_port}",
+                       account_short_id: Shard.short_id_for(provider.account.global_id))
+
+        valid, error = provider.test_tls_cert_validity
+        return if valid.nil?
+
+        unless valid
+          scope.set_tags(verify_error: error)
+
+          # For now, just report a message to Sentry
+          # In the future, we may want to send the admin a (debounced) email
+          Sentry.capture_message("LDAP provider failed TLS validity check: #{error}", level: :warning)
+        end
+      end
+    end
+  end
+
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
   before_save :clear_last_timeout_failure
 
@@ -69,12 +89,13 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     self.class.auth_over_tls_setting(read_attribute(:auth_over_tls), tls_required: account.feature_enabled?(:verify_ldap_certs))
   end
 
-  def ldap_connection
+  def ldap_connection(verify_tls_certs: nil)
     raise "Not an LDAP config" unless auth_type == "ldap"
 
     require "net/ldap"
 
     tls_verification_required = account.feature_enabled?(:verify_ldap_certs) || verify_tls_cert_opt_in
+    tls_verification_required = verify_tls_certs unless verify_tls_certs.nil? # allow overriding
     args = {}
     if auth_over_tls
       custom_params = {}
@@ -213,6 +234,24 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
       )
     end
     false
+  end
+
+  def test_tls_cert_validity
+    require "securerandom"
+
+    filter = ldap_filter(SecureRandom.hex(16))
+    password = SecureRandom.hex(16)
+
+    [false, true].each do |verify_tls_certs|
+      ldap = ldap_connection(verify_tls_certs:)
+      ldap.bind_as(base: ldap.base, filter:, password:)
+    rescue => e
+      return nil unless verify_tls_certs # don't continue if the connection fails even without verifying certs
+
+      return [false, e.message]
+    end
+
+    [true, nil]
   end
 
   def failure_wait_time
