@@ -76,7 +76,11 @@ export default function FilterNav({
       <Tag
         data-testid="applied-filter-tag"
         key={`staged-filter-${filter.id}`}
-        text={<AccessibleContent alt={I18n.t('Remove filter')}>{label}</AccessibleContent>}
+        text={
+          <AccessibleContent alt={I18n.t('Remove %{filterName} Filter', {filterName: label})}>
+            {label}
+          </AccessibleContent>
+        }
         dismissible={true}
         onClick={() =>
           useStore.setState({
