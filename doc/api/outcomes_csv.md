@@ -96,7 +96,7 @@ This value does not apply to learning outcome groups.</td>
 <td></td>
 <td>Must be one of "decaying_average", "n_mastery", "highest", "latest", "average" or blank.
 This field must be blank for learning outcome groups. If not provided and this
-is a learning outcome, then the calculation method defaults to "decaying_average".</td>
+is a learning outcome, then the calculation method defaults to "decaying_average". If the Account and Course Level Outcome Mastery Scales flag is enabled, the calculation_method field does not need to be defined in the imported .csv. The calculation_method field will be determined by the account and course settings.</td>
 </tr>
 <tr>
 <td>calculation_int</td>
@@ -104,7 +104,7 @@ is a learning outcome, then the calculation method defaults to "decaying_average
 <td></td>
 <td>Valid values depend on the "calculation_method". For "decaying_average", the value must
 be between 1 and 99, inclusive. For "n_mastery", the value must be between 1 and 10, inclusive.
-For "highest", "latest" and "average", this field must be blank.</td>
+For "highest", "latest" and "average", this field must be blank. If the Account and Course Level Outcome Mastery Scales flag is enabled, the calculation_int field does not need to be defined in the imported .csv. The calculation_int field will be determined by the account and course settings.</td>
 </tr>
 <tr>
 <td>parent_guids</td>
@@ -128,7 +128,7 @@ or learning outcome group is "active".</td>
 <td>number</td>
 <td></td>
 <td>The number of points that define mastery for this learning outcome.
-Must be blank for learning outcome groups.</td>
+Must be blank for learning outcome groups. If the Account and Course Level Outcome Mastery Scales flag is enabled, the mastery_points field does not need to be defined in the imported .csv. The mastery_points field will be determined by the account and course settings.</td>
 </tr>
 <tr>
 <td>ratings</td>
@@ -138,7 +138,7 @@ Must be blank for learning outcome groups.</td>
 tiers for the given outcome. The columns alternate in decreasing point order:
 first, number of points for the tier, then tier description. This alternating
 pattern continues until there are no more scoring tiers for this outcome.
-These columns must be blank for learning outcome groups. See sample below.</td>
+These columns must be blank for learning outcome groups. See sample below. If the Account and Course Level Outcome Mastery Scales flag is enabled, the ratings field does not need to be defined in the imported .csv. The ratings field will be determined by the account and course settings.</td>
 </tr>
 </table>
 
