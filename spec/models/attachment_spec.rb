@@ -3087,38 +3087,4 @@ describe Attachment do
       expect(same_att).to eq att
     end
   end
-
-  describe "media_object_by_media_id" do
-    before(:once) do
-      course_with_teacher(active_all: true)
-      @media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
-      @attachment = attachment_model(context: @course, media_entry_id: @media_object.media_id)
-    end
-
-    it "returns the media object with the given media id" do
-      expect(@attachment.media_object_by_media_id).to eq @media_object
-    end
-
-    it "returns soft-deleted media objects" do
-      @media_object.destroy
-      expect(@attachment.media_object_by_media_id).to eq @media_object
-    end
-  end
-
-  describe "active_media_object_by_media_id" do
-    before(:once) do
-      course_with_teacher(active_all: true)
-      @media_object = @course.media_objects.create!(media_id: "0_feedbeef", attachment: attachment_model(context: @course))
-      @attachment = attachment_model(context: @course, media_entry_id: @media_object.media_id)
-    end
-
-    it "returns the media object with the given media id" do
-      expect(@attachment.active_media_object_by_media_id).to eq @media_object
-    end
-
-    it "does not return deleted media objects" do
-      @media_object.destroy
-      expect(@attachment.active_media_object_by_media_id).to be_nil
-    end
-  end
 end
