@@ -40,14 +40,14 @@ it('calls the onClick prop when clicked', () => {
 it('does not call the onClick prop when disabled', () => {
   const fakeOnClick = jest.fn()
   const wrapper = shallow(
-    <StickyButton id="sb" onClick={fakeOnClick} disabled>
+    <StickyButton id="sb" onClick={fakeOnClick} disabled={true}>
       Disabled button
     </StickyButton>
   )
 
   wrapper.find('button').simulate('click', {
     preventDefault() {},
-    stopPropagation() {}
+    stopPropagation() {},
   })
   expect(fakeOnClick).not.toHaveBeenCalled()
 })
@@ -72,7 +72,7 @@ it('renders the correct down icon', () => {
 
 it('adds aria-hidden when specified', () => {
   const wrapper = shallow(
-    <StickyButton id="sb" hidden>
+    <StickyButton id="sb" hidden={true}>
       Click me
     </StickyButton>
   )

@@ -2710,7 +2710,7 @@
     "@babel/runtime" "^7.13.10"
     tinycolor2 "^1.4.2"
 
-"@instructure/ui-color-utils@8.38.0", "@instructure/ui-color-utils@^8.17.0":
+"@instructure/ui-color-utils@8.38.0":
   version "8.38.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-color-utils/-/ui-color-utils-8.38.0.tgz#e054db2d89e01d7b6d8c5c579cb564b87ca531fa"
   integrity sha512-tYSCXd2WEuaKFM8i/oiXkGDQoRUcVGfdBFOF9z7icPR1JS5/0qYqQR0EeAhfTeF/naqurvHYJM7PicmrpnG2HQ==
@@ -2733,6 +2733,14 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
     tinycolor2 "^1.4.1"
+
+"@instructure/ui-color-utils@^8.17.0", "@instructure/ui-color-utils@^8.38.1":
+  version "8.38.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-color-utils/-/ui-color-utils-8.38.1.tgz#2879f961e10e6ce563e2058e05e01b1c11f4711a"
+  integrity sha512-KVQNRgHA+EBZFZvRptsUSz5UekQjNd2OuW4KIATvOo5pssUmedHvP/8/+cUJCJl2XsLoNyKCwn1ZvcS+qUXFyg==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
+    tinycolor2 "^1.6.0"
 
 "@instructure/ui-date-input@8.38.0":
   version "8.38.0"
