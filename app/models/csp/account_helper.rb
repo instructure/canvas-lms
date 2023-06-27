@@ -122,8 +122,9 @@ module Csp::AccountHelper
     # first, get the allowed domain list from the enabled csp account
     # then get the list of domains extracted from external tools
     domains = ::Csp::Domain.get_cached_domains_for_account(csp_account_id)
-    # This is gross but needed for now for lti 1.3 tools until we transition them to
-    # using the LoginRedirectController.sso_host
+    # directly include `canvas.instructure.com` or its variants so that LTI 1.3 launches
+    # still work. This is still needed for now until all LTI 1.3 tools have been
+    # transitioned to using `sso.canvaslms.com`, or until we decide to begin enforcing this.
     domains << HostUrl.context_host(Account.default, request&.host_with_port) if include_tools
     domains += Setting.get("csp.global_whitelist", "").split(",").map(&:strip)
     domains += cached_tool_domains if include_tools
