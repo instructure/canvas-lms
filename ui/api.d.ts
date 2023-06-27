@@ -533,7 +533,7 @@ export type GradingPeriod = Readonly<{
   id: string
   is_closed: boolean
   is_last: boolean
-  permission: {
+  permissions: {
     read: boolean
     update: boolean
     create: boolean
@@ -541,7 +541,7 @@ export type GradingPeriod = Readonly<{
   }
   start_date: string
   title: string
-  weight: number
+  weight: number | null
 }>
 
 export type SubmissionAttemptsComments = {
@@ -552,7 +552,7 @@ export type SubmissionAttemptsComments = {
 
 export type GradingPeriodSet = Readonly<{
   account_id: string
-  course_id: null | string
+  course_id: string | null
   created_at: string
   display_totals_for_all_grading_periods: boolean
   enrollment_term_ids: string[]

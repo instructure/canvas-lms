@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -25,16 +24,16 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {FinalGradeOverrideMap} from './grading.d'
 
 const I18n = useI18nScope('finalGradeOverrideApi')
-
-export function getFinalGradeOverrides(
-  courseId: string
-): Promise<void | {finalGradeOverrides: FinalGradeOverrideMap}> {
+type FinalGradeOverrideResult = {
+  finalGradeOverrides: FinalGradeOverrideMap
+}
+export function getFinalGradeOverrides(courseId: string): Promise<void | FinalGradeOverrideResult> {
   const url = `/courses/${courseId}/gradebook/final_grade_overrides`
 
   return axios
     .get<{final_grade_overrides: {[studentId: string]: any}}>(url)
     .then(response => {
-      const data = {finalGradeOverrides: {}}
+      const data: FinalGradeOverrideResult = {finalGradeOverrides: {}}
 
       for (const studentId in response.data.final_grade_overrides) {
         const responseOverrides = response.data.final_grade_overrides[studentId]
@@ -72,7 +71,11 @@ export function getFinalGradeOverrides(
     })
 }
 
-export function updateFinalGradeOverride(enrollmentId, gradingPeriodId, grade) {
+export function updateFinalGradeOverride(
+  enrollmentId: string,
+  gradingPeriodId?: string,
+  grade?: {percentage: number}
+): any {
   const gradingPeriodQuery = gradingPeriodId ? `gradingPeriodId: ${gradingPeriodId}` : ''
 
   const mutation = gql`
@@ -89,17 +92,20 @@ export function updateFinalGradeOverride(enrollmentId, gradingPeriodId, grade) {
     }
   `
 
-  return createClient()
-    .mutate({mutation})
-    .then(response => {
-      const {overrideScore} = response.data.setOverrideScore.grades
-      return overrideScore != null ? {percentage: overrideScore} : null
-    })
-    .catch((/* error */) => {
-      showFlashAlert({
-        message: I18n.t('There was a problem overriding the grade.'),
-        type: 'error',
-        err: null,
+  return (
+    createClient()
+      .mutate({mutation})
+      // @ts-ignore
+      .then(response => {
+        const {overrideScore} = response.data.setOverrideScore.grades
+        return overrideScore != null ? {percentage: overrideScore} : null
       })
-    })
+      .catch((/* error */) => {
+        showFlashAlert({
+          message: I18n.t('There was a problem overriding the grade.'),
+          type: 'error',
+          err: null,
+        })
+      })
+  )
 }

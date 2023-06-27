@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -27,9 +27,16 @@ import {
   GradebookUserSubmissionDetails,
   ApiCallStatus,
 } from '../../../types'
-import {AssignmentGroupCriteriaMap, SubmissionGradeCriteria} from '@canvas/grading/grading'
+import {
+  AssignmentGroupCriteriaMap,
+  SubmissionGradeCriteria,
+  FinalGradeOverrideMap,
+  FinalGradeOverride,
+} from '@canvas/grading/grading'
 import Notes from './Notes'
 import {useGradebookNotes} from '../../hooks/useGradebookNotes'
+import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
+import FinalGradeOverrideTextBox from './FinalGradeOverrideTextBox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -49,11 +56,21 @@ export default function StudentInformation({
   submissions,
 }: Props) {
   const {
-    customOptions: {includeUngradedAssignments, hideStudentNames, showNotesColumn},
+    activeGradingPeriods,
+    customOptions: {
+      allowFinalGradeOverride,
+      includeUngradedAssignments,
+      hideStudentNames,
+      showNotesColumn,
+    },
     customColumnsUrl,
     customColumnDataUrl,
     customColumnDatumUrl,
+    contextId,
+    finalGradeOverrideEnabled,
+    gradingStandard,
   } = gradebookOptions
+  const [finalGradeOverrides, setFinalGradeOverrides] = useState<FinalGradeOverrideMap>({})
   const {submitNotesError, submitNotesStatus, studentNotes, getNotesStatus, submit} =
     useGradebookNotes(
       studentNotesColumnId,
@@ -66,6 +83,19 @@ export default function StudentInformation({
       showFlashError(I18n.t('Error updating notes'))(new Error(submitNotesError))
     }
   }, [submitNotesError, submitNotesStatus])
+  useEffect(() => {
+    async function fetchFinalGradeOverrides() {
+      if (!contextId) {
+        return
+      }
+      const data = await getFinalGradeOverrides(contextId)
+      if (!data) {
+        return // TODO: handle error
+      }
+      setFinalGradeOverrides(data.finalGradeOverrides)
+    }
+    fetchFinalGradeOverrides()
+  }, [contextId])
   if (!student || !submissions) {
     return (
       <View as="div">
@@ -198,16 +228,19 @@ export default function StudentInformation({
               {gradeToDisplay.score} / {gradeToDisplay.possible} points)
             </View>
           </View>
-          {gradebookOptions.finalGradeOverrideEnabled &&
-            gradebookOptions.customOptions.allowFinalGradeOverride && (
-              <>
-                <View as="div">
-                  <label htmlFor="final-grade-override-input">
-                    <strong>{I18n.t('Final Grade Override')}</strong>
-                  </label>
-                </View>
-                <input id="final-grade-override-input" type="text" />
-              </>
+          {finalGradeOverrideEnabled &&
+            allowFinalGradeOverride &&
+            // TODO: remove conditional below once final grade override for
+            // grading periods is supported in enhanced individual gradebook
+            !activeGradingPeriods && (
+              <FinalGradeOverrideTextBox
+                finalGradeOverride={finalGradeOverrides[student.id]}
+                enrollmentId={student.enrollments[0]?.id}
+                onSubmit={(finalGradeOverride: FinalGradeOverride) => {
+                  setFinalGradeOverrides({...finalGradeOverrides, [student.id]: finalGradeOverride})
+                }}
+                gradingStandard={gradingStandard}
+              />
             )}
         </View>
       </View>
