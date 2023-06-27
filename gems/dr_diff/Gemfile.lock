@@ -16,6 +16,7 @@ GEM
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
     mini_mime (1.1.2)
+    mini_portile2 (2.8.2)
     multi_xml (0.6.0)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
@@ -30,6 +31,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.0)
+    sqlite3 (1.6.2)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (1.6.2-aarch64-linux)
     sqlite3 (1.6.2-arm64-darwin)
     sqlite3 (1.6.2-x86_64-darwin)
@@ -38,6 +41,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin
+  ruby
   x86_64-darwin
   x86_64-linux
 
