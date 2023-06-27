@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.6.17 - 2023-06-27
+
+### Fixed
+- Added some missing media translations
+- Fixed some a11y/usability issues in the 'Edit Course Link' tray
+- Fixed an icon maker bug related to image compression
+- Fixed some issues related to pasting images in Firefox and embedding media
+
+### Changed
+- Removed the `rce_improved_placeholders`, `rce_better_paste`, `rce_show_studio_media_options`, and
+  `buttons_and_icons_cropper` feature flags
+- Improved the accessibility checker's performance
+
 ## 5.6.16 - 2023-05-17
 
 ### Fixed
