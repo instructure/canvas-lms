@@ -118,6 +118,7 @@ class Attachment < ActiveRecord::Base
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
   belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
+  belongs_to :active_media_object_by_media_id, -> { where.not(workflow_state: "deleted") }, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :active_attachments_by_media_id
   has_many :media_tracks, dependent: :destroy
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
