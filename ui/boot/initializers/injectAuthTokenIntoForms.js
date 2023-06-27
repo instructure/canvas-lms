@@ -31,10 +31,13 @@ const isCrossSite = function (href) {
 
 const injectTokenIntoLocalRequests = function () {
   if (isCrossSite(this.action)) {
+    $(this).find('input[name="authenticity_token"]').val('requestWasCrossSite')
     return
   }
 
-  $(this).find('input[name="authenticity_token"]').val(authenticityToken())
+  $(this)
+    .find('input[name="authenticity_token"]')
+    .val(authenticityToken() || 'tokenWasEmpty')
 }
 
 $(document).on('submit', 'form', injectTokenIntoLocalRequests)
