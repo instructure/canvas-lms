@@ -1,51 +1,229 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`adds aria-hidden when specified 1`] = `
-<span>
-  <button
-    aria-describedby={null}
-    aria-disabled={null}
-    aria-hidden="true"
-    className="StickyButton-styles__root StickyButton-styles__newActivityButton"
-    id="sb"
-    onClick={[Function]}
-    style={
-      Object {
-        "zIndex": null,
+<Fragment>
+  <style>
+    
+  .StickyButton-styles__root {
+    box-sizing: border-box;
+    display: block;
+    border: none;
+    color: #FFFFFF;
+    background-color: #0374B5;
+    padding: 0;
+    font-size: 0.75rem;
+    font-weight: 400;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+    line-height: 1.5rem;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    appearance: none;
+    transition: background-color 0.2s;
+    outline: none;
+    overflow: visible;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    position: fixed;
+  }
+  .StickyButton-styles__root::before {
+    content: "";
+    box-sizing: border-box;
+    width: calc(100% + 0.5rem);
+    height: calc(100% + 0.5rem);
+    border: 0.0625rem solid #0374B5;
+    position: absolute;
+    top: -0.25rem;
+    /* the placement and radii are symetrical, so no need to replace left/right with start/end */
+    left: -0.25rem;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    transform: scale(0.25);
+    opacity: 0;
+    transition: all 0.2s ease-out;
+  }
+  .StickyButton-styles__root:focus::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .StickyButton-styles__root:focus, .StickyButton-styles__root:hover {
+    background-color: rgb(3, 100, 156);
+  }
+  .StickyButton-styles__root:focus .StickyButton-styles__icon, .StickyButton-styles__root:hover .StickyButton-styles__icon {
+    transform: translate3d(0, -0.0625rem, 0) scale(1.2);
+  }
+  .StickyButton-styles__root[aria-disabled] {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  .StickyButton-styles__icon {
+    display: block;
+    font-size: 0.75rem;
+    margin-inline-start: 0.375rem;
+    transform: translate3d(0, -0.0625rem, 0);
+    transition: all 0.2s;
+  }
+  
+  .StickyButton-styles__direction--up .StickyButton-styles__layout,
+  .StickyButton-styles__direction--down .StickyButton-styles__layout {
+    padding-inline-end: 0.5rem;
+  }
+  
+  .StickyButton-styles__layout {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 0.75rem;
+  }
+  
+  .StickyButton-styles__newActivityButton {
+    offset-inline-start: 0;
+    top: 100%;
+    position: absolute;
+  }
+  
+  </style>
+  <span>
+    <button
+      aria-describedby={null}
+      aria-disabled={null}
+      aria-hidden="true"
+      className="StickyButton-styles__root StickyButton-styles__newActivityButton"
+      id="sb"
+      onClick={[Function]}
+      style={
+        Object {
+          "zIndex": null,
+        }
       }
-    }
-    type="button"
-  >
-    <span
-      className="StickyButton-styles__layout"
+      type="button"
     >
-      Click me
-    </span>
-  </button>
-</span>
+      <span
+        className="StickyButton-styles__layout"
+      >
+        Click me
+      </span>
+    </button>
+  </span>
+</Fragment>
 `;
 
 exports[`renders 1`] = `
-<span>
-  <button
-    aria-describedby={null}
-    aria-disabled={null}
-    aria-hidden={null}
-    className="StickyButton-styles__root StickyButton-styles__newActivityButton"
-    id="sb"
-    onClick={[Function]}
-    style={
-      Object {
-        "zIndex": null,
+<Fragment>
+  <style>
+    
+  .StickyButton-styles__root {
+    box-sizing: border-box;
+    display: block;
+    border: none;
+    color: #FFFFFF;
+    background-color: #0374B5;
+    padding: 0;
+    font-size: 0.75rem;
+    font-weight: 400;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+    line-height: 1.5rem;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    appearance: none;
+    transition: background-color 0.2s;
+    outline: none;
+    overflow: visible;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    position: fixed;
+  }
+  .StickyButton-styles__root::before {
+    content: "";
+    box-sizing: border-box;
+    width: calc(100% + 0.5rem);
+    height: calc(100% + 0.5rem);
+    border: 0.0625rem solid #0374B5;
+    position: absolute;
+    top: -0.25rem;
+    /* the placement and radii are symetrical, so no need to replace left/right with start/end */
+    left: -0.25rem;
+    border-bottom-left-radius: 0.25rem;
+    border-bottom-right-radius: 0.25rem;
+    transform: scale(0.25);
+    opacity: 0;
+    transition: all 0.2s ease-out;
+  }
+  .StickyButton-styles__root:focus::before {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .StickyButton-styles__root:focus, .StickyButton-styles__root:hover {
+    background-color: rgb(3, 100, 156);
+  }
+  .StickyButton-styles__root:focus .StickyButton-styles__icon, .StickyButton-styles__root:hover .StickyButton-styles__icon {
+    transform: translate3d(0, -0.0625rem, 0) scale(1.2);
+  }
+  .StickyButton-styles__root[aria-disabled] {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  .StickyButton-styles__icon {
+    display: block;
+    font-size: 0.75rem;
+    margin-inline-start: 0.375rem;
+    transform: translate3d(0, -0.0625rem, 0);
+    transition: all 0.2s;
+  }
+  
+  .StickyButton-styles__direction--up .StickyButton-styles__layout,
+  .StickyButton-styles__direction--down .StickyButton-styles__layout {
+    padding-inline-end: 0.5rem;
+  }
+  
+  .StickyButton-styles__layout {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 0.75rem;
+  }
+  
+  .StickyButton-styles__newActivityButton {
+    offset-inline-start: 0;
+    top: 100%;
+    position: absolute;
+  }
+  
+  </style>
+  <span>
+    <button
+      aria-describedby={null}
+      aria-disabled={null}
+      aria-hidden={null}
+      className="StickyButton-styles__root StickyButton-styles__newActivityButton"
+      id="sb"
+      onClick={[Function]}
+      style={
+        Object {
+          "zIndex": null,
+        }
       }
-    }
-    type="button"
-  >
-    <span
-      className="StickyButton-styles__layout"
+      type="button"
     >
-      I am a Sticky Button
-    </span>
-  </button>
-</span>
+      <span
+        className="StickyButton-styles__layout"
+      >
+        I am a Sticky Button
+      </span>
+    </button>
+  </span>
+</Fragment>
 `;

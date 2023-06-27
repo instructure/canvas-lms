@@ -23,7 +23,6 @@ import {connect} from 'react-redux'
 import keycode from 'keycode'
 import qs from 'qs'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {themeable} from '@instructure/ui-themeable'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
@@ -36,15 +35,14 @@ import {
   deletePlannerItem,
   cancelEditingPlannerItem,
   openEditingPlannerItem,
-  toggleMissingItems
+  toggleMissingItems,
 } from '../../actions'
 import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'
 import {isInMomentRange} from '../../utilities/dateUtils'
 import TodoEditorModal from '../TodoEditorModal'
 
-import theme from './theme'
-import styles from './styles.css'
+import buildStyle from './style'
 
 export const WEEKLY_PLANNER_ACTIVE_BTN_ID = 'weekly-header-active-button'
 
@@ -80,7 +78,7 @@ export class WeeklyPlannerHeader extends Component {
     loading: PropTypes.shape({
       isLoading: PropTypes.bool,
       loadingWeek: PropTypes.bool,
-      loadingError: PropTypes.string
+      loadingError: PropTypes.string,
     }).isRequired,
     visible: PropTypes.bool,
     todayMoment: momentObj,
@@ -93,14 +91,19 @@ export class WeeklyPlannerHeader extends Component {
     timeZone: PropTypes.string.isRequired,
     todo: PropTypes.shape({
       updateTodoItem: PropTypes.shape({
-        title: PropTypes.string
-      })
+        title: PropTypes.string,
+      }),
     }),
     savePlannerItem: PropTypes.func.isRequired,
     deletePlannerItem: PropTypes.func.isRequired,
     cancelEditingPlannerItem: PropTypes.func.isRequired,
     openEditingPlannerItem: PropTypes.func.isRequired,
-    courses: PropTypes.arrayOf(PropTypes.object).isRequired
+    courses: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
   }
 
   prevButtonRef = createRef()
@@ -114,7 +117,7 @@ export class WeeklyPlannerHeader extends Component {
     prevEnabled: true,
     nextEnabled: true,
     focusedButtonIndex: 1, // start with the today button
-    buttons: [this.prevButtonRef, this.todayButtonRef, this.nextButtonRef]
+    buttons: [this.prevButtonRef, this.todayButtonRef, this.nextButtonRef],
   }
 
   handleStickyOffset = () => {
@@ -272,79 +275,80 @@ export class WeeklyPlannerHeader extends Component {
 
   render() {
     return (
-      <div
-        id="weekly_planner_header"
-        data-testid="WeeklyPlannerHeader"
-        className={`${styles.root} WeeklyPlannerHeader`}
-        style={{top: `${this.state.stickyOffset}px`}}
-        role="toolbar"
-        aria-label={formatMessage('Weekly schedule navigation')}
-      >
-        {this.props.loading.loadingError && (
-          <div className={styles.errorbox}>
-            <ErrorAlert error={this.props.loading.loadingError} margin="xx-small">
-              {formatMessage('Error loading items')}
-            </ErrorAlert>
-          </div>
-        )}
-        <View
-          as="div"
-          textAlign="end"
-          padding="xx-small 0 xx-small xx-small"
-          background="primary"
-          onKeyDown={this.handleKey}
+      <>
+        <style>{this.style.css}</style>
+        <div
+          id="weekly_planner_header"
+          data-testid="WeeklyPlannerHeader"
+          className={`${this.style.classNames.root} WeeklyPlannerHeader`}
+          style={{top: `${this.state.stickyOffset}px`}}
+          role="toolbar"
+          aria-label={formatMessage('Weekly schedule navigation')}
         >
-          <IconButton
-            data-testid="view-previous-week-button"
-            id={this.getButtonId('prev')}
-            onClick={this.handlePrev}
-            screenReaderLabel={formatMessage('View previous week')}
-            interaction={this.state.prevEnabled ? 'enabled' : 'disabled'}
-            ref={this.prevButtonRef}
-            tabIndex={this.getButtonTabIndex('prev')}
+          {this.props.loading.loadingError && (
+            <div className={this.style.classNames.errorbox}>
+              <ErrorAlert error={this.props.loading.loadingError} margin="xx-small">
+                {formatMessage('Error loading items')}
+              </ErrorAlert>
+            </div>
+          )}
+          <View
+            as="div"
+            textAlign="end"
+            padding="xx-small 0 xx-small xx-small"
+            background="primary"
+            onKeyDown={this.handleKey}
           >
-            <IconArrowOpenStartLine />
-          </IconButton>
-          <Button
-            data-testid="jump-to-today-button"
-            id={this.getButtonId('today')}
-            margin="0 xx-small"
-            onClick={this.handleToday}
-            ref={this.todayButtonRef}
-            tabIndex={this.getButtonTabIndex('today')}
-          >
-            <AccessibleContent alt={formatMessage('Jump to Today')}>
-              {formatMessage('Today')}
-            </AccessibleContent>
-          </Button>
-          <IconButton
-            data-testid="view-next-week-button"
-            id={this.getButtonId('next')}
-            onClick={this.handleNext}
-            screenReaderLabel={formatMessage('View next week')}
-            interaction={this.state.nextEnabled ? 'enabled' : 'disabled'}
-            ref={this.nextButtonRef}
-            tabIndex={this.getButtonTabIndex('next')}
-          >
-            <IconArrowOpenEndLine />
-          </IconButton>
-          <TodoEditorModal
-            locale={this.props.locale}
-            timeZone={this.props.timeZone}
-            todoItem={this.props.todo?.updateTodoItem}
-            courses={this.props.courses}
-            onEdit={this.props.openEditingPlannerItem}
-            onClose={this.props.cancelEditingPlannerItem}
-            savePlannerItem={this.props.savePlannerItem}
-            deletePlannerItem={this.props.deletePlannerItem}
-          />
-        </View>
-      </div>
+            <IconButton
+              data-testid="view-previous-week-button"
+              id={this.getButtonId('prev')}
+              onClick={this.handlePrev}
+              screenReaderLabel={formatMessage('View previous week')}
+              interaction={this.state.prevEnabled ? 'enabled' : 'disabled'}
+              ref={this.prevButtonRef}
+              tabIndex={this.getButtonTabIndex('prev')}
+            >
+              <IconArrowOpenStartLine />
+            </IconButton>
+            <Button
+              data-testid="jump-to-today-button"
+              id={this.getButtonId('today')}
+              margin="0 xx-small"
+              onClick={this.handleToday}
+              ref={this.todayButtonRef}
+              tabIndex={this.getButtonTabIndex('today')}
+            >
+              <AccessibleContent alt={formatMessage('Jump to Today')}>
+                {formatMessage('Today')}
+              </AccessibleContent>
+            </Button>
+            <IconButton
+              data-testid="view-next-week-button"
+              id={this.getButtonId('next')}
+              onClick={this.handleNext}
+              screenReaderLabel={formatMessage('View next week')}
+              interaction={this.state.nextEnabled ? 'enabled' : 'disabled'}
+              ref={this.nextButtonRef}
+              tabIndex={this.getButtonTabIndex('next')}
+            >
+              <IconArrowOpenEndLine />
+            </IconButton>
+            <TodoEditorModal
+              locale={this.props.locale}
+              timeZone={this.props.timeZone}
+              todoItem={this.props.todo?.updateTodoItem}
+              courses={this.props.courses}
+              onEdit={this.props.openEditingPlannerItem}
+              onClose={this.props.cancelEditingPlannerItem}
+              savePlannerItem={this.props.savePlannerItem}
+              deletePlannerItem={this.props.deletePlannerItem}
+            />
+          </View>
+        </div>
+      </>
     )
   }
 }
-
-export const ThemedWeeklyPlannerHeader = themeable(theme, styles)(WeeklyPlannerHeader)
 
 const mapStateToProps = state => {
   const weeks = state.weeklyDashboard?.weeks
@@ -359,7 +363,7 @@ const mapStateToProps = state => {
     weekLoaded: weeks ? !!weeks[state.weeklyDashboard.weekStart.format()] : false,
     timeZone: state.timeZone,
     todo: state.todo,
-    courses: state.courses
+    courses: state.courses,
   }
 }
 
@@ -372,7 +376,7 @@ const mapDispatchToProps = {
   deletePlannerItem,
   cancelEditingPlannerItem,
   openEditingPlannerItem,
-  toggleMissing: toggleMissingItems
+  toggleMissing: toggleMissingItems,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ThemedWeeklyPlannerHeader)
+export default connect(mapStateToProps, mapDispatchToProps)(WeeklyPlannerHeader)

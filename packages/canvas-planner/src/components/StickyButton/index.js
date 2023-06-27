@@ -17,15 +17,13 @@
  */
 import React, {Component} from 'react'
 import classnames from 'classnames'
-import {themeable} from '@instructure/ui-themeable'
 import {bool, func, node, number, string, oneOf} from 'prop-types'
 import {IconArrowUpSolid, IconArrowDownLine} from '@instructure/ui-icons'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import styles from './styles.css'
-import theme from './theme'
+import buildStyle from './style'
 
-class StickyButton extends Component {
+export default class StickyButton extends Component {
   static propTypes = {
     id: string.isRequired,
     children: node.isRequired,
@@ -35,11 +33,16 @@ class StickyButton extends Component {
     direction: oneOf(['none', 'up', 'down']),
     zIndex: number,
     buttonRef: func,
-    description: string
+    description: string,
   }
 
   static defaultProps = {
-    direction: 'none'
+    direction: 'none',
+  }
+
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
   }
 
   handleClick = e => {
@@ -57,9 +60,9 @@ class StickyButton extends Component {
     const direction = this.props.direction
 
     if (direction === 'up') {
-      return <IconArrowUpSolid className={styles.icon} />
+      return <IconArrowUpSolid className={this.style.classNames.icon} />
     } else if (direction === 'down') {
-      return <IconArrowDownLine className={styles.icon} />
+      return <IconArrowDownLine className={this.style.classNames.icon} />
     } else {
       return null
     }
@@ -82,36 +85,37 @@ class StickyButton extends Component {
     const {id, children, disabled, hidden, direction, zIndex} = this.props
 
     const classes = {
-      [styles.root]: true,
-      [styles['direction--' + direction]]: direction !== 'none'
+      [this.style.classNames.root]: true,
+      [this.style.classNames['direction--' + direction]]: direction !== 'none',
     }
 
     const style = {
-      zIndex: zIndex || null
+      zIndex: zIndex || null,
     }
 
     return (
-      <span>
-        <button
-          id={id}
-          type="button"
-          onClick={this.handleClick}
-          className={classnames(classes, styles.newActivityButton)}
-          style={style}
-          aria-disabled={disabled ? 'true' : null}
-          aria-hidden={hidden ? 'true' : null}
-          ref={this.props.buttonRef}
-          aria-describedby={this.props.description ? this.descriptionId : null}
-        >
-          <span className={styles.layout}>
-            {children}
-            {this.renderIcon()}
-          </span>
-        </button>
-        {this.renderDescription()}
-      </span>
+      <>
+        <style>{this.style.css}</style>
+        <span>
+          <button
+            id={id}
+            type="button"
+            onClick={this.handleClick}
+            className={classnames(classes, this.style.classNames.newActivityButton)}
+            style={style}
+            aria-disabled={disabled ? 'true' : null}
+            aria-hidden={hidden ? 'true' : null}
+            ref={this.props.buttonRef}
+            aria-describedby={this.props.description ? this.descriptionId : null}
+          >
+            <span className={this.style.classNames.layout}>
+              {children}
+              {this.renderIcon()}
+            </span>
+          </button>
+          {this.renderDescription()}
+        </span>
+      </>
     )
   }
 }
-
-export default themeable(theme, styles)(StickyButton)
