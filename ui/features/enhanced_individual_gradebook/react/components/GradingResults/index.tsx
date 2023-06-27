@@ -184,7 +184,7 @@ export default function GradingResults({
                 value={gradeInput}
                 disabled={submitScoreStatus === ApiCallStatus.PENDING}
                 renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
-                onChange={e => setGradeInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGradeInput(e.target.value)}
                 onBlur={() => submitGrade()}
               />
               <View as="span" margin="0 0 0 small">

@@ -24,7 +24,7 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
-import htmlEscape from 'html-escape'
+import htmlEscape, {unescape} from 'html-escape'
 import filterTypes from './constants/filterTypes'
 import type {
   ColumnSizeSettings,
@@ -240,7 +240,7 @@ export function sectionList(sections: {[id: string]: Pick<Section, 'name' | 'id'
   return x
     .sort((a, b) => a.id.localeCompare(b.id))
     .map(section => {
-      return {...section, name: htmlEscape.unescape(section.name)}
+      return {...section, name: unescape(section.name)}
     })
 }
 
@@ -568,7 +568,7 @@ export function escapeStudentContent(student: Student) {
   escapedStudent?.enrollments.forEach(enrollment => {
     const gradesUrl = enrollment?.grades?.html_url
     if (gradesUrl) {
-      enrollment.grades.html_url = htmlEscape.unescape(gradesUrl)
+      enrollment.grades.html_url = unescape(gradesUrl)
     }
   })
 }

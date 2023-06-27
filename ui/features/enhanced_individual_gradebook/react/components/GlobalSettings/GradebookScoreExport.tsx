@@ -94,7 +94,7 @@ export default function GradebookScoreExport({
         lastGeneratedCsvLinkText &&
         gradebookCsvProgress && (
           <Link
-            elementRef={e => (linkRef.current = e)}
+            elementRef={(e: HTMLAnchorElement) => (linkRef.current = e)}
             href={lastGeneratedCsvLink}
             isWithinText={false}
             margin="0 xx-small"

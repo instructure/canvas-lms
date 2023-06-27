@@ -176,7 +176,7 @@ function SubmissionComment({comment, showDivider}: SubmissionCommentProps) {
       as="div"
       key={comment.id}
       padding="0 medium"
-      elementRef={current => {
+      elementRef={(current: HTMLDivElement) => {
         if (current) {
           current.scrollIntoView()
         }
@@ -292,7 +292,7 @@ function SubmissionGradeForm({
               width="4rem"
               value={gradeInput}
               disabled={submitScoreStatus === ApiCallStatus.PENDING}
-              onChange={e => setGradeInput(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGradeInput(e.target.value)}
             />
           </View>
           <Text>{outOfText(assignment, submission)}</Text>
