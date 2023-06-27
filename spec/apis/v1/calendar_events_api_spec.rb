@@ -2003,6 +2003,44 @@ describe CalendarEventsApiController, type: :request do
             expect(json[0]["series_uuid"]).to eql event["series_uuid"]
           end
         end
+
+        it "creates series events from single event without changing datetime" do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          single_event = @user.calendar_events.create!(title: "event", start_at: start_at.iso8601, end_at: end_at.iso8601)
+          rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
+          new_title = "series events title"
+
+          json = api_call(:put,
+                          "/api/v1/calendar_events/#{single_event.id}",
+                          { controller: "calendar_events_api", action: "update", id: single_event.id.to_s, format: "json" },
+                          { calendar_event: { title: new_title, rrule: } })
+          assert_status(200)
+          expect(json.length).to be 2
+          json.each_with_index do |series_event, i|
+            expect(json[i]["title"]).to eql new_title
+            expect(Time.parse(json[i]["start_at"])).to eql(Time.parse((single_event["start_at"] + i.weeks).iso8601))
+            expect(json[0]["series_uuid"]).to eql series_event["series_uuid"]
+          end
+        end
+
+        it "creates series events from single event including changing date and time" do
+          single_event = @user.calendar_events.create!(title: "event", start_at: "2023-06-29 09:00:00", end_at: "2023-06-29 10:00:00")
+          rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
+          new_start_at = Time.parse(single_event["start_at"].iso8601) + 15.minutes
+          new_end_at = (Time.parse(single_event["end_at"].iso8601) + 15.minutes)
+
+          json = api_call(:put,
+                          "/api/v1/calendar_events/#{single_event.id}",
+                          { controller: "calendar_events_api", action: "update", id: single_event.id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, end_at: new_end_at, rrule: } })
+          assert_status(200)
+          expect(json.length).to be 2
+          json.each_with_index do |_event, i|
+            expect(Time.parse(json[i]["start_at"])).to eql(new_start_at + i.weeks)
+            expect(Time.parse(json[i]["end_at"])).to eql(new_end_at + i.weeks)
+          end
+        end
       end
     end
 
