@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {GradingPeriod, GradingPeriodSet} from 'api'
 import {
   AssignmentConnection,
   UserConnection,
@@ -23,6 +24,7 @@ import {
   SubmissionConnection,
 } from './queries'
 import {ProgressData} from 'features/gradebook/react/default_gradebook/gradebook.d'
+import {GradingScheme, GradingStandard} from '@canvas/grading/grading'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
@@ -64,6 +66,7 @@ export type CustomColumnDatum = {
 export type HandleCheckboxChange = (key: keyof CustomOptions, value: boolean) => void
 
 export type GradebookOptions = {
+  activeGradingPeriods?: GradingPeriod[]
   anonymizeStudents?: boolean
   sortOrder: GradebookSortOrder
   selectedSection?: string
@@ -79,6 +82,9 @@ export type GradebookOptions = {
   customColumnUrl?: string | null
   customColumnsUrl?: string | null
   gradesAreWeighted?: boolean | null
+  gradingPeriodSet?: GradingPeriodSet | null
+  gradingSchemes?: GradingScheme[] | null
+  gradingStandard?: GradingStandard[] | null
   finalGradeOverrideEnabled?: boolean | null
   publishToSisEnabled?: boolean | null
   publishToSisUrl?: string | null

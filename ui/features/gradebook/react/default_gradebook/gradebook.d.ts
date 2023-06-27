@@ -131,7 +131,7 @@ export type GradebookOptions = {
   grades_are_weighted: boolean
   grading_period_set: GradingPeriodSet
   grading_schemes: GradingScheme[]
-  grading_standard: boolean
+  grading_standard: GradingStandard[]
   group_weighting_scheme: null | string
   has_modules: boolean
   individual_gradebook_enhancements: boolean

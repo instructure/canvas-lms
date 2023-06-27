@@ -547,11 +547,13 @@ class GradebooksController < ApplicationController
 
   def set_enhanced_individual_gradebook_env
     gradebook_is_editable = @context.grants_right?(@current_user, session, :manage_grades)
+    grading_standard = @context.grading_standard_or_default
     last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
     per_page = Setting.get("api_max_per_page", "50").to_i
     gradebook_options = {
+      active_grading_periods: active_grading_periods_json,
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility]),
       course_settings: {
@@ -568,7 +570,10 @@ class GradebooksController < ApplicationController
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_is_editable:,
-      grades_are_weighted: grading_period_group_json&.weighted || @context.group_weighting_scheme.present? || false,
+      grades_are_weighted: (grading_period_group_json && grading_period_group_json[:weighted]) || @context.group_weighting_scheme == "percent" || false,
+      grading_period_set: grading_period_group_json,
+      grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
+      grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       publish_to_sis_enabled: (
