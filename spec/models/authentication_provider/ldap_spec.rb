@@ -60,6 +60,38 @@ describe AuthenticationProvider::LDAP do
     end
   end
 
+  describe "#test_tls_cert_validity" do
+    let(:account) { Account.create }
+    let(:auth_provider) { account.authentication_providers.create(auth_type: "ldap", auth_filter: "") }
+
+    context "when the connection fails even without verification" do
+      it "returns nil" do
+        allow_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::Error.new("Some error"))
+        expect(auth_provider.test_tls_cert_validity).to be_nil
+      end
+    end
+
+    context "when the connection fails only with verification" do
+      it "returns false, with the exception message" do
+        ldap = instance_double("Net::LDAP")
+        allow(ldap).to receive_messages({ :host= => nil, :port= => nil, :base= => nil, :base => nil, :auth => nil })
+        allow(ldap).to receive(:bind_as).and_invoke(->(_) { false }, ->(_) { raise Net::LDAP::Error, "Some error" })
+        allow(Net::LDAP).to receive(:new).and_return(ldap)
+        expect(auth_provider.test_tls_cert_validity).to eq([false, "Some error"])
+      end
+    end
+
+    context "when the connection doesn't fail" do
+      it "returns true, with no exception message" do
+        ldap = instance_double("Net::LDAP")
+        allow(ldap).to receive_messages({ :host= => nil, :port= => nil, :base= => nil, :base => nil, :auth => nil })
+        allow(ldap).to receive(:bind_as).and_return(false).twice
+        allow(Net::LDAP).to receive(:new).and_return(ldap)
+        expect(auth_provider.test_tls_cert_validity).to eq([true, nil])
+      end
+    end
+  end
+
   describe "#ldap_connection" do
     let(:account) { Account.create }
     let(:auth_provider) { account.authentication_providers.create(auth_type: "ldap") }
@@ -73,6 +105,13 @@ describe AuthenticationProvider::LDAP do
         encryption_args = auth_provider.ldap_connection.instance_variable_get(:@encryption)
         expect(encryption_args[:tls_options]).to eq(OpenSSL::SSL::SSLContext::DEFAULT_PARAMS)
       end
+
+      context "and verify_tls_certs kwarg is false" do
+        it "doesn't verify anything" do
+          encryption_args = auth_provider.ldap_connection(verify_tls_certs: false).instance_variable_get(:@encryption)
+          expect(encryption_args[:tls_options]).to eq({ verify_mode: OpenSSL::SSL::VERIFY_NONE, verify_hostname: false })
+        end
+      end
     end
 
     context "when verify_ldap_certs is disabled" do
@@ -83,6 +122,13 @@ describe AuthenticationProvider::LDAP do
       it "doesn't verify anything" do
         encryption_args = auth_provider.ldap_connection.instance_variable_get(:@encryption)
         expect(encryption_args[:tls_options]).to eq({ verify_mode: OpenSSL::SSL::VERIFY_NONE, verify_hostname: false })
+      end
+
+      context "and verify_tls_certs kwarg is true" do
+        it "uses default OpenSSL options" do
+          encryption_args = auth_provider.ldap_connection(verify_tls_certs: true).instance_variable_get(:@encryption)
+          expect(encryption_args[:tls_options]).to eq(OpenSSL::SSL::SSLContext::DEFAULT_PARAMS)
+        end
       end
     end
   end
