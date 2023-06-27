@@ -32,7 +32,7 @@ function handleMethod(link) {
   const form = $(`<form method="post" action="${htmlEscape(href)}"></form>`)
   const metadataInputHtml = `
     <input name="_method" value="${htmlEscape(method)}" type="hidden" />
-    <input name="authenticity_token" type="hidden" />
+    <input name="authenticity_token" value="tokenNotSet" type="hidden" />
   `
 
   if (target) form.attr('target', target)
