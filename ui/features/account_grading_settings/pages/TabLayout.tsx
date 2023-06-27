@@ -49,7 +49,10 @@ export const TabLayout = () => {
       <Tabs
         margin="large auto"
         padding="medium"
-        onRequestTabChange={(event, {index}) => handleTabChange(index)}
+        onRequestTabChange={(
+          event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+          {index}: {index: number}
+        ) => handleTabChange(index)}
       >
         <TabsPanel
           id="gradingPeriodTab"

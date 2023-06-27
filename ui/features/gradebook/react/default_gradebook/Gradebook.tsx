@@ -108,7 +108,6 @@ import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColum
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-// @ts-expect-error
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import {useScope as useI18nScope} from '@canvas/i18n'

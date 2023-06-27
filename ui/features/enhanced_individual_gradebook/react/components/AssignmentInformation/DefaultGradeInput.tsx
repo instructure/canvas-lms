@@ -63,7 +63,7 @@ export default function DefaultGradeInput({disabled, gradingType, onGradeInputCh
           width="4rem"
           value={textInput}
           disabled={disabled}
-          onChange={e => setTextInput(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTextInput(e.target.value)}
         />
       ) : (
         <SimpleSelect

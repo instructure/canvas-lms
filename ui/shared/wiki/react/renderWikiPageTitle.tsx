@@ -19,8 +19,8 @@
 import React, {useEffect, useRef, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {TextInput, TextInputProps} from '@instructure/ui-text-input'
-import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type JQuery from 'jquery'
@@ -94,7 +94,7 @@ const EditableContent = (props: Props) => {
     <View as="div" maxWidth="356px">
       <TextInput
         data-testid="wikipage-title-input"
-        inputRef={ref => (inputRef.current = ref)}
+        inputRef={(ref: HTMLInputElement | null) => (inputRef.current = ref)}
         messages={errors}
         renderLabel={() => (
           <Text size="small" weight="normal">

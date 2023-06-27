@@ -43,7 +43,6 @@ export type FilterTrayPresetProps = {
   gradingPeriods: CamelizedGradingPeriod[]
   isActive: boolean
   modules: Module[]
-  onChange?: (filter: PartialFilterPreset) => void
   onCreate?: (filter: PartialFilterPreset) => Promise<boolean>
   onUpdate?: (filter: FilterPreset) => Promise<boolean>
   onDelete?: () => void
@@ -215,12 +214,12 @@ export default function FilterTrayPreset({
         <View as="div" padding="xx-small 0 xx-small xx-small">
           <Flex margin="0 0 small 0" padding="0 xx-small 0 0">
             <TextInput
-              inputRef={ref => (inputRef.current = ref)}
+              inputRef={(ref: HTMLInputElement) => (inputRef.current = ref)}
               width="100%"
               renderLabel={I18n.t('Filter preset name')}
               placeholder={I18n.t('Give your filter preset a name')}
               value={name}
-              onChange={(_event, value) => {
+              onChange={(_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
                 setName(value)
                 setFilterPresetWasChanged(true)
               }}

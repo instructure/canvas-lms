@@ -31,7 +31,7 @@ type ClearBadgeCountsButtonProps = {
 }
 
 function ClearBadgeCountsButton({courseId, userId}: ClearBadgeCountsButtonProps) {
-  const [interaction, setInteraction] = useState<ButtonInteraction>('enabled')
+  const [interaction, setInteraction] = useState<typeof ButtonInteraction>('enabled')
   const handleClick = async () => {
     setInteraction('disabled')
     const url = `/api/v1/courses/${courseId}/submissions/${userId}/clear_unread`
