@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
@@ -49,6 +49,26 @@ const AssignmentTable = ({
 }) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
   const droppedAssignments = listDroppedAssignments(queryData, getGradingPeriodID() === '0')
+  const [calculateOnlyGradedAssignments, setCalculateOnlyGradedAssignments] = useState(true)
+
+  const handleCalculateOnlyGradedAssignmentsChange = useCallback(() => {
+    setCalculateOnlyGradedAssignments(
+      document.querySelector('#only_consider_graded_assignments').checked
+    )
+  }, [])
+
+  useEffect(() => {
+    const checkbox = document.querySelector('#only_consider_graded_assignments')
+    if (checkbox) {
+      checkbox.addEventListener('change', handleCalculateOnlyGradedAssignmentsChange)
+    }
+    return () => {
+      if (checkbox) {
+        checkbox.removeEventListener('change', handleCalculateOnlyGradedAssignmentsChange)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Table caption={I18n.t('Student Grade Summary')} layout={layout} hover={true}>
@@ -85,12 +105,14 @@ const AssignmentTable = ({
         )}
         {getGradingPeriodID() !== '0'
           ? queryData?.assignmentGroupsConnection?.nodes?.map(assignmentGroup => {
-              return assignmentGroupRow(assignmentGroup, queryData)
+              return assignmentGroupRow(assignmentGroup, queryData, calculateOnlyGradedAssignments)
             })
           : queryData?.gradingPeriodsConnection?.nodes?.map(gradingPeriod => {
-              return gradingPeriod.displayTotals ? gradingPeriodRow(gradingPeriod, queryData) : null
+              return gradingPeriod.displayTotals
+                ? gradingPeriodRow(gradingPeriod, queryData, calculateOnlyGradedAssignments)
+                : null
             })}
-        {totalRow(queryData)}
+        {totalRow(queryData, calculateOnlyGradedAssignments)}
       </Table.Body>
     </Table>
   )

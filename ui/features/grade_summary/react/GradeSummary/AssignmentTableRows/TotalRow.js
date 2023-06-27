@@ -27,9 +27,9 @@ import {formatNumber, scorePercentageToLetterGrade, getTotal, filteredAssignment
 
 const I18n = useI18nScope('grade_summary')
 
-export const totalRow = queryData => {
+export const totalRow = (queryData, calculateOnlyGradedAssignments = false) => {
   const total = getTotal(
-    filteredAssignments(queryData),
+    filteredAssignments(queryData, calculateOnlyGradedAssignments),
     queryData?.assignmentGroupsConnection?.nodes,
     queryData?.gradingPeriodsConnection?.nodes,
     queryData?.applyGroupWeights

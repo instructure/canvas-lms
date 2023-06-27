@@ -30,8 +30,15 @@ import {
   filteredAssignments,
 } from '../utils'
 
-export const assignmentGroupRow = (assignmentGroup, queryData) => {
-  const applicableAssignments = filteredAssignments(queryData).filter(assignment => {
+export const assignmentGroupRow = (
+  assignmentGroup,
+  queryData,
+  calculateOnlyGradedAssignments = false
+) => {
+  const applicableAssignments = filteredAssignments(
+    queryData,
+    calculateOnlyGradedAssignments
+  ).filter(assignment => {
     return assignment?.assignmentGroup?._id === assignmentGroup?._id
   })
 

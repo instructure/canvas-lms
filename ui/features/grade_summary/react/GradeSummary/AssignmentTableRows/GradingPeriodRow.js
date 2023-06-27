@@ -30,8 +30,15 @@ import {
   filteredAssignments,
 } from '../utils'
 
-export const gradingPeriodRow = (gradingPeriod, queryData) => {
-  const filterByGradingPeriod = filteredAssignments(queryData).filter(assignment => {
+export const gradingPeriodRow = (
+  gradingPeriod,
+  queryData,
+  calculateOnlyGradedAssignments = false
+) => {
+  const filterByGradingPeriod = filteredAssignments(
+    queryData,
+    calculateOnlyGradedAssignments
+  ).filter(assignment => {
     return assignment?.gradingPeriodId === gradingPeriod?._id
   })
 
