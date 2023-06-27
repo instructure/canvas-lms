@@ -495,6 +495,16 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("gradingType")).to be_nil
   end
 
+  it "returns grading period id" do
+    grading_period_group = GradingPeriodGroup.create!(title: "foo", course_id: @course.id)
+    grading_period = GradingPeriod.create!(title: "foo", start_date: 1.day.ago, end_date: 1.day.from_now, grading_period_group_id: grading_period_group.id)
+    gp_assignment = @course.assignments.create! name: "asdf", points_possible: 10
+
+    grading_period_assignment_type = GraphQLTypeTester.new(gp_assignment, current_user: student)
+
+    expect(grading_period_assignment_type.resolve("gradingPeriodId")).to eq grading_period.id
+  end
+
   context "overridden assignments" do
     before(:once) do
       @assignment_due_at = 1.month.from_now
