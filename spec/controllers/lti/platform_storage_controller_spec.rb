@@ -35,7 +35,7 @@ describe Lti::PlatformStorageController do
     end
 
     context "when current domain does not match forwarding domain" do
-      let(:forwarding_domain) { "https://forwarding.domain.com" }
+      let(:forwarding_domain) { "http://forwarding.domain.com" }
 
       before do
         allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => forwarding_domain })
@@ -50,15 +50,15 @@ describe Lti::PlatformStorageController do
     end
 
     context "when current domain matches forwarding domain" do
-      let(:forwarding_domain) { request.base_url }
+      let(:forwarding_domain) { "localhost" }
 
       before do
         allow(CanvasSecurity).to receive(:config).and_return({ "lti_iss" => forwarding_domain })
       end
 
-      it "sets parent domain in js env" do
+      it "sets parent origin in js env" do
         subject
-        expect(assigns.dig(:js_env, :PARENT_DOMAIN)).to eq forwarding_domain
+        expect(assigns.dig(:js_env, :PARENT_ORIGIN)).to match(forwarding_domain)
       end
 
       it { is_expected.to be_successful }
@@ -66,7 +66,7 @@ describe Lti::PlatformStorageController do
       it "modifies the frame-ancestors in the CSP header" do
         subject
         expect(response.headers["Content-Security-Policy"])
-          .to match(/frame-ancestors [^;]*self[^;]*test\.host/)
+          .to match(/frame-ancestors [^;]*self[^;]*localhost/)
       end
     end
   end
