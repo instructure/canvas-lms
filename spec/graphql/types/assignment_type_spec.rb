@@ -502,7 +502,7 @@ describe Types::AssignmentType do
 
     grading_period_assignment_type = GraphQLTypeTester.new(gp_assignment, current_user: student)
 
-    expect(grading_period_assignment_type.resolve("gradingPeriodId")).to eq grading_period.id
+    expect(grading_period_assignment_type.resolve("gradingPeriodId")).to eq grading_period.id.to_s
   end
 
   context "overridden assignments" do

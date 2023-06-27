@@ -30,6 +30,7 @@ export const Assignment = {
       name
       pointsPossible
       gradingType
+      gradingPeriodId
       assignmentGroup {
         _id
         name
@@ -58,6 +59,7 @@ export const Assignment = {
     name: string,
     pointsPossible: float,
     gradingType: string,
+    gradingPeriodId: string,
     assignmentGroup: {
       _id: string,
       name: string,
@@ -84,6 +86,7 @@ export const Assignment = {
     name = 'Assignment 1',
     pointsPossible = 100,
     gradingType = 'points',
+    gradingPeriodId = '1',
     assignmentGroup = {
       _id: '1',
       name: 'Group 1',
@@ -113,6 +116,7 @@ export const Assignment = {
     name,
     pointsPossible,
     gradingType,
+    gradingPeriodId,
     assignmentGroup,
     submissionsConnection,
     modules,

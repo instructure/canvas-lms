@@ -286,8 +286,7 @@ export const listDroppedAssignments = (queryData, byGradingPeriod) => {
                   const assignments = filterDroppedAssignments(
                     filteredAssignments(queryData).filter(assignment => {
                       return (
-                        assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId ===
-                          gradingPeriod._id &&
+                        assignment?.gradingPeriodId === gradingPeriod._id &&
                         assignment?.assignmentGroup?._id === assignmentGroup?._id
                       )
                     }),
@@ -434,7 +433,7 @@ export const getGradingPeriodTotalPoints = (gradingPeriod, assignments) => {
   return (
     assignments?.reduce((total, assignment) => {
       if (
-        assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === gradingPeriod?._id &&
+        assignment?.gradingPeriodId === gradingPeriod?._id &&
         !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused')
       ) {
         total += getAssignmentTotalPoints(assignment) || 0
@@ -448,7 +447,7 @@ export const getGradingPeriodEarnedPoints = (gradingPeriod, assignments) => {
   return (
     assignments?.reduce((total, assignment) => {
       if (
-        assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === gradingPeriod?._id &&
+        assignment?.gradingPeriodId === gradingPeriod?._id &&
         !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused')
       ) {
         total += getAssignmentEarnedPoints(assignment) || 0
@@ -467,7 +466,7 @@ export const getGradingPeriodPercentage = (
   if (!assignments || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
   assignments = assignments?.filter(assignment => {
-    return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === gradingPeriod?._id
+    return assignment?.gradingPeriodId === gradingPeriod?._id
   })
 
   if (applyGroupWeights) {
@@ -583,7 +582,7 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
         getGradingPeriodPercentage(
           period,
           assignments?.filter(assignment => {
-            return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === period?._id
+            return assignment?.gradingPeriodId === period?._id
           }),
           assignmentGroups,
           validGradingPeriodsCount.length === gradingPeriods.length ? applyWeights : false
