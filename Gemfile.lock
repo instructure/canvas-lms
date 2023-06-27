@@ -590,6 +590,7 @@ GEM
       multi_json (~> 1.10)
       retriable (~> 1.4)
       signet (~> 0.6)
+    google-protobuf (3.22.2)
     google-protobuf (3.22.2-aarch64-linux)
     google-protobuf (3.22.2-arm64-darwin)
     google-protobuf (3.22.2-x86_64-darwin)
@@ -702,6 +703,7 @@ GEM
     mime-types-data (3.2023.0218.1)
     mini_magick (4.11.0)
     mini_mime (1.1.2)
+    mini_portile2 (2.8.2)
     minitest (5.18.0)
     moodle2cc (0.2.41)
       builder
@@ -734,6 +736,9 @@ GEM
       timeout
     netrc (0.11.0)
     nio4r (2.5.9)
+    nokogiri (1.13.10)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
     nokogiri (1.13.10-aarch64-linux)
       racc (~> 1.4)
     nokogiri (1.13.10-arm64-darwin)
@@ -1040,6 +1045,8 @@ GEM
       spring (>= 0.9.1)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
+    sqlite3 (1.6.2)
+      mini_portile2 (~> 2.8.0)
     sqlite3 (1.6.2-aarch64-linux)
     sqlite3 (1.6.2-arm64-darwin)
     sqlite3 (1.6.2-x86_64-darwin)
@@ -1135,6 +1142,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin
+  ruby
   x86_64-darwin
   x86_64-linux
 

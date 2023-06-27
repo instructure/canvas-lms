@@ -44,6 +44,10 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2023.0218.1)
+    mini_portile2 (2.8.2)
+    nokogiri (1.13.10)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
     nokogiri (1.13.10-aarch64-linux)
       racc (~> 1.4)
     nokogiri (1.13.10-arm64-darwin)
@@ -78,6 +82,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin
+  ruby
   x86_64-darwin
   x86_64-linux
 

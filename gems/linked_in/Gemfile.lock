@@ -10,6 +10,10 @@ GEM
   specs:
     diff-lcs (1.5.0)
     hashie (4.1.0)
+    mini_portile2 (2.8.2)
+    nokogiri (1.13.10)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
     nokogiri (1.13.10-aarch64-linux)
       racc (~> 1.4)
     nokogiri (1.13.10-arm64-darwin)
@@ -47,6 +51,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin
+  ruby
   x86_64-darwin
   x86_64-linux
 
