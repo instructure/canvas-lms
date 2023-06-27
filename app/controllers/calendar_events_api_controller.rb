@@ -776,8 +776,13 @@ class CalendarEventsApiController < ApplicationController
         params_for_update[:web_conference] = web_conference
       end
 
-      if @event[:series_uuid] && Account.site_admin.feature_enabled?(:calendar_series)
-        return update_from_series(@event, params_for_update, params[:which])
+      if Account.site_admin.feature_enabled?(:calendar_series)
+        if @event[:series_uuid].nil? && params_for_update[:rrule].present?
+          series_event = change_to_series_event(@event)
+          return update_from_series(series_event, params_for_update, "all")
+        elsif @event[:series_uuid].present?
+          return update_from_series(@event, params_for_update, params[:which])
+        end
       end
 
       if @event.update(params_for_update)
@@ -924,12 +929,8 @@ class CalendarEventsApiController < ApplicationController
     end
 
     all_events = find_which_series_events(target_event:, which: "all", for_update: true)
-    events = (which == "following") ? all_events.where("start_at >= ?", target_event.start_at) : all_events
-    if events.blank?
-      # i don't believe we can get here, but cya
-      render json: { message: t("No events were found to update") }, status: :bad_request
-      return
-    end
+    adjusted_all_events = all_events.empty? ? [target_event] : all_events
+    events = (which == "following") ? adjusted_all_events.where("start_at >= ?", target_event.start_at) : adjusted_all_events
 
     tz = @current_user.time_zone || ActiveSupport::TimeZone.new("UTC")
     target_start = Time.parse(params_for_update[:start_at]).in_time_zone(tz)
@@ -1025,7 +1026,6 @@ class CalendarEventsApiController < ApplicationController
     end
 
     target_event.context.touch
-
     json = events.map do |event|
       event_json(
         event,
@@ -1059,6 +1059,12 @@ class CalendarEventsApiController < ApplicationController
       render json: { error: t("Invalid parameter which='%{which}'", which:) }, status: :bad_request
     end
     events
+  end
+
+  def change_to_series_event(event)
+    event.series_uuid = SecureRandom.uuid
+    event.series_head = true
+    event
   end
 
   def public_feed
@@ -1789,7 +1795,6 @@ class CalendarEventsApiController < ApplicationController
     if @current_user
       get_all_pertinent_contexts(include_groups: true)
     end
-
     event_attributes[:series_uuid] = SecureRandom.uuid
 
     first_start_at = Time.parse(event_attributes[:start_at]) if event_attributes[:start_at]
