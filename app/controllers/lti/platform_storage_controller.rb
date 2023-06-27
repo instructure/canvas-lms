@@ -32,24 +32,28 @@ module Lti
   # Canvas to tool.
   #
   # Other references:
-  # * standard postMessage listener: ui/shared/lti/jquery/messages.js
+  # * standard postMessage listener: ui/shared/lti/jquery/messages.ts
   # * forwarding listener: ui/features/post_message_forwarding/index.ts
   # * postMessage docs: doc/api/lti_window_post_message.md
+  # * LTI Platform Storage spec:
+  #   * Client Side postMessages: https://www.imsglobal.org/spec/lti-cs-pm/v0p1
+  #   * postMessage Storage: https://www.imsglobal.org/spec/lti-pm-s/v0p1
+  #   * Implementation Guide: https://www.imsglobal.org/spec/lti-cs-oidc/v0p1
   class PlatformStorageController < ApplicationController
-    after_action :set_extra_csp_frame_ancestor!
-
     def post_message_forwarding
       unless Lti::PlatformStorage.flag_enabled?
         render status: :not_found
         return
       end
 
-      unless current_domain == forwarding_domain
-        redirect_to "#{forwarding_domain}/post_message_forwarding?token=#{create_jwt}"
+      unless current_domain == oidc_auth_domain
+        redirect_to "#{HostUrl.protocol}://#{oidc_auth_domain}/post_message_forwarding?token=#{create_jwt}"
         return
       end
 
-      js_env({ PARENT_DOMAIN: parent_domain })
+      # postMessage origins require a protocol
+      js_env({ PARENT_ORIGIN: "#{HostUrl.protocol}://#{parent_domain}" })
+      set_extra_csp_frame_ancestor!
 
       render layout: "bare"
     end
@@ -65,53 +69,31 @@ module Lti
     #
     # Adding `school.instructure.com` allows the main Canvas window (showing `school.instructure.com`) to
     # load an iframe that points to `canvas.instructure.com`
-    #
-    # TODO: this doesn't account for accounts that have the CSP enabled, since that adds `frame-src ...;`,
-    # which means this will add the parent domain to both -ancestors and -src.
-    # TODO: is there a way to achieve this same result using frame-src <forwarding domain>? Since that
-    # is already added when an account turns on the CSP, it may be easier. but what to do for accounts
-    # that have it off (which is the majority)
-    # TODO: resolve these above TODOs before enabling the lti_platform_storage flag (see INTEROP-7714)
-
     def set_extra_csp_frame_ancestor!
-      csp_frame_ancestors << URI.parse(parent_domain)&.host
+      csp_frame_ancestors << parent_domain
     end
 
-    # Per the LTI Platform Storage spec, postMessages from tools to get and put data
-    # must be sent to the OIDC Auth domain.
-    #   For most environments, that is the same as the `iss` value sent in the LTI 1.3 launch.
-    #   For local development, that will normally be the main domain unless an override is set.
-    def forwarding_domain
-      if Rails.env.development?
-        return forwarding_domain_override if forwarding_domain_override
+    # In most instances, the OIDC Auth endpoint will share a domain with the Issuer Identifier/iss.
+    # Instructure-hosted Canvas overrides this method in MRA, since it uses (for example):
+    # `canvas.instructure.com` for the iss, and
+    # `sso.canvaslms.com` for the OIDC Auth endpoint
+    # format: canvas.docker, canvas.instructure.com (no protocol)
+    def oidc_auth_domain
+      return current_domain if Rails.env.development?
 
-        return request.base_url
-      end
+      iss = CanvasSecurity.config["lti_iss"] || current_domain
+      return iss unless /^https?:/.match?(iss)
 
-      # TODO: this will eventually need to change to match the LTI OIDC Auth redirect endpoint.
-      # That is currently the same as the iss (`canvas.instructure.com`), but at some point will
-      # need to be changed to `sso.canvaslms.com`, while leaving the iss with its original value.
-      # see INTEROP-7715
-      CanvasSecurity.config["lti_iss"]
-    end
-
-    # For local development
-    # Set this value in `config/dynamic_settings.yml` under
-    # development.config.canvas.canvas.lti_post_message_forwarding_domain
-    # An example:
-    #   Set this value to `canvas.docker`
-    #   Render this route at `shard2.canvas.docker` or another local domain
-    #   This route should redirect to `canvas.docker`
-    def forwarding_domain_override
-      DynamicSettings.find("canvas")["lti_post_message_forwarding_domain"]
+      URI(iss)&.host
     end
 
     def parent_domain
-      decoded_jwt["parent_domain"] || request.base_url
+      decoded_jwt["parent_domain"] || current_domain
     end
 
+    # format: canvas.docker, school.instructure.com, etc.
     def current_domain
-      request.base_url
+      HostUrl.context_host(@domain_root_account, request.host)
     end
 
     def decoded_jwt

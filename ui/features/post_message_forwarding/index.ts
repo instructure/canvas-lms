@@ -25,8 +25,12 @@ type Message = {
   [key: string]: any
 }
 
+type WindowReferences = {
+  [origin: string]: Window
+}
+
 export const handler =
-  (PARENT_DOMAIN: string, windowReferences: object, parentWindow: Window | null) =>
+  (PARENT_ORIGIN: string, windowReferences: WindowReferences, parentWindow: Window | null) =>
   (e: MessageEvent) => {
     let message: Message
     try {
@@ -36,8 +40,8 @@ export const handler =
       return false
     }
 
-    // eslint-disable-next-line eqeqeq
-    if (e.origin == PARENT_DOMAIN) {
+    if (e.origin === PARENT_ORIGIN) {
+      // message is from Canvas window, forward to tool
       const targetOrigin = message.toolOrigin
       if (!targetOrigin) {
         return false
@@ -48,15 +52,16 @@ export const handler =
 
       targetWindow?.postMessage(message, targetOrigin)
     } else {
+      // message is from tool, forward to Canvas window
       windowReferences[e.origin] = e.source
       message.toolOrigin = e.origin
 
-      parentWindow?.postMessage(message, PARENT_DOMAIN)
+      parentWindow?.postMessage(message, PARENT_ORIGIN)
     }
   }
 
 ready(() => {
-  const {PARENT_DOMAIN} = window.ENV as EnvPlatformStoragePostMessageForwarding
-  const windowReferences = {}
-  window.addEventListener('message', handler(PARENT_DOMAIN, windowReferences, window.top))
+  const {PARENT_ORIGIN} = window.ENV as EnvPlatformStoragePostMessageForwarding
+  const windowReferences = {} as WindowReferences
+  window.addEventListener('message', handler(PARENT_ORIGIN, windowReferences, window.top))
 })
