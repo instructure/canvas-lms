@@ -36,6 +36,7 @@ const defaultQueryData = {
         htmlUrl: '',
         name: 'Graded discussion for submission comments',
         pointsPossible: 1000,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '3',
           name: 'Test Assignment Group',
@@ -90,6 +91,7 @@ const defaultQueryData = {
         htmlUrl: '',
         name: 'Test Assignment Grading',
         pointsPossible: 100,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '3',
           name: 'Test Assignment Group',
@@ -128,6 +130,7 @@ const defaultQueryData = {
           groupWeight: 30,
           __typename: 'AssignmentGroup',
         },
+        gradingPeriodId: '4',
         submissionsConnection: {
           nodes: [
             {
@@ -154,6 +157,7 @@ const defaultQueryData = {
         htmlUrl: '',
         name: 'Late Assignment',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '3',
           name: 'Test Assignment Group',
@@ -204,6 +208,7 @@ const defaultQueryData = {
         htmlUrl: '',
         name: 'Excused Assignment',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '3',
           name: 'Test Assignment Group',
@@ -236,6 +241,7 @@ const defaultQueryData = {
         htmlUrl: '',
         name: 'Welcome New Riders',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '1',
           name: 'Assignments',
@@ -415,6 +421,7 @@ const varyingAssignmentTypes = {
         htmlUrl: '',
         name: 'Percentage',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '16',
           name: 'Assignments',
@@ -447,6 +454,7 @@ const varyingAssignmentTypes = {
         htmlUrl: '',
         name: 'Complete/Incomplete',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '16',
           name: 'Assignments',
@@ -479,6 +487,7 @@ const varyingAssignmentTypes = {
         htmlUrl: '',
         name: 'Points',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '16',
           name: 'Assignments',
@@ -511,6 +520,7 @@ const varyingAssignmentTypes = {
         htmlUrl: '',
         name: 'Letter Grade',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '16',
           name: 'Assignments',
@@ -543,6 +553,7 @@ const varyingAssignmentTypes = {
         htmlUrl: '',
         name: 'GPA Scale',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '16',
           name: 'Assignments',
@@ -575,6 +586,7 @@ const varyingAssignmentTypes = {
         htmlUrl: '',
         name: 'Not Graded',
         pointsPossible: null,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '16',
           name: 'Assignments',
@@ -593,6 +605,7 @@ const varyingAssignmentTypes = {
         htmlUrl: '',
         name: 'Manual post',
         pointsPossible: 10,
+        gradingPeriodId: '4',
         assignmentGroup: {
           _id: '16',
           name: 'Assignments',

@@ -32,7 +32,7 @@ import {
 
 export const gradingPeriodRow = (gradingPeriod, queryData) => {
   const filterByGradingPeriod = filteredAssignments(queryData).filter(assignment => {
-    return assignment?.submissionsConnection?.nodes[0]?.gradingPeriodId === gradingPeriod?._id
+    return assignment?.gradingPeriodId === gradingPeriod?._id
   })
 
   const periodPercentage = getGradingPeriodPercentage(
