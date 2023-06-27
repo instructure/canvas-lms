@@ -1032,6 +1032,39 @@ module Lti
               end
             end
           end
+
+          context "when a content item for a collaboration is received" do
+            before do
+              course
+              user_session(@user)
+              context_external_tool
+            end
+
+            let(:content_items) do
+              [
+                { type: "ltiResourceLink", url: launch_url, title: "Item 1" }
+              ]
+            end
+
+            let(:return_url_params) { super().merge(placement: "collaboration") }
+
+            it "does not create a resource link" do
+              expect do
+                subject
+              end.to_not change { Lti::ResourceLink.count }
+            end
+
+            it "includes tool_id in the js_env deep_link_response" do
+              allow(controller).to receive(:js_env)
+              subject
+              expected_js_env_attributes = {
+                tool_id: context_external_tool.id,
+                content_items:
+              }
+
+              expect(controller).to have_received(:js_env).with(deep_link_response: hash_including(expected_js_env_attributes))
+            end
+          end
         end
       end
     end

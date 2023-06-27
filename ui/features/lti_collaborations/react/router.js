@@ -42,6 +42,7 @@ const attachListeners = () => {
         actions.externalContentReady({
           service_id: event.data?.service_id,
           contentItems: [item],
+          tool_id: event.data?.tool_id,
         })
       )
     } catch {

@@ -28,10 +28,9 @@ describe('handleDeepLinking', () => {
     },
   ]
 
-  const event = overrides => ({
+  const event = dataOverrides => ({
     origin: 'http://www.test.com',
-    data: {subject: 'LtiDeepLinkingResponse', content_items},
-    ...overrides,
+    data: {subject: 'LtiDeepLinkingResponse', content_items, ...dataOverrides},
   })
 
   let ajaxJSON, flashError, env
@@ -60,46 +59,53 @@ describe('handleDeepLinking', () => {
     $.flashError.mockClear()
   })
 
+  function mockNewCollaborationElement() {
+    jest
+      .spyOn(document, 'querySelector')
+      .mockReturnValue({getAttribute: key => ({action: '/collaborations'}[key])})
+  }
+
+  function expectAJAXWithContentItems(url, method) {
+    const data = {contentItems: JSON.stringify(content_items)}
+    expect($.ajaxJSON).toHaveBeenCalledWith(url, method, data, expect.anything(), expect.anything())
+  }
+
   it('creates the collaboration', async () => {
+    mockNewCollaborationElement()
     await handleDeepLinking(event())
-    expect($.ajaxJSON).toHaveBeenCalledWith(
-      undefined,
-      'POST',
-      {contentItems: JSON.stringify(content_items)},
-      expect.anything(),
-      expect.anything()
-    )
+    expectAJAXWithContentItems('/collaborations?tool_id=', 'POST')
+    expect(document.querySelector).toHaveBeenCalledWith('#new_collaboration')
+  })
+
+  it('passes along the tool_id from the postMessage', async () => {
+    mockNewCollaborationElement()
+    await handleDeepLinking(event({tool_id: 9876}))
+    expectAJAXWithContentItems('/collaborations?tool_id=9876', 'POST')
+    expect(document.querySelector).toHaveBeenCalledWith('#new_collaboration')
   })
 
   describe('when there is a service_id in the postMessage', () => {
-    const overrides = {data: {subject: 'LtiDeepLinkingResponse', content_items, service_id: 123}}
     it('updates the collaboration', async () => {
-      jest.spyOn(document, 'querySelector')
-      await handleDeepLinking(event(overrides))
+      jest.spyOn(document, 'querySelector').mockReturnValue({href: '/collaborations/123'})
+      await handleDeepLinking(event({service_id: 123}))
+      expectAJAXWithContentItems('/collaborations/123?tool_id=', 'PUT')
+    })
 
-      expect($.ajaxJSON).toHaveBeenCalledWith(
-        undefined,
-        'PUT',
-        {contentItems: JSON.stringify(content_items)},
-        expect.anything(),
-        expect.anything()
-      )
-      expect(document.querySelector).toHaveBeenCalledWith('.collaboration_123 a.title')
+    it('passes along the tool_id from the postMessage', async () => {
+      jest.spyOn(document, 'querySelector').mockReturnValue({href: '/collaborations/123'})
+      await handleDeepLinking(event({service_id: 123, tool_id: 9876}))
+      expectAJAXWithContentItems('/collaborations/123?tool_id=9876', 'PUT')
     })
   })
 
   describe('when there is a unhandled error parsing the content item', () => {
-    const overrides = {
-      data: {subject: 'LtiDeepLinkingResponse', content_items: 1},
-    }
-
     it('does not attempt to create a collaboration', async () => {
-      await handleDeepLinking(event(overrides))
+      await handleDeepLinking(event({content_items: 1}))
       expect($.ajaxJSON).not.toHaveBeenCalled()
     })
 
     it('shows an error message to the user', async () => {
-      await handleDeepLinking(event(overrides))
+      await handleDeepLinking(event({content_items: 1}))
       expect($.flashError).toHaveBeenCalled()
     })
   })
@@ -145,7 +151,7 @@ describe('onExternalContentReady', () => {
   it('creates a new collaboration', () => {
     onExternalContentReady(...params())
     expect($.ajaxJSON).toHaveBeenCalledWith(
-      'http://www.test.com/create',
+      'http://www.test.com/create?tool_id=',
       'POST',
       expect.anything(),
       expect.anything(),
@@ -157,7 +163,7 @@ describe('onExternalContentReady', () => {
     it('updates the existing collaboration', () => {
       onExternalContentReady(...params({service_id: 1}))
       expect($.ajaxJSON).toHaveBeenCalledWith(
-        'http://www.test.com/update',
+        'http://www.test.com/update?tool_id=',
         'PUT',
         expect.anything(),
         expect.anything(),
