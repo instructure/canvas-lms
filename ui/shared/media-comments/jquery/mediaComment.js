@@ -90,9 +90,10 @@ mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'sourcechoose
 // enable the playback speed selector
 mejs.MepDefaults.features.splice(positionAfterSubtitleSelector, 0, 'speed')
 
-function getSourcesAndTracks(id) {
+export function getSourcesAndTracks(id, attachmentId) {
   const dfd = new $.Deferred()
-  $.getJSON(`/media_objects/${id}/info`, data => {
+  const api = attachmentId ? 'media_attachments' : 'media_objects'
+  $.getJSON(`/${api}/${attachmentId || id}/info`, data => {
     // this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
     // see: CNVS-12998
     const sources = data.media_sources
@@ -191,7 +192,7 @@ const mediaCommentActions = {
     const showInline = function (id, holder) {
       const width = Math.min(holder.closest('div,p,table').width() || VIDEO_WIDTH, VIDEO_WIDTH)
       const height = Math.round((width / 336) * 240)
-      return getSourcesAndTracks(id).done(sourcesAndTracks => {
+      return getSourcesAndTracks(id, attachmentId).done(sourcesAndTracks => {
         if (sourcesAndTracks.sources.length) {
           const mediaPlayerOptions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
