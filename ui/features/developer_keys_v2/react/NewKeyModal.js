@@ -310,7 +310,7 @@ export default class DeveloperKeyModal extends React.Component {
               onClick={this.closeModal}
               screenReaderLabel={I18n.t('Cancel')}
             />
-            <Heading>{I18n.t('Key Settings')}</Heading>
+            <Heading level="h1">{I18n.t('Key Settings')}</Heading>
           </Modal.Header>
           <Modal.Body>
             {this.isSaving ? (
