@@ -114,7 +114,7 @@ describe('choosing a day on the calendar', () => {
     fireEvent.click(getInput())
     const button15 = getByText('15').closest('button')
     fireEvent.click(button15)
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-15'))
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-15'), 'pick')
   })
 
   it('hides the calendar when clicked', () => {
@@ -129,28 +129,28 @@ describe('choosing a day on the calendar', () => {
     const {props, getInput} = renderInput()
     fireEvent.click(getInput())
     pressKey(getInput(), {key: 'ArrowDown', code: 40, keyCode: 40})
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-01'))
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-01'), 'pick')
   })
 
   it('selects the first of the month on up-arrow if selectedDate is null', () => {
     const {props, getInput} = renderInput()
     fireEvent.click(getInput())
     pressKey(getInput(), {key: 'ArrowUp', code: 38, keyCode: 38})
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-01'))
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-01'), 'pick')
   })
 
   it('selects the next date on down-arrow', () => {
     const {props, getInput} = renderInput({selectedDate: new Date()})
     fireEvent.click(getInput())
     pressKey(getInput(), {key: 'ArrowDown', code: 40, keyCode: 40})
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-20'))
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-20'), 'pick')
   })
 
   it('selects the previous date on up-arrow', () => {
     const {props, getInput} = renderInput({selectedDate: new Date()})
     fireEvent.click(getInput())
     pressKey(getInput(), {key: 'ArrowUp', code: 38, keyCode: 38})
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-18'))
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(new Date('2020-05-18'), 'pick')
   })
 })
 
@@ -176,7 +176,7 @@ describe('dirty input state', () => {
     const {props, getInput} = renderAndDirtyInput('May 20')
     const newDate = new Date('2020-05-20')
     fireEvent.blur(getInput())
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(newDate)
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(newDate, 'other')
     expect(getInput().value).toBe(newDate.toISOString())
   })
 
@@ -184,13 +184,13 @@ describe('dirty input state', () => {
     const {props, getInput} = renderAndDirtyInput('May 20')
     const newDate = new Date('2020-05-20')
     pressKey(getInput(), {key: 'Enter'})
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(newDate)
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(newDate, 'other')
   })
 
   it('calls onSelectedDateChange with on blur and garbage input, and clears the input', () => {
     const {props, getInput} = renderAndDirtyInput('asdf')
     fireEvent.blur(getInput())
-    expect(props.onSelectedDateChange).toHaveBeenCalledWith(null)
+    expect(props.onSelectedDateChange).toHaveBeenCalledWith(null, 'other')
     expect(getInput().value).toBe('')
   })
 

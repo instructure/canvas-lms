@@ -259,7 +259,7 @@ describe('Assignment Bulk Edit Dates', () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
     const assignmentUnlockInput = getByDisplayValue('Thu, Mar 19, 2020, 9:00 AM')
     changeAndBlurInput(assignmentUnlockInput, '2020-01-01')
-    expect(assignmentUnlockInput.value).toBe('Wed, Jan 1, 2020, 9:00 AM')
+    expect(assignmentUnlockInput.value).toBe('Wed, Jan 1, 2020, 12:00 AM')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
@@ -267,7 +267,7 @@ describe('Assignment Bulk Edit Dates', () => {
     const {getByText, getByDisplayValue} = await renderBulkEditAndWait()
     const overrideLockInput = getByDisplayValue('Tue, Apr 21, 2020, 9:00 AM')
     changeAndBlurInput(overrideLockInput, '2020-12-31')
-    expect(overrideLockInput.value).toBe('Thu, Dec 31, 2020, 9:00 AM')
+    expect(overrideLockInput.value).toBe('Thu, Dec 31, 2020, 11:59 PM')
     expect(getByText('Save').closest('button').disabled).toBe(false)
   })
 
@@ -309,7 +309,7 @@ describe('Assignment Bulk Edit Dates', () => {
 
     fireEvent.click(revertButtons[1])
     expect(overrideLockInput.value).toBe('Tue, Apr 21, 2020, 9:00 AM') // original value
-    expect(assignmentUnlockAt.value).toBe('Mon, Jun 15, 2020, 9:00 AM') // not changed yet
+    expect(assignmentUnlockAt.value).toBe('Mon, Jun 15, 2020, 12:00 AM') // not changed yet
     expect(nullDueDate.value).toBe('Tue, Jun 16, 2020, 11:59 PM') // not changed yet
     // focus should be explicitly set to the lock at input
     expect(document.activeElement).toBe(overrideLockInput)
@@ -373,7 +373,7 @@ describe('Assignment Bulk Edit Dates', () => {
           id: 'assignment_1',
           all_dates: [
             {
-              due_at: '2020-04-01T00:00:00.000Z', // Time of day was preserved, which was UTC 00:00:00
+              due_at: '2020-04-01T14:59:59.999Z', // Time of day was preserved, which was UTC 00:00:00
               unlock_at: assignments[0].all_dates[1].unlock_at,
               lock_at: assignments[0].all_dates[1].lock_at,
             },
@@ -398,11 +398,11 @@ describe('Assignment Bulk Edit Dates', () => {
           all_dates: [
             {
               base: true,
-              due_at: '2020-04-01T03:00:00.000Z', // The UTC time of day was preserved
+              due_at: '2020-04-01T14:59:59.999Z', // The UTC time of day was preserved
             },
             {
               id: 'override_1',
-              due_at: '2020-04-01T00:00:00.000Z',
+              due_at: '2020-04-01T14:59:59.999Z',
             },
           ],
         },
@@ -571,46 +571,126 @@ describe('Assignment Bulk Edit Dates', () => {
       ])
     })
 
-    it('preserves the existing time on existing available until dates', async () => {
-      const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
-      const lockAtInput = getAllByLabelText('Available Until')[0]
-      const lockAtDate = '2020-04-01'
-      const originalLockAtMoment = moment.tz(assignments[0].all_dates[0].lock_at, 'Asia/Tokyo')
-      const localTimeOffset = originalLockAtMoment.diff(originalLockAtMoment.clone().startOf('day'))
-      changeAndBlurInput(lockAtInput, lockAtDate)
+    it('choosing a date from the calendar preserves the time of the existing date in the date input box', async () => {
+      const {getAllByText, getByText, getAllByLabelText} = await renderBulkEditAndWait()
+      const availableAtInput = getAllByLabelText('Available From')[2]
+      changeAndBlurInput(availableAtInput, 'Mon, Nov 1, 2021, 4:00 PM')
+      fireEvent.click(availableAtInput)
+      const button7 = getAllByText('7')[0]
+      fireEvent.click(button7)
+      expect(availableAtInput.value).toMatch('Sun, Nov 7, 2021, 4:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
       expect(body).toMatchObject([
         {
-          id: 'assignment_1',
+          id: 'assignment_2',
           all_dates: [
             {
               base: true,
-              lock_at: moment.tz(lockAtDate, 'Asia/Tokyo').add(localTimeOffset, 'ms').toISOString(),
+              unlock_at: '2021-11-07T07:00:00.000Z',
+              due_at: null,
+              lock_at: null,
             },
           ],
         },
       ])
     })
 
-    it('preserves the existing time on existing dates', async () => {
-      const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
-      const dueAtInput = getAllByLabelText('Due At')[0]
-      const dueAtDate = '2020-04-01'
-      const originalDueAtMoment = moment.tz(assignments[0].all_dates[0].due_at, 'Asia/Tokyo')
-      const localTimeOffset = originalDueAtMoment.diff(originalDueAtMoment.clone().startOf('day'))
-      changeAndBlurInput(dueAtInput, dueAtDate)
+    it('choosing the same day from the calendar as the existing day in the date input box will preserve the existing time', async () => {
+      const {getAllByText, getByText, getAllByLabelText} = await renderBulkEditAndWait()
+      const availableAtInput = getAllByLabelText('Available From')[2]
+      changeAndBlurInput(availableAtInput, 'Mon, Nov 1, 2021, 4:00 PM')
+      fireEvent.click(availableAtInput)
+      const button7 = getAllByText('1')[0]
+      fireEvent.click(button7)
+      expect(availableAtInput.value).toMatch('Mon, Nov 1, 2021, 4:00 PM')
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
       expect(body).toMatchObject([
         {
-          id: 'assignment_1',
+          id: 'assignment_2',
           all_dates: [
             {
               base: true,
-              due_at: moment.tz(dueAtDate, 'Asia/Tokyo').add(localTimeOffset, 'ms').toISOString(),
+              unlock_at: '2021-11-01T07:00:00.000Z',
+              due_at: null,
+              lock_at: null,
+            },
+          ],
+        },
+      ])
+    })
+
+    it('pressing the arrow up key when the calendar is open preserves the time of the existing date in the date input box', async () => {
+      const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
+      const availableAtInput = getAllByLabelText('Available From')[2]
+      changeAndBlurInput(availableAtInput, 'Wed, Nov 3, 2021, 4:00 PM')
+      fireEvent.click(availableAtInput)
+      fireEvent.keyDown(availableAtInput, {key: 'ArrowUp', keyCode: 38})
+      expect(availableAtInput.value).toMatch('Tue, Nov 2, 2021, 4:00 PM')
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_2',
+          all_dates: [
+            {
+              base: true,
+              unlock_at: '2021-11-02T07:00:00.000Z',
+              due_at: null,
+              lock_at: null,
+            },
+          ],
+        },
+      ])
+    })
+
+    it('preserves the copied time when there are no values in the date box', async () => {
+      const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
+      const unlockAtInput = getAllByLabelText('Available From')[2]
+      const unlockDate = 'Wed, Apr 1, 2020, 4:00 PM'
+      changeAndBlurInput(unlockAtInput, unlockDate)
+      expect(unlockAtInput.value).toMatch('Wed, Apr 1, 2020, 4:00 PM')
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_2',
+          all_dates: [
+            {
+              base: true,
+              unlock_at: '2020-04-01T07:00:00.000Z',
+              due_at: null,
+              lock_at: null,
+            },
+          ],
+        },
+      ])
+    })
+
+    it('preserves the copied time when there is an existing value in the date box', async () => {
+      const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
+      const unlockAtInput = getAllByLabelText('Available From')[2]
+      changeAndBlurInput(unlockAtInput, 'Wed, Apr 3, 2020, 4:00 PM')
+      const unlockDate = 'Wed, Apr 1, 2020, 1:00 PM'
+      changeAndBlurInput(unlockAtInput, unlockDate)
+      expect(unlockAtInput.value).toMatch('Wed, Apr 1, 2020, 1:00 PM')
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_2',
+          all_dates: [
+            {
+              base: true,
+              unlock_at: '2020-04-01T04:00:00.000Z',
+              due_at: null,
+              lock_at: null,
             },
           ],
         },
@@ -1162,12 +1242,16 @@ describe('in a timezone that does DST', () => {
         ],
       },
     ]
-    const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait({}, af)
+    const {assignments, getAllByText, getByText, getAllByLabelText} = await renderBulkEditAndWait(
+      {},
+      af
+    )
     const originalDueAtMoment = moment.tz(assignments[0].all_dates[0].due_at, 'America/Anchorage')
     expect(originalDueAtMoment.format('YYYY-MM-DD h:mm:ss.S')).toEqual('2021-11-02 5:37:14.5')
     const dueAtInput = getAllByLabelText('Due At')[0]
-    const dueAtDate = '2021-11-07'
-    changeAndBlurInput(dueAtInput, dueAtDate)
+    fireEvent.click(dueAtInput)
+    const button7 = getAllByText('7')[0]
+    fireEvent.click(button7)
     fireEvent.click(getByText('Save'))
     await flushPromises()
     const body = JSON.parse(fetch.mock.calls[1][1].body)

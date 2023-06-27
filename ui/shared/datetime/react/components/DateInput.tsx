@@ -78,7 +78,7 @@ export type CanvasDateInputProps = {
    * field, or by clicking on a date in the calendar. It is called with one argument, a JS `Date` object. If the input
    * is a bad date (such as if the user types something unparseable) the value passed will evaluate to Boolean `false`.
    */
-  onSelectedDateChange: (date: Date | null) => void
+  onSelectedDateChange: (date: Date | null, dateInputType: 'pick' | 'other') => void
   /**
    * focus and blur event handlers
    */
@@ -267,8 +267,15 @@ export default function CanvasDateInput({
 
   function handleDayClick(_event: Event, {date}: {date: string}) {
     const parsedMoment = moment.tz(date, timezone)
-    syncInput(parsedMoment)
-    onSelectedDateChange(parsedMoment.toDate())
+    let input = parsedMoment
+    if (selectedDate) {
+      const selectedMoment = moment.tz(selectedDate, timezone)
+      if (selectedMoment.isSame(parsedMoment, 'day')) {
+        input = selectedMoment
+      }
+    }
+    syncInput(input)
+    onSelectedDateChange(parsedMoment.toDate(), 'pick')
     setInputDetails({method: 'pick', value: date})
   }
 
@@ -278,7 +285,7 @@ export default function CanvasDateInput({
     const newDate = errorsExist || inputEmpty ? null : renderedMoment.toDate()
 
     syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
-    onSelectedDateChange(newDate)
+    onSelectedDateChange(newDate, 'other')
 
     if (inputDetails?.method === 'pick') {
       const date = inputDetails.value
@@ -355,7 +362,7 @@ export default function CanvasDateInput({
       ? selectedMoment.clone().add(step, type).startOf('day')
       : renderedMoment.clone().startOf('month')
 
-    onSelectedDateChange(newMoment.toDate())
+    onSelectedDateChange(newMoment.toDate(), 'pick')
   }
 
   function modifyRenderedMoment(

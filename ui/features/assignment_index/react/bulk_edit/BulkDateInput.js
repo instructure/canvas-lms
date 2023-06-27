@@ -72,43 +72,35 @@ function BulkDateInput({
   )
 
   const handleSelectedDateChange = useCallback(
-    newDate => {
+    (newDate, dateInputType) => {
       if (!newDate) {
         setDate(null)
-      } else if (selectedDateString) {
-        // preserve the existing selected time
+      } else if (dateInputType === 'pick' && selectedDateString) {
+        // preserve the existing selected time when picking date from the calendar and there is an already existing date in the textbox
         const selectedMoment = moment.tz(selectedDateString, timezone)
+        const newMoment = moment.tz(newDate, timezone)
+        const [h, m, s, ms] = [
+          selectedMoment.hour(),
+          selectedMoment.minute(),
+          selectedMoment.second(),
+          selectedMoment.millisecond(),
+        ]
+        newMoment.hour(h)
+        newMoment.minute(m)
+        newMoment.second(s)
+        newMoment.millisecond(ms)
+        setDate(newMoment.toDate())
+      } else {
         const newMoment = moment.tz(newDate, timezone)
         const isMidnight =
           newMoment.hour() === 0 && newMoment.minute() === 0 && newMoment.second() === 0
-        if (!newMoment.isSame(selectedMoment, 'day')) {
-          const [h, m, s, ms] = [
-            selectedMoment.hour(),
-            selectedMoment.minute(),
-            selectedMoment.second(),
-            selectedMoment.millisecond(),
-          ]
-          newMoment.hour(h)
-          newMoment.minute(m)
-          newMoment.second(s)
-          newMoment.millisecond(ms)
-        } else if (fancyMidnight && isMidnight) {
-          // If the date is midnight and the field wants fancy midnight we change it to the end of day
-          setDate(newMoment.endOf('day'))
-        }
-        setDate(newMoment.toDate())
-      } else {
-        // assign a default time to the new date
-        const newMoment = moment.tz(newDate, timezone)
         if (defaultTime) {
           const [h, m, s] = defaultTime.split(':').map(n => parseInt(n, 10))
           newMoment.hour(h)
           newMoment.minute(m)
           newMoment.second(s)
-        } else if (fancyMidnight) {
+        } else if (fancyMidnight && isMidnight) {
           newMoment.endOf('day')
-        } else {
-          newMoment.startOf('day')
         }
         setDate(newMoment.toDate())
       }
