@@ -31,12 +31,20 @@ export const getGradingPeriodID = () => {
     ?.split('=')[1]
 }
 
-export const filteredAssignments = data => {
-  return (
+export const filteredAssignments = (data, calculateOnlyGradedAssignments = false) => {
+  let assignments =
     data?.assignmentsConnection?.nodes.filter(assignment => {
       return !assignment?.submissionsConnection?.nodes[0]?.hideGradeFromStudent
     }) || []
-  )
+
+  if (calculateOnlyGradedAssignments) {
+    assignments = assignments.filter(assignment => {
+      const status = getAssignmentStatus(assignment)
+      return status.shouldConsiderAsGraded
+    })
+  }
+
+  return assignments
 }
 
 export const getAssignmentPositionInModuleItems = (assignmentId, moduleItems) => {
@@ -118,7 +126,12 @@ export const getAssignmentStatus = assignment => {
   } else if (assignment?.submissionsConnection?.nodes?.length === 0) {
     return getAssignmentNoSubmissionStatus(assignment?.dueAt)
   } else if (assignment?.submissionsConnection?.nodes[0]?.late) {
-    return ASSIGNMENT_STATUS.LATE
+    const gradingStatus = assignment?.submissionsConnection?.nodes[0]?.gradingStatus
+    if (gradingStatus === 'graded') {
+      return ASSIGNMENT_STATUS.LATE_GRADED
+    } else {
+      return ASSIGNMENT_STATUS.LATE_NOT_GRADED
+    }
   } else if (assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'graded') {
     return ASSIGNMENT_STATUS.GRADED
   } else {
@@ -247,13 +260,6 @@ export const filterDroppedAssignments = (
 ) => {
   if (!assignments || !assignments.length) return []
 
-  assignments = assignments?.filter(assignment => {
-    return (
-      assignment?.gradingType !== 'not_graded' &&
-      assignment?.submissionsConnection?.nodes[0]?.score !== null
-    )
-  })
-
   const relevantSubmissions = assignments.map(assignment => {
     return convertSubmissionToDroppableSubmission(
       assignment,
@@ -354,9 +360,7 @@ export const getAssignmentGroupTotalPoints = (assignmentGroup, assignments) => {
     assignmentGroup
   )?.reduce((total, assignment) => {
     if (
-      assignment?.submissionsConnection?.nodes.length > 0 &&
       assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'excused' &&
-      assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'needs_grading' &&
       assignment?.assignmentGroup?._id === assignmentGroup?._id
     ) {
       total += getAssignmentTotalPoints(assignment)
@@ -371,9 +375,7 @@ export const getAssignmentGroupEarnedPoints = (assignmentGroup, assignments) => 
     assignmentGroup
   ).reduce((total, assignment) => {
     if (
-      assignment?.submissionsConnection?.nodes.length > 0 &&
       assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'excused' &&
-      assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'needs_grading' &&
       assignment?.assignmentGroup?._id === assignmentGroup?._id
     ) {
       total += getAssignmentEarnedPoints(assignment)
@@ -462,31 +464,12 @@ export const getGradingPeriodPercentage = (
 ) => {
   if (!assignments || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
-  assignments = assignments?.filter(assignment => {
-    return assignment?.gradingPeriodId === gradingPeriod?._id
-  })
-
   if (applyGroupWeights) {
     return getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
   }
 
-  const [gradingPeriodEarnedPoints, gradingPeriodTotalPoints] = assignmentGroups?.reduce(
-    ([earnedPoints, totalPoints], assignmentGroup) => {
-      const earnedPointsValue = getAssignmentGroupEarnedPoints(assignmentGroup, assignments, false)
-      const totalPointsValue = getAssignmentGroupTotalPoints(assignmentGroup, assignments, false)
-
-      if (earnedPointsValue !== ASSIGNMENT_NOT_APPLICABLE) {
-        earnedPoints += parseFloat(earnedPointsValue)
-      }
-
-      if (totalPointsValue !== ASSIGNMENT_NOT_APPLICABLE) {
-        totalPoints += parseFloat(totalPointsValue)
-      }
-
-      return [earnedPoints, totalPoints]
-    },
-    [0, 0]
-  )
+  const gradingPeriodEarnedPoints = getGradingPeriodEarnedPoints(gradingPeriod, assignments)
+  const gradingPeriodTotalPoints = getGradingPeriodTotalPoints(gradingPeriod, assignments)
 
   if (gradingPeriodTotalPoints === 0 && gradingPeriodEarnedPoints === 0)
     return ASSIGNMENT_NOT_APPLICABLE

@@ -31,6 +31,7 @@ import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE, ASSIGNMENT_STATUS} f
 
 import {
   formatNumber,
+  filteredAssignments,
   submissionCommentsPresent,
   getDisplayStatus,
   getDisplayScore,
@@ -967,44 +968,6 @@ describe('util', () => {
         expect(filterDroppedAssignments(assignments)).toEqual([])
       })
 
-      it('should filter assignments based on gradingType and score', () => {
-        const assignmentGroup = {}
-        const assignments = [
-          {
-            _id: 'assignment1',
-            gradingType: 'graded',
-            submissionsConnection: {
-              nodes: [{score: 80}],
-            },
-          },
-          {
-            _id: 'assignment2',
-            gradingType: 'not_graded',
-            submissionsConnection: {
-              nodes: [{score: 100}],
-            },
-          },
-          {
-            _id: 'assignment3',
-            gradingType: 'graded',
-            submissionsConnection: {
-              nodes: [{score: null}],
-            },
-          },
-        ]
-        const expected = [
-          {
-            _id: 'assignment1',
-            gradingType: 'graded',
-            submissionsConnection: {
-              nodes: [{score: 80}],
-            },
-          },
-        ]
-
-        expect(filterDroppedAssignments(assignments, assignmentGroup)).toEqual(expected)
-      })
-
       it('should return all assignments if rules are null and returnDropped is false', () => {
         const assignmentGroup = {
           rules: null,
@@ -1775,6 +1738,41 @@ describe('util', () => {
           })
         })
       })
+    })
+  })
+
+  describe('filteredAssignments', () => {
+    it('should exclude assignments that are not graded', () => {
+      const assignments = mockAssignments()
+
+      let filtered = filteredAssignments(
+        {
+          assignmentsConnection: {nodes: assignments},
+        },
+        true
+      )
+
+      expect(filtered.length).toBe(4)
+
+      assignments[0].gradingType = 'not_graded'
+      filtered = filteredAssignments(
+        {
+          assignmentsConnection: {nodes: assignments},
+        },
+        true
+      )
+
+      expect(filtered.length).toBe(3)
+
+      assignments[1].submissionsConnection.nodes = []
+      filtered = filteredAssignments(
+        {
+          assignmentsConnection: {nodes: assignments},
+        },
+        true
+      )
+
+      expect(filtered.length).toBe(2)
     })
   })
 })
