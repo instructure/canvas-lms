@@ -345,6 +345,13 @@ module Types
       GRADING_TYPES[assignment.grading_type]
     end
 
+    field :grading_period_id, Int, null: true
+    def grading_period_id
+      load_association(:submissions).then do |submissions|
+        submissions.pluck(:grading_period_id).uniq.first
+      end
+    end
+
     field :submission_types,
           [Types::AssignmentSubmissionType],
           null: true
