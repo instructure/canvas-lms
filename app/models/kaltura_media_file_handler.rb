@@ -27,7 +27,7 @@ class KalturaMediaFileHandler
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     files = []
     root_account_id = attachments.filter_map(&:root_account_id).first
-    attachments.reject(&:active_media_object_by_media_id).each do |attachment|
+    attachments.reject(&:media_object_by_media_id).each do |attachment|
       files << {
         name: attachment.display_name,
         url: attachment.public_download_url,

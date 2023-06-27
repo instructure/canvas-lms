@@ -610,31 +610,4 @@ describe MediaObject do
       expect(@mo.guaranteed_title).to eq "User title"
     end
   end
-
-  describe "#attachments_by_media_id" do
-    it "returns attachments with the given media_id" do
-      attachment = media_object.attachment
-      other_attachment = attachment_model(media_entry_id: media_object.media_id)
-      attachment_model(media_entry_id: "something else")
-      expect(media_object.attachments_by_media_id).to match_array([attachment, other_attachment])
-    end
-
-    it "returns soft-deleted attachments with the given media_id" do
-      attachment = media_object.attachment
-      attachment.destroy
-      other_attachment = attachment_model(media_entry_id: media_object.media_id)
-      attachment_model(media_entry_id: "something else")
-      expect(media_object.attachments_by_media_id).to match_array([attachment, other_attachment])
-    end
-  end
-
-  describe "#active_attachments_by_media_id" do
-    it "returns active attachments with the given media_id" do
-      attachment = media_object.attachment
-      attachment.destroy
-      other_attachment = attachment_model(media_entry_id: media_object.media_id)
-      attachment_model(media_entry_id: "something else")
-      expect(media_object.active_attachments_by_media_id).to match_array([other_attachment])
-    end
-  end
 end
