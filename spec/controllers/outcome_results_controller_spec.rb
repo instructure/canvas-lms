@@ -554,8 +554,8 @@ describe OutcomeResultsController do
               )
             end
 
-            it "has empty outcome results in the response" do
-              expect(subject["outcome_results"]).to be_empty
+            it "returns all the results" do
+              expect(subject["outcome_results"].count).to eq 3
             end
 
             it "has empty linked assignments in the response" do
