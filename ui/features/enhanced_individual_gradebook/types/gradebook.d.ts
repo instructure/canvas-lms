@@ -97,6 +97,7 @@ export type GradebookOptions = {
   customOptions: CustomOptions
   showTotalGradeAsPoints?: boolean | null
   messageAttachmentUploadFolderId?: string
+  downloadAssignmentSubmissionsUrl?: string
 }
 
 export type AssignmentDetailCalculationText = {

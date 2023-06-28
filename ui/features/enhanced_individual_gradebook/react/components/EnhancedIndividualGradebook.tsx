@@ -116,6 +116,7 @@ export default function EnhancedIndividualGradebook() {
           : false,
       showTotalGradeAsPoints: ENV.GRADEBOOK_OPTIONS?.show_total_grade_as_points ?? false,
     },
+    downloadAssignmentSubmissionsUrl: ENV.GRADEBOOK_OPTIONS?.download_assignment_submissions_url,
     exportGradebookCsvUrl: ENV.GRADEBOOK_OPTIONS?.export_gradebook_csv_url,
     finalGradeOverrideEnabled: ENV.GRADEBOOK_OPTIONS?.final_grade_override_enabled,
     gradebookCsvProgress: ENV.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
