@@ -224,6 +224,14 @@ const mockPostResponse = {
 
 describe('FilterNav', () => {
   beforeEach(() => {
+    let liveRegion = null
+    if (!document.getElementById('flash_screenreader_holder')) {
+      liveRegion = document.createElement('div')
+      liveRegion.id = 'flash_screenreader_holder'
+      liveRegion.setAttribute('role', 'alert')
+      document.body.appendChild(liveRegion)
+    }
+
     store.setState({
       filterPresets: defaultFilterPresets,
       appliedFilters: defaultAppliedFilters,
@@ -360,6 +368,35 @@ describe('Filter dropdown', () => {
     userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
     userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
     expect(getByTestId('applied-filter-tag')).toHaveTextContent('Remove Section 7 Filter')
+  })
+
+  it('selecting a filter and deselecting the same filter from the filter dropdown triggers screenreader alerts', async () => {
+    const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByText('Added Section 7 Filter')).toBeInTheDocument()
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByText('Removed Section 7 Filter')).toBeInTheDocument()
+  })
+
+  it('selecting a filter from the filter dropdown and pressing the filter pill will trigger remove filter screenreader alert', async () => {
+    const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    userEvent.click(getByTestId('applied-filter-tag'))
+    expect(getByText('Removed Section 7 Filter')).toBeInTheDocument()
+  })
+
+  it('pressing the Clear All Filters button will trigger the all filters have been cleared screenreader alert', async () => {
+    const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByRole('button', {name: 'Clear All Filters'})).toBeInTheDocument()
+    userEvent.click(getByRole('button', {name: 'Clear All Filters'}))
+    expect(getByText('All Filters Have Been Cleared')).toBeInTheDocument()
   })
 })
 

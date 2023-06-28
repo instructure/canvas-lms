@@ -39,6 +39,7 @@ type Props = {
   onOpenTray: () => void
   dataMap: FilterDrilldownData
   filterItems: FilterDrilldownData
+  changeAnnouncement: (filterAnnouncement) => void
 }
 
 const TruncateWithTooltip = ({children}: {children: React.ReactNode}) => {
@@ -61,6 +62,7 @@ const FilterDropdown = ({
   onOpenTray,
   dataMap,
   filterItems,
+  changeAnnouncement,
 }: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
@@ -262,9 +264,18 @@ const FilterDropdown = ({
               <MenuGroup
                 label={currentObj.name}
                 selected={selectedIndices}
-                onSelect={(_event: MouseEvent, updated: [number, ...number[]]) =>
+                onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
+                  if (items[updated[0]].isSelected) {
+                    changeAnnouncement(
+                      I18n.t('Removed %{filterName} Filter', {filterName: items[updated[0]].name})
+                    )
+                  } else {
+                    changeAnnouncement(
+                      I18n.t('Added %{filterName} Filter', {filterName: items[updated[0]].name})
+                    )
+                  }
                   items[updated[0]].onToggle?.()
-                }
+                }}
               >
                 <MenuSeparator />
                 {items.map(a => {
