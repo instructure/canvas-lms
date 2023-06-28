@@ -345,17 +345,10 @@ function useFilterDropdownData({
       isSelected: appliedFilters.some(c => c.type === 'submissions'),
       items: [
         {
-          id: 'savedFilterPresets',
+          id: '1',
           name: I18n.t('Has Ungraded Submissions'),
           isSelected: appliedFilters.some(
-            c =>
-              c.type === 'submissions' &&
-              [
-                'has-ungraded-submissions',
-                'has-submissions',
-                'has-no-submissions',
-                'has-unposted-grades',
-              ].includes(c.value || '')
+            c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
           ),
           onToggle: () => {
             const filter: Filter = {
