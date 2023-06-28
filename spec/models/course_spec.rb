@@ -8049,4 +8049,11 @@ describe Course do
       end
     end
   end
+
+  describe "#destroy" do
+    it "records deleted_at" do
+      course_model
+      expect { @course.destroy }.to change { @course.reload.deleted_at }.from(nil).to be_truthy
+    end
+  end
 end
