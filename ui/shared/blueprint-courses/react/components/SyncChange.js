@@ -26,6 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {captionLanguageForLocale} from '@instructure/canvas-media'
 import {IconLock, IconUnlock} from './BlueprintLocks'
 
 import propTypes from '../propTypes'
@@ -47,7 +48,7 @@ class SyncChange extends Component {
   }
 
   toggleExpanded = () => {
-    this.setState({isExpanded: !this.state.isExpanded})
+    this.setState(prevState => ({isExpanded: !prevState.isExpanded}))
   }
 
   renderText = text => (
@@ -96,7 +97,7 @@ class SyncChange extends Component {
   }
 
   render() {
-    const {asset_type, asset_name, change_type, exceptions, locked} = this.props.change
+    const {asset_type, asset_name, change_type, exceptions, locked, locale} = this.props.change
     const hasExceptions = exceptions.length > 0
     const classes = cx({
       'bcs__history-item__change': true,
@@ -123,7 +124,11 @@ class SyncChange extends Component {
           <div className="bcs__history-item__content-grid">
             <Grid colSpacing="small" hAlign="end">
               <Grid.Row>
-                <Grid.Col width={5}>{this.renderText(asset_name)}</Grid.Col>
+                <Grid.Col width={5}>
+                  {this.renderText(
+                    locale ? `${asset_name} (${captionLanguageForLocale(locale)})` : asset_name
+                  )}
+                </Grid.Col>
                 <Grid.Col width={2}>{this.renderText(itemTypeLabels[asset_type])}</Grid.Col>
                 <Grid.Col width={2}>{this.renderText(changeTypeLabels[change_type])}</Grid.Col>
                 <Grid.Col width={2}>
