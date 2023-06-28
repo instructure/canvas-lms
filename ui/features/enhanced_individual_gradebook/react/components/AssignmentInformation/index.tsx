@@ -17,6 +17,7 @@
  */
 
 import React, {useCallback, useMemo, useState} from 'react'
+import _ from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -32,6 +33,7 @@ import {computeAssignmentDetailText} from '../../../utils/gradebookUtils'
 import MessageStudentsWhoModal from './MessageStudentsWhoModal'
 import DefaultGradeModal from './DefaultGradeModal'
 import {CurveGradesModal} from './CurveGradesModal'
+import SubmissionDownloadModal from './SubmissionDownloadModal'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -75,6 +77,18 @@ export default function AssignmentInformation({
     )
   }
 
+  const {downloadAssignmentSubmissionsUrl} = gradebookOptions
+  const downloadSubmissionsUrl = (downloadAssignmentSubmissionsUrl ?? '').replace(
+    ':assignment',
+    assignment.id
+  )
+  const {hasSubmittedSubmissions, submissionTypes} = assignment
+  const showSubmissionDownloadButton = () => {
+    const allowList = ['online_upload', 'online_text_entry', 'online_url']
+    const submissionTypesOnAllowlist = _.intersection(submissionTypes, allowList)
+    return hasSubmittedSubmissions && _.some(submissionTypesOnAllowlist)
+  }
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -111,14 +125,11 @@ export default function AssignmentInformation({
               {I18n.t('See this assignment in speedgrader')}
             </Link>
           </View>
-          {/* {{#if showDownloadSubmissionsButton}}
-              <View as="div" className="pad-box no-sides">
-                {{
-                  ic-submission-download-dialog
-                  submissionsDownloadUrl=selectedAssignment.submissions_download_url
-                }}
-              </div>
-            {{/if}} */}
+          {showSubmissionDownloadButton() && (
+            <View as="div" margin="small 0 0 0">
+              <SubmissionDownloadModal downloadSubmissionsUrl={downloadSubmissionsUrl} />
+            </View>
+          )}
           <View as="div" className="pad-box no-sides">
             <View as="p">
               <View as="strong">

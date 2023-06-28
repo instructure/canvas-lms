@@ -59,6 +59,7 @@ export type AssignmentConnection = {
   postManually: boolean
   published: boolean
   gradingPeriodId?: string
+  hasSubmittedSubmissions: boolean
 }
 
 export type AssignmentGroupConnection = {
