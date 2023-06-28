@@ -34,7 +34,7 @@ class ImportedHtmlConverter
     @migration = migration
     @migration_id_converter = migration_id_converter
     @link_parser = Importers::LinkParser.new(migration_id_converter)
-    @link_resolver = Importers::LinkResolver.new(migration_id_converter)
+    @link_resolver = CanvasLinkMigrator::LinkResolver.new(migration_id_converter)
     @link_replacer = Importers::LinkReplacer.new(migration, migration_id_converter)
   end
 

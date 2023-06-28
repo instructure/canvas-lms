@@ -18,11 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "mock_migration_query_service"
+require "spec_helper"
+require "json"
 
-describe Importers::LinkResolver do
-  def course_based_converter(assets = LinkConverters::MockMigrationQueryService.default_assets)
-    Importers::LinkResolver.new(LinkConverters::MockMigrationQueryService.new(context_path: "/courses/1", assets:))
+describe CanvasLinkMigrator::LinkResolver do
+  def course_based_converter(assets = JSON.parse(File.read("spec/fixtures/canvas_resource_map.json")))
+    CanvasLinkMigrator::LinkResolver.new(CanvasLinkMigrator::ResourceMapService.new(assets))
   end
 
   describe "resolve_link!" do

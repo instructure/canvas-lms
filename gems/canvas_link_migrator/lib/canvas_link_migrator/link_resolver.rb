@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Importers
+require "active_support/core_ext/object"
+
+module CanvasLinkMigrator
   class LinkResolver
     def initialize(migration_id_converter)
       @migration_id_converter = migration_id_converter
