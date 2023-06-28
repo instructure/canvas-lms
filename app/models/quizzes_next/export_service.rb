@@ -54,17 +54,22 @@ module QuizzesNext
 
       def send_imported_content(new_course, content_migration, imported_content)
         send_quizzes_next_quiz_duplicated = false
+        original_course = Course.find_by(uuid: imported_content[:original_course_uuid])
+        return unless original_course
+
         imported_content[:assignments].each do |assignment|
           next if QuizzesNext::Service.assignment_not_in_export?(assignment)
           next unless QuizzesNext::Service.assignment_duplicated?(assignment)
+
+          old_assignment_id = assignment.fetch(:original_assignment_id)
+          old_assignment = Assignment.find_by(id: old_assignment_id, context_id: original_course.id)
+          next unless old_assignment
 
           new_assignment_id = assignment.fetch(:$canvas_assignment_id)
           new_assignment = Assignment.find(new_assignment_id)
           next unless new_assignment.created_at > content_migration.started_at # no more recopies
 
           send_quizzes_next_quiz_duplicated = true
-          old_assignment_id = assignment.fetch(:original_assignment_id)
-          old_assignment = Assignment.find(old_assignment_id)
 
           new_assignment.skip_downstream_changes! # don't let these updates prevent future blueprint syncs
           new_assignment.duplicate_of = old_assignment
