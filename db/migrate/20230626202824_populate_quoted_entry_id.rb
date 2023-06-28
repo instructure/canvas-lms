@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module DataFixup::PopulateQuotedEntry
-  def self.run
-    DiscussionEntry.where(include_reply_preview: true, quoted_entry_id: nil).joins(:parent_entry).in_batches.update_all("quoted_entry_id = discussion_entries.parent_id")
+class PopulateQuotedEntryId < ActiveRecord::Migration[7.0]
+  tag :postdeploy
+
+  def up
+    DataFixup::PopulateQuotedEntry.delay_if_production(priority: Delayed::LOW_PRIORITY).run
   end
 end
