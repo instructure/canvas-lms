@@ -110,6 +110,7 @@ class WikiPagesController < ApplicationController
       if authorized_action(@page, @current_user, :read) &&
          (!@context.conditional_release? || enforce_assignment_visible(@page))
         if params[:id] != @page.url
+          InstStatsd::Statsd.increment("wikipage.show.page_url_resolved")
           redirect_to polymorphic_url([@context, :wiki_page], id: @page, titleize: params[:titleize])
         end
         add_crumb(@page.title)
