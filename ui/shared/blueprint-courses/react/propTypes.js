@@ -88,6 +88,7 @@ propTypes.migrationChange = shape({
     'announcement',
     'rubric',
     'syllabus',
+    'media_tracks',
   ]).isRequired,
   asset_name: string.isRequired,
   change_type: oneOf(['created', 'updated', 'deleted']).isRequired,
