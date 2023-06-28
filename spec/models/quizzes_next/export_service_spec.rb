@@ -91,16 +91,17 @@ describe QuizzesNext::ExportService do
   end
 
   describe ".send_imported_content" do
-    let(:new_course) { course_model }
-    let(:root_account) { double("account") }
+    let(:old_course) { course_model(uuid: "100005") }
+    let(:new_course) { course_model(uuid: "100006") }
+    let(:root_account) { account_model }
     let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "some_type", asset_map_url: "http://example.com/resource_map.json") }
-    let(:new_assignment1) { assignment_model(id: 1) }
-    let(:new_assignment2) { assignment_model(id: 2) }
-    let(:old_assignment1) { assignment_model(id: 3) }
-    let(:old_assignment2) { assignment_model(id: 4) }
+    let(:new_assignment1) { assignment_model(id: 1, context: new_course) }
+    let(:new_assignment2) { assignment_model(id: 2, context: new_course) }
+    let(:old_assignment1) { assignment_model(id: 3, context: old_course) }
+    let(:old_assignment2) { assignment_model(id: 4, context: old_course) }
     let(:basic_import_content) do
       {
-        original_course_uuid: "100005",
+        original_course_uuid: old_course.uuid,
         assignments: [
           {
             original_resource_link_id: "link-1234",
@@ -112,7 +113,7 @@ describe QuizzesNext::ExportService do
     end
 
     before do
-      allow(new_course).to receive(:uuid).and_return("100006")
+      allow(old_course).to receive(:root_account).and_return(root_account)
       allow(new_course).to receive(:lti_context_id).and_return("ctx-1234")
       allow(new_course).to receive(:name).and_return("Course Name")
 
@@ -120,7 +121,7 @@ describe QuizzesNext::ExportService do
       allow(new_course).to receive(:root_account).and_return(root_account)
     end
 
-    it "emits live events for each copied assignment" do
+    it "emits a single live event when there are copied assignments" do
       payload = {
         original_course_uuid: "100005",
         new_course_uuid: "100006",
@@ -140,6 +141,19 @@ describe QuizzesNext::ExportService do
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(payload).once
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
+    end
+
+    it "ignores assignments when the original assignment cannot be found as a child of the original course" do
+      course_model(uuid: "100007")
+      basic_import_content[:original_course_uuid] = "100007"
+
+      expect(Canvas::LiveEvents).not_to receive(:quizzes_next_quiz_duplicated)
+    end
+
+    it "ignores assignments if the original course doesn't exist" do
+      basic_import_content[:original_course_uuid] = "100007"
+
+      expect(Canvas::LiveEvents).not_to receive(:quizzes_next_quiz_duplicated)
     end
 
     it "ignores not found assignments" do
