@@ -1591,6 +1591,7 @@ class Course < ActiveRecord::Base
 
     gradebook_filters.in_batches.destroy_all
     self.workflow_state = "deleted"
+    self.deleted_at = Time.now.utc
     save!
   end
 
