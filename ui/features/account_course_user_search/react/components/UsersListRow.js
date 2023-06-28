@@ -21,11 +21,17 @@ import {string, func, shape, bool} from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {IconMasqueradeLine, IconMessageLine, IconEditLine} from '@instructure/ui-icons'
+import {
+  IconMasqueradeLine,
+  IconMessageLine,
+  IconEditLine,
+  IconCalendarClockLine,
+} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 import UserLink from './UserLink'
+import {TempEnrollModal} from '@canvas/temporary-enrollment/react/TempEnrollModal'
 
 const I18n = useI18nScope('account_course_user_search')
 
@@ -45,6 +51,25 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
       <Table.Cell data-heap-redact-text="">{user.sis_user_id}</Table.Cell>
       <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
       <Table.Cell>
+        {permissions.can_temp_enroll && (
+          <TempEnrollModal>
+            <Tooltip
+              data-testid="user-list-row-tooltip"
+              renderTip={I18n.t('Temporarily enroll %{name}', {name: user.name})}
+            >
+              <IconButton
+                withBorder={false}
+                withBackground={false}
+                size="small"
+                screenReaderLabel={I18n.t('Temporarily enroll %{name}', {name: user.name})}
+              >
+                <IconCalendarClockLine
+                  title={I18n.t('Temporarily enroll %{name}', {name: user.name})}
+                />
+              </IconButton>
+            </Tooltip>
+          </TempEnrollModal>
+        )}
         {permissions.can_masquerade && (
           <Tooltip
             data-testid="user-list-row-tooltip"
@@ -55,6 +80,7 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
               withBackground={false}
               size="small"
               href={`/users/${user.id}/masquerade`}
+              screenReaderLabel={I18n.t('Act as %{name}', {name: user.name})}
             >
               <IconMasqueradeLine title={I18n.t('Act as %{name}', {name: user.name})} />
             </IconButton>
@@ -71,6 +97,7 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
               withBackground={false}
               size="small"
               href={`/conversations?user_name=${user.name}&user_id=${user.id}`}
+              screenReaderLabel={I18n.t('Send message to %{name}', {name: user.name})}
             >
               <IconMessageLine title={I18n.t('Send message to %{name}', {name: user.name})} />
             </IconButton>
@@ -88,7 +115,12 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
                 data-testid="user-list-row-tooltip"
                 renderTip={I18n.t('Edit %{name}', {name: user.name})}
               >
-                <IconButton withBorder={false} withBackground={false} size="small">
+                <IconButton
+                  withBorder={false}
+                  withBackground={false}
+                  size="small"
+                  screenReaderLabel={I18n.t('Edit %{name}', {name: user.name})}
+                >
                   <IconEditLine title={I18n.t('Edit %{name}', {name: user.name})} />
                 </IconButton>
               </Tooltip>

@@ -612,6 +612,24 @@ describe RoleOverride do
       account_model
     end
 
+    describe "manage_temp_enroll" do
+      let(:add_perm) { RoleOverride.permissions[:manage_temp_enroll_add] }
+      let(:edit_perm) { RoleOverride.permissions[:manage_temp_enroll_edit] }
+      let(:del_perm) { RoleOverride.permissions[:manage_temp_enroll_delete] }
+
+      it "is true for AccountAdmin by default" do
+        expect(edit_perm[:true_for]).to match_array ["AccountAdmin"]
+        expect(del_perm[:true_for]).to match_array ["AccountAdmin"]
+        expect(add_perm[:true_for]).to match_array ["AccountAdmin"]
+      end
+
+      it "is available to admin role types" do
+        expect(edit_perm[:available_to]).to match_array %w[AccountAdmin AccountMembership]
+        expect(add_perm[:available_to]).to match_array %w[AccountAdmin AccountMembership]
+        expect(del_perm[:available_to]).to match_array %w[AccountAdmin AccountMembership]
+      end
+    end
+
     describe "manage_proficiency_calculations" do
       let(:permission) { RoleOverride.permissions[:manage_proficiency_calculations] }
 
