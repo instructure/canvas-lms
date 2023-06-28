@@ -247,6 +247,10 @@ class RoleOverridesController < ApplicationController
   #     manage_role_overrides            -- Permissions - manage
   #     manage_storage_quotas            -- Storage Quotas - manage
   #     manage_sis                       -- SIS data - manage
+  #     Manage Temporary Enrollments granular permissions
+  #         manage_temp_enroll_add       -- Temporary Enrollments - add
+  #         manage_temp_enroll_edit      -- Temporary Enrollments - edit
+  #         manage_temp_enroll_delete    -- Temporary Enrollments - delete
   #     manage_user_logins               -- Users - manage login details
   #     manage_user_observers            -- Users - manage observers
   #     moderate_user_content            -- Users - moderate content

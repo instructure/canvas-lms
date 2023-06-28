@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import React from 'react'
 import {bool, func, shape, string, element, oneOf} from 'prop-types'
-import {Avatar} from '@instructure/ui-avatar'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -70,8 +69,8 @@ export default class CreateOrUpdateUserModal extends React.Component {
       time_zone: string,
     }),
     customized_login_handle_name: string,
-    delegated_authentication: bool.isRequired,
-    showSIS: bool.isRequired,
+    delegated_authentication: bool,
+    showSIS: bool,
     afterSave: func.isRequired,
   }
 
@@ -223,19 +222,9 @@ export default class CreateOrUpdateUserModal extends React.Component {
         onDismiss={this.close}
         size="medium"
         label={
-          this.props.createOrUpdate === 'create' ? (
-            I18n.t('Add a New User')
-          ) : (
-            <span>
-              <Avatar
-                size="small"
-                name={this.state.data.user.name}
-                src={this.props.user.avatar_url}
-                data-fs-exclude={true}
-              />{' '}
-              {I18n.t('Edit User Details')}
-            </span>
-          )
+          this.props.createOrUpdate === 'create'
+            ? I18n.t('Add a New User')
+            : I18n.t('Edit User Details')
         }
       >
         <Modal.Body>

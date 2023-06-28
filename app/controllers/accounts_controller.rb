@@ -1559,6 +1559,7 @@ class AccountsController < ApplicationController
       can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),
+      can_temp_enroll: @account.grants_right?(@current_user, session, :manage_temp_enroll_add),
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),

@@ -1387,6 +1387,36 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Users - Students") },
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
       },
+      manage_temp_enroll_add: {
+        label: -> { t("permissions.manage_temp_enroll_add", "Add temporary enrollments") },
+        label_v2: -> { t("Temporary Enrollments - add") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: ["AccountAdmin"],
+        account_only: true,
+        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollment) },
+        group: "manage_temp_enroll",
+        group_label: -> { t("Users - Temporary Enrollments") }
+      },
+      manage_temp_enroll_edit: {
+        label: -> { t("permissions.manage_temp_enroll_edit", "Edit temporary enrollments") },
+        label_v2: -> { t("Temporary Enrollments - edit") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: ["AccountAdmin"],
+        account_only: true,
+        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollment) },
+        group: "manage_temp_enroll",
+        group_label: -> { t("Users - Temporary Enrollments") }
+      },
+      manage_temp_enroll_delete: {
+        label: -> { t("permissions.manage_temp_enroll_delete", "Delete temporary enrollments") },
+        label_v2: -> { t("Temporary Enrollments - delete") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: ["AccountAdmin"],
+        account_only: true,
+        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollment) },
+        group: "manage_temp_enroll",
+        group_label: -> { t("Users - Temporary Enrollments") }
+      },
       manage_user_notes: {
         label: -> { t("permissions.manage_user_notes", "Manage faculty journal entries") },
         label_v2: -> { t("Faculty Journal - manage entries") },
