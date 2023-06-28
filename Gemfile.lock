@@ -194,6 +194,7 @@ PATH
       multipart
       nokogiri
     canvas_link_migrator (0.1.0)
+      activesupport
       nokogiri
     canvas_mimetype_fu (0.0.1)
     canvas_panda_pub (1.0.0)

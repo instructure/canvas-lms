@@ -1,0 +1,67 @@
+{
+    "contains_migration_ids": true,
+    "destination_course": "2",
+    "destination_hosts": [
+        "apple.edu",
+        "kiwi.edu"
+    ],
+    "destination_root_folder": "course files/",
+    "resource_mapping": {
+        "discussion_topics": {
+            "G": {
+                "destination": {
+                    "id": "7"
+                },
+                "source": {
+                    "id": "6"
+                }
+            }
+        },
+        "files": {
+            "E": {
+                "destination": {
+                    "id": "5",
+                    "media_entry_id": "m-stuff"
+                },
+                "source": {
+                    "id": "3",
+                    "media_entry_id": "m-stuff"
+                }
+            },
+            "F": {
+                "destination": {
+                    "id": "6",
+                    "media_entry_id": "m-stuff"
+                },
+                "source": {
+                    "id": "4",
+                    "media_entry_id": "m-stuff"
+                }
+            }
+        },
+        "module_items": {
+            "C": {
+                "destination": {
+                    "id": "3"
+                },
+                "source": {
+                    "id": "2"
+                }
+            }
+        },
+        "wiki_pages": {
+            "A": {
+                "destination": {
+                    "id": "2",
+                    "url": "slug-a"
+                },
+                "source": {
+                    "id": "1",
+                    "url": "slug-a"
+                }
+            }
+        }
+    },
+    "source_course": "1",
+    "source_host": "pineapple.edu"
+}
