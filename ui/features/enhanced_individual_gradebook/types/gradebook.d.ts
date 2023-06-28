@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingPeriod, GradingPeriodSet} from 'api'
+import {GradingScheme, GradingStandard} from '@canvas/grading/grading'
 import {
   AssignmentConnection,
   UserConnection,
   GradebookUserSubmissionDetails,
   SubmissionConnection,
 } from './queries'
-import {ProgressData} from 'features/gradebook/react/default_gradebook/gradebook.d'
-import {GradingScheme, GradingStandard} from '@canvas/grading/grading'
+import {GradingPeriod, GradingPeriodSet} from '../../../api.d'
+import type {ProgressData} from '../../../shared/grading/grading.d'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
@@ -70,6 +70,7 @@ export type GradebookOptions = {
   anonymizeStudents?: boolean
   sortOrder: GradebookSortOrder
   selectedSection?: string
+  selectedGradingPeriodId?: string
   exportGradebookCsvUrl?: string
   lastGeneratedCsvAttachmentUrl?: string | null
   gradebookCsvProgress?: ProgressData | null

@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {useState} from 'react'
 import {ApiCallStatus} from '../../types'
 import {Attachment} from '../../../../api.d'
-import {Progress} from '../../../gradebook/react/default_gradebook/gradebook.d'
+import type {Progress} from '../../../../shared/grading/grading.d'
 
 const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
 type AttachmentProgress = {

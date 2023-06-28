@@ -95,6 +95,7 @@ type AssignmentDropdownProps = {
   sortOrder: GradebookSortOrder
   selectedStudentId?: string | null
   studentSubmissions?: GradebookUserSubmissionDetails[]
+  selectedGradingPeriodId?: string | null
 }
 
 type AssignmentDropdownResponse = {
@@ -106,6 +107,7 @@ export const useAssignmentDropdownOptions = ({
   sortOrder,
   selectedStudentId,
   studentSubmissions,
+  selectedGradingPeriodId,
 }: AssignmentDropdownProps): AssignmentDropdownResponse => {
   const [assignmentDropdownOptions, setAssignmentDropdownOptions] =
     useState<AssignmentDropdownOption>()
@@ -116,10 +118,16 @@ export const useAssignmentDropdownOptions = ({
     }
 
     const sortedAssignments = sortAssignments(assignments, sortOrder)
-    const filteredAssignments =
+    let filteredAssignments =
       selectedStudentId && studentSubmissions
         ? filterAssignmentsByStudent(sortedAssignments, studentSubmissions)
         : sortedAssignments
+
+    if (selectedGradingPeriodId && selectedGradingPeriodId !== '0') {
+      filteredAssignments = filteredAssignments.filter(
+        assignment => assignment.gradingPeriodId === selectedGradingPeriodId
+      )
+    }
 
     const assignmentOptions: AssignmentDropdownOption = [
       defaultAssignmentDropdownOptions,
@@ -130,7 +138,14 @@ export const useAssignmentDropdownOptions = ({
       })),
     ]
     setAssignmentDropdownOptions(assignmentOptions)
-  }, [assignments, sortOrder, selectedStudentId, studentSubmissions, setAssignmentDropdownOptions])
+  }, [
+    assignments,
+    sortOrder,
+    selectedStudentId,
+    studentSubmissions,
+    selectedGradingPeriodId,
+    setAssignmentDropdownOptions,
+  ])
 
   return {assignmentDropdownOptions}
 }

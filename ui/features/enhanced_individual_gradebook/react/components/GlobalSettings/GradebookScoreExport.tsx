@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {ApiCallStatus} from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
-import {ProgressData} from '../../../../gradebook/react/default_gradebook/gradebook.d'
+import type {ProgressData} from '../../../../../shared/grading/grading.d'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconDownloadLine} from '@instructure/ui-icons'
 import DateHelper from '@canvas/datetime/dateHelper'
