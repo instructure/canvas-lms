@@ -93,6 +93,18 @@ describe MediaObjectsController do
       )
     end
 
+    context "with media_links_use_attachment_id ON" do
+      before { Account.site_admin.enable_feature!(:media_links_use_attachment_id) }
+
+      it "uses the correct json helper" do
+        course_with_teacher_logged_in
+        mo = MediaObject.create! media_id: "_media_id", course: @course
+        expect(controller).to receive(:media_attachment_api_json).with(mo.attachment, mo, @teacher, anything).and_call_original
+        get "show", params: { attachment_id: mo.attachment.id, media_object_id: mo.id }
+        assert_status(200)
+      end
+    end
+
     context "adheres to attachment permissions" do
       before :once do
         attachment_model(context: @course)

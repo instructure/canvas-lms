@@ -87,12 +87,20 @@ class MediaObjectsController < ApplicationController
   # Returns the Details of the given Media Object.
   #
   # @example_request
-  #     curl https://<canvas>/media_objects/<media_object_id> \
+  #     curl https://<canvas>/media_objects/<media_object_id>/info \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #     curl https://<canvas>/media_attachments/<attachment_id>/info \
   #          -H 'Authorization: Bearer <token>'
   #
   # @returns MediaObject
   def show
-    render json: media_object_api_json(@media_object, @current_user, session)
+    if Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
+      render json: media_attachment_api_json(@attachment, @media_object, @current_user, session)
+    else
+      render json: media_object_api_json(@media_object, @current_user, session)
+    end
   end
 
   # @API List Media Objects
