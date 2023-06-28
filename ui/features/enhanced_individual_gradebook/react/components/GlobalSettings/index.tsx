@@ -58,6 +58,7 @@ type Props = {
   gradebookOptions: GradebookOptions
   onSortChange: (sortType: GradebookSortOrder) => void
   onSectionChange: (sectionId?: string) => void
+  onGradingPeriodChange: (gradingPeriodId?: string) => void
   handleCheckboxChange: HandleCheckboxChange
   onTeacherNotesCreation: (teacherNotes: TeacherNotes) => void
 }
@@ -66,6 +67,7 @@ export default function GlobalSettings({
   sections,
   customColumns,
   gradebookOptions,
+  onGradingPeriodChange,
   onSortChange,
   onSectionChange,
   handleCheckboxChange,
@@ -82,6 +84,13 @@ export default function GlobalSettings({
     onSectionChange(sectionId)
   }
 
+  const handleGradePeriodChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const index = event.target.selectedIndex
+    const gradingPeriodId = index !== 0 ? event.target.value : undefined
+    onGradingPeriodChange(gradingPeriodId)
+  }
+
+  const {gradingPeriodSet, sortOrder: defaultSortOrder, selectedGradingPeriodId} = gradebookOptions
   return (
     <>
       <View as="div" className="row-fluid">
@@ -108,6 +117,31 @@ export default function GlobalSettings({
         </View>
       </View>
 
+      {gradingPeriodSet && (
+        <View as="div" className="row-fluid">
+          <View as="div" className="span4">
+            <label htmlFor="section_select" style={{textAlign: 'right', display: 'block'}}>
+              {I18n.t('Select a Grading Period')}
+            </label>
+          </View>
+          <View as="div" className="span8">
+            <select
+              id="grading_period_select"
+              className="section_select"
+              onChange={handleGradePeriodChange}
+              defaultValue={selectedGradingPeriodId}
+            >
+              <option value="-1">{I18n.t('All Grading Periods')}</option>
+              {gradingPeriodSet.grading_periods.map(gradingPeriod => (
+                <option key={gradingPeriod.id} value={gradingPeriod.id}>
+                  {gradingPeriod.title}
+                </option>
+              ))}
+            </select>
+          </View>
+        </View>
+      )}
+
       <div className="row-fluid" style={{paddingBottom: 20}}>
         <View as="div" className="span4">
           <label htmlFor="sort_select" style={{textAlign: 'right', display: 'block'}}>
@@ -118,7 +152,7 @@ export default function GlobalSettings({
           <select
             id="sort_select"
             className="section_select"
-            defaultValue={gradebookOptions.sortOrder}
+            defaultValue={defaultSortOrder}
             onChange={handleSortChange}
           >
             {assignmentSortOptions.map(option => (

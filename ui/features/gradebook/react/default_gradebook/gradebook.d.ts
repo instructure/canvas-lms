@@ -33,6 +33,7 @@ import type {
   StudentGroupCategoryMap,
   StudentMap,
 } from '../api.d'
+import type {ProgressData} from '../../../../shared/grading/grading.d'
 
 export type SortDirection = 'ascending' | 'descending'
 
@@ -363,10 +364,6 @@ export type ColumnOrderSettings = {
   sortType: string
 }
 
-export type ProgressData = {
-  progress: Progress
-}
-
 export type FilteredContentInfo = {
   invalidAssignmentGroups: AssignmentGroup[]
   totalPointsPossible: number
@@ -435,13 +432,6 @@ export type AssignmentWithOverride = {
     course_section_id: string
     due_at: null | Date
   }
-}
-
-export type Progress = {
-  id: string
-  workflow_state: string
-  message?: string
-  updated_at?: string
 }
 
 export type ProgressCamelized = {

@@ -68,7 +68,7 @@ export const GRADEBOOK_QUERY = gql`
           }
           state
           position
-          assignmentsConnection {
+          assignmentsConnection(filter: {gradingPeriodId: null}) {
             nodes {
               anonymizeStudents
               gradingType
@@ -88,6 +88,7 @@ export const GRADEBOOK_QUERY = gql`
               moderatedGrading: moderatedGradingEnabled
               postManually
               published
+              gradingPeriodId
             }
           }
         }

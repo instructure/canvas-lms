@@ -58,6 +58,7 @@ export default function ContentSelection({
 
   const {
     sortOrder,
+    selectedGradingPeriodId,
     selectedSection,
     customOptions: {showConcludedEnrollments},
   } = gradebookOptions
@@ -72,6 +73,7 @@ export default function ContentSelection({
     sortOrder,
     studentSubmissions,
     selectedStudentId,
+    selectedGradingPeriodId,
   })
 
   useEffect(() => {

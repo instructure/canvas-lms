@@ -129,6 +129,7 @@ export default function EnhancedIndividualGradebook() {
     publishToSisUrl: ENV.GRADEBOOK_OPTIONS?.publish_to_sis_url,
     reorderCustomColumnsUrl: ENV.GRADEBOOK_OPTIONS?.reorder_custom_columns_url,
     saveViewUngradedAsZeroToServer: ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
+    selectedGradingPeriodId: userSettings.contextGet<string>('gradebook_current_grading_period'),
     settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
     settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
     sortOrder: defaultAssignmentSort,
@@ -270,6 +271,14 @@ export default function EnhancedIndividualGradebook() {
         }}
         onSectionChange={sectionId => {
           const newGradebookOptions = {...gradebookOptions, selectedSection: sectionId}
+          setGradebookOptions(newGradebookOptions)
+        }}
+        onGradingPeriodChange={gradingPeriodId => {
+          userSettings.contextSet('gradebook_current_grading_period', gradingPeriodId)
+          const newGradebookOptions = {
+            ...gradebookOptions,
+            selectedGradingPeriodId: gradingPeriodId,
+          }
           setGradebookOptions(newGradebookOptions)
         }}
         handleCheckboxChange={(key: keyof CustomOptions, value: boolean) => {

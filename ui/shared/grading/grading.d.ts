@@ -378,3 +378,14 @@ export type AssignmentGroupCriteriaMap = {
     assignments: AssignmentGradeCriteria[]
   }
 }
+
+export type Progress = {
+  id: string
+  workflow_state: string
+  message?: string
+  updated_at?: string
+}
+
+export type ProgressData = {
+  progress: Progress
+}
