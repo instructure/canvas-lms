@@ -224,7 +224,31 @@ Email is often sent through background jobs in the jobs container. If you would 
 
 ### Canvas RCE API
 
-This feature is not yet supported.
+Edit `.env`
+```
+COMPOSE_FILE=<CURRENT_VALUE>:inst-cli/docker-compose/rce-api.override.yml
+```
+
+Edit `config/dynamic_settings.yml`
+```
+development:
+  # tree
+  config:
+    # service
+    canvas:
+      # prefix
+      # ... omitted for brevity ...
+      rich-content-service:
+        app-host: "<http://canvas-canvasrceapi.inst.test">
+```
+
+Then
+```
+docker compose up canvasrceapi
+# restart canvas to make it read
+# the new RCS app-host
+docker compose restart web
+```
 
 ## Storybook
 
