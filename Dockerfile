@@ -29,6 +29,12 @@ WORKDIR $APP_HOME
 
 USER root
 
+# This is required in order to change the permissions and 
+# ownership of the directory that causes permission issues
+# via bundle_config_and_install() in install_assets.sh
+RUN useradd -ms /bin/bash docker || usermod -aG sudo docker
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 ARG USER_ID
 # This step allows docker to write files to a host-mounted volume with the correct user permissions.
 # Without it, some linux distributions are unable to write at all to the host mounted volume.
