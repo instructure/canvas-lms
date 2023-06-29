@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingScheme, GradingStandard} from '@canvas/grading/grading'
+import {GradingScheme, GradingStandard, ProgressData} from '@canvas/grading/grading'
 import {
   AssignmentConnection,
   UserConnection,
@@ -24,7 +24,6 @@ import {
   SubmissionConnection,
 } from './queries'
 import {GradingPeriod, GradingPeriodSet} from '../../../api.d'
-import type {ProgressData} from '../../../shared/grading/grading.d'
 
 export enum GradebookSortOrder {
   DueDate = 'dueDate',
@@ -86,6 +85,7 @@ export type GradebookOptions = {
   gradingPeriodSet?: GradingPeriodSet | null
   gradingSchemes?: GradingScheme[] | null
   gradingStandard?: GradingStandard[] | null
+  groupWeightingScheme?: string | null
   finalGradeOverrideEnabled?: boolean | null
   publishToSisEnabled?: boolean | null
   publishToSisUrl?: string | null

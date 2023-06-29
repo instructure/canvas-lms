@@ -470,6 +470,10 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.to_param
   end
 
+  it "has an assignmentGroupID" do
+    expect(assignment_type.resolve("assignmentGroupId")).to eq assignment.assignment_group.id.to_s
+  end
+
   it "has modules" do
     module1 = assignment.course.context_modules.create!(name: "Module 1")
     module2 = assignment.course.context_modules.create!(name: "Module 2")

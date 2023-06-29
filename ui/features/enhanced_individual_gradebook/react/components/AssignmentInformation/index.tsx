@@ -20,6 +20,8 @@ import React, {useCallback, useMemo, useState} from 'react'
 import _ from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
+// @ts-expect-error
+import {IconWarningLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {
@@ -34,11 +36,13 @@ import MessageStudentsWhoModal from './MessageStudentsWhoModal'
 import DefaultGradeModal from './DefaultGradeModal'
 import {CurveGradesModal} from './CurveGradesModal'
 import SubmissionDownloadModal from './SubmissionDownloadModal'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   assignment?: AssignmentConnection
+  assignmentGroupInvalid?: boolean
   students?: SortableStudent[]
   submissions?: SubmissionConnection[]
   gradebookOptions: GradebookOptions
@@ -47,6 +51,7 @@ type Props = {
 
 export default function AssignmentInformation({
   assignment,
+  assignmentGroupInvalid,
   gradebookOptions,
   students = [],
   submissions = [],
@@ -77,16 +82,24 @@ export default function AssignmentInformation({
     )
   }
 
-  const {downloadAssignmentSubmissionsUrl} = gradebookOptions
+  const {downloadAssignmentSubmissionsUrl, contextUrl, groupWeightingScheme} = gradebookOptions
   const downloadSubmissionsUrl = (downloadAssignmentSubmissionsUrl ?? '').replace(
     ':assignment',
     assignment.id
   )
-  const {hasSubmittedSubmissions, submissionTypes} = assignment
+  const {hasSubmittedSubmissions, submissionTypes, htmlUrl} = assignment
   const showSubmissionDownloadButton = () => {
     const allowList = ['online_upload', 'online_text_entry', 'online_url']
     const submissionTypesOnAllowlist = _.intersection(submissionTypes, allowList)
     return hasSubmittedSubmissions && _.some(submissionTypesOnAllowlist)
+  }
+
+  const speedGraderUrl = () => {
+    return `${contextUrl}/gradebook/speed_grader?assignment_id=${assignment.id}`
+  }
+
+  const showAssignmentPointsWarning = (): boolean => {
+    return (assignmentGroupInvalid ?? false) && groupWeightingScheme === 'percent'
   }
 
   return (
@@ -97,11 +110,11 @@ export default function AssignmentInformation({
         </View>
         <View as="div" className="span8">
           <View as="h3" className="assignment_selection">
-            <Link href="#" isWithinText={false}>
+            <Link href={htmlUrl} isWithinText={false}>
               {assignment.name}
             </Link>
           </View>
-          {assignment.omitFromFinalGrade && (
+          {assignment.omitFromFinalGrade ? (
             <>
               <i className="icon-warning">
                 <View as="span" className="screenreader-only">
@@ -110,18 +123,21 @@ export default function AssignmentInformation({
               </i>{' '}
               {I18n.t('This assignment does not count toward the final grade.')}
             </>
-          )}
-          {/* {{#if showAssignmentPointsWarning}}
-                <span className="text-error">
-                  <a {{bind-attr href="selectedAssignment.html_url"}}>
-                    <i className="icon-warning"><span className="screenreader-only">{{#t}}Warning{{/t}}</span></i>
-                    {{#t}}Assignments in this group have no points possible and cannot be included in grade calculation.{{/t}}
-                  </a>
-                </span>
-              {{/if}}
-            {{/if}} */}
+          ) : showAssignmentPointsWarning() ? (
+            <View as="span" className="text-error">
+              <Link
+                href={htmlUrl}
+                isWithinText={false}
+                renderIcon={<IconWarningLine size="x-small" />}
+              >
+                <ScreenReaderContent>Warning</ScreenReaderContent>
+                Assignments in this group have no points possible and cannot be included in grade
+                calculation.
+              </Link>
+            </View>
+          ) : null}
           <View as="div">
-            <Link href="#" isWithinText={false}>
+            <Link href={speedGraderUrl()} isWithinText={false}>
               {I18n.t('See this assignment in speedgrader')}
             </Link>
           </View>
@@ -163,8 +179,10 @@ type AssignmentScoreDetailsProps = {
   scores: number[]
 }
 function AssignmentScoreDetails({assignment, scores}: AssignmentScoreDetailsProps) {
-  // TODO: memorize this
-  const {average, max, min} = computeAssignmentDetailText(assignment, scores)
+  const {average, max, min} = useMemo(
+    () => computeAssignmentDetailText(assignment, scores),
+    [assignment, scores]
+  )
   return (
     <View as="div" className="pad-box bottom-only ic-Table-responsive-x-scroll">
       <table className="ic-Table">

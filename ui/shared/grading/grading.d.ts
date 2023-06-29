@@ -379,6 +379,7 @@ export type SubmissionGradeCriteria = Pick<
 export type AssignmentGroupCriteriaMap = {
   [id: string]: Omit<AssignmentGroup, 'assignments'> & {
     assignments: AssignmentGradeCriteria[]
+    invalid?: boolean
   }
 }
 

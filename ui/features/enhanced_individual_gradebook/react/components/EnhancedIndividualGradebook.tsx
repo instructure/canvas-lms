@@ -30,12 +30,10 @@ import GlobalSettings from './GlobalSettings'
 import GradingResults from './GradingResults'
 import StudentInformation from './StudentInformation'
 import {
-  AssignmentSortContext,
   AssignmentSubmissionsMap,
   CustomOptions,
   GradebookOptions,
   GradebookQueryResponse,
-  GradebookSortOrder,
   GradebookUserSubmissionDetails,
   SectionConnection,
   SortableAssignment,
@@ -46,6 +44,7 @@ import {
 } from '../../types'
 import {GRADEBOOK_QUERY} from '../../queries/Queries'
 import {
+  gradebookOptionsSetup,
   mapAssignmentGroupQueryResults,
   mapAssignmentSubmissions,
   mapEnrollmentsToSortableStudents,
@@ -85,60 +84,9 @@ export default function EnhancedIndividualGradebook() {
   const submissionsMap = selectedAssignment ? assignmentSubmissionsMap[selectedAssignment.id] : {}
   const submissionsForSelectedAssignment = Object.values(submissionsMap)
 
-  // TODO: move this into helper function
-  const defaultAssignmentSort: GradebookSortOrder =
-    userSettings.contextGet<AssignmentSortContext>('sort_grade_columns_by')?.sortType ??
-    GradebookSortOrder.Alphabetical
-  const defaultGradebookOptions: GradebookOptions = {
-    activeGradingPeriods: ENV.GRADEBOOK_OPTIONS?.active_grading_periods,
-    changeGradeUrl: ENV.GRADEBOOK_OPTIONS?.change_grade_url,
-    contextId: ENV.GRADEBOOK_OPTIONS?.context_id,
-    contextUrl: ENV.GRADEBOOK_OPTIONS?.context_url,
-    customColumnDatumUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_datum_url,
-    customColumnDataUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_data_url,
-    customColumnUrl: ENV.GRADEBOOK_OPTIONS?.custom_column_url,
-    customColumnsUrl: ENV.GRADEBOOK_OPTIONS?.custom_columns_url,
-    customOptions: {
-      allowFinalGradeOverride:
-        ENV.GRADEBOOK_OPTIONS?.course_settings.allow_final_grade_override ?? false,
-      includeUngradedAssignments:
-        ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server &&
-        ENV.GRADEBOOK_OPTIONS?.settings
-          ? ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero === 'true'
-          : userSettings.contextGet('include_ungraded_assignments') || false,
-      hideStudentNames: userSettings.contextGet('hide_student_names') || false,
-      showConcludedEnrollments: ENV.GRADEBOOK_OPTIONS?.settings?.show_concluded_enrollments
-        ? ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments === 'true'
-        : false,
-      showNotesColumn:
-        ENV.GRADEBOOK_OPTIONS?.teacher_notes?.hidden !== undefined
-          ? !ENV.GRADEBOOK_OPTIONS.teacher_notes.hidden
-          : false,
-      showTotalGradeAsPoints: ENV.GRADEBOOK_OPTIONS?.show_total_grade_as_points ?? false,
-    },
-    downloadAssignmentSubmissionsUrl: ENV.GRADEBOOK_OPTIONS?.download_assignment_submissions_url,
-    exportGradebookCsvUrl: ENV.GRADEBOOK_OPTIONS?.export_gradebook_csv_url,
-    finalGradeOverrideEnabled: ENV.GRADEBOOK_OPTIONS?.final_grade_override_enabled,
-    gradebookCsvProgress: ENV.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
-    gradesAreWeighted: ENV.GRADEBOOK_OPTIONS?.grades_are_weighted,
-    gradingPeriodSet: ENV.GRADEBOOK_OPTIONS?.grading_period_set,
-    gradingSchemes: ENV.GRADEBOOK_OPTIONS?.grading_schemes,
-    gradingStandard: ENV.GRADEBOOK_OPTIONS?.grading_standard,
-    lastGeneratedCsvAttachmentUrl: ENV.GRADEBOOK_OPTIONS?.attachment_url,
-    messageAttachmentUploadFolderId: ENV.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
-    publishToSisEnabled: ENV.GRADEBOOK_OPTIONS?.publish_to_sis_enabled,
-    publishToSisUrl: ENV.GRADEBOOK_OPTIONS?.publish_to_sis_url,
-    reorderCustomColumnsUrl: ENV.GRADEBOOK_OPTIONS?.reorder_custom_columns_url,
-    saveViewUngradedAsZeroToServer: ENV.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
-    selectedGradingPeriodId: userSettings.contextGet<string>('gradebook_current_grading_period'),
-    settingsUpdateUrl: ENV.GRADEBOOK_OPTIONS?.settings_update_url,
-    settingUpdateUrl: ENV.GRADEBOOK_OPTIONS?.setting_update_url,
-    sortOrder: defaultAssignmentSort,
-    teacherNotes: ENV.GRADEBOOK_OPTIONS?.teacher_notes,
-    userId: ENV.current_user_id,
-  }
-  const [gradebookOptions, setGradebookOptions] =
-    useState<GradebookOptions>(defaultGradebookOptions)
+  const [gradebookOptions, setGradebookOptions] = useState<GradebookOptions>(
+    gradebookOptionsSetup(ENV)
+  )
 
   const {data, error} = useQuery<GradebookQueryResponse>(GRADEBOOK_QUERY, {
     variables: {courseId},
@@ -150,6 +98,10 @@ export default function EnhancedIndividualGradebook() {
   const studentNotesColumnId = customColumns?.find(
     (column: CustomColumn) => column.teacher_notes
   )?.id
+
+  const selectedAssignmentGroupInvalid = selectedAssignment?.assignmentGroupId
+    ? assignmentGroupMap[selectedAssignment?.assignmentGroupId]?.invalid
+    : false
 
   useEffect(() => {
     if (!currentStudent || !students) {
@@ -334,6 +286,7 @@ export default function EnhancedIndividualGradebook() {
 
       <AssignmentInformation
         assignment={selectedAssignment}
+        assignmentGroupInvalid={selectedAssignmentGroupInvalid}
         gradebookOptions={gradebookOptions}
         students={students}
         submissions={submissionsForSelectedAssignment}
