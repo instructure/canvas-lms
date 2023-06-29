@@ -31,7 +31,7 @@ import {
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useMemo} from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -136,7 +136,9 @@ export const ConversationListItem = ({...props}) => {
                       data-testid="conversationListItem-Checkbox"
                       label={
                         <ScreenReaderContent>
-                          {props.isSelected ? I18n.t('selected') : I18n.t('not selected')}
+                          {props.isSelected
+                            ? I18n.t('%{subject} selected', {subject: conversationSubject})
+                            : I18n.t('%{subject} not selected', {subject: conversationSubject})}
                         </ScreenReaderContent>
                       }
                       checked={props.isSelected}
@@ -162,6 +164,19 @@ export const ConversationListItem = ({...props}) => {
                       fontSize: '0.8125rem',
                       fontWeight: '700',
                     }}
+                    formatOutput={formattedCount => (
+                      <AccessibleContent
+                        alt={I18n.t(
+                          {
+                            one: '1 message',
+                            other: '%{count} messages',
+                          },
+                          {count: props.conversation.messages.length}
+                        )}
+                      >
+                        {formattedCount}
+                      </AccessibleContent>
+                    )}
                   />
                 </Grid.Col>
               </Grid.Row>
@@ -182,7 +197,11 @@ export const ConversationListItem = ({...props}) => {
                             ? props.onMarkAsRead(props.conversation)
                             : props.onMarkAsUnread(props.conversation)
                         }}
-                        screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
+                        screenReaderLabel={
+                          props.isUnread
+                            ? I18n.t('%{subject} Mark as Read', {subject: conversationSubject})
+                            : I18n.t('%{subject} Mark as Unread', {subject: conversationSubject})
+                        }
                         size="small"
                         withBackground={false}
                         withBorder={false}
@@ -231,7 +250,9 @@ export const ConversationListItem = ({...props}) => {
                           withBorder={false}
                           renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
                           screenReaderLabel={
-                            props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                            props.isStarred
+                              ? I18n.t('%{subject} starred', {subject: conversationSubject})
+                              : I18n.t('%{subject} not starred', {subject: conversationSubject})
                           }
                           onClick={handleConversationStarClick}
                           data-testid={props.isStarred ? 'visible-starred' : 'visible-not-starred'}
@@ -255,6 +276,9 @@ export const ConversationListItem = ({...props}) => {
                             setMessageOpenEvent(true) // Required to redirect focus into message
                             handleConversationClick(e)
                           }}
+                          aria-label={I18n.t('Open Conversation %{subject}', {
+                            subject: conversationSubject,
+                          })}
                         >
                           {I18n.t('Open Conversation')}
                         </Button>
@@ -263,7 +287,7 @@ export const ConversationListItem = ({...props}) => {
                           tabIndex="0"
                           data-testid={`open-conversation-for-${props.conversation._id}`}
                         >
-                          {I18n.t('Open Conversation')}
+                          {I18n.t('Open Conversation %{subject}', {subject: conversationSubject})}
                         </ScreenReaderContent>
                       )
                     }}
