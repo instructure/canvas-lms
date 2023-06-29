@@ -109,7 +109,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
         }
       ) {
         nodes {
-          enrollments {
+          enrollments(courseId: $courseId) {
             id: _id
             grades {
               unpostedCurrentGrade

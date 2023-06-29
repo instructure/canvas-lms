@@ -18,7 +18,7 @@
  */
 
 import round from '@canvas/round'
-import type {GradingScheme} from './grading.d'
+import type {GradingScheme, GradingStandard} from './grading.d'
 
 export function indexOfGrade(grade: null | string | number, gradingSchemes: GradingScheme[]) {
   const cleanGrade = `${grade}`.trim().toLowerCase()
@@ -71,7 +71,7 @@ export function gradeToScoreLowerBound(grade: null | number, gradingSchemes: Gra
   return round(matchingSchemeValue * 100, 2)
 }
 
-export function scoreToGrade(score: number, gradingSchemes: GradingScheme[]) {
+export function scoreToGrade(score: number, gradingSchemes: GradingStandard[]) {
   // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
   // score can be NaN despite its type being declared as a number
   if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemes == null) {

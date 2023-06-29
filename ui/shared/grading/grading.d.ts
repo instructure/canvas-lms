@@ -227,11 +227,14 @@ export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
 
 export type FinalGradeOverride = {
   courseGrade?: {
-    percentage?: string | null
+    percentage?: number | null
     schemeKey?: string | null
   }
   gradingPeriodGrades?: {
-    [gradingPeriodId: string]: string
+    [gradingPeriodId: string]: {
+      percentage?: number | null
+      schemeKey?: string | null
+    }
   }
 }
 

@@ -56,7 +56,6 @@ export default function StudentInformation({
   submissions,
 }: Props) {
   const {
-    activeGradingPeriods,
     customOptions: {
       allowFinalGradeOverride,
       includeUngradedAssignments,
@@ -68,6 +67,7 @@ export default function StudentInformation({
     customColumnDatumUrl,
     contextId,
     finalGradeOverrideEnabled,
+    selectedGradingPeriodId,
     gradingStandard,
   } = gradebookOptions
   const [finalGradeOverrides, setFinalGradeOverrides] = useState<FinalGradeOverrideMap>({})
@@ -228,20 +228,20 @@ export default function StudentInformation({
               {gradeToDisplay.score} / {gradeToDisplay.possible} points)
             </View>
           </View>
-          {finalGradeOverrideEnabled &&
-            allowFinalGradeOverride &&
-            // TODO: remove conditional below once final grade override for
-            // grading periods is supported in enhanced individual gradebook
-            !activeGradingPeriods && (
-              <FinalGradeOverrideTextBox
-                finalGradeOverride={finalGradeOverrides[student.id]}
-                enrollmentId={student.enrollments[0]?.id}
-                onSubmit={(finalGradeOverride: FinalGradeOverride) => {
-                  setFinalGradeOverrides({...finalGradeOverrides, [student.id]: finalGradeOverride})
-                }}
-                gradingStandard={gradingStandard}
-              />
-            )}
+          {finalGradeOverrideEnabled && allowFinalGradeOverride && (
+            <FinalGradeOverrideTextBox
+              finalGradeOverride={finalGradeOverrides[student.id]}
+              enrollmentId={student.enrollments[0]?.id}
+              onSubmit={(finalGradeOverride: FinalGradeOverride) => {
+                setFinalGradeOverrides({
+                  ...finalGradeOverrides,
+                  [student.id]: finalGradeOverride,
+                })
+              }}
+              gradingStandard={gradingStandard}
+              gradingPeriodId={selectedGradingPeriodId}
+            />
+          )}
         </View>
       </View>
     </View>
