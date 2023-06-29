@@ -20,6 +20,7 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {merge} from 'lodash'
 import OutcomeKebabMenu from '../OutcomeKebabMenu'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('OutcomeKebabMenu', () => {
   let onMenuHandlerMock
@@ -35,6 +36,25 @@ describe('OutcomeKebabMenu', () => {
       },
       props
     )
+
+  const renderWithProvider = (
+    children,
+    {contextType = 'Account', contextId = '1', menuOptionForOutcomeDetailsPageFF = true} = {}
+  ) => {
+    return render(
+      <OutcomesContext.Provider
+        value={{
+          env: {
+            contextType,
+            contextId,
+            menuOptionForOutcomeDetailsPageFF,
+          },
+        }}
+      >
+        {children}
+      </OutcomesContext.Provider>
+    )
+  }
 
   beforeEach(() => {
     onMenuHandlerMock = jest.fn()
@@ -98,18 +118,42 @@ describe('OutcomeKebabMenu', () => {
     expect(getByText('Import Outcomes')).toBeInTheDocument()
   })
 
-  it('renders Alignments in Kebab menu if a isGroup is not provided and menu button clicked', () => {
-    const {getByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: false})} />)
-    const menuButton = getByText(groupMenuTitle)
-    fireEvent.click(menuButton)
-    expect(getByText('Alignments')).toBeInTheDocument()
-  })
+  describe('Menu Option for Outcome Details Page FF', () => {
+    it('does not render Alignments menu option if Menu Option for Outcome Details Page FF is disabled', () => {
+      const {queryByText} = renderWithProvider(
+        <OutcomeKebabMenu {...defaultProps({isGroup: false})} />,
+        {
+          menuOptionForOutcomeDetailsPageFF: false,
+        }
+      )
+      const menuButton = queryByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      expect(queryByText('Alignments')).not.toBeInTheDocument()
+    })
 
-  it('does not render Alignments in Kebab menu if a isGroup is provided and menu button clicked', () => {
-    const {queryByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: true})} />)
-    const menuButton = queryByText(groupMenuTitle)
-    fireEvent.click(menuButton)
-    expect(queryByText('Alignments')).not.toBeInTheDocument()
+    it('renders Alignments in Kebab menu if a isGroup is not provided and menu button clicked and FF is enabled', () => {
+      const {getByText} = renderWithProvider(
+        <OutcomeKebabMenu {...defaultProps({isGroup: false})} />,
+        {
+          menuOptionForOutcomeDetailsPageFF: true,
+        }
+      )
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      expect(getByText('Alignments')).toBeInTheDocument()
+    })
+
+    it('does not render Alignments in Kebab menu if a isGroup is provided and menu button clicked and FF is disabled', () => {
+      const {queryByText} = renderWithProvider(
+        <OutcomeKebabMenu {...defaultProps({isGroup: true})} />,
+        {
+          menuOptionForOutcomeDetailsPageFF: true,
+        }
+      )
+      const menuButton = queryByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      expect(queryByText('Alignments')).not.toBeInTheDocument()
+    })
   })
 
   describe('with Kebab menu open', () => {
@@ -144,7 +188,9 @@ describe('OutcomeKebabMenu', () => {
     })
 
     it('handles click on Alignments item', () => {
-      const {getByText} = render(<OutcomeKebabMenu {...defaultProps()} />)
+      const {getByText} = renderWithProvider(<OutcomeKebabMenu {...defaultProps()} />, {
+        menuOptionForOutcomeDetailsPageFF: true,
+      })
       const menuButton = getByText(groupMenuTitle)
       fireEvent.click(menuButton)
       const menuItem = getByText('Alignments')
