@@ -57,7 +57,7 @@ GEM
     nokogiri (1.13.10-x86_64-linux)
       racc (~> 1.4)
     public_suffix (5.0.1)
-    racc (1.6.2)
+    racc (1.7.1)
     rake (13.0.6)
     rexml (3.2.5)
     rspec (3.12.0)

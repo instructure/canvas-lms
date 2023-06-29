@@ -8,9 +8,9 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (7.0.5)
-      activesupport (= 7.0.5)
-    activesupport (7.0.5)
+    activemodel (7.0.5.1)
+      activesupport (= 7.0.5.1)
+    activesupport (7.0.5.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -25,7 +25,7 @@ GEM
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
-    minitest (5.18.0)
+    minitest (5.18.1)
     rake (13.0.6)
     redcarpet (3.6.0)
     rspec (3.12.0)
