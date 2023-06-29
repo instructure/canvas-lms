@@ -396,6 +396,8 @@ module Types
       load_association(:assignment_group)
     end
 
+    field :assignment_group_id, ID, null: true
+
     field :only_visible_to_overrides,
           Boolean,
           "specifies that this assignment is only assigned to students for whom an

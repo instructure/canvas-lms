@@ -17,12 +17,12 @@
  */
 
 import React, {useState, useRef, useEffect} from 'react'
+import type {ProgressData} from '@canvas/grading/grading.d'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ApiCallStatus} from '../../../types'
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
-import type {ProgressData} from '../../../../../shared/grading/grading.d'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconDownloadLine} from '@instructure/ui-icons'
 import DateHelper from '@canvas/datetime/dateHelper'

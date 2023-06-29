@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {ProgressData} from '@canvas/grading/grading.d'
 import StudentDatastore from './stores/StudentDatastore'
 import type {StatusColors} from './constants/colors'
 import type {
@@ -33,7 +34,6 @@ import type {
   StudentGroupCategoryMap,
   StudentMap,
 } from '../api.d'
-import type {ProgressData} from '../../../../shared/grading/grading.d'
 
 export type SortDirection = 'ascending' | 'descending'
 

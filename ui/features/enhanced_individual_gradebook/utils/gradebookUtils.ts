@@ -17,16 +17,20 @@
  */
 
 import _ from 'lodash'
+import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import tz from '@canvas/timezone'
+import userSettings from '@canvas/user-settings'
 
 import {
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGroupConnection,
+  AssignmentSortContext,
   AssignmentSubmissionsMap,
   EnrollmentConnection,
+  GradebookOptions,
   GradebookSortOrder,
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
@@ -53,9 +57,11 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
       )
       prev.mappedAssignments.push(...mappedAssignments)
 
+      let totalGroupPoints = 0
       prev.mappedAssignmentGroupMap[curr.id] = {
         name: curr.name,
         assignments: curr.assignmentsConnection.nodes.map(assignment => {
+          totalGroupPoints += assignment.pointsPossible
           return {
             id: assignment.id,
             name: assignment.name,
@@ -72,6 +78,7 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
         position: curr.position,
         integration_data: {}, // TODO: Get Data
         sis_source_id: null, // TODO: Get data
+        invalid: totalGroupPoints === 0,
       }
 
       return prev
@@ -236,6 +243,64 @@ export function mapToSubmissionGradeChange(submission: Submission): SubmissionGr
     state: submission.workflow_state,
     userId: submission.user_id,
   }
+}
+
+export function gradebookOptionsSetup(env: GlobalEnv) {
+  const defaultAssignmentSort: GradebookSortOrder =
+    userSettings.contextGet<AssignmentSortContext>('sort_grade_columns_by')?.sortType ??
+    GradebookSortOrder.Alphabetical
+
+  const defaultGradebookOptions: GradebookOptions = {
+    activeGradingPeriods: env.GRADEBOOK_OPTIONS?.active_grading_periods,
+    changeGradeUrl: env.GRADEBOOK_OPTIONS?.change_grade_url,
+    contextId: env.GRADEBOOK_OPTIONS?.context_id,
+    contextUrl: env.GRADEBOOK_OPTIONS?.context_url,
+    customColumnDatumUrl: env.GRADEBOOK_OPTIONS?.custom_column_datum_url,
+    customColumnDataUrl: env.GRADEBOOK_OPTIONS?.custom_column_data_url,
+    customColumnUrl: env.GRADEBOOK_OPTIONS?.custom_column_url,
+    customColumnsUrl: env.GRADEBOOK_OPTIONS?.custom_columns_url,
+    customOptions: {
+      allowFinalGradeOverride:
+        env.GRADEBOOK_OPTIONS?.course_settings.allow_final_grade_override ?? false,
+      includeUngradedAssignments:
+        env.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server &&
+        env.GRADEBOOK_OPTIONS?.settings
+          ? env.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero === 'true'
+          : userSettings.contextGet('include_ungraded_assignments') || false,
+      hideStudentNames: userSettings.contextGet('hide_student_names') || false,
+      showConcludedEnrollments: env.GRADEBOOK_OPTIONS?.settings?.show_concluded_enrollments
+        ? env.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments === 'true'
+        : false,
+      showNotesColumn:
+        env.GRADEBOOK_OPTIONS?.teacher_notes?.hidden !== undefined
+          ? !env.GRADEBOOK_OPTIONS.teacher_notes.hidden
+          : false,
+      showTotalGradeAsPoints: env.GRADEBOOK_OPTIONS?.show_total_grade_as_points ?? false,
+    },
+    downloadAssignmentSubmissionsUrl: env.GRADEBOOK_OPTIONS?.download_assignment_submissions_url,
+    exportGradebookCsvUrl: env.GRADEBOOK_OPTIONS?.export_gradebook_csv_url,
+    finalGradeOverrideEnabled: env.GRADEBOOK_OPTIONS?.final_grade_override_enabled,
+    gradebookCsvProgress: env.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
+    gradesAreWeighted: env.GRADEBOOK_OPTIONS?.grades_are_weighted,
+    gradingPeriodSet: env.GRADEBOOK_OPTIONS?.grading_period_set,
+    gradingSchemes: env.GRADEBOOK_OPTIONS?.grading_schemes,
+    gradingStandard: env.GRADEBOOK_OPTIONS?.grading_standard,
+    groupWeightingScheme: env.GRADEBOOK_OPTIONS?.group_weighting_scheme,
+    lastGeneratedCsvAttachmentUrl: env.GRADEBOOK_OPTIONS?.attachment_url,
+    messageAttachmentUploadFolderId: env.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
+    publishToSisEnabled: env.GRADEBOOK_OPTIONS?.publish_to_sis_enabled,
+    publishToSisUrl: env.GRADEBOOK_OPTIONS?.publish_to_sis_url,
+    reorderCustomColumnsUrl: env.GRADEBOOK_OPTIONS?.reorder_custom_columns_url,
+    saveViewUngradedAsZeroToServer: env.GRADEBOOK_OPTIONS?.save_view_ungraded_as_zero_to_server,
+    selectedGradingPeriodId: userSettings.contextGet<string>('gradebook_current_grading_period'),
+    settingsUpdateUrl: env.GRADEBOOK_OPTIONS?.settings_update_url,
+    settingUpdateUrl: env.GRADEBOOK_OPTIONS?.setting_update_url,
+    sortOrder: defaultAssignmentSort,
+    teacherNotes: env.GRADEBOOK_OPTIONS?.teacher_notes,
+    userId: env.current_user_id,
+  }
+
+  return defaultGradebookOptions
 }
 
 function nonNumericGuard(value: number, message = 'No graded submissions'): string {

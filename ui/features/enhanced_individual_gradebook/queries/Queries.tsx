@@ -71,6 +71,7 @@ export const GRADEBOOK_QUERY = gql`
           assignmentsConnection(filter: {gradingPeriodId: null}) {
             nodes {
               anonymizeStudents
+              assignmentGroupId
               gradingType
               id: _id
               name

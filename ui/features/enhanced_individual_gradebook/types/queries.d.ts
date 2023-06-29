@@ -40,6 +40,7 @@ export type EnrollmentConnection = {
 
 export type AssignmentConnection = {
   id: string
+  assignmentGroupId: string
   name: string
   pointsPossible: number
   submissionTypes: string[]
