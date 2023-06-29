@@ -1688,7 +1688,7 @@ class CoursesController < ApplicationController
     return unless api_request?
 
     @course = api_find(Course, params[:course_id])
-    return unless authorized_action(@course, @current_user, :update)
+    return unless authorized_action(@course, @current_user, %i[manage_content manage_course_content_edit])
 
     old_settings = @course.settings
 
@@ -3007,7 +3007,7 @@ class CoursesController < ApplicationController
       return
     end
 
-    if authorized_action(@course, @current_user, %i[update manage_content manage_course_content_edit])
+    if authorized_action(@course, @current_user, %i[manage_content manage_course_content_edit])
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)

@@ -2100,6 +2100,23 @@ describe CoursesController, type: :request do
           expect(response).to have_http_status :unauthorized
         end
       end
+
+      context "a custom teacher role" do
+        before :once do
+          @role = custom_teacher_role("Lecturer", account: @course.account)
+          @user = user_factory(active_all: true, name: "Larry")
+          @course.enroll_teacher(@user, role: @role).accept!
+        end
+
+        it "cannot update the course without :manage_content" do
+          Account.default.role_overrides.create!(role: @role, permission: :manage_content, enabled: false)
+          raw_api_call(:put, @path, @params, @new_values)
+          @course.reload
+
+          expect(@course.default_view).not_to eql(@new_values["course"]["default_view"])
+          expect(@course.default_view).to eql("assignments")
+        end
+      end
     end
 
     describe "course deletion" do
