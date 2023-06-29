@@ -53,7 +53,10 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
       .then(response => {
         ReactDOM.render(
           <View display="block" margin="0 0 medium">
-            <Heading level="h3" as="h2" margin="0 0 small">
+            <Heading
+              level={['wiki', 'syllabus'].includes(ENV.COURSE.default_view) ? 'h1' : 'h2'}
+              margin="0 0 small"
+            >
               {I18n.t('Recent Announcements')}
             </Heading>
             {response.data.map(announcement => (

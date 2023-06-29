@@ -193,4 +193,7 @@ export interface EnvCourseSettings {
 
   USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: boolean
   BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: Record<string, boolean>
+
+  SHOW_ANNOUNCEMENTS?: boolean | null
+  ANNOUNCEMENT_LIMIT?: number | null
 }
