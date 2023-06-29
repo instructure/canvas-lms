@@ -29,6 +29,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ConversationContext} from '../../../util/constants'
 import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -44,34 +45,28 @@ export const MessageDetailHeader = ({...props}) => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          level: 'h4',
-          as: 'h3',
           datatestId: 'message-detail-header-mobile',
         },
         desktop: {
-          level: 'h3',
-          as: 'h3',
           datatestId: 'message-detail-header-desktop',
         },
       }}
       render={responsiveProps => (
         <Flex padding="small">
           <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <Heading
-              level={responsiveProps.level}
-              as={responsiveProps.as}
-              data-testid={responsiveProps.datatestId}
-            >
-              {isSubmissionCommentsType && props.submissionCommentURL ? (
-                <Link
-                  href={props.submissionCommentURL}
-                  data-testid="submission-comment-header-line"
-                >
-                  {props.text}
-                </Link>
-              ) : (
-                props.text
-              )}
+            <Heading level="h2">
+              <Text weight="bold" size="large" data-testid={responsiveProps.datatestId}>
+                {isSubmissionCommentsType && props.submissionCommentURL ? (
+                  <Link
+                    href={props.submissionCommentURL}
+                    data-testid="submission-comment-header-line"
+                  >
+                    {props.text}
+                  </Link>
+                ) : (
+                  props.text
+                )}
+              </Text>
             </Heading>
           </Flex.Item>
           <Flex.Item>
