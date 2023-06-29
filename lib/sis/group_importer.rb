@@ -106,6 +106,12 @@ module SIS
         group.sis_batch_id = @batch.id
         group.workflow_state = (status == "deleted") ? "deleted" : "available"
 
+        # ensure that the assigned group.group_category corresponds to the same context_id as the group
+        # in the case of an SIS import, the group.group_category may not be set (unless group_category_id was passed)
+        if group&.group_category && group.group_category.context_id != context.id
+          group.group_category.update!(context_id: context.id)
+        end
+
         if group.save
           data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group)
           @roll_back_data << data if data
