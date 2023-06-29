@@ -46,6 +46,7 @@ const Settings = props => (
           renderIcon={IconMoreLine}
           disabled={props.settingsDisabled}
           data-testid="settings"
+          aria-label={I18n.t('More options')}
         />
       </Tooltip>
     }
@@ -91,6 +92,7 @@ const ActionButton = props => (
       margin="0 x-small 0 0"
       interaction={props.disabled ? 'disabled' : 'enabled'}
       data-testid={props.testid}
+      aria-label={props.ariaLabel}
     />
   </Tooltip>
 )
@@ -105,6 +107,7 @@ export const MessageActionButtons = props => {
         onClick={props.reply}
         testid="reply"
         disabled={props.replyDisabled}
+        ariaLabel={I18n.t('Reply')}
       />
     )
   }
@@ -118,6 +121,7 @@ export const MessageActionButtons = props => {
             icon={IconComposeLine}
             onClick={props.compose}
             testid="compose"
+            ariaLabel={I18n.t('Compose a new message')}
           />
         </View>
       </Flex.Item>
@@ -128,6 +132,7 @@ export const MessageActionButtons = props => {
           onClick={props.reply}
           disabled={props.replyDisabled}
           testid="reply"
+          ariaLabel={I18n.t('Reply')}
         />
         <ActionButton
           tip={I18n.t('Reply all')}
@@ -135,6 +140,7 @@ export const MessageActionButtons = props => {
           onClick={props.replyAll}
           disabled={props.replyDisabled}
           testid="reply-all"
+          ariaLabel={I18n.t('Reply all')}
         />
         <ActionButton
           tip={props.unarchive ? I18n.t('Unarchive') : I18n.t('Archive')}
@@ -142,6 +148,7 @@ export const MessageActionButtons = props => {
           onClick={props.unarchive ? props.unarchive : props.archive}
           disabled={props.archiveDisabled}
           testid={props.unarchive ? 'unarchive' : 'archive'}
+          ariaLabel={props.unarchive ? I18n.t('Unarchive') : I18n.t('Archive')}
         />
         <ActionButton
           tip={I18n.t('Delete')}
@@ -149,6 +156,7 @@ export const MessageActionButtons = props => {
           onClick={props.delete}
           disabled={props.deleteDisabled}
           testid="delete"
+          ariaLabel={I18n.t('Delete')}
         />
         <Settings {...props} />
       </Flex.Item>
