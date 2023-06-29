@@ -20,24 +20,26 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {MessageDetailActions} from '../MessageDetailActions'
 
-describe('MessageDetailItem', () => {
+describe('MessageDetailActions', () => {
   it('sends the selected option to the provided callback function', () => {
     const props = {
       onReply: jest.fn(),
       onReplyAll: jest.fn(),
       onDelete: jest.fn(),
       onForward: jest.fn(),
+      authorName: 'John Cena',
     }
     const {getByRole, getByText} = render(<MessageDetailActions {...props} />)
 
     const replyButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'Reply'
+      (role, element) => role === 'button' && element.textContent === 'Reply to John Cena'
     )
     fireEvent.click(replyButton)
     expect(props.onReply).toHaveBeenCalled()
 
     const moreOptionsButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'More options'
+      (role, element) =>
+        role === 'button' && element.textContent === 'More options for message from John Cena'
     )
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Reply All'))
