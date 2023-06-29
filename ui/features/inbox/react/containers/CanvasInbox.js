@@ -38,6 +38,8 @@ import {responsiveQuerySizes} from '../../util/utils'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -605,6 +607,9 @@ const CanvasInbox = () => {
       }}
       render={(responsiveProps, matches) => (
         <ConversationContext.Provider value={conversationContext}>
+          <Heading level="h1">
+            <ScreenReaderContent>{I18n.t('Inbox')}</ScreenReaderContent>
+          </Heading>
           <Flex height="100vh" as="div" direction="column">
             {(matches.includes('desktop') ||
               (matches.includes('mobile') && !selectedConversations.length) ||

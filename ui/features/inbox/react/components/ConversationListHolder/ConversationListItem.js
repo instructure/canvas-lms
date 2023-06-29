@@ -37,6 +37,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {Heading} from '@instructure/ui-heading'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -81,6 +82,9 @@ export const ConversationListItem = ({...props}) => {
     }
     props.onStar(!props.isStarred, [props.conversation])
   }
+
+  const conversationParticipants = truncateText(props.conversation.participantString)
+  const conversationSubject = truncateText(props.conversation.subject || I18n.t('(No subject)'))
 
   return useMemo(() => {
     return (
@@ -189,9 +193,11 @@ export const ConversationListItem = ({...props}) => {
                   </View>
                 </Grid.Col>
                 <Grid.Col>
-                  <Text weight="bold" size={props.textSize}>
-                    {truncateText(props.conversation.participantString)}
-                  </Text>
+                  <Heading level="h2">
+                    <Text weight="bold" size={props.textSize}>
+                      {conversationParticipants}
+                    </Text>
+                  </Heading>
                 </Grid.Col>
               </Grid.Row>
               <Grid.Row>
@@ -199,9 +205,11 @@ export const ConversationListItem = ({...props}) => {
                   <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
                 </Grid.Col>
                 <Grid.Col>
-                  <Text weight="normal" size={props.textSize}>
-                    {truncateText(props.conversation.subject || I18n.t('(No subject)'))}
-                  </Text>
+                  <Heading level="h3">
+                    <Text weight="normal" size={props.textSize}>
+                      {conversationSubject}
+                    </Text>
+                  </Heading>
                 </Grid.Col>
               </Grid.Row>
               <Grid.Row>
