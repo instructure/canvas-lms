@@ -53,7 +53,7 @@ describe "conversations new" do
         get "/conversations"
         f("div[data-testid='conversation']").click
         wait_for_ajaximations
-        fj("button:contains('Return to Conversation List')").click
+        fj("button:contains('Return to test in Conversation List')").click
         wait_for_ajaximations
         expect(fj("button:contains('Open Conversation')")).to be_present
       end

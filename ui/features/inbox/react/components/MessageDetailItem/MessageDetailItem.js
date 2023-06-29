@@ -32,6 +32,9 @@ import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
 import {MediaAttachment} from '@canvas/message-attachments'
 import {formatMessage} from '@canvas/util/TextHelper'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('conversations_2')
 
 export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
@@ -103,6 +106,11 @@ export const MessageDetailItem = ({...props}) => {
                   onReplyAll={props.onReplyAll}
                   onDelete={props.onDelete}
                   onForward={props.onForward}
+                  authorName={
+                    props.conversationMessage?.author?.name?.length > 0
+                      ? props.conversationMessage?.author?.name
+                      : I18n.t('Unknown User')
+                  }
                 />
               </Flex.Item>
             )}
