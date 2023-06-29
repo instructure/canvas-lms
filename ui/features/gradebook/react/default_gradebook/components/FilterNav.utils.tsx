@@ -342,7 +342,16 @@ function useFilterDropdownData({
       id: 'submissions',
       name: I18n.t('Submissions'),
       parentId: 'savedFilterPresets',
-      isSelected: appliedFilters.some(c => c.type === 'submissions'),
+      isSelected: appliedFilters.some(
+        c =>
+          c.type === 'submissions' &&
+          [
+            'has-ungraded-submissions',
+            'has-submissions',
+            'has-no-submissions',
+            'has-unposted-grades',
+          ].includes(c.value || '')
+      ),
       items: [
         {
           id: '1',
