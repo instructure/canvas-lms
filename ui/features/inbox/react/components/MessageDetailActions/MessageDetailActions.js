@@ -34,7 +34,9 @@ export const MessageDetailActions = ({...props}) => {
           <IconButton
             size="small"
             margin="0 x-small 0 0"
-            screenReaderLabel={I18n.t('Reply')}
+            screenReaderLabel={I18n.t('Reply to %{authorName}', {
+              authorName: props.authorName,
+            })}
             onClick={props.onReply}
             data-testid="message-reply"
             withBackground={false}
@@ -54,7 +56,9 @@ export const MessageDetailActions = ({...props}) => {
               data-testid="message-more-options"
               withBackground={false}
               withBorder={false}
-              screenReaderLabel={I18n.t('More options')}
+              screenReaderLabel={I18n.t('More options for message from %{authorName}', {
+                authorName: props.authorName,
+              })}
             >
               <IconMoreLine />
             </IconButton>
@@ -84,4 +88,5 @@ MessageDetailActions.propTypes = {
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
   onForward: PropTypes.func,
+  authorName: PropTypes.string,
 }

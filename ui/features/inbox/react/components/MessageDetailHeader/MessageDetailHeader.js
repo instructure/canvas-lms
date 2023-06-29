@@ -74,7 +74,9 @@ export const MessageDetailHeader = ({...props}) => {
               <IconButton
                 ref={ref => props.focusRef(ref)}
                 margin="0 x-small 0 0"
-                screenReaderLabel={I18n.t('Return to Conversation List')}
+                screenReaderLabel={I18n.t('Return to %{subject} in Conversation List', {
+                  subject: props.text,
+                })}
                 onClick={() => props.onBack()}
                 withBackground={false}
                 withBorder={false}
@@ -89,7 +91,7 @@ export const MessageDetailHeader = ({...props}) => {
                 <IconButton
                   data-testid="message-detail-header-reply-btn"
                   margin="0 x-small 0 0"
-                  screenReaderLabel={I18n.t('Reply')}
+                  screenReaderLabel={I18n.t('Reply for %{subject}', {subject: props.text})}
                   onClick={() => props.onReply()}
                   withBackground={false}
                   withBorder={false}
@@ -107,7 +109,9 @@ export const MessageDetailHeader = ({...props}) => {
                   <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
                     <IconButton
                       margin="0 x-small 0 0"
-                      screenReaderLabel={I18n.t('More options')}
+                      screenReaderLabel={I18n.t('More options for %{subject}', {
+                        subject: props.text,
+                      })}
                       withBackground={false}
                       withBorder={false}
                       data-testid="more-options"

@@ -172,7 +172,8 @@ describe('MessageDetailItem', () => {
     const {getByRole, queryByText, queryByTestId} = render(<MessageDetailItem {...props} />)
 
     const moreOptionsButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'More options'
+      (role, element) =>
+        role === 'button' && element.textContent === 'More options for message from Tom Thompson'
     )
 
     fireEvent.click(moreOptionsButton)
