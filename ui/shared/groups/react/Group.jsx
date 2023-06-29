@@ -144,6 +144,7 @@ class Group extends React.Component {
         aria-expanded={showBody}
         aria-controls={studentGroupId}
         tabIndex={hasUsers ? '0' : '-1'}
+        data-testid={`open-group-dropdown-${this.props.group.name}`}
       />
     )
 

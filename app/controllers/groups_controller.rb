@@ -267,8 +267,11 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     @groups = all_groups = @context.groups.active
-                                   .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-                                   .eager_load(:group_category).preload(:root_account)
+    unless params[:filter].nil?
+      @groups = all_groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
+    end
+    @groups = all_groups = @groups.order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+                                  .eager_load(:group_category).preload(:root_account)
 
     # run this only for students
     if params[:section_restricted] && @context.is_a?(Course) && @context.user_is_student?(@current_user)
@@ -353,7 +356,6 @@ class GroupsController < ApplicationController
       end
 
       format.atom { render xml: @groups.map(&:to_atom).to_xml }
-
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
 

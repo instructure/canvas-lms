@@ -27,6 +27,9 @@ describe "student groups" do
   let(:group_name) { "Windfury" }
   let(:group_category_name) { "cat1" }
 
+  def wait_for_spinner(&)
+    wait_for_transient_element(".spinner-container", &)
+  end
   describe "as a student" do
     before do
       course_with_student_logged_in(active_all: true)
@@ -289,6 +292,30 @@ describe "student groups" do
             expect(student).to include_text(expected_student_list[index - 1].to_s)
           end
         end
+      end
+    end
+
+    describe "student group search" do
+      before do
+        seed_students(2)
+        seed_groups(1, 2)
+        add_users_to_group(@students, @testgroup.first)
+        get "/courses/#{@course.id}/groups"
+      end
+
+      it "works for searching by user's name" do
+        wait_for_spinner { f('[data-testid="group-search-input"]').send_keys(@students.first.name) }
+        wait_for_ajaximations
+        expect(ff("div[role='listitem']").length).to eq 1
+        f("[data-testid=\"open-group-dropdown-#{@testgroup.first.name}\"]").click
+        expect(f("div[role='listitem']")).to include_text(@students.first.name)
+      end
+
+      it "works for searching by group's name" do
+        wait_for_spinner { f('[data-testid="group-search-input"]').send_keys(@testgroup.last.name) }
+        wait_for_ajaximations
+        expect(ff("div[role='listitem']").length).to eq 1
+        expect(f("div[role='listitem']")).to include_text(@testgroup.last.name)
       end
     end
   end

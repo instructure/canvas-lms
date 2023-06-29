@@ -27,6 +27,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import { debounce } from '@instructure/debounce'
 import UserCollection from '@canvas/users/backbone/collections/UserCollection'
 import ContextGroupCollection from '../backbone/collections/ContextGroupCollection'
 import BackboneState from './mixins/BackboneState'
@@ -50,7 +51,6 @@ const StudentView = createReactClass({
 
   getInitialState() {
     return {
-      filter: '',
       showNewStudentGroupModal: false,
       userCollection: new UserCollection(null, {
         params: {enrollment_type: 'student', per_page: 15, sort: 'username'},
@@ -210,27 +210,27 @@ const StudentView = createReactClass({
     $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)
   },
 
-  _filter(group) {
-    const filter = this.state.filter.toLowerCase()
-    return (
-      !filter ||
-      group.name.toLowerCase().indexOf(filter) > -1 ||
-      group.users.some(u => u.name.toLowerCase().indexOf(filter) > -1)
-    )
-  },
-
   manage(group) {
     this.openManageGroupDialog(group)
   },
 
-  renderGroupList(filter, filteredGroups, loading) {
+  renderGroupList(groups, loading) {
+    const debouncedSetState = debounce((...args) => this.setState(...args), 500)
     return (
       <>
-        <Filter onChange={e => this.setState({filter: e.target.value})} />
+        <Filter
+          onChange={e => {
+            debouncedSetState({
+              groupCollection: new ContextGroupCollection([], {
+                course_id: ENV.course_id,
+                filter: e.target.value,
+              }),
+            })
+          }}
+        />
         <PaginatedGroupList
           loading={this.state.groupCollection.fetchingNextPage}
-          groups={filteredGroups}
-          filter={filter}
+          groups={groups}
           loadMore={() => this._loadMore(this.state.groupCollection)}
           onLeave={this.leave}
           onJoin={this.join}
@@ -246,10 +246,10 @@ const StudentView = createReactClass({
   },
 
   render() {
-    const filteredGroups = this.state.groupCollection.toJSON().filter(this._filter)
-    const {filter, groupCollection} = this.state
+    const groups = this.state.groupCollection.toJSON()
+    const {groupCollection} = this.state
     const loading =
-      groupCollection.fetchingNextPage || (filter.length > 0 && !groupCollection.loadedAll)
+      groupCollection.fetchingNextPage || !groupCollection.loadedAll
 
     let newGroupButton = null
     if (ENV.STUDENT_CAN_ORGANIZE_GROUPS_FOR_COURSE) {
@@ -294,10 +294,10 @@ const StudentView = createReactClass({
                 this.panelRef = ref
               }}
             />
-            {this.renderGroupList(filter, filteredGroups, loading)}
+            {this.renderGroupList(groups, loading)}
           </div>
         ) : (
-          this.renderGroupList(filter, filteredGroups, loading)
+          this.renderGroupList(groups, loading)
         )}
       </div>
     )

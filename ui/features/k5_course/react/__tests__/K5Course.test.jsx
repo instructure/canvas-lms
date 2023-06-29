@@ -151,7 +151,7 @@ const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1&inclu
 const ANNOUNEMENTS_URL_REGEX = /\/api\/v1\/announcements\.*/
 
 const GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true&section_restricted=true'
+  '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true&section_restricted=true&filter='
 )
 
 const createModulesPartial = () => {
