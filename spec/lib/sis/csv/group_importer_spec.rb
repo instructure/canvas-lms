@@ -171,4 +171,170 @@ describe SIS::CSV::GroupImporter do
     )
     expect(importer.errors.last.last).to eq "Cannot move group G001 because it has group_memberships."
   end
+
+  context "group_category integration" do
+    it "ensures consistency of SIS-imported groups within a course after a course reset and re-import" do
+      course_sis_id = "c001"
+
+      # required fields: group_id (aka sis_source_id internally), name, status
+      groups_csv = [
+        "group_id,course_id,name,status",
+        # because these groups don’t have a group_category_id, they will
+        # be added to the default “Student Groups” group_category
+        "g001,#{course_sis_id},Group 1,available",
+        "g002,#{course_sis_id},Group 2,available",
+        "g003,#{course_sis_id},Group 3,available",
+      ]
+
+      # create course (sis_source_id is required in order for the
+      # SIS-imported data to be associated with the course)
+      course = course_factory(account: @account,
+                              sis_source_id: course_sis_id)
+      expect(course.group_categories).to be_empty
+      expect(course.groups).to be_empty
+
+      # SIS import the groups
+      process_csv_data(*groups_csv)
+
+      expect(course.group_categories.count).to eq 1
+      expect(course.groups.count).to eq 3
+      expect(course.groups.count do |g|
+        # when a group_category is not defined, the group is
+        # automatically assigned to "Student Groups"
+        g.category == "Student Groups"
+      end).to eq 3
+
+      group_categories = GroupCategory.where(context_id: course_sis_id)
+      groups = Group.where(context_id: course_sis_id)
+
+      group_categories.each do |gc|
+        expect(gc.context).to eq course
+        # explicitly check the context_id for sanity’s sake
+        expect(gc.context_id).to eq course.id
+      end
+      groups.each do |g|
+        expect(g.context).to eq course
+        expect(g.context_id).to eq course.id
+      end
+
+      # do a course reset and reload potentially-updated objects
+      new_course = course.reset_content
+      [course, group_categories, groups].map!(&:reload)
+
+      expect(new_course.group_categories).to be_empty
+      expect(new_course.groups).to be_empty
+
+      # group_category and group should still be in the old course
+      expect(course.group_categories.count).to eq 1
+      expect(course.groups.count).to eq 3
+      expect(course.groups.count do |g|
+        g.category == "Student Groups"
+      end).to eq 3
+
+      group_categories.each do |gc|
+        expect(gc.context).to eq course
+        expect(gc.context_id).to eq course.id
+      end
+      groups.each do |g|
+        expect(g.context).to eq course
+        expect(g.context_id).to eq course.id
+      end
+
+      # SIS import the groups (again)
+      process_csv_data(*groups_csv)
+
+      [course, new_course, group_categories, groups].map!(&:reload)
+
+      # old course no longer has the updated group_category and group
+      expect(course.group_categories).to be_empty
+      expect(course.groups).to be_empty
+
+      # new_course should have the updated group_category and group
+      expect(new_course.group_categories.count).to eq 1
+      expect(new_course.groups.count).to eq 3
+      expect(new_course.groups.count do |g|
+        g.category == "Student Groups"
+      end).to eq 3
+
+      group_categories.each do |gc|
+        expect(gc.context).to eq new_course
+        expect(gc.context_id).to eq new_course.id
+      end
+      groups.each do |g|
+        expect(g.context).to eq new_course
+        expect(g.context_id).to eq new_course.id
+      end
+    end
+
+    it "does not update the group_category when a group with a matching group_category and context_id is created" do
+      course_sis_id = "c001"
+      group_category_sis_id = "gc001"
+      group_sis_id = "g001"
+
+      groups_csv = [
+        "group_id,group_category_id,course_id,name,status",
+        "#{group_sis_id},#{group_category_sis_id},#{course_sis_id},Group 1,available",
+      ]
+
+      course = course_factory(account: @account,
+                              sis_source_id: course_sis_id)
+      group_category = course.group_categories.create(name: "Group Category 1",
+                                                      sis_source_id: group_category_sis_id)
+
+      group_category_context_id = group_category&.context_id
+      expect(group_category_context_id).to eq course.id
+
+      process_csv_data(*groups_csv)
+
+      # the group category should not be updated
+      expect(group_category.context_id).to eq group_category_context_id
+    end
+
+    it "creates a default group_category of “Student Groups” when a group_category_id is not provided" do
+      course_sis_id = "c001"
+      group_sis_id = "g001"
+
+      groups_csv = [
+        "group_id,course_id,name,status",
+        "#{group_sis_id},#{course_sis_id},Group 1,available",
+      ]
+
+      course_factory(account: @account,
+                     sis_source_id: course_sis_id)
+
+      process_csv_data(*groups_csv)
+
+      group = Group.find_by(sis_source_id: group_sis_id)
+      expect(group.group_category.name).to eq "Student Groups"
+    end
+
+    it "updates the context_id of “Student Groups” group_category to match the course for an existing group" do
+      course_sis_id = "c001"
+      group_sis_id = "g001"
+
+      groups_csv = [
+        "group_id,course_id,name,status",
+        "#{group_sis_id},#{course_sis_id},Group 1,available",
+      ]
+
+      course = course_factory(account: @account,
+                              sis_source_id: course_sis_id)
+      course.groups.create(name: "Group 1",
+                           sis_source_id: group_sis_id)
+
+      # "Student Groups" is automatically created
+      group_category = GroupCategory.all.first
+      # update context_id to mimic an old "Student Groups" group_category
+      group_category&.update_attribute(:context_id, 1234)
+      expect(group_category&.context_id).to eq 1234
+
+      process_csv_data(*groups_csv)
+
+      group_category&.reload
+
+      # the context_id of "Student Groups" group_category
+      # should be updated to match the course the group belongs to
+      expect(group_category&.context_id).to eq course.id
+    end
+  end
 end
