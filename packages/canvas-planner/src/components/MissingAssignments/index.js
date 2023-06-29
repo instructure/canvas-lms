@@ -24,7 +24,6 @@ import moment from 'moment-timezone'
 
 import {IconWarningLine} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import {themeable} from '@instructure/ui-themeable'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
@@ -32,8 +31,7 @@ import {courseShape, opportunityShape, sizeShape} from '../plannerPropTypes'
 import {toggleMissingItems} from '../../actions'
 import formatMessage from '../../format-message'
 import PlannerItem from '../PlannerItem'
-import styles from './styles.css'
-import theme from './theme'
+import buildStyle from './style'
 
 export const convertSubmissionType = submissionTypes => {
   if (submissionTypes?.length > 0) {
@@ -113,7 +111,6 @@ MissingAssignment.propTypes = {
 
 // Themeable doesn't support pure functional components
 // and redux's connect throws an error with PureComponent
-// eslint-disable-next-line react/prefer-stateless-function
 export class MissingAssignments extends Component {
   static propTypes = {
     courses: arrayOf(shape(courseShape)).isRequired,
@@ -121,6 +118,11 @@ export class MissingAssignments extends Component {
     timeZone: string.isRequired,
     toggleMissing: func.isRequired,
     responsiveSize: string,
+  }
+
+  constructor(props) {
+    super(props)
+    this.style = buildStyle()
   }
 
   render() {
@@ -131,41 +133,46 @@ export class MissingAssignments extends Component {
     }
 
     return (
-      <section className={classnames(styles.root, styles[responsiveSize])}>
-        {!expanded && (
-          <div className={styles.icon} data-testid="warning-icon">
-            <View margin="0 small 0 0">
-              <PresentationContent>
-                <IconWarningLine color="error" />
-              </PresentationContent>
-            </View>
-          </div>
-        )}
-        <ToggleDetails
-          id="MissingAssignments"
-          expanded={expanded}
-          data-testid="missing-item-info"
-          fluidWidth={true}
-          onToggle={() => toggleMissing()}
-          summary={
-            <View data-testid="missing-data" margin="0 0 0 small">
-              {getMissingItemsText(expanded, items.length)}
-            </View>
-          }
+      <>
+        <style>{this.style.css}</style>
+        <section
+          className={classnames(this.style.classNames.root, this.style.classNames[responsiveSize])}
         >
-          <View as="div" borderWidth="small none none none">
-            {items.map(opp => (
-              <MissingAssignment
-                key={opp.id}
-                {...opp}
-                course={courses.find(c => c.id === opp.course_id)}
-                timeZone={timeZone}
-                responsiveSize={responsiveSize}
-              />
-            ))}
-          </View>
-        </ToggleDetails>
-      </section>
+          {!expanded && (
+            <div className={this.style.classNames.icon} data-testid="warning-icon">
+              <View margin="0 small 0 0">
+                <PresentationContent>
+                  <IconWarningLine color="error" />
+                </PresentationContent>
+              </View>
+            </div>
+          )}
+          <ToggleDetails
+            id="MissingAssignments"
+            expanded={expanded}
+            data-testid="missing-item-info"
+            fluidWidth={true}
+            onToggle={() => toggleMissing()}
+            summary={
+              <View data-testid="missing-data" margin="0 0 0 small">
+                {getMissingItemsText(expanded, items.length)}
+              </View>
+            }
+          >
+            <View as="div" borderWidth="small none none none">
+              {items.map(opp => (
+                <MissingAssignment
+                  key={opp.id}
+                  {...opp}
+                  course={courses.find(c => c.id === opp.course_id)}
+                  timeZone={timeZone}
+                  responsiveSize={responsiveSize}
+                />
+              ))}
+            </View>
+          </ToggleDetails>
+        </section>
+      </>
     )
   }
 }
@@ -177,11 +184,7 @@ const mapStateToProps = ({courses, opportunities}) => ({
 
 const mapDispatchToProps = {toggleMissing: toggleMissingItems}
 
-const ThemeableMissingAssignments = themeable(theme, styles)(MissingAssignments)
-const ConnectedMissingAssignments = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ThemeableMissingAssignments)
-ConnectedMissingAssignments.theme = ThemeableMissingAssignments.theme
+const ConnectedMissingAssignments = connect(mapStateToProps, mapDispatchToProps)(MissingAssignments)
+ConnectedMissingAssignments.theme = MissingAssignments.theme
 
 export default ConnectedMissingAssignments
