@@ -26,13 +26,13 @@ const defaultProps = (expanded = false) => ({
     {
       id: '18',
       originalName: 'Nuclear Fission for Beginners',
-      color: '#123456'
+      color: '#123456',
     },
     {
       id: '19',
       originalName: 'Mac-to-Basics: Remedial Macramé',
-      color: '#ABCDEF'
-    }
+      color: '#ABCDEF',
+    },
   ],
   loadingOpportunities: false,
   opportunities: {
@@ -44,7 +44,7 @@ const defaultProps = (expanded = false) => ({
         html_url: '/courses/18/assignments/3',
         due_at: '2019-07-10T05:59:00Z',
         submission_types: ['online_url'],
-        course_id: '18'
+        course_id: '18',
       },
       {
         id: '12',
@@ -53,7 +53,7 @@ const defaultProps = (expanded = false) => ({
         html_url: '/courses/19/assignments/12',
         due_at: '2020-10-10T05:59:00Z',
         submission_types: ['online_quiz'],
-        course_id: '19'
+        course_id: '19',
       },
       {
         id: '22',
@@ -62,15 +62,15 @@ const defaultProps = (expanded = false) => ({
         html_url: '/courses/18/assignments/22',
         due_at: '2020-12-10T05:59:00Z',
         submission_types: ['discussion_topic'],
-        course_id: '18'
-      }
+        course_id: '18',
+      },
     ],
     missingItemsExpanded: expanded,
-    nextUrl: null
+    nextUrl: null,
   },
   responsiveSize: 'large',
   timeZone: 'Pacific/Guam',
-  toggleMissing: jest.fn()
+  toggleMissing: jest.fn(),
 })
 
 describe('MissingAssignments', () => {
