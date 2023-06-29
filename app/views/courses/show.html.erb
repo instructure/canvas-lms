@@ -19,7 +19,9 @@
 <% provide :page_title, @context.nickname_for(@current_user) %>
 
 <% unless @context.elementary_subject_course? %>
-  <h1 class='screenreader-only'><%= @context.nickname_for(@current_user) %></h1>
+  <% unless @course_home_view == 'wiki' || @course_home_view == 'syllabus' %>
+    <h1 class='screenreader-only'><%= @context.nickname_for(@current_user) %></h1>
+  <% end %>
 
   <% provide :right_side do %>
     <%= render :partial => 'courses/course_show_secondary' %>

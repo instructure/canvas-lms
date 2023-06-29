@@ -410,6 +410,22 @@ describe "courses" do
       expect(f("#announcements_on_home_page")).to_not include_text(@html)
     end
 
+    ["wiki", "syllabus"].each do |view|
+      it "displays an h1 header when home page is #{view}" do
+        @course.update_column(:default_view, view)
+        get "/courses/#{@course.id}"
+        expect(f("#announcements_on_home_page h1")).to include_text("Recent Announcements")
+      end
+    end
+
+    %w[feed assignments modules].each do |view|
+      it "displays with an h2 header when course home is #{view}" do
+        @course.update_column(:default_view, view)
+        get "/courses/#{@course.id}"
+        expect(f("#announcements_on_home_page h2")).to include_text("Recent Announcements")
+      end
+    end
+
     it "does not show on k5 subject even with setting on" do
       toggle_k5_setting(@course.account)
       get "/courses/#{@course.id}"

@@ -38,12 +38,13 @@ To add some comments, click the "Edit" link at the top.
 %>
 <% set_active_tab "syllabus" %>
 <% course_home ||= false %>
+<% header_content = course_home ? @context.nickname_for(@current_user) : title_text %>
 <div class="ic-Action-header">
   <div class="ic-Action-header__Primary">
-  <% if course_home %>
-    <h2 class="ic-Action-header__Heading"><%= @context.nickname_for(@current_user) %></h2>
+  <% if @context.show_announcements_on_home_page? && !@context.elementary_subject_course? %>
+    <h2 class="ic-Action-header__Heading"><%= header_content %></h2>
   <% else %>
-    <h1 class="ic-Action-header__Heading"><%= title_text %></h1>
+    <h1 class="ic-Action-header__Heading"><%= header_content %></h1>
   <% end %>
   </div>
   <div class="ic-Action-header__Secondary">
