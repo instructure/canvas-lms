@@ -123,7 +123,7 @@ export const useAssignmentDropdownOptions = ({
         ? filterAssignmentsByStudent(sortedAssignments, studentSubmissions)
         : sortedAssignments
 
-    if (selectedGradingPeriodId && selectedGradingPeriodId !== '0') {
+    if (selectedGradingPeriodId) {
       filteredAssignments = filteredAssignments.filter(
         assignment => assignment.gradingPeriodId === selectedGradingPeriodId
       )

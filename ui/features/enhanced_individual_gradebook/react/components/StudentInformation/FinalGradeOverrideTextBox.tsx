@@ -26,6 +26,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import {ApiCallStatus} from '../../../types'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
@@ -33,29 +34,35 @@ type Props = {
   gradingStandard?: GradingStandard[] | null
   enrollmentId: string
   onSubmit: (finalGradeOverride: FinalGradeOverride) => void
+  gradingPeriodId?: string
 }
 function FinalGradeOverrideTextBox({
   finalGradeOverride,
   gradingStandard,
   enrollmentId,
   onSubmit,
+  gradingPeriodId,
 }: Props) {
   const [inputValue, setInputValue] = useState<string>('')
+  const [finalGradeOverridePercentage, setFinalGradeOverridePercentage] = useState<string>('')
   const [apiCallStatus, setApiCallStatus] = useState<ApiCallStatus>(ApiCallStatus.NOT_STARTED)
   useEffect(() => {
-    const percentage = finalGradeOverride?.courseGrade?.percentage
+    const percentage = gradingPeriodId
+      ? finalGradeOverride?.gradingPeriodGrades?.[gradingPeriodId]?.percentage
+      : finalGradeOverride?.courseGrade?.percentage
     if (percentage == null) {
+      setFinalGradeOverridePercentage('')
       setInputValue('')
-      return
-    }
-    if (gradingStandard) {
-      setInputValue('')
-      // TODO: handle grading scheme and grading periods
+    } else if (gradingStandard) {
+      setInputValue(scoreToGrade(percentage, gradingStandard))
+      setFinalGradeOverridePercentage(
+        GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
+      )
     } else {
-      const ret = GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
-      setInputValue(ret)
+      setInputValue(GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'}))
+      setFinalGradeOverridePercentage('')
     }
-  }, [finalGradeOverride, gradingStandard])
+  }, [finalGradeOverride, gradingPeriodId, gradingStandard])
 
   const handleFinalGradeOverrideChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value)
@@ -65,31 +72,46 @@ function FinalGradeOverrideTextBox({
     if (gradingStandard) {
       options.gradingScheme = {data: gradingStandard}
     }
+    const percentage = gradingPeriodId
+      ? finalGradeOverride?.gradingPeriodGrades?.[gradingPeriodId]?.percentage
+      : finalGradeOverride?.courseGrade?.percentage
     const gradeOverrideEntry = new GradeOverrideEntry(options)
     const enteredGrade = gradeOverrideEntry.parseValue(inputValue)
-    const existingGrade = gradeOverrideEntry.parseValue(
-      finalGradeOverride?.courseGrade?.percentage ?? {}
-    )
+    const existingGrade = gradeOverrideEntry.parseValue(percentage != null ? percentage : {})
     if (
       !enteredGrade.valid ||
       !gradeOverrideEntry.hasGradeChanged(existingGrade, enteredGrade) ||
-      !enteredGrade.grade?.percentage
+      enteredGrade.grade?.percentage == null
     ) {
+      if (existingGrade.grade?.schemeKey) {
+        setInputValue(existingGrade.grade?.schemeKey)
+      } else {
+        setInputValue(
+          existingGrade.grade?.percentage ? String(existingGrade.grade?.percentage) : ''
+        )
+      }
       return
     }
-    const gradingPeriodId = null
-    const gradingPeriodIdProp =
-      gradingPeriodId === '0' || gradingPeriodId == null ? undefined : gradingPeriodId
     const castedEnteredGrade = {percentage: enteredGrade.grade.percentage}
     setApiCallStatus(ApiCallStatus.PENDING)
     const updatedScore = await updateFinalGradeOverride(
       enrollmentId,
-      gradingPeriodIdProp,
+      gradingPeriodId,
       castedEnteredGrade
     )
     setApiCallStatus(ApiCallStatus.COMPLETED)
     if (updatedScore) {
-      onSubmit({courseGrade: updatedScore})
+      if (gradingPeriodId) {
+        onSubmit({
+          ...finalGradeOverride,
+          gradingPeriodGrades: {
+            ...finalGradeOverride?.gradingPeriodGrades,
+            [gradingPeriodId]: updatedScore,
+          },
+        })
+      } else {
+        onSubmit({...finalGradeOverride, courseGrade: updatedScore})
+      }
     }
   }
   return (
@@ -100,6 +122,7 @@ function FinalGradeOverrideTextBox({
         </label>
       </View>
       <TextInput
+        display="inline-block"
         renderLabel={<ScreenReaderContent>{I18n.t('Final Grade Override')}</ScreenReaderContent>}
         value={inputValue}
         onChange={handleFinalGradeOverrideChange}
@@ -107,6 +130,9 @@ function FinalGradeOverrideTextBox({
         width="14rem"
         disabled={apiCallStatus === ApiCallStatus.PENDING}
       />
+      <View as="span" margin="0 0 0 xx-small">
+        {finalGradeOverridePercentage}
+      </View>
     </>
   )
 }

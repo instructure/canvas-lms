@@ -131,7 +131,7 @@ export default function GlobalSettings({
               onChange={handleGradePeriodChange}
               defaultValue={selectedGradingPeriodId}
             >
-              <option value="-1">{I18n.t('All Grading Periods')}</option>
+              <option>{I18n.t('All Grading Periods')}</option>
               {gradingPeriodSet.grading_periods.map(gradingPeriod => (
                 <option key={gradingPeriod.id} value={gradingPeriod.id}>
                   {gradingPeriod.title}
