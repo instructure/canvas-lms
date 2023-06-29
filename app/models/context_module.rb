@@ -662,8 +662,12 @@ class ContextModule < ActiveRecord::Base
 
   def add_item(params, added_item = nil, opts = {})
     params[:type] = params[:type].underscore if params[:type]
-    position = opts[:position] || ((content_tags.not_deleted.maximum(:position) || 0) + 1)
+    top_position = (content_tags.not_deleted.maximum(:position) || 0) + 1
+    position = opts[:position] || top_position
     position = [position, params[:position].to_i].max if params[:position]
+    if content_tags.not_deleted.where(position:).count != 0
+      position = top_position
+    end
     case params[:type]
     when "wiki_page", "page"
       item = opts[:wiki_page] || context.wiki_pages.where(id: params[:id]).first
