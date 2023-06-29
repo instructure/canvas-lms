@@ -62,6 +62,12 @@ improved_lmgb:
       state: disabled
     beta:
       state: disabled
+menu_option_for_outcome_details_page:
+  type: setting
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Menu Option for Outcome Details Page
+  description: Adds menu option for accessing alignments at the outcome level with Improved Outcomes Management
 outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin

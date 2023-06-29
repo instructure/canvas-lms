@@ -33,6 +33,7 @@ import {
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -44,6 +45,7 @@ const OutcomeKebabMenu = ({
   isGroup,
   groupDescription,
 }) => {
+  const {menuOptionForOutcomeDetailsPageFF} = useCanvasContext()
   const hasDescription =
     typeof groupDescription === 'string' &&
     stripHtmlTags(groupDescription).replace(/[\n\r\t\s(&nbsp;)]+/g, '')
@@ -65,7 +67,7 @@ const OutcomeKebabMenu = ({
           {I18n.t('Edit')}
         </View>
       </Menu.Item>
-      {!isGroup && (
+      {menuOptionForOutcomeDetailsPageFF && !isGroup && (
         <Menu.Item value="alignments">
           <IconOutcomesLine size="x-small" />
           <View padding="0 x-large 0 small" data-testid="outcome-kebab-menu-alignments">
