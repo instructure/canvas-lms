@@ -20,6 +20,10 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {HandleCheckboxChange} from '../../../types'
+import {View} from '@instructure/ui-view'
+import {ApplyTheme} from '@instructure/ui-themeable'
+// @ts-expect-error TODO: fix in instui 8
+import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
@@ -45,20 +49,34 @@ export default function ShowTotalGradesAsPointsCheckbox({
   }
 
   return (
-    <div
-      className="checkbox"
-      style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
+    <ApplyTheme
+      theme={{
+        [CheckboxFacade.theme]: {
+          checkedBackground: '#0375ff',
+          borderColor: '#777777',
+          labelFontSizeSmall: '1rem',
+        },
+        [View.theme]: {
+          paddingMedium: '16px',
+        },
+      }}
     >
-      <label className="checkbox" htmlFor="show_total_as_points">
-        <input
-          type="checkbox"
-          id="show_total_as_points"
-          name="show_total_as_points"
+      <View
+        as="div"
+        className="checkbox"
+        margin="x-small 0"
+        borderRadius="large"
+        background="primary"
+        padding="medium"
+        theme={{backgroundPrimary: '#eee'}}
+      >
+        <Checkbox
+          size="small"
+          label={I18n.t('Show Totals as Points on Student Grade Page')}
           checked={showTotalGradeAsPoints}
           onChange={handleShowTotalGradeAsPointsChange}
         />
-        {I18n.t('Show Totals as Points on Student Grade Page')}
-      </label>
-    </div>
+      </View>
+    </ApplyTheme>
   )
 }
