@@ -1271,8 +1271,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.gradebookGrid?.invalidateRows(indicesToUpdate)
     }
     if (rowCountChanged) {
-      this.gradebookGrid?.updateRowCount()
       this.gridData.rows.length = this.filteredStudentIds.length // truncate the array
+      this.gradebookGrid?.updateRowCount()
     }
 
     this.gradebookGrid?.render()

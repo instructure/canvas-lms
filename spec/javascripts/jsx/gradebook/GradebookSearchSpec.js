@@ -197,5 +197,24 @@ QUnit.module('Gradebook#rowFilter', contextHooks => {
       gradebook.searchFilteredStudentIds = []
       strictEqual(gradebook.rowFilter(student), true)
     })
+    test('row count does not match the filtered student count before determining vertical scrollbar settings for gradebook grid display', () => {
+      gradebook.courseContent.students.setStudentIds(['1101', '1102', '1103'])
+      gradebook.updateRows()
+      gradebook.searchFilteredStudentIds = ['1101', '1102']
+      gradebook.updateFilteredStudentIds()
+      gradebook.gradebookGrid.updateRowCount()
+      strictEqual(gradebook.gridData.rows.length, 3)
+      gradebook.gridData.rows.length = gradebook.filteredStudentIds.length
+      strictEqual(gradebook.gridData.rows.length, 2)
+    })
+    test('row count matches the filtered student count before determining vertical scrollbar settings for gradebook grid display', () => {
+      gradebook.courseContent.students.setStudentIds(['1101', '1102', '1103'])
+      gradebook.updateRows()
+      gradebook.searchFilteredStudentIds = ['1101', '1102']
+      gradebook.updateFilteredStudentIds()
+      gradebook.gridData.rows.length = gradebook.filteredStudentIds.length
+      gradebook.gradebookGrid.updateRowCount()
+      strictEqual(gradebook.gridData.rows.length, 2)
+    })
   })
 })
