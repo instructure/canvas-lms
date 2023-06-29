@@ -222,7 +222,9 @@ describe('ConversationListContainer', () => {
 
       await waitForApolloLoading()
 
-      const checkboxes = await conversationList.findAllByText('not selected')
+      const checkboxes = await conversationList.findAllByText(
+        'This is an inbox conversation not selected'
+      )
       checkboxes.forEach(checkbox => {
         fireEvent(
           checkbox,

@@ -146,7 +146,7 @@ describe('ConversationListItem', () => {
 
       const container = render(<ConversationListItem {...props} />)
 
-      expect(container.getByText('Unread')).toBeInTheDocument()
+      expect(container.getByText('This is the subject line Mark as Read')).toBeInTheDocument()
       expect(container.getByTestId('unread-badge')).toBeInTheDocument()
       expect(container.getByText('Mark as Read')).toBeInTheDocument()
     })
@@ -171,7 +171,7 @@ describe('ConversationListItem', () => {
 
       const container = render(<ConversationListItem {...props} />)
 
-      expect(container.getByText('Read')).toBeInTheDocument()
+      expect(container.getByText('This is the subject line Mark as Unread')).toBeInTheDocument()
       expect(container.getByTestId('read-badge')).toBeInTheDocument()
       expect(container.getByText('Mark as Unread')).toBeInTheDocument()
     })
