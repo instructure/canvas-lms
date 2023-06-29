@@ -20,6 +20,10 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {HandleCheckboxChange} from '../../../types'
+import {View} from '@instructure/ui-view'
+import {ApplyTheme} from '@instructure/ui-themeable'
+// @ts-expect-error TODO: fix in instui 8
+import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
@@ -47,20 +51,34 @@ export default function ShowConcludedEnrollmentsCheckbox({
   }
 
   return (
-    <div
-      className="checkbox"
-      style={{padding: 12, margin: '10px 0px', background: '#eee', borderRadius: 5}}
+    <ApplyTheme
+      theme={{
+        [CheckboxFacade.theme]: {
+          checkedBackground: '#0375ff',
+          borderColor: '#777777',
+          labelFontSizeSmall: '1rem',
+        },
+        [View.theme]: {
+          paddingMedium: '16px',
+        },
+      }}
     >
-      <label className="checkbox" htmlFor="concluded_enrollments_checkbox">
-        <input
-          type="checkbox"
-          id="concluded_enrollments_checkbox"
-          name="concluded_enrollments_checkbox"
+      <View
+        as="div"
+        className="checkbox"
+        margin="x-small 0"
+        borderRadius="medium"
+        background="primary"
+        padding="medium"
+        theme={{backgroundPrimary: '#eee'}}
+      >
+        <Checkbox
+          size="small"
+          label={I18n.t('Show Concluded Enrollments')}
           checked={showConcludedEnrollments}
           onChange={handleShowConcludedEnrollmentsChange}
         />
-        {I18n.t('Show Concluded Enrollments')}
-      </label>
-    </div>
+      </View>
+    </ApplyTheme>
   )
 }
