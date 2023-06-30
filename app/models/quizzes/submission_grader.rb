@@ -80,7 +80,7 @@ module Quizzes
       Quizzes::QuizRegrader::Regrader.regrade!(options)
     end
 
-    def self.score_question(q, params)
+    def self.score_question(question, params)
       params = params.with_indifferent_access
       # TODO: undefined_if_blank - we need a better solution for the
       # following problem: since teachers can modify quizzes after students
@@ -90,7 +90,7 @@ module Quizzes
       # added or the question answer they selected goes away, then the
       # the teacher gets the added burden of going back and manually assigning
       # scores for these questions per student.
-      qq = Quizzes::QuizQuestion::Base.from_question_data(q)
+      qq = Quizzes::QuizQuestion::Base.from_question_data(question)
 
       user_answer = qq.score_question(params)
       result = {
@@ -142,7 +142,14 @@ module Quizzes
       # for the latter two, the kept score is always updating and
       # we'll need this method to return true. if the method is highest,
       # the kept score only updates if it's higher than the original score
+      # UNLESS the grade is updated via speedgrader.
       quiz = @submission.quiz
+
+      # if the update is performed via speedgrader and the scoring policy is keep_highest
+      # the method should return true. The current workflow state will be complete
+      # and a submission grader_id will be present on the submission.
+      return true if quiz.scoring_policy == "keep_highest" && @submission.grader_id.present? && @submission.workflow_state == "complete"
+
       return true if quiz.scoring_policy != "keep_highest" || quiz.points_possible.to_i == 0 || original_score.nil?
       # when a submission is pending review, no outcome results are generated.
       # if the submission transitions to completed, then we need this method
