@@ -21,19 +21,7 @@
 require_relative "mock_migration_query_service"
 
 describe Importers::LinkResolver do
-  def default_assets
-    {
-      wiki_pages: {
-        "A" => "slug-a",
-        "B" => "slug-b"
-      },
-      context_module_tags: { "C" => "3", "D" => "4" },
-      attachments: { "E" => "5", "F" => "6" },
-      discussion_topics: { "G" => "7", "H" => "8" },
-    }
-  end
-
-  def course_based_converter(assets = default_assets)
+  def course_based_converter(assets = LinkConverters::MockMigrationQueryService.default_assets)
     Importers::LinkResolver.new(nil, LinkConverters::MockMigrationQueryService.new(context_path: "/courses/1", assets:))
   end
 
