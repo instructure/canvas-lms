@@ -21,6 +21,18 @@ module LinkConverters
   # This class privides a mock of the logic to retrieve a new id (for various types of assets)
   # given a migration id.
   class MockMigrationQueryService
+    def self.default_assets
+      {
+        wiki_pages: {
+          "A" => "slug-a",
+          "B" => "slug-b"
+        },
+        context_module_tags: { "C" => "3", "D" => "4" },
+        attachments: { "E" => "5", "F" => "6" },
+        discussion_topics: { "G" => "7", "H" => "8" },
+      }
+    end
+
     def initialize(context_path: "/", assets: {})
       @context_path = context_path
       @assets = assets
