@@ -53,7 +53,7 @@ function FinalGradeOverrideTextBox({
     if (percentage == null) {
       setFinalGradeOverridePercentage('')
       setInputValue('')
-    } else if (gradingStandard) {
+    } else if (gradingStandard && gradingStandard.length > 0) {
       setInputValue(scoreToGrade(percentage, gradingStandard))
       setFinalGradeOverridePercentage(
         GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})

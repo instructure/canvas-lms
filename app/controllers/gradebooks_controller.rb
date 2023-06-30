@@ -568,6 +568,7 @@ class GradebooksController < ApplicationController
       custom_columns_url: api_v1_course_custom_gradebook_columns_url(@context),
       export_gradebook_csv_url: course_gradebook_csv_url,
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
+      grade_calc_ignore_unposted_anonymous_enabled: @context.root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_is_editable:,
       grades_are_weighted: (grading_period_group_json && grading_period_group_json[:weighted]) || @context.group_weighting_scheme == "percent" || false,

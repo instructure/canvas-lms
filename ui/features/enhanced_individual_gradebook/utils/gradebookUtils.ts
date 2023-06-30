@@ -18,6 +18,12 @@
 
 import _ from 'lodash'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {
+  AssignmentGroupCriteriaMap,
+  CamelizedGradingPeriodSet,
+  GradingStandard,
+  SubmissionGradeCriteria,
+} from '@canvas/grading/grading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import tz from '@canvas/timezone'
@@ -39,9 +45,11 @@ import {
   SubmissionConnection,
   SubmissionGradeChange,
 } from '../types'
-import {Submission} from '../../../api.d'
-import {AssignmentGroupCriteriaMap} from '../../../shared/grading/grading.d'
+import {GradingPeriodSet, Submission, WorkflowState} from '../../../api.d'
 import DateHelper from '@canvas/datetime/dateHelper'
+import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
+import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
+import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -190,6 +198,7 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     userId: submission.user_id,
     submissionType: submission.submission_type,
     state: submission.workflow_state,
+    cachedDueDate: submission.cached_due_date,
   }
 }
 
@@ -280,6 +289,8 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
     downloadAssignmentSubmissionsUrl: env.GRADEBOOK_OPTIONS?.download_assignment_submissions_url,
     exportGradebookCsvUrl: env.GRADEBOOK_OPTIONS?.export_gradebook_csv_url,
     finalGradeOverrideEnabled: env.GRADEBOOK_OPTIONS?.final_grade_override_enabled,
+    gradeCalcIgnoreUnpostedAnonymousEnabled:
+      env.GRADEBOOK_OPTIONS?.grade_calc_ignore_unposted_anonymous_enabled,
     gradebookCsvProgress: env.GRADEBOOK_OPTIONS?.gradebook_csv_progress,
     gradesAreWeighted: env.GRADEBOOK_OPTIONS?.grades_are_weighted,
     gradingPeriodSet: env.GRADEBOOK_OPTIONS?.grading_period_set,
@@ -301,6 +312,107 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
   }
 
   return defaultGradebookOptions
+}
+
+export function mapToCamelizedGradingPeriodSet(
+  gradingPeriodSet?: GradingPeriodSet | null
+): CamelizedGradingPeriodSet | null {
+  if (!gradingPeriodSet) {
+    return null
+  }
+
+  return {
+    createdAt: new Date(gradingPeriodSet.created_at),
+    displayTotalsForAllGradingPeriods: gradingPeriodSet.display_totals_for_all_grading_periods,
+    enrollmentTermIDs: gradingPeriodSet.enrollment_term_ids,
+    gradingPeriods: gradingPeriodSet.grading_periods.map(gradingPeriod => ({
+      closeDate: new Date(gradingPeriod.close_date),
+      endDate: new Date(gradingPeriod.end_date),
+      id: gradingPeriod.id,
+      startDate: new Date(gradingPeriod.start_date),
+      isClosed: gradingPeriod.is_closed,
+      title: gradingPeriod.title,
+      isLast: gradingPeriod.is_last,
+      weight: gradingPeriod.weight ?? 0,
+    })),
+    id: gradingPeriodSet.id,
+    permissions: gradingPeriodSet.permissions,
+    title: gradingPeriodSet.title,
+    weighted: gradingPeriodSet.weighted,
+  }
+}
+
+export function scoreToPercentage(score?: number, possible?: number, decimalPlaces = 2) {
+  const percent = (Number(score) / Number(possible)) * 100.0
+  return percent % 1 === 0 ? percent : percent.toFixed(decimalPlaces)
+}
+
+export function getLetterGrade(
+  possible?: number,
+  score?: number,
+  gradingStadards?: GradingStandard[] | null
+) {
+  if (!gradingStadards || !gradingStadards.length || !!possible || !!score) {
+    return '-'
+  }
+  const rawPercentage = scoreToPercentage(score, possible)
+  const percentage = parseFloat(Number(rawPercentage).toPrecision(4))
+  return scoreToGrade(percentage, gradingStadards)
+}
+
+type CalculateGradesForUserProps = {
+  assignmentGroupMap: AssignmentGroupCriteriaMap
+  gradeCalcIgnoreUnpostedAnonymousEnabled?: boolean | null
+  gradingPeriodSet?: GradingPeriodSet | null
+  groupWeightingScheme?: string | null
+  studentId?: string
+  submissions?: GradebookUserSubmissionDetails[]
+}
+export function calculateGradesForStudent({
+  assignmentGroupMap,
+  gradeCalcIgnoreUnpostedAnonymousEnabled,
+  gradingPeriodSet,
+  groupWeightingScheme,
+  studentId,
+  submissions,
+}: CalculateGradesForUserProps) {
+  if (!submissions || !studentId) {
+    return
+  }
+
+  const camelizedGradingPeriodSet = mapToCamelizedGradingPeriodSet(gradingPeriodSet)
+
+  const gradeCriteriaSubmissions: SubmissionGradeCriteria[] = submissions.map(submission => {
+    return {
+      assignment_id: submission.assignmentId,
+      excused: submission.excused,
+      grade: submission.grade,
+      score: submission.score,
+      workflow_state: submission.state as WorkflowState,
+      id: submission.id,
+    }
+  })
+
+  const effectiveDueDates = updateWithSubmissions(
+    {},
+    submissions.map(submission => ({
+      assignment_id: submission.assignmentId,
+      cached_due_date: submission.cachedDueDate,
+      user_id: submission.userId,
+    })),
+    camelizedGradingPeriodSet?.gradingPeriods
+  )
+
+  const hasGradingPeriods = gradingPeriodSet && effectiveDueDates
+
+  return CourseGradeCalculator.calculate(
+    gradeCriteriaSubmissions,
+    assignmentGroupMap,
+    groupWeightingScheme ?? 'points',
+    gradeCalcIgnoreUnpostedAnonymousEnabled ?? false,
+    hasGradingPeriods ? camelizedGradingPeriodSet : undefined,
+    hasGradingPeriods ? scopeToUser(effectiveDueDates, studentId) : undefined
+  )
 }
 
 function nonNumericGuard(value: number, message = 'No graded submissions'): string {

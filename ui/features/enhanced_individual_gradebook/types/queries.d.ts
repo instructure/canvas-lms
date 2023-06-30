@@ -165,6 +165,8 @@ export type GradebookUserSubmissionDetails = {
   missing: boolean
   userId: string
   redoRequest: boolean
+  cachedDueDate: string | null
+  gradingPeriodId?: string
 }
 
 export type GradebookStudentQueryResponse = {

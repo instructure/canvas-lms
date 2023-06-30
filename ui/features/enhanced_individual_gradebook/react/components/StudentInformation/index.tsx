@@ -16,9 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
-import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
+import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
+import {
+  AssignmentGroupCriteriaMap,
+  FinalGradeOverrideMap,
+  FinalGradeOverride,
+} from '@canvas/grading/grading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {
@@ -27,16 +32,16 @@ import {
   GradebookUserSubmissionDetails,
   ApiCallStatus,
 } from '../../../types'
-import {
-  AssignmentGroupCriteriaMap,
-  SubmissionGradeCriteria,
-  FinalGradeOverrideMap,
-  FinalGradeOverride,
-} from '@canvas/grading/grading'
 import Notes from './Notes'
 import {useGradebookNotes} from '../../hooks/useGradebookNotes'
-import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrideTextBox from './FinalGradeOverrideTextBox'
+import {
+  calculateGradesForStudent,
+  getLetterGrade,
+  scoreToPercentage,
+} from '../../../utils/gradebookUtils'
+import {GradingPeriodScores} from './GradingPeriodScores'
+import {AssignmentGroupScores} from './AssignmentGroupScores'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -67,9 +72,13 @@ export default function StudentInformation({
     customColumnDatumUrl,
     contextId,
     finalGradeOverrideEnabled,
-    selectedGradingPeriodId,
+    gradeCalcIgnoreUnpostedAnonymousEnabled,
+    gradingPeriodSet,
     gradingStandard,
+    groupWeightingScheme,
+    selectedGradingPeriodId,
   } = gradebookOptions
+
   const [finalGradeOverrides, setFinalGradeOverrides] = useState<FinalGradeOverrideMap>({})
   const {submitNotesError, submitNotesStatus, studentNotes, getNotesStatus, submit} =
     useGradebookNotes(
@@ -78,11 +87,13 @@ export default function StudentInformation({
       customColumnDataUrl,
       customColumnDatumUrl
     )
+
   useEffect(() => {
     if (submitNotesError && submitNotesStatus === ApiCallStatus.FAILED) {
       showFlashError(I18n.t('Error updating notes'))(new Error(submitNotesError))
     }
   }, [submitNotesError, submitNotesStatus])
+
   useEffect(() => {
     async function fetchFinalGradeOverrides() {
       if (!contextId) {
@@ -96,7 +107,32 @@ export default function StudentInformation({
     }
     fetchFinalGradeOverrides()
   }, [contextId])
-  if (!student || !submissions) {
+
+  const filteredSubmissions = selectedGradingPeriodId
+    ? submissions?.filter(s => s.gradingPeriodId === selectedGradingPeriodId)
+    : submissions
+
+  const studentGradeResults = useMemo(
+    () =>
+      calculateGradesForStudent({
+        submissions: filteredSubmissions,
+        assignmentGroupMap,
+        groupWeightingScheme,
+        gradeCalcIgnoreUnpostedAnonymousEnabled,
+        gradingPeriodSet,
+        studentId: student?.id,
+      }),
+    [
+      filteredSubmissions,
+      assignmentGroupMap,
+      groupWeightingScheme,
+      gradeCalcIgnoreUnpostedAnonymousEnabled,
+      gradingPeriodSet,
+      student,
+    ]
+  )
+
+  if (!student || !submissions || !studentGradeResults) {
     return (
       <View as="div">
         <View as="div" className="row-fluid">
@@ -112,35 +148,41 @@ export default function StudentInformation({
       </View>
     )
   }
-  const gradeCriteriaSubmissions: SubmissionGradeCriteria[] = submissions.map(submission => {
-    return {
-      assignment_id: submission.assignmentId,
-      excused: false,
-      grade: submission.grade,
-      score: submission.score,
-      workflow_state: 'graded',
-      id: submission.id,
-    }
-  })
 
-  const scoreToPercentage = (score: number, possible: number, decimalPlaces = 2) => {
-    const percent = (score / possible) * 100.0
-    return percent % 1 === 0 ? percent : percent.toFixed(decimalPlaces)
-  }
-
-  // TODO: get weighting scheme from course & other options
-  const {final, assignmentGroups, current} = CourseGradeCalculator.calculate(
-    gradeCriteriaSubmissions,
-    assignmentGroupMap,
-    'points',
-    true
-  )
+  const {current, final, assignmentGroups, gradingPeriods = {}} = studentGradeResults
 
   const gradeToDisplay = includeUngradedAssignments ? final : current
   const finalGradePercent = gradeToDisplay
     ? scoreToPercentage(gradeToDisplay.score, gradeToDisplay.possible)
     : null
   const currentStudentNotes = studentNotes[student.id] ?? ''
+  const showGradingPeriodSubtotals = !selectedGradingPeriodId && gradingPeriodSet?.weighted
+
+  const finalGradeText = () => {
+    const {possible, score} = gradeToDisplay
+    if (possible === null || possible === undefined) {
+      return '-'
+    }
+
+    const percentText = Number.isNaN(Number(finalGradePercent)) ? '-' : finalGradePercent
+
+    // TODO: refactor hidePointsText & showPointsText after tests are in place
+    const hidePointsText = !!(
+      groupWeightingScheme === 'percent' ||
+      (!selectedGradingPeriodId && gradingPeriodSet?.weighted)
+    )
+    const showPointsText = !!(!hidePointsText && gradeToDisplay)
+    const pointsText = showPointsText
+      ? ` (${gradeToDisplay.score} / ${gradeToDisplay.possible} ${I18n.t('points')})`
+      : ''
+
+    const letterGradeText = gradingStandard
+      ? ` - ${getLetterGrade(possible, score, gradingStandard)}`
+      : ''
+
+    return `${percentText}%${pointsText}${letterGradeText}`
+  }
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -186,46 +228,46 @@ export default function StudentInformation({
             <table className="ic-Table">
               <thead>
                 <tr>
-                  <th scope="col">{I18n.t('Assignment Group')}</th>
+                  <th scope="col">
+                    {showGradingPeriodSubtotals
+                      ? I18n.t('Grading Period')
+                      : I18n.t('Assignment Group')}
+                  </th>
                   <th scope="col">{I18n.t('Grade')}</th>
                   <th scope="col">{I18n.t('Letter Grade')}</th>
                   <th scope="col">{I18n.t('% of Grade')}</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.keys(assignmentGroups).map(assignmentGroupId => {
-                  const {name: groupName} = assignmentGroupMap[assignmentGroupId]
-                  const {final: groupFinal, current: groupCurrent} =
-                    assignmentGroups[assignmentGroupId]
-                  const groupGradeToDisplay = includeUngradedAssignments ? groupFinal : groupCurrent
-
-                  const percentScore = scoreToPercentage(
-                    groupGradeToDisplay.score,
-                    groupGradeToDisplay.possible,
-                    1
-                  )
-                  const percentScoreText = Number.isNaN(Number(percentScore))
-                    ? '-'
-                    : `${percentScore}% (${groupGradeToDisplay.score} / ${groupGradeToDisplay.possible})`
-                  return (
-                    <tr key={`group_final_scores_${assignmentGroupId}`}>
-                      <th>{groupName}</th>
-                      <td>{percentScoreText}</td>
-                      <td>-</td>
-                      <td>-</td>
-                    </tr>
-                  )
-                })}
+                {showGradingPeriodSubtotals
+                  ? Object.keys(gradingPeriods).map(gradingPeriodId => (
+                      <GradingPeriodScores
+                        key={`grading_period_scores_${gradingPeriodId}`}
+                        gradingPeriodId={gradingPeriodId}
+                        gradingPeriodSet={gradingPeriodSet}
+                        gradingPeriods={gradingPeriods}
+                        gradingStandard={gradingStandard || []}
+                        includeUngradedAssignments={includeUngradedAssignments}
+                      />
+                    ))
+                  : Object.keys(assignmentGroupMap).map(assignmentGroupId => (
+                      <AssignmentGroupScores
+                        key={`assignment_group_scores_${assignmentGroupId}`}
+                        assignmentGroupId={assignmentGroupId}
+                        assignmentGroupMap={assignmentGroupMap}
+                        assignmentGroups={assignmentGroups}
+                        gradingStandard={gradingStandard || []}
+                        includeUngradedAssignments={includeUngradedAssignments}
+                      />
+                    ))}
               </tbody>
             </table>
           </View>
 
           <View as="h3">
-            {I18n.t('Final Grade:')}
+            {I18n.t('Final Grade: ')}
             <View as="span" className="total-grade">
-              {' '}
-              {Number.isNaN(Number(finalGradePercent)) ? '-' : finalGradePercent}% (
-              {gradeToDisplay.score} / {gradeToDisplay.possible} points)
+              {finalGradeText()}
             </View>
           </View>
           {finalGradeOverrideEnabled && allowFinalGradeOverride && (
@@ -238,7 +280,7 @@ export default function StudentInformation({
                   [student.id]: finalGradeOverride,
                 })
               }}
-              gradingStandard={gradingStandard}
+              gradingStandard={gradingStandard || []}
               gradingPeriodId={selectedGradingPeriodId}
             />
           )}
