@@ -42,6 +42,7 @@ export const assignmentRow = (
 ) => {
   return (
     <Table.Row
+      data-testid="assignment-row"
       key={assignment._id}
       onMouseEnter={() => {
         if (assignment?.submissionsConnection?.nodes[0]?.readState !== 'read') {
