@@ -147,6 +147,8 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           latePolicyStatus
           missing
           userId
+          cachedDueDate
+          gradingPeriodId
         }
       }
     }

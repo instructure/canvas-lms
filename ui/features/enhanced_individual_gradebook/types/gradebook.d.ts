@@ -81,6 +81,7 @@ export type GradebookOptions = {
   customColumnDatumUrl?: string | null
   customColumnUrl?: string | null
   customColumnsUrl?: string | null
+  gradeCalcIgnoreUnpostedAnonymousEnabled?: boolean | null
   gradesAreWeighted?: boolean | null
   gradingPeriodSet?: GradingPeriodSet | null
   gradingSchemes?: GradingScheme[] | null

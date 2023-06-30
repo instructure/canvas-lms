@@ -49,6 +49,8 @@ module Types
 
     global_id_field :id
 
+    field :cached_due_date, DateTimeType, null: true
+
     field :read_state, String, null: true
     def read_state
       object.read_state(current_user)
