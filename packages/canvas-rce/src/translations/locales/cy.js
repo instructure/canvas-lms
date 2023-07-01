@@ -228,6 +228,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Tocio Delwedd" },
   "cup_product_14174434": { "message": "Cynnyrch Cwpan" },
   "current_image_f16c249c": { "message": "Delwedd Bresennol" },
+  "current_link_945a47ee": { "message": "Dolen Gyfredol" },
   "current_volume_level_c55ab825": { "message": "Lefel Sain Bresennol" },
   "custom_6979cd81": { "message": "Personol" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -580,6 +581,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Glas golau" },
   "link_7262adec": { "message": "Dolen" },
   "link_options_a16b758b": { "message": "Opsiynau Dolen" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "math o ddolen: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Dolen â thestun yn dechrau gyda { start }"
   },
@@ -642,6 +646,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minws/Plws" },
   "misc_3b692ea7": { "message": "Amrywiol" },
   "miscellaneous_e9818229": { "message": "Amrywiol" },
+  "module_90d9fd32": { "message": "Modiwl" },
   "modules_c4325335": { "message": "Modiwlau" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Wrthi’n symud delwedd i docio { directionWord }"
@@ -666,8 +671,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Llywiwch trwy''r ddewislen neu''r bar offer"
   },
+  "navigation_ee9af92d": { "message": "Crwydro" },
   "nested_greater_than_d852e60d": { "message": "Nythu’n Fwy Na" },
   "nested_less_than_27d17e58": { "message": "Nythu’n Llai Na" },
+  "new_quiz_34aacba6": { "message": "Cwis Newydd" },
   "next_40e12421": { "message": "Nesaf" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Heb ganfod problemau o ran hygyrchedd."

@@ -212,6 +212,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "قص صورة" },
   "cup_product_14174434": { "message": "Cup Product" },
   "current_image_f16c249c": { "message": "الصورة الحالية" },
+  "current_link_945a47ee": { "message": "الارتباط الحالي" },
   "current_volume_level_c55ab825": { "message": "مستوى الصوت الحالي" },
   "custom_6979cd81": { "message": "مخصص" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -554,6 +555,9 @@ const locale = {
   "light_blue_5374f600": { "message": "أزرق فاتح" },
   "link_7262adec": { "message": "ارتباط" },
   "link_options_a16b758b": { "message": "خيارات الارتباط" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "نوع الارتباط: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "رابط بنص يبدأ بـ { start }"
   },
@@ -606,6 +610,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "سالب/موجب" },
   "misc_3b692ea7": { "message": "متنوع" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
+  "module_90d9fd32": { "message": "الوحدة" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "جارٍ نقل الصورة إلى القص { directionWord }"
@@ -630,8 +635,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
+  "navigation_ee9af92d": { "message": "التنقل" },
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
+  "new_quiz_34aacba6": { "message": "اختبار جديد" },
   "next_40e12421": { "message": "التالي" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "لم يتم الكشف عن مشاكل إمكانية الوصول."

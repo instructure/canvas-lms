@@ -222,6 +222,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Przytnij obraz" },
   "cup_product_14174434": { "message": "Iloczyn kartezjański" },
   "current_image_f16c249c": { "message": "Bieżący obraz" },
+  "current_link_945a47ee": { "message": "Bieżące łącze" },
   "current_volume_level_c55ab825": { "message": "Bieżący poziom głośności" },
   "custom_6979cd81": { "message": "Niestandardowe" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -570,6 +571,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Jasny niebieski" },
   "link_7262adec": { "message": "Łącze" },
   "link_options_a16b758b": { "message": "Opcje łącza" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "typ łącza: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Powiąż z tekstem, który się zaczyna od słów { start }"
   },
@@ -628,6 +632,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Różne" },
   "miscellaneous_e9818229": { "message": "Różne" },
+  "module_90d9fd32": { "message": "Moduł" },
   "modules_c4325335": { "message": "Moduły" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Przenoszenie obrazu do przycięcia { directionWord }"
@@ -652,8 +657,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Przejdź w menu lub na pasku narzędzi"
   },
+  "navigation_ee9af92d": { "message": "Nawigacja" },
   "nested_greater_than_d852e60d": { "message": "Zagnieżdżone większe niż" },
   "nested_less_than_27d17e58": { "message": "Zagnieżdżone mniejsze niż" },
+  "new_quiz_34aacba6": { "message": "Nowy test" },
   "next_40e12421": { "message": "Następny" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Nie wykryto problemów z dostępnością."
