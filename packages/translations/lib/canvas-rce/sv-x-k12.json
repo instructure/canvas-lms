@@ -205,6 +205,7 @@
   "crop_image_807ebb08": { "message": "Beskär bilden" },
   "cup_product_14174434": { "message": "Kopprodukt" },
   "current_image_f16c249c": { "message": "Aktuell bild" },
+  "current_link_945a47ee": { "message": "Aktuell länk" },
   "current_volume_level_c55ab825": { "message": "Aktuell volymnivå" },
   "custom_6979cd81": { "message": "Anpassa" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -555,6 +556,9 @@
   "light_blue_5374f600": { "message": "Ljusblå" },
   "link_7262adec": { "message": "Länk" },
   "link_options_a16b758b": { "message": "Länkalternativ" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "länktyp { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Länk med text som börjar med { start }"
   },
@@ -613,6 +617,7 @@
   "minus_plus_3461f637": { "message": "Minus/plus" },
   "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Blandat" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Moduler" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Flyttar bild till beskärning { directionWord }"
@@ -637,8 +642,10 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigera via menyn eller verktygsfältet"
   },
+  "navigation_ee9af92d": { "message": "Navigering" },
   "nested_greater_than_d852e60d": { "message": "Kapslade större än" },
   "nested_less_than_27d17e58": { "message": "Kapslad mindre än" },
+  "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Nästa" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Inga tillgänglighetsproblem upptäcktes."

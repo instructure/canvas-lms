@@ -521,6 +521,9 @@
     "current_image_f16c249c": {
         "message": "当前图像"
     },
+    "current_link_945a47ee": {
+        "message": "当前链接"
+    },
     "current_volume_level_c55ab825": {
         "message": "当前音量"
     },
@@ -1454,6 +1457,9 @@
     "link_options_a16b758b": {
         "message": "链接选项"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "链接类型：{ linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "具有以{ start }开始的文本的链接"
     },
@@ -1619,6 +1625,9 @@
     "missing_items_for_title_516511f8": {
         "message": "{ title } 的缺失项目"
     },
+    "module_90d9fd32": {
+        "message": "单元"
+    },
     "modules_c4325335": {
         "message": "单元"
     },
@@ -1670,6 +1679,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "导航菜单或工具栏"
     },
+    "navigation_ee9af92d": {
+        "message": "导航"
+    },
     "nested_greater_than_d852e60d": {
         "message": "嵌套大于"
     },
@@ -1687,6 +1699,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "新机会"
+    },
+    "new_quiz_34aacba6": {
+        "message": "新测验"
     },
     "next_40e12421": {
         "message": "下一步"

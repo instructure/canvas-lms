@@ -205,6 +205,7 @@
   "crop_image_807ebb08": { "message": "画像の切り取り" },
   "cup_product_14174434": { "message": "カップ製品" },
   "current_image_f16c249c": { "message": "現在の画像" },
+  "current_link_945a47ee": { "message": "現在のリンク" },
   "current_volume_level_c55ab825": { "message": "現在の音量のレベル" },
   "custom_6979cd81": { "message": "カスタム" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -535,6 +536,9 @@
   "light_blue_5374f600": { "message": "ライトブルー" },
   "link_7262adec": { "message": "リンク" },
   "link_options_a16b758b": { "message": "リンクオプション" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "リンクタイプ：{ linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "{ start } で始まるテキストとのリンク"
   },
@@ -591,6 +595,7 @@
   "minus_plus_3461f637": { "message": "マイナス/プラス" },
   "misc_3b692ea7": { "message": "その他" },
   "miscellaneous_e9818229": { "message": "その他" },
+  "module_90d9fd32": { "message": "モジュール" },
   "modules_c4325335": { "message": "モジュール" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "{ directionWord }トリミングに画像を移動中。"
@@ -615,8 +620,10 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "メニューまたはツールバーを移動する"
   },
+  "navigation_ee9af92d": { "message": "ナビゲーション" },
   "nested_greater_than_d852e60d": { "message": "ネストされた＞" },
   "nested_less_than_27d17e58": { "message": "ネストされた＜" },
+  "new_quiz_34aacba6": { "message": "新しい小テスト" },
   "next_40e12421": { "message": "次へ" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "アクセシビリティの問題は検出されませんでした。"

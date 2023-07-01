@@ -209,6 +209,7 @@
   "crop_image_807ebb08": { "message": "Rajaa kuva" },
   "cup_product_14174434": { "message": "Korkkituote" },
   "current_image_f16c249c": { "message": "Nykyinen kuva" },
+  "current_link_945a47ee": { "message": "Nykyinen linkki" },
   "current_volume_level_c55ab825": {
     "message": "Nykyinen äänenvoimakkuuden taso"
   },
@@ -565,6 +566,9 @@
   "light_blue_5374f600": { "message": "Vaaleansininen" },
   "link_7262adec": { "message": "Linkki" },
   "link_options_a16b758b": { "message": "Linkin asetukset" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "linkin tyyppi: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Linkki tekstillä, joka alkaa { start }"
   },
@@ -625,6 +629,7 @@
   "minus_plus_3461f637": { "message": "Miinus/plus" },
   "misc_3b692ea7": { "message": "Sekalainen" },
   "miscellaneous_e9818229": { "message": "Muut asiat" },
+  "module_90d9fd32": { "message": "Moduuli" },
   "modules_c4325335": { "message": "Moduulit" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Siirretään kuvaa kohteen { directionWord } rajaamiseksi"
@@ -649,8 +654,10 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Siirry valikon tai työkalupalkin läpi"
   },
+  "navigation_ee9af92d": { "message": "Navigaatio" },
   "nested_greater_than_d852e60d": { "message": "on suurempi kuin" },
   "nested_less_than_27d17e58": { "message": "on pienempi kuin" },
+  "new_quiz_34aacba6": { "message": "Uusi testi" },
   "next_40e12421": { "message": "Seuraava" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ei havaittu käytettävyysongelmia."

@@ -197,6 +197,7 @@
   "crop_image_807ebb08": { "message": "Klippa mynd" },
   "cup_product_14174434": { "message": "Stafafeldi (Cup Product)" },
   "current_image_f16c249c": { "message": "Núverandi mynd" },
+  "current_link_945a47ee": { "message": "Núverandi tengill" },
   "current_volume_level_c55ab825": { "message": "Núverandi stig hljóðstyrks" },
   "custom_6979cd81": { "message": "Sérsníða" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -541,6 +542,9 @@
   "light_blue_5374f600": { "message": "Ljósblár" },
   "link_7262adec": { "message": "Tengill" },
   "link_options_a16b758b": { "message": "Valkostir tengils" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "gerð tengils: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Tengill með texta byrjar á { start }"
   },
@@ -595,6 +599,7 @@
   "minus_plus_3461f637": { "message": "Mínus/Plús" },
   "misc_3b692ea7": { "message": "Ýmislegt" },
   "miscellaneous_e9818229": { "message": "Ýmislegt" },
+  "module_90d9fd32": { "message": "Eining" },
   "modules_c4325335": { "message": "Námsefni" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Flytja mynd til að klippa { directionWord }"
@@ -619,8 +624,10 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Notaðu valmyndina eða verkfæraslánna til að komast á réttan stað"
   },
+  "navigation_ee9af92d": { "message": "Leiðarstýring" },
   "nested_greater_than_d852e60d": { "message": "Faldað stærra en" },
   "nested_less_than_27d17e58": { "message": "Faldað minna en" },
+  "new_quiz_34aacba6": { "message": "Nýtt próf" },
   "next_40e12421": { "message": "Næsti" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Engin vandamál fundust varðandi aðgengileika."

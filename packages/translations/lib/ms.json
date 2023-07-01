@@ -521,6 +521,9 @@
     "current_image_f16c249c": {
         "message": "Imej Semasa"
     },
+    "current_link_945a47ee": {
+        "message": "Pautan Semasa"
+    },
     "current_volume_level_c55ab825": {
         "message": "Tahap Volum Semasa"
     },
@@ -1454,6 +1457,9 @@
     "link_options_a16b758b": {
         "message": "Pilihan Pautan"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "jenis pautan: { linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "Pautan dengan teks bermula dengan { start }"
     },
@@ -1619,6 +1625,9 @@
     "missing_items_for_title_516511f8": {
         "message": "Tiada item untuk { title }"
     },
+    "module_90d9fd32": {
+        "message": "Modul"
+    },
     "modules_c4325335": {
         "message": "Modul"
     },
@@ -1670,6 +1679,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigasi melalui menu atau bar alat"
     },
+    "navigation_ee9af92d": {
+        "message": "Navigasi"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Lebih Daripada Tersarang"
     },
@@ -1687,6 +1699,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Peluang Baharu"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Kuiz Baharu"
     },
     "next_40e12421": {
         "message": "Seterusnya"

@@ -521,6 +521,9 @@
     "current_image_f16c249c": {
         "message": "Whakapakoko o Nāianei"
     },
+    "current_link_945a47ee": {
+        "message": "Hononga o naianei"
+    },
     "current_volume_level_c55ab825": {
         "message": "Taumata o te rōrahi ōnāianei"
     },
@@ -1454,6 +1457,9 @@
     "link_options_a16b758b": {
         "message": "Hono Kōwhiringa"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "momo hono: { linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "Hono me te kuputuhi e tīmata ana me { start }"
     },
@@ -1619,6 +1625,9 @@
     "missing_items_for_title_516511f8": {
         "message": "Ngā tūemi e ngaro ana { title }"
     },
+    "module_90d9fd32": {
+        "message": "Kōwae"
+    },
     "modules_c4325335": {
         "message": "Kōwae"
     },
@@ -1670,6 +1679,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Whakatere i roto i te tahua paeutauta rānei"
     },
+    "navigation_ee9af92d": {
+        "message": "Whakatere"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Nested Nui atu i"
     },
@@ -1687,6 +1699,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Ngā mea angitu hou"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Quiz Hou"
     },
     "next_40e12421": {
         "message": "E haere ake nei"
