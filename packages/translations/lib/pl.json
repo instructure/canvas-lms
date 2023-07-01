@@ -521,6 +521,9 @@
     "current_image_f16c249c": {
         "message": "Bieżący obraz"
     },
+    "current_link_945a47ee": {
+        "message": "Bieżące łącze"
+    },
     "current_volume_level_c55ab825": {
         "message": "Bieżący poziom głośności"
     },
@@ -1454,6 +1457,9 @@
     "link_options_a16b758b": {
         "message": "Opcje łącza"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "typ łącza: { linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "Powiąż z tekstem, który się zaczyna od słów { start }"
     },
@@ -1619,6 +1625,9 @@
     "missing_items_for_title_516511f8": {
         "message": "Brak elementów dla { title }"
     },
+    "module_90d9fd32": {
+        "message": "Moduł"
+    },
     "modules_c4325335": {
         "message": "Moduły"
     },
@@ -1670,6 +1679,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Przejdź w menu lub na pasku narzędzi"
     },
+    "navigation_ee9af92d": {
+        "message": "Nawigacja"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Zagnieżdżone większe niż"
     },
@@ -1687,6 +1699,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Nowe okazje"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Nowy test"
     },
     "next_40e12421": {
         "message": "Następny"

@@ -521,6 +521,9 @@
     "current_image_f16c249c": {
         "message": "現在の画像"
     },
+    "current_link_945a47ee": {
+        "message": "現在のリンク"
+    },
     "current_volume_level_c55ab825": {
         "message": "現在の音量のレベル"
     },
@@ -1454,6 +1457,9 @@
     "link_options_a16b758b": {
         "message": "リンクオプション"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "リンクタイプ：{ linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "{ start } で始まるテキストとのリンク"
     },
@@ -1619,6 +1625,9 @@
     "missing_items_for_title_516511f8": {
         "message": "{ title }に不足しているアイテム"
     },
+    "module_90d9fd32": {
+        "message": "モジュール"
+    },
     "modules_c4325335": {
         "message": "モジュール"
     },
@@ -1670,6 +1679,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "メニューまたはツールバーを移動する"
     },
+    "navigation_ee9af92d": {
+        "message": "ナビゲーション"
+    },
     "nested_greater_than_d852e60d": {
         "message": "ネストされた＞"
     },
@@ -1687,6 +1699,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "新しい機会"
+    },
+    "new_quiz_34aacba6": {
+        "message": "新しい小テスト"
     },
     "next_40e12421": {
         "message": "次へ"

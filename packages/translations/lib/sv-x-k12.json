@@ -521,6 +521,9 @@
     "current_image_f16c249c": {
         "message": "Aktuell bild"
     },
+    "current_link_945a47ee": {
+        "message": "Aktuell länk"
+    },
     "current_volume_level_c55ab825": {
         "message": "Aktuell volymnivå"
     },
@@ -1454,6 +1457,9 @@
     "link_options_a16b758b": {
         "message": "Länkalternativ"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "länktyp { linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "Länk med text som börjar med { start }"
     },
@@ -1619,6 +1625,9 @@
     "missing_items_for_title_516511f8": {
         "message": "Objekt saknas för { title }"
     },
+    "module_90d9fd32": {
+        "message": "Modul"
+    },
     "modules_c4325335": {
         "message": "Moduler"
     },
@@ -1670,6 +1679,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigera via menyn eller verktygsfältet"
     },
+    "navigation_ee9af92d": {
+        "message": "Navigering"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Kapslade större än"
     },
@@ -1687,6 +1699,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "Nya möjligheter"
+    },
+    "new_quiz_34aacba6": {
+        "message": "Ny quiz"
     },
     "next_40e12421": {
         "message": "Nästa"

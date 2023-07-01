@@ -181,6 +181,7 @@
   "crop_image_807ebb08": { "message": "裁剪图像" },
   "cup_product_14174434": { "message": "上积" },
   "current_image_f16c249c": { "message": "当前图像" },
+  "current_link_945a47ee": { "message": "当前链接" },
   "current_volume_level_c55ab825": { "message": "当前音量" },
   "custom_6979cd81": { "message": "自定义" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -483,6 +484,9 @@
   "light_blue_5374f600": { "message": "浅蓝色" },
   "link_7262adec": { "message": "链接" },
   "link_options_a16b758b": { "message": "链接选项" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "链接类型：{ linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "具有以{ start }开始的文本的链接"
   },
@@ -533,6 +537,7 @@
   "minus_plus_3461f637": { "message": "减号/加号" },
   "misc_3b692ea7": { "message": "其他" },
   "miscellaneous_e9818229": { "message": "其他" },
+  "module_90d9fd32": { "message": "单元" },
   "modules_c4325335": { "message": "单元" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "正在移动图片以剪裁 { directionWord }"
@@ -557,8 +562,10 @@
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "导航菜单或工具栏"
   },
+  "navigation_ee9af92d": { "message": "导航" },
   "nested_greater_than_d852e60d": { "message": "嵌套大于" },
   "nested_less_than_27d17e58": { "message": "嵌套小于" },
+  "new_quiz_34aacba6": { "message": "新测验" },
   "next_40e12421": { "message": "下一步" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "没有发现辅助功能问题。"

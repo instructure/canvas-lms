@@ -521,6 +521,9 @@
     "current_image_f16c249c": {
         "message": "الصورة الحالية"
     },
+    "current_link_945a47ee": {
+        "message": "الارتباط الحالي"
+    },
     "current_volume_level_c55ab825": {
         "message": "مستوى الصوت الحالي"
     },
@@ -1454,6 +1457,9 @@
     "link_options_a16b758b": {
         "message": "خيارات الارتباط"
     },
+    "link_type_linktypemessage_c6d26815": {
+        "message": "نوع الارتباط: { linkTypeMessage }"
+    },
     "link_with_text_starting_with_start_b3fcbe71": {
         "message": "رابط بنص يبدأ بـ { start }"
     },
@@ -1619,6 +1625,9 @@
     "missing_items_for_title_516511f8": {
         "message": "عناصر مفقودة لـ { title }"
     },
+    "module_90d9fd32": {
+        "message": "الوحدة"
+    },
     "modules_c4325335": {
         "message": "الوحدات النمطية"
     },
@@ -1670,6 +1679,9 @@
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "تنقل من خلال القائمة أو شريط الأدوات"
     },
+    "navigation_ee9af92d": {
+        "message": "التنقل"
+    },
     "nested_greater_than_d852e60d": {
         "message": "Nested Greater Than"
     },
@@ -1687,6 +1699,9 @@
     },
     "new_opportunities_7d349c4d": {
         "message": "الفرص الجديدة"
+    },
+    "new_quiz_34aacba6": {
+        "message": "اختبار جديد"
     },
     "next_40e12421": {
         "message": "التالي"
