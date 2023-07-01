@@ -202,6 +202,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "裁剪影像" },
   "cup_product_14174434": { "message": "杯子產品" },
   "current_image_f16c249c": { "message": "目前的圖像" },
+  "current_link_945a47ee": { "message": "目前的連結" },
   "current_volume_level_c55ab825": { "message": "目前音量" },
   "custom_6979cd81": { "message": "自訂" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -512,6 +513,9 @@ const locale = {
   "light_blue_5374f600": { "message": "淺藍色" },
   "link_7262adec": { "message": "連結" },
   "link_options_a16b758b": { "message": "連結選項" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "連結類型：{ linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "文字以 { start } 開始的連結"
   },
@@ -562,6 +566,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "+/-" },
   "misc_3b692ea7": { "message": "雜項" },
   "miscellaneous_e9818229": { "message": "雜項" },
+  "module_90d9fd32": { "message": "單元" },
   "modules_c4325335": { "message": "單元" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "移動影像以裁剪 { directionWord }"
@@ -586,8 +591,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "導航整個選單或工具欄"
   },
+  "navigation_ee9af92d": { "message": "導航工具" },
   "nested_greater_than_d852e60d": { "message": "巢式大於" },
   "nested_less_than_27d17e58": { "message": "巢式小於" },
+  "new_quiz_34aacba6": { "message": "新測驗" },
   "next_40e12421": { "message": "下一個" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "並無偵察任何可訪問性問題。"

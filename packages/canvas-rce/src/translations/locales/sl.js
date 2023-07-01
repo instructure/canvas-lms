@@ -232,6 +232,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Obreži sliko" },
   "cup_product_14174434": { "message": "Izdelek za skodelico" },
   "current_image_f16c249c": { "message": "Trenutna slika" },
+  "current_link_945a47ee": { "message": "Trenutna povezava" },
   "current_volume_level_c55ab825": { "message": "Trenutna raven glasnosti" },
   "custom_6979cd81": { "message": "Po meri" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -578,6 +579,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Svetlo modra" },
   "link_7262adec": { "message": "Povezava" },
   "link_options_a16b758b": { "message": "Možnosti povezave" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "vrsta povezave: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Poveži z besedilom, ki se začne s/z { start }"
   },
@@ -636,6 +640,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/plus" },
   "misc_3b692ea7": { "message": "Razno" },
   "miscellaneous_e9818229": { "message": "Drugo" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Moduli" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Premikam sliko za obrezovanje { directionWord }"
@@ -660,8 +665,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigirajte skozi meni ali orodno vrstico"
   },
+  "navigation_ee9af92d": { "message": "Navigacija" },
   "nested_greater_than_d852e60d": { "message": "Ugnezdeni znak za večje kot" },
   "nested_less_than_27d17e58": { "message": "Ugnezdeni znak za manjše kot" },
+  "new_quiz_34aacba6": { "message": "Nov kviz" },
   "next_40e12421": { "message": "Naprej" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ni zaznanih težav z dostopnostjo."

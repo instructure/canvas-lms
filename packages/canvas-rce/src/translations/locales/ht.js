@@ -207,6 +207,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Koupe Imaj" },
   "cup_product_14174434": { "message": "Tèt Pwodui" },
   "current_image_f16c249c": { "message": "Imaj Aktyèl" },
+  "current_link_945a47ee": { "message": "Lyen Aktyèl" },
   "current_volume_level_c55ab825": { "message": "Nivo Volim Aktyèl" },
   "custom_6979cd81": { "message": "Pèsonalize" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -545,6 +546,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Limyè Ble" },
   "link_7262adec": { "message": "Lyen" },
   "link_options_a16b758b": { "message": "Opsyon Lyen" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "tip lyen: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Lyen ak tèks ki kòmanse pa { start }"
   },
@@ -597,6 +601,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Mwens/Plis" },
   "misc_3b692ea7": { "message": "Divès" },
   "miscellaneous_e9818229": { "message": "Divès" },
+  "module_90d9fd32": { "message": "Modil" },
   "modules_c4325335": { "message": "Modil" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Deplase imaj pou koupe { directionWord }"
@@ -621,8 +626,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navige atravè meni oswa ba zouti a"
   },
+  "navigation_ee9af92d": { "message": "Navigasyon" },
   "nested_greater_than_d852e60d": { "message": "Siperyè Enbrike" },
   "nested_less_than_27d17e58": { "message": "Enferyè Enbrike" },
+  "new_quiz_34aacba6": { "message": "Nouvo Quiz" },
   "next_40e12421": { "message": "Pwochen" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Nou pa t detekte okenn pwoblèm aksesibilite."

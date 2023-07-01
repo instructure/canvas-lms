@@ -216,6 +216,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Crop Image" },
   "cup_product_14174434": { "message": "Cup Product" },
   "current_image_f16c249c": { "message": "Current Image" },
+  "current_link_945a47ee": { "message": "Current Link" },
   "current_volume_level_c55ab825": { "message": "Current volume level" },
   "custom_6979cd81": { "message": "Custom" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -560,6 +561,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Light blue" },
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Link Options" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "link type: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Link with text starting with { start }"
   },
@@ -616,6 +620,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Misc" },
   "miscellaneous_e9818229": { "message": "Miscellaneous" },
+  "module_90d9fd32": { "message": "Unit" },
   "modules_c4325335": { "message": "Units" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Moving image to crop { directionWord }"
@@ -640,8 +645,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
+  "navigation_ee9af92d": { "message": "Navigation" },
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
+  "new_quiz_34aacba6": { "message": "New Quiz" },
   "next_40e12421": { "message": "Next" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No accessibility issues were detected."

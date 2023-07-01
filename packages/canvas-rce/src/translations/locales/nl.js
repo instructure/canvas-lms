@@ -226,6 +226,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Afbeelding bijsnijden" },
   "cup_product_14174434": { "message": "Cup-product" },
   "current_image_f16c249c": { "message": "Huidige afbeelding" },
+  "current_link_945a47ee": { "message": "Huidige link" },
   "current_volume_level_c55ab825": { "message": "Huidig volumeniveau" },
   "custom_6979cd81": { "message": "Aangepast" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -582,6 +583,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Lichtblauw" },
   "link_7262adec": { "message": "Link" },
   "link_options_a16b758b": { "message": "Linkopties" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "linktype: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Koppeling maken naar tekst die begint met { start }"
   },
@@ -642,6 +646,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Min/Plus" },
   "misc_3b692ea7": { "message": "Diversen" },
   "miscellaneous_e9818229": { "message": "Diversen" },
+  "module_90d9fd32": { "message": "Module" },
   "modules_c4325335": { "message": "Modules" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Afbeelding verplaatsen om naar { directionWord } bij te snijden"
@@ -666,8 +671,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigeer door het menu of de werkbalk"
   },
+  "navigation_ee9af92d": { "message": "Navigatie" },
   "nested_greater_than_d852e60d": { "message": "Genest groter dan" },
   "nested_less_than_27d17e58": { "message": "Genest kleiner dan" },
+  "new_quiz_34aacba6": { "message": "Nieuwe toets" },
   "next_40e12421": { "message": "Volgende" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Geen toegankelijkheidsproblemen gevonden."

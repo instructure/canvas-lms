@@ -227,6 +227,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Tapahi Whakaahua" },
   "cup_product_14174434": { "message": "Hua Kapu" },
   "current_image_f16c249c": { "message": "Whakapakoko o Nāianei" },
+  "current_link_945a47ee": { "message": "Hononga o naianei" },
   "current_volume_level_c55ab825": {
     "message": "Taumata o te rōrahi ōnāianei"
   },
@@ -579,6 +580,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Puru marama" },
   "link_7262adec": { "message": "Hono" },
   "link_options_a16b758b": { "message": "Hono Kōwhiringa" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "momo hono: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Hono me te kuputuhi e tīmata ana me { start }"
   },
@@ -635,6 +639,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/Plus" },
   "misc_3b692ea7": { "message": "Misc" },
   "miscellaneous_e9818229": { "message": "Momo kē" },
+  "module_90d9fd32": { "message": "Kōwae" },
   "modules_c4325335": { "message": "Kōwae" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Te neke atahanga ki te tapahi { directionWord }"
@@ -659,8 +664,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Whakatere i roto i te tahua paeutauta rānei"
   },
+  "navigation_ee9af92d": { "message": "Whakatere" },
   "nested_greater_than_d852e60d": { "message": "Nested Nui atu i" },
   "nested_less_than_27d17e58": { "message": "Kohanga Iti I Te" },
+  "new_quiz_34aacba6": { "message": "Quiz Hou" },
   "next_40e12421": { "message": "E haere ake nei" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Kaore he whakaurunga take i kitea."

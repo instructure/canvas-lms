@@ -218,6 +218,7 @@ const locale = {
   "crop_image_807ebb08": { "message": "Beskjær bilde" },
   "cup_product_14174434": { "message": "Kopp-produkt" },
   "current_image_f16c249c": { "message": "Nåværende bilde" },
+  "current_link_945a47ee": { "message": "Gjeldende lenke" },
   "current_volume_level_c55ab825": { "message": "Gjeldende volumnivå" },
   "custom_6979cd81": { "message": "Tilpasset" },
   "custom_width_and_height_pixels_946eea7c": {
@@ -564,6 +565,9 @@ const locale = {
   "light_blue_5374f600": { "message": "Lyseblå" },
   "link_7262adec": { "message": "Lenke" },
   "link_options_a16b758b": { "message": "Lenkevalg" },
+  "link_type_linktypemessage_c6d26815": {
+    "message": "lenketype: { linkTypeMessage }"
+  },
   "link_with_text_starting_with_start_b3fcbe71": {
     "message": "Lenke med tekst som starter med { start }"
   },
@@ -624,6 +628,7 @@ const locale = {
   "minus_plus_3461f637": { "message": "Minus/pluss" },
   "misc_3b692ea7": { "message": "Diverse" },
   "miscellaneous_e9818229": { "message": "Diverse" },
+  "module_90d9fd32": { "message": "Modul" },
   "modules_c4325335": { "message": "Moduler" },
   "moving_image_to_crop_directionword_6f66cde2": {
     "message": "Flytter bilde for å beskjære { directionWord }"
@@ -648,8 +653,10 @@ const locale = {
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigere gjennom menyen eller verktøylinjen"
   },
+  "navigation_ee9af92d": { "message": "Navigasjon" },
   "nested_greater_than_d852e60d": { "message": "Nested større enn" },
   "nested_less_than_27d17e58": { "message": "Nested mindre enn" },
+  "new_quiz_34aacba6": { "message": "Ny quiz" },
   "next_40e12421": { "message": "Neste" },
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ingen tiljengelighetsproblemer ble oppdaget."
