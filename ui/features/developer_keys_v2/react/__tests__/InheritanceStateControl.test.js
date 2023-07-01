@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash'
+import moxios from 'moxios'
 
 import {screen, render, fireEvent} from '@testing-library/react'
 import React from 'react'
@@ -32,7 +33,7 @@ const sampleDeveloperKey = (defaults = {}) => {
   })
 }
 
-const getProps = (developerKey, store = false) => {
+const getProps = (developerKey, store = false, contextId = '1') => {
   if (!store) {
     store = storeCreator({
       listDeveloperKeys: {
@@ -44,7 +45,7 @@ const getProps = (developerKey, store = false) => {
     developerKey,
     ctx: {
       params: {
-        contextId: '1',
+        contextId,
       },
     },
     store,
@@ -54,15 +55,77 @@ const getProps = (developerKey, store = false) => {
 
 describe('InheritanceStateControl', () => {
   let oldConfirmation = window.confirm
+  let oldFeatures = {}
 
   beforeEach(() => {
     oldConfirmation = window.confirm
+    window.ENV.FEATURES ||= {}
+    oldFeatures = window.ENV.FEATURES
+    window.ENV.FEATURES.developer_key_page_checkboxes = true
+
+    moxios.install()
   })
 
   afterEach(() => {
     window.confirm = oldConfirmation
+    window.ENV.FEATURES = oldFeatures
+
+    moxios.uninstall()
   })
 
+  it('uses the "off" state from the store for a siteadmin key', () => {
+    const key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        developer_key_id: '1',
+        workflow_state: 'off',
+        account_owns_binding: true,
+      },
+    })
+    const wrapper = mount(<InheritanceStateControl {...getProps(key, false, 'site_admin')} />)
+    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    expect(checkedBtn.value).toBe('off')
+  })
+
+  it('uses the "on" state from the store for a siteadmin key', () => {
+    const key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        developer_key_id: '1',
+        workflow_state: 'on',
+        account_owns_binding: true,
+      },
+    })
+    const wrapper = mount(<InheritanceStateControl {...getProps(key, false, 'site_admin')} />)
+    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    expect(checkedBtn.value).toBe('on')
+  })
+
+  it('with the dev key checkbox flag off uses the "off" state from the store for a root account key', () => {
+    window.ENV.FEATURES.developer_key_page_checkboxes = false
+    const key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        developer_key_id: '1',
+        workflow_state: 'off',
+        account_owns_binding: true,
+      },
+    })
+    const wrapper = mount(<InheritanceStateControl {...getProps(key, false)} />)
+    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    expect(checkedBtn.value).toBe('off')
+  })
+
+  it('with the dev key checkbox flag off uses the "on" state from the store for a root account key', () => {
+    window.ENV.FEATURES.developer_key_page_checkboxes = false
+    const key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        developer_key_id: '1',
+        workflow_state: 'on',
+        account_owns_binding: true,
+      },
+    })
+    const wrapper = mount(<InheritanceStateControl {...getProps(key, false)} />)
+    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
+    expect(checkedBtn.value).toBe('on')
+  })
   it('uses the "off" state from the store', () => {
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
@@ -72,8 +135,8 @@ describe('InheritanceStateControl', () => {
       },
     })
     const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
-    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
-    expect(checkedBtn.value).toBe('off')
+    const checkedBtn = wrapper.find('input[type="checkbox"]').getDOMNode()
+    expect(checkedBtn.checked).toBe(false)
   })
 
   it('uses the "on" state from the store', () => {
@@ -85,15 +148,15 @@ describe('InheritanceStateControl', () => {
       },
     })
     const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
-    const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
-    expect(checkedBtn.value).toBe('on')
+    const checkedBtn = wrapper.find('input[type="checkbox"]').getDOMNode()
+    expect(checkedBtn.checked).toBe(true)
   })
 
   it('renders "off" if "allow" is set as the workflow state for root account', () => {
     const key = sampleDeveloperKey()
     const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
-    const domNode = wrapper.find('input[checked=true]').getDOMNode()
-    expect(domNode.value).toBe('off')
+    const domNode = wrapper.find('input[type="checkbox"]').getDOMNode()
+    expect(domNode.checked).toBe(false)
   })
 
   it('updates the state when the RadioInput is clicked', () => {
@@ -112,8 +175,32 @@ describe('InheritanceStateControl', () => {
       },
     })
 
-    render(<InheritanceStateControl {...getProps(key, store)} />)
+    render(<InheritanceStateControl {...getProps(key, store, 'site_admin')} />)
     const item = screen.getByText('Off')
+    fireEvent.click(item)
+    const updatedDevKey = store.getState().listDeveloperKeys.list[0]
+
+    expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
+  })
+
+  it('updates the state when the Checkbox is clicked', () => {
+    window.confirm = jest.fn(() => true)
+
+    const key = sampleDeveloperKey({
+      developer_key_account_binding: {
+        developer_key_id: '1',
+        workflow_state: 'on',
+        account_owns_binding: true,
+      },
+    })
+    const store = storeCreator({
+      listDeveloperKeys: {
+        list: [key],
+      },
+    })
+
+    render(<InheritanceStateControl {...getProps(key, store)} />)
+    const item = document.querySelector('input[type="checkbox"]:checked')
     fireEvent.click(item)
     const updatedDevKey = store.getState().listDeveloperKeys.list[0]
 
@@ -137,7 +224,7 @@ describe('InheritanceStateControl', () => {
     })
 
     render(<InheritanceStateControl {...getProps(key, store)} />)
-    const item = screen.getByText('Off')
+    const item = document.querySelector('input[type="checkbox"]')
     fireEvent.click(item)
     const devKeyFromStore = store.getState().listDeveloperKeys.list[0]
 
@@ -179,12 +266,26 @@ describe('InheritanceStateControl', () => {
     return component.getDOMNode()
   }
 
-  it('disables the radio group if the account does not own the binding and it is set', () => {
+  it('disables the checkbox if the account does not own the binding and it is set', () => {
+    const checkbox = componentNode(mockDevKey('off')).querySelector('input[type="checkbox"]')
+    expect(checkbox.disabled).toBe(true)
+  })
+
+  it('disabled the checkbox if the account does not own the binding and it is not set and the account is a child account', () => {
+    const checkbox = componentNode(mockDevKey('allow', false, 'child_account')).querySelector(
+      'input[type="checkbox"]'
+    )
+    expect(checkbox.disabled).toBe(true)
+  })
+
+  it('with the dev key checkbox flag off disables the radio group if the account does not own the binding and it is set', () => {
+    window.ENV.FEATURES.developer_key_page_checkboxes = false
     const radioGroup = componentNode(mockDevKey('off')).querySelector('input[type="radio"]')
     expect(radioGroup.disabled).toBe(true)
   })
 
-  it('disabled the radio group if the account does not own the binding and it is not set and the account is a child account', () => {
+  it('with the dev key checkbox flag off disabled the radio group if the account does not own the binding and it is not set and the account is a child account', () => {
+    window.ENV.FEATURES.developer_key_page_checkboxes = false
     const radioGroup = componentNode(mockDevKey('allow', false, 'child_account')).querySelector(
       'input[type="radio"]'
     )
@@ -192,18 +293,32 @@ describe('InheritanceStateControl', () => {
   })
 
   it('enables the radio group if the account does not own the binding and it is not set and the account is not a child account', () => {
-    const radioGroup = componentNode(mockDevKey('allow')).querySelector('input[type="radio"]')
+    const radioGroup = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
+      'input[type="radio"]'
+    )
     expect(radioGroup.disabled).toBeFalsy()
   })
 
-  it('enables the radio group if the account does the binding', () => {
-    const radioGroup = componentNode(mockDevKey('on', true)).querySelector('input[type="radio"]')
+  it('enables the radio group if the account does own the binding', () => {
+    const radioGroup = componentNode(mockDevKey('on', true)).querySelector('input[type="checkbox"]')
     expect(radioGroup.disabled).toBeFalsy()
   })
 
-  it('the correct state for the developer key', () => {
-    const offRadioInput = componentNode(mockDevKey()).querySelector('input[value="off"]')
+  it('the correct state for the developer key for siteadmin', () => {
+    const offRadioInput = componentNode(mockDevKey(), siteAdminCTX).querySelector(
+      'input[value="off"]'
+    )
     expect(offRadioInput.checked).toBe(true)
+  })
+
+  it('the correct state for the developer key that is off', () => {
+    const toggleSwitch = componentNode(mockDevKey()).querySelector('input[type="checkbox"]')
+    expect(toggleSwitch.checked).toBe(false)
+  })
+
+  it('the correct state for a developer key that is on', () => {
+    const toggleSwitch = componentNode(mockDevKey('on')).querySelector('input[type="checkbox"]')
+    expect(toggleSwitch.checked).toBe(true)
   })
 
   it('renders "allow" if no binding is sent only for site_admin', () => {
@@ -215,12 +330,18 @@ describe('InheritanceStateControl', () => {
     expect(allowRadioInput.checked).toBe(true)
   })
 
-  it('renders an "on" option', () => {
-    expect(componentNode({id: '123'}).querySelector('input[value="on"]')).toBeTruthy()
+  it('renders an "on" option for siteadmin keys', () => {
+    expect(componentNode({id: '123'}, siteAdminCTX).querySelector('input[value="on"]')).toBeTruthy()
   })
 
-  it('renders an "off" option', () => {
-    expect(componentNode({id: '123'}).querySelector('input[value="off"]')).toBeTruthy()
+  it('renders an "off" option for siteadmin keys', () => {
+    expect(
+      componentNode({id: '123'}, siteAdminCTX).querySelector('input[value="off"]')
+    ).toBeTruthy()
+  })
+
+  it('renders a toggle switch for non-siteadmin keys', () => {
+    expect(componentNode({id: '123'}).querySelector('input[type="checkbox"]')).toBeTruthy()
   })
 
   it('renders an "allow" option only for site_admin', () => {

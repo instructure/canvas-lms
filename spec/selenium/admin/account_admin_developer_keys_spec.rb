@@ -26,6 +26,7 @@ describe "Developer Keys" do
   describe "as an admin" do
     before do
       admin_logged_in
+      Account.site_admin.enable_feature! :developer_key_page_checkboxes
     end
 
     let(:root_developer_key) do
@@ -170,11 +171,33 @@ describe "Developer Keys" do
         site_admin_developer_key.update(visible: true)
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
+        expect(f("input[type='checkbox']:not(:checked)")).to be_truthy
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
+      end
+
+      it "with the dev key checkbox flag off site admin dev key is visible and set to 'off' in root account" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
+        site_admin_developer_key.update(visible: true)
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
         expect(fj("input[type='radio']:checked").attribute("value")).to eq "off"
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
       end
 
       it "root account inherits 'on' binding workflow state from site admin key" do
+        site_admin_logged_in
+        site_admin_developer_key.update(visible: true)
+        get "/accounts/site_admin/developer_keys"
+        fj("div:contains('On'):last").click
+        accept_alert
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
+        expect(f("input[type='checkbox']:disabled")).to be_truthy
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "on"
+      end
+
+      it "with the dev key checkbox flag off root account inherits 'on' binding workflow state from site admin key" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
@@ -194,11 +217,46 @@ describe "Developer Keys" do
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         # checks that the state toggle is disabled from interaction
+        expect(f("input[type='checkbox']:disabled")).to be_truthy
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
+      end
+
+      it "with the dev key checkbox flag off root account inherits 'off' binding workflow state from site admin key" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
+        site_admin_logged_in
+        site_admin_developer_key.update(visible: true)
+        get "/accounts/site_admin/developer_keys"
+        fj("div:contains('Off'):last").click
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
+        # checks that the state toggle is disabled from interaction
         expect(fj("fieldset:last").attribute("aria-disabled")).to eq "true"
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
       end
 
       it "root account keeps self binding workflow state if site admin key state is 'allow'" do
+        site_admin_logged_in
+        site_admin_developer_key.update!(visible: true)
+        site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: "allow")
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
+        fj("div:has(input[type='checkbox']:not(:checked):last) > label").click
+        accept_alert
+        get "/accounts/site_admin/developer_keys"
+        fj("div:contains('Off'):last").click
+        accept_alert
+        expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq "off"
+        fj("div:contains('Allow'):last").click
+        accept_alert
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
+        expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq "on"
+        # checks that the state toggle is enabled for interaction
+        expect(fj("input[type='checkbox']:last")).not_to have_attribute("disabled")
+      end
+
+      it "with the dev key checkbox flag off root account keeps self binding workflow state if site admin key state is 'allow'" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
         site_admin_logged_in
         site_admin_developer_key.update!(visible: true)
         site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: "allow")
@@ -222,6 +280,16 @@ describe "Developer Keys" do
       it "allows for root account dev key status 'on'" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
+        fj("div:has(input[type='checkbox']:not(:checked):last) > label").click
+        accept_alert
+        keep_trying_until { expect(current_active_element.attribute("checked")).to eq "true" }
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "on"
+      end
+
+      it "with the dev key checkbox flag off allows for root account dev key status 'on'" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
+        root_developer_key
+        get "/accounts/#{Account.default.id}/developer_keys"
         fj("div:contains('On'):last").click
         accept_alert
         keep_trying_until { expect(current_active_element.attribute("value")).to eq "on" }
@@ -229,6 +297,17 @@ describe "Developer Keys" do
       end
 
       it "allows for root account dev key status 'off'" do
+        root_developer_key
+        DeveloperKeyAccountBinding.last.update(workflow_state: "on")
+        get "/accounts/#{Account.default.id}/developer_keys"
+        fj("div:has(input[type='checkbox']:checked:last) > label").click
+        accept_alert
+        expect(f("input[type='checkbox']:not(:checked)")).to be_truthy
+        expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
+      end
+
+      it "with the dev key checkbox flag off allows for root account dev key status 'off'" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
         root_developer_key
         DeveloperKeyAccountBinding.last.update(workflow_state: "on")
         get "/accounts/#{Account.default.id}/developer_keys"
@@ -241,6 +320,17 @@ describe "Developer Keys" do
       it "persists state when switching between account and inheritance tabs" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
+        fj("div:has(input[type='checkbox']:not(:checked):last) > label").click
+        accept_alert
+        click_inherited_tab
+        click_account_tab
+        expect(f("input[type='checkbox']:checked")).to be_truthy
+      end
+
+      it "with the dev key checkbox flag off persists state when switching between account and inheritance tabs" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
+        root_developer_key
+        get "/accounts/#{Account.default.id}/developer_keys"
         fj("div:contains('On'):last").click
         accept_alert
         click_inherited_tab
@@ -249,6 +339,18 @@ describe "Developer Keys" do
       end
 
       it "persists state when switching between inheritance and account tabs" do
+        site_admin_developer_key
+        DeveloperKey.find(site_admin_developer_key.id).update(visible: true)
+        DeveloperKeyAccountBinding.first.update(workflow_state: "allow")
+        get "/accounts/#{Account.default.id}/developer_keys"
+        click_inherited_tab
+        click_account_tab
+        click_inherited_tab
+        expect(f("input[type='checkbox']:not(:checked)")).to be_truthy
+      end
+
+      it "with the dev key checkbox flag off persists state when switching between inheritance and account tabs" do
+        Account.site_admin.disable_feature! :developer_key_page_checkboxes
         site_admin_developer_key
         DeveloperKey.find(site_admin_developer_key.id).update(visible: true)
         DeveloperKeyAccountBinding.first.update(workflow_state: "allow")

@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('react_developer_keys')
@@ -86,69 +87,101 @@ export default class DeveloperKeyStateControl extends React.Component {
     this.offToggle = node
   }
 
+  refCheckboxToggle = node => {
+    // Only onToggle and offToggle are set, since a checkbox should only
+    // be used for non-siteadmin keys, so the allowToggle function *shouldn't*
+    // ever get called.
+    this.onToggle = node
+    this.offToggle = node
+  }
+
   getKeyName() {
     return this.props.developerKey.name || I18n.t('Unnamed Key')
   }
 
   render() {
-    return (
-      <RadioInputGroup
-        size="medium"
-        variant="toggle"
-        defaultValue={this.getDefaultValue()}
-        description={
-          <ScreenReaderContent>{I18n.t('Key state for the current account')}</ScreenReaderContent>
-        }
-        onChange={(e, val) => this.setBindingState(val)}
-        disabled={this.isDisabled()}
-        name={this.props.developerKey.id}
-        value={this.radioGroupValue()}
-      >
-        <RadioInput
-          ref={this.refOnToggle}
-          label={
-            <div>
-              {I18n.t('On')}
-              <ScreenReaderContent>
-                {I18n.t('On for key: %{keyName}', {keyName: this.getKeyName()})}
-              </ScreenReaderContent>
-            </div>
+    if (this.isSiteAdmin() || !ENV.FEATURES?.developer_key_page_checkboxes) {
+      return (
+        <RadioInputGroup
+          size="medium"
+          variant="toggle"
+          defaultValue={this.getDefaultValue()}
+          description={
+            <ScreenReaderContent>{I18n.t('Key state for the current account')}</ScreenReaderContent>
           }
-          value="on"
-          context="success"
-        />
-        {this.isSiteAdmin() && (
+          onChange={(e, val) => this.setBindingState(val)}
+          disabled={this.isDisabled()}
+          name={this.props.developerKey.id}
+          value={this.radioGroupValue()}
+        >
           <RadioInput
-            ref={node => {
-              this.allowToggle = node
-            }}
+            ref={this.refOnToggle}
             label={
               <div>
-                {I18n.t('Allow')}
+                {I18n.t('On')}
                 <ScreenReaderContent>
-                  {I18n.t('Allow for key: %{keyName}', {keyName: this.getKeyName()})}
+                  {I18n.t('On for key: %{keyName}', {keyName: this.getKeyName()})}
                 </ScreenReaderContent>
               </div>
             }
-            value="allow"
-            context="off"
+            value="on"
+            context="success"
           />
-        )}
-        <RadioInput
-          ref={this.refOffToggle}
+          {this.isSiteAdmin() && (
+            <RadioInput
+              ref={node => {
+                this.allowToggle = node
+              }}
+              label={
+                <div>
+                  {I18n.t('Allow')}
+                  <ScreenReaderContent>
+                    {I18n.t('Allow for key: %{keyName}', {keyName: this.getKeyName()})}
+                  </ScreenReaderContent>
+                </div>
+              }
+              value="allow"
+              context="off"
+            />
+          )}
+          <RadioInput
+            ref={this.refOffToggle}
+            label={
+              <div>
+                {I18n.t('Off')}
+                <ScreenReaderContent>
+                  {I18n.t('Off for key: %{keyName}', {keyName: this.getKeyName()})}
+                </ScreenReaderContent>
+              </div>
+            }
+            value="off"
+            context="danger"
+          />
+        </RadioInputGroup>
+      )
+    } else {
+      return (
+        <Checkbox
+          ref={this.refCheckboxToggle}
           label={
-            <div>
-              {I18n.t('Off')}
-              <ScreenReaderContent>
-                {I18n.t('Off for key: %{keyName}', {keyName: this.getKeyName()})}
-              </ScreenReaderContent>
-            </div>
+            <ScreenReaderContent>
+              {I18n.t('%{status} for key: %{keyName}', {
+                status: this.radioGroupValue(),
+                keyName: this.getKeyName(),
+              })}
+            </ScreenReaderContent>
           }
-          value="off"
-          context="danger"
+          variant="toggle"
+          checked={this.radioGroupValue() === 'on'}
+          disabled={this.isDisabled()}
+          name={this.props.developerKey.id}
+          onChange={e => {
+            const newValue = e.target.checked ? 'on' : 'off'
+            this.setBindingState(newValue)
+          }}
         />
-      </RadioInputGroup>
-    )
+      )
+    }
   }
 }
 

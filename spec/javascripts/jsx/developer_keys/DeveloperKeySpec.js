@@ -180,8 +180,8 @@ test('includes "Never" when last_used_at is null', () => {
   testWrapperOk(updateDefaultProps({developerKey: {last_used_at: null}}), 'Never')
 })
 
-test('it renders the developer key state control', () => {
-  testWrapperOk(defaultProps, 'Key state for the current account')
+test('it renders the developer key state control for site admin keys', () => {
+  testWrapperOk(updateDefaultProps({ctx: {params: {contextId: 'site_admin'}}}), 'Key state for the current account')
 })
 
 test('renders No Email when email is missing', () => {
