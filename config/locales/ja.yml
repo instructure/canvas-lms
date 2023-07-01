@@ -278,8 +278,11 @@ ja:
         partner_id: "パートナー ID"
         partner_key: パートナーキー
   academic_engagement_capella_74946a80: "アカデミックな予定 (Capella)"
+  academic_engagement_detail_capella_e76c939d: アカデミックエンゲージメント詳細（Capella）
   academic_engagement_detail_sei_31f8f271: "アカデミック・エンゲージメント詳細 - SEI"
+  academic_engagement_detail_strayer_1f80cba4: アカデミックエンゲージメント詳細（Strayer）
   academic_engagement_strayer_8c7832b9: "アカデミックな予定 (Strayer)"
+  academic_engagement_strayer_v2_61e00b88: "アカデミックエンゲージメント（Strayer V2）"
   academic_success_reporting_2585c499: 学術的成功の報告
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union ハイスクール評定表"
   accept_2fdd362e: 受諾
@@ -2074,6 +2077,7 @@ ja:
           zero_activity: 
             text: "このレポートでは、指定した期間のすべてのコースに登録しているすべての受講者が示されます。生成される csv ファイルでは、日付以降にコースを訪問していない登録ユーザがそれぞれ 1 行で示されます。"
   accounts_752dc365: アカウント
+  accounts_could_not_be_loaded_640d5531: アカウントが読み込めませんでした
   accounts_lti_546d15c7: "アカウント (LTI)"
   accounts_tree_navigate_the_accounts_tree_hierarchi_8afea172: アカウントツリー：アカウントツリーを階層的に移動して、アカウントカレンダーの表示・非表示を切り替えられます。
   achieve_mastery_count_times_8c9bbcec: 
@@ -4932,6 +4936,7 @@ ja:
     corrupted: 詳細なし
     login: ログイン
     logout: ログアウト
+  authenticated_iframe_content_a7588e91: 認証済みIFrameコンテンツ
   authentication_1b518c38: 認証
   authentication_context_60748f2f: 認証コンテキスト
   authentication_provider: 
@@ -5067,6 +5072,7 @@ ja:
   authorize_e3f25bb4: 認証する
   authorize_url_f28167a3: URLを承認
   auto_leader_7791c30a: auto_leader
+  auto_provision_new_quizzes_if_flagged_root_account_a19fbf5b: ルートアカウントにフラグが設定されている場合、新しい小テストを自動プロビジョニングします。
   auto_show_closed_captions_e4cd7aff: クローズドキャプションの自動表示
   auto_subscribe_a7da0dff: 自動登録
   autodetect_field_separators_in_compatible_spreadsh_768067e1: 対応するスプレッドシートのエクスポートで、フィールド区切りを自動検出
@@ -5504,6 +5510,7 @@ ja:
   by_default_students_can_always_create_groups_in_a__af000dd: "デフォルトでは、学生はグループを作成できます。学生によるグループの作成を制限するには、[コース管理：管理者-管理/更新]が有効にされていなければなりません。また、コース設定で「受講生が自分のグループを整理する」チェックボックスがオフになっていなければなりません。"
   by_default_students_can_always_create_groups_in_a__dac761d3: "デフォルトでは、受講者はグループを作成できます。受講生がグループを作成するのを制限するには、[コース - 管理/更新]も有効にされていなければならず、コース設定で[受講生が自分のグループを整理する]チェックボックスがオフにされていなければなりません。"
   by_due_date_648d7f3b: 期日ごと
+  by_entering_and_submitting_a_grade_value_below_f77e29e7: 以下に評定値を入力し、送信すること：
   by_lti_2_registration_url_e421e523: "LTI 2 登録 URL"
   by_name_54daec42: "%{name}が担当"
   by_url_a163275e: "URL ごと"
@@ -6113,6 +6120,7 @@ ja:
   canvas_for_elementary_font_selection_5d1f2271: "Canvas for Elementary フォントの選択"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "初級用Canvas: ホームルームでの多数のアナウンス"
   canvas_for_elementary_parent_support_74a2356e: "初級用Canvas:保護者サポート"
+  canvas_grading_scheme_course_default_150b6fec: "Canvasの評定スキーム (コースデフォルト)"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   canvas_guides_d65431: "Canvas ガイド"
@@ -6155,6 +6163,7 @@ ja:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       最初のページ読み込み時にレンダリングされるRCEの数を制限します。その後、
       ビューポートに入る前にそれぞれ初期化します。
+  caption_1cf95987: キャプション
   captions_subtitles_af2c47e: キャプション/字幕
   captured_image_91838f78: キャプチャされた画像
   card_movement_menu_for_title_b94c09af: "～用カードの動きメニュー%{title}"
@@ -6225,6 +6234,9 @@ ja:
   change_visibility_of_account_calendars_fd03fbb8: アカウントカレンダーの可視性を変更する
   changed_by_person_c39615e: "変更者：%{person}"
   changed_item_1d16a85f: 変更されたアイテム
+  changes_the_resourcelink_id_substitution_parameter_15c7faaf: |-
+      $ResourceLink.id 置換パラメータの動作を、ライン項目用にresource_idではなく
+      resource_link_uuidを含むように変更します
   changes_the_sort_order_of_the_gradebook_export_to__41b286fd: 評定表エクスポートの並べ替え順を変更して、Canvasのドキュメントにより厳密に一致させます
   changes_will_still_apply_if_you_leave_this_page_935cedc6: このページを終了しても、変更は適用されます。
   changes_you_made_may_not_be_saved_4e8db973: 行われた変更は保存されません。
@@ -7700,6 +7712,10 @@ ja:
   continue_draft_6166ea79: 下書きを続ける
   continue_typing_to_find_additional_sections_or_stu_49786085: 更にタイプして、追加のセクションまたは生徒を見つける
   contributed_to_this_module_item_and_is_complete_2799d5c: このモジュールアイテムに貢献し、完了しました
+  controls_the_final_changes_needed_to_fully_conform_8398b749: |-
+      LTI Platform Storages
+      仕様に完全に準拠するために必要な最終的な変更を制御します。（正しいOIDC Auth
+      URI オリジン宛のメッセージの受信、およびpostMessage転送プロキシフレームを含む）。
   conversation_dialog: 
     errors: 
       field_is_required: このフィールドは必須項目です
@@ -8343,6 +8359,8 @@ ja:
   course_copy_no_course_error: コピー元のコースが見つかりませんでした。
   course_copy_not_allowed_error: コピー元のコースのコピーが許可されていません。
   course_course_d1c78210: "コース：%{course}"
+  course_default_fd054879: (コースデフォルト)
+  course_default_grading_scheme_6b902d8: コースデフォルト評定スキーム
   course_details_25cdf103: コースの詳細情報
   course_discussions_38c0b74f: コースのディスカッション
   course_end_date_4c797823: コース終了日
@@ -9803,7 +9821,9 @@ ja:
   default_due_time_9d0e9140: デフォルトの期限
   default_email_5cb9fa04: 初期設定のメ－ルアドレス：
   default_email_9efb7fbd: デフォルトの電子メール
+  default_grade_2033adfd: デフォルト評定
   default_grade_cannot_be_set_to_ex_723caa59: "ディフォルトの評定は%{ex}に設定することはできません"
+  default_grade_for_1283e89b: （）のデフォルト評定
   default_grading_scheme_894a0eb: デフォルトの採点スキーム
   default_order_8c409051: デフォルトオーダー
   default_question_name: 問題
@@ -11228,6 +11248,7 @@ ja:
     assignment_order_alpha: アルファベット順
     assignment_order_assignment_groups: 課題グループおよび職位順
     assignment_order_due_date: 期日ごと
+    notes: メモ
   enhanced_individual_gradebook_4e825077: 強化された個人評定ブック
   enhanced_rce_paste_from_clipboard_30ddb011: クリップボードからのRCEペーストの強化
   enhances_the_canvas_experience_within_the_learning_8031b650: 学習達成度の成績表内のCanvasエクスペリエンスを強化します。
@@ -11745,6 +11766,7 @@ ja:
   error_uploading_files_f709361f: ファイル読み込み中にエラー
   error_uploading_video_audio_recording_16d9730a: 映像/オーディオ録音のアップロード中にエラーが発生しました
   error_while_importing_csv_please_contact_support_e_57e6b3b: "CSV のインポート中にエラーが発生しました。サポートに連絡してください。(エラー レポート %{number})"
+  errormessage_efa8ae9: "%{errorMessage}"
   errors: 
     bad_navigation_config: "無効なコース タブ構成です"
     blank: 必須
@@ -12229,6 +12251,7 @@ ja:
   failed_to_save_dashboard_selection_32e71c72: ダッシュボード選択の保存に失敗しました
   failed_to_save_please_try_again_later_bb7070fb: 保存に失敗しました。後でもう一度試してください
   failed_to_save_selected_calendars_210b5e8f: 選択したカレンダーの保存に失敗しました
+  failed_to_set_default_grade_aa3defda: デフォルト評定の設定に失敗しました
   failed_to_split_users_d9759007: ユーザーの分割に失敗しました。
   failed_to_submit_draft_comment_1de83451: 下書きコメントの提出に失敗しました
   failed_to_throttle_tag_error_356b24eb: "タグをスロットルできませんでした。%{error}"
@@ -12670,6 +12693,7 @@ ja:
   french_canada_c3d92fa6: フランス語（カナダ）
   frequently_used_21a3eb8e: よく使われるもの
   fri_e2451e74: 金曜
+  friday_2c4f6d5a: 金曜日
   friendly_description_57f7fdde: わかりやすい説明
   friendly_description_for_parent_student_display_e608ecf3: わかりやすい説明（親/生徒に表示用）
   friendly_name_601153fb: なじみやすい名前
@@ -12731,6 +12755,8 @@ ja:
   getting_recipients_observers_52d47cad: 受信者オブザーバーを獲得
   getting_started_with_collaborations_794240ba: コラボレーションを開始する
   gif_74e4a622: GIF
+  give_all_students_the_same_4804fbe7: すべての受講者に同じ評定を与える
+  give_all_students_the_same_grade_for_596ae9d0: すべての受講者に（）への同じ評点を与える
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "以下のグレードの値を入力して提出することによって、すべての生徒に*%{assignment.name}*への同じグレードを与えます："
   give_all_students_the_same_percent_grade_for_assig_6a008004: "以下のグレードの値を入力して提出することによって、すべての生徒に同じ*パーセント*のグレードを**%{assignment.name}**に対して与えます："
   give_this_filter_a_name_36b4b03a: フィルターに名前を付ける
@@ -12813,6 +12839,8 @@ ja:
       warning: 警告
   grade_distribution_e52c9256: 評定の分布
   grade_export_title: 評定のエクスポート
+  grade_for_4c87a353: 評定：
+  grade_for_ce7621f0: 評定：
   grade_for_course_ccc8513c: "%{course}を採点する"
   grade_for_missing_submissions_56f91c83: 提出物がない場合の評定
   grade_for_name_b9df168a: "評定：%{name}"
@@ -12834,6 +12862,7 @@ ja:
   grade_posting_policy_42c8a94b: 評定掲示ポリシー
   grade_posting_policy_name_a6d6f178: "評定掲示ポリシー”%{name}"
   grade_posting_policy_tray_c929cfd: 評定掲示ポリシートレイ
+  grade_saved_300616e9: 保存された評定
   grade_saved_ab539b53: 評定が保存されました。
   grade_selection_table_dcf9d1ea: 評定選択表
   grade_summary: 
@@ -14431,6 +14460,7 @@ ja:
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: カレンダーの使い方を覚えて、課題以外のイベントをコースに追加できるようになりましょう。詳しく説明しますので、心配は無用です。
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "以下は、Canvas の使用を開始するための簡単なヒントです！"
   hi_contrast_373b614f: 高コントラスト
+  hidden_130c3791: 非表示
   hidden_14a032a7: 非表示
   hidden_available_with_a_link_65ef2bda: 非表示です。リンクで利用できます
   hidden_available_with_a_link_click_to_modify_184990e7: "非表示です。リンクで利用できます- クリックして変更してください"
@@ -18962,6 +18992,7 @@ ja:
   modules_updated_abeb4ec6: モジュールの更新
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle}（未公開）"
   mon_8f18082a: 月曜
+  monday_432ff613: 月曜日
   month_s_5c17590e: 月
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}開始地点%{time}"
   moodle_dropdown_many_warning_title: "このバンクの %{count} 件の複数ドロップダウン問題が、正しくインポートされていない可能性があります"
@@ -20496,6 +20527,7 @@ ja:
   overview_58268c72: 概要
   overview_of_student_status_a004bcf3: 受講者テータスの概要
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: すべてのユーザーの既存のデフォルトダッシュボード設定を上書きする
+  overwrite_already_entered_grades_64a98037: 既に入力されている評定を上書き
   own_copyright_cc59db55: 著作権保有
   owner_email_236d1b2: 所有者の電子メール
   owner_email_4d02f795: 所有者の電子メール：
@@ -21329,6 +21361,7 @@ ja:
         user_severity: ユーザ重要度
         username: ユーザ名
   png_55cbb586: PNG
+  points_based_letter_grading_schemes_e65127d5: ポイントベースの文字成績評価スキーム
   points_bb475533: 点数
   points_bceb5005: ポイント
   points_changed_exceptions_b0c771f7: ポイント変更の例外：
@@ -23935,6 +23968,7 @@ ja:
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "受講者が登録されている教員のTo Doリストを両方表示する"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "ダッシュボードのサイドバーに表示されるTo Doリストを、受講者が登録されている教員用に両方表示します。"
   reorders_some_menu_options_for_more_consistency_an_90efff07: メニューの順序を変更し、SpeedGraderへのリンクを追加。
+  repeats_on_61ecde30: 反復日：
   replace_attachmentdisplayname_button_94dd8ba1: "%{attachmentDisplayName}ボタンを交換"
   replace_e61834a7: 置換
   replace_filename_png_button_cf5dc7c3: filename.png　ボタンを交換
@@ -24417,6 +24451,7 @@ ja:
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "'Canvas_URL__c'と同じ値は、おそらくすぐに消失するでしょう。"
   sample_data_e4fd01ff: サンプルデータ
   sat_fa4152a4: 土曜
+  saturday_af8feb7f: 土曜日
   saudi_arabia_1f0dcbdc: サウジアラビア
   saudi_arabia_966_d01ed717: "サウジアラビア (+966)"
   save_11a80ec3: 保存
@@ -24481,6 +24516,8 @@ ja:
   school_of_rock_4b7b1fd0: スクール・オブ・ロック
   scope_9729c11e: 範囲：
   scope_c59afc8a: 範囲
+  scope_to_a_specifc_user_9828eb72: 特定のユーザーを対象とする
+  scope_to_a_specific_course_deb646df: 特定のコースを対象とする
   score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: スコア変更のお知らせ
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -25050,6 +25087,7 @@ ja:
   send_title_to_user_d952e233: "%{title}をユーザーに送信"
   send_to_7881bf0e: 送信先...
   send_to_a879095e: 送信先：
+  send_to_all_of_group_6e91ead8: グループの全員に送信
   send_to_b940900a: 送信先...
   send_to_ce05b460: 送信
   send_usage_metrics_cecc7a7d: 使用状況メトリクスの送信
@@ -26589,6 +26627,7 @@ ja:
   student_id_7cc45fb5: "受講者 ID"
   student_id_9d858781: "受講生 (%{id})"
   student_id_a61d78c7: "受講者 IＤ"
+  student_id_c2a72227: "受講者%{id}"
   student_information_8715d0c7: 受講者情報
   student_integration_id_b9e6ede: "受講者統合 id"
   student_integration_id_e08f80af: "受講者統合 ID"
@@ -27034,6 +27073,7 @@ ja:
   summary_of_report_types_d064d42b: レポートタイプの概要
   summary_statistics_f74852a5: 統計概要
   sun_298d7c8b: 日曜
+  sunday_50a31adb: 日曜日
   support: 
     array: 
       last_word_connector: 、および
@@ -27216,6 +27256,7 @@ ja:
   teachers_52e2423f: 教員
   teachers_add_d5258e33: "教員 - 追加"
   teachers_add_ed68c8d3: "教員 - 追加"
+  teachers_and_account_managers_will_be_able_to_crea_9bad32cf: 教員およびアカウントマネージャは評定表の入力および表示において、パーセンテージの代わりにポイントを使用する、文字による評定スキームを作成することができるようになります。
   teachers_and_account_managers_will_be_able_to_more_f0b4474f: 教員とアカウント管理者は、アカウント、コース、および課題のレターグレーディングスキームをより簡単に管理できるようになります。
   teachers_designers_and_tas_can_select_a_course_hom_30025956: "教員、設計者、およびTAは、コースのコンテンツなしでコースのホームページを選択できます。 - 追加/編集/削除の権限があります。"
   teachers_over_time_1905603b: 経時教員
@@ -27997,6 +28038,7 @@ ja:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "公開する前に、このファイルに usage_rights を設定する必要があります。"
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "このフラグにより、Canvas Calendar からカレンダーイベントシリーズを作成できるようになります。"
   this_flag_allows_events_from_account_calendars_to__fbef2289: このフラグは、アカウントカレンダーからのイベントをCanvasプランナーに表示することを許可するものです。
+  this_flag_changes_the_way_rce_content_is_loaded_in_b72905ec: このフラグはRCEコンテンツがiframeに読み込まれる方法を変更します。
   this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: このフラグは無効であり、テスト目的のみとしています。
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: このフラグは、機能フラグタブの名称を「機能オプション」に更新し、機能プレビュープロジェクト用の「機能プレビュー」ピルを追加します。
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: このフラグが動作の変更の原因となることはありません。
@@ -28251,6 +28293,7 @@ ja:
   throttle_tag_tag_ba5b9b50: "スロットルタグ %{tag}"
   throttling_jobs_4a90578c: ジョブをスロットル中
   thu_59cbcffe: 木曜
+  thursday_f112cf65: 木曜日
   ticket_successfully_submitted_f6254460: チケットの提出が完了しました。
   ticketing_system_52205bff: チケットシステム
   ticketing_system_configurations_c4fecd96: チケットシステムの構成
@@ -29232,6 +29275,7 @@ ja:
   try_out_canvas_for_free_e2265d30: "Canvas を無料でお試しください！"
   ttml_tracks_are_not_allowed_because_they_are_susce_d40b654a: TTMLトラックは、xss攻撃の影響を受けやすいため、使用できません。
   tue_bb10b386: 火曜
+  tuesday_698a01b: 火曜日
   turkish_5b69578b: トルコ語
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "RTL 以外の言語でも RTL を有効にする"
   turned_in_submission_date_e9180b8b: "提出：%{submission_date}"
@@ -29684,6 +29728,7 @@ ja:
   usage_rights_on_discussion_topics_7bb66ac2: ディスカッショントピックの使用権
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "次に含まれるすべてのファイルに使用権が設定されます:"
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "複数のユーザーを追加するには、\",\" か改行を使用します。"
+  use_a_resource_link_s_resource_link_uuid_in_the_re_3bb2f166: $ResourceLink.id置換パラメータ内のリソースリンクのresource_link_uuidを使用します
   use_arrow_keys_to_navigate_options_2021cc50: 矢印キーを使用してオプションを移動します。
   use_arrow_keys_to_navigate_options_d45347e8: 矢印キーを使用してオプションをナビゲートします
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: 矢印キーを使って会議プロバイダーを選択する
@@ -30508,6 +30553,7 @@ ja:
   website_url_input_1a3eab25: WebサイトのURL入力
   website_url_url_bd07233d: "ウェブサイトのURL%{url}"
   wed_84932f18: 水曜
+  wednesday_b6f755f5: 水曜日
   week_s_cb1492ee: 週
   weekly_summary_56cd0c95: 毎週のサマリー
   weight_9b308e5b: 重み
@@ -30572,6 +30618,10 @@ ja:
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       有効にすると、「新しい小テスト」の規定は、専用のサイト管理者
       サービスユーザー使用し、DeveloperKeyアクセストークンとリフレッシュトークンを生成するようになります。
+  when_enabled_root_accounts_with_a_ready_for_new_qu_b412daa: |-
+      有効にすると、
+      プロビジョニングされていない`:ready_for_new_quizzes_provision`キーを設定に持つRootアカウントがプロビジョニングされます。この
+      チェックとプロビジョニングは、そのシャードリージョンの真夜中前後にすべてのシャードで行われます。
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       有効にすると、このフラグはテキスト
       ベースの送信のスピードグレーダーに単語数を表示します。
