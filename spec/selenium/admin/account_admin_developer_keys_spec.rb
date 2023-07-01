@@ -17,16 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../helpers/developer_keys_rewrite_common"
+require_relative "../helpers/developer_keys_common"
 
 describe "Developer Keys" do
   include_context "in-process server selenium tests"
-  include DeveloperKeysRewriteCommon
+  include DeveloperKeysCommon
 
-  describe "with developer key management UI rewrite feature flag" do
+  describe "as an admin" do
     before do
       admin_logged_in
-      Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, "true")
     end
 
     let(:root_developer_key) do

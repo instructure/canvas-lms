@@ -19,7 +19,7 @@
 
 require_relative "../common"
 
-module DeveloperKeysRewriteCommon
+module DeveloperKeysCommon
   def click_inherited_tab
     fj('[role="tablist"] [aria-controls]:contains("Inherited"):last').click
     wait_for_ajaximations
