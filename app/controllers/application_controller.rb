@@ -358,6 +358,7 @@ class ApplicationController < ActionController::Base
     auto_subscribe_account_calendars
     account_calendars_planner_support
     permanent_page_links
+    developer_key_page_checkboxes
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

@@ -197,3 +197,11 @@ instui_for_tool_configuration_forms:
     If enabled, the tool installation and configuration forms located on the Account and Course settings pages will use
     InstUI components, as opposed to the older, less accessible homegrown components.
   applies_to: SiteAdmin
+developer_key_page_checkboxes:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Use toggle switches for non-siteadmin developer keys page
+  description: |-
+    If enabled, root accounts and subaccounts will see toggle switches for enabling
+    and disabling keys on the developer keys page. Siteadmin will still see the
+    disable/allow/enable buttons.
