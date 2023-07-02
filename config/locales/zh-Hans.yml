@@ -278,8 +278,11 @@ zh-Hans:
         partner_id: "合作伙伴 ID"
         partner_key: 合作伙伴密钥
   academic_engagement_capella_74946a80: 学业投入（卡佩拉大学）
+  academic_engagement_detail_capella_e76c939d: "学业详情 (Capella)"
   academic_engagement_detail_sei_31f8f271: "学习积极性详情 - SEI"
+  academic_engagement_detail_strayer_1f80cba4: "学业详情 (Strayer)"
   academic_engagement_strayer_8c7832b9: 学业投入（斯特雷耶大学）
+  academic_engagement_strayer_v2_61e00b88: "学业 (Strayer V2)"
   academic_success_reporting_2585c499: 学术成绩报告
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union 高分报告"
   accept_2fdd362e: 接受
@@ -2074,6 +2077,7 @@ zh-Hans:
           zero_activity: 
             text: "此报告显示某个指定学期中注册了任意课程的所有学生。在生成的 csv 文件中，自该日期起尚未访问课程的每项用户注册占一行。"
   accounts_752dc365: 账户
+  accounts_could_not_be_loaded_640d5531: 无法加载帐户
   accounts_lti_546d15c7: "帐户 (LTI)"
   accounts_tree_navigate_the_accounts_tree_hierarchi_8afea172: 帐户树：按层次结构浏览帐户树以切换帐户日历可见性
   achieve_mastery_count_times_8c9bbcec: 
@@ -4928,6 +4932,7 @@ zh-Hans:
     corrupted: 详细信息不可用
     login: 登录
     logout: 退出
+  authenticated_iframe_content_a7588e91: "已验证的 IFrame 内容"
   authentication_1b518c38: 身份验证
   authentication_context_60748f2f: 身份验证上下文
   authentication_provider: 
@@ -5063,6 +5068,7 @@ zh-Hans:
   authorize_e3f25bb4: 授权
   authorize_url_f28167a3: "授权 URL"
   auto_leader_7791c30a: auto_leader
+  auto_provision_new_quizzes_if_flagged_root_account_a19fbf5b: 如果已标记根帐户，则自动预置新测验。
   auto_show_closed_captions_e4cd7aff: 自动显示关闭的字幕
   auto_subscribe_a7da0dff: 自动订阅
   autodetect_field_separators_in_compatible_spreadsh_768067e1: 自动检测兼容的数据表报告中的字段分隔符
@@ -5495,6 +5501,7 @@ zh-Hans:
   by_default_students_can_always_create_groups_in_a__af000dd: "默认情况下，学生可以随时在课程中创建组。要限制学生创建组，必须启用“管理课程：管理员 - 管理/更新”，并且取消选中“课程设置”中的“允许学生整理自己的组”复选框。"
   by_default_students_can_always_create_groups_in_a__dac761d3: "默认情况下，学生可以随时在课程中创建组。要限制学生创建组，必须启用“课程 - 管理/更新”，且不能选中课程设置中的“让学生自行整理组”复选框。"
   by_due_date_648d7f3b: 根据截止时间
+  by_entering_and_submitting_a_grade_value_below_f77e29e7: 通过在下方输入并提交评分值：
   by_lti_2_registration_url_e421e523: "按照 LTI 2 注册 URL"
   by_name_54daec42: "由%{name}提供"
   by_url_a163275e: "通过 URL"
@@ -6104,6 +6111,7 @@ zh-Hans:
   canvas_for_elementary_font_selection_5d1f2271: "Canvas 基本字体选择"
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary：教室中的多个公告"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary：父级支持"
+  canvas_grading_scheme_course_default_150b6fec: "Canvas 评分方案（课程默认）"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   canvas_guides_d65431: Canvas指南
@@ -6146,6 +6154,7 @@ zh-Hans:
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
       设定在初始页面加载中显示的 RCE 的数量。之后
       每当要进入视区时进行初始化。
+  caption_1cf95987: 说明
   captions_subtitles_af2c47e: 说明/字幕
   captured_image_91838f78: 捕获的图像
   card_movement_menu_for_title_b94c09af: "卡片移动菜单%{title}"
@@ -6216,6 +6225,9 @@ zh-Hans:
   change_visibility_of_account_calendars_fd03fbb8: 更改帐户日历的可见性
   changed_by_person_c39615e: "更改者：%{person}"
   changed_item_1d16a85f: 更改的项目
+  changes_the_resourcelink_id_substitution_parameter_15c7faaf: |-
+      更改 $ResourceLink.id 替换参数的行为
+      以便在行项目中包含 resource_link_uuid，而不是 resource_id
   changes_the_sort_order_of_the_gradebook_export_to__41b286fd: 更改评分册导出分类顺序，更密切匹配Canvas文件
   changes_will_still_apply_if_you_leave_this_page_935cedc6: 如果您离开这个页面，更改将仍然适用。
   changes_you_made_may_not_be_saved_4e8db973: 您做出的变更可能无法保存。
@@ -7691,6 +7703,10 @@ zh-Hans:
   continue_draft_6166ea79: 继续撰写草稿
   continue_typing_to_find_additional_sections_or_stu_49786085: 继续键入，寻找其他班级或学生。
   contributed_to_this_module_item_and_is_complete_2799d5c: 贡献于此单元项目，并且完成
+  controls_the_final_changes_needed_to_fully_conform_8398b749: |-
+      控制最终更改，以完全符合 LTI 平台存储
+      规格, 包括接收发送到正确 OIDC 授权
+      URI 源的消息，以及 postMessage 转发代理帧。
   conversation_dialog: 
     errors: 
       field_is_required: 此字段为必填字段
@@ -8334,6 +8350,8 @@ zh-Hans:
   course_copy_no_course_error: 源课程未找到。
   course_copy_not_allowed_error: 不允许您复制源课程。
   course_course_d1c78210: "课程：%{course}"
+  course_default_fd054879: （课程默认）
+  course_default_grading_scheme_6b902d8: 课程默认评分方案
   course_details_25cdf103: 课程详细信息
   course_discussions_38c0b74f: 课程讨论
   course_end_date_4c797823: 课程结束日期
@@ -9792,7 +9810,9 @@ zh-Hans:
   default_due_time_9d0e9140: 默认截止时间
   default_email_5cb9fa04: 默认电子邮件：
   default_email_9efb7fbd: 默认电子邮件
+  default_grade_2033adfd: 默认评分
   default_grade_cannot_be_set_to_ex_723caa59: "默认评分不可以设置到%{ex}"
+  default_grade_for_1283e89b: 默认评分对象
   default_grading_scheme_894a0eb: 默认评分方案
   default_order_8c409051: 默认顺序
   default_question_name: 问题
@@ -11217,6 +11237,7 @@ zh-Hans:
     assignment_order_alpha: 按字母顺序
     assignment_order_assignment_groups: 按作业小组和位置
     assignment_order_due_date: 根据截止时间
+    notes: 备注
   enhanced_individual_gradebook_4e825077: 增强的个人评分册
   enhanced_rce_paste_from_clipboard_30ddb011: "从剪贴板粘贴增强型 RCE"
   enhances_the_canvas_experience_within_the_learning_8031b650: "改进学习掌握程度评分册中的 Canvas 体验。"
@@ -11732,6 +11753,7 @@ zh-Hans:
   error_uploading_files_f709361f: 上传文件时发生错误
   error_uploading_video_audio_recording_16d9730a: 上传视频/音频录制文件时出错
   error_while_importing_csv_please_contact_support_e_57e6b3b: "导入 CSV 时出错。请联系支持人员。（错误报告 %{number}）"
+  errormessage_efa8ae9: "%{errorMessage}"
   errors: 
     bad_navigation_config: 课程标签配置无效
     blank: 必需
@@ -12217,6 +12239,7 @@ zh-Hans:
   failed_to_save_dashboard_selection_32e71c72: 无法保存仪表板选择
   failed_to_save_please_try_again_later_bb7070fb: 保存失败，请稍后重试
   failed_to_save_selected_calendars_210b5e8f: 无法保存选中的日历
+  failed_to_set_default_grade_aa3defda: 未能设置默认评分
   failed_to_split_users_d9759007: 无法拆分用户。
   failed_to_submit_draft_comment_1de83451: 无法提交评论草案
   failed_to_throttle_tag_error_356b24eb: "无法调节标签：%{error}"
@@ -12658,6 +12681,7 @@ zh-Hans:
   french_canada_c3d92fa6: 法语(加拿大)
   frequently_used_21a3eb8e: 常用
   fri_e2451e74: 星期五
+  friday_2c4f6d5a: 星期五
   friendly_description_57f7fdde: 友好描述
   friendly_description_for_parent_student_display_e608ecf3: 友好描述（用于家长/学生显示）
   friendly_name_601153fb: 友好名称
@@ -12719,6 +12743,8 @@ zh-Hans:
   getting_recipients_observers_52d47cad: 正在获取接收人观察员
   getting_started_with_collaborations_794240ba: 协作入门
   gif_74e4a622: GIF
+  give_all_students_the_same_4804fbe7: 给所有学生相同的
+  give_all_students_the_same_grade_for_596ae9d0: 对于…给所有学生相同的评分
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "通过输入并提交以下评分值对所有学生的*%{assignment.name}*给出相同的评分："
   give_all_students_the_same_percent_grade_for_assig_6a008004: "通过输入并提交以下评分值对所有学生的**%{assignment.name}**给出相同的评分*百分比*："
   give_this_filter_a_name_36b4b03a: 为该过滤器命名
@@ -12801,6 +12827,8 @@ zh-Hans:
       warning: 警告
   grade_distribution_e52c9256: 评分分布
   grade_export_title: 评分导出
+  grade_for_4c87a353: 评分对象
+  grade_for_ce7621f0: 评分对象
   grade_for_course_ccc8513c: "%{course} 的评分"
   grade_for_missing_submissions_56f91c83: 缺失提交项的评分
   grade_for_name_b9df168a: "评分：%{name}"
@@ -12822,6 +12850,7 @@ zh-Hans:
   grade_posting_policy_42c8a94b: 评分发布政策
   grade_posting_policy_name_a6d6f178: "评分发布政策：%{name}"
   grade_posting_policy_tray_c929cfd: 评分发布政策托盘
+  grade_saved_300616e9: 已保存评分
   grade_saved_ab539b53: 已保存评分。
   grade_selection_table_dcf9d1ea: 评分选择表
   grade_summary: 
@@ -14417,6 +14446,7 @@ zh-Hans:
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: 这是一个绝好的机会，可了解日历以及向课程中添加您可能有的任何非作业活动。别担心，我们将帮助您完成该过程。
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "这里提供了如何开始使用 Canvas 的一些快速提示！"
   hi_contrast_373b614f: 高对比度
+  hidden_130c3791: 已隐藏
   hidden_14a032a7: 隐藏
   hidden_available_with_a_link_65ef2bda: 隐藏。含有可用链接
   hidden_available_with_a_link_click_to_modify_184990e7: "隐藏提供的链接 - 点击修改"
@@ -18944,6 +18974,7 @@ zh-Hans:
   modules_updated_abeb4ec6: 单元已更新
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} （已取消发布）"
   mon_8f18082a: 星期一
+  monday_432ff613: 星期一
   month_s_5c17590e: 月
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}开始位置%{time}"
   moodle_dropdown_many_warning_title: "可能已错误地导入此题库中的 %{count} 个下拉列表问题"
@@ -20476,6 +20507,7 @@ zh-Hans:
   overview_58268c72: 概括
   overview_of_student_status_a004bcf3: 学生情况概述
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: 覆盖所有用户的现有默认仪表板首选项
+  overwrite_already_entered_grades_64a98037: 覆盖已输入的评分
   own_copyright_cc59db55: 拥有版权
   owner_email_236d1b2: 所有者电子邮件
   owner_email_4d02f795: "所有者电子邮件:"
@@ -21311,6 +21343,7 @@ zh-Hans:
         user_severity: 用户级别
         username: 用户名
   png_55cbb586: PNG
+  points_based_letter_grading_schemes_e65127d5: 基于分数的字母评分方案
   points_bb475533: 得分
   points_bceb5005: 分值
   points_changed_exceptions_b0c771f7: 得分更改异常：
@@ -23916,6 +23949,7 @@ zh-Hans:
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: 为有学生注册的教师显示两个待办事项列表
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: 在控制面板侧栏为有学生注册的教师显示两个待办事项列表。
   reorders_some_menu_options_for_more_consistency_an_90efff07: 对一些菜单选项重新排序以提高一致性并在SpeedGrader中添加链接。
+  repeats_on_61ecde30: 重复时间：
   replace_attachmentdisplayname_button_94dd8ba1: "替换%{attachmentDisplayName}按钮"
   replace_e61834a7: 替代
   replace_filename_png_button_cf5dc7c3: "重新放置 filename.png 按钮"
@@ -24397,6 +24431,7 @@ zh-Hans:
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "与“Canvas_URL__c” 相同的价值将可能很快消失。"
   sample_data_e4fd01ff: 样本数据
   sat_fa4152a4: 星期六
+  saturday_af8feb7f: 星期六
   saudi_arabia_1f0dcbdc: 沙特阿拉伯
   saudi_arabia_966_d01ed717: 沙特阿拉伯(+966)
   save_11a80ec3: 保存
@@ -24461,6 +24496,8 @@ zh-Hans:
   school_of_rock_4b7b1fd0: 摇滚教室
   scope_9729c11e: 范围：
   scope_c59afc8a: 范围
+  scope_to_a_specifc_user_9828eb72: 特定用户的范围
+  scope_to_a_specific_course_deb646df: 特定课程的范围
   score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: 分数更改通知
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -25030,6 +25067,7 @@ zh-Hans:
   send_title_to_user_d952e233: "把%{title}发送给用户"
   send_to_7881bf0e: 发送至...
   send_to_a879095e: 发送至：
+  send_to_all_of_group_6e91ead8: 发送给群组所有人
   send_to_b940900a: 发送至...
   send_to_ce05b460: 发送到
   send_usage_metrics_cecc7a7d: 发送使用指标
@@ -26564,6 +26602,7 @@ zh-Hans:
   student_id_7cc45fb5: "学生 id"
   student_id_9d858781: "学生 (%{id})"
   student_id_a61d78c7: "学生 Id"
+  student_id_c2a72227: "学生 %{id}"
   student_information_8715d0c7: 学生信息
   student_integration_id_b9e6ede: 学生集成id
   student_integration_id_e08f80af: "学生集成 ID"
@@ -27009,6 +27048,7 @@ zh-Hans:
   summary_of_report_types_d064d42b: 报告类型概览
   summary_statistics_f74852a5: 汇总统计
   sun_298d7c8b: 星期日
+  sunday_50a31adb: 星期天
   support: 
     array: 
       last_word_connector: 和
@@ -27189,6 +27229,7 @@ zh-Hans:
   teachers_52e2423f: 教师
   teachers_add_d5258e33: "教师 - 添加"
   teachers_add_ed68c8d3: "教师 - 添加"
+  teachers_and_account_managers_will_be_able_to_crea_9bad32cf: 老师和帐户管理员可以创建字母评分方案，在评分册中输入并显示分数而不是百分比。
   teachers_and_account_managers_will_be_able_to_more_f0b4474f: 老师和帐户管理员将能更轻松地管理帐户、课程和作业的字母评分方案。
   teachers_designers_and_tas_can_select_a_course_hom_30025956: "教师、设计者和助教即使没有“课程内容 - 添加/编辑/删除”权限，也可以选择课程主页。"
   teachers_over_time_1905603b: 一段时间的老师
@@ -27969,6 +28010,7 @@ zh-Hans:
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "此文件必须先设置 usage_rights，然后才能发布。"
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "此标记允许从 Canvas 日历创建日历事件系列。"
   this_flag_allows_events_from_account_calendars_to__fbef2289: "此标记允许在 canvas 规划器上显示帐户日历中的事件。"
+  this_flag_changes_the_way_rce_content_is_loaded_in_b72905ec: "此标记更改了在 iframes 中加载 RCE 内容的方式，以便通过 Canvas 代理请求。"
   this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: 此标记是空操作，仅用于测试。
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: 此标记会将功能标记标签的标题更新为“功能选项”并为功能预览项目添加“功能预览”按钮。
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: 该标记不会导致任何行为变化。
@@ -28223,6 +28265,7 @@ zh-Hans:
   throttle_tag_tag_ba5b9b50: "调节标签%{tag}"
   throttling_jobs_4a90578c: 正在调节作业
   thu_59cbcffe: 星期四
+  thursday_f112cf65: 星期四
   ticket_successfully_submitted_f6254460: 任务单成功提交
   ticketing_system_52205bff: 票务系统
   ticketing_system_configurations_c4fecd96: 票务系统配置
@@ -29203,6 +29246,7 @@ zh-Hans:
   try_out_canvas_for_free_e2265d30: "免费试用 Canvas！"
   ttml_tracks_are_not_allowed_because_they_are_susce_d40b654a: "不允许 TTML 跟踪，原因是它们容易受到 xss 攻击"
   tue_bb10b386: 星期二
+  tuesday_698a01b: 星期二
   turkish_5b69578b: 土耳其语
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "对非 RTL 语言启用 RTL"
   turned_in_submission_date_e9180b8b: "已提交：%{submission_date}"
@@ -29650,6 +29694,7 @@ zh-Hans:
   usage_rights_on_discussion_topics_7bb66ac2: 讨论主题使用权限
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: 将为此中包含的所有文件设置使用权限：
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: 添加多个用户时使用“，”隔开或另起一行。
+  use_a_resource_link_s_resource_link_uuid_in_the_re_3bb2f166: "在 $ResourceLink.id 替换参数中使用资源链接的 resource_link_uuid"
   use_arrow_keys_to_navigate_options_2021cc50: 使用方向键来导航各选项。
   use_arrow_keys_to_navigate_options_d45347e8: 使用箭头键浏览选项
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: 使用箭头键选择会议提供者
@@ -30473,6 +30518,7 @@ zh-Hans:
   website_url_input_1a3eab25: 输入网站url
   website_url_url_bd07233d: "网址：%{url}"
   wed_84932f18: 星期三
+  wednesday_b6f755f5: 星期三
   week_s_cb1492ee: 星期
   weekly_summary_56cd0c95: 每周摘要
   weight_9b308e5b: 权重
@@ -30537,6 +30583,10 @@ zh-Hans:
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       启用后，新测验配置文件将使用专用站点管理员
       服务用户和 DeveloperKey 生成访问令牌并刷新令牌
+  when_enabled_root_accounts_with_a_ready_for_new_qu_b412daa: |-
+      启用后，设置中具有 `:ready_for_new_quizzes_provision` 密钥
+      但尚未配置该密钥的根帐户将得到密钥配置。在该分片所在区域午夜前后对每个分片执行这种
+      检查和配置。
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       启用此标记后，会在 SpeedGrader 中显示
       文本提交项的字数统计。
