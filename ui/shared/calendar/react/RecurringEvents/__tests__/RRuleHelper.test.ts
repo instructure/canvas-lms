@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import RRuleHelper, {RRuleHelperSpec, ISODateToIcalDate, icalDateToISODate} from '../RRuleHelper'
+import RRuleHelper, {
+  RRuleHelperSpec,
+  RruleValidationError,
+  ISODateToIcalDate,
+  icalDateToISODate,
+} from '../RRuleHelper'
 import moment from 'moment-timezone'
 
 const defaultTZ = 'Asia/Tokyo'
@@ -182,7 +187,7 @@ describe('RRuleHelper', () => {
         expect(rrh.isValid()).toEqual(true)
       })
 
-      it('returns false for invalid specs', () => {
+      it('throws for invalid specs', () => {
         const spec: RRuleHelperSpec = {
           freq: 'WEEKLY',
           interval: 1,
@@ -191,7 +196,7 @@ describe('RRuleHelper', () => {
           count: 7,
         }
         const rrh = new RRuleHelper(spec)
-        expect(rrh.isValid()).toEqual(false)
+        expect(() => rrh.isValid()).toThrow(RruleValidationError)
       })
     })
   })

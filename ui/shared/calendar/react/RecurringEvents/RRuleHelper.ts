@@ -57,6 +57,13 @@ const makeEmptySpec = (more: UnknownSubset<RRuleHelperSpec> = {}): RRuleHelperSp
   ...more,
 })
 
+export class RruleValidationError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'RruleValidationError'
+  }
+}
+
 export default class RRuleHelper {
   // the parameters describing the recurrence
   spec: RRuleHelperSpec
@@ -116,7 +123,7 @@ export default class RRuleHelper {
           spec.count = parseInt(val, 10)
           break
         default:
-          throw new Error(`Unknown key: ${key}`)
+          throw new RruleValidationError(`Unknown key: ${key}`)
       }
     }
     return spec
@@ -124,7 +131,7 @@ export default class RRuleHelper {
 
   // Generate an RRULE string from an RRuleHelper
   toString(): string {
-    if (!this.isValid()) throw new Error('Invalid RRULE spec')
+    this.isValid()
     switch (this.spec.freq) {
       case 'DAILY':
         return this.daily()
@@ -134,8 +141,6 @@ export default class RRuleHelper {
         return this.monthly()
       case 'YEARLY':
         return this.yearly()
-      default:
-        throw new Error(`Unknown frequency: ${this.spec.freq}`)
     }
   }
 
@@ -158,24 +163,34 @@ export default class RRuleHelper {
     return typeof this.spec.pos === 'number' && this.spec.pos > 0
   }
 
-  isValid(): boolean {
-    if (!this.hasValidEnd()) return false
-    if (!this.hasValidInterval()) return false
+  // this could be more complete (i.e. checking for valid days in the month)
+  isValid(): boolean | never {
+    if (!this.hasValidEnd()) throw new RruleValidationError('RRULE must have a COUNT or UNTIL')
+    if (!this.hasValidInterval()) throw new RruleValidationError('RRULE must have an INTERVAL > 0')
 
     switch (this.spec.freq) {
       case 'DAILY':
-        return typeof this.spec.interval === 'number' && this.spec.interval > 0
+        if (typeof this.spec.interval === 'number' && this.spec.interval > 0) return true
+        else throw new RruleValidationError('RRULE INTERVAL must be a number > 0')
       case 'WEEKLY':
-        return this.hasValidWeekdays()
+        if (this.hasValidWeekdays()) return true
+        else throw new RruleValidationError('RRULE BYDAY is invalid')
       case 'MONTHLY':
-        return this.spec.monthdate !== undefined || this.spec.pos !== undefined
+        if (this.spec.monthdate === undefined && this.spec.pos === undefined) {
+          throw new RruleValidationError(
+            'RRULE with MONTHLY frequency must have BYMONTHDAY or BYSETPOS'
+          )
+        }
+        return true
       case 'YEARLY':
-        return (
+        if (
           (this.spec.monthdate !== undefined && this.spec.month !== undefined) ||
           (this.spec.month !== undefined && this.hasValidWeekdays() && this.hasValidPos())
         )
+          return true
+        throw new RruleValidationError('YEARLY RRULE must have BYMONTHDAY or BYMONTH and BYDAY')
       default:
-        return false
+        throw new RruleValidationError(`Unknown frequency: ${this.spec.freq}`)
     }
   }
 
@@ -215,7 +230,7 @@ export default class RRuleHelper {
   weekly() {
     const {interval, weekdays, until, count} = this.spec
     if (weekdays === undefined) {
-      throw new Error("Weekly recurrence doesn't have weekdays")
+      throw new RruleValidationError("Weekly recurrence doesn't have weekdays")
     }
     const endoptions = this.untilOrCount(until, count)
     return `FREQ=WEEKLY;INTERVAL=${interval};BYDAY=${weekdays.join(',')}${endoptions}`
@@ -231,7 +246,7 @@ export default class RRuleHelper {
         ','
       )};BYSETPOS=${pos}${endoptions}`
     } else {
-      throw new Error('Invalid monthly recurrence')
+      throw new RruleValidationError('Invalid monthly recurrence')
     }
   }
 
@@ -243,7 +258,7 @@ export default class RRuleHelper {
     } else if (monthdate === undefined) {
       return `FREQ=YEARLY;INTERVAL=${interval};BYDAY=${weekdays};BYMONTH=${month};BYSETPOS=${pos}${endoptions}`
     } else {
-      throw new Error('Invalid yearly recurrence')
+      throw new RruleValidationError('Invalid yearly recurrence')
     }
   }
 }

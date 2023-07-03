@@ -25,6 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import CustomRecurrenceModal, {CustomRecurrenceModalProps} from './CustomRecurrenceModal'
 import {ISODateToIcalDate} from '../RRuleHelper'
+import RRuleToNaturalLanguage from '../RRuleNaturalLanguage'
 
 export default {
   title: 'Examples/Calendar/RecurringEvents/CustomRecurrenceModal',
@@ -61,6 +62,7 @@ const Template: Story<CustomRecurrenceModalProps> = args => {
       <div style={{margin: '.75rem 0', lineHeight: 1.5}}>
         <Text as="div">eventStart: {args.eventStart}</Text>
         <Text as="div">result: {currRRULE}</Text>
+        <Text as="div">{RRuleToNaturalLanguage(currRRULE, args.locale, args.timezone)}</Text>
       </div>
     </div>
   )

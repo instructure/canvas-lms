@@ -27,7 +27,11 @@ const I18n = useScope('calendar_custom_recurring_event_custom_recurrence_modal')
 
 const isValid = (spec: RRuleHelperSpec): boolean => {
   const rrule = new RRuleHelper(spec)
-  return rrule.isValid()
+  try {
+    return rrule.isValid()
+  } catch (_e) {
+    return false
+  }
 }
 
 type CustomRecurrenceErrorState = {

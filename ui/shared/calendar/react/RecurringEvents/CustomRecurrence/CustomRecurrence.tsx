@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import moment from 'moment-timezone'
 import {FrequencyValue, RRULEDayValue, UnknownSubset} from '../types'
-import RRuleHelper, {RRuleHelperSpec} from '../RRuleHelper'
+import RRuleHelper, {RRuleHelperSpec, RruleValidationError} from '../RRuleHelper'
 import RepeatPicker, {OnRepeatPickerChangeType} from '../RepeatPicker/RepeatPicker'
 import RecurrenceEndPicker, {
   OnRecurrenceEndChangeType,
@@ -42,7 +42,7 @@ type StateToSpecFunc = (overrides: RRULESpecOverride) => RRuleHelperSpec
 function startToString(dtstart: string | null, timezone: string): string {
   const start = dtstart == null ? moment().tz(timezone) : moment.tz(dtstart, timezone)
   if (start.isValid()) return start.format('YYYY-MM-DDTHH:mm:ssZ')
-  throw new Error('eventStart is not a valid date')
+  throw new RruleValidationError('eventStart is not a valid date')
 }
 
 // NOTE: you can get some weird results if the rrule isn't in sync with the eventStart
@@ -95,7 +95,7 @@ export default function CustomRecurrence({
   useEffect(() => {
     const eventStartMoment = moment(eventStart)
     if (!eventStartMoment.isValid()) {
-      throw new Error('eventStart is not a valid date')
+      throw new RruleValidationError('eventStart is not a valid date')
     }
     setDtstartStr(startToString(eventStart, timezone))
     let updatedSpec
