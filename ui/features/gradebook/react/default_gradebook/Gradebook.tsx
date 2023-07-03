@@ -89,7 +89,7 @@ import type {
   GradeEntryMode,
   GradeResult,
   GradingPeriodGradeMap,
-  GradingScheme,
+  DeprecatedGradingScheme,
   StudentGrade,
 } from '@canvas/grading/grading.d'
 import type {
@@ -4205,10 +4205,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   getDefaultGradingScheme = () => this.courseContent.defaultGradingScheme
 
-  getGradingScheme = (gradingSchemeId: string | null): GradingScheme | undefined =>
+  getGradingScheme = (gradingSchemeId: string | null): DeprecatedGradingScheme | undefined =>
     this.courseContent.gradingSchemes.find(scheme => scheme.id === gradingSchemeId)
 
-  getAssignmentGradingScheme = (assignmentId: string): GradingScheme | null => {
+  getAssignmentGradingScheme = (assignmentId: string): DeprecatedGradingScheme | null => {
     const assignment = this.getAssignment(assignmentId)
     return this.getGradingScheme(assignment.grading_standard_id) || this.getDefaultGradingScheme()
   }

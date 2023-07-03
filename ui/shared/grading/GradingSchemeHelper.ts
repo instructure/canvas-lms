@@ -18,14 +18,17 @@
  */
 
 import round from '@canvas/round'
-import type {GradingScheme, GradingStandard} from './grading.d'
+import type {DeprecatedGradingScheme, GradingStandard} from './grading.d'
 
-export function indexOfGrade(grade: null | string | number, gradingSchemes: GradingScheme[]) {
+export function indexOfGrade(
+  grade: null | string | number,
+  gradingSchemes: DeprecatedGradingScheme[]
+) {
   const cleanGrade = `${grade}`.trim().toLowerCase()
   return gradingSchemes.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
 }
 
-export function gradeToScoreUpperBound(grade: number, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreUpperBound(grade: number, gradingSchemes: DeprecatedGradingScheme[]) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -58,7 +61,10 @@ export function gradeToScoreUpperBound(grade: number, gradingSchemes: GradingSch
   return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
 }
 
-export function gradeToScoreLowerBound(grade: null | number, gradingSchemes: GradingScheme[]) {
+export function gradeToScoreLowerBound(
+  grade: null | number,
+  gradingSchemes: DeprecatedGradingScheme[]
+) {
   const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
@@ -87,7 +93,7 @@ export function scoreToGrade(score: number, gradingSchemes: GradingStandard[]) {
     // floating-point errors.
     // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
     return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemes.length - 1
-  }) as GradingScheme
+  }) as DeprecatedGradingScheme
   if (!letter) {
     throw new Error('grading scheme not found')
   }

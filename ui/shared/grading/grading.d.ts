@@ -320,12 +320,14 @@ export type FormatGradeOptions = {
   pointsPossible?: number
   score?: number
   restrict_quantitative_data?: boolean
-  grading_scheme?: GradingScheme[]
+  grading_scheme?: DeprecatedGradingScheme[]
 }
 
+// TODO: remove this type after points grading scheme feature flag is turned on globally
 export type GradingStandard = [string, number]
 
-export type GradingScheme = {
+// TODO: remove this type after points grading scheme feature flag is turned on globally
+export type DeprecatedGradingScheme = {
   id?: string
   title?: string
   data: GradingStandard[]
