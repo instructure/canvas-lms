@@ -1353,6 +1353,9 @@ class RCEWrapper extends React.Component {
       false,
       {
         mountNode: instuiPopupMountNode,
+        onFixError: errors => {
+          this.setState({a11yErrorsCount: errors.length})
+        },
       },
       {
         skip_focus: true,

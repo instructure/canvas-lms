@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import Checker from '../checker'
 import util from 'util'
 
@@ -62,7 +62,9 @@ describe('checker', () => {
     child = node.appendChild(document.createElement('div'))
     child2 = node.appendChild(document.createElement('div'))
     const instanceRef = React.createRef()
-    renderResult = render(<Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} />)
+    renderResult = render(
+      <Checker ref={instanceRef} getBody={() => node} editor={fakeEditor} onFixError={jest.fn()} />
+    )
     instance = instanceRef.current
   })
 
@@ -378,6 +380,14 @@ describe('checker', () => {
       instance._closeButtonRef = {focus: jest.fn()}
       instance.fixIssue(ev)
       expect(instance._closeButtonRef.focus).toHaveBeenCalled()
+    })
+
+    test('updates the number of errors', async () => {
+      instance.fixIssue(ev)
+      expect(instance.state.errors).toEqual([])
+      await waitFor(() => {
+        expect(instance.props.onFixError).toHaveBeenCalled()
+      })
     })
   })
 
