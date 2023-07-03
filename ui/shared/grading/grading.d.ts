@@ -323,10 +323,14 @@ export type FormatGradeOptions = {
   grading_scheme?: DeprecatedGradingScheme[]
 }
 
-// TODO: remove this type after points grading scheme feature flag is turned on globally
+/**
+ * @deprecated
+ */
 export type GradingStandard = [string, number]
 
-// TODO: remove this type after points grading scheme feature flag is turned on globally
+/**
+ * @deprecated
+ */
 export type DeprecatedGradingScheme = {
   id?: string
   title?: string

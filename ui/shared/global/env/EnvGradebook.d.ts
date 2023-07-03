@@ -18,6 +18,7 @@
 
 import {EnvCommonNewUserTutorial} from '@canvas/global/env/EnvCommon'
 import {GradebookOptions} from '../../../features/gradebook/react/default_gradebook/gradebook.d'
+import {GradingScheme} from '@canvas/grading_scheme'
 
 /**
  * Generic Gradebook environment.
@@ -56,6 +57,11 @@ export interface EnvGradebookCommon {
    * From GradebooksController#set_learning_mastery_env
    */
   outcome_service_results_to_canvas?: unknown
+
+  /**
+   * From GradebooksController#load_grade_summary_data
+   */
+  course_active_grading_scheme?: GradingScheme
 
   /**
    * From ApplicationController#set_student_context_cards_js_env

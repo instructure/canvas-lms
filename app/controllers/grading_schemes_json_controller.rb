@@ -60,17 +60,8 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def show_default_grading_scheme
-    grading_standard_data = GradingStandard.default_grading_standard
-    props = {}
-    props["title"] = I18n.t("Default Canvas Grading Scheme")
-    props["data"] = grading_standard_data
-    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
-      props["scaling_factor"] = 1.0
-      props["points_based"] = false
-    end
-    default_grading_standard = @context.grading_standards.build(props)
     respond_to do |format|
-      format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(default_grading_standard, @current_user) }
+      format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(GradingSchemesJsonController.default_canvas_grading_standard(@context), @current_user) }
     end
   end
 
@@ -161,6 +152,18 @@ class GradingSchemesJsonController < ApplicationController
     else
       %w[id title context_type context_id]
     end
+  end
+
+  def self.default_canvas_grading_standard(context)
+    grading_standard_data = GradingStandard.default_grading_standard
+    props = {}
+    props["title"] = I18n.t("Default Canvas Grading Scheme")
+    props["data"] = grading_standard_data
+    if Account.site_admin.feature_enabled?(:points_based_grading_schemes)
+      props["scaling_factor"] = 1.0
+      props["points_based"] = false
+    end
+    context.grading_standards.build(props)
   end
 
   private

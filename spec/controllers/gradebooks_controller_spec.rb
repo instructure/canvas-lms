@@ -590,6 +590,98 @@ describe GradebooksController do
       end
     end
 
+    describe "course_active_grading_scheme" do
+      it "uses the course's grading scheme when a grading scheme is set" do
+        Account.site_admin.enable_feature!(:points_based_grading_schemes)
+        user_session(@student)
+        data = [{ "name" => "A", "value" => 0.90 },
+                { "name" => "B", "value" => 0.80 },
+                { "name" => "C", "value" => 0.70 },
+                { "name" => "D", "value" => 0.60 },
+                { "name" => "F", "value" => 0.0 }]
+
+        grading_standard = @course.grading_standards.build({ title: "My Grading Scheme",
+                                                             data: GradingSchemesJsonController.to_grading_standard_data(data),
+                                                             points_based: true,
+                                                             scaling_factor: 4.0 })
+        @course.update!(default_grading_standard: grading_standard)
+        all_grading_periods_id = 0
+        get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
+        expect(controller.js_env[:course_active_grading_scheme]).to eq({ "id" => grading_standard.id.to_s,
+                                                                         "title" => grading_standard.title,
+                                                                         "context_type" => "Course",
+                                                                         "context_id" => @course.id,
+                                                                         "context_name" => @course.name,
+                                                                         "data" => data,
+                                                                         "permissions" => { "manage" => false },
+                                                                         "assessed_assignment" => false,
+                                                                         "points_based" => grading_standard.points_based,
+                                                                         "scaling_factor" => grading_standard.scaling_factor })
+        expect(controller.js_env[:grading_scheme]).to be_nil
+      end
+
+      it "uses the Canvas default grading scheme if the course is set to use default grading scheme" do
+        Account.site_admin.enable_feature!(:points_based_grading_schemes)
+        user_session(@student)
+        @course.update!(grading_standard_id: 0)
+        all_grading_periods_id = 0
+        get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
+        expect(controller.js_env[:course_active_grading_scheme]).to eq({ "id" => "",
+                                                                         "title" => "Default Canvas Grading Scheme",
+                                                                         "context_type" => "Course",
+                                                                         "context_id" => @course.id,
+                                                                         "context_name" => @course.name,
+                                                                         "data" => [{ "name" => "A", "value" => 0.94 }, { "name" => "A-", "value" => 0.9 }, { "name" => "B+", "value" => 0.87 }, { "name" => "B", "value" => 0.84 }, { "name" => "B-", "value" => 0.8 }, { "name" => "C+", "value" => 0.77 }, { "name" => "C", "value" => 0.74 }, { "name" => "C-", "value" => 0.7 }, { "name" => "D+", "value" => 0.67 }, { "name" => "D", "value" => 0.64 }, { "name" => "D-", "value" => 0.61 }, { "name" => "F", "value" => 0.0 }],
+                                                                         "permissions" => { "manage" => false },
+                                                                         "assessed_assignment" => false,
+                                                                         "points_based" => false,
+                                                                         "scaling_factor" => 1.0 })
+        expect(controller.js_env[:grading_scheme]).to be_nil
+      end
+
+      it "uses the default canvas grading scheme when a course's grading scheme was (soft) deleted" do
+        Account.site_admin.enable_feature!(:points_based_grading_schemes)
+        user_session(@student)
+        data = [{ "name" => "A", "value" => 0.90 },
+                { "name" => "B", "value" => 0.80 },
+                { "name" => "C", "value" => 0.70 },
+                { "name" => "D", "value" => 0.60 },
+                { "name" => "F", "value" => 0.0 }]
+
+        grading_standard = @course.grading_standards.build({ title: "My Grading Scheme",
+                                                             data: GradingSchemesJsonController.to_grading_standard_data(data),
+                                                             points_based: true,
+                                                             scaling_factor: 4.0 })
+        @course.update!(default_grading_standard: grading_standard)
+        @course.reload
+        grading_standard.destroy
+        @course.reload
+
+        all_grading_periods_id = 0
+        get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
+        expect(controller.js_env[:course_active_grading_scheme]).to eq({ "id" => "",
+                                                                         "title" => "Default Canvas Grading Scheme",
+                                                                         "context_type" => "Course",
+                                                                         "context_id" => @course.id,
+                                                                         "context_name" => @course.name,
+                                                                         "data" => [{ "name" => "A", "value" => 0.94 }, { "name" => "A-", "value" => 0.9 }, { "name" => "B+", "value" => 0.87 }, { "name" => "B", "value" => 0.84 }, { "name" => "B-", "value" => 0.8 }, { "name" => "C+", "value" => 0.77 }, { "name" => "C", "value" => 0.74 }, { "name" => "C-", "value" => 0.7 }, { "name" => "D+", "value" => 0.67 }, { "name" => "D", "value" => 0.64 }, { "name" => "D-", "value" => 0.61 }, { "name" => "F", "value" => 0.0 }],
+                                                                         "permissions" => { "manage" => false },
+                                                                         "assessed_assignment" => false,
+                                                                         "points_based" => false,
+                                                                         "scaling_factor" => 1.0 })
+        expect(controller.js_env[:grading_scheme]).to be_nil
+      end
+
+      it "uses no course grading scheme if the course is not set to use grading schemes" do
+        Account.site_admin.enable_feature!(:points_based_grading_schemes)
+        user_session(@student)
+        all_grading_periods_id = 0
+        get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
+        expect(controller.js_env[:course_active_grading_scheme]).to be_nil
+        expect(controller.js_env[:grading_scheme]).to be_nil
+      end
+    end
+
     context "with grading periods" do
       let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
       let(:period_helper) { Factories::GradingPeriodHelper.new }
