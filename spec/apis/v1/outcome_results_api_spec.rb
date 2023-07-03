@@ -308,8 +308,8 @@ describe "Outcome Results API", type: :request do
           get "/courses/#{@course.id}/outcome_rollups.csv"
           expect(response).to be_successful
           expect(response.body).to eq <<~CSV
-            Student name,Student ID,new outcome result,new outcome mastery points
-            User,#{outcome_student.id},3.0,3.0
+            Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+            User,#{outcome_student.id},N/A,3.0,3.0
           CSV
         end
 
@@ -322,9 +322,53 @@ describe "Outcome Results API", type: :request do
           get "/courses/#{@course.id}/outcome_rollups.csv"
           expect(response).to be_successful
           expect(response.body).to eq <<~CSV
-            \xEF\xBB\xBFStudent name;Student ID;new outcome result;new outcome mastery points
-            User;#{outcome_student.id};3.0;3.0
+            \xEF\xBB\xBFStudent name;Student ID;Student SIS ID;new outcome result;new outcome mastery points
+            User;#{outcome_student.id};N/A;3.0;3.0
           CSV
+        end
+
+        context "exports with student sis_ids" do
+          it "returns sis_ids for students that have them" do
+            pseudonym_student = User.create!(name: "Student - Pseudonym")
+            pseudonym_student = user_with_pseudonym(user: pseudonym_student, sis_user_id: "student_1")
+            pseudonym_student.register!
+            @course.enroll_student(pseudonym_student)
+            create_outcome_assessment(student: pseudonym_student)
+            outcome_result
+
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv"
+            expect(response).to be_successful
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              Student - Pseudonym,#{pseudonym_student.id},student_1,3.0,3.0
+              User,#{outcome_student.id},N/A,3.0,3.0
+            CSV
+          end
+
+          it "returns correct sis_id for students with multiple pseudonyms" do
+            pseudonym_student = User.create!(name: "Student - Pseudonym")
+            p1 = Pseudonym.create!(unique_id: "deleted_pseudonym@instructure.com", user: pseudonym_student, sis_user_id: "bad_student")
+            Pseudonym.create!(unique_id: "active_pseudonym@instructure.com", user: pseudonym_student, sis_user_id: "student_1")
+            # Delete the first pseudonym
+            p1.workflow_state = "deleted"
+            p1.save!
+            # Register student
+            pseudonym_student.register!
+            @course.enroll_student(pseudonym_student)
+            create_outcome_assessment(student: pseudonym_student)
+            outcome_result
+
+            user_session @user
+            get "/courses/#{@course.id}/outcome_rollups.csv"
+            expect(response).to be_successful
+            expect(pseudonym_student.pseudonyms.length).to eq 2
+            expect(response.body).to eq <<~CSV
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              Student - Pseudonym,#{pseudonym_student.id},student_1,3.0,3.0
+              User,#{outcome_student.id},N/A,3.0,3.0
+            CSV
+          end
         end
 
         context "when Account-level Mastery Scales flag is on" do
@@ -340,8 +384,8 @@ describe "Outcome Results API", type: :request do
             outcome_proficiency = OutcomeProficiency.find_or_create_default!(@course)
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              User,#{outcome_student.id},#{outcome_proficiency.points_possible},#{outcome_proficiency.mastery_points}
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              User,#{outcome_student.id},N/A,#{outcome_proficiency.points_possible},#{outcome_proficiency.mastery_points}
             CSV
           end
 
@@ -353,8 +397,8 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv"
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              User,#{outcome_student.id},10.0,10.0
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              User,#{outcome_student.id},N/A,10.0,10.0
             CSV
           end
         end
@@ -389,10 +433,10 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=concluded_enrollments"
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-              #{outcome_student.name},#{outcome_student.id},3.0,3.0
-              #{@no_results_student.name},#{@no_results_student.id},,3.0
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+              #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
             CSV
           end
 
@@ -406,8 +450,8 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=concluded_enrollments&section_id=#{section1.id}"
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
             CSV
           end
 
@@ -416,10 +460,10 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments"
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-              #{outcome_student.name},#{outcome_student.id},3.0,3.0
-              #{@no_results_student.name},#{@no_results_student.id},,3.0
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+              #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
             CSV
           end
 
@@ -433,8 +477,8 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&section_id=#{section1.id}"
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
             CSV
           end
 
@@ -443,10 +487,10 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=missing_user_rollups"
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-              #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-              #{outcome_student.name},#{outcome_student.id},3.0,3.0
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0
+              #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
             CSV
           end
 
@@ -455,11 +499,11 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv"
             expect(response).to be_successful
             expect(response.body).to eq <<~CSV
-              Student name,Student ID,new outcome result,new outcome mastery points
-              #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-              #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-              #{outcome_student.name},#{outcome_student.id},3.0,3.0
-              #{@no_results_student.name},#{@no_results_student.id},,3.0
+              Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+              #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0
+              #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0
+              #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+              #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
             CSV
           end
 
@@ -480,11 +524,11 @@ describe "Outcome Results API", type: :request do
               get "/courses/#{@course.id}/outcome_rollups.csv?section_id=#{@section1.id}"
               expect(response).to be_successful
               expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                #{@no_results_student.name},#{@no_results_student.id},,3.0
+                Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0
+                #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0
+                #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+                #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
               CSV
             end
 
@@ -493,11 +537,11 @@ describe "Outcome Results API", type: :request do
               get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&exclude[]=concluded_enrollments"
               expect(response).to be_successful
               expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                #{@no_results_student.name},#{@no_results_student.id},,3.0
+                Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0
+                #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0
+                #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+                #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
               CSV
             end
 
@@ -508,11 +552,11 @@ describe "Outcome Results API", type: :request do
               get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments"
               expect(response).to be_successful
               expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{@concluded_student.name},#{@concluded_student.id},3.0,3.0
-                #{@inactive_student.name},#{@inactive_student.id},3.0,3.0
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                #{@no_results_student.name},#{@no_results_student.id},,3.0
+                Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+                #{@concluded_student.name},#{@concluded_student.id},N/A,3.0,3.0
+                #{@inactive_student.name},#{@inactive_student.id},N/A,3.0,3.0
+                #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+                #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
               CSV
             end
 
@@ -523,9 +567,9 @@ describe "Outcome Results API", type: :request do
               get "/courses/#{@course.id}/outcome_rollups.csv?exclude[]=inactive_enrollments&exclude[]=concluded_enrollments"
               expect(response).to be_successful
               expect(response.body).to eq <<~CSV
-                Student name,Student ID,new outcome result,new outcome mastery points
-                #{outcome_student.name},#{outcome_student.id},3.0,3.0
-                #{@no_results_student.name},#{@no_results_student.id},,3.0
+                Student name,Student ID,Student SIS ID,new outcome result,new outcome mastery points
+                #{outcome_student.name},#{outcome_student.id},N/A,3.0,3.0
+                #{@no_results_student.name},#{@no_results_student.id},N/A,,3.0
               CSV
             end
           end
