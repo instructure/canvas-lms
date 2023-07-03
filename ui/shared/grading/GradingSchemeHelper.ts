@@ -19,6 +19,7 @@
 
 import round from '@canvas/round'
 import type {DeprecatedGradingScheme, GradingStandard} from './grading.d'
+import {GradingSchemeDataRow} from '@canvas/grading-scheme'
 
 export function indexOfGrade(
   grade: null | string | number,
@@ -77,6 +78,12 @@ export function gradeToScoreLowerBound(
   return round(matchingSchemeValue * 100, 2)
 }
 
+/**
+ * @deprecated Use scoreToLetterGrade(score: number, gradingSchemeDataRows: GradingSchemeDataRow[]) instead, which takes
+ * a more reasonably typed object model than the 2d array that this function takes in for gradingScheme data rows.
+ * @param score
+ * @param gradingSchemes
+ */
 export function scoreToGrade(score: number, gradingSchemes: GradingStandard[]) {
   // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
   // score can be NaN despite its type being declared as a number
@@ -84,18 +91,30 @@ export function scoreToGrade(score: number, gradingSchemes: GradingStandard[]) {
     return null
   }
 
+  // convert deprecated 2d array format to newer GradingSchemeDataRow[] format
+  const gradingSchemeDataRows = gradingSchemes.map(row => ({name: row[0], value: row[1]}))
+  return scoreToLetterGrade(score, gradingSchemeDataRows)
+}
+
+export function scoreToLetterGrade(score: number, gradingSchemeDataRows: GradingSchemeDataRow[]) {
+  // Because scoreToGrade is being used in a non typescript file, ui/features/grade_summary/jquery/index.js,
+  // score can be NaN despite its type being declared as a number
+  if (typeof score !== 'number' || Number.isNaN(score) || gradingSchemeDataRows == null) {
+    return null
+  }
+
   const roundedScore = round(score, 4)
   // does the following need .toPrecision(4) ?
   const scoreWithLowerBound = Math.max(roundedScore, 0)
-  const letter = gradingSchemes.find((row, i) => {
-    const schemeScore: string = (row[1] * 100).toPrecision(4)
+  const letter = gradingSchemeDataRows.find((row, i) => {
+    const schemeScore: string = (row.value * 100).toPrecision(4)
     // The precision of the lower bound (* 100) must be limited to eliminate
     // floating-point errors.
     // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
-    return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemes.length - 1
-  }) as DeprecatedGradingScheme
+    return scoreWithLowerBound >= parseFloat(schemeScore) || i === gradingSchemeDataRows.length - 1
+  }) as GradingSchemeDataRow
   if (!letter) {
     throw new Error('grading scheme not found')
   }
-  return letter[0]
+  return letter.name
 }
