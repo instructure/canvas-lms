@@ -20,7 +20,7 @@
 
 require "erubi"
 require "optparse"
-require_relative "./docker_utils"
+require_relative "docker_utils"
 
 class DockerfileWriter
   attr_reader :env, :compose_files, :in_file, :out_file, :out_file_suffix

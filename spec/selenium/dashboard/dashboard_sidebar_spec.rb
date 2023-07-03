@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
-require_relative "./pages/dashboard_page"
-require_relative "./pages/k5_dashboard_page"
+require_relative "pages/dashboard_page"
+require_relative "pages/k5_dashboard_page"
 require_relative "../helpers/dashboard_common"
 
 describe "dashboard" do

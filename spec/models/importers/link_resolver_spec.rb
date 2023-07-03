@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "./mock_migration_query_service"
+require_relative "mock_migration_query_service"
 
 describe Importers::LinkResolver do
   def default_assets

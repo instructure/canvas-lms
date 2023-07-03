@@ -31,9 +31,9 @@ describe "international sms" do
 
     it "shows a disclaimer for international numbers", priority: "1" do
       # All selections except those in this array should include the text messaging rate disclaimer
-      no_disclaimer = Array[
-          "Select Country or Region",
-          "United States"
+      no_disclaimer = [
+        "Select Country or Region",
+        "United States"
       ]
 
       get "/profile/settings"

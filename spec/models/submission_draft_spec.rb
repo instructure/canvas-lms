@@ -38,9 +38,9 @@ RSpec.describe SubmissionDraft do
       @shard2.activate do
         @same_shard_attachment = attachment_model
         account = Account.create!
-        course_with_student(account: account, active_all: true)
+        course_with_student(account:, active_all: true)
         assignment = assignment_model(course: @course)
-        submission = submission_model(assignment: assignment, user: @student)
+        submission = submission_model(assignment:, user: @student)
         @draft = submission.submission_drafts.create!(submission_attempt: 1)
       end
     end

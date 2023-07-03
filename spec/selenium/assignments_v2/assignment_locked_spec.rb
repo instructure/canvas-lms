@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "./page_objects/student_assignment_page_v2"
+require_relative "page_objects/student_assignment_page_v2"
 require_relative "../common"
 require_relative "../helpers/assignments_common"
 

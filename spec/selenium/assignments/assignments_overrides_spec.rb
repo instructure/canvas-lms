@@ -19,7 +19,7 @@
 
 require_relative "../common"
 require_relative "../helpers/assignment_overrides"
-require_relative "./page_objects/assignment_page"
+require_relative "page_objects/assignment_page"
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper

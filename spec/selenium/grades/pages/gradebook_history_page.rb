@@ -112,7 +112,7 @@ class GradeBookHistory
 
     def check_current_col_for_history(assignment_name)
       row_elements = results_table_rows
-      current_grade_arr = Array.[]
+      current_grade_arr = []
       (1...row_elements.size).each do |index|
         if results_table_assignment_col(index).text == assignment_name
           current_grade_arr[index] = results_table_current_col(index).text

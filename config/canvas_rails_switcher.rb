@@ -45,7 +45,7 @@ unless defined?(CANVAS_RAILS)
       require "net/http"
       require "yaml"
 
-      environment = YAML.safe_load(File.read(File.expand_path("consul.yml", __dir__))).dig(ENV["RAILS_ENV"] || "development", "environment")
+      environment = YAML.safe_load_file(File.expand_path("consul.yml", __dir__)).dig(ENV["RAILS_ENV"] || "development", "environment")
 
       keys = [
         ["private/canvas", environment, $canvas_cluster, "rails_version"].compact.join("/"),

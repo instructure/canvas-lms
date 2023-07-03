@@ -679,10 +679,10 @@ class ApplicationController < ActionController::Base
   # check which type of context it is everywhere
   def named_context_url(context, name, *opts)
     if context.is_a?(UserProfile)
-      name = name.to_s.sub(/context/, "profile")
+      name = name.to_s.sub("context", "profile")
     else
       klass = context.class.base_class
-      name = name.to_s.sub(/context/, klass.name.underscore)
+      name = name.to_s.sub("context", klass.name.underscore)
       opts.unshift(context)
     end
     opts.push({}) unless opts[-1].is_a?(Hash)

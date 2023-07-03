@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../common"
-require_relative "./pages/courses_home_page"
-require_relative "./pages/course_settings_page"
-require_relative "./pages/course_settings_navigation_page_component"
-require_relative "./pages/course_left_nav_page_component"
+require_relative "pages/courses_home_page"
+require_relative "pages/course_settings_page"
+require_relative "pages/course_settings_navigation_page_component"
+require_relative "pages/course_left_nav_page_component"
 require_relative "../calendar/pages/calendar_page"
 
 describe "course wizard" do

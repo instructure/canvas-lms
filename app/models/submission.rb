@@ -932,7 +932,7 @@ class Submission < ActiveRecord::Base
   end
 
   def turnitinable_by_lti?
-    turnitin_data.select { |_, v| v.is_a?(Hash) && v.key?(:outcome_response) }.any?
+    turnitin_data.any? { |_, v| v.is_a?(Hash) && v.key?(:outcome_response) }
   end
 
   # VeriCite

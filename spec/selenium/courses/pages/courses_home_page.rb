@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../common"
-require_relative "./course_wizard_page_component"
+require_relative "course_wizard_page_component"
 
 module CoursesHomePage
   #------------------------- Sections ---------------------------

@@ -19,7 +19,7 @@
 #
 
 require_relative "../spec_helper"
-require_relative "./graphql_spec_helper"
+require_relative "graphql_spec_helper"
 
 describe "GraphQL Token Scoping" do
   before(:once) do

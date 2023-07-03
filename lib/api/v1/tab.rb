@@ -31,7 +31,7 @@ module Api::V1::Tab
     json = context_tabs(context, user, session:, precalculated_permissions:).map do |tab|
       tab_json(tab.with_indifferent_access, context, user, session)
     end
-    json.sort! { |x, y| x["position"] <=> y["position"] }
+    json.sort_by! { |a| a["position"] }
   end
 
   def tab_json(tab, context, user, session)

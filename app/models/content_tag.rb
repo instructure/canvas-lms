@@ -435,7 +435,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def locked_for?(user, opts = {})
-    return unless context_module && !context_module.deleted?
+    return false unless context_module && !context_module.deleted?
 
     context_module.locked_for?(user, opts.merge({ tag: self }))
   end
@@ -676,7 +676,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def visible_to_user?(user, opts = nil, session = nil)
-    return unless context_module
+    return false unless context_module
 
     opts ||= context_module.visibility_for_user(user, session)
     return false unless opts[:can_read]

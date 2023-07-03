@@ -20,8 +20,8 @@
 
 require_relative "../../spec_helper"
 require_relative "../../feature_flag_helper"
-require_relative "./ims/concerns/advantage_services_shared_context"
-require_relative "./ims/concerns/lti_services_shared_examples"
+require_relative "ims/concerns/advantage_services_shared_context"
+require_relative "ims/concerns/lti_services_shared_examples"
 
 describe Lti::FeatureFlagsController do
   include WebMock::API

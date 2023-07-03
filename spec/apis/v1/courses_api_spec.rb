@@ -3852,7 +3852,7 @@ describe CoursesController, type: :request do
           links = response["Link"].split(",")
           expect(links).not_to be_empty
           expect(links.all? { |l| l.include?("enrollment_type=student") }).to be_truthy
-          expect(links.first.scan(/per_page/).length).to eq 1
+          expect(links.first.scan("per_page").length).to eq 1
         end
 
         it "does not include sis user id or login id for non-admins" do

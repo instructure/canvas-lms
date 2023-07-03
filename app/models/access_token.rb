@@ -235,7 +235,7 @@ class AccessToken < ActiveRecord::Base
       # build up the scope matching regexp from the route path
       path = path.gsub(%r{:[^/)]+}, "[^/]+") # handle dynamic segments /courses/:course_id -> /courses/[^/]+
       path = path.gsub(%r{\*[^/)]+}, ".+") # handle glob segments /files/*path -> /files/.+
-      path = path.gsub(/\(/, "(?:").gsub(/\)/, "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = path.gsub("(", "(?:").gsub(")", "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
       path = "#{path}(?:\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
     end

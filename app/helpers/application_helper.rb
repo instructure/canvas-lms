@@ -102,7 +102,7 @@ module ApplicationHelper
     res = nil
     if opts.length > 1 || (opts[0].is_a? String) || (opts[0].is_a? Symbol)
       name = opts.shift.to_s
-      name = name.sub(/context/, context_name)
+      name = name.sub("context", context_name)
       opts.unshift context.id
       opts.push({}) unless opts[-1].is_a?(Hash)
       begin

@@ -19,7 +19,7 @@
 #
 
 require_relative "../graphql_spec_helper"
-require_relative "./shared_examples/types_with_enumerable_workflow_states"
+require_relative "shared_examples/types_with_enumerable_workflow_states"
 
 describe Types::AssignmentType do
   let_once(:course) { course_factory(active_all: true) }

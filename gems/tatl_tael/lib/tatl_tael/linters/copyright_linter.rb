@@ -230,7 +230,7 @@ module TatlTael
 
       def existing_copyright_header?(path_from_root)
         lines = head(path_from_root, copyright_line_count + COPYRIGHT_LINES_BUFFER)
-        return unless lines
+        return false unless lines
 
         lines.any? { |line| line.include?(config[:copyright_ending_token]) }
       end

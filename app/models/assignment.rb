@@ -258,8 +258,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def positive_points_possible?
-    return if points_possible.to_i >= 0
-    return unless points_possible_changed?
+    return false if points_possible.to_i >= 0
+    return false unless points_possible_changed?
 
     errors.add(
       :points_possible,
@@ -271,8 +271,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def reasonable_points_possible?
-    return if points_possible.to_i < 1_000_000_000
-    return unless points_possible_changed?
+    return false if points_possible.to_i < 1_000_000_000
+    return false unless points_possible_changed?
 
     errors.add(
       :points_possible,
@@ -442,7 +442,7 @@ class Assignment < ActiveRecord::Base
   delegate :restrict_quantitative_data?, to: :course
 
   def group_category_changes_ok?
-    return unless group_category_id_changed?
+    return false unless group_category_id_changed?
 
     if has_submitted_submissions?
       errors.add :group_category_id,
@@ -456,7 +456,7 @@ class Assignment < ActiveRecord::Base
   private :group_category_changes_ok?
 
   def turnitin_changes_ok?
-    return unless turnitin_enabled_changed?
+    return false unless turnitin_enabled_changed?
 
     if has_submitted_submissions?
       errors.add :turnitin_enabled,
@@ -466,7 +466,7 @@ class Assignment < ActiveRecord::Base
   private :turnitin_changes_ok?
 
   def vericite_changes_ok?
-    return unless vericite_enabled_changed?
+    return false unless vericite_enabled_changed?
 
     if has_submitted_submissions?
       errors.add :vericite_enabled,
@@ -476,7 +476,7 @@ class Assignment < ActiveRecord::Base
   private :vericite_changes_ok?
 
   def anonymous_grading_changes_ok?
-    return unless anonymous_grading_changed?
+    return false unless anonymous_grading_changed?
 
     if group_category.present? && !group_category_id_changed?
       errors.add :anonymous_grading, I18n.t("Group assignments can't be anonymously graded")
@@ -513,8 +513,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def discussion_group_ok?
-    return unless new_record? || group_category_id_changed?
-    return unless group_category_id && submission_types == "discussion_topic"
+    return false unless new_record? || group_category_id_changed?
+    return false unless group_category_id && submission_types == "discussion_topic"
 
     errors.add :group_category_id, I18n.t("discussion_group_category_locked",
                                           "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead")
@@ -1679,7 +1679,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def include_description?(user, lock_info = nil)
-    return unless user
+    return false unless user
 
     lock_info = locked_for?(user, check_policies: true) if lock_info.nil?
     !lock_info || (lock_info[:can_view] && !lock_info[:context_module])
@@ -4095,7 +4095,7 @@ class Assignment < ActiveRecord::Base
     # Due to the removal of the multiple `validates_length_of :title` validations we need this nil check
     # here to act as those validations so we can reduce the number of validations for this attribute
     # to just one single check
-    return if nil? || self.title.nil?
+    return false if nil? || self.title.nil?
 
     if self.title.to_s.length > name_length && self.grading_type != "not_graded"
       errors.add(:title, I18n.t("The title cannot be longer than %{length} characters", length: name_length))
@@ -4103,14 +4103,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def annotatable_and_group_exclusivity_ok?
-    return unless has_group_category? && annotated_document?
+    return false unless has_group_category? && annotated_document?
 
     errors.add(:annotatable_attachment_id, "must be blank when group_category_id is present")
     errors.add(:group_category_id, "must be blank when annotatable_attachment_id is present")
   end
 
   def grader_section_ok?
-    return if grader_section.blank?
+    return false if grader_section.blank?
 
     if grader_section.workflow_state != "active" || grader_section.course_id != course.id
       errors.add(:grader_section, "must be active and in same course as assignment")
@@ -4118,8 +4118,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def final_grader_ok?
-    return unless final_grader_id_changed?
-    return if final_grader_id.blank?
+    return false unless final_grader_id_changed?
+    return false if final_grader_id.blank?
 
     if grader_section_id.present? && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: "active").empty?
       errors.add(:final_grader, "must be enrolled in selected section")

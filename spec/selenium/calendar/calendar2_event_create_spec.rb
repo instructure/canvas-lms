@@ -20,7 +20,7 @@
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
 require_relative "../../helpers/k5_common"
-require_relative "./pages/calendar_page"
+require_relative "pages/calendar_page"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"

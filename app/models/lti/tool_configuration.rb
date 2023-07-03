@@ -150,7 +150,7 @@ module Lti
       end
       schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration.compact)
       errors.add(:configuration, schema_errors) if schema_errors.present?
-      return if errors[:configuration].present?
+      return false if errors[:configuration].present?
 
       tool = new_external_tool(developer_key.owner_account)
       unless tool.valid?

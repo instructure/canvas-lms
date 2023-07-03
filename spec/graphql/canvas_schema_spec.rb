@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "./graphql_spec_helper"
+require_relative "graphql_spec_helper"
 
 describe CanvasSchema do
   before(:once) { course_with_student(active_all: true, course_name:) }

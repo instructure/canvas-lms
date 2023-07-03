@@ -1088,7 +1088,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_is_admin?(user)
-    return unless user
+    return false unless user
 
     fetch_on_enrollments("user_is_admin", user) do
       enrollments.for_user(user).active.of_admin_type.exists?
@@ -1096,7 +1096,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_is_instructor?(user)
-    return unless user
+    return false unless user
 
     fetch_on_enrollments("user_is_instructor", user) do
       enrollments.for_user(user).active_by_date.of_instructor_type.exists?
@@ -1104,7 +1104,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_is_student?(user, opts = {})
-    return unless user
+    return false unless user
 
     fetch_on_enrollments("user_is_student", user, opts) do
       enroll_types = ["StudentEnrollment"]
@@ -1143,7 +1143,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_has_been_instructor?(user)
-    return unless user
+    return false unless user
     if @user_ids_by_enroll_type
       return preloaded_user_has_been?(user, %w[TaEnrollment TeacherEnrollment])
     end
@@ -1155,7 +1155,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_has_been_admin?(user)
-    return unless user
+    return false unless user
     if @user_ids_by_enroll_type
       return preloaded_user_has_been?(user, %w[TaEnrollment TeacherEnrollment DesignerEnrollment])
     end
@@ -1166,7 +1166,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_has_been_observer?(user)
-    return unless user
+    return false unless user
     if @user_ids_by_enroll_type
       return preloaded_user_has_been?(user, "ObserverEnrollment")
     end
@@ -1177,7 +1177,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_has_been_student?(user)
-    return unless user
+    return false unless user
     if @user_ids_by_enroll_type
       return preloaded_user_has_been?(user, %w[StudentEnrollment StudentViewEnrollment])
     end
@@ -1188,7 +1188,7 @@ class Course < ActiveRecord::Base
   end
 
   def user_has_no_enrollments?(user)
-    return unless user
+    return false unless user
 
     if @user_ids_by_enroll_type
       shard.activate do
@@ -3649,7 +3649,7 @@ class Course < ActiveRecord::Base
   end
 
   def restrict_quantitative_data?(user = nil, check_extra_permissions = false)
-    return unless user.is_a?(User)
+    return false unless user.is_a?(User)
 
     # When check_extra_permissions is true, return false for a teacher,ta, admin, or designer
     can_read_as_admin = if check_extra_permissions
@@ -4434,7 +4434,7 @@ class Course < ActiveRecord::Base
   end
 
   def change_to_logged_settings?
-    return unless saved_change_to_settings? && available? && !publishing?
+    return false unless saved_change_to_settings? && available? && !publishing?
 
     @enable_paces_change = change_to_enable_paces?
     @course_format_change = changes_to_course_format?
@@ -4449,7 +4449,7 @@ class Course < ActiveRecord::Base
     new_enable_paces_setting = setting_changes[1][:enable_course_paces]
 
     # Check to see if enable_course_paces is in list of updated items
-    return if new_enable_paces_setting.nil?
+    return false if new_enable_paces_setting.nil?
 
     # If enable_course_paces IS in the list, then check to see if the original value is present or if it's nil
     # It can be nil when a course is initially created and published without other settings present.
