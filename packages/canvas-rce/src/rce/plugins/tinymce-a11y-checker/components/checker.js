@@ -69,6 +69,7 @@ export default class Checker extends React.Component {
 
   static defaultProps = {
     additionalRules: [],
+    onFixError: noop,
   }
 
   componentDidMount() {
@@ -257,7 +258,10 @@ export default class Checker extends React.Component {
         this._closeButtonRef.focus()
       }
       const errorIndex = this.state.errorIndex
-      this.check(() => this.setErrorIndex(errorIndex))
+      this.check(() => {
+        this.setErrorIndex(errorIndex)
+        this.props.onFixError(this.state.errors)
+      })
     }
   }
 
