@@ -26,7 +26,7 @@ import GradeOverride from '../GradeOverride'
 import {parseEntryValue} from '../GradeInputHelper'
 import GradeOverrideInfo from './GradeOverrideInfo'
 import GradeEntry, {EnterGradesAs} from './index'
-import type {GradeType, GradingScheme, GradeEntryMode} from '../grading.d'
+import type {GradeType, DeprecatedGradingScheme, GradeEntryMode} from '../grading.d'
 
 function schemeKeyForPercentage(percentage, gradingScheme) {
   if (gradingScheme) {
@@ -114,7 +114,7 @@ export default class GradeOverrideEntry extends GradeEntry {
   }
 
   parseValue(value): GradeOverrideInfo {
-    const gradingScheme: string | {data: GradingScheme[]} = this.options.gradingScheme
+    const gradingScheme: string | {data: DeprecatedGradingScheme[]} = this.options.gradingScheme
     const parseResult = parseEntryValue(value, gradingScheme)
 
     let enteredAs: null | GradeType = null

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingScheme, GradingStandard, ProgressData} from '@canvas/grading/grading'
+import {DeprecatedGradingScheme, GradingStandard, ProgressData} from '@canvas/grading/grading'
 import {
   AssignmentConnection,
   UserConnection,
@@ -84,7 +84,7 @@ export type GradebookOptions = {
   gradeCalcIgnoreUnpostedAnonymousEnabled?: boolean | null
   gradesAreWeighted?: boolean | null
   gradingPeriodSet?: GradingPeriodSet | null
-  gradingSchemes?: GradingScheme[] | null
+  gradingSchemes?: DeprecatedGradingScheme[] | null
   gradingStandard?: GradingStandard[] | null
   groupWeightingScheme?: string | null
   finalGradeOverrideEnabled?: boolean | null
