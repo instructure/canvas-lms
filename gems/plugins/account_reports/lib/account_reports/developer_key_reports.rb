@@ -61,7 +61,7 @@ module AccountReports
       row << key.email
       row << (key.is_lti_key ? "LTI Key" : "API Key")
       row << (key.tool_configuration&.placements&.pluck("placement").presence || "None")
-      row << (key.account_binding_for(account)&.workflow_state&.capitalize&.presence || "Allow")
+      row << (key.account_binding_for(account)&.workflow_state&.capitalize.presence || "Allow")
       row << (key.scopes.presence || "All")
       csv << row
     end

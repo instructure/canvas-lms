@@ -20,7 +20,7 @@
 module Canvas::LiveEvents
   def self.post_event_stringified(event_name, payload, context = nil)
     ctx = LiveEvents.get_context || {}
-    payload.compact! if ctx[:compact_live_events]&.present?
+    payload.compact! if ctx[:compact_live_events].present?
 
     StringifyIds.recursively_stringify_ids(payload)
     StringifyIds.recursively_stringify_ids(context)

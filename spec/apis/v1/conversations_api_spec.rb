@@ -187,7 +187,7 @@ describe ConversationsController, type: :request do
       expect(json.size).to be 3
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l.include?("api/v1/conversations") }).to be_truthy
-      expect(links.all? { |l| l.scan(/scope=default/).size == 1 }).to be_truthy
+      expect(links.all? { |l| l.scan("scope=default").size == 1 }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
@@ -199,7 +199,7 @@ describe ConversationsController, type: :request do
       expect(json.size).to be 1
       links = response.headers["Link"].split(",")
       expect(links.all? { |l| l.include?("api/v1/conversations") }).to be_truthy
-      expect(links.all? { |l| l.scan(/scope=default/).size == 1 }).to be_truthy
+      expect(links.all? { |l| l.scan("scope=default").size == 1 }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)

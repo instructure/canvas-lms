@@ -1623,7 +1623,7 @@ class User < ActiveRecord::Base
   end
 
   def self.user_id_from_avatar_key(key)
-    user_id, sig = key.to_s.split(/-/, 2)
+    user_id, sig = key.to_s.split("-", 2)
     Canvas::Security.verify_hmac_sha1(sig, user_id.to_s, truncate: 10) ? user_id : nil
   end
 

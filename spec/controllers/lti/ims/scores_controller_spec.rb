@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "apis/api_spec_helper"
-require_relative "./concerns/advantage_services_shared_context"
-require_relative "./concerns/advantage_services_shared_examples"
-require_relative "./concerns/lti_services_shared_examples"
+require_relative "concerns/advantage_services_shared_context"
+require_relative "concerns/advantage_services_shared_examples"
+require_relative "concerns/lti_services_shared_examples"
 
 module Lti::IMS
   RSpec.describe ScoresController do

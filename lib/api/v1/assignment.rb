@@ -1115,7 +1115,7 @@ module Api::V1::Assignment
 
   def clear_tool_settings_tools?(assignment, assignment_params)
     assignment.assignment_configuration_tool_lookups.present? &&
-      assignment_params["submission_types"]&.present? &&
+      assignment_params["submission_types"].present? &&
       (
         assignment.submission_types.split(",").none? { |t| assignment_params["submission_types"].include?(t) } ||
         assignment_params["submission_types"].blank?

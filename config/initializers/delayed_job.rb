@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative "./job_live_events_context"
+require_relative "job_live_events_context"
 Delayed::Job.include(JobLiveEventsContext)
 
 Delayed::Backend::Base.class_eval do

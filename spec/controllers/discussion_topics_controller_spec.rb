@@ -808,7 +808,7 @@ describe DiscussionTopicsController do
       # this is essentially a unit test for ui/features/discussion_topic/backbone/models/Entry.js,
       # making sure that we get back the expected format for this url template
       template = assigns[:js_env][:DISCUSSION][:SPEEDGRADER_URL_TEMPLATE]
-      url = template.gsub(/%3Astudent_id/, "123")
+      url = template.gsub("%3Astudent_id", "123")
       expect(url).to match "student_id=123"
     end
 

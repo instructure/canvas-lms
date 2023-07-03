@@ -102,7 +102,7 @@ describe Course do
       expect(page).not_to be_nil
       expect(page.migration_id).to eq("1865116206002")
       expect(page.body).not_to be_nil
-      expect(page.body.scan(/<li>/).length).to eq(4)
+      expect(page.body.scan("<li>").length).to eq(4)
       expect(page.body).to match(/Orientation/)
       expect(page.body).to match(/Orientation Quiz/)
       file = @course.attachments.where(migration_id: "1865116527002").first

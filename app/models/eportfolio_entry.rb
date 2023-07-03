@@ -169,7 +169,7 @@ class EportfolioEntry < ActiveRecord::Base
 
   def content_contains_spam?
     content_regexp = Eportfolio.spam_criteria_regexp(type: :content)
-    return if content_regexp.blank?
+    return false if content_regexp.blank?
 
     content_bodies = content_sections.map do |section|
       case section

@@ -22,7 +22,7 @@ require_relative "../helpers/public_courses_context"
 require_relative "../helpers/files_common"
 require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../rcs/pages/rce_next_page"
-require_relative "./pages/syllabus_page"
+require_relative "pages/syllabus_page"
 
 describe "course syllabus" do
   include_context "in-process server selenium tests"

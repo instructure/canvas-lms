@@ -19,8 +19,8 @@
 
 require_relative "../common"
 require_relative "../helpers/notifications_common"
-require_relative "./pages/k5_dashboard_page"
-require_relative "./pages/dashboard_page"
+require_relative "pages/k5_dashboard_page"
+require_relative "pages/dashboard_page"
 
 describe "dashboard" do
   include NotificationsCommon

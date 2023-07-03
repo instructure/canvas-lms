@@ -7829,7 +7829,7 @@ describe Course do
 
     describe "with no user" do
       it "calls restrict_quantitative_data with no user" do
-        expect(@course.restrict_quantitative_data?).to be_nil
+        expect(@course.restrict_quantitative_data?).to be false
       end
     end
 

@@ -188,7 +188,7 @@ module CC::Exporter::WebZip
         quizzes: @quizzes,
         attachments: files
       }
-      return unless list.keys.any? { |type| tab_hidden?(type) }
+      return false unless list.keys.any? { |type| tab_hidden?(type) }
 
       list.each { |type, item_list| map_export_item_ids(type, item_list) }
     end

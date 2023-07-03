@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../pages/srgb_page"
-require_relative "./weighting_setup"
-require_relative "./a_gradebook_shared_example"
+require_relative "weighting_setup"
+require_relative "a_gradebook_shared_example"
 
 describe "individual view" do
   include_context "in-process server selenium tests"

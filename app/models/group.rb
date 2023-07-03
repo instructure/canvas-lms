@@ -239,7 +239,7 @@ class Group < ActiveRecord::Base
   end
 
   def has_member?(user)
-    return nil unless user.present?
+    return false unless user.present?
 
     if group_memberships.loaded?
       group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
@@ -249,7 +249,7 @@ class Group < ActiveRecord::Base
   end
 
   def has_moderator?(user)
-    return nil unless user.present?
+    return false unless user.present?
     if group_memberships.loaded?
       return group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id && gm.moderator }
     end

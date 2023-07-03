@@ -173,7 +173,7 @@ module Lti
     end
 
     def resource_link_id
-      @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items&.present?
+      @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items.present?
                               if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
                                 @assignment.line_items.first&.resource_link&.resource_link_uuid
                               else

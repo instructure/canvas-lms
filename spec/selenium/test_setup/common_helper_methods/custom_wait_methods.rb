@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative "./state_poller"
+require_relative "state_poller"
 
 module CustomWaitMethods
   # #initialize and #to_s are overwritten to allow message customization

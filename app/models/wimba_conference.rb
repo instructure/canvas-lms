@@ -29,7 +29,7 @@ class WimbaConference < WebConference
     if (res = send_request("listClass", { "filter00" => "archive_of", "filter00value" => wimba_id, "attribute" => "longname" }))
       res.delete_prefix("100 OK\n").split(/\n=END RECORD\n?/).each do |match|
         data = match.split("\n").each_with_object({}) do |line, hash|
-          key, val = line.split(/=/, 2)
+          key, val = line.split("=", 2)
           hash[key.to_sym] = val
         end
         unless data[:longname] && data[:class_id]
@@ -174,7 +174,7 @@ class WimbaConference < WebConference
                           "nickname" => user.name.gsub(/[^a-zA-Z0-9]/, "")
                         })) &&
       (token = res.split("\n").detect { |s| s.match(/^authToken/) }) &&
-      token.split(/=/, 2).last.chomp
+      token.split("=", 2).last.chomp
   end
 
   def admin_join_url(user, _return_to = nil)
@@ -219,7 +219,7 @@ class WimbaConference < WebConference
     active = nil
     if (res = send_request("statusClass", { "target" => wimba_id }))
       res.split(/\r?\n/).each do |str|
-        key, value = str.strip.split(/=/, 2)
+        key, value = str.strip.split("=", 2)
         if key == "num_users"
           return :closed unless value.to_i > 0
 

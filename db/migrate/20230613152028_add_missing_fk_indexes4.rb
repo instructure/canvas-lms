@@ -21,7 +21,7 @@ class AddMissingFkIndexes4 < ActiveRecord::Migration[7.0]
   disable_ddl_transaction!
 
   def change
-    # rubocop:disable Migrations/Predeploy
+    # rubocop:disable Migration/Predeploy
     add_index :abstract_courses, :account_id, algorithm: :concurrently, if_not_exists: true
     # We have a poorly named index (index_account_notification_roles_on_role_id) that is actually on (account_notification_id, role_id)
     add_index :account_notification_roles, :role_id, name: "index_account_notification_roles_only_on_role_id", where: "role_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true
@@ -63,6 +63,6 @@ class AddMissingFkIndexes4 < ActiveRecord::Migration[7.0]
     add_index :switchman_shards, :delayed_jobs_shard_id, where: "delayed_jobs_shard_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true
     add_index :user_profile_links, :user_profile_id, where: "user_profile_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true
     add_index :wiki_pages, :cloned_item_id, where: "cloned_item_id IS NOT NULL", algorithm: :concurrently, if_not_exists: true
-    # rubocop:enable Migrations/Predeploy
+    # rubocop:enable Migration/Predeploy
   end
 end

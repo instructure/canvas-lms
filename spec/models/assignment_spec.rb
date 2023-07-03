@@ -11189,7 +11189,7 @@ describe Assignment do
 
     describe "with no user" do
       it "calls restrict_quantitative_data with no user" do
-        expect(@course_assignment.restrict_quantitative_data?).to be_nil
+        expect(@course_assignment.restrict_quantitative_data?).to be false
       end
     end
 

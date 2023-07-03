@@ -133,7 +133,7 @@ describe "Outcome Reports" do
                        :quiz_submission,
                        :pseudonym)
     result = quiz.nil? ? outcome_result : quiz_outcome_result
-    rating = if outcome.present? && result&.score&.present?
+    rating = if outcome.present? && result&.score.present?
                outcome.rubric_criterion&.[](:ratings)&.select do |r|
                  score = if quiz.nil?
                            result.score

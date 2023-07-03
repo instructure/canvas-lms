@@ -466,7 +466,7 @@ class AssignmentsController < ApplicationController
 
   def downloadable_submissions?(current_user, context, assignment)
     types = %w[online_upload online_url online_text_entry]
-    return unless assignment.submission_types.split(",").intersect?(types) && current_user
+    return false unless assignment.submission_types.split(",").intersect?(types) && current_user
 
     student_ids =
       if assignment.grade_as_group?
