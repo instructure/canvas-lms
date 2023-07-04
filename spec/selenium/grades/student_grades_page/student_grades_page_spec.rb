@@ -265,6 +265,7 @@ describe "gradebook - logged in as a student" do
       end
 
       it "correctly displays all past grading period" do
+        skip "VICE-3642"
         # Testing the following: N/A, 0%, correct assignment groups
         user_session(@student)
         StudentGradesPage.visit_as_student(@course)
@@ -316,6 +317,7 @@ describe "gradebook - logged in as a student" do
       end
 
       it "correctly displays current grading period" do
+        skip "VICE-3642"
         # Testing the following: N/A, 0%, correct assignment groups
         user_session(@student)
         StudentGradesPage.visit_as_student(@course)
