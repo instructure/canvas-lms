@@ -465,7 +465,7 @@ module Lti
       context "$com.instructure.Assignment.restrict_quantitative_data" do
         let(:exp_hash) { { test: "$com.instructure.Assignment.restrict_quantitative_data" } }
 
-        it "is false if restrict_quantitative_data is falsy for current user" do
+        it "is `false` if restrict_quantitative_data is falsy for current user" do
           course.save!
           managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
           login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
@@ -482,10 +482,30 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be false
+          expect(exp_hash[:test]).to eq "false"
         end
 
-        it "is true if restrict_quantitative_data is truthy for current user" do
+        it "is the variable's default name if assignment is nil" do
+          course.save!
+          managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
+          login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
+          course.enroll_user(user, "StudentEnrollment", sis_pseudonym_id: login.id, enrollment_state: "active")
+          my_assignment = nil
+
+          variable_expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: my_assignment
+          )
+
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "$com.instructure.Assignment.restrict_quantitative_data"
+        end
+
+        it "is `true` if restrict_quantitative_data is truthy for current user" do
           # truthy feature flag
           Account.default.enable_feature! :restrict_quantitative_data
 
@@ -509,7 +529,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to be true
+          expect(exp_hash[:test]).to eq "true"
         end
       end
 
@@ -531,7 +551,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq [["A", 90], ["B", 80], ["C", 70], ["D", 60], ["F", 0]]
+          expect(exp_hash[:test]).to eq "[[\"A\",90],[\"B\",80],[\"C\",70],[\"D\",60],[\"F\",0]]"
         end
 
         it "provides the default grading standard if no specific one is set" do
@@ -545,7 +565,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq [["A", 0.94], ["A-", 0.9], ["B+", 0.87], ["B", 0.84], ["B-", 0.8], ["C+", 0.77], ["C", 0.74], ["C-", 0.7], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]]
+          expect(exp_hash[:test]).to eq "[[\"A\",0.94],[\"A-\",0.9],[\"B+\",0.87],[\"B\",0.84],[\"B-\",0.8],[\"C+\",0.77],[\"C\",0.74],[\"C-\",0.7],[\"D+\",0.67],[\"D\",0.64],[\"D-\",0.61],[\"F\",0.0]]"
         end
       end
 
