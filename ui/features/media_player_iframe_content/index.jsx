@@ -34,7 +34,15 @@ ready(() => {
   //  `http://canvas.example.com/media_objects_iframe/m-48jGWTHdvcV5YPdZ9CKsqbtRzu1jURgu?type=video`
   // or
   //  `http://canvas.example.com/media_objects_iframe/?type=video&mediahref=url/to/file.mov`
-  const media_id = window.location.pathname.split('media_objects_iframe/').pop()
+  // or
+  //  `http://canvas.example.com/media_attachments_iframe/12345678
+  let media_id = window.location.pathname.split('media_objects_iframe/').pop()
+  // This covers a timing issue between canvas/RCE when the media_links_use_attachment flag is flipped off
+  if (media_id.includes('media_attachments_iframe') && ENV?.media_object.media_id) 
+  {
+    media_id = ENV.media_object.media_id
+  }
+  const attachment_id = ENV.attachment_id
   const media_href_match = window.location.search.match(/mediahref=([^&]+)/)
   const media_object = ENV.media_object || {}
   const is_attachment = ENV.attachment
@@ -100,6 +108,7 @@ ready(() => {
       type={is_video ? 'video' : 'audio'}
       aria_label={aria_label}
       is_attachment={is_attachment}
+      attachment_id={attachment_id}
     />,
     document.getElementById('player_container')
   )
