@@ -43,6 +43,14 @@ admin_analytics_new_filter_ui:
     admin_analytics_new_filter_ui_description: Enables the new Admin Analytics Filter UI.
   root_opt_in: true
   beta: true
+k20_course_readiness:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics - Course Readiness
+  description:
+    k20_course_readiness_description: Enables the new Admin Analytics Course Readiness Dashboard.
+  root_opt_in: true
+  beta: true
 anonymous_instructor_annotations:
   type: setting
   state: allowed
