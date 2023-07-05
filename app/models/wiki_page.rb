@@ -206,10 +206,8 @@ class WikiPage < ActiveRecord::Base
     end
     urls = context.wiki_pages.where(*url_conditions).not_deleted.pluck(:url)
 
-    if Account.site_admin.feature_enabled?(:permanent_page_links)
-      lookup_conditions = [wildcard("slug", base_url, type: :right)]
-      urls += context.wiki_page_lookups.where(*lookup_conditions).where.not(wiki_page_id: id).pluck(:slug)
-    end
+    lookup_conditions = [wildcard("slug", base_url, type: :right)]
+    urls += context.wiki_page_lookups.where(*lookup_conditions).where.not(wiki_page_id: id).pluck(:slug)
 
     # This is the part in stringex that messed us up, since it will never allow
     # a url of "front-page" once "front-page-1" or "front-page-2" is created

@@ -190,8 +190,7 @@ describe WikiPage do
     expect(p2.title).to eq(title)
   end
 
-  it "creates a unique url if title is taken by an existing lookup when permanent_page_links is enabled" do
-    Account.site_admin.enable_feature! :permanent_page_links
+  it "creates a unique url if title is taken by an existing lookup" do
     course_factory(active_all: true)
     p1 = @course.wiki_pages.create!(title: "bananas")
     p1.wiki_page_lookups.create!(slug: "apples")
