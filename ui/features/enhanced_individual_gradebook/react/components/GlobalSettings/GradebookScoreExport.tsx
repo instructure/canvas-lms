@@ -81,6 +81,7 @@ export default function GradebookScoreExport({
   return (
     <View as="div" className="pad-box bottom-only">
       <Button
+        data-testid="gradebook-export-button"
         color="secondary"
         renderIcon={IconDownloadLine}
         id="gradebook-export"

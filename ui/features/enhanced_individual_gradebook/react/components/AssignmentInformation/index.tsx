@@ -67,7 +67,7 @@ export default function AssignmentInformation({
 
   if (!assignment) {
     return (
-      <View as="div">
+      <View as="div" data-testid="assignment-information-empty">
         <View as="div" className="row-fluid">
           <View as="div" className="span4">
             <View as="h2">{I18n.t('Assignment Information')}</View>

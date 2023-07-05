@@ -81,6 +81,7 @@ export default function IncludeUngradedAssignmentsCheckbox({
         theme={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
+          data-testid="include-ungraded-assignments-checkbox"
           size="small"
           label={I18n.t('View Ungraded as 0')}
           checked={includeUngradedAssignments}

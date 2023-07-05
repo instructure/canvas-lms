@@ -71,6 +71,7 @@ export default function StudentInformation({
     customColumnDataUrl,
     customColumnDatumUrl,
     contextId,
+    contextUrl,
     finalGradeOverrideEnabled,
     gradeCalcIgnoreUnpostedAnonymousEnabled,
     gradingPeriodSet,
@@ -134,7 +135,7 @@ export default function StudentInformation({
 
   if (!student || !submissions || !studentGradeResults) {
     return (
-      <View as="div">
+      <View as="div" data-testid="student-information-empty">
         <View as="div" className="row-fluid">
           <View as="div" className="span4">
             <View as="h2">{I18n.t('Student Information')}</View>
@@ -183,6 +184,8 @@ export default function StudentInformation({
     return `${percentText}%${pointsText}${letterGradeText}`
   }
 
+  const studentUrl = `${contextUrl}/grades/${student.id}`
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -194,7 +197,7 @@ export default function StudentInformation({
             {hideStudentNames ? (
               <>{student.hiddenName}</>
             ) : (
-              <a href="studentUrl"> {student.name}</a>
+              <a href={studentUrl}> {student.name}</a>
             )}
           </View>
 

@@ -61,6 +61,7 @@ export default function HideStudentNamesCheckbox({handleCheckboxChange, hideStud
         theme={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
+          data-testid="hide-student-names-checkbox"
           size="small"
           label={I18n.t('Hide Student Names')}
           checked={hideStudentNames}
