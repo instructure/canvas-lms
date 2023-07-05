@@ -954,7 +954,7 @@ module Lti
     #   ```
     register_expansion "com.instructure.Assignment.restrict_quantitative_data",
                        [],
-                       -> { @assignment.restrict_quantitative_data?(@current_user) },
+                       -> { @assignment.restrict_quantitative_data?(@current_user)&.to_s },
                        ASSIGNMENT_GUARD,
                        default_name: "com_instructure_assignment_restrict_quantitative_data"
 
@@ -963,14 +963,14 @@ module Lti
     # @example
     #  ```
     #  [
-    #    ["A", 94.0, 100.0],
-    #    ["A-", 90.0, 93.99],
-    #    ["B+", 87.0, 89.99],
+    #    ["A", 94.0],
+    #    ["A-", 90.0],
+    #    ["B+", 87.0],
     #  ]
     #  ```
     register_expansion "com.instructure.Course.gradingScheme",
                        [],
-                       -> { @context.grading_standard_or_default.data },
+                       -> { @context.grading_standard_or_default.data.to_json },
                        COURSE_GUARD,
                        default_name: "com_instructure_course_grading_scheme"
 

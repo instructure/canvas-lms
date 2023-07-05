@@ -739,6 +739,30 @@ enabled.
 ```
 true
 ```
+## com.instructure.Assignment.restrict_quantitative_data
+returns true if the assignment restricts quantitative data.
+Assignment types: points, percentage, gpa_scale are all considered quantitative.
+
+**Availability**: *when launched as an assignment*  
+**Launch Parameter**: *com_instructure_assignment_restrict_quantitative_data*  
+
+```
+true
+```
+## com.instructure.Course.gradingScheme
+returns the grading scheme data for the course
+it is an array of arrays of grade levels.
+
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_course_grading_scheme*  
+
+```
+[
+  ["A", 94.0],
+  ["A-", 90.0],
+  ["B+", 87.0],
+]
+```
 ## com.Instructure.membership.roles
 returns the current course membership roles
 using the LIS v2 vocabulary.
