@@ -146,6 +146,38 @@ describe CalendarsController do
       expect(assigns[:selected_contexts]).to eql([account.asset_string])
     end
 
+    it "has account calendars cope with a non-array user preference" do
+      # this was caught in Sentry when the :selected_calendar_contexts preference
+      # was a string instead of an array.
+      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+      account = @user.account
+      account.account_calendar_visible = true
+      account.account_calendar_subscription_type = "auto"
+      account.save!
+      @admin = account_admin_user(account:, active_all: true)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      # this pref should be an array, but sometimes is not
+      @student.set_preference(:selected_calendar_contexts, account.asset_string)
+      get "show"
+      expect(assigns[:selected_contexts]).to eql([account.asset_string])
+    end
+
+    it "sets selected_contexts to nil if the user_preference is nil" do
+      # this was caught in Sentry when the :selected_calendar_contexts preference
+      # was a string instead of an array.
+      Account.site_admin.enable_feature!(:auto_subscribe_account_calendars)
+      account = @user.account
+      account.account_calendar_visible = true
+      account.account_calendar_subscription_type = "auto"
+      account.save!
+      @admin = account_admin_user(account:, active_all: true)
+      @admin.set_preference(:enabled_account_calendars, account.id)
+      # this pref should be an array, but sometimes is not
+      @student.set_preference(:selected_calendar_contexts, nil)
+      get "show"
+      expect(assigns[:selected_contexts]).to be_nil
+    end
+
     it "sets context.course_sections.can_create_ag based off :manage_calendar permission" do
       @section1 = @course.default_section
       @section2 = @course.course_sections.create!(name: "Section 2")
