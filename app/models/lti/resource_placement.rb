@@ -87,7 +87,9 @@ module Lti
         link_selection
         migration_selection
         module_index_menu_modal
+        module_menu_modal
         resource_selection
+        submission_type_selection
       ]
     }.freeze
 
