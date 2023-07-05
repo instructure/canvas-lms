@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Importers
+module CanvasLinkMigrator
   class LinkParser
     REFERENCE_KEYWORDS = %w[CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE IMS-CC-FILEBASE].freeze
     LINK_PLACEHOLDER = "LINK.PLACEHOLDER"
