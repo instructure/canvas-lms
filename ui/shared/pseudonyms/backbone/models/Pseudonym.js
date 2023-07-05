@@ -68,7 +68,7 @@ Pseudonym.prototype.errorMap = function (policy) {
           max: policy.max_sequence,
         }
       ),
-      common: I18n.t('errors.common', 'Can\'t use common passwords (e.g. "password")'),
+      common: I18n.t('errors.common', 'Can\'t use common passwords (e.g. "hunter2")'),
       repeated: I18n.t(
         'errors.repeated',
         "Can't have the same character more than %{max} times in a row",

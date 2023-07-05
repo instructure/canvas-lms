@@ -58,103 +58,109 @@ module Canvas
 
     # per https://en.wikipedia.org/wiki/Wikipedia:10,000_most_common_passwords
     # Licensed under CC BY-SA 3.0: https://creativecommons.org/licenses/by-sa/3.0/legalcode
-    # Top 100 common passwords as at May 2023, excluding profanity
+    # Top 100 common passwords > 8 characters as per NIST Guidelines, as at June 2023, excluding profanity
     COMMON_PASSWORDS = %w[
-      123456
       password
       12345678
-      qwerty
-      123456789
-      12345
-      1234
-      111111
-      1234567
-      dragon
-      123123
       baseball
-      abc123
       football
-      monkey
-      letmein
-      696969
-      shadow
-      master
-      666666
-      qwertyuiop
-      123321
-      mustang
-      1234567890
-      michael
-      654321
       superman
       1qaz2wsx
-      7777777
-      121212
-      000000
-      qazwsx
-      123qwe
-      killer
       trustno1
-      jordan
       jennifer
-      zxcvbnm
-      asdfgh
-      hunter
-      buster
-      soccer
-      harley
-      batman
-      andrew
-      tigger
       sunshine
       iloveyou
-      2000
-      charlie
-      robert
-      thomas
-      hockey
-      ranger
-      daniel
       starwars
-      klaster
-      112233
-      george
       computer
       michelle
-      jessica
-      pepper
-      1111
-      zxcvbn
-      555555
       11111111
-      131313
-      freedom
-      777777
-      pass
-      maggie
-      159753
-      aaaaaa
-      ginger
       princess
-      joshua
-      cheese
-      amanda
-      summer
-      love
-      ashley
-      6969
-      nicole
-      chelsea
-      biteme
-      matthew
-      access
-      yankees
-      987654321
-      dallas
-      austin
-      thunder
-      taylor
-      matrix
-    ].freeze
+      corvette
+      1234qwer
+      88888888
+      internet
+      samantha
+      whatever
+      maverick
+      steelers
+      mercedes
+      qwer1234
+      hardcore
+      q1w2e3r4
+      midnight
+      bigdaddy
+      victoria
+      1q2w3e4r
+      cocacola
+      marlboro
+      asdfasdf
+      87654321
+      12344321
+      jordan23
+      jonathan
+      liverpool
+      danielle
+      abcd1234
+      scorpion
+      slipknot
+      startrek
+      12341234
+      redskins
+      butthead
+      qwertyui
+      dolphins
+      nicholas
+      elephant
+      mountain
+      xxxxxxxx
+      metallic
+      benjamin
+      creative
+      rush2112
+      asdfghjk
+      passw0rd
+      1qazxsw2
+      garfield
+      69696969
+      december
+      11223344
+      godzilla
+      airborne
+      lifehack
+      brooklyn
+      platinum
+      darkness
+      blink182
+      12qwaszx
+      snowball
+      pakistan
+      redwings
+      williams
+      nintendo
+      guinness
+      november
+      asdf1234
+      lasvegas
+      babygirl
+      12121212
+      explorer
+      snickers
+      alexande
+      paradise
+      michigan
+      carolina
+      lacrosse
+      christin
+      kimberly
+      kristina
+      poohbear
+      bollocks
+      drowssap
+      qweasdzxc
+      1232323q
+      westside
+      12345qwert
+      aaaaaaaa
+].freeze
   end
 end
