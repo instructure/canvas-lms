@@ -43,6 +43,7 @@ class CalendarsController < ApplicationController
                            unseen_auto_sub_cals = all_auto_sub_cals - viewed_auto_sub_cal_asset_strings
                            current_user_selected_cals = @current_user.get_preference(:selected_calendar_contexts)
                            unless current_user_selected_cals.nil?
+                             current_user_selected_cals = Array(current_user_selected_cals)
                              @current_user.set_preference(:selected_calendar_contexts, ((current_user_selected_cals || []) + unseen_auto_sub_cals).uniq)
                            end
                            @current_user.get_preference(:selected_calendar_contexts)
