@@ -21,14 +21,14 @@
 // needs, it will fetch even after the component is unmounted.
 
 import React from 'react'
-import {render, waitFor, fireEvent, act} from '@testing-library/react'
-import {queries as domQueries} from '@testing-library/dom'
+import { render, waitFor, fireEvent, act } from '@testing-library/react'
+import { queries as domQueries } from '@testing-library/dom'
 import CanvasMediaPlayer, {
   setPlayerSize,
   getAutoTrack,
   formatTracksForMediaPlayer,
 } from '../CanvasMediaPlayer'
-import {uniqueId} from 'lodash'
+import { uniqueId } from 'lodash'
 
 const defaultMediaObject = (overrides = {}) => ({
   bitrate: '12345',
@@ -44,8 +44,7 @@ const defaultMediaObject = (overrides = {}) => ({
 })
 
 describe('CanvasMediaPlayer', () => {
-  // MAT-885
-  describe.skip('rendering', () => {
+  describe('rendering', () => {
     beforeAll(() => {
       // put the flash_screenreader_holder into the dom
       let d = document.createElement('div')
@@ -66,22 +65,20 @@ describe('CanvasMediaPlayer', () => {
     beforeEach(() => {
       fetch.resetMocks()
       jest.useFakeTimers()
-      fetch.mockResponse([JSON.stringify({media_sources: [defaultMediaObject()]}), {status: 200}])
+      fetch.mockResponse([JSON.stringify({ media_sources: [defaultMediaObject()] }), { status: 200 }])
     })
-    afterEach(async () => {
+    afterEach(() => {
       // satisfy CanvasMediaPlayer's desire to keep trying until it finds media sources
-      fetch.mockResponse([JSON.stringify({media_sources: [defaultMediaObject()]}), {status: 200}])
-      await act(async () => {
-        await waitFor(() => {
-          jest.runOnlyPendingTimers()
-        })
+      fetch.mockResponse([JSON.stringify({ media_sources: [defaultMediaObject()] }), { status: 200 }])
+      act(() => {
+        jest.runOnlyPendingTimers()
       })
       jest.resetAllMocks()
       jest.useRealTimers()
     })
 
     it('renders the component', () => {
-      const {container, getAllByText} = render(
+      const { container, getAllByText } = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
           media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
@@ -93,13 +90,13 @@ describe('CanvasMediaPlayer', () => {
       expect(container.querySelector('video')).toBeInTheDocument()
     })
     it('sorts sources by bitrate, ascending', () => {
-      const {container, getAllByText, getByRole} = render(
+      const { container, getAllByText, getByRole } = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
           media_sources={[
-            defaultMediaObject({bitrate: '3000', label: '3000'}),
-            defaultMediaObject({bitrate: '2000', label: '2000'}),
-            defaultMediaObject({bitrate: '1000', label: '1000'}),
+            defaultMediaObject({ bitrate: '3000', label: '3000' }),
+            defaultMediaObject({ bitrate: '2000', label: '2000' }),
+            defaultMediaObject({ bitrate: '1000', label: '1000' }),
           ]}
         />
       )
@@ -118,7 +115,7 @@ describe('CanvasMediaPlayer', () => {
 
     it('adds aria-label for screenreaders when provided in props', () => {
       const label = 'Video file 1.mp4'
-      const {container} = render(
+      const { container } = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
           media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
@@ -131,7 +128,7 @@ describe('CanvasMediaPlayer', () => {
     })
 
     it('omits aria-label for screenreaders when not provided in props', () => {
-      const {container} = render(
+      const { container } = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
           media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
@@ -142,61 +139,47 @@ describe('CanvasMediaPlayer', () => {
     })
 
     describe('dealing with media_sources', () => {
-      it('handles string-type media_sources', () => {
-        // seen for audio files
-        const {getAllByText, container} = render(
-          <CanvasMediaPlayer
-            media_id="dummy_media_id"
-            media_sources="http://localhost:3000/files/797/download?download_frd=1"
-          />
+      it.skip('renders loading if there are no media sources', async () => {
+        // MAT-885
+        const { getAllByText } = render(
+          <CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />
         )
-        fireEvent.canPlay(container.querySelector('video'))
-        // just make sure it doesn't blow up and renders the player
-        expect(getAllByText('Play')[0]).toBeInTheDocument()
-      })
-      it('renders loading if there are no media sources', async () => {
-        await act(async () => {
-          const {getAllByText} = render(
-            <CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />
-          )
-          expect(getAllByText('Loading')[0]).toBeInTheDocument()
-
-          await waitFor(() => {
-            jest.runOnlyPendingTimers()
-            expect(fetch.mock.calls.length).toEqual(1)
-          })
-        })
+        expect(getAllByText('Loading')[0]).toBeInTheDocument()
+        jest.runOnlyPendingTimers()
+        expect(fetch.mock.calls.length).toEqual(1)
       })
       it('makes ajax call if no mediaSources are provided on load', async () => {
         fetch.mockResponse(
-          JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]})
-        )
-        await act(async () => {
-          render(<CanvasMediaPlayer media_id="dummy_media_id" />)
-          await waitFor(() => {
-            jest.runOnlyPendingTimers()
-            expect(fetch.mock.calls.length).toEqual(1)
-          })
-        })
-        expect(fetch.mock.calls.length).toEqual(1)
-        expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info')
+          JSON.stringify({ media_sources: [defaultMediaObject(), defaultMediaObject()] })
+        );
+        render(<CanvasMediaPlayer media_id="dummy_media_id" />);
+        jest.runOnlyPendingTimers();
+        expect(fetch.mock.calls.length).toEqual(1);
+        expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info');
       })
-      it('shows error message if fetch for media_sources fails', async () => {
-        fetch.mockResponses([JSON.stringify({error: 'whoops'}), {status: 503}])
+      it('makes ajax call to media_attachments if no mediaSources are provided on load', async () => {
+        fetch.mockResponse(
+          JSON.stringify({ media_sources: [defaultMediaObject(), defaultMediaObject()] })
+        )
+        render(<CanvasMediaPlayer media_id="dummy_media_id" attachment_id="1" />)
+        jest.runOnlyPendingTimers()
+        expect(fetch.mock.calls.length).toEqual(1)
+        expect(fetch.mock.calls[0][0]).toEqual('/media_attachments/1/info')
+      })
+      it.skip('shows error message if fetch for media_sources fails', async () => {
+        // MAT-885
+        fetch.mockReject(new Error('fake error message'))
         let component
-        await act(async () => {
-          component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
-            container: document.getElementById('here').firstElementChild,
-          })
-          await waitFor(() => {
-            jest.runOnlyPendingTimers()
-            expect(fetch.mock.calls.length).toEqual(1)
-          })
+        component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
+          container: document.getElementById('here').firstElementChild,
         })
+        act(() => { jest.runOnlyPendingTimers() })
+
         expect(fetch.mock.calls.length).toEqual(1)
         expect(component.getByText('Failed retrieving media sources.')).toBeInTheDocument()
       })
-      it('tries ajax call up to MAX times if no media_sources', async () => {
+      it.skip('tries ajax call up to MAX times if no media_sources', async () => {
+        // MAT-885
         // this spec passes if run alone, but fails as part of the larger suite
         // what I see happening is fetch.mock.calls is getting reset to 0 because the mock
         // can't find the instance. see canvas-lms/node_modules/jest-mock/build/index.js
@@ -207,13 +190,13 @@ describe('CanvasMediaPlayer', () => {
         // creates a new fetch mock? (though that doesn't explain why it works when it's the only test run)
         // it also doesn't explain why this passed before using ui-media-player 7
         fetch.mockResponses(
-          [JSON.stringify({media_sources: []}), {status: 200}],
-          [JSON.stringify({media_sources: []}), {status: 304}],
-          [JSON.stringify({media_sources: []}), {status: 304}],
-          [JSON.stringify({media_sources: []}), {status: 304}],
-          [JSON.stringify({media_sources: []}), {status: 304}],
-          [JSON.stringify({media_sources: []}), {status: 304}],
-          [JSON.stringify({media_sources: []}), {status: 304}]
+          [JSON.stringify({ media_sources: [] }), { status: 200 }],
+          [JSON.stringify({ media_sources: [] }), { status: 304 }],
+          [JSON.stringify({ media_sources: [] }), { status: 304 }],
+          [JSON.stringify({ media_sources: [] }), { status: 304 }],
+          [JSON.stringify({ media_sources: [] }), { status: 304 }],
+          [JSON.stringify({ media_sources: [] }), { status: 304 }],
+          [JSON.stringify({ media_sources: [] }), { status: 304 }]
         )
 
         let component
@@ -284,14 +267,14 @@ describe('CanvasMediaPlayer', () => {
           // add a 7th iteration just to prove the queries stopped at MAX_RETRY_ATTEMPTS
           await act(async () => {
             jest.runOnlyPendingTimers()
-            await waitFor(() => {})
+            await waitFor(() => { })
           })
 
           expect(fetch.mock.calls.length).toEqual(6) // initial attempt + 5 MAX_RETRY_ATTEMPTS
           expect(
             component.getByText(
               'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
-              {exact: false}
+              { exact: false }
             )
           ).toBeInTheDocument()
           expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
@@ -299,11 +282,12 @@ describe('CanvasMediaPlayer', () => {
           )
 
           jest.runOnlyPendingTimers()
-          await waitFor(() => {})
+          await waitFor(() => { })
         })
       })
-      it('still says "Loading" if we receive no info from backend', async () => {
-        fetch.mockResponse(JSON.stringify({media_sources: []}), {status: 200})
+      it.skip('still says "Loading" if we receive no info from backend', async () => {
+        // MAT-885
+        fetch.mockResponse(JSON.stringify({ media_sources: [] }), { status: 200 })
 
         let component
         await act(async () => {
@@ -351,7 +335,7 @@ describe('CanvasMediaPlayer', () => {
         expect(getAllByText('Speed')[0]).toBeInTheDocument()
         expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
-        expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
+        expect(queryAllByText('Captions').length).toBe(0) // AKA CC
       })
       it('skips fullscreen button when not enabled', () => {
         document.fullscreenEnabled = false
@@ -379,7 +363,7 @@ describe('CanvasMediaPlayer', () => {
         expect(getAllByText('Speed')[0]).toBeInTheDocument()
         expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(queryAllByText('Full Screen').length).toBe(0)
-        expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
+        expect(queryAllByText('Captions').length).toBe(0) // AKA CC
       })
       it('skips source chooser button when there is only 1 source', () => {
         document.fullscreenEnabled = true
@@ -407,7 +391,7 @@ describe('CanvasMediaPlayer', () => {
         expect(getAllByText('Speed')[0]).toBeInTheDocument()
         expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
-        expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
+        expect(queryAllByText('Captions').length).toBe(0) // AKA CC
       })
       describe("for safari's fullscreen api", () => {
         beforeAll(() => {
@@ -415,7 +399,7 @@ describe('CanvasMediaPlayer', () => {
         })
         it('renders all the buttons', () => {
           document.webkitFullscreenEnabled = true
-          const {getAllByText, container} = render(
+          const { getAllByText, container } = render(
             <CanvasMediaPlayer
               media_id="dummy_media_id"
               media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
@@ -426,7 +410,7 @@ describe('CanvasMediaPlayer', () => {
         })
         it('skips fullscreen button when not enabled', () => {
           document.webkitFullscreenEnabled = false
-          const {queryAllByText, container} = render(
+          const { queryAllByText, container } = render(
             <CanvasMediaPlayer
               media_id="dummy_media_id"
               media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
@@ -437,7 +421,7 @@ describe('CanvasMediaPlayer', () => {
         })
         it('skips source chooser button when there is only 1 source', () => {
           document.webkitFullscreenEnabled = true
-          const {getAllByText, container, queryByLabelText} = render(
+          const { getAllByText, container, queryByLabelText } = render(
             <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
           )
           fireEvent.canPlay(container.querySelector('video'))
@@ -446,7 +430,7 @@ describe('CanvasMediaPlayer', () => {
         })
       })
       it('includes the CC button when there are subtitle track(s)', () => {
-        const {getAllByText, getByLabelText, queryByLabelText, container, getByRole} = render(
+        const { getAllByText, getByLabelText, queryByLabelText, container, getByRole } = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
             media_sources={[defaultMediaObject(), defaultMediaObject()]}
@@ -472,7 +456,7 @@ describe('CanvasMediaPlayer', () => {
         expect(getAllByText('Volume')[0]).toBeInTheDocument()
         expect(getAllByText('Speed')[0]).toBeInTheDocument()
         expect(queryByLabelText('Quality')).not.toBeInTheDocument()
-        expect(getAllByText('Video Track')[0]).toBeInTheDocument() // AKA CC
+        expect(getAllByText('Captions')[0]).toBeInTheDocument() // AKA CC
       })
     })
   })
@@ -496,7 +480,7 @@ describe('CanvasMediaPlayer', () => {
       container.style.height = '300px'
       container.style.width = '500px'
       const player = makePlayer(1000, 500)
-      setPlayerSize(player, 'audio/*', {width: 400, height: 200}, container, false)
+      setPlayerSize(player, 'audio/*', { width: 400, height: 200 }, container, false)
       expect(player.classList.add).toHaveBeenCalledWith('audio-player')
       expect(player.style.width).toBe('320px')
       expect(player.style.height).toBe('14.25rem')
@@ -510,7 +494,7 @@ describe('CanvasMediaPlayer', () => {
       container.style.height = '300px'
       const player = makePlayer(1000, 500)
       player.offsetHeight = 0
-      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
+      setPlayerSize(player, 'video/*', { width: 400, height: 200 }, container)
       expect(container.style.width).toBe('500px')
       expect(container.style.height).toBe('300px')
     })
@@ -518,7 +502,7 @@ describe('CanvasMediaPlayer', () => {
     it('when the media is audio', () => {
       const container = document.createElement('div')
       const player = makePlayer(1000, 500)
-      setPlayerSize(player, 'audio/*', {width: 400, height: 200}, container)
+      setPlayerSize(player, 'audio/*', { width: 400, height: 200 }, container)
       expect(player.classList.add).toHaveBeenCalledWith('audio-player')
       expect(player.style.width).toBe('320px')
       expect(player.style.height).toBe('14.25rem')
@@ -529,7 +513,7 @@ describe('CanvasMediaPlayer', () => {
     it('when the video is landscape', () => {
       const container = document.createElement('div')
       const player = makePlayer(1000, 500)
-      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
+      setPlayerSize(player, 'video/*', { width: 400, height: 200 }, container)
       expect(player.classList.add).toHaveBeenCalledWith('video-player')
       expect(player.style.width).toBe('400px')
       expect(player.style.height).toBe('200px')
@@ -540,7 +524,7 @@ describe('CanvasMediaPlayer', () => {
     it('when the video is portrait', () => {
       const container = document.createElement('div')
       const player = makePlayer(500, 1000)
-      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
+      setPlayerSize(player, 'video/*', { width: 400, height: 200 }, container)
       expect(player.classList.add).toHaveBeenCalledWith('video-player')
       expect(player.style.width).toBe('100px')
       expect(player.style.height).toBe('200px')
@@ -551,7 +535,7 @@ describe('CanvasMediaPlayer', () => {
     it('shrinks the height for short and squat videos', () => {
       const container = document.createElement('div')
       const player = makePlayer(1000, 100)
-      setPlayerSize(player, 'video/*', {width: 400, height: 200}, container)
+      setPlayerSize(player, 'video/*', { width: 400, height: 200 }, container)
       expect(player.classList.add).toHaveBeenCalledWith('video-player')
       expect(player.style.width).toBe('400px')
       expect(player.style.height).toBe('40px')
@@ -563,7 +547,7 @@ describe('CanvasMediaPlayer', () => {
       const container = document.createElement('div')
       const player = makePlayer(500, 250)
       document.fullscreenElement = container
-      setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+      setPlayerSize(player, 'video/*', { width: 1000, height: 800 }, null)
       expect(player.classList.add).toHaveBeenCalledWith('video-player')
       expect(player.style.width).toBe('1000px')
       expect(player.style.height).toBe('500px')
@@ -573,7 +557,7 @@ describe('CanvasMediaPlayer', () => {
       const container = document.createElement('div')
       const player = makePlayer(250, 500)
       document.fullscreenElement = container
-      setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+      setPlayerSize(player, 'video/*', { width: 1000, height: 800 }, null)
       expect(player.classList.add).toHaveBeenCalledWith('video-player')
       expect(player.style.width).toBe('400px')
       expect(player.style.height).toBe('800px')
@@ -583,7 +567,7 @@ describe('CanvasMediaPlayer', () => {
         const container = document.createElement('div')
         const player = makePlayer(500, 250)
         document.webkitFullscreenElement = container
-        setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+        setPlayerSize(player, 'video/*', { width: 1000, height: 800 }, null)
         expect(player.classList.add).toHaveBeenCalledWith('video-player')
         expect(player.style.width).toBe('1000px')
         expect(player.style.height).toBe('500px')
@@ -593,7 +577,7 @@ describe('CanvasMediaPlayer', () => {
         const container = document.createElement('div')
         const player = makePlayer(250, 500)
         document.webkitFullscreenElement = container
-        setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+        setPlayerSize(player, 'video/*', { width: 1000, height: 800 }, null)
         expect(player.classList.add).toHaveBeenCalledWith('video-player')
         expect(player.style.width).toBe('400px')
         expect(player.style.height).toBe('800px')
@@ -611,8 +595,8 @@ describe('CanvasMediaPlayer', () => {
 
     it('finds the track for the user locale', () => {
       const tracks = [
-        {id: 1, locale: 'en'},
-        {id: 2, locale: 'es'},
+        { id: 1, locale: 'en' },
+        { id: 2, locale: 'es' },
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('es')
@@ -621,8 +605,8 @@ describe('CanvasMediaPlayer', () => {
     it('finds the generic local given a regional locale', () => {
       global.ENV.locale = 'en-US'
       const tracks = [
-        {id: 1, locale: 'en-UK'},
-        {id: 2, locale: 'en'},
+        { id: 1, locale: 'en-UK' },
+        { id: 2, locale: 'en' },
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('en')
@@ -631,8 +615,8 @@ describe('CanvasMediaPlayer', () => {
     it('finds any a matching de-regionalized locale local given regional locale', () => {
       global.ENV.locale = 'en-US'
       const tracks = [
-        {id: 1, locale: 'en-UK'},
-        {id: 2, locale: 'es-MX'},
+        { id: 1, locale: 'en-UK' },
+        { id: 2, locale: 'es-MX' },
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('en-UK')
@@ -642,9 +626,9 @@ describe('CanvasMediaPlayer', () => {
       delete global.ENV.locale
       document.documentElement.setAttribute('lang', 'he')
       const tracks = [
-        {id: 1, locale: 'en'},
-        {id: 2, locale: 'es'},
-        {id: 3, locale: 'he'},
+        { id: 1, locale: 'en' },
+        { id: 2, locale: 'es' },
+        { id: 3, locale: 'he' },
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('he')
@@ -654,9 +638,9 @@ describe('CanvasMediaPlayer', () => {
       delete global.ENV.locale
       document.documentElement.removeAttribute('lang')
       const tracks = [
-        {id: 1, locale: 'en'},
-        {id: 2, locale: 'es'},
-        {id: 3, locale: 'he'},
+        { id: 1, locale: 'en' },
+        { id: 2, locale: 'es' },
+        { id: 3, locale: 'he' },
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('en')
@@ -664,8 +648,8 @@ describe('CanvasMediaPlayer', () => {
 
     it('returns undefined if the right track is not found', () => {
       const tracks = [
-        {id: 1, locale: 'en'},
-        {id: 2, locale: 'he'},
+        { id: 1, locale: 'en' },
+        { id: 2, locale: 'he' },
       ]
       const found = getAutoTrack(tracks)
       expect(found).toBeUndefined()
@@ -679,8 +663,8 @@ describe('CanvasMediaPlayer', () => {
     it('returns undefined if auto_show_cc feature is off', () => {
       global.ENV.auto_show_cc = false
       const tracks = [
-        {id: 1, locale: 'en'},
-        {id: 2, locale: 'es'},
+        { id: 1, locale: 'en' },
+        { id: 2, locale: 'es' },
       ]
       const found = getAutoTrack(tracks)
       expect(found).toBeUndefined()
@@ -689,7 +673,7 @@ describe('CanvasMediaPlayer', () => {
 
   describe('formatTracksForMediaPlayer', () => {
     it('returns an object with id, src, label, type, and language', () => {
-      const rawTracks = [{id: '456', media_object_id: '123', locale: 'en', kind: 'subtitles'}]
+      const rawTracks = [{ id: '456', media_object_id: '123', locale: 'en', kind: 'subtitles' }]
       const track = formatTracksForMediaPlayer(rawTracks)[0]
       expect(track).toEqual({
         id: '456',

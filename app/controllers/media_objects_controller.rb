@@ -297,6 +297,7 @@ class MediaObjectsController < ApplicationController
 
     js_env media_object: media_api_json if media_api_json
     js_env attachment: !!@attachment
+    js_env attachment_id: @attachment.id if Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
     js_bundle :media_player_iframe_content
     css_bundle :media_player
     render html: "<div id='player_container'>#{I18n.t("Loading...")}</div>".html_safe,
