@@ -66,6 +66,7 @@ export default function ShowConcludedEnrollmentsCheckbox({
       <View
         as="div"
         className="checkbox"
+        data-testid="show-concluded-enrollments-checkbox"
         margin="x-small 0"
         borderRadius="medium"
         background="primary"

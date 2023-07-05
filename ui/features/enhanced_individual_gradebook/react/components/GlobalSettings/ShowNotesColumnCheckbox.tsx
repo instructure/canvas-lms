@@ -109,6 +109,7 @@ export default function ShowNotesColumnCheckbox({
         theme={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
+          data-testid="show-notes-column-checkbox"
           size="small"
           label={I18n.t('Show Notes in Student Info')}
           checked={showNotesColumn}

@@ -150,7 +150,11 @@ export default function ContentSelection({
         </View>
       </View>
 
-      <View as="div" className="row-fluid pad-box bottom-only">
+      <View
+        as="div"
+        className="row-fluid pad-box bottom-only"
+        data-testid="content-selection-student"
+      >
         <View as="div" className="span4 text-right-responsive">
           <label htmlFor="student_select" style={{textAlign: 'right', display: 'block'}}>
             {I18n.t('Select a student')}
@@ -193,7 +197,11 @@ export default function ContentSelection({
         </View>
       </View>
 
-      <View as="div" className="row-fluid pad-box bottom-only">
+      <View
+        as="div"
+        className="row-fluid pad-box bottom-only"
+        data-testid="content-selection-assignment"
+      >
         <View as="div" className="span4 text-right-responsive">
           <label htmlFor="assignment_select" style={{textAlign: 'right', display: 'block'}}>
             {I18n.t('Select an assignment')}

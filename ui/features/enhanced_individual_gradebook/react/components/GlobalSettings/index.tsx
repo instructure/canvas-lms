@@ -99,7 +99,7 @@ export default function GlobalSettings({
         </View>
       </View>
 
-      <View as="div" className="row-fluid">
+      <View as="div" className="row-fluid" data-testid="section-select">
         <View as="div" className="span4">
           <label htmlFor="section_select" style={{textAlign: 'right', display: 'block'}}>
             {I18n.t('Select a section')}
@@ -127,6 +127,7 @@ export default function GlobalSettings({
           <View as="div" className="span8">
             <select
               id="grading_period_select"
+              data-testid="grading-period-select"
               className="section_select"
               onChange={handleGradePeriodChange}
               defaultValue={selectedGradingPeriodId}
@@ -151,6 +152,7 @@ export default function GlobalSettings({
         <View as="div" className="span8">
           <select
             id="sort_select"
+            data-testid="sort-select"
             className="section_select"
             defaultValue={defaultSortOrder}
             onChange={handleSortChange}
@@ -230,6 +232,7 @@ export default function GlobalSettings({
 
           <View as="div" className="pad-box bottom-only">
             <Button
+              data-testid="upload-button"
               href={`${gradebookOptions.contextUrl}/gradebook_upload/new`}
               color="secondary"
               renderIcon={IconUploadLine}
@@ -249,7 +252,11 @@ export default function GlobalSettings({
             </View>
 
             <View as="div">
-              <Link href={`${gradebookOptions.contextUrl}/gradebook/history`} isWithinText={false}>
+              <Link
+                href={`${gradebookOptions.contextUrl}/gradebook/history`}
+                isWithinText={false}
+                data-testid="gradebook-history-link"
+              >
                 {I18n.t('View Gradebook History')}
               </Link>
             </View>
