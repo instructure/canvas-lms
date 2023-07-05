@@ -288,8 +288,6 @@ export const GradingSchemesManagement = ({
       </View>
       {!gradingSchemeCards || !defaultGradingSchemeTemplate ? (
         <Spinner renderTitle="Loading" size="small" margin="0 0 0 medium" />
-      ) : gradingSchemeCards.length === 0 ? (
-        <h3>{I18n.t('No grading schemes to display')}</h3>
       ) : (
         <>
           {gradingSchemeCreating ? (
@@ -433,7 +431,7 @@ export const GradingSchemesManagement = ({
           <View
             display="block"
             padding="small"
-            margin="0 0 small"
+            margin="medium none medium none"
             borderWidth="small"
             borderRadius="small"
           >
