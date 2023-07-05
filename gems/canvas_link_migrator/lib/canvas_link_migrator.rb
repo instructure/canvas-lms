@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "canvas_link_migrator/resource_map_service"
+require "canvas_link_migrator/link_parser"
 require "canvas_link_migrator/link_resolver"
 
 module CanvasLinkMigrator

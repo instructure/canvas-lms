@@ -63,7 +63,7 @@ module Importers
     end
 
     def convert_migration_id(type, migration_id)
-      if Importers::LinkParser::KNOWN_REFERENCE_TYPES.include? type
+      if CanvasLinkMigrator::LinkParser::KNOWN_REFERENCE_TYPES.include? type
         @context.send(type).scope.where(migration_id:).limit(1).pick(:id)
       end
     end
