@@ -78,28 +78,16 @@ module Lti
         wiki_page_menu
       ],
       LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE => %i[
-        assignment_index_menu
-        assignment_menu
         assignment_selection
         collaboration
         conference_selection
-        discussion_topic_index_menu
-        discussion_topic_menu
+        course_assignments_menu
         editor_button
-        file_menu
         homework_submission
         link_selection
         migration_selection
-        module_index_menu
         module_index_menu_modal
-        module_menu_modal
-        module_menu
-        quiz_index_menu
-        quiz_menu
         resource_selection
-        submission_type_selection
-        wiki_index_menu
-        wiki_page_menu
       ]
     }.freeze
 
