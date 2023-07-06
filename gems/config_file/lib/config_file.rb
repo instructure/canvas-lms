@@ -46,7 +46,11 @@ module ConfigFile
       path = Rails.root.join("config/#{config_name}.yml")
       if path.file?
         config_string = ERB.new(path.read)
-        config = YAML.safe_load(config_string.result, aliases: true)
+        begin
+          config = YAML.safe_load(config_string.result, aliases: true)
+        rescue Psych::SyntaxError => e
+          raise e, "Error parsing #{path} #{e.message}"
+        end
         config = config.with_indifferent_access if config.respond_to?(:with_indifferent_access)
       end
       if config
