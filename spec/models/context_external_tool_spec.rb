@@ -754,10 +754,11 @@ describe ContextExternalTool do
   end
 
   describe "#matches_host?" do
-    subject { tool.matches_host?(given_url) }
+    subject { tool.matches_host?(given_url, use_environment_overrides:) }
 
     let(:tool) { external_tool_model }
     let(:given_url) { "https://www.given-url.com/test?foo=bar" }
+    let(:use_environment_overrides) { false }
 
     context "when the tool has a url and no domain" do
       let(:url) { "https://app.test.com/foo" }
@@ -783,6 +784,28 @@ describe ContextExternalTool do
         let(:url) { "https://www.GiveN-url.cOm/foo?foo=bar" }
 
         it { is_expected.to be true }
+      end
+
+      context "and use_environment_overrides is true" do
+        let(:use_environment_overrides) { true }
+        let(:override_url) { "https://beta.app.test.com/foo" }
+
+        before do
+          allow(tool).to receive(:use_environment_overrides?).and_return(true)
+
+          tool.settings[:environments] = { launch_url: override_url }
+          tool.save!
+        end
+
+        context "and the override url host does not match the given url host" do
+          it { is_expected.to be false }
+        end
+
+        context "and the override url host matches the given url host" do
+          let(:given_url) { "https://beta.app.test.com/foo?foo=bar" }
+
+          it { is_expected.to be true }
+        end
       end
     end
 
@@ -1752,6 +1775,74 @@ describe ContextExternalTool do
         it "returns the tool" do
           expect(ContextExternalTool.find_external_tool(url, @course, only_1_3: true)).to eq tool
         end
+      end
+    end
+
+    context "with env-specific override urls" do
+      subject { ContextExternalTool.find_external_tool(given_url, @course) }
+
+      let(:given_url) { "http://example.beta.com/launch?foo=bar" }
+      let(:tool) do
+        t = @course.context_external_tools.create!(name: "test", domain: "example.com", url: "http://example.com/launch", consumer_key: "12345", shared_secret: "secret")
+        t.global_navigation = {
+          url: "http://www.example.com",
+          text: "Example URL"
+        }
+        t.save!
+        t
+      end
+
+      shared_examples_for "matches tool with overrides" do
+        context "in production environment" do
+          it "does not match" do
+            expect(subject).to be_nil
+          end
+        end
+
+        context "in nonprod environment" do
+          before do
+            allow(ApplicationController).to receive(:test_cluster?).and_return(true)
+            allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+            Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
+          end
+
+          it "matches on override" do
+            expect(subject).to eq tool
+          end
+        end
+      end
+
+      context "when tool has override domain" do
+        before do
+          tool.settings[:environments] = {
+            domain: "example.beta.com"
+          }
+          tool.save!
+        end
+
+        it_behaves_like "matches tool with overrides"
+      end
+
+      context "when tool has override url" do
+        before do
+          tool.settings[:environments] = {
+            launch_url: "http://example.beta.com/launch"
+          }
+          tool.save!
+        end
+
+        it_behaves_like "matches tool with overrides"
+      end
+
+      context "when tool has override url with query parameters" do
+        before do
+          tool.settings[:environments] = {
+            launch_url: "http://example.beta.com/launch?foo=bar"
+          }
+          tool.save!
+        end
+
+        it_behaves_like "matches tool with overrides"
       end
     end
   end
