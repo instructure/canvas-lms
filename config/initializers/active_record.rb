@@ -2247,7 +2247,7 @@ module AdditionalIgnoredColumns
       cache_class = ActiveRecord::Base.singleton_class
       return super unless cache_class.columns_to_ignore_enabled
 
-      cache_class.columns_to_ignore_cache[table_name] ||= DynamicSettings.find("activerecord/ignored_columns", tree: :store)[table_name]&.split(",") || []
+      cache_class.columns_to_ignore_cache[table_name] ||= DynamicSettings.find("activerecord/ignored_columns", tree: :store)[table_name, failsafe: ""]&.split(",") || []
       super + cache_class.columns_to_ignore_cache[table_name]
     end
   end
@@ -2257,7 +2257,7 @@ module AdditionalIgnoredColumns
 
     def reset_ignored_columns!
       @columns_to_ignore_cache = {}
-      @columns_to_ignore_enabled = !DynamicSettings.find("activerecord", tree: :store)["ignored_columns_disabled"]
+      @columns_to_ignore_enabled = !ActiveModel::Type::Boolean.new.cast(DynamicSettings.find("activerecord", tree: :store)["ignored_columns_disabled", failsafe: false])
     end
   end
 end

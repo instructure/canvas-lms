@@ -164,7 +164,7 @@ module Csp::AccountHelper
   def csp_files_domains(request)
     files_host = HostUrl.file_host(root_account, request.host_with_port)
     config = DynamicSettings.find(tree: :private, cluster: root_account.shard.database_server.id)
-    if config["attachment_specific_file_domain"] == "true"
+    if config["attachment_specific_file_domain", failsafe: false] == "true"
       separator = config["attachment_specific_file_domain_separator"] || "."
       files_host = if separator == "."
                      "*.#{files_host}"

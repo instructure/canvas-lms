@@ -287,7 +287,7 @@ describe ProfileController do
     end
 
     it "shows if user has any non-student enrollments" do
-      allow(DynamicSettings).to receive(:find).and_return({ "base_url" => "the_ccv_url" })
+      allow(DynamicSettings).to receive(:find).and_return(DynamicSettings::FallbackProxy.new({ "base_url" => "the_ccv_url" }))
       user_session(@teacher)
       get "content_shares", params: { user_id: @teacher.id }
       expect(response).to render_template("content_shares")

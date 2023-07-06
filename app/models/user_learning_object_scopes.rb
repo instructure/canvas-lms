@@ -354,7 +354,7 @@ module UserLearningObjectScopes
   end
 
   def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
-    if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries"]
+    if ::DynamicSettings.find(tree: :private, cluster: Shard.current.database_server.id)["disable_needs_grading_queries", failsafe: false]
       return scope_only ? Assignment.none : []
     end
 
