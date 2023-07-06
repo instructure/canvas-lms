@@ -4201,7 +4201,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // # Course Settings Access Methods
-  getCourseGradingScheme = () => this.courseContent.courseGradingScheme
+  getCourseGradingScheme = (): DeprecatedGradingScheme | null =>
+    this.courseContent.courseGradingScheme
+
+  pointsBasedGradingSchemesFeatureEnabled = () => !!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED
 
   getDefaultGradingScheme = () => this.courseContent.defaultGradingScheme
 

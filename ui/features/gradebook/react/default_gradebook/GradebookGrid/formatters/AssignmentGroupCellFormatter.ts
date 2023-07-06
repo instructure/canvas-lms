@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -19,27 +18,65 @@
 
 import round from '@canvas/round'
 import I18n from '@canvas/i18n'
-import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
+import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
+import Gradebook from '../../Gradebook'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
 
-function getGradePercentage(score, pointsPossible) {
+function getGradePercentage(score: number, pointsPossible: number) {
   const grade = scoreToPercentage(score, pointsPossible)
   return round(grade, round.DEFAULT)
 }
 
-function render(options) {
-  const percentage = options.possible ? options.percentage : '–'
+export interface AssignmentGroupCellData {
+  score: number
+  possible: number
+  percentage: number
+  scaledScore: number
+  scaledPossible: number
+  displayAsScaledPoints: boolean
+}
 
-  // xsslint safeString.property score possible
-  // xsslint safeString.identifier percentage
+function render(assignmentGroupCellData: AssignmentGroupCellData) {
+  let assignmentGroupGrade
+  if (assignmentGroupCellData.displayAsScaledPoints) {
+    // display scaled points instead of percentage
+    assignmentGroupGrade = assignmentGroupCellData.scaledPossible
+      ? `${assignmentGroupCellData.scaledScore} / ${assignmentGroupCellData.scaledPossible}`
+      : '-'
+  } else {
+    // display percentage
+    assignmentGroupGrade = assignmentGroupCellData.possible
+      ? assignmentGroupCellData.percentage
+      : '–'
+  }
   return `
     <div class="gradebook-cell">
-      <div class="gradebook-tooltip">${options.score} / ${options.possible}</div>
-      <span class="percentage">${percentage}</span>
+      <div class="gradebook-tooltip">${assignmentGroupCellData.score} / ${assignmentGroupCellData.possible}</div>
+      <span class="percentage">${assignmentGroupGrade}</span>
     </div>
   `
 }
 
+type Getters = {
+  pointsBasedGradingSchemesFeatureEnabled(): boolean
+  getCourseGradingScheme(): DeprecatedGradingScheme | null
+}
+
 export default class AssignmentGroupCellFormatter {
+  options: Getters
+
+  constructor(gradebook: Gradebook) {
+    this.options = {
+      pointsBasedGradingSchemesFeatureEnabled(): boolean {
+        return gradebook.pointsBasedGradingSchemesFeatureEnabled()
+      },
+      getCourseGradingScheme(): DeprecatedGradingScheme | null {
+        return gradebook.getCourseGradingScheme()
+      },
+    }
+  }
+
+  // @ts-ignore
   render = (_row, _cell, value, _columnDef, _dataContext) => {
     if (value == null) {
       return ''
@@ -50,11 +87,34 @@ export default class AssignmentGroupCellFormatter {
 
     let possible = round(value.possible, round.DEFAULT)
     possible = possible ? I18n.n(possible) : possible
+    let displayAsScaledPoints = false
+    let scaledScore = NaN
+    let scaledPossible = NaN
+
+    if (this.options.pointsBasedGradingSchemesFeatureEnabled()) {
+      const scheme = this.options.getCourseGradingScheme()
+      if (scheme) {
+        displayAsScaledPoints = scheme.pointsBased
+        const scalingFactor = scheme.scalingFactor
+
+        if (displayAsScaledPoints && value.possible) {
+          scaledPossible = I18n.n(scalingFactor, {
+            precision: 1,
+          })
+          scaledScore = I18n.n(scoreToScaledPoints(value.score, value.possible, scalingFactor), {
+            precision: 1,
+          })
+        }
+      }
+    }
 
     const templateOpts = {
       percentage: I18n.n(round(percentage, round.DEFAULT), {percentage: true}),
       possible,
       score: I18n.n(round(value.score, round.DEFAULT)),
+      displayAsScaledPoints,
+      scaledScore,
+      scaledPossible,
     }
 
     return render(templateOpts)

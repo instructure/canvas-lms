@@ -18,14 +18,35 @@
 import Ember from 'ember'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('sr_gradebook')
 
 const FinalGradeComponent = Ember.Component.extend({
   percent: function () {
     const percent = this.get('student.total_percent')
-    return I18n.n(percent, {percentage: true})
-  }.property('student.total_percent', 'student'),
+    let scoreText = I18n.n(percent, {percentage: true})
+
+    if (this.get('pointsBasedGradingSchemesFeatureEnabled')) {
+      if (this.get('gradingStandard') && this.get('gradingStandardPointsBased')) {
+        const scalingFactor = this.get('gradingStandardScalingFactor')
+        const studentTotalGrade = this.get('student.total_grade')
+        if (studentTotalGrade.possible) {
+          const scaledPossible = I18n.n(scalingFactor, {
+            precision: 1,
+          })
+          const scaledScore = I18n.n(
+            scoreToScaledPoints(studentTotalGrade.score, studentTotalGrade.possible, scalingFactor),
+            {
+              precision: 1,
+            }
+          )
+          scoreText = `${scaledScore} / ${scaledPossible}`
+        }
+      }
+    }
+    return scoreText
+  }.property('student.total_percent', 'student.total_grade', 'grading_standard', 'student'),
 
   pointRatioDisplay: function () {
     return I18n.t('final_point_ratio', '%{pointRatio} points', {pointRatio: this.get('pointRatio')})

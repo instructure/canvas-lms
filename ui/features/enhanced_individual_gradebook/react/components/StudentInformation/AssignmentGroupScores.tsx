@@ -20,7 +20,7 @@ import React from 'react'
 import type {
   AssignmentGroupCriteriaMap,
   AssignmentGroupGradeMap,
-  GradingStandard,
+  DeprecatedGradingScheme,
 } from '@canvas/grading/grading'
 import RowScore from './RowScore'
 
@@ -29,13 +29,15 @@ type Props = {
   assignmentGroupMap: AssignmentGroupCriteriaMap
   assignmentGroups: AssignmentGroupGradeMap
   includeUngradedAssignments: boolean
-  gradingStandard?: GradingStandard[] | null
+  gradingScheme?: DeprecatedGradingScheme | null
+  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 export function AssignmentGroupScores({
   assignmentGroupId,
   assignmentGroupMap,
   assignmentGroups,
-  gradingStandard,
+  gradingScheme,
+  pointsBasedGradingSchemesFeatureEnabled,
   includeUngradedAssignments,
 }: Props) {
   const {name: groupName, group_weight} = assignmentGroupMap[assignmentGroupId]
@@ -45,7 +47,8 @@ export function AssignmentGroupScores({
 
   return (
     <RowScore
-      gradingStandard={gradingStandard}
+      gradingScheme={gradingScheme}
+      pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
       name={groupName}
       possible={possible}
       score={score}

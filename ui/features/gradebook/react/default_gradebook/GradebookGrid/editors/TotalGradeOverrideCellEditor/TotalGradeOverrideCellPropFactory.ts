@@ -36,6 +36,8 @@ export default class TotalGradeOverrideCellPropFactory {
 
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: this._gradebook.getCourseGradingScheme(),
+      pointsBasedGradingSchemesFeatureEnabled:
+        this._gradebook.pointsBasedGradingSchemesFeatureEnabled(),
     })
 
     return {

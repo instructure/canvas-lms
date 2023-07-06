@@ -19,7 +19,7 @@ import I18n from '@canvas/i18n'
 import Ember from 'ember'
 import round from '@canvas/round'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
-import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
+import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 
 const AssignmentSubtotalGradesComponent = Ember.Component.extend({
   tagName: '',
@@ -57,7 +57,28 @@ const AssignmentSubtotalGradesComponent = Ember.Component.extend({
   }.property('values'),
 
   percent: function () {
-    return I18n.n(round(this.get('rawPercent'), round.DEFAULT), {percentage: true})
+    let scoreText = I18n.n(round(this.get('rawPercent'), round.DEFAULT), {percentage: true})
+
+    if (this.get('pointsBasedGradingSchemesFeatureEnabled')) {
+      if (this.get('gradingStandard') && this.get('gradingStandardPointsBased')) {
+        const scalingFactor = this.get('gradingStandardScalingFactor')
+        const values = this.get('values')
+        if (values.possible) {
+          const scaledPossible = I18n.n(scalingFactor, {
+            precision: 1,
+          })
+          const scaledScore = I18n.n(
+            scoreToScaledPoints(values.score, values.possible, scalingFactor),
+            {
+              precision: 1,
+            }
+          )
+          scoreText = `${scaledScore} / ${scaledPossible}`
+        }
+      }
+    }
+
+    return scoreText
   }.property('values'),
 
   scoreDetail: function () {

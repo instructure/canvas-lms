@@ -526,6 +526,8 @@ class GradebooksController < ApplicationController
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
+      grading_standard_points_based: active_grading_standard_points_based(grading_standard),
+      grading_standard_scaling_factor: active_grading_standard_scaling_factor(grading_standard),
       group_weighting_scheme: @context.group_weighting_scheme,
       has_modules: @context.has_modules?,
       individual_gradebook_enhancements: root_account.feature_enabled?(:individual_gradebook_enhancements),
@@ -567,6 +569,7 @@ class GradebooksController < ApplicationController
     js_env({
              EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
              EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
+             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
              GRADEBOOK_OPTIONS: gradebook_options
            })
   end
@@ -601,6 +604,8 @@ class GradebooksController < ApplicationController
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
+      grading_standard_points_based: active_grading_standard_points_based(grading_standard),
+      grading_standard_scaling_factor: active_grading_standard_scaling_factor(grading_standard),
       group_weighting_scheme: @context.group_weighting_scheme,
       individual_gradebook_enhancements: true,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
@@ -619,7 +624,8 @@ class GradebooksController < ApplicationController
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, ":assignment", zip: 1),
     }
     js_env({
-             GRADEBOOK_OPTIONS: gradebook_options
+             GRADEBOOK_OPTIONS: gradebook_options,
+             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
            })
   end
 
@@ -693,6 +699,8 @@ class GradebooksController < ApplicationController
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
+      grading_standard_points_based: active_grading_standard_points_based(grading_standard),
+      grading_standard_scaling_factor: active_grading_standard_scaling_factor(grading_standard),
       group_weighting_scheme: @context.group_weighting_scheme,
       hide_zero_point_quizzes: Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option),
       late_policy: @context.late_policy.as_json(include_root: false),
@@ -735,7 +743,8 @@ class GradebooksController < ApplicationController
 
     js_env({
              GRADEBOOK_OPTIONS: gradebook_options,
-             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
+             outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?,
+             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
            })
   end
 
@@ -1374,6 +1383,22 @@ class GradebooksController < ApplicationController
   end
 
   private
+
+  def active_grading_standard_scaling_factor(grading_standard)
+    if Account.site_admin.feature_enabled?(:points_based_grading_schemes) && grading_standard
+      grading_standard.scaling_factor
+    else
+      1.0
+    end
+  end
+
+  def active_grading_standard_points_based(grading_standard)
+    if Account.site_admin.feature_enabled?(:points_based_grading_schemes) && grading_standard
+      grading_standard.points_based
+    else
+      false
+    end
+  end
 
   def gradebook_group_categories_json
     @context

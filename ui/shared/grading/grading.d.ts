@@ -334,11 +334,14 @@ export type GradingStandard = [string, number]
 export type DeprecatedGradingScheme = {
   id?: string
   title?: string
+  pointsBased: boolean
+  scalingFactor: number
   data: GradingStandard[]
 }
 
 export type GradeEntryOptions = {
-  gradingScheme?: string | {data: GradingStandard[]}
+  gradingScheme?: {data: GradingStandard[]; pointsBased: boolean; scalingFactor: number} | null
+  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 
 export type ProvisionalGrade = {
