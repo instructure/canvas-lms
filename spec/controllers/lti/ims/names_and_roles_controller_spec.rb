@@ -207,24 +207,24 @@ describe Lti::IMS::NamesAndRolesController do
           user.locale = :de
           user.time_zone = "Europe/Berlin"
           user.save!
+          sis_email = "sis@example.com"
+          cc = user.communication_channels.email.create!(path: sis_email)
+          cc.user = user
+          cc.save!
+          @cc_pseud = user.pseudonyms.create!({
+                                                account: course.account,
+                                                unique_id: cc.path,
+                                                sis_communication_channel_id: cc.id,
+                                                communication_channel_id: cc.id,
+                                                workflow_state: "active",
+                                                sis_user_id: "user-1-sis-user-id-1",
+                                                integration_id: "user-1-sis-integration-id-1",
+                                              })
           user.pseudonyms.create!({
                                     account: course.account,
                                     unique_id: "user1@example.com",
                                     password: "asdfasdf",
                                     password_confirmation: "asdfasdf",
-                                    workflow_state: "active",
-                                    sis_user_id: "user-1-sis-user-id-1",
-                                    integration_id: "user-1-sis-integration-id-1",
-                                  })
-          sis_email = "sis@example.com"
-          cc = user.communication_channels.email.create!(path: sis_email)
-          cc.user = user
-          cc.save!
-          user.pseudonyms.create!({
-                                    account: course.account,
-                                    unique_id: cc.path,
-                                    sis_communication_channel_id: cc.id,
-                                    communication_channel_id: cc.id,
                                     workflow_state: "active",
                                     sis_user_id: "user-1-sis-user-id-2",
                                     integration_id: "user-1-sis-integration-id-2",
@@ -268,15 +268,15 @@ describe Lti::IMS::NamesAndRolesController do
                 "canvas_user_id" => user.id,
                 "vnd_instructure_user_uuid" => user.uuid,
                 "canvas_user_globalid" => user.global_id,
-                "canvas_user_sissourceid" => "user-1-sis-user-id-2",
-                "person_sourced_id" => "user-1-sis-user-id-2",
+                "canvas_user_sissourceid" => @cc_pseud.sis_user_id,
+                "person_sourced_id" => @cc_pseud.sis_user_id,
                 "message_locale" => "de",
                 "vnd_canvas_person_email_sis" => "sis@example.com",
                 "person_email_primary" => "marta.perkins@school.edu",
                 "person_address_timezone" => "Europe/Berlin",
                 "user_username" => "sis@example.com",
                 "canvas_user_loginid" => "sis@example.com",
-                "canvas_user_sisintegrationid" => "user-1-sis-integration-id-2",
+                "canvas_user_sisintegrationid" => @cc_pseud.integration_id,
                 "canvas_xapi_url" => be_xapi_url,
                 "caliper_url" => be_caliper_url,
                 "unsupported_param_1" => "$unsupported.param.1",
