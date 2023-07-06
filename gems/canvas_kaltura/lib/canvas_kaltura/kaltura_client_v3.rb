@@ -276,6 +276,8 @@ module CanvasKaltura
                            ks: @ks,
                            conversionProfileId: -1,
                            csvFileData: KalturaStringIO.new(csv, "bulk_data.csv"))
+      raise "Failed to get bulkUpload result from Kaltura" if result.nil?
+
       unless result.css("logFileUrl").any?
         code = result.css("error > code").first.try(:content)
         message = result.css("error > message").first.try(:content)
