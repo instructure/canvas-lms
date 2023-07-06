@@ -15,6 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "aws-sdk-s3"
   spec.add_dependency "aws-sdk-sqs"
+  spec.add_dependency "canvas_errors"
   spec.add_dependency "html_text_helper"
   spec.add_dependency "inst_statsd"
   spec.add_dependency "mail", "~> 2.7.1"

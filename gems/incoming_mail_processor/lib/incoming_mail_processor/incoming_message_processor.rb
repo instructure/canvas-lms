@@ -19,6 +19,7 @@
 #
 
 require "mail"
+require "canvas_errors"
 
 module IncomingMailProcessor
   class IncomingMessageProcessor
@@ -315,7 +316,7 @@ module IncomingMailProcessor
     rescue => e
       # any exception that makes it here probably means the connection is broken
       # skip this account, but the rest of the accounts should still be tried
-      @error_reporter.log_exception(self.class.error_report_category, e, {})
+      CanvasErrors.capture_exception(self.class.error_report_category, e, {})
     end
 
     def parse_message(raw_contents)
@@ -327,7 +328,7 @@ module IncomingMailProcessor
 
       [message, errors]
     rescue => e
-      @error_reporter.log_exception(self.class.error_report_category, e, {})
+      CanvasErrors.capture_exception(self.class.error_report_category, e, {})
       nil
     end
 
@@ -346,10 +347,10 @@ module IncomingMailProcessor
 
       process_single(message, tag, account)
     rescue => e
-      @error_reporter.log_exception(self.class.error_report_category,
-                                    e,
-                                    from: message.from.try(:first),
-                                    to: message.to.to_s)
+      CanvasErrors.capture_exception(self.class.error_report_category,
+                                     e,
+                                     from: message.from.try(:first),
+                                     to: message.to.to_s)
     end
   end
 end
