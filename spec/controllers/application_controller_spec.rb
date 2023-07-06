@@ -323,7 +323,7 @@ RSpec.describe ApplicationController do
       end
 
       it "gets appropriate settings from the root account" do
-        root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
+        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
         allow(root_account).to receive(:kill_joy?).and_return(false)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -332,7 +332,7 @@ RSpec.describe ApplicationController do
       end
 
       it "disables fun when set" do
-        root_account = double(global_id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
+        root_account = double(global_id: 1, id: 1, feature_enabled?: false, open_registration?: true, settings: {}, cache_key: "key")
         allow(root_account).to receive(:kill_joy?).and_return(true)
         allow(HostUrl).to receive_messages(file_host: "files.example.com")
         controller.instance_variable_set(:@domain_root_account, root_account)
@@ -493,6 +493,44 @@ RSpec.describe ApplicationController do
                                                               })
           jsenv = controller.js_env({})
           expect(jsenv[:API_GATEWAY_URI]).to be_nil
+        end
+      end
+
+      context "ACCOUNT_ID" do
+        before :once do
+          @subaccount = Account.default.sub_accounts.create!
+        end
+
+        it "is the account id in account context" do
+          controller.instance_variable_set :@context, @subaccount
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the course's subaccount id in course context" do
+          course_factory(account: @subaccount)
+          controller.instance_variable_set :@context, @course
+          allow(controller).to receive(:polymorphic_url).and_return("/dummy")
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the group's account id in account group context" do
+          group = @subaccount.groups.create!
+          controller.instance_variable_set :@context, group
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the group's course's subaccount id in course group context" do
+          course_factory(account: @subaccount)
+          group = @course.groups.create!
+          controller.instance_variable_set :@context, group
+          expect(controller.js_env[:ACCOUNT_ID]).to eq @subaccount.id
+        end
+
+        it "is the domain root account id in user context" do
+          user_factory
+          controller.instance_variable_set :@context, @user
+          controller.instance_variable_set :@domain_root_account, Account.default
+          expect(controller.js_env[:ACCOUNT_ID]).to eq Account.default.id
         end
       end
     end

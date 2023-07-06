@@ -318,6 +318,7 @@ class ApplicationController < ActionController::Base
         @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?
         @js_env[:K5_SUBJECT_COURSE] = @context.is_a?(Course) && @context.elementary_subject_course?
         @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
+        @js_env[:ACCOUNT_ID] = effective_account_id(@context)
       end
     end
 
@@ -416,6 +417,18 @@ class ApplicationController < ActionController::Base
     res
   end
   helper_method :render_js_env
+
+  def effective_account_id(context)
+    if context.is_a?(Account)
+      context.id
+    elsif context.is_a?(Course)
+      context.account_id
+    elsif context.respond_to?(:context)
+      effective_account_id(context.context)
+    else
+      @domain_root_account&.id
+    end
+  end
 
   # add keys to JS environment necessary for the RCE at the given risk level
   def rce_js_env_base(domain: request.host_with_port, user: @current_user, context: @context)

@@ -169,7 +169,6 @@ class RoleOverridesController < ApplicationController
                ACCOUNT_PERMISSIONS: account_permissions(@context),
                COURSE_PERMISSIONS: course_permissions(@context),
                IS_SITE_ADMIN: @context.site_admin?,
-               ACCOUNT_ID: @context.id,
                ACCOUNT_ENABLE_ALERTS: @context.settings[:enable_alerts]
              })
 

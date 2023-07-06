@@ -1316,7 +1316,6 @@ class AccountsController < ApplicationController
     end
     logging ||= false
 
-    js_env ACCOUNT_ID: @account.id
     js_env PERMISSIONS: {
       restore_course: @account.grants_right?(@current_user, session, :undelete_courses),
       # Permission caching issue makes explicitly checking the account setting
@@ -1579,7 +1578,6 @@ class AccountsController < ApplicationController
     end
     js_env({
              ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
-             ACCOUNT_ID: @account.id,
              ROOT_ACCOUNT_ID: @account.root_account.id,
              customized_login_handle_name: @account.root_account.customized_login_handle_name,
              delegated_authentication: @account.root_account.delegated_authentication?,
@@ -1749,7 +1747,7 @@ class AccountsController < ApplicationController
     add_crumb(title)
     set_active_tab "account_calendars"
     @current_user.add_to_visited_tabs("account_calendars")
-    js_env ACCOUNT_ID: @account.id
+    js_env
     css_bundle :account_calendar_settings
     js_bundle :account_calendar_settings
     InstStatsd::Statsd.increment("account_calendars.settings.visit")
