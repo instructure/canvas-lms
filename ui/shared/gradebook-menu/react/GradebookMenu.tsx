@@ -77,7 +77,7 @@ export default function GradebookMenu({
             href={`${courseUrl}/gradebook?view=learning_mastery`}
             value="DefaultGradebookLearningMastery"
           >
-            <span data-menu-item-id="learning-mastery">{I18n.t('Learning Mastery')}</span>
+            <span data-menu-item-id="learning-mastery">{I18n.t('Learning Mastery Gradebook')}</span>
           </Item>
         )}
 
