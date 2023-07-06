@@ -48,14 +48,17 @@ const AssignmentTable = ({
   handleReadStateChange,
 }) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
-  const droppedAssignments = listDroppedAssignments(queryData, getGradingPeriodID() === '0')
   const [calculateOnlyGradedAssignments, setCalculateOnlyGradedAssignments] = useState(true)
 
+  const [droppedAssignments, setDroppedAssignments] = useState(
+    listDroppedAssignments(queryData, getGradingPeriodID() === '0', true)
+  )
+
   const handleCalculateOnlyGradedAssignmentsChange = useCallback(() => {
-    setCalculateOnlyGradedAssignments(
-      document.querySelector('#only_consider_graded_assignments').checked
-    )
-  }, [])
+    const checked = document.querySelector('#only_consider_graded_assignments').checked
+    setCalculateOnlyGradedAssignments(checked)
+    setDroppedAssignments(listDroppedAssignments(queryData, getGradingPeriodID() === '0', checked))
+  }, [queryData])
 
   useEffect(() => {
     const checkbox = document.querySelector('#only_consider_graded_assignments')

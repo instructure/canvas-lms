@@ -34,7 +34,7 @@ describe "gradebook - logged in as a student" do
 
   context "when :student_grade_summary_upgrade feature flag is OFF" do
     context "total point displays" do
-      before(:once) do
+      before do
         course_with_student({ active_course: true, active_enrollment: true })
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
@@ -108,7 +108,7 @@ describe "gradebook - logged in as a student" do
     end
 
     context "when testing grading periods" do
-      before(:once) do
+      before do
         account_admin_user({ active_user: true })
         course_with_teacher({ user: @user, active_course: true, active_enrollment: true })
         student_in_course
@@ -151,7 +151,7 @@ describe "gradebook - logged in as a student" do
   end
 
   context "when student_grade_summary_upgrade is enabled" do
-    before(:once) do
+    before do
       # enable the feature flag
       Account.site_admin.enable_feature! :student_grade_summary_upgrade
 
@@ -203,9 +203,6 @@ describe "gradebook - logged in as a student" do
 
       # Create assignment with no due date
       @assignment_11 = @course.assignments.create!(title: "assignment 11 (no due date)", grading_type: "points", points_possible: 10)
-
-      # Create an override so @student has past_assignment_5 in the current period
-      create_adhoc_override_for_assignment(@assignment_5, @student, due_at: 1.week.from_now)
     end
 
     context "when viewing ungraded assignments" do
@@ -229,16 +226,15 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the correct assignments are being dropped
         # TODO: VICE-3636 - FIX it so in this case dropped assignments no longer show, then uncomment
-        # expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
+        expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
 
         # Verify that the 2 grading period rows have the correct values
-        # TODO: VICE-3638 FIX it so that the points possible is correct in this case
-        # expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
-        # expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period N/A 0.00/0.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period N/A 0.00/0.00"
 
         # Verify that the total is correct
         # TODO: VICE-3594 FIX the total_row in this case so that it appears correctly, instead of N/A it should have 0%, then uncomment this code
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total 0%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 0%"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -246,22 +242,21 @@ describe "gradebook - logged in as a student" do
         f("#only_consider_graded_assignments_wrapper").click
 
         # Verify that the correct assignments are being dropped
-        # TODO: VICE-3621 FIX so that dropped assignments are correct in this case
-        # dropped_assignments = ffj("tr[data-testid='assignment-row']::contains('Dropped')")
-        # expect(dropped_assignments.length).to eq 3
-        # dropped_assignments_text = dropped_assignments.map(&:text)
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_3.title) }).to be true
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_8.title) }).to be true
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_11.title) }).to be true
+        dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
+        expect(dropped_assignments.length).to eq 4
+        dropped_assignments_text = dropped_assignments.map(&:text)
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_3.title) }).to be true
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_5.title) }).to be true
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_8.title) }).to be true
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_11.title) }).to be true
 
         # Verify that the 2 group rows have the correct values
-        # TODO: VICE-3639 FIX it so that 0% is displayed instead of NaN and the correct points possible is displayed, then uncomment
-        # expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period 0% 0.00/1,110.00"
-        # expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 0% 0.00/50.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period 0.00% 0.00/1,110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 0.00% 0.00/40.00"
 
         # Verify that the total is correct
         # TODO: VICE-3594 FIX so that the correct info is displayed, 0%, then uncomment
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total 0%
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 0%"
       end
 
       it "correctly displays all past grading period" do
@@ -329,7 +324,7 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the correct assignments are being dropped
         # TODO: VICE-3636 FIX it so in this case dropped assignments no longer show, then uncomment
-        # expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
+        expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
 
         # Verify that the 2 group rows have the correct values
         expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 N/A 0.00/0.00"
@@ -353,18 +348,18 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the 2 group rows have the correct values
         # TODO: VICE-3594 FIX it so that 0% is displayed instead of NaN, then uncomment
-        # expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 0% 0.00/20.00"
-        # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 0% 0.00/30.00"
+        expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 0% 0.00/20.00"
+        expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 0% 0.00/30.00"
 
         # Verify that the total is correct
         # TODO: VICE-3594 FIX so that the correct info is displayed 0% and points possible, then uncomment
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total 0% 0.00/50.00"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 0% 0.00/50.00"
       end
     end
 
     context "when viewing partially graded courses" do
       # What a student would see mid-course when some submissions are graded and others are not
-      before(:once) do
+      before do
         # Grade assignments that have no submission
         @assignment_8.grade_student(@student, grade: 8, grader: @teacher)
         @assignment_9.grade_student(@student, grade: 11, grader: @teacher)
@@ -396,19 +391,18 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the correct assignments are being dropped
         # TODO: FIX VICE-3636 it so the correct assignments are dropped, then uncomment
-        # dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")
-        # expect(dropped_assignments.length).to eq 1
-        # dropped_assignments_text = dropped_assignments.map(&:text)
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
+        dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")
+        expect(dropped_assignments.length).to eq 1
+        dropped_assignments_text = dropped_assignments.map(&:text)
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
 
         # Verify that the 2 grading period rows have the correct values
-        # TODO: FIX VICE-3638 so the correct points possible is shown
-        # expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
-        # expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 17.27% 19.00/110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 17.27% 19.00/110.00"
 
         # Verify that the total is correct
         # TODO: VICE-3594 FIX it so that the total is correct, then uncomment
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27%"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -416,23 +410,26 @@ describe "gradebook - logged in as a student" do
         f("#only_consider_graded_assignments_wrapper").click
 
         # Verify that the correct assignments are being dropped
-        # TODO: VICE-3637 FIX it so that the correct assignments are dropped ( assignment_6)
-        dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")
+        dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped')")
         expect(dropped_assignments.length).to eq 4
         dropped_assignments_text = dropped_assignments.map(&:text)
         expect(dropped_assignments_text.any? { |str| str.include?(@assignment_3.title) }).to be true
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_6.title) }).to be true
-        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_5.title) }).to be true
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_6.title) }).to be true
         expect(dropped_assignments_text.any? { |str| str.include?(@assignment_11.title) }).to be true
 
+        excused_assignments = ffj("tr[data-testid='assignment-row']:contains('Excused')")
+        expect(excused_assignments.length).to eq 1
+        excused_assignments_text = excused_assignments.map(&:text)
+        expect(excused_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
+
         # Verify that the 2 group rows have the correct values
-        # TODO: VICE-3639
-        # expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period 0% 0.00/1,110.00"
-        # expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 14.62% 19.00/130.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period 0.00% 0.00/1,110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 15.83% 19.00/120.00"
 
         # Verify that the total is correct
         # TODO: VICE-3594 FIX
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total 10.96%
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 11.88%"
       end
 
       it "correctly displays current grading period" do
@@ -444,23 +441,23 @@ describe "gradebook - logged in as a student" do
         # ------- Verify output when "calculate based only on graded assignments" is checked -------
 
         # Verify the number of assignments is correct
-        expect(ff("tr[data-testid='assignment-row']").length).to eq 7
+        expect(ff("tr[data-testid='assignment-row']").length).to eq 6
 
         # Verify that the correct assignments are being dropped
         # TODO: VICE-3636 FIX it so only one assignment is dropped here
-        # dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")
-        # expect(dropped_assignments.length).to eq 1
-        # dropped_assignments_text = dropped_assignments.map(&:text)
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
+        dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")
+        expect(dropped_assignments.length).to eq 1
+        dropped_assignments_text = dropped_assignments.map(&:text)
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
 
         # Verify that the 2 group rows have the correct values
         # TODO: VICE-3594 FIX group-2 so that the correct values appear
         expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 110.00% 11.00/10.00"
-        # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 8.00% 8.00/10.00"
+        expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 8.00% 8.00/100.00"
 
         # Verify that the total is correct
         # TODO: VICE-3594 FIX it so that the points possible shows
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total 60% 12.00/20.00"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27%"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -468,22 +465,21 @@ describe "gradebook - logged in as a student" do
         f("#only_consider_graded_assignments_wrapper").click
 
         # Verify that the correct assignments are being dropped
-        # TODO: VICE-3637 FIX it so that the correct assignments are dropped
         dropped_assignments = ffj("tr[data-testid='assignment-row']:contains('Dropped'), tr[data-testid='assignment-row']:contains('Excused')")
         expect(dropped_assignments.length).to eq 3
-        # dropped_assignments_text = dropped_assignments.map(&:text)
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_6.title) }).to be true
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
-        # expect(dropped_assignments_text.any? { |str| str.include?(@assignment_11.title) }).to be true
+        dropped_assignments_text = dropped_assignments.map(&:text)
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_6.title) }).to be true
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
+        expect(dropped_assignments_text.any? { |str| str.include?(@assignment_11.title) }).to be true
 
         # Verify that the 2 group rows have the correct values
         # TODO: VICE-3594 FIX it so that the percentages are correct
-        # expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 55.00% 11.00/20.00"
-        # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 7.27% 8.00/110.00"
+        expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 55.00% 11.00/20.00"
+        expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 8.00% 8.00/100.00"
 
         # Verify that the total is correct
         # TODO: VICE-3594 FIX it so that the totals are correct
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total 14.62% 19.00/130.00"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 15.83%"
       end
     end
   end

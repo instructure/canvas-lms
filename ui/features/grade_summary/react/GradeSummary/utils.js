@@ -37,6 +37,11 @@ export const filteredAssignments = (data, calculateOnlyGradedAssignments = false
       return !assignment?.submissionsConnection?.nodes[0]?.hideGradeFromStudent
     }) || []
 
+  assignments = assignments.filter(assignment => {
+    const status = getAssignmentStatus(assignment)
+    return status.id !== 'excused'
+  })
+
   if (calculateOnlyGradedAssignments) {
     assignments = assignments.filter(assignment => {
       const status = getAssignmentStatus(assignment)
@@ -162,12 +167,17 @@ export const getDisplayScore = (assignment, gradingStandard) => {
       gradingStandard
     )
 
+  const earned = getAssignmentEarnedPoints(assignment)
+  const total = getAssignmentTotalPoints(assignment)
+
   if (
     assignment?.submissionsConnection?.nodes?.length === 0 ||
     assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'needs_grading' ||
     assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused'
   ) {
-    return '-'
+    return assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused'
+      ? '-'
+      : `${'-'}/${total || '0'}`
   } else if (
     ENV.restrict_quantitative_data &&
     (assignment?.gradingType === 'gpa_scale' ||
@@ -185,8 +195,6 @@ export const getDisplayScore = (assignment, gradingStandard) => {
   } else if (assignment?.gradingType === 'pass_fail') {
     return assignment?.submissionsConnection?.nodes[0]?.score ? <IconCheckLine /> : <IconXLine />
   }
-  const earned = getAssignmentEarnedPoints(assignment)
-  const total = getAssignmentTotalPoints(assignment)
   return `${earned || '0'}/${total || '0'}`
 }
 
@@ -219,13 +227,13 @@ export const scorePercentageToLetterGrade = (score, gradingStandard) => {
 
 export const convertSubmissionToDroppableSubmission = (assignment, submission) => {
   return {
-    score: submission?.score,
-    grade: submission?.grade,
+    score: submission?.score || 0,
+    grade: submission?.grade || 0,
     total: assignment?.pointsPossible,
     assignment_id: assignment?._id,
-    workflow_state: submission?.gradingStatus,
-    excused: submission?.late,
-    id: submission?._id,
+    workflow_state: assignment?.state,
+    excused: submission?.late || false,
+    id: submission?._id || null,
     submission: {assignment_id: assignment?._id},
   }
 }
@@ -281,12 +289,16 @@ export const filterDroppedAssignments = (
   })
 }
 
-export const listDroppedAssignments = (queryData, byGradingPeriod) => {
+export const listDroppedAssignments = (
+  queryData,
+  byGradingPeriod,
+  calculateOnlyGradedAssignments
+) => {
   const processAssignmentGroup = (data, checkAssignment) => {
     return data?.assignmentGroupsConnection?.nodes
       ?.map(assignmentGroup => {
         const assignments = filterDroppedAssignments(
-          filteredAssignments(data).filter(assignment => {
+          filteredAssignments(data, calculateOnlyGradedAssignments).filter(assignment => {
             return checkAssignment(assignment, assignmentGroup)
           }),
           assignmentGroup,
@@ -428,29 +440,33 @@ export const getAssignmentGroupLetterGrade = (assignmentGroup, assignments, grad
 
 // **************** GRADING PERIODS ***********************************************
 
-export const getGradingPeriodTotalPoints = (gradingPeriod, assignments) => {
+const removeNonGradingPeriodAssignments = (assignments, gradingPeriod) => {
+  return assignments?.filter(assignment => {
+    return assignment?.gradingPeriodId === gradingPeriod?._id
+  })
+}
+
+export const getGradingPeriodTotalPoints = (gradingPeriod, assignments, assignmentGroups) => {
   return (
-    assignments?.reduce((total, assignment) => {
-      if (
-        assignment?.gradingPeriodId === gradingPeriod?._id &&
-        !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused')
-      ) {
-        total += getAssignmentTotalPoints(assignment) || 0
-      }
+    assignmentGroups?.reduce((total, assignmentGroup) => {
+      total +=
+        getAssignmentGroupTotalPoints(
+          assignmentGroup,
+          removeNonGradingPeriodAssignments(assignments, gradingPeriod)
+        ) || 0
       return total
     }, 0) || 0
   )
 }
 
-export const getGradingPeriodEarnedPoints = (gradingPeriod, assignments) => {
+export const getGradingPeriodEarnedPoints = (gradingPeriod, assignments, assignmentGroups) => {
   return (
-    assignments?.reduce((total, assignment) => {
-      if (
-        assignment?.gradingPeriodId === gradingPeriod?._id &&
-        !(assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused')
-      ) {
-        total += getAssignmentEarnedPoints(assignment) || 0
-      }
+    assignmentGroups?.reduce((total, assignmentGroup) => {
+      total +=
+        getAssignmentGroupEarnedPoints(
+          assignmentGroup,
+          removeNonGradingPeriodAssignments(assignments, gradingPeriod)
+        ) || 0
       return total
     }, 0) || 0
   )
@@ -468,8 +484,16 @@ export const getGradingPeriodPercentage = (
     return getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
   }
 
-  const gradingPeriodEarnedPoints = getGradingPeriodEarnedPoints(gradingPeriod, assignments)
-  const gradingPeriodTotalPoints = getGradingPeriodTotalPoints(gradingPeriod, assignments)
+  const gradingPeriodEarnedPoints = getGradingPeriodEarnedPoints(
+    gradingPeriod,
+    assignments,
+    assignmentGroups
+  )
+  const gradingPeriodTotalPoints = getGradingPeriodTotalPoints(
+    gradingPeriod,
+    assignments,
+    assignmentGroups
+  )
 
   if (gradingPeriodTotalPoints === 0 && gradingPeriodEarnedPoints === 0)
     return ASSIGNMENT_NOT_APPLICABLE
