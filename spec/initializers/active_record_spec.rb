@@ -365,15 +365,11 @@ module ActiveRecord
 
       def set_ignored_columns_state!(columns, enabled)
         allow(DynamicSettings).to receive(:find).with("activerecord", tree: :store).and_return(
-          {
-            "ignored_columns_disabled" => !enabled
-          }
+          DynamicSettings::FallbackProxy.new({ "ignored_columns_disabled" => !enabled })
         )
 
         allow(DynamicSettings).to receive(:find).with("activerecord/ignored_columns", tree: :store).and_return(
-          {
-            "users" => columns
-          }
+          DynamicSettings::FallbackProxy.new({ "users" => columns })
         )
 
         reset_cache!

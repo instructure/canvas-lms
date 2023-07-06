@@ -271,11 +271,11 @@ class ApplicationController < ActionController::Base
         end
 
         dynamic_settings_tree = DynamicSettings.find(tree: :private)
-        if dynamic_settings_tree["api_gateway_enabled"] == "true"
+        if dynamic_settings_tree["api_gateway_enabled", failsafe: nil] == "true"
           @js_env[:API_GATEWAY_URI] = dynamic_settings_tree["api_gateway_uri"]
         end
 
-        if dynamic_settings_tree["frontend_data_collection_endpoint"]
+        if dynamic_settings_tree["frontend_data_collection_endpoint", failsafe: nil]
           @js_env[:DATA_COLLECTION_ENDPOINT] = dynamic_settings_tree["frontend_data_collection_endpoint"]
         end
 

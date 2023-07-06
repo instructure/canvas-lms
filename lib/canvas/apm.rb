@@ -59,13 +59,20 @@ module Canvas
       end
 
       def config
-        return @_config if @_config.present?
+        unless @_config
 
-        dynamic_settings = DynamicSettings.find(tree: :private)
-        if canvas_cluster.present?
-          dynamic_settings = DynamicSettings.find(tree: :private, cluster: canvas_cluster)
+          return @_config if @_config.present?
+
+          dynamic_settings = DynamicSettings.find(tree: :private)
+          if canvas_cluster.present?
+            dynamic_settings = DynamicSettings.find(tree: :private, cluster: canvas_cluster)
+          end
+          yaml = dynamic_settings["datadog_apm.yml", failsafe: :missing] || "{}"
+          return {} if yaml == :missing
+
+          @_config = YAML.safe_load(yaml)
         end
-        @_config = YAML.safe_load(dynamic_settings["datadog_apm.yml"] || "{}")
+        @_config
       end
 
       def sample_rate

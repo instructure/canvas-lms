@@ -228,7 +228,13 @@ class RequestThrottle
   end
 
   def self.dynamic_settings
-    @dynamic_settings ||= YAML.safe_load(DynamicSettings.find(tree: :private)["request_throttle.yml", failsafe: ""] || "") || {}
+    unless @dynamic_settings
+      consul_data = DynamicSettings.find(tree: :private)["request_throttle.yml", failsafe: :missing] || ""
+      return {} if consul_data == :missing
+
+      @dynamic_settings = YAML.safe_load(consul_data) || {}
+    end
+    @dynamic_settings
   end
 
   def rate_limit_exceeded
