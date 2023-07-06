@@ -102,7 +102,8 @@ module Api
         "img" => ["src"].freeze,
         "object" => ["data"].freeze, # needed?
         "embed" => ["src"].freeze, # needed?
-        "iframe" => ["src"].freeze # needed?
+        "iframe" => ["src"].freeze, # needed?
+        "source" => ["srcset"].freeze, # needed?
       }.freeze
 
       # rewrite HTML being sent out to an API request to make sure

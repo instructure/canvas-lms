@@ -25,7 +25,7 @@ class ImportedHtmlConverter
   include HtmlTextHelper
 
   CONTAINER_TYPES = %w[div p body].freeze
-  LINK_ATTRS = %w[rel href src data value longdesc data-download-url].freeze
+  LINK_ATTRS = %w[rel href src srcset data value longdesc data-download-url].freeze
   RCE_MEDIA_TYPES = %w[audio video].freeze
 
   attr_reader :link_parser, :link_resolver, :link_replacer
