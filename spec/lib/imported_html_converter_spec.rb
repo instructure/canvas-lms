@@ -66,6 +66,11 @@ describe ImportedHtmlConverter do
       end
     end
 
+    it "converts picture source srcsets" do
+      test_string = %(<source srcset="$CANVAS_COURSE_REFERENCE$/img.src">)
+      expect(convert_and_replace(test_string)).to eq %(<source srcset="/courses/#{@course.id}/img.src">)
+    end
+
     it "converts a wiki reference without $ escaped" do
       test_string = %(<a href="$WIKI_REFERENCE$/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
       @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")
