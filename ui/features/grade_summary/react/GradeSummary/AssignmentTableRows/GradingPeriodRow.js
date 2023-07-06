@@ -55,8 +55,22 @@ export const gradingPeriodRow = (
       : scorePercentageToLetterGrade(periodPercentage, queryData?.gradingStandard)
 
   const formattedScore = `${
-    formatNumber(getGradingPeriodEarnedPoints(gradingPeriod, filterByGradingPeriod)) || '-'
-  }/${formatNumber(getGradingPeriodTotalPoints(gradingPeriod, filterByGradingPeriod)) || '-'}`
+    formatNumber(
+      getGradingPeriodEarnedPoints(
+        gradingPeriod,
+        filterByGradingPeriod,
+        queryData?.assignmentGroupsConnection?.nodes
+      )
+    ) || '-'
+  }/${
+    formatNumber(
+      getGradingPeriodTotalPoints(
+        gradingPeriod,
+        filterByGradingPeriod,
+        queryData?.assignmentGroupsConnection?.nodes
+      )
+    ) || '-'
+  }`
 
   return (
     <Table.Row key={gradingPeriod._id} data-testid={'gradingPeriod-' + gradingPeriod._id}>

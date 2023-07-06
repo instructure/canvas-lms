@@ -28,14 +28,15 @@ import {formatNumber, scorePercentageToLetterGrade, getTotal, filteredAssignment
 const I18n = useI18nScope('grade_summary')
 
 export const totalRow = (queryData, calculateOnlyGradedAssignments = false) => {
+  const applicableAssignments = filteredAssignments(queryData, calculateOnlyGradedAssignments)
   const total = getTotal(
-    filteredAssignments(queryData, calculateOnlyGradedAssignments),
+    applicableAssignments,
     queryData?.assignmentGroupsConnection?.nodes,
     queryData?.gradingPeriodsConnection?.nodes,
     queryData?.applyGroupWeights
   )
 
-  const formattedTotal = total === ASSIGNMENT_NOT_APPLICABLE ? total : `${formatNumber(total)}%`
+  const formattedTotal = total === ASSIGNMENT_NOT_APPLICABLE ? '0%' : `${formatNumber(total)}%`
 
   const letterGrade =
     total === ASSIGNMENT_NOT_APPLICABLE

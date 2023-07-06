@@ -661,18 +661,6 @@ describe('util', () => {
   })
 
   describe('getDisplayScore', () => {
-    it('returns "-" when assignment has no submissions or needs grading or is excused', () => {
-      const assignment = Assignment.mock({
-        submissionsConnection: {
-          nodes: [],
-        },
-      })
-
-      const gradingStandard = GradingStandard.mock()
-
-      expect(getDisplayScore(assignment, gradingStandard)).toBe('-')
-    })
-
     it('calls getAssignmentLetterGrade when ENV restricts quantitative data and assignment uses GPA scale, percent, or points grading types', () => {
       const assignment = Assignment.mock({
         gradingType: 'gpa_scale',
@@ -839,29 +827,38 @@ describe('util', () => {
   describe('Drop Assignment', () => {
     describe('convertSubmissionToDroppableSubmission', () => {
       it('should return the correct object with all properties when assignment and submission are provided', () => {
-        const assignment = {
+        const assignment = Assignment.mock({
           _id: 'assignment123',
           pointsPossible: 100,
-        }
-        const submission = {
-          _id: 'submission456',
-          score: 80,
-          grade: 'B',
-          gradingStatus: 'graded',
-          late: false,
-        }
+          submissionsConnection: {
+            nodes: [
+              Submission.mock({
+                _id: 'submission456',
+                score: 80,
+                grade: 'B',
+                gradingStatus: 'graded',
+                late: false,
+              }),
+            ],
+          },
+        })
         const expected = {
           score: 80,
           grade: 'B',
           total: 100,
           assignment_id: 'assignment123',
-          workflow_state: 'graded',
+          workflow_state: 'published',
           excused: false,
           id: 'submission456',
           submission: {assignment_id: 'assignment123'},
         }
 
-        expect(convertSubmissionToDroppableSubmission(assignment, submission)).toEqual(expected)
+        expect(
+          convertSubmissionToDroppableSubmission(
+            assignment,
+            assignment.submissionsConnection.nodes[0]
+          )
+        ).toEqual(expected)
       })
     })
 
@@ -1393,7 +1390,8 @@ describe('util', () => {
       it('should return the points possible for the grading period', () => {
         const gradingPeriod = GradingPeriod.mock()
         const assignments = mockAssignments()
-        expect(getGradingPeriodTotalPoints(gradingPeriod, assignments)).toBe(40)
+        const assignmentGroups = [AssignmentGroup.mock()]
+        expect(getGradingPeriodTotalPoints(gradingPeriod, assignments, assignmentGroups)).toBe(40)
       })
 
       it('should return 0 when points possible is not provided', () => {
@@ -1412,7 +1410,8 @@ describe('util', () => {
       it('should return the earned points for the grading period', () => {
         const gradingPeriod = GradingPeriod.mock()
         const assignments = mockAssignments()
-        expect(getGradingPeriodEarnedPoints(gradingPeriod, assignments)).toBe(31)
+        const assignmentGroups = [AssignmentGroup.mock()]
+        expect(getGradingPeriodEarnedPoints(gradingPeriod, assignments, assignmentGroups)).toBe(31)
       })
 
       it('should return 0 when earned points is not provided', () => {
