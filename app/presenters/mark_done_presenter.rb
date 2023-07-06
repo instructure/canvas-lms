@@ -26,7 +26,7 @@ class MarkDonePresenter
     @context = context
     @asset = asset
     module_item_id = use_or_infer_item_id(module_item_id)
-    @item = ContentTag.find(module_item_id.to_i) if module_item_id
+    @item = ContentTag.find(module_item_id.to_i) if module_item_id.to_i != 0
     @module = @item.context_module if @item
     @user = user
   end
