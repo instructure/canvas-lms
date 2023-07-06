@@ -1030,7 +1030,7 @@ modules.initModuleManagement = function (duplicate) {
       $('#no_context_modules_message').slideUp()
       $('#expand_collapse_all').show()
       setExpandAllButton()
-      const published = data.context_module.workflow_state === 'published'
+      const published = data.context_module.workflow_state === 'active'
       const $publishIcon = $module.find('.publish-icon')
       // new module, setup publish icon and other stuff
       if (!$publishIcon.data('id')) {
