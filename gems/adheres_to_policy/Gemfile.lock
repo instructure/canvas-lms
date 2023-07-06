@@ -167,7 +167,7 @@ GEM
     simplecov_json_formatter (0.1.4)
     strscan (3.0.6)
     thor (1.2.1)
-    timeout (0.3.2)
+    timeout (0.4.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     websocket-driver (0.7.5)

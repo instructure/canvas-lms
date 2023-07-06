@@ -242,7 +242,7 @@ GEM
     strscan (3.0.6)
     thor (1.2.1)
     timecop (0.9.6)
-    timeout (0.3.2)
+    timeout (0.4.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     websocket-driver (0.7.5)

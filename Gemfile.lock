@@ -1076,7 +1076,7 @@ GEM
     thread_safe (0.3.6)
     thrift (0.9.3.0)
     timecop (0.9.6)
-    timeout (0.3.2)
+    timeout (0.4.0)
     tins (1.32.1)
       sync
     ttfunk (1.7.0)

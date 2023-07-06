@@ -171,7 +171,7 @@ GEM
     sqlite3 (1.6.2-x86_64-linux)
     strscan (3.0.6)
     thor (1.2.1)
-    timeout (0.3.2)
+    timeout (0.4.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     websocket-driver (0.7.5)
