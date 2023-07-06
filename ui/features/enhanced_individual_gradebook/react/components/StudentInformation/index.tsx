@@ -39,6 +39,7 @@ import {
   calculateGradesForStudent,
   getLetterGrade,
   scoreToPercentage,
+  scoreToScaledPoints,
 } from '../../../utils/gradebookUtils'
 import {GradingPeriodScores} from './GradingPeriodScores'
 import {AssignmentGroupScores} from './AssignmentGroupScores'
@@ -79,7 +80,10 @@ export default function StudentInformation({
     gradeCalcIgnoreUnpostedAnonymousEnabled,
     gradingPeriodSet,
     gradingStandard,
+    gradingStandardScalingFactor,
+    gradingStandardPointsBased,
     groupWeightingScheme,
+    pointsBasedGradingSchemesFeatureEnabled,
     selectedGradingPeriodId,
   } = gradebookOptions
 
@@ -162,13 +166,35 @@ export default function StudentInformation({
   const currentStudentNotes = studentNotes[student.id] ?? ''
   const showGradingPeriodSubtotals = !selectedGradingPeriodId && gradingPeriodSet?.weighted
 
-  const finalGradeText = () => {
+  const renderFinalGradeText = () => {
     const {possible, score} = gradeToDisplay
     if (possible === null || possible === undefined) {
       return '-'
     }
 
-    const percentText = Number.isNaN(Number(finalGradePercent)) ? '-' : finalGradePercent
+    let displayAsScaledPoints = false
+    let finalGradeText
+    if (pointsBasedGradingSchemesFeatureEnabled) {
+      if (gradingStandard) {
+        displayAsScaledPoints = gradingStandardPointsBased
+        const scalingFactor = gradingStandardScalingFactor
+
+        if (displayAsScaledPoints && possible) {
+          const scaledPossible = I18n.n(scalingFactor, {
+            precision: 1,
+          })
+          const scaledScore = I18n.n(scoreToScaledPoints(score, possible, scalingFactor), {
+            precision: 1,
+          })
+
+          finalGradeText = `${scaledScore} / ${scaledPossible}`
+        } else {
+          finalGradeText = Number.isNaN(Number(finalGradePercent)) ? '-' : `${finalGradePercent}%`
+        }
+      }
+    } else {
+      finalGradeText = Number.isNaN(Number(finalGradePercent)) ? '-' : `${finalGradePercent}%`
+    }
 
     // TODO: refactor hidePointsText & showPointsText after tests are in place
     const hidePointsText = !!(
@@ -184,7 +210,7 @@ export default function StudentInformation({
       ? ` - ${getLetterGrade(possible, score, gradingStandard)}`
       : ''
 
-    return `${percentText}%${pointsText}${letterGradeText}`
+    return `${finalGradeText}${pointsText}${letterGradeText}`
   }
 
   const studentUrl = `${contextUrl}/grades/${student.id}`
@@ -253,7 +279,14 @@ export default function StudentInformation({
                         gradingPeriodId={gradingPeriodId}
                         gradingPeriodSet={gradingPeriodSet}
                         gradingPeriods={gradingPeriods}
-                        gradingStandard={gradingStandard || []}
+                        gradingScheme={{
+                          data: gradingStandard || [],
+                          pointsBased: gradingStandardPointsBased,
+                          scalingFactor: gradingStandardScalingFactor,
+                        }}
+                        pointsBasedGradingSchemesFeatureEnabled={
+                          pointsBasedGradingSchemesFeatureEnabled
+                        }
                         includeUngradedAssignments={includeUngradedAssignments}
                       />
                     ))
@@ -263,7 +296,14 @@ export default function StudentInformation({
                         assignmentGroupId={assignmentGroupId}
                         assignmentGroupMap={assignmentGroupMap}
                         assignmentGroups={assignmentGroups}
-                        gradingStandard={gradingStandard || []}
+                        gradingScheme={{
+                          data: gradingStandard || [],
+                          pointsBased: gradingStandardPointsBased,
+                          scalingFactor: gradingStandardScalingFactor,
+                        }}
+                        pointsBasedGradingSchemesFeatureEnabled={
+                          pointsBasedGradingSchemesFeatureEnabled
+                        }
                         includeUngradedAssignments={includeUngradedAssignments}
                       />
                     ))}
@@ -274,11 +314,12 @@ export default function StudentInformation({
           <View as="h3">
             {I18n.t('Final Grade: ')}
             <View as="span" className="total-grade">
-              {finalGradeText()}
+              {renderFinalGradeText()}
             </View>
           </View>
           {finalGradeOverrideEnabled && allowFinalGradeOverride && (
             <FinalGradeOverrideTextBox
+              pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
               finalGradeOverride={finalGradeOverrides[student.id]}
               enrollmentId={student.enrollments[0]?.id}
               onSubmit={(finalGradeOverride: FinalGradeOverride) => {
@@ -287,7 +328,11 @@ export default function StudentInformation({
                   [student.id]: finalGradeOverride,
                 })
               }}
-              gradingStandard={gradingStandard || []}
+              gradingScheme={{
+                data: gradingStandard || [],
+                pointsBased: gradingStandardPointsBased,
+                scalingFactor: gradingStandardScalingFactor,
+              }}
               gradingPeriodId={selectedGradingPeriodId}
             />
           )}

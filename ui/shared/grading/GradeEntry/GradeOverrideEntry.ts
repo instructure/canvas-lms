@@ -28,7 +28,7 @@ import GradeOverrideInfo from './GradeOverrideInfo'
 import GradeEntry, {EnterGradesAs} from './index'
 import type {GradeType, DeprecatedGradingScheme, GradeEntryMode} from '../grading.d'
 
-function schemeKeyForPercentage(percentage, gradingScheme) {
+function schemeKeyForPercentage(percentage, gradingScheme: DeprecatedGradingScheme) {
   if (gradingScheme) {
     return scoreToGrade(percentage, gradingScheme.data)
   }

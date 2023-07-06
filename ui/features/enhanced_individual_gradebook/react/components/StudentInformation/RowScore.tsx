@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import type {GradingStandard} from '@canvas/grading/grading'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {getLetterGrade, scoreToPercentage} from '../../../utils/gradebookUtils'
+import {getLetterGrade, scoreToPercentage, scoreToScaledPoints} from '../../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -28,23 +28,58 @@ type Props = {
   score?: number
   possible?: number
   weight?: number | null
-  gradingStandard?: GradingStandard[] | null
+  gradingScheme?: DeprecatedGradingScheme | null
+  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
-export default function RowScore({gradingStandard, name, possible, score, weight}: Props) {
+export default function RowScore({
+  gradingScheme,
+  name,
+  possible,
+  score,
+  weight,
+  pointsBasedGradingSchemesFeatureEnabled,
+}: Props) {
   const percentScore = scoreToPercentage(score, possible, 1)
 
   const isPercentInvalid = Number.isNaN(Number(percentScore))
 
-  const percentScoreText = isPercentInvalid ? '-' : `${percentScore}% (${score} / ${possible})`
+  let scoreText
 
-  const letterGradeScore = isPercentInvalid ? '-' : getLetterGrade(possible, score, gradingStandard)
+  let displayAsScaledPoints = false
+  if (pointsBasedGradingSchemesFeatureEnabled) {
+    if (gradingScheme) {
+      displayAsScaledPoints = gradingScheme.pointsBased
+      const scalingFactor = gradingScheme.scalingFactor
+
+      if (displayAsScaledPoints && possible) {
+        const scaledPossible = I18n.n(scalingFactor, {
+          precision: 1,
+        })
+        const scaledScore = I18n.n(scoreToScaledPoints(score || 0, possible, scalingFactor), {
+          precision: 1,
+        })
+
+        scoreText = `${scaledScore} / ${scaledPossible}`
+      } else {
+        scoreText = isPercentInvalid ? '-' : `${percentScore}% (${score} / ${possible})`
+      }
+    }
+  } else {
+    scoreText = isPercentInvalid ? '-' : `${percentScore}% (${score} / ${possible})`
+  }
+
+  const letterGradeScore = isPercentInvalid
+    ? '-'
+    : gradingScheme
+    ? getLetterGrade(possible, score, gradingScheme.data)
+    : '-'
 
   const weightText = weight ? I18n.n(weight, {percentage: true}) : '-'
 
   return (
     <tr>
       <th>{name}</th>
-      <td>{percentScoreText}</td>
+      <td>{scoreText}</td>
       <td>{letterGradeScore}</td>
       <td>{weightText}</td>
     </tr>

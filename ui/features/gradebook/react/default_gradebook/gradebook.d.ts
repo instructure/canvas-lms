@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {ProgressData} from '@canvas/grading/grading.d'
+import type {ProgressData, DeprecatedGradingScheme} from '@canvas/grading/grading.d'
 import StudentDatastore from './stores/StudentDatastore'
 import type {StatusColors} from './constants/colors'
 import type {
@@ -24,7 +24,6 @@ import type {
   AttachmentData,
   GradingPeriod,
   GradingPeriodSet,
-  GradingScheme,
   GradingStandard,
   Module,
   ModuleMap,
@@ -131,8 +130,10 @@ export type GradebookOptions = {
   graded_late_submissions_exist: boolean
   grades_are_weighted: boolean
   grading_period_set: GradingPeriodSet
-  grading_schemes: GradingScheme[]
+  grading_schemes: DeprecatedGradingScheme[]
   grading_standard: GradingStandard[]
+  grading_standard_scaling_factor: number
+  grading_standard_points_based: boolean
   group_weighting_scheme: null | string
   has_modules: boolean
   individual_gradebook_enhancements: boolean
@@ -222,9 +223,9 @@ export type GradingPeriodAssignmentMap = {
 
 export type CourseContent = {
   contextModules: Module[]
-  courseGradingScheme: GradingScheme | null
-  defaultGradingScheme: GradingScheme | null
-  gradingSchemes: GradingScheme[]
+  courseGradingScheme: DeprecatedGradingScheme | null
+  defaultGradingScheme: DeprecatedGradingScheme | null
+  gradingSchemes: DeprecatedGradingScheme[]
   gradingPeriodAssignments: GradingPeriodAssignmentMap
   assignmentStudentVisibility: {[assignmentId: string]: null | StudentMap}
   latePolicy?: LatePolicyCamelized

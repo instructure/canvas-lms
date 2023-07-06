@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {GradingPeriodGrade, GradingStandard} from '@canvas/grading/grading'
+import type {GradingPeriodGrade, DeprecatedGradingScheme} from '@canvas/grading/grading'
 import type {GradingPeriodSet} from '../../../../../api.d'
 import RowScore from './RowScore'
 
@@ -27,14 +27,16 @@ type Props = {
     [periodId: string]: GradingPeriodGrade
   }
   gradingPeriodSet: GradingPeriodSet
-  gradingStandard?: GradingStandard[] | null
+  gradingScheme?: DeprecatedGradingScheme | null
+  pointsBasedGradingSchemesFeatureEnabled: boolean
   includeUngradedAssignments: boolean
 }
 export function GradingPeriodScores({
   gradingPeriodId,
   gradingPeriods,
   gradingPeriodSet,
-  gradingStandard,
+  gradingScheme,
+  pointsBasedGradingSchemesFeatureEnabled,
   includeUngradedAssignments,
 }: Props) {
   const matchingGradingPeriod = gradingPeriodSet.grading_periods.find(
@@ -54,7 +56,8 @@ export function GradingPeriodScores({
 
   return (
     <RowScore
-      gradingStandard={gradingStandard}
+      gradingScheme={gradingScheme}
+      pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
       name={title}
       possible={possible}
       score={score}

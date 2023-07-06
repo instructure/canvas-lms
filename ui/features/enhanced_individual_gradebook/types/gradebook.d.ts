@@ -86,8 +86,11 @@ export type GradebookOptions = {
   gradingPeriodSet?: GradingPeriodSet | null
   gradingSchemes?: DeprecatedGradingScheme[] | null
   gradingStandard?: GradingStandard[] | null
+  gradingStandardScalingFactor: number
+  gradingStandardPointsBased: boolean
   groupWeightingScheme?: string | null
   finalGradeOverrideEnabled?: boolean | null
+  pointsBasedGradingSchemesFeatureEnabled: boolean
   publishToSisEnabled?: boolean | null
   publishToSisUrl?: string | null
   reorderCustomColumnsUrl?: string | null

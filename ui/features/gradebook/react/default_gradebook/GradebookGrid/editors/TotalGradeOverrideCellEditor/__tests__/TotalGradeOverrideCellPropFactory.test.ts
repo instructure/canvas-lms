@@ -23,10 +23,11 @@ import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import FinalGradeOverrides from '../../../../FinalGradeOverrides/index'
 import TotalGradeOverrideCellPropFactory from '../TotalGradeOverrideCellPropFactory'
+import {DeprecatedGradingScheme} from '@canvas/grading/grading'
 
 describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
   let gradebook
-  let gradingScheme
+  let gradingScheme: DeprecatedGradingScheme
 
   describe('#getProps()', () => {
     let editorOptions
@@ -42,12 +43,18 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
         ],
         id: '2801',
         title: 'Default Grading Scheme',
+        pointsBased: false,
+        scalingFactor: 1.0,
       }
 
       // `gradebook` is a double because CoffeeScript and AMD cannot be imported
       // into Jest specs
       gradebook = {
         getCourseGradingScheme() {
+          return gradingScheme
+        },
+
+        pointsBasedGradingSchemesFeatureEnabled() {
           return gradingScheme
         },
 

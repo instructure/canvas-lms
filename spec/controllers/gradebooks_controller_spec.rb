@@ -1213,6 +1213,35 @@ describe GradebooksController do
         end
       end
 
+      describe "grading_standard" do
+        it "uses the course's grading standard" do
+          grading_standard = grading_standard_for(@course)
+          @course.update!(default_grading_standard: grading_standard)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:grading_standard)).to eq grading_standard.data
+          expect(gradebook_options.fetch(:grading_standard_points_based)).to be false
+          expect(gradebook_options.fetch(:grading_standard_scaling_factor)).to eq 1.0
+        end
+
+        it "uses the course's grading standard points_based value when feature flag is on" do
+          Account.site_admin.enable_feature!(:points_based_grading_schemes)
+          grading_standard = grading_standard_for(@course)
+          grading_standard.points_based = true
+          grading_standard.scaling_factor = 4.0
+          grading_standard.save
+          @course.update!(default_grading_standard: grading_standard)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:grading_standard)).to eq grading_standard.data
+          expect(gradebook_options.fetch(:grading_standard_points_based)).to be true
+          expect(gradebook_options.fetch(:grading_standard_scaling_factor)).to eq 4.0
+        end
+
+        it "grading_standard is false if the course does not have one" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:grading_standard)).to be false
+        end
+      end
+
       it "includes colors" do
         get :show, params: { course_id: @course.id }
         expect(gradebook_options).to have_key :colors

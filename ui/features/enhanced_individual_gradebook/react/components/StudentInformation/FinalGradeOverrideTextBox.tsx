@@ -19,7 +19,11 @@
 import {View} from '@instructure/ui-view'
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {FinalGradeOverride, GradeEntryOptions, GradingStandard} from '@canvas/grading/grading'
+import {
+  DeprecatedGradingScheme,
+  FinalGradeOverride,
+  GradeEntryOptions,
+} from '@canvas/grading/grading'
 import {TextInput} from '@instructure/ui-text-input'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -31,21 +35,24 @@ import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
   finalGradeOverride?: FinalGradeOverride
-  gradingStandard?: GradingStandard[] | null
+  gradingScheme?: DeprecatedGradingScheme | null
   enrollmentId: string
   onSubmit: (finalGradeOverride: FinalGradeOverride) => void
   gradingPeriodId?: string
+  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 function FinalGradeOverrideTextBox({
   finalGradeOverride,
-  gradingStandard,
+  gradingScheme,
   enrollmentId,
   onSubmit,
   gradingPeriodId,
+  pointsBasedGradingSchemesFeatureEnabled,
 }: Props) {
   const [inputValue, setInputValue] = useState<string>('')
   const [finalGradeOverridePercentage, setFinalGradeOverridePercentage] = useState<string>('')
   const [apiCallStatus, setApiCallStatus] = useState<ApiCallStatus>(ApiCallStatus.NOT_STARTED)
+
   useEffect(() => {
     const percentage = gradingPeriodId
       ? finalGradeOverride?.gradingPeriodGrades?.[gradingPeriodId]?.percentage
@@ -53,25 +60,28 @@ function FinalGradeOverrideTextBox({
     if (percentage == null) {
       setFinalGradeOverridePercentage('')
       setInputValue('')
-    } else if (gradingStandard && gradingStandard.length > 0) {
-      const inputVal = scoreToGrade(percentage, gradingStandard)
+    } else if (gradingScheme && gradingScheme.data.length > 0) {
+      const inputVal = scoreToGrade(percentage, gradingScheme.data)
       setInputValue(inputVal || '')
-      setFinalGradeOverridePercentage(
-        GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
-      )
+      if (!gradingScheme.pointsBased) {
+        // hide all percentages if this scheme is points based
+        setFinalGradeOverridePercentage(
+          GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
+        )
+      }
     } else {
       setInputValue(GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'}))
       setFinalGradeOverridePercentage('')
     }
-  }, [finalGradeOverride, gradingPeriodId, gradingStandard])
+  }, [finalGradeOverride, gradingPeriodId, gradingScheme])
 
   const handleFinalGradeOverrideChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value)
   }
   const handleFinalGradeOverrideBlur = async () => {
-    const options: GradeEntryOptions = {}
-    if (gradingStandard) {
-      options.gradingScheme = {data: gradingStandard}
+    const options: GradeEntryOptions = {pointsBasedGradingSchemesFeatureEnabled}
+    if (gradingScheme) {
+      options.gradingScheme = gradingScheme
     }
     const percentage = gradingPeriodId
       ? finalGradeOverride?.gradingPeriodGrades?.[gradingPeriodId]?.percentage

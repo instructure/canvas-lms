@@ -346,7 +346,10 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       const options = {}
 
       if (ENV.GRADEBOOK_OPTIONS.grading_standard) {
-        options.gradingScheme = {data: ENV.GRADEBOOK_OPTIONS.grading_standard}
+        options.gradingScheme = {
+          data: ENV.GRADEBOOK_OPTIONS.grading_standard,
+          pointsBased: ENV.GRADEBOOK_OPTIONS.gradingStandardPointsBased,
+        }
       }
 
       const gradeOverrideEntry = new GradeOverrideEntry(options)

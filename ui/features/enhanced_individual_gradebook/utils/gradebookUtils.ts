@@ -50,6 +50,7 @@ import DateHelper from '@canvas/datetime/dateHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -296,9 +297,12 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
     gradingPeriodSet: env.GRADEBOOK_OPTIONS?.grading_period_set,
     gradingSchemes: env.GRADEBOOK_OPTIONS?.grading_schemes,
     gradingStandard: env.GRADEBOOK_OPTIONS?.grading_standard,
+    gradingStandardPointsBased: env.GRADEBOOK_OPTIONS?.grading_standard_points_based || false,
+    gradingStandardScalingFactor: env.GRADEBOOK_OPTIONS?.grading_standard_scaling_factor || 1.0,
     groupWeightingScheme: env.GRADEBOOK_OPTIONS?.group_weighting_scheme,
     lastGeneratedCsvAttachmentUrl: env.GRADEBOOK_OPTIONS?.attachment_url,
     messageAttachmentUploadFolderId: env.GRADEBOOK_OPTIONS?.message_attachment_upload_folder_id,
+    pointsBasedGradingSchemesFeatureEnabled: !!env.POINTS_BASED_GRADING_SCHEMES_ENABLED,
     publishToSisEnabled: env.GRADEBOOK_OPTIONS?.publish_to_sis_enabled,
     publishToSisUrl: env.GRADEBOOK_OPTIONS?.publish_to_sis_url,
     reorderCustomColumnsUrl: env.GRADEBOOK_OPTIONS?.reorder_custom_columns_url,
@@ -347,12 +351,20 @@ export function scoreToPercentage(score?: number, possible?: number, decimalPlac
   return percent % 1 === 0 ? percent : percent.toFixed(decimalPlaces)
 }
 
+export function scoreToScaledPoints(score: number, pointsPossible: number, scalingFactor: number) {
+  const scoreAsScaledPoints = score / (pointsPossible / scalingFactor)
+  if (!Number.isFinite(scoreAsScaledPoints)) {
+    return scoreAsScaledPoints
+  }
+  return toNumber(divide(score, divide(pointsPossible, scalingFactor)))
+}
+
 export function getLetterGrade(
   possible?: number,
   score?: number,
   gradingStadards?: GradingStandard[] | null
 ) {
-  if (!gradingStadards || !gradingStadards.length || !!possible || !!score) {
+  if (!gradingStadards || !gradingStadards.length || !possible || !score) {
     return '-'
   }
   const rawPercentage = scoreToPercentage(score, possible)

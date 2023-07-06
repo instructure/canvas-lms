@@ -21,12 +21,12 @@ import _ from 'underscore'
 import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
-import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
+import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from 'html-escape'
 import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
-import type {GradingScheme} from '../../gradebook.d'
+import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
 
 const I18n = useI18nScope('gradebook')
 
@@ -34,7 +34,7 @@ const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
   : listFormatterPolyfill
 
-function getGradePercentage(score, pointsPossible) {
+function getGradePercentage(score: number, pointsPossible: number) {
   const grade = scoreToPercentage(score, pointsPossible)
   return round(grade, round.DEFAULT)
 }
@@ -102,6 +102,8 @@ function render(options) {
 
   if (options.showPointsNotPercent) {
     grade = options.score
+  } else if (options.displayAsScaledPoints) {
+    grade = options.scaledPossible ? `${options.scaledScore} / ${options.scaledPossible}` : '-'
   } else {
     grade = options.possible ? options.percentage : '–'
   }
@@ -131,10 +133,11 @@ function render(options) {
 type Getters = {
   getTotalPointsPossible(): ReturnType<Gradebook['getTotalPointsPossible']>
   gradesAreWeighted: ReturnType<Gradebook['weightedGrades']>
-  getGradingStandard(): GradingScheme[]
+  getGradingStandard(): DeprecatedGradingScheme | null
   listInvalidAssignmentGroups(): ReturnType<Gradebook['listInvalidAssignmentGroups']>
   listHiddenAssignments(studentId: string): Assignment[]
   shouldShowPoints(): boolean
+  pointsBasedGradingSchemesFeatureEnabled(): boolean
 }
 
 export default class TotalGradeCellFormatter {
@@ -142,12 +145,15 @@ export default class TotalGradeCellFormatter {
 
   constructor(gradebook: Gradebook) {
     this.options = {
+      pointsBasedGradingSchemesFeatureEnabled(): boolean {
+        return gradebook.pointsBasedGradingSchemesFeatureEnabled()
+      },
       getTotalPointsPossible() {
         return gradebook.getTotalPointsPossible()
       },
       gradesAreWeighted: gradebook.weightedGrades(),
       getGradingStandard() {
-        return gradebook.options.grading_standard
+        return gradebook.getCourseGradingScheme()
       },
       listInvalidAssignmentGroups() {
         return gradebook.listInvalidAssignmentGroups()
@@ -173,8 +179,29 @@ export default class TotalGradeCellFormatter {
     possible = possible ? I18n.n(possible) : possible
 
     let letterGrade
-    if (grade.possible && this.options.getGradingStandard()) {
-      letterGrade = scoreToGrade(percentage, this.options.getGradingStandard())
+    const scheme = this.options.getGradingStandard()
+    if (grade.possible && scheme) {
+      letterGrade = scoreToGrade(percentage, scheme.data)
+    }
+
+    let displayAsScaledPoints = false
+    let scaledScore = NaN
+    let scaledPossible = NaN
+
+    if (this.options.pointsBasedGradingSchemesFeatureEnabled()) {
+      if (scheme) {
+        displayAsScaledPoints = scheme.pointsBased
+        const scalingFactor = scheme.scalingFactor
+
+        if (displayAsScaledPoints && grade.possible) {
+          scaledPossible = I18n.n(scalingFactor, {
+            precision: 1,
+          })
+          scaledScore = I18n.n(scoreToScaledPoints(grade.score, grade.possible, scalingFactor), {
+            precision: 1,
+          })
+        }
+      }
     }
 
     let warning
@@ -201,6 +228,9 @@ export default class TotalGradeCellFormatter {
       score: I18n.n(round(grade.score, round.DEFAULT)),
       showPointsNotPercent: this.options.shouldShowPoints(),
       warning,
+      displayAsScaledPoints,
+      scaledScore,
+      scaledPossible,
     }
 
     return render(options)
