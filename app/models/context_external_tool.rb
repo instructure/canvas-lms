@@ -881,11 +881,14 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
-  def standard_url
-    unless defined?(@standard_url)
-      @standard_url = url.present? && ContextExternalTool.standardize_url(url)
+  def standard_url(use_environment_overrides = false)
+    standard_url = url.present? && ContextExternalTool.standardize_url(url)
+
+    if use_environment_overrides
+      ContextExternalTool.standardize_url(url_with_environment_overrides(standard_url, include_launch_url: true))
+    else
+      standard_url
     end
-    @standard_url
   end
 
   # Does the tool match the host of the given url?
@@ -899,31 +902,33 @@ class ContextExternalTool < ActiveRecord::Base
   # in the domain. Rather than changing that method and
   # risking breaking Canvas flows, we introduced this
   # new method.
-  def matches_host?(url)
+  def matches_host?(url, use_environment_overrides: false)
     matches_tool_domain?(url) ||
-      (self.url.present? &&
-        Addressable::URI.parse(self.url)&.normalize&.host ==
+      (standard_url(use_environment_overrides).present? &&
+        Addressable::URI.parse(standard_url(use_environment_overrides))&.normalize&.host ==
           Addressable::URI.parse(url).normalize.host)
   end
 
-  def matches_url?(url, match_queries_exactly = true)
+  def matches_url?(url, match_queries_exactly = true, use_environment_overrides: false)
+    tool_url = standard_url(use_environment_overrides)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
-      return true if url == standard_url
-    elsif standard_url.present?
+      return true if url == tool_url
+    elsif tool_url.present?
       unless defined?(@url_params)
-        res = Addressable::URI.parse(standard_url)
+        res = Addressable::URI.parse(tool_url)
         @url_params = res.query.present? ? res.query.split("&") : []
       end
       res = Addressable::URI.parse(url).normalize
       res.query = res.query.split("&").select { |p| @url_params.include?(p) }.sort.join("&") if res.query.present?
       res.query = nil if res.query.blank?
       res.normalize!
-      return true if res.to_s == standard_url
+      return true if res.to_s == tool_url
     end
   end
 
-  def matches_tool_domain?(url)
+  def matches_tool_domain?(url, use_environment_overrides: false)
+    domain = use_environment_overrides ? domain_with_environment_overrides : self.domain
     return false if domain.blank?
 
     url = ContextExternalTool.standardize_url(url)
@@ -933,13 +938,14 @@ class ContextExternalTool < ActiveRecord::Base
     !!(host && ("." + host + (port ? ":#{port}" : "")).match(/\.#{d}\z/))
   end
 
-  def matches_domain?(url)
+  def matches_domain?(url, use_environment_overrides: false)
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).host
+    domain = use_environment_overrides ? domain_with_environment_overrides : self.domain
     if domain
       domain.casecmp?(host)
-    elsif standard_url
-      Addressable::URI.parse(standard_url).host == host
+    elsif standard_url(use_environment_overrides)
+      Addressable::URI.parse(standard_url(use_environment_overrides)).host == host
     else
       false
     end
@@ -1111,6 +1117,27 @@ class ContextExternalTool < ActiveRecord::Base
         ->(t) { t.matches_tool_domain?(url) },
         ->(t) { t.domain.present? }
       )
+
+      # repeat matches with environment-specific url and domain overrides
+      if ApplicationController.test_cluster? && Account.site_admin.feature_enabled?(:dynamic_lti_environment_overrides)
+        match ||= find_tool_match(
+          sorted_external_tools,
+          ->(t) { t.matches_url?(url, use_environment_overrides: true) },
+          ->(t) { t.url.present? }
+        )
+
+        match ||= find_tool_match(
+          sorted_external_tools,
+          ->(t) { t.matches_url?(url, false, use_environment_overrides: true) },
+          ->(t) { t.url.present? }
+        )
+
+        match ||= find_tool_match(
+          sorted_external_tools,
+          ->(t) { t.matches_tool_domain?(url, use_environment_overrides: true) },
+          ->(t) { t.domain.present? }
+        )
+      end
 
       # always use the preferred tool id *unless* the preferred tool is a 1.1 tool
       # and the matched tool is a 1.3 tool, since 1.3 is the preferred version of a tool
