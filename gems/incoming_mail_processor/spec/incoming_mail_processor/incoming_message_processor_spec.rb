@@ -94,6 +94,7 @@ module IncomingMailProcessor
     def expect_no_errors
       expect(error_reporter).not_to receive(:log_exception)
       expect(error_reporter).not_to receive(:log_error)
+      expect(CanvasErrors).not_to receive(:capture_exception)
     end
 
     describe ".configure" do
@@ -500,7 +501,7 @@ module IncomingMailProcessor
           expect(@mock_mailbox).to receive(:move_message).with(:foo, "errors_go_here")
           expect(@mock_mailbox).to receive(:each_message).and_yield(:foo, foo)
           expect(@mock_mailbox).to receive(:disconnect)
-          expect(error_reporter).to receive(:log_exception)
+          expect(CanvasErrors).to receive(:capture_exception)
             .with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
 
           IncomingMessageProcessor.new(message_handler, error_reporter).process
@@ -521,7 +522,8 @@ module IncomingMailProcessor
           expect(@mock_mailbox).to receive(:connect).ordered
           expect(@mock_mailbox).to receive(:disconnect).ordered
           expect(@mock_mailbox).to receive(:each_message).once
-          expect(error_reporter).to receive(:log_exception)
+
+          expect(CanvasErrors).to receive(:capture_exception)
             .with(IncomingMessageProcessor.error_report_category, kind_of(StandardError), anything)
 
           IncomingMessageProcessor.new(message_handler, error_reporter).process
@@ -602,7 +604,7 @@ module IncomingMailProcessor
           end
         end
 
-        expect(error_reporter).to receive(:log_exception).once
+        expect(CanvasErrors).to receive(:capture_exception).once
         IncomingMessageProcessor.new(message_handler, error_reporter).process
         expect(processed_second).to be_truthy
       end

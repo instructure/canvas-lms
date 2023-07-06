@@ -261,6 +261,7 @@ PATH
       activesupport (>= 3.2)
       aws-sdk-s3
       aws-sdk-sqs
+      canvas_errors
       html_text_helper
       inst_statsd
       mail (~> 2.7.1)
