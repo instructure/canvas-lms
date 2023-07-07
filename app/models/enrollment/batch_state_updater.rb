@@ -137,7 +137,7 @@ class Enrollment::BatchStateUpdater
         sis_batch.downloadable_attachments(:diffed).each do |attachment|
           file = attachment.open(integrity_check: true)
           csv = ::CSV.foreach(file.path, **SIS::CSV::CSVBaseImporter::PARSE_ARGS)
-          next unless SIS::CSV::EnrollmentImporter.enrollment_csv?(csv.peek.headers.map(&:downcase))
+          next unless csv.any? && SIS::CSV::EnrollmentImporter.enrollment_csv?(csv.peek.headers.map(&:downcase))
 
           csv.each_slice(1000) do |rows|
             active_rows = rows.select { |row| row["status"] == "active" }
