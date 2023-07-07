@@ -22,6 +22,7 @@ require_relative "../common"
 require_relative "../rcs/pages/rce_next_page"
 
 describe "as a student" do
+  specs_require_sharding
   include RCENextPage
   include_context "in-process server selenium tests"
 
