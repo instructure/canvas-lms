@@ -1187,10 +1187,11 @@ test_1,test_a,course
 
       process_csv_data([
                          %(course_id,user_id,role,status
-        A042,U1,Student,active
-        A042,U2,Student,active
-        A042,U3,Student,active
-        A042,U4,Student,active)
+                           A042,U1,Student,active
+                           A042,U2,Student,active
+                           A042,U3,Student,active
+                           A042,U4,Student,active),
+                         %(term_id,name,status)
                        ],
                        diffing_data_set_identifier: "default")
 
@@ -1203,10 +1204,11 @@ test_1,test_a,course
 
       create_csv_data([
                         %(course_id,user_id,role,status
-        A042,U1,Padawan,active
-        A042,U2,Padawan,active
-        A042,U3,Padawan,active
-        A042,U4,Padawan,active)
+                          A042,U1,Padawan,active
+                          A042,U2,Padawan,active
+                          A042,U3,Padawan,active
+                          A042,U4,Padawan,active),
+                        %(term_id,name,status)
                       ]) do |batch|
         batch.update(diffing_data_set_identifier: "default")
         batch.process_without_send_later
