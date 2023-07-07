@@ -169,7 +169,6 @@ export type SiteAdminFeatureId =
   | 'module_publish_menu'
   | 'explicit_latex_typesetting'
   | 'dev_key_oidc_alert'
-  | 'rce_new_external_tool_dialog_in_canvas'
   | 'media_links_use_attachment_id'
   | 'auto_subscribe_account_calendars'
   | 'permanent_page_links'
