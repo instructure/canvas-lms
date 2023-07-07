@@ -192,6 +192,22 @@ const CanvasInbox = () => {
     skip: isSubmissionCommentsType || scope === 'submission_comments',
   })
 
+  const {loading, data} = conversationsQuery
+
+  useEffect(() => {
+    if (loading) {
+      setOnSuccess(I18n.t('Loading inbox conversations'))
+    } else if (data) {
+      const searchResults = [...(data?.legacyNode?.conversationsConnection?.nodes ?? [])]
+      const successMessage =
+        searchResults.length > 0
+          ? I18n.t('%{count} Conversation messages loaded', {count: searchResults.length})
+          : I18n.t('No Conversation messages loaded')
+      setOnSuccess(successMessage)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, data])
+
   const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
     variables: {...commonQueryVariables, sort: 'desc'},
     fetchPolicy: 'cache-and-network',
