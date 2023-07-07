@@ -174,6 +174,10 @@ module Lti::Messages
 
     def add_lti1p1_claims!
       @message.lti1p1.user_id = @user&.lti_context_id
+      if associated_1_1_tool.present?
+        @message.lti1p1.oauth_consumer_key = associated_1_1_tool.consumer_key
+        @message.lti1p1.oauth_consumer_key_sign = Lti::Helpers::JwtMessageHelper.generate_oauth_consumer_key_sign(associated_1_1_tool, @message)
+      end
     end
 
     # Following the spec https://www.imsglobal.org/spec/lti/v1p3/migr#remapping-parameters
@@ -181,7 +185,9 @@ module Lti::Messages
     # platform MUST include the parameter and its LTI 1.1 value. Otherwise the
     # platform MAY omit that attribute.
     def include_lti1p1_claims?
-      @user&.lti_context_id && @user.lti_context_id != @user.lti_id
+      user_ids_differ = @user&.lti_context_id && @user.lti_context_id != @user.lti_id
+
+      user_ids_differ || associated_1_1_tool.present?
     end
 
     # Follows the spec at https://www.imsglobal.org/spec/lti-ags/v2p0/#assignment-and-grade-service-claim
@@ -205,6 +211,12 @@ module Lti::Messages
         else
           @expander.controller.lti_line_item_index_url(course_id: course_id_for_ags_url)
         end
+    end
+
+    def associated_1_1_tool
+      return nil unless Account.site_admin.feature_enabled?(:include_oauth_consumer_key_in_lti_launch)
+
+      @associated_1_1_tool ||= @tool&.associated_1_1_tool(@context, target_link_uri)
     end
 
     # Used to construct URLs for AGS endpoints like line item index, or line item show
