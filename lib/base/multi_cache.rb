@@ -24,7 +24,7 @@ class MultiCache
 
     def cache
       unless defined?(@multi_cache)
-        ha_cache_config = YAML.safe_load(DynamicSettings.find(tree: :private, cluster: Canvas.cluster)["ha_cache.yml"] || "{}").symbolize_keys || {}
+        ha_cache_config = YAML.safe_load(DynamicSettings.find(tree: :private, cluster: Canvas.cluster)["ha_cache.yml", failsafe_cache: Rails.root.join("config")] || "{}").symbolize_keys || {}
         @multi_cache = if ha_cache_config[:cache_store]
                          ha_cache_config[:url] = ha_cache_config[:servers] if ha_cache_config[:servers]
                          ActiveSupport::Cache.lookup_store(ha_cache_config[:cache_store].to_sym, ha_cache_config)

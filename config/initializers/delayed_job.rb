@@ -123,7 +123,7 @@ end
 module DelayedJobConfig
   class << self
     def config
-      @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["delayed_jobs.yml"] || "{}")
+      @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["delayed_jobs.yml", failsafe_cache: Rails.root.join("config")] || "{}")
     end
 
     def strands_to_send_to_statsd
@@ -132,6 +132,7 @@ module DelayedJobConfig
 
     def reload
       @config = @strands_to_send_to_statsd = nil
+      config
     end
     Canvas::Reloader.on_reload { DelayedJobConfig.reload }
   end
