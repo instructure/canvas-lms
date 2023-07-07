@@ -55,6 +55,7 @@ export const GRADEBOOK_QUERY = gql`
           submittedAt
           userId
           state
+          gradingPeriodId
         }
       }
       assignmentGroupsConnection {
@@ -89,7 +90,6 @@ export const GRADEBOOK_QUERY = gql`
               moderatedGrading: moderatedGradingEnabled
               postManually
               published
-              gradingPeriodId
               hasSubmittedSubmissions
             }
           }

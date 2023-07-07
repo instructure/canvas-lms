@@ -32,6 +32,7 @@ import userSettings from '@canvas/user-settings'
 import {
   AssignmentConnection,
   AssignmentDetailCalculationText,
+  AssignmentGradingPeriodMap,
   AssignmentGroupConnection,
   AssignmentSortContext,
   AssignmentSubmissionsMap,
@@ -54,7 +55,10 @@ import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
-export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupConnection[]): {
+export function mapAssignmentGroupQueryResults(
+  assignmentGroup: AssignmentGroupConnection[],
+  assignmentGradingPeriodMap: AssignmentGradingPeriodMap
+): {
   mappedAssignments: SortableAssignment[]
   mappedAssignmentGroupMap: AssignmentGroupCriteriaMap
 } {
@@ -62,15 +66,25 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
     (prev, curr) => {
       const assignments = curr.assignmentsConnection.nodes
       const mappedAssignments: SortableAssignment[] = assignments.map(assignment =>
-        mapToSortableAssignment(assignment, curr.position)
+        mapToSortableAssignment(
+          assignment,
+          curr.position,
+          assignmentGradingPeriodMap[assignment.id]
+        )
       )
       prev.mappedAssignments.push(...mappedAssignments)
+
+      const assignmentGroupGradingPeriods: string[] = []
 
       let totalGroupPoints = 0
       prev.mappedAssignmentGroupMap[curr.id] = {
         name: curr.name,
         assignments: curr.assignmentsConnection.nodes.map(assignment => {
           totalGroupPoints += assignment.pointsPossible
+          const currentAssignmentGradingPeriod = assignmentGradingPeriodMap[assignment.id]
+          if (currentAssignmentGradingPeriod) {
+            assignmentGroupGradingPeriods.push(currentAssignmentGradingPeriod)
+          }
           return {
             id: assignment.id,
             name: assignment.name,
@@ -88,6 +102,7 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
         integration_data: {}, // TODO: Get Data
         sis_source_id: null, // TODO: Get data
         invalid: totalGroupPoints === 0,
+        gradingPeriodsIds: _.uniq(assignmentGroupGradingPeriods),
       }
 
       return prev
@@ -99,18 +114,22 @@ export function mapAssignmentGroupQueryResults(assignmentGroup: AssignmentGroupC
   )
 }
 
-export function mapAssignmentSubmissions(
-  submissions: SubmissionConnection[]
-): AssignmentSubmissionsMap {
-  return submissions.reduce((submissionMap, submission) => {
+export function mapAssignmentSubmissions(submissions: SubmissionConnection[]): {
+  assignmentSubmissionsMap: AssignmentSubmissionsMap
+  assignmentGradingPeriodMap: AssignmentGradingPeriodMap
+} {
+  const assignmentGradingPeriodMap: AssignmentGradingPeriodMap = {}
+  const assignmentSubmissionsMap = submissions.reduce((submissionMap, submission) => {
     const {assignmentId, id: submissionId} = submission
     if (!submissionMap[assignmentId]) {
       submissionMap[assignmentId] = {}
+      assignmentGradingPeriodMap[assignmentId] = submission.gradingPeriodId
     }
 
     submissionMap[assignmentId][submissionId] = submission
     return submissionMap
   }, {} as AssignmentSubmissionsMap)
+  return {assignmentGradingPeriodMap, assignmentSubmissionsMap}
 }
 
 export function mapEnrollmentsToSortableStudents(
@@ -427,6 +446,13 @@ export function calculateGradesForStudent({
   )
 }
 
+export function showInvalidGroupWarning(
+  invalidAssignmentGroupsCount: number,
+  groupWeightingScheme?: string | null
+) {
+  return invalidAssignmentGroupsCount > 0 && groupWeightingScheme === 'percent'
+}
+
 function nonNumericGuard(value: number, message = 'No graded submissions'): string {
   return Number.isFinite(value) && !Number.isNaN(value) ? value.toString() : message
 }
@@ -440,7 +466,8 @@ function percentile(values: number[], percentileValue: number): number {
 
 function mapToSortableAssignment(
   assignment: AssignmentConnection,
-  assignmentGroupPosition: number
+  assignmentGroupPosition: number,
+  gradingPeriodId?: string | null
 ): SortableAssignment {
   // Used sort date logic from screenreader_gradebook_controller.js
   const sortableDueDate = assignment.dueAt ? +tz.parse(assignment.dueAt) / 1000 : Number.MAX_VALUE
@@ -449,5 +476,6 @@ function mapToSortableAssignment(
     sortableName: assignment.name.toLowerCase(),
     sortableDueDate,
     assignmentGroupPosition,
+    gradingPeriodId,
   }
 }

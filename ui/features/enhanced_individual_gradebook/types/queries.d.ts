@@ -59,7 +59,7 @@ export type AssignmentConnection = {
   moderatedGrading: boolean
   postManually: boolean
   published: boolean
-  gradingPeriodId?: string
+  gradingPeriodId?: string | null
   hasSubmittedSubmissions: boolean
 }
 
@@ -92,6 +92,7 @@ export type SubmissionConnection = {
   redoRequest: boolean
   submittedAt: Date | null
   userId: string
+  gradingPeriodId?: string
 }
 
 export type Attachment = {
