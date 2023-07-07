@@ -447,6 +447,7 @@ class CalendarEventsApiController < ApplicationController
         ActiveRecord::Associations.preload(calendar_events, [:context, :parent_event])
         ActiveRecord::Associations.preload(assignments, Api::V1::Assignment::PRELOADS)
         ActiveRecord::Associations.preload(assignments.map(&:context), %i[account grading_period_groups enrollment_term])
+        log_event_count(events.count)
 
         json = events.map do |event|
           subs = submissions[event.id] if submissions
@@ -1940,5 +1941,16 @@ class CalendarEventsApiController < ApplicationController
 
   def includes(keys = params[:include])
     (Array(keys) + DEFAULT_INCLUDES).uniq - (params[:excludes] || [])
+  end
+
+  def log_event_count(event_count)
+    # Sometimes the API returns more events than the per_page limit because an assignment
+    # event might have multiple assignment overrides, and overrides aren't counted toward
+    # the limit. We're tracking to see how often this happens.
+    per_page = Api.per_page_for(self)
+    if event_count > per_page
+      InstStatsd::Statsd.increment("calendar.events_api.per_page_exceeded.count")
+      InstStatsd::Statsd.count("calendar.events_api.per_page_exceeded.value", event_count)
+    end
   end
 end
