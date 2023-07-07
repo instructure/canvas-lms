@@ -18,8 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# rubocop:disable RSpec/FilePath
 describe AuthenticationProvider::Apple do
   it "allows login attribute to be set" do
     expect(described_class.recognized_params).to include(:login_attribute)
   end
+
+  it "allows jit_provisioning to be set" do
+    expect(described_class.recognized_params).to include(:jit_provisioning)
+  end
 end
+# rubocop:enable RSpec/FilePath
