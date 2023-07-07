@@ -76,7 +76,6 @@ export default function ShowNotesColumnCheckbox({
     if (!checked || !reorderCustomColumnsUrl || !customColumns) {
       return
     }
-
     executeApiRequest({
       method: 'POST',
       path: reorderCustomColumnsUrl,

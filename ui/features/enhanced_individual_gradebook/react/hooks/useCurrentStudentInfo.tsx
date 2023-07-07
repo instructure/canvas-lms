@@ -75,5 +75,10 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
     [setStudentSubmissions]
   )
 
-  return {currentStudent, studentSubmissions, loadingStudent: loading, updateSubmissionDetails}
+  return {
+    currentStudent,
+    studentSubmissions,
+    loadingStudent: loading,
+    updateSubmissionDetails,
+  }
 }

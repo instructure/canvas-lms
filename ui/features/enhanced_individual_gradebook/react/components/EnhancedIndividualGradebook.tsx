@@ -82,7 +82,7 @@ export default function EnhancedIndividualGradebook() {
 
   const selectedAssignment = assignments?.find(assignment => assignment.id === selectedAssignmentId)
   const submissionsMap = selectedAssignment ? assignmentSubmissionsMap[selectedAssignment.id] : {}
-  const submissionsForSelectedAssignment = Object.values(submissionsMap)
+  const submissionsForSelectedAssignment = Object.values(submissionsMap ?? {})
 
   const [gradebookOptions, setGradebookOptions] = useState<GradebookOptions>(
     gradebookOptionsSetup(ENV)
@@ -103,12 +103,13 @@ export default function EnhancedIndividualGradebook() {
     ? assignmentGroupMap[selectedAssignment?.assignmentGroupId]?.invalid
     : false
 
+  const [currentStudentHiddenName, setCurrentStudentHiddenName] = useState<string>('')
   useEffect(() => {
     if (!currentStudent || !students) {
       return
     }
     const hiddenName = students?.find(s => s.id === currentStudent.id)?.hiddenName
-    currentStudent.hiddenName = hiddenName ?? I18n.t('Student')
+    setCurrentStudentHiddenName(hiddenName ?? I18n.t('Student'))
   }, [currentStudent, students])
 
   useEffect(() => {
@@ -201,7 +202,6 @@ export default function EnhancedIndividualGradebook() {
     },
     [selectedStudentId, updateSubmissionDetails]
   )
-
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -270,6 +270,7 @@ export default function EnhancedIndividualGradebook() {
         gradebookOptions={gradebookOptions}
         loadingStudent={loadingStudent}
         onSubmissionSaved={handleSubmissionSaved}
+        currentStudentHiddenName={currentStudentHiddenName}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
@@ -280,6 +281,7 @@ export default function EnhancedIndividualGradebook() {
         assignmentGroupMap={assignmentGroupMap}
         gradebookOptions={gradebookOptions}
         studentNotesColumnId={studentNotesColumnId}
+        currentStudentHiddenName={currentStudentHiddenName}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

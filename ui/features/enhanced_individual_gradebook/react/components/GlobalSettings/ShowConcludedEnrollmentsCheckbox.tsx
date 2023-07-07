@@ -66,7 +66,6 @@ export default function ShowConcludedEnrollmentsCheckbox({
       <View
         as="div"
         className="checkbox"
-        data-testid="show-concluded-enrollments-checkbox"
         margin="x-small 0"
         borderRadius="medium"
         background="primary"
@@ -78,6 +77,7 @@ export default function ShowConcludedEnrollmentsCheckbox({
           label={I18n.t('Show Concluded Enrollments')}
           checked={showConcludedEnrollments}
           onChange={handleShowConcludedEnrollmentsChange}
+          data-testid="show-concluded-enrollments-checkbox"
         />
       </View>
     </ApplyTheme>

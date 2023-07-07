@@ -109,7 +109,7 @@ export default function AssignmentInformation({
           <View as="h2">Assignment Information</View>
         </View>
         <View as="div" className="span8">
-          <View as="h3" className="assignment_selection">
+          <View as="h3" className="assignment_selection" data-testid="assignment-information-name">
             <Link href={htmlUrl} isWithinText={false}>
               {assignment.name}
             </Link>

@@ -47,6 +47,7 @@ type Props = {
   courseId: string
   gradebookOptions: GradebookOptions
   loadingStudent: boolean
+  currentStudentHiddenName: string
   onSubmissionSaved: (submission: GradebookUserSubmissionDetails) => void
 }
 
@@ -57,6 +58,7 @@ export default function GradingResults({
   studentSubmissions,
   gradebookOptions,
   loadingStudent,
+  currentStudentHiddenName,
   onSubmissionSaved,
 }: Props) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
@@ -110,7 +112,6 @@ export default function GradingResults({
       error: submitScoreError,
     })
   }, [submitScoreStatus, savedSubmission, submitScoreError, handleGradeChange])
-
   if (!submission || !assignment || !currentStudent) {
     return (
       <>
@@ -165,10 +166,9 @@ export default function GradingResults({
             <View as="div">
               <View as="span">
                 <Text size="small">
-                  <View as="strong">{`${I18n.t('Grade for')} ${studentDisplayName(
-                    currentStudent,
-                    hideStudentNames
-                  )} - ${assignment.name}`}</View>
+                  <View as="strong">{`${I18n.t('Grade for')} ${
+                    hideStudentNames ? currentStudentHiddenName : currentStudent.name
+                  } - ${assignment.name}`}</View>
                 </Text>
                 <SubmissionStatus submission={submission} />
               </View>
