@@ -32,7 +32,7 @@ should already see a live_events block and it should already be configured prope
 If you don't see a live_events block, check the example file or copy this block:
 
 ```yml
-      live-events:
+      live_events.yml: |-
         aws_endpoint: http://kinesis:4567
         kinesis_stream_name: live-events
         aws_access_key_id: key
@@ -85,7 +85,7 @@ Note that these settings differ from the example block above. If you don't see a
 block, check the example file or copy this block:
 
 ```yml
-      live-events:
+      live_events.yml: |-
         aws_endpoint: http://kinesis.live-events-publish.docker
         kinesis_stream_name: live-events-local-test-stream
         aws_access_key_id: ACCESS_KEY
