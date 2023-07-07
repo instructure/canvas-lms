@@ -315,7 +315,6 @@ class RCEWrapper extends React.Component {
     const {
       new_math_equation_handling = false,
       rce_ux_improvements = false,
-      rce_new_external_tool_dialog_in_canvas = false,
       explicit_latex_typesetting = false,
       rce_transform_loaded_content = false,
       media_links_use_attachment_id = false,
@@ -324,7 +323,6 @@ class RCEWrapper extends React.Component {
     return {
       new_math_equation_handling,
       rce_ux_improvements,
-      rce_new_external_tool_dialog_in_canvas,
       explicit_latex_typesetting,
       rce_transform_loaded_content,
       media_links_use_attachment_id,
@@ -1429,17 +1427,13 @@ class RCEWrapper extends React.Component {
 
     const setupCallback = options.setup
 
-    const isOnCanvasDomain = window.origin === this.props.canvasOrigin
-
     const canvasPlugins = rcsExists
       ? [
           'instructure_links',
           'instructure_image',
           'instructure_documents',
           'instructure_equation',
-          !isOnCanvasDomain || this.props.features?.rce_new_external_tool_dialog_in_canvas
-            ? 'instructure_rce_external_tools'
-            : 'instructure_external_tools',
+          'instructure_rce_external_tools',
           'a11y_checker',
         ]
       : ['instructure_links']

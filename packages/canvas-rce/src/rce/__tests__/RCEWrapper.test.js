@@ -717,27 +717,19 @@ describe('RCEWrapper', () => {
       expect(options.plugins.indexOf('instructure_record')).toEqual(-1)
     })
 
-    it('instructure_rce_external_tools if enabled and rcs available', () => {
+    it('instructure_rce_external_tools if rcs available', () => {
       for (const rcsAvailable in [true, false]) {
-        for (const flagEnabled in [true, false]) {
-          for (const onCanvasDomain in [true, false]) {
-            const enabledPlugins = createBasicElement({
-              canvasOrigin: onCanvasDomain ? window.location.origin : 'https://nq.com',
-              trayProps: {
-                ...trayProps().trayProps,
-                ...(rcsAvailable ? {} : {jwt: null}),
-              },
-              features: {
-                rce_new_external_tool_dialog_in_canvas: flagEnabled,
-              },
-            }).wrapOptions().plugins
+        const enabledPlugins = createBasicElement({
+          trayProps: {
+            ...trayProps().trayProps,
+            ...(rcsAvailable ? {} : {jwt: null}),
+          },
+        }).wrapOptions().plugins
 
-            if (rcsAvailable && (flagEnabled || !onCanvasDomain)) {
-              expect(enabledPlugins).toContain('instructure_rce_external_tools')
-            } else {
-              expect(enabledPlugins).not.toContain('instructure_rce_external_tools')
-            }
-          }
+        if (rcsAvailable) {
+          expect(enabledPlugins).toContain('instructure_rce_external_tools')
+        } else {
+          expect(enabledPlugins).not.toContain('instructure_rce_external_tools')
         }
       }
     })
