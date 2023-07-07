@@ -75,6 +75,7 @@ export default function ShowTotalGradesAsPointsCheckbox({
           label={I18n.t('Show Totals as Points on Student Grade Page')}
           checked={showTotalGradeAsPoints}
           onChange={handleShowTotalGradeAsPointsChange}
+          data-testid="show-total-grade-as-points-checkbox"
         />
       </View>
     </ApplyTheme>

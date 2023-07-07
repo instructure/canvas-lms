@@ -99,6 +99,7 @@ export default function GradebookScoreExport({
             href={lastGeneratedCsvLink}
             isWithinText={false}
             margin="0 xx-small"
+            data-testid="gradebook-export-link"
           >
             {downloadText(lastGeneratedCsvLinkText)}
           </Link>

@@ -105,7 +105,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
       usersConnection(
         filter: {
           enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
-          enrollmentStates: [active, invited]
+          enrollmentStates: [active, invited, completed]
           userIds: $userIds
         }
       ) {

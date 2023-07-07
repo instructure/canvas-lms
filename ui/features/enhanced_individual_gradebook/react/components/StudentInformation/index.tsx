@@ -42,6 +42,7 @@ import {
 } from '../../../utils/gradebookUtils'
 import {GradingPeriodScores} from './GradingPeriodScores'
 import {AssignmentGroupScores} from './AssignmentGroupScores'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -51,6 +52,7 @@ type Props = {
   assignmentGroupMap: AssignmentGroupCriteriaMap
   studentNotesColumnId?: string | null
   gradebookOptions: GradebookOptions
+  currentStudentHiddenName: string
 }
 
 export default function StudentInformation({
@@ -59,6 +61,7 @@ export default function StudentInformation({
   gradebookOptions,
   student,
   submissions,
+  currentStudentHiddenName,
 }: Props) {
   const {
     customOptions: {
@@ -185,7 +188,6 @@ export default function StudentInformation({
   }
 
   const studentUrl = `${contextUrl}/grades/${student.id}`
-
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -193,11 +195,13 @@ export default function StudentInformation({
           <View as="h2">{I18n.t('Student Information')}</View>
         </View>
         <View as="div" className="span8">
-          <View as="h3" className="student_selection">
+          <View as="h3" className="student_selection" data-testid="student-information-name">
             {hideStudentNames ? (
-              <>{student.hiddenName}</>
+              currentStudentHiddenName
             ) : (
-              <a href={studentUrl}> {student.name}</a>
+              <Link isWithinText={false} href={studentUrl}>
+                {student.name}
+              </Link>
             )}
           </View>
 

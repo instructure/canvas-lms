@@ -20,16 +20,19 @@ import {MockedResponse} from '@apollo/react-testing'
 import {GRADEBOOK_QUERY, GRADEBOOK_STUDENT_QUERY} from '../../../queries/Queries'
 
 export const DEFAULT_ENV = {
-  GRADEBOOK_OPTIONS: {
-    active_grading_periods: [],
-    context_id: '1',
-    context_url: '/courses/1',
-    userId: '10',
-    course_settings: {},
-  },
+  active_grading_periods: [],
+  context_id: '1',
+  context_url: '/courses/1',
+  userId: '10',
+  course_settings: {},
 }
 
-const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
+export const setGradebookOptions = (gradebookOptions = {}) => {
+  const env = {GRADEBOOK_OPTIONS: {...DEFAULT_ENV, ...gradebookOptions}}
+  return env
+}
+
+const GRADEBOOK_QUERY_MOCK_RESPONSE = {
   data: {
     course: {
       assignmentGroupsConnection: {
@@ -44,6 +47,7 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
                 {
                   id: '1',
                   name: 'Missing Assignment 1',
+                  gradingPeriodId: '1',
                 },
               ],
             },
@@ -58,14 +62,86 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
               name: 'Test User 1',
               sortableName: 'User 1, Test',
             },
+            course_section_id: '1',
+            state: 'active',
           },
         ],
       },
       submissionsConnection: {
-        nodes: [],
+        nodes: [
+          {
+            grade: '68',
+            id: '13',
+            score: 68.0,
+            assignmentId: '1',
+            redoRequest: false,
+            submittedAt: '2023-06-01T00:19:23-06:00',
+            userId: '5',
+            state: 'submitted',
+            __typename: 'Submission',
+          },
+        ],
       },
       sectionsConnection: {
         nodes: [],
+      },
+    },
+  },
+}
+
+const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
+  data: {
+    course: {
+      usersConnection: {
+        nodes: [
+          {
+            enrollments: [
+              {
+                id: '7',
+                grades: {
+                  unpostedCurrentGrade: 'D-',
+                  unpostedCurrentScore: 61.0,
+                  unpostedFinalGrade: 'F',
+                  unpostedFinalScore: 58.1,
+                  __typename: 'Grades',
+                },
+                section: {
+                  id: '2',
+                  name: 'English',
+                  __typename: 'Section',
+                },
+                __typename: 'Enrollment',
+              },
+            ],
+            id: '5',
+            loginId: 'rohanchugh',
+            name: 'Rohan Chugh',
+            __typename: 'User',
+          },
+        ],
+        __typename: 'UserConnection',
+      },
+      submissionsConnection: {
+        nodes: [
+          {
+            grade: '68',
+            id: '13',
+            score: 68.0,
+            enteredScore: 68.0,
+            assignmentId: '1',
+            submissionType: 'online_text_entry',
+            submittedAt: '2023-06-01T00:19:23-06:00',
+            state: 'submitted',
+            proxySubmitter: null,
+            excused: false,
+            late: true,
+            latePolicyStatus: null,
+            missing: false,
+            userId: '5',
+            cachedDueDate: '2023-05-12T23:59:59-06:00',
+            gradingPeriodId: '1',
+          },
+        ],
       },
     },
   },
@@ -78,19 +154,17 @@ export const setupGraphqlMocks = (overrides: MockedResponse[] = []): MockedRespo
         query: GRADEBOOK_QUERY,
         variables: {courseId: '1'},
       },
-      result: GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE,
+      result: GRADEBOOK_QUERY_MOCK_RESPONSE,
     },
     {
       request: {
         query: GRADEBOOK_STUDENT_QUERY,
         variables: {
           courseId: '1',
-          userIds: null,
+          userIds: '5',
         },
       },
-      result: {
-        data: null,
-      },
+      result: GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE,
     },
     ...overrides,
   ]

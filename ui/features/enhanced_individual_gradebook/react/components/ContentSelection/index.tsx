@@ -62,7 +62,6 @@ export default function ContentSelection({
     selectedSection,
     customOptions: {showConcludedEnrollments},
   } = gradebookOptions
-
   const {studentDropdownOptions} = useUserDropdownOptions({
     students,
     selectedSection,
@@ -165,6 +164,7 @@ export default function ContentSelection({
             className="student_select"
             onChange={handleChangeStudent}
             value={studentDropdownOptions[selectedStudentIndex]?.id}
+            data-testid="content-selection-student-select"
           >
             {studentDropdownOptions.map(option => (
               <option key={option.id} value={option.id}>
@@ -212,6 +212,7 @@ export default function ContentSelection({
             className="assignment_select"
             onChange={handleChangeAssignment}
             value={assignmentDropdownOptions[selectedAssignmentIndex]?.id}
+            data-testid="content-selection-assignment-select"
           >
             {assignmentDropdownOptions.map(option => (
               <option key={option.id} value={option.id}>

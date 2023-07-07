@@ -76,6 +76,7 @@ export default function AllowFinalGradeOverrideCheckbox({
           label={I18n.t('Allow Final Grade Override')}
           checked={allowFinalGradeOverride}
           onChange={handleAllowFinalGradeOverrideChange}
+          data-testid="allow-final-grade-override-checkbox"
         />
       </View>
     </ApplyTheme>

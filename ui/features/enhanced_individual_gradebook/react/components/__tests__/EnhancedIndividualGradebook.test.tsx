@@ -19,23 +19,58 @@
 import React from 'react'
 import axios from 'axios'
 import {MockedProvider} from '@apollo/react-testing'
-import {render, within} from '@testing-library/react'
-import {DEFAULT_ENV, setupGraphqlMocks} from './fixtures'
+import {render, within, fireEvent} from '@testing-library/react'
+import {setGradebookOptions, setupGraphqlMocks} from './fixtures'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import EnhancedIndividualGradebook from '../EnhancedIndividualGradebook'
+import userSettings from '@canvas/user-settings'
+import {GradebookSortOrder} from '../../../types/gradebook.d'
+import * as ReactRouterDom from 'react-router-dom'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {executeApiRequest} from '@canvas/util/apiRequest'
 
 jest.mock('axios') // mock axios for final grade override helper API call
+jest.mock('@canvas/do-fetch-api-effect', () => jest.fn()) // mock doFetchApi for final grade override helper API call
+jest.mock('@canvas/util/apiRequest', () => ({
+  executeApiRequest: jest.fn(),
+}))
 const mockedAxios = axios as jest.Mocked<typeof axios>
+const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof executeApiRequest>
+const mockUserSettings = (mockGet = true) => {
+  if (mockGet) {
+    jest.spyOn(userSettings, 'contextGet').mockImplementation(input => {
+      switch (input) {
+        case 'sort_grade_columns_by':
+          return {sortType: GradebookSortOrder.DueDate}
+        case 'gradebook_current_grading_period':
+          return '1'
+        case 'hide_student_names':
+          return true
+      }
+    })
+  }
+  const mockedContextSet = jest.spyOn(userSettings, 'contextSet')
+  return {mockedContextSet}
+}
+
+const mockSearchParams = (defaultSearchParams = {}) => {
+  const setSearchParamsMock = jest.fn()
+  const searchParamsMock = new URLSearchParams(defaultSearchParams)
+  jest
+    .spyOn(ReactRouterDom, 'useSearchParams')
+    .mockReturnValue([searchParamsMock, setSearchParamsMock])
+  return {searchParamsMock, setSearchParamsMock}
+}
 
 describe('Enhanced Individual Gradebook', () => {
   beforeEach(() => {
-    ;(window.ENV as any) = DEFAULT_ENV
+    ;(window.ENV as any) = setGradebookOptions()
     mockedAxios.get.mockResolvedValue({
       data: [],
     })
   })
-
   afterEach(() => {
+    jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
     jest.resetAllMocks()
   })
 
@@ -123,51 +158,308 @@ describe('Enhanced Individual Gradebook', () => {
       ).toBeInTheDocument()
     })
 
-    it('renders page with preselected options', () => {
-      /**
-       * Global Settings
-       * preselected section dropdown value from local storage
-       * preseleected grading period dropdown value from local storage
-       * preselcted sort assignments value from local storage
-       * checkboxes are shown with default values
-       *
-       * Content Selection
-       * preselected student dropdwon from query param
-       * preselected assignment dropdown from query param
-       *
-       * Grading
-       * check for text `Grade for {studentName}`
-       *
-       * Student Information
-       * check for Student Name in link text (data-testid)
-       *
-       * Assignment Information
-       * check for Assignment Name in link text (data-testid)
-       */
+    it('renders page with preselected options', async () => {
+      mockUserSettings()
+      ;(window.ENV as any) = setGradebookOptions({
+        grading_period_set: {
+          grading_periods: [
+            {
+              id: '1',
+              title: 'Grading Period 1',
+            },
+          ],
+        },
+        course_settings: {
+          allow_final_grade_override: true,
+        },
+        save_view_ungraded_as_zero_to_server: true,
+        settings: {
+          view_ungraded_as_zero: 'true',
+          show_concluded_enrollments: 'true',
+        },
+        teacher_notes: {
+          hidden: false,
+        },
+        show_total_grade_as_points: true,
+        grades_are_weighted: false,
+        final_grade_override_enabled: true,
+        gradebook_csv_progress: {
+          progress: {
+            updated_at: '2023-06-07T12:34:14-06:00',
+          },
+        },
+        attachment_url: 'https://www.testattachment.com/attachment',
+      })
+      mockSearchParams({student: '5', assignment: '1'})
+      // dropdowns
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      const sortSelect = getByTestId('sort-select')
+      expect(sortSelect).toBeInTheDocument()
+      expect(sortSelect).toHaveTextContent('By Due Date')
+
+      const gradingPeriodSelect = getByTestId('grading-period-select')
+      expect(gradingPeriodSelect).toBeInTheDocument()
+      expect(gradingPeriodSelect).toHaveTextContent('Grading Period 1')
+
+      // checkboxes
+      const includeUngradedCheckbox = getByTestId('include-ungraded-assignments-checkbox')
+      expect(includeUngradedCheckbox).toBeInTheDocument()
+      expect(includeUngradedCheckbox).toBeChecked()
+
+      const hideStudentNamesCheckbox = getByTestId('hide-student-names-checkbox')
+      expect(hideStudentNamesCheckbox).toBeInTheDocument()
+      expect(hideStudentNamesCheckbox).toBeChecked()
+
+      const showConcludedEnrollmentsCheckbox = getByTestId('show-concluded-enrollments-checkbox')
+      expect(showConcludedEnrollmentsCheckbox).toBeInTheDocument()
+      expect(showConcludedEnrollmentsCheckbox).toBeChecked()
+
+      const showNotesColumnCheckbox = getByTestId('show-notes-column-checkbox')
+      expect(showNotesColumnCheckbox).toBeInTheDocument()
+      expect(showNotesColumnCheckbox).toBeChecked()
+
+      const allowFinalGradeOverrideCheckbox = getByTestId('allow-final-grade-override-checkbox')
+      expect(allowFinalGradeOverrideCheckbox).toBeInTheDocument()
+      expect(allowFinalGradeOverrideCheckbox).toBeChecked()
+
+      const showTotalGradeAsPointsCheckbox = getByTestId('show-total-grade-as-points-checkbox')
+      expect(showTotalGradeAsPointsCheckbox).toBeInTheDocument()
+      expect(showTotalGradeAsPointsCheckbox).toBeChecked()
+
+      const gradebookExportLink = getByTestId('gradebook-export-link')
+      expect(gradebookExportLink).toBeInTheDocument()
+      expect(gradebookExportLink).toHaveAttribute(
+        'href',
+        'https://www.testattachment.com/attachment'
+      )
+      expect(gradebookExportLink).toHaveTextContent('Download Scores Generated on')
+
+      // content selection query params
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const contentSelectionStudent = getByTestId('content-selection-student')
+      expect(contentSelectionStudent).toBeInTheDocument()
+      expect(within(contentSelectionStudent).getByText('Student 1')).toBeInTheDocument()
+
+      const contentSelectionAssignment = getByTestId('content-selection-assignment')
+      expect(contentSelectionAssignment).toBeInTheDocument()
+      expect(
+        within(contentSelectionAssignment).getByText('Missing Assignment 1')
+      ).toBeInTheDocument()
+
+      // grading results
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const gradingResults = getByTestId('grading-results')
+      expect(gradingResults).toBeInTheDocument()
+      expect(
+        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 1')
+      ).toBeInTheDocument()
+
+      // student information
+      const studentInformationName = getByTestId('student-information-name')
+      expect(studentInformationName).toBeInTheDocument()
+      expect(within(studentInformationName).getByText('Student 1')).toBeInTheDocument()
+
+      // assignment information
+      const assignmentInformationName = getByTestId('assignment-information-name')
+      expect(assignmentInformationName).toBeInTheDocument()
+      expect(
+        within(assignmentInformationName).getByText('Missing Assignment 1')
+      ).toBeInTheDocument()
     })
   })
 
   describe('student dropdown handler tests', () => {
-    it('should change student query param when student dropdown is changed to valid student', () => {})
-
-    it('should remove student query param when no student is selected', () => {})
-
-    it('should change assignment query param when student dropdown is changed to valid assingment', () => {})
-
-    it('should remove assignment query param when no assignment is selected', () => {})
+    it('should change student query param when student dropdown is changed to valid student', async () => {
+      const {searchParamsMock, setSearchParamsMock} = mockSearchParams()
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(searchParamsMock.get('student')).toBe(null)
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const contentSelectionStudent = getByTestId('content-selection-student-select')
+      expect(contentSelectionStudent).toBeInTheDocument()
+      fireEvent.change(contentSelectionStudent, {target: {value: '5'}})
+      expect(searchParamsMock.get('student')).toBe('5')
+      expect(setSearchParamsMock).toHaveBeenCalledWith(searchParamsMock)
+    })
+    it('should remove student query param when no student is selected', async () => {
+      const {searchParamsMock, setSearchParamsMock} = mockSearchParams({student: '5'})
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(searchParamsMock.get('student')).toBe('5')
+      const contentSelectionStudent = getByTestId('content-selection-student-select')
+      fireEvent.change(contentSelectionStudent, {target: {value: '-1'}})
+      expect(searchParamsMock.get('student')).toBe(null)
+      expect(setSearchParamsMock).toHaveBeenCalledWith(searchParamsMock)
+    })
+    it('should change assignment query param when assignment dropdown is changed to valid assingment', async () => {
+      const {searchParamsMock, setSearchParamsMock} = mockSearchParams()
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(searchParamsMock.get('assignment')).toBe(null)
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const contentSelectionAssignment = getByTestId('content-selection-assignment-select')
+      expect(contentSelectionAssignment).toBeInTheDocument()
+      fireEvent.change(contentSelectionAssignment, {target: {value: '1'}})
+      expect(searchParamsMock.get('assignment')).toBe('1')
+      expect(setSearchParamsMock).toHaveBeenCalledWith(searchParamsMock)
+    })
+    it('should remove assignment query param when no assignment is selected', async () => {
+      const {searchParamsMock, setSearchParamsMock} = mockSearchParams({assignment: '1'})
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(searchParamsMock.get('assignment')).toBe('1')
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const contentSelectionAssignment = getByTestId('content-selection-assignment-select')
+      expect(contentSelectionAssignment).toBeInTheDocument()
+      fireEvent.change(contentSelectionAssignment, {target: {value: '-1'}})
+      expect(searchParamsMock.get('assignment')).toBe(null)
+      expect(setSearchParamsMock).toHaveBeenCalledWith(searchParamsMock)
+    })
   })
 
   describe('global settings checkbox handler tests', () => {
-    it('sets local storage when "View Ungraded as 0" checkbox is checked', () => {})
+    it('sets local storage when "View Ungraded as 0" checkbox is checked', async () => {
+      const {mockedContextSet} = mockUserSettings(false)
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const viewUngradedAsZeroCheckbox = getByTestId('include-ungraded-assignments-checkbox')
+      expect(viewUngradedAsZeroCheckbox).not.toBeChecked()
+      expect(viewUngradedAsZeroCheckbox).toBeInTheDocument()
+      fireEvent.click(viewUngradedAsZeroCheckbox)
+      expect(mockedContextSet).toHaveBeenCalledWith('include_ungraded_assignments', true)
+      expect(viewUngradedAsZeroCheckbox).toBeChecked()
+    })
 
-    it('makes api call when "View Ungraded as 0" checkbox is checked & save-view-ungraded-as-zero-to-server is true', () => {})
+    it('makes api call when "View Ungraded as 0" checkbox is checked & save-view-ungraded-as-zero-to-server is true', async () => {
+      ;(window.ENV as any) = setGradebookOptions({save_view_ungraded_as_zero_to_server: true})
+      mockUserSettings(false)
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const viewUngradedAsZeroCheckbox = getByTestId('include-ungraded-assignments-checkbox')
+      expect(viewUngradedAsZeroCheckbox).not.toBeChecked()
+      expect(viewUngradedAsZeroCheckbox).toBeInTheDocument()
+      fireEvent.click(viewUngradedAsZeroCheckbox)
+      expect(doFetchApi).toHaveBeenCalledWith({
+        body: {
+          gradebook_settings: {
+            view_ungraded_as_zero: 'true',
+          },
+        },
+        method: 'PUT',
+        path: '/api/v1/courses/1/gradebook_settings',
+      })
+      expect(viewUngradedAsZeroCheckbox).toBeChecked()
+    })
 
-    it('sets local storage when "Hide Student Names" checkbox is checked', () => {})
+    it('sets local storage when "Hide Student Names" checkbox is checked', async () => {
+      const {mockedContextSet} = mockUserSettings(false)
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const hideStudentNamesCheckbox = getByTestId('hide-student-names-checkbox')
+      expect(hideStudentNamesCheckbox).not.toBeChecked()
+      expect(hideStudentNamesCheckbox).toBeInTheDocument()
+      fireEvent.click(hideStudentNamesCheckbox)
+      expect(mockedContextSet).toHaveBeenCalledWith('hide_student_names', true)
+      expect(hideStudentNamesCheckbox).toBeChecked()
+    })
 
-    it('makes api call when "Show Concluded Enrollments" checkbox is checked', () => {})
+    it('makes api call when "Show Concluded Enrollments" checkbox is checked', async () => {
+      ;(window.ENV as any) = setGradebookOptions({
+        settings_update_url: 'http://canvas.docker/api/v1/courses/2/gradebook_settings',
+      })
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const showConcludedEnrollmentsCheckbox = getByTestId('show-concluded-enrollments-checkbox')
+      expect(showConcludedEnrollmentsCheckbox).not.toBeChecked()
+      expect(showConcludedEnrollmentsCheckbox).toBeInTheDocument()
+      fireEvent.click(showConcludedEnrollmentsCheckbox)
+      expect(doFetchApi).toHaveBeenCalledWith({
+        body: {
+          gradebook_settings: {
+            show_concluded_enrollments: 'true',
+          },
+        },
+        method: 'PUT',
+        path: 'http://canvas.docker/api/v1/courses/2/gradebook_settings',
+      })
+      expect(showConcludedEnrollmentsCheckbox).toBeChecked()
+    })
 
-    it('makes api call when "Show Notes in Student Info" checkbox is checked', () => {})
+    it('makes api call when "Show Notes in Student Info" checkbox is checked', async () => {
+      ;(window.ENV as any) = setGradebookOptions({
+        custom_column_url: 'http://canvas.docker/api/v1/courses/2/custom_gradebook_columns/:id',
+        custom_columns_url: 'http://canvas.docker/api/v1/courses/2/custom_gradebook_columns',
+        reorder_custom_columns_url:
+          'http://canvas.docker/api/v1/courses/2/custom_gradebook_columns/reorder',
+        teacher_notes: {
+          hidden: true,
+          id: '1',
+          position: 1,
+          read_only: false,
+          teacher_notes: true,
+          title: 'Notes',
+        },
+      })
+      mockedExecuteApiRequest.mockResolvedValue({
+        data: [
+          {
+            hidden: true,
+            id: '1',
+            position: 1,
+            read_only: false,
+            teacher_notes: true,
+            title: 'Notes',
+          },
+        ],
+        status: 200,
+      })
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const showNotesInStudentInfoCheckbox = getByTestId('show-notes-column-checkbox')
+      expect(showNotesInStudentInfoCheckbox).not.toBeChecked()
+      expect(showNotesInStudentInfoCheckbox).toBeInTheDocument()
+      fireEvent.click(showNotesInStudentInfoCheckbox)
+      expect(executeApiRequest).toHaveBeenCalledWith({
+        method: 'GET',
+        path: 'http://canvas.docker/api/v1/courses/2/custom_gradebook_columns',
+      })
+      expect(executeApiRequest).toHaveBeenCalledWith({
+        body: {
+          column: {
+            hidden: false,
+          },
+        },
+        method: 'PUT',
+        path: 'http://canvas.docker/api/v1/courses/2/custom_gradebook_columns/1',
+      })
+      expect(executeApiRequest).toHaveBeenCalledWith({
+        body: {
+          order: [1],
+        },
+        method: 'POST',
+        path: 'http://canvas.docker/api/v1/courses/2/custom_gradebook_columns/reorder',
+      })
+    })
 
-    it('makes api call when "Allow Final Grade Override" checkbox is checked', () => {})
+    it('makes api call when "Allow Final Grade Override" checkbox is checked', async () => {
+      ;(window.ENV as any) = setGradebookOptions({
+        final_grade_override_enabled: true,
+      })
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      const allowFinalGradeOverrideCheckbox = getByTestId('allow-final-grade-override-checkbox')
+      expect(allowFinalGradeOverrideCheckbox).not.toBeChecked()
+      expect(allowFinalGradeOverrideCheckbox).toBeInTheDocument()
+      fireEvent.click(allowFinalGradeOverrideCheckbox)
+      expect(mockedExecuteApiRequest).toHaveBeenCalledWith({
+        body: {
+          allow_final_grade_override: true,
+        },
+        method: 'PUT',
+        path: '/api/v1/courses/1/settings',
+      })
+      expect(allowFinalGradeOverrideCheckbox).toBeChecked()
+    })
   })
 })
