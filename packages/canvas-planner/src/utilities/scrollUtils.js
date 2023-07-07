@@ -42,8 +42,7 @@ function isWheelDownEvent(e) {
   return e.deltaY > 0
 }
 
-function handleScrollAttempt(cb, e) {
-  e.preventDefault()
+function handleScrollAttempt(cb, _e) {
   cb()
 }
 
@@ -75,7 +74,7 @@ function handleWindowTouchMove(pastCb, futureCb, wind, e) {
     futureCb()
   }
 }
-function handleTouchEnd(e) {
+function handleTouchEnd(_e) {
   ongoingTouch = null
 }
 
@@ -111,7 +110,7 @@ export function registerScrollEvents({
   scrollIntoPast: scrollIntoPastCb,
   scrollIntoFuture: scrollIntoFutureCb,
   scrollPositionChange: scrollCb,
-  window: wind
+  window: wind,
 }) {
   wind = wind || window
   const boundWindowWheel = handleWindowWheel.bind(

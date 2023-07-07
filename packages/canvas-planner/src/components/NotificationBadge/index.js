@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import MissingIndicator from './MissingIndicator'
-import {NewActivityIndicator} from './NewActivityIndicator'
+import AnimatableNewActivityIndicator from './NewActivityIndicator'
 import {sizeShape} from '../plannerPropTypes'
 import buildStyle from './style'
 
@@ -57,4 +57,4 @@ export default class NotificationBadge extends React.Component {
   }
 }
 
-export {MissingIndicator, NewActivityIndicator, NotificationBadge}
+export {MissingIndicator, AnimatableNewActivityIndicator as NewActivityIndicator, NotificationBadge}

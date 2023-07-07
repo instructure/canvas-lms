@@ -26,11 +26,11 @@ function createMockWindow(opts) {
     document: {
       documentElement: {
         clientHeight: 42,
-        getBoundingClientRect: () => ({bottom: 42})
-      }
+        getBoundingClientRect: () => ({bottom: 42}),
+      },
     },
     callbacks,
-    ...opts
+    ...opts,
   }
 }
 
@@ -46,7 +46,7 @@ function mockRegister() {
     scrollIntoPast: pastCb,
     scrollIntoFuture: futureCb,
     scrollPositionChange,
-    callbacks
+    callbacks,
   })
   return {wind, pastCb, futureCb, scrollPositionChange}
 }
@@ -63,20 +63,16 @@ describe('wheel events', () => {
   describe('scrolling into the past', () => {
     it('invokes the callback and preventDefault when a wheel event happens at the top of the page', () => {
       const {wind, pastCb} = mockRegister()
-      const mockPreventDefault = jest.fn()
       const wheelHandler = wind.callbacks.wheel
-      wheelHandler({deltaY: -42, preventDefault: mockPreventDefault})
-      expect(mockPreventDefault).toHaveBeenCalled()
+      wheelHandler({deltaY: -42})
       expect(pastCb).toHaveBeenCalled()
     })
 
     it('does not invoke the callback when the window is not scrolled to the top', () => {
       const {wind, pastCb} = mockRegister()
       wind.pageYOffset = 42
-      const mockPreventDefault = jest.fn()
       const wheelHandler = wind.callbacks.wheel
-      wheelHandler({deltaY: -42, preventDefault: mockPreventDefault})
-      expect(mockPreventDefault).not.toHaveBeenCalled()
+      wheelHandler({deltaY: -42})
       expect(pastCb).not.toHaveBeenCalled()
     })
   })
@@ -84,30 +80,24 @@ describe('wheel events', () => {
   describe('scrolling into the future', () => {
     it('invokes the callback and preventDefault when a wheel event happens at the bottom of the page', () => {
       const {wind, futureCb} = mockRegister()
-      const mockPreventDefault = jest.fn()
       const wheelHandler = wind.callbacks.wheel
-      wheelHandler({deltaY: 42, preventDefault: mockPreventDefault})
-      expect(mockPreventDefault).toHaveBeenCalled()
+      wheelHandler({deltaY: 42})
       expect(futureCb).toHaveBeenCalled()
     })
 
     it('invokes the callback and preventDefault when the document is shorter than the window', () => {
       const {wind, futureCb} = mockRegister()
       wind.document.documentElement.getBoundingClientRect = () => ({bottom: 15})
-      const mockPreventDefault = jest.fn()
       const wheelHandler = wind.callbacks.wheel
-      wheelHandler({deltaY: 42, preventDefault: mockPreventDefault})
-      expect(mockPreventDefault).toHaveBeenCalled()
+      wheelHandler({deltaY: 42})
       expect(futureCb).toHaveBeenCalled()
     })
 
     it('does not invoke the callback when the window is not scrolled to the bottom', () => {
       const {wind, futureCb} = mockRegister()
       wind.document.documentElement.getBoundingClientRect = () => ({bottom: 100})
-      const mockPreventDefault = jest.fn()
       const wheelHandler = wind.callbacks.wheel
-      wheelHandler({deltaY: 42, preventDefault: mockPreventDefault})
-      expect(mockPreventDefault).not.toHaveBeenCalled()
+      wheelHandler({deltaY: 42})
       expect(futureCb).not.toHaveBeenCalled()
     })
   })
@@ -190,7 +180,7 @@ describe('scroll events', () => {
       window: mockWindow,
       scrollIntoPast: jest.fn(),
       scrollIntoFuture: jest.fn(),
-      scrollPositionChange: mockScrollCb
+      scrollPositionChange: mockScrollCb,
     })
 
     mockWindow.pageYOffset = 42
