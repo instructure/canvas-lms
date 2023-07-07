@@ -63,15 +63,13 @@ exports[`renders an indicator 1`] = `
   <div
     className="NotificationBadge-styles__activityIndicator NotificationBadge-styles__hasBadge"
   >
-    <NewActivityIndicator
-      deregisterAnimatable={[Function]}
+    <Animatable(NewActivityIndicator)
       itemIds={
         Array [
           "first",
           "second",
         ]
       }
-      registerAnimatable={[Function]}
       title="blah"
     />
   </div>

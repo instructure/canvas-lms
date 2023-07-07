@@ -139,7 +139,7 @@ it('renders an activity notification when there is new activity', () => {
   const props = getDefaultProps()
   props.items[1].newActivity = true
   const wrapper = shallow(<Grouping {...props} />)
-  const nai = wrapper.find('NewActivityIndicator')
+  const nai = wrapper.find('Animatable(NewActivityIndicator)')
   expect(nai).toHaveLength(1)
   expect(nai.prop('title')).toBe(props.title)
 })
@@ -149,7 +149,7 @@ it('does not render an activity notification when layout is not large', () => {
   props.items[1].newActivity = true
   props.responsiveSize = 'medium'
   const wrapper = shallow(<Grouping {...props} />)
-  const nai = wrapper.find('NewActivityIndicator')
+  const nai = wrapper.find('Animatable(NewActivityIndicator)')
   expect(nai).toHaveLength(0)
 })
 
@@ -186,7 +186,7 @@ it('renders the to do title when there is no course', () => {
   props.title = null
   props.items[1].newActivity = true
   const wrapper = shallow(<Grouping {...props} />)
-  expect(wrapper.find('NewActivityIndicator').prop('title')).toBe('To Do')
+  expect(wrapper.find('Animatable(NewActivityIndicator)').prop('title')).toBe('To Do')
 })
 
 it('does not render an activity badge when things have no new activity', () => {
