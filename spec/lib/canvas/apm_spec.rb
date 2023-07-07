@@ -40,6 +40,7 @@ describe Canvas::Apm do
   describe "settings parsing" do
     describe "analytics setting" do
       it "is true for bool string" do
+        Canvas::Apm.reset!
         inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0\napp_analytics_enabled: true")
         expect(Canvas::Apm.config["app_analytics_enabled"]).to be(true)
         expect(Canvas::Apm).to be_analytics_enabled
