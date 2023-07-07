@@ -48,10 +48,6 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
 
     submission = find_submission(input[:submission_id])
 
-    file_ids = (input[:file_ids] || []).compact.uniq
-    attachments = get_and_verify_attachments!(file_ids)
-    verify_allowed_extensions!(submission.assignment, attachments)
-
     submission_draft = SubmissionDraft.where(
       submission:,
       submission_attempt: input[:attempt] || (submission.attempt + 1)
@@ -81,6 +77,9 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     when "online_text_entry"
       submission_draft.body = input[:body]
     when "online_upload"
+      file_ids = (input[:file_ids] || []).compact.uniq
+      attachments = get_and_verify_attachments!(file_ids)
+      verify_allowed_extensions!(submission.assignment, attachments)
       submission_draft.attachments = attachments
     when "online_url"
       submission_draft.url = input[:url]
@@ -129,25 +128,30 @@ def find_submission(submission_id)
 end
 
 def get_and_verify_attachments!(file_ids)
-  attachment_ids = get_attachment_ids(file_ids)
-
-  validate_file_ids!(file_ids, attachment_ids)
-  attachments = Attachment.active.where(id: attachment_ids)
-
-  attachments.each do |attachment|
-    verify_authorized_action!(attachment, :read)
+  attachments_by_shard = Attachment.where(id: file_ids).group_by(&:shard)
+  return_attachments = []
+  attachments_by_shard.each do |shard, attachments|
+    shard.activate do
+      valid_attachment_ids = get_attachment_ids(attachments.map(&:id))
+      validate_file_ids!(attachments, valid_attachment_ids)
+      return_attachments += Attachment.active.where(id: valid_attachment_ids)
+    end
   end
 
-  attachments
+  return_attachments.each do |attachment|
+    verify_authorized_action!(attachment, :read)
+  end
+  return_attachments
 end
 
-def validate_file_ids!(file_ids, current_and_replaced_ids)
+def validate_file_ids!(file_id_attachments, valid_attachment_ids)
+  file_ids = file_id_attachments.pluck(:id).map(&:to_s)
   file_ids.each do |file_id|
-    next if current_and_replaced_ids.include?(file_id)
+    next if valid_attachment_ids.include?(file_id)
 
     raise SubmissionError, I18n.t(
       "No attachments found for the following ids: %{ids}",
-      { ids: file_ids - current_and_replaced_ids.to_a }
+      { ids: file_ids - valid_attachment_ids }
     )
   end
 end
