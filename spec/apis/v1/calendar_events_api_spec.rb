@@ -4077,6 +4077,59 @@ describe CalendarEventsApiController, type: :request do
         expect(json[0]["important_dates"]).to be true
       end
     end
+
+    describe "log_event_count" do
+      before :once do
+        student_in_course(course: @course)
+        assignment = @course.assignments.create!(workflow_state: "published", due_at: 1.day.from_now, submission_types: "online_text_entry")
+        override = assignment.assignment_overrides.create!(due_at: 2.days.from_now, due_at_overridden: true)
+        override.assignment_override_students.create!(user: @student)
+      end
+
+      before do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:count)
+      end
+
+      let_once(:start_date) { Time.now }
+      let_once(:end_date) { 1.week.from_now }
+
+      it "logs when event count exceeds page size" do
+        expect(InstStatsd::Statsd).to receive(:increment).with("calendar.events_api.per_page_exceeded.count").once
+        expect(InstStatsd::Statsd).to receive(:count).with("calendar.events_api.per_page_exceeded.value", 2).once
+        api_call_as_user(@teacher,
+                         :get,
+                         "/api/v1/calendar_events",
+                         {
+                           controller: "calendar_events_api",
+                           action: "index",
+                           format: "json",
+                           type: "assignment",
+                           context_codes: ["course_#{@course.id}"],
+                           start_date: start_date.iso8601,
+                           end_date: end_date.iso8601,
+                           per_page: 1
+                         })
+      end
+
+      it "does not log if the page size is not exceeded" do
+        expect(InstStatsd::Statsd).not_to receive(:increment).with("calendar.events_api.per_page_exceeded.count")
+        expect(InstStatsd::Statsd).not_to receive(:count).with("calendar.events_api.per_page_exceeded.value")
+        api_call_as_user(@teacher,
+                         :get,
+                         "/api/v1/calendar_events",
+                         {
+                           controller: "calendar_events_api",
+                           action: "index",
+                           format: "json",
+                           type: "assignment",
+                           context_codes: ["course_#{@course.id}"],
+                           start_date: start_date.iso8601,
+                           end_date: end_date.iso8601,
+                           per_page: 5
+                         })
+      end
+    end
   end
 
   context "user index" do
