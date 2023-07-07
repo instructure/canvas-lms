@@ -36,7 +36,7 @@ Rails.configuration.to_prepare do
   LiveEvents.cache = Rails.cache
   LiveEvents.statsd = InstStatsd::Statsd
   LiveEvents.max_queue_size = -> { Setting.get("live_events_max_queue_size", 5000).to_i }
-  LiveEvents.settings = -> { DynamicSettings.find("live-events", default_ttl: 2.hours) }
+  LiveEvents.settings = -> { YAML.safe_load(DynamicSettings.find(tree: :private, default_ttl: 2.hours)["live_events.yml", failsafe_cache: Rails.root.join("config")] || "{}") }
   LiveEvents.aws_credentials = lambda do |settings|
     if settings["vault_credential_path"]
       Canvas::Vault::AwsCredentialProvider.new(settings["vault_credential_path"])
@@ -44,7 +44,7 @@ Rails.configuration.to_prepare do
       nil
     end
   end
-  LiveEvents.stream_client =  ->(settings) { StubbedClient if settings["stub_kinesis"] }
+  LiveEvents.stream_client = ->(settings) { StubbedClient if settings["stub_kinesis"] }
   # sometimes this async worker thread grabs a connection on a Setting read or similar.
   # We need it to be released or the main thread can have a real problem.
   LiveEvents.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }
