@@ -389,6 +389,7 @@ export type AssignmentGroupCriteriaMap = {
   [id: string]: Omit<AssignmentGroup, 'assignments'> & {
     assignments: AssignmentGradeCriteria[]
     invalid?: boolean
+    gradingPeriodsIds?: string[]
   }
 }
 

@@ -26,6 +26,9 @@ import {
 } from '@canvas/grading/grading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {Text} from '@instructure/ui-text'
+// @ts-expect-error
+import {IconWarningLine} from '@instructure/ui-icons'
 import {
   GradebookOptions,
   GradebookStudentDetails,
@@ -54,6 +57,7 @@ type Props = {
   studentNotesColumnId?: string | null
   gradebookOptions: GradebookOptions
   currentStudentHiddenName: string
+  invalidAssignmentGroups: Record<string, string>
 }
 
 export default function StudentInformation({
@@ -63,6 +67,7 @@ export default function StudentInformation({
   student,
   submissions,
   currentStudentHiddenName,
+  invalidAssignmentGroups,
 }: Props) {
   const {
     customOptions: {
@@ -214,6 +219,25 @@ export default function StudentInformation({
   }
 
   const studentUrl = `${contextUrl}/grades/${student.id}`
+  const invalidAssignmentGroupsLength = Object.keys(invalidAssignmentGroups).length
+  const invalidAssignmentGroupsNames = Object.values(invalidAssignmentGroups)
+  const showInvalidAssignmentGroupsWarning =
+    invalidAssignmentGroupsLength > 0 && groupWeightingScheme === 'percent'
+  const invalidGroupsWarningPhrases = () => {
+    return I18n.t(
+      'invalid_group_warning',
+      {
+        one: 'Note: Score does not include assignments from the group %{list_of_group_names} because it has no points possible.',
+        other:
+          'Note: Score does not include assignments from the groups %{list_of_group_names} because they have no points possible.',
+      },
+      {
+        count: invalidAssignmentGroupsLength,
+        list_of_group_names: invalidAssignmentGroupsNames.join(' or '),
+      }
+    )
+  }
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -335,6 +359,14 @@ export default function StudentInformation({
               }}
               gradingPeriodId={selectedGradingPeriodId}
             />
+          )}
+
+          {showInvalidAssignmentGroupsWarning && (
+            <View as="div" className="text-error" margin="small 0 0 0" style={{width: '100%'}}>
+              <Text size="medium">
+                <IconWarningLine /> {invalidGroupsWarningPhrases()}{' '}
+              </Text>
+            </View>
           )}
         </View>
       </View>

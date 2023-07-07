@@ -94,14 +94,12 @@ export default function EnhancedIndividualGradebook() {
     skip: !courseId,
   })
 
-  const {customColumns} = useCustomColumns(gradebookOptions.customColumnsUrl)
+  const {customColumnsUrl} = gradebookOptions
+
+  const {customColumns} = useCustomColumns(customColumnsUrl)
   const studentNotesColumnId = customColumns?.find(
     (column: CustomColumn) => column.teacher_notes
   )?.id
-
-  const selectedAssignmentGroupInvalid = selectedAssignment?.assignmentGroupId
-    ? assignmentGroupMap[selectedAssignment?.assignmentGroupId]?.invalid
-    : false
 
   const [currentStudentHiddenName, setCurrentStudentHiddenName] = useState<string>('')
   useEffect(() => {
@@ -125,13 +123,18 @@ export default function EnhancedIndividualGradebook() {
         submissionsConnection,
       } = data.course
 
+      const {assignmentGradingPeriodMap, assignmentSubmissionsMap} = mapAssignmentSubmissions(
+        submissionsConnection.nodes
+      )
+      setAssignmentSubmissionsMap(assignmentSubmissionsMap)
+
       const {mappedAssignmentGroupMap, mappedAssignments} = mapAssignmentGroupQueryResults(
-        assignmentGroupsConnection.nodes
+        assignmentGroupsConnection.nodes,
+        assignmentGradingPeriodMap
       )
 
       setAssignmentGroupMap(mappedAssignmentGroupMap)
       setAssignments(mappedAssignments)
-      setAssignmentSubmissionsMap(mapAssignmentSubmissions(submissionsConnection.nodes))
       setSections(sectionsConnection.nodes)
 
       const sortableStudents = mapEnrollmentsToSortableStudents(enrollmentsConnection.nodes)
@@ -144,6 +147,23 @@ export default function EnhancedIndividualGradebook() {
       setStudents(sortedStudents)
     }
   }, [data, error])
+
+  const invalidAssignmentGroups = Object.keys(assignmentGroupMap).reduce((invalidKeys, groupId) => {
+    const {invalid, name, gradingPeriodsIds} = assignmentGroupMap[groupId]
+    const {selectedGradingPeriodId} = gradebookOptions
+    if (
+      invalid ||
+      (selectedGradingPeriodId && !gradingPeriodsIds?.includes(selectedGradingPeriodId))
+    ) {
+      invalidKeys[groupId] = name
+    }
+
+    return invalidKeys
+  }, {} as Record<string, string>)
+
+  const selectedAssignmentGroupInvalid = selectedAssignment?.assignmentGroupId
+    ? !!invalidAssignmentGroups[selectedAssignment?.assignmentGroupId]
+    : false
 
   const handleStudentChange = (studentId?: string) => {
     setSelectedStudentId(studentId)
@@ -276,12 +296,13 @@ export default function EnhancedIndividualGradebook() {
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />
 
       <StudentInformation
-        student={currentStudent}
-        submissions={studentSubmissions}
         assignmentGroupMap={assignmentGroupMap}
         gradebookOptions={gradebookOptions}
+        invalidAssignmentGroups={invalidAssignmentGroups}
+        student={currentStudent}
         studentNotesColumnId={studentNotesColumnId}
         currentStudentHiddenName={currentStudentHiddenName}
+        submissions={studentSubmissions}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

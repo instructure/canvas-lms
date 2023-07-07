@@ -118,6 +118,7 @@ export type SortableAssignment = AssignmentConnection & {
   assignmentGroupPosition: number
   sortableName: string
   sortableDueDate: number
+  gradingPeriodId?: string | null
 }
 
 export type AssignmentSortContext = {
@@ -143,6 +144,8 @@ export type AssignmentSubmissionsMap = {
     [submissionId: string]: SubmissionConnection
   }
 }
+
+export type AssignmentGradingPeriodMap = Record<string, string | null | undefined>
 
 export type SubmissionGradeChange = Pick<
   GradebookUserSubmissionDetails,
