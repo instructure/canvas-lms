@@ -17,15 +17,21 @@
  */
 
 import PropTypes from 'prop-types'
-import React, {useMemo, useState, useEffect} from 'react'
+import React, {useMemo, useState, useEffect, useContext} from 'react'
 import {AddressBook, USER_TYPE, CONTEXT_TYPE} from '../../components/AddressBook/AddressBook'
 import {
   ADDRESS_BOOK_RECIPIENTS,
   ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES,
 } from '../../../graphql/Queries'
 import {useQuery} from 'react-apollo'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('conversations_2')
 
 export const AddressBookContainer = props => {
+  const {setOnSuccess} = useContext(AlertManagerContext)
+
   const userID = ENV.current_user_id?.toString()
   const [filterHistory, setFilterHistory] = useState([
     {
@@ -73,7 +79,6 @@ export const AddressBookContainer = props => {
     }
     return false
   }
-
   const addressBookRecipientsQuery = useQuery(
     props.includeCommonCourses
       ? ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES
@@ -93,6 +98,33 @@ export const AddressBookContainer = props => {
     }
   )
   const {loading, data} = addressBookRecipientsQuery
+
+  useEffect(() => {
+    if (loading) {
+      const loadingMessage =
+        searchTerm.length > 0
+          ? I18n.t('Loading address book results for %{term}', {term: searchTerm})
+          : I18n.t('Loading address book results')
+
+      setOnSuccess(loadingMessage)
+    } else if (data) {
+      const searchResults = [
+        ...(data?.legacyNode?.recipients?.usersConnection?.nodes ?? []),
+        ...(data?.legacyNode?.recipients?.contextsConnection?.nodes ?? []),
+      ]
+
+      const loadedMessage = I18n.t(
+        {
+          zero: 'No Address book results found',
+          one: '1 Address book result loaded',
+          other: '%{count} Address book results loaded',
+        },
+        {count: searchResults.length}
+      )
+      setOnSuccess(loadedMessage)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, data, searchTerm])
 
   useEffect(() => {
     if (
