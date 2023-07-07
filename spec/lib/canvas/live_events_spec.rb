@@ -1394,8 +1394,8 @@ describe Canvas::LiveEvents do
       migration.migration_settings[:import_quizzes_next] = true
       course.lti_context_id = "abc"
       source_course.lti_context_id = "def"
-      expect(source_course).to receive(:has_new_quizzes?).and_return(true)
-      expect(migration).to receive(:file_download_url).and_return("http://example.com/resource_map.json")
+      allow(source_course).to receive(:has_new_quizzes?).and_return(true)
+      allow(migration).to receive(:file_download_url).and_return("http://example.com/resource_map.json")
     end
 
     it "sent events with expected payload" do
@@ -1424,6 +1424,45 @@ describe Canvas::LiveEvents do
       ).once
 
       Canvas::LiveEvents.content_migration_completed(migration)
+    end
+
+    describe "resource map property" do
+      before do
+        allow(migration).to receive(:asset_map_v2?).and_return(true)
+        allow(source_course).to receive(:has_new_quizzes?).and_return(false)
+      end
+
+      describe "the resource map is not needed" do
+        before do
+          migration.migration_settings[:import_quizzes_next] = false
+        end
+
+        it "does not send the resource map" do
+          expect_event(
+            "content_migration_completed",
+            hash_not_including(:resource_map_url),
+            hash_including(context_id: course.global_id.to_s)
+          ).once
+
+          Canvas::LiveEvents.content_migration_completed(migration)
+        end
+      end
+
+      describe "importing new quizzes with link migration" do
+        before do
+          migration.migration_settings[:import_quizzes_next] = true
+        end
+
+        it "does not send the resource map" do
+          expect_event(
+            "content_migration_completed",
+            hash_including(resource_map_url: "http://example.com/resource_map.json"),
+            hash_including(context_id: course.global_id.to_s)
+          ).once
+
+          Canvas::LiveEvents.content_migration_completed(migration)
+        end
+      end
     end
   end
 
