@@ -2743,22 +2743,22 @@ describe ContextExternalTool do
     end
 
     it "handles spaces in front of url" do
-      url = ContextExternalTool.standardize_url(" http://sub_underscore.google.com?a=1&b=2")
+      url = ContextExternalTool.standardize_url(" http://sub_underscore.google.com?a=1&b=2").to_s
       expect(url).to eql("http://sub_underscore.google.com/?a=1&b=2")
     end
 
     it "handles tabs in front of url" do
-      url = ContextExternalTool.standardize_url("\thttp://sub_underscore.google.com?a=1&b=2")
+      url = ContextExternalTool.standardize_url("\thttp://sub_underscore.google.com?a=1&b=2").to_s
       expect(url).to eql("http://sub_underscore.google.com/?a=1&b=2")
     end
 
     it "handles unicode whitespace" do
-      url = ContextExternalTool.standardize_url("\u00A0http://sub_underscore.go\u2005ogle.com?a=1\u2002&b=2")
+      url = ContextExternalTool.standardize_url("\u00A0http://sub_underscore.go\u2005ogle.com?a=1\u2002&b=2").to_s
       expect(url).to eql("http://sub_underscore.google.com/?a=1&b=2")
     end
 
     it "handles underscores in the domain" do
-      url = ContextExternalTool.standardize_url("http://sub_underscore.google.com?a=1&b=2")
+      url = ContextExternalTool.standardize_url("http://sub_underscore.google.com?a=1&b=2").to_s
       expect(url).to eql("http://sub_underscore.google.com/?a=1&b=2")
     end
   end
@@ -3668,6 +3668,71 @@ describe ContextExternalTool do
       sk2 = external_tool_model(opts: { name: "A" }).sort_key
       sk3 = external_tool_model(opts: { name: "a" }).sort_key
       expect([sk1, sk2, sk3].sort).to eq([sk1, sk3, sk2])
+    end
+  end
+
+  describe "associated_1_1_tool" do
+    specs_require_cache(:redis_cache_store)
+
+    subject { lti_1_3_tool.associated_1_1_tool(context, requested_url) }
+
+    let(:context) { @course }
+    let(:domain) { "test.com" }
+    let(:opts) { { url:, domain: } }
+    let(:requested_url) { nil }
+    let(:url) { "https://test.com/foo?bar=1" }
+    let!(:lti_1_1_tool) { external_tool_model(context:, opts:) }
+    let!(:lti_1_3_tool) { external_tool_1_3_model(context:, opts:) }
+
+    it { is_expected.to eq lti_1_1_tool }
+
+    it "caches the result" do
+      expect(subject).to eq lti_1_1_tool
+
+      allow(ContextExternalTool).to receive(:find_external_tool)
+      lti_1_3_tool.associated_1_1_tool(context)
+      expect(ContextExternalTool).not_to have_received(:find_external_tool)
+    end
+
+    it "finds deleted 1.1 tools" do
+      lti_1_1_tool.destroy
+      expect(subject).to eq(lti_1_1_tool)
+    end
+
+    it "finds nil and doesn't error on tools with invalid URL & Domains" do
+      lti_1_1_tool.update_column(:url, "http://url path>/invalidurl}")
+      lti_1_1_tool.update_column(:domain, "url path>/invalidurl}")
+
+      expect { subject }.not_to raise_error
+      expect(subject).to be_nil
+    end
+
+    it "finds tools in a higher level context" do
+      lti_1_1_tool.update!(context: context.account)
+      expect(subject).to eq(lti_1_1_tool)
+    end
+
+    it "ignores duplicate tools" do
+      lti_1_1_tool.dup.save!
+      expect(subject).to eq(lti_1_1_tool)
+    end
+
+    context "the request is to a subdomain of the tools' domain" do
+      let(:requested_url) { "https://morespecific.test.com/foo?bar=1" }
+
+      it { is_expected.to eq(lti_1_1_tool) }
+
+      context "there's another 1.1 tool with that subdomain" do
+        let(:specific_opts) do
+          {
+            url: "https://morespecific.test.com/foo?bar=1",
+            domain: "https://morespecific.test.com"
+          }
+        end
+        let!(:specific_1_1_tool) { external_tool_model(context:, opts: specific_opts) }
+
+        it { is_expected.to eq(specific_1_1_tool) }
+      end
     end
   end
 end
