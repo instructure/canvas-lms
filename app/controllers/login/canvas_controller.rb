@@ -34,7 +34,7 @@ class Login::CanvasController < ApplicationController
     @headers = false
     flash.now[:error] = params[:message] if params[:message]
     flash.now[:notice] = t("Your password has been changed.") if params[:password_changed] == "1"
-    @include_recaptcha = recaptcha_enabled?
+    @include_recaptcha = recaptcha_enabled?(failsafe: false)
 
     maybe_render_mobile_login
   end

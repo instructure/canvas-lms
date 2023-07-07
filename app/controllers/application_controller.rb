@@ -3050,8 +3050,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def recaptcha_enabled?
-    DynamicSettings.find(tree: :private)["recaptcha_server_key"].present? && @domain_root_account.self_registration_captcha?
+  def recaptcha_enabled?(**kwargs)
+    DynamicSettings.find(tree: :private)["recaptcha_server_key", **kwargs].present? && @domain_root_account.self_registration_captcha?
   end
 
   def peer_reviews_for_a2_enabled?

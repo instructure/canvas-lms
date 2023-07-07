@@ -3538,7 +3538,7 @@ describe ContextExternalTool do
       let(:allowlist) { [".docker", "localhost"] }
 
       before do
-        allow(DynamicSettings).to receive(:find).and_return({ "internal_tool_domain_allowlist" => YAML.dump(allowlist) })
+        allow(DynamicSettings).to receive(:find).and_return(DynamicSettings::FallbackProxy.new({ "internal_tool_domain_allowlist" => YAML.dump(allowlist) }))
       end
 
       it "returns correct config value" do

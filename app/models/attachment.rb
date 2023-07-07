@@ -2219,11 +2219,12 @@ class Attachment < ActiveRecord::Base
 
   class << self
     def clone_url_strand_overrides
-      @clone_url_strand_overrides ||= YAML.safe_load(DynamicSettings.find(tree: :private)["clone_url_strand.yml"] || "{}")
+      @clone_url_strand_overrides ||= YAML.safe_load(DynamicSettings.find(tree: :private)["clone_url_strand.yml", failsafe_cache: Rails.root.join("config")] || "{}")
     end
 
     def reset_clone_url_strand_overrides
       @clone_url_strand_overrides = nil
+      clone_url_strand_overrides
     end
     Canvas::Reloader.on_reload { Attachment.reset_clone_url_strand_overrides }
 
