@@ -21,6 +21,7 @@
 require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::CreateSubmissionDraft do
+  specs_require_sharding
   before(:once) do
     @submission = submission_model
     @attachments = [
@@ -130,6 +131,25 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       expect(
         result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments, 0, :_id)
       ).to eq @attachments.second.id.to_s
+    end
+
+    it "does not fetch attachments with the same local ID, but on different shard, from requested attachments" do
+      @student.associate_with_shard(@shard1)
+
+      @shard1.activate do
+        @not_requested_attachment = attachment_with_context(@student)
+        @not_requested_attachment.update!(id: @attachments.second.local_id)
+      end
+
+      result = run_mutation(
+        submission_id: @submission.id,
+        active_submission_type: "online_upload",
+        attempt: @submission.attempt,
+        file_ids: @attachments.pluck(:id)
+      )
+
+      returned_attachment_ids = result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).pluck("_id")
+      expect(returned_attachment_ids).not_to include @not_requested_attachment.global_id.to_s
     end
   end
 
