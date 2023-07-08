@@ -18,7 +18,7 @@
 
 import React, {Component, useRef} from 'react'
 import {bool, func, string} from 'prop-types'
-import {linksShape, linkType} from './propTypes'
+import {linkShape, linksShape, linkType} from './propTypes'
 import formatMessage from '../../../../format-message'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {List} from '@instructure/ui-list'
@@ -80,6 +80,12 @@ class LinkSet extends Component {
     return !this.hasLinks(props) && !props.collection.hasMore && !props.collection.isLoading
   }
 
+  compareURLs(url1 = '', url2 = '') {
+    if (url1 === '' || url2 === '') return false
+
+    return url1.split('?')[0] === url2.split('?')[0]
+  }
+
   renderLinks(lastItemRef) {
     function refFor(index, array) {
       if (!lastItemRef || index !== array.length - 1) {
@@ -109,6 +115,7 @@ class LinkSet extends Component {
                 elementRef={refFor(index, array)}
                 editing={this.props.editing}
                 onEditClick={this.props.onEditClick}
+                isSelected={this.compareURLs(this.props.selectedLink?.href, link.href)}
               />
             </List.Item>
           ))}
@@ -173,6 +180,7 @@ LinkSet.propTypes = {
   searchString: string,
   editing: bool,
   onEditClick: func,
+  selectedLink: linkShape,
 }
 
 export default LinkSet

@@ -161,4 +161,21 @@ describe('RCE "Links" Plugin > LinkSet', () => {
 
     expect(getByText('Loading')).toBeInTheDocument()
   })
+
+  it('adds a SR indicator to the selected link', async () => {
+    const {findByTestId} = renderComponent({
+      collection: {
+        hasMore: false,
+        isLoading: false,
+        links: [
+          {href: 'url1', title: 'link1'},
+          {href: 'url2', title: 'link2'},
+        ],
+        lastError: {},
+      },
+      selectedLink: {href: 'url2', title: 'link2'},
+    })
+
+    expect(await findByTestId('selected-link-indicator')).toBeInTheDocument()
+  })
 })

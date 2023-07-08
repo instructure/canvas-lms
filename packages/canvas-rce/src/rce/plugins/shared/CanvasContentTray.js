@@ -537,6 +537,7 @@ export default function CanvasContentTray(props) {
                     context={{type: props.contextType, id: props.contextId}}
                     editing={isEditTray}
                     onEditClick={setLink}
+                    selectedLink={link}
                     {...storeProps}
                   />
                 </ErrorBoundary>

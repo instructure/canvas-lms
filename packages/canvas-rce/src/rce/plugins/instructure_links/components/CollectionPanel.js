@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, string} from 'prop-types'
-import {collectionsShape} from './propTypes'
+import {collectionsShape, linkShape} from './propTypes'
 import AccordionSection from './AccordionSection'
 import LinkSet from './LinkSet'
 
@@ -55,6 +55,7 @@ export default function CollectionPanel(props) {
           searchString={props.searchString}
           editing={props.editing}
           onEditClick={props.onEditClick}
+          selectedLink={props.selectedLink}
         />
       </AccordionSection>
     </div>
@@ -79,6 +80,7 @@ CollectionPanel.propTypes = {
   selectedAccordionIndex: string,
   editing: bool,
   onEditClick: func,
+  selectedLink: linkShape,
 }
 
 CollectionPanel.defaultProps = {
