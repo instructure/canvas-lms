@@ -23,7 +23,7 @@ import formatMessage from '../../../../format-message'
 import {renderLink as renderLinkHtml} from '../../../contentRendering'
 import dragHtml from '../../../../sidebar/dragHtml'
 import {applyTimezoneOffsetToDate} from '../../shared/dateUtils'
-import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -159,6 +159,11 @@ export default function Link(props) {
                     >
                       <View as="div" margin="0">
                         {title}
+                        {props.isSelected && (
+                          <ScreenReaderContent data-testid="selected-link-indicator">
+                            {formatMessage('Selected')}
+                          </ScreenReaderContent>
+                        )}
                       </View>
                       {dateString ? <View as="div">{dateString}</View> : null}
                     </Flex.Item>
@@ -202,4 +207,5 @@ Link.propTypes = {
   elementRef: func,
   editing: bool,
   onEditClick: func,
+  isSelected: bool,
 }

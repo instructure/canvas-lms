@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, func, string} from 'prop-types'
 import formatMessage from '../../../../format-message'
 
-import {collectionsShape} from './propTypes'
+import {collectionsShape, linkShape} from './propTypes'
 import NavigationPanel from './NavigationPanel'
 import CollectionPanel from './CollectionPanel'
 
@@ -39,6 +39,7 @@ function LinksPanel(props) {
           {...collectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
+          selectedLink={props.selectedLink}
           collection="wikiPages"
           label={formatMessage('Pages')}
         />
@@ -49,6 +50,7 @@ function LinksPanel(props) {
           {...collectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
+          selectedLink={props.selectedLink}
           collection="assignments"
           label={formatMessage('Assignments')}
         />
@@ -59,6 +61,7 @@ function LinksPanel(props) {
           {...collectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
+          selectedLink={props.selectedLink}
           collection="quizzes"
           label={formatMessage('Quizzes')}
         />
@@ -69,6 +72,7 @@ function LinksPanel(props) {
           {...collectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
+          selectedLink={props.selectedLink}
           collection="announcements"
           label={formatMessage('Announcements')}
         />
@@ -79,6 +83,7 @@ function LinksPanel(props) {
           {...collectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
+          selectedLink={props.selectedLink}
           collection="discussions"
           label={formatMessage('Discussions')}
         />
@@ -89,6 +94,7 @@ function LinksPanel(props) {
           {...collectionProps}
           editing={props.editing}
           onEditClick={props.onEditClick}
+          selectedLink={props.selectedLink}
           collection="modules"
           label={formatMessage('Modules')}
         />
@@ -120,6 +126,7 @@ LinksPanel.propTypes = {
   canCreatePages: bool,
   editing: bool,
   onEditClick: func,
+  selectedLink: linkShape,
 }
 
 LinksPanel.defaultProps = {
