@@ -67,6 +67,14 @@ services:
           - canvas-web
           - canvas-web.$INST_DOMAIN
 
+  web-dev-logs:
+    <<: *BASE-SERVICE
+    command: tail -f log/development.log
+    volumes:
+      - log:/usr/src/app/log:ro
+    labels:
+      - "traefik.enable=false"
+
   jobs:
     <<: *BASE-SERVICE
     command: bundle exec script/delayed_job run
