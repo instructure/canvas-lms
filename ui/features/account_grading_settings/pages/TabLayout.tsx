@@ -20,6 +20,7 @@ import React from 'react'
 import {Outlet, useNavigate, useMatch} from 'react-router-dom'
 import {Tabs} from '@instructure/ui-tabs'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {TabLayoutPanel} from '../types/tabLayout'
 
 const I18n = useI18nScope('gradingCourseTabContainer')
 const {Panel: TabsPanel} = Tabs as any
@@ -31,10 +32,16 @@ export const TabLayout = () => {
   const selectedTab = pathMatch?.params?.tabPath
 
   const handleTabChange = (index: number) => {
-    if (index === 0) {
-      navigate('periods')
-    } else if (index === 1) {
-      navigate('schemes')
+    switch (index) {
+      case TabLayoutPanel.GRADING_PERIODS:
+        navigate('periods')
+        break
+      case TabLayoutPanel.GRADING_SCHEMES:
+        navigate('schemes')
+        break
+      case TabLayoutPanel.CUSTOM_STATUSES:
+        navigate('statuses')
+        break
     }
   }
   if (!selectedTab) {
@@ -73,6 +80,19 @@ export const TabLayout = () => {
           isSelected={selectedTab === 'schemes'}
         >
           {selectedTab === 'schemes' ? (
+            <>
+              <Outlet />
+            </>
+          ) : (
+            <></>
+          )}
+        </TabsPanel>
+        <TabsPanel
+          id="gradingCustomStatusTab"
+          renderTitle={I18n.t('Statuses')}
+          isSelected={selectedTab === 'statuses'}
+        >
+          {selectedTab === 'statuses' ? (
             <>
               <Outlet />
             </>

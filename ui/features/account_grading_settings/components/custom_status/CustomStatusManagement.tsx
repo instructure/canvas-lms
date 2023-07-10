@@ -17,21 +17,10 @@
  */
 
 import React from 'react'
-import {Navigate} from 'react-router-dom'
-import {TabLayout} from '../pages/TabLayout'
-import {AccountGradingSchemes} from '../pages/AccountGradingSchemes'
-import {AccountGradingPeriods} from '../pages/AccountGradingPeriods'
-import {AccountCustomStatuses} from '../pages/AccountCustomStatuses'
 
-export const accountGradingSettingsRoutes = [
-  {
-    path: 'grading_settings',
-    element: <TabLayout />,
-    children: [
-      {path: '', element: <Navigate to="schemes" replace={true} />},
-      {path: 'periods', element: <AccountGradingPeriods />},
-      {path: 'schemes', element: <AccountGradingSchemes />},
-      {path: 'statuses', element: <AccountCustomStatuses />},
-    ],
-  },
-]
+export const CustomStatusManagement = () => {
+  return (
+    /** This is temporary. UI to be implemented in future ticket */
+    <div>Custom Status Management</div>
+  )
+}
