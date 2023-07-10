@@ -165,7 +165,7 @@ class FilesController < ApplicationController
 
   before_action :check_file_access_flags, only: [:show_relative, :show]
 
-  skip_before_action :verify_authenticity_token # , only: [:api_create, :show]
+  skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: %i[
     api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
   ]
