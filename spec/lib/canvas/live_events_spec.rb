@@ -321,6 +321,29 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.conversation_message_created(convo_message)
     end
 
+    it "triggers live event from Incoming Mail (via reply_from) method" do
+      # when a user replies to a conversation via email, the IncomingMailProcessor
+      # looks up the reply_from method of the object, in this case,
+      # reply_from creates a new ConversationMessage and adds it to the conversation
+      # this spec should prove that the live event is triggered from the "reply_from"
+      allow(LiveEvents).to receive(:post_event)
+      user1 = user_model
+      user2 = user_model
+      convo = Conversation.initiate([user1, user2], false)
+      convo_message = convo.reply_from({ user: user1, text: "this is an example incoming mail reply" })
+      expect(LiveEvents).to have_received(:post_event).with(
+        context: nil,
+        event_name: "conversation_message_created",
+        time: anything,
+        payload: {
+          author_id: convo_message.author_id.to_s,
+          conversation_id: convo_message.conversation_id.to_s,
+          message_id: convo_message.id.to_s,
+          created_at: convo_message.created_at
+        }
+      )
+    end
+
     it "doesnt include conversation_id" do
       user = user_model
       msg = Conversation.build_message(user, "lorem ipsum")
