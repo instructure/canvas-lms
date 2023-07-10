@@ -362,6 +362,28 @@ describe('Filter dropdown', () => {
     expect(getByTestId('applied-filter-tag')).toBeVisible()
   })
 
+  it('Clicking "Clear All Filters" removes all applied filters', async () => {
+    const {getByText, getByTestId, queryByTestId, getByRole} = render(
+      <FilterNav {...defaultProps} />
+    )
+    expect(queryByTestId('applied-filter-tag')).toBeNull()
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    expect(getByTestId('applied-filter-tag')).toBeVisible()
+    userEvent.click(getByText('Clear All Filters'))
+    expect(queryByTestId('applied-filter-tag')).toBeNull()
+  })
+
+  it('Clicking "Clear All Filters" focuses apply filters button', async () => {
+    const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByRole('menuitemradio', {name: 'Sections'}))
+    userEvent.click(getByRole('menuitemradio', {name: 'Section 7'}))
+    userEvent.click(getByText('Clear All Filters'))
+    expect(getByTestId('apply-filters-button')).toHaveFocus()
+  })
+
   it('Check for accessbility text to remove filter', async () => {
     const {getByText, getByTestId, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
