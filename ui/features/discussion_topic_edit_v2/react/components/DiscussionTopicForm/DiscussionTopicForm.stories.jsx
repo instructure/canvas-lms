@@ -19,6 +19,8 @@
 import React, {useState, useCallback} from 'react'
 import DiscussionTopicForm from './DiscussionTopicForm'
 
+ENV.current_user = {display_name: 'Count Dracula'}
+
 export default {
   title: 'Examples/Discussion Create\\Edit/Components/DiscussionTopicForm',
   component: DiscussionTopicForm,
@@ -37,10 +39,26 @@ export function Primary(args) {
 
   return (
     <div style={{backgroundColor: color, padding: '100px'}}>
-      <DiscussionTopicForm submitForm={onSubmit} />
+      <DiscussionTopicForm
+        isStudent={args.isStudent}
+        isEditing={args.isEditing}
+        sections={args.sections}
+        groups={args.groups}
+        onSubmit={onSubmit}
+      />
     </div>
   )
 }
 Primary.args = {
+  isStudent: false,
+  isEditing: false,
+  sections: [
+    {id: '1', label: 'Example Section 1'},
+    {id: '2', label: 'Example Section 2'},
+  ],
+  groups: [
+    {id: '1', label: 'Example Group Set 1'},
+    {id: '2', label: 'Example Group Set 2'},
+  ],
   submitColor: '#516dd0',
 }
