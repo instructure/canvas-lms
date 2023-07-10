@@ -51,10 +51,18 @@ module Lti
         return
       end
 
-      # postMessage origins require a protocol
-      js_env({ PARENT_ORIGIN: "#{HostUrl.protocol}://#{parent_domain}" })
+      js_env({
+               # postMessage origins require a protocol
+               PARENT_ORIGIN: "#{HostUrl.protocol}://#{parent_domain}",
+               IGNORE_LTI_POST_MESSAGES: true,
+             })
       set_extra_csp_frame_ancestor!
 
+      # this page has no UI and so doesn't need all the preloaded JS.
+      # also, the preloaded JS ends up loading the canvas postMessage handler
+      # (through the RCE), which results in duplicate responses to postMessages,
+      # so we extra do not need this here.
+      # @headers = false
       render layout: "bare"
     end
 
