@@ -1876,7 +1876,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json["start_at"]).to eql new_start_at
         end
 
-        it "updates all events in the series" do
+        it "updates all events in the series with the second event in the event list" do
           orig_events = [@event_series.except("duplicates")]
           orig_events += @event_series["duplicates"].pluck("calendar_event")
           target_event = @event_series["duplicates"][0]["calendar_event"]
@@ -1936,7 +1936,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json["message"]).to eql "You may not update one event with a new rrule."
         end
 
-        it "returns an error when which='all' and the start date changes" do
+        it "returns an error when which='all' the event is not the head event and the start date changes" do
           target_event = @event_series["duplicates"][0]["calendar_event"]
           target_event_id = target_event["id"].to_s
           new_start_at = (Time.parse(target_event["start_at"]) + 1.day).iso8601
@@ -1947,6 +1947,29 @@ describe CalendarEventsApiController, type: :request do
                           { calendar_event: { title: "new title", start_at: new_start_at }, which: "all" })
           assert_status(400)
           expect(json["message"]).to eql "You may not change the start date when changing all events in the series"
+        end
+
+        it "updates all series events when date changes and head event used" do
+          orig_events = [@event_series.except("duplicates")]
+          orig_events += @event_series["duplicates"].pluck("calendar_event")
+          target_event = orig_events[0]
+          target_event_id = target_event["id"].to_s
+          new_start_at = (Time.parse(target_event["start_at"]) + 1.day).iso8601
+          series_uuid = target_event["series_uuid"]
+          new_title = "a new title"
+
+          json = api_call(:put,
+                          "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id, format: "json" },
+                          { calendar_event: { title: new_title, start_at: new_start_at }, which: "all" })
+          assert_status(200)
+          expect(json.length).to be 3
+          json.each_with_index do |event, i|
+            expect(event["id"]).to eql orig_events[i]["id"]
+            expect(event["title"]).to eql new_title
+            expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 1.day).iso8601
+            expect(event["series_uuid"]).to eql series_uuid
+          end
         end
 
         it "extends the series when updating the rrule" do
@@ -1978,6 +2001,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json[2]["start_at"]).to eql (Time.parse(json[1]["start_at"]) + 1.week).iso8601
           expect(CalendarEvent.where(series_uuid: orig_events[0]["series_uuid"]).length).to be 1
           expect(CalendarEvent.where(series_uuid: json[0]["series_uuid"]).length).to be 4
+          expect(CalendarEvent.where(series_head: true, id: json[0]["id"]).length).to be 1
         end
 
         it "truncates the series when updating the rrule" do
@@ -2024,11 +2048,29 @@ describe CalendarEventsApiController, type: :request do
           end
         end
 
-        it "creates series events from single event including changing date and time" do
+        it "creates series events from single event including changing time" do
           single_event = @user.calendar_events.create!(title: "event", start_at: "2023-06-29 09:00:00", end_at: "2023-06-29 10:00:00")
           rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
           new_start_at = Time.parse(single_event["start_at"].iso8601) + 15.minutes
           new_end_at = (Time.parse(single_event["end_at"].iso8601) + 15.minutes)
+
+          json = api_call(:put,
+                          "/api/v1/calendar_events/#{single_event.id}",
+                          { controller: "calendar_events_api", action: "update", id: single_event.id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, end_at: new_end_at, rrule: } })
+          assert_status(200)
+          expect(json.length).to be 2
+          json.each_with_index do |_event, i|
+            expect(Time.parse(json[i]["start_at"])).to eql(new_start_at + i.weeks)
+            expect(Time.parse(json[i]["end_at"])).to eql(new_end_at + i.weeks)
+          end
+        end
+
+        it "creates series events from single event including changing date and time" do
+          single_event = @user.calendar_events.create!(title: "event", start_at: "2023-06-29 09:00:00", end_at: "2023-06-29 10:00:00")
+          rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
+          new_start_at = Time.parse(single_event["start_at"].iso8601) + 1.day + 15.minutes
+          new_end_at = Time.parse(single_event["end_at"].iso8601) + 1.day + 15.minutes
 
           json = api_call(:put,
                           "/api/v1/calendar_events/#{single_event.id}",

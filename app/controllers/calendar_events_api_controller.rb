@@ -779,7 +779,7 @@ class CalendarEventsApiController < ApplicationController
 
       if Account.site_admin.feature_enabled?(:calendar_series)
         if @event[:series_uuid].nil? && params_for_update[:rrule].present?
-          series_event = change_to_series_event(@event)
+          series_event = change_to_series_event(@event, params_for_update)
           return update_from_series(series_event, params_for_update, "all")
         elsif @event[:series_uuid].present?
           return update_from_series(@event, params_for_update, params[:which])
@@ -912,9 +912,15 @@ class CalendarEventsApiController < ApplicationController
       render json: { message: t("You may not update one event with a new rrule.") }, status: :bad_request
       return
     end
+
+    all_date_change_ok = false
     if which == "all" && Date.parse(params_for_update[:start_at]) != target_event.start_at.to_date
-      render json: { message: t("You may not change the start date when changing all events in the series") }, status: :bad_request
-      return
+      if target_event.series_head?
+        all_date_change_ok = true
+      else
+        render json: { message: t("You may not change the start date when changing all events in the series") }, status: :bad_request
+        return
+      end
     end
 
     if which == "one"
@@ -936,11 +942,12 @@ class CalendarEventsApiController < ApplicationController
     tz = @current_user.time_zone || ActiveSupport::TimeZone.new("UTC")
     target_start = Time.parse(params_for_update[:start_at]).in_time_zone(tz)
     target_end = Time.parse(params_for_update[:end_at]).in_time_zone(tz)
-    if which == "all"
+    if which == "all" && !all_date_change_ok
       # the target_event not be the first event in the series. We need to find it
       # as the anchor for the series dates
       start_date0 = events[0].start_at.in_time_zone(tz).to_date
       end_date0 = events[0].end_at.in_time_zone(tz).to_date
+
       first_start_at = Time.new(start_date0.year, start_date0.month, start_date0.day, target_start.hour, target_start.min, target_start.sec, tz)
       first_end_at = Time.new(end_date0.year, end_date0.month, end_date0.day, target_end.hour, target_end.min, target_end.sec, tz)
     else
@@ -960,7 +967,10 @@ class CalendarEventsApiController < ApplicationController
 
     if (all_events.length > events.length && date_time_changed) || rrule_changed
       # updating date-time for half a series starts a new series
-      params_for_update[:series_uuid] = SecureRandom.uuid if all_events.length > events.length
+      if all_events.length > events.length
+        params_for_update[:series_uuid] = SecureRandom.uuid
+        new_series_head = true
+      end
     else
       params_for_update[:series_uuid] = target_event[:series_uuid]
     end
@@ -987,6 +997,10 @@ class CalendarEventsApiController < ApplicationController
           end
         end
         events = events.take(dtstart_list.length)
+      end
+
+      if new_series_head
+        events[0].series_head = true
       end
 
       dtstart_list.each_with_index do |dtstart, i|
@@ -1062,9 +1076,11 @@ class CalendarEventsApiController < ApplicationController
     events
   end
 
-  def change_to_series_event(event)
+  def change_to_series_event(event, params_for_update)
     event.series_uuid = SecureRandom.uuid
     event.series_head = true
+    event.start_at = params_for_update[:start_at] if params_for_update[:start_at]
+    event.end_at = params_for_update[:end_at] if params_for_update[:end_at]
     event
   end
 
