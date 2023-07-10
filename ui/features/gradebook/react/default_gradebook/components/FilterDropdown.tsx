@@ -40,6 +40,7 @@ type Props = {
   dataMap: FilterDrilldownData
   filterItems: FilterDrilldownData
   changeAnnouncement: (filterAnnouncement) => void
+  applyFiltersButtonRef: React.RefObject<HTMLButtonElement>
 }
 
 const TruncateWithTooltip = ({children}: {children: React.ReactNode}) => {
@@ -63,6 +64,7 @@ const FilterDropdown = ({
   dataMap,
   filterItems,
   changeAnnouncement,
+  applyFiltersButtonRef,
 }: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
@@ -128,7 +130,15 @@ const FilterDropdown = ({
   return (
     <View as="div">
       <Popover
-        renderTrigger={<Button renderIcon={IconFilterLine}>{I18n.t('Apply Filters')}</Button>}
+        renderTrigger={
+          <Button
+            elementRef={ref => (applyFiltersButtonRef.current = ref)}
+            data-testid="apply-filters-button"
+            renderIcon={IconFilterLine}
+          >
+            {I18n.t('Apply Filters')}
+          </Button>
+        }
         shouldRenderOffscreen={false}
         on="click"
         placement="bottom start"

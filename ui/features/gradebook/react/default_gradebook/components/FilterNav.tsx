@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback, SetStateAction} from 'react'
+import React, {useState, useCallback, useRef, SetStateAction} from 'react'
 import {Link} from '@instructure/ui-link'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
@@ -60,10 +60,12 @@ export default function FilterNav({
   const applyFilters = useStore(state => state.applyFilters)
   const addFilters = useStore(state => state.addFilters)
   const appliedFilters = useStore(state => state.appliedFilters)
+  const applyFiltersButtonRef = useRef<HTMLButtonElement>(null)
 
   const handleClearFilters = () => {
     setAnnouncement(I18n.t('All Filters Have Been Cleared'))
     applyFilters([])
+    applyFiltersButtonRef.current?.focus()
   }
 
   const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map(filter => {
@@ -147,6 +149,7 @@ export default function FilterNav({
               dataMap={dataMap}
               filterItems={filterItems}
               changeAnnouncement={changeAnnouncement}
+              applyFiltersButtonRef={applyFiltersButtonRef}
             />
           </FlexItem>
           <FlexItem data-testid="filter-tags">
