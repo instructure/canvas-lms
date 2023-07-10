@@ -218,14 +218,18 @@ async function ltiMessageHandler(
   }
 }
 
+// Prevent duplicate listeners inside the same window
 let hasListener = false
 
 function monitorLtiMessages() {
+  // This should only be true when canvas is in an iframe (like for postMessage forwarding),
+  // to prevent duplicate listeners across canvas windows.
+  const shouldIgnoreLtiPostMessages: boolean = ENV?.IGNORE_LTI_POST_MESSAGES || false
   const platformStorageFeatureFlag: boolean = ENV?.FEATURES?.lti_platform_storage || false
   const cb = (e: MessageEvent<unknown>) => {
     if (e.data !== '') ltiMessageHandler(e, platformStorageFeatureFlag)
   }
-  if (!hasListener) {
+  if (!hasListener && !shouldIgnoreLtiPostMessages) {
     window.addEventListener('message', cb)
     hasListener = true
   }
