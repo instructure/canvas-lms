@@ -991,23 +991,32 @@ class AuthenticationProvidersController < ApplicationController
   def filter_data(data)
     auth_type = data.delete(:auth_type)
     klass = AuthenticationProvider.find_sti_class(auth_type)
+
     federated_attributes = data[:federated_attributes]
     federated_attributes = {} if federated_attributes == ""
     federated_attributes = federated_attributes.to_unsafe_h if federated_attributes.is_a?(ActionController::Parameters)
+
     # mfa_option is so we can keep mfa_required a boolean for backwards compatibility but still use a radio input for it
     data = data.permit(klass.recognized_params + [:mfa_option])
-    data = data.reject { |k, _| klass.site_admin_params.include?(k.to_sym) } unless @domain_root_account.grants_right?(@current_user, :manage_site_settings)
+    unless @domain_root_account.grants_right?(@current_user, :manage_site_settings)
+      data = data.reject { |k, _| klass.site_admin_params.include?(k.to_sym) }
+    end
+
+    data[:jit_provisioning] = value_to_boolean(data[:jit_provisioning]) if data.include?(:jit_provisioning)
     data[:federated_attributes] = federated_attributes if federated_attributes
     data[:auth_type] = auth_type
     if data[:auth_type] == "ldap"
       data[:auth_over_tls] = "start_tls" unless data.key?(:auth_over_tls)
-      data[:auth_over_tls] = AuthenticationProvider::LDAP.auth_over_tls_setting(data[:auth_over_tls], tls_required: @account.feature_enabled?(:verify_ldap_certs))
+      data[:auth_over_tls] = AuthenticationProvider::LDAP.auth_over_tls_setting(
+        data[:auth_over_tls], tls_required: @account.feature_enabled?(:verify_ldap_certs)
+      )
     end
     if data[:mfa_option]
       data[:mfa_required] = data[:mfa_option] == "required"
       data[:skip_internal_mfa] = data[:mfa_option] == "bypass"
       data.delete(:mfa_option)
     end
+
     data
   end
 

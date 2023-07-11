@@ -119,7 +119,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def self.recognized_params
-    [:mfa_required, :skip_internal_mfa].freeze
+    %i[mfa_required skip_internal_mfa].freeze
   end
 
   def self.site_admin_params
