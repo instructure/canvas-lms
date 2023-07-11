@@ -543,6 +543,17 @@ class DiscussionTopicsController < ApplicationController
     usage_rights_required = @context.try(:usage_rights_required?)
     include_usage_rights = usage_rights_required &&
                            @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
+    course_published = if @context.is_a?(Course)
+                         @context.published?
+                       elsif @context.is_a?(Group) && @context.context.is_a?(Course)
+                         @context.context.published?
+                       else
+                         # known case: @context.is_a?(Group) && @context.context&.is_a?(Account)
+                         # at the time of writing, this is only used to show the announcment course unpublished warning
+                         # so in this known case, and other unknown cases, we can just return true to not show the warning
+                         true
+                       end
+
     unless @topic.new_record?
       add_discussion_or_announcement_crumb
       add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
@@ -558,6 +569,7 @@ class DiscussionTopicsController < ApplicationController
     end
     (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
     hash[:ATTRIBUTES][:can_group] = @topic.can_group?
+    hash[:ATTRIBUTES][:course_published] = course_published
     handle_assignment_edit_params(hash[:ATTRIBUTES])
 
     categories = []

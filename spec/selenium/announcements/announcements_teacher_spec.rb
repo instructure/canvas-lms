@@ -36,6 +36,13 @@ describe "announcements" do
       stub_rcs_config
     end
 
+    it "shows the unpublished course warning when course is unpublished" do
+      @course.workflow_state = "unpublished"
+      @course.save!
+      AnnouncementNewEdit.visit_new(@course)
+      expect(fj("div:contains('You must publish your course for students to receive announcement notifications. Notifications will not be sent retroactively from announcements created before publishing the course.')")).to be_present
+    end
+
     it "allows saving of section announcement", priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")

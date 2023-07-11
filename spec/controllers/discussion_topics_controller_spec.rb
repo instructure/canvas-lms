@@ -1209,6 +1209,42 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:CONTEXT_ID]).to eq(@course.id)
     end
 
+    it "js_env DISCUSSION_TOPIC ATTRIBUTES course_published correctly for course context" do
+      @course.workflow_state = "unpublished"
+      @course.save!
+      user_session(@teacher)
+      get :new, params: { course_id: @course.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_falsy
+      @course.workflow_state = "available"
+      @course.save!
+      get :new, params: { course_id: @course.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
+    end
+
+    it "js_env DISCUSSION_TOPIC ATTRIBUTES course_published correctly for group in course context" do
+      @course.workflow_state = "unpublished"
+      @course.save!
+      @group_category = @course.group_categories.create(name: "gc")
+      @group = @course.groups.create!(group_category: @group_category)
+      user_session(@teacher)
+      get :new, params: { group_id: @group.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_falsy
+      @course.workflow_state = "available"
+      @course.save!
+      get :new, params: { group_id: @group.id, is_announcement: true }
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
+    end
+
+    it "js_env DISCUSSION_TOPIC ATTRIBUTES course_published correctly for group in account context" do
+      @group_category = Account.default.group_categories.create(name: "gc")
+      @group = Account.default.groups.create!(group_category: @group_category)
+      user_session(account_admin_user(account: Account.default))
+
+      get :new, params: { group_id: @group.id, is_announcement: true }
+      # will be truthy since there is no such thing as unpublished account context
+      expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES][:course_published]).to be_truthy
+    end
+
     it "js_bundles includes discussion_create when ff is on" do
       user_session(@teacher)
       @course.root_account.enable_feature!(:discussion_create)
