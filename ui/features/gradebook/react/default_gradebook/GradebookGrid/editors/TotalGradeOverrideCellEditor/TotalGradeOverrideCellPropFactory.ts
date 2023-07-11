@@ -42,7 +42,7 @@ export default class TotalGradeOverrideCellPropFactory {
 
     return {
       gradeEntry,
-      gradeInfo: gradeEntry.gradeInfoFromGrade(grade),
+      gradeInfo: gradeEntry.gradeInfoFromGrade(grade, false),
       gradeIsUpdating: pendingGradeInfo != null && pendingGradeInfo.valid,
 
       onGradeUpdate: gradeInfo => {

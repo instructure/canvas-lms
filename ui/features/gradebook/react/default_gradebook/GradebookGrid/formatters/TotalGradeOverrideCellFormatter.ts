@@ -69,7 +69,7 @@ export default class TotalGradeOverrideCellFormatter {
         }
 
         const grade = gradebook.finalGradeOverrides?.getGradeForUser(studentId)
-        return gradeEntry.gradeInfoFromGrade(grade)
+        return gradeEntry.gradeInfoFromGrade(grade, false)
       },
 
       formatGradeInfo(gradeInfo) {
