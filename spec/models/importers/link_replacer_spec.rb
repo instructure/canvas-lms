@@ -21,16 +21,17 @@
 require_relative "../../import_helper"
 require_relative "mock_migration_query_service"
 
-describe "Importers::DbMigrationQueryService" do
+describe "Importers::LinkReplacer" do
   describe "#rewrite_item_version!" do
     it "takes a fresh snapshot of the model" do
       course = course_model
+      query_service = LinkConverters::MockMigrationQueryService.new(context_path: "/courses/#{course.id}", assets: {})
       p = course.wiki_pages.create(title: "some page", body: "asdf")
       version = p.current_version
       expect(version.yaml).to include("asdf")
       WikiPage.where(id: p.id).update_all(body: "fdsa")
-      query_service = Importers::DbMigrationQueryService.new(course, ContentMigration.new)
-      query_service.rewrite_item_version!(p.reload)
+      replacer = Importers::LinkReplacer.new(ContentMigration.new, query_service)
+      replacer.rewrite_item_version!(p.reload)
       expect(version.reload.yaml).to_not include("asdf")
       expect(version.reload.yaml).to include("fdsa")
     end
