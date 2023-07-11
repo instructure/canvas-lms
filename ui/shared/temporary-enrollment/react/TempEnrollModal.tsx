@@ -22,15 +22,43 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import {TempEnrollSearch} from './TempEnrollSearch'
 
 const I18n = useI18nScope('account_course_user_search')
 
 interface Props {
   readonly children: ReactElement
+  readonly user: {
+    id: string
+    name: string
+    avatar_url?: string
+  }
+  readonly canReadSIS?: boolean
+  readonly accountId: string
 }
 
 export function TempEnrollModal(props: Props) {
   const [open, setOpen] = useState(false)
+  const [page, setPage] = useState(0)
+
+  const renderScreen = () => {
+    if (page >= 2) {
+      // placeholder
+      return null
+    } else {
+      return (
+        <TempEnrollSearch
+          accountId={props.accountId}
+          canReadSIS={props.canReadSIS}
+          user={props.user}
+          page={page}
+          searchFail={() => setPage(0)}
+          // will set the enrollment in future commit
+          searchSuccess={() => {}}
+        />
+      )
+    }
+  }
 
   return (
     <>
@@ -40,23 +68,45 @@ export function TempEnrollModal(props: Props) {
           setOpen(false)
         }}
         size="large"
-        label={I18n.t('Create Temporary Enrollment')}
+        label={I18n.t('Create a Temporary Enrollment')}
         shouldCloseOnDocumentClick={true}
         theme={{smallMaxWidth: '30em'}}
       >
         <Modal.Header>
-          <Heading tabIndex="-1">{I18n.t('Create a Temporary Enrollment')}</Heading>
+          <Heading tabIndex="-1">
+            {I18n.t('Create a Temporary Enrollment for %{name}', {name: props.user.name})}
+          </Heading>
         </Modal.Header>
-        <Modal.Body />
+        <Modal.Body>{renderScreen()}</Modal.Body>
         <Modal.Footer>
           <Button
             onClick={() => {
               setOpen(false)
+              setPage(0)
             }}
           >
             {I18n.t('Cancel')}
           </Button>
-          <Button color="primary">{I18n.t('Next')}</Button>
+          &nbsp;
+          {page > 0 ? (
+            <Button
+              onClick={() => {
+                setPage(p => p - 1)
+              }}
+            >
+              {I18n.t('Back')}
+            </Button>
+          ) : null}
+          &nbsp;
+          <Button
+            color="primary"
+            onClick={() => {
+              setPage(p => p + 1)
+            }}
+          >
+            {I18n.t('Next')}
+          </Button>
+          &nbsp;
         </Modal.Footer>
       </Modal>
       {React.Children.map(props.children, child =>

@@ -52,7 +52,7 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
       <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
       <Table.Cell>
         {permissions.can_temp_enroll && (
-          <TempEnrollModal>
+          <TempEnrollModal user={user} canReadSIS={permissions.can_read_sis} accountId={accountId}>
             <Tooltip
               data-testid="user-list-row-tooltip"
               renderTip={I18n.t('Temporarily enroll %{name}', {name: user.name})}
@@ -140,6 +140,7 @@ UsersListRow.propTypes = {
     can_masquerade: bool,
     can_message_users: bool,
     can_edit_users: bool,
+    can_read_sis: bool,
   }).isRequired,
 }
 

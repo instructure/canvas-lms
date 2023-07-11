@@ -20,25 +20,31 @@ import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import {TempEnrollModal} from '../TempEnrollModal'
 
+const props = {
+  user: {id: '1', name: 'student1'},
+  canReadSIS: true,
+  accountId: '1',
+}
+
 describe('TempEnrollModal', () => {
   it('shows modal when opened', () => {
     const {getByText, queryByText} = render(
-      <TempEnrollModal>
+      <TempEnrollModal {...props}>
         <p>child_element</p>
       </TempEnrollModal>
     )
-    const noHeading = queryByText('Create a Temporary Enrollment')
+    const noHeading = queryByText('Create a Temporary Enrollment for student1')
     expect(noHeading).toBeNull()
 
     const c = getByText('child_element')
     fireEvent.click(c)
 
-    expect(getByText('Create a Temporary Enrollment')).toBeInTheDocument()
+    expect(getByText('Create a Temporary Enrollment for student1')).toBeInTheDocument()
   })
 
   it('hides modal when exited', async () => {
     const {getByText, queryByText} = render(
-      <TempEnrollModal>
+      <TempEnrollModal {...props}>
         <p>child_element</p>
       </TempEnrollModal>
     )
@@ -49,7 +55,7 @@ describe('TempEnrollModal', () => {
     fireEvent.click(cancel)
 
     await waitFor(() => expect(queryByText('Cancel')).toBeNull())
-    const header = queryByText('Create a Temporary Enrollment')
+    const header = queryByText('Create a Temporary Enrollment for student1')
     expect(header).toBeNull()
   })
 })
