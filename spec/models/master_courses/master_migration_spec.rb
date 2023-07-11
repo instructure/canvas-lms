@@ -39,6 +39,19 @@ describe MasterCourses::MasterMigration do
     @migration.reload
   end
 
+  def run_course_copy(copy_from, copy_to)
+    @cm = ContentMigration.new(context: copy_to,
+                               user: @user,
+                               source_course: copy_from,
+                               migration_type: "course_copy_importer",
+                               copy_options: { everything: "1" })
+    @cm.migration_settings[:import_immediately] = true
+    @cm.set_default_settings
+    @cm.save!
+    worker = Canvas::Migration::Worker::CourseCopyWorker.new
+    worker.perform(@cm)
+  end
+
   describe "start_new_migration!" do
     it "queues a migration" do
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).once
@@ -234,6 +247,14 @@ describe MasterCourses::MasterMigration do
         expect(@assignment_copy.reload.title).to eq("updated assignment title AGAIN")
         expect(@line_item_copy.reload.label).to eq("updated assignment title AGAIN")
         expect(@line_item_copy.reload.resource_id).to eq("updated_resource_id AGAIN")
+      end
+
+      it "does not cause errors for regular course copies" do
+        fresh_course = course_factory
+        Account.site_admin.enable_feature! :blueprint_line_item_support
+        run_course_copy(@copy_from, fresh_course)
+        expect(fresh_course.assignments.count).to eq(@copy_from.assignments.count)
+        expect(@cm.migration_issues).to be_empty
       end
     end
 
@@ -3217,19 +3238,6 @@ describe MasterCourses::MasterMigration do
     end
 
     context "attachment migration id preservation" do
-      def run_course_copy(copy_from, copy_to)
-        @cm = ContentMigration.new(context: copy_to,
-                                   user: @user,
-                                   source_course: copy_from,
-                                   migration_type: "course_copy_importer",
-                                   copy_options: { everything: "1" })
-        @cm.migration_settings[:import_immediately] = true
-        @cm.set_default_settings
-        @cm.save!
-        worker = Canvas::Migration::Worker::CourseCopyWorker.new
-        worker.perform(@cm)
-      end
-
       it "does not overwrite blueprint attachment migration ids from other course copies" do
         att = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
 

@@ -507,7 +507,7 @@ module Importers
 
           params[:client_id] = li[:client_id] unless tool
 
-          if Account.site_admin.feature_enabled?(:blueprint_line_item_support) && primary_line_item
+          if Account.site_admin.feature_enabled?(:blueprint_line_item_support) && migration&.for_master_course_import? && primary_line_item
             params = clear_params_before_overwriting_child_li(params, primary_line_item, migration)
             primary_line_item.mark_as_importing! migration
           end
@@ -551,7 +551,7 @@ module Importers
     end
 
     def self.clear_params_before_overwriting_child_li(params, primary_line_item, migration)
-      return params unless (child_tag = migration.master_course_subscription.content_tag_for(primary_line_item.assignment))
+      return params unless (child_tag = migration.master_course_subscription&.content_tag_for(primary_line_item.assignment))
       return params unless child_tag.downstream_changes.present?
 
       primary_line_item.class.base_class.restricted_column_settings.each do |type, columns|
