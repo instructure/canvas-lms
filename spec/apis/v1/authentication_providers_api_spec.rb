@@ -171,6 +171,13 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.position).to eq 1
     end
 
+    it "allows setting jit_provisioning attribute" do
+      call_create(@cas_hash.merge!(jit_provisioning: true))
+
+      aac = @account.authentication_providers.take
+      expect(aac.jit_provisioning).to be_truthy
+    end
+
     it "does not error when mixing auth_types (for now)" do
       call_create(@ldap_hash)
       call_create(@saml_hash, 200)
@@ -326,6 +333,16 @@ describe "AuthenticationProviders API", type: :request do
 
       aac.reload
       expect(aac.auth_base).to eq "192.168.0.1"
+    end
+
+    it "allows updating jit_provisioning attribute" do
+      aac = @account.authentication_providers.create!(@cas_hash)
+      expect(aac.jit_provisioning).to be_falsey
+
+      @cas_hash["jit_provisioning"] = true
+      call_update(aac.id, @cas_hash)
+
+      expect(aac.reload.jit_provisioning).to be_truthy
     end
 
     it "errors when mixing auth_types" do
