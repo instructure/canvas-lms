@@ -40,6 +40,8 @@ const isAnnouncement =
   ENV.DISCUSSION_TOPIC.ATTRIBUTES != null
     ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
     : undefined
+const isUnpublishedAnnouncement =
+  isAnnouncement && !ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published
 const model = new (isAnnouncement ? Announcement : DiscussionTopic)(
   ENV.DISCUSSION_TOPIC.ATTRIBUTES,
   {parse: true}
@@ -93,7 +95,6 @@ function sectionSpecificEnabled() {
     return false
   }
 
-  const isAnnouncement = ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
   return isAnnouncement || ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
 }
 
@@ -142,11 +143,22 @@ ready(() => {
   }
 
   view.render().$el.appendTo('#content')
+
+  if (isUnpublishedAnnouncement) {
+    ReactDOM.render(
+      <View display="block" id="announcement-course-unpublished-alert">
+        <Alert variant="warning">
+          {I18n.t(
+            'You must publish your course for students to receive announcement notifications. Notifications will not be sent retroactively from announcements created before publishing the course.'
+          )}
+        </Alert>
+      </View>,
+      document.querySelector('#announcement-course-unpublished-holder')
+    )
+  }
+
   document.querySelector('#discussion-title').focus()
 
-  // This needs to be run in the next tick, so that the backbone views are all
-  // properly created/rendered thus can be used to checked if this is a graded
-  // or group discussions.
   setTimeout(() => renderSectionsAutocomplete(view))
 
   setTimeout(() => {
