@@ -925,7 +925,7 @@ module Api::V1::Assignment
   # the current user is an observer
   def current_user_and_observed(opts = { include_observed: false })
     user_and_observees = Array(@current_user)
-    if opts[:include_observed] && @context_enrollment && @context_enrollment.observer?
+    if opts[:include_observed] && @current_user.enrollments.of_observer_type.active.where(course: @context).exists?
       user_and_observees.concat(ObserverEnrollment.observed_students(@context, @current_user).keys)
     end
     user_and_observees
