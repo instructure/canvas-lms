@@ -338,6 +338,7 @@ module Api::V1::Submission
 
     if other_fields.include?("proxy_submitter") && attempt.proxy_submission?
       hash["proxy_submitter"] = attempt.proxy_submitter.short_name
+      hash["proxy_submitter_id"] = attempt.proxy_submitter_id
     end
 
     if attempt.submission_type == "basic_lti_launch"
