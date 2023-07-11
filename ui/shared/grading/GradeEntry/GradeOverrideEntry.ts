@@ -82,13 +82,13 @@ export default class GradeOverrideEntry extends GradeEntry {
     })
   }
 
-  gradeInfoFromGrade(grade) {
+  gradeInfoFromGrade(grade, inputByUser: boolean) {
     if (!grade) {
       return this.parseValue(null)
     }
 
     const parseValue = grade.percentage == null ? grade.schemeKey : grade.percentage
-    return this.parseValue(parseValue)
+    return this.parseValue(parseValue, inputByUser)
   }
 
   hasGradeChanged(
@@ -106,6 +106,10 @@ export default class GradeOverrideEntry extends GradeEntry {
       return true
     }
 
+    if (currentGradeInfo.valid !== effectiveGradeInfo.valid) {
+      return true
+    }
+
     if (currentGradeInfo.enteredAs === EnterGradesAs.GRADING_SCHEME) {
       return currentGradeInfo.grade.schemeKey !== effectiveGradeInfo.grade.schemeKey
     }
@@ -113,7 +117,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     return currentGradeInfo.grade.percentage !== effectiveGradeInfo.grade.percentage
   }
 
-  parseValue(value): GradeOverrideInfo {
+  parseValue(value, inputByUser: boolean = true): GradeOverrideInfo {
     const gradingScheme: string | {data: DeprecatedGradingScheme[]} = this.options.gradingScheme
     const parseResult = parseEntryValue(value, gradingScheme)
 
@@ -137,7 +141,22 @@ export default class GradeOverrideEntry extends GradeEntry {
         percentage: parseResult.value,
         schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
       }
-      valid = true
+      if (
+        this.options.pointsBasedGradingSchemesFeatureEnabled &&
+        gradingScheme &&
+        gradingScheme.pointsBased
+      ) {
+        // points based scheme
+        if (inputByUser) {
+          // don't allow user to input percents or points for points based scheme
+          valid = false
+        } else {
+          // the initial (ie, saved to server value) in percent format is valid
+          valid = true
+        }
+      } else {
+        valid = true
+      }
     }
 
     if (grade != null) {
