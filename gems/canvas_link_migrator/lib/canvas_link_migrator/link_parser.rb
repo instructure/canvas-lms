@@ -90,7 +90,7 @@ module CanvasLinkMigrator
       if result[:resolved]
         # resolved, just replace and carry on
         new_url = result[:new_url] || url
-        unless ImportedHtmlConverter.relative_url?(new_url)
+        unless CanvasLinkMigrator.relative_url?(new_url)
           # perform configured substitutions
           if (processed_url = @migration_query_service.process_domain_substitutions(new_url))
             new_url = processed_url
@@ -191,7 +191,7 @@ module CanvasLinkMigrator
             # It's just a link to an anchor, leave it alone
             url.start_with?("#")
         resolved
-      elsif ImportedHtmlConverter.relative_url?(url)
+      elsif CanvasLinkMigrator.relative_url?(url)
         unresolved(:file, rel_path: URI::DEFAULT_PARSER.unescape(url))
       else # rubocop:disable Lint/DuplicateBranch
         resolved

@@ -302,22 +302,4 @@ describe ImportedHtmlConverter do
       expect(new_string).to eq "<p><img src=\"/courses/#{@course.id}/files/#{attachment.id}/preview\"></p>"
     end
   end
-
-  context ".relative_url?" do
-    it "recognizes an absolute url" do
-      expect(ImportedHtmlConverter.relative_url?("http://example.com")).to be false
-    end
-
-    it "recognizes relative urls" do
-      expect(ImportedHtmlConverter.relative_url?("/relative/eh")).to be true
-      expect(ImportedHtmlConverter.relative_url?("also/relative")).to be true
-      expect(ImportedHtmlConverter.relative_url?("watup/nothing.html#anchoritbaby")).to be true
-      expect(ImportedHtmlConverter.relative_url?("watup/nothing?absolutely=1")).to be true
-    end
-
-    it "does not error on invalid urls" do
-      expect(ImportedHtmlConverter.relative_url?("stupid &^%$ url")).to be_falsey
-      expect(ImportedHtmlConverter.relative_url?("mailto:jfarnsworth@instructure.com,")).to be_falsey
-    end
-  end
 end

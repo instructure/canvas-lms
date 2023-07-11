@@ -224,7 +224,7 @@ class CourseLinkValidator
 
     unless (result = visited_urls[url])
       begin
-        if ImportedHtmlConverter.relative_url?(url) || (domain_regex && url.match(domain_regex))
+        if CanvasLinkMigrator.relative_url?(url) || (domain_regex && url.match(domain_regex))
           result = if valid_route?(url)
                      if url.match(%r{/courses/(\d+)}) && course.id.to_s != $1
                        :course_mismatch
