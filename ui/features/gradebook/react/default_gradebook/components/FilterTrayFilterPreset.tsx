@@ -50,6 +50,7 @@ export type FilterTrayPresetProps = {
   isExpanded: boolean
   sections: Section[]
   studentGroupCategories: StudentGroupCategoryMap
+  closeRef: React.RefObject<any>
 }
 
 export default function FilterTrayPreset({
@@ -66,6 +67,7 @@ export default function FilterTrayPreset({
   isExpanded,
   sections,
   studentGroupCategories,
+  closeRef,
 }: FilterTrayPresetProps) {
   const [name, setName] = useState(filterPreset.name)
   const [filterPresetWasChanged, setFilterPresetWasChanged] = useState(false)
@@ -102,6 +104,7 @@ export default function FilterTrayPreset({
         filters: stagedFilters.filter(isFilterNotEmpty),
       }).then(success => {
         if (success) {
+          closeRef?.current?.focus()
           setName('')
           setStagedFilters(filterPreset.filters)
           setFilterPresetWasChanged(false)
@@ -121,6 +124,7 @@ export default function FilterTrayPreset({
       } as FilterPreset
       return onUpdate(updatedFilter).then(success => {
         if (success) {
+          closeRef?.current?.focus()
           setFilterPresetWasChanged(false)
         }
         if (isActive) {
