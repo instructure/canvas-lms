@@ -22,4 +22,10 @@ require "canvas_link_migrator/link_parser"
 require "canvas_link_migrator/link_resolver"
 
 module CanvasLinkMigrator
+  def self.relative_url?(url)
+    URI.parse(url).relative? && !url.to_s.start_with?("//")
+  rescue URI::Error
+    # leave the url as it was
+    false
+  end
 end
