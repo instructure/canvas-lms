@@ -69,8 +69,10 @@ $(function () {
         data,
         hrefValues: ['id', 'account_id'],
       })
-      $login.find('.links').addClass('passwordable')
-      $('#login_information .login .delete_pseudonym_link').show()
+      const $logins = $('#login_information .login')
+      $('.delete_pseudonym_link', $logins)[
+        $logins.filter(':visible').length < 2 ? 'hide' : 'show'
+      ]()
       $.flashMessage(I18n.t('save_succeeded', 'Save successful'))
     },
     error(errors, jqXHR, response) {
@@ -172,10 +174,13 @@ $(function () {
           ),
           url: $(this).attr('rel'),
           success() {
-            $(this).fadeOut()
-            if ($('#login_information .login:visible').length < 2) {
-              $('#login_information .login .delete_pseudonym_link').hide()
-            }
+            $(this).fadeOut(() => {
+              // to get an accurate count, we must wait for this fade to complete
+              const $logins = $('#login_information .login')
+              if ($logins.filter(':visible').length < 2) {
+                $('.delete_pseudonym_link', $logins).hide()
+              }
+            })
           },
         })
     })
