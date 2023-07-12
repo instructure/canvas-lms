@@ -34,18 +34,19 @@ const I18n = useScope('calendar_frequency_picker')
 export type OnFrequencyChange = (frequency: FrequencyOptionValue, RRule: string | null) => void
 
 export type FrequencyPickerProps = {
-  readonly date: string
-  readonly frequency?: FrequencyOptionValue
+  readonly date: Date | string
+  readonly initialFrequency?: FrequencyOptionValue
   readonly locale: string
   readonly onChange: OnFrequencyChange
 }
 
 export default function FrequencyPicker({
   date,
-  frequency = 'not-repeat',
+  initialFrequency = 'not-repeat',
   locale,
   onChange,
 }: FrequencyPickerProps) {
+  const [frequency, setFrequency] = useState<FrequencyOptionValue>(initialFrequency)
   const [parsedMoment, setParsedMoment] = useState<Moment>(moment(date))
   const [options, setOptions] = useState<FrequencyOptionsArray>(
     generateFrequencyOptions(parsedMoment, locale)
@@ -55,11 +56,13 @@ export default function FrequencyPicker({
     const newMoment = moment(date)
     setParsedMoment(newMoment)
     setOptions(generateFrequencyOptions(newMoment, locale))
+    setFrequency(frequency)
     onChange(frequency, generateFrequencyRRule(frequency, newMoment))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date])
 
   const handleSelectOption = (e: any, option: FrequencyOption) => {
+    setFrequency(option.id)
     onChange(option.id, generateFrequencyRRule(option.id, parsedMoment))
   }
 

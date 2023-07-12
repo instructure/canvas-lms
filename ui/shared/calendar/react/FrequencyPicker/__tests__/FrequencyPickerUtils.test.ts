@@ -117,27 +117,27 @@ describe('generateFrequencyRRule()', () => {
 
     it('daily event', () => {
       const result = generateFrequencyRRule('daily', datetime)
-      expect(result).toEqual('FREQ=DAILY;INTERVAL=1')
+      expect(result).toEqual('FREQ=DAILY;INTERVAL=1;COUNT=200')
     })
 
     it('weekly event', () => {
       const result = generateFrequencyRRule('weekly-day', datetime)
-      expect(result).toEqual('FREQ=WEEKLY;BYDAY=SA;INTERVAL=1')
+      expect(result).toEqual('FREQ=WEEKLY;BYDAY=SA;INTERVAL=1;COUNT=52')
     })
 
     it('monthly last day event', () => {
       const result = generateFrequencyRRule('monthly-nth-day', datetime)
-      expect(result).toEqual('FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA;INTERVAL=1')
+      expect(result).toEqual('FREQ=MONTHLY;BYSETPOS=1;BYDAY=SA;INTERVAL=1;COUNT=12')
     })
 
     it('annually event', () => {
       const result = generateFrequencyRRule('annually', datetime)
-      expect(result).toEqual('FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=05')
+      expect(result).toEqual('FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=05;INTERVAL=1;COUNT=5')
     })
 
     it('every-weekday event', () => {
       const result = generateFrequencyRRule('every-weekday', datetime)
-      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1')
+      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=52')
     })
 
     it('custom event', () => {
@@ -160,27 +160,27 @@ describe('generateFrequencyRRule()', () => {
 
     it('a daily event', () => {
       const result = generateFrequencyRRule('daily', datetime)
-      expect(result).toEqual('FREQ=DAILY;INTERVAL=1')
+      expect(result).toEqual('FREQ=DAILY;INTERVAL=1;COUNT=200')
     })
 
     it('a weekly event', () => {
       const result = generateFrequencyRRule('weekly-day', datetime)
-      expect(result).toEqual('FREQ=WEEKLY;BYDAY=TH;INTERVAL=1')
+      expect(result).toEqual('FREQ=WEEKLY;BYDAY=TH;INTERVAL=1;COUNT=52')
     })
 
     it('a monthly last day event', () => {
       const result = generateFrequencyRRule('monthly-nth-day', datetime)
-      expect(result).toEqual('FREQ=MONTHLY;BYSETPOS=-1;BYDAY=TH;INTERVAL=1')
+      expect(result).toEqual('FREQ=MONTHLY;BYSETPOS=-1;BYDAY=TH;INTERVAL=1;COUNT=12')
     })
 
     it('an annually event', () => {
       const result = generateFrequencyRRule('annually', datetime)
-      expect(result).toEqual('FREQ=YEARLY;BYMONTH=12;BYMONTHDAY=25')
+      expect(result).toEqual('FREQ=YEARLY;BYMONTH=12;BYMONTHDAY=25;INTERVAL=1;COUNT=5')
     })
 
     it('a every-weekday event', () => {
       const result = generateFrequencyRRule('every-weekday', datetime)
-      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1')
+      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=52')
     })
 
     it('custom', () => {
