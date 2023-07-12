@@ -83,6 +83,7 @@ class Submission < ActiveRecord::Base
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions
   belongs_to :course, inverse_of: :submissions
+  belongs_to :custom_grade_status, inverse_of: :submissions
   has_many :observer_alerts, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :user
   alias_method :student, :user
