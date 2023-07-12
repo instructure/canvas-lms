@@ -19,6 +19,7 @@
 
 require "canvas_link_migrator/resource_map_service"
 require "canvas_link_migrator/link_parser"
+require "canvas_link_migrator/link_replacer"
 require "canvas_link_migrator/link_resolver"
 
 module CanvasLinkMigrator

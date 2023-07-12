@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Importers
+module CanvasLinkMigrator
   class LinkReplacer
     # returns false if no substitutions were made
     def sub_placeholders!(html, links)

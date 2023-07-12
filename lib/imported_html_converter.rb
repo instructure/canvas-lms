@@ -44,7 +44,7 @@ class ImportedHtmlConverter
     @migration_id_converter = migration_id_converter
     @link_parser = CanvasLinkMigrator::LinkParser.new(migration_id_converter)
     @link_resolver = CanvasLinkMigrator::LinkResolver.new(migration_id_converter)
-    @link_replacer = Importers::LinkReplacer.new
+    @link_replacer = CanvasLinkMigrator::LinkReplacer.new
   end
 
   def convert_text(text)
