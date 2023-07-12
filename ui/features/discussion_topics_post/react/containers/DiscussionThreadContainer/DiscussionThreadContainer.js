@@ -321,7 +321,7 @@ export const DiscussionThreadContainer = props => {
     }
   }
 
-  const onUpdate = (message, _includeReplyPreview, file) => {
+  const onUpdate = (message, _quotedEntryId, file) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: props.discussionEntry._id,
@@ -402,7 +402,6 @@ export const DiscussionThreadContainer = props => {
       parentEntryId: getParentId(),
       fileId: file?._id,
       isAnonymousAuthor,
-      includeReplyPreview: !!quotedEntryId,
       message,
       courseID: ENV.course_id,
       quotedEntryId,

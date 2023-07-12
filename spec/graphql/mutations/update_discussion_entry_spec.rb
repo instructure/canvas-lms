@@ -35,7 +35,6 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     message: nil,
     remove_attachment: nil,
     file_id: nil,
-    include_reply_preview: nil,
     quoted_entry_id: nil
   )
     <<~GQL
@@ -45,7 +44,6 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
           #{"message: \"#{message}\"" unless message.nil?}
           #{"removeAttachment: #{remove_attachment}" unless remove_attachment.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
-          #{"includeReplyPreview: #{include_reply_preview}" unless include_reply_preview.nil?}
           #{"quotedEntryId: #{quoted_entry_id}" unless quoted_entry_id.nil?}
         }) {
           discussionEntry {
@@ -129,46 +127,6 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(@entry.reload.attachment_id).to eq attachment.id
     # Verify that the owner of the attachment did not change when teacher edited message
     expect(@entry.reload.attachment.user.id).to eq @student.id
-  end
-
-  context "include reply preview" do
-    it "cannot be true on a root entry" do
-      result = run_mutation(discussion_entry_id: @entry.id, include_reply_preview: true)
-      expect(result["errors"]).to be_nil
-      expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
-      expect(@entry.reload.include_reply_preview).to be false
-    end
-
-    it "can be true on a reply to a root entry" do
-      parent_entry = @topic.discussion_entries.create!(message: "I am the parent reply", user: @student, attachment: @attachment)
-      entry = @topic.discussion_entries.create!(message: "I am the child reply", user: @student, attachment: @attachment, parent_id: parent_entry.id, include_reply_preview: false, root_entry_id: parent_entry.id)
-      result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
-      expect(result["errors"]).to be_nil
-      expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
-      expect(entry.reload.include_reply_preview).to be true
-    end
-
-    it "does set on reply to a child reply" do
-      parent_entry = @topic.discussion_entries.create!(message: "I am the parent reply", user: @student, attachment: @attachment)
-      child_reply = @topic.discussion_entries.create!(message: "I am the child reply", user: @student, attachment: @attachment, parent_id: parent_entry.id)
-      entry = @topic.discussion_entries.create!(message: "Howdy", user: @student, attachment: @attachment, parent_id: child_reply.id, include_reply_preview: false)
-      result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: true)
-      expect(result["errors"]).to be_nil
-      expect(result.dig("data",
-                        'updateDiscussion
-        Entry',
-                        "errors")).to be_nil
-      expect(entry.reload.include_reply_preview).to be true
-    end
-
-    it "allows removing reply preview" do
-      parent_entry = @topic.discussion_entries.create!(message: "I am the parent reply", user: @student, attachment: @attachment)
-      child_reply = @topic.discussion_entries.create!(message: "I am the child reply", user: @student, attachment: @attachment, parent_id: parent_entry.id)
-      entry = @topic.discussion_entries.create!(message: "Howdy", user: @student, attachment: @attachment, parent_id: child_reply.id, include_reply_preview: true)
-      expect(entry.reload.include_reply_preview).to be true
-      run_mutation(discussion_entry_id: entry.id, include_reply_preview: false)
-      expect(entry.reload.include_reply_preview).to be false
-    end
   end
 
   context "quoted entry id" do

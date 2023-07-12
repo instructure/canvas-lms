@@ -202,7 +202,6 @@ export const IsolatedViewContainer = props => {
       isAnonymousAuthor,
       message,
       fileId: file?._id,
-      includeReplyPreview: !!quotedEntryId,
       courseID: ENV.course_id,
       quotedEntryId,
     }

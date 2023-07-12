@@ -117,7 +117,6 @@ describe('DiscussionsIsolatedView', () => {
         includeRelativeEntry: false,
       }),
       ...createDiscussionEntryMock({
-        includeReplyPreview: false,
         parentEntryId: '1',
       }),
     ]
