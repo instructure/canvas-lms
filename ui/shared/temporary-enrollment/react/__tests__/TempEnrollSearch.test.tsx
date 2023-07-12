@@ -34,31 +34,27 @@ describe('TempEnrollSearch', () => {
   }
   const userTemplate = {
     user_name: '',
-    email: '',
-    address: '',
     account_name: '',
     account_id: '',
-    login_id: '',
-    sis_user_id: '',
   }
-  const mockSame = {
-    userTemplate,
-    user_id: '1',
-  }
-  const mockNoUser = {
-    userTemplate,
-    user_id: '',
-  }
+  const mockSame = {users: [{userTemplate, user_id: '1', address: ''}]}
+  const mockNoUser = {users: []}
   const mockFindUser = {
-    userTemplate,
-    user_id: '2',
+    users: [
+      {
+        userTemplate,
+        user_id: '2',
+        email: 'user@email.com',
+        sis_user_id: 'user_sis',
+        login_id: 'user_login',
+      },
+    ],
   }
 
   afterEach(() => {
     fetchMock.restore()
   })
 
-  // passes
   it('shows search page', () => {
     const {getByText} = render(<TempEnrollSearch page={0} {...props} />)
     expect(getByText('Find an assignee of temporary enrollments from user1')).toBeInTheDocument()
@@ -73,9 +69,7 @@ describe('TempEnrollSearch', () => {
   })
 
   it('displays error message when user is same as original user', async () => {
-    fetchMock.post(`/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`, [
-      {mockSame},
-    ])
+    fetchMock.post(`/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`, mockSame)
     const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() =>
       expect(
@@ -87,20 +81,22 @@ describe('TempEnrollSearch', () => {
   })
 
   it('displays error message when no user is returned', async () => {
-    fetchMock.post(`/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`, [
-      {mockNoUser},
-    ])
+    fetchMock.post(`/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`, mockNoUser)
     const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
     await waitFor(() => expect(queryAllByText('User could not be found.')).toBeTruthy())
   })
 
   it('displays new page when user is found', async () => {
-    fetchMock.post(`/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`, [
-      {mockFindUser},
-    ])
-    const {queryAllByText} = render(<TempEnrollSearch page={1} {...props} />)
+    fetchMock.post(
+      `/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`,
+      mockFindUser
+    )
+    fetchMock.get('/api/v1/users/2', mockFindUser.users[0])
+    const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
     // in a future commit, this will be changed to the found user on the confirmation screen
-    await waitFor(() => expect(queryAllByText('Confirmation Page')).toBeTruthy())
+    await waitFor(() =>
+      expect(queryByText('This user is ready to be assigned temporary enrollments.')).toBeTruthy()
+    )
   })
 
   it('changes label when different search type is chosen', () => {
@@ -125,5 +121,27 @@ describe('TempEnrollSearch', () => {
   it('hides SIS search when user does not have permission', () => {
     const {queryByText} = render(<TempEnrollSearch page={0} {...props} canReadSIS={false} />)
     expect(queryByText('SIS ID')).toBeFalsy()
+  })
+
+  it('shows found user information on confirmation page', async () => {
+    fetchMock.post(
+      `/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`,
+      mockFindUser
+    )
+    fetchMock.get('/api/v1/users/2', mockFindUser.users[0])
+    const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
+    await waitFor(() => expect(queryByText('user@email.com')).toBeInTheDocument())
+    await waitFor(() => expect(queryByText('user_sis')).toBeInTheDocument())
+    await waitFor(() => expect(queryByText('user_login')).toBeInTheDocument())
+  })
+
+  it('does not show sis id on confirmation page when permission is off', async () => {
+    fetchMock.post(
+      `/accounts/1/user_lists.json?user_list=&v2=true&search_type=cc_path`,
+      mockFindUser
+    )
+    fetchMock.get('/api/v1/users/2', mockFindUser.users[0])
+    const {queryByText} = render(<TempEnrollSearch page={1} {...props} canReadSIS={false} />)
+    await waitFor(() => expect(queryByText('SIS ID')).toBeFalsy())
   })
 })
