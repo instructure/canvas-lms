@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import moment from 'moment-timezone'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
-import {FormFieldGroup} from '@instructure/ui-form-field'
+import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
 // @ts-expect-error
 import {px} from '@instructure/ui-utils'
@@ -27,7 +27,10 @@ import {px} from '@instructure/ui-utils'
 import {RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
+// @ts-expect-error
+import {IconWarningLine} from '@instructure/ui-icons'
 import {DEFAULT_COUNT, MAX_COUNT} from '../RRuleHelper'
+import {FrequencyValue} from '../types'
 
 import {useScope} from '@canvas/i18n'
 
@@ -43,20 +46,157 @@ export type RecurrenceEndPickerProps = {
   dtstart: string
   locale: string
   timezone: string
+  freq: FrequencyValue
+  interval: number
   courseEndAt?: string
   until?: string
   count?: number
   onChange: (state: OnRecurrenceEndChangeType) => void
 }
 
-const makeDefaultCount = (count: number | undefined) =>
-  typeof count === 'number' && count > 0 && count <= MAX_COUNT ? count : DEFAULT_COUNT
+export type InstuiMessage = {
+  type: 'hint' | 'error'
+  text: string
+}
+
+export const CountValidator = {
+  makeDefaultCount: (count: number | undefined) =>
+    typeof count === 'number' && count > 0 && count <= MAX_COUNT ? count : DEFAULT_COUNT,
+
+  hint: (): InstuiMessage[] => [],
+
+  invalidCount: (): InstuiMessage[] => [
+    {
+      type: 'error',
+      text: I18n.t('Must be between 1 and %{max}', {
+        max: MAX_COUNT,
+      }),
+    },
+  ],
+
+  countTooSmall: (): InstuiMessage[] => [
+    {
+      type: 'error',
+      text: I18n.t('Must have at least 1 occurrence'),
+    },
+  ],
+
+  countTooLarge: (): InstuiMessage[] => [
+    {
+      type: 'error',
+      text: I18n.t('Exceeds %{max} occurrences limit', {
+        max: MAX_COUNT,
+      }),
+    },
+  ],
+
+  countNotWhole: (): InstuiMessage[] => [
+    {
+      type: 'error',
+      text: I18n.t('Must be a whole number'),
+    },
+  ],
+
+  isValidCount: (cnt: number | undefined, mode: ModeValues): boolean => {
+    if (mode === 'ON') return true // we don't care
+    // @ts-expect-error isInteger will prevent the following checks being done on undefined, but ts doesn't know that
+    if (Number.isInteger(cnt) && cnt > 0 && cnt <= MAX_COUNT) return true
+    return false
+  },
+
+  getCountMessage: (count: number | undefined): InstuiMessage[] | undefined => {
+    if (count === undefined) return CountValidator.hint()
+    if (Number.isNaN(count)) return CountValidator.invalidCount()
+    if (!Number.isInteger(count)) return CountValidator.countNotWhole()
+    if (count < 1) return CountValidator.countTooSmall()
+    if (count > MAX_COUNT) return CountValidator.countTooLarge()
+    return undefined
+  },
+}
+
+export const UntilValidator = {
+  hint: (courseEndAt: string | undefined): InstuiMessage[] => {
+    return courseEndAt !== undefined ? UntilValidator.courseEndHint(courseEndAt) : []
+  },
+
+  courseEndHint: (courseEndAt: string): InstuiMessage[] => [
+    {
+      type: 'hint',
+      text: I18n.t('Course ends %{endat}', {endat: courseEndAt}),
+    },
+  ],
+
+  tooSoon: (): InstuiMessage[] => [
+    {
+      type: 'error',
+      text: I18n.t('Until date must be after the event start date'),
+    },
+  ],
+
+  tooMany: (): InstuiMessage[] => [
+    {
+      type: 'error',
+      text: I18n.t('Exceeds %{max} events.', {max: MAX_COUNT}),
+    },
+    {
+      type: 'error',
+      text: I18n.t('Please pick an earlier date'),
+    },
+  ],
+
+  freq2Diff: (freq: FrequencyValue): moment.unitOfTime.Diff => {
+    switch (freq) {
+      case 'DAILY':
+        return 'days'
+      case 'WEEKLY':
+        return 'weeks'
+      case 'MONTHLY':
+        return 'months'
+      case 'YEARLY':
+        return 'years'
+    }
+  },
+
+  occurrences(
+    start: moment.Moment,
+    until: moment.Moment,
+    freq: FrequencyValue,
+    interval: number
+  ): number {
+    const days = until.diff(start, UntilValidator.freq2Diff(freq))
+    return Math.floor(days / interval) + 1
+  },
+
+  getUntilMessage: (
+    until: string | undefined,
+    timezone: string,
+    eventStart: string,
+    mode: ModeValues,
+    freq: FrequencyValue,
+    interval: number,
+    courseEndAt: string | undefined
+  ): InstuiMessage[] | undefined => {
+    if (mode === 'AFTER') {
+      return UntilValidator.hint(courseEndAt)
+    }
+    if (until === undefined) return UntilValidator.hint(courseEndAt)
+    const untilDate = moment.tz(until, timezone)
+    const eventStartDate = moment.tz(eventStart, timezone)
+    if (untilDate.isBefore(eventStartDate)) return UntilValidator.tooSoon()
+
+    return UntilValidator.occurrences(eventStartDate, untilDate, freq, interval) > MAX_COUNT
+      ? UntilValidator.tooMany()
+      : UntilValidator.hint(courseEndAt)
+  },
+}
 
 export default function RecurrenceEndPicker({
   dtstart,
   locale,
   timezone,
   courseEndAt,
+  freq,
+  interval,
   until,
   count,
   onChange,
@@ -74,11 +214,17 @@ export default function RecurrenceEndPicker({
     // to be consistent with what is returned from DateInput when the date
     // is changed, initialize untilDate to be as the start of the day
     if (until !== undefined)
-      return moment.tz(until, timezone).startOf('day').format('YYYY-MM-DDTHH:mm:ssZ')
-    const start = moment.tz(eventStart, timezone).startOf('day')
+      return moment.tz(until, timezone).endOf('day').format('YYYY-MM-DDTHH:mm:ssZ')
+    const start = moment.tz(eventStart, timezone).endOf('day')
     return start.add(1, 'year').format('YYYY-MM-DDTHH:mm:ssZ')
   })
-  const [countNumber, setCountNumber] = useState<number | undefined>(makeDefaultCount(count))
+  const [countNumber, setCountNumber] = useState<number | undefined>(
+    CountValidator.makeDefaultCount(count)
+  )
+  const [countValue, setCountValue] = useState<string>(countNumber?.toString() || '')
+  const [countMessage, setCountMessage] = useState<InstuiMessage[] | undefined>(
+    CountValidator.hint()
+  )
 
   const dateFormatter = new Intl.DateTimeFormat(locale, {
     month: 'long',
@@ -101,17 +247,19 @@ export default function RecurrenceEndPicker({
       setUntilDate(until)
     } else {
       setMode('AFTER')
-      setCountNumber(makeDefaultCount(count))
+      if (count !== undefined && !Number.isNaN(count)) {
+        setCountNumber(count)
+      }
     }
   }, [count, until])
 
-  const formatCourseEndDate = (date?: string): string => {
-    if (!date) return ''
+  const formatCourseEndDate = (date?: string): string | undefined => {
+    if (!date) return undefined
     return dateFormatter.format(moment.tz(date, timezone).toDate())
   }
 
   const fireOnChange = useCallback(
-    (newMode, newUntil, newCount) => {
+    (newMode, newUntil, newCount): void => {
       if (newMode === 'ON') {
         if (newUntil === undefined) return
         onChange({until: newUntil, count: undefined})
@@ -127,6 +275,11 @@ export default function RecurrenceEndPicker({
   const handleModeChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
       const newMode = event.target.value as ModeValues
+      if (newMode === 'ON') {
+        setCountMessage(CountValidator.hint())
+      } else {
+        setCountMessage(CountValidator.getCountMessage(countNumber))
+      }
       setMode(newMode)
       fireOnChange(newMode, untilDate, countNumber)
     },
@@ -135,11 +288,16 @@ export default function RecurrenceEndPicker({
 
   const handleCountChange = useCallback(
     (_event: Event, value: string | number): void => {
-      const cnt = typeof value === 'string' ? parseInt(value, 10) : value
-      if (Number.isNaN(cnt)) return
-      if (cnt < 1) return
+      const cnt = typeof value === 'string' ? parseFloat(value) : value
       setCountNumber(cnt)
-      fireOnChange(mode, untilDate, cnt)
+      setCountValue(value.toString())
+      if (CountValidator.isValidCount(cnt, mode)) {
+        setCountMessage(CountValidator.hint())
+        fireOnChange(mode, untilDate, cnt)
+      } else {
+        setCountMessage(CountValidator.getCountMessage(cnt))
+        fireOnChange(mode, untilDate, undefined)
+      }
     },
     [fireOnChange, mode, untilDate]
   )
@@ -151,6 +309,7 @@ export default function RecurrenceEndPicker({
       // js Date cannot parse ISO strings with milliseconds
       const newISODate = moment
         .tz(date, timezone)
+        .endOf('day')
         .toISOString(true)
         .replace(/\.\d+/, '')
         .replace(/\+00:00/, 'Z')
@@ -194,16 +353,15 @@ export default function RecurrenceEndPicker({
           selectedDate={untilDate}
           formatDate={date => dateFormatter.format(date)}
           onSelectedDateChange={handleDateChange}
-          messages={
-            courseEndAt
-              ? [
-                  {
-                    type: 'hint',
-                    text: I18n.t('Course ends %{endat}', {endat: formatCourseEndDate(courseEndAt)}),
-                  },
-                ]
-              : undefined
-          }
+          messages={UntilValidator.getUntilMessage(
+            untilDate,
+            timezone,
+            eventStart,
+            mode,
+            freq,
+            interval,
+            formatCourseEndDate(courseEndAt)
+          )}
         />
         <div style={alignMe}>
           <RadioInput
@@ -214,28 +372,44 @@ export default function RecurrenceEndPicker({
             onChange={handleModeChange}
           />
         </div>
-        <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-          <NumberInput
-            display="inline-block"
-            interaction={mode === 'AFTER' ? 'enabled' : 'disabled'}
-            messages={[{type: 'hint', text: I18n.t('Maximum %{max}', {max: MAX_COUNT})}]}
-            renderLabel={<ScreenReaderContent>{I18n.t('occurences')}</ScreenReaderContent>}
-            value={countNumber}
-            width={`${px('3em') + px('4rem')}px`}
-            onChange={handleCountChange}
-            onIncrement={(event: Event) => {
-              if (countNumber === undefined || Number.isNaN(countNumber)) return
-              handleCountChange(event, countNumber + 1)
-            }}
-            onDecrement={(event: Event) => {
-              if (countNumber === undefined || Number.isNaN(countNumber)) return
-              handleCountChange(event, countNumber - 1)
-            }}
-          />
-          <div style={alignMe}>
-            <Text as="span">{I18n.t('occurrences')}</Text>
+        <FormField
+          id="recurrence-end-count"
+          messages={countMessage}
+          label={<ScreenReaderContent>{I18n.t('occurrences')}</ScreenReaderContent>}
+        >
+          <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <NumberInput
+              display="inline-block"
+              interaction={mode === 'AFTER' ? 'enabled' : 'disabled'}
+              renderLabel={() => ''}
+              value={countValue}
+              width={`${px('3em') + px('4rem')}px`}
+              onChange={handleCountChange}
+              onIncrement={(event: Event) => {
+                if (
+                  countNumber === undefined ||
+                  Number.isNaN(countNumber) ||
+                  countNumber >= MAX_COUNT
+                )
+                  return
+                handleCountChange(event, Math.floor(countNumber) + 1)
+              }}
+              onDecrement={(event: Event) => {
+                if (countNumber === undefined || Number.isNaN(countNumber) || countNumber <= 1)
+                  return
+                handleCountChange(event, Math.ceil(countNumber) - 1)
+              }}
+            />
+            <div style={{...alignMe, whiteSpace: 'nowrap'}}>
+              <Text as="span">{I18n.t('occurrences (max %{max})', {max: MAX_COUNT})}</Text>
+              {!CountValidator.isValidCount(countNumber, mode) && (
+                <span style={{marginInlineStart: '0.5rem'}}>
+                  <IconWarningLine color="error" />
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        </FormField>
       </div>
     </FormFieldGroup>
   )

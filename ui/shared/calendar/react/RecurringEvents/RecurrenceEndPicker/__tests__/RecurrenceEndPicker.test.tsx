@@ -19,11 +19,20 @@
 import React from 'react'
 import {render, act, fireEvent, screen, waitFor} from '@testing-library/react'
 import moment from 'moment-timezone'
-import {UnknownSubset} from '../../types'
-import RecurrenceEndPicker, {RecurrenceEndPickerProps} from '../RecurrenceEndPicker'
+import {UnknownSubset, FrequencyValue} from '../../types'
+import RecurrenceEndPicker, {
+  RecurrenceEndPickerProps,
+  CountValidator,
+  UntilValidator,
+  InstuiMessage,
+  ModeValues,
+} from '../RecurrenceEndPicker'
+import {MAX_COUNT} from '../../RRuleHelper'
 
 const defaultTZ = 'Asia/Tokyo'
 const today = moment().tz(defaultTZ)
+
+type messageSpy = jest.SpyInstance<InstuiMessage[], []>
 
 export function formatDate(date: Date, locale: string, timezone: string) {
   return new Intl.DateTimeFormat('en', {
@@ -63,6 +72,8 @@ const defaultProps = (
   timezone: defaultTZ,
   dtstart: today.format('YYYY-MM-DDTHH:mm:ssZ'),
   courseEndAt: undefined,
+  freq: 'DAILY',
+  interval: 1,
   until: undefined,
   count: undefined,
   onChange: () => {},
@@ -114,7 +125,7 @@ describe('RecurrenceEndPicker', () => {
     await changeUntilDate(enddate, newEndDate, props.locale, props.timezone)
 
     expect(onChange).toHaveBeenCalledWith({
-      until: newEndDate.startOf('day').format('YYYY-MM-DDTHH:mm:ssZ'),
+      until: newEndDate.endOf('day').format('YYYY-MM-DDTHH:mm:ssZ'),
       count: undefined,
     })
   })
@@ -132,6 +143,184 @@ describe('RecurrenceEndPicker', () => {
     expect(onChange).toHaveBeenCalledWith({
       until: undefined,
       count: 6,
+    })
+  })
+
+  it('fires onChange with undefined pos if the count input is invalid', async () => {
+    const onChange = jest.fn()
+    const props = {...defaultProps({onChange, count: 5})}
+    const {getByDisplayValue} = render(<RecurrenceEndPicker {...props} />)
+
+    const countinput = getByDisplayValue('5')
+
+    act(() => {
+      fireEvent.change(countinput, {target: {value: ''}})
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      until: undefined,
+      count: undefined,
+    })
+
+    act(() => {
+      fireEvent.change(countinput, {target: {value: 'invalid'}})
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      until: undefined,
+      count: undefined,
+    })
+
+    act(() => {
+      fireEvent.change(countinput, {target: {value: '5.2'}})
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      until: undefined,
+      count: undefined,
+    })
+
+    act(() => {
+      fireEvent.change(countinput, {target: {value: '-1'}})
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      until: undefined,
+      count: undefined,
+    })
+
+    act(() => {
+      fireEvent.change(countinput, {target: {value: '401'}})
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      until: undefined,
+      count: undefined,
+    })
+  })
+
+  describe('CountValidator', () => {
+    describe('isValidCount', () => {
+      it('returns false for NaN', () => {
+        expect(CountValidator.isValidCount(NaN, 'AFTER')).toBe(false)
+      })
+
+      it('returns false for numbers out of bounds', () => {
+        expect(CountValidator.isValidCount(-1, 'AFTER')).toBe(false)
+        expect(CountValidator.isValidCount(MAX_COUNT + 1, 'AFTER')).toBe(false)
+      })
+
+      it('returns false for non-integers', () => {
+        expect(CountValidator.isValidCount(1.5, 'AFTER')).toBe(false)
+      })
+
+      it('returns true if the mode is "ON"', () => {
+        expect(CountValidator.isValidCount(1, 'ON')).toBe(true)
+        expect(CountValidator.isValidCount(NaN, 'ON')).toBe(true)
+        expect(CountValidator.isValidCount(-1, 'ON')).toBe(true)
+        expect(CountValidator.isValidCount(MAX_COUNT + 1, 'ON')).toBe(true)
+        expect(CountValidator.isValidCount(1.5, 'ON')).toBe(true)
+      })
+    })
+
+    describe('getCountMessage', () => {
+      afterEach(() => {
+        jest.resetAllMocks()
+      })
+
+      it('returns the hint count is undefined', () => {
+        const hintSpy: messageSpy = jest.spyOn(CountValidator, 'hint')
+        CountValidator.getCountMessage(undefined)
+        expect(hintSpy).toHaveBeenCalled()
+      })
+
+      it('returns the invalidCount message if the count is NaN', () => {
+        const invalidCountSpy: messageSpy = jest.spyOn(CountValidator, 'invalidCount')
+        CountValidator.getCountMessage(NaN)
+        expect(invalidCountSpy).toHaveBeenCalled()
+      })
+
+      it('returns the countTooSmall message if the count is too small', () => {
+        const countTooSmallSpy: messageSpy = jest.spyOn(CountValidator, 'countTooSmall')
+        CountValidator.getCountMessage(0)
+        expect(countTooSmallSpy).toHaveBeenCalled()
+      })
+
+      it('returns the countTooLarge message if the count is too large', () => {
+        const countTooLargeSpy: messageSpy = jest.spyOn(CountValidator, 'countTooLarge')
+        CountValidator.getCountMessage(MAX_COUNT + 1)
+        expect(countTooLargeSpy).toHaveBeenCalled()
+      })
+
+      it('returns the countNotWhole message if the count is not a whole number', () => {
+        const countNotWholeSpy: messageSpy = jest.spyOn(CountValidator, 'countNotWhole')
+        CountValidator.getCountMessage(1.5)
+        expect(countNotWholeSpy).toHaveBeenCalled()
+      })
+    })
+  })
+
+  describe('UntilValidator', () => {
+    describe('getUntilMessage', () => {
+      type getUntilMessageArgs = [
+        until: string | undefined,
+        timezone: string,
+        eventStart: string,
+        mode: ModeValues,
+        freq: FrequencyValue,
+        interval: number,
+        courseEndAt: string | undefined
+      ]
+      const defaultGetUntilMessageProps = (overrides = {}): getUntilMessageArgs => {
+        const propObj = {
+          until: undefined,
+          timezone: defaultTZ,
+          eventStart: '2023-07-13T13:00:00-04:00',
+          mode: 'ON',
+          freq: 'DAILY',
+          interval: 1,
+          courseEndAt: undefined,
+          ...overrides,
+        }
+        return Object.values(propObj) as getUntilMessageArgs
+      }
+
+      afterEach(() => {
+        jest.resetAllMocks()
+      })
+
+      it('returns the hint count end mode is "AFTER"', () => {
+        const hintSpy: jest.SpyInstance<InstuiMessage[], [CourseEndAt: string | undefined]> =
+          jest.spyOn(UntilValidator, 'hint')
+        UntilValidator.getUntilMessage.apply(null, defaultGetUntilMessageProps({mode: 'AFTER'}))
+        expect(hintSpy).toHaveBeenCalled()
+      })
+
+      it('returns the hint if until is undefined', () => {
+        const hintSpy: jest.SpyInstance<InstuiMessage[], [CourseEndAt: string | undefined]> =
+          jest.spyOn(UntilValidator, 'hint')
+        UntilValidator.getUntilMessage.apply(null, defaultGetUntilMessageProps())
+        expect(hintSpy).toHaveBeenCalled()
+      })
+
+      it('returns too soon message if until is before event start', () => {
+        const tooSoonSpy: messageSpy = jest.spyOn(UntilValidator, 'tooSoon')
+        UntilValidator.getUntilMessage.apply(
+          null,
+          defaultGetUntilMessageProps({
+            eventStart: '2023-07-13T13:00:00-04:00',
+            until: '2023-07-12T13:00:00-04:00',
+          })
+        )
+        expect(tooSoonSpy).toHaveBeenCalled()
+      })
+
+      it('returns too many message if until is too far in the future', () => {
+        const tooManySpy: messageSpy = jest.spyOn(UntilValidator, 'tooMany')
+        UntilValidator.getUntilMessage.apply(
+          null,
+          defaultGetUntilMessageProps({
+            eventStart: '2023-07-13T13:00:00-04:00',
+            until: '2025-07-13T13:00:00-04:00',
+          })
+        )
+        expect(tooManySpy).toHaveBeenCalled()
+      })
     })
   })
 })

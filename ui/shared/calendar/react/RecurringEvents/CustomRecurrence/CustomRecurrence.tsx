@@ -171,6 +171,8 @@ export default function CustomRecurrence({
           dtstart={dtstart_str}
           locale={locale}
           timezone={timezone}
+          freq={freq}
+          interval={interval}
           until={until}
           count={count}
           courseEndAt={courseEndAt}

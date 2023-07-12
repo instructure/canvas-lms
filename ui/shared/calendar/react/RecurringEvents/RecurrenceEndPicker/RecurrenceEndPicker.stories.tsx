@@ -53,6 +53,8 @@ const Template: Story<RecurrenceEndPicker> = args => {
           dtstart={args.dtstart}
           locale={args.locale}
           timezone={args.timezone}
+          freq={args.freq}
+          interval={args.interval}
           until={currUntil}
           count={currCount}
           onChange={handleChange}
@@ -75,6 +77,7 @@ export const Default = Template.bind({})
 Default.args = {
   locale: 'en',
   timezone: mytimezone,
+  freq: 'DAILY',
 }
 
 export const WithCount = Template.bind({})
@@ -82,6 +85,8 @@ WithCount.args = {
   locale: 'en',
   timezone: mytimezone,
   count: 2,
+  freq: 'DAILY',
+  interval: 2,
 }
 
 export const WithUntil = Template.bind({})
@@ -89,6 +94,8 @@ WithUntil.args = {
   locale: 'en',
   timezone: 'America/Los_Angeles',
   until: '2024-06-30',
+  freq: 'DAILY',
+  interval: 2,
 }
 
 export const InGerman = Template.bind({})
@@ -96,6 +103,8 @@ InGerman.args = {
   locale: 'de',
   timezone: mytimezone,
   until: '2024-06-30',
+  freq: 'DAILY',
+  interval: 2,
 }
 
 export const CourseEnds = Template.bind({})
@@ -103,4 +112,6 @@ CourseEnds.args = {
   locale: 'en',
   timezone: mytimezone,
   courseEndAt: '2024-06-30',
+  freq: 'DAILY',
+  interval: 2,
 }
