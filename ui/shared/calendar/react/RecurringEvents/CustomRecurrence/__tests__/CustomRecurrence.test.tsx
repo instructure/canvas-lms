@@ -145,7 +145,7 @@ describe('CustomRecurrence', () => {
 
     expect(onChange).toHaveBeenCalledWith({
       ...props.rruleSpec,
-      until: newEndDate.startOf('day').format('YYYY-MM-DDTHH:mm:ssZ'),
+      until: newEndDate.endOf('day').format('YYYY-MM-DDTHH:mm:ssZ'),
     })
   })
 
@@ -160,7 +160,7 @@ describe('CustomRecurrence', () => {
     expect(onChange).toHaveBeenCalledWith({
       ...props.rruleSpec,
       count: undefined,
-      until: today.clone().add(1, 'year').startOf('day').format('YYYY-MM-DDTHH:mm:ssZ'),
+      until: today.clone().add(1, 'year').endOf('day').format('YYYY-MM-DDTHH:mm:ssZ'),
     })
   })
 })

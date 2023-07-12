@@ -130,16 +130,18 @@ export default function CustomRecurrenceModal({
       footer={<Footer />}
       shouldCloseOnDocumentClick={false}
     >
-      <CustomRecurrenceErrorBoundary>
-        <CustomRecurrence
-          eventStart={eventStart}
-          locale={locale}
-          timezone={timezone}
-          courseEndAt={courseEndAt}
-          rruleSpec={currSpec}
-          onChange={handleChange}
-        />
-      </CustomRecurrenceErrorBoundary>
+      <div style={{minWidth: '28rem', minHeight: '20rem'}}>
+        <CustomRecurrenceErrorBoundary>
+          <CustomRecurrence
+            eventStart={eventStart}
+            locale={locale}
+            timezone={timezone}
+            courseEndAt={courseEndAt}
+            rruleSpec={currSpec}
+            onChange={handleChange}
+          />
+        </CustomRecurrenceErrorBoundary>
+      </div>
     </CanvasModal>
   )
 }
