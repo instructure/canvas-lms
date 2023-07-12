@@ -20,15 +20,14 @@
 
 describe ImportedHtmlConverter do
   # tests link_parser and link_resolver
+  before :once do
+    course_factory
+    @path = "/courses/#{@course.id}/"
+    @migration = @course.content_migrations.create!
+    @converter = @migration.html_converter
+  end
 
   context ".convert" do
-    before :once do
-      course_factory
-      @path = "/courses/#{@course.id}/"
-      @migration = @course.content_migrations.create!
-      @converter = @migration.html_converter
-    end
-
     def convert_and_replace(test_string)
       html = @migration.convert_html(test_string, "sometype", "somemigid", "somefield")
       link_map = @converter.link_parser.unresolved_link_map
@@ -300,6 +299,18 @@ describe ImportedHtmlConverter do
       expect(attachment.content_type).to eq "image/gif"
       expect(attachment.name).to eq "1d1fde3d669ed5c4fc68a49d643f140d.gif"
       expect(new_string).to eq "<p><img src=\"/courses/#{@course.id}/files/#{attachment.id}/preview\"></p>"
+    end
+  end
+
+  describe "#rewrite_item_version!" do
+    it "takes a fresh snapshot of the model" do
+      p = @course.wiki_pages.create(title: "some page", body: "asdf")
+      version = p.current_version
+      expect(version.yaml).to include("asdf")
+      WikiPage.where(id: p.id).update_all(body: "fdsa")
+      @converter.rewrite_item_version!(p.reload)
+      expect(version.reload.yaml).to_not include("asdf")
+      expect(version.reload.yaml).to include("fdsa")
     end
   end
 end

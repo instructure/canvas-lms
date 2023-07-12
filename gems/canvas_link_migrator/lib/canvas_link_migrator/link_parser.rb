@@ -50,6 +50,9 @@ module CanvasLinkMigrator
       wiki
       wiki_pages
     ].freeze
+    CONTAINER_TYPES = %w[div p body].freeze
+    LINK_ATTRS = %w[rel href src srcset data value longdesc data-download-url].freeze
+    RCE_MEDIA_TYPES = %w[audio video].freeze
 
     attr_reader :unresolved_link_map, :migration_query_service
 
@@ -71,6 +74,42 @@ module CanvasLinkMigrator
 
     def placeholder(old_value)
       "#{LINK_PLACEHOLDER}_#{Digest::MD5.hexdigest(old_value)}"
+    end
+
+    def convert(html, item_type, mig_id, field, opts = {})
+      mig_id = mig_id.to_s
+      doc = Nokogiri::HTML5(html || "")
+
+      # Replace source tags with iframes
+      doc.search("source[data-media-id]").each do |source|
+        next unless RCE_MEDIA_TYPES.include?(source.parent.name)
+
+        media_node = source.parent
+        media_node.name = "iframe"
+        media_node["src"] = source["src"]
+        source.remove
+      end
+
+      doc.search("*").each do |node|
+        LINK_ATTRS.each do |attr|
+          convert_link(node, attr, item_type, mig_id, field)
+        end
+      end
+
+      node = doc.at_css("body")
+      return "" unless node
+
+      if opts[:remove_outer_nodes_if_one_child]
+        while node.children.size == 1 && node.child.child
+          break unless CONTAINER_TYPES.member?(node.child.name) && node.child.attributes.blank?
+
+          node = node.child
+        end
+      end
+
+      node.inner_html
+    rescue Nokogiri::SyntaxError
+      ""
     end
 
     def convert_link(node, attr, item_type, mig_id, field)
