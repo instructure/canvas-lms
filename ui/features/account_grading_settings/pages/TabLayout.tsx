@@ -27,6 +27,7 @@ const {Panel: TabsPanel} = Tabs as any
 
 export const TabLayout = () => {
   const navigate = useNavigate()
+  const isCustomGradebookStatusesEnabled = !!ENV.CUSTOM_GRADEBOOK_STATUSES_ENABLED
 
   const pathMatch = useMatch('/accounts/:accountId/grading_settings/:tabPath/*')
   const selectedTab = pathMatch?.params?.tabPath
@@ -57,7 +58,7 @@ export const TabLayout = () => {
         margin="large auto"
         padding="medium"
         onRequestTabChange={(
-          event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+          _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
           {index}: {index: number}
         ) => handleTabChange(index)}
       >
@@ -66,40 +67,24 @@ export const TabLayout = () => {
           renderTitle={I18n.t('Grading Periods')}
           selected={selectedTab === 'periods'}
         >
-          {selectedTab === 'periods' ? (
-            <>
-              <Outlet />
-            </>
-          ) : (
-            <></>
-          )}
+          {selectedTab === 'periods' ? <Outlet /> : null}
         </TabsPanel>
         <TabsPanel
           id="gradingSchemeTab"
           renderTitle={I18n.t('Schemes')}
           isSelected={selectedTab === 'schemes'}
         >
-          {selectedTab === 'schemes' ? (
-            <>
-              <Outlet />
-            </>
-          ) : (
-            <></>
-          )}
+          {selectedTab === 'schemes' ? <Outlet /> : null}
         </TabsPanel>
-        <TabsPanel
-          id="gradingCustomStatusTab"
-          renderTitle={I18n.t('Statuses')}
-          isSelected={selectedTab === 'statuses'}
-        >
-          {selectedTab === 'statuses' ? (
-            <>
-              <Outlet />
-            </>
-          ) : (
-            <></>
-          )}
-        </TabsPanel>
+        {isCustomGradebookStatusesEnabled && (
+          <TabsPanel
+            id="gradingCustomStatusTab"
+            renderTitle={I18n.t('Statuses')}
+            isSelected={selectedTab === 'statuses'}
+          >
+            {selectedTab === 'statuses' ? <Outlet /> : null}
+          </TabsPanel>
+        )}
       </Tabs>
     </>
   )
