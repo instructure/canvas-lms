@@ -36,6 +36,108 @@ RSpec.describe SubmissionComment do
 
   let(:valid_attributes) { { comment: "some comment" } }
 
+  describe "permissions" do
+    describe "delete" do
+      context "as a student" do
+        it "can delete their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@student, :delete)).to be true
+        end
+
+        it "cannot delete their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@student, :delete)).to be false
+        end
+
+        it "cannot delete their peers' draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student, draft: true)
+          expect(comment.grants_right?(@student, :delete)).to be false
+        end
+
+        it "cannot delete their peers' non-draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student)
+          expect(comment.grants_right?(@student, :delete)).to be false
+        end
+      end
+
+      context "as a teacher" do
+        it "can delete their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher, draft: true)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+
+        it "can delete their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+
+        it "can delete students' draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+
+        it "can delete students' non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@teacher, :delete)).to be true
+        end
+      end
+    end
+
+    describe "update" do
+      context "as a student" do
+        it "can update their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@student, :update)).to be true
+        end
+
+        it "cannot update their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@student, :update)).to be false
+        end
+
+        it "cannot update their peers' draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student, draft: true)
+          expect(comment.grants_right?(@student, :update)).to be false
+        end
+
+        it "cannot update their peers' non-draft comments" do
+          first_student = @student
+          student_in_course(active_all: true)
+          comment = @submission.submission_comments.create!(comment: "hi", author: first_student)
+          expect(comment.grants_right?(@student, :update)).to be false
+        end
+      end
+
+      context "as a teacher" do
+        it "can update their own draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher, draft: true)
+          expect(comment.grants_right?(@teacher, :update)).to be true
+        end
+
+        it "can update their own non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @teacher)
+          expect(comment.grants_right?(@teacher, :update)).to be true
+        end
+
+        it "cannot update students' draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student, draft: true)
+          expect(comment.grants_right?(@teacher, :update)).to be false
+        end
+
+        it "cannot update students' non-draft comments" do
+          comment = @submission.submission_comments.create!(comment: "hi", author: @student)
+          expect(comment.grants_right?(@teacher, :update)).to be false
+        end
+      end
+    end
+  end
+
   it "creates a new instance given valid attributes" do
     expect(@submission.submission_comments.create!(valid_attributes)).to be_persisted
   end

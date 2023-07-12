@@ -194,8 +194,11 @@ class SubmissionComment < ActiveRecord::Base
     given { |user, session| can_view_comment?(user, session) }
     can :read
 
-    given { |user| author == user }
-    can :read and can :delete and can :update
+    given { |user| author_id == user.id && draft? }
+    can :delete and can :update
+
+    given { |user, session| author_id == user.id && submission.grants_right?(user, session, :grade) }
+    can :update
 
     given { |user, session| submission.grants_right?(user, session, :grade) }
     can :delete
