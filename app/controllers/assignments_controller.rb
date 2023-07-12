@@ -670,7 +670,7 @@ class AssignmentsController < ApplicationController
     # if no due_at was given, set it to 11:59 pm in the creator's time zone
     @assignment.infer_times
     if authorized_action(@assignment, @current_user, :create)
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         respond_to do |format|
           if @assignment.save
             flash[:notice] = t "notices.created", "Assignment was successfully created."
@@ -880,7 +880,7 @@ class AssignmentsController < ApplicationController
     if authorized_action(@assignment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@assignment)
 
-      DueDateCacher.with_executing_user(@current_user) do
+      SubmissionLifecycleManager.with_executing_user(@current_user) do
         @assignment.destroy
       end
 
