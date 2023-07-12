@@ -37,6 +37,7 @@ class Account < ActiveRecord::Base
   belongs_to :parent_account, class_name: "Account"
 
   has_many :courses
+  has_many :custom_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :favorites, inverse_of: :root_account
   has_many :all_courses, class_name: "Course", foreign_key: "root_account_id"
   has_one :terms_of_service, dependent: :destroy

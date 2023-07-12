@@ -24,6 +24,7 @@ class Score < ActiveRecord::Base
   belongs_to :enrollment, inverse_of: :scores
   belongs_to :grading_period, optional: true
   belongs_to :assignment_group, optional: true
+  belongs_to :custom_grade_status, inverse_of: :scores
   has_one :course, through: :enrollment
   has_one :score_metadata
 
