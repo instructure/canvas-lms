@@ -160,32 +160,34 @@ export const SplitScreenParent = props => {
               />
             </View>
           )}
-          {props.discussionEntry.depth > 2 && props.RCEOpen && ENV.should_show_deeply_nested_alert && (
-            <Alert
-              variant="warning"
-              renderCloseButtonLabel="Close"
-              margin="small"
-              onDismiss={() => {
-                updateSplitScreenViewDeeplyNestedAlert({
-                  variables: {
-                    isolatedViewDeeplyNestedAlert: false,
-                  },
-                })
+          {props.discussionEntry.depth > 2 &&
+            props.RCEOpen &&
+            ENV.should_show_deeply_nested_alert && (
+              <Alert
+                variant="warning"
+                renderCloseButtonLabel="Close"
+                margin="small"
+                onDismiss={() => {
+                  updateSplitScreenViewDeeplyNestedAlert({
+                    variables: {
+                      isolatedViewDeeplyNestedAlert: false,
+                    },
+                  })
 
-                ENV.should_show_deeply_nested_alert = false
-              }}
-            >
-              <Text size={responsiveProps.textSize}>
-                {props.discussionEntry.depth > 3
-                  ? I18n.t(
-                      'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
-                    )
-                  : I18n.t(
-                      'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.'
-                    )}
-              </Text>
-            </Alert>
-          )}
+                  ENV.should_show_deeply_nested_alert = false
+                }}
+              >
+                <Text size={responsiveProps.textSize}>
+                  {props.discussionEntry.depth > 3
+                    ? I18n.t(
+                        'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
+                      )
+                    : I18n.t(
+                        'Deeply nested replies are no longer supported. Your reply will appear on on the page you are currently on.'
+                      )}
+                </Text>
+              </Alert>
+            )}
           <View as="div" padding={responsiveProps.padding}>
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
@@ -242,7 +244,7 @@ export const SplitScreenParent = props => {
                     anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
-                    onSave={(message, _includeReplyPreview, file) => {
+                    onSave={(message, _quotedEntryId, file) => {
                       if (props.onSave) {
                         props.onSave(props.discussionEntry, message, file)
                         setIsEditing(false)

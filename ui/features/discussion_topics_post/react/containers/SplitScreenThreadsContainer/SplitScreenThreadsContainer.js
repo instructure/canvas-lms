@@ -260,7 +260,7 @@ const SplitScreenThreadContainer = props => {
     },
   })
 
-  const onUpdate = (message, _includeReplyPreview, file) => {
+  const onUpdate = (message, _quotedEntryId, file) => {
     updateDiscussionEntry({
       variables: {
         discussionEntryId: props.discussionEntry._id,

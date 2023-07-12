@@ -148,43 +148,6 @@ describe Types::DiscussionEntryType do
       expect(type.resolve("quotedEntry { previewMessage }")).to eq inline_reply_to_third_level_entry.summary(500)
       expect(type.resolve("quotedEntry { _id }")).to eq inline_reply_to_third_level_entry.id.to_s
     end
-
-    context "split screen view" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:split_screen_view).and_return(true)
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(false)
-      end
-
-      it "returns the reply preview data" do
-        message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
-        parent.message = message * 5 # something longer than the default 150 chars
-        parent.save
-        type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
-        sub_entry.update!(include_reply_preview: true)
-        expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
-        expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
-        expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
-        expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
-      end
-    end
-
-    context "isolated view" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
-      end
-
-      it "returns the reply preview data" do
-        message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
-        parent.message = message * 5 # something longer than the default 150 chars
-        parent.save
-        type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
-        sub_entry.update!(include_reply_preview: true)
-        expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
-        expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
-        expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
-        expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
-      end
-    end
   end
 
   context "anonymous discussions" do
@@ -307,16 +270,16 @@ describe Types::DiscussionEntryType do
     end
 
     describe "quoted reply" do
-      let(:anon_discussion_teacher_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting teacher", parent_id: @anon_teacher_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_teacher_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting teacher", parent_id: @anon_teacher_discussion_entry.id, user: @student, quoted_entry_id: @anon_teacher_discussion_entry.id) }
       let(:anon_teacher_quoted_type) { GraphQLTypeTester.new(anon_discussion_teacher_quoted, current_user: @teacher) }
 
-      let(:anon_discussion_ta_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_ta_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_ta_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_ta_discussion_entry.id, user: @student, quoted_entry_id: @anon_ta_discussion_entry.id) }
       let(:anon_ta_quoted_type) { GraphQLTypeTester.new(anon_discussion_ta_quoted, current_user: @teacher) }
 
-      let(:anon_discussion_designer_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting designer", parent_id: @anon_designer_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_designer_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting designer", parent_id: @anon_designer_discussion_entry.id, user: @student, quoted_entry_id: @anon_designer_discussion_entry.id) }
       let(:anon_designer_quoted_type) { GraphQLTypeTester.new(anon_discussion_designer_quoted, current_user: @teacher) }
 
-      let(:anon_discussion_student_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_student_discussion_entry.id, user: @student, include_reply_preview: true) }
+      let(:anon_discussion_student_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_student_discussion_entry.id, user: @student, quoted_entry_id: @anon_student_discussion_entry.id) }
       let(:anon_student_quoted_type) { GraphQLTypeTester.new(anon_discussion_student_quoted, current_user: @teacher) }
 
       context "split screen view flag" do

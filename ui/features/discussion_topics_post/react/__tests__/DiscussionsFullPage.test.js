@@ -464,7 +464,6 @@ describe('DiscussionFullPage', () => {
       ...getDiscussionQueryMock(),
       ...createDiscussionEntryMock({
         parentEntryId: 'DiscussionEntry-default-mock',
-        includeReplyPreview: false,
         quotedEntryId: null,
       }),
       ...getDiscussionSubentriesQueryMock({discussionEntryID: 'DiscussionEntry-default-mock-1'}),
@@ -500,7 +499,6 @@ describe('DiscussionFullPage', () => {
       ...getDiscussionQueryMock(),
       ...createDiscussionEntryMock({
         parentEntryId: 'DiscussionEntry-default-mock',
-        includeReplyPreview: true,
         quotedEntryId: 'DiscussionEntry-default-mock',
       }),
       ...getDiscussionSubentriesQueryMock({includeRelativeEntry: true}),
