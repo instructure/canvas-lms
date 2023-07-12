@@ -24,54 +24,27 @@ class ImportedHtmlConverter
   include TextHelper
   include HtmlTextHelper
 
-  CONTAINER_TYPES = %w[div p body].freeze
-  LINK_ATTRS = %w[rel href src srcset data value longdesc data-download-url].freeze
-  RCE_MEDIA_TYPES = %w[audio video].freeze
+  LINK_TYPE_TO_CLASS = {
+    announcement: Announcement,
+    assessment_question: AssessmentQuestion,
+    assignment: Assignment,
+    calendar_event: CalendarEvent,
+    discussion_topic: DiscussionTopic,
+    quiz: Quizzes::Quiz,
+    learning_outcome: LearningOutcome,
+    wiki_page: WikiPage
+  }.freeze
 
   attr_reader :link_parser, :link_resolver, :link_replacer
+
+  delegate :convert, to: :link_parser
 
   def initialize(migration, migration_id_converter)
     @migration = migration
     @migration_id_converter = migration_id_converter
     @link_parser = CanvasLinkMigrator::LinkParser.new(migration_id_converter)
     @link_resolver = CanvasLinkMigrator::LinkResolver.new(migration_id_converter)
-    @link_replacer = Importers::LinkReplacer.new(migration, migration_id_converter)
-  end
-
-  def convert(html, item_type, mig_id, field, opts = {})
-    mig_id = mig_id.to_s
-    doc = Nokogiri::HTML5(html || "")
-
-    # Replace source tags with iframes
-    doc.search("source[data-media-id]").each do |source|
-      next unless RCE_MEDIA_TYPES.include?(source.parent.name)
-
-      media_node = source.parent
-      media_node.name = "iframe"
-      media_node["src"] = source["src"]
-      source.remove
-    end
-
-    doc.search("*").each do |node|
-      LINK_ATTRS.each do |attr|
-        @link_parser.convert_link(node, attr, item_type, mig_id, field)
-      end
-    end
-
-    node = doc.at_css("body")
-    return "" unless node
-
-    if opts[:remove_outer_nodes_if_one_child]
-      while node.children.size == 1 && node.child.child
-        break unless CONTAINER_TYPES.member?(node.child.name) && node.child.attributes.blank?
-
-        node = node.child
-      end
-    end
-
-    node.inner_html
-  rescue Nokogiri::SyntaxError
-    ""
+    @link_replacer = Importers::LinkReplacer.new
   end
 
   def convert_text(text)
@@ -83,7 +56,7 @@ class ImportedHtmlConverter
     return unless link_map.present?
 
     @link_resolver.resolve_links!(link_map)
-    @link_replacer.replace_placeholders!(link_map)
+    replace_placeholders!(link_map)
     @link_parser.reset!
   end
 
@@ -93,5 +66,186 @@ class ImportedHtmlConverter
     # leave the url as it was
     Rails.logger.warn "attempting to translate invalid url: #{url}"
     false
+  end
+
+  def context
+    @migration.context
+  end
+
+  def context_path
+    @migration_id_converter.context_path
+  end
+
+  def replace_placeholders!(link_map)
+    load_questions!(link_map)
+
+    link_map.each do |item_key, field_links|
+      item_key[:item] ||= retrieve_item(item_key)
+
+      replace_item_placeholders!(item_key, field_links)
+
+      add_missing_link_warnings!(item_key, field_links)
+    rescue
+      @migration.add_warning("An error occurred while translating content links", $!)
+    end
+  end
+
+  # these don't get added to the list of imported migration items
+  def load_questions!(link_map)
+    aq_item_keys = link_map.keys.select { |item_key| item_key[:type] == :assessment_question }
+    aq_item_keys.each_slice(100) do |item_keys|
+      context.assessment_questions.where(migration_id: item_keys.pluck(:migration_id)).preload(:assessment_question_bank).each do |aq|
+        item_keys.detect { |ikey| ikey[:migration_id] == aq.migration_id }[:item] = aq
+      end
+    end
+
+    qq_item_keys = link_map.keys.select { |item_key| item_key[:type] == :quiz_question }
+    qq_item_keys.each_slice(100) do |item_keys|
+      context.quiz_questions.where(migration_id: item_keys.pluck(:migration_id)).each do |qq|
+        item_keys.detect { |ikey| ikey[:migration_id] == qq.migration_id }[:item] = qq
+      end
+    end
+  end
+
+  def retrieve_item(item_key)
+    klass = LINK_TYPE_TO_CLASS[item_key[:type]]
+    return unless klass
+
+    item = @migration.find_imported_migration_item(klass, item_key[:migration_id])
+    raise "item not found" unless item
+
+    item
+  end
+
+  def add_missing_link_warnings!(item_key, field_links)
+    fix_issue_url = nil
+    field_links.each do |field, links|
+      missing_links = links.select { |link| link[:replaced] && (link[:missing_url] || !link[:new_value]) }
+      next unless missing_links.any?
+
+      fix_issue_url ||= fix_issue_url(item_key)
+      type = item_key[:type].to_s.humanize.titleize
+      @migration.add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
+    end
+  end
+
+  def fix_issue_url(item_key)
+    item = item_key[:item]
+
+    case item_key[:type]
+    when :assessment_question
+      "#{context_path}/question_banks/#{item.assessment_question_bank_id}#question_#{item.id}_question_text"
+    when :quiz_question
+      "#{context_path}/quizzes/#{item.quiz_id}/edit" # can't jump to the question unfortunately
+    when :syllabus
+      "#{context_path}/assignments/syllabus"
+    when :wiki_page
+      "#{context_path}/pages/#{item.url}"
+    else
+      "#{context_path}/#{item.class.to_s.demodulize.underscore.pluralize}/#{item.id}"
+    end
+  end
+
+  def replace_item_placeholders!(item_key, field_links, skip_associations = false)
+    case item_key[:type]
+    when :syllabus
+      syllabus = context.syllabus_body
+      if link_replacer.sub_placeholders!(syllabus, field_links.values.flatten)
+        context.class.where(id: context.id).update_all(syllabus_body: syllabus)
+      end
+    when :assessment_question
+      process_assessment_question!(item_key[:item], field_links.values.flatten)
+    when :quiz_question
+      process_quiz_question!(item_key[:item], field_links.values.flatten)
+    else
+      item = item_key[:item]
+      item_updates = {}
+      field_links.each do |field, links|
+        html = item.read_attribute(field)
+        if link_replacer.sub_placeholders!(html, links)
+          item_updates[field] = html
+        end
+      end
+      if item_updates.present?
+        item.class.where(id: item.id).update_all(item_updates)
+        # we don't want the placeholders sticking around in any
+        # version we've created.
+        rewrite_item_version!(item)
+      end
+
+      unless skip_associations
+        process_assignment_types!(item, field_links.values.flatten)
+      end
+    end
+  end
+
+  def rewrite_item_version!(item)
+    if (version = (item.current_version rescue nil))
+      # if there's a current version of this thing, it has placeholders
+      # in it.  rather than replace them in the yaml, which is finnicky, let's just
+      # make sure the current version is represented by the current model state
+      # by overwritting it
+      version.model = item.reload
+      version.save
+    end
+  end
+
+  def process_assignment_types!(item, links)
+    case item
+    when Assignment
+      if item.discussion_topic
+        replace_item_placeholders!({ item: item.discussion_topic }, { message: links }, true)
+      end
+      if item.quiz
+        replace_item_placeholders!({ item: item.quiz }, { description: links }, true)
+      end
+    when DiscussionTopic, Quizzes::Quiz
+      if item.assignment
+        replace_item_placeholders!({ item: item.assignment }, { description: links }, true)
+      end
+    end
+  end
+
+  def process_assessment_question!(aq, links)
+    # we have to do a little bit more here because the question_data can get copied all over
+    quiz_ids = []
+    Quizzes::QuizQuestion.where(assessment_question_id: aq.id).find_each do |qq|
+      if link_replacer.recursively_sub_placeholders!(qq["question_data"], links)
+        Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
+        quiz_ids << qq.quiz_id
+      end
+    end
+
+    if quiz_ids.any?
+      Quizzes::Quiz.where(id: quiz_ids.uniq).where.not(quiz_data: nil).find_each do |quiz|
+        if link_replacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
+          Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
+        end
+      end
+    end
+
+    # we have to do some special link translations for files in assessment questions
+    # because we stopped doing them in the regular importer
+    # basically just moving them to the question context
+    links.each do |link|
+      next unless link[:new_value]
+
+      link[:new_value] = aq.translate_file_link(link[:new_value])
+    end
+
+    if link_replacer.recursively_sub_placeholders!(aq["question_data"], links)
+      AssessmentQuestion.where(id: aq.id).update_all(question_data: aq["question_data"])
+    end
+  end
+
+  def process_quiz_question!(qq, links)
+    if link_replacer.recursively_sub_placeholders!(qq["question_data"], links)
+      Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
+    end
+
+    quiz = Quizzes::Quiz.where(id: qq.quiz_id).where.not(quiz_data: nil).first
+    if quiz && link_replacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
+      Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
+    end
   end
 end
