@@ -28,6 +28,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
+import {Table} from '@instructure/ui-table'
 
 const I18n = useI18nScope('account_course_user_search')
 
@@ -50,34 +51,39 @@ export function TempEnrollSearch(props: Props) {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
-  const defaultEnrollment = {
-    user_name: '',
-    email: '',
-    address: '',
-    account_name: '',
-    account_id: '',
-    user_id: '',
-    login_id: '',
-    sis_user_id: '',
+  const [enrollment, setEnrollment] = useState(null)
+
+  // user_lists.json does not always return email, sis id, and login
+  const fetchUserDetails = async (user: any) => {
+    try {
+      const {json} = await doFetchApi({
+        path: `/api/v1/users/${user.user_id}`,
+        method: 'GET',
+      })
+      setEnrollment(json)
+    } catch (error: any) {
+      setMessage(error)
+      setEnrollment(null)
+      props.searchFail()
+    }
   }
-  const [enrollment, setEnrollment] = useState(defaultEnrollment)
 
   const handleResponse = (response: any) => {
     const foundUser = response.users[0]
     if (typeof foundUser === 'undefined') {
       setMessage(I18n.t('User could not be found.'))
-      setEnrollment(defaultEnrollment)
+      setEnrollment(null)
       props.searchFail()
     } else if (response.users.length === 1 && foundUser.user_id !== props.user.id) {
       // api could return more than 1, which we don't want
-      setEnrollment(foundUser)
+      fetchUserDetails(foundUser)
       setMessage('')
       props.searchSuccess(enrollment)
     } else {
       setMessage(
         I18n.t('The user found matches the source user. Please search for a different user.')
       )
-      setEnrollment(defaultEnrollment)
+      setEnrollment(null)
       props.searchFail()
     }
   }
@@ -124,7 +130,7 @@ export function TempEnrollSearch(props: Props) {
           handleResponse(json)
         } catch (error: any) {
           setMessage(error.message)
-          setEnrollment(defaultEnrollment)
+          setEnrollment(null)
           props.searchFail()
         } finally {
           setLoading(false)
@@ -161,9 +167,36 @@ export function TempEnrollSearch(props: Props) {
   if (loading) {
     return <Spinner renderTitle="Retrieving user information" size="large" />
   }
-  if (props.page === 1 && enrollment.user_name !== '') {
+  if (props.page === 1 && enrollment !== null) {
     // user confirmation page
-    return <Text>Confirmation Page</Text>
+    return (
+      <>
+        {renderAvatar()}
+        <Alert variant="success">
+          {I18n.t('This user is ready to be assigned temporary enrollments.')}
+        </Alert>
+        <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="usertable-name">{I18n.t('Name')}</Table.ColHeader>
+              <Table.ColHeader id="usertable-email">{I18n.t('Email Address')}</Table.ColHeader>
+              <Table.ColHeader id="usertable-loginid">{I18n.t('Login ID')}</Table.ColHeader>
+              {props.canReadSIS ? (
+                <Table.ColHeader id="usertable-sisid">{I18n.t('SIS ID')}</Table.ColHeader>
+              ) : null}
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
+            <Table.Row>
+              <Table.RowHeader>{(enrollment as any).name}</Table.RowHeader>
+              <Table.Cell>{(enrollment as any).email}</Table.Cell>
+              <Table.Cell>{(enrollment as any).login_id}</Table.Cell>
+              {props.canReadSIS ? <Table.Cell>{(enrollment as any).sis_user_id}</Table.Cell> : null}
+            </Table.Row>
+          </Table.Body>
+        </Table>
+      </>
+    )
   } else {
     return (
       <>
