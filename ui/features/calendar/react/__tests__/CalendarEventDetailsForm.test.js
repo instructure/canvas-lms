@@ -17,9 +17,12 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render} from '@testing-library/react'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
+import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
+
+jest.mock('@canvas/calendar/jquery/CommonEvent/index')
 
 let defaultProps = eventFormProps()
 
@@ -89,6 +92,9 @@ const expectFieldsToBeDisabled = (component, fieldNames) => {
 describe('CalendarEventDetailsForm', () => {
   beforeEach(() => {
     defaultProps = eventFormProps()
+    commonEventFactory.mockImplementation(
+      jest.requireActual('@canvas/calendar/jquery/CommonEvent/index').default
+    )
   })
 
   afterEach(() => {
@@ -392,5 +398,81 @@ describe('CalendarEventDetailsForm', () => {
     const {getByText, queryByText} = render(<CalendarEventDetailsForm {...props} />)
     expect(getByText('Title:')).toBeInTheDocument()
     expect(queryByText('Location:')).not.toBeInTheDocument()
+  })
+
+  describe('frequency picker', () => {
+    beforeEach(() => {
+      ENV.FEATURES.calendar_series = true
+      defaultProps.event.isNewEvent = () => true
+      commonEventFactory.mockImplementation(() => defaultProps.event)
+    })
+
+    afterEach(() => {
+      ENV.FEATURES.calendar_series = false
+      defaultProps.event.isNewEvent = () => false
+      jest.resetModules()
+    })
+
+    it('renders when creating', async () => {
+      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+      expect(component.queryByRole('button', {name: 'Frequency:'})).toBeInTheDocument()
+    })
+
+    it('does not render when editing', async () => {
+      defaultProps.event.isNewEvent = () => false
+      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+      expect(component.queryByRole('button', {name: 'Frequency:'})).not.toBeInTheDocument()
+    })
+
+    it('does not render when calendar_series is disabled', async () => {
+      ENV.FEATURES.calendar_series = false
+      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+      expect(component.queryByRole('button', {name: 'Frequency:'})).not.toBeInTheDocument()
+    })
+
+    it('with option selected contains RRULE on submit', async () => {
+      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+
+      select(component, 'button', 'Frequency:')
+      select(component, 'option', 'Daily')
+      select(component, 'button', 'Submit')
+
+      expect(defaultProps.closeCB).toHaveBeenCalled()
+      expect(defaultProps.event.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          'calendar_event[rrule]': 'FREQ=DAILY;INTERVAL=1;COUNT=200',
+        }),
+        expect.anything(),
+        expect.anything()
+      )
+    })
+
+    it('with not-repeat option selected does not contain RRULE on submit', async () => {
+      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+
+      select(component, 'button', 'Submit')
+
+      expect(defaultProps.closeCB).toHaveBeenCalled()
+      expect(defaultProps.event.save).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          'calendar_event[rrule]': expect.anything(),
+        }),
+        expect.anything(),
+        expect.anything()
+      )
+    })
+
+    it('with custom option selected redirects to other page', async () => {
+      delete global.window.location
+      global.window = Object.create(window)
+      global.window.location = {}
+
+      const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+      const location = window.location.href
+      select(component, 'button', 'Frequency:')
+      select(component, 'option', 'Custom...')
+
+      await waitFor(() => expect(window.location.href).not.toEqual(location))
+    })
   })
 })

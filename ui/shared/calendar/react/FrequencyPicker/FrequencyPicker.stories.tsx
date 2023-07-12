@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {Story, Meta} from '@storybook/react'
 import FrequencyPicker, {FrequencyPickerProps} from './FrequencyPicker'
 import I18n from '@canvas/i18n'
@@ -65,19 +65,6 @@ I18n.translations.en_GB = {
 }
 
 I18n.translations.zh = {
-  'calendar_frequency_picker.frequency': '频率：',
-  'calendar_frequency_picker.not_repeat': '不重复',
-  'calendar_frequency_picker.daily': '每日',
-  'calendar_frequency_picker.weekly_day': '%{day}的周报',
-  'calendar_frequency_picker.monthly_last_day': '每月最后一个%{day}',
-  'calendar_frequency_picker.annually': '每年的%{month}%{date}日',
-  'calendar_frequency_picker.every_weekday': '每个工作日（周一至周五',
-  'calendar_frequency_picker.custom': '习俗...',
-  'calendar_frequency_picker.first': '首先',
-  'calendar_frequency_picker.second': '第二',
-  'calendar_frequency_picker.third': '第三次',
-  'calendar_frequency_picker.fourth': '第四次',
-  'calendar_frequency_picker.last': '最后一次',
   'date.day_names': ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
   'date.month_names': [
     '~',
@@ -94,6 +81,19 @@ I18n.translations.zh = {
     '十一月',
     '十二月',
   ],
+  'calendar_frequency_picker.frequency': '频率：',
+  'calendar_frequency_picker.not_repeat': '不重复',
+  'calendar_frequency_picker.daily': '每日',
+  'calendar_frequency_picker.weekly_day': '%{day}的周报',
+  'calendar_frequency_picker.monthly_last_day': '每月最后一个%{day}',
+  'calendar_frequency_picker.annually': '每年的%{month}%{date}日',
+  'calendar_frequency_picker.every_weekday': '每个工作日（周一至周五',
+  'calendar_frequency_picker.custom': '习俗...',
+  'calendar_frequency_picker.first': '首先',
+  'calendar_frequency_picker.second': '第二',
+  'calendar_frequency_picker.third': '第三次',
+  'calendar_frequency_picker.fourth': '第四次',
+  'calendar_frequency_picker.last': '最后一次',
 }
 
 export default {
@@ -104,12 +104,10 @@ export default {
 const Template: Story<FrequencyPickerProps> = args => {
   const {date, initialFrequency, locale, timezone} = args
 
-  useEffect(() => {
-    I18n.locale = locale
-    moment.tz.setDefault(timezone)
-  }, [locale, timezone])
+  I18n.locale = locale
+  moment.tz.setDefault(timezone)
 
-  const [RRule, setRRule] = useState<string>('')
+  const [RRule, setRRule] = useState<string>(null)
   const [frequency, setFrequency] = useState<string>(initialFrequency)
 
   const handleFrequencyChange = useCallback(
@@ -126,7 +124,7 @@ const Template: Story<FrequencyPickerProps> = args => {
         <FrequencyPicker
           key={date}
           date={date}
-          frequency={frequency}
+          initialFrequency={frequency}
           locale={locale}
           onChange={handleFrequencyChange}
         />

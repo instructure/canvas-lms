@@ -40,11 +40,13 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
+import FrequencyPicker from '@canvas/calendar/react/FrequencyPicker/FrequencyPicker'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
 
 const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContextCB, timezone}) => {
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
+  const locale = ENV?.MOMENT_LOCALE || ENV?.LOCALE || 'en'
 
   const initTime = time => (!time || event.allDay ? '' : time)
 
@@ -54,6 +56,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const [date, setDate] = useState(tz.parse(event.startDate().format('ll'), timezone))
   const [startTime, setStartTime] = useState(initTime(event.calendarEvent?.start_at))
   const [endTime, setEndTime] = useState(initTime(event.calendarEvent?.end_at))
+  const [rrule, setRRule] = useState(null)
   const [webConference, setWebConference] = useState(event.webConference)
   const [shouldShowConferences, setShouldShowConferences] = useState(false)
   const [isImportant, setImportant] = useState(event.important_dates)
@@ -66,6 +69,9 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const allContexts = event.allPossibleContexts
 
   const shouldEnableTimeFields = () => !isBlackout
+  // Right now we don't have a way to edit event series and backend doesn't support to change
+  // the rrule of an event. Also we don't save frequency in database.
+  const shouldShowFrequencyPicker = () => ENV?.FEATURES?.calendar_series && event.isNewEvent()
   const shouldShowLocationField = () => event.calendarEvent?.parent_event_id == null
   const shouldEnableLocationField = () => !isBlackout
   const shouldShowConferenceField = () => shouldShowConferences
@@ -196,8 +202,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
     if (canUpdateConference()) setWebConference(conference)
   }
 
-  const moreOptionsClick = jsEvent => {
-    jsEvent.preventDefault()
+  const getEventUrlParams = () => {
     const params = {return_to: window.location.href}
 
     if (title && !event.lockedTitle) params.title = title
@@ -218,9 +223,24 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         params.web_conference = ''
       }
     }
+    return params
+  }
+
+  const moreOptionsClick = jsEvent => {
+    jsEvent.preventDefault()
     const pieces = jsEvent.target.attributes.href.value.split('#')
-    pieces[0] += `?${$.param(params)}`
+    pieces[0] += `?${$.param(getEventUrlParams())}`
     window.location.href = pieces.join('#')
+  }
+
+  const handleFrequencyChange = (newFrequency, newRRule) => {
+    if (newFrequency !== 'custom') {
+      setRRule(newRRule)
+    } else {
+      const pieces = getMoreOptionsHref().split('#')
+      pieces[0] += `?${$.param(getEventUrlParams())}`
+      window.location.href = pieces.join('#')
+    }
   }
 
   const addTimeToDate = time => {
@@ -288,6 +308,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
 
     if (event.isNewEvent()) {
       params['calendar_event[context_code]'] = context.asset_string
+      if (ENV?.FEATURES?.calendar_series && rrule) params['calendar_event[rrule]'] = rrule
       const objectData = {
         calendar_event: {
           title: params['calendar_event[title]'],
@@ -384,6 +405,14 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             />
           </Flex.Item>
         </Flex>
+        {shouldShowFrequencyPicker() && (
+          <FrequencyPicker
+            key={date}
+            date={date}
+            locale={locale}
+            onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
+          />
+        )}
         {shouldShowLocationField() && (
           <TextInput
             disabled={!shouldEnableLocationField()}

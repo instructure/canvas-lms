@@ -17,16 +17,17 @@
  */
 
 import React from 'react'
+import moment from 'moment'
 import {render, screen} from '@testing-library/react'
 import FrequencyPicker from '../FrequencyPicker'
 import userEvent from '@testing-library/user-event'
 import {FrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
 
 const defaultProps = (overrides: object = {}) => ({
-  date: '2001-04-12',
-  onChange: jest.fn(),
+  date: moment('2001-04-12').toDate(),
+  initialFrequency: 'weekly-day' as FrequencyOptionValue,
   locale: 'en',
-  frequency: 'weekly-day' as FrequencyOptionValue,
+  onChange: jest.fn(),
   ...overrides,
 })
 
@@ -52,23 +53,29 @@ describe('FrequencyPicker', () => {
     it('after was mounted', () => {
       const props = defaultProps()
       render(<FrequencyPicker {...props} />)
-      expect(props.onChange).toHaveBeenCalledWith('weekly-day', 'FREQ=WEEKLY;BYDAY=TH;INTERVAL=1')
+      expect(props.onChange).toHaveBeenCalledWith(
+        'weekly-day',
+        'FREQ=WEEKLY;BYDAY=TH;INTERVAL=1;COUNT=52'
+      )
     })
 
     it('with not-default prop after was mounted', () => {
-      const props = defaultProps({frequency: 'annually'})
+      const props = defaultProps({initialFrequency: 'annually'})
       render(<FrequencyPicker {...props} />)
       expect(props.onChange).toHaveBeenCalledWith(
         'annually',
-        'FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=12'
+        'FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=12;INTERVAL=1;COUNT=5'
       )
     })
 
     it('when date prop changes', () => {
       const props = defaultProps()
       const {rerender} = render(<FrequencyPicker {...props} />)
-      rerender(<FrequencyPicker {...props} {...{date: '1997-04-15'}} />)
-      expect(props.onChange).toHaveBeenCalledWith('weekly-day', 'FREQ=WEEKLY;BYDAY=TU;INTERVAL=1')
+      rerender(<FrequencyPicker {...props} {...{date: moment('1997-04-15').toDate()}} />)
+      expect(props.onChange).toHaveBeenCalledWith(
+        'weekly-day',
+        'FREQ=WEEKLY;BYDAY=TU;INTERVAL=1;COUNT=52'
+      )
     })
 
     it('when user changes frequency', () => {
@@ -77,7 +84,7 @@ describe('FrequencyPicker', () => {
       selectOption(/frequency:/i, /annually on april 12/i)
       expect(props.onChange).toHaveBeenCalledWith(
         'annually',
-        'FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=12'
+        'FREQ=YEARLY;BYMONTH=04;BYMONTHDAY=12;INTERVAL=1;COUNT=5'
       )
     })
   })

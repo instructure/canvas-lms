@@ -79,7 +79,7 @@ export const generateFrequencyOptions = (
     {id: 'daily', label: I18n.t('daily', 'Daily')},
     {
       id: 'weekly-day',
-      label: I18n.t('Weekly on %{day}', {day}),
+      label: I18n.t('weekly_day', 'Weekly on %{day}', {day}),
     },
     {
       id: 'monthly-nth-day',
@@ -119,21 +119,26 @@ export const generateFrequencyRRule = (
   switch (id) {
     case 'not-repeat':
       return null
+    // COUNT = Backend maximum is 200
     case 'daily':
-      return 'FREQ=DAILY;INTERVAL=1'
+      return 'FREQ=DAILY;INTERVAL=1;COUNT=200'
     case 'weekly-day':
-      return `FREQ=WEEKLY;BYDAY=${dayRRULEValues.at(utcMoment.day())};INTERVAL=1`
+      // COUNT = Average weeks in a year
+      return `FREQ=WEEKLY;BYDAY=${dayRRULEValues.at(utcMoment.day())};INTERVAL=1;COUNT=52`
     case 'monthly-nth-day':
+      // COUNT = Months in a year
       return `FREQ=MONTHLY;BYSETPOS=${weekdayIndex};BYDAY=${dayRRULEValues.at(
         utcMoment.day()
-      )};INTERVAL=1`
+      )};INTERVAL=1;COUNT=12`
     case 'annually': {
       const month = utcMoment.format('MM')
       const date = utcMoment.format('DD')
-      return `FREQ=YEARLY;BYMONTH=${month};BYMONTHDAY=${date}`
+      // COUNT = The event will occur for five years
+      return `FREQ=YEARLY;BYMONTH=${month};BYMONTHDAY=${date};INTERVAL=1;COUNT=5`
     }
     case 'every-weekday':
-      return 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1'
+      // COUNT = Average weeks in a year
+      return 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=52'
     default:
       // Custom option should open another modal selecting dates
       return null
