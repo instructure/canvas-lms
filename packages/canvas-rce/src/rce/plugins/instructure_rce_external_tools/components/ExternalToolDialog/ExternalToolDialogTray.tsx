@@ -25,6 +25,8 @@ import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import formatMessage from 'format-message'
 
+const FlexItem = Flex.Item as any
+
 export function ExternalToolDialogTray(props: {
   open?: boolean
   label: string
@@ -59,16 +61,16 @@ export function ExternalToolDialogTray(props: {
             section rather than the whole Tray */}
         <div style={{display: 'flex', flexDirection: 'column', width: '100%', height: '100%'}}>
           <Flex as="div" padding="small">
-            <Flex.Item shouldGrow={true}>
+            <FlexItem shouldGrow={true}>
               <Heading>{name}</Heading>
-            </Flex.Item>
-            <Flex.Item>
+            </FlexItem>
+            <FlexItem>
               <CloseButton
                 onClick={onCloseButton}
                 size="small"
                 screenReaderLabel={formatMessage('Close')}
               />
-            </Flex.Item>
+            </FlexItem>
           </Flex>
 
           <div style={{position: 'relative', flex: 1}}>
