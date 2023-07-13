@@ -1238,26 +1238,26 @@ describe SubmissionsController do
     context "when the submission's turnitin data contains a report URL" do
       before do
         submission.update!(turnitin_data: { asset_string => { report_url: "MY_GREAT_REPORT" } })
-      end
 
-      it "redirects to the course tool retrieval URL" do
         get "turnitin_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           submission_id: student.id,
           asset_string:
         }
+      end
+
+      it "redirects to the course tool retrieval URL" do
         expect(response).to redirect_to(/#{retrieve_course_external_tools_url(course.id)}/)
       end
 
       it "includes the report URL in the redirect" do
-        get "turnitin_report", params: {
-          course_id: assignment.context_id,
-          assignment_id: assignment.id,
-          submission_id: student.id,
-          asset_string:
-        }
         expect(response).to redirect_to(/MY_GREAT_REPORT/)
+      end
+
+      it "includes prefer_1_1 in the redirect URI" do
+        redirect_uri = URI.parse(response.location)
+        expect(redirect_uri.query.split("&")).to include("prefer_1_1=true")
       end
     end
 

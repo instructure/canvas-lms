@@ -1619,7 +1619,9 @@ describe ContextExternalTool do
       end
 
       context "and there is a difference in LTI version" do
-        subject { ContextExternalTool.find_external_tool(requested_url, context) }
+        def find_tool(url, **opts)
+          ContextExternalTool.find_external_tool(url, context, **opts)
+        end
 
         before do
           # Creation order is important. Be default Canvas uses
@@ -1633,27 +1635,35 @@ describe ContextExternalTool do
         let(:context) { @course }
         let(:domain) { "www.test.com" }
         let(:opts) { { url:, domain: } }
-        let(:requested_url) { "" }
         let(:url) { "https://www.test.com/foo?bar=1" }
         let(:lti_1_1_tool) { external_tool_model(context:, opts:) }
         let(:lti_1_3_tool) { external_tool_1_3_model(context:, opts:) }
 
-        context "with an exact URL match" do
-          let(:requested_url) { url }
-
-          it { is_expected.to eq lti_1_3_tool }
+        it "prefers LTI 1.3 tools when there is an exact URL match" do
+          expect(find_tool(url)).to eq lti_1_3_tool
         end
 
-        context "with a partial URL match" do
-          let(:requested_url) { "#{url}&extra_param=1" }
-
-          it { is_expected.to eq lti_1_3_tool }
+        it "prefers LTI 1.3 tools when there is an partial URL match" do
+          expect(find_tool("#{url}&extra_param=1")).to eq lti_1_3_tool
         end
 
-        context "whith a domain match" do
-          let(:requested_url) { "https://www.test.com/another_endpoint" }
+        it "prefers LTI 1.3 tools when there is an domain match" do
+          expect(find_tool("https://www.test.com/another_endpoint")).to eq lti_1_3_tool
+        end
 
-          it { is_expected.to eq lti_1_3_tool }
+        context "when prefer_1_1: true is passed in" do
+          it "prefers LTI 1.1 tools when there is an exact URL match" do
+            expect(find_tool(url, prefer_1_1: true)).to eq lti_1_1_tool
+          end
+
+          it "prefers LTI 1.1 tools when there is an partial URL match" do
+            expect(find_tool("#{url}&extra_param=1", prefer_1_1: true)).to eq lti_1_1_tool
+          end
+
+          it "prefers LTI 1.1 tools when there is an domain match" do
+            expect(find_tool("https://www.test.com/another_endpoint", prefer_1_1: true)).to \
+              eq lti_1_1_tool
+          end
         end
       end
     end
@@ -1974,6 +1984,17 @@ describe ContextExternalTool do
 
       it "sorts 1.1 tools to the back" do
         expect(subject.last).to eq tool2
+      end
+
+      context "when prefer_1_1 is true" do
+        subject do
+          ContextExternalTool.find_and_order_tools(@course, preferred_tool_id, exclude_tool_id, preferred_client_id, prefer_1_1: true).to_a
+        end
+
+        it "sorts 1.1 tools to the front and 1.3 tools to the back" do
+          expect(subject.first).to eq tool1
+          expect(subject.last).to eq tool3
+        end
       end
     end
 

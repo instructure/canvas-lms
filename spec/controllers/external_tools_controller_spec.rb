@@ -1134,16 +1134,20 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
-    it "finds tools matching by domain" do
+    it "passes prefer_1_1=false to find_external_tool by default when looking up by URL" do
       user_session(@teacher)
-      tool = @course.context_external_tools.new(
-        name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "www.example.com"
+      expect(ContextExternalTool).to receive(:find_external_tool).with(
+        anything, anything, anything, anything, anything, prefer_1_1: false
       )
-      tool.save!
       get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
-      expect(response).to be_successful
-      expect(assigns[:tool]).to eq tool
-      expect(assigns[:lti_launch].params).not_to be_nil
+    end
+
+    it "passes prefer_1_1=false to find_external_tool only when the prefer_1_1 param is set" do
+      user_session(@teacher)
+      expect(ContextExternalTool).to receive(:find_external_tool).with(
+        anything, anything, anything, anything, anything, prefer_1_1: true
+      )
+      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti", prefer_1_1: true }
     end
 
     it "finds tools matching by exact url" do
