@@ -143,7 +143,13 @@ module Api::V1::Assignment
     end
 
     hash = api_json(assignment, user, session, fields)
-    hash["secure_params"] = assignment.secure_params if assignment.has_attribute?(:lti_context_id)
+
+    description = api_user_content(hash["description"],
+                                   @context || assignment.context,
+                                   user,
+                                   opts[:preloaded_user_content_attachments] || {})
+
+    hash["secure_params"] = assignment.secure_params(include_description: description.present?) if assignment.has_attribute?(:lti_context_id)
     hash["lti_context_id"] = assignment.lti_context_id if assignment.has_attribute?(:lti_context_id)
     hash["course_id"] = assignment.context_id
     hash["name"] = assignment.title
@@ -217,10 +223,7 @@ module Api::V1::Assignment
     # use already generated hash['description'] because it is filtered by
     # Assignment#filter_attributes_for_user when the assignment is locked
     unless opts[:exclude_response_fields].include?("description")
-      hash["description"] = api_user_content(hash["description"],
-                                             @context || assignment.context,
-                                             user,
-                                             opts[:preloaded_user_content_attachments] || {})
+      hash["description"] = description
     end
 
     can_manage = assignment.context.grants_any_right?(user, :manage, :manage_grades, :manage_assignments, :manage_assignments_edit)

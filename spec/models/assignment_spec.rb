@@ -2195,6 +2195,20 @@ describe Assignment do
     it "returns a jwt" do
       expect(Canvas::Security.decode_jwt(@assignment.secure_params)).to be
     end
+
+    it "contains the description when the assignment isn't locked" do
+      @assignment.update!(due_at: 2.days.from_now, lock_at: 3.days.from_now)
+      @assignment.reload
+      decoded = Canvas::Security.decode_jwt(@assignment.secure_params)
+      expect(decoded).to_not include(:description)
+    end
+
+    it "does not contain the description when the assignment is locked" do
+      @assignment.update!(due_at: 2.days.from_now, lock_at: 3.days.from_now, unlock_at: 1.day.from_now)
+      @assignment.reload
+      decoded = Canvas::Security.decode_jwt(@assignment.secure_params)
+      expect(decoded[:description]).to be_nil
+    end
   end
 
   describe "#grade_to_score" do
