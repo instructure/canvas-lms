@@ -52,13 +52,13 @@ describe "Student Gradebook - Arrange By" do
       )
       @quiz.publish!
 
-      assignment = @course.assignments.create!(
+      @discussion_assignment = @course.assignments.create!(
         due_at: Time.now.utc + 5.days + 1.hour,
         assignment_group: group0
       )
 
       @discussion = @course.discussion_topics.create!(
-        assignment:,
+        assignment: @discussion_assignment,
         title: "Physics Beta Discussion"
       )
 
@@ -68,13 +68,13 @@ describe "Student Gradebook - Arrange By" do
         assignment_group: group1
       )
 
-      module0 = ContextModule.create!(name: "Beta Mod", context: @course)
-      module1 = ContextModule.create!(name: "Alpha Mod", context: @course)
+      module0 = ContextModule.create!(name: "Alpha Mod", context: @course)
+      module1 = ContextModule.create!(name: "Beta Mod", context: @course)
 
-      module0.content_tags.create!(context: @course, content: @quiz, tag_type: "context_module")
+      module0.content_tags.create!(context: @course, content: @quiz.assignment, tag_type: "context_module")
       module0.content_tags.create!(context: @course, content: @assignment0, tag_type: "context_module")
       module1.content_tags.create!(context: @course, content: @assignment1, tag_type: "context_module")
-      module1.content_tags.create!(context: @course, content: @discussion, tag_type: "context_module")
+      module1.content_tags.create!(context: @course, content: @discussion_assignment, tag_type: "context_module")
     end
 
     context "when restrict_quantitative_data is OFF" do
@@ -158,9 +158,8 @@ describe "Student Gradebook - Arrange By" do
         fj("button:contains('Apply')").click
         wait_for_ajaximations
         expect(f("label[for='assignment_sort_order_select_menu'] input").attribute("value")).to eq "Module"
-        # TODO: wait for VICE-3582
-        # current_list = ff("a[data-testid='assignment-link']").collect(&:text)
-        # expect(current_list).to eq module_order
+        current_list = ff("a[data-testid='assignment-link']").collect(&:text)
+        expect(current_list).to eq module_order
       end
 
       it "persists for user after changing preferred order" do
