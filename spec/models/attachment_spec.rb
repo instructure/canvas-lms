@@ -898,6 +898,25 @@ describe Attachment do
       a.restore
       expect(a).to be_available
     end
+
+    it "restores deleted parent folders" do
+      course_factory
+      parent_folder = folder_model
+      child_folder = folder_model(parent_folder_id: parent_folder.id)
+      attachment = attachment_model(folder: child_folder)
+      parent_folder.destroy
+
+      child_folder.reload
+      attachment.reload
+
+      attachment.restore
+      child_folder.reload
+      parent_folder.reload
+
+      expect(attachment).to be_available
+      expect(child_folder.workflow_state).to eq "visible"
+      expect(parent_folder.workflow_state).to eq "visible"
+    end
   end
 
   context "destroy_permanently!" do

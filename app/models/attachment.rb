@@ -1934,6 +1934,7 @@ class Attachment < ActiveRecord::Base
     self.file_state = "available"
     if save
       handle_duplicates(:rename)
+      folder&.restore
     end
     true
   end

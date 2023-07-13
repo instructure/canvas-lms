@@ -601,4 +601,13 @@ class Folder < ActiveRecord::Base
   def next_lock_change
     [lock_at, unlock_at].compact.select { |t| t > Time.zone.now }.min
   end
+
+  def restore
+    return unless self.workflow_state == "deleted"
+
+    self.workflow_state = "visible"
+    if save
+      parent_folder&.restore
+    end
+  end
 end
