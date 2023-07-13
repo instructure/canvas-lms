@@ -22,45 +22,45 @@ require "spec_helper"
 require "json"
 
 describe CanvasLinkMigrator::LinkResolver do
-  def course_based_converter(assets = JSON.parse(File.read("spec/fixtures/canvas_resource_map.json")))
+  def resolver(assets = JSON.parse(File.read("spec/fixtures/canvas_resource_map.json")))
     CanvasLinkMigrator::LinkResolver.new(CanvasLinkMigrator::ResourceMapService.new(assets))
   end
 
   describe "resolve_link!" do
     it "converts wiki_pages links" do
       link = { link_type: :wiki_page, migration_id: "A", query: "?foo=bar" }
-      course_based_converter.resolve_link!(link)
-      expect(link[:new_value]).to eq("/courses/1/pages/slug-a?foo=bar")
+      resolver.resolve_link!(link)
+      expect(link[:new_value]).to eq("/courses/2/pages/slug-a?foo=bar")
     end
 
     it "converts module_item links" do
       link = { link_type: :module_item, migration_id: "C", query: "?foo=bar" }
-      course_based_converter.resolve_link!(link)
-      expect(link[:new_value]).to eq("/courses/1/modules/items/3?foo=bar")
+      resolver.resolve_link!(link)
+      expect(link[:new_value]).to eq("/courses/2/modules/items/3?foo=bar")
     end
 
     it "converts file_ref urls" do
       link = { link_type: :file_ref, migration_id: "F" }
-      course_based_converter.resolve_link!(link)
-      expect(link[:new_value]).to eq("/courses/1/files/6/preview")
+      resolver.resolve_link!(link)
+      expect(link[:new_value]).to eq("/courses/2/files/6/preview")
     end
 
     it "converts attachment urls" do
       link = { link_type: :object, type: "attachments", migration_id: "E", query: "?foo=bar" }
-      course_based_converter.resolve_link!(link)
-      expect(link[:new_value]).to eq("/courses/1/files/5/preview")
+      resolver.resolve_link!(link)
+      expect(link[:new_value]).to eq("/courses/2/files/5/preview")
     end
 
     it "converts media_attachments_iframe urls" do
       link = { link_type: :object, type: "media_attachments_iframe", migration_id: "F", query: "?foo=bar" }
-      course_based_converter.resolve_link!(link)
+      resolver.resolve_link!(link)
       expect(link[:new_value]).to eq("/media_attachments_iframe/6?foo=bar")
     end
 
     it "converts discussion_topic links" do
       link = { link_type: :discussion_topic, migration_id: "G", query: "?foo=bar" }
-      course_based_converter.resolve_link!(link)
-      expect(link[:new_value]).to eq("/courses/1/discussion_topics/7?foo=bar")
+      resolver.resolve_link!(link)
+      expect(link[:new_value]).to eq("/courses/2/discussion_topics/7?foo=bar")
     end
   end
 end

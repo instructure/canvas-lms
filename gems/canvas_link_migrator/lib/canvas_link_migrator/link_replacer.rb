@@ -20,7 +20,7 @@
 module CanvasLinkMigrator
   class LinkReplacer
     # returns false if no substitutions were made
-    def sub_placeholders!(html, links)
+    def self.sub_placeholders!(html, links)
       subbed = false
       links.each do |link|
         new_value = link[:new_value] || link[:old_value]
@@ -32,7 +32,7 @@ module CanvasLinkMigrator
       subbed
     end
 
-    def recursively_sub_placeholders!(object, links)
+    def self.recursively_sub_placeholders!(object, links)
       subbed = false
       case object
       when Hash

@@ -17,6 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "nokogiri"
+require "digest"
+
 module CanvasLinkMigrator
   class LinkParser
     REFERENCE_KEYWORDS = %w[CANVAS_COURSE_REFERENCE CANVAS_OBJECT_REFERENCE WIKI_REFERENCE IMS_CC_FILEBASE IMS-CC-FILEBASE].freeze
@@ -76,7 +79,7 @@ module CanvasLinkMigrator
       "#{LINK_PLACEHOLDER}_#{Digest::MD5.hexdigest(old_value)}"
     end
 
-    def convert(html, item_type, mig_id, field, opts = {})
+    def convert(html, item_type, mig_id, field, remove_outer_nodes_if_one_child: nil)
       mig_id = mig_id.to_s
       doc = Nokogiri::HTML5(html || "")
 
@@ -99,7 +102,7 @@ module CanvasLinkMigrator
       node = doc.at_css("body")
       return "" unless node
 
-      if opts[:remove_outer_nodes_if_one_child]
+      if remove_outer_nodes_if_one_child
         while node.children.size == 1 && node.child.child
           break unless CONTAINER_TYPES.member?(node.child.name) && node.child.attributes.blank?
 

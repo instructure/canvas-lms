@@ -191,7 +191,7 @@ class CourseLinkValidator
     end
   end
 
-  # pretty much copied from ImportedHtmlConverter
+  # pretty much copied from CanvasImportedHtmlConverter
   def find_invalid_links(html)
     links = []
     doc = Nokogiri::HTML5(html || "")

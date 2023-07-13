@@ -20,7 +20,7 @@
 
 class ContentMigration < ActiveRecord::Base
   include Workflow
-  include TextHelper
+  include HtmlTextHelper
   include Rails.application.routes.url_helpers
   include CanvasOutcomesHelper
 
@@ -941,15 +941,15 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def html_converter
-    @html_converter ||= ImportedHtmlConverter.new(self, Importers::DbMigrationQueryService.new(context, self))
+    @html_converter ||= CanvasImportedHtmlConverter.new(self)
   end
 
-  def convert_html(*args)
-    html_converter.convert(*args)
+  def convert_html(*args, **keyword_args)
+    html_converter.convert(*args, **keyword_args)
   end
 
-  def convert_text(*args)
-    html_converter.convert_text(*args)
+  def convert_text(text)
+    format_message(text || "")[0]
   end
 
   delegate :resolve_content_links!, to: :html_converter
