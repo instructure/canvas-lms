@@ -560,4 +560,43 @@ describe Folder do
       expect(attachment.reload).to be_deleted
     end
   end
+
+  describe "#restore" do
+    it "restores until first non-deleted folder" do
+      root_folder = folder_model
+      grandparent_folder = folder_model(parent_folder_id: root_folder)
+      parent_folder = folder_model(parent_folder_id: grandparent_folder)
+      child_folder = folder_model(parent_folder_id: parent_folder.id)
+      root_folder.workflow_state = "deleted"
+      root_folder.save!
+
+      parent_folder.destroy
+      child_folder.reload
+
+      child_folder.restore
+      parent_folder.reload
+      grandparent_folder.reload
+      root_folder.reload
+
+      expect(child_folder.workflow_state).to eq "visible"
+      expect(parent_folder.workflow_state).to eq "visible"
+      expect(grandparent_folder.workflow_state).to eq "visible"
+      expect(root_folder.workflow_state).to eq "deleted"
+    end
+
+    it "deals with name collisions" do
+      f = Folder.root_folders(@course).first
+      expect(f.full_name).to eql("course files")
+      child = f.active_sub_folders.build(name: "child")
+      child.context = @course
+      child.save!
+      child.destroy
+      child2 = f.active_sub_folders.build(name: "child")
+      child2.context = @course
+      child2.save!
+      expect(child2.parent_folder).to eql(f)
+      child.restore
+      expect(child.full_name).to eql("course files/child 2")
+    end
+  end
 end
