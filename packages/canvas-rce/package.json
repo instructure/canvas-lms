@@ -78,6 +78,7 @@
     "@instructure/canvas-media": "*",
     "@instructure/canvas-theme": "7",
     "@instructure/debounce": "^7",
+    "@instructure/emotion": "^8.38.1",
     "@instructure/k5uploader": "*",
     "@instructure/media-capture": "~8.4.1-rc.16",
     "@instructure/ui-a11y-content": "^7",
@@ -158,18 +159,18 @@
     "redux-batch-middleware": "^0.2.0",
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
-    "tinymce": "^5",
     "text-field-edit": "^3.2.0",
+    "tinymce": "^5",
     "uri-js": "^4.2.2",
     "wcag-element-contrast": "^1.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7",
     "@babel/core": "^7",
-    "@babel/preset-typescript": "^7",
-    "@babel/register": "7",
     "@babel/plugin-proposal-optional-chaining": "^7.20.7",
     "@babel/plugin-syntax-nullish-coalescing-operator": "^7.8.3",
+    "@babel/preset-typescript": "^7",
+    "@babel/register": "7",
     "@instructure/babel-plugin-themeable-styles": "7.19.0-canvas",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/translations": ">=1",
@@ -198,6 +199,7 @@
     "jest": "^28",
     "jest-canvas-mock": "^2",
     "jest-junit": "^7",
+    "jest-mock-proxy": "3.1.2",
     "mathjax": "^3.2.0",
     "mocha": "^6",
     "mocha-junit-reporter": "^1.18.0",
@@ -209,6 +211,7 @@
     "shelljs": "^0.8.3",
     "sinon": "^7",
     "skin-deep": "^1",
+    "source-map-support": "0.5.21",
     "testcafe": "1.14.2",
     "testcafe-browser-provider-selenium": "^1.2.0",
     "testcafe-react-selectors": "^3.3.0",
@@ -218,9 +221,7 @@
     "webpack": "^5",
     "webpack-merge": "^5",
     "webpack-nano": "^1",
-    "webpack-plugin-serve": "^1",
-    "source-map-support": "0.5.21",
-    "jest-mock-proxy": "3.1.2"
+    "webpack-plugin-serve": "^1"
   },
   "resolutions": {
     "format-message-estree-util": "./packages/format-message-estree-util"

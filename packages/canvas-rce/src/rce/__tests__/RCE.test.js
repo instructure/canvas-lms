@@ -39,7 +39,7 @@ describe('RCE', () => {
 
   it('bridges newly rendered editors', async () => {
     render(<RCE textareaId="textarea3" />, target)
-    await waitFor(() => expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper'))
+    await waitFor(() => expect(bridge.activeEditor().constructor.name).toEqual('RCEWrapper'))
   })
 
   it('supports getCode() and setCode() on its ref', async () => {
