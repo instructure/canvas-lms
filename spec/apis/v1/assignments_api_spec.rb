@@ -1890,6 +1890,16 @@ describe AssignmentsApiController, type: :request do
         subject
       end
 
+      it 'sets the "resource_map" to equal the one from this course\'s content migration' do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
+        cm = instance_double(ContentMigration, asset_map_url: "some_s3_url")
+        allow(ContentMigration).to receive(:find_most_recent_by_course_ids).and_return(cm)
+
+        expect(ContentMigration).to receive(:find_most_recent_by_course_ids).with(@course.global_id, new_course.global_id)
+        expect_any_instance_of(Assignment).to receive(:resource_map=).with("some_s3_url")
+        subject
+      end
+
       it 'does not set the "resource_map" when the assignment is not a quiz_lti' do
         allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(false)
         master_template = MasterCourses::MasterTemplate.create!(course: @course)
