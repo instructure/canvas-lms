@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {act, fireEvent, render} from '@testing-library/react'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
@@ -462,17 +462,13 @@ describe('CalendarEventDetailsForm', () => {
       )
     })
 
-    it('with custom option selected redirects to other page', async () => {
-      delete global.window.location
-      global.window = Object.create(window)
-      global.window.location = {}
-
+    it('with custom option selected opens the modal', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      const location = window.location.href
       select(component, 'button', 'Frequency:')
       select(component, 'option', 'Custom...')
 
-      await waitFor(() => expect(window.location.href).not.toEqual(location))
+      const modal = await component.findByText('Custom Repeating Event')
+      expect(modal).toBeInTheDocument()
     })
   })
 })

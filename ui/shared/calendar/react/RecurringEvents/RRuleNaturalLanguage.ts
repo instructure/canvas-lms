@@ -23,19 +23,6 @@ import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('calendar_custom_recurring_event_natural_language')
 
-type RRULEDayValueToWeekdayName = {[key in RRULEDayValue]: string}
-
-// I know these dates map to their respective days of the week
-const DAYS_OF_WEEK: RRULEDayValueToWeekdayName = Object.freeze({
-  SU: '2023-07-02',
-  MO: '2023-07-03',
-  TU: '2023-07-04',
-  WE: '2023-07-05',
-  TH: '2023-07-06',
-  FR: '2023-07-07',
-  SA: '2023-07-08',
-})
-
 const ORDINALS: readonly string[] = Object.freeze([
   '',
   I18n.t('first'),
@@ -44,6 +31,26 @@ const ORDINALS: readonly string[] = Object.freeze([
   I18n.t('fourth'),
   I18n.t('fifth'),
 ])
+
+// I know these dates map to their respective days of the week
+const match_day_of_week = (rrule_day: RRULEDayValue, timezone: string): Date => {
+  switch (rrule_day) {
+    case 'SU':
+      return moment.tz('2023-07-02', timezone).toDate()
+    case 'MO':
+      return moment.tz('2023-07-03', timezone).toDate()
+    case 'TU':
+      return moment.tz('2023-07-04', timezone).toDate()
+    case 'WE':
+      return moment.tz('2023-07-05', timezone).toDate()
+    case 'TH':
+      return moment.tz('2023-07-06', timezone).toDate()
+    case 'FR':
+      return moment.tz('2023-07-07', timezone).toDate()
+    case 'SA':
+      return moment.tz('2023-07-08', timezone).toDate()
+  }
+}
 
 function ordinalize(n: number): string {
   if (n < 0) return I18n.t('last')
@@ -98,7 +105,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
 
   function format_weekday(weekdays: SelectedDaysArray): string {
     return weekdays
-      .map((d: RRULEDayValue) => weekday_formatter(new Date(DAYS_OF_WEEK[d])))
+      .map((d: RRULEDayValue) => weekday_formatter(match_day_of_week(d, timezone)))
       .join(', ')
   }
 
@@ -305,32 +312,6 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
       return ''
     }
   }
-
-  // def parse_generic_monthly(rropts)
-  //   interval = rropts.interval
-  //   times = rropts.count
-  //   until_date = rropts.until
-
-  //   if times
-  //     I18n.t({
-  //              one: "Monthly, %{times} times",
-  //              other: "Every %{count} months, %{times} times"
-  //            },
-  //            {
-  //              count: interval,
-  //              times:
-  //            })
-  //   else
-  //     I18n.t({
-  //              one: "Monthly until %{until}",
-  //              other: "Every %{count} months until %{until}"
-  //            },
-  //            {
-  //              count: interval,
-  //              until: format_date(until_date)
-  //            })
-  //   end
-  // end
 
   function parse_yearly(rropts: RRuleHelperSpec): string {
     if (rropts.weekdays) {

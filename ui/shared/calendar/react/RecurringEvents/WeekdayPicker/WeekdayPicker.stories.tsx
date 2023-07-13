@@ -55,7 +55,13 @@ const Template: Story<WeekdayPickerProps> = args => {
       <button type="button" onClick={e => e.target.focus()}>
         tab stop before
       </button>
-      <View as="div" margin="small" padding="medium" borderWidth="small 0" borderColor="default">
+      <View
+        as="div"
+        margin="small 0"
+        padding="medium 0"
+        borderWidth="small 0"
+        borderColor="default"
+      >
         <WeekdayPicker
           locale={locale}
           selectedDays={currSelectedDays}

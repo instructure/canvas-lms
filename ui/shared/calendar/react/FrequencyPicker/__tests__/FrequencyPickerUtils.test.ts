@@ -32,13 +32,13 @@ describe('FrequencyPickerUtils', () => {
 
   describe('generateFrequencyOptions()', () => {
     it('returns labels', () => {
-      const datetime = moment('2001-04-12')
-      const result = generateFrequencyOptions(datetime)
+      const datetime = moment.tz('2001-04-12', defaultTZ)
+      const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
       expect(result).toEqual([
         {id: 'not-repeat', label: 'Does not repeat'},
         {id: 'daily', label: 'Daily'},
         {id: 'weekly-day', label: 'Weekly on Thursday'},
-        {id: 'monthly-nth-day', label: 'Monthly on second Thursday'},
+        {id: 'monthly-nth-day', label: 'Monthly on the second Thursday'},
         {id: 'annually', label: 'Annually on April 12'},
         {id: 'every-weekday', label: 'Every weekday (Monday to Friday)'},
         {id: 'custom', label: 'Custom...'},
@@ -47,68 +47,106 @@ describe('FrequencyPickerUtils', () => {
 
     describe('returns when four weekdays in month', () => {
       it('first', () => {
-        const datetime = moment('2023-07-05')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-05', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on first Wednesday')
+        expect(nthString).toEqual('Monthly on the first Wednesday')
       })
 
       it('second', () => {
-        const datetime = moment('2023-07-12')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-12', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on second Wednesday')
+        expect(nthString).toEqual('Monthly on the second Wednesday')
       })
 
       it('third', () => {
-        const datetime = moment('2023-07-19')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-19', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on third Wednesday')
+        expect(nthString).toEqual('Monthly on the third Wednesday')
       })
 
       it('last', () => {
-        const datetime = moment('2023-07-26')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-26', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on last Wednesday')
+        expect(nthString).toEqual('Monthly on the last Wednesday')
       })
     })
 
     describe('returns when five weekdays in month', () => {
       it('first', () => {
-        const datetime = moment('2023-07-01')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-01', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on first Saturday')
+        expect(nthString).toEqual('Monthly on the first Saturday')
       })
 
       it('second', () => {
-        const datetime = moment('2023-07-08')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-08', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on second Saturday')
+        expect(nthString).toEqual('Monthly on the second Saturday')
       })
 
       it('third', () => {
-        const datetime = moment('2023-07-15')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-15', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on third Saturday')
+        expect(nthString).toEqual('Monthly on the third Saturday')
       })
 
       it('fourth', () => {
-        const datetime = moment('2023-07-22')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-22', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on fourth Saturday')
+        expect(nthString).toEqual('Monthly on the fourth Saturday')
       })
 
       it('last', () => {
-        const datetime = moment('2023-07-29')
-        const result = generateFrequencyOptions(datetime)
+        const datetime = moment.tz('2023-07-29', defaultTZ)
+        const result = generateFrequencyOptions(datetime, 'en', defaultTZ, null)
         const nthString = result[3].label
-        expect(nthString).toEqual('Monthly on last Saturday')
+        expect(nthString).toEqual('Monthly on the last Saturday')
+      })
+    })
+
+    describe('updates the custom label when the reference date changes', () => {
+      it('for an annual event', () => {
+        const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=21;COUNT=2'
+        const eventStart = moment.tz('2023-07-21', defaultTZ)
+
+        let result = generateFrequencyOptions(eventStart, 'en', defaultTZ, rrule)
+        expect(result[6].label).toEqual('Annually on Jul 21, 2 times')
+
+        eventStart.add(1, 'day')
+        result = generateFrequencyOptions(eventStart, 'en', defaultTZ, rrule)
+        expect(result[6].label).toEqual('Annually on Jul 22, 2 times')
+      })
+
+      it('for a monthly by date event', () => {
+        const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=21;COUNT=2'
+        const eventStart = moment.tz('2023-07-21', defaultTZ)
+
+        let result = generateFrequencyOptions(eventStart, 'en', defaultTZ, rrule)
+        expect(result[6].label).toEqual('Monthly on day 21, 2 times')
+
+        eventStart.add(1, 'day')
+        result = generateFrequencyOptions(eventStart, 'en', defaultTZ, rrule)
+        expect(result[6].label).toEqual('Monthly on day 22, 2 times')
+      })
+
+      it('for a monthly by weekday event', () => {
+        const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=FR;BYSETPOS=3;COUNT=2'
+        const eventStart = moment.tz('2023-07-21', defaultTZ)
+
+        let result = generateFrequencyOptions(eventStart, 'en', defaultTZ, rrule)
+        expect(result[6].label).toEqual('Monthly on the third Fri, 2 times')
+
+        eventStart.add(8, 'days')
+        result = generateFrequencyOptions(eventStart, 'en', defaultTZ, rrule)
+        expect(result[6].label).toEqual('Monthly on the last Sat, 2 times')
       })
     })
   })
@@ -118,7 +156,7 @@ describe('FrequencyPickerUtils', () => {
       let datetime: Moment
 
       beforeAll(() => {
-        datetime = moment('1997-04-05')
+        datetime = moment.tz('1997-04-05', defaultTZ)
       })
 
       it('not-repeated event', () => {
@@ -161,7 +199,7 @@ describe('FrequencyPickerUtils', () => {
       let datetime: Moment
 
       beforeAll(() => {
-        datetime = moment('1997-12-25')
+        datetime = moment.tz('1997-12-25', defaultTZ)
       })
 
       it('a not-repeated event', () => {
@@ -204,62 +242,62 @@ describe('FrequencyPickerUtils', () => {
   describe('rruleToFrequencyOptionValue', () => {
     it('returns daily for a matching rrule', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=DAILY;INTERVAL=1'
+      const rrule = 'FREQ=DAILY;INTERVAL=1;COUNT=200'
       expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('daily')
     })
 
     it('returns weekly-day for a matching rrule', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO'
+      const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO;COUNT=52'
       expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('weekly-day')
     })
 
     it('returns monthly-nth-day for an matching rrule for nth weekday of the month', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=MO;BYSETPOS=3'
+      const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=MO;BYSETPOS=3;COUNT=12'
       expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('monthly-nth-day')
     })
 
     it('returns monthly-nth-day for an matching rrule for last week day of the month', () => {
       const eventStart = moment.tz('2023-07-25T00:00:00', defaultTZ)
-      const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=TU;BYSETPOS=-1'
+      const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=TU;BYSETPOS=-1;COUNT=12'
       expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('monthly-nth-day')
     })
 
     it('returns annually for a matching rrule', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=17'
+      const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=17;COUNT=5'
       expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('annually')
     })
 
     it('returns every-weekday for a matching rrule', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR'
+      const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=52'
       expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('every-weekday')
     })
 
     it('returns custom for an rrule with interval not 1', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=DAILY;INTERVAL=2'
-      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('custom')
+      const rrule = 'FREQ=DAILY;INTERVAL=2;COUNT=200'
+      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('saved-custom')
     })
 
     it('returns custom for an rrule not on the right day of the week', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=TU;BYSETPOS=3'
-      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('custom')
+      const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=TU;BYSETPOS=3;COUNT=12'
+      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('saved-custom')
     })
 
     it('returns custom for an rrule not in the right month', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=6;BYMONTHDAY=17'
-      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('custom')
+      const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=6;BYMONTHDAY=17;COUNT=5'
+      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('saved-custom')
     })
 
     it('returns custom for an rrule not on the right day of the month', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=18'
-      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('custom')
+      const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=18;COUNT=5'
+      expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('saved-custom')
     })
 
     it('returns custom for an empty rrule', () => {

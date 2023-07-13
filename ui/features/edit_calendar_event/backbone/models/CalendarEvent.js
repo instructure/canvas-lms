@@ -59,7 +59,8 @@ export default class CalendarEvent extends Backbone.Model {
       'comments',
       'web_conference',
       'important_dates',
-      'blackout_date'
+      'blackout_date',
+      'rrule'
     )
     if (obj.use_section_dates && obj.child_event_data) {
       filtered.child_event_data = _.chain(obj.child_event_data)

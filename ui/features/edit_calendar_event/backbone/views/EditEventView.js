@@ -21,6 +21,7 @@ import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import tz from '@canvas/timezone'
+import moment from 'moment-timezone'
 import Backbone from '@canvas/backbone'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -35,6 +36,8 @@ import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/DeleteCale
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
+import FrequencyPicker from '@canvas/calendar/react/FrequencyPicker/FrequencyPicker'
+import {rruleToFrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
 
 const I18n = useI18nScope('calendar.edit')
 
@@ -73,7 +76,8 @@ export default class EditCalendarEventView extends Backbone.View {
         'blackout_date',
         'context_type',
         'course_pacing_enabled',
-        'course_sections'
+        'course_sections',
+        'rrule'
       )
       if (picked_params.start_at) {
         picked_params.start_date = tz.format(
@@ -181,6 +185,50 @@ export default class EditCalendarEventView extends Backbone.View {
         conferenceNode
       )
     }
+  }
+
+  _handleFrequencyChange(newFrequency, newRRule) {
+    if (newFrequency !== 'custom') {
+      this.model.set('rrule', newRRule)
+      this.renderRecurringEventFrequencyPicker(newFrequency, newRRule)
+    }
+  }
+
+  renderRecurringEventFrequencyPicker() {
+    if (ENV.FEATURES.calendar_series) {
+      const pickerNode = document.getElementById('recurring_event_frequency_picker')
+      const start =
+        this.$el.find('[name="start_time"]').data('iso8601') ||
+        this.$el.find('[name="start_date"]').data('iso8601') ||
+        this.model.get('start_date')
+      const eventStart = moment.tz(start, ENV.TIMEZONE)
+
+      const rrule = this.model.get('rrule')
+      const freq = rrule ? rruleToFrequencyOptionValue(eventStart, rrule) : 'not-repeat'
+
+      ReactDOM.render(
+        <div style={{margin: '.5rem 0 1rem'}}>
+          <FrequencyPicker
+            date={eventStart.toISOString(true)}
+            locale={ENV.LOCALE || 'en'}
+            timezone={ENV.TIMEZONE}
+            initialFrequency={freq}
+            rrule={rrule}
+            onChange={this.handleFrequencyChange}
+          />
+        </div>,
+        pickerNode
+      )
+    }
+  }
+
+  afterRender() {
+    this.handleFrequencyChange = this._handleFrequencyChange.bind(this)
+    this.renderRecurringEventFrequencyPicker()
+
+    this.$el.find('[name="start_date"]').on('change', () => {
+      this.renderRecurringEventFrequencyPicker()
+    })
   }
 
   render() {
@@ -473,6 +521,10 @@ export default class EditCalendarEventView extends Backbone.View {
     }
 
     data.important_dates = this.$el.find('#calendar_event_important_dates').prop('checked')
+
+    if (this.model.get('rrule')) {
+      data.rrule = this.model.get('rrule')
+    }
     return data
   }
 

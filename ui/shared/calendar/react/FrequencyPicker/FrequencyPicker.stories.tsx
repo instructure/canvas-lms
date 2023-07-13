@@ -125,13 +125,21 @@ const Template: Story<FrequencyPickerProps> = args => {
           key={date}
           date={date}
           initialFrequency={frequency}
+          rrule={frequency === 'saved-custom' ? RRule : undefined}
           locale={locale}
+          timezone={timezone}
           onChange={handleFrequencyChange}
         />
       </View>
       <View as="div" margin="small">
-        <Text weight="bold">Generated RRule:&nbsp;</Text>
-        <Text>{RRule}</Text>
+        <div>
+          <Text weight="bold">Event start:&nbsp;</Text>
+          <Text>{moment.tz(date, timezone).toString()}</Text>
+        </div>
+        <div>
+          <Text weight="bold">Generated RRule:&nbsp;</Text>
+          <Text>{RRule}</Text>
+        </div>
       </View>
     </div>
   )
@@ -143,6 +151,22 @@ Default.args = {
   initialFrequency: 'not-repeat',
   locale: 'en',
   timezone: moment.tz.guess(),
+}
+
+export const WithInitialFrequency = Template.bind({})
+WithInitialFrequency.args = {
+  date: moment().format('YYYY-MM-DD'),
+  initialFrequency: 'daily',
+  locale: 'en',
+  timezone: moment.tz.guess(),
+}
+
+export const InToko = Template.bind({})
+InToko.args = {
+  date: moment().tz('Asia/Tokyo').format('YYYY-MM-DD'),
+  initialFrequency: 'not-repeat',
+  locale: 'en',
+  timezone: 'Asia/Tokyo',
 }
 
 export const InGBEnglish = Template.bind({})

@@ -56,7 +56,7 @@ export default function CustomRecurrence({
   rruleSpec,
   onChange,
 }: CustomRecurrenceProps) {
-  const [rrule_obj, set_rrrule_obj] = useState(new RRuleHelper(rruleSpec))
+  const [rrule_obj, set_rrule_obj] = useState(new RRuleHelper(rruleSpec))
 
   const [freq, setFreq] = useState<FrequencyValue>(rrule_obj.spec.freq)
   const [interval, setInterval] = useState<number>(rrule_obj.spec.interval)
@@ -116,7 +116,7 @@ export default function CustomRecurrence({
   }, [eventStart, fireOnChange, rrule_obj.spec, timezone])
 
   useEffect(() => {
-    set_rrrule_obj(new RRuleHelper(rruleSpec))
+    set_rrule_obj(new RRuleHelper(rruleSpec))
   }, [rruleSpec])
 
   useEffect(() => {
