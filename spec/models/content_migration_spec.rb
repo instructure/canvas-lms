@@ -1528,4 +1528,50 @@ describe ContentMigration do
       end
     end
   end
+
+  describe "find_most_recent_by_course_ids" do
+    specs_require_sharding
+
+    before :once do
+      @shard1.activate do
+        @other_account = Account.create! name: "Source Account"
+        @other_account.account_domains.create! host: "pineapple.127.0.0.1.xip.io"
+        @other_course_cross_shard = course_factory(account: @other_account)
+      end
+
+      @source_course = course_factory
+
+      @other_course_a = course_factory
+      @other_course_b = course_factory
+    end
+
+    it "returns the correct content migration" do
+      cm_to_a = ContentMigration.create!(source_course: @source_course, context: @other_course_a)
+      ContentMigration.create!(source_course: @source_course, context: @other_course_b)
+
+      expect(ContentMigration.find_most_recent_by_course_ids(@source_course.id, @other_course_a)&.id).to eq cm_to_a.id
+    end
+
+    it "works with global ids" do
+      cm_to_a = ContentMigration.create!(source_course: @source_course, context: @other_course_a)
+      ContentMigration.create!(source_course: @source_course, context: @other_course_b)
+
+      expect(ContentMigration.find_most_recent_by_course_ids(@source_course.global_id, @other_course_a.global_id)&.id).to eq cm_to_a.id
+    end
+
+    it "works cross shard" do
+      ContentMigration.create!(source_course: @source_course, context: @other_course_a)
+      @shard1.activate do
+        cm_to_cross_shard = ContentMigration.create!(source_course: @source_course, context: @other_course_cross_shard)
+        expect(ContentMigration.find_most_recent_by_course_ids(@source_course.global_id, @other_course_cross_shard.global_id)&.id).to eq cm_to_cross_shard.id
+      end
+    end
+
+    it "returns the most recently finished" do
+      ContentMigration.create!(source_course: @source_course, context: @other_course_a, finished_at: 1.year.ago)
+      cm_to_a_more_recent = ContentMigration.create!(source_course: @source_course, context: @other_course_a, finished_at: 1.day.ago)
+
+      expect(ContentMigration.find_most_recent_by_course_ids(@source_course.id, @other_course_a)&.id).to eq cm_to_a_more_recent.id
+    end
+  end
 end

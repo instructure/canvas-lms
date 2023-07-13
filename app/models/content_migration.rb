@@ -1358,4 +1358,8 @@ class ContentMigration < ActiveRecord::Base
       none
     end
   }
+
+  def self.find_most_recent_by_course_ids(source_course_id, context_id)
+    ContentMigration.where(source_course_id:, context_id:).order(finished_at: :desc).first
+  end
 end

@@ -1667,12 +1667,8 @@ class AssignmentsApiController < ApplicationController
   end
 
   def set_assignment_asset_map(assignment)
-    content_migration = ContentMigration.where(migration_type: "master_course_import",
-                                               child_subscription_id: MasterCourses::ChildSubscription.where(
-                                                 master_template_id: MasterCourses::MasterContentTag.where(
-                                                   content: assignment.duplicate_of
-                                                 ).select(:master_template_id)
-                                               ).select(:id)).first
-    assignment.resource_map = content_migration&.asset_map_url
+    assignment.shard.activate do
+      assignment.resource_map = ContentMigration.find_most_recent_by_course_ids(@context.global_id, assignment.context.global_id)&.asset_map_url
+    end
   end
 end
