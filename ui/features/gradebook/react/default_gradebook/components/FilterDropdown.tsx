@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {MouseEvent, useState, useRef} from 'react'
+import React, {MouseEvent, useState, useRef, useEffect} from 'react'
 import {Popover} from '@instructure/ui-popover'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -94,6 +94,12 @@ const FilterDropdown = ({
 
   const isRoot = currentItemId === 'savedFilterPresets'
 
+  useEffect(() => {
+    if (menuRef.current) {
+      menuRef.current.focus()
+    }
+  }, [isRoot])
+
   const setItemId = id => {
     setTempItemId(id)
 
@@ -145,7 +151,7 @@ const FilterDropdown = ({
         placement="bottom start"
         constrain="window"
         offsetY={8}
-        isOpen={isOpen}
+        isShowingContent={isOpen}
         onShowContent={() => {
           setIsOpen(true)
         }}
