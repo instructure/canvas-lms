@@ -25,7 +25,7 @@ import {Button, IconButton, CondensedButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Badge} from '@instructure/ui-badge'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 
 import {Text} from '@instructure/ui-text'
 import {SVGIcon} from '@instructure/ui-svg-images'
@@ -202,15 +202,17 @@ export default function StatusBar(props) {
       return button
     }
     return (
-      <ApplyTheme
+      <InstUISettingsProvider
         theme={{
-          [Badge.theme]: {colorPrimary: props.a11yBadgeColor},
+          componentOverrides: {
+            Badge: {colorPrimary: props.a11yBadgeColor},
+          },
         }}
       >
         <Badge count={props.a11yErrorsCount} countUntil={100}>
           {button}
         </Badge>
-      </ApplyTheme>
+      </InstUISettingsProvider>
     )
   }
 

@@ -37,7 +37,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconQuestionLine} from '@instructure/ui-icons'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Alert} from '@instructure/ui-alerts'
 import ColorField from './color-field'
 import PlaceholderSVG from './placeholder-svg'
@@ -402,17 +402,19 @@ export default class Checker extends React.Component {
                                   <p>{rule.why()}</p>
                                   <p>
                                     {rule.link && rule.link.length && (
-                                      <ApplyTheme
+                                      <InstUISettingsProvider
                                         theme={{
-                                          [Link.theme]: {
-                                            textDecoration: 'underline',
+                                          componentOverrides: {
+                                            Link: {
+                                              textDecoration: 'underline',
+                                            },
                                           },
                                         }}
                                       >
                                         <Link href={rule.link} target="_blank">
                                           {rule.linkText()}
                                         </Link>
-                                      </ApplyTheme>
+                                      </InstUISettingsProvider>
                                     )}
                                   </p>
                                 </Text>
