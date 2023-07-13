@@ -505,10 +505,10 @@ class Assignment < ActiveRecord::Base
     Assignment.maximum_string_length
   end
 
-  def secure_params
+  def secure_params(include_description: true)
     body = {}
     body[:lti_assignment_id] = lti_context_id || SecureRandom.uuid
-    body[:lti_assignment_description] = lti_safe_description
+    body[:lti_assignment_description] = lti_safe_description if include_description
     Canvas::Security.create_jwt(body)
   end
 
