@@ -21,6 +21,7 @@
 class AccountReport < ActiveRecord::Base
   include Workflow
   include LocaleSelection
+  include CaptureJobIds
 
   belongs_to :account, inverse_of: :account_reports
   belongs_to :user, inverse_of: :account_reports

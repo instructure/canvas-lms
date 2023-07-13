@@ -20,6 +20,7 @@
 
 class AccountReportRunner < ActiveRecord::Base
   include Workflow
+  include CaptureJobIds
 
   belongs_to :account_report, inverse_of: :account_report_runners
   has_many :account_report_rows, inverse_of: :account_report_runner, autosave: false
@@ -53,6 +54,7 @@ class AccountReportRunner < ActiveRecord::Base
     # remove any account report rows created during a previously failed job
     AccountReportRow.where(account_report_runner: self).delete_all if account_report.account.root_account.feature_enabled?(:custom_report_experimental)
     @rows ||= []
+    capture_job_id
     update!(workflow_state: "running", started_at: Time.now.utc)
   end
 
