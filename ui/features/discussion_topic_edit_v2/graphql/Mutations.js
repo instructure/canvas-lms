@@ -21,23 +21,58 @@ import gql from 'graphql-tag'
 
 export const CREATE_DISCUSSION_TOPIC = gql`
   mutation CreateDiscussionTopic(
-    $context_id: ID!
-    $context_type: String!
+    $contextId: ID!
+    $contextType: String!
+    $isAnnouncement: Boolean!
     $title: String
     $message: String
+    $discussionType: String
+    $delayedPostAt: ISO8601DateTime
+    $lockAt: ISO8601DateTime
+    $podcastEnabled: Boolean
+    $podcastHasStudentPosts: Boolean
+    $requireInitialPost: Boolean
+    $pinned: Boolean
+    $todoDate: ISO8601DateTime
+    $groupCategoryId: ID
+    $allowRating: Boolean
+    $onlyGradersCanRate: Boolean
+    $sortByRating: Boolean
+    $anonymousState: String
+    $isAnonymousAuthor: Boolean
+    $specificSections: [String!]
+    $locked: Boolean
     $published: Boolean
   ) {
     createDiscussionTopic(
       input: {
-        contextId: $course_id
-        contextType: $context_type
+        contextId: $contextId
+        contextType: $contextType
+        isAnnouncement: $isAnnouncement
         title: $title
         message: $message
+        discussionType: $discussionType
+        delayedPostAt: $delayedPostAt
+        lockAt: $lockAt
+        podcastEnabled: $podcastEnabled
+        podcastHasStudentPosts: $podcastHasStudentPosts
+        requireInitialPost: $requireInitialPost
+        pinned: $pinned
+        todoDate: $todoDate
+        groupCategoryId: $groupCategoryId
+        allowRating: $allowRating
+        onlyGradersCanRate: $onlyGradersCanRate
+        sortByRating: $sortByRating
+        anonymousState: $anonymousState
+        isAnonymousAuthor: $isAnonymousAuthor
+        specificSections: $specificSections
+        locked: $locked
         published: $published
       }
     ) {
       discussionTopic {
         _id
+        contextType
       }
       errors {
         ...Error
