@@ -166,7 +166,14 @@ class ExternalToolsController < ApplicationController
 
   def retrieve
     track_time_with_lti_version "lti.retrieve.request_time" do |timing_meta|
-      tool, url = find_tool_and_url(resource_link_lookup_uuid, params[:url], @context, params[:client_id], params[:resource_link_id])
+      tool, url = find_tool_and_url(
+        resource_link_lookup_uuid,
+        params[:url],
+        @context,
+        params[:client_id],
+        params[:resource_link_id],
+        prefer_1_1: !!params[:prefer_1_1]
+      )
       @tool = tool
       placement = placement_from_params
       add_crumb(@tool.name)
@@ -195,7 +202,7 @@ class ExternalToolsController < ApplicationController
   # Finds a tool for a given resource_link_id or url in a context
   # Prefers the resource_link_id, but defaults to the provided_url,
   #   if the resource_link does not provide a url
-  def find_tool_and_url(lookup_id, provided_url, context, client_id, resource_link_id = nil)
+  def find_tool_and_url(lookup_id, provided_url, context, client_id, resource_link_id = nil, prefer_1_1: false)
     resource_link = if resource_link_id
                       Lti::ResourceLink.where(
                         resource_link_uuid: resource_link_id,
@@ -209,7 +216,7 @@ class ExternalToolsController < ApplicationController
                     end
     if resource_link.nil? || resource_link.url.nil?
       # If the resource_link doesn't have a url, then use the provided url to look up the tool
-      tool = ContextExternalTool.find_external_tool(provided_url, context, nil, nil, client_id)
+      tool = ContextExternalTool.find_external_tool(provided_url, context, nil, nil, client_id, prefer_1_1:)
       unless tool
         invalid_settings_error
       end

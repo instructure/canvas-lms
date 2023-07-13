@@ -264,7 +264,14 @@ class SubmissionsBaseController < ApplicationController
     plag_data = (type == "vericite") ? submission.vericite_data : submission.turnitin_data
 
     if plag_data.dig(asset_string, :report_url).present?
-      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display: "borderless")
+      polymorphic_url(
+        [:retrieve, @context, :external_tools],
+        url: plag_data[asset_string][:report_url],
+        # Hack because turnitin supports only 1.1 here, but they have 1.3 tools
+        # with the same domain that we will find because we prefer 1.3 tools:
+        prefer_1_1: type == "turnitin",
+        display: "borderless"
+      )
     elsif type == "vericite"
       # VeriCite URL
       submission.vericite_report_url(asset_string, @current_user, session)

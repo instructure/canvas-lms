@@ -1085,7 +1085,8 @@ class ContextExternalTool < ActiveRecord::Base
     url,
     context,
     preferred_tool_id = nil, exclude_tool_id = nil, preferred_client_id = nil,
-    only_1_3: false
+    only_1_3: false,
+    prefer_1_1: false
   )
     GuardRail.activate(:secondary) do
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
@@ -1100,7 +1101,8 @@ class ContextExternalTool < ActiveRecord::Base
         preferred_tool_id,
         exclude_tool_id,
         preferred_client_id,
-        only_1_3:
+        only_1_3:,
+        prefer_1_1:
       )
 
       # Check for a tool that exactly matches the given URL
@@ -1138,16 +1140,19 @@ class ContextExternalTool < ActiveRecord::Base
   def self.find_and_order_tools(
     context,
     preferred_tool_id_param, exclude_tool_id, preferred_client_id,
-    only_1_3: false
+    only_1_3: false,
+    prefer_1_1: false
   )
     context.shard.activate do
       preferred_tool_id = Shard.integral_id_for(preferred_tool_id_param)
       contexts = contexts_to_search(context)
       context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
 
+      preferred_version = prefer_1_1 ? "1.1" : "1.3" # Hack required for one Turnitin case :( see git blame
+
       order_clauses = [
-        # prefer 1.3 tools
-        sort_by_sql_string("lti_version = '1.3'"),
+        # prefer 1.3 tools (unless told otherwise)
+        sort_by_sql_string("lti_version = '#{preferred_version}'"),
         # prefer tools that are not duplicates
         sort_by_sql_string("identity_hash != 'duplicate'"),
         # prefer tools from closer contexts
