@@ -107,6 +107,7 @@ module AccountReports
   end
 
   def self.generate_report(account_report)
+    account_report.capture_job_id
     account_report.update(workflow_state: "running", start_at: Time.zone.now)
     begin
       I18n.with_locale(account_report.parameters["locale"]) do
