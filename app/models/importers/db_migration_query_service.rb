@@ -25,8 +25,8 @@ module Importers
   # Each function returns exactly one id (if available), and nil if an id
   # cannot be resolved
   class DbMigrationQueryService
-    def initialize(context, migration)
-      @context = context
+    def initialize(migration)
+      @context = migration.context
       @migration = migration
     end
 

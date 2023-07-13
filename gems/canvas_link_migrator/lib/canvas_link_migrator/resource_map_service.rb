@@ -35,10 +35,36 @@ module CanvasLinkMigrator
       migration_data["resource_mapping"]
     end
 
+    ### Overwritable methods
+    def supports_embedded_images
+      false
+    end
+
+    def fix_relative_urls?
+      true
+    end
+
+    def process_domain_substitutions(url)
+      url
+    end
+
+    def context_hosts
+      migration_data["destination_hosts"]
+    end
+
+    def attachment_path_id_lookup; end
+
+    def attachment_path_id_lookup_lower; end
+
+    def root_folder_name
+      migration_data["destination_root_folder"]
+    end
+    ### End of Ovewritable methods
+
     # Returns the path for the context, for a course, it should return something like
     # "courses/1"
     def context_path
-      "/courses/#{migration_data["source_course"]}"
+      "/courses/#{migration_data["destination_course"]}"
     end
 
     # Looks up a wiki page slug for a migration id

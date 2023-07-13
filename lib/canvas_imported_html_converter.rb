@@ -20,9 +20,8 @@
 
 require "nokogiri"
 
-class ImportedHtmlConverter
-  include TextHelper
-  include HtmlTextHelper
+class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
+  include CanvasLinkMigrator
 
   LINK_TYPE_TO_CLASS = {
     announcement: Announcement,
@@ -35,37 +34,9 @@ class ImportedHtmlConverter
     wiki_page: WikiPage
   }.freeze
 
-  attr_reader :link_parser, :link_resolver, :link_replacer
-
-  delegate :convert, to: :link_parser
-
-  def initialize(migration, migration_id_converter)
+  def initialize(migration)
     @migration = migration
-    @migration_id_converter = migration_id_converter
-    @link_parser = CanvasLinkMigrator::LinkParser.new(migration_id_converter)
-    @link_resolver = CanvasLinkMigrator::LinkResolver.new(migration_id_converter)
-    @link_replacer = CanvasLinkMigrator::LinkReplacer.new
-  end
-
-  def convert_text(text)
-    format_message(text || "")[0]
-  end
-
-  def resolve_content_links!
-    link_map = @link_parser.unresolved_link_map
-    return unless link_map.present?
-
-    @link_resolver.resolve_links!(link_map)
-    replace_placeholders!(link_map)
-    @link_parser.reset!
-  end
-
-  def self.relative_url?(url)
-    URI.parse(url).relative? && !url.to_s.start_with?("//")
-  rescue URI::Error
-    # leave the url as it was
-    Rails.logger.warn "attempting to translate invalid url: #{url}"
-    false
+    super(migration_id_converter: Importers::DbMigrationQueryService.new(migration))
   end
 
   def context
@@ -74,6 +45,15 @@ class ImportedHtmlConverter
 
   def context_path
     @migration_id_converter.context_path
+  end
+
+  def resolve_content_links!
+    link_map = link_parser.unresolved_link_map
+    return unless link_map.present?
+
+    link_resolver.resolve_links!(link_map)
+    replace_placeholders!(link_map)
+    link_parser.reset!
   end
 
   def replace_placeholders!(link_map)
@@ -150,7 +130,7 @@ class ImportedHtmlConverter
     case item_key[:type]
     when :syllabus
       syllabus = context.syllabus_body
-      if link_replacer.sub_placeholders!(syllabus, field_links.values.flatten)
+      if LinkReplacer.sub_placeholders!(syllabus, field_links.values.flatten)
         context.class.where(id: context.id).update_all(syllabus_body: syllabus)
       end
     when :assessment_question
@@ -162,7 +142,7 @@ class ImportedHtmlConverter
       item_updates = {}
       field_links.each do |field, links|
         html = item.read_attribute(field)
-        if link_replacer.sub_placeholders!(html, links)
+        if LinkReplacer.sub_placeholders!(html, links)
           item_updates[field] = html
         end
       end
@@ -210,7 +190,7 @@ class ImportedHtmlConverter
     # we have to do a little bit more here because the question_data can get copied all over
     quiz_ids = []
     Quizzes::QuizQuestion.where(assessment_question_id: aq.id).find_each do |qq|
-      if link_replacer.recursively_sub_placeholders!(qq["question_data"], links)
+      if LinkReplacer.recursively_sub_placeholders!(qq["question_data"], links)
         Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
         quiz_ids << qq.quiz_id
       end
@@ -218,7 +198,7 @@ class ImportedHtmlConverter
 
     if quiz_ids.any?
       Quizzes::Quiz.where(id: quiz_ids.uniq).where.not(quiz_data: nil).find_each do |quiz|
-        if link_replacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
+        if LinkReplacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
           Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
         end
       end
@@ -233,18 +213,18 @@ class ImportedHtmlConverter
       link[:new_value] = aq.translate_file_link(link[:new_value])
     end
 
-    if link_replacer.recursively_sub_placeholders!(aq["question_data"], links)
+    if LinkReplacer.recursively_sub_placeholders!(aq["question_data"], links)
       AssessmentQuestion.where(id: aq.id).update_all(question_data: aq["question_data"])
     end
   end
 
   def process_quiz_question!(qq, links)
-    if link_replacer.recursively_sub_placeholders!(qq["question_data"], links)
+    if LinkReplacer.recursively_sub_placeholders!(qq["question_data"], links)
       Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
     end
 
     quiz = Quizzes::Quiz.where(id: qq.quiz_id).where.not(quiz_data: nil).first
-    if quiz && link_replacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
+    if quiz && LinkReplacer.recursively_sub_placeholders!(quiz["quiz_data"], links)
       Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
     end
   end
