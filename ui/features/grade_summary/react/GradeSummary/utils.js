@@ -24,11 +24,14 @@ import {Pill} from '@instructure/ui-pill'
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 export const getGradingPeriodID = () => {
-  return window?.location?.search
+  const fromUrl = window?.location?.search
     ?.split('?')[1]
     ?.split('&')
     ?.filter(param => param.includes('grading_period_id'))[0]
     ?.split('=')[1]
+
+  // if the course truly has no grading periods, then the ENV variable will be undefined
+  return fromUrl || ENV.current_grading_period_id
 }
 
 export const filteredAssignments = (data, calculateOnlyGradedAssignments = false) => {

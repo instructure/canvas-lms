@@ -367,7 +367,7 @@ describe "gradebook - logged in as a student" do
         @assignment_10.submit_homework(@student, { body: "blah" })
       end
 
-      it "correctly displays all grading periods" do
+      it "correctly displays all grading periods when selected from the menu" do
         # Testing the following:
         # correct dropped assignments, correct period totals, correct values with the "calculate based only on graded assignments" option, correct assignments in the correct grading period, assignment date overrides, grading period weight, assignment group weight
         user_session(@student)
@@ -424,6 +424,28 @@ describe "gradebook - logged in as a student" do
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
         expect(f("tr[data-testid='total_row']").text).to eq "Total 11.88%"
+      end
+
+      it "correctly displays all grading periods as default when there is no current grading period" do
+        # all grading periods must be in the past
+        @current_period.start_date = 300.days.ago
+        @current_period.end_date = 200.days.ago
+        @current_period.close_date = 200.days.ago
+        @current_period.save!
+
+        @assignment_5.update!(due_at: 250.days.ago)
+        @assignment_6.update!(due_at: 250.days.ago)
+        @assignment_7.update!(due_at: 250.days.ago)
+        @assignment_8.update!(due_at: 250.days.ago)
+        @assignment_9.update!(due_at: 250.days.ago)
+        @assignment_10.update!(due_at: 250.days.ago)
+
+        user_session(@student)
+        StudentGradesPage.visit_as_student(@course)
+        expect(f("#grading_period_select_menu").attribute("value")).to eq @all_grading_periods
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 17.27% 19.00/110.00"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27%"
       end
 
       it "correctly displays current grading period" do
