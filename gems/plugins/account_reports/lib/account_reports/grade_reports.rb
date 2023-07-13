@@ -59,19 +59,19 @@ module AccountReports
     # - enrollment status
     def grade_export
       headers = []
-      headers << I18n.t("student name")
-      headers << I18n.t("student id")
-      headers << I18n.t("student sis")
-      headers << I18n.t("student integration id") if include_integration_id?
-      headers << I18n.t("course")
-      headers << I18n.t("course id")
-      headers << I18n.t("course sis")
-      headers << I18n.t("section")
-      headers << I18n.t("section id")
-      headers << I18n.t("section sis")
-      headers << I18n.t("term")
-      headers << I18n.t("term id")
-      headers << I18n.t("term sis")
+      headers << "student name"
+      headers << "student id"
+      headers << "student sis"
+      headers << "student integration id" if include_integration_id?
+      headers << "course"
+      headers << "course id"
+      headers << "course sis"
+      headers << "section"
+      headers << "section id"
+      headers << "section sis"
+      headers << "term"
+      headers << "term id"
+      headers << "term sis"
 
       headers.concat(grading_field_headers)
 
@@ -161,33 +161,33 @@ module AccountReports
       return false unless gp_set
 
       headers = []
-      headers << I18n.t("student name")
-      headers << I18n.t("student id")
-      headers << I18n.t("student sis")
-      headers << I18n.t("student integration id") if include_integration_id?
-      headers << I18n.t("course")
-      headers << I18n.t("course id")
-      headers << I18n.t("course sis")
-      headers << I18n.t("section")
-      headers << I18n.t("section id")
-      headers << I18n.t("section sis")
-      headers << I18n.t("term")
-      headers << I18n.t("term id")
-      headers << I18n.t("term sis")
-      headers << I18n.t("grading period set")
-      headers << I18n.t("grading period set id")
+      headers << "student name"
+      headers << "student id"
+      headers << "student sis"
+      headers << "student integration id" if include_integration_id?
+      headers << "course"
+      headers << "course id"
+      headers << "course sis"
+      headers << "section"
+      headers << "section id"
+      headers << "section sis"
+      headers << "term"
+      headers << "term id"
+      headers << "term sis"
+      headers << "grading period set"
+      headers << "grading period set id"
       gp_set.grading_periods.active.order(:start_date).each do |gp|
-        headers << I18n.t("%{name} grading period id", name: gp.title)
-        headers << I18n.t("%{name} current score", name: gp.title)
-        headers << I18n.t("%{name} final score", name: gp.title)
-        headers << I18n.t("%{name} unposted current score", name: gp.title)
-        headers << I18n.t("%{name} unposted final score", name: gp.title)
-        headers << I18n.t("%{name} override score", name: gp.title) if include_override_score?
-        headers << I18n.t("%{name} current grade", name: gp.title)
-        headers << I18n.t("%{name} final grade", name: gp.title)
-        headers << I18n.t("%{name} unposted current grade", name: gp.title)
-        headers << I18n.t("%{name} unposted final grade", name: gp.title)
-        headers << I18n.t("%{name} override grade", name: gp.title) if include_override_score?
+        headers << "#{gp.title} grading period id"
+        headers << "#{gp.title} current score"
+        headers << "#{gp.title} final score"
+        headers << "#{gp.title} unposted current score"
+        headers << "#{gp.title} unposted final score"
+        headers << "#{gp.title} override score" if include_override_score?
+        headers << "#{gp.title} current grade"
+        headers << "#{gp.title} final grade"
+        headers << "#{gp.title} unposted current grade"
+        headers << "#{gp.title} unposted final grade"
+        headers << "#{gp.title} override grade" if include_override_score?
       end
       headers.concat(grading_field_headers)
     end
@@ -323,17 +323,17 @@ module AccountReports
     def grading_field_headers
       headers = []
 
-      headers << I18n.t("current score")
-      headers << I18n.t("final score")
-      headers << I18n.t("enrollment state")
-      headers << I18n.t("unposted current score")
-      headers << I18n.t("unposted final score")
-      headers << I18n.t("override score") if include_override_score?
-      headers << I18n.t("current grade")
-      headers << I18n.t("final grade")
-      headers << I18n.t("unposted current grade")
-      headers << I18n.t("unposted final grade")
-      headers << I18n.t("override grade") if include_override_score?
+      headers << "current score"
+      headers << "final score"
+      headers << "enrollment state"
+      headers << "unposted current score"
+      headers << "unposted final score"
+      headers << "override score" if include_override_score?
+      headers << "current grade"
+      headers << "final grade"
+      headers << "unposted current grade"
+      headers << "unposted final grade"
+      headers << "override grade" if include_override_score?
 
       headers
     end
