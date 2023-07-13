@@ -42,6 +42,12 @@ const Template: Story<CustomRecurrenceModalProps> = args => {
     setIsModalOpen(false)
   }, [])
 
+  const handleDismiss = useCallback(() => {
+    setIsModalOpen(false)
+  }, [])
+
+  const handleClose = useCallback(() => {}, [])
+
   return (
     <div style={{maxWidth: '700px'}}>
       <View as="div" margin="small">
@@ -54,9 +60,8 @@ const Template: Story<CustomRecurrenceModalProps> = args => {
         courseEndAt={args.courseEndAt}
         RRULE={currRRULE}
         isOpen={isModalOpen}
-        onDismiss={() => {
-          setIsModalOpen(false)
-        }}
+        onClose={handleClose}
+        onDismiss={handleDismiss}
         onSave={handleChange}
       />
       <div style={{margin: '.75rem 0', lineHeight: 1.5}}>

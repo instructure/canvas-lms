@@ -33,6 +33,7 @@ const defaultProps = (
   courseEndAt: undefined,
   RRULE: 'RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
   isOpen: true,
+  onClose: () => {},
   onDismiss: () => {},
   onSave: () => {},
   ...overrides,
@@ -46,7 +47,7 @@ describe('CustomRecurrenceModal', () => {
   it('renders', () => {
     const {getByText, getByTestId} = render(<CustomRecurrenceModal {...defaultProps()} />)
 
-    expect(getByText('Custom Recurrence')).toBeInTheDocument()
+    expect(getByText('Custom Repeating Event')).toBeInTheDocument()
     expect(getByTestId('custom-recurrence')).toBeInTheDocument()
   })
 

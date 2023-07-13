@@ -61,7 +61,7 @@ class CustomRecurrenceErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div>
-          <p>{I18n.t('There was an error loading the custom recurrence editor')}</p>
+          <p>{I18n.t('There was an error loading the Custom Repeating Event editor')}</p>
           <p>{this.state.errorMessage}</p>
         </div>
       )
@@ -77,6 +77,7 @@ export type CustomRecurrenceModalProps = {
   courseEndAt?: string
   RRULE: string
   isOpen: boolean
+  onClose: () => void
   onDismiss: () => void
   onSave: (RRULE: string) => void
 }
@@ -88,14 +89,18 @@ export default function CustomRecurrenceModal({
   courseEndAt,
   RRULE,
   isOpen,
+  onClose,
   onDismiss,
   onSave,
 }: CustomRecurrenceModalProps) {
   const [currSpec, setCurrSpec] = useState<RRuleHelperSpec>(() => {
-    return new RRuleHelper(RRuleHelper.parseString(RRULE)).spec
+    return RRuleHelper.parseString(RRULE)
   })
   const [isValidState, setIsValidState] = useState<boolean>(() => isValid(currSpec))
 
+  useEffect(() => {
+    setCurrSpec(RRuleHelper.parseString(RRULE))
+  }, [RRULE])
   useEffect(() => {
     setIsValidState(isValid(currSpec))
   }, [currSpec])
@@ -128,13 +133,15 @@ export default function CustomRecurrenceModal({
 
   return (
     <CanvasModal
-      label={I18n.t('Custom Recurrence')}
+      label={I18n.t('Custom Repeating Event')}
+      onClose={onClose}
       onDismiss={onDismiss}
       open={isOpen}
+      padding="small medium"
       footer={<Footer />}
       shouldCloseOnDocumentClick={false}
     >
-      <div style={{minWidth: '28rem', minHeight: '20rem'}}>
+      <div style={{minWidth: '28rem', minHeight: '21rem'}}>
         <CustomRecurrenceErrorBoundary>
           <CustomRecurrence
             eventStart={eventStart}

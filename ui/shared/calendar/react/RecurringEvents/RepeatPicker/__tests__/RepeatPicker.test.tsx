@@ -63,12 +63,36 @@ describe('RepeatPicker', () => {
 
   describe('utilities', () => {
     it('cardinalDayInMonth returns the correct day', () => {
-      expect(cardinalDayInMonth(moment('2023-06-02'))).toEqual({cardinal: 1, last: false})
-      expect(cardinalDayInMonth(moment('2023-06-09'))).toEqual({cardinal: 2, last: false})
-      expect(cardinalDayInMonth(moment('2023-06-16'))).toEqual({cardinal: 3, last: false})
-      expect(cardinalDayInMonth(moment('2023-06-23'))).toEqual({cardinal: 4, last: false})
-      expect(cardinalDayInMonth(moment('2023-06-30'))).toEqual({cardinal: 5, last: true})
-      expect(cardinalDayInMonth(moment('2023-07-25'))).toEqual({cardinal: 4, last: true})
+      expect(cardinalDayInMonth(moment('2023-06-02'))).toEqual({
+        cardinal: 1,
+        last: false,
+        dayOfWeek: 5,
+      })
+      expect(cardinalDayInMonth(moment('2023-06-09'))).toEqual({
+        cardinal: 2,
+        last: false,
+        dayOfWeek: 5,
+      })
+      expect(cardinalDayInMonth(moment('2023-06-16'))).toEqual({
+        cardinal: 3,
+        last: false,
+        dayOfWeek: 5,
+      })
+      expect(cardinalDayInMonth(moment('2023-06-23'))).toEqual({
+        cardinal: 4,
+        last: false,
+        dayOfWeek: 5,
+      })
+      expect(cardinalDayInMonth(moment('2023-06-30'))).toEqual({
+        cardinal: 5,
+        last: true,
+        dayOfWeek: 5,
+      })
+      expect(cardinalDayInMonth(moment('2023-07-25'))).toEqual({
+        cardinal: 4,
+        last: true,
+        dayOfWeek: 2,
+      })
     })
 
     it('getWeekdayName returns the dates day of the week', () => {

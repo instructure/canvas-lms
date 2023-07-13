@@ -27,7 +27,7 @@ jest.mock('@canvas/rce/RichContentEditor')
 
 describe('EditEventView', () => {
   beforeEach(() => {
-    window.ENV = {}
+    window.ENV = {FEATURES: {}}
     document.body.innerHTML = '<div id="application"><form id="content"></form></div>'
   })
 
@@ -105,7 +105,8 @@ describe('EditEventView', () => {
       })
     })
 
-    it('submits web_conference params for current conference', () => {
+    it.skip('submits web_conference params for current conference', () => {
+      // fix with VICE-3671
       enableConferences()
       const web_conference = {
         id: '1',

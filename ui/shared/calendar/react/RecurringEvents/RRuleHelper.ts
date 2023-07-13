@@ -75,7 +75,7 @@ export default class RRuleHelper {
 
   // Parse an RRULE string into an RRuleHelperSpec
   static parseString(rrule_str: string = ''): RRuleHelperSpec {
-    if (rrule_str.length === 0) {
+    if (rrule_str === null || rrule_str.length === 0) {
       // guarantee what return is valid
       return makeEmptySpec({count: DEFAULT_COUNT})
     }

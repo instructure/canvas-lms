@@ -57,6 +57,7 @@ export type OnRepeatPickerChangeType = {
 type CardinalDayInMonth = {
   cardinal: number
   last: boolean
+  dayOfWeek: number // 0-6, Sunday-Saturday
 }
 
 export const weekdaysFromMoment = (m: moment.Moment): SelectedDaysArray => [
@@ -68,7 +69,7 @@ export const cardinalDayInMonth = (m: moment.Moment): CardinalDayInMonth => {
   if (n >= 4 && m.clone().add(1, 'week').month() !== m.month()) {
     last = true
   }
-  return {cardinal: n, last}
+  return {cardinal: n, last, dayOfWeek: m.day()}
 }
 
 export const getWeekdayName = (

@@ -27,7 +27,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import moment from 'moment'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -116,9 +115,15 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
     [onChange, selectedDays, weekDays.dayRRULEValues]
   )
 
+  // until canvas is on instui 8 where <Flex> has the gap prop
+  const flexStyle = {
+    display: 'flex',
+    gap: '.5rem',
+  }
+
   return (
     <FormFieldGroup description={I18n.t('Repeats on:')} layout="columns">
-      <Flex>
+      <div style={flexStyle}>
         {weekDays.dayRRULEValues.map((d, i) => {
           const checked = selectedDays.includes(d as RRULEDayValue)
           return (
@@ -132,7 +137,7 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
             />
           )
         })}
-      </Flex>
+      </div>
     </FormFieldGroup>
   )
 }
@@ -160,7 +165,7 @@ export function OneDay({label, screenreaderLabel, value, checked, onChange}: One
         background={bgcolor}
         borderRadius="pill"
         display="flex"
-        margin="xx-small x-small xx-small 0"
+        margin="0"
         minHeight="3rem"
         minWidth="3rem"
         padding="small"

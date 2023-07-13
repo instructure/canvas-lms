@@ -56,7 +56,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const [date, setDate] = useState(tz.parse(event.startDate().format('ll'), timezone))
   const [startTime, setStartTime] = useState(initTime(event.calendarEvent?.start_at))
   const [endTime, setEndTime] = useState(initTime(event.calendarEvent?.end_at))
-  const [rrule, setRRule] = useState(null)
+  const [rrule, setRRule] = useState(event.object.rrule ? event.object.rrule : '')
   const [webConference, setWebConference] = useState(event.webConference)
   const [shouldShowConferences, setShouldShowConferences] = useState(false)
   const [isImportant, setImportant] = useState(event.important_dates)
@@ -215,6 +215,9 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
     params.blackout_date = isBlackout
     params.context_type = context.type
     params.course_pacing_enabled = context.course_pacing_enabled
+    if (typeof rrule === 'string') {
+      params.rrule = rrule
+    }
 
     if (canUpdateConference()) {
       if (webConference) {
@@ -226,20 +229,29 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
     return params
   }
 
+  const buildEditEventUrl = extraParams => {
+    const moreOptionsUrl = new URL(getMoreOptionsHref(), window.location.origin)
+    const queryString = $.param({...getEventUrlParams(), ...extraParams})
+    if (moreOptionsUrl.search) {
+      moreOptionsUrl.search += `&${queryString}`
+    } else {
+      moreOptionsUrl.search = `?${queryString}`
+    }
+    return moreOptionsUrl.toString()
+  }
+
   const moreOptionsClick = jsEvent => {
-    jsEvent.preventDefault()
-    const pieces = jsEvent.target.attributes.href.value.split('#')
-    pieces[0] += `?${$.param(getEventUrlParams())}`
-    window.location.href = pieces.join('#')
+    jsEvent?.preventDefault()
+
+    window.location.href = buildEditEventUrl().toString()
   }
 
   const handleFrequencyChange = (newFrequency, newRRule) => {
-    if (newFrequency !== 'custom') {
-      setRRule(newRRule)
+    if (newFrequency === 'custom') {
+      // setRRule('')
+      // window.location.href = buildEditEventUrl({rrule: ''}).toString()
     } else {
-      const pieces = getMoreOptionsHref().split('#')
-      pieces[0] += `?${$.param(getEventUrlParams())}`
-      window.location.href = pieces.join('#')
+      setRRule(newRRule)
     }
   }
 
@@ -410,6 +422,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             key={date}
             date={date}
             locale={locale}
+            timezone={timezone}
             onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
           />
         )}
