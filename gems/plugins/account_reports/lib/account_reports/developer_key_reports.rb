@@ -27,14 +27,14 @@ module AccountReports
     end
 
     DEV_KEY_REPORT_HEADERS = [
-      I18n.t("Global ID"),
-      I18n.t("Key Name"),
-      I18n.t("Inherited from Parent Account"),
-      I18n.t("Contact Info"),
-      I18n.t("Key Type"),
-      I18n.t("Placements"),
-      I18n.t("Status"),
-      I18n.t("Permitted API Endpoints")
+      "Global ID",
+      "Key Name",
+      "Inherited from Parent Account",
+      "Contact Info",
+      "Key Type",
+      "Placements",
+      "Status",
+      "Permitted API Endpoints"
     ].freeze
 
     def dev_key_report

@@ -35,35 +35,35 @@ module AccountReports
     end
 
     def self.student_assignment_outcome_headers
-      {
-        "student name" => I18n.t("student name"),
-        "student id" => I18n.t("student id"),
-        "student sis id" => I18n.t("student sis id"),
-        "assignment title" => I18n.t("assignment title"),
-        "assignment id" => I18n.t("assignment id"),
-        "submission date" => I18n.t("submission date"),
-        "submission score" => I18n.t("submission score"),
-        "learning outcome name" => I18n.t("learning outcome name"),
-        "learning outcome id" => I18n.t("learning outcome id"),
-        "attempt" => I18n.t("attempt"),
-        "outcome score" => I18n.t("outcome score"),
-        "course name" => I18n.t("course name"),
-        "course id" => I18n.t("course id"),
-        "course sis id" => I18n.t("course sis id"),
-        "section name" => I18n.t("section name"),
-        "section id" => I18n.t("section id"),
-        "section sis id" => I18n.t("section sis id"),
-        "assignment url" => I18n.t("assignment url"),
-        "learning outcome friendly name" => I18n.t("learning outcome friendly name"),
-        "learning outcome points possible" => I18n.t("learning outcome points possible"),
-        "learning outcome mastery score" => I18n.t("learning outcome mastery score"),
-        "learning outcome mastered" => I18n.t("learning outcome mastered"),
-        "learning outcome rating" => I18n.t("learning outcome rating"),
-        "learning outcome rating points" => I18n.t("learning outcome rating points"),
-        "account id" => I18n.t("account id"),
-        "account name" => I18n.t("account name"),
-        "enrollment state" => I18n.t("enrollment state")
-      }
+      [
+        "student name",
+        "student id",
+        "student sis id",
+        "assignment title",
+        "assignment id",
+        "submission date",
+        "submission score",
+        "learning outcome name",
+        "learning outcome id",
+        "attempt",
+        "outcome score",
+        "course name",
+        "course id",
+        "course sis id",
+        "section name",
+        "section id",
+        "section sis id",
+        "assignment url",
+        "learning outcome friendly name",
+        "learning outcome points possible",
+        "learning outcome mastery score",
+        "learning outcome mastered",
+        "learning outcome rating",
+        "learning outcome rating points",
+        "account id",
+        "account name",
+        "enrollment state"
+      ]
     end
 
     # returns rows for each assignment that is linked to an outcome,
@@ -73,38 +73,38 @@ module AccountReports
     end
 
     def self.outcome_result_headers
-      {
-        "student name" => I18n.t("student name"),
-        "student id" => I18n.t("student id"),
-        "student sis id" => I18n.t("student sis id"),
-        "assessment title" => I18n.t("assessment title"),
-        "assessment id" => I18n.t("assessment id"),
-        "assessment type" => I18n.t("assessment type"),
-        "submission date" => I18n.t("submission date"),
-        "submission score" => I18n.t("submission score"),
-        "learning outcome name" => I18n.t("learning outcome name"),
-        "learning outcome id" => I18n.t("learning outcome id"),
-        "attempt" => I18n.t("attempt"),
-        "outcome score" => I18n.t("outcome score"),
-        "assessment question" => I18n.t("assessment question"),
-        "assessment question id" => I18n.t("assessment question id"),
-        "course name" => I18n.t("course name"),
-        "course id" => I18n.t("course id"),
-        "course sis id" => I18n.t("course sis id"),
-        "section name" => I18n.t("section name"),
-        "section id" => I18n.t("section id"),
-        "section sis id" => I18n.t("section sis id"),
-        "assignment url" => I18n.t("assignment url"),
-        "learning outcome friendly name" => I18n.t("learning outcome friendly name"),
-        "learning outcome points possible" => I18n.t("learning outcome points possible"),
-        "learning outcome mastery score" => I18n.t("learning outcome mastery score"),
-        "learning outcome mastered" => I18n.t("learning outcome mastered"),
-        "learning outcome rating" => I18n.t("learning outcome rating"),
-        "learning outcome rating points" => I18n.t("learning outcome rating points"),
-        "account id" => I18n.t("account id"),
-        "account name" => I18n.t("account name"),
-        "enrollment state" => I18n.t("enrollment state")
-      }
+      [
+        "student name",
+        "student id",
+        "student sis id",
+        "assessment title",
+        "assessment id",
+        "assessment type",
+        "submission date",
+        "submission score",
+        "learning outcome name",
+        "learning outcome id",
+        "attempt",
+        "outcome score",
+        "assessment question",
+        "assessment question id",
+        "course name",
+        "course id",
+        "course sis id",
+        "section name",
+        "section id",
+        "section sis id",
+        "assignment url",
+        "learning outcome friendly name",
+        "learning outcome points possible",
+        "learning outcome mastery score",
+        "learning outcome mastered",
+        "learning outcome rating",
+        "learning outcome rating points",
+        "account id",
+        "account name",
+        "enrollment state"
+      ]
     end
 
     # returns rows for each assessed outcome result (or question result)
@@ -562,14 +562,12 @@ module AccountReports
     def write_outcomes_report(headers, canvas_scope, config_options = {})
       config_options[:empty_scope_message] ||= "No outcomes found"
       config_options[:new_quizzes_scope] ||= []
-      header_keys = headers.keys
-      header_names = headers.values
       host = root_account.domain
       enable_i18n_features = true
 
       os_scope = config_options[:new_quizzes_scope]
 
-      write_report header_names, enable_i18n_features do |csv|
+      write_report headers, enable_i18n_features do |csv|
         total = canvas_scope.length + os_scope.length
         GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
@@ -589,7 +587,7 @@ module AccountReports
                                   "/assignments/#{row["assignment id"]}"
           row["submission date"] = default_timezone_format(row["submission date"])
           add_outcomes_data(row)
-          csv << header_keys.map { |h| row[h] }
+          csv << headers.map { |h| row[h] }
         end
         csv << [config_options[:empty_scope_message]] if total == 0
       end

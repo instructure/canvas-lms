@@ -406,7 +406,7 @@ describe "Outcome Reports" do
 
   describe "Student Competency report" do
     let(:report_type) { "student_assignment_outcome_map_csv" }
-    let(:expected_headers) { AccountReports::OutcomeReports.student_assignment_outcome_headers.keys }
+    let(:expected_headers) { AccountReports::OutcomeReports.student_assignment_outcome_headers }
     let(:all_values) { [user2_values, user1_values] }
     let(:order) { [0, 2, 3, 15] }
 
@@ -415,7 +415,7 @@ describe "Outcome Reports" do
 
   describe "outcome results report" do
     let(:report_type) { "outcome_results_csv" }
-    let(:expected_headers) { AccountReports::OutcomeReports.outcome_result_headers.keys }
+    let(:expected_headers) { AccountReports::OutcomeReports.outcome_result_headers }
     let(:all_values) { [user1_values] }
     let(:order) { [0, 2, 3, 13, 18] }
 
