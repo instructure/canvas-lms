@@ -419,7 +419,7 @@ module RruleHelper
                })
       else
         I18n.t({
-                 one: "Annualy on the %{ord} %{days} of %{month}, %{times} times",
+                 one: "Annually on the %{ord} %{days} of %{month}, %{times} times",
                  other: "Every %{count} years on the %{ord} %{days} of %{month}, %{times} times"
                },
                {
