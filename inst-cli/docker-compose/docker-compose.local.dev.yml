@@ -91,19 +91,6 @@ services:
         aliases:
           - canvas-webpack
 
-  storybook:
-    <<: *BASE-SERVICE
-    command: yarn run storybook
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.canvas-storybook-router.rule=Host(`canvas-storybook.$INST_DOMAIN`)
-      - traefik.http.routers.canvas-storybook-router.service=canvas-storybook
-      - traefik.http.services.canvas-storybook.loadbalancer.server.port=6006
-    networks:
-      default:
-        aliases:
-          - canvas-storybook
-
   postgres:
     build: ./docker-compose/postgres
     env_file: .env

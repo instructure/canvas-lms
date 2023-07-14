@@ -1,0 +1,17 @@
+# to use this add docker-compose/storybook.override.yml
+# to your COMPOSE_FILE var in .env
+
+version: '3'
+services:
+  storybook:
+    <<: *BASE-SERVICE
+    command: yarn run storybook
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.canvas-storybook-router.rule=Host(`canvas-storybook.$INST_DOMAIN`)
+      - traefik.http.routers.canvas-storybook-router.service=canvas-storybook
+      - traefik.http.services.canvas-storybook.loadbalancer.server.port=6006
+    networks:
+      default:
+        aliases:
+          - canvas-storybook
