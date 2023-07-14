@@ -46,7 +46,7 @@ describe('RRuleToNaturalLanguage', () => {
       it('with until', () => {
         const until = today.clone().add(1, 'year')
         const str = RRuleToNaturalLanguage(
-          `FREQ=DAILY;INTERVAL=1;UNTIL=${until.format('YYYYMMDDTHHmmss') + 'Z'}`,
+          `FREQ=DAILY;INTERVAL=1;UNTIL=${until.utc().format('YYYYMMDDTHHmmss') + 'Z'}`,
           locale,
           timezone
         )
@@ -62,7 +62,7 @@ describe('RRuleToNaturalLanguage', () => {
       it('with interval and until', () => {
         const until = today.clone().add(1, 'year')
         const str = RRuleToNaturalLanguage(
-          `FREQ=DAILY;INTERVAL=2;UNTIL=${until.format('YYYYMMDDTHHmmss') + 'Z'}`,
+          `FREQ=DAILY;INTERVAL=2;UNTIL=${until.utc().format('YYYYMMDDTHHmmss') + 'Z'}`,
           locale,
           timezone
         )
@@ -85,7 +85,9 @@ describe('RRuleToNaturalLanguage', () => {
       it('with until', () => {
         const until = today.clone().add(1, 'year')
         const str = RRuleToNaturalLanguage(
-          `FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;UNTIL=${until.format('YYYYMMDDTHHmmss') + 'Z'}`,
+          `FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;UNTIL=${
+            until.utc().format('YYYYMMDDTHHmmss') + 'Z'
+          }`,
           locale,
           timezone
         )
@@ -106,7 +108,9 @@ describe('RRuleToNaturalLanguage', () => {
       it('with until', () => {
         const until = today.clone().add(1, 'year')
         const str = RRuleToNaturalLanguage(
-          `FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;UNTIL=${until.format('YYYYMMDDTHHmmss') + 'Z'}`,
+          `FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;UNTIL=${
+            until.utc().format('YYYYMMDDTHHmmss') + 'Z'
+          }`,
           locale,
           timezone
         )
@@ -130,7 +134,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=MONTHLY;BYMONTHDAY=15;INTERVAL=1;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -153,7 +157,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=MONTHLY;BYMONTHDAY=15;INTERVAL=2;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -177,7 +181,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=MONTHLY;BYDAY=TU;BYSETPOS=1;INTERVAL=1;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -200,7 +204,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=MONTHLY;BYDAY=TU;BYSETPOS=1;INTERVAL=2;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -226,7 +230,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=MONTHLY;BYDAY=TU;BYSETPOS=-1;INTERVAL=1;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -249,7 +253,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=MONTHLY;BYDAY=TU;BYSETPOS=-1;INTERVAL=2;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -278,7 +282,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=28;INTERVAL=1;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -300,7 +304,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=YEARLY;BYMONTH=7;BYDAY=TU;BYSETPOS=2;INTERVAL=1;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -327,7 +331,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=YEARLY;BYMONTH=7;BYMONTHDAY=28;INTERVAL=2;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
@@ -349,7 +353,7 @@ describe('RRuleToNaturalLanguage', () => {
             const until = today.clone().add(1, 'year')
             const str = RRuleToNaturalLanguage(
               `FREQ=YEARLY;BYMONTH=7;BYDAY=TU;BYSETPOS=2;INTERVAL=2;UNTIL=${
-                until.format('YYYYMMDDTHHmmss') + 'Z'
+                until.utc().format('YYYYMMDDTHHmmss') + 'Z'
               }`,
               locale,
               timezone
