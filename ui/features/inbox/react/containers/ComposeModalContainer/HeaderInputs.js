@@ -17,7 +17,7 @@
  */
 
 import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeInputWrapper'
-import {CourseSelect} from '../../components/CourseSelect/CourseSelect'
+import CourseSelect from '../../components/CourseSelect/CourseSelect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'

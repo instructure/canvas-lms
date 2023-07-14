@@ -18,7 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import React from 'react'
-import {CourseSelect, ALL_COURSES_ID} from './CourseSelect'
+import CourseSelect, {ALL_COURSES_ID} from './CourseSelect'
 
 export default {
   title: 'Examples/Canvas Inbox/Course Select',

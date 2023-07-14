@@ -17,9 +17,8 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
@@ -61,175 +60,99 @@ const getCourseName = (courseAssetString, options) => {
   }
 }
 
-export class CourseSelect extends React.Component {
-  static propTypes = {
-    mainPage: PropTypes.bool.isRequired,
-    options: PropTypes.shape({
-      allCourses: PropTypes.arrayOf(
-        PropTypes.shape({
-          _id: PropTypes.oneOf([ALL_COURSES_ID]).isRequired,
-          contextName: PropTypes.string,
-          assetString: PropTypes.string,
-        })
-      ),
-      favoriteCourses: PropTypes.arrayOf(
-        PropTypes.shape({
-          _id: PropTypes.string,
-          contextName: PropTypes.string,
-          assetString: PropTypes.string,
-        })
-      ),
-      moreCourses: PropTypes.arrayOf(
-        PropTypes.shape({
-          _id: PropTypes.string,
-          contextName: PropTypes.string,
-          assetString: PropTypes.string,
-        })
-      ),
-      concludedCourses: PropTypes.arrayOf(
-        PropTypes.shape({
-          _id: PropTypes.string,
-          contextName: PropTypes.string,
-          assetString: PropTypes.string,
-        })
-      ),
-      groups: PropTypes.arrayOf(
-        PropTypes.shape({
-          _id: PropTypes.string,
-          contextName: PropTypes.string,
-          assetString: PropTypes.string,
-        })
-      ),
-    }).isRequired,
-    onCourseFilterSelect: PropTypes.func,
-    activeCourseFilterID: PropTypes.string,
-    courseMessages: PropTypes.array,
-  }
+const CourseSelect = props => {
+  const [inputValue, setInputValue] = useState(
+    getCourseName(props.activeCourseFilterID, props.options)
+  )
+  const [isShowingOptions, setIsShowingOptions] = useState(false)
+  const [options, setOptions] = useState(props.options)
+  const [filteredOptions, setFilteredOptions] = useState(
+    filterOptions(getCourseName(props.activeCourseFilterID, props.options), props.options)
+  )
+  const [highlightedOptionId, setHighlightedOptionId] = useState(null)
+  const [selectedOptionId, setSelectedOptionId] = useState(
+    props.activeCourseFilterID ? props.activeCourseFilterID : null
+  )
+  const [autoComplete, setAutoComplete] = useState(false)
 
-  static getDerivedStateFromProps(props, state) {
-    if (props.options !== state.options) {
-      return {
-        filteredOptions: filterOptions(state.inputValue, props.options),
-        inputValue: getCourseName(props.activeCourseFilterID, props.options),
-      }
+  useEffect(() => {
+    if (props.options !== filteredOptions) {
+      setOptions(filterOptions(inputValue, props.options))
+      setInputValue(getCourseName(props.activeCourseFilterID, props.options))
     }
-    return null
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.options, selectedOptionId])
+
+  useEffect(() => {
+    if (autoComplete) return
+    setOptions(filterOptions(inputValue, props.options))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue, props.options])
+
+  const getDefaultHighlightedOption = (newOptions = []) => {
+    const defaultOptions = Object.values(newOptions).flat()
+    return defaultOptions.length > 0 ? defaultOptions[0].assetString : null
   }
 
-  state = {
-    inputValue: getCourseName(this.props.activeCourseFilterID, this.props.options),
-    isShowingOptions: false,
-    options: this.props.options,
-    filteredOptions: filterOptions(
-      getCourseName(this.props.activeCourseFilterID, this.props.options),
-      this.props.options
-    ),
-    highlightedOptionId: null,
-    selectedOptionId: this.props.activeCourseFilterID ? this.props.activeCourseFilterID : null,
+  const handleBlur = () => {
+    setHighlightedOptionId(null)
+    setAutoComplete(false)
+    if (selectedOptionId) {
+      setInputValue(getCourseName(selectedOptionId, props.options))
+    }
   }
 
-  getDefaultHighlightedOption = (newOptions = []) => {
-    const options = Object.values(newOptions).flat()
-    return options.length > 0 ? options[0].assetString : null
-  }
-
-  getGroupChangedMessage = newOption => {
-    const currentOption = getOptionById(this.state.highlightedOptionId, this.props.options)
-    const currentOptionGroup = this.getOptionGroup(currentOption)
-    const newOptionGroup = this.getOptionGroup(newOption)
-
-    const isNewGroup = !currentOption || currentOptionGroup !== newOptionGroup
-    const newOptionContextName = newOption.contextName
-    const message = isNewGroup
-      ? I18n.t('Group %{newOptionGroup} entered. %{newOptionContextName}', {
-          newOptionContextName,
-          newOptionGroup,
-        })
-      : newOption.contextName
-    return message
-  }
-
-  getOptionGroup = option => {
-    if (!option) return
-    return this.getGroupLabel(
-      Object.keys(this.props.options).find(key =>
-        this.props.options[key].find(({assetString}) => assetString === option.assetString)
-      )
-    )
-  }
-
-  handleBlur = () => {
-    this.setState({highlightedOptionId: null})
-  }
-
-  handleHighlightOption = (event, {id}) => {
+  const handleHighlightOption = (event, {id}) => {
     event.persist()
-    const option = getOptionById(id, this.props.options)
+    const option = getOptionById(id, props.options)
     if (!option) return // prevent highlighting of empty options
-    if (event.key) {
-      this.setState({
-        highlightedOptionId: id,
-      })
-    } else {
-      this.setState(
-        state => ({
-          highlightedOptionId: id,
-          inputValue: state.inputValue,
-        }),
-        () => {
-          this.context.setOnSuccess(this.getGroupChangedMessage(option))
-        }
-      )
-    }
+    // if event key is arrow up or down, don't update input value
+    setHighlightedOptionId(id)
+    const autoComp =
+      event.type === 'keydown' && (event.key === 'ArrowUp' || event.key === 'ArrowDown')
+    setAutoComplete(autoComp)
+    setInputValue(autoComp ? option.contextName : inputValue)
   }
 
-  handleSelectOption = (event, {id}) => {
-    const option = getOptionById(id, this.props.options)
+  const handleSelectOption = (event, {id}) => {
+    const option = getOptionById(id, props.options)
     const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
     if (id === 'all_courses') id = null
-    this.props.onCourseFilterSelect({contextID: id, contextName})
-    this.setState(
-      {
-        selectedOptionId: id,
-        inputValue: id === null ? '' : option.contextName,
-        isShowingOptions: false,
-        filteredOptions: this.props.options,
-      },
-      () => {
-        this.context.setOnSuccess(I18n.t('%{contextName} selected', {contextName}))
-      }
-    )
+    props.onCourseFilterSelect({contextID: id, contextName})
+    setSelectedOptionId(id)
+    setInputValue(id === null ? '' : option.contextName)
+    setIsShowingOptions(false)
+    setFilteredOptions(props.options)
   }
 
-  handleInputChange = event => {
+  const handleInputChange = event => {
     const value = event.target.value
-    const newOptions = filterOptions(value, this.props.options)
-    this.setState(state => ({
-      inputValue: value,
-      filteredOptions: newOptions,
-      highlightedOptionId: this.getDefaultHighlightedOption(newOptions),
-      isShowingOptions: true,
-      selectedOptionId: value === '' ? null : state.selectedOptionId,
-    }))
+    const newOptions = filterOptions(value, props.options)
+    setAutoComplete(false)
+    setInputValue(value)
+    setFilteredOptions(newOptions)
+    setHighlightedOptionId(getDefaultHighlightedOption(newOptions))
+    setIsShowingOptions(true)
+    if (value === '') {
+      props.onCourseFilterSelect({contextID: null, contextName: null})
+      setSelectedOptionId(null)
+    } else {
+      setSelectedOptionId(selectedOptionId)
+    }
   }
 
-  handleShowOptions = () => {
-    if (this.state.inputValue !== '') return
-
-    this.setState({
-      isShowingOptions: true,
-    })
+  const handleShowOptions = () => {
+    if (inputValue !== '') return
+    setIsShowingOptions(true)
   }
 
-  handleHideOptions = () => {
-    this.setState({
-      isShowingOptions: false,
-      highlightedOptionId: null,
-    })
+  const handleHideOptions = () => {
+    setIsShowingOptions(false)
+    setHighlightedOptionId(null)
   }
 
-  getGroupLabel = groupKey => {
+  const getGroupLabel = groupKey => {
     switch (groupKey) {
       case 'favoriteCourses':
         return I18n.t('Favorite Courses')
@@ -244,13 +167,10 @@ export class CourseSelect extends React.Component {
     }
   }
 
-  renderGroups = () => {
-    const options = this.state.filteredOptions
-    const {highlightedOptionId, selectedOptionId} = this.state
-
+  const renderGroups = () => {
     return Object.keys(options).map(key => {
       return options[key]?.length > 0 ? (
-        <Select.Group key={key} renderLabel={this.getGroupLabel(key)}>
+        <Select.Group key={key} renderLabel={getGroupLabel(key)}>
           {options[key].map(option => (
             <Select.Option
               id={option.assetString}
@@ -266,52 +186,92 @@ export class CourseSelect extends React.Component {
     })
   }
 
-  handleReset = () => {
-    this.props.onCourseFilterSelect({contextID: null, contextName: null})
-    this.setState({
-      inputValue: '',
-      isShowingOptions: false,
-      highlightedOptionId: null,
-      selectedOptionId: null,
-    })
+  const handleReset = () => {
+    props.onCourseFilterSelect({contextID: null, contextName: null})
+    setAutoComplete(false)
+    setInputValue('')
+    setIsShowingOptions(false)
+    setHighlightedOptionId(null)
+    setSelectedOptionId(null)
   }
 
-  render() {
-    const {inputValue, isShowingOptions} = this.state
-    return (
-      <Select
-        renderLabel={
-          <ScreenReaderContent>
-            {this.props.mainPage ? I18n.t('Filter messages by course') : I18n.t('Select course')}
-          </ScreenReaderContent>
-        }
-        assistiveText={I18n.t('Type or use arrow keys to navigate options')}
-        placeholder={this.props.mainPage ? I18n.t('All Courses') : I18n.t('Select Course')}
-        inputValue={inputValue}
-        isShowingOptions={isShowingOptions}
-        onBlur={this.handleBlur}
-        onInputChange={this.handleInputChange}
-        onRequestShowOptions={this.handleShowOptions}
-        onRequestHideOptions={this.handleHideOptions}
-        onRequestHighlightOption={this.handleHighlightOption}
-        onRequestSelectOption={this.handleSelectOption}
-        renderAfterInput={
-          inputValue !== '' ? (
-            <CloseButton
-              offset="small"
-              data-testid="delete-course-button"
-              screenReaderLabel={I18n.t('Clear Course Selection')}
-              onClick={this.handleReset}
-            />
-          ) : null
-        }
-        messages={this.props.courseMessages}
-        data-testid="course-select"
-      >
-        {this.renderGroups()}
-      </Select>
-    )
-  }
+  return (
+    <Select
+      renderLabel={
+        <ScreenReaderContent>
+          {props.mainPage ? I18n.t('Filter messages by course') : I18n.t('Select course')}
+        </ScreenReaderContent>
+      }
+      assistiveText={I18n.t('Type or use arrow keys to navigate options')}
+      placeholder={props.mainPage ? I18n.t('All Courses') : I18n.t('Select Course')}
+      inputValue={inputValue}
+      isShowingOptions={isShowingOptions}
+      onBlur={handleBlur}
+      onInputChange={handleInputChange}
+      onRequestShowOptions={handleShowOptions}
+      onRequestHideOptions={handleHideOptions}
+      onRequestHighlightOption={handleHighlightOption}
+      onRequestSelectOption={handleSelectOption}
+      renderAfterInput={
+        inputValue !== '' ? (
+          <CloseButton
+            offset="small"
+            data-testid="delete-course-button"
+            screenReaderLabel={I18n.t('Clear Course Selection')}
+            onClick={handleReset}
+          />
+        ) : null
+      }
+      messages={props.courseMessages}
+      data-testid="course-select"
+    >
+      {renderGroups()}
+    </Select>
+  )
 }
 
-CourseSelect.contextType = AlertManagerContext
+CourseSelect.propTypes = {
+  mainPage: PropTypes.bool.isRequired,
+  options: PropTypes.shape({
+    allCourses: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.oneOf([ALL_COURSES_ID]).isRequired,
+        contextName: PropTypes.string,
+        assetString: PropTypes.string,
+      })
+    ),
+    favoriteCourses: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string,
+        contextName: PropTypes.string,
+        assetString: PropTypes.string,
+      })
+    ),
+    moreCourses: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string,
+        contextName: PropTypes.string,
+        assetString: PropTypes.string,
+      })
+    ),
+    concludedCourses: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string,
+        contextName: PropTypes.string,
+        assetString: PropTypes.string,
+      })
+    ),
+    groups: PropTypes.arrayOf(
+      PropTypes.shape({
+        _id: PropTypes.string,
+        contextName: PropTypes.string,
+        assetString: PropTypes.string,
+      })
+    ),
+  }).isRequired,
+  onCourseFilterSelect: PropTypes.func,
+  activeCourseFilterID: PropTypes.string,
+  courseMessages: PropTypes.array,
+}
+
+export default CourseSelect
