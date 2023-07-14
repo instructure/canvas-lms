@@ -115,7 +115,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   # hold the lease.  It deletes the lock, but only if the nonce that
   # is passed
   def unlock(key, nonce)
-    raise ArgumentError("nonce can't be nil") unless nonce
+    raise ArgumentError, "nonce can't be nil" unless nonce
 
     node = redis
     node = redis.node_for(key) if redis.is_a?(Redis::Distributed)
