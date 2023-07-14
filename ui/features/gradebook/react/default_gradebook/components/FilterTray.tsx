@@ -90,7 +90,10 @@ export default function FilterTray({
               placement="end"
               offset="small"
               screenReaderLabel="Close"
-              onClick={() => setIsTrayOpen(false)}
+              onClick={() => {
+                setIsTrayOpen(false)
+                setExpandedFilterPresetId(null)
+              }}
             />
           </FlexItem>
         </Flex>

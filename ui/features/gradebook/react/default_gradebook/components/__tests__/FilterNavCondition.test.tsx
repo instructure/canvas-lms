@@ -80,7 +80,7 @@ const dateTests = (testType: string) => {
     )
     const dateComponent = getByTestId(`${filter.type}-input`)
     fireEvent.change(dateComponent, {
-      target: {value: 'Fri Dec 04 2021 02:00:00 GMT-0500 (Colombia Standard Time)'},
+      target: {value: 'Dec 04, 2021'},
     })
     fireEvent.blur(dateComponent)
     expect(onChange).toHaveBeenCalled()

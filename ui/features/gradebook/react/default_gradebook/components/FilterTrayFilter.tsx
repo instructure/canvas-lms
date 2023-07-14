@@ -185,10 +185,13 @@ export default function ({
           formatDate={formatDate}
           interaction="enabled"
           onSelectedDateChange={(value: MomentInput) => {
-            onChange({
-              ...filter,
-              value: value ? moment(value).toISOString() : null,
-            })
+            const newValue = value ? moment(value).toISOString() : undefined
+            if (filter.value !== newValue) {
+              onChange({
+                ...filter,
+                value: newValue,
+              })
+            }
           }}
         />
       )}
