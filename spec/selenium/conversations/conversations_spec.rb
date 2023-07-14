@@ -268,6 +268,21 @@ describe "conversations new" do
         expect(messages[0].text).to include "DELETED USER, #{@s[0].name}"
       end
     end
+
+    context "course selection" do
+      it "resets the course selection when the reset button is clicked" do
+        get "/conversations"
+        f("[data-testid='course-select']").click
+        wait_for_ajaximations
+
+        f("##{@course.asset_string}").click
+        wait_for_ajaximations
+        expect(f("[data-testid='course-select']").attribute("value")).to eq @course.name
+        force_click("[data-testid='delete-course-button'] > button")
+        wait_for_ajaximations
+        expect(f("[data-testid='course-select']").attribute("value")).to eq ""
+      end
+    end
   end
 
   context "when react_inbox feature flag is off" do
