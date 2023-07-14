@@ -225,12 +225,14 @@ Email is often sent through background jobs in the jobs container. If you would 
 ### Canvas RCE API
 
 Edit `.env`
+
 ```
 COMPOSE_FILE=<CURRENT_VALUE>:inst-cli/docker-compose/rce-api.override.yml
 ```
 
 Edit `config/dynamic_settings.yml`
-```
+
+```yaml
 development:
   # tree
   config:
@@ -243,7 +245,8 @@ development:
 ```
 
 Then
-```
+
+```bash
 docker compose up canvasrceapi
 # restart canvas to make it read
 # the new RCS app-host
@@ -252,7 +255,13 @@ docker compose restart web
 
 ## Storybook
 
-Simple! `inst proxy up` if you haven't already, then `docker-compose up storybook` and open <http://canvas-storybook.inseng.test> in your browser.
+Edit `.env`
+
+```
+COMPOSE_FILE=<CURRENT_VALUE>:inst-cli/docker-compose/storybook.override.yml
+```
+
+`inst proxy up` if you haven't already, then `docker-compose up storybook` and open <http://canvas-storybook.inseng.test> in your browser.
 
 ## Tips
 
