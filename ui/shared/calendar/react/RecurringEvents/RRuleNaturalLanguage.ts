@@ -17,7 +17,7 @@
  */
 
 import moment from 'moment-timezone'
-import RruleHelper, {RRuleHelperSpec, RruleValidationError} from './RRuleHelper'
+import RruleHelper, {RRuleHelperSpec, RruleValidationError, icalDateToISODate} from './RRuleHelper'
 import {RRULEDayValue, SelectedDaysArray} from './types'
 import {useScope} from '@canvas/i18n'
 
@@ -88,7 +88,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
   }
 
   function format_date(date_str: string): string {
-    const m = moment(date_str, 'YYYYMMDDTHHmmss').tz(timezone)
+    const m = moment(icalDateToISODate(date_str)).tz(timezone)
     return date_formatter(m.toDate())
   }
 
