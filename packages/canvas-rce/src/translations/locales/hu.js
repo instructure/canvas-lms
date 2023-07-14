@@ -691,6 +691,7 @@ const locale = {
   "search_280d00bd": { "message": "Keresés" },
   "select_crop_shape_d441feeb": { "message": "Válassza ki a kivágás alakját" },
   "select_language_7c93a900": { "message": "Válasszon nyelvet" },
+  "selected_274ce24f": { "message": "Kiválasztva" },
   "selected_linkfilename_c093b1f2": {
     "message": "Kijelölve: { linkFileName }"
   },

@@ -169,6 +169,7 @@ const locale = {
   "rich_content_editor_2708ef21": { "message": "עורך תוכן עשיר" },
   "save_11a80ec3": { "message": "שמירה " },
   "search_280d00bd": { "message": "חיפוש" },
+  "selected_274ce24f": { "message": "נבחר" },
   "selection_b52c4c5e": { "message": "בחירה" },
   "size_b30e1077": { "message": "גודל" },
   "star_8d156e09": { "message": "הוספת כוכבית" },
