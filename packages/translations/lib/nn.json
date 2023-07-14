@@ -2159,6 +2159,9 @@
     "select_video_source_1b5c9dbe": {
         "message": "Vel videokilde"
     },
+    "selected_274ce24f": {
+        "message": "Valt"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Vald { linkFileName }"
     },

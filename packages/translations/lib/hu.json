@@ -1976,6 +1976,9 @@
     "select_language_7c93a900": {
         "message": "Válasszon nyelvet"
     },
+    "selected_274ce24f": {
+        "message": "Kiválasztva"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Kijelölve: { linkFileName }"
     },
