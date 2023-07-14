@@ -87,19 +87,21 @@ module CanvasPartman
       constraint_check = generate_check_constraint(value)
 
       with_statement_timeout do
-        execute(<<SQL.squish)
-        CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
-          LIKE #{base_class.quoted_table_name} INCLUDING ALL,
-          CHECK (#{constraint_check})
-        ) INHERITS (#{base_class.quoted_table_name})
-SQL
+        base_class.connection.transaction do
+          execute(<<~SQL.squish)
+            CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
+              LIKE #{base_class.quoted_table_name} INCLUDING ALL,
+              CHECK (#{constraint_check})
+            ) INHERITS (#{base_class.quoted_table_name})
+          SQL
 
-        # copy foreign keys, since INCLUDING ALL won't bring them along
-        base_class.connection.foreign_keys(base_class.table_name).each do |foreign_key|
-          base_class.connection.add_foreign_key partition_table, foreign_key.to_table, **foreign_key.options.except(:name)
+          # copy foreign keys, since INCLUDING ALL won't bring them along
+          base_class.connection.foreign_keys(base_class.table_name).each do |foreign_key|
+            base_class.connection.add_foreign_key partition_table, foreign_key.to_table, **foreign_key.options.except(:name)
+          end
+
+          CanvasPartman.after_create_callback.call(base_class, partition_table)
         end
-
-        CanvasPartman.after_create_callback.call(base_class, partition_table)
       end
 
       partition_table
