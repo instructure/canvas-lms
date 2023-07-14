@@ -165,11 +165,21 @@ const ProxyUploadModal = ({
       variables: {
         assignmentLid: assignment.id,
         submissionID: submission.id,
-        fileIds: uploadedFiles.map(file => file.id),
+        fileIds: uploadedFiles.map(grabFileId),
         studentId: student.id,
         type: 'online_upload',
       },
     })
+  }
+
+  const grabFileId = file => {
+    if (typeof file.id === 'number' && file.id > 10000000000000 && file.preview_url) {
+      const pattern = /\/files\/([\d~]+)/
+      const match = file.preview_url.match(pattern)
+      const globalId = match[1]
+      return globalId
+    }
+    return file.id
   }
 
   const handleDropAccept = async files => {
