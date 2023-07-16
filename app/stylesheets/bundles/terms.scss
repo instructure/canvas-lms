@@ -37,6 +37,7 @@
 }
 .edit_term_buttons {
   text-align: direction(right);
+  margin-bottom: 10px;
 }
 #terms .term td.header {
   font-size: 1.2em;
@@ -86,12 +87,51 @@
   width: 80%;
 }
 #terms form.enrollment_term_form .control-group {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 #terms form.enrollment_term_form label {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 .terms-wrapper {
-  margin: 0 10px;
+  margin: 20px 0;
   width: auto;
+}
+.terms-controls {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  // visually hidden
+  label {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+  }
+
+  input {
+    margin-bottom: 0;
+    width: 150px;
+  }
+
+  form {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0;
+  }
+
+  @include mobile-only {
+    align-items: unset;
+    flex-direction: column;
+    justify-content: unset;
+  }
 }
