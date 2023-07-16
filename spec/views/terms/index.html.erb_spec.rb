@@ -20,14 +20,14 @@
 
 require_relative "../views_helper"
 
-describe "terms/index" do
+describe "terms_api/index" do
   it "allows deletion of terms with only deleted courses" do
     assign(:context, assign(:root_account, Account.default))
     term = Account.default.enrollment_terms.create!
     term.courses.create! { |c| c.workflow_state = "deleted" }
     terms = assign(:terms, Account.default.enrollment_terms.active.sort_by { |t| t.start_at || t.created_at }.reverse)
     assign(:course_counts_by_term, EnrollmentTerm.course_counts(terms))
-    render "terms/index"
+    render "terms_api/index"
     page = Nokogiri("<document>" + response.body + "</document>")
     expect(page.css(".delete_term_link")[0]["class"]).to include("delete_term_link")
   end

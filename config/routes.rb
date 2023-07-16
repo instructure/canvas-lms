@@ -673,7 +673,10 @@ CanvasRails::Application.routes.draw do
       end
     end
 
-    resources :terms, except: %i[show new edit]
+    resources :terms, except: %i[index new show edit]
+    # handle the index route using terms_api_controller
+    get "terms", controller: :terms_api, action: "index"
+
     resources :sub_accounts
     resources :calendar_events
 
