@@ -33,6 +33,7 @@ module.exports = {
     // https://github.com/ai/nanoid/issues/363
     '^nanoid(/(.*)|$)': 'nanoid$1',
     '\\.(css)$': '<rootDir>/jest/styleMock.js',
+    'crypto-es': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/_mockCryptoEs.ts',
   },
   roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],

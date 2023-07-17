@@ -180,6 +180,7 @@ const RCELoader = {
       lockedAttachments: window.ENV?.CHILD_COURSE_ATTACHMENTS_LOCKED_STATUSES || {},
       flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
       timezone: ENV?.TIMEZONE,
+      userCacheKey: ENV?.user_cache_key,
       canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || '',
       externalToolsConfig: {
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,

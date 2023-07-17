@@ -43,6 +43,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
       Setting.set("rce_auto_save_max_age_ms", 1.hour.to_i * 1_000)
       course_with_teacher_logged_in
       stub_rcs_config
+      @teacher.update! uuid: "kDEDLQJhhoVaIGHbunzuUnt6yiZwja4am90LMfCr"
     end
 
     def make_autosave_entry(content, time = Time.zone.now.to_i * 1_000)
@@ -59,15 +60,15 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
       edit_announcement
     end
 
-    it "autosaves" do
+    it "autosaves encrypted content" do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
-      expect(JSON.parse(saved_content)["content"]).to match(%r{<p>hello</p>}m)
+      expect(JSON.parse(saved_content)["content"]).to match("JvwYPc4X9emMRM+w6MEuRvGQiS7d9Vwtuu4=")
       driver.local_storage.clear
     end
 
-    it "autosaves htmlview entered content" do
+    it "autosaves encrypted content entered in htmlview" do
       create_and_edit_announcement
       switch_to_html_view
       switch_to_raw_html_editor
@@ -78,7 +79,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
       wait_for_rce
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
-      expect(JSON.parse(saved_content)["content"]).to match(%r{<p>hello</p>.*html text}m)
+      expect(JSON.parse(saved_content)["content"]).to match("JvwYPc4X9emMRM+w6MEuRvGQiS7d9Vwtuu6HVbEatwZRIIPBEZFQNeZcVQ==")
       driver.local_storage.clear
     end
 
@@ -148,11 +149,11 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
       get "/"
       driver.local_storage.clear
       driver.local_storage[autosave_key(@teacher.id, "http://some/url", "id")] =
-        make_autosave_entry(("x" * 5_119 * 1_024) + ("x" * 921))
+        make_autosave_entry(("x" * 4_119 * 1_024) + ("x" * 921))
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       saved_content = JSON.parse(saved_content)
-      expect(saved_content["content"]).to eql("<p>hello</p>\n<p>&nbsp;</p>")
+      expect(saved_content["content"]).to eql("JvwYPc4X9emMRM+w6MEuRvGQiS7d9Vwtuu4=")
       driver.local_storage.clear
     end
 
@@ -160,7 +161,7 @@ describe "RCE Next autosave feature", ignore_js_errors: true do
       get "/"
       driver.local_storage.clear
       Timecop.freeze(2.hours.ago) do
-        driver.local_storage[autosave_key(@teacher.id, "http://some/url", "id")] = make_autosave_entry("anything")
+        driver.local_storage[autosave_key(@teacher.id, "http://some/url", "id")] = make_autosave_entry("JvwYPc4X9emMRM+w6MEuRvGQiS7d9Vwtuu4=")
       end
 
       create_announcement

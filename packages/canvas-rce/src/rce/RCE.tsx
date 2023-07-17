@@ -269,6 +269,11 @@ export interface RCEPropTypes {
    */
   timezone?: string
 
+  /**
+   * user's cache key to be used to encrypt and decrypt autosaved content
+   */
+  userCacheKey?: string
+
   onFocus?: (rce: RCEWrapper) => void
   onBlur?: (event: Event) => void
   onInit?: (editor: Editor) => void
