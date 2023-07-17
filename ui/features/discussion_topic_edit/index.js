@@ -42,6 +42,7 @@ const isAnnouncement =
     : undefined
 const isUnpublishedAnnouncement =
   isAnnouncement && !ENV.DISCUSSION_TOPIC.ATTRIBUTES.course_published
+const isEditingAnnouncement = isAnnouncement && ENV.DISCUSSION_TOPIC.ATTRIBUTES.id
 const model = new (isAnnouncement ? Announcement : DiscussionTopic)(
   ENV.DISCUSSION_TOPIC.ATTRIBUTES,
   {parse: true}
@@ -144,16 +145,29 @@ ready(() => {
 
   view.render().$el.appendTo('#content')
 
-  if (isUnpublishedAnnouncement) {
-    ReactDOM.render(
-      <View display="block" id="announcement-course-unpublished-alert">
-        <Alert variant="warning">
-          {I18n.t(
+  if (isUnpublishedAnnouncement || isEditingAnnouncement) {
+    const alertProps = isUnpublishedAnnouncement
+      ? {
+          id: 'announcement-course-unpublished-alert',
+          key: 'announcement-course-unpublished-alert',
+          variant: 'warning',
+          text: I18n.t(
             'You must publish your course for students to receive announcement notifications. Notifications will not be sent retroactively from announcements created before publishing the course.'
-          )}
-        </Alert>
+          ),
+        }
+      : {
+          id: 'announcement-no-notification-on-edit',
+          key: 'announcement-no-notification-on-edit',
+          variant: 'info',
+          text: I18n.t(
+            'Editing an announcement will create a notification in the User Dashboard and Course Activity Stream. If you want users to receive the edited announcement via their notification settings, you will need to create a new announcement.'
+          ),
+        }
+    ReactDOM.render(
+      <View display="block" id={alertProps.id} key={alertProps.key}>
+        <Alert variant={alertProps.variant}>{alertProps.text}</Alert>
       </View>,
-      document.querySelector('#announcement-course-unpublished-holder')
+      document.querySelector('#announcement-alert-holder')
     )
   }
 
