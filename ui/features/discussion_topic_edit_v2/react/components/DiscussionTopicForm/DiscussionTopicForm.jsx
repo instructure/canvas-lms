@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import {useScope as usei18NScope} from '@canvas/i18n'
@@ -36,7 +36,20 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 
 const I18N = usei18NScope('discussion_create')
 
-export default function DiscussionTopicForm({isEditing, isStudent, sections, groups, onSubmit}) {
+export default function DiscussionTopicForm({
+  isEditing,
+  currentDiscussionTopic,
+  isStudent,
+  sections,
+  groupCategories,
+  onSubmit,
+}) {
+  const rceRef = useRef()
+
+  const allSectionsOption = {_id: 'all-sections', name: 'All Sections'}
+
+  const inputWidth = '50%'
+
   const [title, setTitle] = useState('')
   const [titleValidationMessages, setTitleValidationMessages] = useState([
     {text: '', type: 'success'},
@@ -44,7 +57,7 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
 
   const [rceContent, setRceContent] = useState('')
 
-  const [sectionsToPostTo, setSectionsToPostTo] = useState(['all-sections'])
+  const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(['all-sections'])
 
   const [discussionAnonymousState, setDiscussionAnonymousState] = useState('off')
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(false)
@@ -57,13 +70,16 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
   const [addToTodo, setAddToTodo] = useState(false)
   const [todoDate, setTodoDate] = useState(null)
   const [isGroupDiscussion, setIsGroupDiscussion] = useState(false)
-  const [groupSet, setGroupSet] = useState(null)
+  const [groupSetId, setGroupSetId] = useState(null)
 
   const [availableFrom, setAvailableFrom] = useState(null)
   const [availableUntil, setAvailableUntil] = useState(null)
   const [availabiltyValidationMessages, setAvailabilityValidationMessages] = useState([
     {text: '', type: 'success'},
   ])
+
+  // only for discussions being edited
+  const [published, setPublished] = useState(false)
 
   // To be implemented in phase 2, kept as a reminder
   // const [pointsPossible, setPointsPossible] = useState(0)
@@ -72,6 +88,33 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
   // const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
   // const [assignTo, setAssignTo] = useState('')
   // const [dueDate, setDueDate] = useState(0)
+
+  useEffect(() => {
+    if (!isEditing || !currentDiscussionTopic) return
+
+    setTitle(currentDiscussionTopic.title)
+    setRceContent(currentDiscussionTopic.message)
+
+    setSectionIdsToPostTo(currentDiscussionTopic.courseSections.map(section => section._id))
+
+    setDiscussionAnonymousState(currentDiscussionTopic.anonymousState || 'off')
+    // setAnonymousAuthorState() TODO: is this necessary? Designs are unclear
+    setRespondBeforeReply(currentDiscussionTopic.requireInitialPost)
+    setEnablePodcastFeed(currentDiscussionTopic.podcastEnabled)
+    setIncludeRepliesInFeed(currentDiscussionTopic.podcastHasStudentPosts)
+    // setIsGraded TODO: phase 2
+    setAllowLiking(currentDiscussionTopic.allowRating)
+    setOnlyGradersCanLike(currentDiscussionTopic.onlyGradersCanRate)
+    setAddToTodo(!!currentDiscussionTopic.todoDate)
+    setTodoDate(currentDiscussionTopic.todoDate)
+    setIsGroupDiscussion(!!currentDiscussionTopic.groupSet)
+    setGroupSetId(currentDiscussionTopic.groupSet?._id)
+
+    setAvailableFrom(currentDiscussionTopic.delayedPostAt)
+    setAvailableUntil(currentDiscussionTopic.lockAt)
+
+    setPublished(currentDiscussionTopic.published)
+  }, [isEditing, currentDiscussionTopic])
 
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
@@ -112,7 +155,7 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
       onSubmit({
         title,
         message: rceContent,
-        sectionsToPostTo,
+        sectionIdsToPostTo,
         discussionAnonymousState,
         anonymousAuthorState,
         respondBeforeReply,
@@ -124,22 +167,15 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
         addToTodo,
         todoDate,
         isGroupDiscussion,
-        groupSet,
+        groupSetId,
         availableFrom,
         availableUntil,
-        shouldPublish,
+        shouldPublish: isEditing ? published : shouldPublish,
       })
       return true
     }
     return false
   }
-
-  const rceRef = useRef()
-  const textAreaId = useRef(`discussion-message-body`)
-
-  const allSectionsOption = {id: 'all-sections', label: 'All Sections'}
-
-  const inputWidth = '50%'
 
   return (
     <>
@@ -159,17 +195,19 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
           width={inputWidth}
         />
         <CanvasRce
-          textareaId={textAreaId.current}
+          textareaId="discussion-topic-message-body"
           onFocus={() => {}}
           onBlur={() => {}}
           onInit={() => {}}
           ref={rceRef}
-          onContentChange={content => {
-            setRceContent(content)
+          onContentChange={setRceContent}
+          editorOptions={{
+            focus: false,
+            plugins: [],
           }}
-          editorOptions={{}}
           height={300}
-          defaultContent=""
+          defaultContent={isEditing ? currentDiscussionTopic?.message : ''}
+          autosave={false}
         />
         {!isGraded && !isGroupDiscussion && (
           <View display="block" padding="medium none">
@@ -178,20 +216,28 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
               assistiveText={I18N.t(
                 'Select sections to post to. Type or use arrow keys to navigate. Multiple selections are allowed.'
               )}
-              selectedOptionIds={sectionsToPostTo}
+              selectedOptionIds={sectionIdsToPostTo}
               onChange={value => {
                 if (
-                  !sectionsToPostTo.includes(allSectionsOption.id) &&
-                  value.includes(allSectionsOption.id)
+                  !sectionIdsToPostTo.includes(allSectionsOption._id) &&
+                  value.includes(allSectionsOption._id)
                 ) {
-                  setSectionsToPostTo([allSectionsOption.id])
+                  setSectionIdsToPostTo([allSectionsOption._id])
+                } else if (
+                  sectionIdsToPostTo.includes(allSectionsOption._id) &&
+                  value.includes(allSectionsOption._id) &&
+                  value.length > 1
+                ) {
+                  setSectionIdsToPostTo(
+                    value.filter(section_id => section_id !== allSectionsOption._id)
+                  )
                 } else {
-                  setSectionsToPostTo(value)
+                  setSectionIdsToPostTo(value)
                 }
               }}
               width={inputWidth}
             >
-              {[allSectionsOption, ...sections].map(({id, label}) => (
+              {[allSectionsOption, ...sections].map(({_id: id, name: label}) => (
                 <CanvasMultiSelect.Option id={id} value={`opt-${id}`} key={id}>
                   {label}
                 </CanvasMultiSelect.Option>
@@ -209,7 +255,7 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
               if (value !== 'off') {
                 setIsGraded(false)
                 setIsGroupDiscussion(false)
-                setGroupSet(null)
+                setGroupSetId(null)
               }
               setDiscussionAnonymousState(value)
             }}
@@ -277,6 +323,7 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
               value="graded"
               checked={isGraded}
               onChange={() => setIsGraded(!isGraded)}
+              // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
             />
           )}
           <Checkbox
@@ -314,6 +361,7 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
           {addToTodo && (
             <View display="block" padding="none none none large">
               <DateTimeInput
+                description=""
                 dateRenderLabel=""
                 timeRenderLabel=""
                 prevMonthLabel={I18N.t('previous')}
@@ -331,7 +379,7 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
               value="group-discussion"
               checked={isGroupDiscussion}
               onChange={() => {
-                setGroupSet(!isGroupDiscussion ? '' : groupSet)
+                setGroupSetId(!isGroupDiscussion ? '' : groupSetId)
                 setIsGroupDiscussion(!isGroupDiscussion)
               }}
             />
@@ -341,20 +389,20 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
               <SimpleSelect
                 renderLabel={I18N.t('Group Set')}
                 defaultValue=""
-                value={groupSet}
+                value={groupSetId}
                 onChange={(_event, newChoice) => {
                   const value = newChoice.value
                   if (value === 'new-group-category') {
                     // new group category workflow here
-                    // setGroupSet(the new category)
+                    // setGroupSetId(the new category)
                   } else {
-                    setGroupSet(value)
+                    setGroupSetId(value)
                   }
                 }}
                 placeholder={I18N.t('Select Group')}
                 width={inputWidth}
               >
-                {groups.map(({id, label}) => (
+                {groupCategories.map(({_id: id, name: label}) => (
                   <SimpleSelect.Option key={id} id={`opt-${id}`} value={id}>
                     {label}
                   </SimpleSelect.Option>
@@ -437,16 +485,18 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
 
 DiscussionTopicForm.propTypes = {
   isEditing: PropTypes.bool,
+  currentDiscussionTopic: PropTypes.object,
   isStudent: PropTypes.bool,
-  sections: PropTypes.arrayOf(PropTypes.string),
-  groups: PropTypes.arrayOf(PropTypes.string),
+  sections: PropTypes.arrayOf(PropTypes.object),
+  groupCategories: PropTypes.arrayOf(PropTypes.object),
   onSubmit: PropTypes.func,
 }
 
 DiscussionTopicForm.defaultProps = {
   isEditing: false,
+  currentDiscussionTopic: {},
   isStudent: false,
   sections: [],
-  groups: [],
+  groupCategories: [],
   onSubmit: () => {},
 }

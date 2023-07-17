@@ -51,6 +51,7 @@ module Types
     field :locked, Boolean, null: false
     field :last_reply_at, Types::DateTimeType, null: true
     field :posted_at, Types::DateTimeType, null: true
+    field :podcast_enabled, Boolean, null: true
     field :podcast_has_student_posts, Boolean, null: true
     field :discussion_type, String, null: true
     field :anonymous_state, String, null: true
@@ -58,6 +59,7 @@ module Types
     field :allow_rating, Boolean, null: true
     field :only_graders_can_rate, Boolean, null: true
     field :sort_by_rating, Boolean, null: true
+    field :todo_date, GraphQL::Types::ISO8601DateTime, null: true
     field :is_announcement, Boolean, null: false
     field :is_section_specific, Boolean, null: true
     field :require_initial_post, Boolean, null: true

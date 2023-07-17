@@ -24,18 +24,20 @@ import DiscussionTopicForm from '../DiscussionTopicForm'
 jest.mock('@canvas/rce/react/CanvasRce')
 
 const setup = ({
-  isEditing = true,
+  isEditing = false,
+  currentDiscussionTopic = {},
   isStudent = false,
   sections = [],
-  groups = [],
+  groupCategories = [],
   onSubmit = () => {},
 } = {}) => {
   return render(
     <DiscussionTopicForm
       isEditing={isEditing}
+      currentDiscussionTopic={currentDiscussionTopic}
       isStudent={isStudent}
       sections={sections}
-      groups={groups}
+      groupCategories={groupCategories}
       onSubmit={onSubmit}
     />
   )

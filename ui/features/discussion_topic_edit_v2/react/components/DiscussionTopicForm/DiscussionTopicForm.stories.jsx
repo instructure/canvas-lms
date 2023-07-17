@@ -18,6 +18,9 @@
 
 import React, {useState, useCallback} from 'react'
 import DiscussionTopicForm from './DiscussionTopicForm'
+import {DiscussionTopic} from '../../../graphql/DiscussionTopic'
+import {GroupSet} from '../../../graphql/GroupSet'
+import {Section} from '../../../graphql/Section'
 
 ENV.current_user = {display_name: 'Count Dracula'}
 
@@ -40,25 +43,21 @@ export function Primary(args) {
   return (
     <div style={{backgroundColor: color, padding: '100px'}}>
       <DiscussionTopicForm
-        isStudent={args.isStudent}
         isEditing={args.isEditing}
+        currentDiscussionTopic={args.currentDiscussionTopic}
+        isStudent={args.isStudent}
         sections={args.sections}
-        groups={args.groups}
+        groupCategories={args.groupCategories}
         onSubmit={onSubmit}
       />
     </div>
   )
 }
 Primary.args = {
-  isStudent: false,
   isEditing: false,
-  sections: [
-    {id: '1', label: 'Example Section 1'},
-    {id: '2', label: 'Example Section 2'},
-  ],
-  groups: [
-    {id: '1', label: 'Example Group Set 1'},
-    {id: '2', label: 'Example Group Set 2'},
-  ],
+  currentDiscussionTopic: DiscussionTopic.mock(),
+  isStudent: false,
+  sections: [Section.mock()],
+  groupCategories: [GroupSet.mock()],
   submitColor: '#516dd0',
 }

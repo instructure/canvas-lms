@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,19 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 
-import {useMutation} from 'react-apollo'
+import {useQuery, useMutation} from 'react-apollo'
+import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 
 import LoadingIndicator from '@canvas/loading-indicator'
+import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 
 export default function DiscussionTopicFormContainer() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [createDiscussionTopic, {data, loading}] = useMutation(CREATE_DISCUSSION_TOPIC, {
+  const is_editing = !!ENV.discussion_topic_id
+  const {data: topic_data, loading: topic_is_loading} = useQuery(DISCUSSION_TOPIC_QUERY, {
+    variables: {
+      discussionTopicId: 120 /* ENV.disscusion_topic_id, */,
+    },
+  })
+  const currentDiscussionTopic = topic_data?.legacyNode
+
+  const [createDiscussionTopic] = useMutation(CREATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
       const new_discussion_topic = completionData?.createDiscussionTopic?.discussionTopic
-      const discussion_topic_id = new_discussion_topic?.course_id
+      const discussion_topic_id = new_discussion_topic?._id
       const context_type = new_discussion_topic?.contextType
       if (discussion_topic_id && context_type) {
         if (context_type === 'Course') {
@@ -55,9 +64,122 @@ export default function DiscussionTopicFormContainer() {
     },
   })
 
-  if (loading) {
+  const createDiscussionTopicOnSubmit = useCallback(
+    ({
+      title,
+      message,
+      sectionIdsToPostTo,
+      discussionAnonymousState,
+      anonymousAuthorState,
+      respondBeforeReply,
+      enablePodcastFeed,
+      includeRepliesInFeed,
+      // isGraded, (phase 2)
+      allowLiking,
+      onlyGradersCanLike,
+      // addToTodo,
+      todoDate,
+      // isGroupDiscussion,
+      // groupSetId,
+      availableFrom,
+      availableUntil,
+      shouldPublish,
+    }) => {
+      createDiscussionTopic({
+        variables: {
+          contextId: ENV.course_id,
+          contextType: 'Course',
+          isAnnouncement: false,
+          title,
+          message,
+          discussionType: 'side_comment',
+          delayedPostAt: availableFrom,
+          lockAt: availableUntil,
+          podcastEnabled: enablePodcastFeed,
+          podcastHasStudentPosts: includeRepliesInFeed,
+          requireInitialPost: respondBeforeReply,
+          pinned: false,
+          todoDate,
+          groupCategoryId: null,
+          allowRating: allowLiking,
+          onlyGradersCanRate: onlyGradersCanLike,
+          anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
+          isAnonymousAuthor: anonymousAuthorState,
+          specificSections: sectionIdsToPostTo,
+          locked: false,
+          published: shouldPublish,
+        },
+      })
+    },
+    [createDiscussionTopic]
+  )
+
+  // const updateDiscussionTopicOnSubmit = useCallback(
+  //   ({
+  //     title,
+  //     message,
+  //     sectionsToPostTo,
+  //     discussionAnonymousState,
+  //     anonymousAuthorState,
+  //     respondBeforeReply,
+  //     enablePodcastFeed,
+  //     includeRepliesInFeed,
+  //     // isGraded,
+  //     allowLiking,
+  //     onlyGradersCanLike,
+  //     // sortByLikes,
+  //     // addToTodo,
+  //     todoDate,
+  //     // isGroupDiscussion,
+  //     // groupSet,
+  //     availableFrom,
+  //     availableUntil,
+  //     shouldPublish,
+  //     // postedAt,
+  //   }) => {
+  //     updateDiscussionTopic({
+  //       variables: {
+  //         contextId: ENV.course_id,
+  //         contextType: 'Course',
+  //         isAnnouncement: false,
+  //         title,
+  //         message,
+  //         discussionType: 'side_comment',
+  //         delayedPostAt: availableFrom,
+  //         lockAt: availableUntil,
+  //         podcastEnabled: enablePodcastFeed,
+  //         podcastHasStudentPosts: includeRepliesInFeed,
+  //         requireInitialPost: respondBeforeReply,
+  //         pinned: false,
+  //         todoDate,
+  //         groupCategoryId: null,
+  //         allowRating: allowLiking,
+  //         onlyGradersCanRate: onlyGradersCanLike,
+  //         anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
+  //         isAnonymousAuthor: anonymousAuthorState,
+  //         specificSections: sectionsToPostTo,
+  //         locked: false,
+  //         published: shouldPublish,
+  //       },
+  //     })
+  //   },
+  //   [updateDiscussionTopic]
+  // )
+
+  if (topic_is_loading) {
     return <LoadingIndicator />
   }
 
-  return <div>Form goes here</div>
+  return (
+    <DiscussionTopicForm
+      isEditing={is_editing}
+      currentDiscussionTopic={currentDiscussionTopic}
+      isStudent={false /* ENV.is_student */}
+      sections={[]}
+      groupCategories={[]}
+      onSubmit={
+        createDiscussionTopicOnSubmit /* is_editing ? updateDiscussionTopicOnSubmit : ... */
+      }
+    />
+  )
 }
