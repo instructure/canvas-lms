@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Course} from './Course'
 import {DiscussionTopic} from './DiscussionTopic'
 import gql from 'graphql-tag'
 
@@ -26,4 +27,13 @@ export const DISCUSSION_TOPIC_QUERY = gql`
     }
   }
   ${DiscussionTopic.fragment}
+`
+
+export const COURSE_QUERY = gql`
+  query GetCourseQuery($courseId: ID!) {
+    legacyNode(_id: $courseId, type: Course) {
+      ...Course
+    }
+  }
+  ${Course.fragment}
 `
