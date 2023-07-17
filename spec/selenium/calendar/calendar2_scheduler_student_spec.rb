@@ -20,11 +20,13 @@
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
 require_relative "../helpers/scheduler_common"
+require_relative "pages/calendar_page"
 
 describe "scheduler" do
   include_context "in-process server selenium tests"
   include Calendar2Common
   include SchedulerCommon
+  include CalendarPage
 
   context "as a student" do
     before(:once) do
@@ -113,7 +115,7 @@ describe "scheduler" do
         scheduler_event.click
         f(".event-details .unreserve_event_link").click
         wait_for_ajaximations
-        f("#delete_event_dialog~.ui-dialog-buttonpane .btn-primary").click
+        click_delete_confirm_button
 
         expect(f("#content")).not_to contain_css(".fc-event.scheduler-event")
       end
@@ -128,7 +130,7 @@ describe "scheduler" do
         wait_for_ajaximations
         f(".event-details .unreserve_event_link").click
         wait_for_ajaximations
-        f("#delete_event_dialog~.ui-dialog-buttonpane .btn-primary").click
+        click_delete_confirm_button
 
         expect(f("#content")).not_to contain_css(".fc-event.scheduler-event")
       end
@@ -139,7 +141,7 @@ describe "scheduler" do
         agenda_item.click
         f(".event-details .unreserve_event_link").click
         wait_for_ajaximations
-        f("#delete_event_dialog~.ui-dialog-buttonpane .btn-primary").click
+        click_delete_confirm_button
 
         expect(f("#content")).not_to contain_css(".agenda-event__item-container")
       end

@@ -117,6 +117,11 @@ calendar_series:
   display_name: Calendar Series
   description: |-
     This flag allows calendar event series to be created from the Canvas Calendar.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 
 account_level_blackout_dates:
   applies_to: SiteAdmin

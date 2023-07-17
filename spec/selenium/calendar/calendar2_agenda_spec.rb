@@ -19,10 +19,12 @@
 
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
+require_relative "pages/calendar_page"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
+  include CalendarPage
 
   before(:once) do
     Account.find_or_create_by!(id: 0).update(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: nil)
@@ -149,8 +151,7 @@ describe "calendar2" do
 
         agenda_item.click
         delete_event_button.click
-        fj(".ui-dialog:visible .btn-primary").click
-
+        click_delete_confirm_button
         expect(f("#content")).not_to contain_css(".agenda-event__item-container")
       end
 
@@ -163,7 +164,7 @@ describe "calendar2" do
 
         agenda_item.click
         delete_event_button.click
-        fj(".ui-dialog:visible .btn-danger").click
+        click_delete_confirm_button
 
         expect(f("#content")).not_to contain_css(".agenda-event__item-container")
       end
@@ -176,7 +177,7 @@ describe "calendar2" do
 
         agenda_item.click
         delete_event_button.click
-        fj(".ui-dialog:visible .btn-danger").click
+        click_delete_confirm_button
 
         expect(f("#content")).not_to contain_css(".agenda-event__item-container")
       end
@@ -281,7 +282,7 @@ describe "calendar2" do
 
           agenda_item.click
           delete_event_button.click
-          fj(".ui-dialog:visible .btn-danger").click
+          click_delete_confirm_button
 
           expect(f("#content")).not_to contain_css(".agenda-event__item-container")
         end
