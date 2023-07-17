@@ -56,7 +56,7 @@ course_admin_role_masquerade_permission_check:
   applies_to: RootAccount
   display_name: Check permissions when Masquerading as Course Admins
   description: When masquerading as Course Admin Roles (Teacher/TA/Designer base role), Canvas will ensure the masquerading user has all of the same (or more) permissions as the target user.
-temporary_enrollment:
+temporary_enrollments:
   state: hidden
   display_name: Temporary Enrollments
   description: Users can temporarily enroll another user in a course. The assigned user is removed from the course when the enrollment expires.
