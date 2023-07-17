@@ -726,6 +726,7 @@ const MessageStudentsWhoDialog = ({
                 </Item>
                 <Item margin="0 0 0 x-small">
                   <Button
+                    data-testid="send-message-button"
                     interaction={isFormDataValid ? 'enabled' : 'disabled'}
                     color="primary"
                     onClick={handleSendButton}

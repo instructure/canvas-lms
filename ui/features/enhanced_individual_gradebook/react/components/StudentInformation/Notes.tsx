@@ -47,6 +47,7 @@ export default function Notes({currentStudentNotes, disabled, handleSubmitNotes}
           <GridCol width={{small: 12, medium: 12, large: 8, xLarge: 8}}>
             <TextArea
               resize="vertical"
+              data-testid="notes-text-box"
               onBlur={() => handleSubmitNotes(notes)}
               label=""
               value={notes}

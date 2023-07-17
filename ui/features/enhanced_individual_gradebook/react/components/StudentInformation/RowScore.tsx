@@ -79,7 +79,7 @@ export default function RowScore({
   return (
     <tr>
       <th>{name}</th>
-      <td>{scoreText}</td>
+      <td data-testid="subtotal-grade">{scoreText}</td>
       <td>{letterGradeScore}</td>
       <td>{weightText}</td>
     </tr>

@@ -59,7 +59,7 @@ export default function GradebookMenu({
   return (
     <Menu
       trigger={
-        <Link isWithinText={false} as="button">
+        <Link isWithinText={false} as="button" data-testid="gradebook-select-dropdown">
           {activeLabels[variant]} <IconMiniArrowDownSolid />
         </Link>
       }
@@ -69,7 +69,9 @@ export default function GradebookMenu({
           href={`${courseUrl}/gradebook/change_gradebook_version?version=gradebook`}
           value="DefaultGradebook"
         >
-          <span data-menu-item-id="default-gradebook">{I18n.t('Traditional Gradebook')}</span>
+          <span data-menu-item-id="default-gradebook" data-testid="default-gradebook-menu-option">
+            {I18n.t('Traditional Gradebook')}
+          </span>
         </Item>
 
         {learningMasteryEnabled && (

@@ -103,14 +103,14 @@ export default function AssignmentInformation({
   }
 
   return (
-    <View as="div">
+    <View as="div" data-testid="assignment-information">
       <View as="div" className="row-fluid">
         <View as="div" className="span4">
           <View as="h2">Assignment Information</View>
         </View>
         <View as="div" className="span8">
-          <View as="h3" className="assignment_selection" data-testid="assignment-information-name">
-            <Link href={htmlUrl} isWithinText={false}>
+          <View as="h3" className="assignment_selection">
+            <Link href={htmlUrl} isWithinText={false} data-testid="assignment-information-name">
               {assignment.name}
             </Link>
           </View>
@@ -129,6 +129,7 @@ export default function AssignmentInformation({
                 href={htmlUrl}
                 isWithinText={false}
                 renderIcon={<IconWarningLine size="x-small" />}
+                data-testid="assignment-group-no-points-warning"
               >
                 <ScreenReaderContent>Warning</ScreenReaderContent>
                 Assignments in this group have no points possible and cannot be included in grade
@@ -137,7 +138,11 @@ export default function AssignmentInformation({
             </View>
           ) : null}
           <View as="div">
-            <Link href={speedGraderUrl()} isWithinText={false}>
+            <Link
+              href={speedGraderUrl()}
+              isWithinText={false}
+              data-testid="assignment-speedgrader-link"
+            >
               {I18n.t('See this assignment in speedgrader')}
             </Link>
           </View>
@@ -146,7 +151,7 @@ export default function AssignmentInformation({
               <SubmissionDownloadModal downloadSubmissionsUrl={downloadSubmissionsUrl} />
             </View>
           )}
-          <View as="div" className="pad-box no-sides">
+          <View as="div" className="pad-box no-sides" data-testid="assignment-submission-info">
             <View as="p">
               <View as="strong">
                 {I18n.t('Submission types:')} {assignment.submissionTypes}
@@ -196,12 +201,12 @@ function AssignmentScoreDetails({assignment, scores}: AssignmentScoreDetailsProp
         </thead>
         <tbody>
           <tr>
-            <td>
+            <td data-testid="assignment-points-possible">
               {assignment.pointsPossible ? assignment.pointsPossible : I18n.t('No points possible')}
             </td>
-            <td>{average}</td>
-            <td>{max}</td>
-            <td>{min}</td>
+            <td data-testid="assignment-average">{average}</td>
+            <td data-testid="assignment-max">{max}</td>
+            <td data-testid="assignment-min">{min}</td>
           </tr>
         </tbody>
       </table>
@@ -240,7 +245,11 @@ function AssignmentActions({
     <>
       {!gradebookOptions.customOptions.hideStudentNames && (
         <View as="div" className="pad-box no-sides">
-          <Button color="secondary" onClick={() => setShowMessageStudentsWhoModal(true)}>
+          <Button
+            color="secondary"
+            onClick={() => setShowMessageStudentsWhoModal(true)}
+            data-testid="message-students-who-button"
+          >
             {I18n.t('Message students who...')}
           </Button>
           <MessageStudentsWhoModal
@@ -255,7 +264,11 @@ function AssignmentActions({
       )}
       <View as="div" className="pad-box no-sides">
         <>
-          <Button color="secondary" onClick={() => setShowSetDefaultGradeModal(true)}>
+          <Button
+            color="secondary"
+            onClick={() => setShowSetDefaultGradeModal(true)}
+            data-testid="default-grade-button"
+          >
             {I18n.t('Set default grade')}
           </Button>
           <DefaultGradeModal

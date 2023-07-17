@@ -36,7 +36,11 @@ export default function SubmissionDownloadModal({downloadSubmissionsUrl}: Props)
 
   return (
     <>
-      <Button color="secondary" onClick={startDownload}>
+      <Button
+        color="secondary"
+        onClick={startDownload}
+        data-testid="download-all-submissions-button"
+      >
         {I18n.t('Download all submissions')}
       </Button>
       <div id="download_submissions_dialog" style={{display: 'none'}}>

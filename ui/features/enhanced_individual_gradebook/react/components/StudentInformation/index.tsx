@@ -258,7 +258,7 @@ export default function StudentInformation({
           <View as="div">
             <View as="strong">
               {I18n.t('Secondary ID:')}
-              <View as="span" className="secondary_id">
+              <View as="span" className="secondary_id" data-testid="secondary-id">
                 {' '}
                 {hideStudentNames ? <View as="em">{I18n.t('hidden')}</View> : student.loginId}
               </View>
@@ -363,7 +363,7 @@ export default function StudentInformation({
 
           {showInvalidAssignmentGroupsWarning && (
             <View as="div" className="text-error" margin="small 0 0 0" style={{width: '100%'}}>
-              <Text size="medium">
+              <Text size="medium" data-testid="no-points-possible-warning">
                 <IconWarningLine /> {invalidGroupsWarningPhrases()}{' '}
               </Text>
             </View>

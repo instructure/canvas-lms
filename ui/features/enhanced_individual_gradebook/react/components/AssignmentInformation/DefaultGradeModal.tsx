@@ -148,6 +148,7 @@ export default function DefaultGradeModal({
     >
       <ModalHeader>
         <CloseButton
+          data-testid="default-grade-close-button"
           placement="end"
           offset="small"
           onClick={() => handleClose()}
@@ -192,6 +193,7 @@ export default function DefaultGradeModal({
       </ModalBody>
       <Modal.Footer>
         <Button
+          data-testid="default-grade-submit-button"
           onClick={setDefaultGrade}
           type="submit"
           disabled={defaultGradeStatus === ApiCallStatus.PENDING || !gradeInput}
