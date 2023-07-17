@@ -1393,7 +1393,7 @@ class RoleOverride < ActiveRecord::Base
         available_to: %w[AccountAdmin AccountMembership],
         true_for: ["AccountAdmin"],
         account_only: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollment) },
+        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollments) },
         group: "manage_temp_enroll",
         group_label: -> { t("Users - Temporary Enrollments") }
       },
@@ -1403,7 +1403,7 @@ class RoleOverride < ActiveRecord::Base
         available_to: %w[AccountAdmin AccountMembership],
         true_for: ["AccountAdmin"],
         account_only: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollment) },
+        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollments) },
         group: "manage_temp_enroll",
         group_label: -> { t("Users - Temporary Enrollments") }
       },
@@ -1413,7 +1413,7 @@ class RoleOverride < ActiveRecord::Base
         available_to: %w[AccountAdmin AccountMembership],
         true_for: ["AccountAdmin"],
         account_only: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollment) },
+        account_allows: ->(a) { a.root_account.feature_enabled?(:temporary_enrollments) },
         group: "manage_temp_enroll",
         group_label: -> { t("Users - Temporary Enrollments") }
       },
