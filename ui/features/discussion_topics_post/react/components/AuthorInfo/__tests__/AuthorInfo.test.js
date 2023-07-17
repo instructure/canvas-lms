@@ -69,6 +69,16 @@ describe('AuthorInfo', () => {
     expect(container.getByText('Harry Potter')).toBeInTheDocument()
   })
 
+  it('does not render the authors pronouns when it is not provided', () => {
+    const container = setup()
+    expect(container.queryByTestId('author-pronouns')).not.toBeInTheDocument()
+  })
+
+  it('renders the authors pronouns when it is provided', () => {
+    const container = setup({author: User.mock({pronouns: 'they/them'})})
+    expect(container.getByTestId('author-pronouns')).toBeInTheDocument()
+  })
+
   it('renders the author roles when there is an author', () => {
     const container = setup()
     expect(container.getByTestId('mobile-Author')).toBeInTheDocument()

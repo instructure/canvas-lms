@@ -246,6 +246,7 @@ export const getOptimisticResponse = ({
               avatarUrl: ENV.current_user.avatar_image_url,
               displayName: ENV.current_user.display_name,
               courseRoles: [],
+              pronouns: null,
               __typename: 'User',
             }
           : null,
@@ -254,6 +255,7 @@ export const getOptimisticResponse = ({
               id: null,
               avatarUrl: null,
               shortName: CURRENT_USER,
+              pronouns: null,
               __typename: 'AnonymousUser',
             }
           : null,

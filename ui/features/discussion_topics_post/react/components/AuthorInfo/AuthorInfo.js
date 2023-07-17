@@ -131,11 +131,23 @@ export const AuthorInfo = props => {
                         {isAnonymous(props) ? (
                           getDisplayName(props)
                         ) : (
-                          <SearchSpan
-                            isIsolatedView={props.isIsolatedView}
-                            searchTerm={searchTerm}
-                            text={getDisplayName(props)}
-                          />
+                          <>
+                            <SearchSpan
+                              isIsolatedView={props.isIsolatedView}
+                              searchTerm={searchTerm}
+                              text={getDisplayName(props)}
+                            />
+                            {props.author?.pronouns && (
+                              <Text
+                                lineHeight="condensed"
+                                size={responsiveProps.authorNameTextSize}
+                                fontStyle="italic"
+                                data-testid="author-pronouns"
+                              >
+                                &nbsp;({props.author?.pronouns})
+                              </Text>
+                            )}
+                          </>
                         )}
                       </Text>
                     </Flex.Item>
