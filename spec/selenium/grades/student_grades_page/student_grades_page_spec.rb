@@ -280,13 +280,14 @@ describe "gradebook - logged in as a student" do
         expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
 
         # Verify that the 2 group rows have the correct values
-        # TODO: VICE-3642 FIX so group totals appear.
+        # TODO: VICE-3663 FIX so group totals appear.
         # expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 N/A 0.00/0.00"
         # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
 
         # Verify that the total is correct
-        # TODO: VICE-3642 FIX the total_row in this case so that it appears correctly, points possible and set NaN to N/A, then uncomment this code
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total N/A 0.00/0.00"
+        # TODO: VICE-3662 FIX the total_row in this case so that it displays N/A
+        # No points possible, because it doesn't make sense when there are weighted grading periods/ assignment groups.
+        # expect(f("tr[data-testid='total_row']").text).to eq "Total N/A"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -322,13 +323,14 @@ describe "gradebook - logged in as a student" do
         expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
 
         # Verify that the 2 group rows have the correct values
-        # TODO: uncomment with VICE-3642 so the groups appear
+        # TODO: uncomment with VICE-3663 so the groups appear
         # expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 N/A 0.00/0.00"
         # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
 
         # Verify that the total is correct
-        # TODO: VICE-3642 FIX the total_row in this case so that it appears correctly, points possible and remove the % from NaN, then uncomment this code
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total NaN 0.00/0.00"
+        # TODO: VICE-3662 FIX the total_row in this case so that it appears correctly as N/A
+        # No points possible, because it doesn't make sense when there are weighted grading periods/ assignment groups.
+        # expect(f("tr[data-testid='total_row']").text).to eq "Total N/A"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
