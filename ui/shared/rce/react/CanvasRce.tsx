@@ -115,6 +115,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       instRecordDisabled={window.ENV?.RICH_CONTENT_INST_RECORD_TAB_DISABLED}
       language={window.ENV?.LOCALES?.[0] || 'en'}
       lockedAttachments={window.ENV?.CHILD_COURSE_ATTACHMENTS_LOCKED_STATUSES}
+      userCacheKey={window.ENV?.user_cache_key}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
       ltiTools={window.INST?.editorButtons}
       maxInitRenderedRCEs={props.maxInitRenderedRCEs}

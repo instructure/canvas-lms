@@ -47,6 +47,7 @@ module.exports = {
     '\\.(css|less)$': '<rootDir>/src/rce/__mocks__/styleMock.js',
     // mock the tinymce-react Editor component
     '@tinymce/tinymce-react': '<rootDir>/src/rce/__mocks__/tinymceReact.jsx',
+    'crypto-es': '<rootDir>/src/rce/__mocks__/_mockCryptoEs.ts',
   },
 
   transform: {

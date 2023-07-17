@@ -67,6 +67,7 @@ import {rceWrapperPropTypes} from './RCEWrapperProps'
 import {insertPlaceholder, placeholderInfoFor, removePlaceholder} from '../util/loadingPlaceholder'
 import {transformRceContentForEditing} from './transformContent'
 import {IconMoreSolid} from '@instructure/ui-icons/es/svg'
+import EncryptedStorage from '../util/encrypted-storage'
 import buildStyle from './style'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
@@ -1216,7 +1217,7 @@ class RCEWrapper extends React.Component {
 
   /* ********** autosave support *************** */
   initAutoSave = editor => {
-    this.storage = window.localStorage
+    this.storage = new EncryptedStorage(this.props.userCacheKey ?? '')
     if (this.storage) {
       editor.on('change Undo Redo', this.doAutoSave)
       editor.on('blur', this.doAutoSave)
@@ -1299,7 +1300,7 @@ class RCEWrapper extends React.Component {
   getAutoSaved(key) {
     let autosaved = null
     try {
-      autosaved = this.storage && JSON.parse(this.storage.getItem(key))
+      autosaved = this.storage && this.storage.getItem(key)
     } catch (_ex) {
       this.storage.removeItem(this.autoSaveKey)
     }
@@ -1338,13 +1339,7 @@ class RCEWrapper extends React.Component {
 
       const content = editor.getContent({no_events: true})
       try {
-        this.storage.setItem(
-          this.autoSaveKey,
-          JSON.stringify({
-            autosaveTimestamp: Date.now(),
-            content,
-          })
-        )
+        this.storage.setItem(this.autoSaveKey, content)
       } catch (ex) {
         if (!retry) {
           // probably failed because there's not enough space

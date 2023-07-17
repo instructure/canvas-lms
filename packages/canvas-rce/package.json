@@ -133,6 +133,7 @@
     "aphrodite": "^2",
     "axios": "^0.21.1",
     "bloody-offset": "0.0.0",
+    "crypto-es": "^2.0.4",
     "classnames": "^2.2.5",
     "concurrently": "^4",
     "format-message": "^6",
