@@ -163,7 +163,7 @@ export default function GradingResults({
             <View as="h2">{I18n.t('Grading')}</View>
           </View>
           <View as="div" className="span8 pad-box top-only">
-            <View as="div">
+            <View as="div" data-testid="student_and_assignment_grade_label">
               <View as="span">
                 <Text size="small">
                   <View as="strong">{`${I18n.t('Grade for')} ${
@@ -174,7 +174,9 @@ export default function GradingResults({
               </View>
             </View>
             <View as="span">
-              <Text size="small">{submitterPreviewText(submission)}</Text>
+              <Text data-testid="submitter-name" size="small">
+                {submitterPreviewText(submission)}
+              </Text>
             </View>
 
             <View as="div" className="grade">
@@ -184,6 +186,7 @@ export default function GradingResults({
                 value={gradeInput}
                 disabled={submitScoreStatus === ApiCallStatus.PENDING}
                 renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
+                data-testid="student_and_assignment_grade_input"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGradeInput(e.target.value)}
                 onBlur={() => submitGrade()}
               />
@@ -213,6 +216,7 @@ export default function GradingResults({
 
             <View as="div" className="span4" margin="medium 0 0 0" width="14.6rem">
               <Button
+                data-testid="submission-details-button"
                 display="block"
                 onClick={() => {
                   setModalOpen(true)
@@ -259,7 +263,7 @@ function SubmissionStatus({submission}: SubmissionStatusProps) {
 
   return (
     <View as="span">
-      <Pill margin="small" color="danger">
+      <Pill margin="small" color="danger" data-testid="submission-status-pill">
         <View as="strong" padding="x-small">
           {I18n.t('%{text}', {text})}
         </View>

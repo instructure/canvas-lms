@@ -175,6 +175,7 @@ export default function ContentSelection({
           <View as="div" className="row-fluid pad-box bottom-only student_navigation">
             <View as="div" className="span4">
               <button
+                data-testid="previous-student-button"
                 type="button"
                 className="btn btn-block next_object"
                 disabled={selectedStudentIndex <= 1}
@@ -185,6 +186,7 @@ export default function ContentSelection({
             </View>
             <View as="div" className="span4">
               <button
+                data-testid="next-student-button"
                 type="button"
                 className="btn btn-block next_object"
                 disabled={selectedStudentIndex >= studentDropdownOptions.length - 1}
@@ -223,6 +225,7 @@ export default function ContentSelection({
           <View as="div" className="row-fluid pad-box bottom-only assignment_navigation">
             <View as="div" className="span4">
               <button
+                data-testid="previous-assignment-button"
                 type="button"
                 className="btn btn-block next_object"
                 disabled={selectedAssignmentIndex <= 1}
@@ -233,6 +236,7 @@ export default function ContentSelection({
             </View>
             <View as="div" className="span4">
               <button
+                data-testid="next-assignment-button"
                 type="button"
                 className="btn btn-block next_object"
                 disabled={selectedAssignmentIndex >= assignmentDropdownOptions.length - 1}

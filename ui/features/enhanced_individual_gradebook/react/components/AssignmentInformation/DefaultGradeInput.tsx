@@ -58,6 +58,7 @@ export default function DefaultGradeInput({disabled, gradingType, onGradeInputCh
     <>
       {showInputType() === 'text' ? (
         <TextInput
+          data-testid="default-grade-input"
           renderLabel={<ScreenReaderContent>{I18n.t('Default Grade')}</ScreenReaderContent>}
           display="inline-block"
           width="4rem"

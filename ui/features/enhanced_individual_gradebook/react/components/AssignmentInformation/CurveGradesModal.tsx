@@ -80,7 +80,7 @@ export function CurveGradesModal({assignment, contextUrl, submissions, handleGra
   })
 
   return (
-    <Button color="secondary" onClick={showDialog}>
+    <Button color="secondary" onClick={showDialog} data-testid="curve-grades-button">
       {I18n.t('Curve Grades')}
     </Button>
   )

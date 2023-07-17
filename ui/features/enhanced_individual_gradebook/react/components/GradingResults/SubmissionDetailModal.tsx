@@ -114,7 +114,11 @@ export default function SubmissionDetailModal({
         <Heading level="h4">{student.name}</Heading>
       </ModalHeader>
       <ModalBody padding="none">
-        <View as="div" padding="medium medium 0 medium">
+        <View
+          as="div"
+          padding="medium medium 0 medium"
+          data-testid="submission-details-assignment-name"
+        >
           <Heading level="h3">{assignment?.name}</Heading>
         </View>
 
@@ -293,12 +297,14 @@ function SubmissionGradeForm({
               value={gradeInput}
               disabled={submitScoreStatus === ApiCallStatus.PENDING}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGradeInput(e.target.value)}
+              data-testid="submission-details-grade-input"
             />
           </View>
           <Text>{outOfText(assignment, submission)}</Text>
         </FlexItem>
         <FlexItem align="start">
           <Button
+            data-testid="submission-details-submit-button"
             disabled={submitScoreStatus === ApiCallStatus.PENDING}
             onClick={() => submitGrade()}
           >
