@@ -70,7 +70,12 @@ class AccountReport < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
-    save!
+    result = save!
+    if saved_change_to_workflow_state?
+      abort_incomplete_runners
+      delay.delete_account_report_rows
+    end
+    result
   end
 
   def self.delete_old_rows_and_runners
@@ -136,5 +141,9 @@ class AccountReport < ActiveRecord::Base
   def self.available_reports
     # check if there is a reports plugin for this account
     AccountReports.available_reports
+  end
+
+  def abort_incomplete_runners
+    account_report_runners.incomplete.in_batches.update_all(workflow_state: "aborted", updated_at: Time.now.utc)
   end
 end
