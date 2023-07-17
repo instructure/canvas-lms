@@ -18,6 +18,9 @@
 
 import {Moment} from 'moment-timezone'
 import {useScope} from '@canvas/i18n'
+import RRuleHelper, {RRuleHelperSpec} from '../RecurringEvents/RRuleHelper'
+import {AllRRULEDayValues} from '../RecurringEvents/types'
+import {cardinalDayInMonth} from '../RecurringEvents/RepeatPicker/RepeatPicker'
 
 export type FrequencyOptionValue =
   | 'not-repeat'
@@ -143,4 +146,54 @@ export const generateFrequencyRRule = (
       // Custom option should open another modal selecting dates
       return null
   }
+}
+
+export const rruleToFrequencyOptionValue = (
+  eventStart: Moment,
+  rrule: string
+): FrequencyOptionValue => {
+  if (rrule.length === 0) return 'custom'
+
+  const spec: RRuleHelperSpec = RRuleHelper.parseString(rrule)
+
+  if (spec.interval !== 1) return 'custom'
+
+  if (spec.freq === 'DAILY') {
+    return 'daily'
+  }
+
+  if (
+    spec.freq === 'WEEKLY' &&
+    Array.isArray(spec.weekdays) &&
+    spec.weekdays.length === 1 &&
+    AllRRULEDayValues[eventStart.weekday()] === spec.weekdays[0]
+  ) {
+    return 'weekly-day'
+  }
+  if (
+    spec.freq === 'MONTHLY' &&
+    !Number.isNaN(spec.pos) &&
+    Array.isArray(spec.weekdays) &&
+    spec.weekdays.length === 1 &&
+    AllRRULEDayValues[eventStart.weekday()] === spec.weekdays[0]
+  ) {
+    const nthday = cardinalDayInMonth(eventStart)
+    if (nthday.cardinal === spec.pos || (nthday.last && spec.pos === -1)) {
+      return 'monthly-nth-day'
+    }
+  }
+  if (
+    spec.freq === 'YEARLY' &&
+    eventStart.month() + 1 === spec.month &&
+    eventStart.date() === spec.monthdate
+  ) {
+    return 'annually'
+  }
+  if (
+    spec.freq === 'WEEKLY' &&
+    spec.weekdays?.toString() === ['MO', 'TU', 'WE', 'TH', 'FR'].toString()
+  ) {
+    return 'every-weekday'
+  }
+  return 'custom'
 }
