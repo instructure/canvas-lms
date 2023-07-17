@@ -19,10 +19,12 @@
 
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
+require_relative "pages/calendar_page"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
+  include CalendarPage
 
   before(:once) do
     Account.find_or_create_by!(id: 0).update(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: nil)
@@ -257,7 +259,7 @@ describe "calendar2" do
         create_middle_day_event("doomed event")
         f(".fc-event").click
         hover_and_click ".delete_event_link"
-        hover_and_click ".ui-dialog:visible .btn-primary"
+        click_delete_confirm_button
         expect(f("#content")).not_to contain_jqcss(".fc-event:visible")
         # make sure it was actually deleted and not just removed from the interface
         get("/calendar2")
@@ -268,9 +270,7 @@ describe "calendar2" do
         create_middle_day_assignment
         f(".fc-event").click
         hover_and_click ".delete_event_link"
-        expect(f(".ui-dialog .ui-dialog-buttonset")).to be_displayed
-        wait_for_ajaximations
-        hover_and_click ".ui-dialog:visible .btn-danger"
+        click_delete_confirm_button
         wait_for_ajaximations
         expect(f("#content")).not_to contain_css(".fc-event")
         # make sure it was actually deleted and not just removed from the interface

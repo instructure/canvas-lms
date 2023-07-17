@@ -19,10 +19,12 @@
 
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
+require_relative "pages/calendar_page"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
+  include CalendarPage
 
   before(:once) do
     course_with_teacher(active_all: true, new_user: true)
@@ -77,7 +79,7 @@ describe "calendar2" do
       f("a.fc-event").click # click the note
       wait_for_animations
       f(".delete_event_link").click # delete button in the popup
-      f(".btn-primary").click       # delete button in the confirmation dialog
+      click_delete_confirm_button # delete button in the confirmation dialog
       expect(f(".fc-view-container")).not_to contain_css("a.fc-event")
     end
 
@@ -188,8 +190,7 @@ describe "calendar2" do
       wait_for_ajax_requests
       f(".fc-content").click
       f(".event-details .delete_event_link").click
-      expect(f("#delete_event_dialog").text).to include "Are you sure you want to delete this page?"
-      f("#delete_event_dialog").find_element(:xpath, "..").find_element(:css, ".btn-primary").click
+      click_delete_confirm_button
       wait_for_ajax_requests
       expect(page.reload).to be_deleted
     end
@@ -221,8 +222,7 @@ describe "calendar2" do
       wait_for_ajax_requests
       f(".fc-content").click
       f(".event-details .delete_event_link").click
-      expect(f("#delete_event_dialog").text).to include "Are you sure you want to delete this discussion?"
-      f("#delete_event_dialog").find_element(:xpath, "..").find_element(:css, ".btn-primary").click
+      click_delete_confirm_button
       wait_for_ajax_requests
       expect(discussion.reload).to be_deleted
     end

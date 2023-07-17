@@ -25,6 +25,10 @@ module CalendarPage
     "#create_new_event_link"
   end
 
+  def delete_confirm_button_selector
+    "//*[@aria-label='Confirm Deletion']//button[.//*[. = 'Delete']]"
+  end
+
   def edit_event_title_input_selector
     "#edit_calendar_event_form #calendar_event_title"
   end
@@ -42,6 +46,10 @@ module CalendarPage
     f(create_new_event_btn_selector)
   end
 
+  def delete_confirm_button
+    fxpath(delete_confirm_button_selector)
+  end
+
   def edit_event_title_input
     f(edit_event_title_input_selector)
   end
@@ -55,6 +63,10 @@ module CalendarPage
   end
 
   #----------------------- Actions/Methods ----------------------
+  def click_delete_confirm_button
+    delete_confirm_button.click
+  end
+
   def create_new_calendar_event
     create_new_event_btn.click
     wait_for_ajaximations
