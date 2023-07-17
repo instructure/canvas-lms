@@ -174,9 +174,15 @@ const ProxyUploadModal = ({
 
   const grabFileId = file => {
     if (typeof file.id === 'number' && file.id > 10000000000000 && file.preview_url) {
-      const pattern = /\/files\/([\d~]+)/
+      const pattern = /\/files\/(\d+)~(\d+)/
       const match = file.preview_url.match(pattern)
-      const globalId = match[1]
+      const numberBeforeTilde = match[1]
+      const numberAfterTilde = match[2]
+      // this simulates multiplying the shard id by 10^13 and adding the file id
+      // since we cannot actually do that math with large numbers in javascript
+      const totalDigits = 13 + numberBeforeTilde.length
+      const zerosToAdd = totalDigits - numberAfterTilde.length - numberBeforeTilde.length
+      const globalId = `${numberBeforeTilde}${'0'.repeat(zerosToAdd)}${numberAfterTilde}`
       return globalId
     }
     return file.id
