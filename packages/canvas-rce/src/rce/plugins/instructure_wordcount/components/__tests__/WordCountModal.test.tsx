@@ -55,7 +55,7 @@ describe('WordCountModal', () => {
     it('are rendered', () => {
       const {getByRole} = renderModal()
       defaultProps.headers.forEach(header => {
-        expect(getByRole('columnheader', {name: header.label})).toBeInTheDocument()
+        expect(getByRole('columnheader', {name: header.getLabel()})).toBeInTheDocument()
       })
     })
   })

@@ -26,7 +26,8 @@ import {showFlashAlert} from '../../../common/FlashAlert'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {getIcon, getFriendlyLinkType} from './linkUtils'
 
-const EDIT_MESSAGE = formatMessage('If left empty, link text will display as course link name')
+const getEditMessage = () =>
+  formatMessage('If left empty, link text will display as course link name')
 
 export const LinkDisplay = ({
   linkText,
@@ -59,7 +60,7 @@ export const LinkDisplay = ({
               onChange={(_e, value) => handleTextChange(value)}
               value={linkText}
               placeholder={placeholderText}
-              messages={[{type: 'hint', text: EDIT_MESSAGE}]}
+              messages={[{type: 'hint', text: getEditMessage()}]}
             />
           </Flex.Item>
         </Flex>
