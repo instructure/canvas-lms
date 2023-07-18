@@ -93,6 +93,9 @@
             "name": "Course"
           },
           {
+            "name": "CustomGradeStatus"
+          },
+          {
             "name": "Discussion"
           },
           {
@@ -198,6 +201,9 @@
             "name": "Section"
           },
           {
+            "name": "StandardGradeStatus"
+          },
+          {
             "name": "Submission"
           },
           {
@@ -300,6 +306,9 @@
             "name": "Course"
           },
           {
+            "name": "CustomGradeStatus"
+          },
+          {
             "name": "Discussion"
           },
           {
@@ -376,6 +385,9 @@
           },
           {
             "name": "Section"
+          },
+          {
+            "name": "StandardGradeStatus"
           },
           {
             "name": "Submission"

@@ -51,6 +51,8 @@ class CanvasSchema < GraphQL::Schema
     when Assignment then Types::AssignmentType
     when AssignmentGroup then Types::AssignmentGroupType
     when CommentBankItem then Types::CommentBankItemType
+    when CustomGradeStatus then Types::CustomGradeStatusType
+    when StandardGradeStatus then Types::StandardGradeStatusType
     when Conversation then Types::ConversationType
     when CourseSection then Types::SectionType
     when User then Types::UserType

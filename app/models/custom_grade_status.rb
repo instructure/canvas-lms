@@ -33,6 +33,7 @@ class CustomGradeStatus < ApplicationRecord
 
   validate :validate_custom_grade_status_limit
   validate :deleted_by_validation
+
   def validate_custom_grade_status_limit
     return unless root_account_id
 

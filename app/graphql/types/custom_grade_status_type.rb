@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class StandardGradeStatus < ApplicationRecord
-  STANDARD_GRADE_STATUSES = %w[late missing resubmitted dropped excused extended].freeze
+module Types
+  class CustomGradeStatusType < ApplicationObjectType
+    implements GraphQL::Types::Relay::Node
+    implements Interfaces::LegacyIDInterface
 
-  belongs_to :root_account, class_name: "Account", inverse_of: :standard_grade_statuses
-
-  validates :color, presence: true, length: { maximum: 7 }, format: { with: /\A#([0-9a-fA-F]{3}){1,2}\z/ }
-  validates :status_name, presence: true, uniqueness: { scope: :root_account }, inclusion: { in: STANDARD_GRADE_STATUSES, message: -> { t("%{value} is not a valid standard grade status") } }
-  validates :hidden, inclusion: [true, false]
-  validates :root_account, presence: true
+    global_id_field :id
+    field :color, String, null: false
+    field :name, String, null: false
+  end
 end
