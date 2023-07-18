@@ -219,6 +219,7 @@ es-ES:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Una tabla de respuestas y breves estadísticas con respecto a las opciones de respuesta del estudiante."
   a_table_that_contains_the_default_canvas_grading_s_7ba86ec6: "Una tabla que contiene información sobre el esquema de evaluación predeterminado de Canvas.  Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo."
   a_table_that_contains_the_grading_scheme_data_each_e9031ad3: "Una tabla que contiene información sobre el esquema de evaluación.  Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo."
+  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Una tabla que contiene información sobre el esquema de evaluación. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un botón para añadir más filas debajo y otro botón para eliminar la fila actual."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Una tabla que contiene información sobre el esquema de evaluaciones. Primero aparece un nombre del esquema de evaluaciones y luego, botones para editar y eliminar el esquema. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un botón para añadir más filas debajo y otro botón para eliminar la fila actual."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Se ha agotado el tiempo para contactar con el servicio externo de autentificación"
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Una RRULE anual debe incluir BYDAY o BYMONTHDAY"
@@ -1876,6 +1877,7 @@ es-ES:
   address_book_input_a0d8e76f: "Entrada del libro de direcciones"
   address_book_menu_c986b615: "Menú del libro de direcciones"
   address_use_as_wildcard_48f2cf60: "Dirección (usar * como comodín)"
+  adds_additional_fields_to_the_content_migration_as_192c2d3f: "Añade campos adicionales al mapa de activos de migración de contenido"
   adds_additional_information_and_filtering_for_feat_3e55a058: "Añade información adicional y filtros para las marcas de la funcionalidad"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Añade una configuración de cuenta/asignatura para una hora de entrega predeterminada para nuevas actividades"
   adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
@@ -1885,6 +1887,7 @@ es-ES:
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Añade enlace de analíticas en el menú de configuraciones del usuario."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Añade análisis a la ventana de contexto de un estudiante."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Añade permisos granulares para añadir o eliminar cada rol, y un permiso separado para otras acciones del administrador de la asignatura"
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Añade la opción al menú para acceder a los ajustes al nivel de resultados con una administración de los resultados mejorada"
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Añade la opción para evaluar por pregunta en SpeedGrader para Quizzes.Next exámenes"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Añade indicadores visuales a la página de detalles de la entrega para decirle a los estudiantes que hay
@@ -2474,7 +2477,10 @@ es-ES:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Permite al usuario ver las identificaciones de SIS de los usuarios en la página Personas de la asignatura."
   allows_user_to_weight_assignment_groups_95cb11b2: "Permite al usuario ponderar los grupos de actividades."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Permite a los usuarios añadir una descripción sencilla de las competencias para la vista de estudiante y de padre en el Libro de notas de dominio de aprendizaje para el estudiante."
+  allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: "Permite a los usuarios añadir una inscripción temporal con una fecha de inicio, una fecha de finalización y un rol"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Permite a los usuarios añadir herramientas LTI con tipo de ubicación conference_selection"
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Permite a los usuarios eliminar una inscripción temporal"
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Permite a los usuarios modificar una inscripción temporal"
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permite a los usuarios habilitar la opción “Ejecutar SpeedGrader filtrado por Grupo de estudiantes” para las asignaturas en la página de configuraciones de la asignatura. Cuando está activo y se ha seleccionado un grupo de estudiantes en el Nuevo libro de notas, SpeedGrader solo cargará a los estudiantes del grupo seleccionado."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Permite a los usuarios importar grupos en una asignatura."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Permite a los usuarios fusionar varias cuentas (si cuentan con las credenciales correspondientes)."
@@ -2655,6 +2661,7 @@ es-ES:
   analytics_course_code_student_name_d63bab4c: "Analíticas: %{course_code} -- %{student_name}"
   and_7fcc2911: "Y"
   and_a_few_more_not_shown_here_28e7d713: "... y unos pocos más que no se muestran aquí"
+  and_compressed_into_a_zip_file_this_may_take_some__1acbe09f: "y comprimirla en archivo zip. Dicha acción podría tardar un tiempo en función del tamaño y la cantidad de archivos entregados."
   and_count_more_43eae021: "y %{count} más…"
   and_many_more_not_shown_here_fb777a4c: "... y *muchos* más que no se muestran aquí"
   and_more_1c35b232: "y más..."
@@ -2944,6 +2951,7 @@ es-ES:
   artist_info_for_username_for_description_12d5d862: "Información del artista para %{userName} para %{description}"
   as_of_a036fa2e: En
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "A partir del %{date}, la autentificación de punto final en LTI 1.3 OIDC cambió de https://canvas.instructure.com/api/lti/authorize_redirect a https://sso.canvaslms.com/api/lti/authorize_redirect. En *este artículo de la Comunidad Canvas* se detalla la justificación y el alcance de este cambio, además, hay información adicional disponible en los documentos de la API. Se trata de un cambio pequeño, por lo que no tardará en realizarse, pero se necesita modificar la configuración en cada herramienta LTI 1.3 instalada en Canvas."
+  as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "A %{date}, la especificación de la plataforma LTI 1.3 es compatible completamente con Canvas. Las herramientas que deseen implementar esta opción deben cambiar el terminal OIDC Auth que almacenen para Canvas de *https://canvas.instructure.com/api/lti/authorize_redirect* a *https://sso.canvaslms.com/api/lti/authorize_redirect*. El terminal OIDC Auth recomendado para la instalación de la nueva herramienta 1.3 también ha cambiado, y recomendamos que todas las herramientas 1.3 cuya configuración utilicen este nuevo terminal lo cambien lo antes posible."
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Al escribir en este campo, la lista de grupos se filtrará automáticamente para incluir solo aquellos cuyo nombre coincida con tu entrada."
   ascending_b3c87427: Ascendente
   ask_your_instructor_a_question_a61ca5e9: "Realiza una pregunta a tu profesor"
@@ -3731,7 +3739,9 @@ es-ES:
       internal_ca_description: "Si tu servidor LDAP presenta un certificado emitido por un autoridad de certificación (CA) raíz interna que no es de confianza, *tienes* que subir tu CA raíz para que Canvas la detecte de confianza cuando se conecte."
       internal_ca_warning: "*Advertencia*: Utilizar una raíz interna CA es menos segura y aumenta el riesgo de poner en peligro. Como alternativa, recomendamos encarecidamente utilizar certificados emitidos por una autoridad de confianza."
       ldap_timeout_failure_help2: "Si se agota el tiempo muchas veces cuando Canvas se comunique con el servidor LDAP, los siguientes intentos de inicio de sesión utilizando ese servidor LDAP se bloquearán e impedirán para %{time}. La última vez que se ha agotado el tiempo para tu servidor LDAP fue %{timestamp}."
+      verify_tls_cert_opt_in_dated_description: "La verificación de certificados TLS será necesaria el *%{enforcement_date}*, pero puedes activarla antes para asegurarte de que tu servidor LDAP cumpla con la directiva."
       verify_tls_cert_opt_in_description: "La verificación de certificados TLS será necesaria el *%{enforcement_date}*, pero puedes activarla antes para asegurarte de que tu servidor LDAP cumpla con la directiva."
+      verify_tls_cert_opt_in_undated_description: "La verificación de certificados TLS será necesaria pronto, pero puedes activarla antes para asegurarte de que tu servidor LDAP cumpla con la directiva."
     ldap_settings_test: 
       labels: 
         pass: Contraseña
@@ -5448,6 +5458,7 @@ es-ES:
     unexpected_error: "Ha habido un error inesperado. Por favor, ponte en contacto con el servicio de asistencia técnica."
     unknown: Desconocido
     upload_timeout_error: "El tiempo de espera del proceso de carga del archivo."
+  content_migration_asset_map_v2_f0f455f: "Mapa de activos de migración de contenido v2"
   content_migration_queued_46c27790: "Migración de contenido en cola"
   content_migration_running_percent_complete_4b00c024: "Ejecutando migración de contenido: %{percent}% completado"
   content_migrations: 
@@ -6494,6 +6505,7 @@ es-ES:
   course_image_for_course_cfbb08df: "Imagen de la asignatura de %{course}"
   course_image_settings_eba3ec55: "Configuraciones de la imagen de la asignatura"
   course_implemented_apps_fa658f5a: "Aplicaciones implementadas a la asignatura"
+  course_import_html_using_gem_812d0af5: "Importación de curso HTML mediante Gem"
   course_is_already_associated_with_a_blueprint_4d9407cb: "La asignatura ya está asociada con un proyecto"
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "La asignatura no cumple con los requisitos de configuración como Blueprint"
   course_level_notification_preferences_require_a_co_2f0a618: "Las preferencias de notificación de los niveles de las asignaturas requieren una course_id para actualizarse"
@@ -7105,6 +7117,7 @@ es-ES:
   create_a_new_domain_lookup_1830a512: "Crear una nueva búsqueda de dominio"
   create_a_new_module_6f31b0fe: "Crear un nuevo contenido"
   create_a_new_user_for_address_7487e9c9: "Crear un nuevo usuario para \"%{address}\""
+  create_a_temporary_enrollment_167f05f1: "Crear una inscripción temporal"
   create_account_263ec6: "Crear cuenta"
   create_an_ba36d171: Crear
   create_announcements_above_1c36202b: "Crear los anuncios anteriores"
@@ -7142,6 +7155,7 @@ es-ES:
   create_pages_581a4d59: "Crear páginas"
   create_slots_71dbb2f8: "Crear espacios"
   create_subject_86de5618: "Crear tema"
+  create_temporary_enrollment_3d4eaa33: "Crear inscripción temporal"
   create_theme_based_on_40651ed3: "Crear tema basado en"
   created_58b8a75a: Creado
   created_6ee36dff: "Creado:"
@@ -7843,6 +7857,7 @@ es-ES:
     empty_message: "Sin mensajes"
   discussion_topic_a7bf935: "tema del foro"
   discussion_topic_dc85ad4c: "Tema del foro"
+  discussion_topic_edit_error_page_c9fb069c: "Página de error de modificación del tema del foro de discusión"
   discussion_topic_initial_query_error_37c98b4: "Error de consulta inicial del tema del foro de discusión"
   discussion_topic_menu_3d4684c6: "Menú de tema del foro de discusión"
   discussion_topic_post_error_page_7f7edc49: "Página de error de publicación del tema del foro de discusión"
@@ -8154,6 +8169,7 @@ es-ES:
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "Hecho Hemos utilizado los archivos que has cargado para adjuntarlos con comentario breve en la página de entrega de cada usuario para esta actividad. Los estudiantes recibirán una notificación de que se ha añadido un comentario nuevo."
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey Business Schools: actividad y rendimiento del estudiante"
   down_5831a426: Abajo
+  download_all_submissions_304d6797: "Descargar todas las entregas"
   download_as_ce13bff6: "Descargar como..."
   download_as_zip_5dae7f19: "Descargar como ZIP"
   download_assignment_submissions_41e50ee7: "Descargar las entregas de actividades"
@@ -8958,6 +8974,7 @@ es-ES:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Error: La herramienta ha devuelto un tipo de contenido incorrecto \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Ha habido un error al actualizar %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Error al actualizar el comentario"
+  error_updating_notes_31b24785: "Error al actualizar las notas"
   error_updating_pacename_ad07f9df: "Ha habido un error al actualizar %{paceName}"
   error_updating_status_of_module_item_80336274: "Ha habido un error al actualizar el estado del ítem del contenido"
   error_updating_submission_draft_1d40ade7: "Ha habido un error al cargar el borrador de la entrega"
@@ -9500,6 +9517,7 @@ es-ES:
   filter_speedgrader_by_student_group_53683142: "Filtrar SpeedGrader por grupo de estudiantes"
   filter_students_2327fe79: "Filtrar estudiantes"
   filters_92f2776f: Filtros
+  final_grade_474e3e37: "Nota final: "
   final_grade_4d7f6545: "Nota final"
   final_grade_6938dca8: "Nota final:"
   final_grade_6e94d99e: "Nota final:"
@@ -9749,6 +9767,7 @@ es-ES:
   grade_9c6f076d: Nota
   grade_a91e433e: "Nota:"
   grade_assignment_7c1abc11: "Nota %{assignment}"
+  grade_by_9ea3661e: "Evaluado por"
   grade_by_question_9d9b8a71: "Evaluar por pregunta"
   grade_change_activity_75fb525: "Actividad de cambio de nota"
   grade_change_log_231f90e4: "Registro del cambio de nota"
@@ -10786,6 +10805,8 @@ es-ES:
   http_response_code_832d6baa: "Respuesta HTTP: %{code}"
   https_3a02e3fb: https
   https_b8426ad8: "https://"
+  https_example_com_config_xml_d3bae5e3: "https://example.com/config.xml"
+  https_lti_tool_provider_example_herokuapp_com_regi_305953da: "https://lti-tool-provider-example.herokuapp.com/register"
   hungarian_fc7d30c9: Húngaro
   hungary_36_cd3e515b: "Hungría (+36)"
   hypothetical_end_date_117d81cf: "Hipotética fecha de finalización"
@@ -10895,6 +10916,10 @@ es-ES:
       de una solicitud de recurso oEmbed.
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Si se habilita esta opción, el formulario de actividad se rellena con los valores procedentes de mensajes de enlaces profundos en la página para crear/editar la actividad."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si se habilita, los parámetros de consulta no se copiarán en el cuerpo de POST durante el lanzamiento de LTI."
+  if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
+      Si se habilita esta opción, en las cuentas principales y las subcuentas se visualizarán comandos de alternancia para habilitar
+      y deshabilitar claves en la página de claves del desarrollador. El administrador del sitio seguirá visualizando los
+      botones de deshabilitar/permitir/habilitar.
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si se habilita, se encriptarán las identificaciones de origen utilizadas por Canvas para las competencias básicas."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Cuando está habilitado, el historial de entregas de pruebas en Nuevas pruebas se gestiona por separado."
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
@@ -10925,6 +10950,9 @@ es-ES:
       Canvas en las que las cuentas principales están en el mismo fragmento
       que la cuenta del administrador del sitio. El comportamiento en otras instancias
       ya se comportaba de esta forma.
+  if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
+      Si se habilita esta opción, los formularios de instalación y configuración de la instalación ubicados en las páginas de configuración de la cuenta y el curso emplearán
+      componentes InstUI, al contrario de los componentes anteriores de desarrollo propio, que eran menos accesibles.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Si se habilita esta opción, el usuario verá un cuadro de alerta en la parte superior de la
       página de las claves de desarrollador que le informará de los cambios de autentificación de punto final en OIDC próximos o completados.
@@ -11139,6 +11167,8 @@ es-ES:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Incluir las puntuaciones cuando se alerte acerca de las notas.
       Si el correo electrónico no es un correo electrónico del centro, esto significa que el contenido confidencial será enviado fuera del centro.
+  include_sis_batch_info_f79dd131: "Incluir información de lote SIS;"
+  include_sis_batch_information_75bf66c4: "Incluir información de lote SIS"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Incluir el agente de JS para RUM de Datadog en el ENCABEZADO del documento."
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Incluir las notas de esta actividad al sincronizar en el sistema de información de estudiantes de tu centro."
   include_unpublished_assignments_83ebbaec: "Incluir actividades no publicadas"
@@ -11235,6 +11265,11 @@ es-ES:
       invalid_number: "Este debería ser un número."
       required: "Campo obligatorio"
   instructure_default_73317bb1: "Predeterminado de Instructure"
+  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructure aloja Canvas Commons en la región elegida por tu institución, que es Europa. Significa que cuando utilizas Canvas Commons, tus datos personales se almacenarán y procesarán en Alemania. Algunos ejemplos de datos personales son: nombre, dirección de correo electrónico, identificación de usuario en Canvas, nombre de inicio de sesión en Canvas, avatar de Canvas, dirección IP, tus recursos favoritos de Canvas Commons y comentarios que hayas realizado en cualquier recurso de Canvas Commons. Puedes encontrar más información sobre las prácticas de privacidad de Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructure aloja Canvas Commons en la región elegida por tu institución, que es Asia Pacífico. Significa que cuando utilizas Canvas Commons, tus datos personales se almacenarán y procesarán en Singapur. Algunos ejemplos de datos personales son: nombre, dirección de correo electrónico, identificación de usuario en Canvas, nombre de inicio de sesión en Canvas, avatar de Canvas, dirección IP, tus recursos favoritos de Canvas Commons y comentarios que hayas realizado en cualquier recurso de Canvas Commons. Puedes encontrar más información sobre las prácticas de privacidad de Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructure aloja Canvas Commons en la región elegida por tu institución, que es Estados Unidos. Significa que cuando utilizas Canvas Commons, tus datos personales se almacenarán y procesarán en los Estados Unidos. Algunos ejemplos de datos personales son: nombre, dirección de correo electrónico, identificación de usuario en Canvas, nombre de inicio de sesión en Canvas, avatar de Canvas, dirección IP, tus recursos favoritos de Canvas Commons y comentarios que hayas realizado en cualquier recurso de Canvas Commons. Puedes encontrar más información sobre las prácticas de privacidad de Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructure aloja Canvas Commons en la región elegida por tu institución, que es Canadá. Significa que cuando utilizas Canvas Commons, tus datos personales se almacenarán y procesarán en Canadá. Algunos ejemplos de datos personales son: nombre, dirección de correo electrónico, identificación de usuario en Canvas, nombre de inicio de sesión en Canvas, avatar de Canvas, dirección IP, tus recursos favoritos de Canvas Commons y comentarios que hayas realizado en cualquier recurso de Canvas Commons. Puedes encontrar más información sobre las prácticas de privacidad de Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructure aloja Canvas Commons en la región elegida por tu institución, que es Australia. Significa que cuando utilizas Canvas Commons, tus datos personales se almacenarán y procesarán en Australia. Algunos ejemplos de datos personales son: nombre, dirección de correo electrónico, identificación de usuario en Canvas, nombre de inicio de sesión en Canvas, avatar de Canvas, dirección IP, tus recursos favoritos de Canvas Commons y comentarios que hayas realizado en cualquier recurso de Canvas Commons. Puedes encontrar más información sobre las prácticas de privacidad de Instructure [aquí](%{url})."
   instructure_inline_media_comment: 
     alerts: 
       kaltura_disabled: "Kaltura ha sido deshabilitado para este sitio de Canvas"
@@ -11305,6 +11340,7 @@ es-ES:
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY '%{bymonthday}' incorrecto"
   invalid_calculation_int_for_this_calculation_metho_971fada3: "no válido calculation_int para este calculation_method"
   invalid_content_type_utf_8_required_bd458b78: "Contenido incorrecto; se requiere UTF-8"
+  invalid_context_9186d37e: "Contexto incorrecto"
   invalid_context_for_group_f6cd268a: "contexto incorrecto para el grupo"
   invalid_context_type_68f40a61: "Tipo de contexto incorrecto"
   invalid_context_type_72085a6a: "tipo de contexto incorrecto"
@@ -11355,6 +11391,9 @@ es-ES:
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: |-
       Nombre de usuario SFTP incorrecto. No hemos podido determinar el nombre de usuario que se debe utilizar porque el dominio no termina en .instructure.
                                     Ponte en contacto con Slack en #canvas-sre.
+  invalid_sftp_username_we_were_unable_to_determine__13339947: |-
+      Nombre de usuario SFTP incorrecto. No hemos podido determinar el nombre de usuario que se debe utilizar porque el dominio no termina en .instructure.
+                                    Ponte en contacto con #canvas-sre en Slack.
   invalid_sis_sync_status_b68db497: "Estado incorrecto de sincronización en SIS"
   invalid_state_parameter_7a5aa108: "Parámetro de estado incorrecto"
   invalid_submission_file_type_cda6742a: "Tipo de archivo de entrega incorrecto"
@@ -12081,8 +12120,8 @@ es-ES:
           mfa_enrollment: |-
               La autentificación de múltiples factores aumenta la seguridad al solicitarte que tengas algo en tu posesión física,
               además de conocer tu contraseña, para iniciar sesión en Canvas. Puede ser un dispositivo que genere
-              códigos de verificación o un teléfono que reciba mensajes de texto. La aplicación Google Authenticator para [iPhone](%{iphone_url}) o
-              [Android](%{android_url}) puede configurarse al escanear el Código QR a continuación. Otros autentificadores pueden configurarse al ingresar la
+              códigos de verificación o un teléfono que reciba mensajes de texto. La aplicación Google Authenticator para iPhone o
+              Android puede configurarse al escanear el Código QR a continuación. Otros autentificadores pueden configurarse al ingresar la
               clave secreta **%{secret_key}**. Una vez que has configurado la autentificación de múltiples factores, entra en tu
               página de perfil e imprime los códigos de seguridad, en caso de que tu dispositivo normal de múltiples factores no esté disponible.
           mfa_required: "Es obligatorio configurar una autentificación de múltiples factores"
@@ -12261,6 +12300,7 @@ es-ES:
   manage_students_for_the_course_3b1bc4f0: "Administrar estudiantes para la asignatura"
   manage_subject_coursecontext_2328e1ff: "Administrar tema: %{courseContext}"
   manage_subject_f9835769: "Administrar tema"
+  manage_temporary_enrollments_4c4f21ef: "Gestionar inscripciones temporales"
   manage_update_23de23a1: "Administrar la actualización"
   manage_update_for_toolname_f8e3b2fb: "Administrar la actualización para %{toolName}"
   manage_usage_rights_c5a8c216: "Administrar derechos de uso"
@@ -12415,6 +12455,7 @@ es-ES:
   menu_39cb0e8e: Menú
   menu_for_group_title_fbf60567: "Menú para grupo %{title}"
   menu_for_outcome_title_1d93378d: "Menú para competencia %{title}"
+  menu_option_for_outcome_details_page_2dcd13d6: "Opción en el menú para la página de detalles del resultado"
   menu_options_9b6b0b5c: "Opciones del menú"
   mesa_public_course_syllabus_52282dd3: "Programa de la asignatura de Mesa Public"
   mesa_public_user_inactivity_report_a6792ccf: "Informe de la inactividad del usuario de Mesa Public"
@@ -14148,6 +14189,7 @@ es-ES:
   missing_required_description_99a99ff: "Falta la descripción requerida"
   missing_required_fields_fields_30e20799: "Faltan campos obligatorios: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Faltan campos obligatorios. Completa todos los campos obligatorios."
+  missing_required_parameters_4f589df8: "Falta la configuración requerida"
   missing_required_points_39db69fa: "Falta la puntuación requerida"
   missing_required_ratings_9b19e66: "Faltan las notas requeridas"
   missing_required_values_missing_values_f3be2ff8: "Faltan los valores requeridos: %{missing_values}"
@@ -14275,6 +14317,8 @@ es-ES:
   more_modules_d9a9f003: "Más contenidos"
   more_options_272b4953: "Más opciones"
   more_options_e89670cf: "Más opciones"
+  more_options_for_message_from_authorname_4001ddda: "Más opciones para el mensaje de %{authorName}"
+  more_options_for_subject_e18d421: "Más opciones para %{subject}"
   more_outcomes_have_been_loaded_9acafe9c: "Se han cargado más resultados"
   more_people_options_730e9686: "Más opciones de personas"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Se han añadido más resultados en la parte inferior de la página."
@@ -14620,6 +14664,8 @@ es-ES:
   next_student_79955068: "Siguiente estudiante"
   next_student_b62869f4: "Siguiente estudiante"
   next_up_review_feedback_19a15e0e: "A continuación: Revisar los comentarios"
+  next_up_review_feedback_59555dbd: "A CONTINUACIÓN: Revisar los comentarios"
+  next_up_submit_assignment_2fdb7174: "A CONTINUACIÓN: Entregar actividad"
   next_up_submit_assignment_793a9d41: "A continuación: Entregar actividad"
   next_window_window_90271943: "Siguiente ventana: %{window}"
   nickname_1e6da3ad: Apodo
@@ -15214,6 +15260,7 @@ es-ES:
   on_8f7190e5: Activado
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "En las asignaturas que tienen los derechos de uso habilitados, se aplica la selección de derechos de uso en los adjuntos de temas de foro de discusión"
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "En %{date}, la autentificación de punto final en LTI 1.3 OIDC cambiará de https://canvas.instructure.com/api/lti/authorize_redirect a https://sso.canvaslms.com/api/lti/authorize_redirect. En *este artículo de la Comunidad Canvas* se detalla la justificación y el alcance de este cambio, además, hay información adicional disponible en los documentos de la API. Se trata de un cambio pequeño, pero se necesita modificar la configuración en cada herramienta LTI 1.3 instalada en Canvas."
+  on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "El %{date}, la especificación de la plataforma LTI 1.3 será compatible completamente con Canvas. Las herramientas que deseen implementar esta opción deben cambiar el terminal OIDC Auth que almacenen para Canvas de *https://canvas.instructure.com/api/lti/authorize_redirect* a *https://sso.canvaslms.com/api/lti/authorize_redirect*. El terminal OIDC Auth recomendado para la instalación de la nueva herramienta 1.3 también cambiará, y recomendamos que todas las herramientas 1.3 cuya configuración utilicen este nuevo terminal lo cambien lo antes posible."
   on_for_key_keyname_bbac4e1b: "Desactivado para la clave: %{keyName}"
   on_paper_46d0ba36: "En papel"
   on_time_17ca5ad9: "A tiempo"
@@ -15271,6 +15318,7 @@ es-ES:
   open_comment_library_9debe2: "Abrir biblioteca de comentarios"
   open_complete_incomplete_menu_cfe2033b: "Abrir menú completo/incompleto"
   open_conversation_a6590865: "Abrir conversación"
+  open_conversation_subject_1dd2d3c: "Abrir conversación %{subject}"
   open_discussion_title_for_comments_6baa3fa: "Abrir foro de discusión %{title} para comentarios"
   open_emoji_menu_1df0eb0b: "Abrir el menú de emojis"
   open_event_menu_for_783510e3: "Menú de evento abierto para"
@@ -18199,6 +18247,7 @@ es-ES:
   remove_filename_87f3781e: "eliminar %{filename}"
   remove_filename_dab5c02e: "Eliminar %{filename}"
   remove_filter_6f7204e2: "Eliminar filtro"
+  remove_filtername_filter_6b6d7063: "Eliminar %{filterName} filtro"
   remove_grading_scheme_title_d3942a08: "Eliminar esquema de evaluaciones %{title}"
   remove_group_5d2f2f2d: "Eliminar grupo"
   remove_group_981d6a02: "¿Eliminar el grupo?"
@@ -18280,8 +18329,10 @@ es-ES:
   reply_389d6fb9: Respuesta
   reply_all_80298bee: "Responder a todos"
   reply_all_b864cd0e: "Responder a todos"
+  reply_for_subject_ae247d1e: "Responder a %{subject}"
   reply_from_author_a2806c77: "Respuesta de %{author}"
   reply_from_name: "%{name} a través de Notificaciones de Canvas"
+  reply_to_authorname_f209e84a: "Responder a %{authorName}"
   reply_to_comment_72d96728: "Responder al comentario"
   reply_to_conversation_f1aa0d4: "Responder a la conversación"
   reply_to_conversation_subject_4b2e6fe7: "Responder a la conversación %{subject}"
@@ -18333,6 +18384,7 @@ es-ES:
   reports_course_f09b7d9e: "Informes (asignatura)"
   reports_manage_92bc45cb: "Informes: la gestión"
   reqired_end_date_a7deac41: "Se necesita una fecha de finalización"
+  request_failed_with_status_status_47054af0: "Ha habido un error en la solicitud con estado %{status}"
   request_id_1499afb0: "Identificación de solicitud"
   request_successfully_sent_note_that_applying_score_ee8665b6: "Solicitud enviada correctamente. Ten en cuenta que aplicar la puntuación llevará un tiempo y los cambios no aparecen hasta que se vuelve a cargar la página."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Se solicita que DocViewer use CloudFront para activos de PDF."
@@ -18427,7 +18479,9 @@ es-ES:
   retry_duplicating_originalassignmentname_884aee1: "Volver a intentar duplicar \"%{originalAssignmentName}\""
   retry_ebd5f8ba: Reintentar
   retry_migrating_name_bdc802ef: "Volver a intentar la migración de \"%{name}\""
+  return_to_conversation_list_86688140: "Volver a la lista de conversaciones"
   return_to_parent_folder_4ece2184: "volver al archivo principal"
+  return_to_subject_in_conversation_list_d67b8e73: "Volver a %{subject} en la lista de conversaciones"
   returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Proporciona valores de cadena en lugar de valores numéricos para las sustituciones de variables"
   revert_date_changes_5105ce5: "Revertir los cambios en las fechas"
   revert_to_actual_score_f665eea9: "Revertir a la puntuación actual"
@@ -18484,6 +18538,9 @@ es-ES:
       manage_site_settings: "Gestionar las configuraciones de todo el sitio y los complementos"
       manage_storage_quotas: "Gestionar capacidades de almacenamiento"
       manage_students: "Añadir/eliminar estudiantes para la asignatura"
+      manage_temp_enroll_add: "Añadir inscripciones temporales"
+      manage_temp_enroll_delete: "Eliminar inscripciones temporales"
+      manage_temp_enroll_edit: "Modificar inscripciones temporales"
       manage_user_logins: "Modificar los detalles de inicio de sesión para los usuarios"
       manage_user_notes: "Gestionar las respuestas del diario del profesor"
       manage_user_observers: "Gestionar observadores para los usuarios"
@@ -19855,6 +19912,8 @@ es-ES:
     errors: 
       unrecorgnized_type: "Tipo de importación no reconocido"
     instructure_csv: "CSV formateado para Instructure o archivo comprimido zip de CSV"
+  sis_batch_id_8b755858: sis_batch_id
+  sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "Datos de SIS"
   sis_data_import_8bb623ce: "Datos de SIS: importar"
   sis_data_manage_328a4799: "Datos de SIS: administrar"
@@ -20206,6 +20265,7 @@ es-ES:
   status_color_picker_9ea0156b: "%{status} Selector de color"
   status_e051bb30: estado
   status_e7fdbe06: Estado
+  status_for_key_keyname_47668960: "%{status} para la clave: %{keyName}"
   statuses_497dfa15: Estados...
   statuses_f41543d8: Estados
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes: datos personalizados de Namespace"
@@ -20419,9 +20479,15 @@ es-ES:
   subject_details_12405b1: "Detalles del tema"
   subject_home_8e593f72: "Inicio de la asignatura"
   subject_home_page_41226803: "Página de inicio de la asignatura"
+  subject_mark_as_read_b0218a: "%{subject} Marcar como leído"
+  subject_mark_as_unread_6f07435f: "%{subject} Marcar como no leído"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "El tema debe contener menos de 255 caracteres."
   subject_name_a1ac4da4: "Nombre del tema"
+  subject_not_selected_10dacadf: "%{subject} no seleccionado"
+  subject_not_starred_4a113097: "%{subject} no destacado"
   subject_reply_to: "Re: %{subject}"
+  subject_selected_2196b77e: "%{subject} seleccionado"
+  subject_starred_8ca02058: "%{subject} destacado"
   subject_subject_9e1057f7: "Tema: %{subject}"
   subjects_14c0c4de: Temas
   submission: 
@@ -20616,6 +20682,7 @@ es-ES:
   submit_on_behalf_of_student_af674b95: "Enviar en representación del estudiante"
   submit_ticket_5515ffd: "Entregar ticket"
   submitted_318fad53: Entregado
+  submitted_718f5cbc: "ENTREGADO: "
   submitted_at_4d5ea3aa: "Entregado a"
   submitted_by_name_dab6d5e1: "Entregado por: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Entregado por %{proxy} el %{date}"
@@ -20823,6 +20890,12 @@ es-ES:
   tempe_grade_export_c611da01: "Exportación de nota de Tempe"
   template_account_21ac8f4f: "Plantilla de la cuenta"
   templates_4ca13d07: Plantillas
+  temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Inscribir temporalmente a un usuario en un curso. Esta inscripción temporal está emparejada con otra inscripción en el curso."
+  temporarily_enroll_name_8acb66ce: "Inscribir temporalmente %{name}"
+  temporary_enrollments_add_373181b7: "Inscripciones temporales - añadir"
+  temporary_enrollments_delete_52ffaae4: "Inscripciones temporales - eliminar"
+  temporary_enrollments_edit_67c01325: "Inscripciones temporales - modificar"
+  temporary_enrollments_f0937c5a: "Inscripciones temporales"
   tenant_d2a41f78: Inquilino
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Falta el inquilino o la sincronización está deshabilitada. Verifica las configuraciones de integración de la sincronización de Microsoft correspondientes a la asignatura y la cuenta."
   tenant_name_e174f404: "Nombre del inquilino"
@@ -20913,6 +20986,7 @@ es-ES:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Esa cuenta de usuario ha sido eliminada.  Ponte en contacto con el administrador del sistema para que reactive tu cuenta."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "La capacidad de los usuarios de recibir notificaciones de Slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "La identificación de la cuenta a la que pertenece el usuario que ha informado"
+  the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "La identificación de la cuenta a la que pertenece el usuario que ha informado"
   the_account_wide_sync_settings_were_changed_while__90c48497: "Las configuraciones de sincronización de toda la cuenta se han cambiado durante la sincronización. Intenta sincronizar de nuevo."
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "El atributo de directorio activo que se utilizará para hacer coincidir un usuario de Canvas con un usuario de Microsoft"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "El algoritmo que se utilizará para firmar mensajes AuthnRequest, LogoutRequest, y LogoutResponse enviados al IdP."
@@ -21165,6 +21239,7 @@ es-ES:
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "Ha habido un error durante la sincronización y no se ha podido completar"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "La configuración sincronizar según SIS no se ha podido habilitar para la actividad “%{assignment_name}” no tiene una fecha de entrega."
   the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "El equipo no ha podido crearse porque el grupo de Microsoft no tiene propietarios. Esto podría ser un error intermitente: intenta sincronizar de nuevo; si el problema persiste, comunícate con soporte."
+  the_temporarily_enrolled_user_can_only_view_and_pa_a5bf0184: "El usuario con una inscripción temporal solo puede ver y participar en un curso entre la fecha de inicio y la fecha de finalización que haya elegido al hacer la inscripción temporal."
   the_term_for_export_data_5aad7a0a: "El período para exportar los datos"
   the_term_for_grade_export_data_d55a6be7: "El período para exportar los datos de las notas"
   the_term_id_to_report_on_4479d2fc: "La identificación del período sobre el que se va a informar"
@@ -21218,6 +21293,8 @@ es-ES:
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Hay cambios sin guardar en una nota.\\n\\n¿Está seguro de que quiere continuar?"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Existe un límite de ubicación de 2 aplicaciones dentro de la barra de herramientas del RCE. Esta configuración solo se aplica al RCE mejorado."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Existe un límite de ubicación de 2 aplicaciones dentro de la barra de herramientas del RCE."
+  there_is_already_a_page_in_this_course_with_this_t_5b37ecf2: "Ya hay una página en este curso con este título."
+  there_is_already_a_page_in_this_group_with_this_ti_3dac30e5: "Ya hay una página en este grupo con este título."
   there_is_currently_1_available_grader_758e4a21: "Actualmente hay 1 evaluador disponible"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Ha habido un fallo al cerrar la sesión en tu IdP"
   there_was_a_problem_applying_scores_7baaeea7: "Ha habido un problema al aplicar la puntuación."
@@ -21370,6 +21447,7 @@ es-ES:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Esta entrega de actividad es mi propio trabajo y es original"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Esta actividad ya no se tendrá en cuenta en tu nota."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Este adjunto no ha sido publicado por el autor."
+  this_canvas_community_article_details_the_reasonin_37be9375: "*Este artículo de la comunidad de Canvas* detalla la justificación de este cambio, su alcance, las instrucciones exactas de lo que hay que cambiar y más información para los administradores de Canvas y los desarrolladores de la herramienta LTI 1.3."
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "La instalación de Canvas es solo de prueba y se *restablecerá cada mes.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "La instalación de Canvas es solo de prueba y se *restablecerá cada semana.*"
@@ -21494,6 +21572,8 @@ es-ES:
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Este es un foro de discusión anónimo. Aunque el nombre y la foto de perfil del estudiante estén ocultos, tu nombre y tu foto de perfil serán visibles para todos los miembros de la asignatura."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Este es un foro de discusión anónimo, tu nombre y la imagen de perfil no se mostrarán al resto de miembros de la asignatura."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Esta opción está habilitada por defecto, ya que las actividades no se pueden retener en el libro de evaluaciones, pero siguen contando para estas."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "*No* se trata de un cambio radical. Todo el comportamiento de la herramienta LTI 1.3 seguirá siendo el mismo, independientemente del terminal que se utilice, con la excepción de la nueva especificación compatible de almacenamiento de la plataforma. Este cambio será obligatorio en una fecha futura no especificada."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "*No* se trata de un cambio radical. Todo el comportamiento de la herramienta LTI 1.3 seguirá siendo el mismo, independientemente del terminal que se utilice, con la excepción de la nueva especificación compatible de almacenamiento de la plataforma. **No** es necesario terminarlo antes del %{date}. Este cambio será obligatorio en una fecha futura no especificada."
   this_is_not_a_valid_grade_9cc2cb8: "No es una nota correcta"
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "Técnicamente es una vulnerabilidad de la seguridad, pero algunas escuelas necesitan mantener los flujos de trabajo por un tiempo."
   this_is_the_default_email_address_f3c421fb: "Esta es la dirección de correo electrónico predeterminada"
@@ -21591,6 +21671,7 @@ es-ES:
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Esta página de muestra incluye elementos de interfaz de usuario comunes en Canvas para ayudarte a crear tu marca personalizada. Cuando comiences a modificar los valores de color y las imágenes, verás el botón *Realizar vista previa de los cambios*. Haz clic en él para volver a cargar esta página y observar cómo se ven los cambios."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Se eliminará el ritmo de esta sección y volverá a utilizarse el predeterminado."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Esta configuración solo afecta a tu visualización de las notas de los estudiantes y muestra las notas como si todas las actividades sin evaluar tuvieran una puntuación de cero. Esta configuración es solamente un cambio visual y no afecta a las notas de los estudiantes ni a las de otros usuarios de este libro de notas. Cuando esta configuración esté activada, Canvas no completará con ceros el libro de notas para las entregas de los estudiantes con actividades individuales. Solamente los grupos de actividades y las columnas totales tendrán automáticamente puntuaciones de cero en los porcentajes generales para cada estudiante."
+  this_setting_only_impacts_courses_it_will_include__1b2169a: "Esta configuración solo afecta a los cursos. Incluirá sis_batch_id y sis_batch_user_id"
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Esta configuración cambia significativamente la experiencia de Canvas para estudiantes y profesores."
   this_settings_only_impact_enrollments_this_include_7f51358: "Esta configuración solo afecta a las inscripciones. Esto incluye los objetos con una last_activity_at marca de tiempo mayor que el parámetro “Actualizado después de”. Esta opción está desactivada de forma predeterminada"
   this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Se eliminará el ritmo de este alumno y volverá a utilizarse el ritmo previamente asignado."
@@ -22388,6 +22469,8 @@ es-ES:
       No se puede obtener el bloqueo de la tabla de usuarios SFTP. Vuelve a intentarlo en un minuto.
                                     Si el problema continúa, ponte en contacto con #canvas-sre en Slack.
   unable_to_parse_certificate_f25ff8b5: "No se puede analizar el certificado"
+  unable_to_perform_diffing_against_mismatched_previ_801191d2: "No se puede realizar la diferenciación respecto a %{type} importaciones anteriores y actuales que no coincidan."
+  unable_to_post_comment_c34ba536: "No se puede publicar el comentario"
   unable_to_read_file_2d04b0c: "No se puede leer el archivo"
   unable_to_remove_app_4293cb53: "No se puede eliminar la aplicación"
   unable_to_remove_outcomes_f682e68f: 
@@ -22401,6 +22484,7 @@ es-ES:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "No se pueden enviar mensajes a usuarios en %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "No se puede establecer la nota predeterminada porque esta actividad tiene fecha de entrega en un período de evaluación cerrado para al menos un estudiante"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "No se puede configurar la acción de arrastrar y soltar para los contenidos"
+  unable_to_submit_score_e47990e3: "No se puede enviar la puntuación"
   unable_to_switch_students_b901bc4b: "Deshabilitar para cambiar estudiantes"
   unable_to_toggle_placement_833db6ff: "No se puede activar/desactivar la ubicación"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "No se puede transmitir el archivo al servicio de almacenamiento. Es posible que el servicio no esté funcionando o que tenga que volver a iniciar sesión en Canvas."
@@ -22679,8 +22763,10 @@ es-ES:
   use_comment_comment_136b5cb3: "Usar comentario %{comment}"
   use_default_890939b7: "Usar predeterminado"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Utilizar las funciones experimentales antes de que se habiliten completamente en producción"
+  use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Puedes utilizar Gem durante la importación para actualizar los enlaces de recursos de Canvas"
   use_high_contrast_ui_a5917282: "Usar IU de contraste alto"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Utiliza marcadores de posición mejorados para insertar contenido en el editor de contenido enriquecido."
+  use_instui_for_tool_installation_and_configuration_36de63e9: "Utiliza InstUI para la instalación de la herramienta y los formularios de configuración"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "¿Usar MathMan para convertir LaTeX a MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "¿Usar MathMan para convertir LaTeX a SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -22710,6 +22796,7 @@ es-ES:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Utilizar este panel para resolver resultados duplicados o personas no encontradas en tu búsqueda."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Utilizar este panel para buscar personas que quieras añadir a esta asignatura."
   use_this_photo_3a594830: "Usar esta foto"
+  use_toggle_switches_for_non_siteadmin_developer_ke_73dc754b: "Utiliza los comandos de alternancia para cambiar a la página de claves de desarrollador para no administradores del sitio"
   use_webcam_1ed0bf6b: "Usar cámara web"
   use_window_parent_in_deep_linking_response_8fe5f845: "Utilizar «window.parent» en la respuesta mediante vínculo profundo"
   used_by_permission_314a78dd: "Utilizado con autorización"
@@ -23126,6 +23213,7 @@ es-ES:
   users_can_access_and_create_but_not_edit_individua_a0b26adf: "Los usuarios pueden acceder y crear (pero no editar) rúbricas de actividades individuales a través de Actividades cuando Contenido de la Asignatura: ver y Actividades y pruebas: añadir están habilitados."
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Los usuarios pueden acceder y crear (pero no editar) rúbricas de actividades individuales mediante Actividades cuando Actividades y evaluaciones: añadir/editar/eliminar está habilitado."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Los usuarios pueden añadir este calendario a su lista de «Otros Calendarios»."
+  users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Los usuarios pueden inscribir temporalmente a otro usuario en un curso. El usuario asignado se eliminará del curso cuando la inscripción caduque."
   users_d1b60cb0: Usuarios
   users_designers_22195c6f: "Usuarios: diseñadores"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Usuarios: generar códigos de emparejamiento de observadores para los estudiantes"
@@ -23140,6 +23228,7 @@ es-ES:
   users_students_ecbb43eb: "Usuarios: estudiantes"
   users_tas_27117894: "Usuarios: profesores auxiliares"
   users_teachers_a5d5d1af: "Usuarios: profesores"
+  users_temporary_enrollments_88c4b8da: "Usuarios - Inscripciones temporales"
   users_view_list_861c7a3f: "Usuarios: ver lista"
   users_view_login_ids_a2e6a85: "Usuarios: ver identificación de inicios de sesión"
   users_view_primary_email_address_14f4978f: "Usuarios: ver dirección de correo electrónico primaria"
@@ -23958,6 +24047,7 @@ es-ES:
     one: "Tu búsqueda ha generado el siguiente error:"
     other: "Tu búsqueda ha generado los siguientes errores:"
   your_search_returned_no_results_383a30cf: "Tu búsqueda no ha dado resultados."
+  your_student_submissions_are_being_gathered_9c9ff764: "Se están recopilando las entregas de estudiante que has realizado"
   your_submission_has_not_been_graded_yet_d6963e53: "Tu entrega no ha sido evaluada todavía"
   your_time_for_this_quiz_has_been_reduced_394652e9: "El tiempo para esta prueba se ha reducido."
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "Los cambios que hayas realizado, pero no publicado, volverán al estado previo guardado."
