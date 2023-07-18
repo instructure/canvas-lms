@@ -263,7 +263,7 @@ pl:
   a_table_that_contains_the_default_canvas_grading_s_7ba86ec6: "Tabela zawierająca dane domyślnego schematu oceniania Canvas.  Każdy wiersz zawiera nazwę, maksymalny odsetek i minimalny odsetek."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Tabela, która zawiera dane schematu oceniania. Każdy rząd zawiera nazwę, maksymalną wartość procentową i minimalną wartość procentową. Ponadto każdy rząd zawiera ikonę pozwalającą dodać nowy rząd poniżej, a także ikonę pozwalającą usunąć bieżący rząd."
   a_table_that_contains_the_grading_scheme_data_each_e9031ad3: "Tabela zawierająca dane schematu oceniania.  Każdy wiersz zawiera nazwę, maksymalny odsetek i minimalny odsetek."
-  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Tabela, która zawiera dane schematu oceniania. Każdy rząd zawiera nazwę, maksymalną wartość procentową i minimalną wartość procentową. Ponadto każdy rząd zawiera ikonę pozwalającą dodać nowy rząd poniżej, a także ikonę pozwalającą usunąć bieżący rząd."
+  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Tabela zawierająca dane schematu oceniania. Każdy wiersz zawiera nazwę, maksymalny odsetek i minimalny odsetek. Co więcej, w każdym wierszu znajduje się przycisk, który pozwala dodać nowy wiersz poniżej, oraz przycisk, który pozwala usunąć bieżący wiersz."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Tabela zawierająca dane schematu oceniania. Najpierw są nazwa schematu oceniana i przyciski do edytowania lub usuwania schematu. Każdy wiersz zawiera nazwę, maksymalny odsetek i minimalny odsetek. Co więcej, w każdym wierszu znajduje się przycisk, który pozwala dodać nowy wiersz poniżej, oraz przycisk, który pozwala usunąć bieżący wiersz."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Przekroczono limit czasu podczas kontaktowania się z zewnętrzną usługą uwierzytelnienia"
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Roczna reguła RRULE musi obejmować BYDAY lub BYMONTHDAY"
@@ -2366,6 +2366,7 @@ pl:
       Dodaje nową kartę Zwrócone wiadomości do Narzędzi administratora konta, co
       pozwala wyszukiwać adresy e-mail tam, gdzie powiadomienia Canvas
       zostały zwrócone
+  adds_additional_fields_to_the_content_migration_as_192c2d3f: "Dodaje kolejne pola do mapy zasobów migracji zawartości"
   adds_additional_information_and_filtering_for_feat_3e55a058: "Dodaj więcej informacji i filtrowanie dla flag funkcji"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Dodaje ustawienia konta/kursu dla domyślnego terminu dotyczącego nowych zadań"
   adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
@@ -2376,6 +2377,7 @@ pl:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Dodaj analizę do karty kontekstowej uczestnika."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Dodaje bank komentarzy dla komentarzy do zadań w ramach narzędzia SpeedGrader"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Dodaje szczegółowe uprawnienia dodania/usuwania każdej roli oraz oddzielne uprawnienie dot. innych działań administratora kursu"
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Dodaj opcję menu uzyskiwania dostępu do dostosowań na poziomie wyniku za pomocą Improved Outcomes Management"
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Dodaj opcję oceniania wg pytania w SpeedGrader na potrzeby testów Quizzes.Next"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Dodaje wskaźniki wizualne do strony szczegółów przesyłki, aby informować uczestników o nieprzeczytanych
@@ -3314,8 +3316,11 @@ pl:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Pozwala użytkownikowi na wyświetlanie SIS ID na stronie kursu Ludzie."
   allows_user_to_weight_assignment_groups_95cb11b2: "Pozwala użytkownikowi na wyważanie grup zadań."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Pozwala użytkownikowi na dodawanie przyjaznego opisu do wyników dla widoku uczestnika i rodzica w Dzienniku nauki poziomu biegłości uczestnika."
+  allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: "Pozwala użytkownikowi dodać zapis tymczasowy z datą rozpoczęcia i zakończenia oraz rolą"
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Pozwala użytkownikom dodawać konferencje z kalendarza"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Pozwala użytkownikom dodawać narzędzia LTI z typem lokalizacji conference_selection"
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Pozwala użytkownikowi usunąć zapis tymczasowy"
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Pozwala użytkownikowi edytować zapis tymczasowy"
   allows_users_to_edit_conferences_2d3c960c: "Pozwala użytkownikom na edytowanie konferencji."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Zezwól użytkownikom na włączenie opcji \"Uruchom SpeedGrader filtrowane wg grupy uczestników\" dla kursów na stronie ustawień kursu. Jeśli ta opcja jest włączona, a w nowym dzienniku ocen wybrano nową grupę uczestników, SpeedGrader wczyta tylko uczestników z wybranej grupy."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Pozwala użytkownikowi na importowanie grup w kursie."
@@ -3560,6 +3565,7 @@ pl:
   analytics_course_code_student_name_d63bab4c: "Analityka: %{course_code} -- %{student_name}"
   and_7fcc2911: Oraz
   and_a_few_more_not_shown_here_28e7d713: "... oraz kilka takich, których nie pokazano"
+  and_compressed_into_a_zip_file_this_may_take_some__1acbe09f: "i skompresować do pliku archiwum ZIP. Może to trochę potrwać; zależy od rozmiaru i liczby plików."
   and_count_more_43eae021: "i %{count} więcej..."
   and_many_more_not_shown_here_fb777a4c: "... oraz *wiele* takich, których nie pokazano"
   and_more_1c35b232: "i więcej..."
@@ -3938,6 +3944,7 @@ pl:
   artist_info_for_username_for_description_12d5d862: "Informacje o wykonawcy dot. %{userName} dla %{description}"
   as_of_a036fa2e: "Na dzień"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "W dniu %{date} punkt końcowy LTI 1.3 OIDC Auth zmieniono z https://canvas.instructure.com/api/lti/authorize_redirect na https://sso.canvaslms.com/api/lti/authorize_redirect. Powód i zakres tej zmiany opisano w *tym artykule społeczności Canvas*, zaś dodatkowe informacje są dostępne w naszych dokumentach dot. interfejsu API. Zmiana ta jest drobna i jej implementacja nie potrwa długo, ale wymaga zmiany konfiguracji po stronie narzędzia dla każdej instancji LTI 1.3 zainstalowanej w Canvas."
+  as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "Na dzień %{date} specyfikacja LTI 1.3 Platform Storage jest całkowicie obsługiwana przez Canvas. Narzędzia, które mają to wdrożyć, muszą zmienić punkt końcowy OIDC Auth przechowywany dla Canvas z *https://canvas.instructure.com/api/lti/authorize_redirect* na *https://sso.canvaslms.com/api/lti/authorize_redirect*. Punkt końcowy OIDC Auth zalecany dla nowych instalacji narzędzia 1.3 także się zmienią, dlatego zalecamy zmianę konfiguracji wszystkich narzędzi 1.3 tak, aby korzystały z tego nowego punktu końcowego jak najszybciej."
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Podczas uzupełniania tego pola lista grup będzie automatycznie filtrowana i zostaną pokazane jedynie nazwy odpowiadające wpisowi."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "Podczas wpisywania w tym polu, lista wyników będzie automatycznie aktualizowana."
   ascending_b3c87427: Rosnąco
@@ -5060,7 +5067,9 @@ pl:
       internal_ca_description: "Jeśli serwer LDAP przedstawi certyfikat wydane przez niezaufany ośrodek certyfikacji (CA), *należy* przesłać dane głównego ośrodka certyfikacji, ab platforma Canvas mu zaufała podczas nawiązywania połączenia."
       internal_ca_warning: "*Ostrzeżenie*: Korzystanie z wewnętrznego głównego ośrodka certyfikacji jest mniej bezpieczne i zwiększa ryzyko naruszenia integralności danych. Zdecydowanie zalecamy korzystanie z certyfikatów wydanych przez zaufany organ certyfikacyjny."
       ldap_timeout_failure_help2: "Jeśli system Canvas podczas komunikacji z serwerem LDAP przekroczy limit czasu zbyt wiele razy, kolejne próby logowania nie będą mogły odbywać się za pomocą serwera LDAP przez okres %{time}. Godzina, o której serwer LDAP ostatnio przekroczył limit czasu: %{timestamp}."
+      verify_tls_cert_opt_in_dated_description: "Potwierdzenie certyfikatu TLS będzie wymagane w dniu *%{enforcement_date}*, ale można je włączyć wcześniej, aby zapewnić zgodność serwera LDAP."
       verify_tls_cert_opt_in_description: "Potwierdzenie certyfikatu TLS będzie wymagane w dniu *%{enforcement_date}*, ale można je włączyć wcześniej, aby zapewnić zgodność serwera LDAP."
+      verify_tls_cert_opt_in_undated_description: "Potwierdzenie certyfikatu TLS będzie wkrótce wymagane, ale można je włączyć wcześniej, aby zapewnić zgodność serwera LDAP."
     ldap_settings_test: 
       labels: 
         pass: Hasło
@@ -7221,6 +7230,7 @@ pl:
     unexpected_error: "Pojawił się nieoczekiwany błąd, skontaktuj się z działem pomocy."
     unknown: Nieznana
     upload_timeout_error: "Proces przekazywania pliku przekroczył limit."
+  content_migration_asset_map_v2_f0f455f: "Mapa zasobów migracji zawartości V2"
   content_migration_queued_46c27790: "Migracja zawartości w kolejce"
   content_migration_running_percent_complete_4b00c024: "Migracja zawartości w trakcie, zakończono %{percent}%"
   content_migrations: 
@@ -8679,6 +8689,7 @@ pl:
   course_image_for_course_cfbb08df: "Obraz kursu dla %{course}"
   course_image_settings_eba3ec55: "Ustawienia obrazu kursu"
   course_implemented_apps_fa658f5a: "Aplikacje wdrożone przez kurs"
+  course_import_html_using_gem_812d0af5: "Importowanie zawartości HTML do kursu za pomocą pakietów gem"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Kurs jest już powiązany z Blueprint"
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Kursu nie można ustawić jako Blueprint"
   course_landing_page_49a53ade: "Strona startowa kursu"
@@ -9543,6 +9554,7 @@ pl:
   create_a_new_domain_lookup_1830a512: "Utwórz nową kontrolę domeny"
   create_a_new_module_6f31b0fe: "Utwórz nowy moduł"
   create_a_new_user_for_address_7487e9c9: "Utwórz nowego użytkownika dla \"%{address}\""
+  create_a_temporary_enrollment_167f05f1: "Utwórz zapis tymczasowy"
   create_account_263ec6: "Utwórz konto"
   create_an_ba36d171: Utwórz
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Twórz oceniane i nieoceniane quizy i ankiety online oraz zarządzaj nimi."
@@ -9621,6 +9633,7 @@ pl:
   create_pages_581a4d59: "Utwórz strony"
   create_slots_71dbb2f8: "Utwórz przedziały czasowe"
   create_subject_86de5618: "Utwórz temat"
+  create_temporary_enrollment_3d4eaa33: "Utwórz zapis tymczasowy"
   create_theme_based_on_40651ed3: "Utwórz motyw na podstawie"
   create_theme_based_on_name_7b1bd318: "Utwórz motyw na podstawie %{name}"
   create_users_view: 
@@ -10571,6 +10584,7 @@ pl:
     empty_message: "Brak wiadomości"
   discussion_topic_a7bf935: "temat dyskusji"
   discussion_topic_dc85ad4c: "Temat dyskusji"
+  discussion_topic_edit_error_page_c9fb069c: "Strona błędu edytowania tematu dyskusji"
   discussion_topic_initial_query_error_37c98b4: "Błąd początkowej kwerendy tematu dyskusji"
   discussion_topic_menu_3d4684c6: "Menu tematów dyskusyjnych"
   discussion_topic_performance_improvements_for_bibs_79a483ef: "Poprawki do tematów dyskusji dla Bibsys"
@@ -11029,6 +11043,7 @@ pl:
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey Business Schools - aktywność i wyniki uczestników"
   down_5831a426: "W dół"
   download_3e89bdef: pobieranie
+  download_all_submissions_304d6797: "Pobierz wszystkie zadania"
   download_as_ce13bff6: "Pobierz jako..."
   download_as_zip_5dae7f19: "Pobierz w formacie Zip"
   download_assignment_submissions_41e50ee7: "Pobierz przesłane zadania"
@@ -12060,6 +12075,7 @@ pl:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Błąd: Narzędzie zwróciło nieprawidłowy typ zawartości \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Błąd podczas aktualizowania %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Błąd podczas aktualizowania komentarza"
+  error_updating_notes_31b24785: "Błąd podczas aktualizowania notatek"
   error_updating_pacename_ad07f9df: "Błąd podczas aktualizowania %{paceName}"
   error_updating_status_of_module_item_80336274: "Błąd podczas aktualizowania statusu elementu modułu"
   error_updating_submission_draft_1d40ade7: "Błąd podczas aktualizowania wersji roboczej przesyłki"
@@ -12890,6 +12906,7 @@ pl:
   filter_speedgrader_by_student_group_53683142: "Filtruj SpeedGrader wg grupy uczestników"
   filter_students_2327fe79: "Filtruj uczestników"
   filters_92f2776f: Filtry
+  final_grade_474e3e37: "Ocena końcowa: "
   final_grade_4d7f6545: "Ocena końcowa"
   final_grade_6938dca8: "Ocena końcowa:"
   final_grade_6e94d99e: "Ocena końcowa:"
@@ -13185,6 +13202,7 @@ pl:
   grade_a91e433e: "Ocena:"
   grade_anonymously_6c37133a: "Oceń anonimowo"
   grade_assignment_7c1abc11: "Oceń zadanie %{assignment}"
+  grade_by_9ea3661e: "Ocena według"
   grade_by_question_9d9b8a71: "Ocena według pytania"
   grade_calculator_performance_improvements_564af0de: "Ulepszenia wydajności kalkulatora ocen"
   grade_change_activity_75fb525: "Zmiana ocen"
@@ -15050,6 +15068,8 @@ pl:
   http_response_code_832d6baa: "Odpowiedź HTTP: %{code}"
   https_3a02e3fb: https
   https_b8426ad8: "https://"
+  https_example_com_config_xml_d3bae5e3: "https://example.com/config.xml"
+  https_lti_tool_provider_example_herokuapp_com_regi_305953da: "https://lti-tool-provider-example.herokuapp.com/register"
   hungarian_fc7d30c9: Węgierski
   hungary_36_cd3e515b: "Węgry (+36)"
   hypothetical_end_date_117d81cf: "Hipotetyczna data zakończenia"
@@ -15197,6 +15217,10 @@ pl:
       żądania dot. zasobu oEmbed.
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Po włączeniu, funkcja ta wstępnie wypełnia formularz zadania wartościami z wiadomości Deep Link na stronie tworzenia/edytowania zadań."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Jeśli włączone, parametry zapytania nie zostaną skopiowanie do części POST podczas uruchomienia LTI."
+  if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
+      Jeśli opcja jest włączona, konta na poziome głównym i podkonta będą posiadać przełączniki do włączania
+      i wyłączania kluczy na stronie kluczy programisty. Administrator witryny będzie mieć nadal dostęp do przycisków
+      wyłączenia/zezwolenia/włączenia.
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "W przypadku włączenia, zakresy będą weryfikowane na żądanie API, jeśli używany klucz programisty wymaga zakresów."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "W przypadku włączenia tej opcji, Sourcedids używane przez Canvas for Basic Outcomes będą szyfrowane."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Jeśli ta opcja jest włączona, historia przesyłek do testów New Quizzes jest zarządzana oddzielnie."
@@ -15230,6 +15254,9 @@ pl:
       instancje Canvas, w których konta główne są w tym samym obszarze (shard)
       co konto administratora witryny. Działanie w innych instancjach
       już się zmieniło w ten sposób.
+  if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
+      Jeśli opcja jest włączona, formularze dotyczące konfiguracji i instalacji narzędzia przechowywane na stronach ustawień kursu i konta będą korzystać
+      ze składników InstUI, w przeciwieństwie do starszych, mniej przystępnych składników lokalnych.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Jeśli opcja jest włączona, użytkownik zobaczy okienko z ostrzeżeniem na górze strony
       kluczy programisty z informacją o nadchodzących lub wprowadzonych zmianach w punkcie końcowym OIDC Auth.
@@ -15571,6 +15598,8 @@ pl:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Uwzględnienie ocen podczas alertu o ocenach.
       Jeśli adres e-mail nie jest adresem e-mail instytucji, oznacza to, że poufna zawartość będzie wysyłana poza instytucję.
+  include_sis_batch_info_f79dd131: "Obejmuje informacje o elemencie wsadowym SIS;"
+  include_sis_batch_information_75bf66c4: "Obejmuje informacje o elemencie wsadowym SIS"
   include_speedgrader_in_assignment_header_menu_69cd8656: "Uwzględnij SpeedGrader w menu Nagłówek zadania"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Uwzględnij agenta Datadog RUM JS w nagłówku dokumentu."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Uwzględnij oceny za zadanie podczas zamieszczania danych w Systemie informacji o uczestnikach szkoły."
@@ -15752,6 +15781,11 @@ pl:
       enter_search_terms: "wprowadź szukane terminy"
   instructure_default_73317bb1: "Domyślna Instructure"
   instructure_default_old_66ef6e9b: "Domyślny Instructure (stary)"
+  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructure hostuje Canvas Commons w regionie wybranym przez instytucję użytkownika: Europa Oznacza to, że podczas używania Canvas Commons dane osobowe użytkownika będą przechowywane i przetwarzane w Niemczech. Te elementy danych osobowych obejmują: imię i nazwisko, adres e-mail, identyfikator użytkownika Canvas, nazwa użytkownika Canvas, adres IP, polubione przez użytkownika zasoby Canvas Commons oraz komentarze użytkownika do zasobów w Canvas Commons. Więcej informacji o zasadach Instructure dot. poufności danych można znaleźć [tutaj](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructure hostuje Canvas Commons w regionie wybranym przez instytucję użytkownika: Azja-Pacyfik. Oznacza to, że podczas używania Canvas Commons dane osobowe użytkownika będą przechowywane i przetwarzane w Singapurze. Te elementy danych osobowych obejmują: imię i nazwisko, adres e-mail, identyfikator użytkownika Canvas, nazwa użytkownika Canvas, adres IP, polubione przez użytkownika zasoby Canvas Commons oraz komentarze użytkownika do zasobów w Canvas Commons. Więcej informacji o zasadach Instructure dot. poufności danych można znaleźć [tutaj](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructure hostuje Canvas Commons w regionie wybranym przez instytucję użytkownika: Stany Zjednoczone. Oznacza to, że podczas używania Canvas Commons dane osobowe użytkownika będą przechowywane i przetwarzane na terenie Stanów Zjednoczonych. Te elementy danych osobowych obejmują: imię i nazwisko, adres e-mail, identyfikator użytkownika Canvas, nazwa użytkownika Canvas, adres IP, polubione przez użytkownika zasoby Canvas Commons oraz komentarze użytkownika do zasobów w Canvas Commons. Więcej informacji o zasadach Instructure dot. poufności danych można znaleźć [tutaj](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructure hostuje Canvas Commons w regionie wybranym przez instytucję użytkownika: Kanada. Oznacza to, że podczas używania Canvas Commons dane osobowe użytkownika będą przechowywane i przetwarzane w Kanadzie. Te elementy danych osobowych obejmują: imię i nazwisko, adres e-mail, identyfikator użytkownika Canvas, nazwa użytkownika Canvas, adres IP, polubione przez użytkownika zasoby Canvas Commons oraz komentarze użytkownika do zasobów w Canvas Commons. Więcej informacji o zasadach Instructure dot. poufności danych można znaleźć [tutaj](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructure hostuje Canvas Commons w regionie wybranym przez instytucję użytkownika: Australia. Oznacza to, że podczas używania Canvas Commons dane osobowe użytkownika będą przechowywane i przetwarzane w Australii. Te elementy danych osobowych obejmują: imię i nazwisko, adres e-mail, identyfikator użytkownika Canvas, nazwa użytkownika Canvas, adres IP, polubione przez użytkownika zasoby Canvas Commons oraz komentarze użytkownika do zasobów w Canvas Commons. Więcej informacji o zasadach Instructure dot. poufności danych można znaleźć [tutaj](%{url})."
   instructure_inline_media_comment: 
     alerts: 
       kaltura_disabled: "Platforma Kaltura została wyłączona dla tej witryny Canvas"
@@ -15827,6 +15861,7 @@ pl:
   invalid_bymonthday_bymonthday_87791c1b: "Nieprawidłowy BYMONTHDAY '%{bymonthday}'"
   invalid_calculation_int_for_this_calculation_metho_971fada3: "nieprawidłowe calculation_int dla tego calculation_method"
   invalid_content_type_utf_8_required_bd458b78: "Nieprawidłowy typ zawartości, wymagany protokół UTF-8"
+  invalid_context_9186d37e: "Nieprawidłowy kontekst"
   invalid_context_for_group_f6cd268a: "nieprawidłowy kontekst dla grupy"
   invalid_context_type_68f40a61: "Nieprawidłowy typ zawartości"
   invalid_context_type_72085a6a: "nieprawidłowy typ kontekstu"
@@ -15882,6 +15917,9 @@ pl:
   invalid_score_3d247da7: "Nieprawidłowy wynik"
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Nieprawidłowa nazwa użytkownika SFTP. Nie udało się określić nazwy użytkownika z powoduj braku domeny zakończonej na .instructure.\n\
       \x20                             Skontaktuj się przez #canvas-sre w Slack.   "
+  invalid_sftp_username_we_were_unable_to_determine__13339947: |-
+      Nieprawidłowa nazwa użytkownika SFTP. Nie udało się określić nazwy użytkownika z powodu braku domeny zakończonej na .instructure.
+                                    Skontaktuj się przez #canvas-sre w Slack.
   invalid_sis_sync_status_b68db497: "Nieprawidłowy status synchronizacji SIS"
   invalid_state_parameter_7a5aa108: "Nieprawidłowy parametr stanu"
   invalid_submission_file_type_cda6742a: "Nieprawidłowy typ pliku przesyłki"
@@ -16726,8 +16764,8 @@ pl:
           mfa_enrollment: |-
               Uwierzytelnienie wieloskładnikowe zwiększa bezpieczeństwo, ponieważ oprócz znajomości hasła, do zalogowania się w
               Canvas wymagany jest fizyczny przedmiot. Może to być urządzenie, które generuje kody weryfikacyjne, lub telefon,
-              który odbiera wiadomości tekstowe. Aplikację Google Authenticator dla [iPhone](%{iphone_url}) lub 
-              [Android](%{android_url}) można skonfigurować, skanując poniższy kod QR. Inne tokeny można skonfigurować, wprowadzając
+              który odbiera wiadomości tekstowe. Aplikację Google Authenticator dla iPhone lub 
+              Android można skonfigurować, skanując poniższy kod QR. Inne tokeny można skonfigurować, wprowadzając
               tajny klucz **%{secret_key}**. Po skonfigurowaniu uwierzytelnienia wieloskładnikowego zaleca się przejście do strony
               profilu i wydrukowanie zestawu kodów zapasowych na wypadek niedostępności normalnego urządzenia wieloskładnikowego.
           mfa_required: "Należy ustawić wieloskładnikowe uwierzytelnianie."
@@ -16930,6 +16968,7 @@ pl:
   manage_students_for_the_course_3b1bc4f0: "Zarządzaj uczestnikami kursu"
   manage_subject_coursecontext_2328e1ff: "Zarządzaj tematem: %{courseContext}"
   manage_subject_f9835769: "Zarządzaj tematem"
+  manage_temporary_enrollments_4c4f21ef: "Zarządzaj zapisami tymczasowymi"
   manage_update_23de23a1: "Zarządzaj aktualizacją"
   manage_update_for_toolname_f8e3b2fb: "Zarządzaj aktualizacją dla %{toolName}"
   manage_usage_rights_c5a8c216: "Zarządzaj prawami użytkowania"
@@ -17143,6 +17182,7 @@ pl:
   menu_for_group_title_fbf60567: "Menu dla grupy %{title}"
   menu_for_outcome_title_1d93378d: "Menu dla wyniku %{title}"
   menu_of_options_for_this_permission_77f50c31: "Menu opcji dla tego zezwolenia"
+  menu_option_for_outcome_details_page_2dcd13d6: "Opcja menu dla strony szczegółów wyników"
   menu_options_9b6b0b5c: "Opcje menu"
   mesa_public_course_syllabus_52282dd3: "Sylabus kursu Mesa Public"
   mesa_public_user_inactivity_report_a6792ccf: "Raport nieaktywności użytkowników Mesa Public"
@@ -19185,6 +19225,7 @@ pl:
   missing_required_description_99a99ff: "Brak wymaganego opisu"
   missing_required_fields_fields_30e20799: "Brak pól obowiązkowych: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Brak pól obowiązkowych. Wypełnij wszystkie pola obowiązkowe."
+  missing_required_parameters_4f589df8: "Brak wymaganych parametrów"
   missing_required_points_39db69fa: "Brak wymaganych punktów"
   missing_required_ratings_9b19e66: "Brak wymaganych ocen"
   missing_required_title_ca06a6de: "Brak wymaganego tytułu"
@@ -19466,6 +19507,8 @@ pl:
   more_modules_d9a9f003: "Więcej modułów"
   more_options_272b4953: "Więcej opcji"
   more_options_e89670cf: "Więcej opcji"
+  more_options_for_message_from_authorname_4001ddda: "Więcej opcji dla wiadomości od %{authorName}"
+  more_options_for_subject_e18d421: "Więcej opcji dla %{subject}"
   more_outcomes_have_been_loaded_9acafe9c: "Wczytano więcej wyników"
   more_people_options_730e9686: "Więcej opcji dla osób"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Dodano więcej wyników na dole strony."
@@ -19881,6 +19924,8 @@ pl:
   next_student_79955068: "Następny uczestnik"
   next_student_b62869f4: "Kolejny uczestnik"
   next_up_review_feedback_19a15e0e: "Kolejne: Przejrzyj opinie"
+  next_up_review_feedback_59555dbd: "KOLEJNE: Przejrzyj opinie"
+  next_up_submit_assignment_2fdb7174: "KOLEJNE: Prześlij zadanie"
   next_up_submit_assignment_793a9d41: "Kolejne: Prześlij zadanie"
   next_window_window_90271943: "Następne okno: %{window}"
   nickname_1e6da3ad: Przydomek
@@ -20598,6 +20643,7 @@ pl:
   on_8f7190e5: Wł.
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "W kursach z włączonymi prawami użytkowania wymuszany jest wybór praw użytkowania w zakresie plików załączników do tematów dyskusji"
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "W dniu %{date} punkt końcowy LTI 1.3 OIDC Auth zmieni się z https://canvas.instructure.com/api/lti/authorize_redirect na https://sso.canvaslms.com/api/lti/authorize_redirect. Powód i zakres tej zmiany opisano w *tym artykule społeczności Canvas*, zaś dodatkowe informacje są dostępne w naszych dokumentach dot. interfejsu API. Zmiana ta jest drobna, ale wymaga zmiany konfiguracji po stronie narzędzia dla każdej instancji LTI 1.3 zainstalowanej w Canvas."
+  on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "W dniu %{date} specyfikacja LTI 1.3 Platform Storage będzie całkowicie obsługiwana przez Canvas. Narzędzia, które mają to wdrożyć, muszą zmienić punkt końcowy OIDC Auth przechowywany dla Canvas z *https://canvas.instructure.com/api/lti/authorize_redirect* na *https://sso.canvaslms.com/api/lti/authorize_redirect*. Punkt końcowy OIDC Auth zalecany dla nowych instalacji narzędzia 1.3 także zmienią się tego dnia, dlatego zalecamy zmianę konfiguracji wszystkich narzędzi 1.3 tak, aby korzystały z tego nowego punktu końcowego jak najszybciej."
   on_for_key_keyname_bbac4e1b: "Włączono dla klucza: %{keyName}"
   on_paper_46d0ba36: "Na papierze"
   on_time_17ca5ad9: "W samą porę"
@@ -20668,6 +20714,7 @@ pl:
   open_comment_tray_160293d7: "Otwórz panel komentarzy"
   open_complete_incomplete_menu_cfe2033b: "Otwórz menu Ukończone/Nieukończone"
   open_conversation_a6590865: "Otwórz rozmowę"
+  open_conversation_subject_1dd2d3c: "Otwórz rozmowę %{subject}"
   open_discussion_title_for_comments_6baa3fa: "Otwórz dyskusję %{title} dla komentarzy"
   open_emoji_menu_1df0eb0b: "Otwórz menu emoji"
   open_event_menu_e9a21e39: "Otwórz menu zdarzeń"
@@ -21090,8 +21137,8 @@ pl:
   pages_front_page_9ce5188: "Strony, pierwsza strona"
   pages_index_menu_f391bf04: "Menu indeksu stron"
   pages_let_you_create_interactive_content_directly__9933eb32: |-
-      Za pomocą Stron można tworzyć interaktywną zawartość bezpośrednio w Canvas
-            , w postaci cotygodniowych aktualizacji, stron wiki kursu lub
+      Za pomocą Stron można tworzyć interaktywną zawartość bezpośrednio w Canvas,
+            w postaci cotygodniowych aktualizacji, stron wiki kursu lub
             wykazu zasobów edukacyjnych. Strony mogą obejmować test, multimedia,
             oraz łącza do plików, a także zawartość i strony innych kursów. Można także umożliwić
             uczestnikom współtworzenie określonych stron w kursie.
@@ -24459,6 +24506,7 @@ pl:
   remove_filename_87f3781e: "usuń %{filename}"
   remove_filename_dab5c02e: "Usuń %{filename}"
   remove_filter_6f7204e2: "Usuń filtr"
+  remove_filtername_filter_6b6d7063: "Usuń filtr %{filterName}"
   remove_grading_scheme_title_d3942a08: "Usuń schemat oceniania %{title}"
   remove_group_5d2f2f2d: "Usuń grupę"
   remove_group_981d6a02: "Usunąć grupę?"
@@ -24566,8 +24614,10 @@ pl:
   reply_389d6fb9: Odpowiedz
   reply_all_80298bee: "Odpowiedz wszystkim"
   reply_all_b864cd0e: "Odpowiedz wszystkim"
+  reply_for_subject_ae247d1e: "Odpowiedź do %{subject}"
   reply_from_author_a2806c77: "Odpowiedź od %{author}"
   reply_from_name: "%{name} za pośrednictwem powiadomień z systemu Canvas"
+  reply_to_authorname_f209e84a: "Odpowiedz na %{authorName}"
   reply_to_comment_72d96728: "Odpowiedz na komentarz"
   reply_to_conversation_f1aa0d4: "Odpowiedz na dyskusję"
   reply_to_conversation_subject_4b2e6fe7: "Odpowiedz na dyskusję %{subject}"
@@ -24632,6 +24682,7 @@ pl:
   reports_course_f09b7d9e: "Raporty (Kurs)"
   reports_manage_92bc45cb: "Raporty - Zarządzaj"
   reqired_end_date_a7deac41: "Wymagana data zakończenia"
+  request_failed_with_status_status_47054af0: "Niepowodzenie żądania, status %{status}"
   request_id_1499afb0: "Żądanie ID"
   request_successfully_sent_note_that_applying_score_ee8665b6: "Pomyślnie przesłano prośbę. Uwaga: wprowadzenie wyników może chwilę potrwać, a zmiany pojawią się dopiero po ponownym załadowaniu strony."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Zażądaj, aby DocViewer korzystał z CloudFront do obsługi zasobów PDF."
@@ -24751,7 +24802,9 @@ pl:
   retry_duplicating_originalassignmentname_884aee1: "Ponów duplikowanie „%{originalAssignmentName}”"
   retry_ebd5f8ba: "Ponów próbę"
   retry_migrating_name_bdc802ef: "Ponów migrowanie \"%{name}\""
+  return_to_conversation_list_86688140: "Powróć do listy rozmów"
   return_to_parent_folder_4ece2184: "powrót do folderu nadrzędnego"
+  return_to_subject_in_conversation_list_d67b8e73: "Powróć do %{subject} na liście rozmów"
   returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Zwraca wartości ciągu zamiast wartości liczbowych w zastępstwach zmiennych"
   revert_date_changes_5105ce5: "Cofnij zmiany terminów"
   revert_to_actual_score_f665eea9: "Powróć do rzeczywistego wyniku punktowego"
@@ -24820,6 +24873,9 @@ pl:
       manage_site_settings: "Zarządzaj ustawieniami dot. całej witryny i wtyczek"
       manage_storage_quotas: "Zarządzaj przydziałem magazynowania"
       manage_students: "Dodaj uczestników do kursu/usuń uczestników z kursu"
+      manage_temp_enroll_add: "Dodaj zapisy tymczasowe"
+      manage_temp_enroll_delete: "Usuń zapisy tymczasowe"
+      manage_temp_enroll_edit: "Edytuj zapisy tymczasowe"
       manage_user_logins: "Modyfikuj informacje szczegółowe logowania użytkowników"
       manage_user_notes: "Zarządzaj wpisami do dziennika wydziałowego"
       manage_user_observers: "Zarządzaj obserwatorami dla użytkowników"
@@ -25821,8 +25877,8 @@ pl:
   share_important_information_about_your_course_with_dceacbf9: |-
       Udostępniaj ważne informacje o kursie wszystkim użytkownikom.
             Wykorzystuj ogłoszenia, aby przypominać uczestnikom szkoleń o ważnych terminach i zadaniach,
-            kieruj ich do zasobów wewnętrznych i zewnętrznych, aby pomóc w osiąganiu wysokich wyników
-            , świętować wspólne sukcesy i powiadamiać o najważniejszych wydarzeniach.
+            kieruj ich do zasobów wewnętrznych i zewnętrznych, aby pomóc w osiąganiu wysokich wyników,
+            świętować wspólne sukcesy i powiadamiać o najważniejszych wydarzeniach.
             Ogłoszenia mogą obejmować tekst, multimedia i pliki.
   share_important_information_with_all_users_in_your_bc49ee7f: |-
       Udostępniaj ważne informacje wszystkim użytkownikom kursu.
@@ -26734,6 +26790,8 @@ pl:
       unrecorgnized_type: "Nierozpoznany typ importu"
     instructure_csv: "Format CSV firmy Instructure lub plik .zip z plikami CSV"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_id_8b755858: sis_batch_id
+  sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "Dane SIS"
   sis_data_import_8bb623ce: "Dane SIS - importuj"
   sis_data_manage_328a4799: "Dane SIS - zarządzaj"
@@ -27164,6 +27222,7 @@ pl:
   status_color_picker_9ea0156b: "%{status} Narzędzie wyboru kolorów"
   status_e051bb30: status
   status_e7fdbe06: Status
+  status_for_key_keyname_47668960: "%{status} dla klucza: %{keyName}"
   statuses_497dfa15: Statusy...
   statuses_f41543d8: Statusy
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes - niestandardowe dane przestrzeni nazw"
@@ -27419,9 +27478,15 @@ pl:
   subject_details_12405b1: "Szczegóły tematu"
   subject_home_8e593f72: "Strona główna tematu"
   subject_home_page_41226803: "Strona główna tematu"
+  subject_mark_as_read_b0218a: "%{subject} oznacz jako przeczytane"
+  subject_mark_as_unread_6f07435f: "%{subject} oznacz jako nieprzeczytane"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Temat musi zawierać mniej niż 255 znaków."
   subject_name_a1ac4da4: "Nazwa tematu"
+  subject_not_selected_10dacadf: "%{subject} nie wybrano"
+  subject_not_starred_4a113097: "%{subject} nieoznaczone gwiazdką"
   subject_reply_to: "Odp.: %{subject}"
+  subject_selected_2196b77e: "Wybrano %{subject}"
+  subject_starred_8ca02058: "%{subject} – oznaczono gwiazdką."
   subject_subject_9e1057f7: "Temat: %{subject}"
   subjects_14c0c4de: Przedmioty
   submission: 
@@ -27655,6 +27720,7 @@ pl:
   submit_on_behalf_of_student_af674b95: "Prześlij w imieniu uczestnika"
   submit_ticket_5515ffd: "Wyślij zgłoszenie"
   submitted_318fad53: Przesłano
+  submitted_718f5cbc: "WYSŁANO: "
   submitted_at_4d5ea3aa: "Przesłane o"
   submitted_by_name_dab6d5e1: "Przesłane przez: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Przesłane przez %{proxy} w dniu %{date}"
@@ -27902,6 +27968,12 @@ pl:
   tempe_grade_export_c611da01: "Eksport ocen Tempe"
   template_account_21ac8f4f: "Konto szablonu"
   templates_4ca13d07: Wzory
+  temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Tymczasowo zapisz użytkownika na kurs. Ta rejestracja tymczasowa jest sparowana z inną rejestracją w ramach kursu."
+  temporarily_enroll_name_8acb66ce: "Tymczasowo zapisz użytkownika %{name}"
+  temporary_enrollments_add_373181b7: "Zapisy tymczasowe - dodaj"
+  temporary_enrollments_delete_52ffaae4: "Zapisy tymczasowe - usuń"
+  temporary_enrollments_edit_67c01325: "Zapisy tymczasowe - edytuj"
+  temporary_enrollments_f0937c5a: "Zapisy tymczasowe"
   tenant_d2a41f78: Lokator
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Brak dzierżawcy lub wyłączono synchronizację. Sprawdź ustawienia integracji z synchronizacją Microsoft dla kursu i konta."
   tenant_name_e174f404: "Nazwa lokatora"
@@ -28006,6 +28078,7 @@ pl:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Konto użytkownika zostało usunięte.  Aby ponownie aktywować konto, skontaktuj się z administratorem systemu."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "Możliwość odbierania przez użytkowników powiadomień z Slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "ID konta do którego należy użytkownik zgłaszający"
+  the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "UUID konta, do którego należy użytkownik zgłaszający"
   the_account_wide_sync_settings_were_changed_while__90c48497: "Podczas synchronizacji zmieniono ustawienia synchronizacji całego konta. Spróbuj zsynchronizować ponownie."
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "Atrybut Active Directory, który zostanie użyty do dopasowania użytkownika Canvas z użytkownikiem Microsoft"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "Algorytm używany do podpisywania wiadomości AuthnRequest, LogoutRequest, i LogoutResponse wysłano do IdP."
@@ -28082,8 +28155,8 @@ pl:
     other: "Pomyślnie usunięto oznaczenie gwiazdkami konwersacji."
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Strona główna kursu jest pierwszą stroną, którą uczestnicy zobaczą, gdy otworzą
-            kurs. Na stronie głównej można wyświetlać strumień aktywności w kursie
-            , stronę modułów kursu, listę zadań w kursie, program oraz
+            kurs. Na stronie głównej można wyświetlać strumień aktywności w kursie,
+            stronę modułów kursu, listę zadań w kursie, program oraz
             stronę zaprojektowaną jako stronę startową kursu.
   the_course_id_for_the_export_data_a99f37d: "Identyfikator kursu do eksportu danych"
   the_course_id_for_the_grade_export_data_d20f4ed: "Identyfikator kursu do eksportu danych ocen"
@@ -28332,6 +28405,7 @@ pl:
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "Wystąpił błąd podczas synchronizacji, nie ukończono jej"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Ustawień synchronizacji do SIS nie można włączyć dla zadania %{assignment_name} bez terminu."
   the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "Nie udało się utworzyć zespołu, ponieważ grupa Microsoft nie ma właścicieli. Może to być błąd tymczasowy: spróbuj zsynchronizować ponownie, a jeśli problem będzie się powtarzać, skontaktuj się z działem pomocy."
+  the_temporarily_enrolled_user_can_only_view_and_pa_a5bf0184: "Tymczasowo zapisany użytkownik może tylko wyświetlać i brać udział w kursie między datą rozpoczęcia i zakończenia wybranymi podczas tworzenia zapisu tymczasowego."
   the_term_for_export_data_5aad7a0a: "Okres dla danych eksportu"
   the_term_for_grade_export_data_d55a6be7: "Okres dla danych eksportu ocen"
   the_term_has_ended_for_this_course_f0ab367: "Okres uczestnictwa dla tego kursu już się skończył"
@@ -28400,6 +28474,8 @@ pl:
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Istnieją niezapisane zmiany w ocenie.\\n\\nCzy chcesz kontynuować pomimo to?"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Obowiązuje limit umieszczania dwóch aplikacji dla pasku narzędzi RCE. Ustawienia te dotyczą tylko ulepszonego RCE."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Obowiązuje limit umieszczania dwóch aplikacji na pasku narzędzi RCE."
+  there_is_already_a_page_in_this_course_with_this_t_5b37ecf2: "Istnieje już strona w kursie o tym tytule."
+  there_is_already_a_page_in_this_group_with_this_ti_3dac30e5: "Istnieje już strona w grupie o tym tytule."
   there_is_currently_1_available_grader_758e4a21: "Obecnie dostępny jest 1 oceniający"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Wystąpił problem podczas wylogowania w IdP"
   there_was_a_problem_applying_scores_7baaeea7: "Wystąpił problem z wprowadzaniem wyników."
@@ -28588,6 +28664,7 @@ pl:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Przesyłane zadanie jest wynikiem mojej indywidualnej pracy"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Zadanie nie będzie już wliczane do oceny."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Ten załącznik został wycofany z publikacji przez autora."
+  this_canvas_community_article_details_the_reasonin_37be9375: "*Ten artykuł społeczności Canvas* przedstawia uzasadnienie tej zmiany, jej zakres, zadania do wykonania oraz dalsze wyjaśnienia dla administratorów Canvas i twórców narzędzia LTI 1.3."
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "Ta instalacja Canvas służy tylko do testów i *będzie co miesiąc resetowana.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     few: "Ta instalacja Canvas służy tylko do testów i *będzie co %{count} tygodni resetowana.*"
@@ -28753,6 +28830,8 @@ pl:
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "To jest anonimowa dyskusja. Twoje nazwa i zdjęcie profilowe będą ukryte przed innymi uczestnikami kursu."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Opcja ta jest domyślnie włączona, ponieważ zadań nie można wyeliminować z dziennika ocen i nadal są one uwzględniane."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Jest to funkcja dla programistów, którą można włączyć, aby uzyskać podgląd stron w środowisku RTL, bez konieczności zmiany języka na typowy dla RTL."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "To *nie* jest istotna zmiana. Wszystkie działania narzędzia LTI 1.3 pozostaną bez zmian, niezależnie od używanego punktu końcowego, z wyjątkiem nowo wspieranej specyfikacji dla Platform Storage. Wdrożenie tej zmiany nastąpi w późniejszym, nieokreślonym terminie."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "To *nie* jest istotna zmiana. Wszystkie działania narzędzia LTI 1.3 pozostaną bez zmian, niezależnie od używanego punktu końcowego, z wyjątkiem nowo wspieranej specyfikacji dla Platform Storage. Tego również **nie** trzeba wykonać przed dniem %{date}. Wdrożenie tej zmiany nastąpi w późniejszym, nieokreślonym terminie."
   this_is_not_a_valid_grade_9cc2cb8: "To nie jest prawidłowa ocena"
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "Od strony technicznej jest to luka w zabezpieczeniach, ale niektóre szkoły muszą zachować swój proces na pewien czas."
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "To jest obecnie wybrana ocena dla danego ucznia."
@@ -28886,6 +28965,7 @@ pl:
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Ta strona przykładowa wykorzystuje typowe elementy interfejsu UI w Canvas, aby pomóc Ci stworzyć własny branding. Po rozpoczęciu wprowadzania zmian w wartościach kolorów i obrazach pojawi się przycisk *Podgląd zmian*. Kliknij go, aby odświeżyć tę stronę i zobaczyć, jak wygląda ze zmianami."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "To tempo sekcji zostanie usunięte i przywrócone do domyślnego."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Ustawienia te mają wpływ tylko na widok ocen uczestników, powodując, że dla wszystkich nieocenionych zadań wyświetlane są zera. Ustawienia te mają tylko charakter wizualny i nie wpływają na oceny uczestników ani innych użytkowników tego dziennika ocen. Gdy ustawienia są włączone, Canvas nie wpisuje zer w dzienniku ocen za materiały uczestników w ramach poszczególnych zadań. Tylko grupy zadań i kolumny sumujące będą automatycznie uwzględniać oceny zerowe w ogólnym wyniku procentowym każdego uczestnika."
+  this_setting_only_impacts_courses_it_will_include__1b2169a: "Te ustawienia mają wpływ tylko na kursy. Obejmie to sis_batch_id i sis_batch_user_id."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "To ustawienie znacząco zmienia obsługę Canvas przez uczestników i nauczycieli."
   this_settings_only_impact_enrollments_this_include_7f51358: "Te ustawienia mają wpływ tylko na rejestracje. Obejmuje to obiekty ze znacznikiem czasu last_activity_at większym niż parametr \"Zaktualizowano po\". Domyślnie jest wyłączone."
   this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "To tempo uczestnika zostanie usunięte i przywrócone do wcześniej przydzielonego."
@@ -30043,6 +30123,8 @@ pl:
       Nie można uzyskać blokady w tabeli użytkowników SFTP. Spróbuj ponownie za minutę.
                                     Jeśli problem będzie nadal występować, skontaktuj się przez #canvas-sre w Slack.
   unable_to_parse_certificate_f25ff8b5: "Nie można przeanalizować certyfikatu"
+  unable_to_perform_diffing_against_mismatched_previ_801191d2: "Nie udało się wykonać różnicowania dla wcześniejszych i bieżących niezgodnych importów %{type}"
+  unable_to_post_comment_c34ba536: "Nie można opublikować komentarza"
   unable_to_read_file_2d04b0c: "Nie można odczytać pliku"
   unable_to_remove_app_4293cb53: "Nie można usunąć aplikacji"
   unable_to_remove_outcomes_f682e68f: 
@@ -30058,6 +30140,7 @@ pl:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Nie można wysłać wiadomości do użytkowników w %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Nie można ustawić domyślnej oceny, ponieważ termin tego zadania przypada na zamknięty okres oceniania dla co najmniej jednego uczestnika"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Nie można skonfigurować funkcji przeciągnij i upuść dla modułów"
+  unable_to_submit_score_e47990e3: "Nie można przesłać wyniku"
   unable_to_switch_students_b901bc4b: "Nie można przełączyć uczestników"
   unable_to_toggle_placement_833db6ff: "Nie można przełączyć lokalizacji"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Nie można przesłać pliku do usługi przechowywania. Usługa może być niedostępna lub wymagane jest ponowne zalogowanie w Canvas."
@@ -30414,9 +30497,11 @@ pl:
   use_comment_comment_136b5cb3: "Użyj komentarza %{comment}"
   use_default_890939b7: "Użyj domyślne ustawienia"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Użyj funkcji eksperymentalnych, zanim zostaną ogólnie włączone w produkcji"
+  use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Użyj pakietu gem podczas importowania kursu w celu zaktualizowania łączy do zasobów Canvas"
   use_high_contrast_ui_a5917282: "Użyj interfejsu użytkownika z wysokim kontrastem"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Użyj rejestratora HTML5 w Edytorze zawartości zamiast Flash"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Użyj ulepszonych elementów zastępczych dla zawartości wstawionej w RCE."
+  use_instui_for_tool_installation_and_configuration_36de63e9: "Użyj składników InstUI do formularzy dotyczących instalacji i konfiguracji narzędzia"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Użyć MathMan do skonwertowania LaTeX na MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Użyć MathMan do skonwertowania LaTeX na SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -30462,6 +30547,7 @@ pl:
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: "Użyj tego panelu do rozwiązania duplikatów lub odnalezienia osób niedostępnych w wyszukiwaniu."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Użyj tego panelu do wyszukania osób, które chcesz dodać do tego kursu."
   use_this_photo_3a594830: "Użyj tego zdjęcia"
+  use_toggle_switches_for_non_siteadmin_developer_ke_73dc754b: "Użyj przełączników do strony kluczy programisty / administratora innej witryny"
   use_webcam_1ed0bf6b: "Użyj kamery internetowej"
   use_window_parent_in_deep_linking_response_8fe5f845: "Użyj window.parent w odpowiedzi Deep Linking"
   used_by_permission_314a78dd: "Użycie według uprawnień"
@@ -30987,6 +31073,7 @@ pl:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Użytkownicy mogą wykorzystywać i tworzyć (bez możliwości edycji) poszczególne kryteria ocen dla zadania za pomocą sekcji Zadania, jeśli włączone są uprawnienia Zadania i testy - Dodaj / edytuj / usuń."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Użytkownicy mogą korzystać z łącza Zarządzaj bankami pytań, na stronie Indeks testów, jeśli włączone są uprawnienia Zawartość kursu - Wyświetl oraz Zadania i testy - Dodaj / edytuj / usuń."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Użytkownicy mogą dodać ten kalendarz do swojej listy „Inne kalendarze”."
+  users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Użytkownicy mogą tymczasowo zapisać innego użytkownika na kurs. Przypisany użytkownik zostaje usunięty z kursu, gdy zapis wygaśnie."
   users_d1b60cb0: Użytkownicy
   users_designers_22195c6f: "Użytkownicy - Projektanci"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Użytkownicy - Generuj kody parowania obserwującego dla uczestników"
@@ -31003,6 +31090,7 @@ pl:
   users_students_ecbb43eb: "Użytkownicy - Uczestnicy"
   users_tas_27117894: "Użytkownicy - Asystenci"
   users_teachers_a5d5d1af: "Użytkownicy - Nauczyciele"
+  users_temporary_enrollments_88c4b8da: "Użytkownicy – zapisy tymczasowe"
   users_view_list_861c7a3f: "Użytkownicy - wyświetl listę"
   users_view_login_ids_a2e6a85: "Użytkownicy - wyświetl ID loginów"
   users_view_primary_email_address_14f4978f: "Użytkownicy - wyświetl główny adres e-mail"
@@ -32012,6 +32100,7 @@ pl:
     one: "Podczas wyszukiwania pojawił się następujący błąd:"
     other: "Podczas wyszukiwanie pojawiły się następujące błędy:"
   your_search_returned_no_results_383a30cf: "Brak wyników wyszukiwania."
+  your_student_submissions_are_being_gathered_9c9ff764: "Przesłane zadania są teraz zbierane."
   your_submission_has_not_been_graded_yet_d6963e53: "Twoje zgłoszenie nie zostało jeszcze ocenione"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Twój czas w tym teście został ograniczony."
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "Twoje nieopublikowane zmiany zostaną przywrócone do wcześniej zapisanego stanu."
