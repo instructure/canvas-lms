@@ -1973,6 +1973,7 @@ ca:
       Afegeix una nova pestanya Adreces electròniques retornades a les Eines d'administrador del compte, que
       us permet cercar les adreces electròniques en què les notificacions del Canvas
       s’han retornat.
+  adds_additional_fields_to_the_content_migration_as_192c2d3f: "Afegeix camps addicionals al mapa de recursos de migració de contingut"
   adds_additional_information_and_filtering_for_feat_3e55a058: "Afegeix informació addicional i filtratge de marques de característiques"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Afegeix un paràmetre del compte usuari o de l’assignatura per a una hora de lliurament predeterminada en el cas de les activitats noves"
   adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
@@ -1983,6 +1984,7 @@ ca:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Afegeix les analítiques a la targeta de context d'un estudiant."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Afegeix un banc de comentaris per als comentaris de les tasques a l’SpeedGrader"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Afegeix permisos de granularitat per afegir i suprimir cada rol, i un permís a part per a altres accions d’administrador de l'assignatura"
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Afegeix l’opció de menú per accedir a les alineacions dels resultats amb la gestió de resultats millorats"
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Afegeix l’opció de qualificar per pregunta a SpeedGrader per a les proves Quizzes.Next"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Afegeix indicadors visuals a la pàgina d’informació sobre l’entrega perquè els estudiants sàpiguen que hi ha
@@ -2721,8 +2723,11 @@ ca:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Permet a l'usuari visualitzar els IDs del SIS dels usuaris a la pàgina Persones de l'assignatura."
   allows_user_to_weight_assignment_groups_95cb11b2: "Permet a l'usuari ponderar grups d'activitats."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Permet als usuaris afegir una descripció imparcial dels resultats perquè els estudiants i els pares puguin visualitzar-la al llibre de notes de domini de l'aprenentatge de l'estudiant."
+  allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: "Permet als usuaris afegir una inscripció temporal amb una data d'inici, una data de finalització i un rol"
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Permet que els usuaris afegeixin conferències del calendari"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Permet que els usuaris afegeixin eines d'LTI amb el tipus d'ubicació conference_selection"
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Permet als usuaris suprimir una inscripció temporal"
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Permet als usuaris editar una inscripció temporal existent"
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permet als usuaris habilitar l'opció \"Inicia SpeedGrader filtrat per grups d'estudiants\" per a les assignatures a la pàgina de configuració de l'assignatura. Si està actiu i se selecciona un grup d'estudiants al Llibre de notes nou, SpeedGrader només carregarà els estudiants del grup seleccionat."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Permet a l'usuari importar grups en una assignatura."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Permet als usuaris combinar diversos comptes (si disposen de les credencials adequades)."
@@ -2908,7 +2913,7 @@ ca:
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "S'ha produït un error desconegut. Comproveu el fitxer CSV o torneu-ho a provar més tard."
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: |-
       S’ha produït un error desconegut.
-                                    Poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Poseu-vos en contacte a #canvas-sre a Slack.
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "S'ha produït un error desconegut del servidor.  Torneu-ho a provar."
   an_update_is_available_for_toolname_bba3fa2: "Hi ha una actualització disponible per a %{toolName}"
   analytics: 
@@ -2937,6 +2942,7 @@ ca:
   analytics_course_code_student_name_d63bab4c: "Analítica: %{course_code}: %{student_name}"
   and_7fcc2911: I
   and_a_few_more_not_shown_here_28e7d713: "…i uns quants més que no es mostren aquí"
+  and_compressed_into_a_zip_file_this_may_take_some__1acbe09f: "i comprimir-la en un fitxer zip. Això pot ser que trigui una estona en funció de la mida i del nombre de fitxers de l'entrega."
   and_count_more_43eae021: "i %{count} més..."
   and_many_more_not_shown_here_fb777a4c: "…i *molts* més que no es mostren aquí"
   and_more_1c35b232: "i més..."
@@ -3234,6 +3240,7 @@ ca:
   artist_info_for_username_for_description_12d5d862: "Informació de l'artista de %{userName} per a %{description}"
   as_of_a036fa2e: "A partir de"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "Amb data %{date}, l’extrem d’LTI 1.3 OIDC Auth ha canviat d’https://canvas.instructure.com/api/lti/authorize_redirect a https://sso.canvaslms.com/api/lti/authorize_redirect. El raonament i l’abast d’aquest canvi es detallen en *aquest article de la Canvas Community*; es pot consultar informació addicional als documents de la nostra API. Aquest canvi és menor i es duu a terme en poc temps, però cal un canvi de configuració en cada eina d’LTI 1.3 instal·lada al Canvas."
+  as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "En data de %{date}, el Canvas admet completament l'especificació d’emmagatzematge de la plataforma LTI 1.3. Les eines que vulguin implementar-la han de canviar l’extrem d’OIDC Auth que desen per al Canvas d’*https://canvas.instructure.com/api/lti/authorize_redirect* a *https://sso.canvaslms.com/api/lti/authorize_redirect*. L’extrem d’OIDC Auth recomanat per a les instal·lacions noves de l’eina 1.3 també ha canviat, i recomanem que totes les eines 1.3 canviïn la seva configuració per utilitzar aquest extrem nou tan aviat com puguin."
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "A mesura que escriviu en aquest camp, la llista de grups es filtrarà automàticament per incloure només aquells membres que coincideixin amb la vostra entrada."
   ascending_b3c87427: Ascendent
   ask_your_instructor_a_question_a61ca5e9: "Fes una pregunta a l'instructor"
@@ -4058,7 +4065,9 @@ ca:
       internal_ca_description: "Si el servidor LDAP presenta un certificat emès per una autoritat de certificació (CA, per les seves sigles en anglès) arrel interna que no sigui de confiança, *heu de* penjar la CA arrel perquè el Canvas pugui confiar-hi en connectar-s’hi."
       internal_ca_warning: "*Advertiment*: Fer servir una CA arrel interna és menys segur i augmenta el risc de generar situacions de perill. Us recomanem encaridament que utilitzeu certificats emesos per una autoritat de certificació de confiança."
       ldap_timeout_failure_help2: "Si el Canvas esgota el temps d'espera massa vegades mentre es comunica amb el servidor LDAP, bloquejarà els intents d'inici de sessió següents per utilitzar aquest servidor LDAP durant %{time}. El vostre servidor LDAP ha esgotat el temps d'espera a les %{timestamp}."
+      verify_tls_cert_opt_in_dated_description: "El *%{enforcement_date}* caldrà verificar el certificat TLS, però podeu activar-lo abans per assegurar-vos que el servidor LDAP compleix els requisits."
       verify_tls_cert_opt_in_description: "El *%{enforcement_date}* caldrà verificar el certificat TLS, però podeu activar-lo abans per assegurar-vos que el servidor LDAP compleix els requisits."
+      verify_tls_cert_opt_in_undated_description: "Aviat caldrà verificar el certificat TLS, però podeu activar-lo abans per assegurar-vos que el servidor LDAP compleix els requisits."
     ldap_settings_test: 
       labels: 
         pass: Contrasenya
@@ -5849,6 +5858,7 @@ ca:
     unexpected_error: "S'ha produït un error inesperat, poseu-vos en contacte amb el suport tècnic."
     unknown: Desconegut
     upload_timeout_error: "S'ha superat el temps d'espera del procés de càrrega del fitxer."
+  content_migration_asset_map_v2_f0f455f: "Mapa de recursos de migració de contingut v2"
   content_migration_queued_46c27790: "Migració de contingut a la cua"
   content_migration_running_percent_complete_4b00c024: "S'està executant la migració de contingut, %{percent}% completat"
   content_migrations: 
@@ -6308,8 +6318,8 @@ ca:
   continue_typing_to_find_additional_sections_or_stu_49786085: "Continueu escrivint per cerca seccions o estudiants addicionals."
   contributed_to_this_module_item_and_is_complete_2799d5c: "S'ha contribuït en aquest contingut i s'ha completat"
   controls_the_final_changes_needed_to_fully_conform_8398b749: |-
-      Controla els canvis finals necessaris per conformar-se completament a les especificacions d’emmagatzematge de la plataforma d’LTI
-      , inclosa la recepció de missatges adreçats a l’origen correcte d’aut. URI d’OIDC
+      Controla els canvis finals necessaris per conformar-se completament a les especificacions d’emmagatzematge de la plataforma d’LTI,
+      inclosa la recepció de missatges adreçats a l’origen correcte d’aut. URI d’OIDC
       i el marc del servidor proxy de reenviament de postmissatges.
   conversation_dialog: 
     message_sent: "Missatge enviat."
@@ -6917,6 +6927,7 @@ ca:
   course_image_for_course_cfbb08df: "Imatge de l'assignatura per a %{course}"
   course_image_settings_eba3ec55: "Configuració de la imatge de l'assignatura"
   course_implemented_apps_fa658f5a: "Aplicacions implementades de l'assignatura"
+  course_import_html_using_gem_812d0af5: "HTML d’importació de l'assignatura mitjançant Gem"
   course_is_already_associated_with_a_blueprint_4d9407cb: "L'assignatura ja està associada amb una plantilla"
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "L’assignatura no reuneix els requisits per establir-se com a plantilla"
   course_level_notification_preferences_require_a_co_2f0a618: "Les preferències de notificació de nivell de l'assignatura requereixen un course_id per actualitzar"
@@ -7605,6 +7616,7 @@ ca:
   create_a_new_domain_lookup_1830a512: "Crea una nova consulta de domini"
   create_a_new_module_6f31b0fe: "Crea un contingut nou"
   create_a_new_user_for_address_7487e9c9: "Crea un nou usuari per a \"%{address}\""
+  create_a_temporary_enrollment_167f05f1: "Crea una inscripció temporal"
   create_account_263ec6: "Crea un usuari"
   create_an_ba36d171: "Crea una"
   create_announcements_above_1c36202b: "Crea els anuncis anteriors"
@@ -7648,6 +7660,7 @@ ca:
   create_pages_581a4d59: "Crea pàgines"
   create_slots_71dbb2f8: "Crea intervals"
   create_subject_86de5618: "Crea una matèria"
+  create_temporary_enrollment_3d4eaa33: "Crea una inscripció temporal"
   create_theme_based_on_40651ed3: "Crea un tema basat en"
   create_users_view: 
     required: "Introduïu algunes adreces electròniques"
@@ -7889,7 +7902,7 @@ ca:
   database_error_err_6393d244: "Error de base de dades (%{err})"
   database_error_please_try_again_if_it_continues_to_3767972c: |-
       Error de base de dades. Torna-ho a provar.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   datadog_rum_js_agent_4c3bea75: "Datadog RUM JS Agent"
   date: 
     abbr_day_names: 
@@ -8387,6 +8400,7 @@ ca:
     empty_message: "Cap missatge"
   discussion_topic_a7bf935: "tema de debat"
   discussion_topic_dc85ad4c: "Tema de debat"
+  discussion_topic_edit_error_page_c9fb069c: "Pàgina d’error d’edició del tema de debat"
   discussion_topic_initial_query_error_37c98b4: "Error en la consulta inicial del tema de debat"
   discussion_topic_menu_3d4684c6: "Menú Tema de debat"
   discussion_topic_post_error_page_7f7edc49: "Pàgina d’error de publicació del tema de debat"
@@ -8702,6 +8716,7 @@ ca:
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey Business Schools: activitat i rendiment de l’estudiant"
   down_5831a426: Avall
   download_3e89bdef: baixa
+  download_all_submissions_304d6797: "Baixa totes les entregues"
   download_as_ce13bff6: "Baixa com a…"
   download_as_zip_5dae7f19: "Baixa com a Zip"
   download_assignment_submissions_41e50ee7: "Baixa les entregues de l'activitat"
@@ -9600,6 +9615,7 @@ ca:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Error: L’eina ha retornat un tipus de contingut no vàlid \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "S’ha produït un error en actualitzar %{cluster}. %{error}"
   error_updating_comment_4b80c76d: "S’ha produït un error en actualitzar el comentari"
+  error_updating_notes_31b24785: "S'ha produït un error en actualitzar les notes"
   error_updating_pacename_ad07f9df: "S’ha produït un error en actualitzar %{paceName}"
   error_updating_status_of_module_item_80336274: "Error en actualitzar l’estat de l’element del contingut"
   error_updating_submission_draft_1d40ade7: "Error en actualitzar l’esborrany de l’entrega"
@@ -10168,6 +10184,7 @@ ca:
   filter_speedgrader_by_student_group_53683142: "Filtra SpeedGrader per grups d'estudiants"
   filter_students_2327fe79: "Filtra els estudiants"
   filters_92f2776f: Filtres
+  final_grade_474e3e37: "Nota final: "
   final_grade_4d7f6545: "Nota final"
   final_grade_6938dca8: "Nota final:"
   final_grade_6e94d99e: "Nota final:"
@@ -10425,6 +10442,7 @@ ca:
   grade_9c6f076d: Nota
   grade_a91e433e: "Nota:"
   grade_assignment_7c1abc11: "Nota %{assignment}"
+  grade_by_9ea3661e: "Qualifica per"
   grade_by_question_9d9b8a71: "Qualificació per pregunta"
   grade_calculator_performance_improvements_564af0de: "Millores del rendiment de la calculadora de qualificacions"
   grade_change_activity_75fb525: "Activitat de canvi de notes"
@@ -11497,6 +11515,8 @@ ca:
   http_response_code_832d6baa: "Resposta HTTP: %{code}"
   https_3a02e3fb: https
   https_b8426ad8: "https://"
+  https_example_com_config_xml_d3bae5e3: "https://example.com/config.xml"
+  https_lti_tool_provider_example_herokuapp_com_regi_305953da: "https://lti-tool-provider-example.herokuapp.com/register"
   hungarian_fc7d30c9: Hongarès
   hungary_36_cd3e515b: "Hongria (+36)"
   hypothetical_end_date_117d81cf: "Data de finalització hipotètica"
@@ -11622,6 +11642,10 @@ ca:
       d’una sol·licitud de recurs d’oEmbed.
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Si s’ha activat, emplena prèviament el formulari d’activitats amb valors de missatges amb enllaç profund a la pàgina de creació o edició d’activitats."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Si s'habilita, els paràmetres de consulta no es copiaran al cos del POST durant l'inici de la interoperabilitat d'eines d'aprenentatge (LTI)."
+  if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
+      Si s’activa aquesta opció, als comptes arrel i als comptes secundaris hi haurà commutadors per activar
+      i desactivar les claus a la pàgina de claus de desenvolupador. L’administrador del lloc web encara disposarà dels botons per
+      desactivar/permetre/activar.
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si s'habilita, els Sourceids utilitzats pel Canvas per als resultats bàsics es xifraran."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Si s'habilita, l'historial d'entrega de les proves de Proves noves es gestionarà per separat."
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
@@ -11652,6 +11676,9 @@ ca:
       aquelles instàncies del Canvas on els comptes arrel siguin a la mateixa partició
       que l'usuari de l'administrador del lloc. El comportament d'altres instàncies
       ja era així.
+  if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
+      Si s’activa aquesta opció, als formularis d’instal·lació i de configuració de l'eina que es troben a les pàgines de configuració del compte i de l'assignatura es faran servir
+      els components d’InstUI, en contraposició als components propis més antics i menys accessibles.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Si està activat, l’usuari veurà una casella d’avís d’advertiment a prop de la part superior de la
       pàgina Claus de desenvolupador en què se l’informarà dels canvis en l’extrem d’OIDC Auth ja realitzats o futurs.
@@ -11758,7 +11785,7 @@ ca:
   if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Si se selecciona en un fòrum l’opció per requerir als usuaris que publiquin abans de veure les respostes, els usuaris han de publicar una resposta per veure totes les publicacions, tret que el permís Fòrums - modera també estigui habilitat."
   if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Si s’inhabilita el permís Persones - actualitza, l’usuari encara podrà ajustar la configuració de bloqueig del contingut a les pàgines individuals d’una assignatura plantilla principal."
   if_these_additional_permissions_are_enabled_but_as_d264879d: "Si s’habiliten aquests permisos addicionals, però Activitats i proves - afegeix/edita/suprimeix està inhabilitat, la configuració de bloqueig de les plantilles per a una activitat es pot administrar des de la pàgina de detalls de l'activitat."
-  if_this_account_already_uses_sftp_please_reach_out_377296d1: "Si en aquest usuari ja s’utilitza SFTP, poseu-vos en contacte a Slack a #Canvas-sre. El seu nom d’usuari no coincideix amb l’estàndard que utilitzem per a noms d’usuari."
+  if_this_account_already_uses_sftp_please_reach_out_377296d1: "Si en aquest usuari ja s’utilitza SFTP, poseu-vos en contacte a Slack a #canvas-sre. El seu nom d’usuari no coincideix amb l’estàndard que utilitzem per a noms d’usuari."
   if_this_account_does_not_use_sftp_currently_press__eb1b3b88: "Si en aquest usuari no s’utilitza SFTP actualment, premeu Activa per crear un usuari SFTP."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Si s'inhabilita aquest permís i s'habilita Cursos - afegeix/edita/suprimeix, els usuaris poden afegir un curs nou amb el botó Afegeix un curs nou de la Configuració del compte."
   if_this_permission_is_disabled_and_courses_add_is__acccce1b: "Si s'inhabilita aquest permís i s'habilita Assignatures - afegeix, els usuaris poden afegir una assignatura nova amb el botó Afegeix una assignatura nova a Configuració de l'usuari."
@@ -11934,6 +11961,8 @@ ca:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Incloeu les puntuacions quan aviseu sobre les notes.
       Si la vostra adreça electrònica no és de cap institució, s'enviarà contingut confidencial fora de la institució.
+  include_sis_batch_info_f79dd131: "Incloeu la informació del lot del SIS;"
+  include_sis_batch_information_75bf66c4: "Incloeu la informació del lot del SIS"
   include_speedgrader_in_assignment_header_menu_69cd8656: "Inclou SpeedGrader al menú de capçalera de la tasca"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Incloeu Datadog RUM JS Agent a la CAPÇALERA del document."
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inclou les notes d'aquesta activitat en sincronitzar amb el Sistema d'informació de l'estudiant de l'escola"
@@ -12038,6 +12067,11 @@ ca:
       invalid_number: "Això hauria de ser un número."
       required: "Camp obligatori"
   instructure_default_73317bb1: "Contingut predeterminat d’Instructure"
+  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructure allotja el Canvas Commons a la regió que la institució ha triat, que és Europa. Això vol dir que, quan utilitzeu el Canvas Commons, les vostres dades personals s’emmagatzemaran i es tractaran a Alemanya. Aquests elements de dades personals inclouen: nom, adreça electrònica, ID d’usuari del Canvas, nom d’inici de sessió al Canvas, avatar del Canvas, adreça IP, recursos del Canvas Commons que hàgiu marcat com a preferits, i comentaris que hàgiu fet sobre qualsevol recurs del Canvas Commons. Podeu obtenir més informació sobre les pràctiques de privacitat d’Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructure allotja el Canvas Commons a la regió que la institució ha triat, que és el Pacífic asiàtic. Això vol dir que, quan utilitzeu el Canvas Commons, les vostres dades personals s’emmagatzemaran i es tractaran a Singapur. Aquests elements de dades personals inclouen: nom, adreça electrònica, ID d’usuari del Canvas, nom d’inici de sessió al Canvas, avatar del Canvas, adreça IP, recursos del Canvas Commons que hàgiu marcat com a preferits, i comentaris que hàgiu fet sobre qualsevol recurs del Canvas Commons. Podeu obtenir més informació sobre les pràctiques de privacitat d’Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructure allotja el Canvas Commons a la regió que la institució ha triat, que és els EUA. Això vol dir que, quan utilitzeu el Canvas Commons, les vostres dades personals s’emmagatzemaran i es tractaran als Estats Units. Aquests elements de dades personals inclouen: nom, adreça electrònica, ID d’usuari del Canvas, nom d’inici de sessió al Canvas, avatar del Canvas, adreça IP, recursos del Canvas Commons que hàgiu marcat com a preferits, i comentaris que hàgiu fet sobre qualsevol recurs del Canvas Commons. Podeu obtenir més informació sobre les pràctiques de privacitat d’Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructure allotja el Canvas Commons a la regió que la institució ha triat, que és el Canadà. Això vol dir que, quan utilitzeu el Canvas Commons, les vostres dades personals s’emmagatzemaran i es tractaran al Canadà. Aquests elements de dades personals inclouen: nom, adreça electrònica, ID d’usuari del Canvas, nom d’inici de sessió al Canvas, avatar del Canvas, adreça IP, recursos del Canvas Commons que hàgiu marcat com a preferits, i comentaris que hàgiu fet sobre qualsevol recurs del Canvas Commons. Podeu obtenir més informació sobre les pràctiques de privacitat d’Instructure [aquí](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructure allotja el Canvas Commons a la regió que la institució ha triat, que és Austràlia. Això vol dir que, quan utilitzeu el Canvas Commons, les vostres dades personals s’emmagatzemaran i es tractaran a Austràlia. Aquests elements de dades personals inclouen: nom, adreça electrònica, ID d’usuari del Canvas, nom d’inici de sessió al Canvas, avatar del Canvas, adreça IP, recursos del Canvas Commons que hàgiu marcat com a preferits, i comentaris que hàgiu fet sobre qualsevol recurs del Canvas Commons. Podeu obtenir més informació sobre les pràctiques de privacitat d’Instructure [aquí](%{url})."
   instructure_inline_media_comment: 
     alerts: 
       kaltura_disabled: "El Kaltura s'ha inhabilitat per a aquest lloc del Canvas"
@@ -12111,6 +12145,7 @@ ca:
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY '%{bymonthday}' no és vàlid"
   invalid_calculation_int_for_this_calculation_metho_971fada3: "calculation_int no és vàlid per a aquest calculation_method"
   invalid_content_type_utf_8_required_bd458b78: "Tipus de contingut no vàlid, es requereix UTF-8"
+  invalid_context_9186d37e: "El context no és vàlid"
   invalid_context_for_group_f6cd268a: "context no vàlid per al grup"
   invalid_context_type_68f40a61: "Tipus de context no vàlid"
   invalid_context_type_72085a6a: "tipus de context no vàlid"
@@ -12157,12 +12192,15 @@ ca:
   invalid_redirect_url_6444a1b0: "URL de redirecció no vàlida"
   invalid_request_sftp_name_is_invalid_please_reach__91bc0955: |-
       Sol·licitud no vàlida. El nom de l’SFTP no és vàlid.
-                                    Poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Poseu-vos en contacte a #canvas-sre a Slack.
   invalid_restrictions_316cd740: "Restriccions no vàlides"
   invalid_score_3d247da7: "Puntuació no vàlida"
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: |-
       El nom d’usuari d’SFTP no és vàlid. No hem pogut determinar el nom d’usuari que s’ha d’utilitzar perquè no hi ha cap domini que acabi en .instructure.
                                     Poseu-vos en contacte a #Canvas-sre a Slack.
+  invalid_sftp_username_we_were_unable_to_determine__13339947: |-
+      El nom d’usuari d’SFTP no és vàlid. No hem pogut determinar el nom d’usuari que s’ha d’utilitzar perquè no hi ha cap domini que acabi en .instructure.
+                                    Poseu-vos en contacte a #canvas-sre a Slack.
   invalid_sis_sync_status_b68db497: "Estat de sincronització al SIS no vàlid"
   invalid_state_parameter_7a5aa108: "Paràmetre d'estat no vàlid"
   invalid_submission_file_type_cda6742a: "Tipus de fitxer d’entrega no vàlid"
@@ -12911,8 +12949,8 @@ ca:
           mfa_enrollment: |-
               L'autenticació multifactorial augmenta la seguretat en requerir-te la possessió física d'alguna cosa,
               a més de saber la contrasenya, per iniciar la sessió al Canvas. Pot ser un dispositiu que pugui generar
-              codis de verificació, o bé un telèfon que pugui rebre missatges de text. L'aplicació Google Authenticator per a [iPhone](%{iphone_url}) o
-              [Android](%{android_url}) es pot configurar escanejant el codi QR següent. Es poden configurar altres testimonis introduint la 
+              codis de verificació, o bé un telèfon que pugui rebre missatges de text. L'aplicació Google Authenticator per a iPhone o
+              Android es pot configurar escanejant el codi QR següent. Es poden configurar altres testimonis introduint la 
               clau secreta **%{secret_key}**. Quan hàgiu configurat l'autenticació multifactorial, és recomanable que aneu a la vostra
               pàgina de perfil i imprimiu un conjunt de codis de còpia de seguretat, en cas que el dispositiu multifactorial normal no estigui disponible.
           mfa_required: "Cal que configureu l'autenticació multifactorial."
@@ -13098,6 +13136,7 @@ ca:
   manage_students_for_the_course_3b1bc4f0: "Administra els estudiants de l'assignatura"
   manage_subject_coursecontext_2328e1ff: "Administra la matèria: %{courseContext}"
   manage_subject_f9835769: "Administra la matèria"
+  manage_temporary_enrollments_4c4f21ef: "Gestiona les inscripcions temporals"
   manage_update_23de23a1: "Administra l'actualització"
   manage_update_for_toolname_f8e3b2fb: "Administra l'actualització de %{toolName}"
   manage_usage_rights_c5a8c216: "Administra els drets d'ús"
@@ -13258,6 +13297,7 @@ ca:
   menu_39cb0e8e: Menú
   menu_for_group_title_fbf60567: "Menú per al grup %{title}"
   menu_for_outcome_title_1d93378d: "Menú per al resultat %{title}"
+  menu_option_for_outcome_details_page_2dcd13d6: "Opció de menú per a la pàgina d’informació del resultat"
   menu_options_9b6b0b5c: "Opcions del menú"
   mesa_public_course_syllabus_52282dd3: "Temari públic de l'assignatura de Mesa"
   mesa_public_user_inactivity_report_a6792ccf: "Informe públic d’inactivitat d’usuaris de Mesa"
@@ -14995,6 +15035,7 @@ ca:
   missing_required_description_99a99ff: "Falta la descripció necessària"
   missing_required_fields_fields_30e20799: "Falten els camps necessaris: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Falten els camps necessaris. Empleneu tots els camps obligatoris."
+  missing_required_parameters_4f589df8: "Falten paràmetres requerits"
   missing_required_points_39db69fa: "Punts obligatoris que falten"
   missing_required_ratings_9b19e66: "Falten les classificacions necessàries"
   missing_required_title_ca06a6de: "Falta el títol obligatori"
@@ -15125,6 +15166,8 @@ ca:
   more_modules_d9a9f003: "Més continguts"
   more_options_272b4953: "Més opcions"
   more_options_e89670cf: "Més opcions"
+  more_options_for_message_from_authorname_4001ddda: "Més opcions per al missatge de %{authorName}"
+  more_options_for_subject_e18d421: "Més opcions per a %{subject}"
   more_outcomes_have_been_loaded_9acafe9c: "S’han carregat més resultats"
   more_people_options_730e9686: "Més opcions de persones"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "S'han afegit més resultats al final de la pàgina."
@@ -15482,6 +15525,8 @@ ca:
   next_student_79955068: "Estudiant següent"
   next_student_b62869f4: "Estudiant següent"
   next_up_review_feedback_19a15e0e: "Següent: Revisa els comentaris"
+  next_up_review_feedback_59555dbd: "SEGÜENT: Revisa els comentaris"
+  next_up_submit_assignment_2fdb7174: "SEGÜENT: Entrega l’activitat"
   next_up_submit_assignment_793a9d41: "Següent: Entrega l'activitat"
   next_window_window_90271943: "Finestra següent: %{window}"
   nickname_1e6da3ad: Àlies
@@ -16109,6 +16154,7 @@ ca:
   on_8f7190e5: Activat
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "Als assignatures amb els drets d'ús habilitats, força la selecció dels drets d'ús als fitxers adjunts del tema de debat"
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "Amb data %{date}, l’extrem d’LTI 1.3 OIDC Auth canviarà d’https://canvas.instructure.com/api/lti/authorize_redirect a https://sso.canvaslms.com/api/lti/authorize_redirect. El raonament i l’abast d’aquest canvi es detallen en *aquest article de la Canvas Community*; es pot consultar informació addicional als documents de la nostra API. Aquest canvi és menor, però cal un canvi de configuració en cada eina d’LTI 1.3 instal·lada al Canvas."
+  on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "El %{date}, el Canvas admetrà completament l'especificació d’emmagatzematge de la plataforma LTI 1.3. Les eines que vulguin implementar-la han de canviar l’extrem d’OIDC Auth que desen per al Canvas d’*https://canvas.instructure.com/api/lti/authorize_redirect* a *https://sso.canvaslms.com/api/lti/authorize_redirect*. L’extrem d’OIDC Auth recomanat per a les instal·lacions noves de l’eina 1.3 també canviarà aquest dia, i recomanem que totes les eines 1.3 canviïn la seva configuració per utilitzar aquest extrem nou tan aviat com puguin."
   on_for_key_keyname_bbac4e1b: "Activat per a la clau: %{keyName}"
   on_paper_46d0ba36: "En paper"
   on_time_17ca5ad9: Puntualment
@@ -16168,6 +16214,7 @@ ca:
   open_comment_tray_160293d7: "Obre la safata de comentaris"
   open_complete_incomplete_menu_cfe2033b: "Menú Obre les completades/no completades"
   open_conversation_a6590865: "Obre una conversa"
+  open_conversation_subject_1dd2d3c: "Obre la conversa %{subject}"
   open_discussion_title_for_comments_6baa3fa: "Obre el fòrum %{title} per a comentaris"
   open_emoji_menu_1df0eb0b: "Obre el menú d’emojis"
   open_event_menu_for_783510e3: "Obre el menú d'esdeveniments de"
@@ -16711,9 +16758,9 @@ ca:
   please_provide_a_field_e5a7d0b3: "Proporcioneu un %{field}"
   please_provide_a_pairing_code_530d1e9d: "Proporcioneu un codi d'emparellament."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Proporcioneu un domini d’inquilí vàlid. Comproveu la configuració del vostre Azure Active Directory per cercar-lo."
-  please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Poseu-vos en contacte a Slack a #Canvas-sre si això segueix passant."
-  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Poseu-vos en contacte a Slack a #Canvas-sre. La regió on està ubicada la instància del Canvas d’aquest client no admet l’ús d’SFTP."
-  please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Poseu-vos en contacte a Slack a #Canvas-sre per crear un SFTP per a aquest usuari."
+  please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Poseu-vos en contacte a Slack a #canvas-sre si això segueix passant."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Poseu-vos en contacte a Slack a #canvas-sre. La regió on està ubicada la instància del Canvas d’aquest client no admet l’ús d’SFTP."
+  please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Poseu-vos en contacte a Slack a #canvas-sre per crear un SFTP per a aquest usuari."
   please_select_a_course_e06d8015: "Seleccioneu una assignatura"
   please_select_a_group_set_for_this_assignment_e1da63d3: "Seleccioneu un conjunt de grups per a aquesta activitat"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Seleccioneu un motiu per informar d’aquesta resposta"
@@ -19166,6 +19213,7 @@ ca:
   remove_filename_87f3781e: "elimina %{filename}"
   remove_filename_dab5c02e: "Elimina %{filename}"
   remove_filter_6f7204e2: "Elimina el filtre"
+  remove_filtername_filter_6b6d7063: "Suprimeix el filtre %{filterName}"
   remove_grading_scheme_title_d3942a08: "Suprimeix l'esquema de qualificació %{title}"
   remove_group_5d2f2f2d: "Suprimeix el grup"
   remove_group_981d6a02: "Suprimir el grup?"
@@ -19261,8 +19309,10 @@ ca:
   reply_389d6fb9: Respon
   reply_all_80298bee: "Respon a tots"
   reply_all_b864cd0e: "Respon a tots"
+  reply_for_subject_ae247d1e: "Resposta per a %{subject}"
   reply_from_author_a2806c77: "Resposta de %{author}"
   reply_from_name: "Notificacions de %{name} a través del Canvas"
+  reply_to_authorname_f209e84a: "Respon a %{authorName}"
   reply_to_comment_72d96728: "Respon el comentari"
   reply_to_conversation_f1aa0d4: "Respon a la conversa"
   reply_to_conversation_subject_4b2e6fe7: "Respon a la conversa %{subject}"
@@ -19314,6 +19364,7 @@ ca:
   reports_course_f09b7d9e: "Informes (assignatura)"
   reports_manage_92bc45cb: "Informes: gestió"
   reqired_end_date_a7deac41: "Data de finalització obligatòria"
+  request_failed_with_status_status_47054af0: "S’ha produït un error a la sol·licitud amb l’estat %{status}"
   request_id_1499afb0: "ID de la sol·licitud"
   request_successfully_sent_note_that_applying_score_ee8665b6: "S’ha enviat correctament la sol·licitud. Teniu en compte que aplicar puntuacions pot tardar una mica i que els canvis no es mostraran fins que torneu a carregar la pàgina."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Sol·licita que DocViewer utilitzi CloudFront per servir actius pdf."
@@ -19414,7 +19465,9 @@ ca:
   retry_duplicating_originalassignmentname_884aee1: "Torna a provar de duplicar \"%{originalAssignmentName}\""
   retry_ebd5f8ba: "Torna-ho a provar"
   retry_migrating_name_bdc802ef: "Torna a provar la migració de \"%{name}\""
+  return_to_conversation_list_86688140: "Torna a la llista de converses"
   return_to_parent_folder_4ece2184: "torna a la carpeta principal"
+  return_to_subject_in_conversation_list_d67b8e73: "Torna a %{subject} a la llista de converses"
   returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Torna valors de cadena en lloc de valors numèrics en les substitucions de variables"
   revert_date_changes_5105ce5: "Reverteix els canvis de les dates"
   revert_to_actual_score_f665eea9: "Reverteix a la puntuació real"
@@ -19476,6 +19529,9 @@ ca:
       manage_site_settings: "Administra la configuració dels complements de tot el lloc"
       manage_storage_quotas: "Administra les quotes d'emmagatzematge"
       manage_students: "Afegeix/suprimeix estudiants de l'assignatura"
+      manage_temp_enroll_add: "Afegeix inscripcions temporals"
+      manage_temp_enroll_delete: "Suprimeix les inscripcions temporals"
+      manage_temp_enroll_edit: "Edita les inscripcions temporals"
       manage_user_logins: "Modifica els detalls d'inici de sessió dels usuaris"
       manage_user_notes: "Administra les entrades al diari del professorat"
       manage_user_observers: "Administra els observadors dels usuaris"
@@ -20315,7 +20371,7 @@ ca:
   sftp_region_invalid_216caa40: "La regió d’SFTP no és vàlida"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       L’usuari de l’SFTP ja existeix o està desactivat.
-                                    Poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Poseu-vos en contacte a #canvas-sre a Slack.
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: "S’ha creat l’usuari de l’SFTP. Poden passar fins a quatre hores abans que aquest usuari comenci a funcionar."
   sftp_user_management_19868cb3: "Administració de l’usuari de l’SFTP"
   shadow_e98b5937: Ombreja
@@ -20888,6 +20944,8 @@ ca:
     errors: 
       unrecorgnized_type: "Tipus d'importació no reconegut"
     instructure_csv: "CSV amb format de l'Instructure o fitxer zip de CSVs"
+  sis_batch_id_8b755858: sis_batch_id
+  sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "Dades del SIS"
   sis_data_import_8bb623ce: "Dades del SIS - importa"
   sis_data_manage_328a4799: "Dades del SIS - administra"
@@ -21245,6 +21303,7 @@ ca:
   status_color_picker_9ea0156b: "Selector de color %{status}"
   status_e051bb30: estat
   status_e7fdbe06: Estat
+  status_for_key_keyname_47668960: "%{status} per a la clau: %{keyName}"
   statuses_497dfa15: Estats...
   statuses_f41543d8: Estats
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes: dades personalitzades d’espai de noms"
@@ -21466,9 +21525,15 @@ ca:
   subject_details_12405b1: "Informació de la matèria"
   subject_home_8e593f72: "Inici de la matèria"
   subject_home_page_41226803: "Pàgina inicial de la matèria"
+  subject_mark_as_read_b0218a: "Marca %{subject} com a llegit"
+  subject_mark_as_unread_6f07435f: "Marca %{subject} marca com a no llegit"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "L'assumpte ha de tenir menys de 255 caràcters."
   subject_name_a1ac4da4: "Nom de la matèria"
+  subject_not_selected_10dacadf: "No s'ha seleccionat %{subject}"
+  subject_not_starred_4a113097: "No s’ha marcat %{subject} amb estrelles"
   subject_reply_to: "Re: %{subject}"
+  subject_selected_2196b77e: "S’ha seleccionat %{subject}"
+  subject_starred_8ca02058: "S’ha marcat %{subject} amb una estrella"
   subject_subject_9e1057f7: "Assumpte: %{subject}"
   subjects_14c0c4de: Matèries
   submission: 
@@ -21669,6 +21734,7 @@ ca:
   submit_on_behalf_of_student_af674b95: "Envia-ho en nom de l’estudiant"
   submit_ticket_5515ffd: "Envia la sol·licitud"
   submitted_318fad53: Entregat
+  submitted_718f5cbc: "S’HA ENTREGAT: "
   submitted_at_4d5ea3aa: "S’ha entregat a"
   submitted_by_name_dab6d5e1: "Entregat per: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Entregat per %{proxy} el %{date}"
@@ -21897,6 +21963,12 @@ ca:
   tempe_grade_export_c611da01: "Exportació de notes de Tempe"
   template_account_21ac8f4f: "Usuari de la plantilla"
   templates_4ca13d07: Plantilles
+  temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Inscriviu temporalment un usuari en una assignatura. Aquesta inscripció temporal s’aparella amb una altra inscripció de l’assignatura."
+  temporarily_enroll_name_8acb66ce: "Inscriviu temporalment %{name}"
+  temporary_enrollments_add_373181b7: "Inscripcions temporals: afegeix"
+  temporary_enrollments_delete_52ffaae4: "Inscripcions temporals: suprimeix"
+  temporary_enrollments_edit_67c01325: "Inscripcions temporals: edita"
+  temporary_enrollments_f0937c5a: "Inscripcions temporals"
   tenant_d2a41f78: Inquilí
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Falta l’inquilí o s’ha inhabilitat la sincronització. Comproveu la configuració de la integració de Microsoft Sync de l'assignatura i de l'usuari."
   tenant_name_e174f404: "Nom de l’inquilí"
@@ -21988,6 +22060,7 @@ ca:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Aquest compte d'usuari s'ha suprimit.  Poseu-vos en contacte amb l'administrador del sistema per reactivar el vostre usuari."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "La capacitat per als usuaris de rebre notificacions de l'Slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "L’ID de l'usuari al qual pertany l’usuari encarregat d’informar"
+  the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "L’UUID del compte al qual pertany l’usuari encarregat d’informar"
   the_account_wide_sync_settings_were_changed_while__90c48497: "En sincronitzar, s’ha canviat la configuració de sincronització de tot l'usuari. Intenteu sincronitzar de nou."
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "Atribut de l’Active Directory que es farà servir perquè un usuari de Canvas coincideixi amb un usuari de Microsoft"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "L'algoritme que cal utilitzar per signar els missatges AuthnRequest, LogoutRequest i LogoutResponse enviats a l'IdP."
@@ -22270,6 +22343,7 @@ ca:
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "S’ha produït un error durant la sincronització i no s’ha completat"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "El paràmetre Sincronitza amb el SIS no s'ha pogut habilitar per a l'activitat \"%{assignment_name}\" sense una data de lliurament."
   the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "No s’ha pogut crear l’equip perquè el grup de Microsoft no té cap propietari. Es pot tractar d’un error intermitent: proveu de tornar a sincronitzar i contacteu amb l’equip d'assistència tècnica si el problema persisteix."
+  the_temporarily_enrolled_user_can_only_view_and_pa_a5bf0184: "L’usuari inscrit temporalment  només pot veure una assignatura i participar-hi entre les dates d’inici i de finalització triades en fer la inscripció temporal."
   the_term_for_export_data_5aad7a0a: "El període acadèmic per a les dades d’exportació"
   the_term_for_grade_export_data_d55a6be7: "El període acadèmic per a les dades d’exportació de les notes"
   the_term_id_to_report_on_4479d2fc: "L’ID del període acadèmic sobre el qual s’ha d’informar"
@@ -22325,6 +22399,8 @@ ca:
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Hi ha una nota que conté canvis sense desar.\\n\\nVoleu continuar de tota manera?"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Hi ha un límit de 2 aplicacions per ubicar dins la barra d'eines de l'RCE. Aquest paràmetre només s'aplica a l'RCE millorat."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Hi ha un límit de 2 aplicacions per ubicar dins la barra d'eines de l'RCE."
+  there_is_already_a_page_in_this_course_with_this_t_5b37ecf2: "Ja hi ha una pàgina en aquesta assignatura amb aquest títol."
+  there_is_already_a_page_in_this_group_with_this_ti_3dac30e5: "Ja hi ha una pàgina en aquest grup amb aquest títol."
   there_is_currently_1_available_grader_758e4a21: "Actualment hi ha un qualificador disponible"
   there_was_a_failure_logging_out_at_your_idp_30070527: "S'ha produït un error en tancar la sessió al vostre IdP"
   there_was_a_problem_applying_scores_7baaeea7: "S'ha produït un problema en aplicar les puntuacions."
@@ -22484,6 +22560,7 @@ ca:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Aquesta entrega de l'activitat és una feina meva i original"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Aquesta activitat ja no es comptarà per a la vostra nota."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "L'autor ha anul·lat la publicació d'aquest fitxer adjunt."
+  this_canvas_community_article_details_the_reasonin_37be9375: "*En aquest article de la Canvas Community* es detallen el raonament que sustenta aquest canvi, l’abast, les instruccions exactes de què cal canviar i un aclariment addicional per a administradors del Canvas i desenvolupadors de l’eina LTI 1.3."
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "Aquesta instal·lació del Canvas només és de prova i *es restablirà cada mes.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "Aquesta instal·lació del Canvas només és de prova i *es restablirà cada setmana.*"
@@ -22632,6 +22709,8 @@ ca:
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Aquest és un fòrum anònim. Tot i que s’amagaran els noms i les imatges de perfil dels estudiants, tots els membres del curs podran veure el vostre nom i la vostra imatge de perfil."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Aquest fòrum és anònim; el teu nom i la teva imatge del perfil estaran ocults, i els altres membres de l'assignatura no els podran veure."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Aquesta acció està activada per defecte ja que les activitats no es poden retenir al llibre de qualificacions i encara hi compten."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Aquest canvi *no* és gaire profund. Tot el comportament de l’eina LTI 1.3 seguirà sent el mateix independentment de l’extrem que es faci servir, amb l’excepció de l’especificació de l’emmagatzematge de la plataforma, compatible des de fa poc. Aquest canvi s’aplicarà en una data posterior que encara no s’ha especificat."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "Aquest canvi *no* és gaire profund. Tot el comportament de l’eina LTI 1.3 seguirà sent el mateix independentment de l’extrem que es faci servir, amb l’excepció de l’especificació de l’emmagatzematge de la plataforma, compatible des de fa poc. Tampoc **no** cal que es dugui a terme abans del %{date}. Aquest canvi s’aplicarà en una data posterior que encara no s’ha especificat."
   this_is_not_a_valid_grade_9cc2cb8: "Aquesta no és una nota vàlida"
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "Tècnicament, això és una vulnerabilitat de seguretat, però en algunes escoles és necessari preservar els fluxos de treball durant un temps."
   this_is_the_default_email_address_f3c421fb: "Aquesta és l'adreça electrònica per defecte"
@@ -22747,6 +22826,7 @@ ca:
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Aquesta pàgina d'exemple inclou els elements de la IU comuns al Canvas per ajudar-vos a crear la vostra marca personalitzada. Quan comenceu a fer canvis als valors de color i les imatges, veureu un botó de *Visualització prèvia dels canvis*. Feu-hi clic per actualitzar la pàgina i veure l'aspecte dels canvis."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Se suprimirà el ritme d’aquest secret, i el ritme tornarà a ser el ritme per defecte."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Aquest paràmetre només afecta la vostra visualització de les notes dels estudiants i mostra les notes como si totes les activitats sense nota haguessin obtingut una puntuació de zero. Aquest paràmetre només és un canvi visual i no afecta les notes dels estudiants o d'altres usuaris d'aquest llibre de notes. Si s'habilita aquest paràmetre, el Canvas no emplenarà amb zeros el llibre de notes de les entregues dels estudiants dins de les activitats individuals. Només els grups d'activitats i les columnes de totals comptaran les puntuacions de zero als percentatges globals de cada estudiant."
+  this_setting_only_impacts_courses_it_will_include__1b2169a: "Aquesta opció de configuració només afecta les assignatures. Inclourà sis_batch_id i sis_batch_user_id"
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Aquest paràmetre modifica significativament l’experiència al Canvas per als estudiants i professors."
   this_settings_only_impact_enrollments_this_include_7f51358: "Aquesta configuració només afecta les inscripcions. Això inclou objectes amb una marca de temps last_activity_at posterior al paràmetre Actualitzat després de. El valor predeterminat és Desactivat"
   this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Se suprimirà el ritme d’aquest estudiant, i el ritme tornarà a ser el ritme assignat anteriorment."
@@ -23634,10 +23714,10 @@ ca:
   unable_to_align_some_outcomes_to_title_53467231: "No es poden alinear alguns resultats a “%{title}\""
   unable_to_check_for_lock_on_sftp_users_table_pleas_1084e348: |-
       No s’ha pogut comprovar el bloqueig a la taula d’usuaris d’SFTP. Torna-ho a provar d’aquí a uns instants.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   unable_to_check_if_sftp_user_already_exists_or_is__80e516b1: |-
       No s’ha pogut comprovar si l’usuari d’SFTP ja existeix o està desactivat. Torna-ho a provar d’aquí a uns instants.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   unable_to_connect_to_google_drive_34886e7a: "No es pot connectar al Google Drive."
   unable_to_create_message_without_a_body_b62274be: "No es pot crear cap missatge sense cos"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "No es poden corbar les notes perquè aquesta activitat té la data de lliurament en un període de qualificació tancat per al menys un estudiant"
@@ -23645,11 +23725,11 @@ ca:
   unable_to_delete_commentbankitem_3a23dc24: "No es pot suprimir CommentBankItem"
   unable_to_delete_lock_on_sftp_users_table_please_t_1c5e6b97: |-
       No s’ha pogut suprimir el bloqueig a la taula d’usuaris d’SFTP. Torna-ho a provar d’aquí a uns instants.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   unable_to_determine_an_sftp_username_for_this_acco_e31e8a90: "No s’ha pogut determinar cap nom d’usuari d’SFTP per a aquest usuari. No s’ha pogut trobar el seu domini inicial .instructure.com."
   unable_to_determine_next_sftp_user_uid_please_try__be9d612d: |-
       No s’ha pogut determinar el següent UID d’usuari d’SFTP. Torna-ho a provar d’aquí a uns instants.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   unable_to_dismiss_update_df1e32eb: "No es pot descartar l'aplicació"
   unable_to_drop_the_course_67f112c4: "No s’ha pogut deixar anar el curs"
   unable_to_drop_the_subject_d7d55ba1: "No s’ha pogut deixar anar la matèria"
@@ -23670,11 +23750,13 @@ ca:
   unable_to_load_this_control_543a8271: "No es pot carregar aquest control"
   unable_to_locate_sftp_key_selected_if_it_continues_c5768e01: |-
       No s’ha pogut trobar la clau d’SFTP seleccionada.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
       No s’ha pogut obtenir el bloqueig a la taula d’usuaris d’SFTP. Torna-ho a provar d’aquí a uns instants.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   unable_to_parse_certificate_f25ff8b5: "No es pot analitzar el certificat"
+  unable_to_perform_diffing_against_mismatched_previ_801191d2: "No s’ha pogut dur a terme la diferenciació relativa a les importacions de %{type} no coincidents anteriors i actuals"
+  unable_to_post_comment_c34ba536: "No s'ha pogut publicar el comentari"
   unable_to_read_file_2d04b0c: "No es pot llegir el fitxer"
   unable_to_remove_app_4293cb53: "No es pot suprimir l'aplicació"
   unable_to_remove_outcomes_f682e68f: 
@@ -23682,12 +23764,13 @@ ca:
     other: "No es poden suprimir els resultats."
   unable_to_remove_sftp_key_selected_if_it_continues_f99a7a22: |-
       No s’ha pogut suprimir la clau d’SFTP seleccionada.
-                                    Si el problema persisteix, poseu-vos en contacte a #Canvas-sre a Slack.
+                                    Si el problema persisteix, poseu-vos en contacte a #canvas-sre a Slack.
   unable_to_save_draft_message_db49a89d: "No s’ha pogut desar l’esborrany del missatge."
   unable_to_save_new_discussion_topic_99239f3f: "No es pot desar un nou tema de debat."
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "No es poden enviar missatges als usuaris a %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "No es pot establir la nota per defecte perquè aquesta activitat té la data de lliurament en un període de qualificació tancat per al menys un estudiant"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "No es pot configurar la funció d'arrossegar i deixar anar per als continguts"
+  unable_to_submit_score_e47990e3: "No s’ha pogut enviar la puntuació"
   unable_to_switch_students_b901bc4b: "No s’ha pogut canviar d'estudiant"
   unable_to_toggle_placement_833db6ff: "No es pot commutar la ubicació"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "No es pot transmetre el fitxer al servei d'emmagatzematge. Pot ser que el servei no funcioni o que hàgiu de tornar a iniciar la sessió al Canvas."
@@ -23982,8 +24065,10 @@ ca:
   use_comment_comment_136b5cb3: "Utilitza el comentari %{comment}"
   use_default_890939b7: "Utilitza el valor per defecte"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Permet utilitzar característiques experimentals abans que s'habilitin de manera general a la producció"
+  use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Feu servir Gem durant la importació de l'assignatura per actualitzar els enllaços de recursos del Canvas"
   use_high_contrast_ui_a5917282: "Utilitza la IU de contrast alt"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Utilitzeu marcadors de posició millorats per al contingut inserit a l’RCE."
+  use_instui_for_tool_installation_and_configuration_36de63e9: "Utilitzeu InstUI per als formularis d’instal·lació i de configuració de l’eina"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Voleu utilitzar MathMan per convertir de LaTeX a MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Voleu utilitzar MathMan per convertir de LaTeX a SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -24013,6 +24098,7 @@ ca:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Utilitzeu aquesta subfinestra per resoldre els resultats duplicats o les persones que no trobeu amb la cerca."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Utilitzeu aquesta subfinestra per cercar persones que vulgueu afegir a aquesta assignatura."
   use_this_photo_3a594830: "Fes servir aquesta foto"
+  use_toggle_switches_for_non_siteadmin_developer_ke_73dc754b: "Feu servir els commutadors per a la pàgina de claus de desenvolupador que no pertanyin a l’administrador del lloc web"
   use_webcam_1ed0bf6b: "Utilitza la càmera web"
   use_window_parent_in_deep_linking_response_8fe5f845: "Utilitzeu window.parent a la resposta a enllaç profund"
   used_by_permission_314a78dd: "Permís Utilitzat per"
@@ -24450,6 +24536,7 @@ ca:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Els usuaris poden accedir a rúbriques de tasques individuals i crear-ne de noves (però no editar-les) a través de Tasques si Tasques i qüestionaris - afegeix/edita/suprimeix està habilitat."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Els usuaris poden accedir a l'enllaç Administra els bancs de preguntes de la pàgina Índex de qüestionaris si Contingut del curs - visualitza i Tasques i qüestionaris - afegeix/edita/suprimeix estan habilitats."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Els usuaris poden afegir aquest calendari a la llista “Altres calendaris”."
+  users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Els usuaris poden inscriure temporalment un altre usuari en una assignatura. Un cop finalitzada la inscripció, se suprimeix l’usuari assignat de l'assignatura."
   users_d1b60cb0: Usuaris
   users_designers_22195c6f: "Usuaris - Dissenyadors"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Usuaris - genera codis d'emparellament d'observadors per als estudiants"
@@ -24464,6 +24551,7 @@ ca:
   users_students_ecbb43eb: "Usuaris - Estudiants"
   users_tas_27117894: "Usuaris - Auxiliars de professors"
   users_teachers_a5d5d1af: "Usuaris - Professors"
+  users_temporary_enrollments_88c4b8da: "Usuaris: inscripcions temporals"
   users_view_list_861c7a3f: "Usuaris - visualitza la llista"
   users_view_login_ids_a2e6a85: "Usuaris - visualitza els IDs d'inici de sessió"
   users_view_primary_email_address_14f4978f: "Usuaris - visualitza l'adreça electrònica principal"
@@ -25320,6 +25408,7 @@ ca:
     one: "S'ha produït l'error següent durant la vostra cerca:"
     other: "S'han produït els errors següents durant la vostra cerca:"
   your_search_returned_no_results_383a30cf: "La cerca no ha retornat cap resultat."
+  your_student_submissions_are_being_gathered_9c9ff764: "S'estan obtenint les entregues dels vostres estudiants"
   your_submission_has_not_been_graded_yet_d6963e53: "La vostra entrega encara no s'ha qualificat"
   your_time_for_this_quiz_has_been_reduced_394652e9: "El vostre temps per a aquesta prova s'ha reduït."
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "Els canvis no publicats es revertiran al seu estat desat anteriorment."
