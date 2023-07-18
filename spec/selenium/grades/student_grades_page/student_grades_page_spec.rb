@@ -235,7 +235,7 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 0%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 0.00%"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -257,7 +257,7 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 0%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 0.00%"
       end
 
       it "correctly displays all past grading period" do
@@ -285,9 +285,8 @@ describe "gradebook - logged in as a student" do
         # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
 
         # Verify that the total is correct
-        # TODO: VICE-3662 FIX the total_row in this case so that it displays N/A
         # No points possible, because it doesn't make sense when there are weighted grading periods/ assignment groups.
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total N/A"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total N/A"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -304,10 +303,9 @@ describe "gradebook - logged in as a student" do
         # Verify that the 2 group rows have the correct values
         expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 0.00% 0.00/1,100.00"
         expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 0.00% 0.00/10.00"
-
         # Verify that the total is correct
         # No points possible, because it doesn't make sense when there are weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 0%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 0.00%"
       end
 
       it "correctly displays current grading period" do
@@ -328,9 +326,8 @@ describe "gradebook - logged in as a student" do
         # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
 
         # Verify that the total is correct
-        # TODO: VICE-3662 FIX the total_row in this case so that it appears correctly as N/A
         # No points possible, because it doesn't make sense when there are weighted grading periods/ assignment groups.
-        # expect(f("tr[data-testid='total_row']").text).to eq "Total N/A"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total N/A"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -350,7 +347,7 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 0%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 0.00%"
       end
     end
 
