@@ -213,3 +213,10 @@ gem_migration_links:
   display_name: Course Import HTML Using Gem
   description: Use gem during course import to update Canvas resource links
   applies_to: SiteAdmin
+
+instui_for_import_page:
+  state: hidden
+  display_name: Use InstUI for the course import page
+  description: |-
+    If enabled, the course import page will use InstUI components
+  applies_to: SiteAdmin
