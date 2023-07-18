@@ -2198,6 +2198,7 @@ en-CA:
       Adds a new Bounced Emails tab to Account Admin Tools, which
       allows you to search email addresses where Canvas notifications
       have bounced
+  adds_additional_fields_to_the_content_migration_as_192c2d3f: "Adds Additional Fields to the Content Migration Asset Map"
   adds_additional_information_and_filtering_for_feat_3e55a058: "Adds additional information and filtering for feature flags"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Adds an account/course setting for a default due time for new assignments"
   adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
@@ -2208,6 +2209,7 @@ en-CA:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Adds analytics to a student’s context card."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Adds comment bank for assignment comments within speedgrader"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions"
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Adds menu option for accessing alignments at the outcome level with Improved Outcomes Management"
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Adds the option to grade by question in SpeedGrader for Quizzes.Next Quizzes"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Adds visual indicators to the submission details page to tell students that unread
@@ -3144,8 +3146,11 @@ en-CA:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Allows user to view user SIS IDs in a course People page."
   allows_user_to_weight_assignment_groups_95cb11b2: "Allows user to weight assignment groups."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Allows users to add a friendly description to outcomes for student and parent view in the Student Learning Mastery Gradebook."
+  allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: "Allows users to add a temporary enrollment with a start date, end date, and role"
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Allows users to add conferences from the calendar"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Allows users to add LTI tools with conference_selection placement type"
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Allows users to delete a temporary enrollment"
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Allows users to edit an existing temporary enrollment"
   allows_users_to_edit_conferences_2d3c960c: "Allows users to edit Conferences."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Allows users to enable the \"Launch SpeedGrader Filtered by Student Group\" option for courses on the course settings page. When active and a student group has been selected in New Gradebook, SpeedGrader will only load students in the selected group."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Allows users to import groups in a course."
@@ -3375,6 +3380,7 @@ en-CA:
   analytics_course_code_student_name_d63bab4c: "Analytics: %{course_code} -- %{student_name}"
   and_7fcc2911: And
   and_a_few_more_not_shown_here_28e7d713: "... and a few more not shown here"
+  and_compressed_into_a_zip_file_this_may_take_some__1acbe09f: "and compressed into a zip file. This may take some time, depending on the size and number of submission files."
   and_count_more_43eae021: "and %{count} more…"
   and_many_more_not_shown_here_fb777a4c: "... and *many* more not shown here"
   and_more_1c35b232: "and more..."
@@ -3720,6 +3726,7 @@ en-CA:
   artist_info_for_username_for_description_12d5d862: "Artist info for %{userName} for %{description}"
   as_of_a036fa2e: "As of"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "As of %{date}, the LTI 1.3 OIDC Auth endpoint has changed from https://canvas.instructure.com/api/lti/authorize_redirect to https://sso.canvaslms.com/api/lti/authorize_redirect. The reasoning and scope of this change is detailed in *this Canvas Community article*, and additional information is available in our API docs. This change is small and will not take very long, but requires configuration change on the tool side for every LTI 1.3 tool that is installed in Canvas."
+  as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "As of %{date}, the LTI 1.3 Platform Storage specification is fully supported by Canvas. Tools wishing to implement this must change the OIDC Auth endpoint they store for Canvas from *https://canvas.instructure.com/api/lti/authorize_redirect* to *https://sso.canvaslms.com/api/lti/authorize_redirect*. The OIDC Auth endpoint recommended for new 1.3 tool installations has also changed, and we recommend that all 1.3 tools switch their configuration to use this new endpoint as soon as they can."
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "As you type in this field, the list of groups will be automatically filtered to only include those whose names match your input."
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: "As you type in this field, the list of results will be automatically updated."
   ascending_b3c87427: Ascending
@@ -4678,7 +4685,9 @@ en-CA:
       internal_ca_description: "If your LDAP server presents a certificate issued by an untrusted, internal root CA, you *must* upload your root CA in order for Canvas to trust it when connecting."
       internal_ca_warning: "*Warning*: Using an internal root CA is less secure, and increases the risk of compromise. We strongly recommend using certificates issued by a trusted certificate authority, instead."
       ldap_timeout_failure_help2: "If Canvas times out too many times communicating with the LDAP server, it will block further login attempts from using that LDAP server for %{time}. Your LDAP server last timed out at %{timestamp}."
+      verify_tls_cert_opt_in_dated_description: "TLS certificate verification will be required on *%{enforcement_date}*, but you may enable it early to ensure your LDAP server is compliant."
       verify_tls_cert_opt_in_description: "TLS certificate verification will be required on *%{enforcement_date}*, but you may enable it early to ensure your LDAP server is compliant."
+      verify_tls_cert_opt_in_undated_description: "TLS certificate verification will be required soon, but you may enable it early to ensure your LDAP server is compliant."
     ldap_settings_test: 
       labels: 
         pass: Password
@@ -6709,6 +6718,7 @@ en-CA:
     unexpected_error: "There was an unexpected error, please contact support."
     unknown: Unknown
     upload_timeout_error: "The file upload process timed out."
+  content_migration_asset_map_v2_f0f455f: "Content Migration Asset Map v2"
   content_migration_queued_46c27790: "Content migration queued"
   content_migration_running_percent_complete_4b00c024: "Content migration running, %{percent}% complete"
   content_migrations: 
@@ -7897,6 +7907,7 @@ en-CA:
   course_image_for_course_cfbb08df: "Course image for %{course}"
   course_image_settings_eba3ec55: "Course image settings"
   course_implemented_apps_fa658f5a: "Course Implemented Apps"
+  course_import_html_using_gem_812d0af5: "Course Import HTML Using Gem"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Course is already associated with a blueprint"
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Course is ineligible to be set as a blueprint"
   course_landing_page_49a53ade: "Course landing page"
@@ -8625,6 +8636,7 @@ en-CA:
   create_a_new_domain_lookup_1830a512: "Create a new domain lookup"
   create_a_new_module_6f31b0fe: "Create a new Module"
   create_a_new_user_for_address_7487e9c9: "Create a new user for \"%{address}\""
+  create_a_temporary_enrollment_167f05f1: "Create a Temporary Enrollment"
   create_account_263ec6: "Create Account"
   create_an_ba36d171: "Create an"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Create and administer online quizzes and surveys, both graded and ungraded."
@@ -8681,6 +8693,7 @@ en-CA:
   create_pages_581a4d59: "Create pages"
   create_slots_71dbb2f8: "Create Slots"
   create_subject_86de5618: "Create Subject"
+  create_temporary_enrollment_3d4eaa33: "Create Temporary Enrollment"
   create_theme_based_on_40651ed3: "Create theme based on"
   create_theme_based_on_name_7b1bd318: "Create theme based on %{name}"
   create_users_view: 
@@ -9559,6 +9572,7 @@ en-CA:
     empty_message: "No message"
   discussion_topic_a7bf935: "discussion topic"
   discussion_topic_dc85ad4c: "Discussion Topic"
+  discussion_topic_edit_error_page_c9fb069c: "Discussion Topic Edit Error Page"
   discussion_topic_initial_query_error_37c98b4: "Discussion Topic initial query error"
   discussion_topic_menu_3d4684c6: "Discussion Topic Menu"
   discussion_topic_performance_improvements_for_bibs_79a483ef: "Discussion Topic performance improvements for Bibsys"
@@ -9956,6 +9970,7 @@ en-CA:
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey Business Schools - Student Activity and Performance"
   down_5831a426: Down
   download_3e89bdef: download
+  download_all_submissions_304d6797: "Download all submissions"
   download_as_ce13bff6: "Download as..."
   download_as_zip_5dae7f19: "Download as Zip"
   download_assignment_submissions_41e50ee7: "Download Assignment Submissions"
@@ -10917,6 +10932,7 @@ en-CA:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Error: The tool returned an invalid content type \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Error updating %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Error updating comment"
+  error_updating_notes_31b24785: "Error updating notes"
   error_updating_pacename_ad07f9df: "Error updating %{paceName}"
   error_updating_status_of_module_item_80336274: "Error updating status of module item"
   error_updating_submission_draft_1d40ade7: "Error updating submission draft"
@@ -11548,6 +11564,7 @@ en-CA:
   filter_speedgrader_by_student_group_53683142: "Filter SpeedGrader by Student Group"
   filter_students_2327fe79: "Filter Students"
   filters_92f2776f: Filters
+  final_grade_474e3e37: "Final Grade: "
   final_grade_4d7f6545: "Final Grade"
   final_grade_6938dca8: "Final grade:"
   final_grade_6e94d99e: "Final Grade:"
@@ -11819,6 +11836,7 @@ en-CA:
   grade_a91e433e: "Grade:"
   grade_anonymously_6c37133a: "Grade anonymously"
   grade_assignment_7c1abc11: "Grade %{assignment}"
+  grade_by_9ea3661e: "Grade by"
   grade_by_question_9d9b8a71: "Grade by question"
   grade_calculator_performance_improvements_564af0de: "Grade Calculator Performance Improvements"
   grade_change_activity_75fb525: "Grade Change Activity"
@@ -13158,6 +13176,8 @@ en-CA:
   http_response_code_832d6baa: "HTTP Response: %{code}"
   https_3a02e3fb: https
   https_b8426ad8: "https://"
+  https_example_com_config_xml_d3bae5e3: "https://example.com/config.xml"
+  https_lti_tool_provider_example_herokuapp_com_regi_305953da: "https://lti-tool-provider-example.herokuapp.com/register"
   hungarian_fc7d30c9: Hungarian
   hungary_36_cd3e515b: "Hungary (+36)"
   hypothetical_end_date_117d81cf: "Hypothetical end date"
@@ -13302,6 +13322,10 @@ en-CA:
       of an oEmbed resource request.
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "If enabled, prefills the assignment form with values from deep link messages on the assignment create/edit page."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "If enabled, query parameters will not be copied to the POST body during an LTI launch."
+  if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
+      If enabled, root accounts and subaccounts will see toggle switches for enabling
+      and disabling keys on the developer keys page. Siteadmin will still see the
+      disable/allow/enable buttons.
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "If enabled, scopes will be validated on API requests if the developer key being used requires scopes."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "If enabled, submission history for New Quizzes quizzes is dealt with separately."
@@ -13335,6 +13359,9 @@ en-CA:
       Canvas instances where root accounts are on the same shard
       as the site admin account. Behavior in other instances
       already behaved in this way.
+  if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
+      If enabled, the tool installation and configuration forms located on the Account and Course settings pages will use
+      InstUI components, as opposed to the older, less accessible homegrown components.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       If enabled, the user will see a warning Alert box near the top of the
       Developer Keys page informing them of upcoming or completed OIDC Auth endpoint changes.
@@ -13653,6 +13680,8 @@ en-CA:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Include scores when alerting about grades.
       If your email is not an institution email this means sensitive content will be sent outside of the institution.
+  include_sis_batch_info_f79dd131: "Include SIS batch info;"
+  include_sis_batch_information_75bf66c4: "Include SIS batch information"
   include_speedgrader_in_assignment_header_menu_69cd8656: "Include SpeedGrader in Assignment Header Menu"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Include the Datadog RUM JS Agent in the document HEAD."
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Include this assignment's grades when syncing to your school's Student Information System"
@@ -13820,6 +13849,11 @@ en-CA:
       enter_search_terms: "enter search terms"
   instructure_default_73317bb1: "Instructure Default"
   instructure_default_old_66ef6e9b: "Instructure Default (Old)"
+  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructure hosts Canvas Commons in the region chosen by your institution, which is Europe. This means that when you use Canvas Commons your personal data will be stored and processed in Germany. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructure hosts Canvas Commons in the region chosen by your institution, which is Asia Pacific. This means that when you use Canvas Commons your personal data will be stored and processed in Singapore. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructure hosts Canvas Commons in the region chosen by your institution, which is the US. This means that when you use Canvas Commons your personal data will be stored and processed in the United States. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructure hosts Canvas Commons in the region chosen by your institution, which is Canada. This means that when you use Canvas Commons your personal data will be stored and processed in Canada. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructure hosts Canvas Commons in the region chosen by your institution, which is Australia. This means that when you use Canvas Commons your personal data will be stored and processed in Australia. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url})."
   instructure_inline_media_comment: 
     alerts: 
       kaltura_disabled: "Kaltura has been disabled for this Canvas site"
@@ -13909,6 +13943,7 @@ en-CA:
   invalid_bymonthday_bymonthday_87791c1b: "Invalid BYMONTHDAY '%{bymonthday}'"
   invalid_calculation_int_for_this_calculation_metho_971fada3: "invalid calculation_int for this calculation_method"
   invalid_content_type_utf_8_required_bd458b78: "Invalid content type, UTF-8 required"
+  invalid_context_9186d37e: "Invalid context"
   invalid_context_for_group_f6cd268a: "invalid context for group"
   invalid_context_type_68f40a61: "Invalid context type"
   invalid_context_type_72085a6a: "invalid context type"
@@ -13963,6 +13998,9 @@ en-CA:
   invalid_score_3d247da7: "Invalid score"
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: |-
       Invalid sftp username. We were unable to determin the username to use due to no domain ending in .instructure.
+                                    Please reach out in #canvas-sre in Slack.
+  invalid_sftp_username_we_were_unable_to_determine__13339947: |-
+      Invalid sftp username. We were unable to determine the username to use due to no domain ending in .instructure.
                                     Please reach out in #canvas-sre in Slack.
   invalid_sis_sync_status_b68db497: "Invalid SIS sync status"
   invalid_state_parameter_7a5aa108: "Invalid state parameter"
@@ -14742,8 +14780,8 @@ en-CA:
           mfa_enrollment: |-
               Multi-factor authentication increases security by requiring that you have something in your physical possession,
               in addition to knowing your password, in order to log in to Canvas. This can be a device that can generate
-              verification codes, or a phone that can receive text messages. The Google Authenticator app for [iPhone](%{iphone_url}) or
-              [Android](%{android_url}) can be configured by scanning the QR Code below. Other tokens can be configured by entering the
+              verification codes, or a phone that can receive text messages. The Google Authenticator app for iPhone or
+              Android can be configured by scanning the QR Code below. Other tokens can be configured by entering the
               secret key **%{secret_key}**. Once you have configured multi-factor authentication, it is recommended that you go to your
               profile page and print out a set of back-up codes, in case your normal multi-factor device is unavailable.
           mfa_required: "You are required to set up multi-factor authentication."
@@ -14939,6 +14977,7 @@ en-CA:
   manage_students_for_the_course_3b1bc4f0: "Manage students for the course"
   manage_subject_coursecontext_2328e1ff: "Manage Subject: %{courseContext}"
   manage_subject_f9835769: "Manage Subject"
+  manage_temporary_enrollments_4c4f21ef: "Manage Temporary Enrollments"
   manage_update_23de23a1: "Manage Update"
   manage_update_for_toolname_f8e3b2fb: "Manage update for %{toolName}"
   manage_usage_rights_c5a8c216: "Manage Usage Rights"
@@ -15139,6 +15178,7 @@ en-CA:
   menu_for_group_title_fbf60567: "Menu for group %{title}"
   menu_for_outcome_title_1d93378d: "Menu for outcome %{title}"
   menu_of_options_for_this_permission_77f50c31: "Menu of options for this permission"
+  menu_option_for_outcome_details_page_2dcd13d6: "Menu Option for Outcome Details Page"
   menu_options_9b6b0b5c: "Menu options"
   mesa_public_course_syllabus_52282dd3: "Mesa Public Course Syllabus"
   mesa_public_user_inactivity_report_a6792ccf: "Mesa Public User Inactivity Report"
@@ -16988,6 +17028,7 @@ en-CA:
   missing_required_description_99a99ff: "Missing required description"
   missing_required_fields_fields_30e20799: "Missing required fields: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Missing required fields. Please fill in all required fields."
+  missing_required_parameters_4f589df8: "Missing required parameters"
   missing_required_points_39db69fa: "Missing required points"
   missing_required_ratings_9b19e66: "Missing required ratings"
   missing_required_title_ca06a6de: "Missing required title"
@@ -17134,6 +17175,8 @@ en-CA:
   more_modules_d9a9f003: "More Modules"
   more_options_272b4953: "More Options"
   more_options_e89670cf: "More options"
+  more_options_for_message_from_authorname_4001ddda: "More options for message from %{authorName}"
+  more_options_for_subject_e18d421: "More options for %{subject}"
   more_outcomes_have_been_loaded_9acafe9c: "More Outcomes Have Been Loaded"
   more_people_options_730e9686: "More People Options"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "More results were added at the bottom of the page."
@@ -17522,6 +17565,8 @@ en-CA:
   next_student_79955068: "Next Student"
   next_student_b62869f4: "Next student"
   next_up_review_feedback_19a15e0e: "Next Up: Review Feedback"
+  next_up_review_feedback_59555dbd: "NEXT UP: Review Feedback"
+  next_up_submit_assignment_2fdb7174: "NEXT UP: Submit Assignment"
   next_up_submit_assignment_793a9d41: "Next Up: Submit Assignment"
   next_window_window_90271943: "Next window: %{window}"
   nickname_1e6da3ad: Nickname
@@ -18193,6 +18238,7 @@ en-CA:
   on_8f7190e5: "On"
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "On courses with usage rights enabled, enforces usage rights selection on discussion topic file attachments"
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "On %{date}, the LTI 1.3 OIDC Auth endpoint will be changing from https://canvas.instructure.com/api/lti/authorize_redirect to https://sso.canvaslms.com/api/lti/authorize_redirect. The reasoning and scope of this change is detailed in *this Canvas Community article*, and additional information is available in our API docs. This change is small, but requires configuration change on the tool side for every LTI 1.3 tool that is installed in Canvas."
+  on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "On %{date}, the LTI 1.3 Platform Storage specification will be fully supported by Canvas. Tools wishing to implement this must change the OIDC Auth endpoint they store for Canvas from *https://canvas.instructure.com/api/lti/authorize_redirect* to *https://sso.canvaslms.com/api/lti/authorize_redirect*. The OIDC Auth endpoint recommended for new 1.3 tool installations will also change on that day, and we recommend that all 1.3 tools switch their configuration to use this new endpoint as soon as they can."
   on_for_key_keyname_bbac4e1b: "On for key: %{keyName}"
   on_paper_46d0ba36: "On Paper"
   on_time_17ca5ad9: "On Time"
@@ -18257,6 +18303,7 @@ en-CA:
   open_comment_tray_160293d7: "Open Comment Tray"
   open_complete_incomplete_menu_cfe2033b: "Open Complete/Incomplete menu"
   open_conversation_a6590865: "Open Conversation"
+  open_conversation_subject_1dd2d3c: "Open Conversation %{subject}"
   open_discussion_title_for_comments_6baa3fa: "Open discussion %{title} for comments"
   open_emoji_menu_1df0eb0b: "Open emoji menu"
   open_event_menu_e9a21e39: "Open event menu"
@@ -21586,6 +21633,7 @@ en-CA:
   remove_filename_87f3781e: "remove %{filename}"
   remove_filename_dab5c02e: "Remove %{filename}"
   remove_filter_6f7204e2: "Remove filter"
+  remove_filtername_filter_6b6d7063: "Remove %{filterName} Filter"
   remove_grading_scheme_title_d3942a08: "Remove Grading Scheme %{title}"
   remove_group_5d2f2f2d: "Remove Group"
   remove_group_981d6a02: "Remove Group?"
@@ -21683,8 +21731,10 @@ en-CA:
   reply_389d6fb9: Reply
   reply_all_80298bee: "Reply all"
   reply_all_b864cd0e: "Reply All"
+  reply_for_subject_ae247d1e: "Reply for %{subject}"
   reply_from_author_a2806c77: "Reply from %{author}"
   reply_from_name: "%{name} via Canvas Notifications"
+  reply_to_authorname_f209e84a: "Reply to %{authorName}"
   reply_to_bodyhtml_7a27da28: "Reply to %{bodyHTML}"
   reply_to_comment_72d96728: "Reply to Comment"
   reply_to_conversation_f1aa0d4: "Reply to conversation"
@@ -21738,6 +21788,7 @@ en-CA:
   reports_course_f09b7d9e: "Reports (Course)"
   reports_manage_92bc45cb: "Reports - manage"
   reqired_end_date_a7deac41: "Reqired end date"
+  request_failed_with_status_status_47054af0: "Request failed with status %{status}"
   request_id_1499afb0: "Request ID"
   request_successfully_sent_note_that_applying_score_ee8665b6: "Request successfully sent. Note that applying scores may take a while and changes will not appear until you reload the page."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Request that DocViewer use CloudFront for serving pdf assets."
@@ -21841,7 +21892,9 @@ en-CA:
   retry_duplicating_originalassignmentname_884aee1: "Retry duplicating \"%{originalAssignmentName}\""
   retry_ebd5f8ba: Retry
   retry_migrating_name_bdc802ef: "Retry migrating \"%{name}\""
+  return_to_conversation_list_86688140: "Return to Conversation List"
   return_to_parent_folder_4ece2184: "return to parent folder"
+  return_to_subject_in_conversation_list_d67b8e73: "Return to %{subject} in Conversation List"
   returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Returns string values instead of numeric values in variable substitutions"
   revert_date_changes_5105ce5: "Revert date changes"
   revert_to_actual_score_f665eea9: "Revert to Actual Score"
@@ -21908,6 +21961,9 @@ en-CA:
       manage_site_settings: "Manage site-wide and plugin settings"
       manage_storage_quotas: "Manage storage quotas"
       manage_students: "Add/remove students for the course"
+      manage_temp_enroll_add: "Add temporary enrollments"
+      manage_temp_enroll_delete: "Delete temporary enrollments"
+      manage_temp_enroll_edit: "Edit temporary enrollments"
       manage_user_logins: "Modify login details for users"
       manage_user_notes: "Manage faculty journal entries"
       manage_user_observers: "Manage observers for users"
@@ -23618,6 +23674,8 @@ en-CA:
       unrecorgnized_type: "Unrecognized import type"
     instructure_csv: "Instructure formatted CSV or zipfile of CSVs"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_id_8b755858: sis_batch_id
+  sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "SIS data"
   sis_data_import_8bb623ce: "SIS Data - import"
   sis_data_manage_328a4799: "SIS Data - manage"
@@ -23996,6 +24054,7 @@ en-CA:
   status_color_picker_9ea0156b: "%{status} Color Picker"
   status_e051bb30: status
   status_e7fdbe06: Status
+  status_for_key_keyname_47668960: "%{status} for key: %{keyName}"
   statuses_497dfa15: Statuses…
   statuses_f41543d8: Statuses
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes - Namespace Custom Data"
@@ -24229,9 +24288,15 @@ en-CA:
   subject_details_12405b1: "Subject Details"
   subject_home_8e593f72: "Subject Home"
   subject_home_page_41226803: "Subject Home Page"
+  subject_mark_as_read_b0218a: "%{subject} Mark as Read"
+  subject_mark_as_unread_6f07435f: "%{subject} Mark as Unread"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Subject must contain fewer than 255 characters."
   subject_name_a1ac4da4: "Subject Name"
+  subject_not_selected_10dacadf: "%{subject} not selected"
+  subject_not_starred_4a113097: "%{subject} not starred"
   subject_reply_to: "Re: %{subject}"
+  subject_selected_2196b77e: "%{subject} selected"
+  subject_starred_8ca02058: "%{subject} starred"
   subject_subject_9e1057f7: "Subject: %{subject}"
   subjects_14c0c4de: Subjects
   submission: 
@@ -24447,6 +24512,7 @@ en-CA:
   submit_on_behalf_of_student_af674b95: "Submit on Behalf of Student"
   submit_ticket_5515ffd: "Submit Ticket"
   submitted_318fad53: Submitted
+  submitted_718f5cbc: "SUBMITTED: "
   submitted_at_4d5ea3aa: "Submitted At"
   submitted_by_name_dab6d5e1: "Submitted by: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Submitted by %{proxy} on %{date}"
@@ -24682,6 +24748,12 @@ en-CA:
   tempe_grade_export_c611da01: "Tempe Grade Export"
   template_account_21ac8f4f: "Template Account"
   templates_4ca13d07: Templates
+  temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Temporarily enroll a user into a course. This temporary enrollment is paired up with another enrollment within the course."
+  temporarily_enroll_name_8acb66ce: "Temporarily enroll %{name}"
+  temporary_enrollments_add_373181b7: "Temporary Enrollments - add"
+  temporary_enrollments_delete_52ffaae4: "Temporary Enrollments - delete"
+  temporary_enrollments_edit_67c01325: "Temporary Enrollments - edit"
+  temporary_enrollments_f0937c5a: "Temporary Enrollments"
   tenant_d2a41f78: Tenant
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tenant missing or sync disabled. Check the Microsoft sync integration settings for the course and account."
   tenant_name_e174f404: "Tenant Name"
@@ -24775,6 +24847,7 @@ en-CA:
   that_user_account_has_been_deleted_please_contact__350e0e0: "That user account has been deleted.  Please contact your system administrator to have your account re-activated."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "The ability for users to receive notifications from slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "The account ID of the account to which the reporting user belongs"
+  the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "The account uuid of the account to which the reporting user belongs"
   the_account_wide_sync_settings_were_changed_while__90c48497: "The account-wide sync settings were changed while syncing. Please attempt the sync again."
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "The Active Directory attribute that will be used to match a Canvas user to a Microsoft user"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "The algorithm to use for signing AuthnRequest, LogoutRequest, and LogoutResponse messages sent to the IdP."
@@ -25083,6 +25156,7 @@ en-CA:
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "The sync encountered an error and did not complete"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date."
   the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "The team could be not be created because the Microsoft group has no owners. This may be an intermittent error: please try to sync again, and if the problem persists, contact support."
+  the_temporarily_enrolled_user_can_only_view_and_pa_a5bf0184: "The temporarily enrolled user can only view and participate in a course between the start and end dates that were chosen when making the temporary enrollment."
   the_term_for_export_data_5aad7a0a: "The term for export data"
   the_term_for_grade_export_data_d55a6be7: "The term for grade export data"
   the_term_has_ended_for_this_course_f0ab367: "The term has ended for this course"
@@ -25142,6 +25216,8 @@ en-CA:
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "There are unsaved changes to a grade.\\n\\nContinue anyway?"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "There is a 2 app limit for placement within the RCE toolbar. This setting only applies to the enhanced RCE."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "There is a 2 app limit for placement within the RCE toolbar."
+  there_is_already_a_page_in_this_course_with_this_t_5b37ecf2: "There is already a page in this course with this title."
+  there_is_already_a_page_in_this_group_with_this_ti_3dac30e5: "There is already a page in this group with this title."
   there_is_currently_1_available_grader_758e4a21: "There is currently 1 available grader"
   there_was_a_failure_logging_out_at_your_idp_30070527: "There was a failure logging out at your IdP"
   there_was_a_problem_applying_scores_7baaeea7: "There was a problem applying scores."
@@ -25326,6 +25402,7 @@ en-CA:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "This assignment submission is my own, original work"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "This assignment will no longer count towards your grade."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "This attachment has been unpublished by the author."
+  this_canvas_community_article_details_the_reasonin_37be9375: "*This Canvas Community article* details the reasoning behind this change, its scope, exact directions for what to change, and further clarification for both Canvas admins and LTI 1.3 tool developers."
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "This Canvas installation is only for testing and *will reset every month.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "This Canvas installation is only for testing and *will reset every week.*"
@@ -25484,6 +25561,8 @@ en-CA:
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "This is an anonymous Discussion, Your name and profile picture will be hidden from other course members."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "This is enabled by default as assignments can not be withheld from the gradebook and still count towards it."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "This is just a dev-only feature you can turn on to get a preview of how pages would look in a RTL environment, without having to change your language to one that is normally RTL"
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "This is *not* a breaking change. All LTI 1.3 tool behavior will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. Enforcement of this change will happen on a later, unspecified date."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "This is *not* a breaking change. All LTI 1.3 tool behavior will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. This also does **not** need to be completed before %{date}. Enforcement of this change will happen on a later, unspecified date."
   this_is_not_a_valid_grade_9cc2cb8: "This is not a valid grade"
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "This is technicaly a security vulnerability, but some schools need to preserve their workflows for a while."
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "This is the currently chosen grade for this student."
@@ -25614,6 +25693,7 @@ en-CA:
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to color values and images, you will see a *Preview Your Changes* button. Click it to refresh this page and see how your changes look."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "This section pace will be removed and the pace will revert back to the default pace."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student."
+  this_setting_only_impacts_courses_it_will_include__1b2169a: "This setting only impacts courses. It will include sis_batch_id and sis_batch_user_id"
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "This setting significantly changes the Canvas experience for students and teachers."
   this_settings_only_impact_enrollments_this_include_7f51358: "This settings only impact enrollments. This include objects with a last_activity_at timestamp greater than Updated After parameter. The default is off"
   this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "This student pace will be removed and the pace will revert back to the previously assigned pace."
@@ -26754,6 +26834,8 @@ en-CA:
       Unable to obtain lock on SFTP users table. Please try again in a minute.
                                     If it continues to fail, please reach out in #canvas-sre in Slack.
   unable_to_parse_certificate_f25ff8b5: "Unable to parse certificate"
+  unable_to_perform_diffing_against_mismatched_previ_801191d2: "Unable to perform diffing against mismatched previous and current %{type} imports"
+  unable_to_post_comment_c34ba536: "Unable to post comment"
   unable_to_read_file_2d04b0c: "Unable to read file"
   unable_to_remove_app_4293cb53: "Unable to remove app"
   unable_to_remove_outcomes_f682e68f: 
@@ -26767,6 +26849,7 @@ en-CA:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Unable to send messages to users in %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Unable to set default grade because this assignment is due in a closed grading period for at least one student"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Unable to set up drag and drop for modules"
+  unable_to_submit_score_e47990e3: "Unable to submit score"
   unable_to_switch_students_b901bc4b: "Unable to switch students"
   unable_to_toggle_placement_833db6ff: "Unable to toggle placement"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas."
@@ -27089,9 +27172,11 @@ en-CA:
   use_comment_comment_136b5cb3: "Use comment %{comment}"
   use_default_890939b7: "Use Default"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Use experimental features before they are generally enabled in production"
+  use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Use gem during course import to update Canvas resource links"
   use_high_contrast_ui_a5917282: "Use High Contrast UI"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Use HTML5 Recorder in Content Editor instead of Flash"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Use improved placeholders for inserted content in the RCE."
+  use_instui_for_tool_installation_and_configuration_36de63e9: "Use InstUI for tool installation and configuration forms"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Use MathMan to convert LaTeX to MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Use MathMan to convert LaTeX to SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -27132,6 +27217,7 @@ en-CA:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Use this panel to resolve duplicate results or people not found with your search."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Use this panel to search for people you wish to add to this course."
   use_this_photo_3a594830: "Use This Photo"
+  use_toggle_switches_for_non_siteadmin_developer_ke_73dc754b: "Use toggle switches for non-siteadmin developer keys page"
   use_webcam_1ed0bf6b: "Use Webcam"
   use_window_parent_in_deep_linking_response_8fe5f845: "Use window.parent in Deep Linking Response"
   used_by_permission_314a78dd: "Used by Permission"
@@ -27587,6 +27673,7 @@ en-CA:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add / edit / delete is enabled."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Users can access the Manage Question Banks link on the Quizzes Index Page when Course content - view and Assignments and Quizzes - add / edit / delete are enabled."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Users can add this calendar to their \"Other Calendars\" list."
+  users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Users can temporarily enroll another user in a course. The assigned user is removed from the course when the enrollment expires."
   users_d1b60cb0: Users
   users_designers_22195c6f: "Users - Designers"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Users - generate observer pairing codes for students"
@@ -27603,6 +27690,7 @@ en-CA:
   users_students_ecbb43eb: "Users - Students"
   users_tas_27117894: "Users - TAs"
   users_teachers_a5d5d1af: "Users - Teachers"
+  users_temporary_enrollments_88c4b8da: "Users - Temporary Enrollments"
   users_view_list_861c7a3f: "Users - view list"
   users_view_login_ids_a2e6a85: "Users - view login IDs"
   users_view_primary_email_address_14f4978f: "Users - view primary email address"
@@ -28544,6 +28632,7 @@ en-CA:
     one: "Your search encountered the following error:"
     other: "Your search encountered the following errors:"
   your_search_returned_no_results_383a30cf: "Your search returned no results."
+  your_student_submissions_are_being_gathered_9c9ff764: "Your student submissions are being gathered"
   your_submission_has_not_been_graded_yet_d6963e53: "Your submission has not been graded yet"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Your time for this quiz has been reduced."
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "Your unpublished changes will be reverted to their previously saved state."
