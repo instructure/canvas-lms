@@ -1061,6 +1061,7 @@ const locale = {
     "message": "Up And Right Diagonal Arrow"
   },
   "up_c553575d": { "message": "Up" },
+  "updated_link_a827e441": { "message": "Updated link" },
   "upload_document_253f0478": { "message": "Upload Document" },
   "upload_file_fd2361b8": { "message": "Upload file" },
   "upload_image_6120b609": { "message": "Upload image" },

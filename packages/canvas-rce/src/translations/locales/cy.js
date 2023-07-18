@@ -1096,6 +1096,7 @@ const locale = {
     "message": "Saeth Croeslinol i fyny ac i’r dde"
   },
   "up_c553575d": { "message": "I Fyny" },
+  "updated_link_a827e441": { "message": "Dolen wedi’i diweddaru" },
   "upload_document_253f0478": { "message": "Llwytho Dogfen i fyny" },
   "upload_file_fd2361b8": { "message": "Llwytho Ffeil i Fyny" },
   "upload_image_6120b609": { "message": "Llwytho Delwedd i Fyny" },

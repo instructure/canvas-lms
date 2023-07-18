@@ -1101,6 +1101,7 @@ const locale = {
     "message": "Ki runga Na Matau Hauroki Pere"
   },
   "up_c553575d": { "message": "Ake" },
+  "updated_link_a827e441": { "message": "Hononga kua whakahoutia" },
   "upload_document_253f0478": { "message": "Tikiake Tuhinga" },
   "upload_file_fd2361b8": { "message": "Tukuake kōnae" },
   "upload_image_6120b609": { "message": "Tukuake Whakāturanga" },

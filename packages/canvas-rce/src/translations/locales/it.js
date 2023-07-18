@@ -1122,6 +1122,7 @@ const locale = {
     "message": "Freccia diagonale su e destra"
   },
   "up_c553575d": { "message": "Su" },
+  "updated_link_a827e441": { "message": "Link aggiornato" },
   "upload_document_253f0478": { "message": "Carica documento" },
   "upload_file_fd2361b8": { "message": "Carica File" },
   "upload_image_6120b609": { "message": "Carica immagine" },

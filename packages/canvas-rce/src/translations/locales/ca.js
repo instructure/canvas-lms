@@ -1140,6 +1140,7 @@ const locale = {
     "message": "Fletxa ascendent dreta en diagonal"
   },
   "up_c553575d": { "message": "Amunt" },
+  "updated_link_a827e441": { "message": "S’ha actualitzat l''enllaç" },
   "upload_document_253f0478": { "message": "Penja un document" },
   "upload_file_fd2361b8": { "message": "Penja el fitxer" },
   "upload_image_6120b609": { "message": "Penja una imatge" },

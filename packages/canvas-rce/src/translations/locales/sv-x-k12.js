@@ -1090,6 +1090,7 @@ const locale = {
     "message": "Diagonal pil, uppåt och till höger"
   },
   "up_c553575d": { "message": "Upp" },
+  "updated_link_a827e441": { "message": "Uppdaterad länk" },
   "upload_document_253f0478": { "message": "Ladda upp dokument" },
   "upload_file_fd2361b8": { "message": "Ladda upp fil" },
   "upload_image_6120b609": { "message": "Ladda upp bild" },

@@ -1073,6 +1073,7 @@ const locale = {
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "Panah Barat Laut" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "Panah Timur Laut" },
   "up_c553575d": { "message": "Ke atas" },
+  "updated_link_a827e441": { "message": "Pautan dikemas kini" },
   "upload_document_253f0478": { "message": "Muat Naik Dokumen" },
   "upload_file_fd2361b8": { "message": "Muat Naik Fail" },
   "upload_image_6120b609": { "message": "Muat Naik Imej" },
