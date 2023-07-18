@@ -29,14 +29,20 @@ const I18n = useI18nScope('grade_summary')
 
 export const totalRow = (queryData, calculateOnlyGradedAssignments = false) => {
   const applicableAssignments = filteredAssignments(queryData, calculateOnlyGradedAssignments)
-  const total = getTotal(
+  let total = getTotal(
     applicableAssignments,
     queryData?.assignmentGroupsConnection?.nodes,
     queryData?.gradingPeriodsConnection?.nodes,
     queryData?.applyGroupWeights
   )
 
-  const formattedTotal = total === ASSIGNMENT_NOT_APPLICABLE ? '0%' : `${formatNumber(total)}%`
+  if (total === ASSIGNMENT_NOT_APPLICABLE) {
+    if (!calculateOnlyGradedAssignments || ENV.current_grading_period_id === '0') {
+      total = 0
+    }
+  }
+  const formattedTotal =
+    total === ASSIGNMENT_NOT_APPLICABLE ? ASSIGNMENT_NOT_APPLICABLE : `${formatNumber(total)}%`
 
   const letterGrade =
     total === ASSIGNMENT_NOT_APPLICABLE
