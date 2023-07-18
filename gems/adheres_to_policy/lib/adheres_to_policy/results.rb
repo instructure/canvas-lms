@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,24 +17,42 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "active_support"
-require "active_support/core_ext/object/blank"
+require "singleton"
 
 module AdheresToPolicy
-  require "adheres_to_policy/cache"
-  require "adheres_to_policy/class_methods"
-  require "adheres_to_policy/condition"
-  require "adheres_to_policy/configuration"
-  require "adheres_to_policy/instance_methods"
-  require "adheres_to_policy/policy"
-  require "adheres_to_policy/results"
+  class Success
+    include Singleton
 
-  @configuration = Configuration.new
-  class << self
-    attr_reader :configuration
+    def success?
+      true
+    end
+  end
 
-    def configure
-      yield(configuration)
+  class Failure
+    include Singleton
+
+    def justifications
+      []
+    end
+
+    def success?
+      false
+    end
+  end
+
+  JustifiedFailure = Struct.new(:justification, :context) do
+    def success?
+      false
+    end
+
+    def justifications
+      [self]
+    end
+  end
+
+  JustifiedFailures = Struct.new(:justifications) do
+    def success?
+      false
     end
   end
 end
