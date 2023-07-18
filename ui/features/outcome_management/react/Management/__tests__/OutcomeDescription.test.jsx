@@ -23,9 +23,9 @@ import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {defaultRatingsAndCalculationMethod} from './helpers'
 
 describe('OutcomeDescription', () => {
+  let setShouldExpandMock
   const empty = ''
   const truncatedTestId = 'description-truncated'
-  const truncatedTestContentId = 'description-truncated-content'
   const ratingsTestId = 'outcome-management-ratings'
   const expandedTestId = 'description-expanded'
   const friendlyExpandedTestId = 'friendly-description-expanded'
@@ -40,7 +40,12 @@ describe('OutcomeDescription', () => {
     masteryPoints,
     pointsPossible,
     ratings,
+    setShouldExpand: setShouldExpandMock,
     ...props,
+  })
+
+  beforeEach(() => {
+    setShouldExpandMock = jest.fn()
   })
 
   const render = (
@@ -59,7 +64,6 @@ describe('OutcomeDescription', () => {
   it('renders truncated Description when description prop provided and truncated prop true', () => {
     const {queryByTestId} = render(<OutcomeDescription {...defaultProps()} />)
     expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
-    expect(queryByTestId(truncatedTestContentId)).toHaveStyle('text-overflow: ellipsis')
   })
 
   it('renders expanded Description when description prop provided and truncated prop false', () => {
@@ -75,6 +79,13 @@ describe('OutcomeDescription', () => {
   it('does not render Description when description prop is empty', () => {
     const {queryByTestId} = render(<OutcomeDescription {...defaultProps({description: empty})} />)
     expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
+  })
+
+  it('renders non-expandable description when description is provided in text format and truncate prop true', () => {
+    const {queryByTestId} = render(
+      <OutcomeDescription {...defaultProps({description: 'Text description'})} />
+    )
+    expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
   })
 
   describe('with friendly description', () => {

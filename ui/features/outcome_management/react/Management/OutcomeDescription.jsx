@@ -20,6 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
@@ -39,6 +40,7 @@ const OutcomeDescription = ({
   calculationInt,
   masteryPoints,
   ratings,
+  setShouldExpand,
 }) => {
   const {friendlyDescriptionFF, isStudent, accountLevelMasteryScalesFF} = useCanvasContext()
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
@@ -57,21 +59,24 @@ const OutcomeDescription = ({
 
   if (!description && !friendlyDescription && accountLevelMasteryScalesFF) return null
 
+  // Update handler for TruncateText's onUpdate property
+  // isTruncated returns true if description is
+  // truncated (contains {...} at the end)
+  const onUpdateHandler = isTruncated => {
+    setShouldExpand(isTruncated)
+  }
+
   return (
     <View>
       {truncated && truncatedDescription && (
         <View as="div" padding="0 small 0 0" data-testid="description-truncated">
           <PresentationContent>
-            <div
+            <TruncateText
               data-testid="description-truncated-content"
-              style={{
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
+              onUpdate={onUpdateHandler}
             >
               {truncatedDescription}
-            </div>
+            </TruncateText>
           </PresentationContent>
           <ScreenReaderContent>{truncatedDescription}</ScreenReaderContent>
         </View>
@@ -136,6 +141,7 @@ const OutcomeDescription = ({
 
 OutcomeDescription.defaultProps = {
   friendlyDescription: '',
+  setShouldExpand: () => {},
 }
 
 OutcomeDescription.propTypes = {
@@ -146,6 +152,7 @@ OutcomeDescription.propTypes = {
   ratings: ratingsShape,
   friendlyDescription: PropTypes.string,
   truncated: PropTypes.bool.isRequired,
+  setShouldExpand: PropTypes.func.isRequired,
 }
 
 export default OutcomeDescription

@@ -38,6 +38,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {Spinner} from '@instructure/ui-spinner'
 import {IMPORT_PENDING, IMPORT_COMPLETED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import {ratingsShape} from './Management/shapes'
+import descriptionType from './shared/descriptionType'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -58,8 +59,10 @@ const FindOutcomeItem = ({
   friendlyDescription,
 }) => {
   const [truncated, setTruncated] = useState(true)
+  // Html descriptions (containing extra formatting) should always be expandable
+  const [shouldExpand, setShouldExpand] = useState(descriptionType(description) === 'html')
   const {isMobileView, accountLevelMasteryScalesFF} = useCanvasContext()
-  const shouldShowDescription = description || friendlyDescription || !accountLevelMasteryScalesFF
+  const shouldShowDescription = !accountLevelMasteryScalesFF || description || friendlyDescription
   const onClickHandler = () => shouldShowDescription && setTruncated(prevState => !prevState)
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
@@ -129,7 +132,9 @@ const FindOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  interaction={shouldShowDescription ? 'enabled' : 'disabled'}
+                  interaction={shouldShowDescription && (!accountLevelMasteryScalesFF || shouldExpand)
+                  ? 'enabled'
+                  : 'disabled'}
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
@@ -175,6 +180,7 @@ const FindOutcomeItem = ({
                 masteryPoints={masteryPoints}
                 ratings={ratings}
                 truncated={truncated}
+                setShouldExpand={setShouldExpand}
               />
             </div>
           )}

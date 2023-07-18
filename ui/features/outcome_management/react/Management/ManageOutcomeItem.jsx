@@ -33,6 +33,7 @@ import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {ratingsShape} from './shapes'
 import {REMOVE_PENDING} from '@canvas/outcomes/react/hooks/useOutcomesRemove'
+import descriptionType from '../shared/descriptionType'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -63,6 +64,8 @@ const ManageOutcomeItem = ({
     isCourse,
   } = useCanvasContext()
   const [truncated, setTruncated] = useState(true)
+  // Html descriptions (containing extra formatting) should always be expandable
+  const [shouldExpand, setShouldExpand] = useState(descriptionType(description) === 'html')
   const onClickHandler = () => setTruncated(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({linkId})
   const onMenuHandlerWrapper = (_, action) => onMenuHandler(linkId, action)
@@ -74,7 +77,7 @@ const ManageOutcomeItem = ({
     friendlyDescriptionFF ||
     (outcomeContextType === contextType && outcomeContextId === contextId) ||
     allowAdminEdit
-  const shouldShowDescription = description || friendlyDescription || !accountLevelMasteryScalesFF
+  const shouldShowDescription = !accountLevelMasteryScalesFF || description || friendlyDescription
   const shouldShowSpinner = removeOutcomeStatus === REMOVE_PENDING
 
   if (!title) return null
@@ -114,7 +117,9 @@ const ManageOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  interaction={shouldShowDescription ? 'enabled' : 'disabled'}
+                  interaction={shouldShowDescription && (!accountLevelMasteryScalesFF || shouldExpand)
+                  ? 'enabled'
+                  : 'disabled'}
                   onClick={onClickHandler}
                   data-testid="manage-outcome-item-expand-toggle"
                 >
@@ -168,6 +173,7 @@ const ManageOutcomeItem = ({
                 masteryPoints={masteryPoints}
                 ratings={ratings}
                 truncated={truncated}
+                setShouldExpand={setShouldExpand}
               />
             </View>
           )}
