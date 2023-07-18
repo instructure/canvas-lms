@@ -248,7 +248,7 @@ ja:
   a_table_that_contains_the_default_canvas_grading_s_7ba86ec6: デフォルトのCanvas採点スキームデータを含む表。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するアイコンも含まれています。
   a_table_that_contains_the_grading_scheme_data_each_e9031ad3: 採点スキームデータを含む表。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。
-  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するボタンも含まれています。
+  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: 採点スキームデータを含む表。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。さらに、各行には、下に新しい行を追加するためのボタンと、現在の行を削除するためのボタンが含まれています。
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: 採点スキームデータを含む表。1つ目は、採点スキームの名前と、スキームを編集・削除するためのボタンです。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。さらに、各行には、下に新しい行を追加するためのボタンと、現在の行を削除するためのボタンが含まれています。
   a_timeout_occurred_contacting_external_authenticat_c064ea48: 外部認証サービスへの問い合わせ中にタイムアウトが発生しました
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: 年間RRULEには、BYDAYまたはBYMONTHDAYを含む必要があります。
@@ -2337,6 +2337,7 @@ ja:
       アカウント管理ツールに新しい[バウンスメール]
       タブを追加します。これにより、はCanvas通知が
       バウンスされたメールアドレスを検索できます。
+  adds_additional_fields_to_the_content_migration_as_192c2d3f: コンテンツ移行アセットマップに追加のフィールドを加える
   adds_additional_information_and_filtering_for_feat_3e55a058: 機能フラグの追加情報とフィルタリングを追加する
   adds_an_account_course_setting_for_a_default_due_t_9903738a: 新しい課題のデフォルトの期限を設定する対象のアカウント/コース設定が追加されました。
   adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
@@ -2347,6 +2348,7 @@ ja:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: 受講者のコンテキストカードに分析機能を追加します。
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: SpeedGrader内の課題コメント用のコメントバンクを追加します
   adds_granular_permissions_for_adding_and_removing__e1e484a3: 各ロールを追加および削除するためのきめ細かい権限と、他のコース管理者アクションのための個別の権限を追加します
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: 成果管理の改善により、成果レベルでのアライメントにアクセスするためのメニューオプションを追加する
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: Quizzes.Next小テストにおいて、SpeedGrader問題ごとに評定するオプションを追加しました。
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       提出の詳細ページに視覚的なインジケータを追加して、未読
@@ -3287,8 +3289,11 @@ ja:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "ユーザーがコースの人物のページのユーザー SIS ID を表示できるようにします。"
   allows_user_to_weight_assignment_groups_95cb11b2: ユーザーが課題グループを比重配分できるようにします。
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "ユーザーが Student Learning Mastery Gradebook（学生学習達成度評定表）の生徒と保護者のビューのアウトカムにわかりやすい説明を追加できるようにします。"
+  allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: 開始日、終了日、およびロールを持つ一時的な登録を追加できるようにします。
   allows_users_to_add_conferences_from_the_calendar_f36c5008: ユーザーが予定表から会議を追加できるようにします
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: ユーザーがconference_selection配置タイプを使用してLTIツールを追加できるようにします
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: ユーザーが一時的な登録を削除できるようにします。
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: ユーザーが一時的な登録を編集できるようにして
   allows_users_to_edit_conferences_2d3c960c: ユーザーが会議を編集できるようにします。
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "ユーザーは、コース設定ページのコース用 「受講者グループ別にフィルタリングした SpeedGrader の開始」オプションを有効にすることができます。有効になており、また受講者グループが新評定帳で選択されている場合、 SpeedGrader は、選択したグループの受講者のみ読み込みます。"
   allows_users_to_import_groups_in_a_course_a8b5c73e: ユーザーがコースでグループをインポートできるようにします。
@@ -3521,6 +3526,7 @@ ja:
   analytics_course_code_student_name_d63bab4c: "分析：%{course_code} -- %{student_name}"
   and_7fcc2911: および
   and_a_few_more_not_shown_here_28e7d713: "...そして、ここに掲載されていないものがさらにいくつか"
+  and_compressed_into_a_zip_file_this_may_take_some__1acbe09f: zipファイルに圧縮します。送信ファイルのサイズと数に応じて、これには時間がかかることがあります。
   and_count_more_43eae021: "あと %{count} 件..."
   and_many_more_not_shown_here_fb777a4c: "...そして、ここに掲載されていないものがさらに*多数*"
   and_more_1c35b232: もっと...
@@ -3878,6 +3884,7 @@ ja:
   artist_info_for_username_for_description_12d5d862: "%{userName} の %{description} に対するアーティスト情報"
   as_of_a036fa2e: （）現在
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "%{date}現在、LTI 1.3 OIDC Auth エンドポイントは https://canvas.instructure.com/api/lti/authorize_redirect から https://sso.canvaslms.com/api/lti/authorize_redirect に変更されています。この変更の理由と範囲については、*本Canvas Communityの記事で詳しく説明しています*。また、追加情報については、APIドキュメントを参照してください。この変更は小さなもので、時間はあまりかかりませんが、Canvasにインストールされているすべての LTI 1.3 ツールについて、ツール側で設定を変更する必要があります。"
+  as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "%{date}現在、LTI 1.3 Platform Storageの仕様は、Canvasで完全にサポートされています。これを実装したいツールは、Canvas用に保存するOIDC Authエンドポイントを*https://canvas.instructure.com/api/lti/authorize_redirect*から*https://sso.canvaslms.com/api/lti/authorize_redirect*に変更する必要があります。新しい1.3ツールのインストールに推奨されるOIDC Authエンドポイントも変更されているため、できるだけ早くこの新しいエンドポイントを使用するように、すべての1.3ツールが設定を切り替えることを推奨します。"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
   as_you_type_in_this_field_the_list_of_results_will_c1a1a3e4: このフィールドに入力すると、結果のリストが自動的に更新されます。
   ascending_b3c87427: 昇順
@@ -4977,7 +4984,9 @@ ja:
       internal_ca_description: LDAPサーバーが信頼されていない内部ルートCAによって発行された証明書を提示する場合、Canvasが接続時にそれを信頼できるようにするために、ルートCAをアップロードする*必要があります*。
       internal_ca_warning: "*警告*:内部ルートCAを使用すると安全性が低くなり、不正・侵害のリスクが高まります。信頼できる認証局から発行された証明書を使用することを強くお勧めします。"
       ldap_timeout_failure_help2: "Canvas がLDAPサーバーとの通信時間時に頻回にタイムアウトしすぎると、%{time}回でさらにそのLDAPサーバーを使用してのログイン試行がブロックされます。LDAP サーバーは、%{timestamp}に最後にタイムアウトしました。"
+      verify_tls_cert_opt_in_dated_description: "TLS証明書の検証は*%{enforcement_date}*が期限ですが、LDAPサーバーが準拠していることを確認できるよう、早めに有効化することができます。"
       verify_tls_cert_opt_in_description: "TLS証明書の検証は*%{enforcement_date}*が期限ですが、LDAPサーバーが準拠していることを確認できるよう、早めに有効化することができます。"
+      verify_tls_cert_opt_in_undated_description: TLS証明書の検証が間もなく求められますが、LDAPサーバーが準拠していることを確認できるよう、早めに有効化することができます。
     ldap_settings_test: 
       labels: 
         pass: パスワード
@@ -7128,6 +7137,7 @@ ja:
     unexpected_error: 予期しないエラーが発生しました。サポートに連絡してください。
     unknown: 不明
     upload_timeout_error: "ファイル アップロード プロセスがタイムアウトしました"
+  content_migration_asset_map_v2_f0f455f: コンテンツ移行アセットマップv2
   content_migration_queued_46c27790: コンテンツ移行がキューに入りました
   content_migration_running_percent_complete_4b00c024: "コンテンツを移行中: %{percent}% 完了"
   content_migrations: 
@@ -8441,6 +8451,7 @@ ja:
   course_image_for_course_cfbb08df: "～用コース画像%{course}"
   course_image_settings_eba3ec55: コースの画像設定
   course_implemented_apps_fa658f5a: コース実行アプリ
+  course_import_html_using_gem_812d0af5: Gemを使用したHTMLコースのインポート
   course_is_already_associated_with_a_blueprint_4d9407cb: コースはすでに青写真に関連付けられています
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: コースにはブループリントとして設定される資格がありません
   course_landing_page_49a53ade: コースのランディングページ
@@ -9300,6 +9311,7 @@ ja:
   create_a_new_domain_lookup_1830a512: 新しいドメインルックアップの作成
   create_a_new_module_6f31b0fe: 新しいモジュールを作成する
   create_a_new_user_for_address_7487e9c9: "\"%{address}\"の新規ユーザーを作成する"
+  create_a_temporary_enrollment_167f05f1: 一時登録を作成
   create_account_263ec6: アカウントを作成
   create_an_ba36d171: （）を作成
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: 採点対象と非採点対象の両方のオンラインクイズとサーベイを作成し、管理します。
@@ -9375,6 +9387,7 @@ ja:
   create_pages_581a4d59: ページを作成
   create_slots_71dbb2f8: スロットの作成
   create_subject_86de5618: 件名を作成
+  create_temporary_enrollment_3d4eaa33: 一時登録を作成
   create_theme_based_on_40651ed3: を基にテーマを作成
   create_theme_based_on_name_7b1bd318: "%{name}に基づくテーマを作成"
   create_users_view: 
@@ -10287,6 +10300,7 @@ ja:
     empty_message: メッセージなし
   discussion_topic_a7bf935: "ディスカッション トピック"
   discussion_topic_dc85ad4c: "ディスカッション トピック"
+  discussion_topic_edit_error_page_c9fb069c: ディスカッショントピックの編集エラーページ
   discussion_topic_initial_query_error_37c98b4: ディスカッショントピックの初期クエリエラー
   discussion_topic_menu_3d4684c6: "ディスカッション トピック メニュー"
   discussion_topic_performance_improvements_for_bibs_79a483ef: Bibsys向けのディスカッショントピックパフォーマンスの改善
@@ -10734,6 +10748,7 @@ ja:
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey ビジネススクール - 受講者のアクティビティと評定"
   down_5831a426: 下
   download_3e89bdef: ダウンロード
+  download_all_submissions_304d6797: すべての提出物のダウンロード
   download_as_ce13bff6: （）としてダウンロードする
   download_as_zip_5dae7f19: "ZIP としてダウンロード"
   download_assignment_submissions_41e50ee7: 課題提出物のダウンロード
@@ -11757,6 +11772,7 @@ ja:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "エラー:ツールが無効なコンテンツタイプ \"%{contentType}を返しました\""
   error_updating_cluster_error_674e5f2e: "%{cluster}更新時のエラー：%{error}"
   error_updating_comment_4b80c76d: コメントの更新中にエラーが発生しました
+  error_updating_notes_31b24785: ノートの更新エラー
   error_updating_pacename_ad07f9df: "%{paceName}の更新中にエラーが発生しました"
   error_updating_status_of_module_item_80336274: モジュールアイテムのステータスの更新中にエラーが発生しました
   error_updating_submission_draft_1d40ade7: 提出起案の更新中にエラーが発生しました
@@ -12537,6 +12553,7 @@ ja:
   filter_speedgrader_by_student_group_53683142: "SpeedGrader を受講者グループ別にフィルタリングする"
   filter_students_2327fe79: 受講者をフィルタリングする
   filters_92f2776f: フィルター
+  final_grade_474e3e37: "最終評定： "
   final_grade_4d7f6545: 最終的な評定
   final_grade_6938dca8: 最終的な評定：
   final_grade_6e94d99e: 最終的な評定：
@@ -12822,6 +12839,7 @@ ja:
   grade_a91e433e: 評定：
   grade_anonymously_6c37133a: 匿名で採点する
   grade_assignment_7c1abc11: "%{assignment} を採点"
+  grade_by_9ea3661e: 評定基準：
   grade_by_question_9d9b8a71: 問題ごとに評定する
   grade_calculator_performance_improvements_564af0de: 成績計算ツールのパフォーマンス改善
   grade_change_activity_75fb525: 評定変更アクティビティ
@@ -14648,6 +14666,8 @@ ja:
   http_response_code_832d6baa: "HTTP 応答：%{code}"
   https_3a02e3fb: https
   https_b8426ad8: "https://"
+  https_example_com_config_xml_d3bae5e3: "https://example.com/config.xml"
+  https_lti_tool_provider_example_herokuapp_com_regi_305953da: "https://lti-tool-provider-example.herokuapp.com/register"
   hungarian_fc7d30c9: ハンガリー語
   hungary_36_cd3e515b: ハンガリー（+36）
   hypothetical_end_date_117d81cf: 仮想終了日
@@ -14795,6 +14815,10 @@ ja:
       ツールが生成したトークンを要求します。
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: 有効な場合、課題の作成/編集ページのディープリンクメッセージの値で課題フォームを事前記入します。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: 有効にした場合、LTI起動中にクエリーパラメーターは、ポストボディーにはコピーされません。
+  if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
+      有効にすると、rootアカウントとサブアカウントに、開発者キーページでキーの有効/
+      無効を切り替えるトグルスイッチが表示されます。サイト管理者には、引き続き
+      無効/許可/有効ボタンが表示されます。
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "有効にすると、使用されている開発者鍵に範囲が必要な場合、API リクエストで範囲が検証されます。"
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "有効にすると、Canvas が 基本的なアウトカムで使用する Sourcedids が暗号化されます。"
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: ここを有効にした場合、新小テストの小テストの提出履歴が別扱いになります。
@@ -14827,6 +14851,9 @@ ja:
       ルートアカウントがサイト管理者アカウントと
       同じシャードにあるCanvasインスタンスにのみ影響することに注意してください。他のインスタンスの動作はすでに
       このように動作していました。
+  if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
+      有効化された場合、アカウントおよびコース設定ページにあるツールのインストールおよび設定フォームは、
+      古くアクセスしにくいホームグロウンコンポーネントではなく、InstUIコンポーネントを使用します。
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       この機能を有効にすると、
       Developer Keys ページの上部付近に警告の「アラート」ボックスが表示され、今後予定されているまたは完了したOIDC Authエンドポイントの変更が通知されるようになります。
@@ -15167,6 +15194,8 @@ ja:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       評定についてアラートするときにスコアを含めます。
       あなたのメールが教育機関のメールでない場合、機密性の高いコンテンツが教育機関外に送信されることになります。
+  include_sis_batch_info_f79dd131: SISバッチ情報を含める
+  include_sis_batch_information_75bf66c4: SISバッチ情報含をめる
   include_speedgrader_in_assignment_header_menu_69cd8656: 課題ヘッダメニューにSpeedGraderを含める
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "ドキュメントの HEAD に Datadog RUM JS エージェントを含めます。"
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
@@ -15347,6 +15376,11 @@ ja:
       enter_search_terms: 検索語を入力
   instructure_default_73317bb1: "Instructure デフォルト"
   instructure_default_old_66ef6e9b: 講師デフォルト（旧）
+  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructureは、あなたの教育機関が選択している地域、すなわちヨーロッパでCanvas Commonsをホストしています。つまり、Canvas Commonsを利用する場合、あなたの個人情報はドイツで保存、処理されます。これらの個人情報には、名前、電子メールアドレス、Canvas ユーザ ID、Canvas ログイン名、Canvas アバター、IP アドレス、お気に入りにした Canvas Commons のリソース、およびCanvas Commons のリソースに対してユーザが行ったコメントが含まれます。Instructure のプライバシー保護に関する詳細な情報は、[こちら](%{url}) を参照してください。"
+  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructureは、あなたの教育機関が選択している地域、すなわちアジア太平洋州でCanvas Commonsをホストしています。つまり、Canvas Commonsを利用する場合、あなたの個人情報はシンガポールで保存、処理されます。これらの個人情報には、名前、電子メールアドレス、Canvas ユーザ ID、Canvas ログイン名、Canvas アバター、IP アドレス、お気に入りにした Canvas Commons のリソース、およびCanvas Commons のリソースに対してユーザが行ったコメントが含まれます。Instructure のプライバシー保護に関する詳細な情報は、[こちら](%{url}) を参照してください。"
+  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructureは、あなたの教育機関が選択している地域、すなわち米国でCanvas Commonsをホストしています。つまり、Canvas Commonsを利用する場合、あなたの個人情報は米国で保存、処理されます。これらの個人情報には、名前、電子メールアドレス、Canvas ユーザ ID、Canvas ログイン名、Canvas アバター、IP アドレス、お気に入りにした Canvas Commons のリソース、およびCanvas Commons のリソースに対してユーザが行ったコメントが含まれます。Instructure のプライバシー保護に関する詳細な情報は、[こちら](%{url}) を参照してください。"
+  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructureは、あなたの教育機関が選択している地域、すなわちカナダでCanvas Commonsをホストしています。つまり、Canvas Commonsを利用する場合、あなたの個人情報はカナダで保存、処理されます。これらの個人情報には、名前、電子メールアドレス、Canvas ユーザ ID、Canvas ログイン名、Canvas アバター、IP アドレス、お気に入りにした Canvas Commons のリソース、およびCanvas Commons のリソースに対してユーザが行ったコメントが含まれます。Instructure のプライバシー保護に関する詳細な情報は、[こちら](%{url}) を参照してください。"
+  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructureは、あなたの教育機関が選択している地域、すなわちオーストラリアでCanvas Commonsをホストしています。つまり、Canvas Commonsを利用する場合、あなたの個人情報はオーストラリアで保存、処理されます。これらの個人情報には、名前、電子メールアドレス、Canvas ユーザ ID、Canvas ログイン名、Canvas アバター、IP アドレス、お気に入りにした Canvas Commons のリソース、およびCanvas Commons のリソースに対してユーザが行ったコメントが含まれます。Instructure のプライバシー保護に関する詳細な情報は、[こちら](%{url}) を参照してください。"
   instructure_inline_media_comment: 
     alerts: 
       kaltura_disabled: "この Canvas サイトは、Kaltura が無効になっています"
@@ -15422,6 +15456,7 @@ ja:
   invalid_bymonthday_bymonthday_87791c1b: "無効な月日ごと '%{bymonthday}'"
   invalid_calculation_int_for_this_calculation_metho_971fada3: このcalculation_intには無効calculation_method
   invalid_content_type_utf_8_required_bd458b78: "無効なコンテンツ タイプです。UTF-8 である必要があります"
+  invalid_context_9186d37e: 文脈が無効
   invalid_context_for_group_f6cd268a: グループのコンテキストが無効
   invalid_context_type_68f40a61: 文脈種類が無効
   invalid_context_type_72085a6a: 文脈種類が無効
@@ -15477,6 +15512,9 @@ ja:
   invalid_score_3d247da7: 無効なスコア
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "無効なsftpユーザー名です。in .instructureで終わるドメインがないため、使用するユーザー名を決定できませんでした。\n\
       \x20                             #Slack 内の canvas-sre にお問い合わせください。   "
+  invalid_sftp_username_we_were_unable_to_determine__13339947: |-
+      無効なsftpユーザー名です。in .instructureで終わるドメインがないため、使用するユーザー名を決定できません。
+                                    Slack内の#canvas-sre までお問い合わせください。
   invalid_sis_sync_status_b68db497: SISの同期ステータスが無効です
   invalid_state_parameter_7a5aa108: 無効な状態パラメータ
   invalid_submission_file_type_cda6742a: 送信ファイルの種類が無効
@@ -16310,8 +16348,8 @@ ja:
           mfa_enrollment: |-
               マルチファクター認証は、Canvas にログインするためにパスワードを知ることに加えて、物理的になにかを所有す
               ることを要求することにより、セキュリティを強化します。これには、確認コードを生成できるデバイスや、テキストメッ
-              セージを受信できる電話機などがあります。下記のQRコードをスキャンして、[iPhone](%{iphone_url})または
-              [Android](%{android_url}) の Google 認証システムアプリを設定することができます。他のトークンは、秘密鍵
+              セージを受信できる電話機などがあります。下記のQRコードをスキャンして、iPhone または
+              Android の Google 認証システムアプリを設定することができます。他のトークンは、秘密鍵
               **%{secret_key}** を入力して設定できます。マルチファクタ認証を設定したらご自分のプロファイルページに進み、
               通常のマルチファクターデバイスが利用できない場合に備えて、一連のバックアップコードを印刷することをお勧めします。
           mfa_required: マルチファクタ認証を設定する必要があります。
@@ -16514,6 +16552,7 @@ ja:
   manage_students_for_the_course_3b1bc4f0: コースの受講者を管理する
   manage_subject_coursecontext_2328e1ff: "科目の管理：%{courseContext}"
   manage_subject_f9835769: 科目を管理する
+  manage_temporary_enrollments_4c4f21ef: 一時登録を管理
   manage_update_23de23a1: 更新の管理
   manage_update_for_toolname_f8e3b2fb: " %{toolName}の更新の管理"
   manage_usage_rights_c5a8c216: 使用権の管理
@@ -16727,6 +16766,7 @@ ja:
   menu_for_group_title_fbf60567: "グループ%{title}のメニュー"
   menu_for_outcome_title_1d93378d: "アウトカム%{title}のメニュー"
   menu_of_options_for_this_permission_77f50c31: この許可のオプションメニュー
+  menu_option_for_outcome_details_page_2dcd13d6: 成果詳細ページのメニューオプション
   menu_options_9b6b0b5c: メニューオプション
   mesa_public_course_syllabus_52282dd3: "Mesa Public コース シラバス"
   mesa_public_user_inactivity_report_a6792ccf: "Mesa Public ユーザ非アクティブレポート"
@@ -18739,6 +18779,7 @@ ja:
   missing_required_description_99a99ff: 必須の説明が未記入です：
   missing_required_fields_fields_30e20799: "必須フィールドが未記入です：%{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: 必須フィールドが未記入です。要求されている全フィールドを記入してください。
+  missing_required_parameters_4f589df8: 必須のパラメータが不足
   missing_required_points_39db69fa: 必須のポイントが不足
   missing_required_ratings_9b19e66: 必須の評価が未記入です：
   missing_required_title_ca06a6de: 必須の件名が未記入です
@@ -19012,6 +19053,8 @@ ja:
   more_modules_d9a9f003: より多くのモジュール
   more_options_272b4953: その他のオプション
   more_options_e89670cf: その他のオプション
+  more_options_for_message_from_authorname_4001ddda: "送信元が%{authorName}であるメッセージのオプションを増やす"
+  more_options_for_subject_e18d421: "%{subject}のその他のオプション"
   more_outcomes_have_been_loaded_9acafe9c: より多くのアウトカムが読み込まれました
   more_people_options_730e9686: より多くの人々のオプション
   more_results_were_added_at_the_bottom_of_the_page_dc323877: さらなる結果がページの最後に追加されました。
@@ -19423,6 +19466,8 @@ ja:
   next_student_79955068: 次の受講者
   next_student_b62869f4: 次の受講者
   next_up_review_feedback_19a15e0e: 次は：フィードバックを確認する
+  next_up_review_feedback_59555dbd: 次へ：フィードバックを確認する
+  next_up_submit_assignment_2fdb7174: 次へ：課題を提出する
   next_up_submit_assignment_793a9d41: 次は：課題を提出する
   next_window_window_90271943: "次のウィンドウ：%{window}"
   nickname_1e6da3ad: ニックネーム
@@ -20132,6 +20177,7 @@ ja:
   on_8f7190e5: オン
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: 使用権が有効になっているコースでは、ディスカッショントピックファイルの添付ファイルに使用権の選択を適用します
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "%{date}付けで、LTI 1.3 の OIDC Auth エンドポイントが https://canvas.instructure.com/api/lti/authorize_redirect から https://sso.canvaslms.com/api/lti/authorize_redirect に変更される予定です。この変更の理由と範囲については、*本Canvas Communityの記事で詳しく説明しています*。また、追加情報については、APIドキュメントを参照してください。この変更は小さいものですが、LTI 1.3 を使用しているすべてのツールで、ツール側の設定を変更する必要があります。"
+  on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "%{date}付けで、LTI 1.3 Platform Storageの仕様は、Canvasで完全にサポートされるようになります。これを実装したいツールは、Canvas用に保存するOIDC Authエンドポイントを*https://canvas.instructure.com/api/lti/authorize_redirect*から*https://sso.canvaslms.com/api/lti/authorize_redirect*に変更する必要があります。新しい1.3ツールのインストールに推奨されるOIDC Authエンドポイントも同日に変更されるため、できるだけ早くこの新しいエンドポイントを使用するように、すべての1.3ツールが設定を切り替えることを推奨します。"
   on_for_key_keyname_bbac4e1b: "キーがオン：%{keyName}"
   on_paper_46d0ba36: 紙面
   on_time_17ca5ad9: 時間通り
@@ -20202,6 +20248,7 @@ ja:
   open_comment_tray_160293d7: コメントトレイを開く
   open_complete_incomplete_menu_cfe2033b: 完全/不完全なメニューを開く
   open_conversation_a6590865: 会話を開く
+  open_conversation_subject_1dd2d3c: "会話%{subject}を開く"
   open_discussion_title_for_comments_6baa3fa: "ディスカッション %{title} のコメントを開く"
   open_emoji_menu_1df0eb0b: 絵文字メニューを開く
   open_event_menu_e9a21e39: イベントメニューを開く
@@ -23891,6 +23938,7 @@ ja:
   remove_filename_87f3781e: "%{filename}を削除"
   remove_filename_dab5c02e: "%{filename}を削除する"
   remove_filter_6f7204e2: フィルタを削除する
+  remove_filtername_filter_6b6d7063: "%{filterName}フィルターを削除する"
   remove_grading_scheme_title_d3942a08: "採点方法%{title}を消去"
   remove_group_5d2f2f2d: グループを削除
   remove_group_981d6a02: グループを削除しますか？
@@ -23992,8 +24040,10 @@ ja:
   reply_389d6fb9: 返信
   reply_all_80298bee: すべてに返信
   reply_all_b864cd0e: 全員に返信
+  reply_for_subject_ae247d1e: "%{subject}へ返信"
   reply_from_author_a2806c77: "%{author}からの返信"
   reply_from_name: "%{name} (Canvas のお知らせから)"
+  reply_to_authorname_f209e84a: "%{authorName}へ返信"
   reply_to_comment_72d96728: コメントに返信
   reply_to_conversation_f1aa0d4: 会話に返答
   reply_to_conversation_subject_4b2e6fe7: "会話に返答 %{subject}"
@@ -24046,6 +24096,7 @@ ja:
   reports_course_f09b7d9e: "レポート (コース)"
   reports_manage_92bc45cb: "レポート - 管理"
   reqired_end_date_a7deac41: 終了日が必要
+  request_failed_with_status_status_47054af0: "ステータス%{status}のリクエストに失敗しました"
   request_id_1499afb0: "要求 ID"
   request_successfully_sent_note_that_applying_score_ee8665b6: リクエストが正常に送信されました。スコアの適用には時間がかかり、ページを再読み込みするまで変更は表示されませんのでご注意ください。
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: PDFアセットを提供するためにそのDocViewer使用CloudFrontを要求します。
@@ -24165,7 +24216,9 @@ ja:
   retry_duplicating_originalassignmentname_884aee1: "\"%{originalAssignmentName}\"の重複を再試行"
   retry_ebd5f8ba: 再試行
   retry_migrating_name_bdc802ef: "\"%{name}\"の移行を再試行する"
+  return_to_conversation_list_86688140: 会話リストに戻る
   return_to_parent_folder_4ece2184: 親フォルダーに戻る
+  return_to_subject_in_conversation_list_d67b8e73: "会話リストの%{subject}に戻る"
   returns_string_values_instead_of_numeric_values_in_a6dfdf7d: 変数の代入で数値の代わりに文字列値を返します
   revert_date_changes_5105ce5: 日付の変更を元に戻す
   revert_to_actual_score_f665eea9: 実際のスコアに戻す
@@ -24234,6 +24287,9 @@ ja:
       manage_site_settings: サイト全体の設定およびプラグインの設定の管理
       manage_storage_quotas: 記憶域のクォータの管理
       manage_students: コースに対する受講者の追加/削除
+      manage_temp_enroll_add: 一時登録を追加する
+      manage_temp_enroll_delete: 一時登録を削除する
+      manage_temp_enroll_edit: 一時登録を編集する
       manage_user_logins: ユーザのログインの詳細変更
       manage_user_notes: 講師日誌のエントリの管理
       manage_user_observers: ユーザのオブザーバを管理
@@ -26122,6 +26178,8 @@ ja:
       unrecorgnized_type: "認識できないインポート タイプです"
     instructure_csv: "Instructure の CSV形式または CSV形式のzip ファイル"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_id_8b755858: sis_batch_id
+  sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "SIS データ"
   sis_data_import_8bb623ce: "SISデータ - インポート"
   sis_data_manage_328a4799: "SISデータ - 管理"
@@ -26546,6 +26604,7 @@ ja:
   status_color_picker_9ea0156b: "%{status} 色を選択"
   status_e051bb30: 状況
   status_e7fdbe06: ステータス
+  status_for_key_keyname_47668960: "キーの%{status}:%{keyName}"
   statuses_497dfa15: ステータス...
   statuses_f41543d8: ステータス
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes - 名前スペースカスタムデータ"
@@ -26785,9 +26844,15 @@ ja:
   subject_details_12405b1: 件名詳細
   subject_home_8e593f72: "件名 ホーム"
   subject_home_page_41226803: 対象ホームページ
+  subject_mark_as_read_b0218a: "%{subject}既読としてマークする"
+  subject_mark_as_unread_6f07435f: "%{subject}未読としてマークする"
   subject_must_contain_fewer_than_255_characters_2e72cd02: 件名は255文字未満でなければなりません。
   subject_name_a1ac4da4: 件名
+  subject_not_selected_10dacadf: "%{subject}が選択されていません"
+  subject_not_starred_4a113097: "%{subject}にスターなし"
   subject_reply_to: "Re: %{subject}"
+  subject_selected_2196b77e: "%{subject}が選択されました"
+  subject_starred_8ca02058: "%{subject}にスターが付けられました"
   subject_subject_9e1057f7: "件名：%{subject}"
   subjects_14c0c4de: 題目
   submission: 
@@ -27021,6 +27086,7 @@ ja:
   submit_on_behalf_of_student_af674b95: 受講者の代わりに送信する
   submit_ticket_5515ffd: チケットの提出
   submitted_318fad53: タスクの評定を送信
+  submitted_718f5cbc: "提出済み： "
   submitted_at_4d5ea3aa: 提出
   submitted_by_name_dab6d5e1: "提出者：%{name}"
   submitted_by_proxy_on_date_569cbae9: "%{proxy}により、%{date}に提出"
@@ -27268,6 +27334,12 @@ ja:
   tempe_grade_export_c611da01: "Tempe 評定エクスポート"
   template_account_21ac8f4f: テンプレートアカウント
   templates_4ca13d07: テンプレート
+  temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: ユーザをコースに一時登録します。この一時登録はコース内の別の登録とペアになります。
+  temporarily_enroll_name_8acb66ce: "一時登録%{name}"
+  temporary_enrollments_add_373181b7: "一時登録 - 追加する"
+  temporary_enrollments_delete_52ffaae4: "一時登録 - 削除する"
+  temporary_enrollments_edit_67c01325: "一時登録 - 編集する"
+  temporary_enrollments_f0937c5a: 一時登録
   tenant_d2a41f78: テナント
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: テナントが見つからないか、同期が無効。コースとアカウントのMicrosoft同期統合設定を確認してください。
   tenant_name_e174f404: 
@@ -27370,6 +27442,7 @@ ja:
   that_user_account_has_been_deleted_please_contact__350e0e0: "そのユーザ アカウントは削除されました。システム管理者に連絡の上、アカウントを再アクティブ化してください。"
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "ユーザーが Slack から通知を受け取る機能"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "レポートユーザが所有するアカウントのアカウント ID"
+  the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "レポートユーザが所有するアカウントのアカウント UUID"
   the_account_wide_sync_settings_were_changed_while__90c48497: 同期中にアカウント全体の同期設定が変更されました。同期を再試行してください。
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "Canvas ユーザーと Microsoft ユーザーを照合するために使用されるアクティブディレクトリ属性"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: AuthnRequestとLogoutRequest、およびLogoutResponseを署名するのに使うアルゴリズムメッセージがIdPに送信されました。
@@ -27685,6 +27758,7 @@ ja:
   the_sync_encountered_an_error_and_did_not_complete_538790b9: 同期にエラーが発生し、完了しませんでした
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "期限なしの課題 \"%{assignment_name}\" のSISに同期設定を有効にできませんでした。"
   the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "Microsoft グループに所有者がいないため、チームを作成できませんでした。これは断続的なエラーである可能性があります:同期を再試行してください。それでも問題が解決しない場合は、サポート担当者に連絡してください。"
+  the_temporarily_enrolled_user_can_only_view_and_pa_a5bf0184: 一時登録ユーザは一時登録時に選択された開始日と終了日の間のみ、コースを閲覧・参加することができます。
   the_term_for_export_data_5aad7a0a: エクスポートデータの期間
   the_term_for_grade_export_data_d55a6be7: 評定エクスポートデータの期間
   the_term_has_ended_for_this_course_f0ab367: このコースの期間は終了しました
@@ -27747,6 +27821,8 @@ ja:
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: 評定に未保存の変更があります。\n\nそれでも続けますか?
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: RCEツールバー内の配置には、2つのアプリ制限があります。この設定は、拡張RCEにのみ適用されます。
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: RCEツールバー内の配置には、2つのアプリ制限があります。
+  there_is_already_a_page_in_this_course_with_this_t_5b37ecf2: このコースにはこのタイトルのページが既に存在します。
+  there_is_already_a_page_in_this_group_with_this_ti_3dac30e5: このグループにはこのタイトルのページが既に存在します。
   there_is_currently_1_available_grader_758e4a21: 現在1名の利用可能な採点者がいます
   there_was_a_failure_logging_out_at_your_idp_30070527: " IdPからのログアウトに失敗しました"
   there_was_a_problem_applying_scores_7baaeea7: スコアの適用に問題がありました。
@@ -27935,6 +28011,7 @@ ja:
   this_assignment_submission_is_my_own_original_work_e820ce4b: この課題提出物は私自身のものであり、オリジナルの研究結果です
   this_assignment_will_no_longer_count_towards_your__a6eb6778: この課題は評定に考慮されなくなります。
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: この添付は作者により未公開とされています。
+  this_canvas_community_article_details_the_reasonin_37be9375: "*このCanvas Communityの記事*には、この変更の理由、範囲、変更内容の正確な指示、Canvas管理者およびLTI 1.3ツール開発者のための詳細な説明が記載されています。"
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "この Canvas のインストールはテスト用で、*毎月リセットされます。*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "この Canvas のインストールはテストのためのもので、*は%{count}週ごとにリセットされます。*"
@@ -28096,6 +28173,8 @@ ja:
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: このディスカッションは匿名で行われます。あなたの名前とプロフィール写真は他のコースメンバーからは見えません。
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: この機能はデフォルトで有効になっています。これは、課題が評定ブックから除外できないことから、評定ブックにカウントされるためです。
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "これは、あなたの言語を通常 RTL に変更することなく、RTL 環境でページがどのように表示されるかをプレビューするためのオンデマンド機能です。"
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "これは破壊的な変更では*ありません*。LTI 1.3ツールの動作は、新たにサポートされたPlatform Storage仕様以外は、使用するエンドポイントに関係なくすべて同じままです。この変更の実施は後日行われ、日付は未定です。"
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "これは破壊的な変更では*ありません*。LTI 1.3ツールの動作は、新たにサポートされたPlatform Storage仕様以外は、使用するエンドポイントに関係なくすべて同じままです。この変更も、.NET Framework 2.0より前に完了する必要は**ありません**%{date}。この変更の実施は後日行われ、日付は未定です。"
   this_is_not_a_valid_grade_9cc2cb8: これは有効な評定ではありません
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: これは技術的にはセキュリティの脆弱性ですが、一部の学校ではしばらくワークフローを維持する必要があります。
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: この成績は、現在この受講生に対して選択されています。
@@ -28229,6 +28308,7 @@ ja:
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "このサンプルページには、カスタムブランドを構築するために役立つ、Canvas の一般的な UI 要素が含まれています。色の値および画像の変更を開始すると、*変更をプレビューする*ボタンが表示されます。これをクリックしてページを更新し、変更がどのように表示されるかを確認してください。"
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: このセクションのペースは削除され、ペースはデフォルトのペースに戻されます。
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: この設定は、受講者の評定の表示にのみ影響し、すべての未採点の課題にゼロのスコアが与えられたかのように評定を表示します。この設定は視覚的な変更のみであり、この評定表の受講者または他のユーザーの評定には影響しません。この設定が有効な場合、Canvasは、個々の課題内の受講者の提出物の評定表にゼロを入力しません。課題グループと合計列のみが、各受講者の全体的なパーセンテージにゼロのスコアを自動的に因数分解します。
+  this_setting_only_impacts_courses_it_will_include__1b2169a: この設定はコースにのみ影響します。sis_batch_idおよびsis_batch_user_idが含まれます
   this_setting_significantly_changes_the_canvas_expe_a9e07674: この設定は、生徒と教員のCanvasエクスペリエンスが大幅に変えます。
   this_settings_only_impact_enrollments_this_include_7f51358: この設定は登録者のみに影響します。この設定には、last_activity_at「更新後」パラメータよりも大きいタイムスタンプを持つオブジェクトが含まれます。デフォルトはオフになっています
   this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: この受講者のペースは削除され、ペースは以前に割り当てられたペースに戻されます。
@@ -29382,6 +29462,8 @@ ja:
       SFTPユーザテーブルのロックを取得できませんでした。少ししてから、もう一度お試しください。
                                     引き続きエラーが起こる場合は、Slack の #canvas-sre までご連絡ください。
   unable_to_parse_certificate_f25ff8b5: 証明書の解析ができない
+  unable_to_perform_diffing_against_mismatched_previ_801191d2: "以前と現在の%{type}インポートが不一致の場合、差分を取ることはできません。"
+  unable_to_post_comment_c34ba536: コメントを投稿できません
   unable_to_read_file_2d04b0c: ファイルが読めません
   unable_to_remove_app_4293cb53: アプリを削除できません
   unable_to_remove_outcomes_f682e68f: 
@@ -29395,6 +29477,7 @@ ja:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "%{context_name}のユーザーにメッセージを送信できません"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: この課題は、少なくとも1人の受講者の終了後の採点期間に終了する予定であるため、デフォルトの評定を設定することができません
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: モジュールのドラッグアンドドロップを設定できません
+  unable_to_submit_score_e47990e3: スコアを提出できません
   unable_to_switch_students_b901bc4b: 受講生を切り替えられません
   unable_to_toggle_placement_833db6ff: 配置を切り替えることができません
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "ストレージサービスにファイルを送信できません。サービスが停止しているか、Canvas に再度ログインする必要があるかもしれません。"
@@ -29745,9 +29828,11 @@ ja:
   use_comment_comment_136b5cb3: "コメントを使用する%{comment}"
   use_default_890939b7: デフォルトを使用
   use_experimental_features_before_they_are_generall_3dfaddd1: 実験機能は通常、作動中に、それら機能が有効になる前に使用します
+  use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: Canvasのリソースリンクを更新するために、コースインポート中にgemを使用する
   use_high_contrast_ui_a5917282: 高コントラストUIを使用する
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: フラッシュの代わりにコンテンツエディタでHTML5レコーダーを使用します
   use_improved_placeholders_for_inserted_content_in__433adfaa: RCEに挿入されるコンテンツには、改良されたプレースホルダーを使用します。
+  use_instui_for_tool_installation_and_configuration_36de63e9: ツールのインストールおよび設定フォームにInstUIを使用する
   use_mathman_to_convert_latex_to_mathml_680ef7b0: MathManを使用してLaTeXをMathMLに転換しますか？
   use_mathman_to_convert_latex_to_svg_3f61c9b: MathManを使用してLaTeXをSVGに転換しますか？
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -29793,6 +29878,7 @@ ja:
   use_this_panel_to_resolve_duplicates_or_people_not_fb437c9: このパネルを使用して、重複を解決、または検索で見つからなかった人物を見つけます。
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: このパネルを使用して、このコースに追加するユーザーを検索します。
   use_this_photo_3a594830: これを写真を使用する
+  use_toggle_switches_for_non_siteadmin_developer_ke_73dc754b: サイト管理者以外の開発者キーページにはトグルスイッチを使用する
   use_webcam_1ed0bf6b: ウェブカメラを使用する
   use_window_parent_in_deep_linking_response_8fe5f845: ディープリンクレスポンスでwindow.parentを使用する
   used_by_permission_314a78dd: 許諾により使用
@@ -30302,6 +30388,7 @@ ja:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "ユーザーは、課題とクイズ - 追加/編集/削除が有効になっているときには、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "ユーザーは、コース内容 - 表示、課題とクイズ - 追加/編集/削除が有効になっているときに、クイズインデックスページの問題バンクの管理リンクにアクセスできます。"
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: ユーザーはこのカレンダーを「その他のカレンダー」リストに追加することができます。
+  users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: ユーザーは、コースに他のユーザーを一時登録することができます。登録期間が終了すると、割り当てられたユーザはコースから削除されます。
   users_d1b60cb0: ユーザー
   users_designers_22195c6f: "ユーザー - デザイナー"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "ユーザー - 受講者用のオブザーバーペアリングコードを生成する"
@@ -30318,6 +30405,7 @@ ja:
   users_students_ecbb43eb: "ユーザー - 受講者"
   users_tas_27117894: "ユーザー - TA"
   users_teachers_a5d5d1af: "ユーザー - 教員"
+  users_temporary_enrollments_88c4b8da: "ユーザ - 一時登録"
   users_view_list_861c7a3f: "ユーザー - 表示リスト"
   users_view_login_ids_a2e6a85: "ユーザー - ログインIDを表示する"
   users_view_primary_email_address_14f4978f: "ユーザー - プライマリ電子メールアドレスを表示する"
@@ -31286,6 +31374,7 @@ ja:
     one: "検索で以下のエラーが発生しました:"
     other: "検索で以下のエラーが発生しました:"
   your_search_returned_no_results_383a30cf: 検索結果は返されませんでした。
+  your_student_submissions_are_being_gathered_9c9ff764: あなたの受講者の提出物を収集中です
   your_submission_has_not_been_graded_yet_d6963e53: 提出物はまだ採点されていません
   your_time_for_this_quiz_has_been_reduced_394652e9: この小テストの回答時間が少なくなっています。
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: 公開されていない変更内容は、以前に保存された状態に戻されます。
