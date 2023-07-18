@@ -269,3 +269,8 @@ custom_gradebook_statuses:
   applies_to: SiteAdmin
   display_name: Custom Status Labels for Submissions and Final Grades
   description: Account administrators can create custom status labels that instructors will be able to use in their gradebooks. These custom status labels will not have any functionality associated with them like missing or late. Admins will also be able to disable default status labels and prevent them from being used in the entire instance.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
