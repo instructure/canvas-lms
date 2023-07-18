@@ -479,7 +479,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
     let letterGrade
     if (ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED) {
       letterGrade =
-        scoreToLetterGrade(scoreToUse, ENV.course_active_grading_scheme.data) || I18n.t('N/A')
+        scoreToLetterGrade(scoreToUse, ENV.course_active_grading_scheme?.data) || I18n.t('N/A')
     } else {
       letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme) || I18n.t('N/A')
     }
