@@ -32,6 +32,10 @@ development:
 #      inst_access_signature:
 #        private_key: <signing private key in base 64>
 #        encryption_public_key: <encryption public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>
+      inst_fs:
+        app_host: "http://api.inst-fs.docker"
+        # this is just "super-sekret-value", base64-encoded:
+        secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
 #      linked_in_creds:
 #        api_key: <api_key>
 #        secret_key: <secret_key>

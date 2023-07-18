@@ -92,7 +92,7 @@ module InstFS
     end
 
     def app_host
-      setting("app-host")
+      setting("app_host")
     end
 
     def jwt_secrets
@@ -289,7 +289,7 @@ module InstFS
     private
 
     def setting(key)
-      DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
+      Rails.application.credentials.inst_fs&.with_indifferent_access&.[](key)
     end
 
     def service_url(path, query_params = nil)
