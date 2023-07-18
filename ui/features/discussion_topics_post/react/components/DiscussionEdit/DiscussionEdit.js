@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousResponseSelector} from '../AnonymousResponseSelector/AnonymousResponseSelector'
+import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useRef, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'

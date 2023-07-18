@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
+import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
 import {CURRENT_USER, DEFAULT_AVATAR_URL} from '../../utils/constants'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
