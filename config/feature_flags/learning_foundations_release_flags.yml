@@ -45,6 +45,9 @@ media_links_use_attachment_id:
     Use attachment ids in media links so that users are always pointed to the correct instance of media
     instead of the original
   applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
 
 assignments_2_student:
   state: hidden
