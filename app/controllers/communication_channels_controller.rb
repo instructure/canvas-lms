@@ -459,7 +459,7 @@ class CommunicationChannelsController < ApplicationController
     if @enrollment
       return render_unauthorized_action unless @current_user.can_create_enrollment_for?(@enrollment.course, session, @enrollment.type)
     else
-      return render_unauthorized_action unless @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
+      return unless authorized_action(@user, @current_user, [:manage, :manage_user_details])
     end
 
     if @enrollment && (@enrollment.invited? || @enrollment.active?)
@@ -475,7 +475,7 @@ class CommunicationChannelsController < ApplicationController
 
   def confirmation_limit_reached
     @user = User.find(params[:user_id])
-    return render_unauthorized_action unless @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
+    return unless authorized_action(@user, @current_user, [:manage, :manage_user_details])
     return render json: {}, status: :bad_request unless params[:id].present?
 
     @cc = @user.communication_channels.find(params[:id])

@@ -70,7 +70,7 @@ class JwtsController < ApplicationController
       init_context
       return render json: { error: @error }, status: :bad_request if @error
       return render json: { error: "Context not found." }, status: :not_found unless @context
-      return render_unauthorized_action unless @context.grants_any_right?(@current_user, :read)
+      return unless authorized_action(@context, @current_user, :read)
     end
     # TODO: remove this once we teach all consumers to consume the asymmetric ones
     symmetric = workflows_require_symmetric_encryption?(workflows)

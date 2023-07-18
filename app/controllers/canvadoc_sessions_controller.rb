@@ -32,7 +32,7 @@ class CanvadocSessionsController < ApplicationController
       return render_unauthorized_action
     end
 
-    return render_unauthorized_action unless submission.grants_right?(@current_user, :read)
+    return unless authorized_action(submission, @current_user, :read)
     return render_unauthorized_action if submission.assignment.annotatable_attachment_id.blank?
 
     is_draft = submission_attempt == "draft"

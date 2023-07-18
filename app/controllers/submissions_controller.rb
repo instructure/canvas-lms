@@ -373,7 +373,7 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def audit_events
-    return render_unauthorized_action unless @context.grants_right?(@current_user, :view_audit_trail)
+    return unless authorized_action(@context, @current_user, :view_audit_trail)
 
     submission = Submission.find(params[:submission_id])
 

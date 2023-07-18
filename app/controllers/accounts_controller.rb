@@ -414,7 +414,7 @@ class AccountsController < ApplicationController
   # @example_response
   #   {"microsoft_sync_enabled": true, "microsoft_sync_login_attribute_suffix": false}
   def show_settings
-    return render_unauthorized_action unless @account.grants_right?(@current_user, session, :manage_account_settings)
+    return unless authorized_action(@account, @current_user, :manage_account_settings)
 
     public_attrs = %i[microsoft_sync_enabled
                       microsoft_sync_tenant

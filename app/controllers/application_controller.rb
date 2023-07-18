@@ -974,8 +974,8 @@ class ApplicationController < ActionController::Base
   # if authorized_action(object, @current_user, :update)
   #   render
   # end
-  def authorized_action(object, actor, rights)
-    can_do = object.grants_any_right?(actor, session, *Array(rights))
+  def authorized_action(object, actor, rights, all_rights: false)
+    can_do = object.send(all_rights ? :grants_all_rights? : :grants_any_right?, actor, session, *Array(rights))
     render_unauthorized_action unless can_do
     can_do
   end

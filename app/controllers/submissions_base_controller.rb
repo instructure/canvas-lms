@@ -27,7 +27,7 @@ class SubmissionsBaseController < ApplicationController
   include Api::V1::SubmissionComment
 
   def show
-    return render_unauthorized_action unless @submission.context.grants_right?(@current_user, session, :read)
+    return unless authorized_action(@submission.context, @current_user, :read)
 
     @visible_rubric_assessments = @submission.visible_rubric_assessments_for(@current_user)
     @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
