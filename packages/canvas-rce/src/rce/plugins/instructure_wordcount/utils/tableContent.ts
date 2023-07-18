@@ -22,7 +22,7 @@ import formatMessage from '../../../../format-message'
 
 export interface Header {
   readonly id: string
-  readonly label: string
+  readonly getLabel: () => string
 }
 
 export interface CountRow {
@@ -32,20 +32,20 @@ export interface CountRow {
 }
 
 export const HEADERS: Header[] = [
-  {id: 'count', label: formatMessage('Count')},
-  {id: 'document', label: formatMessage('Document')},
-  {id: 'selection', label: formatMessage('Selection')},
+  {id: 'count', getLabel: () => formatMessage('Count')},
+  {id: 'document', getLabel: () => formatMessage('Document')},
+  {id: 'selection', getLabel: () => formatMessage('Selection')},
 ]
 
-const ROW_LABELS: [Category, string][] = [
-  ['words', formatMessage('Words')],
-  ['chars-no-spaces', formatMessage('Characters (no spaces)')],
-  ['chars', formatMessage('Characters')],
+const ROW_LABELS: [Category, () => string][] = [
+  ['words', () => formatMessage('Words')],
+  ['chars-no-spaces', () => formatMessage('Characters (no spaces)')],
+  ['chars', () => formatMessage('Characters')],
 ]
 
 export const generateRows = (ed: Editor): CountRow[] => {
-  return ROW_LABELS.map(([category, label]) => ({
-    label,
+  return ROW_LABELS.map(([category, getLabel]) => ({
+    label: getLabel(),
     documentCount: countContent(ed, 'body', category),
     selectionCount: countContent(ed, 'selection', category),
   }))
