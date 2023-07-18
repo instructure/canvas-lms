@@ -81,6 +81,9 @@ module AdheresToPolicy
     # session - The session to use if the rights are dependend upon the session.
     # rights - The rights to get the status for.  Will return true if the user
     #          is granted any of the rights provided.
+    # with_justifications - If true, returns an object that responds to `success?`
+    #                    and `justifications`, which is a (possibly empty) list of
+    #                    JustifiedFailure objects instead of a boolean.
     #
     # Examples
     #
@@ -95,11 +98,19 @@ module AdheresToPolicy
     #
     # Returns true if any of the provided rights are granted to the user.  False
     # if none of the provided rights are granted.
-    def grants_any_right?(user, *args)
+    def grants_any_right?(user, *args, with_justifications: false)
       session, sought_rights = parse_args(args)
-      sought_rights.any? do |sought_right|
-        check_right?(user, session, sought_right)
+      check_results = sought_rights.map do |sought_right|
+        result = check_right?(user, session, sought_right, with_justifications: true)
+        # short circuit if we succeed so we don't process unnecessary permissions
+        return with_justifications ? result : true if result.success?
+
+        result
       end
+
+      # Justifications must be resolvable without knowledge of the specific check they happened
+      # to fail on, so just return the unique justifications
+      with_justifications ? JustifiedFailures.new(check_results.flat_map(&:justifications).uniq) : false
     end
 
     # Public: Checks all of the rights passed in for a user.
@@ -108,6 +119,9 @@ module AdheresToPolicy
     # session - The session to use if the rights are dependend upon the session.
     # rights - The rights to get the status for.  Will return true if the user
     #          is granted all of the rights provided.
+    # with_justifications - If true, returns an object that responds to `success?`
+    #                    and `justifications`, which is a (possibly empty) list of
+    #                    JustifiedFailure objects instead of a boolean.
     #
     # Examples
     #
@@ -121,13 +135,20 @@ module AdheresToPolicy
     #   # => false
     #
     # Returns true if all of the provided rights are granted. Otherwise, returns false.
-    def grants_all_rights?(user, *args)
+    def grants_all_rights?(user, *args, with_justifications: false)
       session, sought_rights = parse_args(args)
-      return false if sought_rights.empty?
+      return with_justifications ? Failure.instance : false if sought_rights.empty?
 
-      sought_rights.none? do |sought_right|
-        !check_right?(user, session, sought_right)
+      sought_rights.map do |sought_right|
+        result = check_right?(user, session, sought_right, with_justifications: true)
+        # short circuit if we fail so we don't process unnecessary permissions
+        return with_justifications ? result : false unless result.success?
+
+        result
       end
+
+      # At this point we must have succeeded on all checks
+      with_justifications ? Success.instance : true
     end
 
     # Public: Checks the right passed in for a user.
@@ -136,6 +157,9 @@ module AdheresToPolicy
     # session - The session to use if the rights are dependent upon the session.
     # right - The right to get the status for.  Will return true if the user
     #         is granted the right provided.
+    # with_justifications - If true, returns an object that responds to `success?`
+    #                    and `justifications`, which is a (possibly empty) list of
+    #                    JustifiedFailure objects instead of a boolean.
     #
     # Examples
     #
@@ -149,11 +173,11 @@ module AdheresToPolicy
     #   # => true
     #
     # Returns true if the provided right is granted. Otherwise, returns false.
-    def grants_right?(user, *args)
+    def grants_right?(user, *args, with_justifications: false)
       session, sought_rights = parse_args(args)
       raise ArgumentError if sought_rights.length > 1
 
-      check_right?(user, session, sought_rights.first)
+      check_right?(user, session, sought_rights.first, with_justifications:)
     end
 
     # Public: Clears the cached permission states for the user.
@@ -211,6 +235,9 @@ module AdheresToPolicy
     # user - The user to base the right check from.
     # session - The session to use when checking the right status.
     # sought_right - The right to check its status.
+    # with_justifications - If true, returns an object that responds to `success?`
+    #                    and `justifications`, which is a (possibly empty) list of
+    #                    JustifiedFailure objects instead of a boolean.
     #
     # Examples
     #
@@ -221,8 +248,8 @@ module AdheresToPolicy
     #   # => false, :delete
     #
     # Returns the rights status pertaining the user and session provided.
-    def check_right?(user, session, sought_right)
-      return false unless sought_right
+    def check_right?(user, session, sought_right, with_justifications: false)
+      return with_justifications ? Failure.instance : false unless sought_right
 
       if Thread.current[:primary_permission_under_evaluation].nil?
         Thread.current[:primary_permission_under_evaluation] = true
@@ -248,14 +275,21 @@ module AdheresToPolicy
         use_rails_cache:
       ) do
         conditions = self.class.policy.conditions[sought_right]
-        next false unless conditions
+        next Failure.instance unless conditions
+
+        failure_justifications = []
 
         # Loop through all the conditions until we find the first one that
         # grants us the sought_right.
-        conditions.any? do |condition|
+        result = conditions.any? do |condition|
           start_time = Time.now
           condition_applies = condition.applies?(self, user, session)
           elapsed_time = Time.now - start_time
+
+          if condition_applies.is_a?(JustifiedFailure)
+            failure_justifications << condition_applies
+            condition_applies = false
+          end
 
           if condition_applies
             # Since the condition is true we can loop through all the rights
@@ -270,7 +304,7 @@ module AdheresToPolicy
               # Cache the condition_right since we already know they have access.
               Cache.write(
                 permission_cache_key_for(user, session, condition_right),
-                true,
+                Success.instance,
                 use_rails_cache: config.cache_permissions && config.cache_related_permissions
               )
             end
@@ -278,9 +312,15 @@ module AdheresToPolicy
             true
           end
         end
+
+        result ? Success.instance : JustifiedFailures.new(failure_justifications)
       end
 
-      value
+      # Handle old cached values
+      value = Success.instance if value == true
+      value = Failure.instance if value == false
+
+      with_justifications ? value : value.success?
     ensure
       Thread.current[:primary_permission_under_evaluation] = was_primary_permission
     end
