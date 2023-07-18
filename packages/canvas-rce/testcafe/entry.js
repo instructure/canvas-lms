@@ -49,7 +49,6 @@ if (content) {
           'instructure_equation',
           'instructure_media_embed',
           'instructure_image',
-          'instructure_external_tools',
           'instructure_rce_external_tools',
           'instructure_record',
           'instructure_links',
