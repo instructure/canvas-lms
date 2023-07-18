@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.7.0 - 2023-07-18
+
+### Fixed
+- Some broken translations in the 'Edit Course Link' tray and the word count modal
+- Some Typescript errors
+- An issue where the a11y checker incorrectly shows the issues icon
+
+### Changed
+- Removed the `rce_new_external_tool_dialog_in_canvas` feature flag
+- Removed the deprecated `instructure_external_tools` package code which was not in use
+- Replaced themeable with emotion
+
+### Added
+- Selected link indicator alert for screenreaders in the 'Edit Course Link' tray
+
 ## 5.6.17 - 2023-06-27
 
 ### Fixed
