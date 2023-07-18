@@ -539,7 +539,9 @@ class MessageableUser
       state_clauses.compact!
       return nil if state_clauses.empty?
 
-      "(#{state_clauses.join(' OR ')}) AND enrollments.type != 'StudentViewEnrollment'" << primary_teacher_enrollment_conditions
+      teacher_message_conditions = "(#{state_clauses.join(' OR ')}) AND enrollments.type != 'StudentViewEnrollment'"
+      teacher_message_conditions << primary_teacher_enrollment_conditions if options[:primary_teacher_only]
+      teacher_message_conditions
     end
 
     def self.primary_teacher_enrollment_conditions()
@@ -573,7 +575,8 @@ class MessageableUser
     def enrollment_scope(options={})
       options = {
         :common_course_column => 'enrollments.course_id',
-        :common_role_column => 'enrollments.type'
+        :common_role_column => 'enrollments.type',
+        :primary_teacher_only => true
       }.merge(options)
       scope = base_scope(options)
       scope = scope.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
