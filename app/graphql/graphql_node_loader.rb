@@ -29,6 +29,10 @@ module GraphQLNodeLoader
       Loaders::SISIDLoader.for(Account).load(id).then(check_read_permission)
     when "Course"
       Loaders::IDLoader.for(Course).load(id).then(check_read_permission)
+    when "CustomGradeStatus"
+      Loaders::IDLoader.for(CustomGradeStatus).load(id)
+    when "StandardGradeStatus"
+      Loaders::IDLoader.for(StandardGradeStatus).load(id)
     when "CourseBySis"
       Loaders::SISIDLoader.for(Course).load(id).then(check_read_permission)
     when "Assignment"
