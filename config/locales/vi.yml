@@ -216,6 +216,7 @@ vi:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Một bảng các câu trả lời và thống kê ngắn gọn về các lựa chọn câu trả lời của sinh viên."
   a_table_that_contains_the_default_canvas_grading_s_7ba86ec6: "Một bảng chứa dữ liệu chế độ cho điểm canvas mặc định.  Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu."
   a_table_that_contains_the_grading_scheme_data_each_e9031ad3: "Một bảng chứa dữ liệu chế độ cho điểm.  Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu."
+  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Một bảng chứa dữ liệu chế độ cho điểm. Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu. Ngoài ra, mỗi hàng còn chứa một nút để thêm một hàng mới bên dưới và một nút để xóa hàng hiện tại."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Một bảng chứa dữ liệu chế độ cho điểm. Đầu tiên là tên của chế độ cho điểm và các nút để chỉnh sửa và xóa chế độ. Mỗi hàng chứa một tên, một tỷ lệ phần trăm tối đa và một tỷ lệ phần trăm tối thiểu. Ngoài ra, mỗi hàng còn chứa một nút để thêm một hàng mới bên dưới và một nút để xóa hàng hiện tại."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "Đã hết thời gian chờ khi liên hệ với dịch vụ xác thực bên ngoài"
   a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "Một RRULE hàng năm phải có BYDAY hoặc BYMONTHDAY"
@@ -1871,6 +1872,7 @@ vi:
   address_book_input_a0d8e76f: "Thông Tin Đầu Vào của Sổ Địa Chỉ"
   address_book_menu_c986b615: "Menu Sổ Địa Chỉ"
   address_use_as_wildcard_48f2cf60: "Địa chỉ (sử dụng * làm ký tự đại diện)"
+  adds_additional_fields_to_the_content_migration_as_192c2d3f: "Thêm Trường Bổ Sung vào Ánh Xạ Quyền Di Chuyển Nội Dung"
   adds_additional_information_and_filtering_for_feat_3e55a058: "Thêm thông tin bổ sung và bộ lọc cho phần chuyển đổi tính năng"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Thêm cài đặt tài khoản/khóa học trong thời gian đến hạn mặc định cho các bài tập mới"
   adds_an_account_setting_to_select_the_classic_lato_c2227d6c: |-
@@ -1880,6 +1882,7 @@ vi:
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Thêm liên kết phân tích trên menu cài đặt người dùng."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Thêm phân tích vào thẻ nội dung của sinh viên."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Thêm các quyền chi tiết để thêm và xóa từng vai trò và một quyền riêng cho các hành động quản trị khóa học khác"
+  adds_menu_option_for_accessing_alignments_at_the_o_6d3bce6: "Thêm tùy chọn menu để truy cập căn chỉnh ở cấp kết quả với Trình Quản Lý Kết Quả Được Cải Thiện"
   adds_the_option_to_grade_by_question_in_speedgrade_5eac06f3: "Thêm tùy chọn xếp hạng theo câu hỏi trong SpeedGrader đối với Quizzes.Next Các Câu Hỏi Kiểm Tra"
   adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
       Thêm các chỉ báo trực quan vào trang chi tiết bài tập đã nộp để cho sinh viên biết rằng tồn tại các chú thích
@@ -2457,7 +2460,10 @@ vi:
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Cho phép người dùng xem các ID SIS của người dùng trong trang Mọi Người của khóa học."
   allows_user_to_weight_assignment_groups_95cb11b2: "Cho phép người dùng hoạch định nhóm bài tập."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Cho phép người dùng thêm mô tả thân thiện vào kết quả cho chế độ xem của sinh viên và phụ huynh trong Sổ Điểm Đánh Giá Mức Học Tập Thành Thục Của Sinh Viên."
+  allows_users_to_add_a_temporary_enrollment_with_a__22f73d4: "Cho phép người dùng thêm một lần ghi danh tạm thời có ngày bắt đầu, ngày kết thúc và vai trò"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Cho phép người dùng thêm các công cụ LTI với conference_selection loại vị trí"
+  allows_users_to_delete_a_temporary_enrollment_7fd33cdd: "Cho phép người dùng xóa một lần ghi danh tạm thời"
+  allows_users_to_edit_an_existing_temporary_enrollm_b3543354: "Cho phép người dùng chỉnh sửa một lần ghi danh tạm thời đang tồn tại"
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Cho phép người dùng bật tùy chọn \"Khởi chạy SpeedGrader Được Lọc bởi Nhóm Sinh Viên\" cho các khóa học trên trang cài đặt khóa học. Khi hoạt động và một nhóm sinh viên đã được chọn trong Sổ Điểm Mới, SpeedGrader sẽ chỉ tải các sinh viên trong nhóm đã được chọn."
   allows_users_to_import_groups_in_a_course_a8b5c73e: "Cho phép người dùng nhập nhóm trong khóa học."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Cho phép người dùng hợp nhất nhiều tài khoản với nhau (được cấp thông tin đăng nhập hợp lệ)."
@@ -2612,6 +2618,7 @@ vi:
   analytics_course_code_student_name_d63bab4c: "Phân Tích: %{course_code} -- %{student_name}"
   and_7fcc2911: Và
   and_a_few_more_not_shown_here_28e7d713: "... và một số khác không được hiển thị ở đây"
+  and_compressed_into_a_zip_file_this_may_take_some__1acbe09f: "và nén thành một tập tin zip. Quá trình này có thể mất một chút thời gian, tùy thuộc vào kích thước và số lượng tập tin bài nộp."
   and_count_more_43eae021: "và %{count} nhiều hơn nữa…"
   and_many_more_not_shown_here_fb777a4c: "... và *nhiều* hơn nữa không được hiển thị ở đây"
   and_more_1c35b232: "và nhiều hơn nữa..."
@@ -2900,6 +2907,7 @@ vi:
   artist_info_for_username_for_description_12d5d862: "Thông tin nghệ sĩ đối với %{userName} cho %{description}"
   as_of_a036fa2e: "Kể từ"
   as_of_date_the_lti_1_3_oidc_auth_endpoint_has_chan_a8783bc6: "Kể từ %{date}, đầu cuối LTI 1.3 OIDC Auth đã thay đổi từ https://canvas.instructure.com/api/lti/authorize_redirect thành https://sso.canvaslms.com/api/lti/authorize_redirect. Lý do và phạm vi của thay đổi này được trình bày chi tiết trong *bài viết này của Cộng Đồng Canvas* và thông tin bổ sung có sẵn trong tài liệu API của chúng tôi. Thay đổi này nhỏ và sẽ không mất nhiều thời gian, nhưng yêu cầu thay đổi cấu hình ở phía công cụ cho mọi công cụ LTI 1.3 được cài đặt trong Canvas."
+  as_of_date_the_lti_1_3_platform_storage_specificat_74b82d8d: "Kể từ %{date}, thông số kỹ thuật trình Lưu Trữ Nền Tảng LTI 1.3 sẽ được Canvas hỗ trợ hoàn toàn. Các công cụ muốn triển khai tính năng này phải thay đổi đầu cuối OIDC mà chúng lưu trữ cho Canvas từ *https://canvas.instructure.com/api/lti/authorize_redirect* thành *https://sso.canvaslms.com/api/lti/authorize_redirect*. Đầu cuối OIDC Auth được khuyến nghị để cài đặt công cụ 1.3 mới cũng đã thay đổi và chúng tôi khuyến nghị tất cả công cụ 1.3 thay đổi cấu hình để có thể sử dụng đầu cuối mới này trong thời gian sớm nhất có thể."
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Khi bạn nhập vào trường này, danh sách các nhóm sẽ được tự động lọc để chỉ bao gồm những nhóm có tên khớp với thông tin bạn nhập."
   ascending_b3c87427: "Tăng dần"
   ask_your_instructor_a_question_a61ca5e9: "Hỏi người hướng dẫn của bạn một câu hỏi"
@@ -3687,7 +3695,9 @@ vi:
       internal_ca_description: "Nếu máy chủ LDAP của bạn xuất trình chứng chỉ do một CA gốc nội bộ, không đáng tin cậy cấp, bạn *phải* tải lên CA gốc của mình để Canvas tin tưởng khi kết nối."
       internal_ca_warning: "*Cảnh báo*: Việc sử dụng một CA gốc nội bộ sẽ kém bảo mật hơn và làm tăng nguy cơ bị tổn hại. Thay vào đó, chúng tôi thực sự khuyên bạn nên sử dụng các chứng chỉ do cơ quan cấp chứng chỉ đáng tin cậy ban hành."
       ldap_timeout_failure_help2: "Nếu Canvas hết thời gian chờ giao tiếp quá nhiều lần với máy chủ LDAP, Canvas sẽ chặn các nỗ lực đăng nhập tiếp theo sử dụng máy chủ LDAP đó đối với %{time}. Máy chủ LDAP của bạn đã hết thời gian chờ lần cuối vào %{timestamp}."
+      verify_tls_cert_opt_in_dated_description: "Xác minh chứng chỉ TLS sẽ được yêu cầu vào *%{enforcement_date}*, nhưng bạn có thể bật tính năng này sớm để đảm bảo máy chủ LDAP của bạn tuân thủ."
       verify_tls_cert_opt_in_description: "Xác minh chứng chỉ TLS sẽ được yêu cầu vào *%{enforcement_date}*, nhưng bạn có thể bật tính năng này sớm để đảm bảo máy chủ LDAP của bạn tuân thủ."
+      verify_tls_cert_opt_in_undated_description: "Xác minh chứng chỉ TLS sẽ được yêu cầu sớm, nhưng bạn có thể bật tính năng này sớm để đảm bảo máy chủ LDAP của bạn tuân thủ."
     ldap_settings_test: 
       labels: 
         pass: "Mật khẩu"
@@ -5397,6 +5407,7 @@ vi:
     unexpected_error: "Đã có lỗi đột xuất, vui lòng liên hệ hỗ trợ."
     unknown: "Không xác định"
     upload_timeout_error: "Quá trình tải tập tin lên đã hết thời gian."
+  content_migration_asset_map_v2_f0f455f: "Ánh Xạ Quyền Di Chuyển Nội Dung phiên bản 2"
   content_migration_queued_46c27790: "Di chuyển nội dung được xếp hàng đợi"
   content_migration_running_percent_complete_4b00c024: "Di chuyển nội dung đang chạy, %{percent}% hoàn thành"
   content_migrations: 
@@ -6431,6 +6442,7 @@ vi:
   course_image_for_course_cfbb08df: "Hình ảnh khóa học cho %{course}"
   course_image_settings_eba3ec55: "Cài đặt hình ảnh khóa học"
   course_implemented_apps_fa658f5a: "Ứng Dụng Được Khóa Học Triển Khai"
+  course_import_html_using_gem_812d0af5: "HTML Nhập Khóa Học Bằng Gem"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Khóa học đã được liên kết với một bản vẽ thiết kế"
   course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Khóa học không đủ điều kiện được đặt làm một bản vẽ thiết kế"
   course_level_notification_preferences_require_a_co_2f0a618: "Tùy chọn thông báo cấp độ khóa học yêu cầu course_id phải cập nhật"
@@ -7023,6 +7035,7 @@ vi:
   create_a_new_domain_lookup_1830a512: "Tạo tra cứu miền mới"
   create_a_new_module_6f31b0fe: "Tạo một Học Phần mới"
   create_a_new_user_for_address_7487e9c9: "Tạo một người sử dụng mới cho “%{address}\""
+  create_a_temporary_enrollment_167f05f1: "Tạo một Lần Ghi Danh Tạm thời"
   create_account_263ec6: "Tạo Tài Khoản"
   create_an_ba36d171: "Tạo một"
   create_announcements_above_1c36202b: "Tạo thông báo chung ở trên"
@@ -7059,6 +7072,7 @@ vi:
   create_pages_581a4d59: "Tạo trang"
   create_slots_71dbb2f8: "Tạo Chỗ"
   create_subject_86de5618: "Tạo Chủ Thể"
+  create_temporary_enrollment_3d4eaa33: "Tạo Lần Ghi Danh Tạm Thời"
   create_theme_based_on_40651ed3: "Tạo chủ đề dựa trên"
   created_58b8a75a: "Đã tạo"
   created_6ee36dff: "Đã tạo:"
@@ -7756,6 +7770,7 @@ vi:
     empty_message: "Không có tin nhắn"
   discussion_topic_a7bf935: "đề tài thảo luận"
   discussion_topic_dc85ad4c: "Đề Tài Thảo Luận"
+  discussion_topic_edit_error_page_c9fb069c: "Trang Lỗi Chỉnh Sửa Đề Tài Thảo Luận"
   discussion_topic_initial_query_error_37c98b4: "Lỗi truy vấn ban đầu của Đề Tài Thảo Luận"
   discussion_topic_menu_3d4684c6: "Menu Đề Tài Thảo Luận"
   discussion_topic_post_error_page_7f7edc49: "Trang Lỗi Bài Đăng Đề Tài Thảo Luận"
@@ -8066,6 +8081,7 @@ vi:
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "Xong! Chúng tôi đã lấy các tập tin bạn tải lên và đính kèm chúng với một bình luận ngắn vào trang nộp bài của mỗi người dùng cho bài tập này. Các sinh viên sẽ nhận được thông báo rằng một bình luận mới đã được thêm vào."
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Trường Kinh doanh Dorsey - Hoạt Động và Thành Tích của Sinh Viên"
   down_5831a426: Xuống
+  download_all_submissions_304d6797: "Tải xuống tất cả các bài nộp"
   download_as_ce13bff6: "Tải xuống dưới dạng..."
   download_as_zip_5dae7f19: "Tải xuống dưới dạng Zip"
   download_assignment_submissions_41e50ee7: "Tải Xuống Các Bài Nộp Bài Tập"
@@ -8850,6 +8866,7 @@ vi:
   error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Lỗi: Công cụ trả về một loại nội dung không hợp lệ \"%{contentType}\""
   error_updating_cluster_error_674e5f2e: "Lỗi khi cập nhật %{cluster}: %{error}"
   error_updating_comment_4b80c76d: "Lỗi khi cập nhật bình luận"
+  error_updating_notes_31b24785: "Lỗi khi cập nhật lưu ý"
   error_updating_pacename_ad07f9df: "Lỗi khi cập nhật %{paceName}"
   error_updating_status_of_module_item_80336274: "Lỗi khi cập nhật trạng thái của mục học phần"
   error_updating_submission_draft_1d40ade7: "Lỗi khi cập nhật dự thảo bài nộp"
@@ -9389,6 +9406,7 @@ vi:
   filter_speedgrader_by_student_group_53683142: "Lọc SpeedGrader theo Nhóm Sinh Viên"
   filter_students_2327fe79: "Lọc Các Sinh Viên"
   filters_92f2776f: "Bộ lọc"
+  final_grade_474e3e37: "Điểm Cuối Cùng: "
   final_grade_4d7f6545: "Điểm Cuối Cùng"
   final_grade_6938dca8: "Điểm cuối cùng:"
   final_grade_6e94d99e: "Điểm Cuối Cùng:"
@@ -9638,6 +9656,7 @@ vi:
   grade_9c6f076d: Điểm
   grade_a91e433e: "Lớp:"
   grade_assignment_7c1abc11: "Điểm %{assignment}"
+  grade_by_9ea3661e: "Lớp theo"
   grade_by_question_9d9b8a71: "Xếp hạng theo câu hỏi"
   grade_change_activity_75fb525: "Hoạt Động Thay Đổi Điểm"
   grade_change_log_231f90e4: "Nhật Ký Thay Đổi Điểm"
@@ -10671,6 +10690,8 @@ vi:
   http_response_code_832d6baa: "Phản Hồi HTTP: %{code}"
   https_3a02e3fb: https
   https_b8426ad8: "https://"
+  https_example_com_config_xml_d3bae5e3: "https://example.com/config.xml"
+  https_lti_tool_provider_example_herokuapp_com_regi_305953da: "https://lti-tool-provider-example.herokuapp.com/register"
   hungarian_fc7d30c9: "Tiếng Hungary"
   hungary_36_cd3e515b: "Hungary (+36)"
   hypothetical_end_date_117d81cf: "Ngày kết thúc giả định"
@@ -10777,6 +10798,10 @@ vi:
       của một yêu cầu tài nguyên oEmbed.
   if_enabled_prefills_the_assignment_form_with_value_edb8ebda: "Nếu được bật, hãy điền trước biểu mẫu bài tập với các giá trị từ thông báo liên kết sâu trên trang tạo/chỉnh sửa bài tập."
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Nếu được bật, các tham số truy vấn sẽ không được sao chép vào phần nội dung ĐĂNG trong quá trình khởi chạy LTI."
+  if_enabled_root_accounts_and_subaccounts_will_see__84cd42e5: |-
+      Nếu đang bật, các tài khoản gốc và tài khoản phụ sẽ hiện công tắc bật/tắt để bật
+      và tắt các mã khóa trên trang mã khóa của nhà phát triển. Quản trị viên của trang vẫn sẽ thấy các nút
+      tắt/cho phép/bật.
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Nếu được bật, id Nguồn được Canvas sử dụng cho Kết Quả Cơ Bản sẽ được mã hóa."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Nếu được bật, lịch sử bài nộp cho các câu hỏi trong Câu Hỏi Kiểm Tra Mới sẽ được xử lý riêng."
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
@@ -10807,6 +10832,9 @@ vi:
       đến các trường hợp Canvas trong đó tài khoản gốc nằm trên cùng phân đoạn
       với tài khoản quản trị trang web. Hành vi trong các trường hợp khác
       đã được xử lý theo cách này.
+  if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
+      Nếu đang bật, các mẫu cài đặt và định cấu hình công cụ được tìm thấy trên trang cài đặt Tài Khoản và Khóa Học sẽ sử dụng
+      các thành phần InstUI, thay vì các thành phần cũ, ít tiếp cận hơn được tạo trong cục bộ.
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Nếu được bật, người dùng sẽ thấy hộp Cảnh Báo mang tính nhắc nhở ở gần đầu trang
       Mã Khóa Của Nhà Phát Triển thông báo cho họ về các thay đổi đầu cuối OIDC Auth sắp tới hoặc đã hoàn thành.
@@ -11016,6 +11044,8 @@ vi:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Bao gồm điểm khi cảnh báo về điểm.
       Nếu email của bạn không phải là email của tổ chức, điều này có nghĩa là nội dung nhạy cảm sẽ được gửi ra bên ngoài tổ chức.
+  include_sis_batch_info_f79dd131: "Bao gồm thông tin khóa SIS;"
+  include_sis_batch_information_75bf66c4: "Bao gồm thông tin khóa SIS"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Bao gồm Đại Lý Datadog RUM JS trong tài liệu HEAD."
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Bao gồm các điểm của bài tập này khi đồng bộ hóa với Hệ Thống Thông Tin Sinh Viên của trường bạn"
   include_unpublished_assignments_83ebbaec: "Bao Gồm Các Bài Tập Chưa Được Phát Hành"
@@ -11110,6 +11140,11 @@ vi:
       invalid_number: "Đây phải là một số."
       required: "Trường bắt buộc"
   instructure_default_73317bb1: "Mặc định Instructure"
+  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructure tổ chức Canvas Commons tại khu vực do tổ chức của bạn chọn, là Châu Âu. Điều này có nghĩa là khi bạn sử dụng Canvas Commons, dữ liệu cá nhân của bạn sẽ được lưu trữ và xử lý tại Đức. Các yếu tố dữ liệu cá nhân này bao gồm: tên, địa chỉ email, ID Người Dùng Canvas, tên đăng nhập Canvas, Hình Đại Diện Canvas, Địa Chỉ IP, các tài nguyên Canvas Commons mà bạn yêu thích và đánh giá của bạn đối với bất kỳ tài nguyên nào trong Canvas Commons. Bạn có thể tìm thêm thông tin về các thực hành quyền riêng tư của Instructure [tại đây](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructure tổ chức Canvas Commons tại khu vực do tổ chức của bạn chọn, là Châu Á - Thái Bình Dương. Điều này có nghĩa là khi bạn sử dụng Canvas Commons, dữ liệu cá nhân của bạn sẽ được lưu trữ và xử lý tại Singapore. Các yếu tố dữ liệu cá nhân này bao gồm: tên, địa chỉ email, ID Người Dùng Canvas, tên đăng nhập Canvas, Hình Đại Diện Canvas, Địa Chỉ IP, các tài nguyên Canvas Commons mà bạn yêu thích và đánh giá của bạn đối với bất kỳ tài nguyên nào trong Canvas Commons. Bạn có thể tìm thêm thông tin về các thực hành quyền riêng tư của Instructure [tại đây](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructure tổ chức Canvas Commons tại khu vực do tổ chức của bạn chọn, là Hoa Kỳ. Điều này có nghĩa là khi bạn sử dụng Canvas Commons, dữ liệu cá nhân của bạn sẽ được lưu trữ và xử lý tại Hoa Kỳ. Các yếu tố dữ liệu cá nhân này bao gồm: tên, địa chỉ email, ID Người Dùng Canvas, tên đăng nhập Canvas, Hình Đại Diện Canvas, Địa Chỉ IP, các tài nguyên Canvas Commons mà bạn yêu thích và đánh giá của bạn đối với bất kỳ tài nguyên nào trong Canvas Commons. Bạn có thể tìm thêm thông tin về các thực hành quyền riêng tư của Instructure [tại đây](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructure tổ chức Canvas Commons tại khu vực do tổ chức của bạn chọn, là Canada. Điều này có nghĩa là khi bạn sử dụng Canvas Commons, dữ liệu cá nhân của bạn sẽ được lưu trữ và xử lý tại Canada. Các yếu tố dữ liệu cá nhân này bao gồm: tên, địa chỉ email, ID Người Dùng Canvas, tên đăng nhập Canvas, Hình Đại Diện Canvas, Địa Chỉ IP, các tài nguyên Canvas Commons mà bạn yêu thích và đánh giá của bạn đối với bất kỳ tài nguyên nào trong Canvas Commons. Bạn có thể tìm thêm thông tin về các thực hành quyền riêng tư của Instructure [tại đây](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructure tổ chức Canvas Commons tại khu vực do tổ chức của bạn chọn, là Úc. Điều này có nghĩa là khi bạn sử dụng Canvas Commons, dữ liệu cá nhân của bạn sẽ được lưu trữ và xử lý tại Úc. Các yếu tố dữ liệu cá nhân này bao gồm: tên, địa chỉ email, ID Người Dùng Canvas, tên đăng nhập Canvas, Hình Đại Diện Canvas, Địa Chỉ IP, các tài nguyên Canvas Commons mà bạn yêu thích và đánh giá của bạn đối với bất kỳ tài nguyên nào trong Canvas Commons. Bạn có thể tìm thêm thông tin về các thực hành quyền riêng tư của Instructure [tại đây](%{url})."
   instructure_inline_media_comment: 
     alerts: 
       kaltura_disabled: "Kaltura đã bị tắt cho trang Canvas này"
@@ -11179,6 +11214,7 @@ vi:
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY không hợp lệ ‘%{bymonthday}'"
   invalid_calculation_int_for_this_calculation_metho_971fada3: "không hợp lệ calculation_int cho calculation_method này"
   invalid_content_type_utf_8_required_bd458b78: "Loại nội dung không hợp lệ, bắt buộc phải có UTF-8"
+  invalid_context_9186d37e: "Ngữ cảnh không hợp lệ"
   invalid_context_for_group_f6cd268a: "ngữ cảnh không hợp lệ cho nhóm"
   invalid_context_type_68f40a61: "Loại ngữ cảnh không hợp lệ"
   invalid_context_type_72085a6a: "loại ngữ cảnh không hợp lệ"
@@ -11227,6 +11263,9 @@ vi:
   invalid_restrictions_316cd740: "Hạn chế không hợp lệ"
   invalid_score_3d247da7: "Điểm không hợp lệ"
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: |-
+      Tên người dùng sftp không hợp lệ. Chúng tôi không thể xác định tên người dùng để sử dụng do không có miền nào kết thúc bằng .instructure.
+                                    Vui lòng liên hệ vào #canvas-sre trong Slack.
+  invalid_sftp_username_we_were_unable_to_determine__13339947: |-
       Tên người dùng sftp không hợp lệ. Chúng tôi không thể xác định tên người dùng để sử dụng do không có miền nào kết thúc bằng .instructure.
                                     Vui lòng liên hệ vào #canvas-sre trong Slack.
   invalid_sis_sync_status_b68db497: "Trạng thái đồng bộ hóa SIS không hợp lệ"
@@ -11953,8 +11992,8 @@ vi:
           mfa_enrollment: |-
               Xác thực đa yếu tố tăng cường bảo mật bằng cách yêu cầu bạn phải có thứ gì đó thuộc quyền sở hữu thực của mình,
               ngoài việc biết mật khẩu của bạn, để đăng nhập vào Canvas. Đây có thể là thiết bị có thể tạo các mã xác minh
-              hoặc điện thoại có thể nhận tin nhắn văn bản. Ứng dụng Google Authenticator dành cho [iPhone](%{iphone_url}) hoặc
-              [Android](%{android_url}) có thể được cấu hình bằng cách quét Mã QR bên dưới. Các thẻ bảo mật khác có thể được cấu hình bằng cách nhập
+              hoặc điện thoại có thể nhận tin nhắn văn bản. Ứng dụng Google Authenticator dành cho iPhone hoặc
+              Android có thể được cấu hình bằng cách quét Mã QR bên dưới. Các thẻ bảo mật khác có thể được cấu hình bằng cách nhập
               khóa bí mật **%{secret_key}**. Khi bạn đã cấu hình xác thực đa yếu tố, bạn nên truy cập trang hồ sơ
               của mình và in ra một bộ mã dự phòng, trong trường hợp thiết bị đa yếu tố thông thường của bạn không khả dụng.
           mfa_required: "Bạn bắt buộc phải thiết lập xác thực đa yếu tố."
@@ -12133,6 +12172,7 @@ vi:
   manage_students_for_the_course_3b1bc4f0: "Quản lý các sinh viên cho khóa học"
   manage_subject_coursecontext_2328e1ff: "Quản Lý Chủ Đề: %{courseContext}"
   manage_subject_f9835769: "Quản Lý Chủ Đề"
+  manage_temporary_enrollments_4c4f21ef: "Quản Lý Ghi Danh Tạm Thời"
   manage_update_23de23a1: "Quản Lý Cập Nhật"
   manage_update_for_toolname_f8e3b2fb: "Quản lý bản cập nhật cho %{toolName}"
   manage_usage_rights_c5a8c216: "Quản Lý Các Quyền Sử Dụng"
@@ -12287,6 +12327,7 @@ vi:
   menu_39cb0e8e: Menu
   menu_for_group_title_fbf60567: "Menu cho nhóm %{title}"
   menu_for_outcome_title_1d93378d: "Menu cho kết quả %{title}"
+  menu_option_for_outcome_details_page_2dcd13d6: "Tùy Chọn Menu cho Trang Chi Tiết Kết Quả"
   menu_options_9b6b0b5c: "Các tùy chọn menu"
   mesa_public_course_syllabus_52282dd3: "Chương Trình Học Khóa Học của Mesa Public"
   mesa_public_user_inactivity_report_a6792ccf: "Báo Cáo Không Hoạt Động của Người Dùng Mesa Public"
@@ -14020,6 +14061,7 @@ vi:
   missing_required_description_99a99ff: "Mô tả bắt buộc bị thiếu"
   missing_required_fields_fields_30e20799: "Trường bắt buộc bị thiếu: %{fields}"
   missing_required_fields_please_fill_in_all_require_1e10b2e9: "Trường bắt buộc bị thiếu. Vui lòng nhập tất cả trường bắt buộc."
+  missing_required_parameters_4f589df8: "Thông số bắt buộc bị thiếu"
   missing_required_points_39db69fa: "Điểm bắt buộc bị thiếu"
   missing_required_ratings_9b19e66: "Đánh giá bắt buộc bị thiếu"
   missing_required_values_missing_values_f3be2ff8: "Giá trị bắt buộc bị thiếu: %{missing_values}"
@@ -14147,6 +14189,8 @@ vi:
   more_modules_d9a9f003: "Thêm Học Phần"
   more_options_272b4953: "Tùy Chọn Khác"
   more_options_e89670cf: "Tùy chọn khác"
+  more_options_for_message_from_authorname_4001ddda: "Thêm tùy chọn cho tin nhắn từ %{authorName}"
+  more_options_for_subject_e18d421: "Thêm tùy chọn cho %{subject}"
   more_outcomes_have_been_loaded_9acafe9c: "Nhiều Kết Quả Hơn Đã Được Tải Lên"
   more_people_options_730e9686: "Thêm Tùy Chọn Mọi Người"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Kết quả thêm được thêm vào phần dưới của trang."
@@ -14491,6 +14535,8 @@ vi:
   next_student_79955068: "Sinh Viên Tiếp Theo"
   next_student_b62869f4: "Sinh viên tiếp theo"
   next_up_review_feedback_19a15e0e: "Tiếp Theo: Xem Lại Phản Hồi"
+  next_up_review_feedback_59555dbd: "TIẾP THEO: Xem Lại Phản Hồi"
+  next_up_submit_assignment_2fdb7174: "TIẾP THEO: Nộp Bài Tập"
   next_up_submit_assignment_793a9d41: "Tiếp Theo: Gửi Bài Tập"
   next_window_window_90271943: "Cửa sổ tiếp theo: %{window}"
   nickname_1e6da3ad: "Biệt danh"
@@ -15084,6 +15130,7 @@ vi:
   on_8f7190e5: Bật
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "Trên các khóa học đã cho phép quyền sử dụng, thực thi lựa chọn quyền sử dụng trên tập tin đính kèm đề tài thảo luận"
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "Vào %{date}, đầu cuối LTI 1.3 OIDC Auth sẽ thay đổi từ https://canvas.instructure.com/api/lti/authorize_redirect thành https://sso.canvaslms.com/api/lti/authorize_redirect. Lý do và phạm vi của thay đổi này được trình bày chi tiết trong *bài viết này của Cộng Đồng Canvas* và thông tin bổ sung có sẵn trong tài liệu API của chúng tôi. Thay đổi này tuy nhỏ nhưng bạn cần thay đổi cấu hình ở phía công cụ cho mọi công cụ LTI 1.3 được cài đặt trong Canvas."
+  on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "Vào %{date}, thông số kỹ thuật trình Lưu Trữ Nền Tảng LTI 1.3 sẽ được Canvas hỗ trợ hoàn toàn. Các công cụ muốn triển khai tính năng này phải thay đổi đầu cuối OIDC mà chúng lưu trữ cho Canvas từ *https://canvas.instructure.com/api/lti/authorize_redirect* thành *https://sso.canvaslms.com/api/lti/authorize_redirect*. Đầu cuối OIDC Auth được khuyến nghị để cài đặt công cụ 1.3 mới cũng đã thay đổi vào ngày đó và chúng tôi khuyến nghị tất cả công cụ 1.3 thay đổi cấu hình để có thể sử dụng đầu cuối mới này trong thời gian sớm nhất có thể."
   on_for_key_keyname_bbac4e1b: "Bật để khóa: %{keyName}"
   on_paper_46d0ba36: "Trên Giấy"
   on_time_17ca5ad9: "Đúng Hạn"
@@ -15141,6 +15188,7 @@ vi:
   open_comment_library_9debe2: "Thư Viện Bình Luận Mở"
   open_complete_incomplete_menu_cfe2033b: "Mở menu Hoàn Chỉnh/Chưa Hoàn Chỉnh"
   open_conversation_a6590865: "Mở Cuộc Trò Chuyện"
+  open_conversation_subject_1dd2d3c: "Mở Cuộc Trò Chuyện %{subject}"
   open_discussion_title_for_comments_6baa3fa: "Mở cuộc thảo luận %{title} để bình luận"
   open_emoji_menu_1df0eb0b: "Mở menu biểu tượng cảm xúc"
   open_event_menu_for_783510e3: "Mở menu sự kiện cho"
@@ -18051,6 +18099,7 @@ vi:
   remove_filename_87f3781e: "Gỡ %{filename}"
   remove_filename_dab5c02e: "Gỡ %{filename}"
   remove_filter_6f7204e2: "Gỡ bộ lọc"
+  remove_filtername_filter_6b6d7063: "Gỡ Bộ Lọc %{filterName}"
   remove_grading_scheme_title_d3942a08: "Gỡ Chế Độ Cho Điểm %{title}"
   remove_group_5d2f2f2d: "Gỡ Nhóm"
   remove_group_981d6a02: "Gỡ Nhóm?"
@@ -18131,8 +18180,10 @@ vi:
   reply_389d6fb9: "Phản hồi"
   reply_all_80298bee: "Phản hồi tất cả"
   reply_all_b864cd0e: "Phản Hồi Tất Cả"
+  reply_for_subject_ae247d1e: "Phản hồi cho %{subject}"
   reply_from_author_a2806c77: "Trả lời từ %{author}"
   reply_from_name: "%{name} qua Thông Báo Canvas"
+  reply_to_authorname_f209e84a: "Phản hồi tới %{authorName}"
   reply_to_comment_72d96728: "Phản Hồi Bình Luận"
   reply_to_conversation_f1aa0d4: "Phản hồi cuộc trò chuyện"
   reply_to_conversation_subject_4b2e6fe7: "Phản hồi cuộc trò chuyện %{subject}"
@@ -18184,6 +18235,7 @@ vi:
   reports_course_f09b7d9e: "Báo cáo (Khóa Học)"
   reports_manage_92bc45cb: "Báo cáo - quản lý"
   reqired_end_date_a7deac41: "Yêu cầu ngày kết thúc"
+  request_failed_with_status_status_47054af0: "Yêu cầu không thành công với trạng thái %{status}"
   request_id_1499afb0: "ID Yêu Cầu"
   request_successfully_sent_note_that_applying_score_ee8665b6: "Đã gửi yêu cầu thành công. Lưu ý rằng việc áp dụng điểm có thể mất một chút thời gian và các thay đổi sẽ không xuất hiện cho tới khi bạn tải lại trang."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Yêu cầu DocViewer sử dụng CloudFront để phục vụ nội dung pdf."
@@ -18278,7 +18330,9 @@ vi:
   retry_duplicating_originalassignmentname_884aee1: "Thử sao chép lại \"%{originalAssignmentName}\""
   retry_ebd5f8ba: "Thử lại"
   retry_migrating_name_bdc802ef: "Thử di chuyển lại \"%{name}\""
+  return_to_conversation_list_86688140: "Quay lại Danh Sách Cuộc Trò Chuyện"
   return_to_parent_folder_4ece2184: "trở lại thư mục mẹ"
+  return_to_subject_in_conversation_list_d67b8e73: "Quay lại %{subject} trong Danh Sách Cuộc Trò Chuyện"
   returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Trả về giá trị chuỗi thay vì giá trị số trong các thay thế biến"
   revert_date_changes_5105ce5: "Hoàn nguyên các thay đổi về ngày"
   revert_to_actual_score_f665eea9: "Hoàn Nguyên về Điểm Thực Tế"
@@ -18334,6 +18388,9 @@ vi:
       manage_site_settings: "Quản lý cài đặt trình cắm và toàn bộ trang web"
       manage_storage_quotas: "Quản lý hạn ngạch bộ nhớ"
       manage_students: "Thêm/xóa sinh viên cho khóa học"
+      manage_temp_enroll_add: "Thêm ghi danh tạm thời"
+      manage_temp_enroll_delete: "Xóa ghi danh tạm thời"
+      manage_temp_enroll_edit: "Chỉnh sửa ghi danh tạm thời"
       manage_user_logins: "Sửa đổi các chi tiết đăng nhập cho người dùng"
       manage_user_notes: "Quản lý mục nhập nhật ký khoa"
       manage_user_observers: "Quản lý người quan sát cho người dùng"
@@ -19704,6 +19761,8 @@ vi:
     errors: 
       unrecorgnized_type: "Loại nhập không được cộng nhận"
     instructure_csv: "CSV được định dạng hoặc tập tin zip chứa CSV của Instructure"
+  sis_batch_id_8b755858: sis_batch_id
+  sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "Dữ liệu SIS"
   sis_data_import_8bb623ce: "Dữ Liệu SIS - nhập"
   sis_data_manage_328a4799: "Dữ Liệu SIS - quản lý"
@@ -20054,6 +20113,7 @@ vi:
   status_color_picker_9ea0156b: "%{status} Trình Chọn Màu"
   status_e051bb30: "trạng thái"
   status_e7fdbe06: "Trạng thái"
+  status_for_key_keyname_47668960: "%{status} cho khóa: %{keyName}"
   statuses_497dfa15: "Các Trạng Thái…"
   statuses_f41543d8: "Các Trạng Thái"
   stemscopes_namespace_custom_data_87bcd65a: "STEMScopes - Dữ Liệu Tùy Chỉnh Không Gian Tên"
@@ -20265,9 +20325,15 @@ vi:
   subject_details_12405b1: "Thông Tin Chi Tiết Chủ Thể"
   subject_home_8e593f72: "Trang Chủ Chủ Thể"
   subject_home_page_41226803: "Trang Chủ Môn Học"
+  subject_mark_as_read_b0218a: "%{subject} Đánh Dấu là Đã Đọc"
+  subject_mark_as_unread_6f07435f: "%{subject} Đánh Dấu là Chưa Đọc"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Chủ thể chỉ được chứa tối đa 255 ký tự."
   subject_name_a1ac4da4: "Tên Chủ Thể"
+  subject_not_selected_10dacadf: "%{subject} không được chọn"
+  subject_not_starred_4a113097: "%{subject} không được đánh sao"
   subject_reply_to: "Trả Lời: %{subject}"
+  subject_selected_2196b77e: "%{subject} đã được chọn"
+  subject_starred_8ca02058: "%{subject} đã gắn dấu sao"
   subject_subject_9e1057f7: "Chủ thể: %{subject}"
   subjects_14c0c4de: "Các chủ thể"
   submission: 
@@ -20461,6 +20527,7 @@ vi:
   submit_on_behalf_of_student_af674b95: "Nộp Thay Mặt cho Sinh Viên"
   submit_ticket_5515ffd: "Gửi Phiếu"
   submitted_318fad53: "Đã gửi"
+  submitted_718f5cbc: "ĐÃ GỬI: "
   submitted_at_4d5ea3aa: "Đã Nộp Vào"
   submitted_by_name_dab6d5e1: "Được nộp bởi: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Đã nộp bởi %{proxy} vào %{date}"
@@ -20665,6 +20732,12 @@ vi:
   tempe_grade_export_c611da01: "Xuất Điểm Tempe"
   template_account_21ac8f4f: "Tài Khoản Mẫu"
   templates_4ca13d07: Mẫu
+  temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Tạm thời ghi danh một người dùng vào khóa học. Việc ghi danh tạm thời được ghép cặp với một thao tác ghi danh khác trong khóa học."
+  temporarily_enroll_name_8acb66ce: "Tạm thời ghi danh %{name}"
+  temporary_enrollments_add_373181b7: "Ghi Danh Tạm Thời - thêm"
+  temporary_enrollments_delete_52ffaae4: "Ghi Danh Tạm Thời - xóa"
+  temporary_enrollments_edit_67c01325: "Ghi Danh Tạm Thời - chỉnh sửa"
+  temporary_enrollments_f0937c5a: "Ghi Danh Tạm Thời"
   tenant_d2a41f78: "Người Thuê"
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Thiếu người thuê hoặc đã tắt đồng bộ hóa. Hãy kiểm tra cài đặt tích hợp Microsoft cho khóa học và tài khoản."
   tenant_name_e174f404: "Tên Người Thuê"
@@ -20755,6 +20828,7 @@ vi:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Tải khoản người dùng đó đã bị xóa.  Vui lòng liên hệ với quản trị viên hệ thống của bạn để kích hoạt lại tài khoản."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "Khả năng người dùng nhận được thông báo từ slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "ID tài khoản của tài khoản mà người dùng báo cáo thuộc về"
+  the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "uuid tài khoản của tài khoản mà người dùng báo cáo thuộc về"
   the_account_wide_sync_settings_were_changed_while__90c48497: "Cài đặt đồng bộ hóa toàn tài khoản đã được thay đổi khi đang đồng bộ hóa. Vui lòng thử đồng bộ hóa lại."
   the_active_directory_attribute_that_will_be_used_t_96f5824e: "Thuộc tính Danh Mục Đang Hoạt Động sẽ được sử dụng để ghép người dùng Canvas với người dùng Microsoft"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "Thuật toán sử dụng để ký AuthnRequest, LogoutRequest, và LogoutResponse tin nhắn được gửi đến IdP."
@@ -21003,6 +21077,7 @@ vi:
   the_sync_encountered_an_error_and_did_not_complete_538790b9: "Quá trình đồng bộ hóa gặp lỗi và không thể hoàn tất"
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Không thể bật cài đặt Đồng Bộ Hóa với SIS cho bài tập “”%{assignment_name}” mà không có hạn nộp."
   the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "Không thể tạo nhóm này vì nhóm Microsoft không có chủ sở hữu. Đây có thể là lỗi không liên tục: vui lòng thử đồng bộ hóa lại và nếu sự cố vẫn tiếp diễn, hãy liên hệ với bộ phận hỗ trợ."
+  the_temporarily_enrolled_user_can_only_view_and_pa_a5bf0184: "Người dùng được ghi danh tạm thời chỉ có thể xem và tham gia vào khóa học trong khoảng thời gian từ ngày bắt đầu đến ngày kết thúc đã được chọn khi ghi danh tạm thời."
   the_term_for_export_data_5aad7a0a: "Học kỳ để xuất dữ liệu"
   the_term_for_grade_export_data_d55a6be7: "Học kỳ cho dữ liệu xuất điểm"
   the_term_id_to_report_on_4479d2fc: "Id học kỳ để báo cáo"
@@ -21055,6 +21130,8 @@ vi:
   there_are_unread_rubric_comments_337270ca: "Có bình luận về bảng đánh giá theo tiêu chí chưa được đọc."
   there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Có các thay đổi chưa lưu cho một lớp.\\n\\nVẫn tiếp tục chứ?"
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Có giới hạn 2 ứng dụng cho vị trí trong thanh công cụ RCE."
+  there_is_already_a_page_in_this_course_with_this_t_5b37ecf2: "Đã có một trang trong khóa học này có tiêu đề này."
+  there_is_already_a_page_in_this_group_with_this_ti_3dac30e5: "Đã có một trang trong nhóm này có tiêu đề này."
   there_is_currently_1_available_grader_758e4a21: "Hiện đang có một người chấm điểm khả dụng"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Không thể đăng xuất tại IdP của bạn"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Đã xảy ra sự cố khi tạo cột ghi chú của giáo viên."
@@ -21205,6 +21282,7 @@ vi:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Bài nộp bài tập này là tác phẩm gốc của riêng tôi"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Bài nộp bài tập này sẽ không còn được tính vào điểm của bạn nữa."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Tập tin đính kèm này chưa được tác giả công bố."
+  this_canvas_community_article_details_the_reasonin_37be9375: "*Mục Cộng Đồng Canvas này* giải thích chi tiết về lý do cho thay đổi này, quy mô và định hướng chính xác cho những gì thay đổi và làm rõ thêm cho cả quản trị viên Canvas và các nhà phát triển công cụ LTI 1.3."
   this_canvas_installation_is_only_for_testing_and_w_12e52370: "Cài đặt Canvas này chỉ dành cho mục đích thử nghiệm và *sẽ đặt lại hàng tháng.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
     one: "Cài đặt Canvas này chỉ dành cho mục đích thử nghiệm và *sẽ đặt lại hàng tuần.*"
@@ -21321,6 +21399,8 @@ vi:
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "Đây là một Cuộc Thảo Luận ẩn danh. Mặc dù tên sinh viên và ảnh hồ sơ sẽ bị ẩn, tên và ảnh hồ sơ của bạn sẽ được hiển thị cho tất cả thành viên của khóa học."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Đây là một cuộc Thảo Luận ẩn danh, Tên và ảnh hồ sơ của bạn sẽ được ẩn khỏi những thành viên của khóa học khác."
   this_is_enabled_by_default_as_assignments_can_not__767e9b16: "Tính năng này được bật theo mặc định do không thể chưa cho bài tập vào sổ điểm và vẫn được tính vào sổ điểm."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "Đây *không phải* là một thay đổi mang tính đột phá. Tất cả hành vi của công cụ LTI 1.3 sẽ không thay đổi bất kể đầu cuối được sử dụng là gì, ngoại trừ thông số kỹ thuật trình Lưu Trữ Nền Tảng mới được hỗ trợ. Việc thực hiện thay đổi này sẽ triển khai vào một ngày chưa được xác định trong tương lai."
+  this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "Đây *không phải* là một thay đổi mang tính đột phá. Tất cả hành vi của công cụ LTI 1.3 sẽ không thay đổi bất kể đầu cuối được sử dụng là gì, ngoại trừ thông số kỹ thuật trình Lưu Trữ Nền Tảng mới được hỗ trợ. Ngoài ra, thay đổi **không** cần phải được thực hiện trước %{date}. Việc thực hiện thay đổi này sẽ triển khai vào một ngày chưa được xác định trong tương lai."
   this_is_not_a_valid_grade_9cc2cb8: "Đây không phải là một điểm hợp lệ"
   this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "Về mặt kỹ thuật, đây là một lỗ hổng bảo mật, nhưng một số trường cần duy trì quy trình làm việc của mình trong một thời gian."
   this_is_the_default_email_address_f3c421fb: "Đây là địa chỉ email mặc định"
@@ -21417,6 +21497,7 @@ vi:
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Trang mẫu này bao gồm các phần tử UI chung trong Canvas để giúp bạn xây dựng thương hiệu tùy chọn của mình. Khi bạn bắt đầu thay đổi để bôi màu các giá trị và hình ảnh, bạn sẽ thấy một nút *Xem Trước Các Thay Đổi Của Bạn*. Nhấp vào nút đấy để tải lại trang và xem các thay đổi của bạn trông như thế nào."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Phần nhịp độ này sẽ bị xóa và nhịp độ sẽ trở lại nhịp độ mặc định."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Cài đặt này chỉ ảnh hưởng chế độ xem của bạn khi xem điểm của sinh viên và hiển thị điểm như thể tất cả các bài tập chưa được phân loại đều bị điểm 0. Cài đặt này chỉ là một thay đổi trực quan và không ảnh hưởng đến điểm của sinh viên hoặc những người dùng khác của Sổ Điểm này. Khi bật cài đặt này, Canvas sẽ không điền các điểm 0 trong Sổ Điểm đối với các bài nộp của sinh viên trong các bài tập cá nhân. Chỉ có nhóm bài tập và tổng số cột sẽ tự động tính các điểm 0 vào tỷ lệ phần trăm tổng cho mỗi học sinh."
+  this_setting_only_impacts_courses_it_will_include__1b2169a: "Cài đặt này chỉ tác động đến các khóa học. Bao gồm cả sis_batch_id và sis_batch_user_id"
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Cài đặt này thay đổi đáng kể trải nghiệm sử dụng Canvas của sinh viên và giáo viên."
   this_settings_only_impact_enrollments_this_include_7f51358: "Cài đặt này chỉ ảnh hưởng đến những lần ghi danh. Đây bao gồm các đối tượng có dấu thời gian last_activity_at lớn hơn thông số Được Cập Nhật Sau. Mặc định đang tắt"
   this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Nhịp độ sinh viên này sẽ bị xóa và nhip độ sẽ trở lại nhịp độ được chỉ định trước đó."
@@ -22101,6 +22182,8 @@ vi:
       Không thể lấy khóa trên bảng người dùng SFTP. Vui lòng thử lại sau một phút.
                                     Nếu vẫn chưa được, vui lòng liên hệ vào #canvas-sre trong Slack.
   unable_to_parse_certificate_f25ff8b5: "Không thể phân tích cú pháp chứng chỉ"
+  unable_to_perform_diffing_against_mismatched_previ_801191d2: "Không thể phân biệt các lần nhập %{type} không khớp của trước đây và bây giờ"
+  unable_to_post_comment_c34ba536: "Không thể đăng bình luận"
   unable_to_read_file_2d04b0c: "Không thể đọc tập tin"
   unable_to_remove_app_4293cb53: "Không thể gỡ ứng dụng"
   unable_to_remove_outcomes_f682e68f: 
@@ -22114,6 +22197,7 @@ vi:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Không thể gửi tin nhắn cho người dùng trong %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Không thể đặt điểm mặc định vì bài tập này đến hạn trong khoảng thời gian chấm điểm đã đóng đối với ít nhất một sinh viên"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Không thể thiết lập kéo và thả các học phần"
+  unable_to_submit_score_e47990e3: "Không thể nộp điểm"
   unable_to_switch_students_b901bc4b: "Không thể chuyển đổi sinh viên"
   unable_to_toggle_placement_833db6ff: "Không thể chuyển đổi vị trí"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Không thể truyền tập tin đến dịch vụ lưu trữ. Dịch vụ có thể bị lỗi hoặc bạn có thể cần đăng nhập lại vào Canvas."
@@ -22391,8 +22475,10 @@ vi:
   use_comment_comment_136b5cb3: "Sử dụng bình luận %{comment}"
   use_default_890939b7: "Sử Dụng Mặc Định"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Sử dụng các tính năng thử nghiệm trước khi những tính năng này cho phép sản xuất chung"
+  use_gem_during_course_import_to_update_canvas_reso_3fcd9a8b: "Sử dụng gem trong lúc nhập khóa học để cập nhật các liên kết tài nguyên Canvas"
   use_high_contrast_ui_a5917282: "Sử Dụng UI Độ Tương Phản Cao"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Sử dụng trình giữ chỗ được cải tiến cho nội dung được chèn trong RCE."
+  use_instui_for_tool_installation_and_configuration_36de63e9: "Sử dụng InstUI cho các mẫu cài đặt và thiết lập cấu hình công cụ"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Sử dụng MathMan để chuyển đổi LaTeX thành MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Sử dụng MathMan để chuyển đổi LaTeX thành SVG?"
   use_modules_to_organize_your_content_and_create_a__1da4149: |-
@@ -22421,6 +22507,7 @@ vi:
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Sử dụng bảng này để giải quyết các kết quả trùng lặp hoặc người không tìm thấy trong tìm kiếm của bạn."
   use_this_panel_to_search_for_people_you_wish_to_ad_a3d726a7: "Sử dụng bảng này để tìm kiếm những người bạn muốn thêm vào khóa học này."
   use_this_photo_3a594830: "Sử Dụng Ảnh Này"
+  use_toggle_switches_for_non_siteadmin_developer_ke_73dc754b: "Sử dụng công tắc bật/tắt cho trang mã khóa của nhà phát triển không phải là quản trị viên trang"
   use_webcam_1ed0bf6b: "Sử Dụng Webcam"
   use_window_parent_in_deep_linking_response_8fe5f845: "Sử dụng window.parent trong Phản Hồi Liên Kết Sâu"
   used_by_permission_314a78dd: "Sử Dụng theo Quyền"
@@ -22835,6 +22922,7 @@ vi:
   users_can_access_and_create_but_not_edit_individua_59bcb8dd: "Người Dùng có thể truy cập và tạo (nhưng không chỉnh sửa) các bảng đánh giá theo tiêu chí bài tập cá nhân thông qua Bài Tập khi Bài Tập và Kiểm Tra - thêm được bật."
   users_can_access_and_create_but_not_edit_individua_a0b26adf: "Người Dùng có thể truy cập và tạo (nhưng không chỉnh sửa) các bảng đánh giá theo tiêu chí bài tập cá nhân thông qua Bài Tập khi Nội Dung Khóa Học - xem và Bài Tập và Kiểm Tra - thêm được bật."
   users_can_add_this_calendar_to_their_other_calenda_69daaa69: "Người dùng có thể thêm lịch này vào danh sách \"Lịch Khác\" của họ."
+  users_can_temporarily_enroll_another_user_in_a_cou_ce9b48ed: "Người dùng có thể tạm thời ghi danh một người dùng khác vào khóa học. Người dùng được chỉ định sẽ bị gỡ khỏi khóa học khi hết hạn ghi danh."
   users_d1b60cb0: "Người Sử Dụng"
   users_designers_22195c6f: "Người Dùng - Nhà Thiết Kế"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Người Dùng - tạo mã ghép nối với người quan sát cho sinh viên"
@@ -22849,6 +22937,7 @@ vi:
   users_students_ecbb43eb: "Người Dùng - Sinh Viên"
   users_tas_27117894: "Người Dùng - Trợ Giảng"
   users_teachers_a5d5d1af: "Người Dùng - Giáo Viên"
+  users_temporary_enrollments_88c4b8da: "Người Dùng - Ghi Danh Tạm Thời"
   users_view_list_861c7a3f: "Người Dùng - xem danh sách"
   users_view_login_ids_a2e6a85: "Người Dùng - xem các ID đăng nhập"
   users_view_primary_email_address_14f4978f: "Người Dùng - xem địa chỉ email chính"
@@ -23663,6 +23752,7 @@ vi:
     one: "Tìm kiếm của bạn đã gặp lỗi sau:"
     other: "Tìm kiếm của bạn đã gặp những lỗi sau:"
   your_search_returned_no_results_383a30cf: "Tìm kiếm của bạn không trả về kết quả nào."
+  your_student_submissions_are_being_gathered_9c9ff764: "Bài nộp của sinh viên của bạn đang được thu thập"
   your_submission_has_not_been_graded_yet_d6963e53: "Bài nộp của bạn chưa được chấm điểm"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Thời gian làm kiểm tra này của bạn đã bị giảm."
   your_unpublished_changes_will_be_reverted_to_their_fd4ba075: "Các thay đổi chưa được phát hành của bạn sẽ được hoàn nguyên về trạng thái đã lưu trước đó."
