@@ -78,7 +78,7 @@ class Login::OtpController < ApplicationController
     # of a maxed out bucket.
     increment_request_cost(150)
 
-    verification_code = params[:otp_login][:verification_code]
+    verification_code = params[:otp_login][:verification_code].delete(" ")
     if Canvas.redis_enabled?
       key = "otp_used:#{@current_user.global_id}:#{verification_code}"
       if Canvas.redis.get(key)
