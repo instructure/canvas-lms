@@ -264,7 +264,7 @@ class UsersController < ApplicationController
 
   def grades_for_student
     enrollment = Enrollment.active.find(params[:enrollment_id])
-    return render_unauthorized_action unless enrollment.grants_right?(@current_user, session, :read_grades)
+    return unless authorized_action(enrollment, @current_user, :read_grades)
 
     grading_period_id = generate_grading_period_id(params[:grading_period_id])
     opts = { grading_period_id: } if grading_period_id
@@ -1178,7 +1178,7 @@ class UsersController < ApplicationController
   def missing_submissions
     GuardRail.activate(:secondary) do
       user = api_find(User, params[:user_id])
-      return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
+      return unless @current_user && authorized_action(user, @current_user, :read)
 
       included_course_ids = api_find_all(Course, Array(params[:course_ids])).pluck(:id)
 

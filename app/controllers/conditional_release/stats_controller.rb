@@ -44,7 +44,7 @@ module ConditionalRelease
     end
 
     def require_course_grade_view_permissions
-      return render_unauthorized_action unless @context.grants_right?(@current_user, :view_all_grades)
+      authorized_action(@context, @current_user, :view_all_grades)
     end
 
     def require_trigger_assignment

@@ -1395,7 +1395,7 @@ class SubmissionsApiController < ApplicationController
   #        -H "Content-Length: 0"
   #
   def submissions_clear_unread
-    return render_unauthorized_action unless Account.site_admin.grants_right?(@current_user, :manage_students)
+    return unless authorized_action(Account.site_admin, @current_user, :manage_students)
 
     user_id = params[:user_id]
     course_id = params[:course_id]

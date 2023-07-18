@@ -160,7 +160,7 @@ class PlannerController < ApplicationController
   def set_user
     if params.key?(:user_id)
       @user = api_find(User, params[:user_id])
-      return render_unauthorized_action unless @user == @current_user || @user.grants_right?(@current_user, session, :read_as_parent)
+      return unless @user == @current_user || authorized_action(@user, @current_user, :read_as_parent)
     elsif params.key?(:observed_user_id)
       return render_unauthorized_action if !params.key?(:context_codes) || params[:context_codes].empty?
 

@@ -1766,7 +1766,8 @@ class CoursesController < ApplicationController
 
   def observer_pairing_codes_csv
     get_context
-    return render_unauthorized_action unless @context.root_account.self_registration? && @context.grants_right?(@current_user, :generate_observer_pairing_code)
+    return render_unauthorized_action unless @context.root_account.self_registration?
+    return unless authorized_action(@context, @current_user, :generate_observer_pairing_code)
 
     res = CSV.generate do |csv|
       csv << [
@@ -3256,7 +3257,7 @@ class CoursesController < ApplicationController
         availability_changes -= ["start_at"] if @course.start_at.nil?
         availability_changes -= ["conclude_at"] if @course.conclude_at.nil?
       end
-      return render_unauthorized_action if availability_changes.present? && !@course.grants_right?(@current_user, :edit_course_availability)
+      return if availability_changes.present? && !authorized_action(@course, @current_user, :edit_course_availability)
 
       # Republish course paces if the course dates have been changed
       term_changed = (@course.enrollment_term_id != enrollment_term_id) && term_id_param_was_sent
@@ -3654,7 +3655,7 @@ class CoursesController < ApplicationController
   #   ]
   def bulk_user_progress
     get_context
-    return render_unauthorized_action unless @context.grants_right?(@current_user, session, :view_all_grades)
+    return unless authorized_action(@context, @current_user, :view_all_grades)
 
     unless @context.module_based?
       return render json: {
