@@ -1102,6 +1102,7 @@ const locale = {
     "message": "Diagonaalinen nuoli ylös ja oikealle"
   },
   "up_c553575d": { "message": "Ylös" },
+  "updated_link_a827e441": { "message": "Päivitetty linkki" },
   "upload_document_253f0478": { "message": "Lataa asiakirja" },
   "upload_file_fd2361b8": { "message": "Lataa tiedosto" },
   "upload_image_6120b609": { "message": "Lisää kuva" },

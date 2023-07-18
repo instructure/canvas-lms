@@ -1112,6 +1112,7 @@ const locale = {
     "message": "Seta diagonal para cima e para a direita"
   },
   "up_c553575d": { "message": "Para Cima" },
+  "updated_link_a827e441": { "message": "Link atualizado" },
   "upload_document_253f0478": { "message": "Carregar documento" },
   "upload_file_fd2361b8": { "message": "Carregar arquivo" },
   "upload_image_6120b609": { "message": "Carregar imagem" },

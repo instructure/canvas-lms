@@ -1096,6 +1096,7 @@ const locale = {
     "message": "Strzałka po przekątnej do góry i w prawo"
   },
   "up_c553575d": { "message": "Do góry" },
+  "updated_link_a827e441": { "message": "Zaktualizowane łącze" },
   "upload_document_253f0478": { "message": "Prześlij dokument" },
   "upload_file_fd2361b8": { "message": "Prześlij plik" },
   "upload_image_6120b609": { "message": "Prześlij obraz" },

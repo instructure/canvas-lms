@@ -1100,6 +1100,7 @@ const locale = {
     "message": "Diagonalna puščica navzdol in desno"
   },
   "up_c553575d": { "message": "Navzgor" },
+  "updated_link_a827e441": { "message": "Posodobljena povezava" },
   "upload_document_253f0478": { "message": "Naloži dokument" },
   "upload_file_fd2361b8": { "message": "Naloži datoteko" },
   "upload_image_6120b609": { "message": "Naloži sliko" },

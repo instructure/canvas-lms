@@ -1140,6 +1140,7 @@ const locale = {
     "message": "Flecha diagonal hacia arriba y hacia la derecha"
   },
   "up_c553575d": { "message": "Arriba" },
+  "updated_link_a827e441": { "message": "Enlace actualizado" },
   "upload_document_253f0478": { "message": "Cargar documento" },
   "upload_file_fd2361b8": { "message": "Cargar archivo" },
   "upload_image_6120b609": { "message": "Cargar imagen" },

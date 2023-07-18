@@ -1080,6 +1080,7 @@ const locale = {
     "message": "Op og højre diagonal pil"
   },
   "up_c553575d": { "message": "Op" },
+  "updated_link_a827e441": { "message": "Opdateret link" },
   "upload_document_253f0478": { "message": "Upload dokument" },
   "upload_file_fd2361b8": { "message": "Overfør fil" },
   "upload_image_6120b609": { "message": "Upload billede" },

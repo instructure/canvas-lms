@@ -1098,6 +1098,7 @@ const locale = {
     "message": "Diagonaler Pfeil nach oben rechts"
   },
   "up_c553575d": { "message": "Nach oben" },
+  "updated_link_a827e441": { "message": "Aktualisierter Link" },
   "upload_document_253f0478": { "message": "Dokument hochladen" },
   "upload_file_fd2361b8": { "message": "Datei hochladen" },
   "upload_image_6120b609": { "message": "Bild hochladen" },

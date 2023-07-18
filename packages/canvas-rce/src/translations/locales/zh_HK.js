@@ -978,6 +978,7 @@ const locale = {
   "up_and_left_diagonal_arrow_e4a74a23": { "message": "向上和向左對角箭頭" },
   "up_and_right_diagonal_arrow_935b902e": { "message": "向上和向右對角箭頭" },
   "up_c553575d": { "message": "向上" },
+  "updated_link_a827e441": { "message": "更新的連結" },
   "upload_document_253f0478": { "message": "上傳文件" },
   "upload_file_fd2361b8": { "message": "上傳檔案" },
   "upload_image_6120b609": { "message": "上載影像" },
