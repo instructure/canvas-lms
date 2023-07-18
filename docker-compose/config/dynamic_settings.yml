@@ -32,10 +32,6 @@ development:
       rich-content-service:
         app-host: "http://rce.canvas.docker:3000"
     # another service
-    inst-fs:
-      app-host: "http://api.inst-fs.docker"
-      # this is just "super-sekret-value", base64-encoded:
-      secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
     pandata:
       ios-pandata-key: IOS_pandata_key
       ios-pandata-secret: teamrocketblastoffatthespeedoflight
