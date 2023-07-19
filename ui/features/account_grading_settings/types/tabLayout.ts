@@ -19,5 +19,5 @@
 export enum TabLayoutPanel {
   GRADING_PERIODS = 0,
   GRADING_SCHEMES = 1,
-  CUSTOM_STATUSES = 2,
+  GRADING_STATUSES = 2,
 }

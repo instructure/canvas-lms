@@ -18,9 +18,9 @@
 
 import React, {useEffect} from 'react'
 import {useMatch} from 'react-router-dom'
-import {CustomStatusManagement} from '../components/custom_status/CustomStatusManagement'
+import {AccountStatusManagement} from '../components/account_grading_status/AccountStatusManagement'
 
-export const AccountCustomStatuses = () => {
+export const AccountGradingStatuses = () => {
   const pathMatch = useMatch('/accounts/:accountId/*')
   if (!pathMatch?.params?.accountId) {
     throw new Error('account id is not present on path')
@@ -29,5 +29,5 @@ export const AccountCustomStatuses = () => {
   useEffect(() => {
     document.title = 'Account Custom Statuses'
   }, [])
-  return <CustomStatusManagement />
+  return <AccountStatusManagement />
 }

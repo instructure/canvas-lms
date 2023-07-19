@@ -21,7 +21,7 @@ import {Navigate} from 'react-router-dom'
 import {TabLayout} from '../pages/TabLayout'
 import {AccountGradingSchemes} from '../pages/AccountGradingSchemes'
 import {AccountGradingPeriods} from '../pages/AccountGradingPeriods'
-import {AccountCustomStatuses} from '../pages/AccountCustomStatuses'
+import {AccountGradingStatuses} from '../pages/AccountGradingStatuses'
 
 export const accountGradingSettingsRoutes = [
   {
@@ -31,7 +31,7 @@ export const accountGradingSettingsRoutes = [
       {path: '', element: <Navigate to="schemes" replace={true} />},
       {path: 'periods', element: <AccountGradingPeriods />},
       {path: 'schemes', element: <AccountGradingSchemes />},
-      {path: 'statuses', element: <AccountCustomStatuses />},
+      {path: 'statuses', element: <AccountGradingStatuses />},
     ],
   },
 ]

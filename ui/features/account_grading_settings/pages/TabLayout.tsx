@@ -40,7 +40,7 @@ export const TabLayout = () => {
       case TabLayoutPanel.GRADING_SCHEMES:
         navigate('schemes')
         break
-      case TabLayoutPanel.CUSTOM_STATUSES:
+      case TabLayoutPanel.GRADING_STATUSES:
         navigate('statuses')
         break
     }
@@ -78,7 +78,7 @@ export const TabLayout = () => {
         </TabsPanel>
         {isCustomGradebookStatusesEnabled && (
           <TabsPanel
-            id="gradingCustomStatusTab"
+            id="gradingStatusTab"
             renderTitle={I18n.t('Statuses')}
             isSelected={selectedTab === 'statuses'}
           >
