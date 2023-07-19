@@ -134,7 +134,8 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
-import {scoreToGrade, gradeToScoreUpperBound} from '@canvas/grading/GradingSchemeHelper'
+import {gradeToScoreUpperBound} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}

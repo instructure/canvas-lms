@@ -26,6 +26,7 @@ import type {
   SubmissionType,
   WorkflowState,
 } from '../../api.d'
+import {GradingStandard} from '@instructure/grading-utils'
 
 export type OriginalityData = {
   reportUrl: string
@@ -322,11 +323,6 @@ export type FormatGradeOptions = {
   restrict_quantitative_data?: boolean
   grading_scheme?: DeprecatedGradingScheme[]
 }
-
-/**
- * @deprecated
- */
-export type GradingStandard = [string, number]
 
 /**
  * @deprecated

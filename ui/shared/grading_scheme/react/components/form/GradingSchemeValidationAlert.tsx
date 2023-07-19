@@ -27,7 +27,7 @@ import {
   rowDataIsValid,
   rowDataIsValidNumbers,
 } from './validations/gradingSchemeValidations'
-import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
+import {GradingSchemeDataRow} from '@instructure/grading-utils'
 
 const I18n = useI18nScope('GradingSchemes')
 

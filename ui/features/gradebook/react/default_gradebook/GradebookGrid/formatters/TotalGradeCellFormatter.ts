@@ -20,7 +20,7 @@
 import _ from 'underscore'
 import round from '@canvas/round'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import htmlEscape from 'html-escape'
 import listFormatterPolyfill from '@canvas/util/listFormatter'

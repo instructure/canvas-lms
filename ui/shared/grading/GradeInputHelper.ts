@@ -18,12 +18,8 @@
  */
 
 import Big from 'big.js'
-import {
-  gradeToScoreLowerBound,
-  gradeToScoreUpperBound,
-  indexOfGrade,
-  scoreToGrade,
-} from './GradingSchemeHelper'
+import {gradeToScoreLowerBound, gradeToScoreUpperBound, indexOfGrade} from './GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
 import type {GradeInput, GradeResult} from './grading.d'
 import {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'

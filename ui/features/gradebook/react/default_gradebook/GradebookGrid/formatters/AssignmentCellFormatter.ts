@@ -26,11 +26,8 @@ import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading
 import {classNamesForAssignmentCell} from './CellStyles'
 import type Gradebook from '../../Gradebook'
 import type {PendingGradeInfo} from '../../gradebook.d'
-import type {
-  GradingStandard,
-  SubmissionData,
-  SubmissionWithOriginalityReport,
-} from '@canvas/grading/grading.d'
+import type {SubmissionData, SubmissionWithOriginalityReport} from '@canvas/grading/grading.d'
+import {GradingStandard} from '@instructure/grading-utils'
 import type {Assignment, Student, Submission} from '../../../../../../api.d'
 
 const I18n = useI18nScope('gradebook')

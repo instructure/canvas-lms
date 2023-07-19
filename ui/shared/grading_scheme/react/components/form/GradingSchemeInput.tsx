@@ -28,7 +28,7 @@ import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import numberHelper from '@canvas/i18n/numberHelper'
 
 import {GradingSchemeDataRowInput} from './GradingSchemeDataRowInput'
-import {GradingSchemeDataRow} from '../../../gradingSchemeApiModel'
+import {GradingSchemeDataRow} from '@instructure/grading-utils'
 import {GradingSchemeValidationAlert} from './GradingSchemeValidationAlert'
 import {gradingSchemeIsValid} from './validations/gradingSchemeValidations'
 import {roundToTwoDecimalPlaces, roundToFourDecimalPlaces} from '../../helpers/roundDecimalPlaces'

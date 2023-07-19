@@ -25,9 +25,9 @@ import type {
   CamelizedAssignment,
   GradeEntryMode,
   GradeResult,
-  GradingStandard,
   SubmissionData,
 } from '@canvas/grading/grading.d'
+import {GradingStandard} from '@instructure/grading-utils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 import {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'

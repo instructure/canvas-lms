@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradingStandard} from '@canvas/grading/grading'
+import {GradingStandard} from '@instructure/grading-utils'
 
 export type EnvGradingStandards = EnvGradingStandardsCommon & Partial<EnvGradingStandardsAccount>
 

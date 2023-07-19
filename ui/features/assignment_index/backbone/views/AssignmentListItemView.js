@@ -40,7 +40,7 @@ import 'jqueryui/tooltip'
 import '@canvas/rails-flash-notifications'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import {StudentViewPeerReviews} from '../../react/components/StudentViewPeerReviews'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('AssignmentListItemView')
