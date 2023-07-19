@@ -94,7 +94,7 @@ export default class CalendarEvent extends Backbone.Model {
 
     const {success, error, ...options} = opts
 
-    options.url = this.url() + '?include[]=web_conference'
+    options.url = this.url() + '?include[]=web_conference&include[]=series_head'
 
     if (this.get('id')) {
       syncDfd = (this.sync || Backbone.sync).call(this, 'read', this, options)

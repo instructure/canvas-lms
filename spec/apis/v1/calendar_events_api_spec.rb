@@ -63,7 +63,7 @@ describe CalendarEventsApiController, type: :request do
     expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
     expected_reserved_fields = (expected_slot_fields + ["reserved", "reserve_comments"])
     expected_reservation_fields = expected_reservation_event_fields - ["child_events"]
-    expected_series_fields = expected_fields + ["series_natural_language"]
+    expected_series_fields = expected_fields + ["series_head", "series_natural_language"]
 
     context "returns events" do
       it "when start after and end before the given range dates" do
@@ -1791,7 +1791,7 @@ describe CalendarEventsApiController, type: :request do
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "one", format: "json" })
           assert_status(200)
           expect(json.length).to eq 1
-          expect(json[0].keys).to match_array expected_fields
+          expect(json[0].keys).to match_array expected_series_fields
           expect(json[0]["id"]).to be target_event_id
 
           remaining_events = CalendarEvent.where(series_uuid:, workflow_state: "active")
@@ -1808,7 +1808,7 @@ describe CalendarEventsApiController, type: :request do
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "following", format: "json" })
           assert_status(200)
           expect(json.length).to eq 2
-          expect(json[0].keys).to match_array expected_fields
+          expect(json[0].keys).to match_array expected_series_fields
           expect(json[0]["id"]).to be target_event_id
           expect(json[1]["id"]).to be @event_series["duplicates"][1]["calendar_event"]["id"]
 

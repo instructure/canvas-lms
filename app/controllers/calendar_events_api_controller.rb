@@ -194,6 +194,10 @@ require "rrule"
 #           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat.",
 #           "type": "string"
 #         },
+#         "series_head": {
+#            "description": "Boolean indicating if is the first event in the series of recurring events.",
+#            "type": "boolean"
+#         },
 #         "series_natural_language": {
 #            "description": "A natural language expression of how events occur in the series. (e.g. Daily, 2 times)",
 #            "type": "string"
@@ -340,7 +344,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
   # @argument includes[] [Array]
-  #   Array of optional attributes to include. Possible values are "web_conferenes" and "series_natural_language"
+  #   Array of optional attributes to include. Possible values are "web_conference", "series_head" and "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false.
   #   If true, only events with important dates set to true will be returned.
@@ -389,7 +393,7 @@ class CalendarEventsApiController < ApplicationController
   #   When type is "assignment", specifies the submission types to be excluded from the returned
   #   assignments. Ignored if type is not "assignment".
   # @argument includes[] [Array]
-  #   Array of optional attributes to include. Possible values are "web_conferenes" and "series_natural_language"
+  #   Array of optional attributes to include. Possible values are "web_conference", "series_head" and "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false
   #   If true, only events with important dates set to true will be returned.
@@ -864,7 +868,7 @@ class CalendarEventsApiController < ApplicationController
     @event.context.touch # assume all events in the series belong to the same context
 
     json = events.map do |event|
-      event_json(event, @current_user, session)
+      event_json(event, @current_user, session, include: includes(["web_conference", "series_natural_language"]))
     end
     render json:
   end

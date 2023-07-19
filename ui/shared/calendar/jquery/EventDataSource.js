@@ -560,7 +560,7 @@ export default class EventDataSource {
     if (ag_ids.length > 0) {
       p.appointment_group_ids = ag_ids.join(',')
     }
-    p.include = ['web_conference', 'series_natural_language']
+    p.include = ['web_conference', 'series_head', 'series_natural_language']
     return p
   }
 

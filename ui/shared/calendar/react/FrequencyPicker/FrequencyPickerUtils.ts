@@ -40,7 +40,7 @@ const FrequencyCounts = {
   'weekly-day': 52, // weeks in a year
   'monthly-nth-day': 12, // Months in a year
   annually: 5, // The event will occur for five years
-  'every-weekday': 52, // weeks in a year
+  'every-weekday': 200, // Backend maximum is 200
 }
 
 const I18n = useScope('calendar_frequency_picker')
@@ -198,9 +198,9 @@ export const generateFrequencyRRule = (
 
 export const rruleToFrequencyOptionValue = (
   eventStart: Moment,
-  rrule: string | null
+  rrule: string | null | undefined
 ): FrequencyOptionValue => {
-  if (rrule === null) return 'not-repeat'
+  if (rrule === null || rrule === undefined) return 'not-repeat'
   if (rrule.length === 0) return 'custom'
 
   const spec: RRuleHelperSpec = RRuleHelper.parseString(rrule)
@@ -249,4 +249,19 @@ export const rruleToFrequencyOptionValue = (
     return 'every-weekday'
   }
   return 'saved-custom'
+}
+
+export const rruleToOptionValue = (rrule: string | null): FrequencyOptionValue => {
+  if (rrule === null) return 'not-repeat'
+  if (rrule === 'FREQ=DAILY;INTERVAL=1;COUNT=200') return 'daily'
+  if (/^FREQ=WEEKLY;BYDAY=(SU|MO|TU|WE|TH|FR|SA);INTERVAL=1;COUNT=52$/.test(rrule))
+    return 'weekly-day'
+  if (
+    /^FREQ=MONTHLY;BYSETPOS=(-?\d+);BYDAY=(SU|MO|TU|WE|TH|FR|SA);INTERVAL=1;COUNT=12$/.test(rrule)
+  )
+    return 'monthly-nth-day'
+  if (/^FREQ=YEARLY;BYMONTH=\d{2};BYMONTHDAY=\d{2};INTERVAL=1;COUNT=5$/.test(rrule))
+    return 'annually'
+  if (/^FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=200$/.test(rrule)) return 'every-weekday'
+  return 'custom'
 }

@@ -24,8 +24,12 @@ import tz from '@canvas/timezone'
 import {fireEvent, within, getByText} from '@testing-library/dom'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
+import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/UpdateCalendarEventDialog'
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('@canvas/calendar/react/UpdateCalendarEventDialog', () => ({
+  renderUpdateCalendarEventDialog: jest.fn(),
+}))
 
 const defaultTZ = 'Asia/Tokyo'
 
@@ -284,6 +288,26 @@ describe('EditEventView', () => {
 
       fireEvent.click(section_checkbox)
       expect(within(document.body).queryByText('Frequency:')).not.toBeVisible()
+    })
+
+    it('render update calendar event dialog', async () => {
+      const view = render({series_uuid: '123'})
+
+      view.submit(null)
+
+      expect(renderUpdateCalendarEventDialog).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          event: expect.objectContaining({
+            id: 1,
+            title: 'My Event',
+          }),
+          params: expect.objectContaining({
+            'calendar_event[title]': 'My Event',
+          }),
+          isOpen: true,
+        })
+      )
     })
   })
 })
