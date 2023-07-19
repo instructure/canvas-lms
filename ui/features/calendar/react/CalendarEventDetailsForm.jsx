@@ -41,8 +41,41 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
 import FrequencyPicker from '@canvas/calendar/react/FrequencyPicker/FrequencyPicker'
+import {rruleToFrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
+import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/UpdateCalendarEventDialog'
+import ReactDOM from 'react-dom'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
+
+const screenReaderMessageCallback = msg => {
+  return () => showFlashAlert({message: msg, type: 'info', srOnly: true})
+}
+
+const renderWhichEditDialog = (selectedEvent, params) => {
+  let modalContainer = document.getElementById('update_modal_container')
+  if (!modalContainer) {
+    modalContainer = document.createElement('div')
+    modalContainer.id = 'update_modal_container'
+    document.body.appendChild(modalContainer)
+  }
+
+  renderUpdateCalendarEventDialog(modalContainer, {
+    event: selectedEvent.calendarEvent,
+    params,
+    isOpen: true,
+    onCancel: () => ReactDOM.unmountComponentAtNode(modalContainer),
+    onUpdate: which => $.publish('CommonEvent/eventSavingFromSeries', {selectedEvent, which}),
+    onUpdated: (_, which) => {
+      ReactDOM.unmountComponentAtNode(modalContainer)
+      $.publish('CommonEvent/eventSavedFromSeries', {selectedEvent, which})
+      screenReaderMessageCallback(I18n.t('The events were successfully updated'))
+    },
+    onError: (_, which) => {
+      $.publish('CommonEvent/eventSavedFromSeriesFailed', {selectedEvent, which})
+      screenReaderMessageCallback(I18n.t('Events update failed'))
+    },
+  })
+}
 
 const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContextCB, timezone}) => {
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
@@ -56,7 +89,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const [date, setDate] = useState(tz.parse(event.startDate().format('ll'), timezone))
   const [startTime, setStartTime] = useState(initTime(event.calendarEvent?.start_at))
   const [endTime, setEndTime] = useState(initTime(event.calendarEvent?.end_at))
-  const [rrule, setRRule] = useState(event.object.rrule ? event.object.rrule : '')
+  const [rrule, setRRule] = useState(event.object.rrule ? event.object.rrule : null)
   const [webConference, setWebConference] = useState(event.webConference)
   const [shouldShowConferences, setShouldShowConferences] = useState(false)
   const [isImportant, setImportant] = useState(event.important_dates)
@@ -71,7 +104,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const shouldEnableTimeFields = () => !isBlackout
   // Right now we don't have a way to edit event series and backend doesn't support to change
   // the rrule of an event. Also we don't save frequency in database.
-  const shouldShowFrequencyPicker = () => ENV?.FEATURES?.calendar_series && event.isNewEvent()
+  const shouldShowFrequencyPicker = () => ENV?.FEATURES?.calendar_series
   const shouldShowLocationField = () => event.calendarEvent?.parent_event_id == null
   const shouldEnableLocationField = () => !isBlackout
   const shouldShowConferenceField = () => shouldShowConferences
@@ -247,10 +280,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   }
 
   const handleFrequencyChange = (newFrequency, newRRule) => {
-    if (newFrequency === 'custom') {
-      // setRRule('')
-      // window.location.href = buildEditEventUrl({rrule: ''}).toString()
-    } else {
+    if (newFrequency !== 'custom') {
       setRRule(newRRule)
     }
   }
@@ -270,10 +300,6 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
     return momentTime
   }
 
-  const screenReaderMessageCallback = msg => {
-    return () => showFlashAlert({message: msg, type: 'info', srOnly: true})
-  }
-
   const formSubmit = jsEvent => {
     jsEvent.preventDefault()
 
@@ -290,6 +316,9 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       'calendar_event[important_dates]': isImportant,
       'calendar_event[blackout_date]': isBlackout,
     }
+
+    if (ENV?.FEATURES?.calendar_series && rrule) params['calendar_event[rrule]'] = rrule
+
     if (canUpdateConference()) {
       if (webConference && shouldEnableConferenceField()) {
         const webConf = {
@@ -355,11 +384,16 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         event.contextInfo = contextFromCode(context.asset_string)
         params['calendar_event[context_code]'] = context.asset_string
       }
-      event.save(
-        params,
-        screenReaderMessageCallback(I18n.t('The event was successfully updated')),
-        screenReaderMessageCallback(I18n.t('Event update failed'))
-      )
+
+      if (ENV?.FEATURES?.calendar_series && event.calendarEvent?.series_uuid) {
+        renderWhichEditDialog(event, params)
+      } else {
+        event.save(
+          params,
+          screenReaderMessageCallback(I18n.t('The event was successfully updated')),
+          screenReaderMessageCallback(I18n.t('Event update failed'))
+        )
+      }
     }
 
     return closeCB()
@@ -424,6 +458,11 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             locale={locale}
             timezone={timezone}
             width="auto"
+            initialFrequency={rruleToFrequencyOptionValue(
+              moment.tz(date, timezone),
+              event.object.rrule
+            )}
+            rrule={event?.object?.rrule || null}
             onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
           />
         )}

@@ -186,7 +186,7 @@ describe('FrequencyPickerUtils', () => {
 
       it('every-weekday event', () => {
         const result = generateFrequencyRRule('every-weekday', datetime)
-        expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=52')
+        expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=200')
       })
 
       it('custom event', () => {
@@ -229,7 +229,7 @@ describe('FrequencyPickerUtils', () => {
 
       it('a every-weekday event', () => {
         const result = generateFrequencyRRule('every-weekday', datetime)
-        expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=52')
+        expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=200')
       })
 
       it('custom', () => {
@@ -239,7 +239,12 @@ describe('FrequencyPickerUtils', () => {
     })
   })
 
-  describe('rruleToFrequencyOptionValue', () => {
+  describe('rruleToFrequencyOptionValue()', () => {
+    it('returns not-repeat for null rrule', () => {
+      const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
+      expect(rruleToFrequencyOptionValue(eventStart, null)).toEqual('not-repeat')
+    })
+
     it('returns daily for a matching rrule', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
       const rrule = 'FREQ=DAILY;INTERVAL=1;COUNT=200'
@@ -272,7 +277,7 @@ describe('FrequencyPickerUtils', () => {
 
     it('returns every-weekday for a matching rrule', () => {
       const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-      const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=52'
+      const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=200'
       expect(rruleToFrequencyOptionValue(eventStart, rrule)).toEqual('every-weekday')
     })
 

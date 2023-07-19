@@ -77,6 +77,7 @@ Object.assign(CalendarEvent.prototype, {
     }
     this.webConference = data.web_conference
     this.important_dates = data.important_dates
+    this.series_head = data.series_head
     this.series_natural_language = data.series_natural_language
     this.blackout_date = data.blackout_date
     return CalendarEvent.__super__.copyDataFromObject.apply(this, arguments)

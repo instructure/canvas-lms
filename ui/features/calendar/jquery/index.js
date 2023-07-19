@@ -132,9 +132,9 @@ export default class Calendar {
     this.hasAppointmentGroups = $.Deferred()
     if (this.options.showScheduler) {
       // Pre-load the appointment group list, for the badge
-      this.dataSource.getAppointmentGroups(false, data => {
+      this.dataSource.getAppointmentGroups(false, appointmentGroupsData => {
         let required = 0
-        data.forEach(group => {
+        appointmentGroupsData.forEach(group => {
           if (group.requiring_action) {
             required += 1
           }
@@ -185,8 +185,11 @@ export default class Calendar {
       'CommonEvent/eventDeleted': this.eventDeleted,
       'CommonEvent/eventsDeletedFromSeries': this.eventsDeletedFromSeries,
       'CommonEvent/eventSaving': this.eventSaving,
+      'CommonEvent/eventSavingFromSeries': this.eventSavingFromSeries,
       'CommonEvent/eventSaved': this.eventSaved,
+      'CommonEvent/eventSavedFromSeries': this.eventSavedFromSeries,
       'CommonEvent/eventSaveFailed': this.eventSaveFailed,
+      'CommonEvent/eventSavedFromSeriesFailed': this.eventSavedFromSeriesFailed,
       'Calendar/visibleContextListChanged': this.visibleContextListChanged,
       'EventDataSource/ajaxStarted': this.ajaxStarted,
       'EventDataSource/ajaxEnded': this.ajaxEnded,
@@ -715,7 +718,7 @@ export default class Calendar {
     }
     event.start = date
     event.addClass('event_pending')
-    const revertFunc = () => console.log('could not save date on undated event')
+    const revertFunc = () => console.log('could not save date on undated event') // eslint-disable-line no-console
 
     if (!this._eventDrop(event, 0, false, revertFunc)) {
       return
@@ -798,15 +801,7 @@ export default class Calendar {
     return this.calendar.fullCalendar('updateEvent', event)
   }
 
-  eventDeleting = event => {
-    event.addClass('event_pending')
-    return this.updateEvent(event)
-  }
-
-  // given the event selected by the user, and which
-  // events in the series are being deleted (one, following, all)
-  // find them all and handle it
-  eventsDeletingFromSeries = ({selectedEvent, which}) => {
+  filterEventsWithSeriesIdAndWhich = (selectedEvent, which) => {
     const seriesId = selectedEvent.calendarEvent.series_uuid
     const eventSeries = this.calendar
       .fullCalendar('getEventCache')
@@ -826,6 +821,19 @@ export default class Calendar {
         candidateEvents = eventSeries
         break
     }
+    return candidateEvents
+  }
+
+  eventDeleting = event => {
+    event.addClass('event_pending')
+    return this.updateEvent(event)
+  }
+
+  // given the event selected by the user, and which
+  // events in the series are being deleted (one, following, all)
+  // find them all and handle it
+  eventsDeletingFromSeries = ({selectedEvent, which}) => {
+    const candidateEvents = this.filterEventsWithSeriesIdAndWhich(selectedEvent, which)
     candidateEvents.forEach(e => {
       $.publish('CommonEvent/eventDeleting', e)
     })
@@ -888,6 +896,13 @@ export default class Calendar {
     }
   }
 
+  eventSavingFromSeries = ({selectedEvent, which}) => {
+    const candidateEvents = this.filterEventsWithSeriesIdAndWhich(selectedEvent, which)
+    candidateEvents.forEach(e => {
+      $.publish('CommonEvent/eventSaving', e)
+    })
+  }
+
   eventSaved = event => {
     event.removeClass('event_pending')
 
@@ -896,9 +911,36 @@ export default class Calendar {
     // fullcalendar stores for itself because the id has changed.
     // This is another reason to do a refetchEvents instead of just an update.
     delete event._id
+    // If is array means that it returned an array of event series, so we apply
+    // the same approach when update/delete series
+    if (Array.isArray(event.calendarEvent)) {
+      this.dataSource.clearCache()
+    }
     this.calendar.fullCalendar('refetchEvents')
     if (event && event.object && event.object.duplicates && event.object.duplicates.length > 0)
       this.reloadClick()
+    // We'd like to just add the event to the calendar rather than fetching,
+    // but the save may be as a result of moving an event from being undated
+    // to dated, and in that case we don't know whether to just update it or
+    // add it. Some new state would need to be kept to track that.
+    this.closeEventPopups()
+  }
+
+  eventSavedFromSeries = ({selectedEvent, which}) => {
+    const candidateEvents = this.filterEventsWithSeriesIdAndWhich(selectedEvent, which)
+
+    candidateEvents.forEach(event => {
+      event.removeClass('event_pending')
+
+      // If we just saved a new event then the id field has changed from what it
+      // was in eventSaving. So we need to clear out the old _id that
+      // fullcalendar stores for itself because the id has changed.
+      // This is another reason to do a refetchEvents instead of just an update.
+      delete event._id
+    })
+    this.dataSource.clearCache()
+    this.calendar.fullCalendar('refetchEvents')
+
     // We'd like to just add the event to the calendar rather than fetching,
     // but the save may be as a result of moving an event from being undated
     // to dated, and in that case we don't know whether to just update it or
@@ -913,6 +955,13 @@ export default class Calendar {
     } else {
       return this.updateEvent(event)
     }
+  }
+
+  eventSavedFromSeriesFailed = ({selectedEvent, which}) => {
+    const candidateEvents = this.filterEventsWithSeriesIdAndWhich(selectedEvent, which)
+    candidateEvents.forEach(e => {
+      $.publish('CommonEvent/eventSaveFailed', e)
+    })
   }
 
   // When an assignment event is updated, update its related overrides.

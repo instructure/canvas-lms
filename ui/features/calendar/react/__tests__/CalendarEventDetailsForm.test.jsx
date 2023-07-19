@@ -23,6 +23,9 @@ import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
 jest.mock('@canvas/calendar/jquery/CommonEvent/index')
+jest.mock('@canvas/calendar/react/UpdateCalendarEventDialog', () => ({
+  renderUpdateCalendarEventDialog: jest.fn(),
+}))
 
 let defaultProps = eventFormProps()
 
@@ -418,10 +421,10 @@ describe('CalendarEventDetailsForm', () => {
       expect(component.queryByRole('button', {name: 'Frequency:'})).toBeInTheDocument()
     })
 
-    it('does not render when editing', async () => {
+    it('renders when editing', async () => {
       defaultProps.event.isNewEvent = () => false
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-      expect(component.queryByRole('button', {name: 'Frequency:'})).not.toBeInTheDocument()
+      expect(component.queryByRole('button', {name: 'Frequency:'})).toBeInTheDocument()
     })
 
     it('does not render when calendar_series is disabled', async () => {
@@ -432,11 +435,9 @@ describe('CalendarEventDetailsForm', () => {
 
     it('with option selected contains RRULE on submit', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-
       select(component, 'button', 'Frequency:')
       select(component, 'option', 'Daily')
       select(component, 'button', 'Submit')
-
       expect(defaultProps.closeCB).toHaveBeenCalled()
       expect(defaultProps.event.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -449,7 +450,8 @@ describe('CalendarEventDetailsForm', () => {
 
     it('with not-repeat option selected does not contain RRULE on submit', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-
+      select(component, 'button', 'Submit')
+      select(component, 'button', 'Submit')
       select(component, 'button', 'Submit')
 
       expect(defaultProps.closeCB).toHaveBeenCalled()
@@ -466,7 +468,6 @@ describe('CalendarEventDetailsForm', () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
       select(component, 'button', 'Frequency:')
       select(component, 'option', 'Custom...')
-
       const modal = await component.findByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
     })

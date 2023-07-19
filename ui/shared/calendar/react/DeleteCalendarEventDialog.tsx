@@ -31,14 +31,9 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Event, Which} from '@canvas/calendar/react/Types'
 
 const I18n = useI18nScope('calendar_event')
-
-type Event = {
-  id: string
-  // a lot of other attributes that don't matter to me
-}
-type Which = 'one' | 'following' | 'all'
 
 type Props = {
   readonly isOpen: boolean
@@ -98,7 +93,7 @@ const DeleteCalendarEventDialog = ({
           </Button>
         </Tooltip>
         <Tooltip renderTip={isDeleting && tiptext} on={isDeleting ? ['hover', 'focus'] : []}>
-          <Button color="primary" onClick={() => isDeleting || handleDelete()}>
+          <Button color="danger" onClick={() => isDeleting || handleDelete()}>
             {isDeleting ? (
               <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
                 <Spinner size="x-small" renderTitle={I18n.t('Deleting')} />
