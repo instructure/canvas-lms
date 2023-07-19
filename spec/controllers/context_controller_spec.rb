@@ -576,7 +576,6 @@ describe ContextController do
                               }]
                             })
       association = rubric.associate_with(assignment, @course, purpose: "grading")
-      puts "association id is: #{association.id}"
       association.destroy
 
       user_session(@teacher)
