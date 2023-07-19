@@ -19,7 +19,6 @@
 export type {
   GradingScheme,
   GradingSchemeTemplate,
-  GradingSchemeDataRow,
   GradingSchemeUpdateRequest,
   GradingSchemeSummary,
 } from './gradingSchemeApiModel'

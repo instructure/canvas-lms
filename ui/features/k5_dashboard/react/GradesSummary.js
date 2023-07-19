@@ -34,7 +34,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 import k5Theme from '@canvas/k5/react/k5-theme'
 import {DEFAULT_COURSE_COLOR} from '@canvas/k5/react/utils'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 
 const I18n = useI18nScope('grades_summary')
 

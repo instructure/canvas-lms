@@ -18,7 +18,7 @@
 import I18n from '@canvas/i18n'
 import Ember from 'ember'
 import round from '@canvas/round'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 
 const AssignmentSubtotalGradesComponent = Ember.Component.extend({

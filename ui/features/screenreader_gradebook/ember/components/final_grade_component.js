@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Ember from 'ember'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 

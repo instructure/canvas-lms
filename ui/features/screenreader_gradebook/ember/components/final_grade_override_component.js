@@ -17,7 +17,7 @@
  */
 
 import Ember from 'ember'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const FinalGradeOverrideComponent = Ember.Component.extend({

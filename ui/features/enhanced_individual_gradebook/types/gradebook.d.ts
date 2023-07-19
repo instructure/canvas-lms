@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DeprecatedGradingScheme, GradingStandard, ProgressData} from '@canvas/grading/grading'
+import {DeprecatedGradingScheme, ProgressData} from '@canvas/grading/grading'
+import {GradingStandard} from '@instructure/grading-utils'
 import {
   AssignmentConnection,
   UserConnection,

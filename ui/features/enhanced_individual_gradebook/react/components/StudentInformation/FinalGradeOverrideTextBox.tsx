@@ -30,7 +30,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import {ApiCallStatus} from '../../../types'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade} from '@instructure/grading-utils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {

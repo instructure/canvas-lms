@@ -21,7 +21,6 @@ import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {
   AssignmentGroupCriteriaMap,
   CamelizedGradingPeriodSet,
-  GradingStandard,
   SubmissionGradeCriteria,
 } from '@canvas/grading/grading'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -50,7 +49,7 @@ import {GradingPeriodSet, Submission, WorkflowState} from '../../../api.d'
 import DateHelper from '@canvas/datetime/dateHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
-import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
+import {scoreToGrade, GradingStandard} from '@instructure/grading-utils'
 import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
