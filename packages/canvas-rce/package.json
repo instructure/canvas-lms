@@ -47,7 +47,8 @@
     "fmt:fix": "prettier --write '**/*.js*' '**/*.ts*'",
     "clean": "rm -rf lib && yarn clean:es && rm -rf coverage && yarn demo:clean",
     "clean:es": "rm -rf es",
-    "generate-svgs": "yarn build:cjs && scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js"
+    "generate-svgs": "yarn build:cjs && scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js",
+    "publishToNpm": "scripts/publishToNpm.sh"
   },
   "keywords": [
     "canvas",
