@@ -74,7 +74,7 @@ gem "diplomat", "2.6.3", require: false
 gem "ims-lti", "2.3.3", require: "ims"
 gem "rrule", "0.4.4", require: false
 
-gem "inst_access", "0.1.1"
+gem "inst_access", "0.1.2"
 gem "inst_statsd", "2.2.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
@@ -84,7 +84,7 @@ gem "inst-jobs-statsd", "2.2.0"
 # gets activated. Updating the gem in it's own commit will make this easier.
 gem "json", "~> 2.6.1"
 gem "json_schemer", "~> 0.2"
-gem "json-jwt", "1.13.0", require: false
+gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"
 gem "mail", "2.7.1", require: false
 gem "marginalia", "1.11.1", require: false

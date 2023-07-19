@@ -17,7 +17,7 @@ PATH
       canvas_cache
       canvas_errors
       dynamic_settings
-      json-jwt (= 1.13.0)
+      json-jwt
       rails
     config_file (0.1.0)
       rails (>= 5.0)
@@ -111,7 +111,7 @@ GEM
       activerecord (>= 5.2)
     aroi (0.0.7)
       rails (>= 3.2)
-    bindata (2.4.14)
+    bindata (2.4.15)
     builder (3.2.4)
     byebug (11.1.3)
     concurrent-ruby (1.2.2)
@@ -138,6 +138,7 @@ GEM
     guardrail (3.0.2)
       activerecord (>= 6.1, < 7.1)
       railties (>= 6.1, < 7.1)
+    httpclient (2.8.3)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     inst-jobs (3.1.10)
@@ -152,10 +153,11 @@ GEM
       aroi (>= 0.0.7)
       dogstatsd-ruby (~> 4.2)
       statsd-ruby (~> 1.0)
-    json-jwt (1.13.0)
+    json-jwt (1.15.3)
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
+      httpclient
     loofah (2.21.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)

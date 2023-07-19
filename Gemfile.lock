@@ -213,7 +213,7 @@ PATH
       canvas_cache
       canvas_errors
       dynamic_settings
-      json-jwt (= 1.13.0)
+      json-jwt
       rails
     canvas_slug (0.0.1)
       swearjar (~> 1.4)
@@ -467,7 +467,7 @@ GEM
     barby (0.6.8)
     bcrypt (3.1.16)
     bigdecimal (3.1.3)
-    bindata (2.4.14)
+    bindata (2.4.15)
     bluecloth (2.2.0)
     bootsnap (1.13.0)
       msgpack (~> 1.2)
@@ -618,6 +618,7 @@ GEM
     httparty (0.21.0)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
+    httpclient (2.8.3)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
     i18nliner (0.2.4)
@@ -657,9 +658,9 @@ GEM
     inst-jobs-statsd (2.2.0)
       inst-jobs (>= 3.1.1, < 4.0)
       inst_statsd (>= 2.1.2, < 3.0)
-    inst_access (0.1.1)
+    inst_access (0.1.2)
       activesupport (>= 5)
-      json-jwt (= 1.13.0)
+      json-jwt (~> 1.13)
     inst_statsd (2.2.0)
       aroi (>= 0.0.7)
       dogstatsd-ruby (~> 4.2)
@@ -673,10 +674,11 @@ GEM
     jira_ref_parser (1.0.1)
     jmespath (1.6.2)
     json (2.6.3)
-    json-jwt (1.13.0)
+    json-jwt (1.15.3)
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
+      httpclient
     json-schema (2.8.1)
       addressable (>= 2.4)
     json_schemer (0.2.24)
@@ -1263,12 +1265,12 @@ DEPENDENCIES
   inst-jobs (~> 3.1)
   inst-jobs-autoscaling (= 2.1.1)
   inst-jobs-statsd (= 2.2.0)
-  inst_access (= 0.1.1)
+  inst_access (= 0.1.2)
   inst_statsd (= 2.2.0)
   irb (= 1.4.1)
   jira_ref_parser (= 1.0.1)
   json (~> 2.6.1)
-  json-jwt (= 1.13.0)
+  json-jwt (~> 1.13)
   json-schema (~> 2.8.1)
   json_schemer (~> 0.2)
   json_token!
