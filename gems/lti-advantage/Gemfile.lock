@@ -16,15 +16,17 @@ GEM
       minitest (>= 5.1)
       tzinfo (~> 2.0)
     aes_key_wrap (1.1.0)
-    bindata (2.4.14)
+    bindata (2.4.15)
     concurrent-ruby (1.2.2)
     diff-lcs (1.5.0)
+    httpclient (2.8.3)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
-    json-jwt (1.13.0)
+    json-jwt (1.15.3)
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
+      httpclient
     minitest (5.18.1)
     rake (13.0.6)
     redcarpet (3.6.0)
