@@ -753,6 +753,25 @@ describe('util', () => {
 
       expect(getDisplayScore(assignment, gradingStandard)).toEqual('90/100')
     })
+
+    it('returns letter grade when restrict quantitative data is true and assignment grading status = needs_grading', () => {
+      const assignment = Assignment.mock({
+        gradingType: 'points',
+        submissionsConnection: {
+          nodes: [
+            {
+              gradingStatus: 'needs_grading',
+            },
+          ],
+        },
+      })
+
+      const gradingStandard = GradingStandard.mock()
+
+      ENV.restrict_quantitative_data = true
+
+      expect(getDisplayScore(assignment, gradingStandard)).toEqual('-')
+    })
   })
 
   describe('getZeroPointAssignmentDisplayScore', () => {
