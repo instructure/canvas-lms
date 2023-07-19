@@ -18,11 +18,11 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {CustomStatusManagement} from '../CustomStatusManagement'
+import {AccountStatusManagement} from '../AccountStatusManagement'
 
 describe('Account Grading Status Management', () => {
   const renderGradingStatusManagement = () => {
-    return render(<CustomStatusManagement />)
+    return render(<AccountStatusManagement />)
   }
 
   const getStatusColor = (element: HTMLElement) => {

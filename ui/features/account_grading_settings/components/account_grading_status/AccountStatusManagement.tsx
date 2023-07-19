@@ -33,7 +33,7 @@ const {Row: GridRow, Col: GridCol} = Grid as any
 
 const TOTAL_ALLOWED_CUSTOM_STATUSES = 3
 
-export const CustomStatusManagement = () => {
+export const AccountStatusManagement = () => {
   const [standardStatuses, setStandardStatuses] = useState<GradeStatus[]>(fakeStandardStatuses)
   const [customStatuses, setCustomStatuses] = useState<GradeStatus[]>(fakeCustomStatuses)
   const [openEditStatusId, setEditStatusId] = useState<string | undefined>(undefined)
