@@ -975,9 +975,18 @@ class ApplicationController < ActionController::Base
   #   render
   # end
   def authorized_action(object, actor, rights, all_rights: false)
-    can_do = object.send(all_rights ? :grants_all_rights? : :grants_any_right?, actor, session, *Array(rights))
-    render_unauthorized_action unless can_do
-    can_do
+    can_do = object.send(all_rights ? :grants_all_rights? : :grants_any_right?, actor, session, *Array(rights), with_justifications: true)
+    unless can_do.success?
+      if can_do.justifications.present?
+        # Even if there are multiple justifications, we can only reasonably handle one at a time,
+        # so just arbitrarily choose the first one
+        chosen = can_do.justifications.first
+        send("render_auth_failure_#{chosen.justification}".to_s, chosen.context)
+      else
+        render_unauthorized_action
+      end
+    end
+    can_do.success?
   end
   alias_method :authorized_action?, :authorized_action
 

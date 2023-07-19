@@ -1897,14 +1897,13 @@ class Course < ActiveRecord::Base
 
     given do |user|
       !root_account&.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
-        account_membership_allows(user, :manage_courses) && grants_right?(user, :change_course_state)
+        grants_right?(user, :change_course_state) && account_membership_allows(user, :manage_courses)
     end
     can :delete
 
     given do |user|
       !root_account&.feature_enabled?(:granular_permissions_manage_courses) && !deleted? &&
-        sis_source_id && account_membership_allows(user, :manage_sis) && !template? &&
-        grants_right?(user, :change_course_state)
+        sis_source_id && !template? && grants_right?(user, :change_course_state) && account_membership_allows(user, :manage_sis)
     end
     can :delete
 
@@ -2081,11 +2080,30 @@ class Course < ActiveRecord::Base
     end
   end
 
+  # Since this method can return AdheresToPolicy::JustifiedFailure, it must be last in a `given` block
+  # or must be explicitly checked for truth
   def account_membership_allows(user, permission = nil)
     return false unless user
 
     @membership_allows ||= {}
-    @membership_allows[[user.id, permission]] ||= cached_account_users_for(user).any? { |au| permission.nil? || au.has_permission_to?(self, permission) }
+    @membership_allows[[user.id, permission]] ||= if permission.nil?
+                                                    cached_account_users_for(user).any? { |au| au.permitted_for_account?(root_account).success? }
+                                                  else
+                                                    results = cached_account_users_for(user).map do |au|
+                                                      res = au.permission_check(self, permission)
+                                                      if res.success?
+                                                        break :success
+                                                      else
+                                                        res
+                                                      end
+                                                    end
+                                                    if results == :success
+                                                      true
+                                                    else
+                                                      # return the first result with a justification or false, either of which will deny access
+                                                      results.find { |r| r.is_a?(AdheresToPolicy::JustifiedFailure) } || false
+                                                    end
+                                                  end
   end
 
   def grade_publishing_status_translation(status, message)
