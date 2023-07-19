@@ -236,12 +236,16 @@ class GradebookImporter
       @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
         custom_column = custom_gradebook_columns.detect { |custom_col| custom_col.id == column_id }
         datum = custom_column.custom_gradebook_column_data.detect { |custom_column_datum| custom_column_datum.user_id == student.id }
-        student_custom_column_cell["current_content"] = datum&.content
+        if student_custom_column_cell["new_content"].blank? && datum&.content.blank?
+          student_custom_column_cell["current_content"] = nil
+          student_custom_column_cell["new_content"] = nil
+        else
+          student_custom_column_cell["current_content"] = datum&.content
+        end
       end
     end
 
     set_current_override_scores if allow_override_scores? && @override_column_indices.present?
-
     translate_pass_fail(@assignments, @students, @gradebook_importer_assignments)
     unless @missing_student
       # weed out assignments with no changes
@@ -256,7 +260,6 @@ class GradebookImporter
           # expectations for the compare so it doesn't look changed
           submission["grade"] = "EX" if submission["grade"].to_s.casecmp("EX") == 0
           no_change = no_change_to_submission?(submission)
-
           @warning_messages[:prevented_grading_ungradeable_submission] = true if !submission["gradeable"] && !no_change
 
           no_change || !submission["gradeable"]
@@ -800,8 +803,6 @@ class GradebookImporter
   def no_change_to_column_values?(column_id:)
     @students.all? do |student|
       custom_column_datum = @gradebook_importer_custom_columns[student.id][column_id]
-
-      return true if custom_column_datum["current_content"].blank? && custom_column_datum["new_content"].blank?
 
       custom_column_datum["current_content"] == custom_column_datum["new_content"]
     end
