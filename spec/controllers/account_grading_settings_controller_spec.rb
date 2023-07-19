@@ -27,14 +27,26 @@ describe AccountGradingSettingsController, type: :request do
     before(:once) do
       @account = Account.default
       @admin = account_admin_user(account: @account)
+      Account.site_admin.enable_feature!(:points_based_grading_schemes)
     end
 
     it "js_env POINTS_BASED_GRADING_SCHEMES_ENABLED is true when points_based_grading_schemes ff is on" do
-      Account.site_admin.enable_feature!(:points_based_grading_schemes)
       user_session(@admin)
-      get "/accounts/" + @account.id.to_s + "/grading_settings"
+      get "/accounts/#{@account.id}/grading_settings"
       expect(response).to be_successful
       expect((controller.js_env[:POINTS_BASED_GRADING_SCHEMES_ENABLED] || [])).to be(true)
+    end
+
+    it "grants access to account admins" do
+      user_session(@admin)
+      get "/accounts/#{@account.id}/grading_settings"
+      expect(response).to be_successful
+    end
+
+    it "denies access to non-account-admins" do
+      course_with_teacher_logged_in(account: @account, active_all: true)
+      get "/accounts/#{@account.id}/grading_settings"
+      expect(response).to be_unauthorized
     end
   end
 end
