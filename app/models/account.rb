@@ -1437,12 +1437,38 @@ class Account < ActiveRecord::Base
     ##################### End legacy permission block ##########################
 
     RoleOverride.permissions.each do |permission, _details|
-      given { |user| cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
+      given do |user|
+        results = cached_account_users_for(user).map do |au|
+          res = au.permission_check(self, permission)
+          if res.success?
+            break :success
+          else
+            res
+          end
+        end
+        next true if results == :success
+
+        # return the first result with a justification or nil, either of which will deny access
+        results.find { |r| r.is_a?(AdheresToPolicy::JustifiedFailure) }
+      end
       can permission
       can :create_courses if permission == :manage_courses_add
     end
 
-    given { |user| !cached_account_users_for(user).empty? }
+    given do |user|
+      results = cached_account_users_for(user).map do |au|
+        res = au.permitted_for_account?(self)
+        if res.success?
+          break :success
+        else
+          res
+        end
+      end
+      next true if results == :success
+
+      # return the first result with a justification or nil, either of which will deny access
+      results.find { |r| r.is_a?(AdheresToPolicy::JustifiedFailure) }
+    end
     can %i[
       read
       read_as_admin
@@ -1455,7 +1481,7 @@ class Account < ActiveRecord::Base
       launch_external_tool
     ]
 
-    given { |user| root_account? && cached_all_account_users_for(user).any? }
+    given { |user| root_account? && cached_all_account_users_for(user).any? { |au| au.permitted_for_account?(self).success? } }
     can :read_terms
 
     given { |user| user&.create_courses_right(self).present? }

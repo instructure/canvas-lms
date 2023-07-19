@@ -3392,7 +3392,7 @@ class User < ActiveRecord::Base
 
   def create_courses_right(account)
     return :admin if account.cached_account_users_for(self).any? do |au|
-                       au.has_permission_to?(account, :manage_courses) || au.has_permission_to?(account, :manage_courses_add)
+                       au.permission_check(account, :manage_courses).success? || au.permission_check(account, :manage_courses_add).success?
                      end
     return nil if fake_student? || account.root_account.site_admin?
 

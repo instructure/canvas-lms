@@ -159,8 +159,12 @@ class AccountUser < ActiveRecord::Base
     @permission_lookup[[context.class, context.global_id, action]] ||= RoleOverride.enabled_for?(context, action, self.role, account)
   end
 
-  def has_permission_to?(context, action)
-    enabled_for?(context, action).include?(:self)
+  def permission_check(context, action)
+    enabled_for?(context, action).include?(:self) ? AdheresToPolicy::Success.instance : AdheresToPolicy::Failure.instance
+  end
+
+  def permitted_for_account?(_target_account)
+    AdheresToPolicy::Success.instance
   end
 
   def self.all_permissions_for(user, account)
