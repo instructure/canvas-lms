@@ -851,6 +851,42 @@ describe GradebookImporter do
       expect(column_datum["new_content"]).to eq "test 2"
     end
 
+    it "gradebook importer does not recognize any changes when the previous cell is empty and empty spaces are added to the cell" do
+      @student2 = User.create(name: "Jim", id: 2)
+      @course.enroll_student(@student2)
+      importer_with_rows(
+        "Student,ID,Section,Notes,Assignment 1,Assignment 2",
+        "#{@student.name},,,,,",
+        "Jim,,,   ,,"
+      )
+      expect(@gi.instance_variable_get(:@gradebook_importer_custom_columns)[2].empty?).to be true
+    end
+
+    it "gradebook importer recognizes any changes to custom column values when the first student has no value in the column" do
+      @student2 = User.create(name: "Jim", id: 2)
+      @course.enroll_student(@student2)
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,Assignment 1",
+        "#{@student.name},,,,,",
+        "Jim,,,hello world,,"
+      )
+      expect(@gi.instance_variable_get(:@gradebook_importer_custom_columns)[2].empty?).to be false
+    end
+
+    it "gradebook importer will not mark the first student as changed if only empty spaces are added and there is a change to another student's value in the custom column" do
+      @student2 = User.create(name: "Jim", id: 2)
+      @course.enroll_student(@student2)
+      importer_with_rows(
+        "Student,ID,Section,CustomColumn1,CustomColumn2,Assignment 1",
+        "#{@student.name},,,   ,,",
+        "Jim,,,hello world,,"
+      )
+      column = @course.custom_gradebook_columns.find_by(title: "CustomColumn1")
+      column_datum = uploaded_student_custom_column_data.detect { |datum| datum["column_id"] == column.id }
+      expect(column_datum["new_content"]).to be_nil
+      expect(column_datum["current_content"]).to be_nil
+    end
+
     context "with a deleted custom column" do
       before do
         @course.custom_gradebook_columns.find_by(title: "CustomColumn1").destroy
