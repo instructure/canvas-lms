@@ -178,7 +178,8 @@ export const getDisplayScore = (assignment, gradingStandard) => {
     assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'needs_grading' ||
     assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused'
   ) {
-    return assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused'
+    return assignment?.submissionsConnection?.nodes[0]?.gradingStatus === 'excused' ||
+      ENV.restrict_quantitative_data
       ? '-'
       : `${'-'}/${total || '0'}`
   } else if (
