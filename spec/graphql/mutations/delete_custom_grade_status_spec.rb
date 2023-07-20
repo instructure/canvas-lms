@@ -27,7 +27,6 @@ describe Mutations::DeleteCustomGradeStatus do
     @admin = account_admin_user(account: @account)
   end
 
-  # TODO: add tests for permissions and changing user_executing
   def execute_with_input(delete_input, user_executing: @admin)
     mutation_command = <<~GQL
       mutation {
@@ -59,6 +58,18 @@ describe Mutations::DeleteCustomGradeStatus do
     expect(result["errors"]).to be_nil
     expect(result.dig("data", "deleteCustomGradeStatus", "errors")).to be_nil
     expect(result.dig("data", "deleteCustomGradeStatus", "customGradeStatusId")).to eq id.to_s
+  end
+
+  it "does not allow admins to delete statuses from other accounts" do
+    CustomGradeStatus.create!(name: "Test Status", color: "#000000", root_account: Account.create!, created_by: @admin).id
+    result = execute_with_input(delete_query)
+    expect(result.dig("errors", 0, "message")).to eq "Insufficient permissions"
+  end
+
+  it "does not allow non-admins to delete" do
+    CustomGradeStatus.create!(name: "Test Status", color: "#000000", root_account: @course.root_account, created_by: @admin).id
+    result = execute_with_input(delete_query, user_executing: @teacher)
+    expect(result.dig("errors", 0, "message")).to eq "Insufficient permissions"
   end
 
   it "returns an error if the custom grade status does not exist" do

@@ -24,10 +24,11 @@ require_relative "../graphql_spec_helper"
 describe Types::StandardGradeStatusType do
   before(:once) do
     teacher_in_course(active_all: true)
+    @admin = account_admin_user(account: @account)
   end
 
   let(:standard_grade_status) { StandardGradeStatus.create(status_name: "missing", color: "#000000", root_account: @course.root_account) }
-  let(:standard_grade_status_type) { GraphQLTypeTester.new(standard_grade_status, current_user: @teacher) }
+  let(:standard_grade_status_type) { GraphQLTypeTester.new(standard_grade_status, current_user: @admin) }
 
   it "works" do
     expect(standard_grade_status_type.resolve(:name)).to eq standard_grade_status.status_name

@@ -29,7 +29,12 @@ module Mutations
 
       root_account = context[:request].env["canvas.domain_root_account"] || LoadAccount.default_domain_root_account
       custom_grade_status = input[:id] ? CustomGradeStatus.active.find(input[:id]) : CustomGradeStatus.new(root_account:, created_by: current_user)
-      # TODO: add multi-tenant shard test
+
+      required_permission = custom_grade_status.new_record? ? :create : :update
+      unless custom_grade_status.grants_right?(current_user, session, required_permission)
+        raise GraphQL::ExecutionError, I18n.t("Insufficient permissions")
+      end
+
       if custom_grade_status.update(name: input[:name], color: input[:color])
         { custom_grade_status: }
       else

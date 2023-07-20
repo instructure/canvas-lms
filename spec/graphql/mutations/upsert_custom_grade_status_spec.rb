@@ -27,7 +27,6 @@ describe Mutations::UpsertCustomGradeStatus do
     @admin = account_admin_user(account: @account)
   end
 
-  # TODO: add tests for permissions and changing user_executing
   def execute_with_input(upsert_input, user_executing: @admin)
     mutation_command = <<~GQL
       mutation {
@@ -65,25 +64,46 @@ describe Mutations::UpsertCustomGradeStatus do
     GQL
   end
 
-  it "creates a custom grade status for the current_user" do
-    result = execute_with_input(create_query)
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "upsertCustomGradeStatus", "errors")).to be_nil
-    result = result.dig("data", "upsertCustomGradeStatus", "customGradeStatus")
-    expect(result["name"]).to eq "Test Status"
-    expect(result["color"]).to eq "#000000"
-    expect(result["_id"]).to be_present
+  context "as an admin" do
+    it "creates a custom grade status for the current_user" do
+      result = execute_with_input(create_query)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "upsertCustomGradeStatus", "errors")).to be_nil
+      result = result.dig("data", "upsertCustomGradeStatus", "customGradeStatus")
+      expect(result["name"]).to eq "Test Status"
+      expect(result["color"]).to eq "#000000"
+      expect(result["_id"]).to be_present
+    end
+
+    it "updates a custom grade status for the current_user" do
+      CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: @course.root_account, created_by: @admin)
+      result = execute_with_input(update_query)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "upsertCustomGradeStatus", "errors")).to be_nil
+      result = result.dig("data", "upsertCustomGradeStatus", "customGradeStatus")
+      expect(result["name"]).to eq "Updated Status"
+      expect(result["color"]).to eq "#FFFFFF"
+      expect(result["_id"]).to eq CustomGradeStatus.first.id.to_s
+    end
+
+    it "does not allow updating a custom grade status for another account" do
+      CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: Account.create!, created_by: @admin)
+      result = execute_with_input(update_query)
+      expect(result.dig("errors", 0, "message")).to eq "Insufficient permissions"
+    end
   end
 
-  it "updates a custom grade status for the current_user" do
-    CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: @course.root_account, created_by: @admin)
-    result = execute_with_input(update_query)
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "upsertCustomGradeStatus", "errors")).to be_nil
-    result = result.dig("data", "upsertCustomGradeStatus", "customGradeStatus")
-    expect(result["name"]).to eq "Updated Status"
-    expect(result["color"]).to eq "#FFFFFF"
-    expect(result["_id"]).to eq CustomGradeStatus.first.id.to_s
+  context "as a non-admin" do
+    it "does not allow creating a custom grade status" do
+      result = execute_with_input(create_query, user_executing: @teacher)
+      expect(result.dig("errors", 0, "message")).to eq "Insufficient permissions"
+    end
+
+    it "does not allow updating a custom grade status" do
+      CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: @course.root_account, created_by: @admin)
+      result = execute_with_input(update_query, user_executing: @teacher)
+      expect(result.dig("errors", 0, "message")).to eq "Insufficient permissions"
+    end
   end
 
   context "errors -" do

@@ -24,8 +24,8 @@ class CustomGradeStatus < ApplicationRecord
   belongs_to :created_by, class_name: "User"
   belongs_to :deleted_by, class_name: "User"
 
-  has_many :submissions, inverse_of: :custom_grade_status
-  has_many :scores, inverse_of: :custom_grade_status
+  has_many :submissions, inverse_of: :custom_grade_status, dependent: :nullify
+  has_many :scores, inverse_of: :custom_grade_status, dependent: :nullify
 
   validates :color, presence: true, length: { maximum: 7 }, format: { with: /\A#([0-9a-fA-F]{3}){1,2}\z/ }
   validates :name, presence: true, length: { maximum: 14 }
@@ -33,6 +33,14 @@ class CustomGradeStatus < ApplicationRecord
 
   validate :validate_custom_grade_status_limit
   validate :deleted_by_validation
+  validate :owned_by_root_account
+
+  set_policy do
+    given { |user, session| root_account&.grants_right?(user, session, :manage) }
+    can :create and can :read and can :update and can :delete
+  end
+
+  private
 
   def validate_custom_grade_status_limit
     return unless root_account_id
@@ -48,6 +56,14 @@ class CustomGradeStatus < ApplicationRecord
       errors.add(:deleted_by, "can't be blank")
     elsif active? && deleted_by_id.present?
       errors.add(:deleted_by, "must be blank")
+    end
+  end
+
+  def owned_by_root_account
+    return unless root_account_id
+
+    unless root_account.root_account?
+      errors.add(:root_account_id, "must reference a root account")
     end
   end
 end
