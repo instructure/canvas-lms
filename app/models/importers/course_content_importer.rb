@@ -26,9 +26,6 @@ module Importers
       data["all_files_export"]["file_path"] ||= data["all_files_zip"]
       return unless data["all_files_export"]["file_path"] && File.exist?(data["all_files_export"]["file_path"])
 
-      migration.attachment_path_id_lookup ||= {}
-      migration.attachment_path_id_lookup_lower ||= {}
-
       params = migration.migration_settings[:migration_ids_to_import]
       valid_paths = []
       (data["file_map"] || {}).each_value do |file|
@@ -234,6 +231,7 @@ module Importers
         imported_asset_hash = {}
         migration.imported_migration_items_hash.each { |k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(",") if assets.present? }
         migration.migration_settings[:imported_assets] = imported_asset_hash
+        migration.migration_settings[:attachment_path_id_lookup] = migration.attachment_path_id_lookup
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
 

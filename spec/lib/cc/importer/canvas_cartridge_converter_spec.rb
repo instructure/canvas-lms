@@ -694,9 +694,6 @@ describe "Canvas Cartridge importing" do
     att.content_type = "video/mp4"
     att.save!
 
-    media_id = "m_mystiry"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
-
     path = CGI.escape(att.full_path)
     body_with_links = <<~HTML
       <p>Watup? <strong>eh?</strong>
@@ -710,6 +707,10 @@ describe "Canvas Cartridge importing" do
       title: "title",
       text: body_with_links
     }.with_indifferent_access
+
+    media_id = "m_mystiry"
+    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
+
     # import into new course
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -731,9 +732,6 @@ describe "Canvas Cartridge importing" do
     att.content_type = "video/mp4"
     att.save!
 
-    media_id = "m_new-media-id"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
-
     path = CGI.escape(att.full_path)
     body = %(<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>)
 
@@ -742,6 +740,9 @@ describe "Canvas Cartridge importing" do
       title: "title",
       text: body
     }.with_indifferent_access
+
+    media_id = "m_new-media-id"
+    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
 
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -762,9 +763,6 @@ describe "Canvas Cartridge importing" do
     att.content_type = "video/mp4"
     att.save!
 
-    media_id = "m_new-media-id"
-    allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(media_id:))
-
     path = CGI.escape(att.full_path)
     body = %(<p>WHAT<video style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"><source src="%24IMS-CC-FILEBASE%24/#{path}" data-media-type="video" data-media-id="m-old-mediaid"></video></p>)
 
@@ -773,6 +771,9 @@ describe "Canvas Cartridge importing" do
       title: "title",
       text: body
     }.with_indifferent_access
+
+    media_id = "m_new-media-id"
+    @copy_to.attachments.find_by(filename: att.filename).update(media_entry_id: media_id)
 
     @migration.attachment_path_id_lookup = { att.full_path => att.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)

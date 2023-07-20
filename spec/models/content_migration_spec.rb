@@ -1335,7 +1335,8 @@ describe ContentMigration do
                                    "destination" => { "id" => @new.id.to_s }
                                  }
                                }
-                             } })
+                             },
+                             "attachment_path_id_lookup" => nil })
       end
 
       it "returns a url to a file containing the asset map for QTI imports" do
@@ -1364,7 +1365,8 @@ describe ContentMigration do
                                    "destination" => { "id" => @new.id.to_s }
                                  }
                                }
-                             } })
+                             },
+                             "attachment_path_id_lookup" => nil })
       end
     end
   end
