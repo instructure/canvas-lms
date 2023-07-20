@@ -34,10 +34,6 @@ module Importers
       @migration.attachment_path_id_lookup
     end
 
-    def attachment_path_id_lookup_lower
-      @migration.attachment_path_id_lookup_lower
-    end
-
     # Returns the path for the context, for a course, it should return something like
     # "courses/1"
     def context_path

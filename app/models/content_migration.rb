@@ -49,7 +49,6 @@ class ContentMigration < ActiveRecord::Base
 
   attr_accessor :outcome_to_id_map,
                 :attachment_path_id_lookup,
-                :attachment_path_id_lookup_lower,
                 :last_module_position,
                 :skipped_master_course_items,
                 :copied_external_outcome_map
@@ -1103,9 +1102,7 @@ class ContentMigration < ActiveRecord::Base
 
   def add_attachment_path(path, migration_id)
     self.attachment_path_id_lookup ||= {}
-    self.attachment_path_id_lookup_lower ||= {}
     self.attachment_path_id_lookup[path] = migration_id
-    self.attachment_path_id_lookup_lower[path.downcase] = migration_id
   end
 
   def add_external_tool_translation(migration_id, target_tool, custom_fields)
@@ -1321,6 +1318,7 @@ class ContentMigration < ActiveRecord::Base
       payload["destination_hosts"] = destination_hosts
       root_folder = Folder.root_folders(context).first
       payload["destination_root_folder"] = root_folder.name + "/" if root_folder
+      payload["attachment_path_id_lookup"] = migration_settings[:attachment_path_id_lookup].presence || attachment_path_id_lookup
     end
 
     self.asset_map_attachment = Attachment.new(context: self, filename: "asset_map.json")

@@ -53,7 +53,7 @@ gem "browser", "5.1.0", require: false
 gem "builder", "3.2.4"
 gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
-gem "canvas_link_migrator", "0.1.0"
+gem "canvas_link_migrator", "0.2.0"
 gem "canvas_webex", "0.18.2"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "code_ownership", "~> 1.33"

@@ -480,9 +480,10 @@ GEM
     canvas_connect (0.3.16)
       adobe_connect (~> 1.0.0)
       rake (>= 0.9.6)
-    canvas_link_migrator (0.1.0)
+    canvas_link_migrator (0.2.0)
       activesupport
       nokogiri
+      rack
     canvas_webex (0.18.2)
       railties
     capybara (3.39.0)
@@ -1215,7 +1216,7 @@ DEPENDENCIES
   canvas_ext!
   canvas_http!
   canvas_kaltura!
-  canvas_link_migrator (= 0.1.0)
+  canvas_link_migrator (= 0.2.0)
   canvas_mimetype_fu!
   canvas_panda_pub!
   canvas_partman!
