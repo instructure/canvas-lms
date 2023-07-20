@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {Component} from 'react'
-import {arrayOf, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
+import {arrayOf, bool, func, objectOf, shape, string, element, oneOfType} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconTrashLine} from '@instructure/ui-icons'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {IconTrashLine, IconQuestionLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -47,6 +48,7 @@ export default class ClosedCaptionCreatorRow extends Component {
     onLanguageSelected: func,
     selectedFile: shape({name: string.isRequired}), // there's more, but his is all I care about
     selectedLanguage: shape({id: string.isRequired, label: string.isRequired}),
+    inheritedCaption: bool,
     mountNode: oneOfType([element, func]),
   }
 
@@ -224,12 +226,14 @@ export default class ClosedCaptionCreatorRow extends Component {
         as="div"
         wrap="wrap"
         justifyItems="start"
-        alignItems="end"
+        alignItems="center"
         data-testid="CC-CreatorRow-chosen"
       >
         <Flex.Item margin="0 0 small 0">
           <View
             as="div"
+            className={this.props.inheritedCaption ? 'Button' : ''}
+            disabled={!!this.props.inheritedCaption}
             borderWidth="small"
             padding="0 0 0 small"
             borderRadius="medium"
@@ -255,6 +259,21 @@ export default class ClosedCaptionCreatorRow extends Component {
             </Flex>
           </View>
         </Flex.Item>
+        {this.props.inheritedCaption && (
+          <Flex.Item margin="0 0 small small">
+            <Tooltip
+              renderTip={
+                <Text>
+                  {formatMessage('Captions inherited from a parent course cannot be removed.')}
+                  <br />
+                  {formatMessage('You can replace by uploading a new caption file.')}
+                </Text>
+              }
+            >
+              <IconQuestionLine size="x-small" color="brand" />
+            </Tooltip>
+          </Flex.Item>
+        )}
       </Flex>
     )
   }

@@ -76,6 +76,28 @@ describe('ClosedCaptionCreatorRow', () => {
       expect(getByText('Remove English closed captions')).toBeInTheDocument()
     })
 
+    it('renders tooltip for inherited captions', () => {
+      const {getByRole} = render(
+        <ClosedCaptionCreatorRow {...makeConfiguredProps()} inheritedCaption={true} />
+      )
+      expect(
+        getByRole('tooltip', {
+          name: 'Captions inherited from a parent course cannot be removed. You can replace by uploading a new caption file.',
+        })
+      ).toBeInTheDocument()
+    })
+
+    it('does not renders tooltip for non-inherited captions', () => {
+      const {queryByRole} = render(
+        <ClosedCaptionCreatorRow {...makeConfiguredProps()} inheritedCaption={false} />
+      )
+      expect(
+        queryByRole('tooltip', {
+          name: 'Captions inherited from a parent course cannot be removed. You can replace by uploading a new caption file.',
+        })
+      ).not.toBeInTheDocument()
+    })
+
     it('calls onDeleteRow when trashcan is clicked', () => {
       const onDeleteRow = jest.fn()
       const {getByText} = render(

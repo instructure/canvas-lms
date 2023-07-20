@@ -30,6 +30,9 @@
 /* eslint-disable no-undef, eqeqeq, prefer-const, promise/catch-or-return */
 /* eslint-disable import/no-cycle, @typescript-eslint/no-unused-vars, no-var, vars-on-top */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
+import InheritedCaptionTooltip from './InheritedCaptionTooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {closedCaptionLanguages} from '@instructure/canvas-media'
 
@@ -272,7 +275,8 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
           player.addTrackButton(
             player.tracks[i].srclang,
             player.tracks[i].label,
-            player.tracks[i].src
+            player.tracks[i].src,
+            player.container.find('track[label=' + player.tracks[i].label + ']')[0]
           )
         }
       }
@@ -517,7 +521,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
       t.adjustLanguageBox()
     },
 
-    addTrackButton(lang, label, src) {
+    addTrackButton(lang, label, src, track_el) {
       const t = this
       const id = `${t.id}_captions_${lang}`
       if (label === '') {
@@ -535,7 +539,10 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         )
         .append($('<label aria-hidden="true">').attr('for', id).text(label))
 
-      if (t.options.can_add_captions) {
+      if (
+        t.options.can_add_captions &&
+        !(track_el && track_el.getAttribute('data-inherited-track') == 'true')
+      ) {
         $li.append(
           $('<a href="#" role="button" data-remove="li" tabindex="-1">')
             .attr('data-confirm', I18n.t('Are you sure you want to delete this track?'))
@@ -547,6 +554,13 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
 
       t.captionsButton.find('ul').append($li)
       t.adjustLanguageBox()
+
+      if (track_el && track_el.getAttribute('data-inherited-track') == 'true') {
+        const tooltip_container = $li
+          .append('<span class="track-tip-container"></span>')
+          .find('.track-tip-container')
+        ReactDOM.render(<InheritedCaptionTooltip />, tooltip_container[0])
+      }
 
       // remove this from the dropdownlist (if it exists)
       t.container.find('.mejs-captions-translations option[value=' + lang + ']').remove()

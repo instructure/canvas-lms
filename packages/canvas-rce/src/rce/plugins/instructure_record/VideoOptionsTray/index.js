@@ -285,6 +285,7 @@ export default function VideoOptionsTray({
                           <ClosedCaptionPanel
                             subtitles={subtitles.map(st => ({
                               locale: st.locale,
+                              inherited: st.inherited,
                               file: {name: st.language || st.locale}, // this is an artifact of ClosedCaptionCreatorRow's inards
                             }))}
                             uploadMediaTranslations={Bridge.uploadMediaTranslations}
@@ -328,7 +329,12 @@ VideoOptionsTray.propTypes = {
     appliedWidth: number,
     naturalHeight: number.isRequired,
     naturalWidth: number.isRequired,
-    tracks: arrayOf(shape({locale: string.isRequired})),
+    tracks: arrayOf(
+      shape({
+        locale: string.isRequired,
+        inherited: bool,
+      })
+    ),
   }).isRequired,
   onEntered: func,
   onExited: func,

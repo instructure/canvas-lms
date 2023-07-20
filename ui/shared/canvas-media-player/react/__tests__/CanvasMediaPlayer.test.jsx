@@ -457,6 +457,7 @@ describe('CanvasMediaPlayer', () => {
                 label: 'English',
                 language: 'en',
                 type: 'subtitles',
+                inherited: false,
               },
             ]}
           />

@@ -87,11 +87,11 @@ ready(() => {
       label: captionLanguageForLocale(track.locale),
       type: track.kind,
       language: track.locale,
+      inherited: track.inherited,
     }
   })
 
   const aria_label = !media_object.title ? undefined : media_object.title
-
   ReactDOM.render(
     <CanvasMediaPlayer
       media_id={media_id}

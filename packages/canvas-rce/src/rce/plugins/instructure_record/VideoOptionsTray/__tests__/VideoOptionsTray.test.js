@@ -46,6 +46,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         naturalWidth: 1280,
         source: {},
         titleText: '',
+        tracks: [{locale: 'en', inherited: false}],
         type: 'video-embed',
         videoSize: 'medium',
         usePercentageUnits: false,
