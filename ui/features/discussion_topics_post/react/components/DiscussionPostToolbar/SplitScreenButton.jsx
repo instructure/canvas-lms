@@ -31,6 +31,7 @@ const I18n = useI18nScope('discussions_posts')
 export const SplitScreenButton = ({
   setUserSplitScreenPreference,
   userSplitScreenPreference,
+  display,
   ...props
 }) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -73,14 +74,12 @@ export const SplitScreenButton = ({
   }
 
   return (
-    <span className="discussions-splitscreen-button">
-      <Button onClick={onSplitScreenClick} data-testid="splitscreenButton">
+    <Button onClick={onSplitScreenClick} data-testid="splitscreenButton" display={display}>
+      {userSplitScreenPreference ? I18n.t('View Inline') : I18n.t('View Split Screen')}
+      <ScreenReaderContent>
         {userSplitScreenPreference ? I18n.t('View Inline') : I18n.t('View Split Screen')}
-        <ScreenReaderContent>
-          {userSplitScreenPreference ? I18n.t('View Inline') : I18n.t('View Split Screen')}
-        </ScreenReaderContent>
-      </Button>
-    </span>
+      </ScreenReaderContent>
+    </Button>
   )
 }
 
@@ -89,4 +88,5 @@ SplitScreenButton.propTypes = {
   userSplitScreenPreference: PropTypes.bool,
   setExpandReplies: PropTypes.func,
   closeView: PropTypes.func,
+  display: PropTypes.string,
 }
