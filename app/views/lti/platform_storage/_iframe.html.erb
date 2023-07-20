@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if Lti::PlatformStorage.flag_enabled? %>
+<%# Don't render the forwarder frame _inside_ the forwarder frame %>
+<% if Lti::PlatformStorage.flag_enabled? && action_name != "post_message_forwarding"%>
   <%= iframe(
     lti_post_message_forwarding_url,
     name: Lti::PlatformStorage::FORWARDING_TARGET,

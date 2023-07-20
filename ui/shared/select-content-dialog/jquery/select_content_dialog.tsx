@@ -344,18 +344,6 @@ export const Events = {
             'data-lti-launch': 'true',
           })
         )
-        if (window.ENV && window.ENV.FEATURES && window.ENV.FEATURES.lti_platform_storage) {
-          $dialog.append(
-            $('<iframe/>', {
-              id: 'post_message_forwarding',
-              name: 'post_message_forwarding',
-              title: 'post_message_forwarding',
-              src: '/post_message_forwarding',
-              sandbox: 'allow-scripts allow-same-origin',
-              style: 'display: none;',
-            })
-          )
-        }
         $dialog.append(`<div class="after_external_content_info_alert screenreader-only" tabindex="0">
             <div class="ic-flash-info">
               <div class="ic-flash__icon" aria-hidden="true">
