@@ -156,7 +156,9 @@ describe('ComposeModalContainer', () => {
       uploadFiles(fileInput, [file])
 
       await waitFor(() =>
-        expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith([file], '/api/v1/folders/1/files')
+        expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith([file], '/files/pending', {
+          conversations: true,
+        })
       )
     })
 
@@ -175,7 +177,8 @@ describe('ComposeModalContainer', () => {
       await waitFor(() =>
         expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith(
           [file1, file2],
-          '/api/v1/folders/1/files'
+          '/files/pending',
+          {conversations: true}
         )
       )
     })
