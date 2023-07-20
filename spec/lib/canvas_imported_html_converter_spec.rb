@@ -137,7 +137,7 @@ describe CanvasImportedHtmlConverter do
     it "finds an attachment by path if capitalization is different" do
       att = make_test_att
       @migration.attachment_path_id_lookup = { "subfolder/withCapital/test.png" => "wrong!" }
-      @migration.attachment_path_id_lookup_lower = { "subfolder/withcapital/test.png" => att.migration_id }
+      @converter.link_resolver.instance_variable_set(:@attachment_path_id_lookup_lower, { "subfolder/withcapital/test.png" => att.migration_id })
 
       test_string = %(<img src="subfolder/WithCapital/TEST.png" alt="nope" />)
       expect(convert_exported_html(test_string)).to eq %(<img src="#{@path}files/#{att.id}/preview" alt="nope">)

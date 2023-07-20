@@ -206,6 +206,15 @@ describe Course do
       expect(file).not_to be_nil
       expect(file.filename).to eq("dropbox.zip")
       expect(file.folder.full_name).to eq("course files/Course Content/Orientation/WebCT specific and old stuff")
+
+      expect(migration.migration_settings[:attachment_path_id_lookup]).to eq(
+        {
+          "Course Content/Orientation/Ins and Outs/Eres directions.htm" => @course.attachments.find_by(display_name: "Eres directions.htm").migration_id,
+          "Course Content/Orientation/WebCT specific and old stuff/dropbox.zip" => file.migration_id,
+          "Pictures/banner_kandinsky.jpg" => @course.attachments.find_by(display_name: "banner_kandinsky.jpg").migration_id,
+          "Writing Assignments/Examples/theatre_example.htm" => @course.attachments.find_by(display_name: "theatre_example.htm").migration_id,
+        }
+      )
     end
 
     def build_migration(import_course, params, copy_options = {})
