@@ -33,31 +33,14 @@ const I18n = useI18nScope('external_toolsModalLauncher')
  * - "the following content is partner provided" - both visible and SR-only types
  */
 const ToolLaunchIframe = React.forwardRef((props, ref) => {
-  const id = 'post_message_forwarding'
-  const src = '/post_message_forwarding'
-  const sandbox = 'allow-scripts allow-same-origin'
-  const style = {display: 'none'}
-  const flagEnabled = !!window.ENV?.FEATURES?.lti_platform_storage
-
-  const postMessageForwardingFrame = () => {
-    if (!flagEnabled) {
-      return null
-    }
-
-    return <iframe id={id} name={id} title={id} src={src} sandbox={sandbox} style={style} />
-  }
-
   return (
-    <>
-      <iframe
-        title={I18n.t('External tool frame')}
-        ref={ref}
-        className="tool_launch"
-        {...props}
-        data-lti-launch="true"
-      />
-      {postMessageForwardingFrame()}
-    </>
+    <iframe
+      title={I18n.t('External tool frame')}
+      ref={ref}
+      className="tool_launch"
+      {...props}
+      data-lti-launch="true"
+    />
   )
 })
 
