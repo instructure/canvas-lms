@@ -127,6 +127,35 @@ alwaysDeeplinkingPlacements.forEach(placementName => {
   })
 })
 
+it('does not require icon_url', () => {
+  const wrapper = mount(<Placement {...props()} />)
+  wrapper.find('button').simulate('click')
+  expect(wrapper.find({isRequired: true}).exists()).toBeFalsy()
+  expect(
+    wrapper
+      .findWhere(
+        n =>
+          n.props().name === 'account_navigation_icon_url' && n.props().renderLabel === 'Icon Url'
+      )
+      .exists()
+  ).toBeTruthy()
+})
+
+it('requires icon_url for editor_button', () => {
+  const wrapper = mount(<Placement {...props({placementName: 'editor_button'})} />)
+  wrapper.find('button').simulate('click')
+  expect(wrapper.find({isRequired: true}).exists()).toBeTruthy()
+  expect(
+    wrapper
+      .findWhere(
+        n =>
+          n.props().name === 'editor_button_icon_url' &&
+          n.props().renderLabel?.includes('Icon Url (required')
+      )
+      .exists()
+  ).toBeTruthy()
+})
+
 const couldBeEither = [
   'assignment_selection',
   'link_selection',

@@ -120,6 +120,14 @@ export default class Placement extends React.Component {
     this.setOrDeletePlacementField('icon_url', value)
   }
 
+  iconUrlText = placementName => {
+    if (placementName === 'editor_button') {
+      return I18n.t('Icon Url (required unless present in Additional Settings)')
+    } else {
+      return I18n.t('Icon Url')
+    }
+  }
+
   handleTextChange = e => {
     const value = e.target.value
     this.setState(state => ({placement: {...state.placement, text: value}}))
@@ -184,8 +192,9 @@ export default class Placement extends React.Component {
                 <TextInput
                   name={`${placementName}_icon_url`}
                   value={placement.icon_url}
-                  renderLabel={I18n.t('Icon Url')}
+                  renderLabel={this.iconUrlText(placementName)}
                   onChange={this.handleIconUrlChange}
+                  isRequired={placementName === 'editor_button'}
                 />
                 <TextInput
                   name={`${placementName}_text`}
