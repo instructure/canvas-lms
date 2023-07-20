@@ -184,6 +184,8 @@ describe "gradebook - logged in as a student" do
       @past_period.save
 
       # Create assignment groups and drop rules
+      @course.apply_assignment_group_weights = true
+      @course.save!
       group_1 = @course.assignment_groups.create!(name: "Group 1", group_weight: 25)
       group_1.update(rules: "drop_lowest:1")
       group_2 = @course.assignment_groups.create!(name: "Group 2", group_weight: 75)
@@ -252,8 +254,8 @@ describe "gradebook - logged in as a student" do
         expect(dropped_assignments_text.any? { |str| str.include?(@assignment_11.title) }).to be true
 
         # Verify that the 2 group rows have the correct values
-        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period 0.00% 0.00/1,110.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 0.00% 0.00/40.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/1,110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period N/A 0.00/40.00"
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
@@ -391,11 +393,11 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the 2 grading period rows have the correct values
         expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 17.27% 19.00/110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 33.50% 19.00/110.00"
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 33.50%"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -417,12 +419,12 @@ describe "gradebook - logged in as a student" do
         expect(excused_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
 
         # Verify that the 2 group rows have the correct values
-        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period 0.00% 0.00/1,110.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 15.83% 19.00/120.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/1,110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 19.75% 19.00/120.00"
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 11.88%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 19.75%"
       end
 
       it "correctly displays all grading periods as default when there is no current grading period" do
@@ -443,8 +445,8 @@ describe "gradebook - logged in as a student" do
         StudentGradesPage.visit_as_student(@course)
         expect(f("#grading_period_select_menu").attribute("value")).to eq @all_grading_periods
         expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 17.27% 19.00/110.00"
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27%"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 33.50% 19.00/110.00"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 33.50%"
       end
 
       it "correctly displays current grading period" do
@@ -470,7 +472,7 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 33.50%"
 
         # ------- Verify output when "calculate based only on graded assignments" is unchecked -------
 
@@ -491,7 +493,22 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 15.83%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 19.75%"
+      end
+
+      context "and nothing is weighted" do
+        before do
+          @course.apply_assignment_group_weights = false
+          @course.save!
+          @past_period.update!(weight: 0)
+          @current_period.update!(weight: 0)
+        end
+
+        it "shows score / points possible in total row" do
+          user_session(@student)
+          StudentGradesPage.visit_as_student(@course)
+          expect(f("tr[data-testid='total_row']").text).to eq "Total 17.27% 19.00/110.00"
+        end
       end
     end
   end
