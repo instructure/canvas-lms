@@ -26,12 +26,15 @@ module Mutations
       raise GraphQL::ExecutionError, "custom gradebook statuses feature flag is disabled" unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
 
       custom_grade_status = CustomGradeStatus.active.find(input[:id])
+
+      unless custom_grade_status.grants_right?(current_user, session, :delete)
+        raise GraphQL::ExecutionError, I18n.t("Insufficient permissions")
+      end
+
       context[:deleted_models] ||= {}
       context[:deleted_models][:custom_grade_status] = custom_grade_status
       custom_grade_status_id = custom_grade_status.id
       custom_grade_status.deleted_by = current_user
-      # TODO: add multi-tenant shard test
-      # TODO: add authorization check (which also ensures correct root account)
       custom_grade_status.destroy
       { custom_grade_status_id: }
     rescue ActiveRecord::RecordNotFound

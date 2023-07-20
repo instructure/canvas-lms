@@ -26,4 +26,9 @@ class StandardGradeStatus < ApplicationRecord
   validates :status_name, presence: true, uniqueness: { scope: :root_account }, inclusion: { in: STANDARD_GRADE_STATUSES, message: -> { t("%{value} is not a valid standard grade status") } }
   validates :hidden, inclusion: [true, false]
   validates :root_account, presence: true
+
+  set_policy do
+    given { |user, session| root_account&.grants_right?(user, session, :manage) }
+    can :create and can :read and can :update
+  end
 end

@@ -23,6 +23,10 @@ describe StandardGradeStatus do
   let_once(:root_account) { Account.create! }
   let_once(:user) { User.create! }
 
+  it_behaves_like "account grade status permissions" do
+    let(:status) { root_account.standard_grade_statuses.create!(status_name: "late", root_account:, color: "#000000") }
+  end
+
   it "allows creation of a valid standard status" do
     status = StandardGradeStatus.create(status_name: "late", root_account:, color: "#000000")
     expect(status.errors.full_messages).to be_empty

@@ -124,6 +124,8 @@ describe Types::AccountType do
       StandardGradeStatus.create!(status_name: "missing", root_account: @course.root_account, color: "#000000")
     end
 
+    let(:account_type) { GraphQLTypeTester.new(account, current_user: @admin) }
+
     it "works for custom grade statuses connection" do
       expect(
         account_type.resolve("customGradeStatusesConnection { nodes { _id } }").sort
