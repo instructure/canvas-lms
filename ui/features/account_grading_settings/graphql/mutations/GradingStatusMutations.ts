@@ -16,12 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type GradeStatusType = 'standard' | 'custom' | 'new'
+import gql from 'graphql-tag'
 
-export type GradeStatus = {
-  id: string
-  name: string
-  color: string
-  isNew?: boolean
-  type: GradeStatusType
-}
+// TODO: Add Mutations
+export const SAVE_ACCOUNT_GRADING_STATUS_MUTATION = gql``

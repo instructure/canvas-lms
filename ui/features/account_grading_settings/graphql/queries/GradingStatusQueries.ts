@@ -16,12 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type GradeStatusType = 'standard' | 'custom' | 'new'
+import gql from 'graphql-tag'
 
-export type GradeStatus = {
-  id: string
-  name: string
-  color: string
-  isNew?: boolean
-  type: GradeStatusType
-}
+export const ACCOUNT_GRADING_STATUS_QUERY = gql`
+  query AccountGradingStatusQuery($accountId: ID!) {
+    account(id: $accountId) {
+      customGradeStatusesConnection {
+        nodes {
+          color
+          id: _id
+          name
+        }
+      }
+      standardGradeStatusesConnection {
+        nodes {
+          color
+          id: _id
+          name
+        }
+      }
+    }
+  }
+`

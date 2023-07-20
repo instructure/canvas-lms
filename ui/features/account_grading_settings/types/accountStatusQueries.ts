@@ -16,12 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type GradeStatusType = 'standard' | 'custom' | 'new'
-
-export type GradeStatus = {
+export type GradingStatusQueryResult = {
+  color: string
   id: string
   name: string
-  color: string
-  isNew?: boolean
-  type: GradeStatusType
+}
+
+export type AccountGradingStatusQueryResults = {
+  account: {
+    customGradeStatusesConnection: {
+      nodes: GradingStatusQueryResult[]
+    }
+    standardGradeStatusesConnection: {
+      nodes: GradingStatusQueryResult[]
+    }
+  }
 }
