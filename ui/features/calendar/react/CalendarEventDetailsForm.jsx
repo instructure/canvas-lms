@@ -536,7 +536,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             </Button>
           </Flex.Item>
           <Flex.Item padding="none xxx-small" shouldShrink={true}>
-            <Button type="submit" color="primary">
+            <Button data-testid="edit-calendar-event-submit-button" type="submit" color="primary">
               {I18n.t('Submit')}
             </Button>
           </Flex.Item>
