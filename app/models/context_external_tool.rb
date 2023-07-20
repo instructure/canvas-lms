@@ -901,12 +901,6 @@ class ContextExternalTool < ActiveRecord::Base
   #
   # This method checks both the domain and url
   # host when attempting to match host.
-  #
-  # This method was added becauase #matches_domain?
-  # cares about the presence or absence of a protocol
-  # in the domain. Rather than changing that method and
-  # risking breaking Canvas flows, we introduced this
-  # new method.
   def matches_host?(url, use_environment_overrides: false)
     standard_url = standard_url(use_environment_overrides)
     matches_tool_domain?(url) ||
@@ -933,6 +927,9 @@ class ContextExternalTool < ActiveRecord::Base
     end
   end
 
+  # Returns true if the host of given url is the same or a subdomain of the tool domain.
+  # Also requires the port numbers to match if present.
+  # If the tool doesn't have a domain, returns false.
   def matches_tool_domain?(url, use_environment_overrides: false)
     domain = use_environment_overrides ? domain_with_environment_overrides : self.domain
     return false if domain.blank?
@@ -942,19 +939,6 @@ class ContextExternalTool < ActiveRecord::Base
     port = url&.port
     d = domain.downcase.gsub(%r{https?://}, "")
     !!(host && ("." + host + (port ? ":#{port}" : "")).match(/\.#{Regexp.escape(d)}\z/))
-  end
-
-  def matches_domain?(url, use_environment_overrides: false)
-    host = ContextExternalTool.standardize_url(url)&.host
-    domain = use_environment_overrides ? domain_with_environment_overrides : self.domain
-    standard_url = standard_url(use_environment_overrides)
-    if domain
-      domain == host
-    elsif standard_url.present?
-      standard_url.host == host
-    else
-      false
-    end
   end
 
   def duplicated_in_context?
@@ -1110,7 +1094,7 @@ class ContextExternalTool < ActiveRecord::Base
 
       # always use the preferred tool id *unless* the preferred tool is a 1.1 tool
       # and the matched tool is a 1.3 tool, since 1.3 is the preferred version of a tool
-      if can_use_preferred_tool && preferred_tool.matches_domain?(url)
+      if can_use_preferred_tool && preferred_tool.matches_host?(url)
         if match&.use_1_3? && !preferred_tool.use_1_3?
           return match
         end

@@ -1560,8 +1560,16 @@ describe ContextExternalTool do
 
       it "does not return preferred tool if url doesn't match" do
         c1 = @course
-        preferred = c1.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
+        preferred = c1.account.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         expect(ContextExternalTool.find_external_tool("http://example.com", c1, preferred.id)).to be_nil
+      end
+
+      it "finds preferred tool if url doesn't match but url's domain is a subdomain of the tool domain" do
+        c1 = @course
+        preferred = c1.account.context_external_tools.create!(name: "a", url: "http://www.google.com", domain: "example.com", consumer_key: "12345", shared_secret: "secret")
+        # If we didn't favor the preferred tool, we would return this tool because it's in a closer context
+        c1.context_external_tools.create!(name: "a", url: "http://www.google.com", domain: "example.com", consumer_key: "12345", shared_secret: "secret")
+        expect(ContextExternalTool.find_external_tool("http://subdomain.example.com", c1, preferred.id)).to eq(preferred)
       end
 
       it "returns the preferred tool if the url is nil" do
