@@ -64,7 +64,11 @@ load_cache_config = lambda do
 
     cached_raw_config = cached_cache_config.read if cached_cache_config.exist?
     yaml_raw_config = YAML.dump(raw_config)
-    cached_cache_config.write(yaml_raw_config) if cached_raw_config != yaml_raw_config
+    begin
+      cached_cache_config.write(yaml_raw_config) if cached_raw_config != yaml_raw_config
+    rescue Errno::EACCES
+      # ignore permission errors
+    end
 
     # resolve links
     cache_map.each_key do |cluster_name|
