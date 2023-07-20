@@ -194,9 +194,6 @@ PATH
       canvas_sort
       multipart
       nokogiri
-    canvas_link_migrator (0.1.0)
-      activesupport
-      nokogiri
     canvas_mimetype_fu (0.0.1)
     canvas_panda_pub (1.0.0)
       canvas_http
@@ -483,6 +480,9 @@ GEM
     canvas_connect (0.3.16)
       adobe_connect (~> 1.0.0)
       rake (>= 0.9.6)
+    canvas_link_migrator (0.1.0)
+      activesupport
+      nokogiri
     canvas_webex (0.18.2)
       railties
     capybara (3.39.0)
@@ -1215,7 +1215,7 @@ DEPENDENCIES
   canvas_ext!
   canvas_http!
   canvas_kaltura!
-  canvas_link_migrator!
+  canvas_link_migrator (= 0.1.0)
   canvas_mimetype_fu!
   canvas_panda_pub!
   canvas_partman!
