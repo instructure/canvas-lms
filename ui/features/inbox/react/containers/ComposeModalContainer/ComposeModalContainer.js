@@ -165,10 +165,6 @@ const ComposeModalContainer = props => {
     setMediaUploadFile(null)
   }
 
-  const fileUploadUrl = attachmentFolderId => {
-    return `/api/v1/folders/${attachmentFolderId}/files`
-  }
-
   const addAttachment = async e => {
     const files = Array.from(e.currentTarget?.files)
     if (!files.length) {
@@ -184,10 +180,7 @@ const ComposeModalContainer = props => {
     setOnSuccess(I18n.t('Uploading files'))
 
     try {
-      const newFiles = await uploadFiles(
-        files,
-        fileUploadUrl(ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID)
-      )
+      const newFiles = await uploadFiles(files, '/files/pending', {conversations: true})
       setAttachments(prev => prev.concat(newFiles))
     } catch (err) {
       setOnFailure(I18n.t('Error uploading files'))
