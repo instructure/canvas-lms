@@ -1500,6 +1500,7 @@ class CoursesController < ApplicationController
 
       js_permissions = {
         can_manage_courses: @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
+        manage_grading_schemes: @context.grants_right?(@current_user, session, :manage_grades),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
         manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
         manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
@@ -3071,14 +3072,10 @@ class CoursesController < ApplicationController
         standard_id = params_for_update.delete :grading_standard_id
         grading_standard = GradingStandard.for(@course).where(id: standard_id).first if standard_id.present?
         if grading_standard != @course.grading_standard
-          if authorized_action?(@course, @current_user, :manage_grades)
-            if standard_id.present?
-              @course.grading_standard = grading_standard if grading_standard
-            else
-              @course.grading_standard = nil
-            end
+          if standard_id.present?
+            @course.grading_standard = grading_standard if grading_standard
           else
-            return
+            @course.grading_standard = nil
           end
         end
       end

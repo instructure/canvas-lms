@@ -2366,6 +2366,10 @@ class Account < ActiveRecord::Base
     feature_enabled?(:disable_post_to_sis_when_grading_period_closed) && feature_enabled?(:new_sis_integrations)
   end
 
+  def grading_standard_read_permission
+    :read
+  end
+
   class << self
     attr_accessor :current_domain_root_account
   end

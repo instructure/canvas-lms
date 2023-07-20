@@ -25,7 +25,7 @@ class GradingSchemesJsonController < ApplicationController
   before_action :require_context
   before_action :require_user
   def detail_list
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, @context.grading_standard_read_permission)
       grading_standards = GradingStandard.for(@context).sorted.limit(GRADING_SCHEMES_LIMIT)
       respond_to do |format|
         format.json do
@@ -38,7 +38,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def summary_list
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, @context.grading_standard_read_permission)
       grading_standards = GradingStandard.for(@context).sorted.limit(GRADING_SCHEMES_LIMIT)
       respond_to do |format|
         format.json do
@@ -51,7 +51,7 @@ class GradingSchemesJsonController < ApplicationController
   end
 
   def show
-    if authorized_action(@context, @current_user, :manage_grades)
+    if authorized_action(@context, @current_user, @context.grading_standard_read_permission)
       grading_standard = GradingStandard.for(@context).find(params[:id])
       respond_to do |format|
         format.json { render json: GradingSchemesJsonController.to_grading_scheme_json(grading_standard, @current_user) }
