@@ -1379,7 +1379,7 @@ describe "RCE next tests", ignore_js_errors: true do
     end
 
     context "fonts", ignore_js_errors: true do
-      it "successfullies change to Balsamiq Sans font with menubar options" do
+      it "changes to Balsamiq Sans font with menubar options" do
         text = "Hello font"
         rce_wysiwyg_state_setup(@course, text)
         select_all_in_tiny(f("#wiki_page_body"))
@@ -1392,7 +1392,7 @@ describe "RCE next tests", ignore_js_errors: true do
         )
       end
 
-      it "successfullies change to Architects Daughter font with menubar options" do
+      it "changes to Architects Daughter font with menubar options" do
         text = "Hello font"
         rce_wysiwyg_state_setup(@course, text)
         select_all_in_tiny(f("#wiki_page_body"))
@@ -1403,6 +1403,22 @@ describe "RCE next tests", ignore_js_errors: true do
         expect(f(".show-content.user_content p span").attribute("style")).to eq(
           'font-family: "Architects Daughter", lato, "Helvetica Neue", Helvetica, Arial, sans-serif;'
         )
+      end
+    end
+
+    describe "Format/Formats menubar menu" do
+      it "shows correct heading options" do
+        rce_wysiwyg_state_setup(@course)
+        menubar_open_menu("Format")
+        expect(menubar_menu_item("Formats")).to be_displayed
+        click_menubar_menu_item("Formats")
+        click_menubar_menu_item("Headings")
+        expect(f("body")).to contain_css(menubar_menu_item_css("Heading 2"))
+        expect(f("body")).to contain_css(menubar_menu_item_css("Heading 3"))
+        expect(f("body")).to contain_css(menubar_menu_item_css("Heading 4"))
+        expect(f("body")).to contain_css(menubar_menu_item_css("Heading 5"))
+        expect(f("body")).to contain_css(menubar_menu_item_css("Heading 6"))
+        expect(f("body")).not_to contain_css(menubar_menu_item_css("Heading 1"))
       end
     end
 
