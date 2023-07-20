@@ -16612,6 +16612,7 @@ uk:
         term_end: "кінець семестру "
         term_start: "початок семестру"
         unspecified: щоразу
+      timespan: "%{start_at}до %{end_at}"
   terms_35d91184: "Семестри:"
   terms_4d979628: Терміни
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Семестрів не знайдено. Семестри мають бути добавлені з multi_term_batch_mode"
