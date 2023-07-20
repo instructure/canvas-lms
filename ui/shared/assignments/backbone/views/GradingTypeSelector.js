@@ -182,6 +182,7 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
     initiallySelectedGradingSchemeId: this.parentModel.gradingStandardId()
       ? this.parentModel.gradingStandardId()
       : undefined,
+    canManage: ENV.PERMISSIONS.manage_grading_schemes,
     courseDefaultSchemeId: courseDefaultGradingSchemeId,
     onChange: this.handleGradingStandardIdChanged,
     contextId: ENV.COURSE_ID,

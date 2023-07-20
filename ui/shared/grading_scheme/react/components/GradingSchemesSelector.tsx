@@ -42,6 +42,7 @@ const I18n = useI18nScope('assignments.grading_type_selector')
 const {Item} = Flex as any
 
 interface ComponentProps {
+  canManage: boolean
   contextType: 'Course' | 'Account'
   contextId: string
   courseDefaultSchemeId?: string
@@ -52,6 +53,7 @@ interface ComponentProps {
 export const GradingSchemesSelector = ({
   initiallySelectedGradingSchemeId,
   onChange,
+  canManage,
   contextType,
   contextId,
   courseDefaultSchemeId,
@@ -231,16 +233,20 @@ export const GradingSchemesSelector = ({
           </Item>
           <Item>
             <View as="div" margin="none none none xx-small" withVisualDebug={false}>
-              <Button onClick={openGradingSchemeViewEditModal}>{I18n.t('View/Edit')}</Button>
+              <Button onClick={openGradingSchemeViewEditModal}>
+                {canManage ? I18n.t('View/Edit') : I18n.t('View')}
+              </Button>
             </View>
           </Item>
         </Flex>
 
-        <View as="div" margin="none none small none" withVisualDebug={false}>
-          <CondensedButton color="primary" onClick={openManageGradingSchemesModal}>
-            {I18n.t('Manage All Grading Schemes')}
-          </CondensedButton>
-        </View>
+        {canManage && (
+          <View as="div" margin="none none small none" withVisualDebug={false}>
+            <CondensedButton color="primary" onClick={openManageGradingSchemesModal}>
+              {I18n.t('Manage All Grading Schemes')}
+            </CondensedButton>
+          </View>
+        )}
 
         {showViewEditGradingSchemeModal ? (
           <>
@@ -266,7 +272,7 @@ export const GradingSchemesSelector = ({
               />
             ) : (
               <GradingSchemeViewCopyTemplateModal
-                allowDuplication={true}
+                allowDuplication={canManage}
                 contextId={contextId}
                 contextType={contextType}
                 onCancel={closeGradingSchemeViewEditModal}
