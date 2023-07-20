@@ -427,6 +427,10 @@ class Course < ActiveRecord::Base
       end
   end
 
+  def grading_standard_read_permission
+    :read_as_admin
+  end
+
   def update_account_associations_if_changed
     if (saved_change_to_root_account_id? || saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
       delay(synchronous: !Rails.env.production? || saved_change_to_id?).update_account_associations

@@ -1941,8 +1941,11 @@ describe CoursesController, type: :request do
           @standard = @course.account.grading_standards.create!(title: "account standard", standard_data: { a: { name: "A", value: "95" }, b: { name: "B", value: "80" }, f: { name: "F", value: "" } })
         end
 
-        it "requires :manage_grades rights if the grading standard is changing" do
-          api_call_as_user(@designer, :put, @path, @params, { course: { grading_standard_id: @standard.id, apply_assignment_group_weights: true } }, {}, { expected_status: 401 })
+        it "does not require :manage_grades rights if the grading standard is changing" do
+          api_call_as_user(@designer, :put, @path, @params, course: { grading_standard_id: @standard.id, apply_assignment_group_weights: true })
+          @course.reload
+          expect(@course.apply_group_weights?).to be true
+          expect(@course.grading_standard).to eq @standard
         end
 
         it "does not require :manage_grades rights if the grading standard is not changing" do
