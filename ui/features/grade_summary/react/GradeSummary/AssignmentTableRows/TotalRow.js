@@ -23,7 +23,14 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
-import {formatNumber, scorePercentageToLetterGrade, getTotal, filteredAssignments} from '../utils'
+import {
+  formatNumber,
+  scorePercentageToLetterGrade,
+  getCourseEarnedPoints,
+  getCourseTotalPoints,
+  getTotal,
+  filteredAssignments,
+} from '../utils'
 
 const I18n = useI18nScope('grade_summary')
 
@@ -49,6 +56,14 @@ export const totalRow = (queryData, calculateOnlyGradedAssignments = false) => {
       ? total
       : scorePercentageToLetterGrade(total, queryData?.gradingStandard)
 
+  const earnedPoints = formatNumber(getCourseEarnedPoints(applicableAssignments)) || '-'
+  const totalPoints = formatNumber(getCourseTotalPoints(applicableAssignments)) || '-'
+  const hasWeightedGradingPeriods = queryData?.gradingPeriodsConnection?.nodes?.some(
+    gradingPeriod => {
+      return gradingPeriod.weight != null && gradingPeriod.weight > 0
+    }
+  )
+
   return (
     <Table.Row data-testid="total_row">
       <Table.Cell textAlign="start" colSpan="3">
@@ -57,6 +72,13 @@ export const totalRow = (queryData, calculateOnlyGradedAssignments = false) => {
       <Table.Cell textAlign="center">
         <Text weight="bold">{ENV.restrict_quantitative_data ? letterGrade : formattedTotal}</Text>
       </Table.Cell>
+      {!ENV.restrict_quantitative_data &&
+        !hasWeightedGradingPeriods &&
+        !queryData?.applyGroupWeights && (
+          <Table.Cell textAlign="center">
+            <Text weight="bold">{`${earnedPoints}/${totalPoints}`}</Text>
+          </Table.Cell>
+        )}
     </Table.Row>
   )
 }
