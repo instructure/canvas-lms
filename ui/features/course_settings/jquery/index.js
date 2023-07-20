@@ -386,6 +386,7 @@ $(document).ready(function () {
       }
       ReactDOM.render(
         <GradingSchemesSelector
+          canManage={ENV.PERMISSIONS.manage_grading_schemes}
           contextId={ENV.COURSE_ID}
           contextType="Course"
           initiallySelectedGradingSchemeId={selectedGradingSchemeId}

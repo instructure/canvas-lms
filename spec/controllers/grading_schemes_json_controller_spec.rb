@@ -497,6 +497,36 @@ describe GradingSchemesJsonController, type: :request do
     end
 
     describe "get grading schemes" do
+      before(:once) do
+        @course_scheme_data = [
+          { "name" => "A", "value" => 0.98 },
+          { "name" => "A-", "value" => 0.9 },
+          { "name" => "B+", "value" => 0.88 },
+          { "name" => "B", "value" => 0.85 },
+          { "name" => "B-", "value" => 0.8 },
+          { "name" => "C+", "value" => 0.78 },
+          { "name" => "C", "value" => 0.75 },
+          { "name" => "C-", "value" => 0.7 },
+          { "name" => "D+", "value" => 0.68 },
+          { "name" => "D", "value" => 0.65 },
+          { "name" => "D-", "value" => 0.61 },
+          { "name" => "F", "value" => 0.0 }
+        ]
+        @course_level_grading_standard = @course.grading_standards.create!(
+          title: "My Course Level Grading Standard",
+          data: GradingSchemesJsonController.to_grading_standard_data(@course_scheme_data),
+          points_based: false,
+          scaling_factor: 1.0
+        )
+      end
+
+      it "returns the appropriate permissions for a teacher without 'Grades — Edit' access" do
+        @account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
+        user_session(@teacher)
+        get "/courses/#{@course.id}/grading_schemes", as: :json
+        expect(response.parsed_body.dig(0, "permissions")).to eq({ "manage" => false })
+      end
+
       it "returns course and account level grading schemes json" do
         Account.site_admin.enable_feature!(:points_based_grading_schemes)
         account_scheme_data = [{ "name" => "A", "value" => 0.9 },
@@ -509,26 +539,6 @@ describe GradingSchemesJsonController, type: :request do
                                                                           points_based: false,
                                                                           scaling_factor: 1.0)
         account_level_grading_standard.save
-
-        course_scheme_data = [{ "name" => "A", "value" => 0.98 },
-                              { "name" => "A-", "value" => 0.9 },
-                              { "name" => "B+", "value" => 0.88 },
-                              { "name" => "B", "value" => 0.85 },
-                              { "name" => "B-", "value" => 0.8 },
-                              { "name" => "C+", "value" => 0.78 },
-                              { "name" => "C", "value" => 0.75 },
-                              { "name" => "C-", "value" => 0.7 },
-                              { "name" => "D+", "value" => 0.68 },
-                              { "name" => "D", "value" => 0.65 },
-                              { "name" => "D-", "value" => 0.61 },
-                              { "name" => "F", "value" => 0.0 }]
-
-        course_level_grading_standard = @course.grading_standards.build(title: "My Course Level Grading Standard",
-                                                                        data: GradingSchemesJsonController.to_grading_standard_data(course_scheme_data),
-                                                                        points_based: false,
-                                                                        scaling_factor: 1.0)
-        course_level_grading_standard.save
-
         user_session(@teacher)
         get "/courses/" + @course.id.to_s + "/grading_schemes", as: :json
         expect(response).to have_http_status(:ok)
@@ -546,12 +556,12 @@ describe GradingSchemesJsonController, type: :request do
                                             "points_based" => false,
                                             "scaling_factor" => 1.0 })
 
-        expect(response_json[1]).to eq({ "id" => course_level_grading_standard.id.to_s,
+        expect(response_json[1]).to eq({ "id" => @course_level_grading_standard.id.to_s,
                                          "title" => "My Course Level Grading Standard",
                                          "context_type" => "Course",
                                          "context_id" => @course.id,
                                          "context_name" => "Unnamed Course",
-                                         "data" => course_scheme_data,
+                                         "data" => @course_scheme_data,
                                          "permissions" => { "manage" => true },
                                          "assessed_assignment" => false,
                                          "points_based" => false,
@@ -568,22 +578,6 @@ describe GradingSchemesJsonController, type: :request do
         account_level_grading_standard = @account.grading_standards.build(title: "My Account Level Grading Standard", data: GradingSchemesJsonController.to_grading_standard_data(account_scheme_data))
         account_level_grading_standard.save
 
-        course_scheme_data = [{ "name" => "A", "value" => 0.98 },
-                              { "name" => "A-", "value" => 0.9 },
-                              { "name" => "B+", "value" => 0.88 },
-                              { "name" => "B", "value" => 0.85 },
-                              { "name" => "B-", "value" => 0.8 },
-                              { "name" => "C+", "value" => 0.78 },
-                              { "name" => "C", "value" => 0.75 },
-                              { "name" => "C-", "value" => 0.7 },
-                              { "name" => "D+", "value" => 0.68 },
-                              { "name" => "D", "value" => 0.65 },
-                              { "name" => "D-", "value" => 0.61 },
-                              { "name" => "F", "value" => 0.0 }]
-
-        course_level_grading_standard = @course.grading_standards.build(title: "My Course Level Grading Standard", data: GradingSchemesJsonController.to_grading_standard_data(course_scheme_data))
-        course_level_grading_standard.save
-
         user_session(@teacher)
         get "/courses/" + @course.id.to_s + "/grading_schemes", as: :json
         expect(response).to have_http_status(:ok)
@@ -599,12 +593,12 @@ describe GradingSchemesJsonController, type: :request do
                                             "permissions" => { "manage" => false },
                                             "assessed_assignment" => false })
 
-        expect(response_json[1]).to eq({ "id" => course_level_grading_standard.id.to_s,
+        expect(response_json[1]).to eq({ "id" => @course_level_grading_standard.id.to_s,
                                          "title" => "My Course Level Grading Standard",
                                          "context_type" => "Course",
                                          "context_id" => @course.id,
                                          "context_name" => "Unnamed Course",
-                                         "data" => course_scheme_data,
+                                         "data" => @course_scheme_data,
                                          "permissions" => { "manage" => true },
                                          "assessed_assignment" => false })
       end
