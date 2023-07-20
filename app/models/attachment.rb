@@ -360,9 +360,9 @@ class Attachment < ActiveRecord::Base
       MediaTrack.select("*, ROW_NUMBER() OVER(PARTITION BY media_tracks_all.locale, media_tracks_all.media_object_id ORDER BY media_tracks_all.rank) AS row")
         .from(<<~SQL.squish),
           (
-            #{MediaTrack.select("*, 0 AS rank, attachment_id AS for_att_id").where(attachment_id: attachment_ids).to_sql}
+            #{MediaTrack.select("*, 0 AS rank, attachment_id AS for_att_id, false AS inherited").where(attachment_id: attachment_ids).to_sql}
             UNION
-            #{MediaTrack.select("media_tracks.*, 1 AS rank, attachments_by_media_ids_media_objects.id AS for_att_id")
+            #{MediaTrack.select("media_tracks.*, 1 AS rank, attachments_by_media_ids_media_objects.id AS for_att_id, true AS inherited")
               .joins(media_object: [:attachment, :attachments_by_media_id])
               .where("media_tracks.attachment_id = attachments.id")
               .where(media_objects: { attachments_by_media_ids_media_objects: { id: attachment_ids } }).to_sql}

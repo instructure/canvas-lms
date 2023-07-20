@@ -106,7 +106,6 @@ export class ClosedCaptionPanel extends Component {
       // setState in componentDidUpdate is generally bad form,
       // but in this case it makes sense to clear lastDeletedCCIndex
       // here in the place where it's just been used to help direct focus.
-      // eslint-disable-next-line react/no-did-update-set-state
       this.setState(state => {
         if (state.lastDeletedCCIndex !== -1) {
           return {lastDeletedCCIndex: -1}
@@ -220,6 +219,7 @@ export class ClosedCaptionPanel extends Component {
               languages={this.closedCaptionLanguages}
               selectedLanguage={this.closedCaptionLanguages.find(l => l.id === cc.locale)}
               selectedFile={cc.file}
+              inheritedCaption={cc.inherited}
               mountNode={this.props.mountNode}
             />
           ))}

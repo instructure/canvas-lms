@@ -59,7 +59,7 @@ export default function CanvasMediaPlayer(props) {
     ? props.media_sources.sort(byBitrate)
     : props.media_sources
   const tracks = Array.isArray(props.media_tracks)
-    ? props.media_tracks.map(t => ({locale: t.language, language: t.label}))
+    ? props.media_tracks.map(t => ({locale: t.language, language: t.label, inherited: t.inherited}))
     : null
   const [media_sources, setMedia_sources] = useState(sorted_sources)
   const [media_tracks] = useState(tracks)

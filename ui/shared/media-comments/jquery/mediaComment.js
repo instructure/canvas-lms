@@ -117,7 +117,8 @@ export function getSourcesAndTracks(id, attachmentId) {
       const languageName = mejs.language.codes[track.locale] || track.locale
       return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(
         languageName
-      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}' />`
+      )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(track.locale)}'
+      data-inherited-track='${htmlEscape(track.inherited)}' />`
     })
 
     const types = _.map(data.media_sources, source => source.content_type)

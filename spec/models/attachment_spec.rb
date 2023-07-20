@@ -626,6 +626,13 @@ describe Attachment do
       expect(@attachment.media_tracks_include_originals).to match [en_track, fra_track]
       expect(@attachment.media_tracks_include_originals).not_to include fr_track
     end
+
+    it "differentiates between inherited and non-inherited tracks" do
+      @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "en subs", user_id: @teacher)
+      @attachment.media_tracks.create!(kind: "subtitles", locale: "fr", content: "fr subs", user_id: @teacher, media_object: @media_object)
+      expect(@attachment.media_tracks_include_originals.first.inherited).to be_truthy
+      expect(@attachment.media_tracks_include_originals.last.inherited).to be_falsey
+    end
   end
 
   context "destroy" do

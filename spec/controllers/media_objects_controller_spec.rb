@@ -968,8 +968,10 @@ describe MediaObjectsController do
       user_session(@student)
       media_attachment_api_json = controller.media_attachment_api_json(other_attachment, @media_object, @student, session)
       expect(media_attachment_api_json["media_tracks"].pluck("locale")).to include("en", "fr")
+      expect(media_attachment_api_json["media_tracks"].pluck("inherited")).to eq([true, false])
       media_attachment_api_json = controller.media_attachment_api_json(original_attachment, @media_object, @student, session)
       expect(media_attachment_api_json["media_tracks"].pluck("locale")).to eq(["en"])
+      expect(media_attachment_api_json["media_tracks"].pluck("inherited")).to eq([false])
     end
 
     it "returns media_attachment_iframe_url for the embedded_iframe_url" do

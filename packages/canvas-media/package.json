@@ -59,6 +59,7 @@
     "@instructure/ui-themeable": "^7",
     "@instructure/ui-themes": "^7",
     "@instructure/ui-toggle-details": "^7",
+    "@instructure/ui-tooltip": "^7",
     "@instructure/ui-utils": "^7",
     "@instructure/ui-view": "^7",
     "@instructure/uid": "7",
