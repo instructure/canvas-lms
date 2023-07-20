@@ -80,15 +80,8 @@ ExternalContentReturnView.prototype.attach = function () {
 
 ExternalContentReturnView.prototype.toJSON = function () {
   const json = ExternalContentReturnView.__super__.toJSON.apply(this, arguments)
-  let ref
   json.allowances = iframeAllowances()
   json.launch_url = this.model.launchUrl(this.launchType, this.launchParams)
-  json.shouldRenderForwardingIframe =
-    typeof ENV !== 'undefined' && ENV !== null
-      ? (ref = ENV.FEATURES) != null
-        ? ref.lti_platform_storage
-        : void 0
-      : void 0
   return json
 }
 

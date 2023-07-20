@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -97,19 +95,12 @@ CollaborationView.prototype.formTemplate = function (arg) {
 }
 
 CollaborationView.prototype.iframeTemplate = function (arg) {
-  let ref
   const url = arg.url
   const $iframe = $(
     editIframe({
       id: this.id,
       url,
       allowances: iframeAllowances(),
-      shouldRenderForwardingIframe:
-        typeof ENV !== 'undefined' && ENV !== null
-          ? (ref = ENV.FEATURES) != null
-            ? ref.lti_platform_storage
-            : void 0
-          : void 0,
     })
   )
   return $iframe.on(
