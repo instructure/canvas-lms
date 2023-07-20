@@ -16,18 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useMatch} from 'react-router-dom'
+import {ApolloProvider, createClient} from '@canvas/apollo'
+import LoadingIndicator from '@canvas/loading-indicator'
 import {AccountStatusManagement} from '../components/account_grading_status/AccountStatusManagement'
 
 export const AccountGradingStatuses = () => {
   const pathMatch = useMatch('/accounts/:accountId/*')
-  if (!pathMatch?.params?.accountId) {
+  const accountId = pathMatch?.params?.accountId
+  if (!accountId) {
     throw new Error('account id is not present on path')
   }
 
+  const [client, setClient] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     document.title = 'Account Custom Statuses'
+    setClient(createClient())
+    setLoading(false)
   }, [])
-  return <AccountStatusManagement />
+
+  if (loading) {
+    return <LoadingIndicator />
+  }
+
+  return (
+    <ApolloProvider client={client}>
+      <AccountStatusManagement accountId={accountId} />
+    </ApolloProvider>
+  )
 }
