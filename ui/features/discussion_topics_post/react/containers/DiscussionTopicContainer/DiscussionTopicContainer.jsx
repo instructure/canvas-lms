@@ -235,7 +235,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
             margin: '0',
           },
           border: {
-            width: 'small 0',
+            width: '0 0 small 0',
             radius: 'none',
           },
           container: {

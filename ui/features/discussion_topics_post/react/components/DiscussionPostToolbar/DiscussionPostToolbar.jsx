@@ -93,7 +93,10 @@ export const DiscussionPostToolbar = props => {
       props={{
         mobile: {
           direction: 'column',
-          dividingMargin: '0 0 small 0',
+          dividingMargin: '0',
+          groupSelect: {
+            margin: '0 xx-small 0 0',
+          },
           search: {
             shouldGrow: true,
             shouldShrink: true,
@@ -103,12 +106,20 @@ export const DiscussionPostToolbar = props => {
             shouldGrow: true,
             shouldShrink: true,
             width: null,
+            margin: '0 xx-small 0 0',
+          },
+          viewSplitScreen: {
+            shouldGrow: true,
+            margin: '0 xx-small 0 0',
           },
           padding: 'xx-small',
         },
         desktop: {
           direction: 'row',
           dividingMargin: '0 small 0 0',
+          groupSelect: {
+            margin: '0 small 0 0',
+          },
           search: {
             shouldGrow: true,
             shouldShrink: true,
@@ -118,21 +129,29 @@ export const DiscussionPostToolbar = props => {
             shouldGrow: false,
             shouldShrink: false,
             width: '120px',
+            margin: '0 small 0 0',
           },
-          padding: '0',
+          viewSplitScreen: {
+            shouldGrow: false,
+            margin: '0 small 0 0',
+          },
+          padding: 'xxx-small',
         },
       }}
-      render={responsiveProps => (
+      render={(responsiveProps, matches) => (
         <View maxWidth="56.875em">
-          <Flex width="100%" direction={responsiveProps.direction}>
-            <Flex.Item margin={responsiveProps.dividingMargin} shouldShrink={true}>
+          <Flex width="100%" direction={responsiveProps.direction} wrap="wrap">
+            <Flex.Item
+              margin={responsiveProps?.dividingMargin}
+              shouldShrink={responsiveProps.shouldShrink}
+            >
               <Flex>
                 {/* Groups */}
                 {props.childTopics?.length && (
                   <Flex.Item
                     data-testid="groups-menu-button"
-                    margin="0 small 0 0"
-                    padding={responsiveProps.padding}
+                    margin={responsiveProps?.groupSelect?.margin}
+                    padding={responsiveProps?.padding}
                   >
                     <span className="discussions-post-toolbar-groupsMenu">
                       <GroupsMenu width="10px" childTopics={props.childTopics} />
@@ -169,13 +188,13 @@ export const DiscussionPostToolbar = props => {
             </Flex.Item>
 
             <Flex.Item shouldGrow={true}>
-              <Flex>
+              <Flex wrap="wrap">
                 {/* Filter */}
                 <Flex.Item
-                  margin="0 small 0 0"
+                  margin={responsiveProps?.filter?.margin}
                   padding={responsiveProps.padding}
                   shouldGrow={responsiveProps?.filter?.shouldGrow}
-                  shouldShrink={responsiveProps?.filter?.shouldShrink}
+                  shouldShrink={false}
                 >
                   <span className="discussions-filter-by-menu">
                     <SimpleSelect
@@ -233,18 +252,23 @@ export const DiscussionPostToolbar = props => {
                     </span>
                   </Tooltip>
                 </Flex.Item>
-                {!ENV.isolated_view && !props.userSplitScreenPreference && (
-                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                    <ExpandCollapseThreadsButton />
-                  </Flex.Item>
-                )}
                 {ENV.split_screen_view && (
-                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                  <Flex.Item
+                    margin={responsiveProps?.viewSplitScreen?.margin}
+                    padding={responsiveProps.padding}
+                    shouldGrow={responsiveProps?.viewSplitScreen?.shouldGrow}
+                  >
                     <SplitScreenButton
                       setUserSplitScreenPreference={props.setUserSplitScreenPreference}
                       userSplitScreenPreference={props.userSplitScreenPreference}
                       closeView={props.closeView}
+                      display={matches.includes('mobile') ? 'block' : 'inline-block'}
                     />
+                  </Flex.Item>
+                )}
+                {!ENV.isolated_view && !props.userSplitScreenPreference && (
+                  <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
+                    <ExpandCollapseThreadsButton showText={!matches.includes('mobile')} />
                   </Flex.Item>
                 )}
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
