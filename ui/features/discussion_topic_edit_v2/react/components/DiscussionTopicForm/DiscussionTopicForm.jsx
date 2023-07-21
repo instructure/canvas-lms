@@ -25,6 +25,7 @@ import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button} from '@instructure/ui-buttons'
+import {IconAddLine} from '@instructure/ui-icons'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -341,7 +342,15 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
                 renderLabel={I18N.t('Group Set')}
                 defaultValue=""
                 value={groupSet}
-                onChange={(_event, newChoice) => setGroupSet(newChoice.value)}
+                onChange={(_event, newChoice) => {
+                  const value = newChoice.value
+                  if (value === 'new-group-category') {
+                    // new group category workflow here
+                    // setGroupSet(the new category)
+                  } else {
+                    setGroupSet(value)
+                  }
+                }}
                 placeholder={I18N.t('Select Group')}
                 width={inputWidth}
               >
@@ -350,6 +359,14 @@ export default function DiscussionTopicForm({isEditing, isStudent, sections, gro
                     {label}
                   </SimpleSelect.Option>
                 ))}
+                <SimpleSelect.Option
+                  key="new-group-category"
+                  id="opt-new-group-category"
+                  value="new-group-category"
+                  renderBeforeLabel={IconAddLine}
+                >
+                  New Group Category
+                </SimpleSelect.Option>
               </SimpleSelect>
             </View>
           )}
