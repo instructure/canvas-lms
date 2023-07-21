@@ -187,6 +187,16 @@ export default class EditCalendarEventView extends Backbone.View {
     }
   }
 
+  toggleRecurringEeventFrequencyPicker(event) {
+    if (event.target.checked) {
+      this.$el.find('#recurring_event_frequency_picker').addClass('hidden')
+      this.model.set('rrule', null)
+      this.renderRecurringEventFrequencyPicker()
+    } else {
+      this.$el.find('#recurring_event_frequency_picker').removeClass('hidden')
+    }
+  }
+
   _handleFrequencyChange(newFrequency, newRRule) {
     if (newFrequency !== 'custom') {
       this.model.set('rrule', newRRule)
@@ -207,7 +217,7 @@ export default class EditCalendarEventView extends Backbone.View {
       const freq = rrule ? rruleToFrequencyOptionValue(eventStart, rrule) : 'not-repeat'
 
       ReactDOM.render(
-        <div style={{margin: '.5rem 0 1rem'}}>
+        <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
           <FrequencyPicker
             date={eventStart.toISOString(true)}
             locale={ENV.LOCALE || 'en'}
@@ -350,6 +360,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
   toggleUseSectionDates(e) {
     this.model.set('use_section_dates', !this.model.get('use_section_dates'))
+    this.toggleRecurringEeventFrequencyPicker(e)
     return this.updateRemoveChildEvents(e)
   }
 

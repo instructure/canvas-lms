@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import '@canvas/backbone'
 import _ from 'lodash'
-import {within, getByText} from '@testing-library/dom'
+import {fireEvent, within, getByText} from '@testing-library/dom'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
 
@@ -228,6 +228,49 @@ describe('EditEventView', () => {
       $('#calendar_event_blackout_date').attr('checked', false)
       $('#calendar_event_blackout_date').trigger('change')
       ids.forEach(id => expectEnabled(id))
+    })
+  })
+
+  describe('recurring events', () => {
+    beforeEach(() => {
+      ENV.FEATURES = {calendar_series: true}
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('displays the frequency picker', async () => {
+      render()
+
+      expect(within(document.body).getByText('Frequency:')).toBeVisible()
+      expect(within(document.body).getByDisplayValue('Does not repeat')).toBeVisible()
+    })
+
+    it('hides the frequency picker when section dates are enabled', async () => {
+      jest.spyOn($, 'ajaxJSON').mockImplementation((url, method, params, successCB) => {
+        const sections = [{id: 1}]
+        return Promise.resolve(sections).then(() => {
+          successCB(sections, {getResponseHeader: () => ''})
+        })
+      })
+
+      // jquery supplies this in the real app
+      document.head.appendChild(document.createElement('style')).textContent =
+        '.hidden {display: none; visibliity: hidden;}'
+
+      render({sections_url: '/api/v1/courses/21/sections'})
+
+      // await within(document.body).findAllByText('Use a different date for each section')
+      const section_checkbox = await within(document.body).findByRole('checkbox', {
+        id: 'use_section_dates', // name should work, but doesn't
+      })
+      expect(section_checkbox).toBeVisible()
+      expect(within(document.body).getByText('Frequency:')).toBeVisible()
+      expect(within(document.body).getByDisplayValue('Does not repeat')).toBeVisible()
+
+      fireEvent.click(section_checkbox)
+      expect(within(document.body).queryByText('Frequency:')).not.toBeVisible()
     })
   })
 })
