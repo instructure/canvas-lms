@@ -70,6 +70,29 @@ class CustomRecurrenceErrorBoundary extends React.Component {
   }
 }
 
+type FooterProps = {
+  canSave: boolean
+  onDismiss: () => void
+  onSave: () => void
+}
+
+const Footer = ({canSave, onDismiss, onSave}: FooterProps) => {
+  return (
+    <>
+      <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
+      <Button
+        interaction={canSave ? 'enabled' : 'disabled'}
+        type="submit"
+        color="primary"
+        margin="0 0 0 x-small"
+        onClick={onSave}
+      >
+        {I18n.t('Done')}
+      </Button>
+    </>
+  )
+}
+
 export type CustomRecurrenceModalProps = {
   eventStart: string
   locale: string
@@ -114,23 +137,6 @@ export default function CustomRecurrenceModal({
     onSave(rrule)
   }, [currSpec, onSave])
 
-  const Footer = useCallback(() => {
-    return (
-      <>
-        <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
-        <Button
-          interaction={isValidState ? 'enabled' : 'disabled'}
-          type="submit"
-          color="primary"
-          margin="0 0 0 x-small"
-          onClick={handleSave}
-        >
-          {I18n.t('Done')}
-        </Button>
-      </>
-    )
-  }, [handleSave, isValidState, onDismiss])
-
   return (
     <CanvasModal
       label={I18n.t('Custom Repeating Event')}
@@ -138,7 +144,7 @@ export default function CustomRecurrenceModal({
       onDismiss={onDismiss}
       open={isOpen}
       padding="small medium"
-      footer={<Footer />}
+      footer={<Footer canSave={isValidState} onDismiss={onDismiss} onSave={handleSave} />}
       shouldCloseOnDocumentClick={false}
     >
       <div style={{minWidth: '28rem', minHeight: '21rem'}}>
