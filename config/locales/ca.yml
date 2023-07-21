@@ -7915,18 +7915,18 @@ ca:
       - Dissabte
     abbr_month_names: 
       - ~
-      - Gener
-      - Febrer
+      - Gen
+      - Febr
       - Març
-      - Abril
+      - Abr
       - Maig
       - Juny
-      - Juliol
-      - Agost
-      - Setembre
-      - Octubre
-      - Novembre
-      - Desembre
+      - Juli
+      - Ag
+      - Set
+      - Oct
+      - Nov
+      - Des
     datepicker: 
       column_headings: 
         - Dg
