@@ -37,73 +37,73 @@
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/DueDateTray/DueDateTray.js",
+    "source": "ui/features/discussion_topics_post/react/components/DueDateTray/DueDateTray.jsx",
     "target": "ui/shared/datetime/dateHelper.js",
     "request": "../../../../../shared/datetime/dateHelper"
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/PeerReview/PeerReview.js",
+    "source": "ui/features/discussion_topics_post/react/components/PeerReview/PeerReview.jsx",
     "target": "ui/shared/datetime/dateHelper.js",
     "request": "../../../../../shared/datetime/dateHelper"
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/ReplyPreview/ReplyPreview.js",
+    "source": "ui/features/discussion_topics_post/react/components/ReplyPreview/ReplyPreview.jsx",
     "target": "ui/shared/datetime/dateHelper.js",
     "request": "../../../../../shared/datetime/dateHelper"
   },
   {
     "name": "AccessViolationError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.js",
+    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
     "target": "ui/features/discussion_topic/jquery/assignmentRubricDialog.js",
     "request": "../../../../discussion_topic/jquery/assignmentRubricDialog"
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.js",
+    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
     "target": "ui/shared/datetime/dateHelper.js",
     "request": "../../../../../shared/datetime/dateHelper"
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.js",
-    "target": "ui/shared/direct-sharing/react/components/DirectShareCourseTray.js",
+    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
+    "target": "ui/shared/direct-sharing/react/components/DirectShareCourseTray.jsx",
     "request": "../../../../../shared/direct-sharing/react/components/DirectShareCourseTray"
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.js",
-    "target": "ui/shared/direct-sharing/react/components/DirectShareUserModal.js",
+    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
+    "target": "ui/shared/direct-sharing/react/components/DirectShareUserModal.jsx",
     "request": "../../../../../shared/direct-sharing/react/components/DirectShareUserModal"
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.js",
-    "target": "ui/shared/rubrics/jquery/edit_rubric.js",
+    "source": "ui/features/discussion_topics_post/react/containers/DiscussionTopicContainer/DiscussionTopicContainer.jsx",
+    "target": "ui/shared/rubrics/jquery/edit_rubric.jsx",
     "request": "../../../../../shared/rubrics/jquery/edit_rubric"
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/containers/IsolatedThreadsContainer/IsolatedThreadsContainer.js",
+    "source": "ui/features/discussion_topics_post/react/containers/IsolatedThreadsContainer/IsolatedThreadsContainer.jsx",
     "target": "ui/shared/datetime/dateHelper.js",
     "request": "../../../../../shared/datetime/dateHelper"
   },
   {
     "name": "AccessViolationError",
-    "source": "ui/features/gradebook/react/default_gradebook/Gradebook.js",
+    "source": "ui/features/gradebook/react/default_gradebook/Gradebook.tsx",
     "target": "ui/boot/initializers/activateKeyClicks.js",
     "request": "../../../../boot/initializers/activateKeyClicks"
   },
   {
     "name": "AccessViolationError",
-    "source": "ui/features/assignment_edit/backbone/views/EditView.js",
+    "source": "ui/features/assignment_edit/backbone/views/EditView.jsx",
     "target": "ui/boot/initializers/activateTooltips.js",
     "request": "../../../../boot/initializers/activateTooltips"
   },
   {
     "name": "AccessViolationError",
-    "source": "ui/features/gradebook/react/default_gradebook/Gradebook.js",
+    "source": "ui/features/gradebook/react/default_gradebook/Gradebook.tsx",
     "target": "ui/boot/initializers/activateTooltips.js",
     "request": "../../../../boot/initializers/activateTooltips"
   },
@@ -121,7 +121,7 @@
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/shared/datetime/react/components/DateTimeInput.js",
+    "source": "ui/shared/datetime/react/components/DateTimeInput.jsx",
     "target": "ui/shared/datetime/changeTimezone.js",
     "request": "@canvas/datetime/changeTimezone"
   },
@@ -151,7 +151,7 @@
   },
   {
     "name": "SpecifierMismatchError",
-    "source": "ui/features/discussion_topics_post/react/components/DiscussionTopicAlertManager/DiscussionTopicAlertManager.js",
+    "source": "ui/features/discussion_topics_post/react/components/DiscussionTopicAlertManager/DiscussionTopicAlertManager.jsx",
     "target": "ui/shared/datetime/dateHelper.js",
     "request": "../../../../../shared/datetime/dateHelper"
   }

@@ -30,7 +30,7 @@ exports.globPlugins = function (pattern) {
 
 // e.g. ['gradebook': 'ui/features/gradebook/index.tsx']
 exports.getAppFeatureBundles = function () {
-  const appFeatureBundlesPattern = path.join(canvasDir, 'ui/features/*/index.{js,ts,tsx}')
+  const appFeatureBundlesPattern = path.join(canvasDir, 'ui/features/*/index.{js,jsx,ts,tsx}')
   const appBundles = sync(appFeatureBundlesPattern, []).map(entryFilepath => [
     path.basename(path.dirname(entryFilepath)),
     entryFilepath,
