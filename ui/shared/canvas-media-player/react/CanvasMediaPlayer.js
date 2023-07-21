@@ -136,9 +136,7 @@ export default function CanvasMediaPlayer(props) {
 
   const fetchSources = useCallback(
     async function () {
-      const url = props.attachment_id
-        ? `/media_attachments/${props.attachment_id}/info`
-        : `/media_objects/${props.media_id}/info`
+      const url = `/media_objects/${props.media_id}/info`
       let resp
       try {
         setMediaObjNetworkErr(null)
@@ -155,7 +153,7 @@ export default function CanvasMediaPlayer(props) {
         setRetryAttempt(retryAttempt + 1)
       }
     },
-    [props.attachment_id, props.media_id, retryAttempt]
+    [props.media_id, retryAttempt]
   )
 
   useEffect(() => {
@@ -330,7 +328,6 @@ CanvasMediaPlayer.propTypes = {
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number,
   aria_label: string,
   is_attachment: bool,
-  attachment_id: string,
 }
 
 CanvasMediaPlayer.defaultProps = {
@@ -342,5 +339,4 @@ CanvasMediaPlayer.defaultProps = {
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS,
   aria_label: '',
   is_attachment: false,
-  attachment_id: '',
 }

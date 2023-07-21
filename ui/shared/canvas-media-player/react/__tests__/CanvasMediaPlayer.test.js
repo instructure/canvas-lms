@@ -181,20 +181,6 @@ describe('CanvasMediaPlayer', () => {
         expect(fetch.mock.calls.length).toEqual(1)
         expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info')
       })
-      it('makes ajax call to media_attachments if no mediaSources are provided on load', async () => {
-        fetch.mockResponse(
-          JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]})
-        )
-        await act(async () => {
-          render(<CanvasMediaPlayer media_id="dummy_media_id" attachment_id="1" />)
-          await waitFor(() => {
-            jest.runOnlyPendingTimers()
-            expect(fetch.mock.calls.length).toEqual(1)
-          })
-        })
-        expect(fetch.mock.calls.length).toEqual(1)
-        expect(fetch.mock.calls[0][0]).toEqual('/media_attachments/1/info')
-      })
       it('shows error message if fetch for media_sources fails', async () => {
         fetch.mockResponses([JSON.stringify({error: 'whoops'}), {status: 503}])
         let component
