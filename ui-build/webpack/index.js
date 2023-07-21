@@ -172,7 +172,7 @@ module.exports = {
 
     modules: [resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
   },
 
   module: {
