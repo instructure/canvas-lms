@@ -53,12 +53,12 @@ module.exports = {
         },
       },
       {
-        test: /\.js$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         type: 'javascript/auto',
         include: [path.resolve(canvasDir, 'node_modules/@instructure')],
       },
       {
-        test: /\.(js|ts|tsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.join(canvasDir, 'ui'),
           path.join(canvasDir, 'packages/jquery-kyle-menu'),
@@ -131,7 +131,7 @@ module.exports = {
       // globals. We should get rid of this and just change our actual source to
       // s/test/qunit.test/ and s/module/qunit.module/
       {
-        test: /\.js$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.join(canvasDir, 'spec/coffeescripts'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
@@ -171,7 +171,7 @@ module.exports = {
     fallback: {
       path: false, // for minimatch
     },
-    extensions: ['.mjs', '.js', '.ts', '.tsx'],
+    extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx'],
     modules: [
       path.join(canvasDir, 'ui/shims'),
       path.join(canvasDir, 'public/javascripts'),

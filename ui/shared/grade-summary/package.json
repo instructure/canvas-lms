@@ -3,5 +3,5 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/IndividualStudentMastery/index.js"
+  "main": "./react/IndividualStudentMastery/index.jsx"
 }
