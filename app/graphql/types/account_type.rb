@@ -61,7 +61,7 @@ module Types
     def custom_grade_statuses_connection
       return unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
 
-      account.custom_grade_statuses.order(:id)
+      account.custom_grade_statuses.active.order(:id)
     end
 
     field :standard_grade_statuses_connection, StandardGradeStatusType.connection_type, null: true
