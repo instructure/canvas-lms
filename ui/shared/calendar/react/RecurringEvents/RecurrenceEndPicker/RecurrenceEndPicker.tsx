@@ -313,10 +313,11 @@ export default function RecurrenceEndPicker({
         .toISOString(true)
         .replace(/\.\d+/, '')
         .replace(/\+00:00/, 'Z')
+      if (newISODate === untilDate) return
       setUntilDate(newISODate)
       fireOnChange(mode, newISODate, countNumber)
     },
-    [timezone, fireOnChange, mode, countNumber]
+    [timezone, untilDate, fireOnChange, mode, countNumber]
   )
 
   const gridStyle = {
