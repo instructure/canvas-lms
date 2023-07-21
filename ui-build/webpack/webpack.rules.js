@@ -84,7 +84,7 @@ exports.fonts = {
 }
 
 exports.babel = {
-  test: /\.(js|ts|tsx)$/,
+  test: /\.(js|ts|jsx|tsx)$/,
   include: [
     resolve(canvasDir, 'ui'),
     resolve(canvasDir, 'packages/jquery-kyle-menu'),

@@ -53,7 +53,7 @@ getTranslationList('canvas-rce')
     const locales = translationFiles.map(tf => tf.split('.')[0])
     const processPromises = locales.map(locale => {
       return exec(
-        `BUILD_LOCALE=${locale} npx babel --out-dir lib/translated/${locale}/modules --ignore locales* src --extensions '.ts,.tsx,.js'`
+        `BUILD_LOCALE=${locale} npx babel --out-dir lib/translated/${locale}/modules --ignore locales* src --extensions '.ts,.tsx,.js,.jsx'`
       )
     })
     Promise.all(processPromises)
