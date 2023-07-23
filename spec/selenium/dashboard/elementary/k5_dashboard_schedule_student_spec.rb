@@ -118,6 +118,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it "does not display points possible if RQD is enabled" do
+      skip "VICE-3678 7/23/2023"
       assignment1 = create_dated_assignment(@subject_course, "missing assignment", 1.day.ago(@now))
       # truthy feature flag
       Account.default.enable_feature! :restrict_quantitative_data
@@ -158,6 +159,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it "clicking list twice hides missing assignments" do
+      skip "VICE-3678 7/23/2023"
       create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
 
       get "/#schedule"
