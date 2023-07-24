@@ -115,7 +115,7 @@ describe('ClosedCaptionCreatorRow', () => {
 
     it('renders selected language when a language is selected', () => {
       const {getByDisplayValue} = render(
-        <ClosedCaptionCreatorRow {...makeProps({selectedLanguage: {id: 'fr', name: 'French'}})} />
+        <ClosedCaptionCreatorRow {...makeProps({selectedLanguage: {id: 'fr', label: 'French'}})} />
       )
       expect(getByDisplayValue('French')).toBeInTheDocument()
     })
