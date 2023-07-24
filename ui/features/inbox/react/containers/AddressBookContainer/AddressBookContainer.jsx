@@ -225,69 +225,73 @@ export const AddressBookContainer = props => {
   }, [props.activeCourseFilter])
 
   const menuData = useMemo(() => {
+    // If loading is true and there is no data, return an empty array.
     if (loading && !data) {
       return []
     }
-
-    let contextData = []
-    let userData = []
-
-    contextData = data?.legacyNode?.recipients?.contextsConnection?.nodes.map(c => {
+  
+    // Extract contextData: { id, name, and context_type}
+    let contextData = (data?.legacyNode?.recipients?.contextsConnection?.nodes || []).map(c => {
       return {
         id: c.id,
         name: c.name,
+        userCount: c.userCount,
         itemType: CONTEXT_TYPE,
       }
     })
-
-    userData = data?.legacyNode?.recipients?.usersConnection?.nodes.map(u => {
+    
+    // Extract userData: {_id, id, name, commonCoursesInfo, observerEnrollments, and itemType}
+    let userData = (data?.legacyNode?.recipients?.usersConnection?.nodes || []).map(u => {
       return {
         _id: u._id,
         id: u.id,
         name: u.name,
-        commonCoursesInfo: props.includeCommonCourses
-          ? getCommonCoursesInformation(u.commonCoursesConnection)
-          : [],
+        commonCoursesInfo: props.includeCommonCourses ? getCommonCoursesInformation(u.commonCoursesConnection) : [],
         observerEnrollments: u?.observerEnrollmentsConnection?.nodes || [],
-        itemType: USER_TYPE,
+        itemType: USER_TYPE
       }
     })
-
-    if (!contextData) {
-      contextData = []
-    }
-    if (!userData) {
-      userData = []
-    }
+  
+    // Ensure contextData and userData are not null.
+    contextData = contextData || []
+    userData = userData || []
+  
+    // Set isLast property to the last items in contextData and userData if they are not loading.
+    // this is used to know which menu item will trigger a fetchMore call.
     if (userData.length > 0 && !loading) {
       userData[userData.length - 1].isLast = true
     }
-
     if (contextData.length > 0 && !loading) {
       contextData[contextData.length - 1].isLast = true
     }
+  
+    // Set the state for canSendAllMessage based on the data object.
     setCanSendAllMessage(!!data?.legacyNode?.recipients?.sendMessagesAll)
-
-    // since we have an array of objects, we use the id field to make sure it's unique.
-    // The id field is safe to use, because its the field we use as a key.
+  
+    // Remove duplicates from contextData and userData arrays based on their id property.
     contextData = [...new Map(contextData.map(item => [item.id, item])).values()]
     userData = [...new Map(userData.map(item => [item.id, item])).values()]
 
+    // Check if there is a subMenuSelection in filterHistory and searchTerm is an empty string.
     if (filterHistory[filterHistory.length - 1]?.subMenuSelection && searchTerm === '') {
       const selection = filterHistory[filterHistory.length - 1]?.subMenuSelection
+      // Filter the menuData based on the subMenuSelection value.
       const filteredMenuData = selection.includes('Course')
-        ? {contextData, userData: []}
-        : {userData, contextData: []}
+        ? { contextData, userData: [] }
+        : { userData, contextData: [] }
       return filteredMenuData
     }
-
-    return {contextData, userData}
+    // If the filter is on the initialCourseMenu, count up the context totals
+    // Otherwise use the totalRecipientCount for the selected context
+    let totalRecipientCount = filterHistory[filterHistory.length - 1]?.context?.totalRecipientCount || contextData.reduce((total, item) => total + (item?.userCount || 0), 0)
+    
+    // If there is no subMenuSelection, return the full menuData with both contextData, userData, and recipient count data.
+    return { contextData, userData, totalRecipientCount }
   }, [loading, data, filterHistory, searchTerm, props.includeCommonCourses])
-
   const handleSelect = (item, isContext, isBackButton, isSubmenu) => {
     if (isContext) {
       addFilterHistory({
-        context: {contextID: item.id, contextName: item.name},
+        context: {contextID: item.id, contextName: item.name, totalRecipientCount: item.userCount},
       })
     } else if (isSubmenu) {
       addFilterHistory({

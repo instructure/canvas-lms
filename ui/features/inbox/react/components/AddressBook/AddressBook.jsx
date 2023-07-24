@@ -159,6 +159,7 @@ export const AddressBook = ({
           id: currentFilter.context.contextID,
           name: `${I18n.t('All in')} ${currentFilter.context.contextName}`,
           itemType: SELECT_ENTIRE_CONTEXT_TYPE,
+          totalRecipientCount: menuData?.totalRecipientCount || 0,
         },
       ]
     : []
@@ -254,18 +255,37 @@ export const AddressBook = ({
 
   // Render individual menu items
   const renderMenuItem = (menuItem, isLast) => {
-    const isSubmenu = menuItem.itemType === SUBMENU_TYPE
-    const isHeader = menuItem.itemType === HEADER_TEXT_TYPE
-    const isBackButton = menuItem.itemType === BACK_BUTTON_TYPE
-    const isContext = menuItem.itemType === CONTEXT_TYPE
+    const { itemType, name: menuItemName, id: menuId, totalRecipientCount, observerEnrollments } = menuItem
+
+    const isSubmenu = itemType === SUBMENU_TYPE
+    const isHeader = itemType === HEADER_TEXT_TYPE
+    const isBackButton = itemType === BACK_BUTTON_TYPE
+    const isContext = itemType === CONTEXT_TYPE
 
     if (isHeader) {
-      return renderHeaderItem(menuItem.name)
+      return renderHeaderItem(menuItemName)
     }
+
+    let iconAfter = null
+    if (isContext || isSubmenu) {
+      iconAfter = <IconArrowOpenEndLine />
+    } else if (totalRecipientCount) {
+      iconAfter = (
+        <Text>
+          {I18n.t('People: %{totalRecipientCount}', {
+            totalRecipientCount,
+          })}
+        </Text>
+      )
+    }
+    const iconBefore = isBackButton ? <IconArrowOpenStartLine /> : null
+  
+    const isSelected = selectedItem?.id === menuId
+    const hasPopup = !!(isContext || isSubmenu)
 
     return (
       <View
-        key={`address-book-item-${menuItem.id}-${menuItem.itemType}`}
+        key={`address-book-item-${menuId}-${itemType}`}
         elementRef={el => {
           if (isLast) {
             onItemRefSet(el)
@@ -273,12 +293,12 @@ export const AddressBook = ({
         }}
       >
         <AddressBookItem
-          iconAfter={isContext || isSubmenu ? <IconArrowOpenEndLine /> : null}
-          iconBefore={isBackButton ? <IconArrowOpenStartLine /> : null}
+          iconAfter={iconAfter}
+          iconBefore={iconBefore}
           as="div"
-          isSelected={selectedItem?.id === menuItem.id}
-          hasPopup={!!(isContext || isSubmenu)}
-          id={`address-book-menu-item-${menuItem.id}-${menuItem.itemType}`}
+          isSelected={isSelected}
+          hasPopup={hasPopup}
+          id={`address-book-menu-item-${menuId}-${itemType}`}
           onSelect={() => {
             selectHandler(menuItem, isContext, isBackButton, isSubmenu)
           }}
@@ -290,10 +310,10 @@ export const AddressBook = ({
           }}
           menuRef={menuRef}
           isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
-          observerEnrollments={menuItem.observerEnrollments}
+          observerEnrollments={observerEnrollments}
           isOnObserverSubmenu={isOnObserverSubmenu}
         >
-          {menuItem.name}
+          {menuItemName}
         </AddressBookItem>
       </View>
     )

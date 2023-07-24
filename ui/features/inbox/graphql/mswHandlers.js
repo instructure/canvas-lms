@@ -524,7 +524,8 @@ export const handlers = [
             {
               id: 'course_FnZW',
               name: 'Testing 101',
-              __typename: 'MessageableUser',
+              userCount: 3,
+              __typename: 'MessageableContext',
             },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),

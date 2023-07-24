@@ -74,6 +74,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
   ${PageInfo.fragment}
 `
 
+// This query is used for the compose modal
 export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
   query GetAddressBookRecipients(
     $userID: ID!
@@ -92,6 +93,7 @@ export const ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES = gql`
             nodes {
               id
               name
+              userCount
             }
             pageInfo {
               ...PageInfo
