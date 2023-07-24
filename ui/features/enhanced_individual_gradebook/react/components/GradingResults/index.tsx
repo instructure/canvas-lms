@@ -36,7 +36,7 @@ import {
 import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
-import {studentDisplayName, outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
+import {outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
