@@ -51,6 +51,10 @@ const checkIfValidHex = (color: string, allowWhite: boolean) => {
   return validHexRe.test(color)
 }
 
+const getHexValue = (color: string) => {
+  return color[0] === '#' ? color : `#${color}`
+}
+
 type ColorPickerProps = {
   colors: Color[]
   defaultColor: string
@@ -93,8 +97,7 @@ export const ColorPicker = ({
   }
 
   const setInputColor = (event: any) => {
-    const value = event.target.value || event.target.placeholder
-    event.preventDefault()
+    const value = getHexValue(event.target.value)
     setCurrentColor(value)
   }
 
@@ -149,11 +152,7 @@ type ColorPreviewProps = {
   isValidHex: boolean
 }
 const ColorPreview = ({currentColor, isValidHex}: ColorPreviewProps) => {
-  let previewColor = isValidHex ? currentColor : DEFAULT_COLOR_PREVIEW
-
-  if (previewColor.indexOf('#') < 0) {
-    previewColor = '#' + previewColor
-  }
+  const previewColor = getHexValue(isValidHex ? currentColor : DEFAULT_COLOR_PREVIEW)
 
   return (
     <ColorTile hexcode={previewColor} isFocusable={false}>

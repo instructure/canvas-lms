@@ -16,11 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export type GradeStatusType = 'standard' | 'custom' | 'new'
+import {GradeStatus} from './gradingStatus'
 
-export type GradeStatus = {
-  id: string
-  name: string
-  color: string
-  isNew?: boolean
+export type CustomGradingStatusUpsertResponse = {
+  upsertCustomGradeStatus: {
+    customGradeStatus: GradeStatus
+    errors?: MutationError[]
+  }
+}
+
+export type StandardGradingStatusUpsertResponse = {
+  upsertStandardGradeStatus: {
+    standardGradeStatus: GradeStatus
+    errors?: MutationError[]
+  }
+}
+
+export type CustomGradingStatusDeleteResponse = {
+  deleteCustomGradeStatus: {
+    customGradeStatusId: string
+    errors?: MutationError[]
+  }
+}
+
+type MutationError = {
+  message: string
+  attribute: string
 }

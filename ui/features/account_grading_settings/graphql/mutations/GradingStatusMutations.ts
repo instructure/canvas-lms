@@ -18,5 +18,46 @@
 
 import gql from 'graphql-tag'
 
-// TODO: Add Mutations
-export const SAVE_ACCOUNT_GRADING_STATUS_MUTATION = gql``
+export const UPSERT_STANDARD_GRADING_STATUS_MUTATION = gql`
+  mutation UpsertStandardGradingStatusMutation($id: ID, $color: String!, $name: String!) {
+    upsertStandardGradeStatus(input: {id: $id, color: $color, name: $name}) {
+      standardGradeStatus {
+        id: _id
+        name
+        color
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+export const UPSERT_CUSTOM_GRADING_STATUS_MUTATION = gql`
+  mutation UpsertCustomGradingStatusMutation($id: ID, $color: String!, $name: String!) {
+    upsertCustomGradeStatus(input: {id: $id, color: $color, name: $name}) {
+      customGradeStatus {
+        id: _id
+        name
+        color
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
+
+export const DELETE_CUSTOM_GRADING_STATUS_MUTATION = gql`
+  mutation DeleteCustomGradingStatusMutation($id: ID!) {
+    deleteCustomGradeStatus(input: {id: $id}) {
+      customGradeStatusId
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`

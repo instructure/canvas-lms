@@ -17,8 +17,18 @@
  */
 
 import {useEffect, useState} from 'react'
-import {useQuery} from 'react-apollo'
+import {useMutation, useQuery} from 'react-apollo'
+import {
+  DELETE_CUSTOM_GRADING_STATUS_MUTATION,
+  UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
+  UPSERT_STANDARD_GRADING_STATUS_MUTATION,
+} from '../graphql/mutations/GradingStatusMutations'
 import {ACCOUNT_GRADING_STATUS_QUERY} from '../graphql/queries/GradingStatusQueries'
+import {
+  CustomGradingStatusDeleteResponse,
+  CustomGradingStatusUpsertResponse,
+  StandardGradingStatusUpsertResponse,
+} from '../types/accountStatusMutations'
 import {AccountGradingStatusQueryResults} from '../types/accountStatusQueries'
 import {GradeStatus} from '../types/gradingStatus'
 import {
@@ -30,10 +40,23 @@ export const useAccountGradingStatuses = (accountId: string) => {
   const [standardStatuses, setStandardStatuses] = useState<GradeStatus[]>([])
   const [customStatuses, setCustomStatuses] = useState<GradeStatus[]>([])
   const [isLoadingStatusError, setIsLoadingStatusError] = useState<boolean>(false)
+  const [hasSaveCustomStatusError, setHasSaveCustomStatusError] = useState<boolean>(false)
+  const [hasSaveStandardStatusError, setHasSaveStandardStatusError] = useState<boolean>(false)
+  const [hasDeleteCustomStatusError, setHasDeleteCustomStatusError] = useState<boolean>(false)
+
+  const [upsertStandardStatusMutation] = useMutation<StandardGradingStatusUpsertResponse>(
+    UPSERT_STANDARD_GRADING_STATUS_MUTATION
+  )
+  const [upsertCustomStatusMutation] = useMutation<CustomGradingStatusUpsertResponse>(
+    UPSERT_CUSTOM_GRADING_STATUS_MUTATION
+  )
+  const [deleteCustomStatusMutation] = useMutation<CustomGradingStatusDeleteResponse>(
+    DELETE_CUSTOM_GRADING_STATUS_MUTATION
+  )
 
   const {
-    data,
-    error,
+    data: fetchStatusesData,
+    error: fetchStatusesError,
     loading: loadingStatuses,
   } = useQuery<AccountGradingStatusQueryResults>(ACCOUNT_GRADING_STATUS_QUERY, {
     variables: {accountId},
@@ -41,49 +64,113 @@ export const useAccountGradingStatuses = (accountId: string) => {
     skip: !accountId,
   })
 
-  const saveStatusChanges = (updatedStatus: GradeStatus) => {
-    const {type} = updatedStatus
-    const updateStatusState = type === 'standard' ? setStandardStatuses : setCustomStatuses
+  useEffect(() => {
+    if (fetchStatusesError) {
+      setIsLoadingStatusError(true)
+      return
+    }
 
-    updateStatusState(statuses => {
-      const statusIndexToChange = statuses.findIndex(status => status.id === updatedStatus.id)
+    if (!fetchStatusesData?.account) {
+      return
+    }
+
+    const {account} = fetchStatusesData
+    const {customGradeStatusesConnection, standardGradeStatusesConnection} = account
+    setCustomStatuses(mapCustomStatusQueryResults(customGradeStatusesConnection.nodes))
+    setStandardStatuses(mapStandardStatusQueryResults(standardGradeStatusesConnection.nodes))
+  }, [fetchStatusesData, fetchStatusesError])
+
+  const saveStandardStatus = async (updatedStatus: GradeStatus) => {
+    setHasSaveStandardStatusError(false)
+    const {isNew, color, name, id} = updatedStatus
+
+    const variables = {
+      color,
+      name: name.toLowerCase(),
+      id: isNew ? undefined : id,
+    }
+
+    const {data, errors} = await upsertStandardStatusMutation({variables})
+
+    if (errors || !data || data.upsertStandardGradeStatus.errors?.length) {
+      setHasSaveStandardStatusError(true)
+      return
+    }
+
+    const {
+      upsertStandardGradeStatus: {standardGradeStatus: savedStatus},
+    } = data
+
+    setStandardStatuses(statuses => {
+      const statusIndexToChange = statuses.findIndex(status =>
+        isNew
+          ? status.name.toLowerCase() === savedStatus.name.toLowerCase()
+          : status.id === savedStatus.id
+      )
+
       if (statusIndexToChange >= 0) {
-        statuses[statusIndexToChange] = updatedStatus
+        statuses[statusIndexToChange] = {...savedStatus, name}
       }
       return [...statuses]
     })
   }
 
-  const saveNewCustomStatus = (newStatus: GradeStatus) => {
-    setCustomStatuses(statuses => [...statuses, newStatus])
+  const saveCustomStatus = async (color: string, name: string, id?: string) => {
+    setHasSaveCustomStatusError(false)
+    const variables = {
+      id,
+      color,
+      name,
+    }
+    const {data, errors} = await upsertCustomStatusMutation({variables})
+
+    if (errors || !data || data?.upsertCustomGradeStatus.errors?.length) {
+      setHasSaveCustomStatusError(true)
+      return
+    }
+
+    const {
+      upsertCustomGradeStatus: {customGradeStatus: savedStatus},
+    } = data
+
+    if (!id) {
+      setCustomStatuses(statuses => [...statuses, {...savedStatus}])
+    } else {
+      setCustomStatuses(statuses => {
+        const statusIndexToChange = statuses.findIndex(status => status.id === savedStatus.id)
+        if (statusIndexToChange >= 0) {
+          statuses[statusIndexToChange] = savedStatus
+        }
+        return [...statuses]
+      })
+    }
   }
 
-  const removeCustomStatus = (statusId: string) => {
+  const removeCustomStatus = async (statusId: string) => {
+    setHasDeleteCustomStatusError(false)
+    const {data, errors} = await deleteCustomStatusMutation({
+      variables: {
+        id: statusId,
+      },
+    })
+
+    if (errors || !data || data?.deleteCustomGradeStatus.errors?.length) {
+      setHasDeleteCustomStatusError(true)
+      return
+    }
     setCustomStatuses(statuses => [...statuses.filter(status => status.id !== statusId)])
   }
 
-  useEffect(() => {
-    if (error) {
-      setIsLoadingStatusError(true)
-      return
-    }
-
-    if (!data?.account) {
-      return
-    }
-
-    const {customGradeStatusesConnection, standardGradeStatusesConnection} = data.account
-    setCustomStatuses(mapCustomStatusQueryResults(customGradeStatusesConnection.nodes))
-    setStandardStatuses(mapStandardStatusQueryResults(standardGradeStatusesConnection.nodes))
-  }, [data, error])
-
   return {
     customStatuses,
+    hasDeleteCustomStatusError,
+    hasSaveCustomStatusError,
+    hasSaveStandardStatusError,
     isLoadingStatusError,
     loadingStatuses,
     standardStatuses,
-    saveNewCustomStatus,
-    saveStatusChanges,
     removeCustomStatus,
+    saveCustomStatus,
+    saveStandardStatus,
   }
 }

@@ -17,7 +17,16 @@
  */
 
 import {MockedResponse} from '@apollo/react-testing'
+import {
+  DELETE_CUSTOM_GRADING_STATUS_MUTATION,
+  UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
+  UPSERT_STANDARD_GRADING_STATUS_MUTATION,
+} from '../../../graphql/mutations/GradingStatusMutations'
 import {ACCOUNT_GRADING_STATUS_QUERY} from '../../../graphql/queries/GradingStatusQueries'
+import {
+  CustomGradingStatusUpsertResponse,
+  StandardGradingStatusUpsertResponse,
+} from '../../../types/accountStatusMutations'
 
 const ACCOUNT_GRADING_STATUS_QUERY_RESPONSE = {
   data: {
@@ -49,6 +58,39 @@ const ACCOUNT_GRADING_STATUS_QUERY_RESPONSE = {
   },
 }
 
+const UPSERT_STANDARD_GRADING_STATUS_MUTATION_RESPONSE: StandardGradingStatusUpsertResponse = {
+  upsertStandardGradeStatus: {
+    standardGradeStatus: {
+      id: '1',
+      color: '#F0E8EF',
+      name: 'missing',
+    },
+    errors: [],
+  },
+}
+
+const UPSERT_CUSTOM_GRADING_STATUS_MUTATION_RESPONSE: CustomGradingStatusUpsertResponse = {
+  upsertCustomGradeStatus: {
+    customGradeStatus: {
+      color: '#E5F3FC',
+      name: 'New Status 10',
+      id: '1',
+    },
+    errors: [],
+  },
+}
+
+const NEW_CUSTOM_STATUS_MUTATION_RESPONSE: CustomGradingStatusUpsertResponse = {
+  upsertCustomGradeStatus: {
+    customGradeStatus: {
+      color: '#E5F3FC',
+      name: 'New Status 11',
+      id: '11',
+    },
+    errors: [],
+  },
+}
+
 export const setupGraphqlMocks = (): MockedResponse[] => {
   return [
     {
@@ -57,6 +99,60 @@ export const setupGraphqlMocks = (): MockedResponse[] => {
         variables: {accountId: '2'},
       },
       result: ACCOUNT_GRADING_STATUS_QUERY_RESPONSE,
+    },
+    {
+      request: {
+        query: UPSERT_STANDARD_GRADING_STATUS_MUTATION,
+        variables: {
+          color: '#F0E8EF',
+          name: 'missing',
+          id: '1',
+        },
+      },
+      result: {
+        data: UPSERT_STANDARD_GRADING_STATUS_MUTATION_RESPONSE,
+      },
+    },
+    {
+      request: {
+        query: DELETE_CUSTOM_GRADING_STATUS_MUTATION,
+        variables: {
+          id: '2',
+        },
+      },
+      result: {
+        data: {
+          deleteCustomGradeStatus: {
+            customGradeStatusId: '2',
+            errors: [],
+          },
+        },
+      },
+    },
+    {
+      request: {
+        query: UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
+        variables: {
+          color: '#E5F3FC',
+          name: 'New Status 10',
+          id: '1',
+        },
+      },
+      result: {
+        data: UPSERT_CUSTOM_GRADING_STATUS_MUTATION_RESPONSE,
+      },
+    },
+    {
+      request: {
+        query: UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
+        variables: {
+          color: '#E5F3FC',
+          name: 'New Status 11',
+        },
+      },
+      result: {
+        data: NEW_CUSTOM_STATUS_MUTATION_RESPONSE,
+      },
     },
   ]
 }

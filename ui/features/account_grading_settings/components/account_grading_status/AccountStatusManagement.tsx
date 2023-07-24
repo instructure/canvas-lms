@@ -42,12 +42,15 @@ type AccountStatusManagementProps = {
 export const AccountStatusManagement = ({accountId}: AccountStatusManagementProps) => {
   const {
     customStatuses,
+    hasDeleteCustomStatusError,
+    hasSaveCustomStatusError,
+    hasSaveStandardStatusError,
     isLoadingStatusError,
     loadingStatuses,
     standardStatuses,
     removeCustomStatus,
-    saveNewCustomStatus,
-    saveStatusChanges,
+    saveCustomStatus,
+    saveStandardStatus,
   } = useAccountGradingStatuses(accountId)
   const [openEditStatusId, setEditStatusId] = useState<string | undefined>(undefined)
 
@@ -57,8 +60,22 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
     }
   }, [isLoadingStatusError])
 
-  const saveChanges = (updatedStatus: GradeStatus) => {
-    saveStatusChanges(updatedStatus)
+  useEffect(() => {
+    if (hasSaveCustomStatusError || hasSaveStandardStatusError) {
+      const statusType = hasSaveCustomStatusError ? 'custom' : 'standard'
+      const flashText = I18n.t('Error saving %{statusType} status', {statusType})
+      showFlashError(flashText)(new Error())
+    }
+  }, [hasSaveCustomStatusError, hasSaveStandardStatusError])
+
+  useEffect(() => {
+    if (hasDeleteCustomStatusError) {
+      showFlashError(I18n.t('Error deleting custom status'))(new Error())
+    }
+  }, [hasDeleteCustomStatusError])
+
+  const handleSaveStandardStatus = (updatedStatus: GradeStatus) => {
+    saveStandardStatus(updatedStatus)
     setEditStatusId(undefined)
   }
 
@@ -67,15 +84,8 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
     removeCustomStatus(statusId)
   }
 
-  const saveCustomStatus = (color: string, name: string) => {
-    const newStatus: GradeStatus = {
-      color,
-      id: Math.floor(Math.random() * 1000).toString(),
-      name,
-      type: 'custom',
-      isNew: true,
-    }
-    saveNewCustomStatus(newStatus)
+  const handleSaveCustomStatus = (color: string, name: string, id?: string) => {
+    saveCustomStatus(color, name, id)
     setEditStatusId(undefined)
   }
 
@@ -112,7 +122,7 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
                 key={`standard-status-${gradeStatus.id}`}
                 gradeStatus={gradeStatus}
                 handleEditSave={(newColor: string) => {
-                  saveChanges({...gradeStatus, color: newColor})
+                  handleSaveStandardStatus({...gradeStatus, color: newColor})
                 }}
                 isEditOpen={openEditStatusId === editStatusId}
                 handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
@@ -131,7 +141,7 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
                 key={`custom-status-${gradeStatus.id}`}
                 gradeStatus={gradeStatus}
                 handleEditSave={(newColor: string, name: string) => {
-                  saveChanges({...gradeStatus, color: newColor, name})
+                  handleSaveCustomStatus(newColor, name, gradeStatus.id)
                 }}
                 handleStatusDelete={remove}
                 isEditOpen={openEditStatusId === editStatusId}
@@ -145,7 +155,7 @@ export const AccountStatusManagement = ({accountId}: AccountStatusManagementProp
               <CustomStatusNewItem
                 // eslint-disable-next-line react/no-array-index-key
                 key={`custom-status-new-${index}-${allowedCustomStatusAdditions}`}
-                handleSave={saveCustomStatus}
+                handleSave={handleSaveCustomStatus}
                 index={index}
                 isEditOpen={openEditStatusId === editStatusId}
                 handleEditStatusToggle={() => handleEditStatusToggle(editStatusId)}
