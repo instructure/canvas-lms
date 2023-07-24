@@ -23,11 +23,15 @@ module Canvas::OAuth
 
     attr_reader :client_id, :scopes, :purpose
 
-    def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil)
+    def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil, key: nil)
       @client_id = client_id
       @redirect_uri = redirect_uri
       @scopes = scopes
       @purpose = purpose
+
+      # Some grant types have already loaded the developer key. If that's the case allow
+      # passing the key into this provider rather than re-querying for it.
+      @key = key if key&.global_id&.to_s == client_id.to_s
     end
 
     def has_valid_key?

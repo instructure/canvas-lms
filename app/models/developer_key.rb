@@ -371,6 +371,18 @@ class DeveloperKey < ActiveRecord::Base
     internal_service
   end
 
+  # If true, this key can be used for "service authentication" (a token request
+  # using a client_credentials grant type and a pre-determined service user).
+  #
+  # For now we will only allow this pattern for internal services in the
+  # site admin account.
+  def site_admin_service_auth?
+    Account.site_admin.feature_enabled?(:site_admin_service_auth) &&
+      service_user.present? &&
+      internal_service? &&
+      site_admin?
+  end
+
   private
 
   def validate_lti_fields

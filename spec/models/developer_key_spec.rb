@@ -44,6 +44,48 @@ describe DeveloperKey do
     )
   end
 
+  describe "#site_admin_service_auth?" do
+    subject do
+      developer_key_not_saved.update!(key_attributes)
+      developer_key_not_saved.site_admin_service_auth?
+    end
+
+    let(:service_user) { user_model }
+    let(:root_account) { account_model }
+
+    context "when 'site_admin_service_auth' is enabled" do
+      before { Account.site_admin.enable_feature!(:site_admin_service_auth) }
+
+      context "and the service user association is not set" do
+        let(:key_attributes) { { service_user: nil } }
+
+        it { is_expected.to be false }
+      end
+
+      context "and the service user association is set" do
+        let(:key_attributes) { { service_user: } }
+
+        context "and the key is a site admin key" do
+          let(:key_attributes) { { service_user:, account: nil } }
+
+          it { is_expected.to be false }
+
+          context "and the key is an internal service" do
+            let(:key_attributes) { { service_user:, account: nil, internal_service: true } }
+
+            it { is_expected.to be true }
+          end
+        end
+
+        context "and the key is not a site admin key" do
+          let(:key_attributes) { super().merge(account: root_account) }
+
+          it { is_expected.to be false }
+        end
+      end
+    end
+  end
+
   describe "#find_cached" do
     it "raises error when not found, and caches that" do
       enable_cache do
