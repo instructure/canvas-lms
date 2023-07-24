@@ -171,7 +171,10 @@ export type SiteAdminFeatureId =
   | 'dev_key_oidc_alert'
   | 'media_links_use_attachment_id'
   | 'auto_subscribe_account_calendars'
+  | 'account_calendars_planner_support'
   | 'permanent_page_links'
+  | 'developer_key_page_checkboxes'
+  | 'improved_no_results_messaging'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

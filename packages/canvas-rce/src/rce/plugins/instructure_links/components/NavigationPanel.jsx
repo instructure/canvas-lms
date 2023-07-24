@@ -146,6 +146,7 @@ export default function NavigationPanel(props) {
           collection={collection}
           onLinkClick={props.onLinkClick}
           contextType={props.contextType}
+          contextId={props.contextId}
           editing={props.editing}
           onEditClick={props.onEditClick}
         />

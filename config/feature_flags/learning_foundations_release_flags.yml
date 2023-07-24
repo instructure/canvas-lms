@@ -223,3 +223,11 @@ instui_for_import_page:
   description: |-
     If enabled, the course import page will use InstUI components
   applies_to: SiteAdmin
+
+improved_no_results_messaging:
+  state: hidden
+  display_name: Improved No Results Messaging (RCE)
+  description: |-
+    If enabled, the course link tray will display more helpful messaging
+    if there are no results for a given resource type.
+  applies_to: SiteAdmin
