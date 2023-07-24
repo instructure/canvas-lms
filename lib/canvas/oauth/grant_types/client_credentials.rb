@@ -23,18 +23,11 @@ module Canvas::OAuth
   module GrantTypes
     class ClientCredentials < BaseType
       def initialize(opts, host, protocol = nil) # rubocop:disable Lint/MissingSuper
-        if opts[:client_assertion_type] == "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
-          raw_jwt = opts.fetch(:client_assertion)
-          @provider = Canvas::OAuth::AsymmetricClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts), protocol)
-          @secret = @provider.key&.api_key
-        else
-          client_id = opts.fetch(:client_id)
-          @provider = Canvas::OAuth::SymmetricClientCredentialsProvider.new(client_id, host, scopes_from_opts(opts), protocol)
-          if @provider.key&.client_credentials_audience != "external"
-            raise Canvas::OAuth::InvalidRequestError, "assertion method not supported for this grant_type"
-          end
+        @provider = client_credential_provider_for(opts, host, protocol:)
+        @secret = secret_for(@provider, opts)
 
-          @secret = opts.fetch(:client_secret)
+        unless @provider.assertion_method_permitted?
+          raise Canvas::OAuth::InvalidRequestError, "assertion method not supported for this grant_type"
         end
       end
 
@@ -43,6 +36,25 @@ module Canvas::OAuth
       end
 
       private
+
+      def client_credential_provider_for(opts, host, protocol: nil)
+        if opts[:client_assertion_type] == "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+          raw_jwt = opts[:client_assertion]
+          return Canvas::OAuth::AsymmetricClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts), protocol)
+        end
+
+        Canvas::OAuth::SymmetricClientCredentialsProvider.new(opts[:client_id], host, scopes_from_opts(opts), protocol)
+      end
+
+      def secret_for(provider, opts)
+        provider.try(:secret) || opts[:client_secret]
+      end
+
+      def key_for(client_id)
+        DeveloperKey.find_cached(client_id)
+      rescue ActiveRecord::RecordNotFound
+        nil
+      end
 
       def validate_type
         raise Canvas::OAuth::InvalidRequestError, @provider.error_message unless @provider.valid?
