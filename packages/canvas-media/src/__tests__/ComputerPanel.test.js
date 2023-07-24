@@ -54,6 +54,8 @@ const uploadMediaTranslations = {
   },
 }
 
+const LIVE_REGION_ID = 'flash_screenreader_holder'
+
 function createPanel(overrideProps) {
   return (
     <ComputerPanel
@@ -65,7 +67,7 @@ function createPanel(overrideProps) {
       uploadMediaTranslations={uploadMediaTranslations}
       accept={ACCEPTED_FILE_TYPES}
       userLocale="en"
-      liveRegion={() => null}
+      liveRegion={() => document.getElementById(LIVE_REGION_ID)}
       updateSubtitles={() => false}
       {...overrideProps}
     />
@@ -77,6 +79,20 @@ function renderPanel(overrideProps = {}) {
 }
 
 describe('UploadMedia: ComputerPanel', () => {
+  beforeEach(() => {
+    const liveRegion = document.createElement('div')
+    liveRegion.id = LIVE_REGION_ID
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  })
+
+  afterEach(() => {
+    const liveRegion = document.getElementById(LIVE_REGION_ID)
+    if (liveRegion) {
+      document.body.removeChild(liveRegion)
+    }
+  })
+
   it('shows a failure message if the file is rejected', () => {
     const notAMediaFile = new File(['foo'], 'foo.txt', {type: 'text/plain'})
     const {getByLabelText, getByText} = renderPanel()
