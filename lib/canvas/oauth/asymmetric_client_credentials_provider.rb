@@ -19,8 +19,8 @@
 
 module Canvas::OAuth
   class AsymmetricClientCredentialsProvider < ClientCredentialsProvider
-    def initialize(jwt, host, scopes = nil, protocol = "http://")
-      super(JSON::JWT.decode(jwt, :skip_verification)[:sub], host, scopes, protocol)
+    def initialize(jwt, host, scopes: nil, protocol: "http://")
+      super(JSON::JWT.decode(jwt, :skip_verification)[:sub], host, scopes:, protocol:)
       @errors = []
       if key.nil? || (key.public_jwk.nil? && key.public_jwk_url.nil?)
         @invalid_key = true

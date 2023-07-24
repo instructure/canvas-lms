@@ -417,7 +417,10 @@ describe OAuth2ProviderController do
           let(:client_secret) { other_key.api_key }
 
           it do
-            skip "not valid for this grant_type" if grant_type == "client_credentials"
+            if grant_type == "client_credentials" && !key.site_admin_service_auth?
+              skip "not valid for this grant_type"
+            end
+
             expect(subject).to have_http_status(:unauthorized)
           end
         end
@@ -426,7 +429,10 @@ describe OAuth2ProviderController do
           let(:client_secret) { nil }
 
           it do
-            skip "not valid for this grant_type" if grant_type == "client_credentials"
+            if grant_type == "client_credentials" && !key.site_admin_service_auth?
+              skip "not valid for this grant_type"
+            end
+
             expect(subject).to have_http_status(:unauthorized)
           end
         end
@@ -570,6 +576,85 @@ describe OAuth2ProviderController do
         expect(response).to be_successful
         json = response.parsed_body
         expect(json["access_token"]).to_not eq access_token
+      end
+    end
+
+    context "with client_credentials grant type and service key" do
+      include_context "InstAccess setup"
+
+      let(:grant_type) { "client_credentials" }
+      let(:service_user) { user_model }
+
+      before do
+        Account.site_admin.enable_feature!(:site_admin_service_auth)
+        key.update!(service_user:, internal_service: true)
+      end
+
+      context "with valid parameters" do
+        before { post :token, params: base_params }
+
+        it { is_expected.to be_successful }
+
+        it "returns a token for the service user" do
+          token = AuthenticationMethods::InstAccessToken.parse(
+            subject.parsed_body["access_token"]
+          )
+
+          expect(token.user_uuid).to eq service_user.uuid
+        end
+      end
+
+      it_behaves_like "common oauth2 token checks" do
+        let(:success_params) { { grant_type: } }
+        let(:success_token_keys) { %w[access_token token_type expires_in] }
+
+        let(:success_setup) { key.update!(service_user:) }
+        let(:before_post) { key.update!(service_user:) }
+      end
+
+      context "when the service user is not present" do
+        before do
+          key.update!(service_user: nil)
+          post :token, params: base_params
+        end
+
+        it { is_expected.to be_bad_request }
+      end
+
+      context "whent the service user is not active" do
+        before do
+          service_user.destroy!
+          post :token, params: base_params
+        end
+
+        it { is_expected.to be_bad_request }
+
+        it "includes the error and description in the response" do
+          expect(subject.parsed_body).to eq(
+            {
+              "error" => "invalid_request",
+              "error_description" => "No active service"
+            }
+          )
+        end
+      end
+
+      context "when the developer key is not active" do
+        before do
+          key.destroy!
+          post :token, params: base_params
+        end
+
+        it { is_expected.to be_unauthorized }
+
+        it "includes the error and description in the response" do
+          expect(subject.parsed_body).to eq(
+            {
+              "error" => "invalid_client",
+              "error_description" => "unknown client"
+            }
+          )
+        end
       end
     end
 
