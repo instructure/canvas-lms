@@ -58,7 +58,7 @@ describe('Should load <AddressBookContainer> normally', () => {
   }
 
   describe('With Context Selection enabled', () => {
-    const contextSelectionDefaultProps = {hasSelectAllFilterOption: true}
+    const contextSelectionDefaultProps = {hasSelectAllFilterOption: true, includeCommonCourses: true}
 
     describe('Rendering', () => {
       it('Does not show context select in initial menu', async () => {
@@ -108,6 +108,7 @@ describe('Should load <AddressBookContainer> normally', () => {
         expect(items.length).toBe(3)
         expect(screen.queryByText('Back')).toBeInTheDocument()
         expect(screen.queryByText('All in Testing 101')).toBeInTheDocument()
+        expect(screen.queryByText('People: 3')).toBeInTheDocument()
       })
     })
   })
