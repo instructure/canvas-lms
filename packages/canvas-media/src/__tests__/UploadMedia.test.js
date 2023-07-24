@@ -38,6 +38,7 @@ const uploadMediaTranslations = {
     UPLOAD_MEDIA_LABEL: 'Upload Media',
     MEDIA_RECORD_NOT_AVAILABLE: 'Record not available',
     PROGRESS_LABEL: 'Making progress',
+    ADD_CLOSED_CAPTIONS_OR_SUBTITLES: 'Add CC/Subtitles',
   },
 }
 
