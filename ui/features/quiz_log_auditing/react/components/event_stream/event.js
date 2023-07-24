@@ -118,7 +118,7 @@ class Event extends React.Component {
         )
 
       case K.EVT_PAGE_BLURRED:
-        return I18n.t('page_blurred', 'Stopped viewing the Canvas quiz-taking page...')
+        return I18n.t('page_blurred', 'Stopped viewing the Canvas quiz-taking page.')
 
       case K.EVT_PAGE_FOCUSED:
         return I18n.t('page_focused', 'Resumed.')
