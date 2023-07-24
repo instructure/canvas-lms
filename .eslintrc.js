@@ -198,7 +198,7 @@ module.exports = {
     'jest/no-large-snapshots': 'warn',
 
     // These are things we care about
-    'react/jsx-filename-extension': ['error', {extensions: ['js', 'jsx', 'ts', 'tsx']}],
+    'react/jsx-filename-extension': ['error', {extensions: ['jsx', 'ts', 'tsx']}],
     'eslint-comments/no-unused-disable': 'error',
     'jest/no-disabled-tests': 'off',
     'import/extensions': [
@@ -288,6 +288,7 @@ module.exports = {
         'no-constant-condition': 'error',
         'react-hooks/exhaustive-deps': 'error',
         'react/prefer-stateless-function': 'error',
+        'prefer-const': 'error',
 
         // TODO: resolve and remove these overrides
         'react/no-string-refs': 'warn',
@@ -316,7 +317,6 @@ module.exports = {
       ],
       rules: {
         'react/prop-types': 'off',
-        'prefer-const': 'warn',
         'react/no-string-refs': 'warn',
       },
     },

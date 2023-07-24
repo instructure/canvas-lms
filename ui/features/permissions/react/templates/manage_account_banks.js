@@ -25,7 +25,9 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Item Banks'),
-      description: I18n.t('Allows a user to view and manage all item banks in an account directly from within a course and account.'),
+      description: I18n.t(
+        'Allows a user to view and manage all item banks in an account directly from within a course and account.'
+      ),
     },
   ],
   [
@@ -39,7 +41,9 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Item Banks'),
-      description: I18n.t('Allows a user to view and manage all item banks in an account from directly within a course.'),
+      description: I18n.t(
+        'Allows a user to view and manage all item banks in an account from directly within a course.'
+      ),
     },
   ],
   [
