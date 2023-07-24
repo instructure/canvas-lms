@@ -24,8 +24,61 @@ require('@instructure/ui-themes')
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {
-    value: require('@sheerun/mutationobserver-shim')
+    value: require('@sheerun/mutationobserver-shim'),
   })
 }
 
 window.scroll = () => {}
+
+/**
+ * We want to ensure errors and warnings get appropriate eyes. If
+ * you are seeing an exception from here, it probably means you
+ * have an unintended consequence from your changes. If you expect
+ * the warning/error, add it to the ignore list below.
+ */
+/* eslint-disable no-console */
+const globalError = global.console.error
+const ignoredErrors = [
+  /An update to %s inside a test was not wrapped in act/,
+  /A theme registry has already been initialized/,
+  /The prop `label` is marked as required in `Checkbox`/,
+  /The prop `children` is marked as required in `CheckboxFacade`/,
+  /The prop `selectedLanguage.label` is marked as required in `ClosedCaptionCreatorRow`/,
+  /Invalid prop `value.state.selectedSrc` of type `object` supplied to `Provider`/,
+  /Invalid prop `sources` supplied to `Player`/,
+  /Invalid prop `sources` supplied to `MediaPlayer`/,
+  /Invalid prop `value.state.selectedSrc` of type `object` supplied to `Provider`/,
+  /Invalid context `state.selectedSrc` of type `object` supplied to `Consumer`/,
+  /Invalid child context `state.selectedSrc` of type `object` supplied to `Provider`/,
+  /Invalid prop `selectedSrc` of type `object` supplied to `HTML5Video`/,
+  /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
+]
+const globalWarn = global.console.warn
+const ignoredWarnings = [
+  /Translation for .* in "en" is missing/,
+  /Exactly one focusable child is required/,
+]
+global.console = {
+  log: console.log,
+  error: error => {
+    if (ignoredErrors.some(regex => regex.test(error))) {
+      return
+    }
+    globalError(error)
+    throw new Error(
+      `Looks like you have an unhandled error. Keep our test logs clean by handling or filtering it. ${error}`
+    )
+  },
+  warn: warning => {
+    if (ignoredWarnings.some(regex => regex.test(warning))) {
+      return
+    }
+    globalWarn(warning)
+    throw new Error(
+      `Looks like you have an unhandled warning. Keep our test logs clean by handling or filtering it. ${warning}`
+    )
+  },
+  info: console.info,
+  debug: console.debug,
+}
+/* eslint-enable no-console */
