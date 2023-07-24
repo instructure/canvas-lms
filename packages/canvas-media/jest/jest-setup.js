@@ -40,7 +40,6 @@ window.scroll = () => {}
 const globalError = global.console.error
 const ignoredErrors = [
   /A theme registry has already been initialized/,
-  /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
