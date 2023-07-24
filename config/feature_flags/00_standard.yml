@@ -452,3 +452,10 @@ new_quiz_public_api:
       state: allowed_on
     development:
       state: allowed_on
+site_admin_service_auth:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Site admin service authentication
+  description: When enabled, site admin account UI will allow associating
+    a service User with a DeveloperKey and using that key/user with the
+    client_credentials grant type
