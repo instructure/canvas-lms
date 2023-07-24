@@ -262,44 +262,46 @@ module Types
     def recipients(search: nil, context: nil)
       return nil unless object == self.context[:current_user]
 
-      @current_user = object
-      search_context = AddressBook.load_context(context)
+      GuardRail.activate(:secondary) do
+        @current_user = object
+        search_context = AddressBook.load_context(context)
 
-      load_all_contexts(
-        context: search_context,
-        permissions: [:send_messages, :send_messages_all],
-        base_url: self.context[:request].base_url
-      )
+        load_all_contexts(
+          context: search_context,
+          permissions: [:send_messages, :send_messages_all],
+          base_url: self.context[:request].base_url
+        )
 
-      collections = search_contexts_and_users(
-        search:,
-        context:,
-        synthetic_contexts: true,
-        messageable_only: true,
-        base_url: self.context[:request].base_url
-      )
+        collections = search_contexts_and_users(
+          search:,
+          context:,
+          synthetic_contexts: true,
+          messageable_only: true,
+          base_url: self.context[:request].base_url
+        )
 
-      contexts_collection = collections.select { |c| c[0] == "contexts" }
-      users_collection = collections.select { |c| c[0] == "participants" }
+        contexts_collection = collections.select { |c| c[0] == "contexts" }
+        users_collection = collections.select { |c| c[0] == "participants" }
 
-      contexts_collection = contexts_collection[0][1] if contexts_collection.count > 0
-      users_collection = users_collection[0][1] if users_collection.count > 0
+        contexts_collection = contexts_collection[0][1] if contexts_collection.count > 0
+        users_collection = users_collection[0][1] if users_collection.count > 0
 
-      can_send_all = if search_context.nil?
-                       false
-                     elsif search_context.is_a?(Course)
-                       search_context.grants_any_right?(object, :send_messages_all)
-                     elsif !search_context.course.nil?
-                       search_context.course.grants_any_right?(object, :send_messages_all)
-                     end
+        can_send_all = if search_context.nil?
+                         false
+                       elsif search_context.is_a?(Course)
+                         search_context.grants_any_right?(object, :send_messages_all)
+                       elsif !search_context.course.nil?
+                         search_context.course.grants_any_right?(object, :send_messages_all)
+                       end
 
-      # The contexts_connection and users_connection return types of custom Collections
-      # These special data structures are handled in the collection_connection.rb files
-      {
-        sendMessagesAll: !!can_send_all,
-        contexts_connection: contexts_collection,
-        users_connection: users_collection
-      }
+        # The contexts_connection and users_connection return types of custom Collections
+        # These special data structures are handled in the collection_connection.rb files
+        {
+          sendMessagesAll: !!can_send_all,
+          contexts_connection: contexts_collection,
+          users_connection: users_collection
+        }
+      end
     rescue ActiveRecord::RecordNotFound
       nil
     end
