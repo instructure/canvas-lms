@@ -39,7 +39,6 @@ window.scroll = () => {}
 /* eslint-disable no-console */
 const globalError = global.console.error
 const ignoredErrors = [
-  /An update to %s inside a test was not wrapped in act/,
   /A theme registry has already been initialized/,
   /The prop `selectedLanguage.label` is marked as required in `ClosedCaptionCreatorRow`/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
