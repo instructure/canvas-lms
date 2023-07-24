@@ -3430,4 +3430,8 @@ class User < ActiveRecord::Base
     }
     acct_cals.where(id: get_preference(:enabled_account_calendars) || []).or(acct_cals.where(auto_sub))
   end
+
+  def inbox_labels
+    preferences[:inbox_labels] || []
+  end
 end
