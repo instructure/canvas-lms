@@ -473,6 +473,13 @@ module Types
 
       Loaders::CourseRoleLoader.for(course_id:, role_types:, built_in_only:).load(object)
     end
+
+    field :inbox_labels, [String], null: true
+    def inbox_labels
+      return unless object == current_user
+
+      object.inbox_labels
+    end
   end
 end
 

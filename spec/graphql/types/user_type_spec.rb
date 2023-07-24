@@ -1227,4 +1227,25 @@ describe Types::UserType do
       end
     end
   end
+
+  context "with a user" do
+    before(:once) do
+      @user = user_factory
+    end
+
+    let(:user_type) do
+      GraphQLTypeTester.new(@user, current_user: @user, domain_root_account: @user.account, request: ActionDispatch::TestRequest.create)
+    end
+
+    it "returns the user's inbox labels" do
+      @user.preferences[:inbox_labels] = ["Test 1", "Test 2"]
+      @user.save!
+
+      expect(user_type.resolve("inboxLabels")).to eq @user.inbox_labels
+    end
+
+    it "returns an empty user's inbox labels" do
+      expect(user_type.resolve("inboxLabels")).to eq []
+    end
+  end
 end
