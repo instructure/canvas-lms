@@ -19,8 +19,11 @@
 import React, {useEffect, useState} from 'react'
 import {useMatch} from 'react-router-dom'
 import {ApolloProvider, createClient} from '@canvas/apollo'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {AccountStatusManagement} from '../components/account_grading_status/AccountStatusManagement'
+
+const I18n = useI18nScope('account_grading_status')
 
 export const AccountGradingStatuses = () => {
   const pathMatch = useMatch('/accounts/:accountId/*')
@@ -33,7 +36,7 @@ export const AccountGradingStatuses = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    document.title = 'Account Custom Statuses'
+    document.title = I18n.t('Account Custom Statuses')
     setClient(createClient())
     setLoading(false)
   }, [])

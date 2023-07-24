@@ -108,6 +108,7 @@ describe('Account Grading Status Management', () => {
     const saveButton = getByTestId('save-status-button')
     fireEvent.click(saveButton)
 
+    await new Promise(resolve => setTimeout(resolve, 0))
     const updatedStatusItem = getByTestId('standard-status-1')
     const updatedStatusColor = getStatusColor(updatedStatusItem)
     expect(updatedStatusColor).toEqual('#F0E8EF')
@@ -122,6 +123,7 @@ describe('Account Grading Status Management', () => {
 
     const deleteButton = statusToDelete?.querySelectorAll('button')[1]
     fireEvent.click(deleteButton)
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(1)
     expect(queryAllByTestId(/custom\-status\-new\-[0-2]/)).toHaveLength(2)
@@ -142,6 +144,7 @@ describe('Account Grading Status Management', () => {
 
     const saveButton = getByTestId('save-status-button')
     fireEvent.click(saveButton)
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     const customStatusItemUpdated = getByTestId('custom-status-1')
     expect(customStatusItemUpdated.textContent).toContain('New Status 10')
@@ -161,6 +164,7 @@ describe('Account Grading Status Management', () => {
 
     const saveButton = getByTestId('save-status-button')
     fireEvent.click(saveButton)
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     const customStatusItems = queryAllByTestId(/custom\-status\-[0-9]/)
     expect(customStatusItems).toHaveLength(3)

@@ -42,7 +42,6 @@ export const mapStandardStatusQueryResults = (
       id,
       name: defaultName,
       color,
-      type: 'standard',
     }
   }
 
@@ -54,42 +53,36 @@ const DefaultStandardStatusesMap: Record<string, GradeStatus> = {
     id: '-1',
     name: 'Late',
     color: '#E5F7E5',
-    type: 'standard',
     isNew: true,
   },
   missing: {
     id: '-2',
     name: 'Missing',
     color: '#FFE8E5',
-    type: 'standard',
     isNew: true,
   },
   resubmitted: {
     id: '-3',
     name: 'Resubmitted',
     color: '#E9EDF5',
-    type: 'standard',
     isNew: true,
   },
   dropped: {
     id: '-4',
     name: 'Dropped',
     color: '#FEF0E5',
-    type: 'standard',
     isNew: true,
   },
   excused: {
     id: '-5',
     name: 'Excused',
     color: '#FEF7E5',
-    type: 'standard',
     isNew: true,
   },
-  standard: {
+  extended: {
     id: '-6',
     name: 'Extended',
     color: '#E5F3FC',
-    type: 'standard',
     isNew: true,
   },
 }
