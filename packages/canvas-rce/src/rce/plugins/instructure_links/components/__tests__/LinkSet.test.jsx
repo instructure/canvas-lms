@@ -19,6 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import LinkSet from '../LinkSet'
+import RCEGlobals from '../../../../RCEGlobals'
 
 function renderComponent(props) {
   return render(
@@ -27,6 +28,7 @@ function renderComponent(props) {
       fetchNextPage={() => {}}
       onLinkClick={() => {}}
       contextType="course"
+      contextId="1"
       suppressRenderEmpty={false}
       type="assignments"
       collection={{links: [], hasMore: false, isLoading: false}}
@@ -36,14 +38,32 @@ function renderComponent(props) {
 }
 
 describe('RCE "Links" Plugin > LinkSet', () => {
-  it('renders empty notice', () => {
-    const {getByText} = renderComponent()
-    expect(getByText('No results.')).toBeInTheDocument()
+  describe('when improved_no_results_messaging is off', () => {
+    it('renders empty notice', () => {
+      const {getByText} = renderComponent()
+      expect(getByText('No results.')).toBeInTheDocument()
+    })
+
+    it('does not render empty notice if suppressed', () => {
+      const {queryByText} = renderComponent({suppressRenderEmpty: true})
+      expect(queryByText('No results.')).toBeNull()
+    })
   })
 
-  it('does not render empty notice if suppressed', () => {
-    const {queryByText} = renderComponent({suppressRenderEmpty: true})
-    expect(queryByText('No results.')).toBeNull()
+  describe('when improved_no_results_messaging is on', () => {
+    beforeAll(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({improved_no_results_messaging: true})
+    })
+
+    it('renders empty notice', () => {
+      const {getByText} = renderComponent()
+      expect(getByText('No assignments created yet.')).toBeInTheDocument()
+    })
+
+    it('does not render empty notice if suppressed', () => {
+      const {queryByText} = renderComponent({suppressRenderEmpty: true})
+      expect(queryByText('No assignments created yet.')).toBeNull()
+    })
   })
 
   it('renders a collection of assignments', () => {

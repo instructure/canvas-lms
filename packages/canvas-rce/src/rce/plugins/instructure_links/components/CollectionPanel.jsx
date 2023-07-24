@@ -52,6 +52,7 @@ export default function CollectionPanel(props) {
           onLinkClick={props.onLinkClick}
           suppressRenderEmpty={props.suppressRenderEmpty}
           contextType={props.contextType}
+          contextId={props.contextId}
           searchString={props.searchString}
           editing={props.editing}
           onEditClick={props.onEditClick}

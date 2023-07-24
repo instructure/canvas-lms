@@ -24,7 +24,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import uid from '@instructure/uid'
-
 import {
   LoadMoreButton,
   LoadingIndicator,
@@ -32,6 +31,9 @@ import {
   useIncrementalLoading,
 } from '../../../../common/incremental-loading'
 import Link from './Link'
+import RCEGlobals from '../../../RCEGlobals'
+
+import {NoResults} from './NoResults'
 
 /*
  * This is needed only as long as `LinkSet` is a class component.
@@ -125,7 +127,16 @@ class LinkSet extends Component {
   }
 
   renderEmptyIndicator() {
-    return (
+    return RCEGlobals.getFeatures()?.improved_no_results_messaging ?
+    (
+      <NoResults
+        contextType={this.props.contextType}
+        contextId={this.props.contextId}
+        collectionType={this.props.type}
+        isSearchResult={this.props.searchString?.length >= 3}
+      />
+    )
+    : (
       <View as="div" role="alert" padding="medium">
         {formatMessage('No results.')}
       </View>
@@ -174,6 +185,7 @@ LinkSet.propTypes = {
   collection: linksShape.isRequired,
   onLinkClick: func.isRequired,
   contextType: string.isRequired,
+  contextId: string.isRequired,
   fetchInitialPage: func,
   fetchNextPage: func,
   suppressRenderEmpty: bool,
