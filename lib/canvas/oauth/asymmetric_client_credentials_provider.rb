@@ -36,12 +36,20 @@ module Canvas::OAuth
       validator.valid?
     end
 
+    def assertion_method_permitted?
+      true
+    end
+
     def error_message
       return "JWK Error: Invalid JSON" if @invalid_json
       return "JWS signature invalid." if @invalid_key
       return "JWK Error: #{errors.first.message}" if errors.present?
 
       validator.error_message
+    end
+
+    def secret
+      key&.api_key
     end
 
     private
