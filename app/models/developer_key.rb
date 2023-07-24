@@ -33,6 +33,7 @@ class DeveloperKey < ActiveRecord::Base
   belongs_to :user
   belongs_to :account
   belongs_to :root_account, class_name: "Account"
+  belongs_to :service_user, class_name: "User"
 
   has_many :page_views
   has_many :access_tokens, -> { where(workflow_state: "active") }
