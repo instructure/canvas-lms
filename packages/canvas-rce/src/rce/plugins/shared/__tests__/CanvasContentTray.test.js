@@ -59,6 +59,7 @@ const storeInitialState = {
     refreshToken: () => {},
   }),
   ...sidebarHandlers(() => {}),
+  onFileSelect: () => {},
 }
 
 describe('RCE Plugins > CanvasContentTray', () => {
