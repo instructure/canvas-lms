@@ -79,7 +79,6 @@ const ignoredErrors = [
   /The prop `trayProps` is marked as required in `AudioOptionsTray`/,
   /Invalid prop `audioOptions` of type `boolean` supplied to `AudioOptionsTray`/,
   /The prop `context` is marked as required in `RceFileBrowser`/,
-  /Invalid value for prop %s on <%s> tag./,
   /Invalid prop `audioOptions` of type `boolean` supplied to `AudioOptionsTray`/,
   /Not implemented: navigation/,
   /Not implemented: HTMLFormElement.prototype.submit/,

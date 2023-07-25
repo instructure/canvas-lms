@@ -130,7 +130,12 @@ describe('ExternalToolSelectionDialog', () => {
 
   it('calls onAction when clicking a tool', () => {
     const helpers = RceToolWrapper.forEditorEnv(
-      fakeEnv,
+      createDeepMockProxy<ExternalToolsEnv>({
+        ltiIframeAllowPolicy: 'allow',
+        containingCanvasLtiToolId: null,
+        editorSelection: null,
+        editorContent: null,
+      }),
       [
         {
           name: 'Tool 1',
