@@ -53,6 +53,9 @@ fa:
       show_assign: f
   AssignmentListItemView: 
     complete: کامل
+    grade_gpa_scale_screenreader: "نمره: {grade}%"
+    grade_letter_grade_screenreader: "نمره: {grade}%"
+    grade_pass_fail_screenreader: "نمره: {grade}%"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "نمره: %{grade}%"
     incomplete: ناقص
@@ -10646,6 +10649,7 @@ fa:
   grade_for_missing_submissions_56f91c83: "نمره برای موارد ارسالی موجود نیست"
   grade_for_name_b9df168a: "نمره برای: %{name}"
   grade_for_studentname_d124b199: "نمره برای %{studentName}"
+  grade_grade_7e52dd1c: "نمره: {grade}%"
   grade_high_to_low_1cea0381: "نمره- زیاد به کم"
   grade_info_19fb9875: "اطلاعات نمره"
   grade_low_to_high_1678b713: "نمره - کم به زیاد"
@@ -11901,6 +11905,8 @@ fa:
     titles: 
       add_group_category: "افزودن مجموعه گروه ها"
       self_signup_help: "گروه های ثبت نام شخصی"
+    unassigned_students: "دانشجویان تخصیص داده نشده ({count}%)"
+    unassigned_users: "کاربران تخصیص داده نشده ({count}%)"
   groups_6b3ce75c: "گروه ها"
   groups_6c90e26a: "گروه ها"
   groups_add_4038ae8a: "گروه ها - اضافه"
@@ -13124,7 +13130,7 @@ fa:
   loading_courses_409a3641: "در حال بارگذاری درس ها"
   loading_courses_bd1bffe: "در حال بارگذاری درس ها..."
   loading_courses_complete_count_courses_found_6768d9e1: 
-    one: "بارگذاری دروس کامل شد: %{count} درس یافت شد."
+    one: "بارگذاری درس ها کامل شد: %{count} درس یافت شد"
     other: "بارگذاری درس ها کامل شد: %{count} درس یافت شد"
   loading_courses_started_6e6d742c: "بارگذاری درس ها آغاز شد."
   loading_data_ecd89ba: "در حال بارگذاری داده ها ..."
@@ -20623,6 +20629,7 @@ fa:
   see_rubric_results_62a6447d: "مشاهده نتایج دستورالعمل ارزیابی"
   see_scoring_details_f7fd1f3b: "مشاهده اطلاعات نمره گذاری"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*برخی ابزارهای LTI را ببینید* که با کانواس عالی کار می کنند."
+  see_some_lti_tools_that_work_great_with_canvas_53e92091: "*برخی ابزارهای LTI را ببینید* که با کانواس عالی کار می کنند."
   see_turnitin_results_cd9d4a6c: "مشاهده نتایج Turnitin"
   see_vericite_results_b44dd8c8: "مشاهده نتایج VeriCite"
   select_1e849959: "[ انتخاب ]"
@@ -22927,13 +22934,13 @@ fa:
   theme_name_68f46e09: "نام زمینه"
   themes_89bfe9c4: "زمینه ها"
   there_are_count_associations_906edb03: 
-    one: "%{count} انجمن وجود دارد."
+    one: "%{count} انجمن وجود دارد"
     other: "%{count} انجمن وجود دارد"
   there_are_count_results_in_the_list_e74f6e36: 
     one: "%{count} نتیجه در فهرست موجود است"
     other: "%{count} نتیجه در فهرست موجود است"
   there_are_count_unsynced_changes_25ed3bed: 
-    one: "%{count} تغییر ناهمگام وجود دارد."
+    one: "%{count} تغییر ناهمگام وجود دارد"
     other: "%{count} تغییر ناهمگام وجود دارد"
   there_are_currently_availablegraderscount_availabl_58f85403: "در حال حاضر %{availableGradersCount} نمره‌گذار موجود است."
   there_are_currently_no_associated_courses_fba1754f: "در حال حاضر هیچ دوره مرتبطی وجود ندارد."
@@ -24323,6 +24330,8 @@ fa:
   userinfo_d21114ef: "مشخصات کاربر"
   username_47bb5bbe: "نام کاربری"
   username_could_not_be_found_6c3e8383: "نام کاربری موجود نیست"
+  username_saved_successfully_9303974f: "%{userName} با موفقیت ذخیره شد!"
+  username_saved_successfully_they_should_receive_an_877e31e: "%{userName} با موفقیت افزوده شد! باید ظرف مدت کوتاهی یک تأییدیه نامه الکترونیکی دریافت نمایند."
   users: 
     admin_merge: 
       buttons: 
