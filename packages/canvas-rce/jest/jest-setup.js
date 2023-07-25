@@ -46,7 +46,6 @@ const ignoredErrors = [
   /The prop `sortBy.order` is marked as required in `DocumentsPanel`/,
   /The prop `sortBy.order` is marked as required in `SavedIconMakerList`/,
   /Invalid prop `images.searchString` of type `string` supplied to `SavedIconMakerList`/,
-  /The prop `onFileSelect` is marked as required in `RceFileBrowser`/,
   /The prop `refreshToken` is marked as required in `RceFileBrowser`/,
   /The prop `onImageEmbed` is marked as required in `Images`/,
   /Invalid prop `media.searchString` of type `string` supplied to `MediaPanel`/,
