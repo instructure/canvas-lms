@@ -1299,6 +1299,13 @@ class AssignmentsApiController < ApplicationController
                                      calculate_grades: params.delete(:calculate_grades))
       render_create_or_update_result(result)
     end
+  rescue ActiveRecord::RecordNotUnique => e
+    message = if e.message.include?("sis_source_id")
+                "Assignment with the given sis_source_id already exists"
+              else
+                "Assignment already exists"
+              end
+    render json: { message: }, status: :conflict
   end
 
   # @API Edit an assignment
