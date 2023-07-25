@@ -26,6 +26,7 @@ import {
 import {RceToolWrapper} from '../../RceToolWrapper'
 import {createDeepMockProxy} from '../../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEnv} from '../../ExternalToolsEnv'
+import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 
 describe('ExternalToolSelectionDialog', () => {
   const fakeEnv = createDeepMockProxy<ExternalToolsEnv>()
@@ -70,6 +71,11 @@ describe('ExternalToolSelectionDialog', () => {
   beforeEach(() => {
     fakeEnv.mockClear()
     document.body.innerHTML = ''
+    createLiveRegion()
+  })
+
+  afterEach(() => {
+    removeLiveRegion()
   })
 
   it('is labeled "Apps"', () => {
@@ -166,10 +172,10 @@ describe('ExternalToolSelectionDialog', () => {
     })
 
     it('shows a no results alert when there are no results', () => {
-      const {getByText, getByPlaceholderText} = renderComponent()
+      const {getAllByText, getByPlaceholderText} = renderComponent()
       const searchBox = getByPlaceholderText('Search')
       fireEvent.change(searchBox, {target: {value: 'instructure'}})
-      expect(getByText('No results found for instructure')).toBeInTheDocument()
+      expect(getAllByText('No results found for instructure')[0]).toBeInTheDocument()
     })
   })
 })

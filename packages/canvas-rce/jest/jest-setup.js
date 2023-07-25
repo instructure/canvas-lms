@@ -39,7 +39,6 @@ const ignoredErrors = [
   /The prop `renderLabel` is marked as required in `SimpleSelect`/,
   /The prop `sortBy.order` is marked as required in `Images`/,
   /SyntaxError: unknown pseudo-class selector ':host>/,
-  /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /You seem to have overlapping act\(\) calls/,
   /The prop `onLinkClick` is marked as required in `DocumentsPanel`/,
   /Invalid prop `documents.searchString` of type `string` supplied to `DocumentsPanel`/,

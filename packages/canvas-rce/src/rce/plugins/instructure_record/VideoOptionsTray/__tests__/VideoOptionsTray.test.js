@@ -22,6 +22,7 @@ import {render, waitFor} from '@testing-library/react'
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import RCEGlobals from '../../../../RCEGlobals'
+import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 
 jest.useFakeTimers()
 
@@ -30,6 +31,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   let tray
 
   beforeEach(() => {
+    createLiveRegion()
+
     props = {
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
@@ -51,6 +54,10 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         jwt: 'someuglyvalue',
       },
     }
+  })
+
+  afterEach(() => {
+    removeLiveRegion()
   })
 
   function renderComponent() {
