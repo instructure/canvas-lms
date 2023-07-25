@@ -26,9 +26,16 @@ jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
 })
 jest.mock('../../../../bridge')
 
+const onAllFilesLoading = jest.fn()
+const props = {
+  searchString: '',
+  onAllFilesLoading,
+  host: 'canvas.docker',
+  jwt: 'fakejwt',
+  context: {type: 'course', id: '1'},
+}
+
 describe('RceFileBrowser', () => {
-  const onAllFilesLoading = jest.fn()
-  const props = {searchString: '', onAllFilesLoading}
   afterEach(() => FileBrowser.mockClear())
 
   it('invokes onFileSelect callback with appropriate data when a file is selected', () => {
