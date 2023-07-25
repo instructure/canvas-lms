@@ -34,6 +34,7 @@ group :test do
 
   gem "once-ler", "~> 2.0"
 
+  gem "rspec-openapi"
   gem "selenium-webdriver", "~> 4.12", require: false
   gem "testrailtagging", "0.3.8.7", require: false
 
