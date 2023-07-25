@@ -480,6 +480,10 @@ class GradebooksController < ApplicationController
     visible_sections = @context.sections_visible_to(@current_user)
     root_account = @context.root_account
 
+    standard_statuses = Account.site_admin.feature_enabled?(:custom_gradebook_statuses) ? root_account.standard_grade_statuses : []
+    standard_status_hash = standard_statuses.pluck(:status_name, :color).to_h
+    colors = standard_status_hash.merge!(gradebook_settings(:colors))
+
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
       allow_separate_first_last_names: @context.account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names),
@@ -488,7 +492,7 @@ class GradebooksController < ApplicationController
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_gradebook_version_url: context_url(@context, :change_gradebook_version_context_gradebook_url, version: 2),
-      colors: gradebook_settings(:colors),
+      colors:,
       context_allows_gradebook_uploads: @context.allows_gradebook_uploads?,
       context_code: @context.asset_string,
       context_id: @context.id.to_s,

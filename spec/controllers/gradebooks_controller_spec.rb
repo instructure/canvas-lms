@@ -1247,6 +1247,30 @@ describe GradebooksController do
         expect(gradebook_options).to have_key :colors
       end
 
+      it "user set colors overwrites standard grading status colors when the feature is enabled" do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        @teacher.set_preference(:gradebook_settings, "colors", { "late" => "#EEEEEE" })
+        StandardGradeStatus.new(root_account: @course.root_account, status_name: "late", color: "#000000").save!
+        StandardGradeStatus.new(root_account: @course.root_account, status_name: "missing", color: "#FFFFFF").save!
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:colors]).to eql({ "late" => "#EEEEEE", "missing" => "#FFFFFF" })
+      end
+
+      it "includes standard grading status colors when the feature is enabled" do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        StandardGradeStatus.new(root_account: @course.root_account, status_name: "late", color: "#000000").save!
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:colors]).to eql({ "late" => "#000000" })
+      end
+
+      it "does not include standard grading status colors when the feature is disabled" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        @teacher.set_preference(:gradebook_settings, "colors", { "late" => "#EEEEEE" })
+        StandardGradeStatus.new(root_account: @course.root_account, status_name: "missing", color: "#000000").save!
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:colors]).to eql({ "late" => "#EEEEEE" })
+      end
+
       it "includes final_grade_override_enabled" do
         get :show, params: { course_id: @course.id }
         expect(gradebook_options).to have_key :final_grade_override_enabled
