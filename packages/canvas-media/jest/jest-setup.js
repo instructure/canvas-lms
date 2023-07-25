@@ -50,7 +50,6 @@ const ignoredErrors = [
   /Invalid prop `value.state.selectedSrc` of type `object` supplied to `Provider`/,
   /Invalid context `state.selectedSrc` of type `object` supplied to `Consumer`/,
   /Invalid child context `state.selectedSrc` of type `object` supplied to `Provider`/,
-  /Invalid prop `selectedSrc` of type `object` supplied to `HTML5Video`/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
 ]
 const globalWarn = global.console.warn
