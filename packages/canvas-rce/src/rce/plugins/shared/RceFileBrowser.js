@@ -35,9 +35,9 @@ RceFileBrowser.propTypes = {
   searchString: string.isRequired,
   canvasOrigin: string,
   jwt: string.isRequired,
-  refreshToken: string.isRequired,
+  refreshToken: func,
   host: string.isRequired,
-  source: string.isRequired,
+  source: object,
   context: object.isRequired,
 }
 
