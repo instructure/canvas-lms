@@ -1231,6 +1231,7 @@ DEPENDENCIES
   canvas_webex (= 0.18.2)
   cassandra-cql (= 1.2.3)!
   chunky_png (= 1.4.0)
+  code_ownership (~> 1.33)
   config_file!
   crocodoc-ruby (= 0.0.1)
   crystalball!
