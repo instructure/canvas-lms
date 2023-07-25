@@ -55,6 +55,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     onUnmount: jest.fn(),
     editing: false,
     canvasOrigin: 'http://canvas.instructor.com',
+    editor: new FakeEditor(),
   }
 
   let rcs
