@@ -11349,6 +11349,7 @@ uk:
   name_error_fee4236: "Помилка імені"
   name_final_score_2dce3ff8: "%{name} фінальна оцінка"
   name_grading_period_id_c9c8b6ae: "%{name} ідентифікатор періоду оцінювання"
+  name_has_been_successfully_installed_but_has_not_y_c3148b96: "* name* був успішно встановлений, але ще не був включений."
   name_is_currently_status_9065c996: "*name* в даний час **status**."
   name_is_locked_click_to_unlock_7aad9928: "%{name} заблоковано. Клацніть, щоб розблокувати"
   name_is_locked_click_to_unlock_bbebf03e: "%{name} заблоковано. Клацніть, щоб розблокувати."
