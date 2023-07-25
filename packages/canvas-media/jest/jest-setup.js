@@ -44,12 +44,6 @@ const ignoredErrors = [
   /The prop `label` is marked as required in `Checkbox`/,
   /The prop `children` is marked as required in `CheckboxFacade`/,
   /The prop `selectedLanguage.label` is marked as required in `ClosedCaptionCreatorRow`/,
-  /Invalid prop `value.state.selectedSrc` of type `object` supplied to `Provider`/,
-  /Invalid prop `sources` supplied to `Player`/,
-  /Invalid prop `sources` supplied to `MediaPlayer`/,
-  /Invalid prop `value.state.selectedSrc` of type `object` supplied to `Provider`/,
-  /Invalid context `state.selectedSrc` of type `object` supplied to `Consumer`/,
-  /Invalid child context `state.selectedSrc` of type `object` supplied to `Provider`/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
 ]
 const globalWarn = global.console.warn
