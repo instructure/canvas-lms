@@ -45,6 +45,11 @@ describe CanvasTextHelper do
       expect(CanvasTextHelper.truncate_text(str, max_words: 6, max_length: 30)).to eq("I am a sentence with areall...")
       expect(CanvasTextHelper.truncate_text(str, max_words: 5, max_length: 20)).to eq("I am a sentence with")
     end
+
+    it "just returns the ellipsis if max_length is ridiculously small" do
+      expect(CanvasTextHelper.truncate_text("hi", max_length: 0)).to eq("...")
+      expect(CanvasTextHelper.truncate_text("hi", max_length: -1)).to eq("...")
+    end
   end
 
   describe "#indent" do
