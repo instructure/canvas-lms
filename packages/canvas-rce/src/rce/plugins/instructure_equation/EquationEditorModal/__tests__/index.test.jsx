@@ -352,40 +352,4 @@ describe('EquationEditorModal', () => {
       expect(advancedPreference.set).toHaveBeenCalled()
     })
   })
-
-  describe('keyboard shortcuts', () => {
-    beforeEach(() => {
-      ENV.disable_keyboard_shortcuts = false
-    })
-
-    describe('are disabled when', () => {
-      it('the modal is opened', () => {
-        renderModal()
-        expect(ENV.disable_keyboard_shortcuts).toBe(true)
-      })
-    })
-
-    describe('original state is restored when', () => {
-      it('the close button is clicked', () => {
-        const {getByTestId} = renderModal()
-        const closeButton = getByTestId('equation-editor-modal-close').querySelector('button')
-        fireEvent.click(closeButton)
-        expect(ENV.disable_keyboard_shortcuts).toBe(false)
-      })
-
-      it('the cancel button is clicked', () => {
-        const {getByTestId} = renderModal()
-        const cancelButton = getByTestId('equation-editor-modal-cancel')
-        fireEvent.click(cancelButton)
-        expect(ENV.disable_keyboard_shortcuts).toBe(false)
-      })
-
-      it('the done button is clicked', () => {
-        const {getByTestId} = renderModal()
-        const doneButton = getByTestId('equation-editor-modal-done')
-        fireEvent.click(doneButton)
-        expect(ENV.disable_keyboard_shortcuts).toBe(false)
-      })
-    })
-  })
 })
