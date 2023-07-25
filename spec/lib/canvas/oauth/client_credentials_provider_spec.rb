@@ -157,7 +157,7 @@ module Canvas::OAuth
       end
 
       def expected_url_called(url, type, response)
-        expect(HTTParty).to receive(type).with(url).and_return(response)
+        expect(CanvasHttp).to receive(type).with(url).and_return(response)
       end
     end
 
