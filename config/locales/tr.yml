@@ -1782,6 +1782,11 @@ tr:
   achieve_mastery_count_times_8c9bbcec: 
     one: "1 deya defa yeterlilik sağlayın"
     other: "%{count} defa yeterlilik sağlayın"
+  act_as_is_essentially_logging_in_as_this_user_with_6244031c: |-
+      Başkası olarak giriş yapma aslında şifreye ihtiyaç olmadan bir başka kullanıcı 
+      olarak giriş yapmadır. Bu kullanıcıymış gibi herşeyi yapabilirsiniz ve başkaları yapılan herşeyi sanki 
+      o kullanıcı yapmış gibi görürler. Fakat, hesap inceleme kayıtlarında, o kullanıcı adına 
+      etkinlikleri yapanın aslında **siz** olduğu gerçeği kayıtlıdır.
   act_as_name_16d15bfa: "%{name}olarak davran"
   act_as_user_77dda176: "Kullanıcının yerine geç"
   act_as_user_d7ef0e48: "Kullanıcı olarak davran"
