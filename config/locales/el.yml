@@ -2860,6 +2860,7 @@ el:
       deletion_reason: "Λόγος διαγραφής:"
     edit: 
       confirm_delete_calendar_event: "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το γεγονός από το ημερολόγιο;"
+      event_deleted: "%{τίτλος_γεγονότος} διεγράφη με επιτυχία"
       event_saved: "Η Εκδήλωση Αποθηκεύτηκε Επιτυχώς"
       missingDueDate: 
         one: "δεν έχει οριστεί καταληκτική ημερομηνία στον τομέα %{sections}. "
@@ -3959,6 +3960,7 @@ el:
     titles: 
       add: "Προσθήκη Ενότητας"
       add_item: "Πρόσθεση Στοιχείου στο %{module}"
+      add_prerequisite: "Προσθήκη Προαπαιτούμενου στην ενότητα *%{module}*"
       edit: "Τροποποίηση Ρυθμίσεων Ενότητας"
       edit_item: "Επεξεργασία Λεπτομερειών Αντικειμένου"
   context_nav_link_8d15d95: "Σύνδεσμος πλοήγησης στο περιεχόμενο"
@@ -6837,6 +6839,7 @@ el:
       removed: "Το σετ ομάδων αφαιρέθηκε επιτυχώς."
     group_atom_feed: "Τροφοδοσία Atom Ομάδας"
     group_limit_number: "Το όριο της ομάδας πρέπει να είναι αριθμός"
+    groups_count: "(%{Count}) ομάδες"
     index: 
       heading_current_groups: "Τρέχουσες Ομάδες"
       heading_previous_groups: "Προηγούμενες Ομάδες"
@@ -7335,6 +7338,7 @@ el:
   item_type_link_5a2abed2: "<mrk mid=\"6437\" mtype=\"seg\">Τύπος στοιχείου:</mrk> <mrk mid=\"6438\" mtype=\"seg\">Σύνδεσμος</mrk>"
   item_type_quiz_c894ddb1: "<mrk mid=\"6439\" mtype=\"seg\">Τύπος στοιχείου:</mrk> <mrk mid=\"6440\" mtype=\"seg\">Κουίζ</mrk>"
   items_299a7626: "<mrk mid=\"5896\" mtype=\"seg\">Στοιχεία:</mrk> "
+  items_items_selected_5b55e566: "%{Items} επιλεγμένα στοιχεία"
   items_selected_have_different_usage_rights_52b325cc: "Τα επιλεγμένα στοιχεία έχουν διαφορετικά δικαιώματα χρήσης."
   j_5226008a: j
   javascript_file_fc27c32b: "Αρχείο JavaScript"
