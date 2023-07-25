@@ -52,7 +52,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.(js|ts|tsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         include: [
           path.resolve(canvasDir, 'ui'),
           path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
