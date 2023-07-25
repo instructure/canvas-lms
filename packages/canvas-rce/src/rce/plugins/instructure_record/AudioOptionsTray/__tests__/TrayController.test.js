@@ -22,6 +22,7 @@ import TrayController, {CONTAINER_ID} from '../TrayController'
 import FakeEditor from '../../../../__tests__/FakeEditor'
 import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
+import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 
 beforeAll(() => {
   contentSelection.asAudioElement = jest.fn(elem => {
@@ -39,6 +40,8 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   let trayController
 
   beforeEach(() => {
+    createLiveRegion()
+
     editors = [new FakeEditor(), new FakeEditor()]
     editors.forEach((editor, i) => {
       editor.initialize()
@@ -51,6 +54,8 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   })
 
   afterEach(() => {
+    removeLiveRegion()
+
     editors.forEach(editor => editor.uninitialize())
     const $container = document.getElementById(CONTAINER_ID)
     if ($container != null) {

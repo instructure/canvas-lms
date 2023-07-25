@@ -23,6 +23,7 @@ import FakeEditor from '../../../../__tests__/FakeEditor'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import RCEGlobals from '../../../../RCEGlobals'
+import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 
 const mockVideoPlayers = [
   {
@@ -74,6 +75,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   let trayController
 
   beforeEach(() => {
+    createLiveRegion()
+
     $videos = []
     editors = [new FakeEditor(), new FakeEditor()]
     editors.forEach((editor, i) => {
@@ -88,6 +91,8 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
   })
 
   afterEach(() => {
+    removeLiveRegion()
+
     editors.forEach(editor => editor.uninitialize())
     const $container = document.getElementById(CONTAINER_ID)
     if ($container != null) {

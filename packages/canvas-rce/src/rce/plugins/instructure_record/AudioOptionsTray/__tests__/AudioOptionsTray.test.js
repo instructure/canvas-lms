@@ -21,12 +21,15 @@ import {render} from '@testing-library/react'
 
 import AudioOptionsTray from '..'
 import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
+import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 
 describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
   let props
   let tray
 
   beforeEach(() => {
+    createLiveRegion()
+
     props = {
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
@@ -39,6 +42,10 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
         jwt: 'someuglyvalue',
       },
     }
+  })
+
+  afterEach(() => {
+    removeLiveRegion()
   })
 
   function renderComponent() {
