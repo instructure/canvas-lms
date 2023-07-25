@@ -1018,6 +1018,10 @@ class EnrollmentsApiController < ApplicationController
         clauses << "(#{conditions.join(" OR ")})"
       else
         clauses << "enrollments.workflow_state IN (:workflow_state)"
+        unless state.is_a?(String) || (state.is_a?(Array) && state.all?(String))
+          raise ActionController::BadRequest, "state must be a single string, or an array of strings"
+        end
+
         replacements[:workflow_state] = Array(state)
       end
     end
