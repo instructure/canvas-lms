@@ -181,6 +181,7 @@ PATH
       aws-sdk-dynamodb (~> 1.32)
     canvas_errors (0.1.0)
       activesupport
+      code_ownership
       inst-jobs
     canvas_ext (1.0.0)
       activesupport (>= 3.2)
@@ -495,6 +496,12 @@ GEM
       xpath (~> 3.2)
     childprocess (3.0.0)
     chunky_png (1.4.0)
+    code_ownership (1.33.1)
+      code_teams (~> 1.0)
+      packs
+      sorbet-runtime (>= 0.5.10821)
+    code_teams (1.0.2)
+      sorbet-runtime
     coderay (1.1.3)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
@@ -776,6 +783,8 @@ GEM
     outrigger (3.0.1)
       activerecord (>= 6.0, < 7.1)
       railties (>= 6.0, < 7.1)
+    packs (0.0.6)
+      sorbet-runtime
     pact (1.63.0)
       pact-mock_service (~> 3.0, >= 3.3.1)
       pact-support (~> 1.16, >= 1.16.9)
@@ -1049,6 +1058,7 @@ GEM
     soap4r-middleware (0.8.7)
       soap4r-ruby1.9 (= 2.0.5)
     soap4r-ruby1.9 (2.0.5)
+    sorbet-runtime (0.5.10932)
     spring (4.0.0)
     spring-commands-parallel-rspec (1.1.0)
       spring (>= 0.9.1)

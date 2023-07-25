@@ -21,7 +21,7 @@ rescue ExpectedError => e
 end
 ```
 
-Sentry is not the only system that can be rigged up to the Canvas Errors system as a callback. 
+Sentry is not the only system that can be rigged up to the Canvas Errors system as a callback.
 If something else should happen as part of an error being declared, you can define a callback
 to make that happen:
 
