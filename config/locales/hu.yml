@@ -3837,6 +3837,7 @@ hu:
   available_until_f3b9c4ed: "Elérhető eddig"
   available_until_field_for_styleguide_85d5d65a: "Elérhető eddig mező stílusútmutatóhoz"
   available_until_lock_at_ab022445: "Elérhető eddig: %{lock_at}"
+  available_until_untildate_b926fe11: "%{date}-ig elérhető"
   availableslots_available_87b8b69d: "%{availableSlots} szabad hely"
   availableslots_more_available_be5193a8: "további %{availableSlots} elérhető"
   avatar_8a8aa935: Avatár
@@ -20260,6 +20261,7 @@ hu:
   userinfo_d21114ef: "Felhasználó adatai"
   username_47bb5bbe: Felhasználónév
   username_could_not_be_found_6c3e8383: "Felhasználónév nem található"
+  username_saved_successfully_9303974f: "%{userName}sikeresen elmentve!"
   users: 
     admin_merge: 
       buttons: 
