@@ -51,6 +51,7 @@ module CanvasTextHelper
 
     ellipsis = options[:ellipsis] || I18n.t("lib.text_helper.ellipsis")
     actual_length = max_length - ellipsis.length
+    return ellipsis if actual_length <= 0
 
     # First truncate the text down to the bytes max, then lop off any invalid
     # unicode characters at the end.
