@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import {NumberInput} from '@instructure/ui-number-input'
 import {useDebouncedNumericValue} from './useDebouncedNumericValue'
 import formatMessage from '../../../../../format-message'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export const CustomNumberInput = ({
   value,
@@ -53,7 +54,7 @@ export const CustomNumberInput = ({
       placeholder={placeholder}
       showArrows={false}
       messages={messages}
-      renderLabel={null}
+      renderLabel={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
       interaction="enabled"
       width="4.5rem"
     />

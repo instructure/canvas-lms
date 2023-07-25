@@ -23,6 +23,7 @@ import formatMessage from '../../../../../format-message'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ZoomControls} from './ZoomControls'
 import {Shape} from '../shape'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const SHAPE_OPTIONS = [
   {id: Shape.Square, label: formatMessage('Square')},
@@ -40,10 +41,11 @@ export const ShapeControls = ({shape, onChange}) => {
     <Flex.Item margin="0 medium 0 0">
       <SimpleSelect
         isInline={true}
-        assistiveText={formatMessage('Select crop shape')}
         value={shape}
         onChange={(event, {id}) => onChange(id)}
-        renderLabel={null}
+        renderLabel={
+          <ScreenReaderContent>{formatMessage('Select crop shape')}</ScreenReaderContent>
+        }
         data-testid="shape-select-dropdown"
       >
         {SHAPE_OPTIONS.map(option => (
