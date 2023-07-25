@@ -133,14 +133,6 @@ describe('RceLti11ContentItem LTI Link', () => {
 })
 
 describe('RceLti11ContentItem File Item', () => {
-  beforeEach(() => {
-    window.ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['microphone', 'camera', 'midi']
-  })
-
-  afterEach(() => {
-    window.ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-  })
-
   it("Handles File item with presentation target of 'embed' and thumbnail is set", () => {
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.text_thumb_embed)
     expect(contentItem.text).toEqual('Arch Linux file item thumbnail embed')
@@ -165,12 +157,11 @@ describe('RceLti11ContentItem File Item', () => {
       exampleLti11ContentItems.text_thumb_iframe,
       iframeEnv
     )
-    const expectedFrameAllowances = window.ENV.LTI_LAUNCH_FRAME_ALLOWANCES?.join('; ')
     expect(contentItem.text).toEqual('Arch Linux file item thumbnail iframe')
     expect(contentItem.url).toEqual('http://lti-tool-provider-example.dev/test_file.txt')
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="${expectedFrameAllowances}" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
+      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
     )
   })
 
@@ -206,12 +197,11 @@ describe('RceLti11ContentItem File Item', () => {
       exampleLti11ContentItems.text_iframe,
       iframeEnv
     )
-    const expectedFrameAllowances = window.ENV.LTI_LAUNCH_FRAME_ALLOWANCES?.join('; ')
     expect(contentItem.text).toEqual('Arch Linux file item iframe')
     expect(contentItem.url).toEqual('http://lti-tool-provider-example.dev/test_file.txt')
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="${expectedFrameAllowances}" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
+      `<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="microphone; camera; midi" width="800" height="600" style="width: 800px; height: 600px;"></iframe>`
     )
   })
 

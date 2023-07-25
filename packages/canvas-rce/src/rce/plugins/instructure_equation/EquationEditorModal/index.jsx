@@ -58,8 +58,6 @@ export default class EquationEditorModal extends Component {
     workingFormula: this.props.originalLatex.latex || '',
   }
 
-  hostPageDisablesShortcuts = null
-
   previewElement = React.createRef()
 
   advancedEditor = React.createRef()
@@ -85,10 +83,6 @@ export default class EquationEditorModal extends Component {
     return containsAdvancedSyntax(normalizedLatex)
   }
 
-  usedInCanvas() {
-    return typeof ENV !== 'undefined' && ENV && ENV.hasOwnProperty('disable_keyboard_shortcuts')
-  }
-
   // ********* //
   // Callbacks //
   // ********* //
@@ -109,10 +103,6 @@ export default class EquationEditorModal extends Component {
   }
 
   handleModalCancel = () => {
-    if (this.usedInCanvas()) {
-      // restore the original value
-      ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
-    }
     this.props.onModalDismiss()
   }
 
@@ -124,10 +114,6 @@ export default class EquationEditorModal extends Component {
       onEquationSubmit(output)
     }
 
-    if (this.usedInCanvas()) {
-      // restore the original value
-      ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
-    }
     onModalDismiss()
   }
 
@@ -178,17 +164,6 @@ export default class EquationEditorModal extends Component {
         this.setState({workingFormula: e.target.value})
       }
     })
-  }
-
-  handleOpen = () => {
-    if (this.usedInCanvas()) {
-      // store the original value (so it can be restored later)
-      this.hostPageDisablesShortcuts = ENV.disable_keyboard_shortcuts
-
-      // And disable keyboard shortcuts while we
-      // are inside the equation editor
-      ENV.disable_keyboard_shortcuts = true
-    }
   }
 
   handleFieldRef = node => {
@@ -270,7 +245,6 @@ export default class EquationEditorModal extends Component {
         mountNode={instuiPopupMountNode}
         onClose={onModalClose}
         onDismiss={this.handleModalCancel}
-        onOpen={this.handleOpen}
         open={true}
         transition="fade"
         shouldCloseOnDocumentClick={false}
