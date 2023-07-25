@@ -10653,6 +10653,10 @@ nn:
   for_each_late_62aecf41: "For kvar seine"
   for_name_d5684bfd: "Til %{name}"
   for_students_who_d0fd45d0: "For studentar som..."
+  for_the_time_being_if_you_need_security_from_3rd_p_95f5c0d4: |-
+      For tida, dersom du treng sikkerheit frå,
+      3. partsverktøy, Speedgrader, eller CSV for analyse av
+      studentrespons, er dette eit betre val.
   for_title_69d92b3a: "for %{title}"
   forgot_password_f0c3fbac: "Gløymt passord?"
   forgot_password_url_3f9c04b: "Gløymt URL-adresse for passord"
@@ -13116,6 +13120,7 @@ nn:
   item_type_locked_85c560ec: "Elementtype: Låst"
   item_type_quiz_c894ddb1: "Elementtype: Quiz"
   items_299a7626: "Element: "
+  items_items_selected_5b55e566: "%{element} element er valde"
   items_selected_have_different_usage_rights_52b325cc: "Valde element har ulike bruksrettar."
   j_5226008a: j
   japan_81_d1832e9d: "Japan (+81)"
@@ -17666,6 +17671,7 @@ nn:
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Vel om Microsoft Teams synkronisering skal være skrudd på eller av."
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Prøv å setje opp koblinga til verktøyet på nytt ved å velje verktøyet ein gong til frå oppgåveinnstillingar eller modulelement. Hugs å lagre."
   please_upload_files_as_a_zip_5a2c799f: "Last opp filene som ZIP-filer"
+  please_visit_your_modules_page_for_more_informatio_846c5e32: "Sjå modul sida for meir informasjon."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Vent til vi har lasta opp og handsama fila."
   please_wait_e6355980: Vent...
   please_wait_while_we_upload_attachments_59544216: "Ver venleg og vent mens vedlegga blir lasta opp."
@@ -25458,6 +25464,7 @@ nn:
   username_47bb5bbe: Brukarnamn
   username_could_not_be_found_6c3e8383: "Finn ikkje brukarnamn"
   username_saved_successfully_9303974f: "*%{userName}* er lagra."
+  username_saved_successfully_they_should_receive_an_877e31e: "%{userName} er lagra. Dei mottek snart ei e-postmelding om dette."
   users: 
     admin_merge: 
       buttons: 
