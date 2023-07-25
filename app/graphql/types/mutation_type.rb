@@ -108,6 +108,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :upsert_standard_grade_status, mutation: Mutations::UpsertStandardGradeStatus
   field :delete_custom_grade_status, mutation: Mutations::DeleteCustomGradeStatus
   field :create_user_inbox_label, mutation: Mutations::CreateUserInboxLabel
+  field :delete_user_inbox_label, mutation: Mutations::DeleteUserInboxLabel
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

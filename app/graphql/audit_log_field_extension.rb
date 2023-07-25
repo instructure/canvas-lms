@@ -150,7 +150,8 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
                Mutations::CreateInternalSetting,
                Mutations::UpdateInternalSetting,
                Mutations::DeleteInternalSetting,
-               Mutations::CreateUserInboxLabel].include? mutation
+               Mutations::CreateUserInboxLabel,
+               Mutations::DeleteUserInboxLabel].include? mutation
 
       logger = Logger.new(mutation, context, arguments)
 
