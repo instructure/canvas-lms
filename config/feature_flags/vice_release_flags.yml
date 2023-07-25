@@ -97,6 +97,14 @@ react_inbox:
     This refactor will make this page more maintainable
   applies_to: RootAccount
 
+react_inbox_labels:
+  state: hidden
+  display_name: Enable Labels on the new Inbox page
+  description: |-
+    This will allow the user to manage their labels, add labels to conversations and
+    filter conversations by labels.
+  applies_to: SiteAdmin
+
 restrict_quantitative_data:
   state: hidden
   display_name: Restrict quantitative data
