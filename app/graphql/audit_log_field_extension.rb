@@ -142,10 +142,15 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       #
       # Also skip audit logs for internal setting mutations, which can only
       # be executed by siteadmins.
+      #
+      # Also skip audit logs for user inbox label mutations, which can only
+      # be executed by the user itself. We can improve that later outside of
+      # hackweek.
       next if [Mutations::CreateDiscussionEntryDraft,
                Mutations::CreateInternalSetting,
                Mutations::UpdateInternalSetting,
-               Mutations::DeleteInternalSetting].include? mutation
+               Mutations::DeleteInternalSetting,
+               Mutations::CreateUserInboxLabel].include? mutation
 
       logger = Logger.new(mutation, context, arguments)
 
