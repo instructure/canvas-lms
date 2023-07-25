@@ -24,12 +24,7 @@ import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 // polyfill URL.createObjectURL
 if (window.URL) {
   window.URL = {
-    createObjectURL: file => {
-      return {
-        label: file.name,
-        src: 'blob://junk',
-      }
-    },
+    createObjectURL: _file => 'blob://junk',
     revokeObjectURL: _url => undefined,
   }
 }
