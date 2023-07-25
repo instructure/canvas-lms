@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "spec_helper"
+require "action_controller"
+require_relative "data/owned_class"
 
 describe CanvasErrors do
   error_testing_class = Class.new do
@@ -45,7 +47,7 @@ describe CanvasErrors do
     described_class.instance_variable_set(:@registry, @old_registry)
   end
 
-  let(:error) { double("Some Error") }
+  let(:error) { double("Some Error", backtrace: []) }
 
   describe ".capture_exception" do
     it "tags with the exception type and default level" do
@@ -76,7 +78,7 @@ describe CanvasErrors do
       allow(Delayed::Worker).to receive(:current_job).and_return(job)
       CanvasErrors.capture(RuntimeError.new, { my_tag: "my_value" }, :warn)
       expect(@error_harness.details[:extra][:my_tag]).to eq("my_value")
-      expect(@error_harness.details[:tags][:job_tag]).to match("#perform")
+      expect(@error_harness.details[:tags]).to eq({ :job_tag => "#perform", "inst.team" => "unknown", :process_type => "BackgroundJob" })
       expect(@error_harness.level).to eq(:warn)
     end
 
@@ -86,6 +88,7 @@ describe CanvasErrors do
         session_id: "1234session1234"
       }
       CanvasErrors.capture(RuntimeError.new, { my_tag: "custom_value" }, :info)
+      expect(@error_harness.details[:tags]).to eq({ "inst.team" => "unknown" })
       expect(@error_harness.details[:extra][:my_tag]).to eq("custom_value")
       expect(@error_harness.details[:extra][:request_id]).to eq("1234request1234")
       expect(@error_harness.details[:extra][:session_id]).to match("1234session1234")
@@ -99,12 +102,23 @@ describe CanvasErrors do
   end
 
   it "passes through extra information if available wrapped in extra" do
-    CanvasErrors.capture(double, { detail1: "blah" })
+    CanvasErrors.capture(error, { detail1: "blah" })
     expect(@error_harness.details[:extra][:detail1]).to eq("blah")
   end
 
   it "captures output from each callback according to their registry tag" do
-    outputs = CanvasErrors.capture(double)
+    outputs = CanvasErrors.capture(error)
     expect(outputs[:test_thing]).to eq("ERROR_BLOCK_RESPONSE")
+  end
+
+  describe "with an owned class" do
+    it "sets the team tag" do
+      begin
+        OwnedClass.new.raise
+      rescue => e
+        CanvasErrors.capture(e)
+      end
+      expect(@error_harness.details[:tags]["inst.team"]).to eq("test")
+    end
   end
 end
