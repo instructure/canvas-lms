@@ -186,6 +186,12 @@ class PageViewsController < ApplicationController
     if (start_time = CanvasTime.try_parse(params[:start_time]))
       date_options[:oldest] = start_time
       url_options[:start_time] = params[:start_time]
+      if start_time > Time.now.utc
+        return respond_to do |format|
+          format.json { render json: { error: "start_time cannot be in the future" }, status: :bad_request }
+          format.any { render plain: t("start_time cannot be in the future"), status: :bad_request }
+        end
+      end
     end
     if (end_time = CanvasTime.try_parse(params[:end_time]))
       date_options[:newest] = end_time
