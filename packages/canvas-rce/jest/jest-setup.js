@@ -52,7 +52,6 @@ const ignoredErrors = [
   /The prop `videoOptions.naturalHeight` is marked as required in `VideoOptionsTray`/,
   /The prop `renderLabel` is marked as required in `Select`/,
   /The prop `renderLabel` is marked as required in `NumberInput`/,
-  /The prop `onMediaEmbed` is marked as required in `MediaPanel`/,
   /The prop `sortBy.order` is marked as required in `MediaPanel`/,
   /Invalid prop `images.searchString` of type `string` supplied to `Images`/,
   /Invalid prop `source` of type `object` supplied to `RceFileBrowser`/,

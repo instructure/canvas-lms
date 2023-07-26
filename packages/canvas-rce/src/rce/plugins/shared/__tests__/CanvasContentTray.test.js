@@ -62,6 +62,7 @@ const storeInitialState = {
   onFileSelect: () => {},
   onLinkClick: () => {},
   onImageEmbed: () => {},
+  onMediaEmbed: () => {},
 }
 
 describe('RCE Plugins > CanvasContentTray', () => {
