@@ -54,19 +54,15 @@ describe('AlignmentSummary', () => {
     )
   }
 
-  it('renders component', () => {
-    const {getByTestId} = render(<AlignmentSummary />)
-    expect(getByTestId('outcome-alignment-summary')).toBeTruthy()
+  it('renders single loader while loading data', () => {
+    const {getByTestId, queryByTestId} = render(<AlignmentSummary />)
+    expect(getByTestId('outcome-alignment-summary-loader')).toBeInTheDocument()
+    expect(queryByTestId('outcome-item-list-loader')).not.toBeInTheDocument()
   })
 
-  it('shows loader while loading alignment summary data', () => {
-    const {getByTestId} = render(<AlignmentSummary />)
-    expect(getByTestId('outcome-alignment-summary-loading')).toBeInTheDocument()
-  })
-
-  it('shows alignment summary header after alignment summary data is loaded', async () => {
+  it('renders component after data is loaded', async () => {
     const {getByTestId} = render(<AlignmentSummary />)
     await act(async () => jest.runOnlyPendingTimers())
-    expect(getByTestId('outcome-alignment-summary-header')).toBeInTheDocument()
+    expect(getByTestId('outcome-alignment-summary')).toBeInTheDocument()
   })
 })

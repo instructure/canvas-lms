@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,7 +30,7 @@ const I18n = useI18nScope('AlignmentSummary')
 
 const AlignmentSummary = () => {
   const [scrollContainer, setScrollContainer] = useState(null)
-  const {data: alignmentStatsData, loading: alignmentStatsLoading} = useCourseAlignmentStats()
+  const {data: alignmentStatsData, loading: loadingAlignmentStats} = useCourseAlignmentStats()
   const courseAlignmentStats = alignmentStatsData?.course?.outcomeAlignmentStats || {}
   const {
     totalOutcomes,
@@ -43,41 +43,45 @@ const AlignmentSummary = () => {
 
   const {
     rootGroup,
-    loading,
-    loadMore,
+    loading: loadingOutcomes,
+    loadMore: loadMoreOutcomes,
     searchString,
     onSearchChangeHandler: updateSearch,
     onSearchClearHandler: clearSearch,
     onFilterChangeHandler: updateFilter,
   } = useCourseAlignments()
 
-  const renderAlignmentStatsLoader = () => (
-    <div style={{textAlign: 'center'}} data-testid="outcome-alignment-summary-loading">
+  const [showSingleLoader, setShowSingleLoader] = useState(true)
+
+  useEffect(() => {
+    showSingleLoader && !loadingAlignmentStats && !loadingOutcomes && setShowSingleLoader(false)
+  }, [showSingleLoader, loadingAlignmentStats, loadingOutcomes, setShowSingleLoader])
+
+  const renderAlignmentSummaryLoader = () => (
+    <div style={{textAlign: 'center'}} data-testid="outcome-alignment-summary-loader">
       <Spinner renderTitle={I18n.t('Loading')} size="large" />
     </div>
   )
 
-  const renderAlignmentSummaryHeader = () => (
-    <AlignmentSummaryHeader
-      totalOutcomes={totalOutcomes}
-      alignedOutcomes={alignedOutcomes}
-      totalAlignments={totalAlignments}
-      totalArtifacts={totalArtifacts}
-      alignedArtifacts={alignedArtifacts}
-      artifactAlignments={artifactAlignments}
-      searchString={searchString}
-      updateSearchHandler={updateSearch}
-      clearSearchHandler={clearSearch}
-      updateFilterHandler={updateFilter}
-      data-testid="outcome-alignment-summary-header"
-    />
-  )
+  if (showSingleLoader) return renderAlignmentSummaryLoader()
+
   return (
     <View data-testid="outcome-alignment-summary">
       <View as="div" padding="0 0 small" borderWidth="0 0 small">
         <Flex>
           <Flex.Item as="div" size="100%" position="relative">
-            {alignmentStatsLoading ? renderAlignmentStatsLoader() : renderAlignmentSummaryHeader()}
+            <AlignmentSummaryHeader
+              totalOutcomes={totalOutcomes}
+              alignedOutcomes={alignedOutcomes}
+              totalAlignments={totalAlignments}
+              totalArtifacts={totalArtifacts}
+              alignedArtifacts={alignedArtifacts}
+              artifactAlignments={artifactAlignments}
+              searchString={searchString}
+              updateSearchHandler={updateSearch}
+              clearSearchHandler={clearSearch}
+              updateFilterHandler={updateFilter}
+            />
           </Flex.Item>
         </Flex>
       </View>
@@ -93,8 +97,8 @@ const AlignmentSummary = () => {
       >
         <AlignmentOutcomeItemList
           rootGroup={rootGroup}
-          loading={loading}
-          loadMore={loadMore}
+          loading={loadingOutcomes}
+          loadMore={loadMoreOutcomes}
           scrollContainer={scrollContainer}
         />
       </View>
