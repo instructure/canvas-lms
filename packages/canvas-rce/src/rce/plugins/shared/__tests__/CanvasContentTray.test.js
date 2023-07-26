@@ -60,6 +60,7 @@ const storeInitialState = {
   }),
   ...sidebarHandlers(() => {}),
   onFileSelect: () => {},
+  onLinkClick: () => {},
 }
 
 describe('RCE Plugins > CanvasContentTray', () => {
