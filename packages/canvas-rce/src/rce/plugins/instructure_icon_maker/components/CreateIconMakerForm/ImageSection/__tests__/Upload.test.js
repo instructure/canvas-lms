@@ -48,7 +48,7 @@ const subject = () => render(<Upload {...props} />)
 
 describe('Upload()', () => {
   beforeEach(() => {
-    props = {editor: new FakeEditor(), dispatch: jest.fn()}
+    props = {editor: new FakeEditor(), dispatch: jest.fn(), canvasOrigin: 'http://canvas.docker'}
     fetchMock.mock('/api/session', '{}')
   })
 
