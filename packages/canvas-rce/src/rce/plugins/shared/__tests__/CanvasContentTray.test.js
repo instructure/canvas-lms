@@ -334,7 +334,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
         expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
       )
 
-      props.bridge.hideTrays()
+      act(() => props.bridge.hideTrays())
       // immediately after being asked to close, INSTUI Tray removes role='dialog' and
       // adds aria-hidden='true', so the getTray() function above does not work
       await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))

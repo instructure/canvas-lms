@@ -451,7 +451,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       userEvent.click(button)
 
       const spinner = getByText('Loading...')
-      expect(spinner).toBeInTheDocument()
+      await waitFor(() => expect(spinner).toBeInTheDocument())
     })
   })
 
@@ -531,13 +531,13 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       fetchMock.restore()
     })
 
-    it('renders the edit view', () => {
-      expect(subject().getByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
+    it('renders the edit view', async () => {
+      expect(await subject().findByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
     })
 
-    it('does not call confirm when there are no changes', () => {
+    it('does not call confirm when there are no changes', async () => {
       subject()
-      userEvent.click(screen.getByText(/close/i))
+      userEvent.click(await screen.findByText(/close/i))
       expect(window.confirm).not.toHaveBeenCalled()
     })
 
@@ -625,11 +625,10 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         IconMakerTray.isLoading = isLoading
       })
 
-      it('renders a spinner', () => {
+      it('renders a spinner', async () => {
         IconMakerTray.isLoading.mockReturnValueOnce(true)
         const {getByText} = subject()
-        const spinner = getByText('Loading...')
-        expect(spinner).toBeInTheDocument()
+        await waitFor(() => expect(getByText('Loading...')).toBeInTheDocument())
       })
     })
   })
