@@ -27,7 +27,7 @@ import {View} from '@instructure/ui-view'
 import {string, bool} from 'prop-types'
 import formatMessage from '../../format-message'
 import Day from '../Day'
-import KinderPandaSvg from './kinder-panda.svg'
+import KinderPanda from './KinderPanda'
 import {MULTI_COURSE_ITEMS, SINGLE_COURSE_ITEMS} from './mock-items'
 
 import {SMALL_MEDIA_QUERY, MEDIUM_MEDIA_QUERY} from '../responsiviser'
@@ -47,7 +47,7 @@ export default function PlannerPreview({timeZone, singleCourse}) {
       <View as="section" margin="x-large large">
         <Flex direction="column" alignItems="center">
           <View as="section" margin="medium medium small medium">
-            <KinderPandaSvg aria-hidden="true" data-testid="kinder-panda" />
+            <KinderPanda aria-hidden="true" data-testid="kinder-panda" />
           </View>
           <Text letterSpacing="expanded">
             <Heading as="h2" level="h3" margin="small">
@@ -76,5 +76,5 @@ export default function PlannerPreview({timeZone, singleCourse}) {
 
 PlannerPreview.propTypes = {
   timeZone: string.isRequired,
-  singleCourse: bool.isRequired
+  singleCourse: bool.isRequired,
 }

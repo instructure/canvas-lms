@@ -24,7 +24,6 @@ services:
       - canvas-media_lib:/usr/src/app/packages/canvas-media/lib
       - canvas-media_node_modules:/usr/src/app/packages/canvas-media/node_modules
       - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
-      - canvas-planner_lib:/usr/src/app/packages/canvas-planner/lib
       - canvas-rce_canvas:/usr/src/app/packages/canvas-rce/canvas
       - canvas-rce_lib:/usr/src/app/packages/canvas-rce/lib
       - canvas-rce_node_modules:/usr/src/app/packages/canvas-rce/node_modules

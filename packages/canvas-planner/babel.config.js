@@ -20,47 +20,56 @@
 // ui-build/babel-recommendations.md for guidance
 module.exports = {
   assumptions: {
-    setPublicClassFields: true
+    setPublicClassFields: true,
   },
   env: {
     production: {
       plugins: [
         'transform-react-remove-prop-types',
         '@babel/plugin-transform-react-inline-elements',
-        '@babel/plugin-transform-react-constant-elements'
-      ]
-    }
+        '@babel/plugin-transform-react-constant-elements',
+      ],
+    },
   },
   presets: [
-    ['@babel/preset-env', {
-      useBuiltIns: 'entry',
-      corejs: '3.20',
-      modules: false,
-      // This is needed to fix a Safari < 16 bug
-      // https://github.com/babel/babel/issues/14289
-      // https://bugs.webkit.org/show_bug.cgi?id=236843
-      include: ['@babel/plugin-proposal-class-properties'],
-    }],
-    ['@babel/preset-react', { useBuiltIns: true }],
+    [
+      '@babel/preset-env',
+      {
+        useBuiltIns: 'entry',
+        corejs: '3.20',
+        modules: false,
+        // This is needed to fix a Safari < 16 bug
+        // https://github.com/babel/babel/issues/14289
+        // https://bugs.webkit.org/show_bug.cgi?id=236843
+        include: ['@babel/plugin-proposal-class-properties'],
+      },
+    ],
+    ['@babel/preset-react', {useBuiltIns: true}],
   ],
 
   plugins: [
-    ['inline-react-svg'],
-    ['@babel/plugin-transform-runtime', {
-      corejs: 3,
-      helpers: true,
-      useESModules: true,
-      regenerator: true
-    }],
+    [
+      '@babel/plugin-transform-runtime',
+      {
+        corejs: 3,
+        helpers: true,
+        useESModules: true,
+        regenerator: true,
+      },
+    ],
 
-    ['@instructure/babel-plugin-themeable-styles', {
-      postcssrc: require('@instructure/ui-postcss-config')()(),
-      themeablerc: require('./themeable.config.js'),
-    }]
+    [
+      '@instructure/babel-plugin-themeable-styles',
+      {
+        // eslint-disable-next-line import/no-extraneous-dependencies
+        postcssrc: require('@instructure/ui-postcss-config')()(),
+        themeablerc: require('./themeable.config'),
+      },
+    ],
   ],
 
   targets: {
     browsers: 'last 2 versions',
-    esmodules: true
-  }
+    esmodules: true,
+  },
 }

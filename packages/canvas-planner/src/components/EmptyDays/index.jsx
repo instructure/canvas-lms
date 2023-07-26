@@ -26,7 +26,7 @@ import {sizeShape} from '../plannerPropTypes'
 import {getShortDate} from '../../utilities/dateUtils'
 import buildStyle from './style'
 import formatMessage from '../../format-message'
-import GroupedDates from './grouped_dates.svg'
+import GroupedDates from './GroupedDates'
 
 export default class EmptyDays extends Component {
   constructor(props) {
@@ -46,8 +46,7 @@ export default class EmptyDays extends Component {
   }
 
   renderDate = (start, end) => {
-    let dateString
-    dateString = formatMessage('{startDate} to {endDate}', {
+    const dateString = formatMessage('{startDate} to {endDate}', {
       startDate: getShortDate(start),
       endDate: getShortDate(end),
     })

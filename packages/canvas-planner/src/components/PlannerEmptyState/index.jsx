@@ -24,8 +24,8 @@ import {Link} from '@instructure/ui-link'
 
 import {InlineList} from '@instructure/ui-list'
 import formatMessage from '../../format-message'
-import DesertSvg from './empty-desert.svg' // Currently uses react-svg-loader
-import BalloonsSvg from './balloons.svg'
+import DesertSvg from './EmptyDesert' // Currently uses react-svg-loader
+import BalloonsSvg from './Balloons'
 import buildStyle from './style'
 
 export default class PlannerEmptyState extends Component {
