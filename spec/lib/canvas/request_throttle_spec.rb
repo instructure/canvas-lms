@@ -67,8 +67,57 @@ describe RequestThrottle do
   describe "#client_identifier" do
     specs_require_sharding
 
+    before do
+      Account.site_admin.enable_feature! :site_admin_service_auth
+    end
+
+    context "with an inst_access service token" do
+      include_context "InstAccess setup"
+
+      let(:service_user) { user_model }
+      let(:root_account) { account_model }
+
+      let(:key) do
+        DeveloperKey.create!(
+          name: "key",
+          account: root_account,
+          internal_service: true,
+          service_user:
+        )
+      end
+
+      let(:token) do
+        InstAccess::Token.for_user(
+          user_uuid: service_user.uuid,
+          account_uuid: root_account.uuid,
+          canvas_domain: "test.host",
+          user_global_id: service_user.global_id,
+          region: ApplicationController.region,
+          client_id: key.global_id,
+          instructure_service: true
+        )
+      end
+
+      let(:request) do
+        req(
+          request_no_session.merge(
+            {
+              "USER_AGENT" => "inst-service-ninety-nine/1234567890ABCDEF",
+              "HTTP_AUTHORIZATION" => "Bearer #{token.to_unencrypted_token_string}",
+              "rack.input" => StringIO.new("")
+            }
+          )
+        )
+      end
+
+      it "uses the proper client identifier" do
+        expect(throttler.client_identifier(request)).to eq "service_user_key:#{key.global_id}"
+      end
+    end
+
     def req(hash)
       r = ActionDispatch::Request.new(hash).tap(&:fullpath)
+      throttler.inst_access_token_authentication = AuthenticationMethods::InstAccessToken::Authentication.new(r)
       allow(r).to receive(:user_agent).and_return(hash["USER_AGENT"]) if hash.key?("USER_AGENT")
       r
     end

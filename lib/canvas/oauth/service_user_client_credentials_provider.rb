@@ -62,7 +62,8 @@ module Canvas::OAuth
         canvas_domain: host,
         user_global_id: key.service_user.global_id,
         region: ApplicationController.region,
-        client_id: key.global_id
+        client_id: key.global_id,
+        instructure_service: key.internal_service?
       )
     end
 

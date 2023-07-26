@@ -19,10 +19,14 @@
 #
 
 class RequestThrottle
+  attr_accessor :inst_access_token_authentication
+
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes
   # multi-threaded, we'll have to just get rid of it since we can't measure
   # per-thread heap used
   @@last_sample = 0
+
+  SERVICE_HEADER_EXPRESSION = %r{^inst-[a-z0-9_-]+/[a-z0-9]+.*$}i
 
   class ActionControllerLogSubscriber < ActiveSupport::LogSubscriber
     def process_action(event)
@@ -38,6 +42,7 @@ class RequestThrottle
 
   def initialize(app)
     @app = app
+    @inst_access_token_authentication = nil
   end
 
   def call(env)
@@ -45,6 +50,9 @@ class RequestThrottle
     starting_cpu = Process.times
 
     request = ActionDispatch::Request.new(env)
+    self.inst_access_token_authentication = ::AuthenticationMethods::InstAccessToken::Authentication.new(
+      request
+    )
 
     # NOTE: calling fullpath was a workaround for a rails bug where some ActionDispatch::Request methods blow
     # up when using certain servers until fullpath is called once to set env['REQUEST_URI']
@@ -129,6 +137,8 @@ class RequestThrottle
   end
 
   def blocked?(request)
+    return true if inst_access_token_authentication&.blocked?
+
     client_identifiers(request).any? { |id| self.class.blocklist.include?(id) }
   end
 
@@ -152,6 +162,7 @@ class RequestThrottle
     request.env["canvas.request_throttle.user_id"] ||= [
       tag_identifier("lti_advantage", lti_advantage_client_id_and_cluster(request)),
       tag_identifier("service_user_key", site_admin_service_user_key(request)),
+      tag_identifier("service_user_key", inst_access_token_authentication&.tag_identifier),
       (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
@@ -196,14 +207,17 @@ class RequestThrottle
     # We only want to allow this approvelist method for User-Agent strings that match the following format:
     # Example (short): `inst-service-name/2d0c1jk2`
     # Example (full): `inst-service-name/2d0c1jk2 (region: us-east-1; host: 1de983c20j1ak2; env: production)`
-    regexp = %r{^inst-[a-z0-9_-]+/[a-z0-9]+.*$}i
-    return unless regexp.match?(request.user_agent)
+    return unless SERVICE_HEADER_EXPRESSION.match?(request.user_agent)
 
     return unless (token_string = AuthenticationMethods.access_token(request))
 
     return unless AccessToken.site_admin?(token_string)
 
     AccessToken.authenticate(token_string).global_developer_key_id
+  end
+
+  def service_user_jwt_key(request)
+    AuthenticationMethods::InstAccessToken.tag_identifier(request)
   end
 
   def self.blocklist
