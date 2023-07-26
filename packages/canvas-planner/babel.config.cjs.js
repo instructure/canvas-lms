@@ -20,29 +20,38 @@
 // suitable for the browser or production
 module.exports = {
   presets: [
-    ['@babel/preset-env', {
-      modules: 'commonjs',
-      include: ['transform-classes']
-    }],
-    ['@babel/preset-react', { useBuiltIns: true }],
+    [
+      '@babel/preset-env',
+      {
+        modules: 'commonjs',
+        include: ['transform-classes'],
+      },
+    ],
+    ['@babel/preset-react', {useBuiltIns: true}],
   ],
 
   plugins: [
-    ['inline-react-svg'],
-    ['@babel/plugin-transform-runtime', {
-      corejs: 3,
-      helpers: true,
-      useESModules: false,
-      regenerator: true
-    }],
-    ['@babel/plugin-proposal-class-properties', { loose: true }],
-    ['@instructure/babel-plugin-themeable-styles', {
-      postcssrc: require('@instructure/ui-postcss-config')()(),
-      themeablerc: require('./themeable.config.js'),
-    }]
+    [
+      '@babel/plugin-transform-runtime',
+      {
+        corejs: 3,
+        helpers: true,
+        useESModules: false,
+        regenerator: true,
+      },
+    ],
+    ['@babel/plugin-proposal-class-properties', {loose: true}],
+    [
+      '@instructure/babel-plugin-themeable-styles',
+      {
+        // eslint-disable-next-line import/no-extraneous-dependencies
+        postcssrc: require('@instructure/ui-postcss-config')()(),
+        themeablerc: require('./themeable.config'),
+      },
+    ],
   ],
 
   targets: {
-    node: 'current'
+    node: 'current',
   },
 }

@@ -23,19 +23,19 @@ import {Spinner} from '@instructure/ui-spinner'
 
 import ErrorAlert from '../ErrorAlert'
 import formatMessage from '../../format-message'
-import TV from './tv.svg'
+import TV from './TV'
 
 export default class LoadingPastIndicator extends Component {
   static propTypes = {
     loadingPast: PropTypes.bool, // actively loading?
     allPastItemsLoaded: PropTypes.bool, // there are no more?
-    loadingError: PropTypes.string // message if there was an error attempting to loaad items
+    loadingError: PropTypes.string, // message if there was an error attempting to loaad items
   }
 
   static defaultProps = {
     loadingPast: false,
     allPastItemsLoaded: false,
-    loadingError: undefined
+    loadingError: undefined,
   }
 
   // Don't try to animate this component here. If we want this to animate, it should be coordinated

@@ -18,7 +18,7 @@
 
 module.exports = {
   transform: {
-    '^.+\\.(js)$': ['babel-jest', {configFile: require.resolve('./babel.config.cjs.js')}],
+    '^.+\\.(js|jsx)$': ['babel-jest', {configFile: require.resolve('./babel.config.cjs.js')}],
     '^.+\\.(css)$': '<rootDir>/jest-themeable-styles',
   },
   reporters: [

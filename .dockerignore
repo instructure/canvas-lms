@@ -26,7 +26,6 @@ gems/plugins/*/.git
 !/log/parallel-runtime-rspec.log
 node_modules/
 packages/*/node_modules/
-packages/canvas-planner/lib
 public/dist/
 public/doc/
 public/javascripts/translations/

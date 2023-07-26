@@ -76,7 +76,6 @@ RUN set -eux; \
     config/locales/generated \
     log \
     node_modules \
-    packages/canvas-planner/lib \
     packages/canvas-planner/node_modules \
     packages/jest-moxios-utils/node_modules \
     packages/js-utils/es \
