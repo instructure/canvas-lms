@@ -25,7 +25,7 @@ function getPanelProps(contextType, mediaprops) {
     contextType,
     fetchInitialMedia: () => {},
     fetchNextMedia: () => {},
-    onMediaMebed: () => {},
+    onMediaEmbed: () => {},
     media: {
       [contextType]: {
         files: [],
@@ -73,7 +73,7 @@ function makeFiles(override) {
 
 describe('RCE "Media" Plugin > MediaPanel', () => {
   it('renders empty notice', () => {
-    const {getByText} = renderComponent(getPanelProps())
+    const {getByText} = renderComponent(getPanelProps('course', {}))
     expect(getByText('No results.')).toBeInTheDocument()
   })
 

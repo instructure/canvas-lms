@@ -56,7 +56,6 @@ const ignoredErrors = [
   /The content `content` is marked as required in `LinkOptionsTray`/,
   /The prop `contextType` is marked as required in `DocumentsPanel`/,
   /The prop `media.course.files\[0].title` is marked as required in `MediaPanel`/,
-  /The prop `contextType` is marked as required in `MediaPanel`/,
   /The prop `audioOptions.titleText` is marked as required in `AudioOptionsTray`/,
   /The prop `audioOptions.id` is marked as required in `AudioOptionsTray`/,
   /The prop `trayProps` is marked as required in `AudioOptionsTray`/,
