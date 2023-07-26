@@ -447,7 +447,6 @@ export default function CanvasContentTray(props) {
   }
   return (
     <Tray
-      contextType={filterSettings.contextType || props.contextType}
       data-mce-component={true}
       data-testid="CanvasContentTray"
       label={getTrayLabel(
