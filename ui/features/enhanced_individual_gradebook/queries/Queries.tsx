@@ -197,6 +197,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           submissionType
           submittedAt
           state
+          sticker
           proxySubmitter
           excused
           late

@@ -331,6 +331,7 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
 
   const defaultGradebookOptions: GradebookOptions = {
     activeGradingPeriods: env.GRADEBOOK_OPTIONS?.active_grading_periods,
+    assignmentEnhancementsEnabled: env.GRADEBOOK_OPTIONS?.assignment_enhancements_enabled,
     changeGradeUrl: env.GRADEBOOK_OPTIONS?.change_grade_url,
     contextId: env.GRADEBOOK_OPTIONS?.context_id,
     contextUrl: env.GRADEBOOK_OPTIONS?.context_url,
@@ -379,6 +380,7 @@ export function gradebookOptionsSetup(env: GlobalEnv) {
     selectedGradingPeriodId: userSettings.contextGet<string>('gradebook_current_grading_period'),
     settingsUpdateUrl: env.GRADEBOOK_OPTIONS?.settings_update_url,
     settingUpdateUrl: env.GRADEBOOK_OPTIONS?.setting_update_url,
+    stickersEnabled: env.GRADEBOOK_OPTIONS?.stickers_enabled,
     sortOrder: defaultAssignmentSort,
     teacherNotes: env.GRADEBOOK_OPTIONS?.teacher_notes,
     userId: env.current_user_id,

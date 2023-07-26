@@ -19,6 +19,7 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import SubmissionSticker, {stickersAvailable} from '@canvas/submission-sticker'
 import {ApolloProvider, createClient} from '@canvas/apollo'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
@@ -28,6 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Avatar} from '@instructure/ui-avatar'
 import {Spinner} from '@instructure/ui-spinner'
+import {Flex} from '@instructure/ui-flex'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Tray} from '@instructure/ui-tray'
@@ -80,6 +82,7 @@ function renderTraySubHeading(headingText: string) {
 
 export type SubmissionTrayProps = {
   assignment: CamelizedAssignment
+  assignmentEnhancementsEnabled: boolean
   currentUserId: string
   editedCommentId: string | null
   gradingDisabled: boolean
@@ -104,6 +107,7 @@ export type SubmissionTrayProps = {
   speedGraderEnabled: boolean
   submissionUpdating: boolean
   submissionCommentsLoaded: boolean
+  stickersEnabled: boolean
   processing: boolean
   isInOtherGradingPeriod: boolean
   isInClosedGradingPeriod: boolean
@@ -117,6 +121,7 @@ export type SubmissionTrayProps = {
   locale: string
   editSubmissionComment: (commentId: string | null) => void
   onClose: () => void
+  onStickerChange: (submission: any, sticker: string | null) => void
   requireStudentGroupForSpeedGrader: boolean
   gradingScheme: null | GradingStandard[]
   pointsBasedGradingScheme: boolean
@@ -294,6 +299,22 @@ export default class SubmissionTray extends React.Component<
       <div style={{textAlign: 'center'}}>
         <Spinner renderTitle={I18n.t('Loading comments')} size="large" />
       </div>
+    )
+  }
+
+  renderSticker() {
+    return (
+      <Flex justifyItems="center">
+        <Flex.Item>
+          <SubmissionSticker
+            confetti={false}
+            size="medium"
+            submission={{...this.props.submission, courseId: this.props.courseId}}
+            onStickerChange={sticker => this.props.onStickerChange(this.props.submission, sticker)}
+            editable={true}
+          />
+        </Flex.Item>
+      </Flex>
     )
   }
 
@@ -580,6 +601,14 @@ export default class SubmissionTray extends React.Component<
       this.props.onClose()
     }
 
+    const showSticker = stickersAvailable(
+      {
+        assignmentEnhancementsEnabled: this.props.assignmentEnhancementsEnabled,
+        stickersEnabled: this.props.stickersEnabled,
+      },
+      this.props.assignment
+    )
+
     return (
       <ApolloProvider client={createClient()}>
         <Tray
@@ -731,6 +760,20 @@ export default class SubmissionTray extends React.Component<
                     {this.renderSubmissionComments(submissionCommentsProps)}
                   </div>
                 </View>
+
+                {showSticker && (
+                  <>
+                    <View as="div" margin="small 0" className="hr" />
+                    <View
+                      as="div"
+                      id="SubmissionTray__Sticker"
+                      padding="xx-small"
+                      margin="none none medium none"
+                    >
+                      {this.renderSticker()}
+                    </View>
+                  </>
+                )}
               </div>
             </div>
           </div>

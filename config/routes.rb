@@ -1315,6 +1315,7 @@ CanvasRails::Application.routes.draw do
       get "users/:user_id/courses/:course_id/assignments", action: :user_index, as: "user_course_assignments"
       put "courses/:course_id/assignments/bulk_update", action: :bulk_update
       get "courses/:course_id/assignments/:id", action: :show, as: "course_assignment"
+      get "courses/:course_id/assignments/:assignment_id/users/:user_id/group_members", action: :student_group_members
       post "courses/:course_id/assignments", action: :create
       put "courses/:course_id/assignments/:id", action: :update
       post "courses/:course_id/assignments/:assignment_id/duplicate", action: :duplicate

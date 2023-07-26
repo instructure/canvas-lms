@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,12 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/shared/message_students.scss";
-@import "pages/gradebook/gradebook.scss";
-@import "pages/gradebook/gradebook_settings.scss";
-@import "pages/gradebook/grade_passback.scss";
-@import "components/carousel.scss";
-@import "components/grade_detail_tray.scss";
-@import "components/emoji";
-@import "components/submission_stickers";
+ @import "base/environment";
+ @import "components/submission_stickers";

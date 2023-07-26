@@ -85,6 +85,38 @@ describe "gradebooks/speed_grader" do
     expect(rendered).to include '<div id="post-assignment-grades-tray"></div>'
   end
 
+  describe "submission stickers" do
+    it "includes the mount point when assignment enhancements and stickers flags are enabled" do
+      @course.enable_feature!(:assignments_2_student)
+      @course.enable_feature!(:submission_stickers)
+      render(template: "gradebooks/speed_grader", locals:)
+      expect(rendered).to include '<div id="submission_sticker_mount_point"></div>'
+    end
+
+    it "does not include the mount point when the assignment type is not supported by assignment enhancements" do
+      @course.enable_feature!(:assignments_2_student)
+      @course.enable_feature!(:submission_stickers)
+      @assignment.update!(submission_types: "wiki_page")
+      @course.wiki_pages.create!(title: "Page 1", assignment: @assignment)
+      render(template: "gradebooks/speed_grader", locals:)
+      expect(rendered).not_to include '<div id="submission_sticker_mount_point"></div>'
+    end
+
+    it "does not include the mount point when assignment enhancements is disabled" do
+      @course.disable_feature!(:assignments_2_student)
+      @course.enable_feature!(:submission_stickers)
+      render(template: "gradebooks/speed_grader", locals:)
+      expect(rendered).not_to include '<div id="submission_sticker_mount_point"></div>'
+    end
+
+    it "does not include the mount point when submission stickers is disabled" do
+      @course.enable_feature!(:assignments_2_student)
+      @course.disable_feature!(:submission_stickers)
+      render(template: "gradebooks/speed_grader", locals:)
+      expect(rendered).not_to include '<div id="submission_sticker_mount_point"></div>'
+    end
+  end
+
   it "includes a mount point for editing submission status" do
     render(template: "gradebooks/speed_grader", locals:)
     expect(rendered).to include '<div id="speed_grader_edit_status_mount_point"></div>'
