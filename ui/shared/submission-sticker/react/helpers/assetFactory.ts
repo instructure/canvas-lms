@@ -17,11 +17,11 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {StickerDescriptions} from '../types/stickers.d'
+import type {Sticker, StickerDescriptions} from '../types/stickers.d'
 
 const I18n = useI18nScope('submission_sticker')
 
-export function stickerDescriptions(name: string): string {
+export function stickerDescriptions(): StickerDescriptions {
   const descriptions: StickerDescriptions = {
     star: I18n.t('A sticker with a picture of a smiling star.'),
     trophy: I18n.t('A sticker with a picture of a golden trophy.'),
@@ -79,11 +79,21 @@ export function stickerDescriptions(name: string): string {
     column: I18n.t('A sticker with a picture of a roman column.'),
   }
 
-  return descriptions[name]
+  return descriptions
 }
 
-export default function assetFactory(key: string): string {
-  switch (key) {
+export function stickerDescription(name: Sticker): string {
+  if (name === null) {
+    return I18n.t('A placeholder sticker with a smiley face and a plus sign.')
+  }
+
+  return stickerDescriptions()[name]
+}
+
+export default function assetFactory(name: Sticker): string {
+  switch (name) {
+    case null:
+      return require('../../images/add_sticker.svg')
     case 'apple':
       return require('../../images/apple.svg')
     case 'basketball':
@@ -185,6 +195,6 @@ export default function assetFactory(key: string): string {
     case 'trophy':
       return require('../../images/trophy.svg')
     default:
-      throw new Error(`Unknown asset key: ${key}`)
+      throw new Error(`Unknown asset key: ${name}`)
   }
 }

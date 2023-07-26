@@ -259,6 +259,7 @@ import {handleExternalContentMessages} from '@canvas/external-tools/messages'
 import type {EnvGradebookCommon} from '@canvas/global/env/EnvGradebook'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {TotalGradeOverrideTrayProvider} from './components/TotalGradeOverrideTray'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('gradebook')
 
@@ -3547,6 +3548,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       excused: false,
       late_policy_status: null,
       seconds_late: 0,
+      sticker: null,
     }
     // TODO: remove cast
     const submission = this.getSubmission(studentId, assignmentId) || (fakeSubmission as Submission)
@@ -3573,6 +3575,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const gradingScheme = this.getAssignmentGradingScheme(assignmentId)
     return {
       assignment: camelizeProperties(assignment),
+      assignmentEnhancementsEnabled: this.options.assignment_enhancements_enabled,
       colors: this.state.gridColors,
       courseId: this.options.context_id,
       currentUserId: this.props.currentUserId,
@@ -3605,6 +3608,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
       onClose: () => this.gradebookGrid?.gridSupport?.helper.focus(),
       onGradeSubmission: this.gradeSubmission,
+      onStickerChange: this.handleStickerChanged,
       onRequestClose: this.closeSubmissionTray,
       pendingGradeInfo: this.getPendingGradeInfo({
         assignmentId,
@@ -3617,6 +3621,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       selectPreviousStudent: () => this.loadTrayStudent('previous'),
       showSimilarityScore: this.options.show_similarity_score,
       speedGraderEnabled: this.options.speed_grader_enabled,
+      stickersEnabled: !!this.options.stickers_enabled,
       student: {
         id: student.id,
         name: htmlDecode(student.name),
@@ -4616,6 +4621,47 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
         // eslint-disable-next-line promise/no-return-wrap
         return Promise.reject(response)
+      })
+  }
+
+  changeSticker = (submission: {assignmentId: string; userId: string}, sticker: string | null) => {
+    const savedSubmission = this.getSubmission(submission.userId, submission.assignmentId)
+    if (savedSubmission) {
+      savedSubmission.sticker = sticker
+    }
+  }
+
+  handleStickerChanged = (
+    submission: {userId: string; assignmentId: string},
+    sticker: string | null
+  ) => {
+    this.changeSticker(submission, sticker)
+
+    const student = this.student(submission.userId)
+    if (this.getSubmissionTrayState().open) {
+      this.renderSubmissionTray(student)
+    }
+
+    const assignment = this.getAssignment(submission.assignmentId)
+    if (assignment?.group_category_id && !assignment.grade_group_students_individually) {
+      this.changeGroupMemberStickers(submission.userId, assignment, sticker)
+    }
+  }
+
+  changeGroupMemberStickers = (userId: string, assignment: Assignment, sticker: string | null) => {
+    const path = `/api/v1/courses/${assignment.course_id}/assignments/${assignment.id}/users/${userId}/group_members`
+    doFetchApi<{id: string}[]>({path})
+      .then(({json: students}) => {
+        if (!students) return
+
+        for (const student of students) {
+          if (student.id !== userId) {
+            this.changeSticker({assignmentId: assignment.id, userId: student.id}, sticker)
+          }
+        }
+      })
+      .catch(_error => {
+        FlashAlert.showFlashError(I18n.t('Failed to update group member stickers'))
       })
   }
 

@@ -45,6 +45,8 @@ import {
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import DefaultGradeInput from './DefaultGradeInput'
 import {CheckpointGradeInputs} from './CheckpointGradeInputs'
+import {Flex} from '@instructure/ui-flex'
+import SubmissionSticker, {stickersAvailable} from '@canvas/submission-sticker'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
@@ -235,9 +237,11 @@ export default function GradingResults({
   }
 
   const {
+    assignmentEnhancementsEnabled,
     changeGradeUrl,
     customOptions: {hideStudentNames},
     gradingStandardPointsBased,
+    stickersEnabled,
   } = gradebookOptions
 
   const submitScoreUrl = (changeGradeUrl ?? '')
@@ -344,6 +348,14 @@ export default function GradingResults({
     return GradeFormatHelper.replaceDashWithMinus(displayGrade)
   }
 
+  const showSticker = stickersAvailable(
+    {
+      assignmentEnhancementsEnabled: assignmentEnhancementsEnabled ?? false,
+      stickersEnabled: stickersEnabled ?? false,
+    },
+    assignment
+  )
+
   return (
     <>
       <View as="div" data-testid="grading-results">
@@ -386,18 +398,34 @@ export default function GradingResults({
                 handleChangeReplyToEntryPassFailStatus={handleChangeReplyToEntryPassFailStatus}
               />
             ) : (
-              <DefaultGradeInput
-                assignment={assignment}
-                submission={submission}
-                passFailStatusIndex={passFailStatusIndex}
-                gradeInput={gradeInput}
-                submitScoreStatus={submitScoreStatus}
-                context="student_and_assignment_grade"
-                handleSetGradeInput={handleSetGradeInput}
-                handleSubmitGrade={submitGrade}
-                handleChangePassFailStatus={handleChangePassFailStatus}
-                gradingStandardPointsBased={gradingStandardPointsBased}
-              />
+              <Flex alignItems="end" gap="none large">
+                <Flex.Item>
+                  <DefaultGradeInput
+                    assignment={assignment}
+                    submission={submission}
+                    passFailStatusIndex={passFailStatusIndex}
+                    gradeInput={gradeInput}
+                    submitScoreStatus={submitScoreStatus}
+                    context="student_and_assignment_grade"
+                    handleSetGradeInput={handleSetGradeInput}
+                    handleSubmitGrade={submitGrade}
+                    handleChangePassFailStatus={handleChangePassFailStatus}
+                    gradingStandardPointsBased={gradingStandardPointsBased}
+                  />
+                </Flex.Item>
+
+                {showSticker && (
+                  <Flex.Item>
+                    <SubmissionSticker
+                      confetti={false}
+                      size="medium"
+                      submission={{...submission, courseId: assignment.courseId}}
+                      onStickerChange={sticker => onSubmissionSaved({...submission, sticker})}
+                      editable={true}
+                    />
+                  </Flex.Item>
+                )}
+              </Flex>
             )}
             <View as="div" margin="small 0 0 0">
               {submission.late && (

@@ -94,6 +94,7 @@ export type GradebookOptions = {
   allow_apply_score_to_ungraded: boolean
   allow_separate_first_last_names: boolean
   allow_view_ungraded_as_zero: boolean
+  assignment_enhancements_enabled: boolean
   assignment_missing_shortcut: boolean
   attachment_url: null | string
   attachment: null | AttachmentData
@@ -171,6 +172,7 @@ export type GradebookOptions = {
   sis_app_url: null | string
   sis_name: string
   speed_grader_enabled: boolean
+  stickers_enabled: boolean
   student_groups: StudentGroupCategoryMap
   user_asset_string: string
   teacher_notes: {

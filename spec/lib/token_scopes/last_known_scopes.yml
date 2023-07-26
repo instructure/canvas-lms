@@ -635,6 +635,8 @@
   path: "/api/v1/courses/:course_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read"
 - verb: POST
   path: "/api/v1/courses/:course_id/assignments/:assignment_id/submissions/update_grades"
+- verb: GET
+  path: "/api/v1/courses/:course_id/assignments/:assignment_id/users/:user_id/group_members"
 - verb: DELETE
   path: "/api/v1/courses/:course_id/assignments/:id"
 - verb: GET

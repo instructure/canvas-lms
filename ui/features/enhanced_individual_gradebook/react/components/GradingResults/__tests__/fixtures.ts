@@ -90,6 +90,7 @@ export const checkpointedAssignment: AssignmentConnection = {
 }
 
 export const defaultGradebookOptions: GradebookOptions = {
+  assignmentEnhancementsEnabled: false,
   contextUrl: '/courses/1',
   sortOrder: GradebookSortOrder.Alphabetical,
   changeGradeUrl: 'testUrl',
@@ -104,6 +105,7 @@ export const defaultGradebookOptions: GradebookOptions = {
   gradingStandardScalingFactor: 1,
   gradingStandardPointsBased: false,
   proxySubmissionEnabled: false,
+  stickersEnabled: false,
 }
 
 export const gradingResultsDefaultProps: GradingResultsComponentProps = {

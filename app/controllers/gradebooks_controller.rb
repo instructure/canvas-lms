@@ -360,6 +360,7 @@ class GradebooksController < ApplicationController
     set_enhanced_individual_gradebook_env
     deferred_js_bundle :enhanced_individual_gradebook
     @page_title = t("Gradebook: Individual View")
+    css_bundle :enhanced_individual_gradebook
     render html: "".html_safe, layout: true
   end
   private :show_enhanced_individual_gradebook
@@ -494,6 +495,7 @@ class GradebooksController < ApplicationController
       allow_separate_first_last_names: @context.account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names),
       allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
       allow_apply_score_to_ungraded: allow_apply_score_to_ungraded?,
+      assignment_enhancements_enabled: @context.feature_enabled?(:assignments_2_student),
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_gradebook_version_url: context_url(@context, :change_gradebook_version_context_gradebook_url, version: 2),
@@ -572,6 +574,7 @@ class GradebooksController < ApplicationController
       sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: gradebook_group_categories_json,
+      stickers_enabled: @context.feature_enabled?(:submission_stickers),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil),
@@ -595,6 +598,7 @@ class GradebooksController < ApplicationController
     per_page = Api::MAX_PER_PAGE
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
+      assignment_enhancements_enabled: @context.feature_enabled?(:assignments_2_student),
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_grade_url: api_v1_course_assignment_submission_url(@context, ":assignment", ":submission", include: [:visibility, :sub_assignment_submissions]),
       course_settings: {
@@ -631,6 +635,7 @@ class GradebooksController < ApplicationController
       settings: gradebook_settings(@context.global_id),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
+      stickers_enabled: @context.feature_enabled?(:submission_stickers),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, ":assignment", zip: 1),
