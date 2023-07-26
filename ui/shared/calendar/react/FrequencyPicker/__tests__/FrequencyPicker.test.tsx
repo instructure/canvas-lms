@@ -57,7 +57,7 @@ describe('FrequencyPicker', () => {
   })
 
   describe('renders', () => {
-    it('with default the given frequency', async () => {
+    it('with default the given frequency', () => {
       const props = defaultProps()
       const {getByDisplayValue, rerender} = render(
         <FrequencyPicker {...props} initialFrequency="daily" />
@@ -84,12 +84,12 @@ describe('FrequencyPicker', () => {
       expect(modal).toBeInTheDocument()
     })
 
-    it('with open modal with the current selected frequency', async () => {
+    it('with open modal with the current selected frequency', () => {
       const props = defaultProps()
-      const {findByText, getByRole} = render(<FrequencyPicker {...props} />)
+      const {getByText, getByRole} = render(<FrequencyPicker {...props} />)
       selectOption(/frequency:/i, /weekly on thursday/i)
       selectOption(/frequency:/i, /custom/i)
-      const modal = await findByText('Custom Repeating Event')
+      const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
 
       const thursdayCheckbox = getByRole('checkbox', {name: 'Thursday'})
@@ -97,9 +97,9 @@ describe('FrequencyPicker', () => {
       expect(thursdayCheckbox).toBeChecked()
     })
 
-    it('the modal with the given custom rrule', async () => {
+    it('the modal with the given custom rrule', () => {
       const props = defaultProps()
-      const {findByText, getByDisplayValue, getByRole} = render(
+      const {getByText, getByDisplayValue, getByRole} = render(
         <FrequencyPicker
           {...props}
           initialFrequency="saved-custom"
@@ -110,7 +110,7 @@ describe('FrequencyPicker', () => {
 
       selectOption(/frequency:/i, /Weekly on Mon, Wed, 5 times/)
       selectOption(/frequency/i, /custom/i)
-      const modal = await findByText('Custom Repeating Event')
+      const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
       expect(getByDisplayValue('Week')).toBeInTheDocument()
       expect(getByRole('checkbox', {name: 'Monday'})).toBeChecked()
@@ -118,11 +118,11 @@ describe('FrequencyPicker', () => {
       expect(getByDisplayValue('5')).toBeInTheDocument()
     })
 
-    it('returns focus to the frequency picker button when the modal is closed', async () => {
+    it('returns focus to the frequency picker button when the modal is closed', () => {
       const props = defaultProps()
-      const {findByText, getByRole} = render(<FrequencyPicker {...props} />)
+      const {getByText, getByRole} = render(<FrequencyPicker {...props} />)
       selectOption(/frequency:/i, /custom/i)
-      const modal = await findByText('Custom Repeating Event')
+      const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
       userEvent.click(getByRole('button', {name: /cancel/i}))
       expect(getByRole('button', {name: /frequency/i})).toHaveFocus()
