@@ -71,7 +71,7 @@ function makeDocuments(override) {
 
 describe('RCE "Documents" Plugin > DocumentsPanel', () => {
   it('renders empty notice', () => {
-    const {getByText} = renderComponent(getDocumentProps())
+    const {getByText} = renderComponent(getDocumentProps('course', {}))
     expect(getByText('No results.')).toBeInTheDocument()
   })
 
