@@ -24,3 +24,11 @@ export type GradeStatus = {
   color: string
   isNew?: boolean
 }
+
+export type StandardStatusAllowedName =
+  | 'late'
+  | 'missing'
+  | 'resubmitted'
+  | 'dropped'
+  | 'excused'
+  | 'extended'

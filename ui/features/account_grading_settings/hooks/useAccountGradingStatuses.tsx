@@ -86,7 +86,7 @@ export const useAccountGradingStatuses = (accountId: string) => {
 
     const variables = {
       color,
-      name: name.toLowerCase(),
+      name,
       id: isNew ? undefined : id,
     }
 
@@ -103,9 +103,7 @@ export const useAccountGradingStatuses = (accountId: string) => {
 
     setStandardStatuses(statuses => {
       const statusIndexToChange = statuses.findIndex(status =>
-        isNew
-          ? status.name.toLowerCase() === savedStatus.name.toLowerCase()
-          : status.id === savedStatus.id
+        isNew ? status.name === savedStatus.name : status.id === savedStatus.id
       )
 
       if (statusIndexToChange >= 0) {
