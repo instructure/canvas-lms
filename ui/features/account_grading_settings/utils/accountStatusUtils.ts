@@ -16,8 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {defaultColors} from '@canvas/grading-status-list-item'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {GradingStatusQueryResult} from '../types/accountStatusQueries'
 import {GradeStatus} from '../types/gradingStatus'
+
+const I18n = useI18nScope('account_grading_settings')
+
+export const statusesTitleMap: {
+  late: string
+  missing: string
+  resubmitted: string
+  dropped: string
+  excused: string
+  extended: string
+} = {
+  late: I18n.t('Late'),
+  missing: I18n.t('Missing'),
+  resubmitted: I18n.t('Resubmitted'),
+  dropped: I18n.t('Dropped'),
+  excused: I18n.t('Excused'),
+  extended: I18n.t('Extended'),
+} as const
 
 export const mapCustomStatusQueryResults = (
   customStatuses: GradingStatusQueryResult[]
@@ -51,38 +71,38 @@ export const mapStandardStatusQueryResults = (
 const DefaultStandardStatusesMap: Record<string, GradeStatus> = {
   late: {
     id: '-1',
-    name: 'Late',
-    color: '#E5F7E5',
+    name: 'late',
+    color: defaultColors.blue,
     isNew: true,
   },
   missing: {
     id: '-2',
-    name: 'Missing',
-    color: '#FFE8E5',
+    name: 'missing',
+    color: defaultColors.salmon,
     isNew: true,
   },
   resubmitted: {
     id: '-3',
-    name: 'Resubmitted',
-    color: '#E9EDF5',
+    name: 'resubmitted',
+    color: defaultColors.green,
     isNew: true,
   },
   dropped: {
     id: '-4',
-    name: 'Dropped',
-    color: '#FEF0E5',
+    name: 'dropped',
+    color: defaultColors.orange,
     isNew: true,
   },
   excused: {
     id: '-5',
-    name: 'Excused',
-    color: '#FEF7E5',
+    name: 'excused',
+    color: defaultColors.yellow,
     isNew: true,
   },
   extended: {
     id: '-6',
-    name: 'Extended',
-    color: '#E5F3FC',
+    name: 'extended',
+    color: defaultColors.lavender,
     isNew: true,
   },
 }

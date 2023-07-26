@@ -17,13 +17,14 @@
  */
 
 import React, {useRef} from 'react'
+import {GradingStatusListItem} from '@canvas/grading-status-list-item'
 // @ts-expect-error
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
-import {GradeStatus} from '../../types/gradingStatus'
-import {GradingStatusListItem} from '@canvas/grading-status-list-item'
+import {GradeStatus, StandardStatusAllowedName} from '../../types/gradingStatus'
+import {statusesTitleMap} from '../../utils/accountStatusUtils'
 
 type StandardStatusItemProps = {
   gradeStatus: GradeStatus
@@ -40,6 +41,7 @@ export const StandardStatusItem = ({
   const {color, name} = gradeStatus
   const standardStatusRef = useRef<HTMLDivElement | undefined>(undefined)
 
+  const statusName = statusesTitleMap[name as StandardStatusAllowedName]
   return (
     <View as="div" margin="small 0 0 0" data-testid={`standard-status-${gradeStatus.id}`}>
       <GradingStatusListItem
@@ -49,7 +51,7 @@ export const StandardStatusItem = ({
         <Grid vAlign="middle">
           <Grid.Row>
             <Grid.Col>
-              <Text weight="bold">{name}</Text>
+              <Text weight="bold">{statusName}</Text>
             </Grid.Col>
             <Grid.Col width="auto">
               <EditStatusPopover
