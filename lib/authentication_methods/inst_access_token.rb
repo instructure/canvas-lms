@@ -85,6 +85,17 @@ module AuthenticationMethods
       auth_context
     end
 
+    def self.usable_developer_key?(token, domain_root_account)
+      # The token is not associated with a specific developer key
+      return true if token.client_id.blank?
+
+      DeveloperKey.find_cached(token.client_id).usable_in_context?(domain_root_account)
+    rescue ActiveRecord::RecordNotFound
+      # The developer key associated with the 'client_id' claim
+      # does not exist or was deleted.
+      false
+    end
+
     # generally users should not share uuids.
     # this is just to make sure that when a shadow
     # user or similar exists, the local user

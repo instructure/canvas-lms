@@ -64,4 +64,75 @@ describe AuthenticationMethods::InstAccessToken do
       expect(ctx[:current_pseudonym]).to be_nil
     end
   end
+
+  describe ".usable_developer_key?" do
+    subject { described_class.usable_developer_key?(token, account) }
+
+    let(:account) { Account.create!(name: "account") }
+    let(:user) { user_model }
+    let(:developer_key) { DeveloperKey.create!(name: "key", account:) }
+
+    before do
+      developer_key.developer_key_account_bindings.find_by(
+        account:
+      ).update!(workflow_state: DeveloperKeyAccountBinding.workflow_states.on)
+    end
+
+    context "when the token has no client_id claim set" do
+      let(:token) do
+        InstAccess::Token.for_user(
+          user_uuid: user.uuid,
+          account_uuid: account.uuid
+        )
+      end
+
+      it { is_expected.to be true }
+    end
+
+    context "when the token has a client_id claim set" do
+      let(:token) do
+        InstAccess::Token.for_user(
+          user_uuid: user.uuid,
+          account_uuid: account.uuid,
+          client_id: developer_key.global_id
+        )
+      end
+
+      context "and the the key is active and has a binding on" do
+        before do
+          developer_key.update!(
+            workflow_state: DeveloperKey.workflow_states.active
+          )
+
+          developer_key.developer_key_account_bindings.find_by(
+            account:
+          ).update!(workflow_state: DeveloperKeyAccountBinding.workflow_states.on)
+        end
+
+        it { is_expected.to be true }
+      end
+
+      context "and the associated developer key is not found" do
+        before { developer_key.delete }
+
+        it { is_expected.to be false }
+      end
+
+      context "and the associated developer key is soft deleted" do
+        before { developer_key.destroy! }
+
+        it { is_expected.to be false }
+      end
+
+      context "and the developer key account binding is off" do
+        before do
+          developer_key.developer_key_account_bindings.find_by(
+            account:
+          ).update!(workflow_state: DeveloperKeyAccountBinding.workflow_states.off)
+        end
+
+        it { is_expected.to be false }
+      end
+    end
+  end
 end
