@@ -29,10 +29,10 @@ describe Mutations::DeleteUserInboxLabel do
     @user.save!
   end
 
-  def run_mutation(name)
+  def run_mutation(names)
     mutation_str = <<~GQL
       mutation DeleteUserInboxLabel {
-        deleteUserInboxLabel(input: {name: "#{name}"}) {
+        deleteUserInboxLabel(input: {names: #{names}}) {
           errors {
             message
           }
@@ -46,20 +46,20 @@ describe Mutations::DeleteUserInboxLabel do
   end
 
   it "deletes an inbox label" do
-    result = run_mutation("Test 1")
+    result = run_mutation(["Test 1", "Test 2"])
     expect(result["data"]["deleteUserInboxLabel"]["errors"]).to be_nil
-    expect(result["data"]["deleteUserInboxLabel"]["inboxLabels"]).to eq(["Test 2", "Test 3"])
+    expect(result["data"]["deleteUserInboxLabel"]["inboxLabels"]).to eq(["Test 3"])
   end
 
   describe "gets an error" do
     it "when trying a non existent label name" do
-      result = run_mutation("Test 4")
+      result = run_mutation(["Test 4"])
       expect(result["data"]["deleteUserInboxLabel"]["errors"][0]["message"]).to eq("Invalid label name. It doesn't exist.")
       expect(result["data"]["deleteUserInboxLabel"]["inboxLabels"]).to be_nil
     end
 
     it "when trying to leave the label name blank" do
-      result = run_mutation("")
+      result = run_mutation([""])
       expect(result["data"]["deleteUserInboxLabel"]["errors"][0]["message"]).to eq("Invalid label name. It cannot be blank.")
       expect(result["data"]["deleteUserInboxLabel"]["inboxLabels"]).to be_nil
     end
