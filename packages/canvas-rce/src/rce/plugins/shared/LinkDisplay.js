@@ -55,7 +55,7 @@ export const LinkDisplay = ({
         <Flex>
           <Flex.Item>
             <TextInput
-              data-testId="link-text-input"
+              data-testid="link-text-input"
               renderLabel={() => formatMessage('Text (optional)')}
               onChange={(_e, value) => handleTextChange(value)}
               value={linkText}
