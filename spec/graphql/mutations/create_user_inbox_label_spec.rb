@@ -27,10 +27,10 @@ describe Mutations::CreateUserInboxLabel do
     @user = user_factory
   end
 
-  def run_mutation(name)
+  def run_mutation(names)
     mutation_str = <<~GQL
       mutation CreateUserInboxLabel {
-        createUserInboxLabel(input: {name: "#{name}"}) {
+        createUserInboxLabel(input: {names: #{names}}) {
           errors {
             message
           }
@@ -44,21 +44,21 @@ describe Mutations::CreateUserInboxLabel do
   end
 
   it "creates a new inbox label" do
-    result = run_mutation("New Label")
+    result = run_mutation(["New Label 1", "New Label 2"])
     expect(result["data"]["createUserInboxLabel"]["errors"]).to be_nil
-    expect(result["data"]["createUserInboxLabel"]["inboxLabels"]).to eq(["New Label"])
+    expect(result["data"]["createUserInboxLabel"]["inboxLabels"]).to eq(["New Label 1", "New Label 2"])
   end
 
   describe "gets an error" do
     it "when trying to repeat label name" do
-      run_mutation("New Label")
-      result = run_mutation("New Label")
+      run_mutation(["New Label 1", "New Label 2"])
+      result = run_mutation(["New Label 1"])
       expect(result["data"]["createUserInboxLabel"]["errors"][0]["message"]).to eq("Invalid label name. It already exists.")
       expect(result["data"]["createUserInboxLabel"]["inboxLabels"]).to be_nil
     end
 
     it "when trying to leave the label name blank" do
-      result = run_mutation("")
+      result = run_mutation([""])
       expect(result["data"]["createUserInboxLabel"]["errors"][0]["message"]).to eq("Invalid label name. It cannot be blank.")
       expect(result["data"]["createUserInboxLabel"]["inboxLabels"]).to be_nil
     end

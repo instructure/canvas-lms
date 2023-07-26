@@ -18,22 +18,32 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class Mutations::DeleteUserInboxLabel < Mutations::BaseMutation
-  argument :name, String, required: true
+  argument :names, [String], required: true
 
   field :inbox_labels, [String], null: true
 
   def resolve(input:)
     return unless current_user
 
-    name = input[:name]
+    ret = nil
+    names = input[:names]
     inbox_labels = current_user.inbox_labels
 
-    if name && name.strip.empty?
-      validation_error(I18n.t("Invalid label name. It cannot be blank."))
-    elsif !inbox_labels.include? name
-      validation_error(I18n.t("Invalid label name. It doesn't exist."))
+    names.each do |name|
+      if name && name.strip.empty?
+        ret = validation_error(I18n.t("Invalid label name. It cannot be blank."))
+        break
+      elsif !inbox_labels.include? name
+        ret = validation_error(I18n.t("Invalid label name. It doesn't exist."))
+        break
+      else
+        inbox_labels.delete(name)
+      end
+    end
+
+    if ret
+      ret
     else
-      inbox_labels.delete(name)
       current_user.preferences[:inbox_labels] = inbox_labels
       current_user.save!
 
