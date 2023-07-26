@@ -48,6 +48,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         titleText: '',
         type: 'video-embed',
         videoSize: 'medium',
+        usePercentageUnits: false,
       },
       trayOptions: {
         host: 'localhost:3001',
