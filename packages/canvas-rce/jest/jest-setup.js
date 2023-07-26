@@ -43,7 +43,6 @@ const ignoredErrors = [
   /Invalid prop `images.searchString` of type `string` supplied to `SavedIconMakerList`/,
   /Invalid prop `media.searchString` of type `string` supplied to `MediaPanel`/,
   /Can't call %s on a component that is not yet mounted./,
-  /The prop `dimensionsState.usePercentageUnits` is marked as required in `DimensionsInput`/,
   /The prop `videoOptions.naturalHeight` is marked as required in `VideoOptionsTray`/,
   /The prop `sortBy.order` is marked as required in `MediaPanel`/,
   /Invalid prop `images.searchString` of type `string` supplied to `Images`/,
