@@ -54,7 +54,6 @@ const ignoredErrors = [
   /The prop `state.image` is marked as required in `ImageOptions`/,
   /The prop `data.icon` is marked as required in `SingleColor`/,
   /The content `content` is marked as required in `LinkOptionsTray`/,
-  /The prop `contextType` is marked as required in `DocumentsPanel`/,
   /The prop `media.course.files\[0].title` is marked as required in `MediaPanel`/,
   /The prop `audioOptions.titleText` is marked as required in `AudioOptionsTray`/,
   /The prop `audioOptions.id` is marked as required in `AudioOptionsTray`/,
