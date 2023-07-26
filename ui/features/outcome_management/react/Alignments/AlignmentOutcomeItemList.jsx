@@ -36,7 +36,7 @@ const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer
   const hasMoreOutcomes = outcomes?.pageInfo?.hasNextPage
 
   const renderSearchLoader = () => (
-    <div style={{textAlign: 'center'}} data-testid="loading">
+    <div style={{textAlign: 'center'}} data-testid="outcome-item-list-loader">
       <Spinner renderTitle={I18n.t('Loading')} size="large" />
     </div>
   )

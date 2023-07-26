@@ -42,9 +42,9 @@ describe('AlignmentOutcomeItemList', () => {
     jest.spyOn(container, prop, 'get').mockImplementation(() => value)
   }
 
-  it('renders loading indicator', () => {
+  it('renders loader when loading prop is true', () => {
     const {queryByTestId} = render(<AlignmentOutcomeItemList {...defaultProps({loading: true})} />)
-    expect(queryByTestId('loading')).toBeInTheDocument()
+    expect(queryByTestId('outcome-item-list-loader')).toBeInTheDocument()
   })
 
   it('renders list of outcome alignments', () => {
