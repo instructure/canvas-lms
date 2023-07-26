@@ -380,9 +380,6 @@ export default class Checker extends React.Component {
                               <Button
                                 variant="icon"
                                 icon={IconQuestionLine}
-                                onDismiss={() => {
-                                  this.setState({showWhyPopover: false})
-                                }}
                                 onClick={() => this.setState({showWhyPopover: true})}
                               >
                                 <ScreenReaderContent>{formatMessage('Why')}</ScreenReaderContent>
