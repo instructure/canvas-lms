@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import type JQuery from 'jquery'
-import {deferPromise} from 'defer-promise'
+import deferPromise from '@instructure/defer-promise'
 import _ from '@instructure/lodash-underscore'
 import {intersection, isEqual, map, pick} from 'lodash'
 import tz from '@canvas/timezone'

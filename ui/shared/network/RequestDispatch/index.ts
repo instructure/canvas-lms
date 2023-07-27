@@ -20,7 +20,7 @@
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-import {deferPromise} from 'defer-promise'
+import deferPromise from '@instructure/defer-promise'
 import cheaterDepaginate from './CheatDepaginator'
 
 export const DEFAULT_ACTIVE_REQUEST_LIMIT = 12 // overall limit

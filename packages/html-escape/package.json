@@ -2,12 +2,6 @@
   "name": "html-escape",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "author": "neme",
-  "main": "./index.ts",
-  "babel": {
-    "presets": [
-      "@babel/preset-typescript"
-    ]
-  }
+  "main": "./index.js"
 }

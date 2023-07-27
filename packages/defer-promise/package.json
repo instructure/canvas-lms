@@ -1,18 +1,19 @@
 {
-  "name": "defer-promise",
+  "name": "@instructure/defer-promise",
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./index.ts",
+  "main": "./index.js",
   "type": "module",
   "babel": {
-    "presets": ["@babel/preset-typescript"]
+    "presets": [
+      "@babel/preset-typescript"
+    ]
   },
   "jest": {
     "testEnvironment": "node",
-    "extensionsToTreatAsEsm": [".ts"],
     "transform": {
-      "\\.ts$": "babel-jest"
+      "\\.js$": "babel-jest"
     },
     "setupFiles": [],
     "resetMocks": false,
