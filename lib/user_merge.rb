@@ -170,7 +170,7 @@ class UserMerge
             if touching_updates.include?(table) && klass.column_names.include?("updated_at")
               update[:updated_at] = Time.now.utc
             end
-            scope.update_all(update)
+            scope.in_batches(of: 1000).update_all(update)
           end
         end
       rescue => e
@@ -755,11 +755,11 @@ class UserMerge
       # user_id to the negative user_id and then the user_id, after the
       # conflicting rows have been updated.
       model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(fkey)} DEFERRED")
-      model.where(id: move_back).update_all(user_id: -from_user.id)
-      model.where(id: to_move_ids).update_all(user_id: target_user.id)
-      model.where(id: move_back).update_all(user_id: from_user.id)
-      update_versions(model.where(id: to_move), table, :user_id)
-      update_versions(model.where(id: move_back), table, :user_id)
+      move_back.each_slice(1000) { |batch| model.where(id: batch).update_all(user_id: -from_user.id) }
+      to_move_ids.each_slice(1000) { |batch| model.where(id: batch).update_all(user_id: target_user.id) }
+      move_back.each_slice(1000) { |batch| model.where(id: batch).update_all(user_id: from_user.id) }
+      to_move.each_slice(1000) { |batch| update_versions(model.where(id: batch), table, :user_id) }
+      move_back.each_slice(1000) { |batch| update_versions(model.where(id: batch), table, :user_id) }
     end
   end
 
