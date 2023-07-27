@@ -43,8 +43,8 @@ const SingleColor = ({data, dispatch, onLoaded}) => {
 SingleColor.propTypes = {
   dispatch: PropTypes.func,
   data: PropTypes.shape({
-    icon: PropTypes.string.isRequired,
-    iconFillColor: PropTypes.string.isRequired,
+    icon: PropTypes.string,
+    iconFillColor: PropTypes.string,
   }),
   onLoaded: PropTypes.func,
 }

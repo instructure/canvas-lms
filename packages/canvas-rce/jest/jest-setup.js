@@ -51,7 +51,6 @@ const ignoredErrors = [
   /failed updating video captions/,
   /The prop `state.compressed` is marked as required in `ImageOptions`/,
   /The prop `state.image` is marked as required in `ImageOptions`/,
-  /The prop `data.icon` is marked as required in `SingleColor`/,
   /The content `content` is marked as required in `LinkOptionsTray`/,
   /The prop `media.course.files\[0].title` is marked as required in `MediaPanel`/,
   /The prop `audioOptions.titleText` is marked as required in `AudioOptionsTray`/,
