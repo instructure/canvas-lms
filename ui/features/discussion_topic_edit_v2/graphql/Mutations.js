@@ -81,3 +81,40 @@ export const CREATE_DISCUSSION_TOPIC = gql`
   }
   ${Error.fragment}
 `
+
+export const CREATE_GROUP_CATEGORY = gql`
+  mutation CreateGroupCategory(
+    $contextId: ID!
+    $contextType: String!
+    $name: String
+    $selfSignUp: String
+    $numberOfGroups: Int
+    $numberOfStudentsPerGroup: Int
+    $autoLeader: String
+    $randomlyAssignBySection: Boolean
+    $randomlyAssignSynchronously: Boolean
+  ) {
+    createGroupCategory(
+      input: {
+        contextId: $contextId
+        contextType: $contextType
+        name: $name
+        selfSignup: $selfSignUp
+        numberOfGroups: $numberOfGroups
+        numberOfStudentsPerGroup: $numberOfStudentsPerGroup
+        autoLeader: $autoLeader
+        randomlyAssignBySection: $randomlyAssignBySection
+        randomlyAssignSynchronously: $randomlyAssignSynchronously
+      }
+    ) {
+      groupCategory {
+        _id
+        id
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+`

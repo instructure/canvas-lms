@@ -35,7 +35,7 @@ import {useScope as usei18NScope} from '@canvas/i18n'
 
 const I18N = usei18NScope('discussion_create')
 
-export default function CreateGroupSetModal({show, setShow, onSubmit}) {
+export default function CreateGroupCategoryModal({show, setShow, onSubmit}) {
   const defaultFocusElementRef = useRef(null)
 
   // Form properties
@@ -45,7 +45,7 @@ export default function CreateGroupSetModal({show, setShow, onSubmit}) {
   const [requireSameSection, setRequireSameSection] = useState(false)
   const [autoAssignGroupLeader, setAutoAssignGroupLeader] = useState(false)
   const [numberOfGroups, setNumberOfGroups] = useState(0)
-  const [studentsPerGroup, setStudentsPerGroup] = useState(0)
+  const [numberOfStudentsPerGroup, setNumberOfStudentsPerGroup] = useState(0)
   const [groupLeaderAssignmentMethod, setGroupLeaderAssignmentMethod] = useState('')
 
   const handleNumberChange = (
@@ -70,7 +70,7 @@ export default function CreateGroupSetModal({show, setShow, onSubmit}) {
     setRequireSameSection(false)
     setAutoAssignGroupLeader(false)
     setNumberOfGroups(0)
-    setStudentsPerGroup(0)
+    setNumberOfStudentsPerGroup(0)
     setGroupLeaderAssignmentMethod('')
   }
 
@@ -82,7 +82,7 @@ export default function CreateGroupSetModal({show, setShow, onSubmit}) {
       requireSameSection,
       autoAssignGroupLeader,
       numberOfGroups,
-      studentsPerGroup,
+      numberOfStudentsPerGroup,
       groupLeaderAssignmentMethod,
     })
     clearFields()
@@ -98,7 +98,7 @@ export default function CreateGroupSetModal({show, setShow, onSubmit}) {
         label={I18N.t('Modal Dialog: New Group Set')}
         onOpen={() => defaultFocusElementRef.current?.focus()}
         shouldCloseOnDocumentClick={true}
-        onExit={clearFields}
+        onExited={clearFields}
       >
         <Modal.Header>
           <CloseButton
@@ -170,7 +170,9 @@ export default function CreateGroupSetModal({show, setShow, onSubmit}) {
               value={groupStructure}
               onChange={(_event, {value}) => {
                 setNumberOfGroups(value !== 'students-by-number-of-groups' ? 0 : numberOfGroups)
-                setStudentsPerGroup(value !== 'number-of-students-per-group' ? 0 : studentsPerGroup)
+                setNumberOfStudentsPerGroup(
+                  value !== 'number-of-students-per-group' ? 0 : numberOfStudentsPerGroup
+                )
                 setGroupStructure(value)
               }}
             >
@@ -214,20 +216,28 @@ export default function CreateGroupSetModal({show, setShow, onSubmit}) {
             ) : groupStructure === 'number-of-students-per-group' ? (
               <NumberInput
                 renderLabel={I18N.t('Number of Students Per Group')}
-                value={studentsPerGroup}
+                value={numberOfStudentsPerGroup}
                 // TODO: this should have a maximum of the number of students in the class
                 onChange={event =>
                   handleNumberChange(
-                    studentsPerGroup,
-                    setStudentsPerGroup,
+                    numberOfStudentsPerGroup,
+                    setNumberOfStudentsPerGroup,
                     Number(event.target.value)
                   )
                 }
                 onIncrement={() =>
-                  handleNumberChange(studentsPerGroup, setStudentsPerGroup, studentsPerGroup + 1)
+                  handleNumberChange(
+                    numberOfStudentsPerGroup,
+                    setNumberOfStudentsPerGroup,
+                    numberOfStudentsPerGroup + 1
+                  )
                 }
                 onDecrement={() =>
-                  handleNumberChange(studentsPerGroup, setStudentsPerGroup, studentsPerGroup - 1)
+                  handleNumberChange(
+                    numberOfStudentsPerGroup,
+                    setNumberOfStudentsPerGroup,
+                    numberOfStudentsPerGroup - 1
+                  )
                 }
               />
             ) : null}
@@ -278,13 +288,13 @@ export default function CreateGroupSetModal({show, setShow, onSubmit}) {
   )
 }
 
-CreateGroupSetModal.propTypes = {
+CreateGroupCategoryModal.propTypes = {
   show: PropTypes.bool,
   setShow: PropTypes.func,
   onSubmit: PropTypes.func,
 }
 
-CreateGroupSetModal.defaultProps = {
+CreateGroupCategoryModal.defaultProps = {
   show: false,
   setShow: () => {},
   onSubmit: () => {},

@@ -17,16 +17,19 @@
  */
 
 import React, {useState, useCallback} from 'react'
-import CreateGroupSetModal from './CreateGroupSetModal'
+import CreateGroupCategoryModal from './CreateGroupCategoryModal'
+import {Button} from '@instructure/ui-buttons'
 
 export default {
-  title: 'Examples/Discussion Create\\Edit/Components/CreateGroupSetModal',
-  component: CreateGroupSetModal,
+  title: 'Examples/Discussion Create\\Edit/Components/CreateGroupCategoryModal',
+  component: CreateGroupCategoryModal,
   argTypes: {},
 }
 
 export function Primary() {
   const [color, setColor] = useState(null)
+
+  const [show, setShow] = useState(false)
 
   const onSubmit = useCallback(({groupName: newColor}) => {
     setColor(newColor)
@@ -34,7 +37,8 @@ export function Primary() {
 
   return (
     <div style={{backgroundColor: color, padding: '100px'}}>
-      <CreateGroupSetModal show={true} setShow={() => {}} onSubmit={onSubmit} />
+      <Button onClick={() => setShow(!show)}>Open Modal</Button>
+      <CreateGroupCategoryModal show={show} setShow={setShow} onSubmit={onSubmit} />
     </div>
   )
 }
