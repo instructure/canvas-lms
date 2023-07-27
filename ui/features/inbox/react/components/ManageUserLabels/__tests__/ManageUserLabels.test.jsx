@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {ManageUserLabels} from '../ManageUserLabels'
 
 const createProps = overrides => {
@@ -117,8 +117,10 @@ describe('ManageUserLabels', () => {
 
     fireEvent.click(getByText('Save'))
 
-    expect(props.onDelete).toHaveBeenCalled()
-    expect(props.onDelete).toHaveBeenCalledWith(['Assignment Info'])
+    waitFor(() => {
+      expect(props.onDelete).toHaveBeenCalled()
+      expect(props.onDelete).toHaveBeenCalledWith(['Assignment Info'])
+    })
   })
 
   it('does not calls onDelete when the Save button is clicked and no labels are deleted', () => {

@@ -148,6 +148,17 @@ export const TOTAL_RECIPIENTS = gql`
   }
 `
 
+export const USER_INBOX_LABELS_QUERY = gql`
+  query GetUserInboxLabels($userID: ID!) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        inboxLabels
+      }
+    }
+  }
+`
+
 export const CONVERSATIONS_QUERY = gql`
   query GetConversationsQuery(
     $userID: ID!

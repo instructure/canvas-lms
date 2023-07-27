@@ -283,6 +283,70 @@ describe "conversations new" do
         expect(f("[data-testid='course-select']").attribute("value")).to eq ""
       end
     end
+
+    context "when react_inbox_labels feature flag is ON" do
+      before do
+        Account.site_admin.set_feature_flag! :react_inbox_labels, "on"
+      end
+
+      it "shows the Manage labels button" do
+        get "/conversations"
+        expect(f('button[data-testid="manage-labels"]')).to be_displayed
+      end
+
+      context "in the Manage labels modal" do
+        before do
+          @teacher.preferences[:inbox_labels] = ["Test 1", "Test 2", "Test 3"]
+          @teacher.save!
+
+          user_session(@teacher)
+          get "/conversations"
+
+          f('button[data-testid="manage-labels"]').click
+          wait_for_ajaximations
+        end
+
+        it "shows the user's labels" do
+          labels = ff("tr[data-testid='label']")
+
+          expect(labels.count).to eq 3
+          expect(labels[0].text).to eq "Test 1\nRemove Label"
+          expect(labels[1].text).to eq "Test 2\nRemove Label"
+          expect(labels[2].text).to eq "Test 3\nRemove Label"
+        end
+
+        it "removes the Test 1 label from user's labels" do
+          delete_label_buttons = ff("button[data-testid='delete-label']")
+          expect(delete_label_buttons.count).to eq 3
+
+          delete_label_buttons[0].click
+          fj("button:contains('Save')").click
+          wait_for_ajaximations
+
+          keep_trying_until { expect(User.find(@teacher.id).inbox_labels).to eq ["Test 2", "Test 3"] }
+        end
+
+        it "adds the Test 4 label to user's labels" do
+          f("input[placeholder='Label Name']").send_keys "Test 4"
+          f("button[data-testid='add-label']").click
+          fj("button:contains('Save')").click
+          wait_for_ajaximations
+
+          expect(User.find(@teacher.id).inbox_labels).to eq ["Test 1", "Test 2", "Test 3", "Test 4"]
+        end
+      end
+    end
+
+    context "when react_inbox_labels feature flag is OFF" do
+      before do
+        Account.site_admin.set_feature_flag! :react_inbox_labels, "off"
+      end
+
+      it "does not shows the Manage labels button" do
+        get "/conversations"
+        expect(f("body")).not_to contain_jqcss('button[data-testid="manage-labels"]')
+      end
+    end
   end
 
   context "when react_inbox feature flag is off" do

@@ -22,6 +22,7 @@ import {ConversationContext} from '../../../util/constants'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {
+  IconAddFolderLine,
   IconCollectionSaveLine,
   IconComposeLine,
   IconMoreLine,
@@ -123,6 +124,16 @@ export const MessageActionButtons = props => {
             testid="compose"
             ariaLabel={I18n.t('Compose a new message')}
           />
+          {ENV?.react_inbox_labels && (
+            <ActionButton
+              tip={I18n.t('Manage labels')}
+              icon={IconAddFolderLine}
+              onClick={props.manageLabels}
+              disabled={props.manageLabels === null}
+              testid="manage-labels"
+              ariaLabel={I18n.t('Manage labels')}
+            />
+          )}
         </View>
       </Flex.Item>
       <Flex.Item>
@@ -170,6 +181,7 @@ MessageActionButtons.propTypes = {
   deleteDisabled: PropTypes.bool,
   settingsDisabled: PropTypes.bool,
   compose: PropTypes.func.isRequired,
+  manageLabels: PropTypes.func,
   reply: PropTypes.func.isRequired,
   replyAll: PropTypes.func.isRequired,
   archive: PropTypes.func,
