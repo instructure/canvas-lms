@@ -56,8 +56,6 @@ const ignoredErrors = [
   /The prop `audioOptions.titleText` is marked as required in `AudioOptionsTray`/,
   /The prop `audioOptions.id` is marked as required in `AudioOptionsTray`/,
   /The prop `trayProps` is marked as required in `AudioOptionsTray`/,
-  /Invalid prop `audioOptions` of type `boolean` supplied to `AudioOptionsTray`/,
-  /Invalid prop `audioOptions` of type `boolean` supplied to `AudioOptionsTray`/,
   /Not implemented: navigation/,
   /Not implemented: HTMLFormElement.prototype.submit/,
   /The prop `images.course.files\[0].content_type` is marked as required in `Images`/,
