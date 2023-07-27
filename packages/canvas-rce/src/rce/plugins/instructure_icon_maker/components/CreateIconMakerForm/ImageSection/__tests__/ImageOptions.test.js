@@ -50,6 +50,7 @@ describe('ImageOptions', () => {
       cropperOpen: false,
       loading: false,
       cropperSettings: null,
+      compressed: false,
     },
     settings: {
       shape: 'square',
@@ -96,6 +97,7 @@ describe('ImageOptions', () => {
           collectionOpen: false,
           cropperOpen: true,
           loading: false,
+          compressed: false,
         },
       })
     })
@@ -134,6 +136,7 @@ describe('ImageOptions', () => {
             collectionOpen: false,
             cropperOpen: false,
             loading: false,
+            compressed: false,
             cropperSettings: {
               shape: 'square',
               rotation: 0,
@@ -219,6 +222,7 @@ describe('ImageOptions', () => {
               collectionOpen: false,
               cropperOpen: false,
               loading: false,
+              compressed: false,
               cropperSettings: {
                 shape: 'circle',
                 rotation: 90,
@@ -286,6 +290,7 @@ describe('ImageOptions', () => {
       collectionOpen: false,
       cropperOpen: false,
       loading: false,
+      compressed: false,
     }
 
     it('focuses Clear button when an image is selected', async () => {
@@ -324,6 +329,7 @@ describe('ImageOptions', () => {
       collectionOpen: false,
       cropperOpen: false,
       loading: false,
+      compressed: false,
     }
 
     beforeEach(() => {
