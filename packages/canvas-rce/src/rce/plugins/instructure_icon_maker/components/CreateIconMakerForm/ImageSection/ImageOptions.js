@@ -184,9 +184,9 @@ export const ImageOptions = ({state, settings, dispatch, mountNode, trayDispatch
 
 ImageOptions.propTypes = {
   state: PropTypes.shape({
-    image: PropTypes.string.isRequired,
-    imageName: PropTypes.string.isRequired,
-    mode: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    imageName: PropTypes.string,
+    mode: PropTypes.string,
     loading: PropTypes.bool.isRequired,
     cropperOpen: PropTypes.bool.isRequired,
     cropperSettings: ImageCropperSettingsPropTypes,
