@@ -16,4 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as deferPromise} from './deferPromise'
+export default function deferPromise() {
+  const deferred = {
+    state: 'pending',
+    resolve: () => {},
+    reject: () => {},
+    promise: new Promise(() => {}),
+  }
+
+  deferred.promise = new Promise((resolve, reject) => {
+    deferred.resolve = value => {
+      if (deferred.state === 'pending') {
+        deferred.state = 'resolved'
+        resolve(value)
+      }
+    }
+
+    deferred.reject = error => {
+      if (deferred.state === 'pending') {
+        deferred.state = 'rejected'
+        reject(error)
+      }
+    }
+  })
+
+  return deferred
+}

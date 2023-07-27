@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -17,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// @ts-expect-error
+const INST = {}
+
 if (!('INST' in window)) window.INST = {}
-declare const INST: any
 
 class SafeString {
-  'string': string
-
-  constructor(string: any) {
+  constructor(string) {
     this.string = typeof string === 'string' ? string : `${string}`
   }
 
@@ -40,19 +37,15 @@ const ENTITIES = {
   '"': '&quot;',
   "'": '&#x27;',
   '/': '&#x2F;',
-  '`': '&#x60;', // for old versions of IE
-  '=': '&#x3D;', // in case of unquoted attributes
-} as const
+  '`': '&#x60;',
+  '=': '&#x3D;',
+}
 
-export function htmlEscape(str: string): string {
-  // ideally we should wrap this in a SafeString, but this is how it has
-  // always worked :-/
+export function htmlEscape(str) {
   return str.replace(/[&<>"'\/`=]/g, c => ENTITIES[c])
 }
 
-// Escapes HTML tags from string, or object string props of `strOrObject`.
-// returns the new string, or the object with escaped properties
-export default function escape<T>(strOrObject: string | SafeString | Object) {
+export default function escape(strOrObject) {
   if (typeof strOrObject === 'string') {
     return htmlEscape(strOrObject)
   } else if (strOrObject instanceof SafeString) {
@@ -67,11 +60,10 @@ export default function escape<T>(strOrObject: string | SafeString | Object) {
       strOrObject[k] = escape(v)
     }
   }
-  return strOrObject as T
+  return strOrObject
 }
 escape.SafeString = SafeString
 
-// tinymce plugins use this and they need it global :(
 INST.htmlEscape = escape
 
 const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {
@@ -83,8 +75,6 @@ const UNESCAPE_ENTITIES = Object.keys(ENTITIES).reduce((map, key) => {
 const unescapeSource = `(?:${Object.keys(UNESCAPE_ENTITIES).join('|')})`
 const UNESCAPE_REGEX = new RegExp(unescapeSource, 'g')
 
-export function unescape(str: string) {
+export function unescape(str) {
   return str.replace(UNESCAPE_REGEX, match => UNESCAPE_ENTITIES[match])
 }
-
-escape.unescape = unescape

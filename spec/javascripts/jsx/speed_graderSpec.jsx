@@ -29,11 +29,9 @@ import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import userSettings from '@canvas/user-settings'
-import htmlEscape from 'html-escape'
+import {unescape} from 'html-escape'
 
 import '@canvas/jquery/jquery.ajaxJSON'
-
-const {unescape} = htmlEscape
 
 const fixtures = document.getElementById('fixtures')
 const setupCurrentStudent = (historyBehavior = null) =>
