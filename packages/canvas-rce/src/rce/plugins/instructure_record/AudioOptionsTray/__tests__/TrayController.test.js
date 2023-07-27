@@ -24,10 +24,17 @@ import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
 
+const MOCK_AUDIO_PLAYERS = [
+  {
+    id: 'audio_id',
+    titleText: 'Audio Title for audio.mp3',
+  },
+]
+
 beforeAll(() => {
   contentSelection.asAudioElement = jest.fn(elem => {
     const id = elem.parentElement.getAttribute('id')
-    return id === 'audio_id'
+    return MOCK_AUDIO_PLAYERS.find(ap => ap.id === id)
   })
 })
 
