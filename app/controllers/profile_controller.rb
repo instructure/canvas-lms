@@ -260,7 +260,11 @@ class ProfileController < ApplicationController
     }
 
     js_bundle :account_notification_settings
-    render html: "", layout: true
+    respond_to do |format|
+      format.html do
+        render html: "", layout: true
+      end
+    end
   end
 
   def communication_update
