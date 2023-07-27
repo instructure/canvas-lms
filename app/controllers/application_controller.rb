@@ -913,7 +913,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def tab_enabled?(id, opts = {})
+  def tab_enabled?(id, no_render: false)
     return true unless @context.respond_to?(:tabs_available)
 
     valid = Rails.cache.fetch(["tab_enabled4", id, @context, @current_user, @domain_root_account, session[:enrollment_uuid]].cache_key) do
@@ -923,7 +923,7 @@ class ApplicationController < ActionController::Base
                               root_account: @domain_root_account,
                               only_check: [id]).any? { |t| t[:id] == id }
     end
-    render_tab_disabled unless valid || opts[:no_render]
+    render_tab_disabled unless valid || no_render
     valid
   end
 

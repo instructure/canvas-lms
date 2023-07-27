@@ -178,8 +178,10 @@ class CollaborationsController < ApplicationController
   #
   # @returns [Collaboration]
   def api_index
-    return unless authorized_action(@context, @current_user, :read) &&
-                  (tab_enabled?(@context.class::TAB_COLLABORATIONS) || tab_enabled?(@context.class::TAB_COLLABORATIONS_NEW))
+    return unless authorized_action(@context, @current_user, :read)
+    unless tab_enabled?(@context.class::TAB_COLLABORATIONS, no_render: true) || tab_enabled?(@context.class::TAB_COLLABORATIONS_NEW, no_render: true)
+      return render_tab_disabled
+    end
 
     log_api_asset_access(["collaborations", @context], "collaborations", "other")
 
