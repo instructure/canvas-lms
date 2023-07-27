@@ -1024,5 +1024,30 @@ describe('CommentsTrayBody', () => {
 
       expect(queryByTestId('peer-review-prompt-modal')).not.toBeInTheDocument()
     })
+
+    it('calls the onSuccessfulPeerReview function to re-render page when a peer review comment is successful', async () => {
+      const mocks = await Promise.all([
+        mockSubmissionCommentQuery({}, {peerReview: true}),
+        mockCreateSubmissionComment(),
+      ])
+      const onSuccessfulPeerReviewMockFunction = jest.fn()
+      const props = {
+        ...(await getDefaultPropsWithReviewerSubmission('assigned')),
+        onSuccessfulPeerReview: onSuccessfulPeerReviewMockFunction,
+      }
+      props.isPeerReviewEnabled = true
+      const {findByPlaceholderText, getByText} = render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+      const textArea = await findByPlaceholderText('Submit a Comment')
+      fireEvent.change(textArea, {target: {value: 'lion'}})
+      fireEvent.click(getByText('Send Comment'))
+      await waitFor(() => expect(onSuccessfulPeerReviewMockFunction).toHaveBeenCalled())
+      expect(props.reviewerSubmission.assignedAssessments[0].workflowState).toEqual('completed')
+    })
   })
 })

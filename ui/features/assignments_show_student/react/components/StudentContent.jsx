@@ -28,7 +28,7 @@ import MarkAsDoneButton from './MarkAsDoneButton'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
-import React, {Suspense, lazy, useContext, useEffect} from 'react'
+import React, {Suspense, lazy, useContext, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -128,7 +128,8 @@ function renderAttemptsAndAvailability(assignment) {
 
 function renderContentBaseOnAvailability(
   {assignment, submission, reviewerSubmission},
-  alertContext
+  alertContext,
+  onSuccessfulPeerReview
 ) {
   if (assignment.env.modulePrereq) {
     return <MissingPrereqs moduleUrl={assignment.env.moduleUrl} />
@@ -195,6 +196,7 @@ function renderContentBaseOnAvailability(
             assignment={assignment}
             submission={submission}
             reviewerSubmission={reviewerSubmission}
+            onSuccessfulPeerReview={onSuccessfulPeerReview}
           />
         ) : (
           <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
@@ -216,6 +218,7 @@ function renderContentBaseOnAvailability(
 
 function StudentContent(props) {
   const alertContext = useContext(AlertManagerContext)
+  const [assignedAssessments, setAssignedAssessments] = useState([])
 
   const {description, name} = props.assignment
   useEffect(() => {
@@ -247,6 +250,10 @@ function StudentContent(props) {
     setUpImmersiveReader()
   }, [description, name])
 
+  const onSuccessfulPeerReview = (assignedAssessments) => {
+    setAssignedAssessments(assignedAssessments)
+  }
+
   // TODO: Move the button provider up one level
   return (
     <div data-testid="assignments-2-student-view">
@@ -257,8 +264,9 @@ function StudentContent(props) {
         scrollThreshold={150}
         submission={props.submission}
         reviewerSubmission={props.reviewerSubmission}
+        onSuccessfulPeerReview={onSuccessfulPeerReview}
       />
-      {renderContentBaseOnAvailability(props, alertContext)}
+      {renderContentBaseOnAvailability(props, alertContext, onSuccessfulPeerReview)}
     </div>
   )
 }
@@ -269,6 +277,7 @@ StudentContent.propTypes = {
   onChangeSubmission: PropTypes.func.isRequired,
   submission: Submission.shape,
   reviewerSubmission: Submission.shape,
+  onSuccessfulPeerReview: PropTypes.func,
 }
 
 StudentContent.defaultProps = {

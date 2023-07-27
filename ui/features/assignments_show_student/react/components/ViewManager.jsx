@@ -91,6 +91,7 @@ class ViewManager extends React.Component {
     displayedAttempt: null,
     dummyNextSubmission: null,
     submissions: [],
+    reviewerSubmission: [],
   }
 
   static getDerivedStateFromProps(props, state) {

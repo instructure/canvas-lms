@@ -37,7 +37,7 @@ import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
-import {bool} from 'prop-types'
+import {bool, func} from 'prop-types'
 import PeerReviewPromptModal from '../PeerReviewPromptModal'
 import {
   getRedirectUrlToFirstPeerReview,
@@ -189,6 +189,7 @@ export default function CommentsTrayBody(props) {
                 onSendCommentSuccess={() => {
                   if (props.isPeerReviewEnabled && !props.assignment.rubric) {
                     handlePeerReviewPromptModal()
+                    props.onSuccessfulPeerReview?.(props.reviewerSubmission)
                   }
                 }}
               />
@@ -221,6 +222,7 @@ CommentsTrayBody.propTypes = {
   submission: Submission.shape.isRequired,
   reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool,
+  onSuccessfulPeerReview: func,
 }
 
 CommentsTrayBody.defaultProps = {

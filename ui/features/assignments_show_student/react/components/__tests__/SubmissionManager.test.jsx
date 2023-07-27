@@ -1964,6 +1964,58 @@ describe('SubmissionManager', () => {
         expect(await findByText(COMPLETED_PEER_REVIEW_TEXT)).toBeTruthy()
       })
 
+      it('calls the onSuccessfulPeerReview function to re-render page when a peer review with rubric is successful', async () => {
+        setOtherUserAsAssessmentOwner()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+            ],
+          },
+        })
+        const assetId = props.submission._id
+        const reviewerSubmission = {
+          id: 'test-id',
+          _id: 'test-id',
+          assignedAssessments: [
+            {
+              assetId,
+              workflowState: 'assigned',
+              assetSubmissionType: 'online-text',
+            },
+            {
+              assetId: 'some other user id',
+              workflowState: 'assigned',
+              assetSubmissionType: 'online-text',
+            },
+          ],
+        }
+
+        props.reviewerSubmission = reviewerSubmission
+        props.assignment.env.peerReviewModeEnabled = true
+        props.assignment.env.peerReviewAvailable = true
+        const onSuccessfulPeerReviewMockFunction = jest.fn()
+
+        const prop = {
+          ...props,
+          onSuccessfulPeerReview: onSuccessfulPeerReviewMockFunction,
+        }
+
+        const {getByText, findByText} = render(
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...prop} />
+            </MockedProvider>
+        )
+        await new Promise(resolve => setTimeout(resolve, 1))
+        const submitButton = getByText('Submit')
+        fireEvent.click(submitButton)
+
+        await waitFor(() => expect(onSuccessfulPeerReviewMockFunction).toHaveBeenCalled())
+        expect(props.reviewerSubmission.assignedAssessments[0].workflowState).toEqual('completed')
+      })
+
       it('creates an error alert when the http request fails', async () => {
         setOtherUserAsAssessmentOwner()
         doFetchApi.mockImplementation(() => Promise.reject(new Error('Network error')))
