@@ -30,7 +30,6 @@ import {Link} from '@instructure/ui-link'
 import {IconChatLine, IconQuestionLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
-import {Popover} from '@instructure/ui-popover'
 import {arrayOf, func} from 'prop-types'
 import OriginalityReport from './OriginalityReport'
 import React from 'react'
@@ -43,10 +42,12 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import CommentsTray from './CommentsTray/index'
+import {Popover} from '@instructure/ui-popover'
 import {
   getOriginalityData,
   isOriginalityReportVisible,
 } from '@canvas/grading/originalityReportHelper'
+import PeerReviewNavigationLink from './PeerReviewNavigationLink'
 
 const I18n = useI18nScope('assignments_2_student_header')
 
@@ -57,6 +58,8 @@ class Header extends React.Component {
     onChangeSubmission: func,
     submission: Submission.shape,
     reviewerSubmission: Submission.shape,
+    peerReviewLinkData: Submission.shape,
+    onSuccessfulPeerReview: func,
   }
 
   static defaultProps = {
@@ -86,11 +89,11 @@ class Header extends React.Component {
     )
   }
 
-  currentAssessmentIndex = () => {
+  currentAssessmentIndex = assignedAssessments => {
     const userId = this.props.assignment.env.revieweeId
     const anonymousId = this.props.assignment.env.anonymousAssetId
     const value =
-      this.props.reviewerSubmission?.assignedAssessments?.findIndex(assessment => {
+      assignedAssessments?.findIndex(assessment => {
         return (
           (userId && userId === assessment.anonymizedUser._id) ||
           (anonymousId && assessment.anonymousId === anonymousId)
@@ -276,15 +279,52 @@ class Header extends React.Component {
     let topRightComponent
     if (this.isPeerReviewModeEnabled()) {
       topRightComponent = (
-        <Flex.Item margin="0 small 0 0">
-          <PeerReviewsCounter
-            current={this.currentAssessmentIndex()}
-            total={this.props.reviewerSubmission?.assignedAssessments?.length || 0}
-          />
-        </Flex.Item>
+        <Flex direction="column" alignItems="end">
+          {this.props.peerReviewLinkData ? (
+            <Flex.Item padding="0 small 0 0">
+              <PeerReviewNavigationLink
+                assignedAssessments={this.props.peerReviewLinkData?.assignedAssessments}
+                currentAssessmentIndex={this.currentAssessmentIndex(
+                  this.props.peerReviewLinkData?.assignedAssessments
+                )}
+              />
+            </Flex.Item>
+          ) : (
+            <>
+              <Flex.Item padding="0 small 0 0">
+                <PeerReviewsCounter
+                  current={this.currentAssessmentIndex(
+                    this.props.reviewerSubmission?.assignedAssessments
+                  )}
+                  total={this.props.reviewerSubmission?.assignedAssessments?.length || 0}
+                />
+              </Flex.Item>
+              <Flex.Item padding="0 small 0 0">
+                <PeerReviewNavigationLink
+                  assignedAssessments={this.props.reviewerSubmission?.assignedAssessments}
+                  currentAssessmentIndex={this.currentAssessmentIndex(
+                    this.props.reviewerSubmission?.assignedAssessments
+                  )}
+                />
+              </Flex.Item>
+            </>
+          )}
+        </Flex>
       )
     } else {
-      topRightComponent = <Flex.Item>{this.renderLatestGrade()}</Flex.Item>
+      topRightComponent = (
+        <Flex direction="column" alignItems="end">
+          <Flex.Item padding="0 small 0 0">{this.renderLatestGrade()}</Flex.Item>
+          {this.props.submission?.assignedAssessments?.length > 0 && (
+            <Flex.Item overflowX="hidden" padding="0 small 0 0">
+              <PeerReviewNavigationLink
+                assignedAssessments={this.props.submission.assignedAssessments}
+                currentAssessmentIndex={0}
+              />
+            </Flex.Item>
+          )}
+        </Flex>
+      )
     }
 
     return (
@@ -301,10 +341,13 @@ class Header extends React.Component {
             <ScreenReaderContent> {this.props.assignment.name} </ScreenReaderContent>
           </Heading>
 
-          <Flex as="div" margin="0" wrap="wrap" alignItems="start">
+          <Flex as="div" margin="0" wrap="wrap" alignItems="start" padding="0 0 large 0">
             <Flex.Item shouldShrink={true}>
               <AssignmentDetails assignment={this.props.assignment} />
             </Flex.Item>
+            {this.props.peerReviewLinkData && (
+              <Flex.Item shouldGrow={true}>{topRightComponent}</Flex.Item>
+            )}
             {this.props.submission && (
               <Flex.Item shouldGrow={true}>
                 <Flex as="div" justifyItems="end" alignItems="center">
@@ -323,6 +366,7 @@ class Header extends React.Component {
                   open={this.state.commentsTrayOpen}
                   closeTray={this.closeCommentsTray}
                   isPeerReviewEnabled={this.isPeerReviewModeEnabled()}
+                  onSuccessfulPeerReview={this.props.onSuccessfulPeerReview}
                 />
               </Flex.Item>
             )}

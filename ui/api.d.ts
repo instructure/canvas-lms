@@ -278,12 +278,12 @@ export type AssessmentRequest = Readonly<{
 export type AssignedAssessments = {
   assetId: string
   workflowState: string
-  assetSubmissionType: string
+  assetSubmissionType: string | null
   anonymizedUser?: {
     displayName: string
     _id: string
-  }
-  anonymousId?: string
+  } | null
+  anonymousId?: string | null
 }
 
 export type AttachmentData = Readonly<{

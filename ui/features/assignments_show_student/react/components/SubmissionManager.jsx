@@ -167,7 +167,7 @@ CancelAttemptButton.propTypes = {
   submission: PropTypes.object.isRequired,
 }
 
-const SubmissionManager = ({assignment, submission, reviewerSubmission}) => {
+const SubmissionManager = ({assignment, submission, reviewerSubmission, onSuccessfulPeerReview}) => {
   const [draftStatus, setDraftStatus] = useState(null)
   const [editingDraft, setEditingDraft] = useState(false)
   const [focusAttemptOnInit, setFocusAttemptOnInit] = useState(false)
@@ -570,6 +570,7 @@ const SubmissionManager = ({assignment, submission, reviewerSubmission}) => {
       if (assignment.env.peerReviewModeEnabled) {
         const matchingAssessment = assignedAssessments.find(x => x.assetId === submission._id)
         if (matchingAssessment) matchingAssessment.workflowState = 'completed'
+        onSuccessfulPeerReview?.(assignedAssessments)
       }
       const {availableCount, unavailableCount} = availableAndUnavailableCounts(assignedAssessments)
       handlePeerReviewPromptSettings(availableCount, unavailableCount)
@@ -868,6 +869,7 @@ SubmissionManager.propTypes = {
   assignment: Assignment.shape,
   submission: Submission.shape,
   reviewerSubmission: Submission.shape,
+  onSuccessfulPeerReview: PropTypes.func,
 }
 
 export default SubmissionManager

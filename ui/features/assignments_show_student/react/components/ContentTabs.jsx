@@ -25,6 +25,7 @@ import SubmissionManager from './SubmissionManager'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
+import PropTypes from 'prop-types'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -40,6 +41,7 @@ ContentTabs.propTypes = {
   assignment: Assignment.shape,
   submission: Submission.shape,
   reviewerSubmission: Submission.shape,
+  onSuccessfulPeerReview: PropTypes.func,
 }
 
 function LoggedInContentTabs(props) {
@@ -52,6 +54,7 @@ function LoggedInContentTabs(props) {
           assignment={props.assignment}
           submission={props.submission}
           reviewerSubmission={props.reviewerSubmission}
+          onSuccessfulPeerReview={props.onSuccessfulPeerReview}
         />
       </View>
     </div>
