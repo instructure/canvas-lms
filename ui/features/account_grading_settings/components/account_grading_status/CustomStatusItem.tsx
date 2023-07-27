@@ -18,6 +18,7 @@
 
 import React, {useRef} from 'react'
 import {GradingStatusListItem} from '@canvas/grading-status-list-item'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import {IconButton} from '@instructure/ui-buttons'
 // @ts-expect-error
 import {IconTrashSolid} from '@instructure/ui-icons'
@@ -26,7 +27,6 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
-import {GradeStatus} from '../../types/gradingStatus'
 import {Flex} from '@instructure/ui-flex'
 
 const {Item: FlexItem} = Flex as any

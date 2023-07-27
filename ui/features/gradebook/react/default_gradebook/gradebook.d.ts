@@ -17,6 +17,7 @@
  */
 
 import type {ProgressData, DeprecatedGradingScheme} from '@canvas/grading/grading.d'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import StudentDatastore from './stores/StudentDatastore'
 import type {StatusColors} from './constants/colors'
 import type {
@@ -109,6 +110,8 @@ export type GradebookOptions = {
   custom_column_datum_url: string
   custom_column_url: string
   custom_columns_url: string
+  custom_grade_statuses: GradeStatus[]
+  custom_grade_statuses_enabled: boolean
   default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
   enhanced_gradebook_filters: boolean

@@ -18,12 +18,12 @@
 
 import React, {useRef} from 'react'
 import {GradingStatusListItem} from '@canvas/grading-status-list-item'
+import type {GradeStatus, StandardStatusAllowedName} from '@canvas/grading/accountGradingStatus'
 // @ts-expect-error
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
-import {GradeStatus, StandardStatusAllowedName} from '../../types/gradingStatus'
 import {statusesTitleMap} from '../../utils/accountStatusUtils'
 
 type StandardStatusItemProps = {

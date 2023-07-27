@@ -480,9 +480,12 @@ class GradebooksController < ApplicationController
     visible_sections = @context.sections_visible_to(@current_user)
     root_account = @context.root_account
 
-    standard_statuses = Account.site_admin.feature_enabled?(:custom_gradebook_statuses) ? root_account.standard_grade_statuses : []
+    custom_grade_statuses_enabled = Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+    standard_statuses = custom_grade_statuses_enabled ? root_account.standard_grade_statuses : []
     standard_status_hash = standard_statuses.pluck(:status_name, :color).to_h
     colors = standard_status_hash.merge!(gradebook_settings(:colors))
+
+    custom_grade_statuses = custom_grade_statuses_enabled ? root_account.custom_grade_statuses.active.as_json(include_root: false) : []
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
@@ -509,6 +512,8 @@ class GradebooksController < ApplicationController
       course_url: api_v1_course_url(@context),
       current_grading_period_id: @current_grading_period_id,
       custom_column_datum_url: api_v1_course_custom_gradebook_column_datum_url(@context, ":id", ":user_id"),
+      custom_grade_statuses:,
+      custom_grade_statuses_enabled:,
       default_grading_standard: grading_standard.data,
       download_assignment_submissions_url: named_context_url(@context, :context_assignment_submissions_url, "{{ assignment_id }}", zip: 1),
       enhanced_gradebook_filters: @context.feature_enabled?(:enhanced_gradebook_filters),

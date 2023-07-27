@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -17,19 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {CamelizedSubmission, CamelizedAssignment} from '@canvas/grading/grading.d'
+import {CamelizedSubmission} from '@canvas/grading/grading.d'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
-function checkedValue(submission: CamelizedSubmission, assignment: CamelizedAssignment) {
+type SubmissionPartialProp = Pick<
+  CamelizedSubmission,
+  'excused' | 'missing' | 'late' | 'latePolicyStatus' | 'customGradeStatusId' | 'secondsLate'
+>
+
+function checkedValue(submission: SubmissionPartialProp, anonymizeStudents: boolean) {
   // If students are anonymized we don't want to leak any information about the submission
-  if (assignment.anonymizeStudents) {
+  if (anonymizeStudents) {
     return 'none'
+  } else if (submission.customGradeStatusId) {
+    return submission.customGradeStatusId
   } else if (submission.excused) {
     return 'excused'
   } else if (submission.missing) {
@@ -43,103 +50,150 @@ function checkedValue(submission: CamelizedSubmission, assignment: CamelizedAssi
   return 'none'
 }
 
-type Props = {
+type ColorValues = 'late' | 'missing' | 'excused' | 'extended'
+
+type StandardOptions = ColorValues | 'none'
+
+export type SubmissionTrayRadioInputGroupProps = {
   assignment: {
     anonymizeStudents: boolean
   }
-  colors: {
-    late: string
-    missing: string
-    excused: string
-    extended: string
-  }
+  colors: Record<ColorValues, string>
+  customGradeStatuses?: GradeStatus[]
+  customGradeStatusesEnabled: boolean
   disabled: boolean
   locale: string
-  submission: {
-    excused: boolean
-    late: boolean
-    missing: boolean
-    secondsLate: number
-    latePolicyStatus: string | null
-  }
+  submission: SubmissionPartialProp
   submissionUpdating: boolean
   updateSubmission: (arg0: PendingUpdateData) => void
   latePolicy: {
     lateSubmissionInterval: string
   }
-  excuse?: boolean
 }
 
-type PendingUpdateData = {
+export type PendingUpdateData = {
   excuse?: boolean
   latePolicyStatus?: string
   secondsLateOverride?: number
+  customGradeStatusId?: string
 }
 
-type State = {
-  pendingUpdateData: null | PendingUpdateData
+type RadioInputOption = {
+  name: string
+  checked: boolean
+  color?: string
+  isCustom: boolean
+  key: string
 }
 
-export default class SubmissionTrayRadioInputGroup extends React.Component<Props, State> {
-  state = {pendingUpdateData: null}
+export default function SubmissionTrayRadioInputGroup({
+  submissionUpdating,
+  assignment,
+  colors,
+  customGradeStatuses = [],
+  customGradeStatusesEnabled,
+  disabled,
+  latePolicy,
+  locale,
+  submission,
+  updateSubmission,
+}: SubmissionTrayRadioInputGroupProps) {
+  const [pendingUpdateData, setPendingUpdateData] = useState<PendingUpdateData | null>(null)
 
-  UNSAFE_componentWillReceiveProps(nextProps: Props) {
-    if (
-      this.props.submissionUpdating &&
-      !nextProps.submissionUpdating &&
-      this.state.pendingUpdateData
-    ) {
-      this.props.updateSubmission(this.state.pendingUpdateData)
-      this.setState({pendingUpdateData: null})
+  useEffect(() => {
+    if (!submissionUpdating && pendingUpdateData) {
+      updateSubmission(pendingUpdateData)
+      setPendingUpdateData(null)
     }
-  }
+  }, [submissionUpdating, pendingUpdateData, setPendingUpdateData, updateSubmission])
 
-  handleRadioInputChanged = ({target: {value}}) => {
-    const alreadyChecked = checkedValue(this.props.submission, this.props.assignment) === value
-    if (alreadyChecked && !this.props.submissionUpdating) {
+  const handleRadioInputChanged = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    isCustom: boolean
+  ) => {
+    const {
+      target: {value},
+    } = event
+    const alreadyChecked = checkedValue(submission, assignment.anonymizeStudents) === value
+    if (alreadyChecked && !submissionUpdating) {
       return
     }
 
-    const data: PendingUpdateData = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
-    if (value === 'late') {
-      data.secondsLateOverride = this.props.submission.secondsLate
-    }
+    let data: PendingUpdateData = {}
 
-    if (this.props.submissionUpdating) {
-      this.setState({pendingUpdateData: data})
+    if (isCustom && customGradeStatusesEnabled) {
+      data.customGradeStatusId = value
     } else {
-      this.props.updateSubmission(data)
+      data = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
+      if (value === 'late') {
+        data.secondsLateOverride = submission.secondsLate
+      }
+    }
+
+    if (submissionUpdating) {
+      setPendingUpdateData(data)
+    } else {
+      updateSubmission(data)
     }
   }
 
-  render() {
-    const optionValues = ['none', 'late', 'missing', 'excused']
-    if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) optionValues.push('extended')
-    const radioOptions = optionValues.map(status => (
-      <SubmissionTrayRadioInput
-        key={status}
-        checked={checkedValue(this.props.submission, this.props.assignment) === status}
-        color={this.props.colors[status]}
-        disabled={this.props.disabled}
-        latePolicy={this.props.latePolicy}
-        locale={this.props.locale}
-        onChange={this.handleRadioInputChanged}
-        updateSubmission={this.props.updateSubmission}
-        submission={this.props.submission}
-        text={statusesTitleMap[status] || I18n.t('None')}
-        value={status}
-      />
-    ))
+  const radioInputOptions = (): RadioInputOption[] => {
+    const standardOptions: StandardOptions[] = ['none', 'late', 'missing', 'excused']
 
-    return (
-      <FormFieldGroup
-        description={I18n.t('Status')}
-        disabled={this.props.disabled}
-        layout="stacked"
-        rowSpacing="none"
-      >
-        {radioOptions}
-      </FormFieldGroup>
-    )
+    if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) {
+      standardOptions.push('extended')
+    }
+
+    const optionsArray: RadioInputOption[] = standardOptions.map(status => {
+      const isNone = status === 'none'
+      return {
+        name: isNone ? I18n.t('None') : statusesTitleMap[status],
+        checked: checkedValue(submission, assignment.anonymizeStudents) === status,
+        color: isNone ? undefined : colors[status],
+        isCustom: false,
+        key: status,
+      }
+    })
+
+    const customGradingStatusOptions: RadioInputOption[] = customGradeStatusesEnabled
+      ? customGradeStatuses.map(status => ({
+          name: status.name,
+          checked: checkedValue(submission, assignment.anonymizeStudents) === status.id,
+          color: status.color,
+          key: status.id,
+          isCustom: true,
+        }))
+      : []
+
+    return optionsArray.concat(customGradingStatusOptions)
   }
+
+  return (
+    <FormFieldGroup
+      description={I18n.t('Status')}
+      disabled={disabled}
+      layout="stacked"
+      rowSpacing="none"
+    >
+      {radioInputOptions().map(status => (
+        <SubmissionTrayRadioInput
+          key={status.name}
+          checked={status.checked}
+          color={status.color}
+          disabled={disabled}
+          latePolicy={latePolicy}
+          locale={locale}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleRadioInputChanged(e, status.isCustom)
+          }
+          // @ts-ignore
+          updateSubmission={updateSubmission}
+          // @ts-ignore
+          submission={submission}
+          text={status.name}
+          value={status.key}
+        />
+      ))}
+    </FormFieldGroup>
+  )
 }

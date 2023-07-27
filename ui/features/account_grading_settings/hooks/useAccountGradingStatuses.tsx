@@ -18,6 +18,7 @@
 
 import {useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import {
   DELETE_CUSTOM_GRADING_STATUS_MUTATION,
   UPSERT_CUSTOM_GRADING_STATUS_MUTATION,
@@ -30,7 +31,6 @@ import {
   StandardGradingStatusUpsertResponse,
 } from '../types/accountStatusMutations'
 import {AccountGradingStatusQueryResults} from '../types/accountStatusQueries'
-import {GradeStatus} from '../types/gradingStatus'
 import {
   mapCustomStatusQueryResults,
   mapStandardStatusQueryResults,
