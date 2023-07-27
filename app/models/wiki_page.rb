@@ -136,11 +136,13 @@ class WikiPage < ActiveRecord::Base
 
   def create_lookup
     new_record = id_changed?
-    lookup = wiki_page_lookups.find_by(slug: read_attribute(:url)) unless new_record
-    lookup ||= wiki_page_lookups.build(slug: read_attribute(:url))
-    lookup.save
-    # this is kind of circular so we want to avoid triggering callbacks again
-    update_column(:current_lookup_id, lookup.id)
+    WikiPageLookup.unique_constraint_retry do
+      lookup = wiki_page_lookups.find_by(slug: read_attribute(:url)) unless new_record
+      lookup ||= wiki_page_lookups.build(slug: read_attribute(:url))
+      lookup.save
+      # this is kind of circular so we want to avoid triggering callbacks again
+      update_column(:current_lookup_id, lookup.id)
+    end
   end
 
   def delete_lookups
