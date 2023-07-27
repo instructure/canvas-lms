@@ -1836,7 +1836,7 @@ class CoursesController < ApplicationController
   # Returns nothing.
   def accept_enrollment(enrollment)
     if @current_user && enrollment.user == @current_user
-      if enrollment.workflow_state == "invited"
+      if enrollment.invited?
         GuardRail.activate(:primary) do
           SubmissionLifecycleManager.with_executing_user(@current_user) do
             enrollment.accept!
