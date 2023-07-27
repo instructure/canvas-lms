@@ -247,7 +247,7 @@ module DynamicSettings
 
       cached_value = failsafe_cache_file.read if failsafe_cache_file.exist?
       failsafe_cache_file.write(value) if cached_value != value
-    rescue Errno::EACCESS
+    rescue Errno::EACCES
       # ignore permission errors
     end
 
