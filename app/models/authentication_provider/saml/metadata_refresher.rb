@@ -35,7 +35,8 @@ class AuthenticationProvider::SAML::MetadataRefresher
         provider.populate_from_metadata_xml(new_data)
         provider.save! if provider.changed?
       rescue => e
-        ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
+        level = (e.is_a?(Net::HTTPClientException) && e.response.code.to_i == 404) ? :warn : :error
+        ::Canvas::Errors.capture(e, { tags: { type: "saml_metadata_refresh", auth_provider: provider.global_id } }, level)
       end
     end
 

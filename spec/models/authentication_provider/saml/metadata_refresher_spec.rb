@@ -35,7 +35,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
 
       expect(subject).to receive(:refresh_if_necessary).with(saml1.global_id, "1").and_raise("die")
       expect(subject).to receive(:refresh_if_necessary).with(saml2.global_id, "2").and_return(false)
-      expect(Canvas::Errors).to receive(:capture_exception).once
+      expect(Canvas::Errors).to receive(:capture).once
 
       subject.refresh_providers
     end
