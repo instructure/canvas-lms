@@ -59,7 +59,6 @@ const ignoredErrors = [
   /Not implemented: navigation/,
   /Not implemented: HTMLFormElement.prototype.submit/,
   /The prop `images.course.files\[0].content_type` is marked as required in `Images`/,
-  /Cannot read properties of undefined \(reading 'canvadoc_session_url'\)/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
