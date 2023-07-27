@@ -1,6 +1,6 @@
 # This is currently used to tag errors from these paths in sentry
-# Tag = `inst.team:collaborate`
-name: collaborate
+# Tag = `inst.team:vice`
+name: vice
 owned_globs:
 # these are mostly file paths that mention "conversation"
 # or "discussion"

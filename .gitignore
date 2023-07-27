@@ -20,6 +20,7 @@
 /config/*.yml.cached
 /config/credentials.yml.enc
 !/config/brakeman.yml
+!/config/code_ownership.yml
 !/config/credentials.test.yml
 !/config/crystalball.yml
 /config/environments/*-local.rb
