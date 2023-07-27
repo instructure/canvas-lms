@@ -1324,7 +1324,7 @@ class UsersController < ApplicationController
     when "skype"
       true
     else
-      raise "Unknown Service"
+      return render json: { errors: true }, status: :bad_request
     end
     @service = UserService.register_from_params(@current_user, params[:user_service])
     render json: @service
