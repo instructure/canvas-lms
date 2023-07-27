@@ -35,7 +35,7 @@ function makeEvent(opts) {
 }
 
 function mockFetchPreview(href) {
-  fetchMock.get(href, '{}')
+  fetchMock.get(href, {attachment: {}})
 }
 
 const canvasOrigin = 'http://localhost'
