@@ -52,19 +52,18 @@ module Lti
     end
 
     def reregistration
-      if authorized_action(@context, @current_user, :update) && (tp = ToolProxy.find(params["tool_proxy_id"]))
-        mh = tp.reregistration_message_handler
-        return not_found unless mh.present?
+      return not_found unless @context.grants_right?(@current_user, :update) && (tp = ToolProxy.find(params["tool_proxy_id"]))
 
-        message = reregistration_message(mh, tp)
-        @lti_launch = Launch.new
-        @lti_launch.resource_url = message.launch_url
-        @lti_launch.link_text = mh.resource_handler.name
-        @lti_launch.launch_type = message.launch_presentation_document_target
-        @lti_launch.params = launch_params(tool_proxy: tp, message:, private_key: tp.shared_secret)
-        render Lti::AppUtil.display_template("borderless") and return
-      end
-      not_found
+      mh = tp.reregistration_message_handler
+      return not_found unless mh.present?
+
+      message = reregistration_message(mh, tp)
+      @lti_launch = Launch.new
+      @lti_launch.resource_url = message.launch_url
+      @lti_launch.link_text = mh.resource_handler.name
+      @lti_launch.launch_type = message.launch_presentation_document_target
+      @lti_launch.params = launch_params(tool_proxy: tp, message:, private_key: tp.shared_secret)
+      render Lti::AppUtil.display_template("borderless")
     end
 
     def reregistration_message(mh, tp)

@@ -1839,6 +1839,11 @@ class ApplicationController < ActionController::Base
       if capture_outputs[:error_report]
         error = ErrorReport.find(capture_outputs[:error_report])
       end
+
+      # already rendered (i.e. the exception happened _after_ responding);
+      # we can't do anything else useful
+      return if response_body
+
       if api_request?
         rescue_action_in_api(exception, error, response_code)
       else
