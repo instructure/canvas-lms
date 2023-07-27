@@ -90,6 +90,7 @@ export type CamelizedSubmission = {
   assignmentVisible?: boolean
   attempt: number | null
   cachedDueDate: null | string
+  customGradeStatusId?: null | string
   drop?: boolean
   enteredGrade: null | string
   enteredScore: null | number

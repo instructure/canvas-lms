@@ -21,6 +21,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ApolloProvider, createClient} from '@canvas/apollo'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
@@ -131,6 +132,8 @@ export type SubmissionTrayProps = {
   showSimilarityScore: boolean
   proxySubmissionsAllowed: boolean
   reloadSubmission: (student: any, submission: any, proxyDetails: any) => void
+  customGradeStatuses: GradeStatus[]
+  customGradeStatusesEnabled: boolean
 }
 
 type SubmissionTrayState = {
@@ -493,6 +496,8 @@ export default class SubmissionTray extends React.Component<
                     <SubmissionTrayRadioInputGroup
                       assignment={this.props.assignment}
                       colors={this.props.colors}
+                      customGradeStatuses={this.props.customGradeStatuses}
+                      customGradeStatusesEnabled={this.props.customGradeStatusesEnabled}
                       disabled={this.props.gradingDisabled}
                       locale={this.props.locale}
                       latePolicy={this.props.latePolicy}

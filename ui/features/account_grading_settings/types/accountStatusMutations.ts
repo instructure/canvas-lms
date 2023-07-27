@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {GradeStatus} from './gradingStatus'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 export type CustomGradingStatusUpsertResponse = {
   upsertCustomGradeStatus: {

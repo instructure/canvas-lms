@@ -18,6 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import type {GradeStatus, GradeStatusType} from '@canvas/grading/accountGradingStatus'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 // @ts-expect-error -- TODO: remove once we're on InstUI 8
@@ -26,7 +27,6 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {CustomStatusItem} from './CustomStatusItem'
 import {StandardStatusItem} from './StandardStatusItem'
-import {GradeStatus, GradeStatusType} from '../../types/gradingStatus'
 import {CustomStatusNewItem} from './CustomStatusNewItem'
 import {useAccountGradingStatuses} from '../../hooks/useAccountGradingStatuses'
 

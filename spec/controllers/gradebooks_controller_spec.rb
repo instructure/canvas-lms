@@ -1271,6 +1271,18 @@ describe GradebooksController do
         expect(gradebook_options[:colors]).to eql({ "late" => "#EEEEEE" })
       end
 
+      it "includes custom_grade_statuses_enabled as true when feature is enabled" do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:custom_grade_statuses_enabled]).to be true
+      end
+
+      it "includes custom_grade_statuses_enabled as false when feature is disabled" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:custom_grade_statuses_enabled]).to be false
+      end
+
       it "includes final_grade_override_enabled" do
         get :show, params: { course_id: @course.id }
         expect(gradebook_options).to have_key :final_grade_override_enabled

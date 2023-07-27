@@ -6720,7 +6720,8 @@ describe AssignmentsApiController, type: :request do
         "sticker" => nil,
         "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
-        "extra_attempts" => nil
+        "extra_attempts" => nil,
+        "custom_grade_status_id" => nil
       }]
     end
 
@@ -6766,7 +6767,8 @@ describe AssignmentsApiController, type: :request do
         "sticker" => nil,
         "preview_url" =>
          "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
-        "extra_attempts" => nil
+        "extra_attempts" => nil,
+        "custom_grade_status_id" => nil
       }]
     end
   end
