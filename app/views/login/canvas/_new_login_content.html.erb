@@ -24,6 +24,11 @@
   else
     login_btn_type = forgot_password_btn_type = "submit"
   end
+  unique_id = begin
+    params.dig(:pseudonym_session, :unique_id)&.to_s
+  rescue TypeError
+    nil
+  end
 %>
 
 <div class="ic-Login">
@@ -54,7 +59,7 @@
             <input type="hidden" name="redirect_to_ssl" value="1"/>
             <div class="ic-Form-control ic-Form-control--login">
               <%= f.label :unique_id, login_handle_name, :class => "ic-Label" %>
-              <%= f.text_field :unique_id, :class => "ic-Input text", :value => params[:pseudonym_session].try(:[], :unique_id), :autofocus => !params[:previewing_from_themeeditor] %>
+              <%= f.text_field :unique_id, :class => "ic-Input text", :value => unique_id, :autofocus => !params[:previewing_from_themeeditor] %>
             </div>
             <div class="ic-Form-control ic-Form-control--login">
               <%= f.label :password, :en => "Password", :class => "ic-Label" %>
