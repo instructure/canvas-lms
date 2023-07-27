@@ -27,11 +27,17 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {useMutation, useQuery} from 'react-apollo'
 import {
+  CREATE_USER_INBOX_LABEL,
   DELETE_CONVERSATIONS,
+  DELETE_USER_INBOX_LABEL,
   UPDATE_CONVERSATION_PARTICIPANTS,
   UPDATE_SUBMISSIONS_READ_STATE,
 } from '../../graphql/Mutations'
-import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
+import {
+  CONVERSATIONS_QUERY,
+  USER_INBOX_LABELS_QUERY,
+  VIEWABLE_SUBMISSIONS_QUERY,
+} from '../../graphql/Queries'
 import {decodeQueryString} from '@canvas/query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
 
@@ -40,6 +46,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Heading} from '@instructure/ui-heading'
+import {ManageUserLabels} from '../components/ManageUserLabels/ManageUserLabels'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -50,6 +57,7 @@ const CanvasInbox = () => {
   const [selectedConversations, setSelectedConversations] = useState([])
   const [selectedConversationMessage, setSelectedConversationMessage] = useState()
   const [composeModal, setComposeModal] = useState(false)
+  const [manageLabels, setManageLabels] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
   const [archiveDisabled, setArchiveDisabled] = useState(true)
   const [canReply, setCanReply] = useState(true)
@@ -193,6 +201,12 @@ const CanvasInbox = () => {
   })
 
   const {loading, data} = conversationsQuery
+
+  const userInboxLabelsQuery = useQuery(USER_INBOX_LABELS_QUERY, {
+    variables: {userID: ENV.current_user_id?.toString()},
+    fetchPolicy: 'cache-and-network',
+    skip: !ENV?.react_inbox_labels,
+  })
 
   useEffect(() => {
     if (loading) {
@@ -355,6 +369,48 @@ const CanvasInbox = () => {
     },
     onError() {
       setOnFailure(I18n.t('Unarchive operation failed'))
+    },
+  })
+
+  const [createUserInboxLabel] = useMutation(CREATE_USER_INBOX_LABEL, {
+    update: (cache, result) => {
+      if (result.data.createUserInboxLabel.errors) {
+        return
+      }
+
+      const options = {
+        query: USER_INBOX_LABELS_QUERY,
+        variables: {userID: ENV.current_user_id?.toString()},
+      }
+      const labelsFromCache = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+      labelsFromCache.legacyNode.inboxLabels = [...result.data.createUserInboxLabel.inboxLabels]
+
+      cache.writeQuery({...options, data: labelsFromCache})
+    },
+    onError: () => {
+      setOnFailure(I18n.t('Label(s) creation failed.'))
+    },
+  })
+
+  const [deleteUserInboxLabel] = useMutation(DELETE_USER_INBOX_LABEL, {
+    update: (cache, result) => {
+      if (result.data.deleteUserInboxLabel.errors) {
+        return
+      }
+
+      const options = {
+        query: USER_INBOX_LABELS_QUERY,
+        variables: {userID: ENV.current_user_id?.toString()},
+      }
+      const labelsFromCache = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+      labelsFromCache.legacyNode.inboxLabels = [...result.data.deleteUserInboxLabel.inboxLabels]
+
+      cache.writeQuery({...options, data: labelsFromCache})
+    },
+    onError: () => {
+      setOnFailure(I18n.t('Label(s) deletion failed.'))
     },
   })
 
@@ -653,6 +709,9 @@ const CanvasInbox = () => {
                   }}
                   selectedConversations={selectedConversations}
                   onCompose={() => setComposeModal(true)}
+                  onManageLabels={() =>
+                    userInboxLabelsQuery.loading ? null : setManageLabels(true)
+                  }
                   onReply={() => onReply()}
                   onReplyAll={() => onReply({replyAll: true})}
                   onForward={() => onForward()}
@@ -773,6 +832,29 @@ const CanvasInbox = () => {
             selectedIds={selectedIds}
             maxGroupRecipientsMet={maxGroupRecipientsMet}
             currentCourseFilter={courseFilter}
+          />
+          <ManageUserLabels
+            open={manageLabels}
+            labels={
+              userInboxLabelsQuery.loading
+                ? []
+                : userInboxLabelsQuery.data?.legacyNode?.inboxLabels || []
+            }
+            onCreate={names => {
+              createUserInboxLabel({
+                variables: {
+                  names,
+                },
+              })
+            }}
+            onDelete={names => {
+              deleteUserInboxLabel({
+                variables: {
+                  names,
+                },
+              })
+            }}
+            onClose={() => setManageLabels(false)}
           />
         </ConversationContext.Provider>
       )}

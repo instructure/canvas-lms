@@ -221,6 +221,7 @@ const MessageListActionContainer = props => {
                 unarchive={props.displayUnarchiveButton ? props.onUnarchive : undefined}
                 archiveDisabled={props.archiveDisabled || props.activeMailbox === 'sent'}
                 compose={props.onCompose}
+                manageLabels={props.onManageLabels}
                 delete={() => props.onDelete()}
                 deleteDisabled={props.deleteDisabled}
                 forward={props.onForward}
@@ -252,6 +253,7 @@ MessageListActionContainer.propTypes = {
   onUserFilterSelect: PropTypes.func,
   onSelectMailbox: PropTypes.func,
   onCompose: PropTypes.func,
+  onManageLabels: PropTypes.func,
   selectedConversations: PropTypes.array,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,

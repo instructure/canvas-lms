@@ -17,7 +17,7 @@
  */
 
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
@@ -36,11 +36,13 @@ const MAX_LABEL_LENGTH = 25
 
 export const ManageUserLabels = ({open, labels, onCreate, onDelete, onClose}) => {
   const [newLabel, setNewLabel] = useState('')
-  const [internalLabels, setInternalLabels] = useState(
-    labels.map(label => ({name: label, new: false}))
-  )
+  const [internalLabels, setInternalLabels] = useState([])
   const [deletedLabels, setDeletedLabels] = useState([])
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    setInternalLabels(labels.map(label => ({name: label, new: false})))
+  }, [labels])
 
   const renderCloseButton = () => {
     return (
@@ -105,7 +107,13 @@ export const ManageUserLabels = ({open, labels, onCreate, onDelete, onClose}) =>
     }
 
     if (deletedLabels.length > 0) {
-      onDelete(deletedLabels)
+      // This is hacky... TLDR: There are sync issues
+      // when running both create and delete mutations at the same time.
+      // Probably the best solution in the future is to have a single mutation
+      // that handles addition and deletions at the same time.
+      setTimeout(() => {
+        onDelete(deletedLabels)
+      }, 2500)
     }
 
     close()
@@ -173,9 +181,7 @@ export const ManageUserLabels = ({open, labels, onCreate, onDelete, onClose}) =>
             {internalLabels.map(label => (
               <Table.Row key={label.name} data-testid="label">
                 <Table.Cell>
-                  <pre>
-                    <Text>{label.name}</Text>
-                  </pre>
+                  <Text dangerouslySetInnerHTML={{__html: label.name.replaceAll(' ', '&nbsp;')}} />
                 </Table.Cell>
                 <Table.Cell textAlign="end">
                   <IconButton
