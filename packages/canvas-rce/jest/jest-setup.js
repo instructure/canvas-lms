@@ -35,7 +35,6 @@ const ignoredErrors = [
   /A component is changing a controlled input of type %s to be uncontrolled/,
   /A component is changing an uncontrolled input of type %s to be controlled./,
   /The prop `sortBy.order` is marked as required in `Images`/,
-  /SyntaxError: unknown pseudo-class selector ':host>/,
   /You seem to have overlapping act\(\) calls/,
   /Invalid prop `documents.searchString` of type `string` supplied to `DocumentsPanel`/,
   /The prop `sortBy.order` is marked as required in `DocumentsPanel`/,
@@ -46,7 +45,6 @@ const ignoredErrors = [
   /The prop `videoOptions.naturalHeight` is marked as required in `VideoOptionsTray`/,
   /The prop `sortBy.order` is marked as required in `MediaPanel`/,
   /Invalid prop `images.searchString` of type `string` supplied to `Images`/,
-  /unknown pseudo-class selector'/,
   /Invalid URL: undefined/,
   /failed updating video captions/,
   /The content `content` is marked as required in `LinkOptionsTray`/,
@@ -54,8 +52,6 @@ const ignoredErrors = [
   /The prop `audioOptions.titleText` is marked as required in `AudioOptionsTray`/,
   /The prop `audioOptions.id` is marked as required in `AudioOptionsTray`/,
   /The prop `trayProps` is marked as required in `AudioOptionsTray`/,
-  /Not implemented: navigation/,
-  /Not implemented: HTMLFormElement.prototype.submit/,
   /The prop `images.course.files\[0].content_type` is marked as required in `Images`/,
 ]
 const globalWarn = global.console.warn
