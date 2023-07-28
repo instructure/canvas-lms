@@ -1302,12 +1302,19 @@ describe ContentMigration do
         @cm.save!
       end
 
-      it "returns a url to a file containing the asset map" do
+      before do
         allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
         allow(HostUrl).to receive(:context_hosts).and_return(["apple.edu", "kiwi.edu:8080"])
         Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
-        url = @cm.asset_map_url(generate_if_needed: true)
+      end
+
+      after do
         Account.site_admin.disable_feature!(:content_migration_asset_map_v2)
+      end
+
+      it "returns a url to a file containing the asset map" do
+        url = @cm.asset_map_url(generate_if_needed: true)
+
         @cm.reload
         expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
         expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
@@ -1325,6 +1332,35 @@ describe ContentMigration do
                                  @old.id.to_s => @new.id.to_s,
                                  old_migration_id => {
                                    "source" => { "id" => @old.id.to_s },
+                                   "destination" => { "id" => @new.id.to_s }
+                                 }
+                               }
+                             } })
+      end
+
+      it "returns a url to a file containing the asset map for QTI imports" do
+        @cm.source_course = nil
+        @cm.migration_type = "qti_converter"
+        @cm.save!
+
+        url = @cm.asset_map_url(generate_if_needed: true)
+
+        @cm.reload
+        expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+        expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+        expect(@cm.asset_map_attachment.context).to eq @cm
+        json = JSON.parse(@cm.asset_map_attachment.open.read)
+        old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        expect(json).to eq({ "source_course" => nil,
+                             "source_host" => nil,
+                             "contains_migration_ids" => true,
+                             "destination_course" => @dst.id.to_s,
+                             "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                             "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                             "resource_mapping" => {
+                               "assignments" => {
+                                 old_migration_id => {
+                                   "source" => {},
                                    "destination" => { "id" => @new.id.to_s }
                                  }
                                }
