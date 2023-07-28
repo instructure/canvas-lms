@@ -46,8 +46,6 @@ const ignoredErrors = [
   /failed updating video captions/,
   /The content `content` is marked as required in `LinkOptionsTray`/,
   /The prop `media.course.files\[0].title` is marked as required in `MediaPanel`/,
-  /The prop `audioOptions.titleText` is marked as required in `AudioOptionsTray`/,
-  /The prop `audioOptions.id` is marked as required in `AudioOptionsTray`/,
   /The prop `images.course.files\[0].content_type` is marked as required in `Images`/,
 ]
 const globalWarn = global.console.warn
