@@ -151,7 +151,7 @@
     "moment-timezone": "^0.5.13",
     "prop-types": "^15",
     "react": "^0.14.8 || ^15.0.0 || ^16",
-    "react-aria-live": "^1.0.4",
+    "react-aria-live": "^2",
     "react-color": "^2.13.4",
     "react-dom": "^0.14.8 || ^15.0.0 || ^16",
     "react-draggable": "^3.3.0",

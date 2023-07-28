@@ -53,7 +53,6 @@ const ignoredErrors = [
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
-  /componentWillReceiveProps has been renamed/,
   /Store interaction failed/,
   /Found bad LTI MRU data/,
   /Cannot save LTI MRU list/,
