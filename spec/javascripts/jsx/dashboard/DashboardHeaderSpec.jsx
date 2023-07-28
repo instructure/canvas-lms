@@ -25,7 +25,7 @@ import {moxiosWait} from 'jest-moxios-utils'
 import sinon from 'sinon'
 import $ from 'jquery'
 import {DashboardHeader} from 'ui/features/dashboard/react/DashboardHeader'
-import {resetPlanner} from '@instructure/canvas-planner'
+import {resetPlanner} from '@canvas/planner'
 import fetchMock from 'fetch-mock'
 import {
   SHOW_K5_DASHBOARD_ROUTE,

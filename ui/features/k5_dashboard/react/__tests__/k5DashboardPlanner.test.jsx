@@ -21,7 +21,7 @@ import {act, render, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import moxios from 'moxios'
 import {cloneDeep} from 'lodash'
-import {resetPlanner} from '@instructure/canvas-planner'
+import {resetPlanner} from '@canvas/planner'
 import {MOCK_CARDS, MOCK_CARDS_2, MOCK_PLANNER_ITEM} from '@canvas/k5/react/__tests__/fixtures'
 import {
   createPlannerMocks,

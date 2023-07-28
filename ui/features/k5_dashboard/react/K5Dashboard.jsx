@@ -20,7 +20,7 @@ import {connect, Provider} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
-import {responsiviser, store} from '@instructure/canvas-planner'
+import {responsiviser, store} from '@canvas/planner'
 import {
   IconBankLine,
   IconCalendarMonthLine,

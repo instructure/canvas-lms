@@ -19,7 +19,7 @@ import React from 'react'
 import moxios from 'moxios'
 import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetCardCache} from '@canvas/dashboard-card'
-import {resetPlanner} from '@instructure/canvas-planner'
+import {resetPlanner} from '@canvas/planner'
 import fetchMock from 'fetch-mock'
 import {
   MOCK_TODOS,

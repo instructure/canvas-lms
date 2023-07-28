@@ -26,7 +26,7 @@ import {
   JumpToHeaderButton,
   preloadInitialItems,
   reloadPlannerForObserver,
-} from '@instructure/canvas-planner'
+} from '@canvas/planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
 
 import EmptyDashboardState from './EmptyDashboardState'

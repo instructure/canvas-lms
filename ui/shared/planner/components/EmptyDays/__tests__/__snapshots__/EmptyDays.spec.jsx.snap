@@ -1,0 +1,195 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders the component 1`] = `
+<Fragment>
+  <style>
+    
+  .EmptyDays-styles__root {
+    position: relative;
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+    border-bottom-width: 0.0625rem;
+    border-bottom-style: solid;
+  }
+  
+  .EmptyDays-styles__nothingPlannedContent {
+    padding: 0.75rem 0 0 0;
+  }
+  
+  .EmptyDays-styles__nothingPlannedContainer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .EmptyDays-styles__nothingPlanned {
+    padding-top: 0.75rem;
+  }
+  
+  .EmptyDays-styles__small .EmptyDays-styles__nothingPlannedContent {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    padding: 0.75rem 0;
+  }
+  .EmptyDays-styles__small .EmptyDays-styles__nothingPlannedContainer {
+    position: static;
+  }
+  .EmptyDays-styles__small .EmptyDays-styles__nothingPlanned {
+    padding-top: 0;
+  }
+  
+  </style>
+  <div
+    className="EmptyDays-styles__root planner-empty-days"
+  >
+    <Heading
+      border="bottom"
+      color="inherit"
+      level="h2"
+    >
+      <Text
+        as="div"
+        letterSpacing="normal"
+        lineHeight="condensed"
+        size="medium"
+        wrap="normal"
+      >
+        April 23 to April 26
+      </Text>
+    </Heading>
+    <div
+      className="EmptyDays-styles__nothingPlannedContent"
+    >
+      <GroupedDates
+        aria-hidden="true"
+        role="img"
+      />
+      <div
+        className="EmptyDays-styles__nothingPlannedContainer"
+      >
+        <div
+          className="EmptyDays-styles__nothingPlanned"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="large"
+            wrap="normal"
+          >
+            Nothing Planned Yet
+          </Text>
+        </div>
+      </div>
+    </div>
+  </div>
+</Fragment>
+`;
+
+exports[`renders the today className when surrounds Today 1`] = `
+<Fragment>
+  <style>
+    
+  .EmptyDays-styles__root {
+    position: relative;
+    font-size: 1rem;
+    font-family: LatoWeb, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #394B58;
+    background: #FFFFFF;
+    margin-top: 2.25rem;
+    border-bottom-width: 0.0625rem;
+    border-bottom-style: solid;
+  }
+  
+  .EmptyDays-styles__nothingPlannedContent {
+    padding: 0.75rem 0 0 0;
+  }
+  
+  .EmptyDays-styles__nothingPlannedContainer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .EmptyDays-styles__nothingPlanned {
+    padding-top: 0.75rem;
+  }
+  
+  .EmptyDays-styles__small .EmptyDays-styles__nothingPlannedContent {
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    padding: 0.75rem 0;
+  }
+  .EmptyDays-styles__small .EmptyDays-styles__nothingPlannedContainer {
+    position: static;
+  }
+  .EmptyDays-styles__small .EmptyDays-styles__nothingPlanned {
+    padding-top: 0;
+  }
+  
+  </style>
+  <div
+    className="EmptyDays-styles__root planner-empty-days planner-today"
+  >
+    <Heading
+      border="bottom"
+      color="inherit"
+      level="h2"
+    >
+      <Text
+        as="div"
+        letterSpacing="normal"
+        lineHeight="condensed"
+        size="medium"
+        wrap="normal"
+      >
+        April 22 to April 26
+      </Text>
+    </Heading>
+    <div
+      className="EmptyDays-styles__nothingPlannedContent"
+    >
+      <GroupedDates
+        aria-hidden="true"
+        role="img"
+      />
+      <div
+        className="EmptyDays-styles__nothingPlannedContainer"
+      >
+        <div
+          className="EmptyDays-styles__nothingPlanned"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="large"
+            wrap="normal"
+          >
+            Nothing Planned Yet
+          </Text>
+        </div>
+      </div>
+    </div>
+  </div>
+</Fragment>
+`;

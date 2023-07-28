@@ -28,7 +28,7 @@ import {
   reloadPlannerForObserver,
   renderToDoSidebar,
   responsiviser,
-} from '@instructure/canvas-planner'
+} from '@canvas/planner'
 import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
@@ -174,6 +174,7 @@ class DashboardHeader extends React.Component {
     $dashboardActivity.show().disableWhileLoading(
       Promise.all([promiseToGetCode, promiseToGetHtml])
         .then(([{default: DashboardView}, axiosResponse]) => {
+          // xsslint safeString.identifier axiosResponse
           // xsslint safeString.property data
           $dashboardActivity.html(axiosResponse.data)
           this.streamItemDashboard = new DashboardView()
