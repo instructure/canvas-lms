@@ -22250,10 +22250,12 @@ react-apollo@~3.0.1:
     "@apollo/react-hooks" "^3.0.1"
     "@apollo/react-ssr" "^3.0.1"
 
-react-aria-live@^1.0.4:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/react-aria-live/-/react-aria-live-1.0.6.tgz#a9c84f7be5ecf955b37400c00d81f47ae09ec271"
-  integrity sha512-7zDMn0zXDCiz9WaO36QjmdZdMUyYLPEv0u/yUy23cZbIhqZWDjrqyJqmS5xX0dfvrzQ+O1DaojkQu8GwwHKPkA==
+react-aria-live@^2:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/react-aria-live/-/react-aria-live-2.0.5.tgz#333480cb898d6963421bd86fe3cbd0ce54e37f08"
+  integrity sha512-rXiH1HNKJrr/UfVeGwA2aKY43r5WbjLs+AYB6/kJF1qny2hwxzQc1qewQmUpdQ5h8HAOTD8O/XlGcEHjqlCl0g==
+  dependencies:
+    uuid "^3.2.1"
 
 react-clientside-effect@^1.2.2:
   version "1.2.5"
