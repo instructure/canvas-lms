@@ -1168,18 +1168,18 @@ class ContentMigration < ActiveRecord::Base
     MIGRATION_DATA_FIELDS[asset_type] || []
   end
 
-  def add_asset_pair_to_mapping(mapping, key, src_asset_fields, mig_id, dest_asset_fields)
+  def add_asset_pair_to_mapping(mapping, key, mig_id, src_asset_fields, dest_asset_fields)
     # mig_ids are md5 hashes (eg they have 32 digits), so there should be zero overlap with
     # the src_ids which are DB primary keys or global_ids and they can safely be stored on the same
     # hash.
     #
-    src_asset_fields[:id] = src_asset_fields[:id].to_s
+    src_asset_fields[:id] = src_asset_fields[:id].to_s if src_asset_fields[:id]
     dest_asset_fields[:id] = dest_asset_fields[:id].to_s
 
     src_id = src_asset_fields[:id]
     dest_id = dest_asset_fields[:id]
 
-    mapping[key][src_id] = dest_id
+    mapping[key][src_id] = dest_id if src_id.present?
 
     return unless asset_map_v2?
 
@@ -1190,7 +1190,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def asset_id_mapping
-    return nil unless (imported? || importing?) && source_course
+    return nil unless imported? || importing?
 
     mapping = {}
     master_template = migration_type == "master_course_import" &&
@@ -1227,6 +1227,13 @@ class ContentMigration < ActiveRecord::Base
       next if mig_id_to_dest_id.empty?
 
       mapping[key] ||= {}
+      unless source_course.present?
+        mig_id_to_dest_id.each do |mig_id, mig_fields|
+          add_asset_pair_to_mapping(mapping, key, mig_id, {}, mig_fields)
+        end
+        next
+      end
+
       if master_template
         # migration_ids are complicated in blueprint courses; fortunately, we have a stored mapping
         # between source id and migration_id in the MasterContentTags (except for ContentTags, which
@@ -1237,7 +1244,7 @@ class ContentMigration < ActiveRecord::Base
             global_asset_string = klass.asset_string(Shard.global_id_for(src_id, source_course.shard))
             mig_id = master_template.migration_id_for(global_asset_string)
 
-            add_asset_pair_to_mapping(mapping, key, { id: src_id }, mig_id, { id: mig_id_to_dest_id[mig_id][:id] }) if mig_id_to_dest_id[mig_id]
+            add_asset_pair_to_mapping(mapping, key, mig_id, { id: src_id }, { id: mig_id_to_dest_id[mig_id][:id] }) if mig_id_to_dest_id[mig_id]
           end
         else
           association_name = MasterCourses::MasterContentTag.polymorphic_assoc_for(klass)
@@ -1253,11 +1260,11 @@ class ContentMigration < ActiveRecord::Base
             mig_id = src[:migration_id]
             next unless mig_id_to_dest_id[mig_id]
 
-            add_asset_pair_to_mapping(mapping, key, src, mig_id, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id][:id]
+            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id][:id]
             src_assignment_id = mig_id_to_dest_id[mig_id][:shell_id] && src[:assignment_id]
             next unless src_assignment_id
 
-            add_asset_pair_to_mapping(mapping, "assignments", { id: src_assignment_id }, mig_id, { id: mig_id_to_dest_id[mig_id][:shell_id] })
+            add_asset_pair_to_mapping(mapping, "assignments", mig_id, { id: src_assignment_id }, { id: mig_id_to_dest_id[mig_id][:shell_id] })
           end
         end
       else
@@ -1272,7 +1279,7 @@ class ContentMigration < ActiveRecord::Base
             asset_string = klass.asset_string(src[:id])
             mig_id = CC::CCHelper.create_key(asset_string, global: global_ids)
 
-            add_asset_pair_to_mapping(mapping, key, src, mig_id, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id]
+            add_asset_pair_to_mapping(mapping, key, mig_id, src, mig_id_to_dest_id[mig_id]) if mig_id_to_dest_id[mig_id]
           end
         end
       end
@@ -1303,8 +1310,8 @@ class ContentMigration < ActiveRecord::Base
     return if data.nil?
 
     payload = {
-      "source_host" => source_course.root_account.domain(ApplicationController.test_cluster_name),
-      "source_course" => source_course_id.to_s,
+      "source_host" => source_course&.root_account&.domain(ApplicationController.test_cluster_name),
+      "source_course" => source_course_id&.to_s,
       "contains_migration_ids" => Account.site_admin.feature_enabled?(:content_migration_asset_map_v2),
       "resource_mapping" => data
     }
