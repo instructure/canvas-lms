@@ -102,11 +102,7 @@ export default class TrayController {
   }
 
   _renderTray(trayProps) {
-    let audioOptions = {}
-
-    if (this._shouldOpen) {
-      audioOptions = asAudioElement(this._audioContainer)
-    }
+    const audioOptions = asAudioElement(this._audioContainer) || {}
 
     const element = (
       <AudioOptionsTray

@@ -36,6 +36,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
       open: true,
       audioOptions: {
         id: 'm-audio-id',
+        titleText: 'Audio player',
       },
       trayProps: {
         host: 'localhost:3001',
