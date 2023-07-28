@@ -45,7 +45,6 @@ const ignoredErrors = [
   /Invalid URL: undefined/,
   /failed updating video captions/,
   /The content `content` is marked as required in `LinkOptionsTray`/,
-  /The prop `media.course.files\[0].title` is marked as required in `MediaPanel`/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [

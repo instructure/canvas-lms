@@ -58,6 +58,7 @@ function makeFiles(override) {
       return {
         id: i,
         filename: `file${i}.mp4`,
+        title: `file${i}.mp4`,
         content_type: 'video/mp4',
         display_name: `file${i}`,
         href: `http://the.net/${i}`,
@@ -98,6 +99,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
       filesObj.files.push({
         id: 3,
         filename: `3.mp4`,
+        title: `3.mp4`,
         content_type: 'video/mp4',
         display_name: `pending file`,
         href: `http://the.net/3`,
