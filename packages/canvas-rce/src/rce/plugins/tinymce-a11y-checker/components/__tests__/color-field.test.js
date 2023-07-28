@@ -21,7 +21,14 @@ import {render, fireEvent} from '@testing-library/react'
 import ColorField from '../color-field'
 
 test('it renders', () => {
-  const {getByTestId, getByText} = render(<ColorField label="change my color" />)
+  const {getByTestId, getByText} = render(
+    <ColorField
+      label="change my color"
+      value="rgba(100,100,100,0.7)"
+      name="color"
+      onChange={jest.fn}
+    />
+  )
   expect(getByText('change my color')).toBeInTheDocument()
   expect(getByTestId('color-field-text-input')).toBeInTheDocument()
   expect(getByTestId('color-field-color-picker')).toBeInTheDocument()

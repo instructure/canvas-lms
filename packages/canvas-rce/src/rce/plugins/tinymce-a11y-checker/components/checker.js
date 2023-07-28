@@ -532,7 +532,7 @@ export default class Checker extends React.Component {
           <ColorField
             label={f.label}
             name={f.dataKey}
-            value={this.state.formState[f.dataKey]}
+            value={this.state.formState[f.dataKey] || ''}
             onChange={this.updateFormState}
           />
         )
@@ -559,7 +559,7 @@ export default class Checker extends React.Component {
           <TextInput
             label={f.label}
             name={f.dataKey}
-            value={this.state.formState[f.dataKey]}
+            value={this.state.formState[f.dataKey] || ''}
             onChange={this.updateFormState}
             disabled={disabled}
           />

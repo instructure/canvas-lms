@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import contrast from 'wcag-element-contrast'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
@@ -51,4 +52,11 @@ export default class ColorField extends React.Component {
       </View>
     )
   }
+}
+
+ColorField.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
 }
