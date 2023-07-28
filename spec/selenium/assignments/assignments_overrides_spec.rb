@@ -88,8 +88,7 @@ describe "assignment groups" do
     end
 
     it "allows setting overrides", priority: "1" do
-      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-      allow(ConditionalRelease::Service).to receive(:jwt_for).and_return(:jwt)
+      allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, jwt_for: :jwt)
 
       default_section = @course.course_sections.first
       other_section = @course.course_sections.create!(name: "other section")

@@ -54,28 +54,28 @@ module CanvasHttp
 
   class ResponseTooLargeError < CanvasHttp::Error; end
 
-  def self.put(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Put, *args, **kwargs, &)
+  def self.put(...)
+    CanvasHttp.request(Net::HTTP::Put, ...)
   end
 
-  def self.delete(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Delete, *args, **kwargs, &)
+  def self.delete(...)
+    CanvasHttp.request(Net::HTTP::Delete, ...)
   end
 
-  def self.head(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Head, *args, **kwargs, &)
+  def self.head(...)
+    CanvasHttp.request(Net::HTTP::Head, ...)
   end
 
-  def self.get(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Get, *args, **kwargs, &)
+  def self.get(...)
+    CanvasHttp.request(Net::HTTP::Get, ...)
   end
 
-  def self.post(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Post, *args, **kwargs, &)
+  def self.post(...)
+    CanvasHttp.request(Net::HTTP::Post, ...)
   end
 
-  def self.patch(*args, **kwargs, &)
-    CanvasHttp.request(Net::HTTP::Patch, *args, **kwargs, &)
+  def self.patch(...)
+    CanvasHttp.request(Net::HTTP::Patch, ...)
   end
 
   # Use this helper method to do HTTP GET requests. It knows how to handle

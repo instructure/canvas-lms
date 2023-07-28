@@ -82,8 +82,7 @@ describe Quizzes::QuizReportSerializer do
 
   let :controller do
     ActiveModel::FakeController.new({}).tap do |controller|
-      allow(controller).to receive(:session).and_return session
-      allow(controller).to receive(:context).and_return context
+      allow(controller).to receive_messages(session:, context:)
     end
   end
 

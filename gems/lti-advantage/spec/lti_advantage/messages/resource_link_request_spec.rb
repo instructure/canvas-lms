@@ -91,7 +91,7 @@ module LtiAdvantage::Messages
       it_behaves_like "validations for optional claims"
 
       it "is not valid if required claims are missing" do
-        expect(message).to be_invalid
+        expect(message).not_to be_valid
       end
 
       it "is valid if all required claims are present" do

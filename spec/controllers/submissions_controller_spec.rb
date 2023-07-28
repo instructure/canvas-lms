@@ -639,9 +639,8 @@ describe SubmissionsController do
       end
 
       it "uses instfs to save google doc if instfs is enabled" do
-        allow(InstFS).to receive(:enabled?).and_return(true)
         uuid = "1234-abcd"
-        allow(InstFS).to receive(:direct_upload).and_return(uuid)
+        allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
         attachment = @assignment.submissions.first.attachments.new
         SubmissionsController.new.store_google_doc_attachment(attachment, File.open("public/images/a.png"))

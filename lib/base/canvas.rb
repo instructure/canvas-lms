@@ -115,7 +115,7 @@ module Canvas
   end
 
   def self.semver_revision
-    revision&.gsub(/-/, "")
+    revision&.gsub("-", "")
   end
 
   DEFAULT_RETRY_CALLBACK = lambda do |ex, tries|

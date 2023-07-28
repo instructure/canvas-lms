@@ -1238,8 +1238,7 @@ describe "Users API", type: :request do
           end
           @shard2.activate do
             account = Account.create!
-            allow(account).to receive(:trust_exists?).and_return(true)
-            allow(account).to receive(:trusted_account_ids).and_return([@account.id])
+            allow(account).to receive_messages(trust_exists?: true, trusted_account_ids: [@account.id])
             course = account.courses.create!
             course.enroll_student(@u)
             p2 = @u.pseudonyms.create!(account:, unique_id: "p2")

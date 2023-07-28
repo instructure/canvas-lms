@@ -1255,7 +1255,7 @@ class User < ActiveRecord::Base
   end
 
   def used_feature?(feature)
-    features_used&.split(/,/)&.include?(feature.to_s)
+    features_used&.split(",")&.include?(feature.to_s)
   end
 
   def available_courses

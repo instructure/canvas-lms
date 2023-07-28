@@ -31,8 +31,7 @@ RSpec.shared_context "plagiarism_platform", shared_context: :metadata do
   end
 
   before do
-    allow(subscription_service).to receive(:available?).and_return true
-    allow(subscription_service).to receive(:destroy_tool_proxy_subscription).and_return success_response
+    allow(subscription_service).to receive_messages(available?: true, destroy_tool_proxy_subscription: success_response)
     allow(subscription_service).to receive(:create_tool_proxy_subscription).and_return(
       success_response,
       success_response,

@@ -28,17 +28,14 @@ RSpec.shared_context "lti_advantage_shared_examples" do
   let(:deep_linking_return_url) { "http://www.test.cop/success" }
   let(:controller) do
     controller = double("controller")
-    allow(controller).to receive(:request).and_return(request)
-    allow(controller).to receive(:polymorphic_url).and_return(deep_linking_return_url)
+    allow(controller).to receive_messages(request:, polymorphic_url: deep_linking_return_url)
     allow(controller).to receive(:params)
     controller
   end
   # All this setup just so we can stub out controller.*_url methods
   let(:request) do
     request = double("request")
-    allow(request).to receive(:url).and_return("https://localhost")
-    allow(request).to receive(:host).and_return("/my/url")
-    allow(request).to receive(:scheme).and_return("https")
+    allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
     request
   end
   let(:expander) do

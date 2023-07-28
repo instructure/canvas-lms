@@ -153,8 +153,7 @@ describe RequestThrottle do
     end
 
     it "passes on other requests" do
-      allow(throttler).to receive(:approved?).and_return(false)
-      allow(throttler).to receive(:blocked?).and_return(false)
+      allow(throttler).to receive_messages(approved?: false, blocked?: false)
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
 
@@ -260,8 +259,7 @@ describe RequestThrottle do
     end
 
     before do
-      allow(throttler).to receive(:approved?).and_return(false)
-      allow(throttler).to receive(:blocked?).and_return(false)
+      allow(throttler).to receive_messages(approved?: false, blocked?: false)
     end
 
     it "skips without redis enabled" do
@@ -502,8 +500,7 @@ describe RequestThrottle do
         it "will always be allowed when disabled, even with full bucket" do
           allow(RequestThrottle).to receive(:enabled?).and_return(false)
           req = request_logged_out
-          allow(req).to receive(:fullpath).and_return("/")
-          allow(req).to receive(:env).and_return({ "canvas.request_throttle.user_id" => ["123"] })
+          allow(req).to receive_messages(fullpath: "/", env: { "canvas.request_throttle.user_id" => ["123"] })
           allow(@bucket).to receive(:full?).and_return(true)
           expect(throttler.allowed?(request_logged_out, @bucket)).to be_truthy
         end

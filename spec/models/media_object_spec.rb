@@ -526,21 +526,19 @@ describe MediaObject do
     before do
       @mock_kaltura = double("CanvasKaltura::ClientV3")
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
-      allow(@mock_kaltura).to receive(:startSession).and_return(nil)
-      allow(@mock_kaltura).to receive(:media_sources).and_return(
-        [{ height: "240",
-           bitrate: "382",
-           isOriginal: "0",
-           width: "336",
-           content_type: "video/mp4",
-           containerFormat: "isom",
-           url: "https://kaltura.example.com/some/url",
-           size: "204",
-           fileExt: "mp4" }]
-      )
-      allow(@mock_kaltura).to receive(:mediaGet).and_return(media_object)
-      allow(@mock_kaltura).to receive(:mediaTypeToSymbol).and_return("video")
-      allow(@mock_kaltura).to receive(:flavorAssetGetByEntryId).and_return([])
+      allow(@mock_kaltura).to receive_messages(startSession: nil,
+                                               media_sources: [{ height: "240",
+                                                                 bitrate: "382",
+                                                                 isOriginal: "0",
+                                                                 width: "336",
+                                                                 content_type: "video/mp4",
+                                                                 containerFormat: "isom",
+                                                                 url: "https://kaltura.example.com/some/url",
+                                                                 size: "204",
+                                                                 fileExt: "mp4" }],
+                                               mediaGet: media_object,
+                                               mediaTypeToSymbol: "video",
+                                               flavorAssetGetByEntryId: [])
     end
 
     it "keeps the current title if already set" do

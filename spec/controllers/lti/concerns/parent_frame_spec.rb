@@ -43,8 +43,7 @@ describe Lti::Concerns::ParentFrame do
   before do
     controller.instance_variable_set(:@current_user, current_pseudonym.user)
     controller.instance_variable_set(:@current_pseudonym, current_pseudonym)
-    allow(controller).to receive(:parent_frame_context).and_return tool.id.to_s
-    allow(controller).to receive(:session).and_return nil
+    allow(controller).to receive_messages(parent_frame_context: tool.id.to_s, session: nil)
     allow(ContextExternalTool).to receive(:find_by).with(id: tool.id.to_s).and_return(tool)
   end
 

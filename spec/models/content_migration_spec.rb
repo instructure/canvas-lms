@@ -49,8 +49,7 @@ describe ContentMigration do
     let(:migration_items) { {} }
 
     before do
-      allow(Canvas::LiveEventsCallbacks).to receive(:after_update).and_return(true)
-      allow(Canvas::LiveEventsCallbacks).to receive(:after_create).and_return(true)
+      allow(Canvas::LiveEventsCallbacks).to receive_messages(after_update: true, after_create: true)
     end
 
     context "when the class is not observed by live events observer" do
@@ -224,9 +223,8 @@ describe ContentMigration do
 
     it "goes through instfs if enabled" do
       cm = setup_zip_import(@course)
-      allow(InstFS).to receive(:enabled?).and_return(true)
       @uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(@uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: @uuid)
 
       test_zip_import(@course, cm)
       attachment = @course.attachments.last
@@ -1303,8 +1301,7 @@ describe ContentMigration do
       end
 
       before do
-        allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
-        allow(HostUrl).to receive(:context_hosts).and_return(["apple.edu", "kiwi.edu:8080"])
+        allow(HostUrl).to receive_messages(default_host: "pineapple.edu", context_hosts: ["apple.edu", "kiwi.edu:8080"])
         Account.site_admin.enable_feature!(:content_migration_asset_map_v2)
       end
 

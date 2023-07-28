@@ -21,8 +21,7 @@
 describe SIS::CSV::CSVBaseImporter do
   it "reads file from index" do
     sis = double
-    allow(sis).to receive(:batch).and_return nil
-    allow(sis).to receive(:root_account).and_return nil
+    allow(sis).to receive_messages(batch: nil, root_account: nil)
     # we also add row numbers on a 1 based index including header row.
     path = generate_csv_file(["h,h,h", # 1
                               "0,0,0", # 2

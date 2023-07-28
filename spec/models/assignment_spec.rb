@@ -131,8 +131,7 @@ describe Assignment do
       it "invokes the LatePolicyApplicator for this assignment if grading type changes but due dates do not" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
+        allow(assignment).to receive_messages(update_cached_due_dates?: false, saved_change_to_grading_type?: true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -141,8 +140,7 @@ describe Assignment do
       it "invokes the LatePolicyApplicator only once if grading type changes and due dates also change" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(true)
+        allow(assignment).to receive_messages(update_cached_due_dates?: true, saved_change_to_grading_type?: true)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -151,8 +149,7 @@ describe Assignment do
       it "does not invoke the LatePolicyApplicator if neither grading type nor due dates change" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(false)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
+        allow(assignment).to receive_messages(update_cached_due_dates?: false, saved_change_to_grading_type?: false)
         expect(LatePolicyApplicator).not_to receive(:for_assignment).with(assignment)
 
         assignment.save!
@@ -161,8 +158,7 @@ describe Assignment do
       it "invokes the LatePolicyApplicator only once if grading type does not change but due dates change" do
         assignment = @course.assignments.new(assignment_valid_attributes)
 
-        allow(assignment).to receive(:update_cached_due_dates?).and_return(true)
-        allow(assignment).to receive(:saved_change_to_grading_type?).and_return(false)
+        allow(assignment).to receive_messages(update_cached_due_dates?: true, saved_change_to_grading_type?: false)
         expect(LatePolicyApplicator).to receive(:for_assignment).with(assignment).once
 
         assignment.save!
@@ -8292,9 +8288,8 @@ describe Assignment do
 
     before do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
+      allow(assignment.context.account).to receive_messages(sis_syncing: { value: true }, sis_require_assignment_due_date: { value: true })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      allow(assignment.context.account).to receive(:sis_require_assignment_due_date).and_return({ value: true })
     end
 
     it "raises an invalid record error if overrides are invalid" do
@@ -8334,9 +8329,7 @@ describe Assignment do
         overrides_to_delete: [],
         override_errors: []
       }
-      allow(AssignmentUtil).to receive(:due_date_required?).and_return(true)
-      allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
-      allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
+      allow(AssignmentUtil).to receive_messages(due_date_required?: true, due_date_required_for_account?: true, sis_integration_settings_enabled?: true)
     end
 
     it "can duplicate" do
@@ -8409,10 +8402,8 @@ describe Assignment do
 
     it "returns custom name length if sis_assignment_name_length_input is present" do
       assignment.post_to_sis = true
-      allow(assignment.context.account).to receive(:sis_syncing).and_return({ value: true })
-      allow(assignment.context.account).to receive(:sis_assignment_name_length).and_return({ value: true })
+      allow(assignment.context.account).to receive_messages(sis_syncing: { value: true }, sis_assignment_name_length: { value: true }, sis_assignment_name_length_input: { value: 15 })
       allow(assignment.context.account).to receive(:feature_enabled?).with("new_sis_integrations").and_return(true)
-      allow(assignment.context.account).to receive(:sis_assignment_name_length_input).and_return({ value: 15 })
       expect(assignment.max_name_length).to eq(15)
     end
 
@@ -9908,7 +9899,7 @@ describe Assignment do
           it "does not allow changing final grader to an inactive user" do
             @section1_ta.enrollments.first.deactivate
             @assignment.final_grader = @section1_ta
-            expect(@assignment).to be_invalid
+            expect(@assignment).not_to be_valid
           end
 
           it "allows a non-active final grader if the final grader was set when the user was active" do

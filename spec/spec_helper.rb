@@ -674,9 +674,8 @@ RSpec.configure do |config|
     new_cache ||= :null_store
     new_cache = ActiveSupport::Cache.lookup_store(new_cache, cache_opts)
     allow(Rails).to receive(:cache).and_return(new_cache)
-    allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+    allow(ActionController::Base).to receive_messages(cache_store: new_cache, perform_caching: true)
     allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-    allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow(MultiCache).to receive(:cache).and_return(new_cache)
   end
@@ -697,9 +696,8 @@ RSpec.configure do |config|
         yield
       ensure
         allow(Rails).to receive(:cache).and_return(previous_cache)
-        allow(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
+        allow(ActionController::Base).to receive_messages(cache_store: previous_cache, perform_caching: previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
-        allow(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
         allow(MultiCache).to receive(:cache).and_return(previous_multicache)
       end
@@ -761,8 +759,8 @@ RSpec.configure do |config|
         @ancestor = ancestor
       end
 
-      def method_missing(sym, *args, &)
-        @ancestor.instance_method(sym).bind_call(@subject, *args, &)
+      def method_missing(sym, ...)
+        @ancestor.instance_method(sym).bind_call(@subject, ...)
       end
     end
 
@@ -837,10 +835,9 @@ RSpec.configure do |config|
   def s3_storage!(opts = { stubs: true })
     [Attachment, Thumbnail].each do |model|
       model.include(AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
-      allow(model).to receive(:current_backend).and_return(AttachmentFu::Backends::S3Backend)
-
-      allow(model).to receive(:s3_storage?).and_return(true)
-      allow(model).to receive(:local_storage?).and_return(false)
+      allow(model).to receive_messages(current_backend: AttachmentFu::Backends::S3Backend,
+                                       s3_storage?: true,
+                                       local_storage?: false)
     end
 
     if opts[:stubs]
@@ -854,10 +851,9 @@ RSpec.configure do |config|
   def local_storage!
     [Attachment, Thumbnail].each do |model|
       model.include(AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
-      allow(model).to receive(:current_backend).and_return(AttachmentFu::Backends::FileSystemBackend)
-
-      allow(model).to receive(:s3_storage?).and_return(false)
-      allow(model).to receive(:local_storage?).and_return(true)
+      allow(model).to receive_messages(current_backend: AttachmentFu::Backends::FileSystemBackend,
+                                       s3_storage?: false,
+                                       local_storage?: true)
     end
   end
 

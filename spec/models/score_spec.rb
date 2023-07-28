@@ -76,7 +76,7 @@ describe Score do
 
     it "is invalid without an enrollment" do
       score.enrollment = nil
-      expect(score).to be_invalid
+      expect(score).not_to be_valid
     end
 
     it { is_expected.to validate_presence_of(:enrollment) }

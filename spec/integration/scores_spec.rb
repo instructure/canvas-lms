@@ -102,8 +102,7 @@ module Lti::IMS
         let(:submitted_at) { 5.minutes.ago.iso8601(3) }
 
         before do
-          allow(InstFS).to receive(:enabled?).and_return(true)
-          allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
+          allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: ["jwt signing key"])
           @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
           Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
         end

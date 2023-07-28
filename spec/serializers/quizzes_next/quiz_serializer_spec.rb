@@ -72,8 +72,7 @@ describe QuizzesNext::QuizSerializer do
   end
 
   before do
-    allow(controller).to receive(:session).and_return session
-    allow(controller).to receive(:context).and_return context
+    allow(controller).to receive_messages(session:, context:)
     allow(assignment).to receive(:grants_right?).at_least(:once).and_return true
     allow(context).to receive(:grants_right?).at_least(:once).and_return true
     allow(context).to receive(:grants_any_right?).at_least(:once).and_return true

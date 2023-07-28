@@ -81,8 +81,8 @@ describe User do
     allow(@cc1).to receive(:path).and_return("cc1")
     @cc2 = double("CommunicationChannel")
     allow(@cc2).to receive(:path).and_return("cc2")
-    allow(@user).to receive(:communication_channels).and_return([@cc1, @cc2])
-    allow(@user).to receive(:communication_channel).and_return(@cc1)
+    allow(@user).to receive_messages(communication_channels: [@cc1, @cc2],
+                                     communication_channel: @cc1)
     expect(@user.communication_channel).to eql(@cc1)
   end
 

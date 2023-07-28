@@ -74,9 +74,6 @@ describe ContentMigration do
       page = @copy_from.wiki_pages.create!(title: "wiki", body: "ohai")
       quiz = @copy_from.quizzes.create!
 
-      allow(klass).to receive(:applies_to_course?).and_return(true)
-      allow(klass).to receive(:begin_export).and_return(true)
-
       data = {
         "$canvas_assignment_id" => assmt.id,
         "$canvas_discussion_topic_id" => topic.id,
@@ -87,8 +84,11 @@ describe ContentMigration do
         "$canvas_page_id" => page.id,
         "$canvas_quiz_id" => quiz.id
       }
-      allow(klass).to receive(:export_completed?).and_return(true)
-      allow(klass).to receive(:retrieve_export).and_return(data)
+
+      allow(klass).to receive_messages(applies_to_course?: true,
+                                       begin_export: true,
+                                       export_completed?: true,
+                                       retrieve_export: data)
 
       run_course_copy
 
@@ -120,12 +120,11 @@ describe ContentMigration do
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!
 
-      allow(klass).to receive(:applies_to_course?).and_return(true)
-      allow(klass).to receive(:begin_export).and_return(true)
-      allow(klass).to receive(:export_completed?).and_return(true)
-      allow(klass).to receive(:retrieve_export).and_return(
-        { "$canvas_assignment_id" => assmt.id, "$canvas_discussion_topic_id" => topic.id }
-      )
+      allow(klass).to receive_messages(applies_to_course?: true,
+                                       begin_export: true,
+                                       export_completed?: true,
+                                       retrieve_export: { "$canvas_assignment_id" => assmt.id,
+                                                          "$canvas_discussion_topic_id" => topic.id })
 
       @cm.copy_options = { "all_discussion_topics" => "1" }
       @cm.save!
@@ -152,9 +151,9 @@ describe ContentMigration do
       cm.add_item(id: assmt.id, type: "assignment")
       cm.add_item(id: graded_quiz.id, type: "quiz")
 
-      allow(klass).to receive(:applies_to_course?).and_return(true)
-      allow(klass).to receive(:export_completed?).and_return(true)
-      allow(klass).to receive(:retrieve_export).and_return({})
+      allow(klass).to receive_messages(applies_to_course?: true,
+                                       export_completed?: true,
+                                       retrieve_export: {})
 
       @cm.copy_options = { context_modules: { mig_id(cm) => "1" } }
       @cm.save!
@@ -166,8 +165,7 @@ describe ContentMigration do
     end
 
     it "only checks a few times for the export to finish before timing out" do
-      allow(klass).to receive(:applies_to_course?).and_return(true)
-      allow(klass).to receive(:begin_export).and_return(true)
+      allow(klass).to receive_messages(applies_to_course?: true, begin_export: true)
       expect(Canvas::Migration::ExternalContent::Migrator).to receive(:retry_delay).at_least(:once).and_return(0) # so we're not actually sleeping for 30s a pop
       expect(klass).to receive(:export_completed?).exactly(6).times.and_return(false) # retries 5 times
 

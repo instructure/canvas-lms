@@ -25,13 +25,12 @@ describe "quizzes/quiz_submissions/show" do
     course_with_student
     view_context
     @submission = double("Quizzes::QuizSubmission")
-    allow(@submission).to receive(:score).and_return(10)
-    allow(@submission).to receive(:data).and_return([])
+    allow(@submission).to receive_messages(score: 10, data: [])
     @quiz = double("Quizzes::Quiz")
-    allow(@quiz).to receive(:questions).and_return([])
-    allow(@quiz).to receive(:points_possible).and_return(10)
-    allow(@quiz).to receive(:stored_questions).and_return([])
-    allow(@quiz).to receive(:show_correct_answers?).and_return(true)
+    allow(@quiz).to receive_messages(questions: [],
+                                     points_possible: 10,
+                                     stored_questions: [],
+                                     show_correct_answers?: true)
     assign(:quiz, @quiz)
     assign(:submission, @submission)
 

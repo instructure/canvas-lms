@@ -28,9 +28,7 @@ describe CC::WebResources do
         mo = MediaObject.create!(user_id: user, context: user, media_id: "test", media_type: "video", title: "Mo")
 
         allow(CanvasKaltura::ClientV3).to receive(:new).and_return(double("Kaltura", startSession: true))
-        allow(self).to receive(:for_course_copy).and_return(false)
-        allow(self).to receive(:export_media_objects?).and_return(true)
-        allow(self).to receive(:add_error).and_return(true)
+        allow(self).to receive_messages(for_course_copy: false, export_media_objects?: true, add_error: true)
 
         add_media_objects(double("Html_Exporter", used_media_objects: [mo], media_object_infos: {}))
         expect(mo.attachment).to be_truthy

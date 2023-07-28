@@ -2261,8 +2261,7 @@ describe Submission do
 
       it "creates a message when the score is changed and the grades were already published" do
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.zone.now - 100)
         submission_spec_model
 
         communication_channel(@user, { username: "somewhere@test.com" })
@@ -2276,8 +2275,7 @@ describe Submission do
 
       it "does not create a grade changed message when theres a quiz attached" do
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.now - 100)
         submission_spec_model
 
         @quiz = Quizzes::Quiz.create!(context: @course)
@@ -2295,8 +2293,7 @@ describe Submission do
       it "does not create a message when grades were already published for an assignment with hidden grades" do
         @assignment.ensure_post_policy(post_manually: true)
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.zone.now - 100)
         submission_spec_model
 
         communication_channel(@user, { username: "somewhere@test.com" })
@@ -2310,8 +2307,7 @@ describe Submission do
 
       it "does not create a message when the submission was recently graded" do
         Notification.create(name: "Submission Grade Changed")
-        allow(@assignment).to receive(:score_to_grade).and_return("10.0")
-        allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
+        allow(@assignment).to receive_messages(score_to_grade: "10.0", due_at: Time.zone.now - 100)
         submission_spec_model
 
         communication_channel(@user, { username: "somewhere@test.com" })
@@ -4027,20 +4023,17 @@ describe Submission do
     let(:submission) { Submission.new }
 
     it "returns false if submission does not has_submission?" do
-      allow(submission).to receive(:has_submission?).and_return false
-      allow(submission).to receive(:graded?).and_return true
+      allow(submission).to receive_messages(has_submission?: false, graded?: true)
       expect(submission.without_graded_submission?).to be false
     end
 
     it "returns false if submission does is not graded" do
-      allow(submission).to receive(:has_submission?).and_return true
-      allow(submission).to receive(:graded?).and_return false
+      allow(submission).to receive_messages(has_submission?: true, graded?: false)
       expect(submission.without_graded_submission?).to be false
     end
 
     it "returns true if submission is not graded and has no submission" do
-      allow(submission).to receive(:has_submission?).and_return false
-      allow(submission).to receive(:graded?).and_return false
+      allow(submission).to receive_messages(has_submission?: false, graded?: false)
       expect(submission.without_graded_submission?).to be true
     end
   end
@@ -5320,9 +5313,7 @@ describe Submission do
       end
 
       before do
-        allow(Canvadocs).to receive(:enabled?).and_return true
-        allow(Canvadocs).to receive(:annotations_supported?).and_return true
-        allow(Canvadocs).to receive(:config).and_return(nil)
+        allow(Canvadocs).to receive_messages(enabled?: true, annotations_supported?: true, config: nil)
       end
 
       it "ties submissions to canvadocs" do
@@ -9142,8 +9133,7 @@ describe Submission do
         quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
       end
 
-      allow(@quiz_submission.submission).to receive(:submission_type).and_return("basic_lti_launch")
-      allow(@quiz_submission.submission).to receive(:url).and_return("https://quiz-lti-iad-prod.instructure.com/lti/launch")
+      allow(@quiz_submission.submission).to receive_messages(submission_type: "basic_lti_launch", url: "https://quiz-lti-iad-prod.instructure.com/lti/launch")
       Timecop.freeze(5.minutes.from_now(now)) do
         @quiz_submission.set_final_score(7)
         @quiz_submission.save!

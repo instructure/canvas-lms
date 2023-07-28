@@ -358,7 +358,7 @@ module Importers
       end
 
       if hash["similarity_detection_tool"].present?
-        settings =  item.turnitin_settings
+        settings = item.turnitin_settings
         settings[:originality_report_visibility] = hash["similarity_detection_tool"]["visibility"]
         item.turnitin_settings = settings
       end

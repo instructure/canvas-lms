@@ -181,7 +181,7 @@ GEM
       zeitwerk (~> 2.5)
     rake (13.0.6)
     retriable (1.4.1)
-    rexml (3.2.5)
+    rexml (3.2.6)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)

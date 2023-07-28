@@ -261,9 +261,7 @@ describe ContextModulesHelper do
         { id: 27, assignment_sets: [{ id: 45 }, { id: 36 }] },
         { id: 28, assignment_sets: [] }
       ]
-      allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-      allow(ConditionalRelease::Service).to receive(:rules_for).and_return(@rules)
-      allow(ConditionalRelease::Service).to receive(:active_rules).and_return([1, 2, 3])
+      allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, rules_for: @rules, active_rules: [1, 2, 3])
     end
 
     it "does not affect cache keys unless mastery paths enabled" do

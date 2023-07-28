@@ -2872,8 +2872,7 @@ describe Quizzes::QuizzesController do
         false
       end
       subject.instance_variable_set(:@quiz, @quiz)
-      allow(@quiz).to receive(:require_lockdown_browser?).and_return(false)
-      allow(@quiz).to receive(:ip_filter).and_return(false)
+      allow(@quiz).to receive_messages(require_lockdown_browser?: false, ip_filter: false)
       subject.instance_variable_set(:@course, @course)
       subject.instance_variable_set(:@current_user, @student)
     end
@@ -2900,8 +2899,7 @@ describe Quizzes::QuizzesController do
     end
 
     it "false with wrong IP address" do
-      allow(@quiz).to receive(:ip_filter).and_return(true)
-      allow(@quiz).to receive(:valid_ip?).and_return(false)
+      allow(@quiz).to receive_messages(ip_filter: true, valid_ip?: false)
       allow(subject).to receive(:params).and_return({ take: 1 })
       expect(return_value).to be false
     end

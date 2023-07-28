@@ -309,9 +309,8 @@ RSpec.shared_examples "a submission update action" do |controller|
     end
 
     it "stores comment files in instfs if instfs is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)

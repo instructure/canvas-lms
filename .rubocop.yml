@@ -79,6 +79,7 @@ Naming/FileName:
     - "**/Gemfile.d/~after.rb"
     - "**/urn_*.rb"
     - "**/fixtures/**/*.rb"
+    - "config/environments/*-*.rb"
     - "config/locales/*.rb" # names must match locale names
     - "spec/selenium/a11y_and_i18n/localized-timezone-lists_spec.rb" # matches JS file it tests
 

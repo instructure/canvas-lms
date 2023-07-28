@@ -170,7 +170,7 @@ module CC
     end
 
     def epub_export?
-      @content_export ? @content_export.epub_export.present? : nil
+      @content_export ? @content_export.epub_export.present? : false
     end
 
     def for_external_migration?

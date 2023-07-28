@@ -40,30 +40,28 @@ module Lti
     let(:substitution_helper) { double.as_null_object }
     let(:right_now) { DateTime.now }
     let(:tool) do
-      m = double("tool")
-      allow(m).to receive(:id).and_return(1)
-      allow(m).to receive(:context).and_return(root_account)
       shard_mock = double("shard")
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
-      allow(m).to receive(:shard).and_return(shard_mock)
-      allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
+      m = double("tool")
+      allow(m).to receive_messages(id: 1,
+                                   context: root_account,
+                                   shard: shard_mock,
+                                   opaque_identifier_for: "6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
       m
     end
     let(:controller) do
       request_mock = double("request")
-      allow(request_mock).to receive(:url).and_return("https://localhost")
-      allow(request_mock).to receive(:host).and_return("/my/url")
-      allow(request_mock).to receive(:scheme).and_return("https")
+      allow(request_mock).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
       m = double("controller")
       allow(m).to receive(:css_url_for).with(:common).and_return("/path/to/common.scss")
-      allow(m).to receive(:request).and_return(request_mock)
-      allow(m).to receive(:logged_in_user).and_return(user)
-      allow(m).to receive(:named_context_url).and_return("url")
-      allow(m).to receive(:polymorphic_url).and_return("url")
       view_context_mock = double("view_context")
       allow(view_context_mock).to receive(:stylesheet_path)
         .and_return(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
-      allow(m).to receive(:view_context).and_return(view_context_mock)
+      allow(m).to receive_messages(request: request_mock,
+                                   logged_in_user: user,
+                                   named_context_url: "url",
+                                   polymorphic_url: "url",
+                                   view_context: view_context_mock)
       m
     end
 

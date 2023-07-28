@@ -46,9 +46,7 @@ module Turnitin
       context "when the TII response is an error" do
         let(:response_mock) do
           r_mock = double("response")
-          allow(r_mock).to receive(:headers).and_return({})
-          allow(r_mock).to receive(:body).and_return("abcdef")
-          allow(r_mock).to receive(:status).and_return(401)
+          allow(r_mock).to receive_messages(headers: {}, body: "abcdef", status: 401)
           r_mock
         end
 

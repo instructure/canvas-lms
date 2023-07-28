@@ -3282,15 +3282,13 @@ describe Enrollment do
 
   describe "#student_with_conditions?" do
     it "returns false if the enrollment is neither a student enrollment nor a fake student enrollment" do
-      allow(@enrollment).to receive(:student?).and_return(false)
-      allow(@enrollment).to receive(:fake_student?).and_return(false)
+      allow(@enrollment).to receive_messages(student?: false, fake_student?: false)
       expect(@enrollment.student_with_conditions?(include_future: true, include_fake_student: true)).to be(false)
     end
 
     context "the enrollment is a student enrollment" do
       before do
-        allow(@enrollment).to receive(:student?).and_return(true)
-        allow(@enrollment).to receive(:fake_student?).and_return(false)
+        allow(@enrollment).to receive_messages(student?: true, fake_student?: false)
       end
 
       it "returns true if include_future is true" do
@@ -3310,8 +3308,7 @@ describe Enrollment do
 
     context "the enrollment is a fake student enrollment" do
       before do
-        allow(@enrollment).to receive(:student?).and_return(false)
-        allow(@enrollment).to receive(:fake_student?).and_return(true)
+        allow(@enrollment).to receive_messages(student?: false, fake_student?: true)
       end
 
       it "returns false if include_fake_student is false" do

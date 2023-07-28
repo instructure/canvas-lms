@@ -79,10 +79,11 @@ describe GroupMembership do
 
     it "has a validation error on new record" do
       membership = GroupMembership.new
-      allow(membership).to receive(:user).and_return(double(name: "test user"))
-      allow(membership).to receive(:group).and_return(double(name: "test group"))
-      allow(membership).to receive(:restricted_self_signup?).and_return(true)
-      allow(membership).to receive(:has_common_section_with_me?).and_return(false)
+
+      allow(membership).to receive_messages(user: double(name: "test user"),
+                                            group: double(name: "test group"),
+                                            restricted_self_signup?: true,
+                                            has_common_section_with_me?: false)
       expect(membership.save).not_to be_truthy
       expect(membership.errors.size).to eq 1
       expect(membership.errors[:user_id].to_s).to match(/test user does not share a section/)

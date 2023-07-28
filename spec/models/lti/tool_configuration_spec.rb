@@ -511,8 +511,7 @@ module Lti
 
           context 'when the response is "not found"' do
             before do
-              allow(stubbed_response).to receive(:message).and_return("Not found")
-              allow(stubbed_response).to receive(:code).and_return("404")
+              allow(stubbed_response).to receive_messages(message: "Not found", code: "404")
             end
 
             it 'adds a "not found error to the model' do
@@ -522,8 +521,7 @@ module Lti
 
           context 'when the response is "unauthorized"' do
             before do
-              allow(stubbed_response).to receive(:message).and_return("Unauthorized")
-              allow(stubbed_response).to receive(:code).and_return("401")
+              allow(stubbed_response).to receive_messages(message: "Unauthorized", code: "401")
             end
 
             it 'adds a "unauthorized error to the model' do
@@ -533,8 +531,7 @@ module Lti
 
           context 'when the response is "internal server error"' do
             before do
-              allow(stubbed_response).to receive(:message).and_return("Internal server error")
-              allow(stubbed_response).to receive(:code).and_return("500")
+              allow(stubbed_response).to receive_messages(message: "Internal server error", code: "500")
             end
 
             it 'adds a "internal server error to the model' do

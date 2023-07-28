@@ -586,8 +586,7 @@ describe PageView do
 
   context "pv4" do
     before do
-      allow(PageView).to receive(:pv4?).and_return(true)
-      allow(PageView).to receive(:page_view_method).and_return(:pv4)
+      allow(PageView).to receive_messages(pv4?: true, page_view_method: :pv4)
     end
 
     it "store doesn't do anything" do

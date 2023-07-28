@@ -36,8 +36,7 @@ module Services
 
       before do
         @queue = double("notification queue")
-        allow(NotificationService).to receive(:notification_sqs).and_return(@queue)
-        allow(NotificationService).to receive(:choose_queue_url).and_return("default")
+        allow(NotificationService).to receive_messages(notification_sqs: @queue, choose_queue_url: "default")
       end
 
       it "processes email message type" do

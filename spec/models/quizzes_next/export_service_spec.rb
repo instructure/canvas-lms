@@ -66,8 +66,7 @@ describe QuizzesNext::ExportService do
       ]
 
       lti_assignments.each_with_index do |assignment, index|
-        allow(assignment).to receive(:lti_resource_link_id).and_return("link-id-#{index}")
-        allow(assignment).to receive(:id).and_return(index)
+        allow(assignment).to receive_messages(lti_resource_link_id: "link-id-#{index}", id: index)
       end
 
       allow(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).and_return(lti_assignments)
@@ -114,11 +113,9 @@ describe QuizzesNext::ExportService do
 
     before do
       allow(old_course).to receive(:root_account).and_return(root_account)
-      allow(new_course).to receive(:lti_context_id).and_return("ctx-1234")
-      allow(new_course).to receive(:name).and_return("Course Name")
+      allow(new_course).to receive_messages(lti_context_id: "ctx-1234", name: "Course Name", root_account:)
 
       allow(root_account).to receive(:domain).and_return("canvas.instructure.com")
-      allow(new_course).to receive(:root_account).and_return(root_account)
     end
 
     it "emits a single live event when there are copied assignments" do

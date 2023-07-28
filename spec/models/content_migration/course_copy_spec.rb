@@ -753,10 +753,9 @@ describe ContentMigration do
     context "kaltura media objects" do
       before do
         allow(Account.site_admin).to receive(:feature_enabled?).with(:media_links_use_attachment_id).and_return true
-        allow(CanvasKaltura::ClientV3).to receive(:config).and_return(true)
         kaltura_double = double("kaltura")
-        allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_double)
         allow(kaltura_double).to receive(:startSession)
+        # rubocop:disable RSpec/ReceiveMessages
         allow(kaltura_double).to receive(:flavorAssetGetByEntryId).and_return([
                                                                                 {
                                                                                   isOriginal: 1,
@@ -767,6 +766,8 @@ describe ContentMigration do
                                                                                 }
                                                                               ])
         allow(kaltura_double).to receive(:flavorAssetGetOriginalAsset).and_return(kaltura_double.flavorAssetGetByEntryId.first)
+        # rubocop:enable RSpec/ReceiveMessages
+        allow(CanvasKaltura::ClientV3).to receive_messages(config: true, new: kaltura_double)
       end
 
       it "updates media attachment links" do

@@ -2713,8 +2713,7 @@ describe Course do
 
     it "create_attachment uses inst-fs if inst-fs is enabled" do
       @uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(@uuid)
-      allow(InstFS).to receive(:enabled?).and_return(true)
+      allow(InstFS).to receive_messages(direct_upload: @uuid, enabled?: true)
       @user = user_factory(active_all: true)
       student_in_course(active_all: true)
 
