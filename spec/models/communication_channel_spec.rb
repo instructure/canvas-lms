@@ -810,8 +810,7 @@ describe CommunicationChannel do
       expect(cc.e164_path).to eq "+18015555555"
       allow(InstStatsd::Statsd).to receive(:increment)
       account = double
-      allow(account).to receive(:feature_enabled?).and_return(true)
-      allow(account).to receive(:global_id).and_return("totes_an_ID")
+      allow(account).to receive_messages(feature_enabled?: true, global_id: "totes_an_ID")
       expect(Services::NotificationService).to receive(:process).with(
         "otp:#{cc.global_id}",
         anything,

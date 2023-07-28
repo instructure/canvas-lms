@@ -165,10 +165,8 @@ describe InfoController do
       allow(MultiCache.cache).to receive(:fetch).with("readiness").and_return(nil)
       allow(Delayed::Job.connection).to receive(:active?).and_return(true)
       allow(Shard.connection).to receive(:active?).and_return(true)
-      allow(Canvadocs).to receive(:enabled?).and_return(true)
+      allow(Canvadocs).to receive_messages(enabled?: true, config: { "base_url" => "https://canvadocs.instructure.com/" })
       allow(PageView).to receive(:pv4?).and_return(true)
-      allow(Canvadocs).to receive(:config)
-        .and_return({ "base_url" => "https://canvadocs.instructure.com/" })
       allow(ConfigFile).to receive(:load).and_call_original
       allow(ConfigFile).to receive(:load)
         .with("pv4").and_return({ "uri" => "https://pv4.instructure.com/api/123/" })
@@ -177,8 +175,7 @@ describe InfoController do
         .with("rich-content-service")
         .and_return(DynamicSettings::FallbackProxy.new("app-host" => "rce.instructure.com"))
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
-      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:run_periodically).and_return(true)
-      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:healthy?).and_return(true)
+      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive_messages(run_periodically: true, healthy?: true)
     end
 
     it "renders readiness check within json response" do

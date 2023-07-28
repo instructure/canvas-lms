@@ -129,14 +129,12 @@ describe Quizzes::QuizEligibility do
     end
 
     it "returns false if quiz explicitly grant access to the user" do
-      allow(@quiz).to receive(:locked_for?).and_return(true)
-      allow(@quiz).to receive(:grants_right?).and_return(true)
+      allow(@quiz).to receive_messages(locked_for?: true, grants_right?: true)
       expect(@eligibility).to_not be_locked
     end
 
     it "returns true if the quiz is locked and access is not granted" do
-      allow(@quiz).to receive(:locked_for?).and_return(true)
-      allow(@quiz).to receive(:grants_right?).and_return(false)
+      allow(@quiz).to receive_messages(locked_for?: true, grants_right?: false)
       expect(@eligibility).to be_locked
     end
   end

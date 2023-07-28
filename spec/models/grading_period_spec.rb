@@ -231,7 +231,7 @@ describe GradingPeriod do
       it "is invalid if the close date is before the end date" do
         period_params = params.merge(close_date: 1.day.ago(params[:end_date]))
         grading_period = grading_period_group.grading_periods.build(period_params)
-        expect(grading_period).to be_invalid
+        expect(grading_period).not_to be_valid
       end
 
       it "considers the grading period valid if the close date is equal to the end date" do

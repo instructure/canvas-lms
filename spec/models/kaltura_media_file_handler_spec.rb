@@ -30,8 +30,7 @@ describe KalturaMediaFileHandler do
     let(:bulk_upload_add_response) { { id: "someBulkUploadId", ready: false } }
 
     before do
-      allow(CanvasKaltura::ClientV3).to receive(:config).and_return(kaltura_config)
-      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
+      allow(CanvasKaltura::ClientV3).to receive_messages(config: kaltura_config, new: kaltura_client)
       allow(kaltura_client).to receive(:startSession)
     end
 

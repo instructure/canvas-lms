@@ -101,8 +101,7 @@ describe "Canvadoc" do
     end
 
     it "Creates test context for annotation session" do
-      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-      allow(ApplicationController).to receive(:test_cluster_name).and_return("super-secret-testing")
+      allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "super-secret-testing")
 
       @doc.upload
       @doc.has_annotations = true

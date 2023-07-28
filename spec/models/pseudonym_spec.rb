@@ -406,8 +406,7 @@ describe Pseudonym do
     end
 
     before do
-      allow(Canvas.redis).to receive(:redis_enabled?).and_return(true)
-      allow(Canvas.redis).to receive(:ttl).and_return(1.day)
+      allow(Canvas.redis).to receive_messages(redis_enabled?: true, ttl: 1.day)
     end
 
     it "checks cas ticket expiration" do

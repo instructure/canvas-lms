@@ -40,9 +40,8 @@ RSpec.shared_context "caching_helpers", shared_context: :metadata do
         yield
       ensure
         allow(Rails).to receive(:cache).and_return(previous_cache)
-        allow(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
+        allow(ActionController::Base).to receive_messages(cache_store: previous_cache, perform_caching: previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(previous_cache)
-        allow(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
         allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(previous_perform_caching)
       end
     end
@@ -60,9 +59,8 @@ RSpec.shared_context "caching_helpers", shared_context: :metadata do
     new_cache ||= :null_store
     new_cache = ActiveSupport::Cache.lookup_store(new_cache, cache_opts)
     allow(Rails).to receive(:cache).and_return(new_cache)
-    allow(ActionController::Base).to receive(:cache_store).and_return(new_cache)
+    allow(ActionController::Base).to receive_messages(cache_store: new_cache, perform_caching: true)
     allow_any_instance_of(ActionController::Base).to receive(:cache_store).and_return(new_cache)
-    allow(ActionController::Base).to receive(:perform_caching).and_return(true)
     allow_any_instance_of(ActionController::Base).to receive(:perform_caching).and_return(true)
     # TODO: re-enable this once multi_cache is pulled over to gem.
     # MultiCache.reset

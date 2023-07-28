@@ -25,17 +25,16 @@ describe Lti::Helpers::JwtMessageHelper do
 
     let(:associated_1_1_tool) do
       t = double("associated_1_1_tool")
-      allow(t).to receive(:consumer_key).and_return("179248902")
-      allow(t).to receive(:shared_secret).and_return("my-lti11-secret")
+      allow(t).to receive_messages(consumer_key: "179248902", shared_secret: "my-lti11-secret")
       t
     end
     let(:message) do
       m = double("message")
-      allow(m).to receive(:deployment_id).and_return("689302")
-      allow(m).to receive(:iss).and_return("https://lmsvendor.com")
-      allow(m).to receive(:aud).and_return("PM48OJSfGDTAzAo")
-      allow(m).to receive(:exp).and_return(1_551_290_856)
-      allow(m).to receive(:nonce).and_return("172we8671fd8z")
+      allow(m).to receive_messages(deployment_id: "689302",
+                                   iss: "https://lmsvendor.com",
+                                   aud: "PM48OJSfGDTAzAo",
+                                   exp: 1_551_290_856,
+                                   nonce: "172we8671fd8z")
       m
     end
 

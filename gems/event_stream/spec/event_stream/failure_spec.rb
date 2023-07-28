@@ -36,8 +36,7 @@ describe EventStream::Failure do
       allow(@stream).to receive(:operation_payload).with(:update, @record).and_return(@record.changes)
 
       @exception = StandardError.new
-      allow(@exception).to receive(:message).and_return(double("exception_message", to_s: "exception_message_string"))
-      allow(@exception).to receive(:backtrace).and_return([42])
+      allow(@exception).to receive_messages(message: double("exception_message", to_s: "exception_message_string"), backtrace: [42])
     end
 
     it "creates a new db record" do

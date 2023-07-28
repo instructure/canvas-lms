@@ -269,23 +269,20 @@ describe "Feature.register" do
     end
 
     it "registers in a dev environment" do
-      allow(Rails.env).to receive(:test?).and_return(false)
-      allow(Rails.env).to receive(:development?).and_return(true)
+      allow(Rails.env).to receive_messages(test?: false, development?: true)
       Feature.register({ dev_feature: t_dev_feature_hash })
       expect(Feature.definitions["dev_feature"]).not_to be_nil
     end
 
     it "registers in a production test cluster" do
-      allow(Rails.env).to receive(:test?).and_return(false)
-      allow(Rails.env).to receive(:production?).and_return(true)
+      allow(Rails.env).to receive_messages(test?: false, production?: true)
       allow(ApplicationController).to receive(:test_cluster?).and_return(true)
       Feature.register({ dev_feature: t_dev_feature_hash })
       expect(Feature.definitions["dev_feature"]).not_to be_nil
     end
 
     it "does not register in production" do
-      allow(Rails.env).to receive(:test?).and_return(false)
-      allow(Rails.env).to receive(:production?).and_return(true)
+      allow(Rails.env).to receive_messages(test?: false, production?: true)
       Feature.register({ dev_feature: t_dev_feature_hash })
       expect(Feature.definitions["dev_feature"]).to eq Feature::DISABLED_FEATURE
     end
@@ -298,8 +295,7 @@ describe "Feature.register" do
     end
 
     it "registers as 'hidden' in production" do
-      allow(Rails.env).to receive(:test?).and_return(false)
-      allow(Rails.env).to receive(:production?).and_return(true)
+      allow(Rails.env).to receive_messages(test?: false, production?: true)
       Feature.register({ dev_feature: t_hidden_in_prod_feature_hash })
       expect(Feature.definitions["dev_feature"]).to be_hidden
     end

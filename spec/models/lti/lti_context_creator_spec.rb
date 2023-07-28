@@ -23,8 +23,7 @@ describe Lti::LtiContextCreator do
     Account.create!.tap do |account|
       account.name = "root_account"
       account.lti_guid = "lti_guid"
-      allow(account).to receive(:domain).and_return("account_domain")
-      allow(account).to receive(:id).and_return(42)
+      allow(account).to receive_messages(domain: "account_domain", id: 42)
       account.sis_source_id = "account_sis_id"
     end
   end

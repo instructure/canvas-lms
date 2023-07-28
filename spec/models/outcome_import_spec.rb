@@ -46,9 +46,8 @@ describe OutcomeImport do
   end
 
   it "uses instfs for attachment during create_with_attachment if instfs is enabled" do
-    allow(InstFS).to receive(:enabled?).and_return(true)
     uuid = "1234-abcd"
-    allow(InstFS).to receive(:direct_upload).and_return(uuid)
+    allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
     import = create_import
     expect(import.attachment.instfs_uuid).to eq uuid
   end

@@ -77,8 +77,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
     let(:redis) { double("redis") }
 
     before do
-      allow(Canvas).to receive(:redis_enabled?).and_return(true)
-      allow(Canvas).to receive(:redis).and_return(redis)
+      allow(Canvas).to receive_messages(redis_enabled?: true, redis:)
     end
 
     it "passes ETag if we know it" do

@@ -32,7 +32,7 @@ describe "conversations new" do
     cat = @course.group_categories.create(name: "the groups")
     @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
-    @t2 =  user_factory(name: "second teacher", active_user: true)
+    @t2 = user_factory(name: "second teacher", active_user: true)
     @course.enroll_teacher(@t2)
   end
 

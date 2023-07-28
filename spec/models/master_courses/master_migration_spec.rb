@@ -3405,9 +3405,6 @@ describe MasterCourses::MasterMigration do
         page = @copy_from.wiki_pages.create!(title: "wiki", body: "ohai")
         quiz = @copy_from.quizzes.create!
 
-        allow(klass).to receive(:applies_to_course?).and_return(true)
-        allow(klass).to receive(:begin_export).and_return(true)
-
         data = {
           "$canvas_assignment_id" => assmt.id,
           "$canvas_discussion_topic_id" => topic.id,
@@ -3418,8 +3415,11 @@ describe MasterCourses::MasterMigration do
           "$canvas_page_id" => page.id,
           "$canvas_quiz_id" => quiz.id
         }
-        allow(klass).to receive(:export_completed?).and_return(true)
-        allow(klass).to receive(:retrieve_export).and_return(data)
+
+        allow(klass).to receive_messages(applies_to_course?: true,
+                                         begin_export: true,
+                                         export_completed?: true,
+                                         retrieve_export: data)
 
         run_master_migration
 

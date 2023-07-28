@@ -851,9 +851,8 @@ s2,test_1,section2,active),
 
   it "stores error file in instfs if instfs is enabled" do
     # enable instfs
-    allow(InstFS).to receive(:enabled?).and_return(true)
     uuid = "1234-abcd"
-    allow(InstFS).to receive(:direct_upload).and_return(uuid)
+    allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
     # generate some errors
     batch = @account.sis_batches.create!

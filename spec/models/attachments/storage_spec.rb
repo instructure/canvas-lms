@@ -21,8 +21,7 @@ describe Attachments::Storage do
   before do
     @attachment = attachment_model
     @uuid = "1234-abcd"
-    allow(InstFS).to receive(:direct_upload).and_return(@uuid)
-    allow(InstFS).to receive(:enabled?).and_return(true)
+    allow(InstFS).to receive_messages(direct_upload: @uuid, enabled?: true)
     @file = File.open("public/images/a.png")
   end
 
@@ -56,8 +55,7 @@ describe Attachments::Storage do
 
   describe "detect_filename" do
     it "prioritizes original_filename first" do
-      allow(@file).to receive(:original_filename).and_return("yep")
-      allow(@file).to receive(:filename).and_return("nope")
+      allow(@file).to receive_messages(original_filename: "yep", filename: "nope")
       expect(Attachments::Storage.detect_filename(@file)).to eq("yep")
     end
 

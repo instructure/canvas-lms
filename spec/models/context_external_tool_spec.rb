@@ -378,8 +378,7 @@ describe ContextExternalTool do
     end
 
     before do
-      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
       allow(tool).to receive(:use_environment_overrides?).and_return(true)
     end
 
@@ -611,8 +610,7 @@ describe ContextExternalTool do
 
     before do
       tool.settings[:environments] = {}
-      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
     end
 
     context "when key isn't valid" do
@@ -691,8 +689,7 @@ describe ContextExternalTool do
 
     before do
       tool.settings[:environments] = { domain: "beta.example.com" }
-      allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-      allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+      allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
       Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
     end
 
@@ -1811,8 +1808,7 @@ describe ContextExternalTool do
 
         context "in nonprod environment" do
           before do
-            allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-            allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+            allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
             Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
           end
 

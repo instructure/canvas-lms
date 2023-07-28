@@ -26,8 +26,7 @@ module Services
         @config = {
           "queue_url" => "http://queue.url"
         }
-        allow(FeatureAnalyticsService).to receive(:client).and_return(@client)
-        allow(FeatureAnalyticsService).to receive(:config).and_return(@config)
+        allow(FeatureAnalyticsService).to receive_messages(client: @client, config: @config)
       end
 
       it "sends messages to the queue_url specified in the config" do

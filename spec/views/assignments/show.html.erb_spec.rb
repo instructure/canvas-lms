@@ -52,9 +52,8 @@ describe "assignments/show" do
     assign(:assignment_groups, [g])
     assign(:current_user_rubrics, [])
     assign(:external_tools, [])
-    allow(view).to receive(:show_moderation_link).and_return(true)
+    allow(view).to receive_messages(show_moderation_link: true, show_confetti: false)
     allow(view).to receive(:eula_url) { eula_url }
-    allow(view).to receive(:show_confetti).and_return(false)
     render "assignments/show"
     expect(response).to have_tag(".attachment_wrapper")
   end
@@ -132,8 +131,7 @@ describe "assignments/show" do
     end
 
     it "is rendered when 'show_confetti' is true" do
-      allow(view).to receive(:show_confetti).and_return(true)
-      allow(view).to receive(:show_moderation_link).and_return(false)
+      allow(view).to receive_messages(show_confetti: true, show_moderation_link: false)
       render "assignments/show"
       expect(response).to render_template partial: "_confetti"
     end

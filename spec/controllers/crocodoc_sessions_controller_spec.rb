@@ -110,9 +110,7 @@ describe CrocodocSessionsController do
   context "Migrate to Canvadocs" do
     before do
       @attachment.submit_to_crocodoc
-      allow(Canvadocs).to receive(:enabled?).and_return true
-      allow(Canvadocs).to receive(:annotations_supported?).and_return true
-      allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return false
+      allow(Canvadocs).to receive_messages(enabled?: true, annotations_supported?: true, hijack_crocodoc_sessions?: false)
 
       allow_any_instance_of(Canvadocs::API).to receive(:session).and_return "id" => "SESSION"
       PluginSetting.create! name: "canvadocs",

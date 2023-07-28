@@ -1494,8 +1494,7 @@ describe FilesController do
 
   describe "POST api_capture" do
     before do
-      allow(InstFS).to receive(:enabled?).and_return(true)
-      allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
+      allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: ["jwt signing key"])
       @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
     end
 

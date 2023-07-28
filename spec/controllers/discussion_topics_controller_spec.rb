@@ -187,8 +187,7 @@ describe DiscussionTopicsController do
 
       it "redirects to correct mastery paths edit page" do
         user_session(@teacher)
-        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "value" })
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, env_for: { dummy: "value" })
         get :edit, params: { group_id: @group.id, id: @child_topic.id }
         redirect_path = "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
         expect(response).to redirect_to(redirect_path)
@@ -1389,16 +1388,14 @@ describe DiscussionTopicsController do
       end
 
       it "includes environment variables if enabled" do
-        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
-        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "value" })
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: true, env_for: { dummy: "value" })
         get :edit, params: { course_id: @course.id, id: @topic.id }
         expect(response).to be_successful
         expect(controller.js_env[:dummy]).to eq "value"
       end
 
       it "does not include environment variables when disabled" do
-        allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
-        allow(ConditionalRelease::Service).to receive(:env_for).and_return({ dummy: "value" })
+        allow(ConditionalRelease::Service).to receive_messages(enabled_in_context?: false, env_for: { dummy: "value" })
         get :edit, params: { course_id: @course.id, id: @topic.id }
         expect(response).to be_successful
         expect(controller.js_env).not_to have_key :dummy
@@ -2262,9 +2259,8 @@ describe DiscussionTopicsController do
     end
 
     it "uses inst-fs if it is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
 
       data = fixture_file_upload("docs/txt.txt", "text/plain", true)
       attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)

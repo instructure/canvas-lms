@@ -287,8 +287,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           tool.course_navigation = { enabled: true }
@@ -539,8 +538,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
@@ -801,8 +799,7 @@ describe ExternalToolsController do
         let(:domain) { "www.example-beta.com" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-          allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
           Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
           @tool.settings[:environments] = {
@@ -2512,8 +2509,7 @@ describe ExternalToolsController do
       let(:domain) { "www.example-beta.com" }
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
         user_session(account_admin_user)
 

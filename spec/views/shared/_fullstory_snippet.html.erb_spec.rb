@@ -38,8 +38,7 @@ describe "shared/_fullstory_snippet" do
 
   describe "with fullstory enabled" do
     before do
-      allow(@current_user).to receive(:global_id).and_return(1)
-      allow(@current_user).to receive(:id).and_return(1)
+      allow(@current_user).to receive_messages(global_id: 1, id: 1)
       allow(@domain_root_account).to receive(:settings).and_return({ enable_fullstory: true })
     end
 

@@ -246,7 +246,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
       next unless a[:associated_asset_type] == "canvas.assignment.quizzes" && a[:associated_asset_id] == alignment[:content_id].to_s
 
       items << { _id: a[:artifact_id], title: a[:title] } if a[:artifact_type] == "quizzes.item"
-      count += 1  if SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type])
+      count += 1 if SUPPORTED_OS_ALIGNMENTS.include?(a[:artifact_type])
     end
     [items, count]
   end

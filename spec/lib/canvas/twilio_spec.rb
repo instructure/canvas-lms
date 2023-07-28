@@ -45,17 +45,12 @@ describe "Canvas::Twilio" do
     end
 
     account = double("Canvas::Twilio.client.account")
-    allow(account).to receive(:incoming_phone_numbers).and_return(
-      double("Canvas::Twilio.client.api.account.client.incoming_phone_numbers",
-             stream: phone_number_objects)
-    )
-    allow(account).to receive(:messages).and_return(double)
+    allow(account).to receive_messages(incoming_phone_numbers: double("Canvas::Twilio.client.api.account.client.incoming_phone_numbers",
+                                                                      stream: phone_number_objects),
+                                       messages: double)
 
     client = double("Canvas::Twilio.client")
-    allow(client).to receive(:lookups).and_return(lookups)
-    allow(client).to receive(:api).and_return(
-      double("Canvas::Twilio.client.api", account:)
-    )
+    allow(client).to receive_messages(lookups:, api: double("Canvas::Twilio.client.api", account:))
     allow(Canvas::Twilio).to receive(:client).and_return(client)
   end
 

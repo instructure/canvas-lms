@@ -33,9 +33,8 @@ describe CanvasCassandra do
 
   describe "#tables" do
     before do
-      allow(conn).to receive(:use_cql3?).and_return(true)
+      allow(conn).to receive_messages(use_cql3?: true, connection: double(describe_version: "19"))
       allow(db).to receive(:keyspace).and_return("page_views")
-      allow(conn).to receive(:connection).and_return(double(describe_version: "19"))
     end
 
     it "queries for all column family names in the keyspace" do

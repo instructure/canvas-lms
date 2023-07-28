@@ -284,8 +284,7 @@ describe CC::CCHelper do
     end
 
     it "prepends the domain to links outside the course" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       @othercourse = Course.create!
       html = <<~HTML
@@ -299,8 +298,7 @@ describe CC::CCHelper do
     end
 
     it "copies pages correctly when the title starts with a number" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       page = @course.wiki_pages.create(title: "9000, the level is over")
       html = <<~HTML
@@ -312,8 +310,7 @@ describe CC::CCHelper do
     end
 
     it "copies pages correctly when the title consists only of a number" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       page = @course.wiki_pages.create(title: "9000")
       html = <<~HTML
@@ -326,8 +323,7 @@ describe CC::CCHelper do
 
     it "copies pages correctly when the url is an old slug" do
       Account.site_admin.enable_feature! :permanent_page_links
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       page = @course.wiki_pages.create(title: "9000, the level is over")
       page.wiki_page_lookups.create!(slug: "old-url")
@@ -340,8 +336,7 @@ describe CC::CCHelper do
     end
 
     it "uses the key_generator to translate links" do
-      allow(HostUrl).to receive(:protocol).and_return("http")
-      allow(HostUrl).to receive(:context_host).and_return("www.example.com:8080")
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @assignment = @course.assignments.create!(name: "Thing")
       html = <<~HTML
         <a href="/courses/#{@course.id}/assignments/#{@assignment.id}">Thing</a>

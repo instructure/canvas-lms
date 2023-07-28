@@ -167,8 +167,7 @@ describe SisPseudonym do
 
   it "includes a pseudonym from a trusted account" do
     pseudonym = account2.pseudonyms.create!(user: u, unique_id: "user") { |p| p.sis_user_id = "abc" }
-    allow(account1).to receive(:trust_exists?).and_return(true)
-    allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
+    allow(account1).to receive_messages(trust_exists?: true, trusted_account_ids: [account2.id])
     expect(SisPseudonym.for(u, account1)).to be_nil
     expect(SisPseudonym.for(u, account1, type: :trusted)).to eq(pseudonym)
   end

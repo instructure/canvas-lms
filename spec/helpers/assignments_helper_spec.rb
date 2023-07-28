@@ -188,8 +188,7 @@ describe AssignmentsHelper do
       assignment.assign_peer_review(reviewer, reviewee)
 
       # Avoid having to go down a rabbit hole of imports
-      allow(self).to receive(:submission_author_name_for).and_return("Nobody")
-      allow(self).to receive(:link_to).and_return("")
+      allow(self).to receive_messages(submission_author_name_for: "Nobody", link_to: "")
     end
 
     it "creates a URL containing the peer reviewee's user ID when peer reviewing is not anonymous" do

@@ -555,16 +555,13 @@ describe Lti::Messages::JwtMessage do
     end
     let(:controller) do
       controller = double("controller")
-      allow(controller).to receive(:polymorphic_url).and_return("polymorphic_url")
-      allow(controller).to receive(:request).and_return(request)
+      allow(controller).to receive_messages(polymorphic_url: "polymorphic_url", request:)
       controller
     end
     # All this setup just so we can stub out controller.polymorphic_url
     let(:request) do
       request = double("request")
-      allow(request).to receive(:url).and_return("https://localhost")
-      allow(request).to receive(:host).and_return("/my/url")
-      allow(request).to receive(:scheme).and_return("https")
+      allow(request).to receive_messages(url: "https://localhost", host: "/my/url", scheme: "https")
       request
     end
     # override b/c all the rest of the tests fail if a Controller is injected into the 'top-level' expander def

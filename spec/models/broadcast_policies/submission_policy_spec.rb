@@ -21,18 +21,16 @@ module BroadcastPolicies
   describe SubmissionPolicy do
     let(:course) do
       double("Course").tap do |c|
-        allow(c).to receive(:available?).and_return(true)
-        allow(c).to receive(:concluded?).and_return(false)
-        allow(c).to receive(:id).and_return(1)
+        allow(c).to receive_messages(available?: true, concluded?: false, id: 1)
       end
     end
     let(:assignment) do
       double("Assignment").tap do |a|
-        allow(a).to receive(:context).and_return(course)
-        allow(a).to receive(:published?).and_return(true)
-        allow(a).to receive(:deleted?).and_return(false)
-        allow(a).to receive(:context_id).and_return(course.id)
-        allow(a).to receive(:quiz_lti?).and_return(false)
+        allow(a).to receive_messages(context: course,
+                                     published?: true,
+                                     deleted?: false,
+                                     context_id: course.id,
+                                     quiz_lti?: false)
       end
     end
     let(:enrollment) do
@@ -50,27 +48,26 @@ module BroadcastPolicies
     end
     let(:submission) do
       double("Submission").tap do |s|
-        allow(s).to receive(:group_broadcast_submission).and_return(false)
-        allow(s).to receive(:assignment).and_return(assignment)
-        allow(s).to receive(:submitted?).and_return(true)
-        allow(s).to receive(:changed_state_to).and_return(false)
-        allow(s).to receive(:submitted_at).and_return(submission_time)
-        allow(s).to receive(:has_submission?).and_return(true)
-        allow(s).to receive(:late?).and_return(false)
-        allow(s).to receive(:posted?).and_return(true)
-        allow(s).to receive(:quiz_submission_id).and_return(nil)
-        allow(s).to receive(:user).and_return(user)
-        allow(s).to receive(:context).and_return(course)
-        allow(s).to receive(:submitted_at_before_last_save).and_return(nil)
-        allow(s).to receive(:saved_change_to_submitted?).and_return(false)
+        allow(s).to receive_messages(group_broadcast_submission: false,
+                                     assignment:,
+                                     submitted?: true,
+                                     changed_state_to: false,
+                                     submitted_at: submission_time,
+                                     has_submission?: true,
+                                     late?: false,
+                                     posted?: true,
+                                     quiz_submission_id: nil,
+                                     user:,
+                                     context: course,
+                                     submitted_at_before_last_save: nil,
+                                     saved_change_to_submitted?: false)
         allow(s).to receive(:changed_state_to).with(:submitted).and_return true
       end
     end
 
     let(:policy) do
       SubmissionPolicy.new(submission).tap do |policy|
-        allow(policy).to receive(:user_active_or_invited?).and_return(true)
-        allow(policy).to receive(:user_has_visibility?).and_return(true)
+        allow(policy).to receive_messages(user_active_or_invited?: true, user_has_visibility?: true)
       end
     end
 
@@ -158,8 +155,8 @@ module BroadcastPolicies
 
     describe "#should_dispatch_assignment_resubmitted" do
       before do
-        allow(submission).to receive(:submitted_at_before_last_save).and_return(1.day.ago)
-        allow(submission).to receive(:saved_change_to_submitted_at?).and_return(true)
+        allow(submission).to receive_messages(submitted_at_before_last_save: 1.day.ago,
+                                              saved_change_to_submitted_at?: true)
       end
 
       def wont_send_when
@@ -191,11 +188,8 @@ module BroadcastPolicies
 
         context "when a change was made to the URL" do
           before do
-            allow(submission).to receive(:saved_change_to_url?).and_return(true)
-
-            allow(submission).to receive(:url).and_return(
-              "http://quiz-lti.docker/lti/launch?participant_session_id=85&quiz_session_id=53"
-            )
+            allow(submission).to receive_messages(saved_change_to_url?: true,
+                                                  url: "http://quiz-lti.docker/lti/launch?participant_session_id=85&quiz_session_id=53")
           end
 
           context "and the submission is the first submission" do
@@ -248,8 +242,7 @@ module BroadcastPolicies
 
     describe "#should_dispatch_group_assignment_submitted_late?" do
       before do
-        allow(submission).to receive(:group_broadcast_submission).and_return true
-        allow(submission).to receive(:late?).and_return true
+        allow(submission).to receive_messages(group_broadcast_submission: true, late?: true)
       end
 
       def wont_send_when
@@ -291,9 +284,9 @@ module BroadcastPolicies
 
     describe "#should_dispatch_submission_grade_changed?" do
       before do
-        allow(submission).to receive(:graded_at).and_return Time.now
-        allow(submission).to receive(:assignment_graded_in_the_last_hour?).and_return false
-        allow(submission).to receive(:assignment_just_published).and_return true
+        allow(submission).to receive_messages(graded_at: Time.now,
+                                              assignment_graded_in_the_last_hour?: false,
+                                              assignment_just_published: true)
         allow(submission).to receive(:changed_in_state).with(:graded, fields: [:score, :grade]).and_return true
       end
 

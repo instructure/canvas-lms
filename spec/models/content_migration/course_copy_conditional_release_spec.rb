@@ -90,8 +90,6 @@ describe ContentMigration do
       @copy_from.update(account: old_account, root_account: old_account)
 
       allow(ConditionalRelease::Service).to receive(:service_configured?).and_return(true)
-      allow(ConditionalRelease::MigrationService).to receive(:begin_export).and_return({ mock_data: true })
-      allow(ConditionalRelease::MigrationService).to receive(:export_completed?).and_return(true)
 
       old_format_data = {
         "rules" => [{
@@ -105,7 +103,12 @@ describe ContentMigration do
             }]
         }]
       }
-      allow(ConditionalRelease::MigrationService).to receive(:retrieve_export).and_return(old_format_data)
+
+      allow(ConditionalRelease::MigrationService).to receive_messages(
+        begin_export: { mock_data: true },
+        export_completed?: true,
+        retrieve_export: old_format_data
+      )
 
       run_course_copy
       trigger_assmt_to = @copy_to.assignments.where(migration_id: mig_id(@trigger_assmt)).take

@@ -2716,8 +2716,7 @@ describe Canvas::LiveEvents do
       let(:region_code) { "prod-iad" }
 
       before do
-        allow(Canvas).to receive(:region).and_return(region)
-        allow(Canvas).to receive(:region_code).and_return(region_code)
+        allow(Canvas).to receive_messages(region:, region_code:)
       end
 
       it "sets region to Canvas.region" do
@@ -2744,8 +2743,7 @@ describe Canvas::LiveEvents do
         let(:environment) { "beta" }
 
         before do
-          allow(ApplicationController).to receive(:test_cluster?).and_return true
-          allow(ApplicationController).to receive(:test_cluster_name).and_return environment
+          allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: environment)
         end
 
         it "sets environment to beta" do

@@ -64,11 +64,9 @@ describe Lti::LtiOutboundAdapter do
   let(:lti_assignment) { LtiOutbound::LTIAssignment.new }
   let(:controller) do
     request_mock = double("request")
-    allow(request_mock).to receive(:host).and_return("/my/url")
-    allow(request_mock).to receive(:scheme).and_return("https")
+    allow(request_mock).to receive_messages(host: "/my/url", scheme: "https")
     m = double("controller")
-    allow(m).to receive(:request).and_return(request_mock)
-    allow(m).to receive(:logged_in_user).and_return(@user || user)
+    allow(m).to receive_messages(request: request_mock, logged_in_user: @user || user)
     m
   end
   let(:variable_expander) do
@@ -232,8 +230,7 @@ describe Lti::LtiOutboundAdapter do
       let(:url) { "http://www.example.com/basic_lti" }
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
         tool.settings[:environments] = {

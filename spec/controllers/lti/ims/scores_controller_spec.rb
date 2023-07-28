@@ -672,8 +672,7 @@ module Lti::IMS
 
             context "with InstFS enabled" do
               before do
-                allow(InstFS).to receive(:enabled?).and_return(true)
-                allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
+                allow(InstFS).to receive_messages(enabled?: true, jwt_secrets: ["jwt signing key"])
                 @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
                 allow(CanvasHttp).to receive(:post).and_return(
                   double(class: Net::HTTPCreated, code: 201, body: {})

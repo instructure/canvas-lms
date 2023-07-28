@@ -92,8 +92,7 @@ describe UsersController do
       let(:override_url) { "http://www.example-beta.com/basic_lti" }
 
       before do
-        allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-        allow(ApplicationController).to receive(:test_cluster_name).and_return("beta")
+        allow(ApplicationController).to receive_messages(test_cluster?: true, test_cluster_name: "beta")
         Account.site_admin.enable_feature! :dynamic_lti_environment_overrides
 
         tool.settings[:environments] = {
@@ -170,8 +169,7 @@ describe UsersController do
     it "sets up oauth for google_drive" do
       state = nil
       settings_mock = double
-      allow(settings_mock).to receive(:settings).and_return({})
-      allow(settings_mock).to receive(:enabled?).and_return(true)
+      allow(settings_mock).to receive_messages(settings: {}, enabled?: true)
 
       user_factory(active_all: true)
       user_session(@user)

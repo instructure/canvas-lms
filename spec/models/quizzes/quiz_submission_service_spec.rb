@@ -128,8 +128,7 @@ describe Quizzes::QuizSubmissionService do
           allow(quiz).to receive(:grants_right?).and_return(true)
           allow(quiz).to receive(:grants_right?).with(anything, anything, :manage).and_return(false)
 
-          allow(participant.user).to receive(:sections_for_course).and_return([inactive_course_section, active_course_section])
-          allow(participant.user).to receive(:new_record?).and_return(false)
+          allow(participant.user).to receive_messages(sections_for_course: [inactive_course_section, active_course_section], new_record?: false)
 
           expect do
             subject.create quiz

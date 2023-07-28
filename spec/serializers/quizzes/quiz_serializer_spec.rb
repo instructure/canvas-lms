@@ -43,11 +43,9 @@ describe Quizzes::QuizSerializer do
     @quiz.id = 1
     @quiz.context = @context
     @user = User.new
-    allow(@quiz).to receive(:locked_for?).and_return false
-    allow(@quiz).to receive(:check_right?).and_return true
+    allow(@quiz).to receive_messages(locked_for?: false, check_right?: true)
     @session = double(:[] => nil)
-    allow(controller).to receive(:session).and_return session
-    allow(controller).to receive(:context).and_return context
+    allow(controller).to receive_messages(session:, context:)
     allow(@quiz).to receive(:grants_right?).at_least(:once).and_return true
     allow(@context).to receive(:grants_right?).at_least(:once).and_return true
     allow(@context).to receive(:grants_any_right?).at_least(:once).and_return true
@@ -137,7 +135,7 @@ describe Quizzes::QuizSerializer do
     assignment = Assignment.new
     assignment.id = 1
     assignment.context_id = @context.id
-    allow(@quiz).to receive(:assignment).and_return assignment
+    allow(@quiz).to receive_messages(assignment:, grants_right?: false)
 
     # nil when quiz is unpublished
     allow(@quiz).to receive(:published?).and_return false
@@ -155,7 +153,6 @@ describe Quizzes::QuizSerializer do
     )
 
     # Students shouldn't be able to see speed_grader_url
-    allow(@quiz).to receive(:grants_right?).and_return false
     allow(@context).to receive(:grants_right?).and_return false
     expect(@serializer.as_json[:quiz]).not_to have_key :speed_grader_url
   end
@@ -587,8 +584,7 @@ describe Quizzes::QuizSerializer do
                          }]
 
     expect(quiz).to receive(:due_at).at_least(:once)
-    allow(serializer).to receive(:all_dates).and_return teacher_overrides
-    allow(serializer).to receive(:include_all_dates?).and_return true
+    allow(serializer).to receive_messages(all_dates: teacher_overrides, include_all_dates?: true)
 
     output = serializer.as_json[:quiz]
     expect(output).to have_key :all_dates

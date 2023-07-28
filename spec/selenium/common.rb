@@ -116,8 +116,8 @@ shared_context "in-process server selenium tests" do
   before do
     raise "all specs need to use transactional fixtures" unless use_transactional_tests
 
-    allow(HostUrl).to receive(:default_host).and_return(app_host_and_port)
-    allow(HostUrl).to receive(:file_host).and_return(app_host_and_port)
+    allow(HostUrl).to receive_messages(default_host: app_host_and_port,
+                                       file_host: app_host_and_port)
   end
 
   before(:all) do

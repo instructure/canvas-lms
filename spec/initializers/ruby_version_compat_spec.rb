@@ -51,8 +51,7 @@ describe "ruby_version_compat" do
       testfile = fixture_file_upload("docs/txt.txt", "text/plain", true)
       testfile.instance_variable_set(:@original_filename, nil)
       controller = ApplicationController.new
-      allow(controller).to receive(:params).and_return({ upload: { file1: testfile } })
-      allow(controller).to receive(:request).and_return(double(path: "/upload"))
+      allow(controller).to receive_messages(params: { upload: { file1: testfile } }, request: double(path: "/upload"))
       expect { controller.force_utf8_params }.to_not raise_error
       expect(testfile.original_filename).to be_nil
     end

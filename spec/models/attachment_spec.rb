@@ -804,8 +804,7 @@ describe Attachment do
 
     context "inst-fs" do
       before do
-        allow(InstFS).to receive(:enabled?).and_return(true)
-        allow(InstFS).to receive(:app_host).and_return("https://somehost.example")
+        allow(InstFS).to receive_messages(enabled?: true, app_host: "https://somehost.example")
         Attachment.class_variable_set :@@base_file_removed_uuids, nil if Attachment.class_variable_defined? :@@base_file_removed_uuids
       end
 
@@ -1979,9 +1978,7 @@ describe Attachment do
 
     context "instfs attachment" do
       before do
-        allow(InstFS).to receive(:enabled?).and_return true
-        allow(InstFS).to receive(:jwt_secret).and_return "secret"
-        allow(InstFS).to receive(:app_host).and_return "instfs"
+        allow(InstFS).to receive_messages(enabled?: true, jwt_secret: "secret", app_host: "instfs")
       end
 
       it "is false when not thumbnailable" do
@@ -2378,8 +2375,7 @@ describe Attachment do
       end
 
       before do
-        allow(@attachment).to receive(:instfs_hosted?).and_return true
-        allow(@attachment).to receive(:public_url).and_return @public_url
+        allow(@attachment).to receive_messages(instfs_hosted?: true, public_url: @public_url)
       end
 
       context "with good data" do
@@ -2523,8 +2519,7 @@ describe Attachment do
     end
 
     before do
-      allow(Attachment).to receive(:local_storage?).and_return(false)
-      allow(Attachment).to receive(:s3_storage?).and_return(true)
+      allow(Attachment).to receive_messages(local_storage?: false, s3_storage?: true)
       allow(@attachment).to receive(:s3object).and_return(double("s3object"))
       allow(@attachment).to receive(:after_attachment_saved)
     end

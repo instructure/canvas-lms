@@ -132,7 +132,7 @@ namespace :db do
 
         while true do
           email = ask("What email address will the site administrator account use? > ") { |q| q.echo = obfuscate_input_or_echo }
-          email_confirm = ask("Please confirm > ") { |q| q.echo =  obfuscate_input_or_echo }
+          email_confirm = ask("Please confirm > ") { |q| q.echo = obfuscate_input_or_echo }
           break if email == email_confirm
         end
 

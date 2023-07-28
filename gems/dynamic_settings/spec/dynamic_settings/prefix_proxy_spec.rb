@@ -115,8 +115,7 @@ module DynamicSettings
 
       context "with retries" do
         before do
-          allow(proxy).to receive(:retry_limit).and_return(2)
-          allow(proxy).to receive(:retry_base).and_return(1.4)
+          allow(proxy).to receive_messages(retry_limit: 2, retry_base: 1.4)
         end
 
         it "retries if there is an initial error" do

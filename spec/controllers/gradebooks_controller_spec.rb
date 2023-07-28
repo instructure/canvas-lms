@@ -46,15 +46,14 @@ describe GradebooksController do
         @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-someid", media_type: "video", title: "Example Media Object", context: @course)
         @mock_kaltura = double("CanvasKaltura::ClientV3")
         allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
-        allow(@mock_kaltura).to receive(:startSession).and_return(nil)
         @media_sources = [{
           height: "240",
           width: "336",
           content_type: "video/mp4",
           url: "https://kaltura.example.com/some/url",
         }]
+        allow(@mock_kaltura).to receive_messages(startSession: nil, media_sources: @media_sources)
         @media_track = @media_object.media_tracks.create!(kind: "subtitles", locale: "en", content: "English").as_json["media_track"]
-        allow(@mock_kaltura).to receive(:media_sources).and_return(@media_sources)
       end
 
       it "includes muted assignments" do
@@ -2679,9 +2678,8 @@ describe GradebooksController do
     end
 
     it "stores attached files in instfs if instfs is enabled" do
-      allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
-      allow(InstFS).to receive(:direct_upload).and_return(uuid)
+      allow(InstFS).to receive_messages(enabled?: true, direct_upload: uuid)
       user_session(@teacher)
       @assignment = @course.assignments.create!(title: "some assignment")
       @student = @course.enroll_user(User.create!(name: "some user"))

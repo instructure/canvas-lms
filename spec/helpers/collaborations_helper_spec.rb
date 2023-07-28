@@ -45,9 +45,8 @@ describe CollaborationsHelper do
     it "has the data-update-launch-url attribute if it is a ExternalToolCollaboration" do
       assign(:context, course)
       launch_url = "http://example.com/test"
-      allow(collab).to receive(:is_a?).and_return false
+      allow(collab).to receive_messages(is_a?: false, update_url: launch_url)
       allow(collab).to receive(:is_a?).with(ExternalToolCollaboration).and_return true
-      allow(collab).to receive(:update_url).and_return(launch_url)
       expect(helper).to receive(:render).with("collaborations/collaboration",
                                               include(
                                                 data_attributes: include(
@@ -68,8 +67,7 @@ describe CollaborationsHelper do
 
     it "doesn't return the edit button for an ExternalToolCollaboration that don't have an edit url" do
       allow(collab).to receive(:is_a?).with(ExternalToolCollaboration).and_return(true)
-      allow(collab).to receive(:update_url).and_return(nil)
-      allow(collab).to receive(:grants_any_right?).and_return(true)
+      allow(collab).to receive_messages(update_url: nil, grants_any_right?: true)
       expect(helper).not_to receive(:render)
       helper.edit_button(collab, user)
     end

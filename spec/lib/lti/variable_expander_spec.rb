@@ -37,20 +37,20 @@ module Lti
     let(:substitution_helper) { double.as_null_object }
     let(:right_now) { DateTime.now }
     let(:tool) do
-      m = double("tool")
-      allow(m).to receive(:id).and_return(1)
-      allow(m).to receive(:context).and_return(root_account)
-      allow(m).to receive(:extension_setting).with(nil, :prefer_sis_email).and_return(nil)
-      allow(m).to receive(:extension_setting).with(:tool_configuration, :prefer_sis_email).and_return(nil)
-      allow(m).to receive(:include_email?).and_return(true)
-      allow(m).to receive(:include_name?).and_return(true)
-      allow(m).to receive(:public?).and_return(true)
       shard_mock = double("shard")
       allow(shard_mock).to receive(:settings).and_return({ encription_key: "abc" })
-      allow(m).to receive(:shard).and_return(shard_mock)
-      allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
-      allow(m).to receive(:use_1_3?).and_return(false)
-      allow(m).to receive(:launch_url).and_return("http://example.com/launch")
+      m = double("tool")
+      allow(m).to receive_messages(id: 1,
+                                   context: root_account,
+                                   include_email?: true,
+                                   include_name?: true,
+                                   public?: true,
+                                   shard: shard_mock,
+                                   opaque_identifier_for: "6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f",
+                                   use_1_3?: false,
+                                   launch_url: "http://example.com/launch")
+      allow(m).to receive(:extension_setting).with(nil, :prefer_sis_email).and_return(nil)
+      allow(m).to receive(:extension_setting).with(:tool_configuration, :prefer_sis_email).and_return(nil)
       m
     end
     let(:available_canvas_resources) do
@@ -62,31 +62,25 @@ module Lti
 
     let(:controller) do
       request_mock = double("request")
-      allow(request_mock).to receive(:url).and_return("https://localhost")
-      allow(request_mock).to receive(:host_with_port).and_return("https://localhost")
-      allow(request_mock).to receive(:host).and_return("/my/url")
-      allow(request_mock).to receive(:scheme).and_return("https")
-      allow(request_mock).to receive(:parameters).and_return(
-        {
-          com_instructure_course_accept_canvas_resource_types: ["page", "module"],
-          com_instructure_course_canvas_resource_type: "page",
-          com_instructure_course_allow_canvas_resource_selection: "true",
-          com_instructure_course_available_canvas_resources: available_canvas_resources
-        }.with_indifferent_access
-      )
+      allow(request_mock).to receive_messages(url: "https://localhost", host_with_port: "https://localhost", host: "/my/url", scheme: "https", parameters: {
+        com_instructure_course_accept_canvas_resource_types: ["page", "module"],
+        com_instructure_course_canvas_resource_type: "page",
+        com_instructure_course_allow_canvas_resource_selection: "true",
+        com_instructure_course_available_canvas_resources: available_canvas_resources
+      }.with_indifferent_access)
+      view_context_mock = double("view_context")
       m = double("controller")
       allow(m).to receive(:css_url_for).with(:common).and_return("/path/to/common.scss")
-      allow(m).to receive(:request).and_return(request_mock)
-      allow(m).to receive(:logged_in_user).and_return(user)
-      allow(m).to receive(:named_context_url).and_return("url")
-      allow(m).to receive(:active_brand_config_url).with("json").and_return("http://example.com/brand_config.json")
-      allow(m).to receive(:active_brand_config_url).with("js").and_return("http://example.com/brand_config.js")
-      allow(m).to receive(:active_brand_config).and_return(double(to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'))
-      allow(m).to receive(:polymorphic_url).and_return("url")
-      view_context_mock = double("view_context")
       allow(view_context_mock).to receive(:stylesheet_path)
         .and_return(URI.parse(request_mock.url).merge(m.css_url_for(:common)).to_s)
-      allow(m).to receive(:view_context).and_return(view_context_mock)
+      allow(m).to receive_messages(request: request_mock,
+                                   logged_in_user: user,
+                                   named_context_url: "url",
+                                   active_brand_config: double(to_json: '{"ic-brand-primary-darkened-5":"#0087D7"}'),
+                                   polymorphic_url: "url",
+                                   view_context: view_context_mock)
+      allow(m).to receive(:active_brand_config_url).with("json").and_return("http://example.com/brand_config.json")
+      allow(m).to receive(:active_brand_config_url).with("js").and_return("http://example.com/brand_config.js")
       m
     end
     let(:attachment) { attachment_model }

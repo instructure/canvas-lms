@@ -440,8 +440,7 @@ describe Api::V1::Submission do
       let(:json) { fake_controller.submission_json(submission, assignment, teacher, session) }
 
       before do
-        allow(Canvadocs).to receive(:annotations_supported?).and_return(true)
-        allow(Canvadocs).to receive(:enabled?).and_return(true)
+        allow(Canvadocs).to receive_messages(annotations_supported?: true, enabled?: true)
         Canvadoc.create!(document_id: "abc123#{attachment.id}", attachment_id: attachment.id)
       end
 

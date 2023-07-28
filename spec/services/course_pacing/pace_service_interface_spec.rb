@@ -29,8 +29,7 @@ describe CoursePacing::PaceServiceInterface do
   describe ".pace_for" do
     context "when context is invalid" do
       before do
-        allow(CoursePacing::PaceServiceInterface).to receive(:valid_context?).and_return(false)
-        allow(CoursePacing::PaceServiceInterface).to receive(:pace_in_context).and_return("invalid context")
+        allow(CoursePacing::PaceServiceInterface).to receive_messages(valid_context?: false, pace_in_context: "invalid context")
       end
 
       it "returns nil if invalid context" do

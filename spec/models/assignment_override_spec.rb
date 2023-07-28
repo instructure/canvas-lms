@@ -41,7 +41,7 @@ describe AssignmentOverride do
     override = assignment_override_model(course: @course)
     # make it invalid
     AssignmentOverride.where(id: override).update_all(set_type: "potato")
-    expect(override.reload).to be_invalid
+    expect(override.reload).not_to be_valid
     override.destroy
     expect { override.destroy }.not_to raise_error
   end
@@ -965,16 +965,14 @@ describe AssignmentOverride do
     end
 
     it "does nothing if the set is not empty" do
-      allow(@override).to receive(:set_type).and_return "ADHOC"
-      allow(@override).to receive(:set).and_return [1, 2, 3]
+      allow(@override).to receive_messages(set_type: "ADHOC", set: [1, 2, 3])
       expect(@override).not_to receive(:destroy)
 
       @override.destroy_if_empty_set
     end
 
     it "destroys itself if the set is empty" do
-      allow(@override).to receive(:set_type).and_return "ADHOC"
-      allow(@override).to receive(:set).and_return []
+      allow(@override).to receive_messages(set_type: "ADHOC", set: [])
       expect(@override).to receive(:destroy).once
 
       @override.destroy_if_empty_set
@@ -1026,8 +1024,7 @@ describe AssignmentOverride do
     end
 
     it "returns false if no students who are active in course for ADHOC" do
-      allow(@override).to receive(:set_type).and_return "ADHOC"
-      allow(@override).to receive(:set).and_return []
+      allow(@override).to receive_messages(set_type: "ADHOC", set: [])
 
       expect(@override.set_not_empty?).to be false
     end

@@ -60,11 +60,9 @@ describe "LTI integration tests" do
 
   let(:controller) do
     request_mock = double("request")
-    allow(request_mock).to receive(:host).and_return("/my/url")
-    allow(request_mock).to receive(:scheme).and_return("https")
+    allow(request_mock).to receive_messages(host: "/my/url", scheme: "https")
     m = double("controller")
-    allow(m).to receive(:request).and_return(request_mock)
-    allow(m).to receive(:logged_in_user).and_return(@user || user)
+    allow(m).to receive_messages(request: request_mock, logged_in_user: @user || user)
     m
   end
 
