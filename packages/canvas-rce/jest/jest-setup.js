@@ -58,7 +58,6 @@ const globalWarn = global.console.warn
 const ignoredWarnings = [
   /componentWillReceiveProps has been renamed/,
   /Store interaction failed/,
-  /Unsupported LTI 1.3 Content Item/,
   /Found bad LTI MRU data/,
   /Cannot save LTI MRU list/,
   /clicked sidebar (link|image) without a focused editor/,
