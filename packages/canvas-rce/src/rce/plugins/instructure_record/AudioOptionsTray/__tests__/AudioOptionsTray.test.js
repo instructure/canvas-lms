@@ -37,7 +37,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
       audioOptions: {
         id: 'm-audio-id',
       },
-      trayOptions: {
+      trayProps: {
         host: 'localhost:3001',
         jwt: 'someuglyvalue',
       },

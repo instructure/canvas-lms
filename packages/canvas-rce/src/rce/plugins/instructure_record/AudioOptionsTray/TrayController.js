@@ -76,7 +76,8 @@ export default class TrayController {
 
   _resetController() {
     this._shouldOpen = false
-    this._renderTray()
+    const trayProps = bridge.trayProps.get(this._editor)
+    this._renderTray(trayProps)
     this._editor = null
     this._audioContainer = null
     const elem = document.getElementById(CONTAINER_ID)

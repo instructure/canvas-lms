@@ -50,7 +50,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         videoSize: 'medium',
         usePercentageUnits: false,
       },
-      trayOptions: {
+      trayProps: {
         host: 'localhost:3001',
         jwt: 'someuglyvalue',
       },
