@@ -21,7 +21,7 @@ import {connect, Provider} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
-import {store} from '@instructure/canvas-planner'
+import {store} from '@canvas/planner'
 import {
   IconAddLine,
   IconBankLine,

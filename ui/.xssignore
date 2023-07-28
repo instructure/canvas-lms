@@ -1,1 +1,3 @@
 shared/mediaelement
+shared/planner/components/PlannerItem/style.js
+shared/planner/utilities/apiUtils.js

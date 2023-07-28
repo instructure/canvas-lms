@@ -21,7 +21,6 @@ import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
 import rceFormatMessage from '@instructure/canvas-rce/lib/format-message'
-import plannerFormatMessage from '@instructure/canvas-planner/src/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'
 import {useTranslations} from '@canvas/i18n'
@@ -29,11 +28,6 @@ import {useTranslations} from '@canvas/i18n'
 useTranslations('en', CoreTranslations)
 
 rceFormatMessage.setup({
-  locale: 'en',
-  missingTranslation: 'ignore',
-})
-
-plannerFormatMessage.setup({
   locale: 'en',
   missingTranslation: 'ignore',
 })
