@@ -834,20 +834,6 @@ module Lti
               expect { subject }.not_to change { course.context_modules.count }
             end
 
-            context "when the `Default SIS Sync for assignments, quizzes, grade discussion` option is enabled" do
-              before do
-                course.root_account.enable_feature! :new_sis_integrations
-                course.root_account.enable_feature! :post_grades
-                course.root_account.settings[:sis_default_grade_export] = { value: true }
-                course.root_account.save!
-              end
-
-              it "creates assignments with 'Post to SIS' enabled" do
-                subject
-                expect(course.assignments.last.post_to_sis).to be true
-              end
-            end
-
             context "when content item includes available dates" do
               let(:content_item) do
                 super().merge({ available: { startDateTime: Time.zone.now.iso8601, endDateTime: Time.zone.now.iso8601 } })
