@@ -35,7 +35,6 @@ const ignoredErrors = [
   /A component is changing a controlled input of type %s to be uncontrolled/,
   /A component is changing an uncontrolled input of type %s to be controlled./,
   /The prop `sortBy.order` is marked as required in `Images`/,
-  /You seem to have overlapping act\(\) calls/,
   /Invalid prop `documents.searchString` of type `string` supplied to `DocumentsPanel`/,
   /The prop `sortBy.order` is marked as required in `DocumentsPanel`/,
   /The prop `sortBy.order` is marked as required in `SavedIconMakerList`/,
