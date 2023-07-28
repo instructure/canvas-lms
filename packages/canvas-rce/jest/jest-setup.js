@@ -32,8 +32,6 @@ const globalError = global.console.error
 const ignoredErrors = [
   /An update to %s inside a test was not wrapped in act/,
   /Can't perform a React state update on an unmounted component/,
-  /A component is changing a controlled input of type %s to be uncontrolled/,
-  /A component is changing an uncontrolled input of type %s to be controlled./,
   /The prop `sortBy.order` is marked as required in `Images`/,
   /Invalid prop `documents.searchString` of type `string` supplied to `DocumentsPanel`/,
   /The prop `sortBy.order` is marked as required in `DocumentsPanel`/,
