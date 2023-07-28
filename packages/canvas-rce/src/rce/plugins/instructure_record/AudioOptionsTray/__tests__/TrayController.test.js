@@ -23,6 +23,7 @@ import FakeEditor from '../../../../__tests__/FakeEditor'
 import AudioOptionsTrayDriver from './AudioOptionsTrayDriver'
 import * as contentSelection from '../../../shared/ContentSelection'
 import {createLiveRegion, removeLiveRegion} from '../../../../__tests__/liveRegionHelper'
+import bridge from '../../../../../bridge'
 
 const MOCK_AUDIO_PLAYERS = [
   {
@@ -49,12 +50,17 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
   beforeEach(() => {
     createLiveRegion()
 
+    const trayProps = {
+      host: 'http://canvas.docker',
+      jwt: 'somevalue',
+    }
     editors = [new FakeEditor(), new FakeEditor()]
     editors.forEach((editor, i) => {
       editor.initialize()
       const audioElement = createAudio(i)
       editor.appendElement(audioElement)
       editor.setSelectedNode(audioElement)
+      bridge.trayProps.set(editor, trayProps)
     })
 
     trayController = new TrayController()
