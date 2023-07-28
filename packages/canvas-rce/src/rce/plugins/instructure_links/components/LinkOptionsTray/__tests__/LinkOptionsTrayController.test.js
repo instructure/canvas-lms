@@ -19,27 +19,34 @@ import ReactDOM from 'react-dom'
 import LinkOptionsTrayController, {CONTAINER_ID} from '../LinkOptionsTrayController'
 import FakeEditor from '../../../../../__tests__/FakeEditor'
 import LinkOptionsTrayDriver from './LinkOptionsTrayDriver'
+import * as contentSelection from '../../../../shared/ContentSelection'
 
 describe('RCE "Links" Plugin > LinkOptionsTray > LinkOptionsTrayController', () => {
   let editors
   let trayController
+
   beforeEach(() => {
+    contentSelection.getLinkContentFromEditor = jest.fn(_editor => ({}))
     editors = [new FakeEditor(), new FakeEditor()]
     editors.forEach(editor => {
       editor.initialize()
     })
     trayController = new LinkOptionsTrayController()
   })
+
   afterEach(() => {
+    jest.restoreAllMocks()
     editors.forEach(editor => editor.uninitialize())
     const $container = document.getElementById(CONTAINER_ID)
     if ($container != null) {
       ReactDOM.unmountComponentAtNode($container)
     }
   })
+
   function getTray() {
     return LinkOptionsTrayDriver.find()
   }
+
   describe('#showTrayForEditor()', () => {
     describe('when the tray is not already open', () => {
       it('opens the tray', () => {
@@ -47,36 +54,43 @@ describe('RCE "Links" Plugin > LinkOptionsTray > LinkOptionsTrayController', () 
         expect(getTray()).not.toBeNull()
       })
     })
+
     describe('when the tray is open for a different editor', () => {
       beforeEach(() => {
         trayController.showTrayForEditor(editors[0])
         trayController.showTrayForEditor(editors[1])
       })
+
       it('keeps the tray open', () => {
         expect(getTray()).not.toBeNull()
       })
     })
+
     describe('when the tray is already open for the given editor', () => {
       beforeEach(() => {
         trayController.showTrayForEditor(editors[0])
       })
+
       it('keeps the tray open', () => {
         expect(getTray()).not.toBeNull()
       })
     })
   })
+
   describe('#hideTrayForEditor()', () => {
     it('closes the tray when open for the given editor', () => {
       trayController.showTrayForEditor(editors[0])
       trayController.hideTrayForEditor(editors[0])
       expect(getTray()).toBeNull()
     })
+
     it('does not close the tray when open for a different editor', () => {
       trayController.showTrayForEditor(editors[0])
       trayController.showTrayForEditor(editors[1])
       trayController.hideTrayForEditor(editors[0])
       expect(getTray()).not.toBeNull()
     })
+
     it('does nothing when the tray was not open', () => {
       // In effect, it does not explode.
       trayController.hideTrayForEditor(editors[0])
