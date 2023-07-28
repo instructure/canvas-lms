@@ -57,8 +57,8 @@ GEM
     method_source (1.0.0)
     mime-types-data (3.2023.0218.1)
     mini_mime (1.1.2)
-    mini_portile2 (2.8.2)
-    minitest (5.18.1)
+    mini_portile2 (2.8.4)
+    minitest (5.19.0)
     multi_xml (0.6.0)
     nokogiri (1.13.10)
       mini_portile2 (~> 2.8.0)
@@ -144,7 +144,7 @@ GEM
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
-    zeitwerk (2.6.8)
+    zeitwerk (2.6.9)
 
 PLATFORMS
   aarch64-linux
