@@ -6,20 +6,20 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (7.0.5.1)
-      actionview (= 7.0.5.1)
-      activesupport (= 7.0.5.1)
+    actionpack (7.0.6)
+      actionview (= 7.0.6)
+      activesupport (= 7.0.6)
       rack (~> 2.0, >= 2.2.4)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.2.0)
-    actionview (7.0.5.1)
-      activesupport (= 7.0.5.1)
+    actionview (7.0.6)
+      activesupport (= 7.0.6)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    activesupport (7.0.5.1)
+    activesupport (7.0.6)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -50,7 +50,7 @@ GEM
     nokogiri (1.13.10-x86_64-linux)
       racc (~> 1.4)
     racc (1.7.1)
-    rack (2.2.7)
+    rack (2.2.8)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails-dom-testing (2.0.3)
@@ -58,9 +58,9 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.5.0)
       loofah (~> 2.19, >= 2.19.1)
-    railties (7.0.5.1)
-      actionpack (= 7.0.5.1)
-      activesupport (= 7.0.5.1)
+    railties (7.0.6)
+      actionpack (= 7.0.6)
+      activesupport (= 7.0.6)
       method_source
       rake (>= 12.2)
       thor (~> 1.0)
@@ -82,7 +82,7 @@ GEM
     thor (1.2.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
-    zeitwerk (2.6.9)
+    zeitwerk (2.6.11)
 
 PLATFORMS
   aarch64-linux
