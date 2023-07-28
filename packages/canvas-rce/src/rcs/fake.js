@@ -317,6 +317,9 @@ export function buildImage(index, name, height, width) {
     id,
     preview_url: url,
     thumbnail_url: url,
+    content_type: 'image/png',
+    date: '2023-05-23T20:05:17Z',
+    filename: name,
   }
 }
 
