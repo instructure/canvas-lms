@@ -44,7 +44,6 @@ const ignoredErrors = [
   /Invalid prop `images.searchString` of type `string` supplied to `Images`/,
   /Invalid URL: undefined/,
   /failed updating video captions/,
-  /The content `content` is marked as required in `LinkOptionsTray`/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
