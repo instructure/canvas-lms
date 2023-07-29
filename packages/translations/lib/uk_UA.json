@@ -5,23 +5,11 @@
     "add_8523c19b": {
         "message": "Додати"
     },
-    "add_to_do_7537af64": {
-        "message": "Додайте до плану роботи"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Додайте до плану роботи"
-    },
-    "address_3159962f": {
-        "message": "Адреса:"
-    },
     "align_11050992": {
         "message": "Вирівняти"
     },
     "all_4321c3a1": {
         "message": "Всі"
-    },
-    "all_day_fb42c4fc": {
-        "message": "Весь день"
     },
     "alpha_15d59033": {
         "message": "Альфа"
@@ -56,9 +44,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "Ви впевнені, що хочете скасувати? Зроблені зміни можуть бути не збережені."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Ви впевнені, що хочете видалити цей елемент планувальника?"
-    },
     "arrows_464a3e54": {
         "message": "Стрілки"
     },
@@ -71,44 +56,11 @@
     "assignments_1e02582c": {
         "message": "Завдання"
     },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }, всі дні о { datetime }."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, в { datetime }."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }, в { datetime } до { endTime }"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, до { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } має бути виконано { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } помічено як завершене."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } не помічено як завершене."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } розміщено { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, нагадування { datetime }."
-    },
     "attributes_963ba262": {
         "message": "Атрибути"
     },
     "basic_554cdc0a": {
         "message": "Базовий"
-    },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "Початок вашої історії завдань"
     },
     "blue_daf8fea9": {
         "message": "Синій"
@@ -118,9 +70,6 @@
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
-    },
-    "calendar_a8563bb2": {
-        "message": "Календар:"
     },
     "calendar_event_89aadc1c": {
         "message": "Календарна подія"
@@ -158,9 +107,6 @@
     "close_d634289d": {
         "message": "Закрити"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "Закрити спливаюче вікно Центру можливостей"
-    },
     "collaborations_5c56c15f": {
         "message": "Сумісна робота"
     },
@@ -179,23 +125,8 @@
     "copyright_holder_66ee111": {
         "message": "Правовласник:"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {}\n    few {}\n   many {}\n  other {}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Курс"
     },
     "course_files_62deb8f8": {
         "message": "Файли курсу"
@@ -205,9 +136,6 @@
     },
     "course_navigation_dd035109": {
         "message": "Навігація курсу"
-    },
-    "course_to_do_bcbbab54": {
-        "message": "Зробити { course }"
     },
     "creative_commons_license_725584ae": {
         "message": "Ліцензія Creative Commons:"
@@ -221,18 +149,6 @@
     "date_at_time_dbdb1b99": {
         "message": "{ date } в { time }"
     },
-    "date_ee500367": {
-        "message": "Дата"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } не є допустимою датою."
-    },
-    "date_is_required_8660ec22": {
-        "message": "Потрібно вказати дату"
-    },
-    "date_time_d9fbf2d7": {
-        "message": "Дата та час:"
-    },
     "decorative_image_fde98579": {
         "message": "Декоративне зображення"
     },
@@ -242,9 +158,6 @@
     "deep_purple_bb3e2907": {
         "message": "Темно-фіолетовий"
     },
-    "delete_a6efa79d": {
-        "message": "Видалити"
-    },
     "delimiters_4db4840d": {
         "message": "Розділювачі"
     },
@@ -253,9 +166,6 @@
     },
     "details_98a31b68": {
         "message": "Подробиці"
-    },
-    "details_a6f427c3": {
-        "message": "Подробиці:"
     },
     "dimensions_45ddb7b7": {
         "message": "Розміри"
@@ -268,18 +178,6 @@
     },
     "discussions_index_6c36ced": {
         "message": "Індекс обговорення"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "Відхилити { itemTitle }"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "Відхилити { opportunityName }"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "Відхилено"
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "Відхилені можливості"
     },
     "documents_81393201": {
         "message": "Документи"
@@ -296,32 +194,14 @@
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"
     },
-    "due_5d7267be": {
-        "message": "Очікується:"
-    },
-    "due_date_124fdd99": {
-        "message": "До: { date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Очікується: Кілька дат"
     },
     "edit_c5fbea07": {
         "message": "Редагувати"
     },
-    "edit_title_72e5a21e": {
-        "message": "Редагувати { title }"
-    },
     "embed_image_1080badc": {
         "message": "Вставити забраження"
-    },
-    "error_loading_grades_e0b38f4d": {
-        "message": "Помилка завантаження оцінок"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "Помилка завантаження інших елементів"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "Помилка завантаження попередніх елементів"
     },
     "excused_cf8792eb": {
         "message": "Виправдано"
@@ -356,17 +236,11 @@
     "generating_preview_45b53be0": {
         "message": "Генерується попередній перегляд..."
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "Перейти на Панель інструментів Card View"
-    },
     "graded_25cd3fcd": {
         "message": "Оцінено"
     },
     "grades_a61eba0a": {
         "message": "Оцінки"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "Оцінки завантажені"
     },
     "grades_loaded_5056277c": {
         "message": "Оцінки завантажені"
@@ -428,15 +302,6 @@
     "invalid_url_cbde79f": {
         "message": "Невірний URL"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
-    },
-    "join_6cafecca": {
-        "message": "Приєднатися"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Перейти на Сьогодні"
-    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Гарячі клавіши"
     },
@@ -454,12 +319,6 @@
     },
     "links_to_an_external_site_de74145d": {
         "message": "Посилання на зовнішній сайт."
-    },
-    "load_more_a36f9cf9": {
-        "message": "Завантажити більше"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "Завантажте попередні дати"
     },
     "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
         "message": "Завантажено { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
@@ -479,20 +338,8 @@
     "loading_grades_c842c887": {
         "message": "Завантаження оцінок"
     },
-    "loading_past_items_ca499e75": {
-        "message": "Завантаження попередніх елементів"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "Завантаження елементів планувальника"
-    },
-    "location_3b6ff307": {
-        "message": "Місцезнаходження:"
-    },
     "locked_762f138b": {
         "message": "Заблоковано"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "Виглядає наче тут нічого немає"
     },
     "media_af190855": {
         "message": "Носій інформації"
@@ -509,9 +356,6 @@
     "missing_1a256b3b": {
         "message": "Відсутній"
     },
-    "missing_items_for_title_516511f8": {
-        "message": "Відсутні елементи для { title }"
-    },
     "module_90d9fd32": {
         "message": "Розділ"
     },
@@ -521,26 +365,11 @@
     "my_files_2f621040": {
         "message": "Мої файли"
     },
-    "my_grades_98834476": {
-        "message": "Мої оцінки"
-    },
     "name_1aed4a1b": {
         "message": "Ім''я"
     },
     "navigation_ee9af92d": {
         "message": "Навігація"
-    },
-    "new_13daf639": {
-        "message": "Новий"
-    },
-    "new_activity_8b84847d": {
-        "message": "Нова діяльність"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "Нова діяльність для { title }"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "Нові можливості"
     },
     "new_quiz_34aacba6": {
         "message": "Нова контрольна робота"
@@ -548,17 +377,8 @@
     "next_40e12421": {
         "message": "Далі"
     },
-    "next_month_749b1778": {
-        "message": "Наступний місяць"
-    },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "Термін виконання не призначено"
-    },
     "no_e16d9132": {
         "message": "Ні"
-    },
-    "no_grade_3b4d7f3e": {
-        "message": "Оцінка відсутня"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Попередній перегляд  для цього файлу недоступний."
@@ -569,41 +389,17 @@
     "none_3b5e34d2": {
         "message": "Ніхто"
     },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Зараз нічого"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "Тут ніщо не вимагає уваги."
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "План роботи порожній"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "Ніщо нове не потребує уваги."
-    },
     "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
         "message": "На сьогодні нічого не заплановано. Виберіть елемент, який використовували останнім."
     },
     "nothing_planned_today_selecting_next_item_f6718aa": {
         "message": "На сьогодні нічого не заплановано. Виберіть наступний елемент."
     },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "Досі нічого не заплановано"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } балів"
-    },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*Покано тільки останній період оцінювання."
-    },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Вікрити діалогове вікно гарячих клавіш"
     },
     "operators_a2ef9a93": {
         "message": "Оператори"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "Опціонально: Додати курс"
     },
     "orange_81386a62": {
         "message": "Помаранчевий"
@@ -617,9 +413,6 @@
     "peer_review_74f26a13": {
         "message": "Експертна оцінка"
     },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "Експертна оцінка для { itemTitle }"
-    },
     "people_b4ebb13c": {
         "message": "Люди"
     },
@@ -629,23 +422,11 @@
     "pink_68ad45cb": {
         "message": "Рожевий"
     },
-    "points_bceb5005": {
-        "message": "бали"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } балів"
-    },
     "prev_f82cbc48": {
         "message": "Попередній"
     },
     "preview_53003fd2": {
         "message": "Попередній перегляд"
-    },
-    "previous_month_bb1e3c84": {
-        "message": "Попередній місяць"
-    },
-    "pts_699bd9aa": {
-        "message": "бали"
     },
     "published_c944a23d": {
         "message": "опубліковано"
@@ -674,9 +455,6 @@
     "relationships_6602af70": {
         "message": "Зв''язки"
     },
-    "reminder_date_4564d12d": {
-        "message": "Нагадування: { date }"
-    },
     "replace_e61834a7": {
         "message": "Замінити"
     },
@@ -692,23 +470,11 @@
     "save_11a80ec3": {
         "message": "Зберегти"
     },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "Прокрутіть вверх, щоб побачити свою історію!"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "Прокрутіть до попереднього елементу з новою діяльністю."
-    },
     "search_280d00bd": {
         "message": "Пошук"
     },
     "selected_274ce24f": {
         "message": "Обраний"
-    },
-    "show_all_ae37d610": {
-        "message": "Показати все"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "Показати мої оцінки"
     },
     "size_b30e1077": {
         "message": "Розмір"
@@ -719,17 +485,11 @@
     "start_over_f7552aa9": {
         "message": "Почати з початку"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } до { endDate }"
-    },
     "startdatetime_enddatetime_20abc10e": {
         "message": "{ startDateTime } - { endDateTime }"
     },
     "startdatetime_endtime_49741bbe": {
         "message": "{ startDateTime } - { endTime }"
-    },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } до { endTime }"
     },
     "submit_a3cc6859": {
         "message": "Підтвердити"
@@ -749,9 +509,6 @@
     "teal_f729a294": {
         "message": "Бірюзовий"
     },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "Дата та час, до якого це потрібно виконати"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Попередній перегляд документа в даний момент обробляється. Будь-ласка спробуйте пізніше."
     },
@@ -767,32 +524,17 @@
     "the_preceding_content_is_partner_provided_d753928c": {
         "message": "Попередній контент наданий партнером"
     },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "З цим елементом не пов''язані бали"
-    },
     "this_document_cannot_be_displayed_within_canvas_7aba77be": {
         "message": "Цей документ не може бути показаний в Canvas."
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Це рівняння не можна перетворити у базовому режимі перегляду"
     },
-    "time_2b5aac58": {
-        "message": "Час"
-    },
     "title_ee03d132": {
         "message": "Назва"
     },
-    "title_is_required_6ddcab69": {
-        "message": "заголовок обов''язковий"
-    },
     "to_do_1d554f36": {
         "message": "Зробити"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "Зробити: { date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "Завантажувати елементи плану робіт"
     },
     "today_76e10f9c": {
         "message": "Сьогодні"
@@ -847,14 +589,5 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Вчора"
-    },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "Ви маєте відгук у вигляді медіа файлу."
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "Ви маєте задати дату та час."
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "Ви прокрутили назад до самого першого завдання!"
     }
 }

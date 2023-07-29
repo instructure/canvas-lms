@@ -32,17 +32,8 @@
     "add_image_60b2de07": {
         "message": "画像を追加"
     },
-    "add_to_do_7537af64": {
-        "message": "タスクを追加"
-    },
-    "add_to_do_7def3c37": {
-        "message": "タスクに追加"
-    },
     "additional_considerations_f3801683": {
         "message": "さらなる考慮事項"
-    },
-    "address_3159962f": {
-        "message": "住所:"
     },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "同じURLを持つ隣接リンクは1つのリンクでなければなりません。"
@@ -67,9 +58,6 @@
     },
     "all_apps_a50dea49": {
         "message": "すべてのアプリ"
-    },
-    "all_day_fb42c4fc": {
-        "message": "全日"
     },
     "alpha_15d59033": {
         "message": "アルファ"
@@ -137,9 +125,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "ほんとうにキャンセルしますか?行われた変更は保存されません。"
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "この計画項目をほんとうに削除しますか？"
-    },
     "armenian_12da6118": {
         "message": "英語（米語）"
     },
@@ -157,36 +142,6 @@
     },
     "assignments_1e02582c": {
         "message": "課題"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }。"
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }終日{ datetime }に。"
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }（{ datetime }にて）。"
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }、{ datetime }で{ endTime }まで"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }、期限 { datetime }。"
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title }は{ datetime }で時間を費やさなければなりません"
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } は、完了とマークされています。"
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } は、完了とマークされていません。"
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title }は{ datetime }を掲示しました。"
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }、リマインダ{ datetime }."
     },
     "asterisk_82255584": {
         "message": "アスタリスク"
@@ -224,17 +179,11 @@
     "because_501841b": {
         "message": "理由は"
     },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "あなたのタスク履歴の始まり"
-    },
     "belarusian_b2f19c76": {
         "message": "ベラルーシ語"
     },
     "below_81d4dceb": {
         "message": "下の"
-    },
-    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "以下は、学生が自分のスケジュールを見る方法の一例です。"
     },
     "beta_cb5f307e": {
         "message": "バータ"
@@ -268,9 +217,6 @@
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
-    },
-    "calendar_a8563bb2": {
-        "message": "カレンダー:"
     },
     "calendar_event_89aadc1c": {
         "message": "カレンダーのイベント"
@@ -383,9 +329,6 @@
     "close_d634289d": {
         "message": "閉じる"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "「機会」センターポップアップを閉じる"
-    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "クローズドキャプションファイルは { maxKb } kb未満であること"
     },
@@ -452,23 +395,8 @@
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 語}\n    one {1 語}\n  other {# 語}\n}"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# 機会}\n    one {# 機会}\n  other {# 機会}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {見つからないアイテムを隠す#}\n  other {見つからないアイテムを隠す#}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# アイテムを読込みました}\n  other {# アイテムを読込みました}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {表示する# （完了したアイテムを}\n  other {表示する # （完了したアイテムを）}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {見つからないアイテムを表示する#}\n  other {見つからないアイテムを表示する#}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "コース"
     },
     "course_documents_104d76e0": {
         "message": "コースドキュメント"
@@ -493,9 +421,6 @@
     },
     "course_navigation_dd035109": {
         "message": "コース ナビゲーション"
-    },
-    "course_to_do_bcbbab54": {
-        "message": "{ course } タスク"
     },
     "create_icon_110d6463": {
         "message": "アイコンを作成する"
@@ -551,18 +476,6 @@
     "date_at_time_dbdb1b99": {
         "message": "{ date }を{ time }で"
     },
-    "date_ee500367": {
-        "message": "日付"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } は無効な日付です。"
-    },
-    "date_is_required_8660ec22": {
-        "message": "日付は必須です"
-    },
-    "date_time_d9fbf2d7": {
-        "message": "日付 & 時間:"
-    },
     "decorative_icon_9a7f3fc3": {
         "message": "装飾アイコン"
     },
@@ -590,9 +503,6 @@
     "degree_symbol_4a823d5f": {
         "message": "度数記号"
     },
-    "delete_a6efa79d": {
-        "message": "消去"
-    },
     "delimiters_4db4840d": {
         "message": "デリミタ"
     },
@@ -613,9 +523,6 @@
     },
     "details_98a31b68": {
         "message": "詳細"
-    },
-    "details_a6f427c3": {
-        "message": "詳細:"
     },
     "diagonal_dots_7d71b57e": {
         "message": "対角線上の点"
@@ -655,18 +562,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "不連続ユニオン"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "{ itemTitle }を却下する"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "{ opportunityName }を却下する"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "却下された"
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "却下された機会"
     },
     "display_options_315aba85": {
         "message": "オプションを表示する"
@@ -716,12 +611,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "ハンドルをドラッグします。上下矢印を使用してサイズを変更する"
     },
-    "due_5d7267be": {
-        "message": "期限："
-    },
-    "due_date_124fdd99": {
-        "message": "期限：{ date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "期限：複数の日付"
     },
@@ -751,9 +640,6 @@
     },
     "edit_link_7f53bebb": {
         "message": "リンクの編集"
-    },
-    "edit_title_72e5a21e": {
-        "message": "{ title }を編集する"
     },
     "editor_statusbar_26ac81fc": {
         "message": "エディタ ステータスバー"
@@ -839,18 +725,6 @@
     "equivalent_identity_654b3ce5": {
         "message": "等価 (同一性)"
     },
-    "error_loading_grades_e0b38f4d": {
-        "message": "評定の読み込み中にエラー"
-    },
-    "error_loading_items_5218438e": {
-        "message": "アイテムの読み込み中にエラーが発生しました"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "さらなるアイテムの読み込み中にエラーが発生しました"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "過去のアイテムの読み込み中にエラーが発生しました"
-    },
     "estonian_5e8e2fa4": {
         "message": "エストニア語"
     },
@@ -914,12 +788,6 @@
     "failed_peeking_into_your_past_5bec2323": {
         "message": "あなたの過去を覗くことに失敗しました"
     },
-    "failed_saving_changes_on_name_1e100ad": {
-        "message": "{ name }の変更の保存に失敗しました。"
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "{ name }タスクの削除に失敗しました。"
-    },
     "failed_to_delete_to_do_64edff49": {
         "message": "タスクの削除に失敗しました"
     },
@@ -934,9 +802,6 @@
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "タスクの保存に失敗しました"
-    },
-    "failure_loading_the_to_do_list_c61895c8": {
-        "message": "To Doリストの読み込みに失敗"
     },
     "feedback_6dcc1991": {
         "message": "フィードバック"
@@ -1037,9 +902,6 @@
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "{ size }KBを超えるGIF/PNG形式の画像は現在サポートされていません。"
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "カードビューダッシュボードに進みます。"
-    },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "エディタのメニューバーに移動する"
     },
@@ -1051,9 +913,6 @@
     },
     "grades_a61eba0a": {
         "message": "評定"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "評定読み込み中です"
     },
     "grades_loaded_5056277c": {
         "message": "評定が読み込まれました"
@@ -1310,26 +1169,8 @@
     "italian_bd3c792d": {
         "message": "イタリア語"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } 完了した{ items, plural,\n     =1 {項目}\n  other {項目}\n}"
-    },
     "japanese_b5721ca7": {
         "message": "日本語"
-    },
-    "join_6cafecca": {
-        "message": "参加する"
-    },
-    "join_active_online_meeting_d9d892b2": {
-        "message": "アクティブなオンラインミーティングに参加する"
-    },
-    "join_online_meeting_b1725843": {
-        "message": "オンラインミーティングに参加する"
-    },
-    "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "ナビゲーションツールバーへジャンプ"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "本日に移動"
     },
     "kappa_2f14c816": {
         "message": "カッパ"
@@ -1478,12 +1319,6 @@
     "load_more_35d33c7": {
         "message": "もっと読み込む"
     },
-    "load_more_a36f9cf9": {
-        "message": "もっと読み込む"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "以前のデータを読み込む"
-    },
     "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
         "message": "読み込んだ{ count, plural,\n     =0 {#項目}\n    one {#項目}\n  other {#項目}\n}"
     },
@@ -1514,23 +1349,14 @@
     "loading_grades_c842c887": {
         "message": "評定読み込み中"
     },
-    "loading_past_items_ca499e75": {
-        "message": "過去のアイテムを読み込む"
-    },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "{ fileName }のプレースホルダを読み込み中。"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "プランナーアイテムをもっと読み込む"
     },
     "loading_please_wait_d276220a": {
         "message": "読み込み中 - しばらくお待ちください"
     },
     "loading_preview_9f077aa1": {
         "message": "プレビュー読み込み中"
-    },
-    "location_3b6ff307": {
-        "message": "場所:"
     },
     "locked_762f138b": {
         "message": "ロックされています"
@@ -1546,9 +1372,6 @@
     },
     "logical_equivalence_thick_662dd3f2": {
         "message": "論理的等価（厚み）"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "ここに何もないようです"
     },
     "low_horizontal_dots_cc08498e": {
         "message": "低い水平ドット"
@@ -1622,9 +1445,6 @@
     "missing_1a256b3b": {
         "message": "欠如"
     },
-    "missing_items_for_title_516511f8": {
-        "message": "{ title }に不足しているアイテム"
-    },
     "module_90d9fd32": {
         "message": "モジュール"
     },
@@ -1654,9 +1474,6 @@
     },
     "my_files_2f621040": {
         "message": "マイ ファイル"
-    },
-    "my_grades_98834476": {
-        "message": "私の評定"
     },
     "n_th_root_9991a6e4": {
         "message": "N番目のルート"
@@ -1688,26 +1505,11 @@
     "nested_less_than_27d17e58": {
         "message": "ネストされた＜"
     },
-    "new_13daf639": {
-        "message": "新規作成"
-    },
-    "new_activity_8b84847d": {
-        "message": "新規アクティビティ"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "{ title }の新規アクティビティ"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "新しい機会"
-    },
     "new_quiz_34aacba6": {
         "message": "新しい小テスト"
     },
     "next_40e12421": {
         "message": "次へ"
-    },
-    "next_month_749b1778": {
-        "message": "翌月"
     },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "アクセシビリティの問題は検出されませんでした。"
@@ -1715,23 +1517,14 @@
     "no_changes_to_save_d29f6e91": {
         "message": "保存する変更はありません。"
     },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "期日指定なし"
-    },
     "no_e16d9132": {
         "message": "いいえ"
     },
     "no_file_chosen_9a880793": {
         "message": "ファイルが選択されていません"
     },
-    "no_grade_3b4d7f3e": {
-        "message": "評定なし"
-    },
     "no_headers_9bc7dc7f": {
         "message": "ヘッダーなし"
-    },
-    "no_more_items_to_show_6a1333c6": {
-        "message": "表示する項目がなくなりました"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "このファイルでは、プレビューは利用できません。"
@@ -1781,35 +1574,14 @@
     "not_superset_strict_24e06f36": {
         "message": "上位集合ではない（厳格）"
     },
-    "nothing_due_this_week_d45c9ef9": {
-        "message": "今週期限のものなし"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "今のところ何もなし"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "ここには注意を必要する新しいものは何もない。"
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "他にタスクはありません"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "注意を必要する新しいものは何もない。"
-    },
     "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
         "message": "今日は何も計画されていません。最新のアイテムを選択中。"
     },
     "nothing_planned_today_selecting_next_item_f6718aa": {
         "message": "今日は何も計画されていません。次のアイテムを選択中。"
     },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "まだ計画はありません"
-    },
     "nu_1c0f6848": {
         "message": "ニュー"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } 点"
     },
     "octagon_e48be9f": {
         "message": "八角形"
@@ -1826,9 +1598,6 @@
     "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
         "message": "1つまたは複数のファイルの貼り付けに失敗しました。ファイルのアップロードまたはドラッグ＆ドロップを試してみてください。"
     },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*最新の採点期間のみが表示されます。"
-    },
     "open_circle_e9bd069": {
         "message": "オープンサークル"
     },
@@ -1840,12 +1609,6 @@
     },
     "operators_a2ef9a93": {
         "message": "演算子"
-    },
-    "opportunities_popup_f6703842": {
-        "message": "機会ポップアップ"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "オプション：コースの追加"
     },
     "or_9b70ccaa": {
         "message": "または"
@@ -1894,9 +1657,6 @@
     },
     "peer_review_74f26a13": {
         "message": "ピア レビュー"
-    },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "{ itemTitle }のピア評価"
     },
     "pentagon_17d82ea3": {
         "message": "ペンタゴン"
@@ -1958,12 +1718,6 @@
     "plus_minus_f8be2e83": {
         "message": "プラス/マイナス"
     },
-    "points_bceb5005": {
-        "message": "ポイント"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } 点"
-    },
     "polish_4cf2ecaf": {
         "message": "ポーランド語"
     },
@@ -2000,9 +1754,6 @@
     "preview_inline_9787330": {
         "message": "インラインでのプレビュー"
     },
-    "previous_month_bb1e3c84": {
-        "message": "前月"
-    },
     "prime_917ea60e": {
         "message": "素数"
     },
@@ -2020,9 +1771,6 @@
     },
     "psi_e3f5f0f7": {
         "message": "プシー"
-    },
-    "pts_699bd9aa": {
-        "message": "ポイント"
     },
     "published_c944a23d": {
         "message": "公開済み"
@@ -2074,9 +1822,6 @@
     },
     "religion_icon_246e0be1": {
         "message": "宗教学のアイコン"
-    },
-    "reminder_date_4564d12d": {
-        "message": "リマインダ（お知らせ）：{ date }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "見出しスタイルを削除する"
@@ -2189,9 +1934,6 @@
     "saved_icon_maker_icons_df86e2a1": {
         "message": "保存したアイコンメーカーのアイコン"
     },
-    "schedule_preview_3bcda153": {
-        "message": "スケジュールプレビュー"
-    },
     "science_8d92214a": {
         "message": "科学"
     },
@@ -2215,12 +1957,6 @@
     },
     "script_l_42a7b254": {
         "message": "スクリプト L"
-    },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "スクロールアップして履歴を見る！"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "新しいアクティビティで前の項目までスクロールします。"
     },
     "search_280d00bd": {
         "message": "検索"
@@ -2267,9 +2003,6 @@
     "shortcut_911d6255": {
         "message": "ショートカット"
     },
-    "show_all_ae37d610": {
-        "message": "すべて表示する"
-    },
     "show_audio_options_b489926b": {
         "message": "オーディオオプションを表示する"
     },
@@ -2278,9 +2011,6 @@
     },
     "show_link_options_545338fd": {
         "message": "リンクオプションを表示する"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "私の評定を表示"
     },
     "show_studio_media_options_a0c748c6": {
         "message": "スタジオメディアオプションを表示する"
@@ -2393,23 +2123,14 @@
     "start_recording_9a65141a": {
         "message": "録画開始"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } - { endDate }"
-    },
     "startdatetime_enddatetime_20abc10e": {
         "message": "{ startDateTime } - { endDateTime }"
     },
     "startdatetime_endtime_49741bbe": {
         "message": "{ startDateTime } - { endTime }"
     },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "スチールブルー"
-    },
-    "student_to_do_c018c835": {
-        "message": "受講者 To Do"
     },
     "studio_media_options_ee504361": {
         "message": "スタジオメディアオプション"
@@ -2552,9 +2273,6 @@
     "the_best_assignment_15e98be1": {
         "message": "最高の課題"
     },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "これを行う日時が期限を過ぎています"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "文書のプレビューは現在処理中です。後ほどもう一度やり直してください。"
     },
@@ -2581,9 +2299,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "選択されたファイルは、{ maxSize }バイト数制限を越えています"
-    },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "このアイテムに関連付けられているポイントはありません。"
     },
     "there_is_nothing_planned_for_today_e09bfc8c": {
         "message": "本日の予定はありません。"
@@ -2627,29 +2342,17 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "あなたのビデオのブラウザ内のタイトルは正しいものですが、データベース内でそれを更新できませんでした。"
     },
-    "time_2b5aac58": {
-        "message": "時間"
-    },
     "timebar_a4d18443": {
         "message": "タイムバー"
     },
     "title_ee03d132": {
         "message": "タイトル"
     },
-    "title_is_required_6ddcab69": {
-        "message": "タイトルは必須です"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "投稿するには:{ when }"
     },
     "to_do_1d554f36": {
         "message": "タスク"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "タスク：{ date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "タスクの読み込み"
     },
     "to_do_when_2783d78f": {
         "message": "タスク：{ when }"
@@ -2891,12 +2594,6 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "キーボードのショートカットを見る"
     },
-    "view_next_week_7f61f755": {
-        "message": "来週の表示"
-    },
-    "view_previous_week_6f83849f": {
-        "message": "前の週の表示"
-    },
     "view_title_description_67940918": {
         "message": "{ title }説明の表示"
     },
@@ -2920,9 +2617,6 @@
     },
     "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
         "message": "ウェブページのH1は1つだけであるべきで、これはページのタイトルに自動的に使用されます。コンテンツの最初のヘッダーはH2であるべきです。"
-    },
-    "weekly_schedule_navigation_6b042645": {
-        "message": "週間スケジュールのナビゲーション"
     },
     "welsh_42ab94b1": {
         "message": "ウェールズ語"
@@ -2972,9 +2666,6 @@
     "yiddish_f96986df": {
         "message": "イディッシュ語"
     },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "メディアフィードバックがあります。"
-    },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Icon Makerトレイに未保存の変更があります。これらの変更を保存せずに続行しますか？"
     },
@@ -2983,12 +2674,6 @@
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "空のファイルをアップロードすることはできません。"
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "日時を指定する必要があります。"
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "あなたの最初のタスクにスクロールしました！"
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "あなたの画像はIcon Maker用に圧縮されています。{ size }KB未満の画像は圧縮されません。"

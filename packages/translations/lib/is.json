@@ -32,17 +32,8 @@
     "add_image_60b2de07": {
         "message": "Bæta við mynd"
     },
-    "add_to_do_7537af64": {
-        "message": "Bæta við Verkefni"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Bæta við Verkefni"
-    },
     "additional_considerations_f3801683": {
         "message": "Auka umhugsunarefni"
-    },
-    "address_3159962f": {
-        "message": "Aðsetur:"
     },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Samliggjandi tenglar með sömu vefslóð eiga að vera stakur tengill."
@@ -67,9 +58,6 @@
     },
     "all_apps_a50dea49": {
         "message": "Öll forrit"
-    },
-    "all_day_fb42c4fc": {
-        "message": "Allan dag"
     },
     "alpha_15d59033": {
         "message": "Alfa"
@@ -137,9 +125,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "Viltu örugglega hætta við? Breytingar verða hugsanlega ekki vistaðar."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Ertu viss um að þú viljir eyða þessu skipulagi?"
-    },
     "armenian_12da6118": {
         "message": "Armenska"
     },
@@ -157,36 +142,6 @@
     },
     "assignments_1e02582c": {
         "message": "Verkefni"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }, allan daginn þann { datetime }."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, klukkan { datetime }."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }, klukkan { datetime } þangað til { endTime }"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, skilafrestur { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } er með skiladag á verkefni klukkan { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } er merkt sem lokið."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } er ekki merkt sem lokið."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } birti { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, áminning { datetime }."
     },
     "asterisk_82255584": {
         "message": "Stjarna"
@@ -224,17 +179,11 @@
     "because_501841b": {
         "message": "Vegna"
     },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "Upphaf verkefnasögu þinnar"
-    },
     "belarusian_b2f19c76": {
         "message": "Hvítrússneska"
     },
     "below_81d4dceb": {
         "message": "Undir"
-    },
-    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "Fyrir neðan er dæmi um hvernig nemendur sjá stundatöflurnar sínar"
     },
     "beta_cb5f307e": {
         "message": "Beta"
@@ -268,9 +217,6 @@
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
-    },
-    "calendar_a8563bb2": {
-        "message": "Dagatal:"
     },
     "calendar_event_89aadc1c": {
         "message": "Dagatalsviðburður"
@@ -383,9 +329,6 @@
     "close_d634289d": {
         "message": "Loka"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "Loka sprettiglugga Tækifærismiðstöðvar"
-    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "Skjátextaskrá verður að vera minni en { maxKb } kb"
     },
@@ -452,23 +395,8 @@
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 orð}\n    one {1 orð}\n  other {# orð}\n}"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# kostir}\n    one {# kostur}\n  other {# kostir}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {Fela # atriði sem vantar}\n  other {Fela # atriði sem vantar}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# atriði hlaðið inn}\n  other {# atriðum hlaðið inn}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {Sýna # fullklárað atriði}\n  other {Sýna # fullkláruð atriði}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {Sýna # atriði sem vantar}\n  other {Sýna # atriði sem vantar}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Námskeið"
     },
     "course_documents_104d76e0": {
         "message": "Skjöl námskeiðs"
@@ -493,9 +421,6 @@
     },
     "course_navigation_dd035109": {
         "message": "Leiðarnet námskeiðs"
-    },
-    "course_to_do_bcbbab54": {
-        "message": "{ course } VERKEFNI"
     },
     "create_icon_110d6463": {
         "message": "Búa til tákn"
@@ -551,18 +476,6 @@
     "date_at_time_dbdb1b99": {
         "message": "{ date } klukkan { time }"
     },
-    "date_ee500367": {
-        "message": "Dagsetning"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } er ekki gild dagsetning."
-    },
-    "date_is_required_8660ec22": {
-        "message": "Dagsetningar er krafist"
-    },
-    "date_time_d9fbf2d7": {
-        "message": "Dagsetning og tími:"
-    },
     "decorative_icon_9a7f3fc3": {
         "message": "Tákn til skreytingar"
     },
@@ -590,9 +503,6 @@
     "degree_symbol_4a823d5f": {
         "message": "Gráðutákn"
     },
-    "delete_a6efa79d": {
-        "message": "Eyða"
-    },
     "delimiters_4db4840d": {
         "message": "Afmarkarar"
     },
@@ -613,9 +523,6 @@
     },
     "details_98a31b68": {
         "message": "Upplýsingar"
-    },
-    "details_a6f427c3": {
-        "message": "Upplýsingar:"
     },
     "diagonal_dots_7d71b57e": {
         "message": "Skápunktar"
@@ -655,18 +562,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Ósamræmt samband"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "Hafna { itemTitle }"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "Hafna { opportunityName }"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "Vísað frá"
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "Tækifæri sem voru vísuð frá"
     },
     "display_options_315aba85": {
         "message": "Sýningar valkostir"
@@ -716,12 +611,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Drag handfang. Nota upp og niður örvarnar til að breyta stærð"
     },
-    "due_5d7267be": {
-        "message": "Skil:"
-    },
-    "due_date_124fdd99": {
-        "message": "Skil: { date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Skil: Margar dagsetningar"
     },
@@ -751,9 +640,6 @@
     },
     "edit_link_7f53bebb": {
         "message": "Breyta tengli"
-    },
-    "edit_title_72e5a21e": {
-        "message": "Breyta { title }"
     },
     "editor_statusbar_26ac81fc": {
         "message": "Stöðuslá ritils"
@@ -839,18 +725,6 @@
     "equivalent_identity_654b3ce5": {
         "message": "Jafngildi (auðkenni)"
     },
-    "error_loading_grades_e0b38f4d": {
-        "message": "Villa við að hlaða inn einkunnum"
-    },
-    "error_loading_items_5218438e": {
-        "message": "Villa kom upp við að hlaða inn atriðum"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "Villa kom upp við að hlaða fleiri atriðum"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "Villa kom upp við að hlaða eldri atriðum"
-    },
     "estonian_5e8e2fa4": {
         "message": "Eistneska"
     },
@@ -914,12 +788,6 @@
     "failed_peeking_into_your_past_5bec2323": {
         "message": "Tókst ekki að kíkja á fortíð þína"
     },
-    "failed_saving_changes_on_name_1e100ad": {
-        "message": "Tókst ekki að vista breytingar á { name }."
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "Tókst ekki að eyða { name }."
-    },
     "failed_to_delete_to_do_64edff49": {
         "message": "Mistókst að eyða Verkefni"
     },
@@ -934,9 +802,6 @@
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "Mistókst að vista Verkefni"
-    },
-    "failure_loading_the_to_do_list_c61895c8": {
-        "message": "Mistókst hlaða Að gera lista"
     },
     "feedback_6dcc1991": {
         "message": "Endurgjöf"
@@ -1037,9 +902,6 @@
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "Myndir á GIF/PNG sniði sem eru stærri en { size } KB eru ekki studdar eins og er."
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "Fara í spjaldskoðunarstjórnborð"
-    },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "Fara í valmyndarslá ritilsins"
     },
@@ -1051,9 +913,6 @@
     },
     "grades_a61eba0a": {
         "message": "Einkunnir"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "Einkunnir eru að hlaðast inn"
     },
     "grades_loaded_5056277c": {
         "message": "Einkunnir eru hlaðnar inn"
@@ -1310,26 +1169,8 @@
     "italian_bd3c792d": {
         "message": "Ítalska"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } lokið { items, plural,\n     =1 {atriði}\n  other {atriði}\n}"
-    },
     "japanese_b5721ca7": {
         "message": "Japanska"
-    },
-    "join_6cafecca": {
-        "message": "Taka þátt"
-    },
-    "join_active_online_meeting_d9d892b2": {
-        "message": "taka þátt í virkum netfundi"
-    },
-    "join_online_meeting_b1725843": {
-        "message": "taka þátt í netfundi"
-    },
-    "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "Hoppa í verkfæraslá leiðarstýringar"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Fara á daginn í dag"
     },
     "kappa_2f14c816": {
         "message": "Kappa"
@@ -1478,12 +1319,6 @@
     "load_more_35d33c7": {
         "message": "Hlaða meira"
     },
-    "load_more_a36f9cf9": {
-        "message": "Hlaða meira"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "Hlaða fyrri dagsetningum"
-    },
     "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
         "message": "Hlaðin { count, plural,\n     =0 {# atriði}\n    one {# atriði}\n  other {# atriði}\n}"
     },
@@ -1514,23 +1349,14 @@
     "loading_grades_c842c887": {
         "message": "Hleð inn einkunnum"
     },
-    "loading_past_items_ca499e75": {
-        "message": "Hlaða fyrri atriðum"
-    },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Hleður staðgengli fyrir { fileName }"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "Hleður skipulögðum atriðum"
     },
     "loading_please_wait_d276220a": {
         "message": "Hleður, augnablik"
     },
     "loading_preview_9f077aa1": {
         "message": "Hlaða forskoðun"
-    },
-    "location_3b6ff307": {
-        "message": "Staðsetning:"
     },
     "locked_762f138b": {
         "message": "Læst"
@@ -1546,9 +1372,6 @@
     },
     "logical_equivalence_thick_662dd3f2": {
         "message": "Rökrétt jafngildi (breitt)"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "Lítur út fyrir að vera autt"
     },
     "low_horizontal_dots_cc08498e": {
         "message": "Lágir láréttir miðjupunktar"
@@ -1622,9 +1445,6 @@
     "missing_1a256b3b": {
         "message": "Vantar"
     },
-    "missing_items_for_title_516511f8": {
-        "message": "Atriði sem vantar fyrir { title }"
-    },
     "module_90d9fd32": {
         "message": "Eining"
     },
@@ -1654,9 +1474,6 @@
     },
     "my_files_2f621040": {
         "message": "Mínar skrár"
-    },
-    "my_grades_98834476": {
-        "message": "Einkunnir mínar"
     },
     "n_th_root_9991a6e4": {
         "message": "N-ta rót"
@@ -1688,26 +1505,11 @@
     "nested_less_than_27d17e58": {
         "message": "Faldað minna en"
     },
-    "new_13daf639": {
-        "message": "Nýtt"
-    },
-    "new_activity_8b84847d": {
-        "message": "Ný virkni"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "Ný virkni fyrir { title }"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "Ný tækifæri"
-    },
     "new_quiz_34aacba6": {
         "message": "Nýtt próf"
     },
     "next_40e12421": {
         "message": "Næsti"
-    },
-    "next_month_749b1778": {
-        "message": "Næsti mánuður"
     },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Engin vandamál fundust varðandi aðgengileika."
@@ -1715,23 +1517,14 @@
     "no_changes_to_save_d29f6e91": {
         "message": "Engar breytingar til að vista."
     },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "Engum skiladagsetningum úthlutað"
-    },
     "no_e16d9132": {
         "message": "Nei"
     },
     "no_file_chosen_9a880793": {
         "message": "Engin skrá valin"
     },
-    "no_grade_3b4d7f3e": {
-        "message": "Engin einkunn"
-    },
     "no_headers_9bc7dc7f": {
         "message": "Engir hausar"
-    },
-    "no_more_items_to_show_6a1333c6": {
-        "message": "Engin fleiri atriði að sýna"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Engin forskoðun tiltæk fyrir þessa skrá."
@@ -1781,35 +1574,14 @@
     "not_superset_strict_24e06f36": {
         "message": "Ekki yfirmengi (strangt)"
     },
-    "nothing_due_this_week_d45c9ef9": {
-        "message": "Engin skil þessa viku"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Ekkert núna"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "Ekkert hérna þarfnast athygli."
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "Ekkert annað á dagskrá"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "Ekkert nýtt sem krefst athygli."
-    },
     "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
         "message": "Ekkert skipulagt í dag. Vel nýlegasta atriðið."
     },
     "nothing_planned_today_selecting_next_item_f6718aa": {
         "message": "Ekkert skipulagt í dag. Vel næsta atriði."
     },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "Ekkert tímasett enn"
-    },
     "nu_1c0f6848": {
         "message": "Ní"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } punktar"
     },
     "octagon_e48be9f": {
         "message": "Átthyrningur"
@@ -1826,9 +1598,6 @@
     "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
         "message": "Ekki tókst að líma eina eða fleiri skrár. Vinsamlegast reyndu að hlaða upp eða draga og sleppa skrám."
     },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*Aðeins nýjasta einkunnatímabil sýnt."
-    },
     "open_circle_e9bd069": {
         "message": "Opinn hringur"
     },
@@ -1840,12 +1609,6 @@
     },
     "operators_a2ef9a93": {
         "message": "Stjórnendur"
-    },
-    "opportunities_popup_f6703842": {
-        "message": "kostir sprettigluggi"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "Valkvætt: Bæta við námskeiði"
     },
     "or_9b70ccaa": {
         "message": "Eða"
@@ -1894,9 +1657,6 @@
     },
     "peer_review_74f26a13": {
         "message": "Jafningjamat"
-    },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "Jafningjamat fyrir { itemTitle }"
     },
     "pentagon_17d82ea3": {
         "message": "fimmhyrningur"
@@ -1958,12 +1718,6 @@
     "plus_minus_f8be2e83": {
         "message": "Plús/Mínus"
     },
-    "points_bceb5005": {
-        "message": "punktar"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } punktar"
-    },
     "polish_4cf2ecaf": {
         "message": "Pólska"
     },
@@ -2000,9 +1754,6 @@
     "preview_inline_9787330": {
         "message": "Forskoðun í línu"
     },
-    "previous_month_bb1e3c84": {
-        "message": "Fyrri mánuður"
-    },
     "prime_917ea60e": {
         "message": "Frum"
     },
@@ -2020,9 +1771,6 @@
     },
     "psi_e3f5f0f7": {
         "message": "Psí"
-    },
-    "pts_699bd9aa": {
-        "message": "punktar"
     },
     "published_c944a23d": {
         "message": "birt"
@@ -2074,9 +1822,6 @@
     },
     "religion_icon_246e0be1": {
         "message": "Trúar tákn"
-    },
-    "reminder_date_4564d12d": {
-        "message": "Áminning: { date }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Fjarlægja stíl hauss"
@@ -2189,9 +1934,6 @@
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Vistað tákngerðartákn"
     },
-    "schedule_preview_3bcda153": {
-        "message": "Forskoðun stundaskrár"
-    },
     "science_8d92214a": {
         "message": "Vísindi"
     },
@@ -2215,12 +1957,6 @@
     },
     "script_l_42a7b254": {
         "message": "Forskrift L"
-    },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "Skruna upp til að sjá sögu þína!"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "Skruna upp að fyrra atriði með nýrri virkni."
     },
     "search_280d00bd": {
         "message": "Leita"
@@ -2267,9 +2003,6 @@
     "shortcut_911d6255": {
         "message": "Flýtileið"
     },
-    "show_all_ae37d610": {
-        "message": "Sýna allt"
-    },
     "show_audio_options_b489926b": {
         "message": "Sýna valkosti hljóðs"
     },
@@ -2278,9 +2011,6 @@
     },
     "show_link_options_545338fd": {
         "message": "Sýna valkosti tengla"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "Sýna einkunnir mínar"
     },
     "show_studio_media_options_a0c748c6": {
         "message": "Sýna valkosti fyrir margmiðlunarefni í Studio"
@@ -2393,23 +2123,14 @@
     "start_recording_9a65141a": {
         "message": "Hefja upptöku"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } til { endDate }"
-    },
     "startdatetime_enddatetime_20abc10e": {
         "message": "{ startDateTime } - { endDateTime }"
     },
     "startdatetime_endtime_49741bbe": {
         "message": "{ startDateTime } - { endTime }"
     },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } til { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Stálblár"
-    },
-    "student_to_do_c018c835": {
-        "message": "Nemandi að gera"
     },
     "studio_media_options_ee504361": {
         "message": "Valkostir Studio Media"
@@ -2552,9 +2273,6 @@
     "the_best_assignment_15e98be1": {
         "message": "Bestu verkefnin"
     },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "Dagsetning og tími skilafrests þessa verkefnis"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Forskoðun skjala er í vinnslu. Vinsamlegast reyndu aftur seinna."
     },
@@ -2581,9 +2299,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "Valin skrá fer yfir { maxSize } bæta mörkin"
-    },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "Það eru engin atriði tengd við þennan hlut"
     },
     "there_is_nothing_planned_for_today_e09bfc8c": {
         "message": "Ekkert á dagskrá í dag."
@@ -2627,29 +2342,17 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Þó að myndbandið sé með réttan titil í vafranum, uppfærðum við það ekki í gagnagrunninum."
     },
-    "time_2b5aac58": {
-        "message": "Tími"
-    },
     "timebar_a4d18443": {
         "message": "Tímaslá"
     },
     "title_ee03d132": {
         "message": "Titill"
     },
-    "title_is_required_6ddcab69": {
-        "message": "titill er áskilinn"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "Verður birt: { when }"
     },
     "to_do_1d554f36": {
         "message": "Verkefni"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "Verkefni: { date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "Hleð inn verkefnalista"
     },
     "to_do_when_2783d78f": {
         "message": "Verkefni: { when }"
@@ -2891,12 +2594,6 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Skoða flýtileiðir lyklaborð"
     },
-    "view_next_week_7f61f755": {
-        "message": "Skoða næstu viku"
-    },
-    "view_previous_week_6f83849f": {
-        "message": "Skoða síðustu viku"
-    },
     "view_title_description_67940918": {
         "message": "Skoða { title } lýsingu"
     },
@@ -2920,9 +2617,6 @@
     },
     "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
         "message": "Vefsíður ættu aðeins að hafa einn H1, sem er sjálfkrafa notaður sem titill síðunnar. Fyrsti hausinn í efninu þínu ætti að vera H2."
-    },
-    "weekly_schedule_navigation_6b042645": {
-        "message": "Leiðarstýring vikulegrar stundatölfu"
     },
     "welsh_42ab94b1": {
         "message": "Velska"
@@ -2972,9 +2666,6 @@
     "yiddish_f96986df": {
         "message": "Jiddíska"
     },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "Þú er með margmiðlunarsvörun."
-    },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Þú ert með óvistaðar breytingar í Tákngerðar bakkanum. Viltu halda áfram án þess að vista þessar breytingar?"
     },
@@ -2983,12 +2674,6 @@
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "Þú getur ekki hlaðið upp tómri skrá."
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "Þú þarft að gefa upp dagsetningu og tíma."
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "Þú hefur skrunað aftur í fyrsta verkefnið þitt!"
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Myndinni þinni hefur verið þjappað saman fyrir Icon Maker. Myndir sem eru minni en { size } KB verða ekki þjappaðar."

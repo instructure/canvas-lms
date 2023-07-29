@@ -41,9 +41,6 @@
     "basic_554cdc0a": {
         "message": "기본"
     },
-    "calendar_a8563bb2": {
-        "message": "달력:"
-    },
     "calendar_event_89aadc1c": {
         "message": "행사"
     },
@@ -68,32 +65,14 @@
     "content_type_2cf90d95": {
         "message": "내용 유형"
     },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n  other {}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n  other {}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n  other {}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n  other {}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "과목"
     },
     "course_files_a31f97fc": {
         "message": "과목 파일"
     },
     "course_navigation_dd035109": {
         "message": "과목 탐색"
-    },
-    "date_ee500367": {
-        "message": "날짜"
-    },
-    "delete_a6efa79d": {
-        "message": "삭제"
     },
     "delimiters_4db4840d": {
         "message": "구분자"
@@ -103,9 +82,6 @@
     },
     "details_98a31b68": {
         "message": "세부 정보"
-    },
-    "details_a6f427c3": {
-        "message": "세부 정보:"
     },
     "dimensions_45ddb7b7": {
         "message": "치수"
@@ -124,9 +100,6 @@
     },
     "down_5831a426": {
         "message": "아래로"
-    },
-    "due_5d7267be": {
-        "message": "기한:"
     },
     "edit_c5fbea07": {
         "message": "편집"
@@ -191,12 +164,6 @@
     "invalid_url_cbde79f": {
         "message": "잘못된 URL"
     },
-    "join_6cafecca": {
-        "message": "참여"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "오늘로 가기"
-    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "키보드 단축키"
     },
@@ -209,9 +176,6 @@
     "links_to_an_external_site_de74145d": {
         "message": "외부 사이트로 연결합니다."
     },
-    "load_more_a36f9cf9": {
-        "message": "더 로드"
-    },
     "loading_25990131": {
         "message": "로드하는 중..."
     },
@@ -220,9 +184,6 @@
     },
     "loading_failed_b3524381": {
         "message": "Loading failed..."
-    },
-    "location_3b6ff307": {
-        "message": "위치:"
     },
     "locked_762f138b": {
         "message": "잠김"
@@ -254,9 +215,6 @@
     "navigation_ee9af92d": {
         "message": "탐색"
     },
-    "new_13daf639": {
-        "message": "새 항목"
-    },
     "new_quiz_34aacba6": {
         "message": "새 퀴즈"
     },
@@ -271,9 +229,6 @@
     },
     "none_3b5e34d2": {
         "message": "없음"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "현재 없음"
     },
     "operators_a2ef9a93": {
         "message": "연산자"
@@ -293,14 +248,8 @@
     "percentage_34ab7c2c": {
         "message": "퍼센트"
     },
-    "points_bceb5005": {
-        "message": "점수"
-    },
     "preview_53003fd2": {
         "message": "미리 보기"
-    },
-    "pts_699bd9aa": {
-        "message": "점"
     },
     "quiz_e0dcce8f": {
         "message": "퀴즈"
@@ -352,9 +301,6 @@
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "이 수식은 기본 뷰에 렌더링할 수 없습니다."
-    },
-    "time_2b5aac58": {
-        "message": "시간"
     },
     "title_ee03d132": {
         "message": "제목"

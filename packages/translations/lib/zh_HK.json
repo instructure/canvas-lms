@@ -32,17 +32,8 @@
     "add_image_60b2de07": {
         "message": "添加影像"
     },
-    "add_to_do_7537af64": {
-        "message": "添加到待辦事項"
-    },
-    "add_to_do_7def3c37": {
-        "message": "添加到待辦事項"
-    },
     "additional_considerations_f3801683": {
         "message": "其他考慮因素"
-    },
-    "address_3159962f": {
-        "message": "地址："
     },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "URL 相同的相鄰連結應為單一連結。"
@@ -67,9 +58,6 @@
     },
     "all_apps_a50dea49": {
         "message": "所有應用程式"
-    },
-    "all_day_fb42c4fc": {
-        "message": "全天"
     },
     "alpha_15d59033": {
         "message": "α"
@@ -137,9 +125,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "是否確定要取消？您所做的變更或未能儲存。"
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "是否確定要刪除此手冊項目？"
-    },
     "armenian_12da6118": {
         "message": "亞美尼亞語"
     },
@@ -157,36 +142,6 @@
     },
     "assignments_1e02582c": {
         "message": "作業列表"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }。"
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }，{ datetime } 全天。"
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }，時間 { datetime }。"
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }，從 { datetime } 至 { endTime }"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }，截止日期 { datetime }。"
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } 的待辦時間為 { datetime }。"
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } 被標記為完成。"
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } 未被標記為完成。"
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } 已於 { datetime } 公佈。"
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }，提醒 { datetime }。"
     },
     "asterisk_82255584": {
         "message": "*"
@@ -224,17 +179,11 @@
     "because_501841b": {
         "message": "因為"
     },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "開始您的待辦事項歷程紀錄"
-    },
     "belarusian_b2f19c76": {
         "message": "白俄羅斯語"
     },
     "below_81d4dceb": {
         "message": "以下"
-    },
-    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "下面是學生看到的排程的範例"
     },
     "beta_cb5f307e": {
         "message": "β"
@@ -268,9 +217,6 @@
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
-    },
-    "calendar_a8563bb2": {
-        "message": "行事曆："
     },
     "calendar_event_89aadc1c": {
         "message": "行事曆活動"
@@ -383,9 +329,6 @@
     "close_d634289d": {
         "message": "關閉"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "關閉機會中心彈出視窗"
-    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "關閉的字幕檔案必須小於 { maxKb } kb"
     },
@@ -452,23 +395,8 @@
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 個字}\n    one {1 個字}\n  other {# 個字}\n}"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# 機會}\n    one {# 機會}\n  other {# 機會}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {隱藏 # 個缺失項目}\n  other {隱藏 # 個缺失項目}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# 個項目已載入}\n  other {# 個項目已載入}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {顯示 # 個已完成項目}\n  other {顯示 # 個已完成項目}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {顯示 # 個缺失項目}\n  other {顯示 # 個缺失項目}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "課程"
     },
     "course_documents_104d76e0": {
         "message": "課程文件"
@@ -493,9 +421,6 @@
     },
     "course_navigation_dd035109": {
         "message": "課程導航"
-    },
-    "course_to_do_bcbbab54": {
-        "message": "{ course } 待辦事項"
     },
     "create_icon_110d6463": {
         "message": "建立圖示"
@@ -551,18 +476,6 @@
     "date_at_time_dbdb1b99": {
         "message": "日期 { date }，時間 { time }"
     },
-    "date_ee500367": {
-        "message": "日期"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } 不是有效日期。"
-    },
-    "date_is_required_8660ec22": {
-        "message": "日期為必填"
-    },
-    "date_time_d9fbf2d7": {
-        "message": "日期和時間："
-    },
     "decorative_icon_9a7f3fc3": {
         "message": "裝飾圖示"
     },
@@ -590,9 +503,6 @@
     "degree_symbol_4a823d5f": {
         "message": "度數符號"
     },
-    "delete_a6efa79d": {
-        "message": "刪除"
-    },
     "delimiters_4db4840d": {
         "message": "分隔符號"
     },
@@ -613,9 +523,6 @@
     },
     "details_98a31b68": {
         "message": "詳細資料"
-    },
-    "details_a6f427c3": {
-        "message": "詳細資料："
     },
     "diagonal_dots_7d71b57e": {
         "message": "對角點"
@@ -655,18 +562,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "互斥聯集"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "忽略 { itemTitle }"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "忽略 { opportunityName }"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "已忽略"
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "已忽略的機會"
     },
     "display_options_315aba85": {
         "message": "顯示選項"
@@ -716,12 +611,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "拖曳控點。使用上下箭頭重新調整大小"
     },
-    "due_5d7267be": {
-        "message": "截止日期："
-    },
-    "due_date_124fdd99": {
-        "message": "截止日期：{ date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "截止日期：多個日期"
     },
@@ -751,9 +640,6 @@
     },
     "edit_link_7f53bebb": {
         "message": "編輯連結"
-    },
-    "edit_title_72e5a21e": {
-        "message": "編輯 { title }"
     },
     "editor_statusbar_26ac81fc": {
         "message": "編輯器狀態欄"
@@ -839,18 +725,6 @@
     "equivalent_identity_654b3ce5": {
         "message": "等價（單位）"
     },
-    "error_loading_grades_e0b38f4d": {
-        "message": "載入成績時發生錯誤"
-    },
-    "error_loading_items_5218438e": {
-        "message": "載入項目時發生錯誤"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "載入更多項目時發生錯誤"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "載入過去項目時發生錯誤"
-    },
     "estonian_5e8e2fa4": {
         "message": "愛沙尼亞語"
     },
@@ -914,12 +788,6 @@
     "failed_peeking_into_your_past_5bec2323": {
         "message": "無法窺視您的過去"
     },
-    "failed_saving_changes_on_name_1e100ad": {
-        "message": "無法儲存對 { name } 的變更。"
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "無法刪除 { name }。"
-    },
     "failed_to_delete_to_do_64edff49": {
         "message": "未能刪除待辦事項"
     },
@@ -934,9 +802,6 @@
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "未能儲存待辦事項"
-    },
-    "failure_loading_the_to_do_list_c61895c8": {
-        "message": "載入待辦事項清單失敗"
     },
     "feedback_6dcc1991": {
         "message": "反饋"
@@ -1037,9 +902,6 @@
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "GIF/PNG 格式影像大於目前不支援的 { size } KB。"
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "前往卡視圖控制面板"
-    },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "前往編輯器的選單欄"
     },
@@ -1051,9 +913,6 @@
     },
     "grades_a61eba0a": {
         "message": "成績"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "正在載入成績"
     },
     "grades_loaded_5056277c": {
         "message": "已載入成績"
@@ -1310,26 +1169,8 @@
     "italian_bd3c792d": {
         "message": "義大利語"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } 已完成 { items, plural,\n     =1 { 個項目}\n  other { 個項目}\n}"
-    },
     "japanese_b5721ca7": {
         "message": "日語"
-    },
-    "join_6cafecca": {
-        "message": "加入"
-    },
-    "join_active_online_meeting_d9d892b2": {
-        "message": "加入已啟用的線上會議"
-    },
-    "join_online_meeting_b1725843": {
-        "message": "加入線上會議"
-    },
-    "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "跳轉到導航工具欄"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "跳轉到今天"
     },
     "kappa_2f14c816": {
         "message": "κ"
@@ -1478,12 +1319,6 @@
     "load_more_35d33c7": {
         "message": "載入更多"
     },
-    "load_more_a36f9cf9": {
-        "message": "載入更多"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "載入先前日期"
-    },
     "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
         "message": "已載入 { count, plural,\n     =0 {# 個項目}\n    one {# 個項目}\n  other {# 個項目}\n}"
     },
@@ -1514,23 +1349,14 @@
     "loading_grades_c842c887": {
         "message": "正在載入成績"
     },
-    "loading_past_items_ca499e75": {
-        "message": "正在載入先前項目"
-    },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "載入 { fileName } 的佔位符"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "正在載入手冊項目"
     },
     "loading_please_wait_d276220a": {
         "message": "正在載入，請稍候"
     },
     "loading_preview_9f077aa1": {
         "message": "載入預覽"
-    },
-    "location_3b6ff307": {
-        "message": "位置："
     },
     "locked_762f138b": {
         "message": "已鎖定"
@@ -1546,9 +1372,6 @@
     },
     "logical_equivalence_thick_662dd3f2": {
         "message": "邏輯對等（粗）"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "看來這里甚麼也沒有"
     },
     "low_horizontal_dots_cc08498e": {
         "message": "下水平點"
@@ -1622,9 +1445,6 @@
     "missing_1a256b3b": {
         "message": "缺失"
     },
-    "missing_items_for_title_516511f8": {
-        "message": "{ title } 的缺失項目"
-    },
     "module_90d9fd32": {
         "message": "單元"
     },
@@ -1654,9 +1474,6 @@
     },
     "my_files_2f621040": {
         "message": "我的檔案"
-    },
-    "my_grades_98834476": {
-        "message": "我的成績"
     },
     "n_th_root_9991a6e4": {
         "message": "N 次方根"
@@ -1688,26 +1505,11 @@
     "nested_less_than_27d17e58": {
         "message": "巢式小於"
     },
-    "new_13daf639": {
-        "message": "新"
-    },
-    "new_activity_8b84847d": {
-        "message": "新活動"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "{ title } 的新活動"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "新機會"
-    },
     "new_quiz_34aacba6": {
         "message": "新測驗"
     },
     "next_40e12421": {
         "message": "下一個"
-    },
-    "next_month_749b1778": {
-        "message": "下個月"
     },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "並無偵察任何可訪問性問題。"
@@ -1715,23 +1517,14 @@
     "no_changes_to_save_d29f6e91": {
         "message": "沒有要儲存的變更。"
     },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "無指定截止日期"
-    },
     "no_e16d9132": {
         "message": "否"
     },
     "no_file_chosen_9a880793": {
         "message": "未選擇檔案"
     },
-    "no_grade_3b4d7f3e": {
-        "message": "無評分"
-    },
     "no_headers_9bc7dc7f": {
         "message": "無標題"
-    },
-    "no_more_items_to_show_6a1333c6": {
-        "message": "沒有要顯示的項目"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "本檔案不支援預覽。"
@@ -1781,35 +1574,14 @@
     "not_superset_strict_24e06f36": {
         "message": "非母集合（嚴格）"
     },
-    "nothing_due_this_week_d45c9ef9": {
-        "message": "無本週截止事項"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "未有內容"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "這裡暫無事項。"
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "沒有待辦事項"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "暫無新事項。"
-    },
     "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
         "message": "本日沒有計劃。正在選取最新項目。"
     },
     "nothing_planned_today_selecting_next_item_f6718aa": {
         "message": "本日沒有計劃。正在選取下一項目。"
     },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "沒有計劃"
-    },
     "nu_1c0f6848": {
         "message": "ν"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } 分"
     },
     "octagon_e48be9f": {
         "message": "八邊形"
@@ -1826,9 +1598,6 @@
     "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
         "message": "無法貼上一個或多個檔案。請嘗試上傳或拖放檔案。"
     },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*只顯示最近的評分期。"
-    },
     "open_circle_e9bd069": {
         "message": "開圓"
     },
@@ -1840,12 +1609,6 @@
     },
     "operators_a2ef9a93": {
         "message": "操作員"
-    },
-    "opportunities_popup_f6703842": {
-        "message": "機會彈出視窗"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "可選：添加課程"
     },
     "or_9b70ccaa": {
         "message": "或者"
@@ -1894,9 +1657,6 @@
     },
     "peer_review_74f26a13": {
         "message": "同儕互評"
-    },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "{ itemTitle } 的同儕互評"
     },
     "pentagon_17d82ea3": {
         "message": "五角形"
@@ -1958,12 +1718,6 @@
     "plus_minus_f8be2e83": {
         "message": "+/-"
     },
-    "points_bceb5005": {
-        "message": "分數"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } 分"
-    },
     "polish_4cf2ecaf": {
         "message": "波蘭語"
     },
@@ -2000,9 +1754,6 @@
     "preview_inline_9787330": {
         "message": "預覽內嵌"
     },
-    "previous_month_bb1e3c84": {
-        "message": "上個月"
-    },
     "prime_917ea60e": {
         "message": "質數"
     },
@@ -2020,9 +1771,6 @@
     },
     "psi_e3f5f0f7": {
         "message": "ψ"
-    },
-    "pts_699bd9aa": {
-        "message": "分數"
     },
     "published_c944a23d": {
         "message": "已發佈"
@@ -2074,9 +1822,6 @@
     },
     "religion_icon_246e0be1": {
         "message": "宗教圖示"
-    },
-    "reminder_date_4564d12d": {
-        "message": "提醒：{ date }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "移除標題樣式"
@@ -2189,9 +1934,6 @@
     "saved_icon_maker_icons_df86e2a1": {
         "message": "儲存的圖示製作者圖示"
     },
-    "schedule_preview_3bcda153": {
-        "message": "排程預覽"
-    },
     "science_8d92214a": {
         "message": "理工學"
     },
@@ -2215,12 +1957,6 @@
     },
     "script_l_42a7b254": {
         "message": "指令集 L"
-    },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "向上捲動以查看您的歷程記錄！"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "向上捲動至有新活動的過去項目。"
     },
     "search_280d00bd": {
         "message": "搜尋"
@@ -2267,9 +2003,6 @@
     "shortcut_911d6255": {
         "message": "快速鍵"
     },
-    "show_all_ae37d610": {
-        "message": "全部顯示"
-    },
     "show_audio_options_b489926b": {
         "message": "顯示音訊選項"
     },
@@ -2278,9 +2011,6 @@
     },
     "show_link_options_545338fd": {
         "message": "顯示連結選項"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "顯示我的成績"
     },
     "show_studio_media_options_a0c748c6": {
         "message": "顯示 Studio 媒體選項"
@@ -2393,23 +2123,14 @@
     "start_recording_9a65141a": {
         "message": "開始錄製"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } 至 { endDate }"
-    },
     "startdatetime_enddatetime_20abc10e": {
         "message": "{ startDateTime } - { endDateTime }"
     },
     "startdatetime_endtime_49741bbe": {
         "message": "{ startDateTime } - { endTime }"
     },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } 至 { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "鋼鐵藍"
-    },
-    "student_to_do_c018c835": {
-        "message": "學生待辦事項"
     },
     "studio_media_options_ee504361": {
         "message": "Studio 媒體選項"
@@ -2552,9 +2273,6 @@
     "the_best_assignment_15e98be1": {
         "message": "最佳作業"
     },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "待辦日期和時間到期"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "文件預覽目前正在處理中。請稍後重試。"
     },
@@ -2581,9 +2299,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "選取的檔案超過 { maxSize } 位元組限制"
-    },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "沒有與此項目關聯的分數。"
     },
     "there_is_nothing_planned_for_today_e09bfc8c": {
         "message": "今天沒有任何規劃項目。"
@@ -2627,29 +2342,17 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "雖然您的影片在瀏覽器中有正確的標題，但我們無法在資料庫中將其更新。"
     },
-    "time_2b5aac58": {
-        "message": "時間"
-    },
     "timebar_a4d18443": {
         "message": "時間欄"
     },
     "title_ee03d132": {
         "message": "標題"
     },
-    "title_is_required_6ddcab69": {
-        "message": "標題為必填"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "待公佈：{ when }"
     },
     "to_do_1d554f36": {
         "message": "待辦事項"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "待辦事項：{ date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "正在載入待辦事項"
     },
     "to_do_when_2783d78f": {
         "message": "待辦事項：{ when }"
@@ -2891,12 +2594,6 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "檢視鍵盤快速鍵"
     },
-    "view_next_week_7f61f755": {
-        "message": "檢視下一周"
-    },
-    "view_previous_week_6f83849f": {
-        "message": "檢視上一周"
-    },
     "view_title_description_67940918": {
         "message": "檢視 { title } 描述"
     },
@@ -2920,9 +2617,6 @@
     },
     "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
         "message": "網頁應該僅有一個 H1，由頁面的標題自動使用。您的內容中的第一個標題應該是 H2。"
-    },
-    "weekly_schedule_navigation_6b042645": {
-        "message": "每週排程導航工具"
     },
     "welsh_42ab94b1": {
         "message": "威爾斯語"
@@ -2972,9 +2666,6 @@
     "yiddish_f96986df": {
         "message": "意第緒語"
     },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "您有媒體反饋。"
-    },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "您在圖示製作者收集箱中有未儲存的變更。是否要繼續，但不儲存這些變更？"
     },
@@ -2983,12 +2674,6 @@
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "不可上傳空白檔案。"
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "您必須提供日期和時間。"
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "您已然回到您的第一個待辦事項！"
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "您的影像已壓縮用於圖示製作者。將不壓縮小於 { size } KB 的影像。"

@@ -5,9 +5,6 @@
     "additional_considerations_f3801683": {
         "message": "ملاحظات اضافی"
     },
-    "address_3159962f": {
-        "message": "نشانی:"
-    },
     "afrikaans_da0fe6ee": {
         "message": "آفریقایی"
     },
@@ -16,9 +13,6 @@
     },
     "all_4321c3a1": {
         "message": "همه"
-    },
-    "all_day_fb42c4fc": {
-        "message": "تمام روز"
     },
     "alpha_15d59033": {
         "message": "آلفا"
@@ -95,9 +89,6 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_a8563bb2": {
-        "message": "تقویم:"
-    },
     "calendar_event_89aadc1c": {
         "message": "رویداد تقویم"
     },
@@ -158,20 +149,8 @@
     "count_40eced3b": {
         "message": "تعداد"
     },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "درس"
     },
     "course_files_62deb8f8": {
         "message": "فایل های درس"
@@ -203,17 +182,11 @@
     "danish_c18cdac8": {
         "message": "دانمارکی"
     },
-    "date_ee500367": {
-        "message": "تاریخ"
-    },
     "decrease_indent_d9cf469d": {
         "message": "کاهش تورفتگی"
     },
     "deep_purple_bb3e2907": {
         "message": "ارغوانی پر رنگ"
-    },
-    "delete_a6efa79d": {
-        "message": "حذف"
     },
     "delimiters_4db4840d": {
         "message": "جداکننده ها"
@@ -223,9 +196,6 @@
     },
     "details_98a31b68": {
         "message": "اطلاعات"
-    },
-    "details_a6f427c3": {
-        "message": "جزئیات:"
     },
     "dimensions_45ddb7b7": {
         "message": "ابعاد"
@@ -244,9 +214,6 @@
     },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "بکشید و رها کنید، یا برای مرور رایانه کلیک کنید"
-    },
-    "due_5d7267be": {
-        "message": "مهلت:"
     },
     "due_multiple_dates_cc0ee3f5": {
         "message": "مهلت: چند تاریخ"
@@ -422,12 +389,6 @@
     "japanese_b5721ca7": {
         "message": "ژاپنی"
     },
-    "join_6cafecca": {
-        "message": "پیوستن"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "پرش به امروز"
-    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "میانبرهای صفحه کلید"
     },
@@ -455,9 +416,6 @@
     "lithuanian_5adcbe24": {
         "message": "لیتوانیایی"
     },
-    "load_more_a36f9cf9": {
-        "message": "بارگذاری بیشتر"
-    },
     "loading_25990131": {
         "message": "در حال بارگذاری..."
     },
@@ -475,9 +433,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "بارگیری پوشه ها"
-    },
-    "location_3b6ff307": {
-        "message": "مکان:"
     },
     "locked_762f138b": {
         "message": "قفل شده"
@@ -527,17 +482,11 @@
     "navigation_ee9af92d": {
         "message": "پیمایش"
     },
-    "new_13daf639": {
-        "message": "جدید"
-    },
     "new_quiz_34aacba6": {
         "message": "آزمون جدید"
     },
     "next_40e12421": {
         "message": "بعدی"
-    },
-    "next_month_749b1778": {
-        "message": "ماه بعد"
     },
     "no_e16d9132": {
         "message": "خیر"
@@ -562,9 +511,6 @@
     },
     "norwegian_nynorsk_c785f8a6": {
         "message": "نینورسک نروژی"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "چیزی در حال حاضر موجود نیست"
     },
     "olive_6a3e4d6b": {
         "message": "زیتون"
@@ -614,9 +560,6 @@
     "please_allow_canvas_to_access_your_microphone_and__dc2c3079": {
         "message": "لطفاً به Canvas اجازه دهید تا به میکروفون و وب کم شما دسترسی پیدا کند."
     },
-    "points_bceb5005": {
-        "message": "امتیازها"
-    },
     "polish_4cf2ecaf": {
         "message": "لهستانی"
     },
@@ -631,12 +574,6 @@
     },
     "preview_a3f8f854": {
         "message": "پیش نمایش"
-    },
-    "previous_month_bb1e3c84": {
-        "message": "ماه قبل"
-    },
-    "pts_699bd9aa": {
-        "message": "امتیاز"
     },
     "published_c944a23d": {
         "message": "منتشر شده"
@@ -773,17 +710,11 @@
     "this_image_is_currently_unavailable_25c68857": {
         "message": "این تصویر در حال حاضر در دسترس نیست"
     },
-    "time_2b5aac58": {
-        "message": "زمان"
-    },
     "title_ee03d132": {
         "message": "عنوان"
     },
     "to_do_1d554f36": {
         "message": "برای اقدام"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "در حال بارگزاری موارد اقدام"
     },
     "today_76e10f9c": {
         "message": "امروز"
