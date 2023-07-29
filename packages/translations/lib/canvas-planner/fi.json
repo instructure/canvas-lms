@@ -1,10 +1,6 @@
 {
   "a_great_discussion_6526a6d9": { "message": "Upea keskustelu" },
   "a_wonderful_assignment_d3139d9b": { "message": "Ihanasta tehtävä" },
-  "add_to_do_7537af64": { "message": "Lisää tehtäväluetteloon" },
-  "add_to_do_7def3c37": { "message": "Lisää tehtäväluetteloon" },
-  "address_3159962f": { "message": "Osoite:" },
-  "all_day_fb42c4fc": { "message": "Koko päivän" },
   "an_amazing_discussion_assignment_e5c8bd6b": {
     "message": "Hämmästyttävä keskustelutehtävä"
   },
@@ -12,98 +8,11 @@
     "message": "Ilmeni virhe yritettäessä ohittaa tilaisuutta."
   },
   "announcement_fb4cb645": { "message": "Ilmoitus" },
-  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-    "message": "Haluatko varmasti poistaa tämän kalenterin kohteen?"
-  },
   "assignment_976578a8": { "message": "Tehtävä" },
-  "assignmenttype_title_6612d008": {
-    "message": "{ assignmentType } { title }."
-  },
-  "assignmenttype_title_all_day_on_datetime_9768903c": {
-    "message": "{ assignmentType } { title }, koko päivän { datetime }."
-  },
-  "assignmenttype_title_at_datetime_478f0709": {
-    "message": "{ assignmentType } { title }, kohteessa { datetime }."
-  },
-  "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-    "message": "{ assignmentType } { title }, kohteessa { datetime } asti { endTime }"
-  },
-  "assignmenttype_title_due_datetime_a112d8ff": {
-    "message": "{ assignmentType } { title }, määräpäivä { datetime }."
-  },
-  "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-    "message": "{ assignmentType } { title } täytyy käyttää aikaa kohteessa { datetime }."
-  },
-  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-    "message": "{ assignmentType } { title } on merkitty valmiiksi."
-  },
-  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-    "message": "{ assignmentType } { title } ei ole merkitty valmiiksi."
-  },
-  "assignmenttype_title_posted_datetime_cab69444": {
-    "message": "{ assignmentType } { title } lähetetty { datetime }."
-  },
-  "assignmenttype_title_reminder_datetime_33fa66d5": {
-    "message": "{ assignmentType } { title }, muistutus { datetime }."
-  },
-  "beginning_of_your_to_do_history_61ef2dce": {
-    "message": "Tehtävähistoriasi alku"
-  },
-  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-    "message": "Alla on esimerkki siitä, kuinka opiskelijat näkevät aikataulunsa"
-  },
-  "calendar_a8563bb2": { "message": "Kalenteri:" },
   "calendar_event_89aadc1c": { "message": "Kalenteritapahtuma" },
   "canvas_planner_98ed106": { "message": "Canvas-kalenteri" },
-  "close_d634289d": { "message": "Sulje" },
-  "close_opportunity_center_popup_9907d981": {
-    "message": "Sulje Mahdollisuuskeskuksen ponnahdusikkuna"
-  },
-  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-    "message": "{ count, plural,\n     =0 {# mahdollisuudet}\n    one {# mahdollisuus}\n  other {# mahdollisuudet}\n}"
-  },
-  "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-    "message": "{ count, plural,\n    one {Piilota # puuttuva kohde}\n  other {Piilota # puuttuvat kohteet}\n}"
-  },
-  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-    "message": "{ count, plural,\n    one {Näytä # valmis kohde}\n  other {Näytä # valmiit kohteet}\n}"
-  },
-  "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-    "message": "{ count, plural,\n    one {Näytä # puuttuva kohde}\n  other {Näytä # puuttuvat kohteet}\n}"
-  },
-  "course_8a63b4a3": { "message": "Kurssi" },
-  "course_to_do_bcbbab54": { "message": "{ course } TEHTÄVÄ" },
   "date_at_time_dbdb1b99": { "message": "{ date } kohteessa { time }" },
-  "date_ee500367": { "message": "Päivämäärä" },
-  "date_is_not_a_valid_date_4ef9f8ba": {
-    "message": "#{ date } ei voimassa oleva päivämäärä."
-  },
-  "date_is_required_8660ec22": { "message": "Päivämäärä vaaditaan" },
-  "date_time_d9fbf2d7": { "message": "Pvm/aika:" },
-  "delete_a6efa79d": { "message": "Poista" },
-  "details_98a31b68": { "message": "Lisätiedot" },
-  "details_a6f427c3": { "message": "Lisätiedot:" },
   "discussion_6719c51d": { "message": "Keskustelu" },
-  "dismiss_itemtitle_a9fae1b3": { "message": "Ohita { itemTitle }" },
-  "dismiss_opportunityname_5995176f": {
-    "message": "Ohita { opportunityName }"
-  },
-  "dismissed_8b0b1fc9": { "message": "Ohitettu" },
-  "dismissed_opportunities_f0826640": { "message": "Ohitetut mahdollisuudet" },
-  "due_5d7267be": { "message": "Määräpäivä:" },
-  "due_date_124fdd99": { "message": "Määräpäivä: { date }" },
-  "edit_c5fbea07": { "message": "Muokkaa" },
-  "edit_title_72e5a21e": { "message": "Muokkaa { title }" },
-  "error_loading_grades_e0b38f4d": {
-    "message": "Virhe arvosanoja ladattaessa"
-  },
-  "error_loading_items_5218438e": { "message": "Virhe ladattaessa kohteita" },
-  "error_loading_more_items_3f109d9f": {
-    "message": "Virhe ladattaessa lisää kohteita"
-  },
-  "error_loading_past_items_2881dbb1": {
-    "message": "Virhe ladattaessa menneitä kohteita"
-  },
   "exciting_discussion_9f67bd0a": { "message": "Olemassa oleva keskustelu" },
   "excused_cf8792eb": { "message": "Annettu anteeksi" },
   "extended_9a58dcb6": { "message": "Laajennettu" },
@@ -119,12 +28,6 @@
   "failed_peeking_into_your_past_5bec2323": {
     "message": "Menneisyyteesi katsominen epäonnistui"
   },
-  "failed_saving_changes_on_name_1e100ad": {
-    "message": "Muutosten tallentaminen kohteeseen { name } epäonnistui."
-  },
-  "failed_to_delete_name_bdd7b810": {
-    "message": "Kohteen { name } poistaminen epäonnistui."
-  },
   "failed_to_delete_to_do_64edff49": {
     "message": "Tehtävän poistaminen epäonnistui"
   },
@@ -137,150 +40,48 @@
   "failed_to_save_to_do_ddc7503b": {
     "message": "Tehtävän tallentaminen epäonnistui"
   },
-  "failure_loading_the_to_do_list_c61895c8": {
-    "message": "Tehtäväluettelon lataus epäonnistui"
-  },
   "feedback_6dcc1991": { "message": "Palaute" },
   "fun_quiz_47ab0b0": { "message": "Hauska testi" },
-  "go_to_card_view_dashboard_9d03970e": {
-    "message": "Siirry korttiin tarkastellaksesi koontinäyttöä"
-  },
   "graded_25cd3fcd": { "message": "Arvosteltu" },
-  "grades_are_loading_c899652d": { "message": "Arvosanoja ladataan" },
   "grades_loaded_5056277c": { "message": "Arvosanat ladattu" },
-  "items_completed_items_plural_1_item_other_items_717d579f": {
-    "message": "{ items } suoritettu { items, plural,\n     =1 {kohde}\n  other {kohdetta}\n}"
-  },
-  "join_6cafecca": { "message": "Liity" },
-  "join_active_online_meeting_d9d892b2": {
-    "message": "liity aktiiviseen verkkokokoukseen"
-  },
-  "join_online_meeting_b1725843": { "message": "liity verkkokokoukseen" },
-  "jump_to_navigation_toolbar_2952cd8b": {
-    "message": "Siirry navigointityökalupalkkiin"
-  },
-  "jump_to_today_254ccf41": { "message": "Siirry tähän päivään" },
   "language_arts_35b79a8b": { "message": "Kielen taiteet" },
   "late_2be42b88": { "message": "Myöhään" },
-  "load_more_a36f9cf9": { "message": "Lataa lisää" },
-  "load_prior_dates_f2b0f6f0": { "message": "Lataa edelliset päivämäärät" },
   "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
     "message": "Ladattu { count, plural,\n     =0 {# kohdetta}\n    one {# kohde}\n  other {# kohdetta}\n}"
   },
-  "loading_25990131": { "message": "Ladataan..." },
   "loading_725811ca": { "message": "ladataan" },
   "loading_grades_c842c887": { "message": "Ladataan arvosanoja" },
-  "loading_past_items_ca499e75": { "message": "Ladataan menneitä kohteita" },
-  "loading_planner_items_947a813d": {
-    "message": "Ladataan kalenterin kohteita"
-  },
-  "location_3b6ff307": { "message": "Sijainti:" },
-  "looks_like_there_isn_t_anything_here_d9bcef49": {
-    "message": "Näyttää siltä kuin täällä ei olisi mitään"
-  },
   "math_ede93050": { "message": "Matematiikka" },
   "missing_1a256b3b": { "message": "Puuttuu" },
-  "missing_items_for_title_516511f8": {
-    "message": "Puuttuu kohteet { title }"
-  },
-  "my_grades_98834476": { "message": "Omat arvosanat" },
-  "new_13daf639": { "message": "Uusi" },
-  "new_activity_8b84847d": { "message": "Uusi aktiviteetti" },
-  "new_activity_for_title_14c9c3af": {
-    "message": "Uusi aktiviteetti kohteelle { title }"
-  },
-  "new_opportunities_7d349c4d": { "message": "Uusia mahdollisuuksia" },
-  "next_month_749b1778": { "message": "Ensi kuussa" },
-  "no_due_dates_assigned_e8f5bac8": {
-    "message": "Määräpäiviä ei ole kohdistettu"
-  },
-  "no_grade_3b4d7f3e": { "message": "Ei arvosanaa" },
-  "no_more_items_to_show_6a1333c6": {
-    "message": "Ei enää näytettäviä kohteita"
-  },
-  "nothing_due_this_week_d45c9ef9": {
-    "message": "Ei mitään erääntyvää tällä viikolla"
-  },
-  "nothing_for_now_e3e3ce2a": { "message": "Ei mitään toistaiseksi" },
-  "nothing_here_needs_attention_c4eaded6": {
-    "message": "Mikään täällä ei vaadi huomiotasi"
-  },
-  "nothing_more_to_do_b665da42": { "message": "Ei enempää tehtävänä" },
-  "nothing_new_needs_attention_3ac548d4": {
-    "message": "Mikään täällä ei vaadi huomiotasi."
-  },
   "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
     "message": "Ei mitään suunniteltu tälle päivälle. Viimeaikaisimman kohteen valitseminen."
   },
   "nothing_planned_today_selecting_next_item_f6718aa": {
     "message": "Ei mitään suunniteltu tälle päivälle. Seuraavan kohteen valitseminen."
   },
-  "nothing_planned_yet_8675ffe9": {
-    "message": "Ei mitään vielä suunniteltuna"
-  },
-  "numpoints_points_8621a43b": { "message": "{ numPoints } pistettä" },
-  "only_most_recent_grading_period_shown_f1ad6458": {
-    "message": "* Vain viimeisiin arvostelujakso näkyvissä."
-  },
-  "opportunities_popup_f6703842": {
-    "message": "mahdollisuuksien ponnahdusikkuna"
-  },
-  "optional_add_course_ef0d70fc": { "message": "Valinnainen: Lisää kurssi" },
   "page_50c4823d": { "message": "Sivu" },
   "peer_review_74f26a13": { "message": "Vertaisarviointi" },
-  "peer_review_for_itemtitle_358cb413": {
-    "message": "Vertaisarviointi { itemTitle }"
-  },
-  "points_bceb5005": { "message": "pisteet" },
-  "points_points_63e59cce": { "message": "{ points } pistettä" },
-  "previous_month_bb1e3c84": { "message": "Edellinen kuukausi" },
-  "pts_699bd9aa": { "message": "pistettä" },
   "quiz_e0dcce8f": { "message": "Tietovisa" },
   "redo_363c58b7": { "message": "Suorita uudelleen" },
-  "reminder_date_4564d12d": { "message": "Muistutus: { date }" },
   "replies_4a8577c8": { "message": "Vastausta" },
-  "save_11a80ec3": { "message": "Tallenna" },
-  "schedule_preview_3bcda153": { "message": "Aikataulun esikatselu" },
   "science_8d92214a": { "message": "Tiede" },
-  "scroll_up_to_see_your_history_19b14cad": {
-    "message": "Vieritä nähdäksesi historiasi!"
-  },
-  "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-    "message": "Vierittää edelliseen kohteeseen, jossa on uusi aktiviteetti."
-  },
-  "show_all_ae37d610": { "message": "Näytä kaikki" },
-  "show_my_grades_ebd08684": { "message": "Näytä omat arvosanat" },
   "social_studies_13fa30c7": { "message": "Yhteiskunnalliset opiskelut" },
-  "startdate_to_enddate_d245175b": { "message": "{ startDate } - { endDate }" },
   "startdatetime_enddatetime_20abc10e": {
     "message": "{ startDateTime } - { endDateTime }"
   },
   "startdatetime_endtime_49741bbe": {
     "message": "{ startDateTime } - { endTime }"
   },
-  "starttime_to_endtime_d7cc249d": { "message": "{ startTime } - { endTime }" },
-  "student_to_do_c018c835": { "message": "Opiskelijoiden tehtävälista" },
   "submitted_318fad53": { "message": "Lähetetty" },
   "success_to_do_created_e34ed395": {
     "message": "Onnistuminen: Tehtävä luotu"
   },
   "task_16b0ef38": { "message": "Tehtävä" },
   "the_best_assignment_15e98be1": { "message": "Paras tehtävä" },
-  "the_date_and_time_this_to_do_is_due_74c823d4": {
-    "message": "Päivämäärä ja aika, jolloin tämä tehtävä täytyy palauttaa."
-  },
-  "there_are_no_points_associated_with_this_item_449c712a": {
-    "message": "Tälle kohteelle ei ole osoitettu pisteitä"
-  },
   "there_is_nothing_planned_for_today_e09bfc8c": {
     "message": "Tälle päivälle ei ole mitään suunniteltuna."
   },
-  "time_2b5aac58": { "message": "Aika" },
-  "title_ee03d132": { "message": "Otsikko" },
-  "title_is_required_6ddcab69": { "message": "Otsikko on pakollinen" },
   "to_do_1d554f36": { "message": "Tehtävä" },
-  "to_do_date_4b211ad0": { "message": "Tehtävä: { date }" },
-  "to_do_items_loading_d1cdfcd5": { "message": "Tehtävä-kohteita ladataan" },
   "today_76e10f9c": { "message": "Tänään" },
   "today_at_date_8ac30d6": { "message": "Tänään kohteessa { date }" },
   "tomorrow_9a6c9a00": { "message": "Huomenna" },
@@ -288,23 +89,6 @@
   "unable_to_mark_as_complete_8141856d": {
     "message": "Ei voitu merkitä valmiiksi."
   },
-  "use_arrow_keys_to_navigate_options_2021cc50": {
-    "message": "Siirry vaihtoehdoissa nuolinäppäinten avulla."
-  },
-  "view_next_week_7f61f755": { "message": "Näytä seuraava viikko" },
-  "view_previous_week_6f83849f": { "message": "Näytä edellinen viikko" },
-  "weekly_schedule_navigation_6b042645": {
-    "message": "Viikkoaikataulun selaus"
-  },
   "yesterday_at_date_1aa6d18e": { "message": "Eilen { date }" },
-  "yesterday_c6bd6abf": { "message": "Eilen" },
-  "you_have_media_feedback_f5f9aba8": {
-    "message": "Sinulla on mediapalautetta."
-  },
-  "you_must_provide_a_date_and_time_a86839d2": {
-    "message": "Sinun täytyy antaa päivämäärä ja aika."
-  },
-  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-    "message": "Olet vierittänyt takaisin ensimmäiseen tehtävääsi!"
-  }
+  "yesterday_c6bd6abf": { "message": "Eilen" }
 }

@@ -20,15 +20,6 @@
     "add_image_60b2de07": {
         "message": "Görsel Ekle"
     },
-    "add_to_do_7537af64": {
-        "message": "Yapılacaklar listesi ekle"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Yapılacaklar listesi ekle"
-    },
-    "address_3159962f": {
-        "message": "Adres:"
-    },
     "aleph_f4ffd155": {
         "message": "Aleph"
     },
@@ -43,9 +34,6 @@
     },
     "all_apps_a50dea49": {
         "message": "Tüm Uygulamalar"
-    },
-    "all_day_fb42c4fc": {
-        "message": "Tüm Gün"
     },
     "alpha_15d59033": {
         "message": "Alfa"
@@ -95,9 +83,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "İptal etmek istediğinize emin misiniz? Yaptığınız değişiklikler kaydedilmeyebilir."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Bu planlayıcı öğesini silmek istediğinize emin misiniz?"
-    },
     "arrows_464a3e54": {
         "message": "Oklar"
     },
@@ -109,36 +94,6 @@
     },
     "assignments_1e02582c": {
         "message": "Ödevler"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title },  { datetime } da tüm gün."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, { datetime } da."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title },  { datetime } ''da { endTime } ''a kadar"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, Teslim tarihi { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } şu tarihe kadar yapılmalı { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } yapıldı olarak işaretlendi."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } yapıldı olarak işaretlenmedi."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } gönderildi { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, hatırlatıcı { datetime }."
     },
     "attributes_963ba262": {
         "message": "Özellikler"
@@ -160,9 +115,6 @@
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
-    },
-    "calendar_a8563bb2": {
-        "message": "Takvim:"
     },
     "calendar_event_89aadc1c": {
         "message": "Takvim Olayı"
@@ -227,20 +179,8 @@
     "copyright_holder_66ee111": {
         "message": "Telif Sahibi:"
     },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Ders"
     },
     "course_documents_104d76e0": {
         "message": "Ders Belgeleri"
@@ -278,17 +218,11 @@
     "date_added_ed5ad465": {
         "message": "Eklendiği Tarih"
     },
-    "date_ee500367": {
-        "message": "Tarih"
-    },
     "decrease_indent_d9cf469d": {
         "message": "İçerden başlatma sınırını azalt"
     },
     "deep_purple_bb3e2907": {
         "message": "Koyu Mor"
-    },
-    "delete_a6efa79d": {
-        "message": "Sil"
     },
     "delimiters_4db4840d": {
         "message": "Ayıraçlar"
@@ -298,9 +232,6 @@
     },
     "details_98a31b68": {
         "message": "Ayrıntılar"
-    },
-    "details_a6f427c3": {
-        "message": "Ayrıntılar:"
     },
     "dimensions_45ddb7b7": {
         "message": "Tanımlamalar"
@@ -331,9 +262,6 @@
     },
     "drag_and_drop_or_click_to_browse_your_computer_60772d6d": {
         "message": "Sürükleyip bırakın ya da bilgisayarınıza gözatın"
-    },
-    "due_5d7267be": {
-        "message": "Bitiş:"
     },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Teslim Tarihi: Birden Çok Gün"
@@ -482,12 +410,6 @@
     "invalid_url_cbde79f": {
         "message": "Geçersiz bağlantı"
     },
-    "join_6cafecca": {
-        "message": "Katıl"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Bugüne Git"
-    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
     },
@@ -515,9 +437,6 @@
     "load_more_35d33c7": {
         "message": "Daha Fazla Yükle"
     },
-    "load_more_a36f9cf9": {
-        "message": "Daha fazla yükle"
-    },
     "loading_25990131": {
         "message": "Yükleniyor..."
     },
@@ -526,15 +445,6 @@
     },
     "loading_failed_b3524381": {
         "message": "Yükleme Başarısız..."
-    },
-    "loading_past_items_ca499e75": {
-        "message": "Önceki öğeler yükleniyor"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "Planlayıcı öğeleri yükleniyor"
-    },
-    "location_3b6ff307": {
-        "message": "Konum:"
     },
     "locked_762f138b": {
         "message": "Kilitli"
@@ -569,20 +479,11 @@
     "navigation_ee9af92d": {
         "message": "Gezinme"
     },
-    "new_13daf639": {
-        "message": "Yeni"
-    },
-    "new_activity_8b84847d": {
-        "message": "Yeni Etkinlik"
-    },
     "new_quiz_34aacba6": {
         "message": "Yeni Kısa Sınav"
     },
     "next_40e12421": {
         "message": "Sonraki"
-    },
-    "next_month_749b1778": {
-        "message": "Sonraki Hafta"
     },
     "no_e16d9132": {
         "message": "Hayır"
@@ -596,14 +497,8 @@
     "none_3b5e34d2": {
         "message": "Yok"
     },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Şimdilik bir şey yok"
-    },
     "operators_a2ef9a93": {
         "message": "Operatörler"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "Tercihen: Kurs Ekle"
     },
     "orange_81386a62": {
         "message": "Turuncu"
@@ -626,23 +521,11 @@
     "pink_68ad45cb": {
         "message": "Pembe"
     },
-    "points_bceb5005": {
-        "message": "puanlar"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } puan"
-    },
     "prev_f82cbc48": {
         "message": "Önceki"
     },
     "preview_53003fd2": {
         "message": "Önizleme"
-    },
-    "previous_month_bb1e3c84": {
-        "message": "Önceki Hafta"
-    },
-    "pts_699bd9aa": {
-        "message": "not"
     },
     "published_c944a23d": {
         "message": "yayınlandı"
@@ -725,14 +608,8 @@
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Bu denklem Temel Görünümde işlenemez."
     },
-    "time_2b5aac58": {
-        "message": "Süre"
-    },
     "title_ee03d132": {
         "message": "Başlık"
-    },
-    "title_is_required_6ddcab69": {
-        "message": "başlık gereklidir"
     },
     "to_be_posted_when_d24bf7dc": {
         "message": "Gönderileceği zaman: { when }"

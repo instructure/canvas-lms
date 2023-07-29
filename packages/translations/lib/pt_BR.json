@@ -32,17 +32,8 @@
     "add_image_60b2de07": {
         "message": "Adicionar imagem"
     },
-    "add_to_do_7537af64": {
-        "message": "Adicionar Lista de Tarefas"
-    },
-    "add_to_do_7def3c37": {
-        "message": "Adicionar à Lista de Tarefas"
-    },
     "additional_considerations_f3801683": {
         "message": "Considerações adicionais"
-    },
-    "address_3159962f": {
-        "message": "Endereço:"
     },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "Links adjacentes com a mesma URL devem ser um único link."
@@ -67,9 +58,6 @@
     },
     "all_apps_a50dea49": {
         "message": "Todos os aplicativos"
-    },
-    "all_day_fb42c4fc": {
-        "message": "Dia inteiro"
     },
     "alpha_15d59033": {
         "message": "Alfa"
@@ -137,9 +125,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "Tem certeza de que deseja cancelar? As alterações feitas não serão salvas."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "Tem certeza de que deseja excluir este item do planejador?"
-    },
     "armenian_12da6118": {
         "message": "Armênio"
     },
@@ -157,36 +142,6 @@
     },
     "assignments_1e02582c": {
         "message": "Tarefas"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }, o dia inteiro em { datetime }."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }, às { datetime }."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }, às { datetime } até { endTime }"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }, com vencimento em { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } tem hora para a lista de tarefas às { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "{ assignmentType } { title } está marcado como feito."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "{ assignmentType } { title } não está marcado como feito."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "{ assignmentType } { title } postado { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }, lembrete { datetime }."
     },
     "asterisk_82255584": {
         "message": "Asterisco"
@@ -224,17 +179,11 @@
     "because_501841b": {
         "message": "Porque"
     },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "Começo do seu histórico de tarefas"
-    },
     "belarusian_b2f19c76": {
         "message": "Bielorrusso"
     },
     "below_81d4dceb": {
         "message": "Abaixo"
-    },
-    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "Abaixo está um exemplo de como os alunos verão sua programação"
     },
     "beta_cb5f307e": {
         "message": "Beta"
@@ -268,9 +217,6 @@
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
-    },
-    "calendar_a8563bb2": {
-        "message": "Calendário:"
     },
     "calendar_event_89aadc1c": {
         "message": "Evento do calendário"
@@ -383,9 +329,6 @@
     "close_d634289d": {
         "message": "Fechar"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "Fechar pop-up do Centro de Oportunidades"
-    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "O arquivo de legenda oculta deve ter menos de { maxKb } kb"
     },
@@ -452,23 +395,8 @@
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 palavras}\n    one {1 palavra}\n  other {# palavras}\n}"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidade}\n  other {# oportunidades}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {Ocultar # item ausente}\n  other {Ocultar # itens ausentes}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# item carregado}\n  other {# itens carregados}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {Mostrar # item completo}\n  other {Mostrar # itens completos}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {Mostrar # item ausente}\n  other {Mostrar # itens ausentes}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Curso"
     },
     "course_documents_104d76e0": {
         "message": "Documentos do curso"
@@ -493,9 +421,6 @@
     },
     "course_navigation_dd035109": {
         "message": "Navegação do curso"
-    },
-    "course_to_do_bcbbab54": {
-        "message": "LISTA DE TAREFAS DE { course }"
     },
     "create_icon_110d6463": {
         "message": "Criar ícone"
@@ -551,18 +476,6 @@
     "date_at_time_dbdb1b99": {
         "message": "{ date } às { time }"
     },
-    "date_ee500367": {
-        "message": "Data"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } não é uma data válida."
-    },
-    "date_is_required_8660ec22": {
-        "message": "Data é necessária"
-    },
-    "date_time_d9fbf2d7": {
-        "message": "Data e Hora:"
-    },
     "decorative_icon_9a7f3fc3": {
         "message": "Ícone decorativo"
     },
@@ -590,9 +503,6 @@
     "degree_symbol_4a823d5f": {
         "message": "Símbolo de grau"
     },
-    "delete_a6efa79d": {
-        "message": "Excluir"
-    },
     "delimiters_4db4840d": {
         "message": "Delimitadores"
     },
@@ -613,9 +523,6 @@
     },
     "details_98a31b68": {
         "message": "Detalhes"
-    },
-    "details_a6f427c3": {
-        "message": "Detalhes:"
     },
     "diagonal_dots_7d71b57e": {
         "message": "Pontos diagonais"
@@ -655,18 +562,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "União disjunta"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "Descartar { itemTitle }"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "Descartar { opportunityName }"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "Descartado"
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "Oportunidades descartadas"
     },
     "display_options_315aba85": {
         "message": "Exibir opções"
@@ -716,12 +611,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Arraste a manilha. Use as setas para cima e para baixo para redimensionar"
     },
-    "due_5d7267be": {
-        "message": "Vencimento:"
-    },
-    "due_date_124fdd99": {
-        "message": "Vencimento: { date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "Vencimento: Várias datas"
     },
@@ -751,9 +640,6 @@
     },
     "edit_link_7f53bebb": {
         "message": "Editar link"
-    },
-    "edit_title_72e5a21e": {
-        "message": "Editar { title }"
     },
     "editor_statusbar_26ac81fc": {
         "message": "Barra de status do Editor"
@@ -839,18 +725,6 @@
     "equivalent_identity_654b3ce5": {
         "message": "Equivalente (Identidade)"
     },
-    "error_loading_grades_e0b38f4d": {
-        "message": "Erro ao carregar notas"
-    },
-    "error_loading_items_5218438e": {
-        "message": "Erro ao carregar itens"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "Erro ao carregar mais itens"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "Erro ao carregar itens passados"
-    },
     "estonian_5e8e2fa4": {
         "message": "Estoniano"
     },
@@ -914,12 +788,6 @@
     "failed_peeking_into_your_past_5bec2323": {
         "message": "Falha ao espiar o seu passado"
     },
-    "failed_saving_changes_on_name_1e100ad": {
-        "message": "Falha ao salvar alterações em { name }."
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "Falha ao excluir { name }."
-    },
     "failed_to_delete_to_do_64edff49": {
         "message": "Falhou ao excluir lista de tarefas"
     },
@@ -934,9 +802,6 @@
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "Falhou ao salvar lista de tarefas"
-    },
-    "failure_loading_the_to_do_list_c61895c8": {
-        "message": "Falha ao carregar a lista de tarefas"
     },
     "feedback_6dcc1991": {
         "message": "Feedback"
@@ -1037,9 +902,6 @@
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "Imagens no formato GIF/PNG maiores que { size } KB não são suportadas no momento."
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "Ir para painel da visualização do cartão"
-    },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "Ir para a barra de menu do editor"
     },
@@ -1051,9 +913,6 @@
     },
     "grades_a61eba0a": {
         "message": "Notas"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "As notas estão carregando"
     },
     "grades_loaded_5056277c": {
         "message": "Notas carregadas"
@@ -1310,26 +1169,8 @@
     "italian_bd3c792d": {
         "message": "Italiano"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } completo(s) { items, plural,\n     =1 {item}\n  other {itens}\n}"
-    },
     "japanese_b5721ca7": {
         "message": "Japonês"
-    },
-    "join_6cafecca": {
-        "message": "Participar"
-    },
-    "join_active_online_meeting_d9d892b2": {
-        "message": "participar da reunião on-line ativa"
-    },
-    "join_online_meeting_b1725843": {
-        "message": "participar da reunião on-line"
-    },
-    "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "Ir para a barra de ferramentas de navegação"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Pular para hoje"
     },
     "kappa_2f14c816": {
         "message": "Kappa"
@@ -1478,12 +1319,6 @@
     "load_more_35d33c7": {
         "message": "Carregar mais"
     },
-    "load_more_a36f9cf9": {
-        "message": "Carregar mais"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "Carregar datas anteriores"
-    },
     "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
         "message": "Carregou { count, plural,\n     =0 {# itens}\n    one {# item}\n  other {# itens}\n}"
     },
@@ -1514,23 +1349,14 @@
     "loading_grades_c842c887": {
         "message": "Carregando notas"
     },
-    "loading_past_items_ca499e75": {
-        "message": "Carregando itens passados"
-    },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Carregando espaço reservado para { fileName }"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "Carregando itens do planejador"
     },
     "loading_please_wait_d276220a": {
         "message": "Carregando, por favor aguarde"
     },
     "loading_preview_9f077aa1": {
         "message": "Carregando prévia"
-    },
-    "location_3b6ff307": {
-        "message": "Local:"
     },
     "locked_762f138b": {
         "message": "Bloqueado(a)"
@@ -1546,9 +1372,6 @@
     },
     "logical_equivalence_thick_662dd3f2": {
         "message": "Equivalência lógica (espesso)"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "Parece que não há nada aqui"
     },
     "low_horizontal_dots_cc08498e": {
         "message": "Pontos horizontais baixos"
@@ -1622,9 +1445,6 @@
     "missing_1a256b3b": {
         "message": "Faltante"
     },
-    "missing_items_for_title_516511f8": {
-        "message": "Itens ausentes para { title }"
-    },
     "module_90d9fd32": {
         "message": "Módulo"
     },
@@ -1654,9 +1474,6 @@
     },
     "my_files_2f621040": {
         "message": "Meus arquivos"
-    },
-    "my_grades_98834476": {
-        "message": "Minhas notas"
     },
     "n_th_root_9991a6e4": {
         "message": "N-ésima raiz"
@@ -1688,26 +1505,11 @@
     "nested_less_than_27d17e58": {
         "message": "Aninhado menos de"
     },
-    "new_13daf639": {
-        "message": "Novo"
-    },
-    "new_activity_8b84847d": {
-        "message": "Nova atividade"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "Nova atividade para { title }"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "Novas oportunidades"
-    },
     "new_quiz_34aacba6": {
         "message": "Novo teste"
     },
     "next_40e12421": {
         "message": "Próximo"
-    },
-    "next_month_749b1778": {
-        "message": "Próximo mês"
     },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Sem problemas de acessibilidades detectados."
@@ -1715,23 +1517,14 @@
     "no_changes_to_save_d29f6e91": {
         "message": "Não há alterações para salvar."
     },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "Nenhum prazo de entrega atribuído"
-    },
     "no_e16d9132": {
         "message": "Não"
     },
     "no_file_chosen_9a880793": {
         "message": "Nenhum arquivo escolhido"
     },
-    "no_grade_3b4d7f3e": {
-        "message": "Sem nota"
-    },
     "no_headers_9bc7dc7f": {
         "message": "Sem cabeçalhos"
-    },
-    "no_more_items_to_show_6a1333c6": {
-        "message": "Não há mais itens para mostrar"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Nenhuma pré-visualização disponível para esse arquivo."
@@ -1781,35 +1574,14 @@
     "not_superset_strict_24e06f36": {
         "message": "Sem superconjunto (estrito)"
     },
-    "nothing_due_this_week_d45c9ef9": {
-        "message": "Nada com prazo nesta semana"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Nada no momento"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "Nada aqui precisa de atenção."
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "Nada mais para fazer"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "Nada novo precisa de atenção."
-    },
     "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
         "message": "Nada planejado hoje. Selecionando item mais recente."
     },
     "nothing_planned_today_selecting_next_item_f6718aa": {
         "message": "Nada planejado hoje. Selecionando próximo item."
     },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "Nada planejado ainda"
-    },
     "nu_1c0f6848": {
         "message": "Nu"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } pontos"
     },
     "octagon_e48be9f": {
         "message": "Octógono"
@@ -1826,9 +1598,6 @@
     "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
         "message": "Falha ao colar um ou mais arquivos. Por favor, tente carregar ou arrastar e soltar arquivos."
     },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*Apenas o período de avaliação mais recente é exibido."
-    },
     "open_circle_e9bd069": {
         "message": "Círculo aberto"
     },
@@ -1840,12 +1609,6 @@
     },
     "operators_a2ef9a93": {
         "message": "Operadores"
-    },
-    "opportunities_popup_f6703842": {
-        "message": "pop-up de oportunidades"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "Opcional: Adicionar Curso"
     },
     "or_9b70ccaa": {
         "message": "Ou"
@@ -1894,9 +1657,6 @@
     },
     "peer_review_74f26a13": {
         "message": "Revisão por pares"
-    },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "Revisão por pares para { itemTitle }"
     },
     "pentagon_17d82ea3": {
         "message": "Pentágono"
@@ -1958,12 +1718,6 @@
     "plus_minus_f8be2e83": {
         "message": "Mais/menos"
     },
-    "points_bceb5005": {
-        "message": "pontos"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } pontos"
-    },
     "polish_4cf2ecaf": {
         "message": "Polonês"
     },
@@ -2000,9 +1754,6 @@
     "preview_inline_9787330": {
         "message": "Pré-visualizar em linha"
     },
-    "previous_month_bb1e3c84": {
-        "message": "Mês anterior"
-    },
     "prime_917ea60e": {
         "message": "Melhor"
     },
@@ -2020,9 +1771,6 @@
     },
     "psi_e3f5f0f7": {
         "message": "Psi"
-    },
-    "pts_699bd9aa": {
-        "message": "pts"
     },
     "published_c944a23d": {
         "message": "publicado"
@@ -2074,9 +1822,6 @@
     },
     "religion_icon_246e0be1": {
         "message": "Ícone de religião"
-    },
-    "reminder_date_4564d12d": {
-        "message": "Lembrete: { date }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "Remover estilo do título"
@@ -2189,9 +1934,6 @@
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Ícones salvos do criador de ícones"
     },
-    "schedule_preview_3bcda153": {
-        "message": "Pré-visualização da programação"
-    },
     "science_8d92214a": {
         "message": "Ciência"
     },
@@ -2215,12 +1957,6 @@
     },
     "script_l_42a7b254": {
         "message": "Roteiro L"
-    },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "Role para cima para ver o seu histórico!"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "Role para cima para o item anterior com nova atividade."
     },
     "search_280d00bd": {
         "message": "Pesquisar"
@@ -2267,9 +2003,6 @@
     "shortcut_911d6255": {
         "message": "Atalho"
     },
-    "show_all_ae37d610": {
-        "message": "Mostrar tudo"
-    },
     "show_audio_options_b489926b": {
         "message": "Mostrar opções de áudio"
     },
@@ -2278,9 +2011,6 @@
     },
     "show_link_options_545338fd": {
         "message": "Exibir opções de link"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "Mostrar minhas notas"
     },
     "show_studio_media_options_a0c748c6": {
         "message": "Mostrar opções de mídia do Studio"
@@ -2393,23 +2123,14 @@
     "start_recording_9a65141a": {
         "message": "Iniciar gravação"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } a { endDate }"
-    },
     "startdatetime_enddatetime_20abc10e": {
         "message": "{ startDateTime } - { endDateTime }"
     },
     "startdatetime_endtime_49741bbe": {
         "message": "{ startDateTime } - { endTime }"
     },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } a { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Azul aço"
-    },
-    "student_to_do_c018c835": {
-        "message": "Aluno a fazer"
     },
     "studio_media_options_ee504361": {
         "message": "Opções de mídia do Studio"
@@ -2552,9 +2273,6 @@
     "the_best_assignment_15e98be1": {
         "message": "A melhor tarefa"
     },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "A data e hora desta tarefa venceu"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "No momento, a pré-visualização do documento está sendo processada. Por favor, tente novamente mais tarde."
     },
@@ -2581,9 +2299,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "O arquivo selecionado excede o limite de { maxSize } bytes"
-    },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "Não há pontos associados a este item."
     },
     "there_is_nothing_planned_for_today_e09bfc8c": {
         "message": "Não há nada planejado para hoje."
@@ -2627,29 +2342,17 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "Embora o seu vídeo tenha o título correto no navegador, falhamos em atualizá-lo no banco de dados."
     },
-    "time_2b5aac58": {
-        "message": "Tempo"
-    },
     "timebar_a4d18443": {
         "message": "Barra do tempo"
     },
     "title_ee03d132": {
         "message": "Título"
     },
-    "title_is_required_6ddcab69": {
-        "message": "título é necessário"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "A ser postado: { when }"
     },
     "to_do_1d554f36": {
         "message": "Lista de Tarefas"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "Para fazer: { date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "Itens da lista de tarefas carregando"
     },
     "to_do_when_2783d78f": {
         "message": "Para fazer: { when }"
@@ -2891,12 +2594,6 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Visualizar atalhos de teclado"
     },
-    "view_next_week_7f61f755": {
-        "message": "Ver na próxima semana"
-    },
-    "view_previous_week_6f83849f": {
-        "message": "Ver semana anterior"
-    },
     "view_title_description_67940918": {
         "message": "Ver { title } descrição"
     },
@@ -2920,9 +2617,6 @@
     },
     "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
         "message": "As páginas da Web devem ter apenas um único H1, que é usado automaticamente pelo título da página. O primeiro cabeçalho do seu conteúdo deve ser um H2."
-    },
-    "weekly_schedule_navigation_6b042645": {
-        "message": "Navegação na programação semanal"
     },
     "welsh_42ab94b1": {
         "message": "Galês"
@@ -2972,9 +2666,6 @@
     "yiddish_f96986df": {
         "message": "Iídiche"
     },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "Você tem feedback de mídia."
-    },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Você tem alterações não salvas na bandeja do Criador de Ícones. Você deseja continuar sem salvar essas alterações?"
     },
@@ -2983,12 +2674,6 @@
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "Você não pode carregar um arquivo vazio."
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "Você deve fornecer uma data e hora."
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "Você voltou para as suas primeiras tarefas!"
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "Sua imagem foi compactada para o Criador de Ícones. Imagens com menos de { size } KB não serão compactadas."

@@ -2,9 +2,6 @@
     "add_8523c19b": {
         "message": "Πρόσθεση"
     },
-    "address_3159962f": {
-        "message": "Διεύθυνση:"
-    },
     "all_4321c3a1": {
         "message": "Όλα"
     },
@@ -50,9 +47,6 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_a8563bb2": {
-        "message": "Ημερολόγιο:"
-    },
     "calendar_event_89aadc1c": {
         "message": "Γεγονός στο Ημερολόγιο"
     },
@@ -89,20 +83,8 @@
     "copyright_holder_66ee111": {
         "message": "Κάτοχος Πνευματικών Δικαιωμάτων:"
     },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {}\n  other {}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "Μάθημα"
     },
     "course_files_62deb8f8": {
         "message": "Αρχεία Μαθήματος"
@@ -119,17 +101,11 @@
     "cyan_c1d5f68a": {
         "message": "Κυανό"
     },
-    "date_ee500367": {
-        "message": "Ημερομηνία"
-    },
     "decrease_indent_d9cf469d": {
         "message": "Μείωση Εσοχής Κειμένου"
     },
     "deep_purple_bb3e2907": {
         "message": "Βαθύ μοβ"
-    },
-    "delete_a6efa79d": {
-        "message": "Διαγραφή"
     },
     "delimiters_4db4840d": {
         "message": "Οριοθέτες"
@@ -139,9 +115,6 @@
     },
     "details_98a31b68": {
         "message": "Λεπτομέρειες"
-    },
-    "details_a6f427c3": {
-        "message": "Λεπτομέρειες:"
     },
     "dimensions_45ddb7b7": {
         "message": "Διαστάσεις"
@@ -160,9 +133,6 @@
     },
     "down_5831a426": {
         "message": "Κάτω"
-    },
-    "due_5d7267be": {
-        "message": "Καταληκτική Ημερ/νία:"
     },
     "due_multiple_dates_cc0ee3f5": {
         "message": "<mrk mid=\"4290\" mtype=\"seg\">Καταληκτική Ημερ/νία:</mrk> <mrk mid=\"4291\" mtype=\"seg\">Πολλαπλές Ημερομηνίες</mrk>"
@@ -251,12 +221,6 @@
     "invalid_url_cbde79f": {
         "message": "Μη έγκυρο URL"
     },
-    "join_6cafecca": {
-        "message": "Συμμετοχή"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "Μετάβαση στο Σήμερα"
-    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Συντομεύσεις πληκτρολογίου"
     },
@@ -275,9 +239,6 @@
     "links_to_an_external_site_de74145d": {
         "message": "Σύνδεσμοι σε εξωτερική ιστοσελίδα."
     },
-    "load_more_a36f9cf9": {
-        "message": "Φόρτωση περισσότερων"
-    },
     "loading_25990131": {
         "message": "Φόρτωση..."
     },
@@ -289,9 +250,6 @@
     },
     "loading_failed_b3524381": {
         "message": "Η Φόρτωση Απέτυχε"
-    },
-    "location_3b6ff307": {
-        "message": "Τοποθεσία:"
     },
     "locked_762f138b": {
         "message": "Κλειδωμένο"
@@ -326,9 +284,6 @@
     "navigation_ee9af92d": {
         "message": "Πλοήγηση"
     },
-    "new_13daf639": {
-        "message": "Νέο"
-    },
     "new_quiz_34aacba6": {
         "message": "Νέο Κουίζ"
     },
@@ -346,9 +301,6 @@
     },
     "none_3b5e34d2": {
         "message": "Κανένα"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "Τίποτα για την ώρα"
     },
     "operators_a2ef9a93": {
         "message": "Χειριστές"
@@ -374,17 +326,11 @@
     "pink_68ad45cb": {
         "message": "Ροζ"
     },
-    "points_bceb5005": {
-        "message": "Μόρια"
-    },
     "prev_f82cbc48": {
         "message": "Προηγούμενο"
     },
     "preview_53003fd2": {
         "message": "Προεπισκόπηση"
-    },
-    "pts_699bd9aa": {
-        "message": "pts"
     },
     "published_c944a23d": {
         "message": "δημοσιευμένο/α"
@@ -466,9 +412,6 @@
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Αυτή η εξίσωση δεν είναι δυνατό να αναπαραχθεί στην Βασική Μορφή"
-    },
-    "time_2b5aac58": {
-        "message": "Χρόνος"
     },
     "title_ee03d132": {
         "message": "Τίτλος"

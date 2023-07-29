@@ -32,17 +32,8 @@
     "add_image_60b2de07": {
         "message": "إضافة صورة"
     },
-    "add_to_do_7537af64": {
-        "message": "إضافة قائمة مهام"
-    },
-    "add_to_do_7def3c37": {
-        "message": "إضافة قائمة مهام"
-    },
     "additional_considerations_f3801683": {
         "message": "الاعتبارات الإضافية"
-    },
-    "address_3159962f": {
-        "message": "العنوان:"
     },
     "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
         "message": "يجب أن تكون الروابط المتجاورة بنفس عنوان URL رابطًا فرديًا."
@@ -67,9 +58,6 @@
     },
     "all_apps_a50dea49": {
         "message": "كافة التطبيقات"
-    },
-    "all_day_fb42c4fc": {
-        "message": "طوال اليوم"
     },
     "alpha_15d59033": {
         "message": "Alpha"
@@ -137,9 +125,6 @@
     "are_you_sure_you_want_to_cancel_changes_you_made_m_c5210496": {
         "message": "هل تريد الإلغاء بالفعل؟ قد لا يتم حفظ التغييرات التي أجريتها."
     },
-    "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
-        "message": "هل أنت متأكد أنك تريد حذف عنصر المخطط هذا؟"
-    },
     "armenian_12da6118": {
         "message": "الأرمينية"
     },
@@ -157,36 +142,6 @@
     },
     "assignments_1e02582c": {
         "message": "المهام"
-    },
-    "assignmenttype_title_6612d008": {
-        "message": "{ assignmentType } { title }."
-    },
-    "assignmenttype_title_all_day_on_datetime_9768903c": {
-        "message": "{ assignmentType } { title }، كل اليوم في { datetime }."
-    },
-    "assignmenttype_title_at_datetime_478f0709": {
-        "message": "{ assignmentType } { title }، الساعة { datetime }."
-    },
-    "assignmenttype_title_at_datetime_until_endtime_a5900e38": {
-        "message": "{ assignmentType } { title }، الساعة { datetime } حتى { endTime }"
-    },
-    "assignmenttype_title_due_datetime_a112d8ff": {
-        "message": "{ assignmentType } { title }، يستحق في { datetime }."
-    },
-    "assignmenttype_title_has_a_to_do_time_at_datetime_e07310e8": {
-        "message": "{ assignmentType } { title } لديه وقت قائمة مهام في { datetime }."
-    },
-    "assignmenttype_title_is_marked_as_done_a8dc46ef": {
-        "message": "تم وضع علامة تم على { assignmentType } { title }."
-    },
-    "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
-        "message": "لم يتم وضع علامة تم على { assignmentType } { title }."
-    },
-    "assignmenttype_title_posted_datetime_cab69444": {
-        "message": "قام { assignmentType } { title } بنشر { datetime }."
-    },
-    "assignmenttype_title_reminder_datetime_33fa66d5": {
-        "message": "{ assignmentType } { title }، تذكير { datetime }."
     },
     "asterisk_82255584": {
         "message": "نجمة"
@@ -224,17 +179,11 @@
     "because_501841b": {
         "message": "لأن"
     },
-    "beginning_of_your_to_do_history_61ef2dce": {
-        "message": "بداية سجل قائمة المهام الخاصة بك"
-    },
     "belarusian_b2f19c76": {
         "message": "البيلاروسية"
     },
     "below_81d4dceb": {
         "message": "الأسفل"
-    },
-    "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "يوجد أدناه مثال على طريقة عرض الطلاب لجداولهم"
     },
     "beta_cb5f307e": {
         "message": "Beta"
@@ -268,9 +217,6 @@
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
-    },
-    "calendar_a8563bb2": {
-        "message": "التقويم:"
     },
     "calendar_event_89aadc1c": {
         "message": "حدث التقويم"
@@ -383,9 +329,6 @@
     "close_d634289d": {
         "message": "إغلاق"
     },
-    "close_opportunity_center_popup_9907d981": {
-        "message": "إغلاق النافذة المنبثقة لمركز الفرص"
-    },
     "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
         "message": "يجب أن يقل حجم ملف التسمية التوضيحية المغلقة عن { maxKb } كيلوبايت"
     },
@@ -452,23 +395,8 @@
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 كلمات}\n    one {1 كلمة}\n  other {# من الكلمات}\n}"
     },
-    "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
-        "message": "{ count, plural,\n     =0 {# من الفرص}\n    one {# فرصة}\n  other {# من الفرص}\n}"
-    },
-    "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-        "message": "{ count, plural,\n    one {إخفاء # عنصر مفقود}\n  other {إخفاء # من العناصر المفقودة}\n}"
-    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# عنصر محمّل}\n  other {# من العناصر محمّلة}\n}"
-    },
-    "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
-        "message": "{ count, plural,\n    one {إظهار # عنصر مكتمل}\n  other {إظهار # من العناصر المكتملة}\n}"
-    },
-    "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-        "message": "{ count, plural,\n    one {إظهار # عنصر مفقود}\n  other {إظهار # من العناصر المفقودة}\n}"
-    },
-    "course_8a63b4a3": {
-        "message": "المساق"
     },
     "course_documents_104d76e0": {
         "message": "مستندات المساق"
@@ -493,9 +421,6 @@
     },
     "course_navigation_dd035109": {
         "message": "التنقل عبر المساق"
-    },
-    "course_to_do_bcbbab54": {
-        "message": "قائمة مهام { course }"
     },
     "create_icon_110d6463": {
         "message": "إنشاء أيقونة"
@@ -551,18 +476,6 @@
     "date_at_time_dbdb1b99": {
         "message": "{ date } في { time }"
     },
-    "date_ee500367": {
-        "message": "التاريخ"
-    },
-    "date_is_not_a_valid_date_4ef9f8ba": {
-        "message": "#{ date } ليس تاريخًا صالحًا."
-    },
-    "date_is_required_8660ec22": {
-        "message": "التاريخ مطلوب"
-    },
-    "date_time_d9fbf2d7": {
-        "message": "التاريخ والوقت:"
-    },
     "decorative_icon_9a7f3fc3": {
         "message": "أيقونة زينة"
     },
@@ -590,9 +503,6 @@
     "degree_symbol_4a823d5f": {
         "message": "رمز الدرجة"
     },
-    "delete_a6efa79d": {
-        "message": "حذف"
-    },
     "delimiters_4db4840d": {
         "message": "المحدِدات"
     },
@@ -613,9 +523,6 @@
     },
     "details_98a31b68": {
         "message": "التفاصيل"
-    },
-    "details_a6f427c3": {
-        "message": "التفاصيل:"
     },
     "diagonal_dots_7d71b57e": {
         "message": "نقاط قطرية"
@@ -655,18 +562,6 @@
     },
     "disjoint_union_e74351a8": {
         "message": "Disjoint Union"
-    },
-    "dismiss_itemtitle_a9fae1b3": {
-        "message": "تجاهل { itemTitle }"
-    },
-    "dismiss_opportunityname_5995176f": {
-        "message": "تجاهل { opportunityName }"
-    },
-    "dismissed_8b0b1fc9": {
-        "message": "المستبعدة"
-    },
-    "dismissed_opportunities_f0826640": {
-        "message": "الفرص المستبعدة"
     },
     "display_options_315aba85": {
         "message": "عرض الخيارات"
@@ -716,12 +611,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "إفلات المؤشر. استخدم سهمي لأعلى ولأسفل لضبط الحجم"
     },
-    "due_5d7267be": {
-        "message": "تاريخ الاستحقاق:"
-    },
-    "due_date_124fdd99": {
-        "message": "تاريخ الاستحقاق: { date }"
-    },
     "due_multiple_dates_cc0ee3f5": {
         "message": "تاريخ الاستحقاق: تواريخ متعددة"
     },
@@ -751,9 +640,6 @@
     },
     "edit_link_7f53bebb": {
         "message": "تحرير الارتباط"
-    },
-    "edit_title_72e5a21e": {
-        "message": "تحرير { title }"
     },
     "editor_statusbar_26ac81fc": {
         "message": "شريط حالة المحرر"
@@ -839,18 +725,6 @@
     "equivalent_identity_654b3ce5": {
         "message": "مكافئ (هوية)"
     },
-    "error_loading_grades_e0b38f4d": {
-        "message": "خطأ أثناء تحميل الدرجات"
-    },
-    "error_loading_items_5218438e": {
-        "message": "خطأ أثناء تحميل العناصر"
-    },
-    "error_loading_more_items_3f109d9f": {
-        "message": "حدث خطأ في تحميل المزيد من العناصر"
-    },
-    "error_loading_past_items_2881dbb1": {
-        "message": "حدث خطأ في تحميل العناصر السابقة"
-    },
     "estonian_5e8e2fa4": {
         "message": "الإستونية"
     },
@@ -914,12 +788,6 @@
     "failed_peeking_into_your_past_5bec2323": {
         "message": "تعذر اختلاس النظر في ماضيك"
     },
-    "failed_saving_changes_on_name_1e100ad": {
-        "message": "تعذر حفظ التغييرات على { name }."
-    },
-    "failed_to_delete_name_bdd7b810": {
-        "message": "تعذر حذف { name }."
-    },
     "failed_to_delete_to_do_64edff49": {
         "message": "تعذر حذف قائمة مهام"
     },
@@ -934,9 +802,6 @@
     },
     "failed_to_save_to_do_ddc7503b": {
         "message": "تعذر حفظ قائمة مهام"
-    },
-    "failure_loading_the_to_do_list_c61895c8": {
-        "message": "تعذر تحميل قائمة المهام"
     },
     "feedback_6dcc1991": {
         "message": "الملاحظات"
@@ -1037,9 +902,6 @@
     "gif_png_format_images_larger_than_size_kb_are_not__7af3bdbd": {
         "message": "الصور بتنسيق GIF/PNG أكبر من { size } كيلوبايت غير مدعومة حاليًا."
     },
-    "go_to_card_view_dashboard_9d03970e": {
-        "message": "انتقل إلى لوحة عرض البطاقة"
-    },
     "go_to_the_editor_s_menubar_e6674c81": {
         "message": "الانتقال إلى شريط القوائم الخاص بالمحرر"
     },
@@ -1051,9 +913,6 @@
     },
     "grades_a61eba0a": {
         "message": "الدرجات"
-    },
-    "grades_are_loading_c899652d": {
-        "message": "جارٍ تحميل الدرجات"
     },
     "grades_loaded_5056277c": {
         "message": "تم تحميل الدرجات"
@@ -1310,26 +1169,8 @@
     "italian_bd3c792d": {
         "message": "الإيطالية"
     },
-    "items_completed_items_plural_1_item_other_items_717d579f": {
-        "message": "{ items } أكمل { items, plural,\n     =1 {عنصر}\n  other {من العناصر}\n}"
-    },
     "japanese_b5721ca7": {
         "message": "اليابانية"
-    },
-    "join_6cafecca": {
-        "message": "انضمام"
-    },
-    "join_active_online_meeting_d9d892b2": {
-        "message": "الانضمام إلى اجتماع نشط عبر الإنترنت"
-    },
-    "join_online_meeting_b1725843": {
-        "message": "الانضمام إلى اجتماع عبر الإنترنت"
-    },
-    "jump_to_navigation_toolbar_2952cd8b": {
-        "message": "الانتقال إلى شريط أدوات التنقل"
-    },
-    "jump_to_today_254ccf41": {
-        "message": "ابدأ اليوم"
     },
     "kappa_2f14c816": {
         "message": "Kappa"
@@ -1478,12 +1319,6 @@
     "load_more_35d33c7": {
         "message": "تحميل المزيد"
     },
-    "load_more_a36f9cf9": {
-        "message": "تحميل المزيد"
-    },
-    "load_prior_dates_f2b0f6f0": {
-        "message": "تحميل تواريخ سابقة"
-    },
     "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
         "message": "تم تحميل { count, plural,\n     =0 {# من العناصر}\n    one {# عنصر}\n  other {# من العناصر}\n}"
     },
@@ -1514,23 +1349,14 @@
     "loading_grades_c842c887": {
         "message": "جارٍ تحميل الدرجات"
     },
-    "loading_past_items_ca499e75": {
-        "message": "جارٍ تحميل العناصر السابقة"
-    },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "جارٍ تحميل عنصر النائب لـ { fileName }"
-    },
-    "loading_planner_items_947a813d": {
-        "message": "جارٍ تحميل عناصر المخطِط"
     },
     "loading_please_wait_d276220a": {
         "message": "جارٍ التحميل، يرجى الانتظار"
     },
     "loading_preview_9f077aa1": {
         "message": "جارٍ تحميل المعاينة"
-    },
-    "location_3b6ff307": {
-        "message": "الموقع:"
     },
     "locked_762f138b": {
         "message": "مؤمّن"
@@ -1546,9 +1372,6 @@
     },
     "logical_equivalence_thick_662dd3f2": {
         "message": "تكافؤ منطقي (سميك)"
-    },
-    "looks_like_there_isn_t_anything_here_d9bcef49": {
-        "message": "يبدو أنه لا يوجد أي شيء هنا"
     },
     "low_horizontal_dots_cc08498e": {
         "message": "نقاط أفقية منخفضة"
@@ -1622,9 +1445,6 @@
     "missing_1a256b3b": {
         "message": "مفقود"
     },
-    "missing_items_for_title_516511f8": {
-        "message": "عناصر مفقودة لـ { title }"
-    },
     "module_90d9fd32": {
         "message": "الوحدة"
     },
@@ -1654,9 +1474,6 @@
     },
     "my_files_2f621040": {
         "message": "ملفاتي"
-    },
-    "my_grades_98834476": {
-        "message": "درجاتي"
     },
     "n_th_root_9991a6e4": {
         "message": "N-th Root"
@@ -1688,26 +1505,11 @@
     "nested_less_than_27d17e58": {
         "message": "Nested Less Than"
     },
-    "new_13daf639": {
-        "message": "الجديدة"
-    },
-    "new_activity_8b84847d": {
-        "message": "نشاط جديد"
-    },
-    "new_activity_for_title_14c9c3af": {
-        "message": "نشاط جديد لـ { title }"
-    },
-    "new_opportunities_7d349c4d": {
-        "message": "الفرص الجديدة"
-    },
     "new_quiz_34aacba6": {
         "message": "اختبار جديد"
     },
     "next_40e12421": {
         "message": "التالي"
-    },
-    "next_month_749b1778": {
-        "message": "الشهر القادم"
     },
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "لم يتم الكشف عن مشاكل إمكانية الوصول."
@@ -1715,23 +1517,14 @@
     "no_changes_to_save_d29f6e91": {
         "message": "لا توجد تغييرات للحفظ."
     },
-    "no_due_dates_assigned_e8f5bac8": {
-        "message": "لم يتم تعيين تواريخ الاستحقاق"
-    },
     "no_e16d9132": {
         "message": "لا"
     },
     "no_file_chosen_9a880793": {
         "message": "لم يتم اختيار ملف"
     },
-    "no_grade_3b4d7f3e": {
-        "message": "لا توجد أي درجة"
-    },
     "no_headers_9bc7dc7f": {
         "message": "بلا رؤوس"
-    },
-    "no_more_items_to_show_6a1333c6": {
-        "message": "لا توجد عناصر إضافية للعرض"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "لا توجد معاينة متوفرة لهذا الملف."
@@ -1781,35 +1574,14 @@
     "not_superset_strict_24e06f36": {
         "message": "Not Superset (Strict)"
     },
-    "nothing_due_this_week_d45c9ef9": {
-        "message": "لا شيء مستحق هذا الأسبوع"
-    },
-    "nothing_for_now_e3e3ce2a": {
-        "message": "لا شيء موجود الآن"
-    },
-    "nothing_here_needs_attention_c4eaded6": {
-        "message": "لا شيء هنا يستدعي الاهتمام."
-    },
-    "nothing_more_to_do_b665da42": {
-        "message": "لا يوجد المزيد من قوائم المهام"
-    },
-    "nothing_new_needs_attention_3ac548d4": {
-        "message": "لا يوجد شيء جديد يستدعي الاهتمام."
-    },
     "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
         "message": "لم يتم اليوم تخطيط أي شيء. تحديد أحدث العناصر."
     },
     "nothing_planned_today_selecting_next_item_f6718aa": {
         "message": "لم يتم اليوم تخطيط أي شيء. تحديد العنصر التالي."
     },
-    "nothing_planned_yet_8675ffe9": {
-        "message": "لم يتم تخطيط أي شيء بعد"
-    },
     "nu_1c0f6848": {
         "message": "Nu"
-    },
-    "numpoints_points_8621a43b": {
-        "message": "{ numPoints } من النقاط"
     },
     "octagon_e48be9f": {
         "message": "ثماني"
@@ -1826,9 +1598,6 @@
     "one_or_more_files_failed_to_paste_please_try_uploa_7fa39dd3": {
         "message": "تعذر لصق ملف واحد أو أكثر يرجى تحميل الملفات أو سحبها وإفلاتها."
     },
-    "only_most_recent_grading_period_shown_f1ad6458": {
-        "message": "*إظهار أحدث فترة تقييم فقط."
-    },
     "open_circle_e9bd069": {
         "message": "دائرة مفتوحة"
     },
@@ -1840,12 +1609,6 @@
     },
     "operators_a2ef9a93": {
         "message": "المشغلون"
-    },
-    "opportunities_popup_f6703842": {
-        "message": "النافذة المنبثقة للفرص"
-    },
-    "optional_add_course_ef0d70fc": {
-        "message": "اختياري: إضافة مساق"
     },
     "or_9b70ccaa": {
         "message": "أو"
@@ -1894,9 +1657,6 @@
     },
     "peer_review_74f26a13": {
         "message": "المراجعة النظيرة"
-    },
-    "peer_review_for_itemtitle_358cb413": {
-        "message": "مراجعة أقران ل{ itemTitle }"
     },
     "pentagon_17d82ea3": {
         "message": "خماسي"
@@ -1958,12 +1718,6 @@
     "plus_minus_f8be2e83": {
         "message": "موجب/سالب"
     },
-    "points_bceb5005": {
-        "message": "نقاط"
-    },
-    "points_points_63e59cce": {
-        "message": "{ points } من النقاط"
-    },
     "polish_4cf2ecaf": {
         "message": "البولندية"
     },
@@ -2000,9 +1754,6 @@
     "preview_inline_9787330": {
         "message": "معاينة مضمّنة"
     },
-    "previous_month_bb1e3c84": {
-        "message": "الشهر السابق"
-    },
     "prime_917ea60e": {
         "message": "Prime"
     },
@@ -2020,9 +1771,6 @@
     },
     "psi_e3f5f0f7": {
         "message": "Psi"
-    },
-    "pts_699bd9aa": {
-        "message": "نقاط"
     },
     "published_c944a23d": {
         "message": "تم النشر"
@@ -2074,9 +1822,6 @@
     },
     "religion_icon_246e0be1": {
         "message": "أيقونة الدين"
-    },
-    "reminder_date_4564d12d": {
-        "message": "التذكير: { date }"
     },
     "remove_heading_style_5fdc8855": {
         "message": "إزالة نمط العنوان"
@@ -2189,9 +1934,6 @@
     "saved_icon_maker_icons_df86e2a1": {
         "message": "تم حفظ أيقونة صانع الأيقونات"
     },
-    "schedule_preview_3bcda153": {
-        "message": "جدولة معاينة"
-    },
     "science_8d92214a": {
         "message": "العلوم"
     },
@@ -2215,12 +1957,6 @@
     },
     "script_l_42a7b254": {
         "message": "Script L"
-    },
-    "scroll_up_to_see_your_history_19b14cad": {
-        "message": "قم بالتمرير للأعلى للاطلاع على السجل!"
-    },
-    "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-        "message": "قم بالتمرير للأعلى إلى العنصر السابق الذي يحتوى على نشاط حديث."
     },
     "search_280d00bd": {
         "message": "بحث"
@@ -2267,9 +2003,6 @@
     "shortcut_911d6255": {
         "message": "اختصار"
     },
-    "show_all_ae37d610": {
-        "message": "عرض الكل"
-    },
     "show_audio_options_b489926b": {
         "message": "إظهار خيارات الصوت"
     },
@@ -2278,9 +2011,6 @@
     },
     "show_link_options_545338fd": {
         "message": "إظهار خيارات الارتباطات"
-    },
-    "show_my_grades_ebd08684": {
-        "message": "إظهار درجاتي"
     },
     "show_studio_media_options_a0c748c6": {
         "message": "إظهار خيارات وسائط Studio"
@@ -2393,23 +2123,14 @@
     "start_recording_9a65141a": {
         "message": "بدء التسجيل"
     },
-    "startdate_to_enddate_d245175b": {
-        "message": "{ startDate } إلى { endDate }"
-    },
     "startdatetime_enddatetime_20abc10e": {
         "message": "{ startDateTime } - { endDateTime }"
     },
     "startdatetime_endtime_49741bbe": {
         "message": "{ startDateTime } - { endTime }"
     },
-    "starttime_to_endtime_d7cc249d": {
-        "message": "{ startTime } إلى { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "أزرق فولاذي"
-    },
-    "student_to_do_c018c835": {
-        "message": "قائمة مهام الطالب"
     },
     "studio_media_options_ee504361": {
         "message": "خيارات وسائط Studio"
@@ -2552,9 +2273,6 @@
     "the_best_assignment_15e98be1": {
         "message": "أفضل مهمة"
     },
-    "the_date_and_time_this_to_do_is_due_74c823d4": {
-        "message": "تاريخ ووقت استحقاق قائمة المهام تلك"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "تجري معالجة معاينة المستند حاليًا. الرجاء إعادة المحاولة لاحقًا."
     },
@@ -2581,9 +2299,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "الملف المحدد يتجاوز حد { maxSize } بايت"
-    },
-    "there_are_no_points_associated_with_this_item_449c712a": {
-        "message": "لا توجد نقاط مقترنة بهذا العنصر"
     },
     "there_is_nothing_planned_for_today_e09bfc8c": {
         "message": "لا يوجد شيء مخطط اليوم."
@@ -2627,29 +2342,17 @@
     "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
         "message": "بالرغم من أن مقطع الفيديو الخاص بك سيشتمل على العنوان الصحيح في المستعرض، لم نتمكن من تحديثه في قاعدة البيانات."
     },
-    "time_2b5aac58": {
-        "message": "الوقت"
-    },
     "timebar_a4d18443": {
         "message": "Timebar"
     },
     "title_ee03d132": {
         "message": "العنوان"
     },
-    "title_is_required_6ddcab69": {
-        "message": "العنوان مطلوب"
-    },
     "to_be_posted_when_d24bf7dc": {
         "message": "المقرر نشره: { when }"
     },
     "to_do_1d554f36": {
         "message": "قائمة المهام"
-    },
-    "to_do_date_4b211ad0": {
-        "message": "قائمة مهام: { date }"
-    },
-    "to_do_items_loading_d1cdfcd5": {
-        "message": "تحميل عناصر قائمة المهام"
     },
     "to_do_when_2783d78f": {
         "message": "قائمة مهام: { when }"
@@ -2891,12 +2594,6 @@
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "عرض اختصارات لوحة المفاتيح"
     },
-    "view_next_week_7f61f755": {
-        "message": "عرض الأسبوع القادم"
-    },
-    "view_previous_week_6f83849f": {
-        "message": "عرض الأسبوع السابق"
-    },
     "view_title_description_67940918": {
         "message": "عرض وصف { title }"
     },
@@ -2920,9 +2617,6 @@
     },
     "webpages_should_only_have_a_single_h1_which_is_aut_dc99189e": {
         "message": "يجب أن تقتصر صفحات الويب على H1 فردي، والذي يستخدمه عنوان الصفحة تلقائيًا. يجب أن يكون أول عنوان في المحتوى الخاص بك هو H2."
-    },
-    "weekly_schedule_navigation_6b042645": {
-        "message": "التنقل للجدول الأسبوعي"
     },
     "welsh_42ab94b1": {
         "message": "الويلزية"
@@ -2972,9 +2666,6 @@
     "yiddish_f96986df": {
         "message": "اليديشية"
     },
-    "you_have_media_feedback_f5f9aba8": {
-        "message": "لديك ملاحظات وسائط."
-    },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "لديك تغييرات غير محفوظة في علبة صانع الأيقونات. هل ترغب في المتابعة بدون حفظ هذه التغييرات؟"
     },
@@ -2983,12 +2674,6 @@
     },
     "you_may_not_upload_an_empty_file_11c31eb2": {
         "message": "لا يمكنك تحميل ملف فارغ."
-    },
-    "you_must_provide_a_date_and_time_a86839d2": {
-        "message": "يجب عليك إدخال تاريخ ووقت."
-    },
-    "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
-        "message": "لقد قمت بالتمرير للخلف إلى أول قائمة مهام خاصة بك!"
     },
     "your_image_has_been_compressed_for_icon_maker_imag_2e45cd91": {
         "message": "تم ضغط صورتك لصانع الأيقونات. لن يتم ضغط الصور الأقل من { size } كيلوبايت."
