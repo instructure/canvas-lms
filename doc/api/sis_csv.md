@@ -109,7 +109,11 @@ as source system, data type, and term id. Some examples of good identifiers:
 
 Diffing mode by default marks objects as "deleted" when they are not included
 for an import, but enrollments can be marked as 'completed' or 'inactive' if the
-`diffing_drop_status` is passed.
+`diffing_drop_status` is passed. Likewise users removed between diffed batches
+can be marked as 'suspended' if the `diffing_user_remove_status` is set to
+`suspended`. If you prefer to leave removed objects alone in diffed imports,
+pass `skip_deletes=true` instead of either of these (this will apply to all object
+types, not just users and enrollments).
 
 If changes are made to SIS-managed objects outside of the normal import
 process, as in the example given above, it may be necessary to process a SIS
