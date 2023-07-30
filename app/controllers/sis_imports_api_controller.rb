@@ -554,6 +554,11 @@ class SisImportsApiController < ApplicationController
   #   If diffing_drop_status is passed, this SIS import will use this status for
   #   enrollments that are not included in the sis_batch. Defaults to 'deleted'
   #
+  # @argument diffing_user_remove_status [String, "deleted"|"suspended"]
+  #   For users removed from one batch to the next one using the same
+  #   diffing_data_set_identifier, set their status to the value of this argument.
+  #   Defaults to 'deleted'.
+  #
   # @argument batch_mode_enrollment_drop_status [String, "deleted"|"completed"|"inactive"]
   #   If batch_mode_enrollment_drop_status is passed, this SIS import will use
   #   this status for enrollments that are not included in the sis_batch. This
@@ -682,6 +687,10 @@ class SisImportsApiController < ApplicationController
         if params[:diffing_drop_status].present?
           batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status]) & SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
           return render json: { message: "Invalid diffing_drop_status" }, status: :bad_request unless batch.options[:diffing_drop_status]
+        end
+        if params[:diffing_user_remove_status].present?
+          batch.options[:diffing_user_remove_status] = (Array(params[:diffing_user_remove_status]) & SIS::CSV::DiffGenerator::VALID_USER_REMOVE_STATUS).first
+          return render json: { message: "Invalid diffing_user_remove_status" }, status: :bad_request unless batch.options[:diffing_user_remove_status]
         end
         if params[:batch_mode_enrollment_drop_status].present?
           batch.options[:batch_mode_enrollment_drop_status] = (Array(params[:batch_mode_enrollment_drop_status]) & SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first

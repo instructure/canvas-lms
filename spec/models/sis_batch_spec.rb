@@ -929,6 +929,46 @@ s2,test_1,section2,active),
       end
     end
 
+    describe "diffing_user_remove_status" do
+      before :once do
+        process_csv_data(
+          [
+            %(user_id,login_id,status
+              user_1,user_1,active,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope"
+        )
+      end
+
+      it "deletes removed users by default" do
+        batch = process_csv_data(
+          [
+            %(user_id,login_id,status,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope"
+        )
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob("*.csv")
+        expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,deleted\n")
+      end
+
+      it "suspends removed users by request" do
+        batch = process_csv_data(
+          [
+            %(user_id,login_id,status,
+              user_2,user_2,active)
+          ],
+          diffing_data_set_identifier: "allotrope",
+          options: { diffing_user_remove_status: "suspended" }
+        )
+        zip = Zip::File.open(batch.generated_diff.open.path)
+        csvs = zip.glob("*.csv")
+        expect(csvs.first.get_input_stream.read).to eq("user_id,login_id,status\nuser_1,user_1,suspended\n")
+      end
+    end
+
     it "skips diffing if previous diff not available" do
       expect_any_instance_of(SIS::CSV::DiffGenerator).not_to receive(:generate)
       batch = process_csv_data([

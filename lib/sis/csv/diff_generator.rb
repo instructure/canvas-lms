@@ -51,6 +51,7 @@ module SIS
       end
 
       VALID_ENROLLMENT_DROP_STATUS = %w[deleted inactive completed deleted_last_completed].freeze
+      VALID_USER_REMOVE_STATUS = %w[deleted suspended].freeze
 
       def generate_csvs(previous_csvs, current_csvs)
         generated = []
@@ -86,8 +87,15 @@ module SIS
           begin
             csvs.each do |current_csv|
               previous_csv = prev_csv_map[current_csv]
-              status = @batch.options && @batch.options[:diffing_drop_status].presence
-              status = "deleted" unless import_type == :enrollment && VALID_ENROLLMENT_DROP_STATUS.include?(status)
+              status = case import_type
+                       when :enrollment
+                         diffing_drop_status = @batch.options && @batch.options[:diffing_drop_status].presence
+                         diffing_drop_status if VALID_ENROLLMENT_DROP_STATUS.include?(diffing_drop_status)
+                       when :user
+                         diffing_user_remove_status = @batch.options && @batch.options[:diffing_user_remove_status].presence
+                         diffing_user_remove_status if VALID_USER_REMOVE_STATUS.include?(diffing_user_remove_status)
+                       end
+              status ||= "deleted"
               diff = generate_diff(class_for_importer(import_type), previous_csv[:fullpath], current_csv[:fullpath], status)
               io = diff[:file_io]
               generated << {
