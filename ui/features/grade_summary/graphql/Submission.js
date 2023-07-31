@@ -33,6 +33,7 @@ export const Submission = {
       readState
       late
       updatedAt
+      excused
       commentsConnection {
         nodes {
           ...SubmissionComment
@@ -51,6 +52,7 @@ export const Submission = {
     readState: string,
     late: bool,
     updatedAt: string,
+    excused: bool,
     commentsConnection: arrayOf({
       nodes: arrayOf({
         comment: string,
@@ -73,6 +75,7 @@ export const Submission = {
     readState = 'read',
     late = false,
     updatedAt = '2019-01-01T00:00:00Z',
+    excused = false,
     commentsConnection = {
       nodes: [
         {
@@ -95,6 +98,7 @@ export const Submission = {
     readState,
     late,
     updatedAt,
+    excused,
     commentsConnection,
     __typename: 'Submission',
   }),
