@@ -5052,7 +5052,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           </Suspense>
         </ErrorBoundary>
         <Portal node={this.props.gridColorNode}>
-          <GridColor colors={this.state.gridColors} />
+          <GridColor
+            colors={this.state.gridColors}
+            customStatuses={
+              this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
+            }
+          />
         </Portal>
 
         <div style={{display: 'flex'}}>

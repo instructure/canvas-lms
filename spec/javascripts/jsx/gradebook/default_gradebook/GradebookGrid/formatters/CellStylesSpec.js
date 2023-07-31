@@ -34,6 +34,7 @@ QUnit.module('GradebookGrid CellStyles', () => {
         late: false,
         missing: false,
         resubmitted: false,
+        customGradeStatusId: null,
       }
     })
 
@@ -167,6 +168,26 @@ QUnit.module('GradebookGrid CellStyles', () => {
       assignment.submissionTypes = ['not_graded']
       const classNames = classNamesForAssignmentCell(assignment, submissionData)
       deepEqual(classNames, ['dropped', 'ungraded'])
+    })
+
+    test('includes "custom-grade-status" when the submission has a custom grade status', () => {
+      submissionData.customGradeStatusId = '1'
+      const classNames = classNamesForAssignmentCell(assignment, submissionData)
+      deepEqual(classNames, ['custom-grade-status-1'])
+    })
+
+    test('does not include "dropped" when the submission has a custom grade status', () => {
+      submissionData.customGradeStatusId = '1'
+      submissionData.dropped = true
+      const classNames = classNamesForAssignmentCell(assignment, submissionData)
+      deepEqual(classNames, ['custom-grade-status-1'])
+    })
+
+    test('assignment classNames are not exclusive with custom grade status submission classNames', () => {
+      submissionData.customGradeStatusId = '1'
+      assignment.submissionTypes = ['not_graded']
+      const classNames = classNamesForAssignmentCell(assignment, submissionData)
+      deepEqual(classNames, ['custom-grade-status-1', 'ungraded'])
     })
   })
 })

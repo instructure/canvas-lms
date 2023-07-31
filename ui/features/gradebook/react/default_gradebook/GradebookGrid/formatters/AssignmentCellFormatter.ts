@@ -157,6 +157,8 @@ function renderTemplate(grade: string, options: Options = {}) {
 export default class AssignmentCellFormatter {
   options: Getters
 
+  customGradeStatusesEnabled: boolean
+
   constructor(gradebook: Gradebook) {
     this.options = {
       getAssignment(assignmentId: string) {
@@ -181,6 +183,7 @@ export default class AssignmentCellFormatter {
         return gradebook.options.show_similarity_score
       },
     }
+    this.customGradeStatusesEnabled = gradebook.options.custom_grade_statuses_enabled
   }
 
   render = (
@@ -222,6 +225,9 @@ export default class AssignmentCellFormatter {
       missing: submission.missing,
       resubmitted: submission.grade_matches_current_submission === false,
       score: submission.score,
+      customGradeStatusId: this.customGradeStatusesEnabled
+        ? submission.custom_grade_status_id
+        : null,
     }
 
     const pendingGradeInfo = this.options.getPendingGradeInfo({

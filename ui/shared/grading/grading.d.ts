@@ -81,6 +81,7 @@ export type SubmissionData = {
   pointsDeducted?: number | null
   resubmitted: boolean
   score: number | null
+  customGradeStatusId?: string | null
 }
 
 // TODO: remove the need for this

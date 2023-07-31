@@ -397,6 +397,7 @@ export type Submission = Readonly<{
   assignment_visible?: boolean
   attempt: number | null
   cached_due_date: null | string
+  custom_grade_status_id: null | string
   drop?: boolean
   entered_grade: null | string
   entered_score: null | number

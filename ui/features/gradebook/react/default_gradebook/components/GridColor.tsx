@@ -20,6 +20,7 @@
 import React from 'react'
 import {statuses} from '../constants/statuses'
 import {darken} from '../constants/colors'
+import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 type Props = {
   colors: {
@@ -31,6 +32,7 @@ type Props = {
     extended: string
   }
   statuses: string[]
+  customStatuses: GradeStatus[]
 }
 
 function GridColor(props: Props) {
@@ -43,16 +45,30 @@ function GridColor(props: Props) {
       ].join('')
     )
     .join('')
+  const customStyleRules = props.customStatuses
+    ?.map(status =>
+      [
+        `.even .gradebook-cell.custom-grade-status-${status.id} { background-color: ${status.color}; }`,
+        `.odd .gradebook-cell.custom-grade-status-${status.id} { background-color: ${darken(
+          status.color,
+          5
+        )}; }`,
+        `.slick-cell.editable .gradebook-cell.custom-grade-status-${status.id} { background-color: white; }`,
+      ].join('')
+    )
+    .join('')
 
   return (
     <style type="text/css" data-testid="grid-color">
       {styleRules}
+      {customStyleRules}
     </style>
   )
 }
 
 GridColor.defaultProps = {
   statuses,
+  customStatuses: [],
 }
 
 export default GridColor
