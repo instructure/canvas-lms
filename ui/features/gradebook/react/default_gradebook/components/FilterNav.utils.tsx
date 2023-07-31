@@ -92,20 +92,22 @@ function useFilterDropdownData({
         name: I18n.t('Sections'),
         parentId: 'savedFilterPresets',
         isSelected: appliedFilters.some(c => c.type === 'section'),
-        items: sections.map(s => ({
-          id: s.id,
-          name: s.name,
-          isSelected: appliedFilters.some(c => c.type === 'section' && c.value === s.id),
-          onToggle: () => {
-            const filter: Filter = {
-              id: uuid.v4(),
-              type: 'section',
-              value: s.id,
-              created_at: new Date().toISOString(),
-            }
-            toggleFilter(filter)
-          },
-        })),
+        items: sections
+          .sort((s1, s2) => natcompare.strings(s1.name, s2.name))
+          .map(s => ({
+            id: s.id,
+            name: s.name,
+            isSelected: appliedFilters.some(c => c.type === 'section' && c.value === s.id),
+            onToggle: () => {
+              const filter: Filter = {
+                id: uuid.v4(),
+                type: 'section',
+                value: s.id,
+                created_at: new Date().toISOString(),
+              }
+              toggleFilter(filter)
+            },
+          })),
       }
       dataMap.sections = filterItems.sections
     }

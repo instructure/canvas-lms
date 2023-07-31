@@ -104,7 +104,11 @@ export default function ({
       break
     }
     case 'section': {
-      items = [blankItem].concat(sections.map(({id, name}) => [id, name]))
+      items = [blankItem].concat(
+        sections
+          .sort((s1, s2) => natcompare.strings(s1.name, s2.name))
+          .map(({id, name}) => [id, name])
+      )
       break
     }
     case 'student-group': {
