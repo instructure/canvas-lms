@@ -1191,6 +1191,39 @@ describe MediaObjectsController do
         get :media_object_redirect, params: { id: @media_object.id }
       end
 
+      it "does not return the file if the user does not have access" do
+        user_session(user_factory)
+        get :media_object_redirect, params: { id: @media_object.id }
+        assert_status(401)
+      end
+
+      context "with public files" do
+        it "returns the file if it is a public file and the user does not have access" do
+          user_session(user_factory)
+          @attachment.update(visibility_level: "public")
+          temp_file = Tempfile.new("foo")
+          expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
+          expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
+          get :media_object_redirect, params: { id: @media_object.id }
+        end
+
+        it "returns the file if it is a public file and there is no user session" do
+          remove_user_session
+          @attachment.update(visibility_level: "public")
+          temp_file = Tempfile.new("foo")
+          expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect").and_return(temp_file)
+          expect(controller).to receive(:send_file).with(temp_file, filename: @attachment.filename, type: @attachment.content_type, stream: true).and_call_original
+          get :media_object_redirect, params: { id: @media_object.id }
+        end
+
+        it "does not return locked public files" do
+          remove_user_session
+          @attachment.update(locked: true, visibility_level: "public")
+          get :media_object_redirect, params: { id: @media_object.id }
+          assert_status(302)
+        end
+      end
+
       it "returns the file by bitrate" do
         temp_file = Tempfile.new("foo")
         expect(controller).to receive(:media_source_temp_file).with("http://test.host/media_redirect_2").and_return(temp_file)
