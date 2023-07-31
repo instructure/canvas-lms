@@ -22,7 +22,9 @@ export function classNamesForAssignmentCell(assignment, submissionData) {
 
   if (submissionData) {
     // Exclusive Classes (only one of these can be used at a time)
-    if (submissionData.dropped) {
+    if (submissionData.customGradeStatusId) {
+      classNames.push(`custom-grade-status-${submissionData.customGradeStatusId}`)
+    } else if (submissionData.dropped) {
       classNames.push('dropped')
     } else if (submissionData.excused) {
       classNames.push('excused')
