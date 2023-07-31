@@ -412,7 +412,7 @@ class Submission < ActiveRecord::Base
   # validation. Otherwise if we place it in any earlier (e.g.
   # before/after_initialize), every Submission.new will make database calls.
   before_validation :set_anonymous_id, if: :new_record?
-  before_save :set_late_policy_attributes
+  before_save :set_status_attributes
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -3080,15 +3080,19 @@ class Submission < ActiveRecord::Base
     self.sticker = nil
   end
 
-  def set_late_policy_attributes
-    self.seconds_late_override = nil unless late_policy_status == "late"
-
+  def set_status_attributes
     if will_save_change_to_excused?(to: true)
       self.late_policy_status = nil
-      self.seconds_late_override = nil
+      self.custom_grade_status_id = nil
+    elsif will_save_change_to_custom_grade_status_id? && custom_grade_status_id.present?
+      self.excused = false
+      self.late_policy_status = nil
     elsif will_save_change_to_late_policy_status? && late_policy_status.present?
       self.excused = false
+      self.custom_grade_status_id = nil
     end
+
+    self.seconds_late_override = nil unless late_policy_status == "late"
   end
 
   def reset_redo_request
