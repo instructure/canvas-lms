@@ -85,8 +85,9 @@ Rails.configuration.to_prepare do
     SentryProxy.register_ignorable_error(error)
   end
 
-  # This error can be caused by LTI tools.
+  # These errors can be caused by LTI tools.
   SentryProxy.register_ignorable_error("Grade pass back failure")
+  SentryProxy.register_ignorable_error("Grade pass back unsupported")
 
   CanvasErrors.register!(:sentry_notification) do |exception, data, level|
     setting = SentryExtensions::Settings.get("sentry_error_logging_enabled", "true")
