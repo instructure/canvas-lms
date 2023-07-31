@@ -221,6 +221,30 @@ describe WikiPage do
     expect(p1.url).to eql("asdf-2")
   end
 
+  it "lets you reuse the title but not the url of a deleted page when PPL is on" do
+    Account.site_admin.enable_feature!(:permanent_page_links)
+
+    course_with_teacher(active_all: true)
+    p1 = @course.wiki_pages.create(title: "Asdf")
+    p1.workflow_state = "deleted"
+    p1.save
+
+    # doesn't delete the lookups
+    expect(p1.current_lookup).to_not be_nil
+
+    # therefore we can't reuse the url
+    p2 = @course.wiki_pages.create(title: "Asdf")
+    p2.reload
+    expect(p2.title).to eql("Asdf")
+    expect(p2.url).to eql("asdf-2")
+
+    # p1's url does not mutate upon reinstating
+    p1.workflow_state = "active"
+    expect(p1.save).to be_truthy
+    expect(p1.title).to eql("Asdf")
+    expect(p1.url).to eql("asdf")
+  end
+
   it "sets root_account_id on create" do
     course_with_teacher(active_all: true)
     wp = @course.wiki_pages.create!(title: "Asdf")

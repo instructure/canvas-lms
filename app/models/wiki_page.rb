@@ -72,7 +72,7 @@ class WikiPage < ActiveRecord::Base
   after_save  :update_assignment,
               if: proc { context.try(:conditional_release?) }
   after_save :create_lookup, if: :should_create_lookup?
-  after_save :delete_lookups, if: -> { saved_change_to_workflow_state? && deleted? }
+  after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
 
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")
