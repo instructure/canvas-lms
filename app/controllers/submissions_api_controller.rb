@@ -854,9 +854,12 @@ class SubmissionsApiController < ApplicationController
       if params[:submission].is_a?(ActionController::Parameters)
         submission[:grade] = params[:submission].delete(:posted_grade)
         submission[:excuse] = params[:submission].delete(:excuse)
-        if params[:submission].key?(:late_policy_status)
-          submission[:late_policy_status] = params[:submission].delete(:late_policy_status)
+        [:late_policy_status, :custom_grade_status_id].each do |status_attr|
+          if params[:submission].key?(status_attr)
+            submission[status_attr] = params[:submission].delete(status_attr)
+          end
         end
+
         if params[:submission].key?(:seconds_late_override)
           submission[:seconds_late_override] = params[:submission].delete(:seconds_late_override)
         end
@@ -888,8 +891,11 @@ class SubmissionsApiController < ApplicationController
         @submissions ||= [@submission]
       end
 
-      late_attrs_changed = submission.key?(:late_policy_status) || submission.key?(:seconds_late_override)
-      if late_attrs_changed || submission.key?(:sticker)
+      submission_status_changed =
+        %i[late_policy_status seconds_late_override custom_grade_status_id]
+        .any? { |status_attr| submission.key?(status_attr) }
+
+      if submission_status_changed || submission.key?(:sticker)
         excused = Canvas::Plugin.value_to_boolean(submission[:excuse])
         grade_group_students = !(@assignment.grade_group_students_individually || excused)
 
@@ -898,13 +904,22 @@ class SubmissionsApiController < ApplicationController
           @submissions = @assignment.find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item))
         end
 
+        if submission.key?(:custom_grade_status_id)
+          custom_status = @context.root_account.custom_grade_statuses.active.find(submission[:custom_grade_status_id])
+        end
+
         @submissions.each do |sub|
-          sub.late_policy_status = submission[:late_policy_status] if submission.key?(:late_policy_status)
+          if custom_status
+            sub.custom_grade_status = custom_status
+          elsif submission.key?(:late_policy_status)
+            sub.late_policy_status = submission[:late_policy_status]
+          end
+
           if sub.late_policy_status == "late" && submission[:seconds_late_override].present?
             sub.seconds_late_override = submission[:seconds_late_override]
           end
           sub.sticker = submission[:sticker] if submission.key?(:sticker)
-          sub.grader = @current_user if late_attrs_changed
+          sub.grader = @current_user if submission_status_changed
           # If we've called Assignment#grade_student, it has already created a
           # new submission version on this request.
           previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)

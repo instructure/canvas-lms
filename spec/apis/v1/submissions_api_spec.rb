@@ -3739,6 +3739,12 @@ describe "Submissions API", type: :request do
 
     context "group assignments" do
       before do
+        @admin = account_admin_user(account: @course.root_account)
+        @custom_status = @course.root_account.custom_grade_statuses.create!(
+          color: "#BBB",
+          created_by: @admin,
+          name: "yolo"
+        )
         @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user
         group_category = @course.group_categories.create!(name: "Category")
         group = @course.groups.create!(name: "Group", group_category:)
@@ -3767,6 +3773,55 @@ describe "Submissions API", type: :request do
 
         submission = @assignment.submission_for_student(@student2)
         expect(submission.late_policy_status).to eq "missing"
+      end
+
+      it "can set a custom status on a group member's submission" do
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: {
+              custom_grade_status_id: @custom_status.id.to_s
+            }
+          }
+        )
+
+        submission = @assignment.submission_for_student(@student2)
+        expect(submission.custom_grade_status_id).to eq @custom_status.id
+      end
+
+      it "does not set a custom status for the whole group when assignment is graded individually" do
+        @assignment.update!(grade_group_students_individually: true)
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: "submissions_api",
+            action: "update",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          },
+          {
+            submission: {
+              custom_grade_status_id: @custom_status.id.to_s
+            }
+          }
+        )
+
+        first_submission = @assignment.submission_for_student(@student)
+        expect(first_submission.custom_grade_status_id).to eq @custom_status.id
+        second_submission = @assignment.submission_for_student(@student2)
+        expect(second_submission.custom_grade_status_id).to be_nil
       end
 
       it "can set seconds_late_override on a group member's submission" do
@@ -3865,6 +3920,38 @@ describe "Submissions API", type: :request do
       submission = @assignment.submission_for_student(@student)
       expect(submission.late_policy_status).to eq "missing"
       expect(json["late_policy_status"]).to eq "missing"
+    end
+
+    it "can set a custom status on a submission" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_status = @course.root_account.custom_grade_statuses.create!(
+        color: "#BBB",
+        created_by: admin,
+        name: "yolo"
+      )
+      submission = @assignment.submission_for_student(@student)
+      submission.update!(late_policy_status: "missing")
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        },
+        {
+          submission: {
+            custom_grade_status_id: custom_status.id.to_s
+          }
+        }
+      )
+
+      submission.reload
+      expect(submission.late_policy_status).to be_nil
+      expect(submission.custom_grade_status_id).to eq custom_status.id
     end
 
     it "can set seconds_late_override on a submission along with the late_policy_status of late" do

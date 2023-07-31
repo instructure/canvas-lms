@@ -766,11 +766,34 @@ describe Submission do
       expect(submission).not_to be_excused
     end
 
-    it "does not set excused to false if the late_policy_status ie being changed to a nil value" do
+    it "does not set excused to false if the late_policy_status is being changed to a nil value" do
       # need to skip callbacks so excused does not get set to false
       submission.update_column(:late_policy_status, "missing")
       submission.update!(late_policy_status: nil)
       expect(submission).to be_excused
+    end
+
+    context "custom statuses" do
+      before do
+        admin = account_admin_user(account: @assignment.root_account)
+        @custom_grade_status = @assignment.root_account.custom_grade_statuses.create!(
+          color: "#ABC",
+          name: "yolo",
+          created_by: admin
+        )
+      end
+
+      it "sets excused to false if the custom_grade_status_id is being changed to a not-nil value" do
+        submission.update!(custom_grade_status: @custom_grade_status)
+        expect(submission).not_to be_excused
+      end
+
+      it "does not set excused to false if the custom_grade_status_id is being changed to a nil value" do
+        # need to skip callbacks so excused does not get set to false
+        submission.update_column(:custom_grade_status_id, @custom_grade_status.id)
+        submission.update!(custom_grade_status_id: nil)
+        expect(submission).to be_excused
+      end
     end
   end
 
@@ -803,6 +826,41 @@ describe Submission do
       submission.update_column(:excused, true)
       submission.update!(excused: false)
       expect(submission.seconds_late_override).to be 60
+    end
+
+    context "custom statuses" do
+      before do
+        admin = account_admin_user(account: @assignment.root_account)
+        @custom_grade_status = @assignment.root_account.custom_grade_statuses.create!(
+          color: "#ABC",
+          name: "yolo",
+          created_by: admin
+        )
+      end
+
+      it "sets late_policy_status to nil if the custom_grade_status_id is being changed to a not-nil value" do
+        submission.update!(custom_grade_status: @custom_grade_status)
+        expect(submission.late_policy_status).to be_nil
+      end
+
+      it "sets seconds_late_override to nil if the submission is updated to have a custom status" do
+        submission.update!(custom_grade_status: @custom_grade_status)
+        expect(submission.seconds_late_override).to be_nil
+      end
+
+      it "does not set late_policy_status to nil if the custom_grade_status_id is being changed to a nil value" do
+        # need to skip callbacks so excused does not get set to false
+        submission.update_column(:custom_grade_status_id, @custom_grade_status.id)
+        submission.update!(custom_grade_status_id: nil)
+        expect(submission.late_policy_status).to eql "late"
+      end
+
+      it "does not set seconds_late_override to nil if the submission is updated to not have a custom status" do
+        # need to skip callbacks so seconds_late_override does not get set to nil
+        submission.update_column(:custom_grade_status_id, @custom_grade_status.id)
+        submission.update!(custom_grade_status_id: nil)
+        expect(submission.seconds_late_override).to be 60
+      end
     end
   end
 
