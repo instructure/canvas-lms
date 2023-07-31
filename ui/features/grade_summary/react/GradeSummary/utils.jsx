@@ -23,6 +23,11 @@ import {Pill} from '@instructure/ui-pill'
 
 import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
+import {
+  convertSubmissionToDroppableSubmission,
+  convertAssignmentGroupRules,
+} from './gradeCalculatorConversions'
+
 export const getGradingPeriodID = () => {
   const fromUrl = window?.location?.search
     ?.split('?')[1]
@@ -228,42 +233,6 @@ export const scorePercentageToLetterGrade = (score, gradingStandard) => {
 }
 
 // **************************** DROP ASSIGNMENT FROM ASSIGNMENT GROUP ****************************
-
-export const convertSubmissionToDroppableSubmission = (assignment, submission) => {
-  return {
-    score: submission?.score || 0,
-    grade: submission?.grade || 0,
-    total: assignment?.pointsPossible,
-    assignment_id: assignment?._id,
-    workflow_state: assignment?.state,
-    excused: submission?.late || false,
-    id: submission?._id || null,
-    submission: {assignment_id: assignment?._id},
-  }
-}
-
-export const camelCaseToSnakeCase = str => {
-  return str.replace(/([A-Z])/g, (_match, letter) => `_${letter.toLowerCase()}`).replace(/^_/, '')
-}
-
-export const convertAssignmentGroupRules = assignmentGroup => {
-  if (
-    !assignmentGroup?.rules ||
-    (assignmentGroup?.rules?.dropLowest === null &&
-      assignmentGroup?.rules?.dropHighest === null &&
-      assignmentGroup?.rules?.neverDrop === null)
-  )
-    return null
-  const rules = {}
-  Object.keys(assignmentGroup?.rules).forEach(key => {
-    rules[camelCaseToSnakeCase(key)] = assignmentGroup.rules[key]
-  })
-
-  if (rules.never_drop !== null) {
-    rules.never_drop = rules.never_drop.map(assignment => assignment._id)
-  }
-  return rules
-}
 
 export const filterDroppedAssignments = (
   assignments = [],

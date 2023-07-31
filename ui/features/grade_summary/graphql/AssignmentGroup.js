@@ -17,7 +17,7 @@
  */
 
 import gql from 'graphql-tag'
-import {arrayOf, float, string} from 'prop-types'
+import {arrayOf, float, number, string} from 'prop-types'
 
 export const AssignmentGroup = {
   fragment: gql`
@@ -25,6 +25,7 @@ export const AssignmentGroup = {
       _id
       name
       groupWeight
+      position
       rules {
         dropHighest
         dropLowest
@@ -47,6 +48,7 @@ export const AssignmentGroup = {
     _id: string,
     name: string,
     groupWeight: float,
+    position: number,
     rules: {
       dropHighest: float,
       dropLowest: float,
@@ -68,6 +70,7 @@ export const AssignmentGroup = {
     _id = '1',
     name = 'Group 1',
     groupWeight = 50,
+    position = 1,
     rules = {
       dropHighest: 0,
       dropLowest: 0,
@@ -87,6 +90,7 @@ export const AssignmentGroup = {
     _id,
     name,
     groupWeight,
+    position,
     rules,
     gradesConnection,
     __typename: 'AssignmentGroup',

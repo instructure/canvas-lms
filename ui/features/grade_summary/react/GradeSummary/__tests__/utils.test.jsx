@@ -37,9 +37,6 @@ import {
   getDisplayScore,
   getZeroPointAssignmentDisplayScore,
   scorePercentageToLetterGrade,
-  convertSubmissionToDroppableSubmission,
-  camelCaseToSnakeCase,
-  convertAssignmentGroupRules,
   filterDroppedAssignments,
   listDroppedAssignments,
   getAssignmentTotalPoints,
@@ -65,6 +62,12 @@ import {
   getAssignmentSortKey,
   getAssignmentNoSubmissionStatus,
 } from '../utils'
+
+import {
+  camelCaseToSnakeCase,
+  convertSubmissionToDroppableSubmission,
+  convertAssignmentGroupRules,
+} from '../gradeCalculatorConversions'
 
 const createAssignment = (score, pointsPossible) => {
   return Assignment.mock({
@@ -931,9 +934,9 @@ describe('util', () => {
           },
         }
 
-        expect(convertAssignmentGroupRules(undefined)).toBeNull()
-        expect(convertAssignmentGroupRules(assignmentGroup1)).toBeNull()
-        expect(convertAssignmentGroupRules(assignmentGroup2)).toBeNull()
+        expect(convertAssignmentGroupRules(undefined)).toStrictEqual({})
+        expect(convertAssignmentGroupRules(assignmentGroup1)).toStrictEqual({})
+        expect(convertAssignmentGroupRules(assignmentGroup2)).toStrictEqual({})
       })
 
       it('should convert rules keys to snake_case and map never_drop assignments', () => {
