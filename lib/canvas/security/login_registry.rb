@@ -53,7 +53,12 @@ module Canvas::Security
     #
     # @return [:too_many_attempts, nil] :too_many_attempts if login is prohibited, nil if it's fine to proceed
     def self.audit_login(pseudonym, remote_ip, valid_password)
-      return :too_many_attempts unless allow_login_attempt?(pseudonym, remote_ip)
+      if !allow_login_attempt?(pseudonym, remote_ip) ||
+         # multiple _successful_ logins in a very short window?!
+         (valid_password && pseudonym.current_login_at &&
+          pseudonym.current_login_at > Time.now.utc - Setting.get("successful_login_window", "5").to_f.seconds)
+        return :too_many_attempts
+      end
 
       if valid_password
         successful_login!(pseudonym)

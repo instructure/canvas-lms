@@ -47,6 +47,12 @@ describe Canvas::Security::LoginRegistry do
       expect(registry.audit_login(@p, "7.7.7.7", true)).to eq(:too_many_attempts)
     end
 
+    it "prohibits rapid fire successful logins" do
+      @p.update_attribute(:current_login_at, 1.second.ago)
+      expect(registry.audit_login(@p, "7.7.7.7", true)).to be :too_many_attempts
+      expect(registry.audit_login(@p, "7.7.7.7", false)).to be_nil
+    end
+
     describe "internal implementation" do
       it "is limited for the same ip" do
         expect(registry.allow_login_attempt?(@p, "5.5.5.5")).to be true

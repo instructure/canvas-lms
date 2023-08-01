@@ -163,8 +163,8 @@ class PseudonymSession < Authlogic::Session::Base
         # a lot.  We want to use the SAME threshold we use for telling authlogic
         # to not bother incrementing the value to make sure we don't update
         # here if another process has already done so while we were waiting on the lock
-        time_clause = Pseudonym.arel_table[:last_request_at].lt(LAST_REQUEST_WINDOW.ago)
-        Pseudonym.where(id: r).where(time_clause).update_all(last_request_at: r.last_request_at)
+        Pseudonym.where(id: r, last_request_at: ...LAST_REQUEST_WINDOW.ago)
+                 .update_all(last_request_at: r.last_request_at)
       else
         r.save_without_transaction
       end
