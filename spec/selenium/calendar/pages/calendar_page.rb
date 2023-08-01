@@ -29,6 +29,10 @@ module CalendarPage
     "//*[@aria-label='Confirm Deletion']//button[.//*[. = 'Delete']]"
   end
 
+  def edit_event_modal_selector
+    "'[data-testid='calendar-event-form']'"
+  end
+
   def edit_event_title_input_selector
     "#edit_calendar_event_form #calendar_event_title"
   end
@@ -47,6 +51,10 @@ module CalendarPage
 
   def frequency_picker_selector
     "[data-testid='frequency-picker']"
+  end
+
+  def more_options_button_selector
+    "[data-testid='edit-calendar-event-more-options-button']"
   end
 
   def submit_button_selector
@@ -74,6 +82,10 @@ module CalendarPage
     f(edit_event_date_input_selector)
   end
 
+  def edit_event_modal
+    f(edit_event_modal_selector)
+  end
+
   def edit_event_title_input
     f(edit_event_title_input_selector)
   end
@@ -84,6 +96,10 @@ module CalendarPage
 
   def frequency_picker
     f(frequency_picker_selector)
+  end
+
+  def more_options_button
+    f(more_options_button_selector)
   end
 
   def submit_button
@@ -103,6 +119,10 @@ module CalendarPage
     delete_confirm_button.click
   end
 
+  def click_more_options_button
+    more_options_button.click
+  end
+
   def click_submit_button
     submit_button.click
     wait_for_ajaximations
@@ -111,6 +131,10 @@ module CalendarPage
   def create_new_calendar_event
     create_new_event_btn.click
     wait_for_ajaximations
+  end
+
+  def edit_event_modal_exists?
+    element_exists?(edit_event_modal_selector)
   end
 
   def enter_new_event_date(date_text)
