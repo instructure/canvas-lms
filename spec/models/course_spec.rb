@@ -168,7 +168,7 @@ describe Course do
       it "returns the grading scheme being used by the course, if one exists" do
         @course.save!
         standard = grading_standard_for(@course)
-        @course.update!(default_grading_standard: standard)
+        @course.update!(grading_standard: standard)
         expect(@course.grading_standard_or_default).to be standard
       end
 

@@ -604,7 +604,7 @@ describe GradebooksController do
                                                              data: GradingSchemesJsonController.to_grading_standard_data(data),
                                                              points_based: true,
                                                              scaling_factor: 4.0 })
-        @course.update!(default_grading_standard: grading_standard)
+        @course.update!(grading_standard:)
         all_grading_periods_id = 0
         get "grade_summary", params: { course_id: @course.id, id: @student.id, grading_period_id: all_grading_periods_id }
         expect(controller.js_env[:course_active_grading_scheme]).to eq({ "id" => grading_standard.id.to_s,
@@ -652,7 +652,7 @@ describe GradebooksController do
                                                              data: GradingSchemesJsonController.to_grading_standard_data(data),
                                                              points_based: true,
                                                              scaling_factor: 4.0 })
-        @course.update!(default_grading_standard: grading_standard)
+        @course.update!(grading_standard:)
         @course.reload
         grading_standard.destroy
         @course.reload
@@ -1238,24 +1238,15 @@ describe GradebooksController do
         end
       end
 
-      describe "default_grading_standard" do
-        it "uses the course's grading standard" do
-          grading_standard = grading_standard_for(@course)
-          @course.update!(default_grading_standard: grading_standard)
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options.fetch(:default_grading_standard)).to eq grading_standard.data
-        end
-
+      describe "grading_standard" do
         it "uses the Canvas default grading standard if the course does not have one" do
           get :show, params: { course_id: @course.id }
           expect(gradebook_options.fetch(:default_grading_standard)).to eq GradingStandard.default_grading_standard
         end
-      end
 
-      describe "grading_standard" do
         it "uses the course's grading standard" do
           grading_standard = grading_standard_for(@course)
-          @course.update!(default_grading_standard: grading_standard)
+          @course.update!(grading_standard:)
           get :show, params: { course_id: @course.id }
           expect(gradebook_options.fetch(:grading_standard)).to eq grading_standard.data
           expect(gradebook_options.fetch(:grading_standard_points_based)).to be false
@@ -1268,7 +1259,7 @@ describe GradebooksController do
           grading_standard.points_based = true
           grading_standard.scaling_factor = 4.0
           grading_standard.save
-          @course.update!(default_grading_standard: grading_standard)
+          @course.update!(grading_standard:)
           get :show, params: { course_id: @course.id }
           expect(gradebook_options.fetch(:grading_standard)).to eq grading_standard.data
           expect(gradebook_options.fetch(:grading_standard_points_based)).to be true

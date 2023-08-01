@@ -2787,4 +2787,104 @@ describe Account do
       end
     end
   end
+
+  context "account grading standards" do
+    before do
+      account_model
+    end
+
+    def example_grading_standard(context)
+      gs = GradingStandard.new(context:, workflow_state: "active")
+      gs.data = [["A", 0.9], ["B", 0.8], ["C", -0.7]]
+      gs.save(validate: false)
+      gs
+    end
+
+    describe "#grading_standard_enabled" do
+      it "returns false by default" do
+        expect(@account.grading_standard_enabled?).to be false
+      end
+
+      it "returns true when grading_standard is set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save!
+        expect(@account.grading_standard_enabled?).to be true
+      end
+
+      it "returns true if a parent account has a grading_standard" do
+        @account.grading_standard_id = example_grading_standard(@account).id
+        @account.save
+        @sub_account = @account.sub_accounts.create!
+
+        expect(@sub_account.grading_standard_enabled?).to be true
+      end
+
+      it "returns false if no parent account has a grading standard" do
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.grading_standard_enabled?).to be false
+      end
+
+      it "returns true if a deeply nested parent account has a grading_standard" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.grading_standard_enabled?).to be true
+      end
+    end
+
+    describe "#default_grading_standard" do
+      it "returns nil by default" do
+        expect(@account.default_grading_standard).to be_nil
+      end
+
+      it "returns the grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        expect(@account.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns the parent account's grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account = @account.sub_accounts.create!
+
+        expect(@sub_account.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns nil if no parent account has a grading standard" do
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to be_nil
+      end
+
+      it "returns a deeply nested parent account's grading_standard if set" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to eq @account.grading_standard
+      end
+
+      it "returns correct parent's grading standard in deeply nested accounts" do
+        @account.grading_standard = example_grading_standard(@account)
+        @account.save
+        @sub_account1 = @account.sub_accounts.create!
+        @sub_account1.grading_standard = example_grading_standard(@sub_account1)
+        @sub_account1.save
+        @sub_account2 = @sub_account1.sub_accounts.create!
+        @sub_account3 = @sub_account2.sub_accounts.create!
+
+        expect(@sub_account3.default_grading_standard).to eq @sub_account1.grading_standard
+      end
+    end
+  end
 end

@@ -126,6 +126,7 @@ class Account < ActiveRecord::Base
            class_name: "Lti::ResourceLink",
            dependent: :destroy
   belongs_to :course_template, class_name: "Course", inverse_of: :templated_accounts
+  belongs_to :grading_standard
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql, conds = [], []
@@ -2369,6 +2370,15 @@ class Account < ActiveRecord::Base
 
   def grading_standard_read_permission
     :read
+  end
+
+  def grading_standard_enabled
+    default_grading_standard.present?
+  end
+  alias_method :grading_standard_enabled?, :grading_standard_enabled
+
+  def default_grading_standard
+    account_chain.find(&:grading_standard_id)&.grading_standard
   end
 
   class << self

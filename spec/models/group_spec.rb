@@ -113,7 +113,7 @@ describe Group do
     context "when the Group belongs to a Course" do
       it "returns the grading scheme being used by the course, if one exists" do
         standard = grading_standard_for(@course)
-        @course.update!(default_grading_standard: standard)
+        @course.update!(grading_standard: standard)
         expect(@group.grading_standard_or_default).to be standard
       end
 
