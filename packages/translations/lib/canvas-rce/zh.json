@@ -749,6 +749,7 @@
   "select_crop_shape_d441feeb": { "message": "选择裁剪形状" },
   "select_language_7c93a900": { "message": "选择语言" },
   "select_video_source_1b5c9dbe": { "message": "选择视频来源" },
+  "selected_274ce24f": { "message": "选定的" },
   "selected_linkfilename_c093b1f2": { "message": "已选择 { linkFileName }" },
   "selection_b52c4c5e": { "message": "选择" },
   "set_header_scope_8c548f40": { "message": "设置标题范围" },

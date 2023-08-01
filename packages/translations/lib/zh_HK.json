@@ -1973,6 +1973,9 @@
     "select_video_source_1b5c9dbe": {
         "message": "選擇視訊資源"
     },
+    "selected_274ce24f": {
+        "message": "已選擇"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "已選定 { linkFileName }"
     },

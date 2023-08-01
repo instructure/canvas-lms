@@ -1973,6 +1973,9 @@
     "select_video_source_1b5c9dbe": {
         "message": "Dewiswch ffynonellau fideo"
     },
+    "selected_274ce24f": {
+        "message": "Wedi dewis"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Wedi dewis { linkFileName }"
     },
