@@ -349,6 +349,7 @@ de:
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
   account_administrators_can_always_create_courses_926dc0cb: "Kontoadministratoren können immer Kurse erstellen."
+  account_administrators_can_create_custom_status_la_e2a601bf: "Kontoadministrator\\*innen können benutzerdefinierte Statusbeschriftungen erstellen, die Lehrende in ihren Notenbüchern verwenden können. Diese benutzerdefinierten Statusbeschriftungen sind nicht mit Funktionen wie „fehlend“ oder „verspätet“ verbunden. Admins können auch die Standard-Statusbeschriftungen deaktivieren und verhindern, dass sie in der gesamten Instanz verwendet werden."
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Leistungszielmaßstäbe auf Konto- und Kursebene"
   account_and_course_level_outcome_proficiencies_1cfa260: "Konto- und Kursstufen-Kenntnisstände"
   account_and_subaccount_40c6430: "Konto und Unterkonto"
@@ -1629,7 +1630,7 @@ de:
         update_button: Aktualisieren
       report_last_run_never: Nie
       report_running: "Der Bericht wird erstellt.*Sie erhalten eine E-Mailbenachrichtigung, sobald der Bericht verfügbar ist.*"
-      rqd_help_message: "Wenn diese Einstellung aktiviert ist, schränkt sie die Ansicht der quantitativen (numerischen) Bewertungsdaten ein und begrenzt die Optionen zur Erstellung von Aufgaben für Lehrende. Die Benutzer\\*innen sehen nur qualitative Daten, d. h. Buchstabenbewertungen und Kommentare. Administrator\\*innen können diese Einstellung weiter anpassen, indem sie die Berechtigungen für Benutzerrollen anpassen."
+      rqd_help_message: "Wenn Sie diese Einstellung wählen, wird die Ansicht der quantitativen (numerischen) Bewertungsdaten neuer Kurse eingeschränkt. Studierende und Beobachter\\*innen sehen nur die qualitativen Daten, d. h. die Buchstabenbewertungen und Kommentare."
       rqd_screenreader: "Über die Einschränkung quantitativer Daten"
       select: 
         mfa: 
@@ -2252,6 +2253,7 @@ de:
   add_section_8b027a1c: "Abschnitt hinzufügen"
   add_set_of_grading_periods_5b4d6e51: "Set von Benotungszeiträumen hinzufügen"
   add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "SpeedGrader-Links zu den Indexansichten für Aufgaben und Quizze hinzufügen"
+  add_status_2df2bdd6: "Status hinzufügen"
   add_student_1152afc0: "Studierende\\*n hinzufügen"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Hinzufügen von Studierenden per Suche nach Name, Kursabschnitt oder Gruppe Navigieren Sie nach der Eingabe von Text in den Ergebnissen mithilfe der Pfeil-nach-unten-Taste. Durch Drücken der Eingabetaste wählen Sie ein Ergebnis aus."
   add_students_tas_and_observers_to_your_course_e84692dd: "Hinzufügen von Studenten, Assistenten und Beobachtern zu Ihrem Kurs"
@@ -2283,6 +2285,7 @@ de:
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Fügen Sie die ID des benutzerdefinierten Felds Ihrer Zendesk-Instanz für jedes folgende Feld hinzu (Felder, die keine IDs haben, werden nicht protokolliert):"
   added_caption_1895db92: "Beschriftung hinzugefügt"
   added_e8a39b2: Hinzugefügt
+  added_filtername_filter_ac7cee4b: "%{filterName} Filter hinzugefügt"
   added_mastery_level_dd4792d1: "Leistungszielstufe hinzugefügt"
   added_new_proficiency_rating_e30cab8a: "Neue Kompetenzeinstufung hinzugefügt"
   added_outcome_title_3c258a9: "Lernergebnis %{title} hingefügt"
@@ -2329,6 +2332,7 @@ de:
   adjust_final_grade_fa45e7e0: "Gesamtnote anpassen"
   adjusting_due_dates_a5918b9c: "Anpassen von Fälligkeitsdaten..."
   admin_4d3ba42f: Admin
+  admin_analytics_course_readiness_c79f13e1: "Admin Analytics – Kursbereitschaft"
   admin_analytics_description: "Ermöglicht Analytics auf Kontoebene. Admin-Dashboards für Analytics liefern Details zur Canvas-Nutzung, zum Erfolg von Canvas-Kursen und zum Engagement der Studierenden. Weitere Informationen finden Sie im *Admin Analytics Hub* in der Canvas-Community."
   admin_analytics_eacba735: "Admin Analytics"
   admin_analytics_new_filter_ui_aee1ea8e: "Admin Analytics – Neue Filter-Benutzeroberfläche"
@@ -2367,6 +2371,7 @@ de:
   afrikaans_da0fe6ee: Afrikaans
   after_48b9d69: "Nach ..."
   after_4c71e718: Nach
+  after_8db0c81c: nach
   after_completing_the_above_configuration_please_us_c6440d32: "Nach Abschluss der obigen Konfiguration, nutzen Sie bitte den folgenden Link, um Canvas Zugriff auf Ihren Microsoft-Mandanten zu gewähren:"
   after_date_981cd41b: "Nach %{date}"
   after_last_attempt_c9168da2: "Nach dem letzten Versuch"
@@ -2454,6 +2459,7 @@ de:
   all_day_fb42c4fc: "Den ganzen Tag"
   all_discussion_entries_report_c1e02906: "Bericht über alle Diskussionsbeiträge"
   all_events_6ae4331b: "Alle Ereignisse"
+  all_filters_have_been_cleared_7f38f765: "Alle Filter wurden gelöscht"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Sind Sie fertig?  Veröffentlichen Sie Ihren Kurs. Klicken Sie auf die Schaltfläche unten, um es offiziell zu machen. Nach der Veröffentlichung können die Benutzer\\*innen am Kurs teilnehmen."
   all_get_scopes_59a54304: "Alle GET-Geltungsbereiche"
   all_gradeable_student_submissions_report_d11ee705: "Bericht über alle benotbaren studentischen Abgaben"
@@ -5815,6 +5821,19 @@ de:
   calendar_a8563bb2: "Kalender:"
   calendar_automatically_appears_in_user_s_other_cal_ed9fc840: "Der Kalender erscheint automatisch in der Liste „Andere Kalender“ der Person."
   calendar_contextinfo_name_a7d98525: "Kalender %{contextInfo.name}"
+  calendar_custom_recurring_event_repeat_picker: 
+    single_and_plural_days: 
+      one: Tag
+      other: Tage
+    single_and_plural_months: 
+      one: Monat
+      other: Monate
+    single_and_plural_weeks: 
+      one: Woche
+      other: Wochen
+    single_and_plural_years: 
+      one: Jahr
+      other: Jahre
   calendar_d14cfc8f: Kalender
   calendar_event: 
     errors: 
@@ -5855,6 +5874,20 @@ de:
     ics_title: "%{course_or_group_name}-Kalender (Canvas)"
     invalid_date_or_time: "Datum oder Datum/Uhrzeit ungültig für %{attr}"
   calendar_feed_url_b7b91e7b: "Feed-URL für Kalender"
+  calendar_frequency_picker: 
+    annually: "Jährlich am %{date} %{month}"
+    custom: "Benutzerdefiniert ..."
+    daily: Täglich
+    every_weekday: "An jedem Werktag (Montag bis Freitag)"
+    first: erster
+    fourth: vierter
+    frequency: "Frequenz:"
+    last: letzter
+    monthly_last_day: "Monatlich am %{day} (%{weekNumber})"
+    not_repeat: "Wiederholt sich nicht"
+    second: zweiter
+    third: dritter
+    weekly_day: "Wöchentlich am %{day}"
   calendar_removed_1c841af4: "Kalender entfernt"
   calendar_series_e1b7a4bc: Kalenderserie
   calendar_subscription_options_1ff6f939: "Optionen für das Kalenderabonnement"
@@ -7922,6 +7955,10 @@ de:
     one: "1 Kontokalender ausgewählt"
     other: "%{count} Kontokalender ausgewählt"
     zero: "Keine Kontokalender ausgewählt"
+  count_address_book_results_loaded_a5dd044e: 
+    one: "1 Adressbuch-Ergebnis geladen"
+    other: "%{count} Adressbuch-Ergebnisse geladen"
+    zero: "Keine Adressbuchergebnisse gefunden"
   count_alignable_artifacts_7779644a: 
     one: "%{count} AUSRICHTUNGSFÄHIGES ARTEFAKT"
     other: "%{count} AUSRICHTUNGSFÄHIGE ARTEFAKTE"
@@ -7961,6 +7998,7 @@ de:
   count_comments_cb137ab8: 
     one: "1 Kommentar"
     other: "%{count} Kommentare"
+  count_conversation_messages_loaded_1a4811ff: "%{count} Konversationsnachrichten geladen"
   count_criteria_22927713: 
     one: "1 Kriterium"
     other: "%{count} Kriterien"
@@ -8326,6 +8364,7 @@ de:
   course_end_date_4c797823: "Enddatum des Kurses"
   course_end_date_on_after_a6bbb0b7: "Kursende am/nach dem"
   course_ends_at_e8b166df: "Kurs endet um"
+  course_ends_endat_d1b11465: "Kurs endet am %{endat}"
   course_enrollments_are_in_85eb1e6b: "Kurseinschreibungen sind in"
   course_export_from_date_f4e2a3e4: "*Kursexport von %{date}*"
   course_export_from_date_file_not_available_8a775e53: "Kursexport vom %{date} (Datei nicht verfügbar)"
@@ -9260,6 +9299,7 @@ de:
   create_a_new_module_6f31b0fe: "Ein neues Modul erstellen"
   create_a_new_user_for_address_7487e9c9: "Erstellen Sie eine/n neue/n Benutzer\\*in für „%{address}“."
   create_a_temporary_enrollment_167f05f1: "Temporäre Einschreibung erstellen"
+  create_a_temporary_enrollment_for_name_2c9828f7: "Erstellen Sie eine temporäre Einschreibung für %{name}"
   create_account_263ec6: "Konto erstellen"
   create_an_ba36d171: "Ein [...] erstellen"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Erstellen und Verwalten von Online-Quizzen und -Umfragen, benotet und unbenotet."
@@ -9535,7 +9575,11 @@ de:
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Im Hilfe-Dialog Popup mit einzuschliessende angepasste Links"
   custom_lti_usage_uwf_b63978a5: "Benutzerdefinierte LTI-Nutzung – UWF"
   custom_outcomes_31a741f5: "Benutzerdefinierte Lernergebnisse"
+  custom_recurrence_6b93143e: "Benutzerdefinierte Wiederholung"
   custom_reports_experimental_features_40bbfe7c: "Benutzerdefinierte Berichte: Experimentelle Funktionen"
+  custom_status_f9dbd33b: "Benutzerdefinierter Status"
+  custom_status_labels_for_submissions_and_final_gra_2ba56b7a: "Benutzerdefinierte Statusbeschriftungen für Abgaben und endgültige Noten"
+  custom_statuses_14038f1e: "Benutzerdefinierter Status"
   customize_configuration_69c22ef3: "Konfiguration anpassen"
   customize_course_details_26fd4afe: "Kursdetails anpassen"
   customize_help_link_62cd05eb: "Hilfe-Link anpassen"
@@ -9677,6 +9721,7 @@ de:
       - Oktober
       - November
       - Dezember
+  date_4e62ac59: Datum
   date_61419973: "Datum:"
   date_at_time_25a04cd2: "%{date} um %{time}"
   date_created_87e265bc: Erstellungsdatum
@@ -9757,6 +9802,7 @@ de:
       second: Sekunden
       year: Jahr
   day_9d999bec: Tag
+  day_of_month_49276955: "Tag des Monats"
   day_s_7cc1231f: Tag(e)
   days_af2ac87b: Tage
   days_late_a3a721b0: "Tage zu spät"
@@ -10991,6 +11037,7 @@ de:
   edited_date_b0455372: "(Geändert) %{date}"
   edited_editedtimingdisplay_85d8f1db: "%{editedTimingDisplay} geändert"
   edited_editedtimingdisplay_8788890e: ", geändert am %{editedTimingDisplay}"
+  editing_an_announcement_will_create_a_notification_cbb5377a: "Wenn Sie eine Ankündigung bearbeiten, wird eine Benachrichtigung im Benutzer-Dashboard und im Kursaktivitäts-Stream erstellt. Wenn Sie möchten, dass Benutzer\\*innen die bearbeitete Ankündigung über ihre Benachrichtigungseinstellungen erhalten, müssen Sie eine neue Ankündigung erstellen."
   editing_permissions_for_name_3503e235: "Änderungsberechtigungen für: %{name}"
   editor: 
     alt_text: "Alternativtext:"
@@ -11210,6 +11257,9 @@ de:
     assignment_order_alpha: Alphabetisch
     assignment_order_assignment_groups: "Nach Aufgabengruppe und Position"
     assignment_order_due_date: "Nach Abgabefrist"
+    invalid_group_warning: 
+      one: "Hinweis: Die Punktzahl enthält keine Aufgaben aus der Gruppe %{list_of_group_names}, da für diese keine Punkte möglich sind."
+      other: "Hinweis: Die Punktzahl enthält keine Aufgaben aus den Gruppen %{list_of_group_names}, da für diese keine Punkte möglich sind."
     notes: Anmerkungen
   enhanced_individual_gradebook_4e825077: "Erweitertes individuelles Notenbuch"
   enhanced_rce_paste_from_clipboard_30ddb011: "Verbessertes RCE-Einfügen aus der Zwischenablage"
@@ -11361,11 +11411,14 @@ de:
                           Erfahren Sie, wie Sie **ein Zugriffstoken** generieren.
   enter_the_access_token_for_your_organization_from__cc77493d: "Geben Sie das Zugangs-Token für Ihre Organisation aus *eduappcenter.com* ein. Einmal übernommen, werden nur Apps auf der Seite „Externe Apps“ aufgeführt, die von Ihrer Organisation im EduAppCenter genehmigt wurden. Erfahren Sie hier, wie man ein **Zugangs-Token erzeugt**."
   enter_the_access_token_for_your_organization_from__f1c71941: "Geben Sie den Zugangs-Token für Ihre Organisation von                       *eduappcenter.com* ein. Einmal angewendet, werden nur Apps auf der Seite „Externen Apps“ angezeigt, die Ihre Organisation in                        EduAppCenter genehmigt hat.                       Hier erfahren Sie, wie Sie **ein Zugangs-Token erzeugen**."
+  enter_the_email_address_of_the_user_you_would_like_92112560: "Geben Sie die E-Mail-Adresse des/der Benutzer\\*in ein, den/die Sie vorübergehend einschreiben möchten."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Geben Sie die E-Mail-Adressen der hinzuzufügenden Benutzer durch Kommas getrennt ein."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Geben Sie die E-Mail-Adressen der hinzuzufügenden Benutzer\\*innen durch Kommas oder Zeilenwechsel getrennt ein."
   enter_the_grade_41d5c97d: "Note eingeben"
+  enter_the_login_id_of_the_user_you_would_like_to_t_46938400: "Geben Sie die Login-ID des/der Benutzer\\*in ein, den/die Sie vorübergehend einschreiben möchten"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Geben Sie die Anmelde-IDs der hinzuzufügenden Benutzer\\*innen durch Kommas oder Zeilenwechsel getrennt ein."
   enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "Geben Sie die Anmelde-IDs der hinzuzufügenden Benutzer durch Kommas getrennt ein."
+  enter_the_sis_id_of_the_user_you_would_like_to_tem_efab1e87: "Geben Sie die SIS-ID des/der Benutzers\\*in ein, den/die Sie vorübergehend einschreiben möchten"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "Geben Sie die SIS-IDs der hinzuzufügenden Benutzer durch Kommas getrennt ein."
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Geben Sie die SIS-IDs der hinzuzufügenden Benutzer\\*innen durch Kommas oder Zeilenwechsel getrennt ein."
   enter_url_e8bb8a33: "URL eingeben"
@@ -11800,6 +11853,7 @@ de:
   event_update_failed_b6116651: "Ereignisaktualisierung fehlgeschlagen"
   everthing_updated_after_start_date_f3be8ba: "Alles aktualisiert nach dem Startdatum"
   every_665d821e: Jede/r/s
+  every_a79cad1a: jede
   every_count_days_times_times_6271ab22: 
     one: "Täglich %{times}-mal"
     other: "Alle %{count} Tage %{times}-mal"
@@ -11861,8 +11915,8 @@ de:
     one: "Jährlich an den ersten %{days} im %{month} bis %{until}"
     other: "Alle %{count} Jahre an den ersten %{days} im %{month} bis %{until}"
   every_count_years_on_the_ord_days_of_month_times_t_59e822d0: 
-    one: "Jährlich an den %{ord} %{days} im %{month} %{times}-mal"
-    other: "Alle %{count} Jahre an den %{ord} %{days} im %{month} %{times}-mal"
+    one: "Jährlich – %{ord} %{days} im %{month}, %{times} mal"
+    other: "Alle %{count} Jahre – %{ord} %{days} im %{month}, %{times} mal"
   every_count_years_on_the_ord_days_of_month_until_u_3eb2883d: 
     one: "Jährlich an den %{ord} %{days} im %{month} bis %{until}"
     other: "Alle %{count} Jahre an den %{ord} %{days} im %{month} bis %{until}"
@@ -11890,6 +11944,8 @@ de:
   exceeded_the_maximum_length_number_characters_2d25611e: "Die Höchstlänge (%{number} Zeichen) wurde überschritten."
   exceeds_expectations_5910fc3a: "Übertrifft die Erwartungen"
   exceeds_mastery_1f995dce: "Übertrifft Leistungsziel"
+  exceeds_max_events_28f19b04: "Überschreitet %{max} Ereignisse."
+  exceeds_max_occurrences_limit_98f47533: "Überschreitet Grenze von %{max} Vorkommen"
   excel_file_c6b9890: Excel-Datei
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior Studierendenaktivitätsverfolgung"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Sämtliche Daten ausschließen, die seit dem vorgegebenen Datum nicht aktualisiert wurden"
@@ -12320,6 +12376,7 @@ de:
   field_cannot_be_blank_afb5b332: "Feld darf nicht leer sein."
   field_must_be_either_active_or_deleted_329a42a: "„%{field}“ muss entweder „%{active}“ oder „%{deleted}“ sein."
   field_name_31fff38e: Feldname
+  fifth_d6eaa92e: fünfter
   file_6863ad33: Datei
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Eine Anfrage an unser Supportteam senden"
   file_already_exists_bdc61895: "Datei existiert bereits"
@@ -12527,6 +12584,7 @@ de:
     titles: 
       bookmark_search: "Lesezeichensuche: %{service_name}"
   find_8d605019: Suchen
+  find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "Finden Sie eine zugewiesenen Person für temporäre Registrierungen von %{name}"
   find_an_existing_grading_scheme_d836ea: "Ein vorhandenes Benotungssystem suchen"
   find_an_outcome_919328e6: "Ein Lernergebnis suchen"
   find_appointment_85d6922e: "Termin finden"
@@ -12547,6 +12605,7 @@ de:
   find_outcome_746cc57e: "Lernergebnis suchen"
   find_questions_4930b38f: "Fragen suchen"
   find_training_resources_and_more_help_f148612c: "Schulungsressourcen suchen sowie weitere Hilfen"
+  find_user_by_f35cd8ca: "Benutzer\\*in suchen nach"
   find_your_canvas_institution_45af99af: "Suchen Sie Ihre %{canvas}-Institution"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Klassen oder Themen auf dem Dashboard finden ..."
   finding_matched_jobs_f7cd0e6d: "Passende Jobs finden"
@@ -12558,6 +12617,7 @@ de:
   finland_358_abeffc8a: "Finnland (+358)"
   finnish_4df2923d: Finnisch
   first_5744470e: Erste
+  first_9685680a: erster
   first_last_name_9820d256: "Vorname, Nachname"
   first_name_d5c12500: Vorname
   first_reviewer_9ea05caa: "Erster Prüfer"
@@ -12645,10 +12705,12 @@ de:
   found_count_unresponsive_links_d1791380: 
     one: "1 nicht funktionierenden Link gefunden"
     other: "%{count} nicht funktionierende Links gefunden"
+  fourth_ecf2ca5c: vierter
   france_33_90b595d7: "Frankreich (+33)"
   france_c25bfeae: Frankreich
   french_33881544: Französisch
   french_canada_c3d92fa6: "Französisch (Kanada)"
+  frequency_87077a39: Frequenz
   frequently_used_21a3eb8e: "Häufig verwendet"
   fri_e2451e74: Fr
   friday_2c4f6d5a: Freitag
@@ -14766,6 +14828,7 @@ de:
       Statt des allgemeinen Codes „404 Not Found“ gibt die API stattdessen den Code „422“
       zurück, zusammen mit einer hilfreichen Meldung, die besagt, dass das Tool nicht auf abgeschlossene
       Kurse zugreifen kann.
+  if_enabled_the_course_import_page_will_use_instui__84bad313: "Wenn diese Option aktiviert ist, verwendet die Kursimportseite die InstUI-Komponenten"
   if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
       Wenn diese Option aktiviert ist, sendet die Deep Linking Response JS postMessages
        an window.parent statt an window.top. Dies ermöglicht es der Deep Linking-Antwort,
@@ -15311,11 +15374,11 @@ de:
       enter_search_terms: "Suchbegriffe eingeben"
   instructure_default_73317bb1: Instructure-Standard
   instructure_default_old_66ef6e9b: "Instructure-Standard (Alt)"
-  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in Europa. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Deutschland gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
-  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. im asiatisch-pazifischen Raum. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Singapur gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
-  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in der USA. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in den USA gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
-  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in Kanada. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Kanada gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
-  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in Australien. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Australien gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_9a57f249: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in Europa. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Deutschland gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_b0897e53: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. im asiatisch-pazifischen Raum. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Singapur gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_cd2fc75d: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in der USA. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in den USA gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_d4d9085f: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in Kanada. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Kanada gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
+  instructure_hosts_canvas_commons_in_the_region_cho_ec929265: "Instructure hostet Canvas Commons in der von Ihrer Institution gewählten Region, d. h. in Australien. Das heißt, wenn Sie Canvas Commons nutzen, werden Ihre persönlichen Daten in Australien gespeichert und verarbeitet. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
   instructure_inline_media_comment: 
     alerts: 
       kaltura_disabled: "Kaltura wurde für diese Canvas-Website deaktiviert"
@@ -15642,6 +15705,7 @@ de:
   jwk_method_6d5d0c84: "* JWK-Methode"
   jwts_4f397c85: JWTs
   k12_description: "Machen Sie die Symbole im Menü „Globale Navigation“ sprechender, besonders für eine K-12-Umgebung."
+  k20_course_readiness_description: "Aktiviert das neue Dashboard „Admin Analytics Kursbereitschaft“"
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kasachstan (+7)"
   keep_8f3e7c16: Halten
@@ -15687,6 +15751,7 @@ de:
   large_course_db3d58b: "Großer Kurs:"
   last_7_days_bd411f1f: "Die letzten 7 Tage"
   last_activity_a983e541: "Letzte Aktivität"
+  last_ae273283: letzter
   last_assessment_cd5659b6: "Letzte Bewertung: "
   last_attempt_7258ebd7: "Letzter Versuch"
   last_bounced_after_76f9ce30: "Zuletzt zurückgesendet nach"
@@ -15815,6 +15880,7 @@ de:
   learning_mastery_6ed4fd63: "Leistungsziel ..."
   learning_mastery_context_name_a0b70957: "Lernleistungsziel – %{context_name}"
   learning_mastery_grade_book_59c90e6a: Lernleistungsziel-Notenbuch
+  learning_mastery_gradebook_72097130: Lernleistungsziel-Notenbuch
   learning_mastery_gradebook_description: |-
       Das Lernleistungsziel-Notenbuch bietet eine Möglichkeit für Lehrende, schnell 
       Fortschritte von Studierenden und Kursen bei den Kurs-Lernergebnissen anzuzeigen. Die Ergebnisse werden in einem notenbuchähnlichen
@@ -16073,6 +16139,8 @@ de:
   loading_accounts_a7606249: "Konten werden geladen"
   loading_additional_items_ed5f672d: "Zusätzliche Elemente werden geladen ..."
   loading_additional_todo_details_acba0cf2: "Zusätzliche Todo-Details werden geladen"
+  loading_address_book_results_e86f2d3: "Laden von Adressbuchergebnissen"
+  loading_address_book_results_for_term_10c406cf: "Laden von Adressbuchergebnissen für %{term}"
   loading_announcement_content_4405470f: "Ankündigungsinhalt wird geladen"
   loading_announcement_title_b8fc3057: "Ankündigungstitel wird geladen"
   loading_announcements_b927a86c: "Ankündigungen laden"
@@ -16127,6 +16195,7 @@ de:
   loading_important_date_2d3a29ce: "Wichtiges Datum laden"
   loading_important_date_details_1b2d2b85: "Details zu wichtigem Datum laden"
   loading_important_info_217bf805: "Wichtige Informationen werden geladen"
+  loading_inbox_conversations_27e200f3: "Laden von Posteingangskonversationen"
   loading_job_cluster_info_f3d15dec: "Info zum Job-Cluster wird geladen"
   loading_jobs_12f0609d: "Jobs werden geladen ..."
   loading_last_attended_date_5a42463: "Letztes Anwesenheitsdatum laden"
@@ -18966,6 +19035,7 @@ de:
   monday_432ff613: Montag
   month_s_5c17590e: Monat(e)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} beginnt um %{time}"
+  months_afdf2830: Monate
   moodle_dropdown_many_warning_title: "Dieser Fragenpool enthält %{count} Fragen mit mehreren Dropdowns, die möglicherweise falsch importiert wurden."
   moodle_dropdown_warning_title: "Möglicherweise wurden Fragen mit mehreren Dropdowns falsch importiert."
   moodle_formula_many_warning_title: "Dieser Fragenpool enthält %{count} Formelfragen, deren mögliche Antworten neu generiert werden müssen."
@@ -19091,11 +19161,13 @@ de:
   must_be_a_number_e1dfe68a: "Muss eine Zahl sein"
   must_be_a_number_f6e09df7: "muss eine Zahl sein"
   must_be_a_valid_number_59f0069: "Muss eine gültige Zahl sein"
+  must_be_a_whole_number_887d8c51: "Muss eine ganze Zahl sein"
   must_be_after_start_date_95e251a3: "muss nach dem Beginndatum liegen"
   must_be_at_least_one_group_per_section_there_are_c_8e8b58e4: "Muss mindestens eine Gruppe pro Abschnitt enthalten. Es gibt %{count} Abschnitte."
   must_be_between_1_and_10_e99eb0d1: "muss zwischen 1 und 10 liegen"
   must_be_between_1_and_5_3b42aca1: "muss zwischen 1 und 5 liegen"
   must_be_between_1_and_99_589b827d: "muss zwischen 1 und 99 liegen"
+  must_be_between_1_and_max_4dc36a5a: "Muss zwischen 1 und %{max} liegen"
   must_be_between_availability_dates_ceaca984: "muss innerhalb der Verfügbarkeitsdaten liegen"
   must_be_between_lower_and_upper_1f501b2a: "Muss zwischen %{lower} und %{upper} liegen."
   must_be_length_characters_or_less_8c24db67: "Darf maximal %{length} Zeichen lang sein"
@@ -19109,6 +19181,7 @@ de:
   must_either_enter_a_start_and_end_date_or_check_th_ddfbbca: "Muss entweder ein Start- und Enddatum eingeben oder das Kontrollkästchen „Letzte 7 Tage“ aktivieren"
   must_have_at_least_1_grader_d4a54e85: "Benötigt mindestens 1 Benoter"
   must_have_at_least_1_group_per_section_9809e708: "Muss mindestens 1 Gruppe pro Abschnitt haben"
+  must_have_at_least_1_occurrence_492eace8: "Muss mindestens 1 Mal vorkommen"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Für Zuweisungen nach Abschnitt muss es mindestens so viele Gruppen wie Abschnitte geben."
   must_have_at_least_one_placement_defined_1bc586c6: "Erfordert mindestens eine Platzierung."
   must_have_at_least_one_redirect_uri_defined_bb236d38: "Erfordert die Definition von mindestens einer redirect_uri"
@@ -19244,6 +19317,7 @@ de:
   netherlands_31_63e4f1b9: "Niederlande (+31)"
   never_1ed1244d: nie
   never_df100b49: Nie
+  never_should_have_made_it_here_ab72bdab: "Hätte es nie hierher schaffen sollen"
   new_13daf639: Neu
   new_account_role_6e5c4964: "Neue Kontorolle"
   new_analytics_api_access_7eec1ead: "Neuer Analytics API-Zugang"
@@ -19429,6 +19503,7 @@ de:
   no_content_not_visible_to_students_905f8996: "Kein Inhalt. Für Studierende nicht sichtbar."
   no_content_not_visible_to_students_b59f4867: "Kein Inhalt. Für Studierende\\*n nicht sichtbar"
   no_context_found_for_the_following_context_code_co_a2f6a1a7: "Kein Kontext für den folgenden Kontextcode gefunden: %{context_code}"
+  no_conversation_messages_loaded_96b537f: "Keine Konversationsnachrichten geladen"
   no_conversations_selected_ebcd9226: "Keine Konversation ausgewählt"
   no_conversations_to_show_9ecbac62: "Keine Konversation anzuzeigen"
   no_courses_favorited_4e69fd63: "Keine Kurse favorisiert"
@@ -20063,6 +20138,8 @@ de:
   observing_student_name_to_select_a_different_stude_e0466126: "Beobachten von %{student_name} Um einen anderen Studierenden auszuwählen, kehren Sie zum Dashboard zurück."
   observing_user_name_1a64e47b: "Beobachten: %{user_name}"
   occurrence_s_c12d1aad: Vorfall/Vorfälle
+  occurrences_9710160a: Vorkommen
+  occurrences_max_max_3201dec: "Vorkommnisse (max. %{max})"
   october_6b2bf82: Oktober
   of_grade_984aa550: "% der Note"
   of_students_5d1af0d2: "# der Studierenden"
@@ -20098,12 +20175,21 @@ de:
       sort: s
   olive_6a3e4d6b: Olive
   oman_968_46f8d901: "Oman (+968)"
+  on_1af5b447: ein
   on_8f7190e5: Ein
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "Bei Kurse mit aktivierten Nutzungsrechten erzwingen die Nutzungsrechte das Auswählen von Dateianhängen zum Diskussionsthema"
+  on_date_30c2c814: "am %{date}"
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "Der Endpunkt für LTI 1.3 OIDC Auth wird am %{date} von https://canvas.instructure.com/api/lti/authorize_redirect auf https://sso.canvaslms.com/api/lti/authorize_redirect geändert. Die Gründe und der Umfang dieser Änderung werden in *diesem Artikel der Canvas-Community* ausführlich erläutert. Weitere Informationen finden Sie in unseren API-Dokumenten. Diese Änderung ist geringfügig, erfordert jedoch eine Konfigurationsänderung auf der Toolseite für jedes LTI 1.3-Tool, das in Canvas installiert ist."
   on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "Ab dem %{date} wird die Spezifikation für LTI 1.3 Platform Storage vollständig von Canvas unterstützt. Tools, die dies implementieren möchten, müssen den OIDC Auth-Endpunkt, den sie für Canvas speichern, von *https://canvas.instructure.com/api/lti/authorize_redirect* auf *https://sso.canvaslms.com/api/lti/authorize_redirect* ändern. Der für neue 1.3-Tool-Installationen empfohlene OIDC-Auth-Endpunkt wird sich ebenfalls an diesem Tag ändern. Wir empfehlen für alle 1.3-Tools, ihre Konfiguration so schnell wie möglich auf diesen neuen Endpunkt umzustellen."
+  on_day_date_c2871702: "am Tag %{date}"
   on_for_key_keyname_bbac4e1b: "Schlüssel auf „An“: %{keyName}"
   on_paper_46d0ba36: "Als Papierdokument"
+  on_the_fifth_dayname_cc0078f6: "am fünften %{dayname}"
+  on_the_first_dayname_c77f6da4: "am ersten %{dayname}"
+  on_the_fourth_dayname_75865f4f: "am vierten %{dayname}"
+  on_the_last_dayname_f269503: "am letzten %{dayname}"
+  on_the_second_dayname_5e481a65: "am zweiten %{dayname}"
+  on_the_third_dayname_e7079e49: "am dritten %{dayname}"
   on_time_17ca5ad9: Rechtzeitig
   on_time_percent_eebffe38: "Rechtzeitig: %{percent}"
   on_whitelist_will_only_be_the_domains_which_have_b_c4c3a861: "An – Whitelist sind nur die Domänen, die ausdrücklich zu diesem Konto hinzugefügt wurden."
@@ -20173,6 +20259,7 @@ de:
   open_conversation_a6590865: "Gespräch eröffnen"
   open_conversation_subject_1dd2d3c: "Konversation %{subject} öffnen"
   open_discussion_title_for_comments_6baa3fa: "Diskussion %{title} für Kommentare öffnen"
+  open_edit_status_dialog_ca956b8: "Dialog „Status bearbeiten“ öffnen"
   open_emoji_menu_1df0eb0b: "Emoji-Menü öffnen"
   open_event_menu_e9a21e39: "Ereignismenü öffnen"
   open_event_menu_for_783510e3: "Ereignismenü öffnen für"
@@ -20820,6 +20907,7 @@ de:
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Hinweis: Instructure hostet Canvas Commons in den USA. Das bedeutet, dass bei der Nutzung von Canvas Commons Ihre personenbezogenen Daten in den USA gespeichert und verarbeitet werden. Zu diesen persönlichen Datenelementen gehören: Name, E-Mail-Adresse, Canvas-Benutzer-ID, Canvas-Anmeldename, Canvas-Avatar, IP-Adresse, von Ihnen favorisierte Canvas Commons-Ressourcen und Kommentare, die Sie zu Ressourcen in Canvas Commons abgeben. Weitere Informationen zu den Datenschutzpraktiken von Instructure finden Sie [hier](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Bitte beachten Sie, dass nach der Einrichtung eines Kursrhythmus alle bestehenden Aufgaben, Quizze, Diskussionen und Fälligkeitstermine durch das Kurstempo gesteuert werden. Weitere Einzelheiten finden Sie in der *Benutzergruppe zum Kurstempo*."
   please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Bitte beachten Sie, dass alle Fälligkeitstermine für bestehende Bewertungen und Lernmaterialien vom Kurstempo gesteuert werden, sobald ein Kurstempo gespeichert wurde. Weitere Informationen zum Kurstempo finden Sie in der *Kurstempo-Benutzergruppe*."
+  please_pick_an_earlier_date_98ba37e5: "Bitte wählen Sie ein früheres Datum"
   please_provide_a_field_e5a7d0b3: "Bitte ein%{field} bereitstellen"
   please_provide_a_pairing_code_530d1e9d: "Bitte geben Sie einen Verbindungscode ein."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Geben Sie bitte eine gültige Mandantendomäne an. Überprüfen Sie die Einstellungen Ihres Azure Active Directory, um sie zu finden."
@@ -23911,6 +23999,7 @@ de:
   removed_assignment_assignment_name_835cc776: "Aufgabe %{assignment_name} entfernt"
   removed_course_association_course_a233342c: "Entfernte Kurszugehörigkeit %{course}"
   removed_filename_a8634af3: "%{filename} entfernt"
+  removed_filtername_filter_c3cb4576: "Filter %{filterName} entfernt"
   removed_user_as_group_leader_bb69330f: "%{user} wurde als Gruppenleitung entfernt."
   removing_pace_9493910c: "Schritt wird entfernt ..."
   rename_45608f54: Umbenennen
@@ -23930,6 +24019,7 @@ de:
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Erstellen Sie beide Aufgabenlisten für Lehrende mit Anmeldungen von Studierenden."
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Erstellt im Dashboard der Seitenleiste beide Aufgabenlisten für Lehrende mit Anmeldungen von Studierenden."
   reorders_some_menu_options_for_more_consistency_an_90efff07: "Ordnet einige Menüoptionen für mehr Konsistenz neu an und fügt einen Link zu SpeedGrader hinzu."
+  repeat_every_e653d6d0: "Wiederholen Sie alle:"
   repeats_on_61ecde30: "Wiederholt sich bei:"
   replace_attachmentdisplayname_button_94dd8ba1: "Schaltfläche %{attachmentDisplayName} ersetzen"
   replace_e61834a7: Ersetzen
@@ -24702,6 +24792,7 @@ de:
   search_within_outcome_group_7ac6ac88: "Innerhalb der Lernzielgruppe suchen"
   searching_b0207e7f: "Wird gesucht"
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Suchen Ankündigungen in den Abschnitten muss span genau einen Kurs"
+  second_2d4ecf45: zweiter
   second_reviewer_90046c68: "Zweiter Prüfer"
   secondary_button_36a86f03: "Sekundäre Schaltfläche"
   secondary_button_text_e92b3e52: "Text für sekundäre Schaltfläche"
@@ -25951,6 +26042,7 @@ de:
   short_name_42f454a1: Kurzname
   short_name_ad9bf84f: Kurzbezeichnung
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "sollte offensichtlich sein, die Canvas-ID des berichtenden Anwenders"
+  should_not_have_gotten_here_2d75f28a: "Sollte nicht hierher gekommen sein"
   show_76c0ed1c: Zeigen
   show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Zeigen Sie ein Kontrollkästchen an, mit dem ein Konten-Admin optional Kurse
@@ -26434,6 +26526,7 @@ de:
   sso_settings_ebf98263: SSO-Einstellungen
   stable_features_84154e5d: "Stabile Funktionen"
   staff_contact_info_2f7a6603: Mitarbeiterkontakt-Info
+  standard_statuses_76e35e3c: Standard-Status
   star_2d27c137: "Mit einem Sternchen versehen"
   star_8d156e09: "Mit Stern markieren"
   star_conversation_2e2ba614: "Konversation mit Stern markieren"
@@ -26642,6 +26735,7 @@ de:
   student_settings_354d9a7e: Studierendeneinstellungen
   student_sis_6721040e: "Studierende\\*r SIS"
   student_sis_d9f0cd39: "SIS für Studierende\\*n"
+  student_sis_id: Studierenden-SIS-ID
   student_sis_id_abe6b292: "SIS-ID für Studierende\\*n"
   student_student_number_5c98bd2d: "Studierende\\*r %{student_number}"
   student_studentnumber_f398d9c2: "Studierende\\*r %{studentNumber}"
@@ -27219,6 +27313,7 @@ de:
   tea_provisional_graders_d4f19c26: "TEA Provisorische Benoter"
   tea_quiz_submission_answers_b8b90be3: "Antworten auf die Abgabe von TEA-Quiz"
   teacher_5a73b637: Lehrende\*r
+  teacher_activity_report_abf49a06: Lehrendenaktivitätsbericht
   teacher_count_teachers_a92f7199: "%{teacher_count} Lehrende"
   teacher_dashboard_custom_report_6d20bef2: "Lehrende\\*r benutzerdefinierter Dashboard-Bericht"
   teacher_engagement_report_ec03613d: "Lehrende Einsatzbericht"
@@ -27326,6 +27421,51 @@ de:
       timespan: "Von %{start_at} *bis* %{end_at}"
   terms_35d91184: "Semester: "
   terms_4d979628: Semester
+  terms_api: 
+    index: 
+      page_title: "%{account} Semester"
+      terms_add_new: "Neues Semester hinzufügen"
+      terms_no_results: "Keine Semester gefunden"
+      terms_no_results_name: "Keine Semester mit dem Namen „%{name}“ gefunden"
+      terms_search_name: "Suche nach dem Namen des Semesters"
+      terms_view_all: "Alle Semester anzeigen"
+      titles: 
+        term_details: "Details des Semesters"
+    term: 
+      buttons: 
+        add: "Semester hinzufügen"
+        update: "Semester aktualisieren"
+      course_count: 
+        one: "1 Kurs"
+        other: "%{count} Kurse"
+      labels: 
+        designers_can_access_from: "**Entwickler** haben Zugriff aus"
+        grading_period_set_title: Benotungszeitraum-Set
+        sis_id: SIS-ID
+        students_can_access_from: "**Studierende** haben Zugriff aus"
+        tas_can_access_from: "**Lehrassistenten** haben Zugriff aus"
+        teachers_can_access_from: "**Lehrende** haben Zugriff aus"
+      name: "Name des Semesters:"
+      sis_source_id: "SIS-ID:"
+      term_runs_from: "**Das Semester läuft** von"
+      titles: 
+        term_ends: "Das Semester endet"
+        term_starts: "Das Semester beginnt"
+      tooltips: 
+        term_ends_designers: "Für Designer endet das Semester am"
+        term_ends_students: "Für Studierende endet die Semester"
+        term_ends_tas: "Für Lehrassistenten endet das Semester"
+        term_ends_teachers: "Für Lehrende endet das Semester"
+        term_starts_designers: "Für Designer beginnt das Semester"
+        term_starts_students: "Für Studierende beginnt das Semester"
+        term_starts_tas: "Für Lehrassistenten beginnt das Semester"
+        term_starts_teachers: "Für Lehrende beginnt das Semester"
+    timespan: 
+      date: 
+        term_end: "Ende des Semesters"
+        term_start: "Beginn des Semesters"
+        unspecified: jederzeit
+      timespan: "Von %{start_at} *bis* %{end_at}"
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Begriffe nicht gefunden Die Begriffe müssen enthalten sein in multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Attribute der Nutzungsbedingungen nicht gültig"
   terms_of_service_bedefcaf: Nutzungsbedingungen
@@ -27684,6 +27824,7 @@ de:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Die eindeutige ID des spezifischen Anfrage/Antwort-Zyklus verwendet wird, in dessen Zusammenhang dieser Fehlerbericht stattfand"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "Der URL, den ein/e ausreichend berechtigte/r Benutzer\\*in verwenden konnte, um sich als der/die berichtende Benutzer\\*in auf derselben Seite auszugeben und das Problem zu melden und zu reproduzieren"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Der URL der Seite, auf der der/die Benutzer\\*in war, als er/sie den Fehler meldete"
+  the_user_found_matches_the_source_user_please_sear_a1d0004f: "Der gefundene Benutzer\\*in stimmt mit dem Quellbenutzer überein. Bitte suchen Sie nach einer anderen Person."
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "Die user_id(s) des/r Admin(s), der Abgaben macht"
   the_user_id_to_report_on_b1de2577: "Die Benutzer-ID, über die zu berichten ist"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Der Benutzer muss auch als Lehrer in den Kursen angemeldet sein, die sie über Kreuz listen wollen."
@@ -27794,6 +27935,7 @@ de:
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "Beim Starten des konfigurierten Tools ist ein Fehler aufgetreten."
   there_was_an_error_linking_pace_7d2bb508: "Beim Verknüpfen des Tempos ist ein Fehler aufgetreten."
   there_was_an_error_linking_plan_6f316070: "Bei der Planverknüpfung gab es einen Fehler."
+  there_was_an_error_loading_the_custom_recurrence_e_df9ad737: "Fehler beim Laden des Editors für benutzerdefnierte Wiederholungen"
   there_was_an_error_loading_the_document_d80e57e0: "Beim Laden des Dokuments ist ein Fehler aufgetreten."
   there_was_an_error_loading_the_pace_810e3a7e: "Beim Laden des Tempos ist ein Fehler aufgetreten."
   there_was_an_error_loading_the_plan_9314ef06: "Beim Laden des Plans gab es einen Fehler."
@@ -27877,6 +28019,7 @@ de:
   they_them_d6125799: sie/ihnen
   they_them_f4d17a04: Sie/Ihnen
   they_were_merged_into_other_user_64758f01: "Sie wurden mit *%{other_user}* zusammengeführt."
+  third_20c6a639: dritter
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Bei diesem Konto darf die Synchronisierung für Microsoft-Teams nicht aktiviert werden. Bitte aktivieren Sie vor der Bearbeitung der Einstellungen das Flag der Funktion „Synchronisieren von Gruppenanmeldungen mit Microsoft“."
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Bei diesem Konto darf die Synchronisierung von Microsoft-Teams nicht aktiviert werden. Bitte aktivieren Sie vor der Bearbeitung der Einstellungen das Flag der Funktion „Synchronisieren von Gruppenanmeldungen mit Microsoft“."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Diese Funktion wurde vom Administrator deaktiviert."
@@ -28253,6 +28396,7 @@ de:
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Diese/r Benutzer\\*in hat die Einladung zum Kurs noch nicht angenommen."
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Diese/r Benutzer\\*in kann derzeit nicht auf den Kurs zugreifen."
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "„Dieser Benutzer kann derzeit nicht auf den Kurs zugreifen.“"
+  this_user_is_ready_to_be_assigned_temporary_enroll_a83b1ae0: "Diesem/dieser Benutzer\\*in können temporäre Einschreibungen zugewiesen werden."
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Dieser Benutzer ausgeführte Aktionen während anonyme war ausgeschaltet"
   this_user_s_last_activity_in_the_course_was_dateti_74d3ac3b: "Die letzte Aktivität dieses Benutzers bzw. dieser Benutzerin in diesem Kurs war %{datetime}"
   this_user_will_be_created_in_3b2a2b52: "Diese/r Benutzer\\*in wird eingerichtet in:"
@@ -29575,6 +29719,7 @@ de:
   until_date_949017c4: "bis %{date}"
   until_date_must_be_after_the_available_date_8670dfcd: "Das Enddatum muss nach dem Datum der Verfügbarkeit liegen."
   until_date_must_be_after_the_due_date_d961566c: "Das Enddatum muss nach dem Fälligkeitsdatum liegen."
+  until_date_must_be_after_the_event_start_date_972f759d: "Bis-Datum muss nach dem Startdatum des Ereignisses liegen"
   until_fccd159a: "Bis:"
   untitled_16aa4f2b: "Ohne Titel"
   untitled_assignment_59354b34: "Aufgabe ohne Titel"
@@ -29734,6 +29879,7 @@ de:
   use_high_contrast_ui_a5917282: "Verwenden Sie hohen Kontrast für die Benutzeroberfläche"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Verwenden Sie im Content Editor HTML5 Recorder anstelle von Flash"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Verwenden Sie verbesserte Platzhalter für eingefügte Inhalte im RCE."
+  use_instui_for_the_course_import_page_1906ef55: "Verwenden Sie InstUI für die Kursimportseite"
   use_instui_for_tool_installation_and_configuration_36de63e9: "InstUI für die Installation von Tools und Konfigurationsformulare verwenden"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "MathMan benutzen, um LaTeX in MathML umzuwandeln?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "MathMan benutzen, um LaTeX in SVG umzuwandeln?"
@@ -29807,6 +29953,7 @@ de:
   user_can_opt_in_to_mfa_canvas_will_only_challenge__649cd2a: "Benutzer\\*in kann sich für MFA entscheiden *Canvas verlangt von dem/der Benutzer\\*in nur MFA, falls er/sie sie zuvor konfiguriert hat.*"
   user_cannot_manage_individual_course_content_witho_d7b65fd4: "Die Benutzer\\*innen können ohne die entsprechende Berechtigung für diese Inhalte einzelne Inhalte nicht verwalten."
   user_content_aaf0fb5a: Benutzer-Inhalt
+  user_could_not_be_found_3e7ef5fe: "Benutzer\\*in konnte nicht gefunden werden."
   user_count_respondents_e30a8593: "%{user_count} Befragte"
   user_course_access_log_f7b8a4bd: "Zugriffsprotokoll für Benutzerkurs"
   user_data_export_from_date_6ba21b89: "*Benutzerdatenexport aus. %{date}*"
@@ -30328,6 +30475,7 @@ de:
   value_d842f16d: Wert
   value_is_not_a_valid_date_23c2d0a2: "%{value}  Ist kein gültiges Datum"
   value_is_not_a_valid_lti_version_ef4f6b1e: "%{value} ist keine gültige LTI-Version"
+  value_is_not_a_valid_standard_grade_status_99de23ac: "%{value} ist kein gültiger Standardbenotungsstatus"
   value_is_not_valid_563afee6: "%{value} ist ungültig"
   value_removed_bba9430c: "%{value} Entfernt"
   value_too_long_allowed_length_is_length_a81d4cf: "Der Wert ist zu lang, die zulässige Länge ist %{length}."
@@ -30547,6 +30695,7 @@ de:
   wednesday_b6f755f5: Mittwoch
   week_s_cb1492ee: Woche(n)
   weekly_summary_56cd0c95: "Wöchentliche Zusammenfassung"
+  weeks_4504fe8b: Wochen
   weight_9b308e5b: Gewichtung
   weight_ff579a8e: "Gewichtung:"
   weight_final_grade_based_on_assignment_groups_3124161: "Die Gewichtung der Gesamtnote basiert auf den Aufgabengruppen"
@@ -30893,6 +31042,7 @@ de:
   xls_733452c1: XLS
   xls_e593104b: XLS
   xml_configuration_5ea1b942: XML-Konfiguration
+  years_663d412e: Jahre
   yellow_4cf93785: Gelb
   yes_3593c135: Ja
   yes_dde87d5: Ja
@@ -31135,6 +31285,7 @@ de:
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Sie müssen einen Wert eingeben oder die Option deaktivieren."
   you_must_provide_required_fields_before_adding_6717073d: "Sie müssen vor dem Hinzufügen die erforderlichen Felder angeben."
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Sie müssen targetGroupId oder targetContextId und targetContextType bereitstellen."
+  you_must_publish_your_course_for_students_to_recei_1995ee46: "Sie müssen Ihren Kurs veröffentlichen, damit die Studierenden Ankündigungen erhalten können. Für Ankündigungen, die vor der Veröffentlichung des Kurses erstellt wurden, werden keine rückwirkenden Benachrichtigungen verschickt."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Sie müssen einen Kurs auswählen, aus dem Sie Inhalte kopieren können."
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Wählen Sie den Ordner aus, in den Sie Ihre Migration hochladen möchten."
   you_must_select_an_assignment_group_c16a2168: "Sie müssen eine Aufgabengruppe auswählen."
