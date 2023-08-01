@@ -1973,6 +1973,9 @@
     "select_video_source_1b5c9dbe": {
         "message": "选择视频来源"
     },
+    "selected_274ce24f": {
+        "message": "选定的"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "已选择 { linkFileName }"
     },

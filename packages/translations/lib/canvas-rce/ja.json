@@ -823,6 +823,7 @@
   "select_crop_shape_d441feeb": { "message": "クロップ形状の選択" },
   "select_language_7c93a900": { "message": "言語を選択する" },
   "select_video_source_1b5c9dbe": { "message": "ビデオ源を選択" },
+  "selected_274ce24f": { "message": "選択されました" },
   "selected_linkfilename_c093b1f2": { "message": "選択された{ linkFileName }" },
   "selection_b52c4c5e": { "message": "選択" },
   "set_header_scope_8c548f40": { "message": "ヘッダースコープを設定する" },

@@ -889,6 +889,7 @@
   },
   "select_language_7c93a900": { "message": "Selecciona l''idioma" },
   "select_video_source_1b5c9dbe": { "message": "Selecciona una font de vídeo" },
+  "selected_274ce24f": { "message": "Seleccionat" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionat"
   },

@@ -851,6 +851,7 @@
   "select_crop_shape_d441feeb": { "message": "Zuschnittsform auswählen" },
   "select_language_7c93a900": { "message": "Sprache auswählen" },
   "select_video_source_1b5c9dbe": { "message": "Videoquelle auswählen" },
+  "selected_274ce24f": { "message": "Ausgewählt" },
   "selected_linkfilename_c093b1f2": {
     "message": "Ausgewählter { linkFileName }"
   },

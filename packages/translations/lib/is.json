@@ -1973,6 +1973,9 @@
     "select_video_source_1b5c9dbe": {
         "message": "Veldu myndband"
     },
+    "selected_274ce24f": {
+        "message": "Valið"
+    },
     "selected_linkfilename_c093b1f2": {
         "message": "Valið { linkFileName }"
     },

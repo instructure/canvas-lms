@@ -841,6 +841,7 @@
   "select_crop_shape_d441feeb": { "message": "Vælg beskæringsform" },
   "select_language_7c93a900": { "message": "Vælg sprog" },
   "select_video_source_1b5c9dbe": { "message": "Vælg videokilde" },
+  "selected_274ce24f": { "message": "Valgt" },
   "selected_linkfilename_c093b1f2": { "message": "Valgt { linkFileName }" },
   "selection_b52c4c5e": { "message": "Udvælgelse" },
   "set_header_scope_8c548f40": { "message": "Indstil overskriftens omfang" },
