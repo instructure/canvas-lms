@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import React from 'react'
 import {
   conflictMessage,
   generateUrl,
@@ -23,6 +23,7 @@ import {
   checkForTitleConflict,
 } from '../titleConflicts'
 import fetchMock from 'fetch-mock'
+import {render} from '@testing-library/react'
 
 describe('titleConflicts', () => {
   beforeEach(() => {
@@ -34,16 +35,20 @@ describe('titleConflicts', () => {
 
   describe('conflictMessage', () => {
     it('returns the correct message for courses', () => {
-      expect(conflictMessage().text).toEqual(
-        'There is already a page in this course with this title.'
-      )
+      const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
+      expect(getByTestId('warning-icon')).toBeInTheDocument()
+      expect(
+        getByText('There is already a page in this course with this title.')
+      ).toBeInTheDocument()
     })
 
     it('returns the correct message for groups', () => {
       window.ENV.context_asset_string = 'group_1'
-      expect(conflictMessage().text).toEqual(
-        'There is already a page in this group with this title.'
-      )
+      const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
+      expect(getByTestId('warning-icon')).toBeInTheDocument()
+      expect(
+        getByText('There is already a page in this group with this title.')
+      ).toBeInTheDocument()
     })
   })
 

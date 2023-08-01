@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {ReactNode, useEffect, useRef, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {TextInput, TextInputProps} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
@@ -37,7 +37,7 @@ interface ComponentProps {
 }
 
 export interface Message {
-  text: string
+  text: ReactNode | string
   type: string
 }
 
