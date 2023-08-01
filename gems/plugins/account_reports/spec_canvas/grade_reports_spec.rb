@@ -83,7 +83,7 @@ describe "Default Account Reports" do
       title: "The Greatest Grading Standard",
       data: grading_standard_data
     )
-    @course1.update!(default_grading_standard: grading_standard)
+    @course1.update!(grading_standard:)
 
     @course2 = course_factory(course_name: "Math 101", account: @account, active_course: true)
 
@@ -1165,7 +1165,7 @@ describe "Default Account Reports" do
           title: "The Worst Grading Standard",
           data: grading_standard_data
         )
-        @course2.update!(default_grading_standard: grading_standard)
+        @course2.update!(grading_standard:)
 
         @course3 = course_factory(course_name: "Fun 404", account: @account, active_course: true)
         @course3.enroll_user(@user2, "StudentEnrollment", enrollment_state: :active)

@@ -3524,7 +3524,6 @@ describe Assignment do
       it "returns the assignment-specific grading standard if there is one, first and foremost" do
         @assignment.update_attribute :grading_standard, @gs1
         @course.update_attribute :grading_standard, @gs3
-        @course.update_attribute :default_grading_standard, @gs2
         expect(@assignment.grading_standard_or_default).to eql @gs1
       end
 
@@ -3534,7 +3533,7 @@ describe Assignment do
       end
 
       it "uses the course default if there is one" do
-        @course.update_attribute :default_grading_standard, @gs2
+        @course.update_attribute :grading_standard, @gs2
         expect(@assignment.grading_standard_or_default).to eql @gs2
       end
 

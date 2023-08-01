@@ -51,7 +51,6 @@ class Course < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   belongs_to :abstract_course
   belongs_to :enrollment_term
-  belongs_to :grading_standard
   belongs_to :template_course, class_name: "Course"
   has_many :templated_courses, class_name: "Course", foreign_key: "template_course_id"
   has_many :templated_accounts, class_name: "Account", foreign_key: "course_template_id"
@@ -200,7 +199,7 @@ class Course < ActiveRecord::Base
   end
 
   has_many :external_feeds, as: :context, inverse_of: :context, dependent: :destroy
-  belongs_to :default_grading_standard, class_name: "GradingStandard", foreign_key: "grading_standard_id"
+  belongs_to :grading_standard
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
   has_many :web_conferences, -> { order("created_at DESC") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :collaborations, -> { order(Arel.sql("collaborations.title, collaborations.created_at")) }, as: :context, inverse_of: :context, dependent: :destroy
@@ -2407,7 +2406,7 @@ class Course < ActiveRecord::Base
 
   def grading_standard_title
     if grading_standard_enabled?
-      grading_standard.try(:title) || t("default_grading_scheme_name", "Default Grading Scheme")
+      default_grading_standard.try(:title) || t("default_grading_scheme_name", "Default Grading Scheme")
     else
       nil
     end
@@ -2416,8 +2415,8 @@ class Course < ActiveRecord::Base
   def score_to_grade(score, user: nil)
     return nil unless (grading_standard_enabled? || restrict_quantitative_data?(user)) && score
 
-    if grading_standard
-      grading_standard.score_to_grade(score)
+    if default_grading_standard
+      default_grading_standard.score_to_grade(score)
     else
       GradingStandard.default_instance.score_to_grade(score)
     end
@@ -2578,8 +2577,16 @@ class Course < ActiveRecord::Base
     instructors.clear_cache_keys(:todo_list)
   end
 
+  def default_grading_standard
+    if grading_standard_id
+      grading_standard
+    else
+      account.default_grading_standard
+    end
+  end
+
   def grading_standard_enabled
-    !!grading_standard_id
+    !!grading_standard_id || account.grading_standard_enabled?
   end
   alias_method :grading_standard_enabled?, :grading_standard_enabled
 
