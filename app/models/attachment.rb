@@ -1688,8 +1688,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.batch_destroy(attachments)
-    ContentTag.active.where(content_type: "Attachment", content_id: attachments)
-              .union(ContentTag.active.where(context_type: "Attachment", context_id: attachments))
+    ContentTag.not_deleted.where(content_type: "Attachment", content_id: attachments)
+              .union(ContentTag.not_deleted.where(context_type: "Attachment", context_id: attachments))
               .find_each(&:destroy)
     while MediaObject.where(attachment_id: attachments).limit(1000).update_all(attachment_id: nil, updated_at: Time.now.utc) > 0 do end
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
