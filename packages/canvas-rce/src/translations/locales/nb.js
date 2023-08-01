@@ -858,6 +858,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Velg beskjæringsform" },
   "select_language_7c93a900": { "message": "Velg språk" },
   "select_video_source_1b5c9dbe": { "message": "Velg videokilde" },
+  "selected_274ce24f": { "message": "Valgt" },
   "selected_linkfilename_c093b1f2": { "message": "Valgt { linkFileName }" },
   "selection_b52c4c5e": { "message": "Valg" },
   "set_header_scope_8c548f40": { "message": "Sett tittelomfang" },

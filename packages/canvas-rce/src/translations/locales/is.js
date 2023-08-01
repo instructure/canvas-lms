@@ -847,6 +847,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Veldu klippiform" },
   "select_language_7c93a900": { "message": "Velja tungumál" },
   "select_video_source_1b5c9dbe": { "message": "Veldu myndband" },
+  "selected_274ce24f": { "message": "Valið" },
   "selected_linkfilename_c093b1f2": { "message": "Valið { linkFileName }" },
   "selection_b52c4c5e": { "message": "Val" },
   "set_header_scope_8c548f40": { "message": "Stilla gildissvið hauss" },

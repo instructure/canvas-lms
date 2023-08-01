@@ -880,6 +880,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Izberite obliko izrezovanja" },
   "select_language_7c93a900": { "message": "Izberite jezik" },
   "select_video_source_1b5c9dbe": { "message": "Izberi videovir" },
+  "selected_274ce24f": { "message": "Izbrano" },
   "selected_linkfilename_c093b1f2": { "message": "Izbrano { linkFileName }" },
   "selection_b52c4c5e": { "message": "Izbira" },
   "set_header_scope_8c548f40": { "message": "Nastavi obseg glave" },

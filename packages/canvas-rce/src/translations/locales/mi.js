@@ -875,6 +875,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Tīpako tapahi āhua" },
   "select_language_7c93a900": { "message": "Tīpako Reo" },
   "select_video_source_1b5c9dbe": { "message": "Tīpakohia ataata puna" },
+  "selected_274ce24f": { "message": "Kua tīpakohia" },
   "selected_linkfilename_c093b1f2": { "message": "Tīpakohia { linkFileName }" },
   "selection_b52c4c5e": { "message": "Tīpakonga" },
   "set_header_scope_8c548f40": { "message": "Whakatau horopaki pane" },

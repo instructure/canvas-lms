@@ -908,6 +908,7 @@ const locale = {
   },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
   "select_video_source_1b5c9dbe": { "message": "Seleccionar fuente de vídeo" },
+  "selected_274ce24f": { "message": "Seleccionado" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } seleccionado"
   },
