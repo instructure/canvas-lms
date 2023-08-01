@@ -30,12 +30,15 @@ function forEachNode(nodeList, fn) {
 }
 
 export default {
-  renderPills() {
+  renderPills(customStatuses = {}) {
     const missMountPoints = document.querySelectorAll('.submission-missing-pill')
     const lateMountPoints = document.querySelectorAll('.submission-late-pill')
     const excusedMountPoints = document.querySelectorAll('.submission-excused-pill')
     const extendedMountPoints = document.querySelectorAll('.submission-extended-pill')
-
+    const customGradeStatusMountPoints = 
+    document.querySelectorAll(
+      '[class^="submission-custom-grade-status-pill-"]'
+    )
     forEachNode(missMountPoints, mountPoint => {
       ReactDOM.render(<Pill color="danger">{I18n.t('missing')}</Pill>, mountPoint)
     })
@@ -50,6 +53,14 @@ export default {
 
     forEachNode(extendedMountPoints, mountPoint => {
       ReactDOM.render(<Pill color="alert">{I18n.t('extended')}</Pill>, mountPoint)
+    })
+
+    forEachNode(customGradeStatusMountPoints, mountPoint => {
+      const status =
+        customStatuses[mountPoint.classList[0].substring('submission-custom-grade-status-pill-'.length)]
+      if(status) {
+        ReactDOM.render(<Pill>{status.name}</Pill>, mountPoint)
+      }
     })
   },
 }

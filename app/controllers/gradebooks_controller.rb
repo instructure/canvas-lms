@@ -69,7 +69,8 @@ class GradebooksController < ApplicationController
              restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user),
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
-             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes)
+             POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
+             custom_grade_statuses: @context.root_account.custom_grade_statuses.active.as_json(include_root: false)
            })
     return render :grade_summary_list unless @presenter.student
 
@@ -115,6 +116,7 @@ class GradebooksController < ApplicationController
     end
 
     ActiveRecord::Associations.preload(@presenter.submissions, :visible_submission_comments)
+    custom_gradebook_statuses_enabled = Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
     submissions_json = @presenter.submissions.map do |submission|
       json = {
         assignment_id: submission.assignment_id
@@ -123,8 +125,9 @@ class GradebooksController < ApplicationController
         json.merge!({
                       excused: submission.excused?,
                       score: submission.score,
-                      workflow_state: submission.workflow_state
+                      workflow_state: submission.workflow_state,
                     })
+        json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end
 
       if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
