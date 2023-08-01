@@ -315,6 +315,7 @@ sl:
   account_97b34646: Račun
   account_account_b6b3746b: "Račun: %{account}"
   account_administrators_can_always_create_courses_926dc0cb: "Skrbniki računa lahko vedno ustvarjajo predmete"
+  account_administrators_can_create_custom_status_la_e2a601bf: "Skrbniki računov lahko ustvarijo statusne oznake po meri, ki jih bodo lahko izvajalci uporabljali v svojih redovalnicah. Te statusne oznake po meri same po sebi ne bodo imele nobene funkcionalnosti, na primer »manjkajoče« ali »z zamudo«. Skrbniki bodo prav tako lahko onemogočili privzete statusne oznake in preprečili njihovo uporabo v celotnem primerku."
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Lestvice doseganja učnih ciljev za rezultate na ravni računa in predmeta"
   account_and_subaccount_40c6430: "Račun in podračun"
   account_branding_for_confetti_db2012a8: "Partnersko povezovanje računa za konfete"
@@ -1356,7 +1357,7 @@ sl:
         update_button: Posodobi
       report_last_run_never: Nikoli
       report_running: "Poročilo je v pripravi.*Ko bo končano, boste prejeli e-pošto.*"
-      rqd_help_message: "Če je ta nastavitev izbrana, bo omejila uporabniški pogled kvantitativnih (številskih) podatkov o ocenjevanju in omejila možnosti ustvarjanja nalog s strani izvajalcev. Uporabniki bodo videli le kvalitativne podatke, ki vključujejo črkovne ocene in komentarje. Skrbnik lahko to nastavitev dodatno prilagodi, tako da prilagodi dovoljenja za uporabniške vloge."
+      rqd_help_message: "Če je ta nastavitev izbrana, bo omejila pogled kvantitativnih (številčnih) podatkov glede ocenjevanja novih predmetov. Študenti in skriti bralci bodo videli le kvalitativne podatke, ki vključujejo črkovne ocene in komentarje."
       rqd_screenreader: "O omejitvi kvantitativnih podatkov"
       select: 
         mfa: 
@@ -1925,6 +1926,7 @@ sl:
   add_section_8b027a1c: "Dodaj sekcijo"
   add_set_of_grading_periods_5b4d6e51: "Dodaj nabor ocenjevalnih obdobij"
   add_speedgrader_links_to_assignments_and_quizzes_i_990a17cd: "Dodaj SpeedGrader povezav do pogledov nalog in kvizov"
+  add_status_2df2bdd6: "Dodaj status"
   add_student_1152afc0: "Dodaj študenta"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Dodaj študente z iskanjem po imenu, sekciji predmeta ali skupini Po vnosu besedila se premikajte po rezultatih s puščično tipko za pomik navzdol. S tipko Enter izberite rezultat."
   add_students_tas_and_observers_to_your_course_e84692dd: "Svojemu predmetu dodajte študente, demonstratorje in skrite bralce"
@@ -1953,6 +1955,7 @@ sl:
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Dodajte ID po meri prilagojenega polja primerka Zendesk za vsako od naslednjih (polja brez ID ne bodo zapisana v dnevnik):"
   added_caption_1895db92: "Dodano je spremno besedilo"
   added_e8a39b2: Dodano
+  added_filtername_filter_ac7cee4b: "Filter %{filterName} je dodan"
   added_mastery_level_dd4792d1: "Dodaj raven doseganja učnih ciljev"
   added_new_proficiency_rating_e30cab8a: "Dodaj novo vrednotenje znanja"
   added_outcome_title_3c258a9: "Dodan izid %{title}"
@@ -1989,6 +1992,7 @@ sl:
       opombe k dokumentom ali ocenjevalnim vodnikom.
   adjusting_due_dates_a5918b9c: "Prilagajanje rokov ..."
   admin_4d3ba42f: Skrbnik
+  admin_analytics_course_readiness_c79f13e1: "Skrbniška analitika – pripravljenost predmeta"
   admin_analytics_description: "Omogoča analitiko na ravni računa. Nadzorne plošče skrbniške analitike zagotavljajo podrobnosti o uporabi sistema Canvas, uspešnosti predmeta Canvas in zavzetost študentov. Več o tem v *središču skrbniške analitike* v Canvas Community."
   admin_analytics_eacba735: "Skrbniška analitika"
   admin_analytics_new_filter_ui_aee1ea8e: "Skrbniška analitika – nov uporabniški vmesnik za filtriranje"
@@ -2018,6 +2022,7 @@ sl:
   afrikaans_da0fe6ee: afrikanščina
   after_48b9d69: "Po ..."
   after_4c71e718: Po
+  after_8db0c81c: po
   after_completing_the_above_configuration_please_us_c6440d32: "Po zaključku konfiguracije zgoraj uporabite naslednjo povezavo, da sistemu Canvas omogočite dostop do vašega odjemalca Microsoft:"
   after_date_981cd41b: "Po %{date}"
   after_last_attempt_c9168da2: "Po zadnjem poskusu"
@@ -2105,6 +2110,7 @@ sl:
   all_day_fb42c4fc: "Ves dan"
   all_discussion_entries_report_c1e02906: "Poročilo o vseh vnosih v razpravo"
   all_events_6ae4331b: "Vsi dogodki"
+  all_filters_have_been_cleared_7f38f765: "Vsi filtri so počiščeni"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Ali je vse dokončano?  Čas je, da objavite svoj predmet.  Kliknite spodnji gumb, da bo objava uradna. Z objavo bodo uporabniki lahko začeli sodelovati pri predmetu."
   all_get_scopes_59a54304: "Vsi obsegi GET"
   all_gradeable_student_submissions_report_d11ee705: "Poročilo o vseh oddajah študentov, ki jih je mogoče oceniti"
@@ -4846,6 +4852,19 @@ sl:
   calendar_a8563bb2: "Koledar:"
   calendar_automatically_appears_in_user_s_other_cal_ed9fc840: "Koledar se samodejno prikaže na uporabnikovem seznamu »Drugi koledarji«."
   calendar_contextinfo_name_a7d98525: "Koledar %{contextInfo.name}"
+  calendar_custom_recurring_event_repeat_picker: 
+    single_and_plural_days: 
+      one: Dan
+      other: Dnevi
+    single_and_plural_months: 
+      one: Mesec
+      other: mesecev
+    single_and_plural_weeks: 
+      one: Teden
+      other: Tednov
+    single_and_plural_years: 
+      one: Leto
+      other: let
   calendar_d14cfc8f: Koledar
   calendar_event: 
     errors: 
@@ -4886,6 +4905,20 @@ sl:
     ics_title: "%{course_or_group_name} Koledar (Canvas)"
     invalid_date_or_time: "Neveljaven datum ali neveljavna datum in čas za %{attr}"
   calendar_feed_url_b7b91e7b: "URL vira koledarja"
+  calendar_frequency_picker: 
+    annually: "Vsako leto %{month} %{date}"
+    custom: "Po meri ..."
+    daily: Dnevno
+    every_weekday: "Vsak delavnik (od ponedeljka do petka)"
+    first: prvi
+    fourth: četrti
+    frequency: "Pogostost:"
+    last: zadnji
+    monthly_last_day: "Vsak mesec, %{weekNumber}, %{day}"
+    not_repeat: "Se ne ponavlja"
+    second: sekund
+    third: tretji
+    weekly_day: "Tedensko na dan %{day}"
   calendar_removed_1c841af4: "Koledar je odstranjen"
   calendar_series_e1b7a4bc: "Zaporedja koledarja"
   calendar_subscription_options_1ff6f939: "Možnosti naročnine na koledar"
@@ -6643,6 +6676,10 @@ sl:
     one: "Izbran je 1 koledar računa"
     other: "%{count} izbranih koledarjev računa"
     zero: "Izbran ni noben koledar računa"
+  count_address_book_results_loaded_a5dd044e: 
+    one: "Naložen je 1 rezultat v imeniku"
+    other: "Naloženih je %{count} rezultatov v imeniku"
+    zero: "Ni rezultatov v imeniku"
   count_alignable_artifacts_7779644a: 
     one: "%{count} PORAVNANI IZDELEK"
     other: "%{count} PORAVNANIH IZDELKOV"
@@ -6677,6 +6714,7 @@ sl:
   count_comments_cb137ab8: 
     one: "1 komentar"
     other: "%{count} komentarji"
+  count_conversation_messages_loaded_1a4811ff: "Naloženih je %{count} sporočil pogovora"
   count_criteria_22927713: 
     one: "1 merilo"
     other: "%{count} merila"
@@ -6973,6 +7011,7 @@ sl:
   course_end_date_4c797823: "Datum konca predmeta"
   course_end_date_on_after_a6bbb0b7: "Datum konca predmeta dne/po"
   course_ends_at_e8b166df: "Predmet se konča ob:"
+  course_ends_endat_d1b11465: "Predmet se zaključi dne %{endat}"
   course_enrollments_are_in_85eb1e6b: "Vpisi v predmet so v"
   course_export_from_date_f4e2a3e4: "*Izvoz predmeta od %{date}*"
   course_export_from_date_file_not_available_8a775e53: "Izvoz predmeta od %{date} (datoteka ni na voljo)."
@@ -7732,6 +7771,7 @@ sl:
   create_a_new_module_6f31b0fe: "Ustvari nov modul"
   create_a_new_user_for_address_7487e9c9: "Ustvari novega uporabnika za »%{address}«"
   create_a_temporary_enrollment_167f05f1: "Ustvari začasen vpis"
+  create_a_temporary_enrollment_for_name_2c9828f7: "Ustvari začasen vpis za %{name}"
   create_account_263ec6: "Ustvari račun"
   create_an_ba36d171: Ustvari
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Ustvarite spletne kvize in ankete za oceno in brez nje ter izvajajte skrbništvo zanje."
@@ -7953,7 +7993,11 @@ sl:
   custom_link_details_35fd38fc: "Podrobnosti o povezavi po meri"
   custom_lti_usage_uwf_b63978a5: "Uporaba LTI po meri – UWF"
   custom_outcomes_31a741f5: "Odstrani učne izide"
+  custom_recurrence_6b93143e: "Ponavljanje po meri"
   custom_reports_experimental_features_40bbfe7c: "Poročila po meri: Eksperimentalne funkcionalnosti"
+  custom_status_f9dbd33b: "Status po meri"
+  custom_status_labels_for_submissions_and_final_gra_2ba56b7a: "Statusne oznake po meri za oddaje in končne ocene"
+  custom_statuses_14038f1e: "Statusi po meri"
   customize_configuration_69c22ef3: "Prilagodi konfiguracijo po meri"
   customize_course_details_26fd4afe: "Prilagodite podrobnosti o predmetu"
   customize_learning_mastery_ratings_4ace142a: "Prilagodi vrednotenja doseganja učnih ciljev"
@@ -8094,6 +8138,7 @@ sl:
       - oktober
       - november
       - december
+  date_4e62ac59: datum
   date_61419973: "Datum:"
   date_created_87e265bc: "Datum nastanka"
   date_created_createdat_265a0dfa: "datum nastanka: %{createdAt}"
@@ -8171,6 +8216,7 @@ sl:
       second: sekund
       year: Leto
   day_9d999bec: Dan
+  day_of_month_49276955: "dan v mesecu"
   day_s_7cc1231f: Dni
   days_af2ac87b: Dnevi
   days_late_a3a721b0: "Dni zamude"
@@ -9081,6 +9127,7 @@ sl:
   edited_c4fcbdbf: "Urejeno:"
   edited_date_b0455372: "(urejeno) %{date}"
   edited_editedtimingdisplay_85d8f1db: "Urejeno %{editedTimingDisplay}"
+  editing_an_announcement_will_create_a_notification_cbb5377a: "Urejanje objave bo ustvarilo obvestilo na uporabniški nadzorni plošči in v toku dejavnosti predmeta. Če želite, da uporabniki prejmejo urejeno obvestilo v okviru svojih nastavitev obvestil, boste morali ustvariti novo obvestilo."
   editing_permissions_for_name_3503e235: "Urejanje dovoljenj za: %{name}"
   editor: 
     alt_text: "Nadomestno besedilo:"
@@ -9262,6 +9309,9 @@ sl:
     assignment_order_alpha: "Abecedni vrstni red"
     assignment_order_assignment_groups: "Glede na skupino nalog in položaj"
     assignment_order_due_date: "Glede na rok"
+    invalid_group_warning: 
+      one: "Opomba: Rezultat ne vključuje nalog iz skupine %{list_of_group_names}, ker nima možnih točk."
+      other: "Opomba: Rezultat ne vključuje nalog iz skupin %{list_of_group_names}, ker nimajo možnih točk."
     notes: Opombe
   enhanced_individual_gradebook_4e825077: "Izboljšana individualna redovalnica"
   enhanced_rce_paste_from_clipboard_30ddb011: "Izboljšano lepljenje RCE iz odložišča"
@@ -9353,9 +9403,12 @@ sl:
                           *eduappcenter.com*. Ko bo uporabljen, bodo na strani 
                           EduAppCenter »Zunanje aplikacije« navedene le aplikacije, ki jih je odobrila vaša organizacija. 
                           Naučite se, kako **generirati žeton za dostop**.
+  enter_the_email_address_of_the_user_you_would_like_92112560: "Vnesite e-poštni naslov uporabnika, ki ga želite začasno vpisati"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Vnesite z vejico ali s prelomom vrstice ločene e-poštne naslove uporabnikov, ki jih želite dodati."
   enter_the_grade_41d5c97d: "Vnesite oceno"
+  enter_the_login_id_of_the_user_you_would_like_to_t_46938400: "Vnesite prijavni ID uporabnika, ki ga želite začasno vpisati"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Vnesite z vejico ali s prelomom vrstice ločene ID-je prijav uporabnikov, ki jih želite dodati."
+  enter_the_sis_id_of_the_user_you_would_like_to_tem_efab1e87: "Vnesite SIS ID uporabnika, ki ga želite začasno vpisati"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Vnesite z vejico ali s prelomom vrstice ločene SIS ID-je uporabnikov, ki jih želite dodati."
   enter_url_e8bb8a33: "Vnesite naslov URL"
   enter_web_url_483c2cbb: "Vnesite spletni naslov (URL)"
@@ -9760,6 +9813,7 @@ sl:
   event_update_failed_b6116651: "Ustvarjanje posodobitve ni uspelo"
   everthing_updated_after_start_date_f3be8ba: "Vse posodobljeno po datumu začetka"
   every_665d821e: Vsak
+  every_a79cad1a: vsake(-ih)
   every_count_days_times_times_6271ab22: 
     one: "Vsak dan, %{times}-krat"
     other: "Vsakih %{count} dni, %{times}-krat"
@@ -9821,8 +9875,8 @@ sl:
     one: "Vsako leto prvi %{days} v %{month}, %{until}-krat"
     other: "Vsakih %{count} let prvi %{days} v %{month} do %{until}"
   every_count_years_on_the_ord_days_of_month_times_t_59e822d0: 
-    one: "Vsako leto prvi %{ord} %{days} v %{month}, %{times}-krat"
-    other: "Vsakih %{count} let, prvi %{ord} %{days} v %{month}, %{times}-krat"
+    one: "Vsako leto %{ord}. %{days} v mesecu %{month}, %{times}-krat"
+    other: "Vsakih %{count} let %{ord}. %{days} meseca %{month}, %{times}-krat"
   every_count_years_on_the_ord_days_of_month_until_u_3eb2883d: 
     one: "Vsako leto ob %{ord} %{days} v %{month}, %{until}-krat"
     other: "Vsakih %{count} let prvi %{ord} %{days} v %{month} do %{until}"
@@ -9848,6 +9902,8 @@ sl:
   exceeded_the_maximum_length_number_characters_2d25611e: "Presežena največja dolžina (%{number} znakov)"
   exceeds_expectations_5910fc3a: "Presega pričakovanja"
   exceeds_mastery_1f995dce: "Presega učne cilje."
+  exceeds_max_events_28f19b04: "Presega %{max} dogodkov."
+  exceeds_max_occurrences_limit_98f47533: "Presega omejitev pojavitev %{max}"
   excel_file_c6b9890: "Excelova datoteka"
   excelsior_student_activity_tracking_7a1ba44d: "Sledenje dejavnosti študentov Excelsior"
   exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: "Izključite vse podatke, ki niso bili posodobljeni od navedenega datuma"
@@ -10124,6 +10180,7 @@ sl:
   field_cannot_be_blank_afb5b332: "Polje ne sme biti prazno."
   field_must_be_either_active_or_deleted_329a42a: "»%{field}« mora biti »%{active}« ali »%{deleted}«."
   field_name_31fff38e: "Ime polja"
+  fifth_d6eaa92e: peti
   file_6863ad33: datoteka
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: "Vložite vstopnico za osebni odziv naše ekipe za podporo."
   file_already_exists_bdc61895: "datoteka že obstaja"
@@ -10276,6 +10333,7 @@ sl:
     titles: 
       bookmark_search: "Iskanje zaznamka: %{service_name}"
   find_8d605019: Najdi
+  find_an_assignee_of_temporary_enrollments_from_nam_ba08bb2b: "Poiščite prevzemnika za začasne vpise s strani %{name}"
   find_an_existing_grading_scheme_d836ea: "Najdi obstoječo ocenjevalno shemo"
   find_an_outcome_919328e6: "Najdi izid"
   find_appointment_85d6922e: "Najdi sestanek"
@@ -10296,6 +10354,7 @@ sl:
   find_outcome_746cc57e: "Najdi izid"
   find_questions_4930b38f: "Najdi vprašanja"
   find_training_resources_and_more_help_f148612c: "poiskati učne vire in dodatno pomoč."
+  find_user_by_f35cd8ca: "Najdi uporabnika po"
   find_your_canvas_institution_45af99af: "Poiščite svojo ustanovo %{canvas}"
   find_your_classes_or_subjects_in_the_dashboard_72e1ed47: "Poiščite svoje razrede ali kratke opise predmetov v preglednici ..."
   finding_matched_jobs_f7cd0e6d: "Iskanje ujemajočih se opravil"
@@ -10305,6 +10364,7 @@ sl:
   finished_publishing_plan_f443d416: "Zaključen načrt objave"
   finland_358_abeffc8a: "Finska (+358)"
   finnish_4df2923d: finščina
+  first_9685680a: prvi
   first_last_name_9820d256: "Ime, priimek"
   first_name_d5c12500: Ime
   fix_missing_policy_applicator_gradebook_history_f3e62bc1: "Popravi zgodovino redovalnice v uveljavitelju manjkajočih potrdil"
@@ -10377,9 +10437,11 @@ sl:
   found_count_broken_links_9224b8dd: 
     one: "Najdena 1 prekinjena povezava."
     other: "Najdenih %{count} prekinjenih povezav."
+  fourth_ecf2ca5c: četrti
   france_33_90b595d7: "Francija (+33)"
   french_33881544: francoščina
   french_canada_c3d92fa6: "francoščina (Kanada)"
+  frequency_87077a39: pogostost
   frequently_used_21a3eb8e: "Pogosto uporabljeno"
   fri_e2451e74: pet
   friday_2c4f6d5a: Petek
@@ -11857,6 +11919,7 @@ sl:
       Namesto generične napake 404 Strani ni mogoče najti bo API vrnil 422
       skupaj s koristnim sporočilom o tem, da orodje ne more dostopati do zaključenih
       predmetov.
+  if_enabled_the_course_import_page_will_use_instui__84bad313: "Če je to omogočeno, bo stran za uvoz predmeta uporabljala komponente InstUI"
   if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
       Če je to omogočeno, bo odgovor na globoko povezovanje JS poslal postMessages
       na window.parent, namesto window.top. To omogoča odgovor na globoko povezovanje
@@ -12573,6 +12636,7 @@ sl:
   jwk_method_6d5d0c84: "Metoda * JWK"
   jwts_4f397c85: "Žetoni JWT"
   k12_description: "Posodobite ikone glavnega menija, ki so bolj značilne zlasti za okolje K-12."
+  k20_course_readiness_description: "Omogoči novo preglednico za pripravljenost predmeta v skrbniški analitiki."
   k_2521301c: k
   kazakhstan_7_8fe892c: "Kazahstan (+7)"
   keep_8f3e7c16: Upoštevaj
@@ -12616,6 +12680,7 @@ sl:
   large_course_db3d58b: "Veliki predmeti:"
   last_7_days_bd411f1f: "Zadnji 7 dni"
   last_activity_a983e541: "Zadnja aktivnost"
+  last_ae273283: zadnji
   last_assessment_cd5659b6: "Zadnje ocenjevanje: "
   last_attempt_7258ebd7: "Zadnji poskus"
   last_bounced_after_76f9ce30: "Zadnja zavrnitev po"
@@ -12727,6 +12792,7 @@ sl:
   learning_mastery_6ed4fd63: "Doseganje učnih ciljev ..."
   learning_mastery_context_name_a0b70957: "Odlično učenje – %{context_name}"
   learning_mastery_grade_book_59c90e6a: "Redovalnica za pregled ocen"
+  learning_mastery_gradebook_72097130: "Pregled ocen"
   learning_mastery_gradebook_description: |-
       Z redovalnico odličnega učenja si lahko izvajalci hitro ogledajo napredek študenta in predmeta
       pri učnih ciljih predmeta. Učni izidi so predstavljeni v obliki, podobni redovalnici,
@@ -12964,6 +13030,8 @@ sl:
   loading_accounts_a7606249: "Nalaganje računov"
   loading_additional_items_ed5f672d: "Nalaganje dodatnih elementov ..."
   loading_additional_todo_details_acba0cf2: "Nalaganje dodatnih podrobnosti o seznamu opravil"
+  loading_address_book_results_e86f2d3: "Nalaganje rezultatov imenika"
+  loading_address_book_results_for_term_10c406cf: "Nalaganje rezultatov imenika za %{term}"
   loading_announcement_content_4405470f: "Nalagam vsebino obvestila"
   loading_announcement_title_b8fc3057: "Nalagam naslov obvestila"
   loading_announcements_b927a86c: "Nalaganje obvestil"
@@ -13014,6 +13082,7 @@ sl:
   loading_important_date_2d3a29ce: "Nalagam pomembni datum"
   loading_important_date_details_1b2d2b85: "Nalagam podrobnosti o pomembnem datumu"
   loading_important_info_217bf805: "Nalagam pomembne informacije"
+  loading_inbox_conversations_27e200f3: "Nalaganje pogovorov v mapi »Prejeto«."
   loading_job_cluster_info_f3d15dec: "Nalaganje informacij o gruči opravil"
   loading_jobs_12f0609d: "Nalaganje opravil ..."
   loading_last_attended_date_5a42463: "Nalaganje datuma zadnje udeležbe"
@@ -15453,6 +15522,7 @@ sl:
   monday_432ff613: Ponedeljek
   month_s_5c17590e: Meseci
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} začetek ob %{time}"
+  months_afdf2830: mesecev
   moodle_dropdown_many_warning_title: "V tej zbirki obstaja %{count} vprašanj z več spustnimi meniji, ki morda niso pravilno uvožena."
   moodle_dropdown_warning_title: "Vprašanje z več spustnimi meniji je morda nepravilno uvoženo."
   moodle_formula_many_warning_title: "V tej zbirki obstaja %{count} vprašanj z obrazcem, pri katerih bo treba obnoviti možne odgovore."
@@ -15553,11 +15623,13 @@ sl:
   must_be_a_number_e1dfe68a: "Mora biti številka."
   must_be_a_number_f6e09df7: "mora biti številka"
   must_be_a_valid_number_59f0069: "Mora biti veljavna številka."
+  must_be_a_whole_number_887d8c51: "Mora biti celo število."
   must_be_after_start_date_95e251a3: "mora biti po datumu začetka"
   must_be_at_least_one_group_per_section_there_are_c_8e8b58e4: "V vsaki sekciji mora biti vsaj ena skupina; obstaja %{count} sekcij"
   must_be_between_1_and_10_e99eb0d1: "vrednost mora biti od 1 do 10"
   must_be_between_1_and_5_3b42aca1: "Vrednost mora biti od 1 do 5"
   must_be_between_1_and_99_589b827d: "Vrednost mora biti od 1 do 99"
+  must_be_between_1_and_max_4dc36a5a: "Vrednost mora biti od 1 do %{max}"
   must_be_between_availability_dates_ceaca984: "mora biti med datumoma razpoložljivosti"
   must_be_between_lower_and_upper_1f501b2a: "Vrednost mora biti od %{lower} in %{upper}."
   must_be_length_characters_or_less_8c24db67: "Dovoljeno je %{length} znakov ali manj"
@@ -15571,6 +15643,7 @@ sl:
   must_either_enter_a_start_and_end_date_or_check_th_ddfbbca: "Vnesti je treba začetni in končni datum ali potrditi potrditveno polje Zadnjih 7 dni"
   must_have_at_least_1_grader_d4a54e85: "Mora imeti vsaj 1 ocenjevalca."
   must_have_at_least_1_group_per_section_9809e708: "Mora imeti vsaj 1 skupino na sekcijo."
+  must_have_at_least_1_occurrence_492eace8: "Mora imeti vsaj 1 pojavitev"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "Mora imeti vsaj toliko skupin kot sekcij, da je mogoče dodeljevati glede na sekcijo."
   must_have_at_least_one_redirect_uri_defined_bb236d38: "Opredeljeno mora imeti vsaj eno redirect_uri."
   must_mark_as_done_91cff799: "Mora označiti kot dokončano."
@@ -15690,6 +15763,7 @@ sl:
   netherlands_31_63e4f1b9: "Nizozemska (+31)"
   never_1ed1244d: nikoli
   never_df100b49: Nikoli
+  never_should_have_made_it_here_ab72bdab: "Sploh ne bi smeli prispeti sem"
   new_13daf639: Novo
   new_account_role_6e5c4964: "Nova vloga računa"
   new_analytics_api_access_7eec1ead: "Nov dostop do API za Google Analytics"
@@ -15858,6 +15932,7 @@ sl:
   no_content_not_visible_to_students_905f8996: "Ni vsebine. Ni vidno študentom."
   no_content_not_visible_to_students_b59f4867: "Ni vsebine. Ni vidno študentom"
   no_context_found_for_the_following_context_code_co_a2f6a1a7: "Za naslednjo kodo konteksta ni mogoče najti konteksta: %{context_code}"
+  no_conversation_messages_loaded_96b537f: "Naloženo ni nobeno sporočilo pogovora"
   no_conversations_selected_ebcd9226: "Ni izbranih pogovorov."
   no_conversations_to_show_9ecbac62: "Ni pogovorov za prikaz"
   no_courses_favorited_4e69fd63: "Ni predmetov, ki bi bili dodani med priljubljene"
@@ -16441,6 +16516,8 @@ sl:
   observing_observees_ffb58017: "Skrito branje: %{observees}"
   observing_student_name_to_select_a_different_stude_e0466126: "Skrito branje %{student_name}. Če želite izbrati drugega študenta, se vrnite na nadzorno ploščo."
   observing_user_name_1a64e47b: "Skrito branje: %{user_name}"
+  occurrences_9710160a: pojavitev
+  occurrences_max_max_3201dec: "pojavitev (največ %{max})"
   october_6b2bf82: oktober
   of_grade_984aa550: "% ocene"
   of_students_5d1af0d2: "# študentov"
@@ -16460,12 +16537,21 @@ sl:
   oldest_newest_4de86803: "Najstarejše – najnovejše"
   olive_6a3e4d6b: Olivna
   oman_968_46f8d901: "Oman (+968)"
+  on_1af5b447: vsak
   on_8f7190e5: Vključeno
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "Uveljavi izbiro pravic uporabe za datotečne priloge v temah razprave pri predmetih, za katere so omogočene pravice uporabe"
+  on_date_30c2c814: "dne %{date}"
   on_date_the_lti_1_3_oidc_auth_endpoint_will_be_cha_9df99806: "Dne %{date} se bo naslov storitve LTI 1.3 OIDC Auth spremenil iz https://canvas.instructure.com/api/lti/authorize_redirect v https://sso.canvaslms.com/api/lti/authorize_redirect. Razlogi in obseg te spremembe so podrobno opisani v *tem članku skupnosti Canvas*, dodatne informacije pa so na voljo v naših dokumentih API. Ta sprememba je majhna, vendar zahteva spremembo konfiguracije na strani orodja za vsako orodje LTI 1.3, ki je nameščeno v sistemu Canvas."
   on_date_the_lti_1_3_platform_storage_specification_3fe8a2fa: "Dne %{date} bo Canvas v celoti podpiral specifikacijo LTI 1.3 Platform Storage. Orodja, ki želijo vključiti to funkcijo, morajo spremeniti naslov storitve OIDC Auth, ki ga hranijo za Canvas s *https://canvas.instructure.com/api/lti/authorize_redirect* na *https://sso.canvaslms.com/api/lti/authorize_redirect*. Tega dne se bo spremenil tudi naslov storitve OIDC Auth, ki je priporočen za nove namestitve orodij 1.3, zato priporočamo, da vsa orodja 1.3 čim prej spremenijo konfiguracijo za uporabo tega novega naslova storitve."
+  on_day_date_c2871702: "dne %{date}"
   on_for_key_keyname_bbac4e1b: "Omogočeno za ključ: %{keyName}"
   on_paper_46d0ba36: "Na papirju"
+  on_the_fifth_dayname_cc0078f6: "peti %{dayname}"
+  on_the_first_dayname_c77f6da4: "prvi %{dayname}"
+  on_the_fourth_dayname_75865f4f: "četrti %{dayname}"
+  on_the_last_dayname_f269503: "zadnji %{dayname}"
+  on_the_second_dayname_5e481a65: "drugi %{dayname}"
+  on_the_third_dayname_e7079e49: "tretji %{dayname}"
   on_time_17ca5ad9: Pravočasno
   on_time_percent_eebffe38: "V roku: %{percent}"
   once_a_grade_is_posted_manually_it_will_automatica_26aff290: "\n\
@@ -16524,6 +16610,7 @@ sl:
   open_conversation_a6590865: "Odpri pogovor"
   open_conversation_subject_1dd2d3c: "Odpri pogovor %{subject}"
   open_discussion_title_for_comments_6baa3fa: "Odpri razpravo %{title} za komentarje"
+  open_edit_status_dialog_ca956b8: "Odprite pogovorno okno za urejanje statusa"
   open_emoji_menu_1df0eb0b: "Odpri meni emotikonov"
   open_event_menu_for_783510e3: "Odpri meni dogodka za"
   open_for_comments_1810648: "Odpri za komentarje"
@@ -17082,6 +17169,7 @@ sl:
   please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Pomnite: Družba Instructure sistem Canvas Commons gosti v ZDA. To pomeni, da bodo med uporabo sistema Canvas Commons vaši osebni podatki shranjeni in obdelani v ZDA. Elementi teh osebnih podatkov vključujejo: ime, e-poštni naslov, ID uporabnika sistema Canvas, ime za prijavo v sistem Canvas, avatar Canvas, naslov IP, vire Canvas Commons, ki ste jih dodali med priljubljene, in komentarje, ki jih vnesete v kateri koli vir v sistemu Canvas Commons. Več informacij o praksah varstva zasebnosti družbe Instructure boste našli [tukaj](%{url})."
   please_note_once_a_course_pace_is_set_up_all_exist_7a8c24d5: "Upoštevajte, da bodo, ko bo funkcija hitrosti napredovanja pri predmetu nastavljena, vse obstoječe naloge, kvizi in roki razprav nadzorovani s hitrostjo napredovanja pri predmetu. Več informacij si lahko preberite v *uporabniški skupini za hitrost napredovanja pri predmetu*."
   please_note_that_once_a_course_pace_is_saved_all_d_319cd267: "Upoštevajte, da bo shranjena hitrost napredovanja pri predmetu upravljala z vsemi roki za obstoječa ocenjevanja in učna gradiva. Več o funkciji različnih hitrosti napredovanja pri predmetu preberite v *uporabniški skupini za hitrost napredovanja pri predmetu*."
+  please_pick_an_earlier_date_98ba37e5: "Izberite zgodnejši datum"
   please_provide_a_field_e5a7d0b3: "Predložite %{field}"
   please_provide_a_pairing_code_530d1e9d: "Vnesite kodo za povezovanje."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Vnesite veljavno domeno najemnika. Preverite nastavitve Azure Active Directory, da jo najdete."
@@ -19744,6 +19832,7 @@ sl:
   removed_assignment_assignment_name_835cc776: "Odstranjena naloga %{assignment_name}"
   removed_course_association_course_a233342c: "Odstranjena povezava predmeta %{course}"
   removed_filename_a8634af3: "odstranjeno %{filename}"
+  removed_filtername_filter_c3cb4576: "Odstrani filter %{filterName}"
   removed_user_as_group_leader_bb69330f: "Uporabnik %{user} je odstranjen kot vodja skupine."
   removing_pace_9493910c: "Odstranjujem hitrost napredovanja ..."
   rename_45608f54: Preimenuj
@@ -19761,6 +19850,7 @@ sl:
   render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Upodobi oba seznama opravil za izvajalce z vpisi študentov"
   renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Upodobi oba seznama opravil v stranski vrstici preglednice za izvajalce z vpisi študentov"
   reorders_some_menu_options_for_more_consistency_an_90efff07: "Preureja nekatere možnosti menija za večjo doslednost in doda povezavo do SpeedGrader."
+  repeat_every_e653d6d0: "Ponovi vsak(ih):"
   repeats_on_61ecde30: "Ponavlja se na dan:"
   replace_attachmentdisplayname_button_94dd8ba1: "Gumb za zamenjavo %{attachmentDisplayName}"
   replace_e61834a7: Zamenjaj
@@ -20422,6 +20512,7 @@ sl:
   search_within_grouptitle_4d38272f: "Išči znotraj %{groupTitle}"
   searching_b0207e7f: Iskanje
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Iskanje obvestil v sekcijah mora obsegati natanko en predmet."
+  second_2d4ecf45: sekund
   secondary_button_36a86f03: "Sekundarni gumb"
   secondary_button_text_e92b3e52: "Besedilo sekundarnega gumba"
   secondary_color_button_7589827d: "Sekundarna barva gumba"
@@ -21432,6 +21523,7 @@ sl:
   short_name_42f454a1: "Kratko ime"
   short_name_ad9bf84f: "kratko ime"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bi moralo biti očitno; ID sistema Canvas uporabnika, ki poroča"
+  should_not_have_gotten_here_2d75f28a: "Sem sploh ne bi smeli priti"
   show_76c0ed1c: Prikaži
   show_accessibility_checker_notifications_while_edi_a7cb6449: "Med urejanjem prikaži obvestila preverjevalnika dostopnosti."
   show_account_calendar_for_name_c79359a0: "Prikaži koledar računa za %{name}"
@@ -21832,6 +21924,7 @@ sl:
   sso_settings_ebf98263: "Nastavitve SSO"
   stable_features_84154e5d: "Stabilne funkcije"
   staff_contact_info_2f7a6603: "Kontaktni podatki osebja"
+  standard_statuses_76e35e3c: "Standardni statusi"
   star_2d27c137: zvezdica
   star_8d156e09: "Označi z zvezdico"
   star_conversation_2e2ba614: "Označi pogovor z zvezdico"
@@ -22014,6 +22107,7 @@ sl:
   student_settings_354d9a7e: "Nastavitve študenta"
   student_sis_6721040e: "SIS študenta"
   student_sis_d9f0cd39: "sis študenta"
+  student_sis_id: "SIS ID študenta"
   student_sis_id_abe6b292: "sis id študenta"
   student_student_number_5c98bd2d: "Študent %{student_number}"
   student_studentnumber_f398d9c2: "Študent %{studentNumber}"
@@ -22522,6 +22616,7 @@ sl:
   tea_provisional_graders_d4f19c26: "Začasni ocenjevalci TEA"
   tea_quiz_submission_answers_b8b90be3: "Odgovori za oddajo kviza TEA"
   teacher_5a73b637: Izvajalec
+  teacher_activity_report_abf49a06: "Poročilo o aktivnosti izvajalca"
   teacher_count_teachers_a92f7199: "%{teacher_count} iIzvajalec"
   teacher_dashboard_custom_report_6d20bef2: "Poročilo po meri nadzorne plošče za izvajalce"
   teacher_engagement_report_ec03613d: "Poročilo o sodelovanju izvajalca"
@@ -22618,6 +22713,51 @@ sl:
       timespan: "%{start_at} *do* %{end_at}"
   terms_35d91184: "Semestri: "
   terms_4d979628: Semestri
+  terms_api: 
+    index: 
+      page_title: "%{account} Semestri"
+      terms_add_new: "Dodaj nov semester"
+      terms_no_results: "Ni najdenih semestrov"
+      terms_no_results_name: "Ni semestrov z imenom »%{name}«"
+      terms_search_name: "Išči po imenu semestra"
+      terms_view_all: "Ogled vseh semestrov"
+      titles: 
+        term_details: "Podrobnosti o semestru"
+    term: 
+      buttons: 
+        add: "Dodaj semester"
+        update: "Posodobi semester"
+      course_count: 
+        one: "1 predmet"
+        other: "%{count} predmeti"
+      labels: 
+        designers_can_access_from: "**Snovalci** lahko dostopajo od"
+        grading_period_set_title: "Nabor ocenjevalnih obdobij"
+        sis_id: "SIS ID"
+        students_can_access_from: "**Študenti** lahko dostopajo od"
+        tas_can_access_from: "**Demonstratorji** lahko dostopajo od"
+        teachers_can_access_from: "**Izvajalci** lahko dostopajo od"
+      name: "Ime semestra:"
+      sis_source_id: "SIS ID:"
+      term_runs_from: "**Semester poteka** od"
+      titles: 
+        term_ends: "Semester se konča"
+        term_starts: "Semester se začne"
+      tooltips: 
+        term_ends_designers: "Za snovalce se semester konča"
+        term_ends_students: "Za študente se semester konča"
+        term_ends_tas: "Za demonstratorje se semester konča"
+        term_ends_teachers: "Za izvajalce se semester konča"
+        term_starts_designers: "Za snovalce se semester začne"
+        term_starts_students: "Za študente se semester začne"
+        term_starts_tas: "Za demonstratorje se semester začne"
+        term_starts_teachers: "Za izvajalce se semester začne"
+    timespan: 
+      date: 
+        term_end: "konec semestra"
+        term_start: "začetek semestra"
+        unspecified: "kadar koli"
+      timespan: "%{start_at} *do* %{end_at}"
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Semestrov ni mogoče najti. Semestre je treba vključiti v multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Lastnosti pogojev storitve niso veljavne."
   test_cluster_only_70e61c19: "Preskusi samo gručo"
@@ -22920,6 +23060,7 @@ sl:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Enolični ID, ki je uporabljen za prikaz cikla specifične zahteve/specifičnega odziva, v katerem se je pojavilo poročilo o tej napaki."
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "Naslov URL, ki ga uporabnik z zadostnimi pravicami lahko na isti strani uporabi, da s prevzemanjem vloge uporabnika, ki poroča, poskusi znova ustvariti težavo."
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Naslov URL strani, na kateri je bil uporabnik, ko je poročal o težavi."
+  the_user_found_matches_the_source_user_please_sear_a1d0004f: "Najdeni uporabnik se ujema z izvornim uporabnikom. Poiščite drugega uporabnika."
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "ID(-ji) uporabnikov skrbnika(-ov), ki izvaja(jo) oddaje"
   the_user_id_to_report_on_b1de2577: "ID uporabnika za poročanje"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Uporabnik mora biti pri predmetih, ki jih skuša navzkrižno navesti, vpisan tudi kot učitelj."
@@ -23024,6 +23165,7 @@ sl:
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "Pri zagonu konfiguriranega orodja je prišlo do napake."
   there_was_an_error_linking_pace_7d2bb508: "Pri povezovanju hitrosti napredovanja je prišlo do napake."
   there_was_an_error_linking_plan_6f316070: "Pri povezovanju načrta je prišlo do napake."
+  there_was_an_error_loading_the_custom_recurrence_e_df9ad737: "Prišlo je do napake pri nalaganju urejevalnika ponovitev po meri."
   there_was_an_error_loading_the_document_d80e57e0: "Prišlo je do napake pri nalaganju dokumenta."
   there_was_an_error_loading_the_pace_810e3a7e: "Prišlo je do napake pri nalaganju hitrosti napredovanja."
   there_was_an_error_loading_the_plan_9314ef06: "Pri nalaganju načrta je prišlo do napake."
@@ -23092,6 +23234,7 @@ sl:
   these_scores_are_out_of_order_4f0859ef: "ti rezultati niso uporabni"
   they_them_f4d17a04: Oni/Njih
   they_were_merged_into_other_user_64758f01: "Združeni so bili v *%{other_user}*."
+  third_20c6a639: tretji
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Ta račun ne omogoča vklopa sinhronizacije Microsoft Teams. Pred urejanjem nastavitev omogočite zastavico funkcije »Sinhronizacija vpisa v Microsoft Group«."
   this_and_all_following_events_4b4b283: "Ta in vsi naslednji dogodki"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "To obvestilo ne bo vodno do %{delayedPostAt}."
@@ -23380,6 +23523,7 @@ sl:
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Ta uporabnik še ni sprejel povabila k predmetu."
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Ta uporabnik trenutno ne more dostopati do predmeta."
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Ta uporabnik trenutno ne more dostopati do predmeta.\""
+  this_user_is_ready_to_be_assigned_temporary_enroll_a83b1ae0: "Ta uporabnik je pripravljen za dodelitev začasnih vpisov."
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Ta uporabnik je izvedel dejanja, medtem ko je bil anonimni način izklopljen"
   this_user_s_last_activity_in_the_course_was_dateti_74d3ac3b: "Zadnja dejavnost tega uporabnika v predmetu je bila %{datetime}"
   this_user_will_be_created_in_3b2a2b52: "Ta uporabnik bo ustvarjen v:"
@@ -24421,6 +24565,7 @@ sl:
   until_date_949017c4: "Do %{date}"
   until_date_must_be_after_the_available_date_8670dfcd: "Datum »Do« mora biti po datumu »Na voljo«"
   until_date_must_be_after_the_due_date_d961566c: "Datum »Do« mora biti po datumu »Roki«"
+  until_date_must_be_after_the_event_start_date_972f759d: "Datum »Do« mora biti po datumu začetka dogodka"
   untitled_16aa4f2b: "Brez naslova"
   untitled_assignment_59354b34: "naloga brez naslova"
   untitled_filter_c07b8ddc: "Filter brez naslova"
@@ -24548,6 +24693,7 @@ sl:
   use_high_contrast_ui_a5917282: "Uporabi visokokontrastni uporabniški vmesnik"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "V urejevalniku vsebine uporabi snemalnik HTML5 namesto vtičnika Flash"
   use_improved_placeholders_for_inserted_content_in__433adfaa: "Uporabite izboljšane označbe mesta za vstavljeno vsebino v RCE."
+  use_instui_for_the_course_import_page_1906ef55: "Za stran za uvoz predmeta uporabite InstUI"
   use_instui_for_tool_installation_and_configuration_36de63e9: "InstUI uporabite za obrazce za namestitev in konfiguracijo orodja"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Ali želite uporabiti MathMan za pretvorbo LaTeX v MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Ali želite uporabiti MathMan za pretvorbo LaTeX v SVG?"
@@ -24606,6 +24752,7 @@ sl:
   user_can_opt_in_to_mfa_canvas_will_only_challenge__649cd2a: "Uporabnik se lahko prijavi za MFA *Sistem Canvas bo uporabnika izzval z MFA le, če je ta to predhodno konfiguriral.*"
   user_cannot_manage_individual_course_content_witho_d7b65fd4: "Uporabnik ne more urejati vsebine posameznega predmeta brez ustreznega dovoljenja za ta element vsebine."
   user_content_aaf0fb5a: "Vsebina uporabnika"
+  user_could_not_be_found_3e7ef5fe: "Uporabnika ni mogoče najti."
   user_course_access_log_f7b8a4bd: "Dnevnik dostopa uporabnika do predmeta"
   user_data_export_from_date_6ba21b89: "*Izvoz podatkov uporabnika iz %{date}*"
   user_date_range_search: 
@@ -25061,6 +25208,7 @@ sl:
   value_d842f16d: Vrednost
   value_is_not_a_valid_date_23c2d0a2: "%{value} ni veljaven datum."
   value_is_not_a_valid_lti_version_ef4f6b1e: "%{value} ni veljavna različica LTI"
+  value_is_not_a_valid_standard_grade_status_99de23ac: "%{value} ni veljaven status standardne ocene"
   value_is_not_valid_563afee6: "%{value} ni veljaven(-na/-no)"
   value_removed_bba9430c: "%{value} Odstranjeno"
   value_too_long_allowed_length_is_length_a81d4cf: "Vrednost je predolga, dovoljena dolžina je %{length}"
@@ -25256,6 +25404,7 @@ sl:
   wednesday_b6f755f5: Sreda
   week_s_cb1492ee: Tedni
   weekly_summary_56cd0c95: "Tedenski povzetek"
+  weeks_4504fe8b: Tednov
   weight_9b308e5b: Utež
   weight_ff579a8e: "Utež:"
   weight_final_grade_based_on_assignment_groups_3124161: "Uteži končno oceno na podlagi skupin naloge"
@@ -25304,7 +25453,7 @@ sl:
   when_enabled_lti_1_3_launches_that_would_be_associ_bfec33fb: |-
       Ko je ta možnost omogočena, se zažene LTI 1.3, ki bi bil povezan z orodjem LTI 1.1,
       če orodje LTI 1.3 ni bilo prisotno pa vključuje lastnosti oauth_consumer_key in
-      oauth_consumer_key_sign  kot del sekcije zahtevkov LTI 1.1.
+      oauth_consumer_key_sign kot del sekcije zahtevkov LTI 1.1.
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
       Če je ta mehanizem omogočen, bodo funkcije Novi kvizi uporabljale namenskega uporabnika storitve skrbnika mesta
       in DeveloperKey za ustvarjanje žetona za dostop in osvežitev
@@ -25563,6 +25712,7 @@ sl:
   xls_733452c1: XLS
   xls_e593104b: xls
   xml_configuration_5ea1b942: "Konfiguracija XML"
+  years_663d412e: let
   yes_3593c135: da
   yes_dde87d5: Da
   yes_install_tool_f51b3278: "Da, namesti orodje."
@@ -25768,6 +25918,7 @@ sl:
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Vnesti morate vrednost ali pa morate izbiro možnosti razveljaviti."
   you_must_provide_required_fields_before_adding_6717073d: "Pred dodajanjem morate izpolniti obvezna polja"
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Vnesti morate targetGroupId, targetContextId in targetContextType"
+  you_must_publish_your_course_for_students_to_recei_1995ee46: "Svoj predmet morate objaviti, da bodo študenti lahko prejeli obvestila o objavah. Obvestila o objavah, ustvarjenih pred objavo predmeta, za nazaj ne bodo poslana."
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Izbrati morate predmet, iz katerega boste kopirali vsebino."
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Izbrati morate mapo, da boste naložili migracijo v"
   you_must_select_an_assignment_group_c16a2168: "Izbrati morate skupino nalog."
