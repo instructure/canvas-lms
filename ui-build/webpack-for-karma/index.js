@@ -41,7 +41,7 @@ module.exports = {
     noParse: [require.resolve('jquery'), require.resolve('tinymce')],
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.(mjs|js|jsx|ts|tsx)$/,
         type: 'javascript/auto',
         include: [
           path.resolve(canvasDir, 'node_modules/graphql'),
@@ -80,7 +80,11 @@ module.exports = {
           options: {
             cacheDirectory: false,
             configFile: false,
-            presets: [['@babel/preset-react', {useBuiltIns: true}], ['@babel/preset-typescript']],
+            presets: [
+              ['@babel/preset-env'],
+              ['@babel/preset-react', {useBuiltIns: true}],
+              ['@babel/preset-typescript'],
+            ],
             plugins: [
               // we need to have babel transpile ESM to CJS and can't just let
               // Webpack do it because Sinon is evidently no longer compatible
