@@ -248,6 +248,7 @@ class Submission < ActiveRecord::Base
       .where(<<~SQL.squish)
         /* excused submissions cannot be missing */
         excused IS NOT TRUE
+        AND custom_grade_status_id IS NULL
         AND (late_policy_status IS DISTINCT FROM 'extended')
         AND NOT (
           /* teacher said it's missing, 'nuff said. */
@@ -278,6 +279,7 @@ class Submission < ActiveRecord::Base
   scope :late, lambda {
     left_joins(:quiz_submission).where(<<~SQL.squish)
       submissions.excused IS NOT TRUE
+      AND submissions.custom_grade_status_id IS NULL
       AND (
         submissions.late_policy_status = 'late' OR
         (submissions.late_policy_status IS NULL AND submissions.submitted_at >= submissions.cached_due_date +
@@ -290,6 +292,7 @@ class Submission < ActiveRecord::Base
   scope :not_late, lambda {
     left_joins(:quiz_submission).where(<<~SQL.squish)
       submissions.excused IS TRUE
+      OR submissions.custom_grade_status_id IS NOT NULL
       OR (late_policy_status IS NOT DISTINCT FROM 'extended')
       OR (
         submissions.late_policy_status is distinct from 'late' AND
@@ -2486,6 +2489,7 @@ class Submission < ActiveRecord::Base
 
     def late?
       return false if excused?
+      return false if custom_grade_status_id
       return late_policy_status == "late" if late_policy_status.present?
 
       submitted_at.present? && past_due?
@@ -2494,6 +2498,7 @@ class Submission < ActiveRecord::Base
 
     def missing?
       return false if excused?
+      return false if custom_grade_status_id
       return false if grader_id && late_policy_status.nil?
       return late_policy_status == "missing" if late_policy_status.present?
       return false if submitted_at.present?
@@ -2509,6 +2514,7 @@ class Submission < ActiveRecord::Base
 
     def extended?
       return false if excused?
+      return false if custom_grade_status_id
       return late_policy_status == "extended" if late_policy_status.present?
 
       false
