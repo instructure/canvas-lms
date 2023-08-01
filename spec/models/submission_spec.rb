@@ -761,6 +761,15 @@ describe Submission do
       submission
     end
 
+    let(:custom_grade_status) do
+      admin = account_admin_user(account: @assignment.root_account)
+      @assignment.root_account.custom_grade_statuses.create!(
+        color: "#ABC",
+        name: "yolo",
+        created_by: admin
+      )
+    end
+
     it "sets excused to false if the late_policy_status is being changed to a not-nil value" do
       submission.update!(late_policy_status: "missing")
       expect(submission).not_to be_excused
@@ -773,27 +782,18 @@ describe Submission do
       expect(submission).to be_excused
     end
 
-    context "custom statuses" do
-      before do
-        admin = account_admin_user(account: @assignment.root_account)
-        @custom_grade_status = @assignment.root_account.custom_grade_statuses.create!(
-          color: "#ABC",
-          name: "yolo",
-          created_by: admin
-        )
-      end
+    it "sets excused to false when a custom status is set" do
+      expect { submission.update!(custom_grade_status:) }.to change {
+        submission.excused?
+      }.from(true).to(false)
+    end
 
-      it "sets excused to false if the custom_grade_status_id is being changed to a not-nil value" do
-        submission.update!(custom_grade_status: @custom_grade_status)
-        expect(submission).not_to be_excused
-      end
-
-      it "does not set excused to false if the custom_grade_status_id is being changed to a nil value" do
-        # need to skip callbacks so excused does not get set to false
-        submission.update_column(:custom_grade_status_id, @custom_grade_status.id)
-        submission.update!(custom_grade_status_id: nil)
-        expect(submission).to be_excused
-      end
+    it "does not set excused to false when a custom status is removed" do
+      # need to skip callbacks so excused does not get set to false
+      submission.update_column(:custom_grade_status_id, custom_grade_status.id)
+      expect { submission.update!(custom_grade_status: nil) }.not_to change {
+        submission.excused?
+      }.from(true)
     end
   end
 
@@ -829,9 +829,9 @@ describe Submission do
     end
 
     context "custom statuses" do
-      before do
+      let(:custom_grade_status) do
         admin = account_admin_user(account: @assignment.root_account)
-        @custom_grade_status = @assignment.root_account.custom_grade_statuses.create!(
+        @assignment.root_account.custom_grade_statuses.create!(
           color: "#ABC",
           name: "yolo",
           created_by: admin
@@ -839,25 +839,25 @@ describe Submission do
       end
 
       it "sets late_policy_status to nil if the custom_grade_status_id is being changed to a not-nil value" do
-        submission.update!(custom_grade_status: @custom_grade_status)
+        submission.update!(custom_grade_status:)
         expect(submission.late_policy_status).to be_nil
       end
 
       it "sets seconds_late_override to nil if the submission is updated to have a custom status" do
-        submission.update!(custom_grade_status: @custom_grade_status)
+        submission.update!(custom_grade_status:)
         expect(submission.seconds_late_override).to be_nil
       end
 
       it "does not set late_policy_status to nil if the custom_grade_status_id is being changed to a nil value" do
         # need to skip callbacks so excused does not get set to false
-        submission.update_column(:custom_grade_status_id, @custom_grade_status.id)
+        submission.update_column(:custom_grade_status_id, custom_grade_status.id)
         submission.update!(custom_grade_status_id: nil)
         expect(submission.late_policy_status).to eql "late"
       end
 
       it "does not set seconds_late_override to nil if the submission is updated to not have a custom status" do
         # need to skip callbacks so seconds_late_override does not get set to nil
-        submission.update_column(:custom_grade_status_id, @custom_grade_status.id)
+        submission.update_column(:custom_grade_status_id, custom_grade_status.id)
         submission.update!(custom_grade_status_id: nil)
         expect(submission.seconds_late_override).to be 60
       end
@@ -4289,6 +4289,20 @@ describe Submission do
         @submission.assignment.update!(submission_types: "online_upload")
       end
 
+      it "excludes an otherwise missing submission that has been marked with a custom status" do
+        @submission.update!(grader_id: nil)
+        admin = account_admin_user(account: @course.root_account)
+        custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+          name: "Custom Status",
+          color: "#ABC",
+          created_by: admin
+        )
+
+        expect { @submission.update!(custom_grade_status:) }.to change {
+          Submission.missing.include?(@submission)
+        }.from(true).to(false)
+      end
+
       it "includes submission when due date has passed with no submission, late_policy_status is nil, excused is nil and grader is nil" do
         @submission.update(grader_id: nil)
         expect(Submission.missing).to include @submission
@@ -4506,11 +4520,11 @@ describe Submission do
 
   describe "#late?" do
     before(:once) do
-      course = Course.create!
+      @course = Course.create!
       student = User.create!
-      course.enroll_student(student, enrollment_state: "active")
+      @course.enroll_student(student, enrollment_state: "active")
       now = Time.zone.now
-      assignment = course.assignments.create!(submission_types: "online_text_entry", due_at: 10.days.ago(now))
+      assignment = @course.assignments.create!(submission_types: "online_text_entry", due_at: 10.days.ago(now))
       @submission = assignment.submit_homework(student, body: "Submitting late :(")
     end
 
@@ -4526,6 +4540,41 @@ describe Submission do
     it "returns false if the submission is past due but has its late_policy_status set to something other than 'late'" do
       @submission.late_policy_status = "missing"
       expect(@submission).not_to be_late
+    end
+
+    it "returns false when an otherwise late submission has a custom status" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @submission.update!(custom_grade_status:) }.to change {
+        @submission.late?
+      }.from(true).to(false)
+    end
+  end
+
+  describe "#extended?" do
+    before(:once) do
+      @course = Course.create!
+      student = User.create!
+      @course.enroll_student(student, enrollment_state: "active")
+      assignment = @course.assignments.create!(submission_types: "online_text_entry")
+      @submission = assignment.submissions.find_by(user: student)
+    end
+
+    it "returns false when a custom status has been applied" do
+      @submission.update(late_policy_status: "extended")
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @submission.update!(custom_grade_status:) }.to change {
+        @submission.extended?
+      }.from(true).to(false)
     end
   end
 
@@ -4559,6 +4608,19 @@ describe Submission do
           expect(@another_submission.reload).to be_missing
         end
       end
+    end
+
+    it "returns false when an otherwise missing submission has a custom status" do
+      @another_assignment.update!(submission_types: "online_upload")
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @another_submission.update!(custom_grade_status:) }.to change {
+        @another_submission.missing?
+      }.from(true).to(false)
     end
 
     it "returns false when late_policy_status is nil standalone" do
@@ -7880,6 +7942,18 @@ describe Submission do
     end
 
     ### Homeworks
+    it "excludes an otherwise late submission that has been marked with a custom status" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @late_hw1.update!(custom_grade_status:) }.to change {
+        Submission.late.include?(@late_hw1)
+      }.from(true).to(false)
+    end
+
     it "excludes unsubmitted homeworks" do
       expect(@late_submission_ids).not_to include(@unsubmitted_hw.id)
     end
@@ -8055,6 +8129,18 @@ describe Submission do
     end
 
     ### Homeworks
+    it "includes an otherwise late submission that has been marked with a custom status" do
+      admin = account_admin_user(account: @course.root_account)
+      custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+        name: "Custom Status",
+        color: "#ABC",
+        created_by: admin
+      )
+      expect { @late_hw1.update!(custom_grade_status:) }.to change {
+        Submission.not_late.include?(@late_hw1)
+      }.from(false).to(true)
+    end
+
     it "includes unsubmitted homeworks" do
       expect(@not_late_submission_ids).to include(@unsubmitted_hw.id)
     end
