@@ -19,6 +19,7 @@
 #
 
 require "oauth2"
+require "canvas/core_ext/oauth2"
 
 class OAuthValidationError < RuntimeError
 end
