@@ -554,6 +554,9 @@ export const SplitScreenViewContainer = props => {
             screenReaderLabel="Close"
             data-testid="splitscreen-container-close-button"
             onClick={() => {
+              if(props.setRCEOpen){
+                props.setRCEOpen(false)
+              }
               if (props.onClose) {
                 props.onClose()
               }
