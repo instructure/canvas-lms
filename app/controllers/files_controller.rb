@@ -208,7 +208,13 @@ class FilesController < ApplicationController
   #  { "quota": 524288000, "quota_used": 402653184 }
   #
   def api_quota
-    if authorized_action(@context.attachments.build, @current_user, %i[create update delete])
+    # allow user quota info to be viewed by admins
+    permitted = true if @context.is_a?(User) &&
+                        @domain_root_account.grants_any_right?(
+                          @current_user,
+                          *RoleOverride::GRANULAR_FILE_PERMISSIONS
+                        )
+    if permitted || authorized_action(@context.attachments.build, @current_user, %i[create update delete])
       get_quota
       render json: { quota: @quota, quota_used: @quota_used }
     end
