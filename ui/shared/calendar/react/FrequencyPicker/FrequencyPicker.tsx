@@ -35,6 +35,7 @@ const {Option} = SimpleSelect as any
 const I18n = useScope('calendar_frequency_picker')
 
 export type OnFrequencyChange = (frequency: FrequencyOptionValue, RRule: string | null) => void
+export type FrequencyPickerWidth = 'auto' | 'fit'
 
 export type FrequencyPickerProps = {
   readonly date: Date | string
@@ -42,7 +43,12 @@ export type FrequencyPickerProps = {
   readonly initialFrequency: FrequencyOptionValue
   readonly rrule?: string
   readonly locale: string
+  readonly width?: FrequencyPickerWidth
   readonly onChange: OnFrequencyChange
+}
+
+function getFrequencySelectWidth(width: FrequencyPickerWidth, options: FrequencyOptionsArray) {
+  return width === 'fit' ? getSelectTextWidth(options.map(opt => opt.label)) : 'auto'
 }
 
 export default function FrequencyPicker({
@@ -51,6 +57,7 @@ export default function FrequencyPicker({
   initialFrequency,
   rrule,
   locale,
+  width = 'fit',
   onChange,
 }: FrequencyPickerProps) {
   const [frequency, setFrequency] = useState<FrequencyOptionValue>(initialFrequency)
@@ -66,7 +73,7 @@ export default function FrequencyPicker({
     generateFrequencyOptions(parsedMoment, locale, timezone, customRRule)
   )
   const [selectTextWidth, setSelectTextWidth] = useState<string>(() =>
-    getSelectTextWidth(options.map(opt => opt.label))
+    getFrequencySelectWidth(width, options)
   )
   const freqPickerRef = useRef<HTMLInputElement | null>(null)
 
@@ -95,9 +102,9 @@ export default function FrequencyPicker({
       newOpts.some((opt, i) => opt.label !== options[i].label)
     ) {
       setOptions(newOpts)
-      setSelectTextWidth(getSelectTextWidth(newOpts.map(opt => opt.label)))
+      setSelectTextWidth(getFrequencySelectWidth(width, newOpts))
     }
-  }, [customRRule, locale, options, parsedMoment, timezone])
+  }, [customRRule, locale, options, parsedMoment, timezone, width])
 
   const handleSelectOption = useCallback(
     (e: any, option: FrequencyOption) => {
@@ -140,9 +147,9 @@ export default function FrequencyPicker({
       setFrequency('saved-custom')
       const newOpts = generateFrequencyOptions(parsedMoment, locale, timezone, newRRule)
       setOptions(newOpts)
-      setSelectTextWidth(getSelectTextWidth(newOpts.map(opt => opt.label)))
+      setSelectTextWidth(getFrequencySelectWidth(width, newOpts))
     },
-    [locale, parsedMoment, timezone]
+    [locale, parsedMoment, timezone, width]
   )
 
   return (

@@ -102,7 +102,7 @@ export default {
 } as Meta
 
 const Template: Story<FrequencyPickerProps> = args => {
-  const {date, initialFrequency, locale, timezone} = args
+  const {date, initialFrequency, locale, timezone, width} = args
 
   I18n.locale = locale
   moment.tz.setDefault(timezone)
@@ -128,6 +128,7 @@ const Template: Story<FrequencyPickerProps> = args => {
           rrule={frequency === 'saved-custom' ? RRule : undefined}
           locale={locale}
           timezone={timezone}
+          width={width}
           onChange={handleFrequencyChange}
         />
       </View>
@@ -159,6 +160,15 @@ WithInitialFrequency.args = {
   initialFrequency: 'daily',
   locale: 'en',
   timezone: moment.tz.guess(),
+}
+
+export const WidthAuto = Template.bind({})
+WidthAuto.args = {
+  date: moment().format('YYYY-MM-DD'),
+  initialFrequency: 'not-repeat',
+  locale: 'en',
+  timezone: moment.tz.guess(),
+  width: 'auto',
 }
 
 export const InToko = Template.bind({})
