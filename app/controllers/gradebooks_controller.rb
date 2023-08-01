@@ -357,7 +357,7 @@ class GradebooksController < ApplicationController
     set_current_grading_period if grading_periods?
     set_enhanced_individual_gradebook_env
     deferred_js_bundle :enhanced_individual_gradebook
-    @page_title = t("Gradebook: Enhanced Individual View")
+    @page_title = t("Gradebook: Individual View")
     render html: "".html_safe, layout: true
   end
   private :show_enhanced_individual_gradebook

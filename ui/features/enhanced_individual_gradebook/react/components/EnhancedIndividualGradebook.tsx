@@ -226,7 +226,7 @@ export default function EnhancedIndividualGradebook() {
     <View as="div">
       <View as="div" className="row-fluid">
         <View as="div" className="span12">
-          <View as="h1">{I18n.t('Gradebook: Enhanced Individual View')}</View>
+          <View as="h1">{I18n.t('Gradebook: Individual View')}</View>
           {I18n.t(
             'Note: Grades and notes will be saved automatically after moving out of the field.'
           )}
