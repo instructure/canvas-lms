@@ -1845,7 +1845,7 @@ describe "Files API", type: :request do
       expect(json).to eql({ "quota" => group.quota, "quota_used" => 13.megabytes })
     end
 
-    it "operates on users" do
+    it "operates on users if user == self" do
       course_with_student active_all: true
       json = api_call(:get,
                       "/api/v1/users/self/files/quota",
@@ -1854,6 +1854,31 @@ describe "Files API", type: :request do
                       format: "json",
                       user_id: "self")
       expect(json).to eql({ "quota" => @student.quota, "quota_used" => 0 })
+    end
+
+    it "operates on users for account admins" do
+      course_with_student active_all: true
+      account_admin_user
+      json = api_call_as_user(@admin,
+                              :get,
+                              "/api/v1/users/#{@student.id}/files/quota",
+                              controller: "files",
+                              action: "api_quota",
+                              format: "json",
+                              user_id: @student.id)
+      expect(json).to eql({ "quota" => @student.quota, "quota_used" => 0 })
+    end
+
+    it "does not operate on users for non admin roles" do
+      course_with_student active_all: true
+      api_call_as_user(@teacher,
+                       :get,
+                       "/api/v1/users/#{@student.id}/files/quota",
+                       controller: "files",
+                       action: "api_quota",
+                       format: "json",
+                       user_id: @student.id)
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end
