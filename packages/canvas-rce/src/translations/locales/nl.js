@@ -884,6 +884,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Bijsnijvorm selecteren" },
   "select_language_7c93a900": { "message": "Taal selecteren" },
   "select_video_source_1b5c9dbe": { "message": "Videobron selecteren" },
+  "selected_274ce24f": { "message": "Geselecteerd" },
   "selected_linkfilename_c093b1f2": {
     "message": "Geselecteerd { linkFileName }"
   },

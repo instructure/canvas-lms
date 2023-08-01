@@ -906,6 +906,7 @@ const locale = {
   "select_video_source_1b5c9dbe": {
     "message": "Sélectionner une source vidéo"
   },
+  "selected_274ce24f": { "message": "Sélectionné" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } sélectionné"
   },

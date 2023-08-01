@@ -836,6 +836,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
   "select_language_7c93a900": { "message": "اختر اللغة" },
   "select_video_source_1b5c9dbe": { "message": "حدد مصدر الفيديو" },
+  "selected_274ce24f": { "message": "تم التحديد" },
   "selected_linkfilename_c093b1f2": { "message": "{ linkFileName } المحدد" },
   "selection_b52c4c5e": { "message": "تحديد" },
   "set_header_scope_8c548f40": { "message": "تعيين نطاق الرأس" },

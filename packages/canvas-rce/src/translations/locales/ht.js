@@ -829,6 +829,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Seleksyone koupe fòm" },
   "select_language_7c93a900": { "message": "Seleksyone Lang" },
   "select_video_source_1b5c9dbe": { "message": "Seleksyone sous videyo" },
+  "selected_274ce24f": { "message": "Seleksyone" },
   "selected_linkfilename_c093b1f2": {
     "message": "Seleksyone { linkFileName }"
   },

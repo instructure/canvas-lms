@@ -896,6 +896,7 @@ const locale = {
   "select_crop_shape_d441feeb": { "message": "Seleziona forma di ritaglio" },
   "select_language_7c93a900": { "message": "Selezionare la lingua" },
   "select_video_source_1b5c9dbe": { "message": "Seleziona sorgente video" },
+  "selected_274ce24f": { "message": "Selezionato" },
   "selected_linkfilename_c093b1f2": {
     "message": "{ linkFileName } selezionato"
   },
