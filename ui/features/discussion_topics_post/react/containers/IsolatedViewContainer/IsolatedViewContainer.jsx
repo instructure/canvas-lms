@@ -521,6 +521,10 @@ export const IsolatedViewContainer = props => {
           return
         }
 
+        if(props.setRCEOpen){
+          props.setRCEOpen(false)
+        }
+
         if (props.onClose) {
           props.onClose()
         }
@@ -539,6 +543,9 @@ export const IsolatedViewContainer = props => {
               offset="small"
               screenReaderLabel="Close"
               onClick={() => {
+                if(props.setRCEOpen){
+                  props.setRCEOpen(false)
+                }
                 if (props.onClose) {
                   props.onClose()
                 }

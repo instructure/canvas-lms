@@ -29,7 +29,6 @@ import {responsiveQuerySizes, showErrorWhenMessageTooLong} from '../../utils'
 import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
-import {nanoid} from 'nanoid'
 import {name as mentionsPluginName} from '@canvas/rce/plugins/canvas_mentions/plugin'
 import positionCursor from './PositionCursorHook'
 import {ReplyPreview} from '../ReplyPreview/ReplyPreview'
@@ -42,7 +41,7 @@ export const DiscussionEdit = props => {
   const rceRef = useRef()
   const [rceContent, setRceContent] = useState(false)
   const [includeQuotedReply, setIncludeQuotedReply] = useState(!!props.quotedEntry?.previewMessage)
-  const textAreaId = useRef(`message-body-${nanoid()}`) // for VICE-3279 change `message-body-${nanoid()}` to `message-body-${props.rceIdentifier}`
+  const textAreaId = useRef(`message-body-${props.rceIdentifier}`)
   const [draftTimeout, setDraftTimeout] = useState(null)
   const [awaitingChanges, setAwaitingChanges] = useState(false)
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
