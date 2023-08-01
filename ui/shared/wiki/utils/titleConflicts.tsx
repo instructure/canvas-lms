@@ -15,10 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce} from '@instructure/debounce'
 import type {Message} from '../react/renderWikiPageTitle'
+// @ts-expect-error
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('wiki_pages')
 
@@ -33,7 +36,14 @@ export function conflictMessage(): Message {
     : I18n.t('There is already a page in this course with this title.')
   return {
     type: 'hint',
-    text,
+    text: (
+      <>
+        <IconWarningSolid data-testid="warning-icon" color="warning" />
+        <View display="inline-block" margin="0 xx-small">
+          {text}
+        </View>
+      </>
+    ),
   }
 }
 
