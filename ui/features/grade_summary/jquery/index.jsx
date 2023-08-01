@@ -948,7 +948,11 @@ function setup() {
       .triggerHandler('change')
 
     bindShowAllDetailsButton($ariaAnnouncer)
-    StatusPill.renderPills()
+    const statusMap = ENV.custom_grade_statuses?.reduce((statusMap, status) => {
+      statusMap[status.id] = status
+      return statusMap
+    }, {}) ?? []
+    StatusPill.renderPills(statusMap)
   })
 }
 

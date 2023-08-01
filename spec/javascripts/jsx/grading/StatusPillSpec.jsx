@@ -79,3 +79,27 @@ test('renderPills mounts a <Pill /> with correct text to each .submission-excuse
     equal(call.args[1], spans[idx])
   })
 })
+
+test('renderPills mounts a <Pill /> with correct text to each .submission-custom-grade-status-pill-id', () => {
+  const stubbedRender = sandbox.stub(ReactDOM, 'render')
+  const spans = [1, 2, 3].map((elem) => addSpan(`submission-custom-grade-status-pill-${elem}`))
+  const statuses = {
+    1: {
+      name: "status one",
+    },
+    2: {
+      name: "status two",
+    },
+    3: {
+      name: "status three",
+    }
+  }
+  StatusPill.renderPills(statuses)
+
+  const calls = spans.map((_span, idx) => stubbedRender.getCall(idx))
+  calls.forEach((call, idx) => {
+    equal(call.args[0].type, Pill)
+    equal(call.args[0].props.children, statuses[idx].name)
+    equal(call.args[1], spans[idx])
+  })
+})

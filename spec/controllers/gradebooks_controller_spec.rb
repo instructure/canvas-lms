@@ -682,6 +682,45 @@ describe GradebooksController do
       end
     end
 
+    context "custom gradebook statuses in grade summary" do
+      it "does not include custom gradebook status ids on submissions when feature flag is disabled" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        user_session(@student)
+        assignment = @course.assignments.create!
+        assignment.grade_student(@student, grade: 10, grader: @teacher)
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+        controller.load_grade_summary_data
+        grade_summary_submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+        expect(grade_summary_submission).not_to have_key(:custom_grade_status_id)
+      end
+
+      it "does include custom gradebook status ids on submissions when feature flag is enabled" do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        user_session(@student)
+        assignment = @course.assignments.create!
+        assignment.grade_student(@student, grade: 10, grader: @teacher)
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+        controller.load_grade_summary_data
+        grade_summary_submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+        expect(grade_summary_submission).to have_key(:custom_grade_status_id)
+        expect(grade_summary_submission[:custom_grade_status_id]).to be_nil
+      end
+
+      it "returns the correct status id on submissions when they have a custom status and the feature flag is enabled" do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        user_session(@student)
+        assignment = @course.assignments.create!
+        submission = assignment.grade_student(@student, grade: 10, grader: @teacher).first
+        status = CustomGradeStatus.create!(name: "custom status", color: "#00ffff", root_account_id: @course.root_account_id, created_by: @teacher)
+        submission.update!(custom_grade_status: status)
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+        controller.load_grade_summary_data
+        grade_summary_submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == assignment.id }
+        expect(grade_summary_submission).to have_key(:custom_grade_status_id)
+        expect(grade_summary_submission[:custom_grade_status_id]).to eq(status.id)
+      end
+    end
+
     context "with grading periods" do
       let(:group_helper)  { Factories::GradingPeriodGroupHelper.new }
       let(:period_helper) { Factories::GradingPeriodHelper.new }

@@ -265,6 +265,32 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
+  describe "custom grade statuses" do
+    it "returns false when there is no custom grade status on the submission" do
+      expect(presenter.custom_grade_status?).to be_falsey
+    end
+
+    it "returns false when there is a custom grade status but the feature flag is disabled" do
+      Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+      status = CustomGradeStatus.create!(color: "#00ffff", name: "custom status", root_account_id: @course.root_account_id, created_by_id: @teacher.id)
+      @submission.update!(custom_grade_status: status)
+      expect(presenter.custom_grade_status?).to be_falsey
+    end
+
+    it "returns true when a custom grade status exists and the feature flag is enabled" do
+      Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+      status = CustomGradeStatus.create!(color: "#00ffff", name: "custom status", root_account_id: @course.root_account_id, created_by_id: @teacher.id)
+      @submission.update!(custom_grade_status: status)
+      expect(presenter.custom_grade_status?).to be_truthy
+    end
+
+    it "returns the id when a custom grade status exists" do
+      status = CustomGradeStatus.create!(color: "#00ffff", name: "custom status", root_account_id: @course.root_account_id, created_by_id: @teacher.id)
+      @submission.update!(custom_grade_status: status)
+      expect(presenter.custom_grade_status_id).to eq(status.id)
+    end
+  end
+
   describe "#hide_grade_from_student?" do
     it "returns true if the submission object is nil" do
       submissionless_presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)

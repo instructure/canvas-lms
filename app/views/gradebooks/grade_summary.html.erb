@@ -200,7 +200,9 @@
             </td>
 
             <td class="status" scope="row">
-              <% if assignment_presenter.missing? %>
+              <% if assignment_presenter.custom_grade_status?%>
+                <span class="submission-custom-grade-status-pill-<%= assignment_presenter.custom_grade_status_id %>">
+              <% elsif assignment_presenter.missing? %>
                 <span class="submission-missing-pill"></span>
               <% elsif assignment_presenter.late? %>
                 <span class="submission-late-pill"></span>
