@@ -1281,16 +1281,28 @@ class User < ActiveRecord::Base
   def check_accounts_right?(user, sought_right)
     # check if the user we are given is an admin in one of this user's accounts
     return false unless user && sought_right
-    return true if Account.site_admin.grants_right?(user, sought_right)
     return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
+
+    # Intentionally include deleted pseudoymns when checking deleted users if the user has
+    # site-admin access (important for diagnosing deleted users)
+    accounts_to_search = if associated_accounts.empty? && Account.site_admin.grants_right?(user, :read)
+                           if merged_into_user
+                             # Early return from inside if to ensure we handle chains of merges correctly
+                             return merged_into_user.check_accounts_right?(user, sought_right)
+                           else
+                             Account.where(id: pseudonyms.pluck(:account_id))
+                           end
+                         else
+                           associated_accounts
+                         end
 
     common_shards = associated_shards & user.associated_shards
     search_method = lambda do |shard|
       # new users with creation pending enrollments don't have account associations
-      if associated_accounts.shard(shard).empty? && common_shards.length == 1 && !unavailable?
+      if accounts_to_search.shard(shard).empty? && common_shards.length == 1 && !unavailable?
         account.grants_right?(user, sought_right)
       else
-        associated_accounts.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
+        accounts_to_search.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
       end
     end
     # search shards the two users have in common first, since they're most likely

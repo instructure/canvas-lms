@@ -2259,7 +2259,7 @@ describe UsersController do
     end
 
     it "404s, but still shows, on a deleted user for site admins" do
-      course_with_teacher(active_all: 1)
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
 
       account_admin_user(account: Account.site_admin)
       user_session(@admin)
