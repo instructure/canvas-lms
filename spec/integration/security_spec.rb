@@ -69,6 +69,8 @@ describe "security" do
       expect(c).not_to match(/expires=/)
       reset!
       https!
+      @pseudonym.update_attribute(:current_login_at, 5.minutes.ago)
+
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
@@ -127,6 +129,8 @@ describe "security" do
       get "/profile/settings"
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
+
+      @p.update_attribute(:current_login_at, 5.minutes.ago)
 
       post "/login/canvas", params: { pseudonym_session: { unique_id: @p.unique_id, password: "asdfasdf" } }
       expect(response).to redirect_to settings_profile_url
@@ -211,6 +215,8 @@ describe "security" do
                                          "pseudonym_session[password]" => "asdfasdf",
                                          "pseudonym_session[remember_me]" => "1" }
       c1 = s1.cookies["pseudonym_credentials"]
+      @p.update_attribute(:current_login_at, 5.minutes.ago)
+
       s2.post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                          "pseudonym_session[password]" => "asdfasdf",
                                          "pseudonym_session[remember_me]" => "1" }
@@ -497,6 +503,8 @@ describe "security" do
       follow_redirect!
       expect(response).to redirect_to login_url
       expect(flash[:warning]).not_to be_empty
+
+      @admin.pseudonyms.first.update_attribute(:current_login_at, 5.minutes.ago)
 
       post "/login/canvas", params: { pseudonym_session: { unique_id: @admin.pseudonyms.first.unique_id, password: "password" } }
       expect(response).to redirect_to user_masquerade_url(@student)
