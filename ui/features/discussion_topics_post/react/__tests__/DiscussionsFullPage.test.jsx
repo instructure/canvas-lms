@@ -263,7 +263,7 @@ describe('DiscussionFullPage', () => {
       const mocks = [...getDiscussionQueryMock(), ...getDiscussionQueryMock({searchTerm: 'a'})]
       const container = setup(mocks)
       expect(await container.findByTestId('discussion-topic-container')).toBeInTheDocument()
-      fireEvent.change(container.getByLabelText('Search entries or author'), {
+      fireEvent.change(container.getByLabelText('Search entries or author...'), {
         target: {value: 'a'},
       })
       expect(await container.findByTestId('discussion-topic-container')).toBeInTheDocument()

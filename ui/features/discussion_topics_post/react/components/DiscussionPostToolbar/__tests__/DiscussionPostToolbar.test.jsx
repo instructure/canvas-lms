@@ -128,7 +128,7 @@ describe('DiscussionPostToolbar', () => {
     it('should call onChange when typing occurs', () => {
       const onSearchChangeMock = jest.fn()
       const {getByLabelText} = setup({onSearchChange: onSearchChangeMock})
-      const searchInput = getByLabelText('Search entries or author')
+      const searchInput = getByLabelText('Search entries or author...')
       fireEvent.change(searchInput, {target: {value: 'A'}})
       window.setTimeout(() => expect(onSearchChangeMock.mock.calls.length).toBe(1), 1500)
       fireEvent.change(searchInput, {target: {value: 'B'}})
