@@ -1435,6 +1435,7 @@ describe Attachment do
       @a.reload
       expect(@a.could_be_locked).to be_truthy
 
+      tag2.update! workflow_state: "unpublished"
       @a2.destroy
       tag2.reload
       expect(tag2).to be_deleted
