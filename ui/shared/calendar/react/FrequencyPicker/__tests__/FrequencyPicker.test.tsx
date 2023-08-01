@@ -86,20 +86,20 @@ describe('FrequencyPicker', () => {
 
     it('with open modal with the current selected frequency', () => {
       const props = defaultProps()
-      const {getByText, getByRole} = render(<FrequencyPicker {...props} />)
+      const {getByText, getByDisplayValue} = render(<FrequencyPicker {...props} />)
       selectOption(/frequency:/i, /weekly on thursday/i)
       selectOption(/frequency:/i, /custom/i)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
 
-      const thursdayCheckbox = getByRole('checkbox', {name: 'Thursday'})
+      const thursdayCheckbox = getByDisplayValue('TH')
       expect(thursdayCheckbox).toBeInTheDocument()
       expect(thursdayCheckbox).toBeChecked()
     })
 
     it('the modal with the given custom rrule', () => {
       const props = defaultProps()
-      const {getByText, getByDisplayValue, getByRole} = render(
+      const {getByText, getByDisplayValue} = render(
         <FrequencyPicker
           {...props}
           initialFrequency="saved-custom"
@@ -113,8 +113,8 @@ describe('FrequencyPicker', () => {
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
       expect(getByDisplayValue('Week')).toBeInTheDocument()
-      expect(getByRole('checkbox', {name: 'Monday'})).toBeChecked()
-      expect(getByRole('checkbox', {name: 'Wednesday'})).toBeChecked()
+      expect(getByDisplayValue('MO')).toBeChecked()
+      expect(getByDisplayValue('WE')).toBeChecked()
       expect(getByDisplayValue('5')).toBeInTheDocument()
     })
 
@@ -126,6 +126,28 @@ describe('FrequencyPicker', () => {
       expect(modal).toBeInTheDocument()
       userEvent.click(getByRole('button', {name: /cancel/i}))
       expect(getByRole('button', {name: /frequency/i})).toHaveFocus()
+    })
+
+    it('sets width to auto', () => {
+      const props = defaultProps()
+      const {container} = render(<FrequencyPicker {...props} width="auto" />)
+      expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
+    })
+
+    it('sets width to fit', () => {
+      const props = defaultProps()
+      const {container} = render(<FrequencyPicker {...props} width="fit" />)
+      expect(container.querySelector('label')?.getAttribute('style')).toMatch(/width: \d+px/)
+    })
+
+    it('retains auto width after selecting a custom frequency', () => {
+      const props = defaultProps({width: 'auto'})
+      const {container, getByText, getByRole} = render(<FrequencyPicker {...props} />)
+      selectOption(/frequency:/i, /custom/i)
+      const modal = getByText('Custom Repeating Event')
+      expect(modal).toBeInTheDocument()
+      userEvent.click(getByRole('button', {name: /done/i}))
+      expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
     })
   })
 

@@ -235,6 +235,7 @@ export default class EditCalendarEventView extends Backbone.View {
             timezone={ENV.TIMEZONE}
             initialFrequency={freq}
             rrule={rrule}
+            width="fit"
             onChange={this.handleFrequencyChange}
           />
         </div>,

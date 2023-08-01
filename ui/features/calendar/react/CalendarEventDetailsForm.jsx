@@ -423,6 +423,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             date={date}
             locale={locale}
             timezone={timezone}
+            width="auto"
             onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
           />
         )}
