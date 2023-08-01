@@ -86,6 +86,10 @@ export const DiscussionPostToolbar = props => {
     })
   }
 
+  const searchElementText = props.discussionAnonymousState
+    ? I18n.t('Search entries...')
+    : I18n.t('Search entries or author...')
+
   return (
     <Responsive
       match="media"
@@ -170,15 +174,11 @@ export const DiscussionPostToolbar = props => {
                       onChange={event => {
                         props.onSearchChange(event.target.value)
                       }}
-                      renderLabel={
-                        <ScreenReaderContent>
-                          {I18n.t('Search entries or author')}
-                        </ScreenReaderContent>
-                      }
+                      renderLabel={<ScreenReaderContent>{searchElementText}</ScreenReaderContent>}
                       value={props.searchTerm}
                       renderBeforeInput={<IconSearchLine display="block" />}
                       renderAfterInput={clearButton}
-                      placeholder={I18n.t('Search entries or author...')}
+                      placeholder={searchElementText}
                       shouldNotWrap={true}
                       width={responsiveProps?.search?.width}
                     />

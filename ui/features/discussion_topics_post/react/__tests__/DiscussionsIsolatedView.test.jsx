@@ -197,13 +197,13 @@ describe('DiscussionsIsolatedView', () => {
       target: {value: 'A new Search'},
     })
     let clearSearchButton = container.queryByTestId('clear-search-button')
-    searchInput = container.getByLabelText('Search entries or author')
+    searchInput = container.getByLabelText('Search entries or author...')
     expect(searchInput.value).toBe('A new Search')
     expect(clearSearchButton).toBeInTheDocument()
 
     fireEvent.click(clearSearchButton)
     clearSearchButton = container.queryByTestId('clear-search-button')
-    searchInput = container.getByLabelText('Search entries or author')
+    searchInput = container.getByLabelText('Search entries or author...')
     expect(searchInput.value).toBe('')
     expect(clearSearchButton).toBeNull()
   })
