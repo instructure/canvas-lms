@@ -219,9 +219,7 @@ individual_gradebook_enhancements:
     ci:
       state: on # enable for automated testings builds and local testing
     development:
-      state: on # enable for local development
-    test:
-      state: on # enable for the deployed 'test' environment
+      state: allowed_on # enable for local development
 hide_zero_point_quizzes_option:
   state: hidden
   applies_to: SiteAdmin

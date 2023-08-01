@@ -40,7 +40,7 @@ const activeLabels = {
   DefaultGradebookLearningMastery: I18n.t('Learning Mastery Grade Book'),
   GradebookHistory: I18n.t('Gradebook History'),
   IndividualGradebook: I18n.t('Individual Gradebook'),
-  EnhancedIndividualGradebook: I18n.t('Enhanced Individual Gradebook'),
+  EnhancedIndividualGradebook: I18n.t('Individual Gradebook'),
 }
 
 type Props = {
@@ -81,21 +81,19 @@ export default function GradebookMenu({
           </Item>
         )}
 
-        <Item
-          href={`${courseUrl}/gradebook/change_gradebook_version?version=individual`}
-          value="IndividualGradebook"
-        >
-          <span data-menu-item-id="individual-gradebook">{I18n.t('Individual Gradebook')}</span>
-        </Item>
-
-        {enhancedIndividualGradebookEnabled && (
+        {enhancedIndividualGradebookEnabled ? (
           <Item
             href={`${courseUrl}/gradebook/change_gradebook_version?version=individual_enhanced`}
             value="EnhancedIndividualGradebook"
           >
-            <span data-menu-item-id="individual-gradebook">
-              {I18n.t('Enhanced Individual Gradebook')}
-            </span>
+            <span data-menu-item-id="individual-gradebook">{I18n.t('Individual Gradebook')}</span>
+          </Item>
+        ) : (
+          <Item
+            href={`${courseUrl}/gradebook/change_gradebook_version?version=individual`}
+            value="IndividualGradebook"
+          >
+            <span data-menu-item-id="individual-gradebook">{I18n.t('Individual Gradebook')}</span>
           </Item>
         )}
 
