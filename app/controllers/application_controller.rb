@@ -2241,12 +2241,12 @@ class ApplicationController < ActionController::Base
   private :external_tool_redirect_display_type
 
   def render_external_tool_prepend_template?
-    !%w[full_width in_nav_context].include?(external_tool_redirect_display_type)
+    !%w[full_width in_nav_context borderless].include?(external_tool_redirect_display_type)
   end
   private :render_external_tool_prepend_template?
 
   def render_external_tool_append_template?
-    external_tool_redirect_display_type != "full_width"
+    !%w[full_width borderless].include?(external_tool_redirect_display_type)
   end
   private :render_external_tool_append_template?
 
