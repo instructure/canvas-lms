@@ -892,16 +892,13 @@ class ContextModule < ActiveRecord::Base
   def find_or_create_progression(user)
     return nil unless user
 
-    progression = nil
     shard.activate do
       GuardRail.activate(:primary) do
         if context.enrollments.except(:preload).where(user_id: user).exists?
-          progression = ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
-          progression ||= context_module_progressions.where(user_id: user).first
+          ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
         end
       end
     end
-    progression
   end
 
   def evaluate_for(user_or_progression)

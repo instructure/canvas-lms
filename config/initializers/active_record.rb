@@ -707,17 +707,19 @@ class ActiveRecord::Base
       end
 
       insert_sql = <<~SQL.squish
-        INSERT INTO #{quoted_table_name}
-                    (#{attributes.join(",")})
-             VALUES (#{values.join(",")})
-        ON CONFLICT DO NOTHING
+        WITH new_row AS (
+          INSERT INTO #{quoted_table_name}
+                      (#{attributes.join(",")})
+              VALUES (#{values.join(",")})
+          ON CONFLICT DO NOTHING
+          RETURNING *
+        )
+        SELECT * FROM new_row
+        UNION
+        #{except(:select).where(*args).to_sql}
       SQL
 
-      result = connection.exec_insert(insert_sql)
-
-      return find(result.last["id"]) unless result.last.nil?
-
-      false
+      find_by_sql(insert_sql).first
     end
   end
 
