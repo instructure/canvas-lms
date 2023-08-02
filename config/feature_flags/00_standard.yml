@@ -51,6 +51,14 @@ k20_course_readiness:
     k20_course_readiness_description: Enables the new Admin Analytics Course Readiness Dashboard.
   root_opt_in: true
   beta: true
+admin_analytics_view_permission:
+  state: hidden
+  applies_to: Account
+  display_name: Admin Analytics - View admin analytics permission
+  description:
+    admin_analytics_view_permission_description: Makes the new Admin Analytics permission visible.
+  root_opt_in: true
+  beta: true
 anonymous_instructor_annotations:
   type: setting
   state: allowed
