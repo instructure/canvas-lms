@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "Ein glimrande diskusjon"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "Ei fin oppgåve"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Gå til HTML-editor"
     },
@@ -71,14 +65,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Koprodukt)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "Ei super diskusjonsoppgåve"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Det oppstod eit problem under lesing av fila"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Ein feil oppstod ved forsøk på å forkaste valet."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Det oppstod ein feil ved nettverksførespurnaden "
@@ -215,14 +203,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Kalenderhending"
-    },
     "cancel_caeb1e68": {
         "message": "Avbryt"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Canvas-planleggar"
     },
     "cap_product_3a5265a6": {
         "message": "Cap-produkt"
@@ -454,9 +436,6 @@
     },
     "date_added_ed5ad465": {
         "message": "Dato lagd til"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date } klokka { time }"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Dekortativt ikon"
@@ -710,12 +689,6 @@
     "eta_b8828f99": {
         "message": "Eta"
     },
-    "exciting_discussion_9f67bd0a": {
-        "message": "Engasjerande diskusjon"
-    },
-    "excused_cf8792eb": {
-        "message": "Fritak er innvilga"
-    },
     "exists_2e62bdaa": {
         "message": "Eksisterer"
     },
@@ -727,9 +700,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "Vis og sjå { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "Utvida"
     },
     "external_link_d3f9e62a": {
         "message": "Ekstern lenke"
@@ -749,35 +719,8 @@
     "f_function_fe422d65": {
         "message": "F (Funksjon)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "Henting av emnelista mislukkast"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Henting av filinnhald mislukkast"
-    },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "Henting av gjerelista mislukkast"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "Eg kunne ikkje sjå inn i framtida di"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "Eg kunne ikkje sjå fortida di"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Kan ikkje slette gjeremål"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Kan ikkje hente ny aktivitet"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Kan ikkje laste val"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Kan ikke lagre gjeremål"
-    },
-    "feedback_6dcc1991": {
-        "message": "Tilbakemelding"
     },
     "file_name_8fd421ff": {
         "message": "Filnamn"
@@ -851,9 +794,6 @@
     "fullscreen_873bf53f": {
         "message": "Full skjerm"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "Underhaldande quiz"
-    },
     "galician_7e4508b5": {
         "message": "Galisisk"
     },
@@ -875,14 +815,8 @@
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "Gå til verktøylinja i redigeringsprogrammet"
     },
-    "graded_25cd3fcd": {
-        "message": "Vurdert"
-    },
     "grades_a61eba0a": {
         "message": "Vurderingar"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Vurderingar er lasta"
     },
     "greater_than_e98af662": {
         "message": "Større enn"
@@ -1151,9 +1085,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "Språkvitskap"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "Språkvitskap-ikon"
     },
@@ -1162,9 +1093,6 @@
     },
     "large_9c5e80e7": {
         "message": "Stort"
-    },
-    "late_2be42b88": {
-        "message": "Sein"
     },
     "latvian_2bbb6aab": {
         "message": "Latvisk"
@@ -1274,14 +1202,8 @@
     "load_more_35d33c7": {
         "message": "Last fleire"
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "Lasta { count, plural,\n     =0 {# elementer}\n    one {# element}\n  other {# elementer}\n}"
-    },
     "loading_25990131": {
         "message": "Lastar..."
-    },
-    "loading_725811ca": {
-        "message": "lastar"
     },
     "loading_bde52856": {
         "message": "Lastar"
@@ -1300,9 +1222,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "Lastar mapper"
-    },
-    "loading_grades_c842c887": {
-        "message": "Lastar vurderingar"
     },
     "loading_please_wait_d276220a": {
         "message": "Lastar, vent"
@@ -1346,9 +1265,6 @@
     "maps_to_e5ef7382": {
         "message": "Avbild til"
     },
-    "math_ede93050": {
-        "message": "Matematikk"
-    },
     "math_icon_ad4e9d03": {
         "message": "Matematikk-ikon"
     },
@@ -1390,9 +1306,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Diverse"
-    },
-    "missing_1a256b3b": {
-        "message": "Manglar"
     },
     "module_90d9fd32": {
         "message": "Modul"
@@ -1514,12 +1427,6 @@
     "not_superset_strict_24e06f36": {
         "message": "Ikkje supersett (Streng)"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "Ingen planar i dag. Sjå førre element. "
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "Ingen planar i dag. Sjå neste element. "
-    },
     "nu_1c0f6848": {
         "message": "Nu"
     },
@@ -1591,9 +1498,6 @@
     },
     "pause_12af3bb4": {
         "message": "Pause"
-    },
-    "peer_review_74f26a13": {
-        "message": "Fagfellevurdering"
     },
     "pentagon_17d82ea3": {
         "message": "Pentagon"
@@ -1748,9 +1652,6 @@
     "red_8258edf3": {
         "message": "Raud"
     },
-    "redo_363c58b7": {
-        "message": "Gjer om att"
-    },
     "relationships_6602af70": {
         "message": "Relasjon"
     },
@@ -1765,9 +1666,6 @@
     },
     "replace_e61834a7": {
         "message": "Erstatt"
-    },
-    "replies_4a8577c8": {
-        "message": "Svar"
     },
     "reset_95a81614": {
         "message": "Tilbakestill"
@@ -1861,9 +1759,6 @@
     },
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Lagra ikondesignar-ikon"
-    },
-    "science_8d92214a": {
-        "message": "Vitskap"
     },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "Skjermlesarar kan ikkje vite kva som visast i eit bilde utan alternativ tekst, og filnamn beskriv ofte ikkje konteksten eller betydninga."
@@ -1967,9 +1862,6 @@
     "small_b070434a": {
         "message": "Liten"
     },
-    "social_studies_13fa30c7": {
-        "message": "Samfunnsvitskap"
-    },
     "solid_circle_9f061dfc": {
         "message": "Solid sirkel"
     },
@@ -2039,12 +1931,6 @@
     "start_recording_9a65141a": {
         "message": "Start opptak"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Stålblå"
     },
@@ -2053,9 +1939,6 @@
     },
     "submit_a3cc6859": {
         "message": "Send!"
-    },
-    "submitted_318fad53": {
-        "message": "Innlevert"
     },
     "subscript_59744f96": {
         "message": "Senka skrift"
@@ -2071,9 +1954,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Etterfølgjer lik"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Vellukka: Gjeremålsliste er oppretta"
     },
     "sum_b0842d31": {
         "message": "Sum"
@@ -2126,9 +2006,6 @@
     "tagalog_74906db7": {
         "message": "Tagalog"
     },
-    "task_16b0ef38": {
-        "message": "Oppgåve"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2156,9 +2033,6 @@
     "thai_8f9bc548": {
         "message": "Thai"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "Den beste innleveringa"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Førehandsvisinga av dokumentet blir behandla no. Prøv på nytt seinare."
     },
@@ -2182,9 +2056,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "Den valde fila er større enn grensa på { maxSize } bytes."
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "Ingen planar for i dag"
     },
     "therefore_d860e024": {
         "message": "Derfor"
@@ -2231,29 +2102,14 @@
     "to_be_posted_when_d24bf7dc": {
         "message": "Vert posta: { when }"
     },
-    "to_do_1d554f36": {
-        "message": "Gjeremål"
-    },
     "to_do_when_2783d78f": {
         "message": "Gjeremål: { when }"
-    },
-    "today_76e10f9c": {
-        "message": "I dag"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "I dag på { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "Veksle { summary } gruppe"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "Vis/skjul tips"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "I morgon"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "I morgon på { date }"
     },
     "tools_2fcf772e": {
         "message": "Verktøy"
@@ -2281,9 +2137,6 @@
     },
     "ukrainian_945b00b7": {
         "message": "Ukrainsk"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Kan ikkje merke som fullført. "
     },
     "union_e6b57a53": {
         "message": "Union"
@@ -2515,12 +2368,6 @@
     },
     "yes_dde87d5": {
         "message": "Ja"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "I går på { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "I går"
     },
     "yiddish_f96986df": {
         "message": "Jiddisk"

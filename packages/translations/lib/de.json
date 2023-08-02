@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "Eine großartige Diskussion"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "Eine wundervolle Aufgabe"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Auf Pretty HTML-Editor zugreifen"
     },
@@ -74,14 +68,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Koprodukt)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "Eine erstaunliche Diskussionsaufgabe"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Fehler beim Lesen der Datei"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Beim Versuch, die Gelegenheit auszulassen, ist ein Fehler aufgetreten"
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Fehler beim einer Netzwerkanforderung"
@@ -218,14 +206,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "© 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Kalenderereignis"
-    },
     "cancel_caeb1e68": {
         "message": "Abbrechen"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Canvas-Plan"
     },
     "cap_product_3a5265a6": {
         "message": "Cap-Produkt"
@@ -472,9 +454,6 @@
     },
     "date_added_ed5ad465": {
         "message": "Datum hinzugefügt"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "am { date } um { time }"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Dekoratives Symbol"
@@ -731,12 +710,6 @@
     "eta_b8828f99": {
         "message": "Eta"
     },
-    "exciting_discussion_9f67bd0a": {
-        "message": "Spannende Diskussion"
-    },
-    "excused_cf8792eb": {
-        "message": "Entschuldigt"
-    },
     "exists_2e62bdaa": {
         "message": "Ist vorhanden"
     },
@@ -748,9 +721,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "{ types } erweitern"
-    },
-    "extended_9a58dcb6": {
-        "message": "Erweitert"
     },
     "external_link_d3f9e62a": {
         "message": "Externer Link"
@@ -773,38 +743,11 @@
     "f_function_fe422d65": {
         "message": "F (Funktion)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "Kursliste konnte nicht abgerufen werden"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Abruf der Dateiinhalte fehlgeschlagen"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "Abrufen der To-Do-Liste fehlgeschlagen"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "Blick in Ihre Zukunft fehlgeschlagen"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "Blick in Ihre Vergangenheit fehlgeschlagen"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Löschen der Aufgabe fehlgeschlagen"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Fehler beim Abrufen einer neuen Tätigkeit"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Laden von Chancen fehlgeschlagen"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Inhalt konnte nicht von externem Tool abgerufen werden"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Speichern der Aufgabe fehlgeschlagen"
-    },
-    "feedback_6dcc1991": {
-        "message": "Feedback"
     },
     "file_name_8fd421ff": {
         "message": "Dateiname"
@@ -884,9 +827,6 @@
     "fullscreen_873bf53f": {
         "message": "Vollbild"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "Spaßquiz"
-    },
     "galician_7e4508b5": {
         "message": "Galizisch"
     },
@@ -908,14 +848,8 @@
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "Gehen Sie zur Editor-Symbolleiste"
     },
-    "graded_25cd3fcd": {
-        "message": "Benotet"
-    },
     "grades_a61eba0a": {
         "message": "Noten"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Noten geladen"
     },
     "greater_than_e98af662": {
         "message": "Größer als"
@@ -1190,9 +1124,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "Sprache"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "Symbol für „Sprachkunst“"
     },
@@ -1201,9 +1132,6 @@
     },
     "large_9c5e80e7": {
         "message": "Groß"
-    },
-    "late_2be42b88": {
-        "message": "Verspätet"
     },
     "latvian_2bbb6aab": {
         "message": "Lettisch"
@@ -1319,14 +1247,8 @@
     "load_more_35d33c7": {
         "message": "Mehr laden"
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "Geladene { count, plural,\n     =0 {# Elemente}\n    one {# Element}\n  other {# Elemente}\n}"
-    },
     "loading_25990131": {
         "message": "Wird geladen ..."
-    },
-    "loading_725811ca": {
-        "message": "Ladevorgang läuft"
     },
     "loading_bde52856": {
         "message": "Wird geladen"
@@ -1345,9 +1267,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "Ordner werden geladen"
-    },
-    "loading_grades_c842c887": {
-        "message": "Benoter werden geladen"
     },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Laden des Platzhalters für { fileName }"
@@ -1394,9 +1313,6 @@
     "maps_to_e5ef7382": {
         "message": "Zuordnung zu"
     },
-    "math_ede93050": {
-        "message": "Mathe"
-    },
     "math_icon_ad4e9d03": {
         "message": "Symbol „Mathematik“"
     },
@@ -1441,9 +1357,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Verschiedenes"
-    },
-    "missing_1a256b3b": {
-        "message": "Fehlt"
     },
     "module_90d9fd32": {
         "message": "Modul"
@@ -1574,12 +1487,6 @@
     "not_superset_strict_24e06f36": {
         "message": "Keine Obermenge (Streng)"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "Heute nichts geplant. Auswahl des letzten Elements."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "Heute nichts geplant. Auswahl des nächsten Element."
-    },
     "nu_1c0f6848": {
         "message": "Ny"
     },
@@ -1654,9 +1561,6 @@
     },
     "pause_12af3bb4": {
         "message": "Pause"
-    },
-    "peer_review_74f26a13": {
-        "message": "Kollegenkorrektur"
     },
     "pentagon_17d82ea3": {
         "message": "Pentagon"
@@ -1814,9 +1718,6 @@
     "red_8258edf3": {
         "message": "Rot"
     },
-    "redo_363c58b7": {
-        "message": "Wiederholen"
-    },
     "relationships_6602af70": {
         "message": "Beziehungen"
     },
@@ -1831,9 +1732,6 @@
     },
     "replace_e61834a7": {
         "message": "Ersetzen"
-    },
-    "replies_4a8577c8": {
-        "message": "Antworten"
     },
     "reset_95a81614": {
         "message": "Zurücksetzen"
@@ -1933,9 +1831,6 @@
     },
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Icon Maker-Symbole gespeichert"
-    },
-    "science_8d92214a": {
-        "message": "Naturwissenschaften"
     },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "Ohne alternativen Text kann ein Bildschirmbetrachter nicht bestimmen, was auf einem Bild gezeigt wird, zumal die Dateinamen oft sinnlose Zeichenfolgen aus Zahlen und Buchstaben sind, die weder den Kontext noch die Bedeutung erläutern."
@@ -2054,9 +1949,6 @@
     "small_b070434a": {
         "message": "Klein"
     },
-    "social_studies_13fa30c7": {
-        "message": "Sozialstudien"
-    },
     "solid_circle_9f061dfc": {
         "message": "Geschlossener Kreise"
     },
@@ -2126,12 +2018,6 @@
     "start_recording_9a65141a": {
         "message": "Aufzeichnung starten"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Stahlblau"
     },
@@ -2147,9 +2033,6 @@
     "submit_a3cc6859": {
         "message": "Abgeben"
     },
-    "submitted_318fad53": {
-        "message": "Abgegeben"
-    },
     "subscript_59744f96": {
         "message": "Abonnieren"
     },
@@ -2164,9 +2047,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Folgt Gleich"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Erfolg: Aufgabenliste erstellt"
     },
     "sum_b0842d31": {
         "message": "Summe"
@@ -2234,9 +2114,6 @@
     "tagalog_74906db7": {
         "message": "Tagalog"
     },
-    "task_16b0ef38": {
-        "message": "Aufgabe"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2273,9 +2150,6 @@
     "thai_8f9bc548": {
         "message": "Thai"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "Die beste Aufgabe"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Die Dokumentvorschau wird gerade ausgeführt. Versuchen Sie es später noch einmal."
     },
@@ -2302,9 +2176,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "Die ausgewählte Datei überschreitet das Limit von { maxSize } Bytes."
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "Für heute ist nichts geplant."
     },
     "therefore_d860e024": {
         "message": "Daher"
@@ -2354,29 +2225,14 @@
     "to_be_posted_when_d24bf7dc": {
         "message": "Bereit für Post: { when }"
     },
-    "to_do_1d554f36": {
-        "message": "Zu erledigen"
-    },
     "to_do_when_2783d78f": {
         "message": "Zu erledigen: { when }"
-    },
-    "today_76e10f9c": {
-        "message": "Heute"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Heute, am { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "{ summary } Gruppe umschalten"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "Quickinfo für Umschalten"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Morgen"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Morgen, am { date }"
     },
     "tools_2fcf772e": {
         "message": "Tools"
@@ -2410,9 +2266,6 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "URL für Ressourcenauswahl kann nicht bestimmt werden"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Kann nicht als fertiggestellt markiert werden."
     },
     "union_e6b57a53": {
         "message": "Union"
@@ -2659,12 +2512,6 @@
     },
     "yes_dde87d5": {
         "message": "Ja"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "Gestern, am { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Gestern"
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"

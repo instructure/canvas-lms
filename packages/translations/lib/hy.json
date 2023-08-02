@@ -47,9 +47,6 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001թ. Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Օրացուցային միջոցառում"
-    },
     "cancel_caeb1e68": {
         "message": "Չեղյալ համարել"
     },
@@ -140,9 +137,6 @@
     "embed_image_1080badc": {
         "message": "Տեղադրել պատկերը"
     },
-    "excused_cf8792eb": {
-        "message": "Ներված է"
-    },
     "external_tools_6e77821": {
         "message": "Արտաքին գործիքներ"
     },
@@ -157,9 +151,6 @@
     },
     "generating_preview_45b53be0": {
         "message": "Կարծիքը գեներացվում է ..."
-    },
-    "graded_25cd3fcd": {
-        "message": "Գնահատվող"
     },
     "grades_a61eba0a": {
         "message": "Գնահատականներ"
@@ -302,9 +293,6 @@
     "pages_e5414c2c": {
         "message": "Էջեր"
     },
-    "peer_review_74f26a13": {
-        "message": "Ունկնդիրների կողմից միմյանց աշխատանքների վերաբերյալ ներկայացված կարծիք"
-    },
     "people_b4ebb13c": {
         "message": "Մարդիկ"
     },
@@ -371,9 +359,6 @@
     "submit_a3cc6859": {
         "message": "Ուղարկել"
     },
-    "submitted_318fad53": {
-        "message": "Ներկայացված է "
-    },
     "syllabus_f191f65b": {
         "message": "Դասընթացի ծրագիր"
     },
@@ -397,15 +382,6 @@
     },
     "title_ee03d132": {
         "message": "Վերնագիր"
-    },
-    "to_do_1d554f36": {
-        "message": "Անել"
-    },
-    "today_76e10f9c": {
-        "message": "Այսօր"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Վաղը"
     },
     "unpublished_dfd8801": {
         "message": "չհրապարակված"
@@ -436,8 +412,5 @@
     },
     "yes_dde87d5": {
         "message": "Այո"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Երեկ"
     }
 }

@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "Harika bir tartışma"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "Harika bir ödev"
-    },
     "accessibility_checker_b3af1f6c": {
         "message": "Erişilebilirlik Kontrolü"
     },
@@ -47,14 +41,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Coproduct)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "Harika bir tartışma ödevi"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Dosya okunurken hata oluştu"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Ağ isteğinde bulunurken bir hata oluştu"
@@ -116,14 +104,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Takvim Olayı"
-    },
     "cancel_caeb1e68": {
         "message": "İptal"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Canvas Planlayıcı"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Yaptığınız değişiklikler kaydedilmemiş olabilir."
@@ -284,29 +266,11 @@
     "english_c60612e2": {
         "message": "İngilizce"
     },
-    "excused_cf8792eb": {
-        "message": "Mazeretli"
-    },
     "external_tools_6e77821": {
         "message": "Harici Araçlar"
     },
     "extra_large_b6cdf1ff": {
         "message": "Ekstra Büyük"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Yapılacak öğesi silinemedi"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Yeni etkinliği alma başarısız"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Fırsatların yüklenmesi başarısız"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Yapılacak öğesi kaydedilemedi"
-    },
-    "feedback_6dcc1991": {
-        "message": "Geribildirim"
     },
     "file_name_8fd421ff": {
         "message": "Dosya adı"
@@ -328,9 +292,6 @@
     },
     "generating_preview_45b53be0": {
         "message": "Oluşturma önizlemesi..."
-    },
-    "graded_25cd3fcd": {
-        "message": "Notlandırmalı"
     },
     "grades_a61eba0a": {
         "message": "Notlar"
@@ -416,9 +377,6 @@
     "large_9c5e80e7": {
         "message": "Büyük"
     },
-    "late_2be42b88": {
-        "message": "Geç"
-    },
     "light_blue_5374f600": {
         "message": "Açık Mavi"
     },
@@ -460,9 +418,6 @@
     },
     "misc_3b692ea7": {
         "message": "Çeşitli"
-    },
-    "missing_1a256b3b": {
-        "message": "Eksik"
     },
     "module_90d9fd32": {
         "message": "Modül"
@@ -508,9 +463,6 @@
     },
     "pages_e5414c2c": {
         "message": "Sayfalar"
-    },
-    "peer_review_74f26a13": {
-        "message": "Akran Değerlendirme"
     },
     "people_b4ebb13c": {
         "message": "Katılımcılar"
@@ -584,14 +536,8 @@
     "submit_a3cc6859": {
         "message": "Gönder"
     },
-    "submitted_318fad53": {
-        "message": "Gönderildi"
-    },
     "syllabus_f191f65b": {
         "message": "Ders Programı"
-    },
-    "task_16b0ef38": {
-        "message": "Görev"
     },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Döküman ön izlemesi hala işleniyor. Lütfen daha sonra tekrar deneyin."
@@ -613,21 +559,6 @@
     },
     "to_be_posted_when_d24bf7dc": {
         "message": "Gönderileceği zaman: { when }"
-    },
-    "to_do_1d554f36": {
-        "message": "Yapılacaklar"
-    },
-    "today_76e10f9c": {
-        "message": "Bugün"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Bugün { date }"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Yarın"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Yarın { date }"
     },
     "tray_839df38a": {
         "message": "Yan menü"
@@ -721,9 +652,6 @@
     },
     "yes_dde87d5": {
         "message": "Evet"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Dün"
     },
     "your_webcam_may_already_be_in_use_6cd64c25": {
         "message": "Web kameranız kullanılıyor olabilir."

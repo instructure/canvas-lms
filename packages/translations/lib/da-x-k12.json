@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "En fantastisk diskussion"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "En fantastisk opgave"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Få adgang til det pæne HTML-redigeringsværktøj"
     },
@@ -74,14 +68,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Koprodukt)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "En fantastisk diskussionsopgave"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Der opstod en fejl, da filen skulle læses"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Der opstod en fejl under forsøg på at afvise muligheden."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Der opstod en fejl under oprettelse af en netværksanmodning"
@@ -218,14 +206,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Kalenderbegivenhed"
-    },
     "cancel_caeb1e68": {
         "message": "Annullér"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Canvas-planlægger"
     },
     "cap_product_3a5265a6": {
         "message": "Cap product"
@@ -472,9 +454,6 @@
     },
     "date_added_ed5ad465": {
         "message": "Dato tilføjet"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date } kl. { time }"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Dekorativt ikon"
@@ -731,12 +710,6 @@
     "eta_b8828f99": {
         "message": "Eta"
     },
-    "exciting_discussion_9f67bd0a": {
-        "message": "Spændende diskussion"
-    },
-    "excused_cf8792eb": {
-        "message": "Undskyldt"
-    },
     "exists_2e62bdaa": {
         "message": "Findes"
     },
@@ -748,9 +721,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "Udvid for at se { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "Udvidet"
     },
     "external_link_d3f9e62a": {
         "message": "Eksternt link"
@@ -773,38 +743,11 @@
     "f_function_fe422d65": {
         "message": "F (funktion)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "Kunne ikke hente fagliste"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Kunne ikke hente filindhold"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "Kunne ikke hente opgavelisten"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "Mislykkedes at kigge ind i din fremtid"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "Mislykkedes at kigge ind i din fortid"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Kunne ikke slette opgave"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Kunne ikke hente ny aktivitet"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Kunne ikke indlæse muligheder"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Kunne ikke hente indhold fra eksternt værktøj"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Kunne ikke gemme opgave"
-    },
-    "feedback_6dcc1991": {
-        "message": "Feedback"
     },
     "file_name_8fd421ff": {
         "message": "Filnavn"
@@ -884,9 +827,6 @@
     "fullscreen_873bf53f": {
         "message": "Fuld skærm"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "Sjov quiz"
-    },
     "galician_7e4508b5": {
         "message": "Galicisk"
     },
@@ -908,14 +848,8 @@
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "Gå til redigerings-værktøjslinjen"
     },
-    "graded_25cd3fcd": {
-        "message": "Bedømt"
-    },
     "grades_a61eba0a": {
         "message": "Vurderinger"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Vurderinger indlæst"
     },
     "greater_than_e98af662": {
         "message": "Større end"
@@ -1190,9 +1124,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "Sprog"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "Sprogkunst-ikon"
     },
@@ -1201,9 +1132,6 @@
     },
     "large_9c5e80e7": {
         "message": "Stor"
-    },
-    "late_2be42b88": {
-        "message": "Sen"
     },
     "latvian_2bbb6aab": {
         "message": "Lettisk"
@@ -1319,14 +1247,8 @@
     "load_more_35d33c7": {
         "message": "Indlæs flere"
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "Indlæst { count, plural,\n     =0 {# elementer}\n    one {# element}\n  other {# elementer}\n}"
-    },
     "loading_25990131": {
         "message": "Indlæser ..."
-    },
-    "loading_725811ca": {
-        "message": "indlæser"
     },
     "loading_bde52856": {
         "message": "Indlæser"
@@ -1345,9 +1267,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "Indlæser mapper"
-    },
-    "loading_grades_c842c887": {
-        "message": "Vurderinger indlæses"
     },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Indlæser pladsholder for { fileName }"
@@ -1394,9 +1313,6 @@
     "maps_to_e5ef7382": {
         "message": "Svarer til"
     },
-    "math_ede93050": {
-        "message": "Matematik"
-    },
     "math_icon_ad4e9d03": {
         "message": "Matematik-ikon"
     },
@@ -1441,9 +1357,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Diverse"
-    },
-    "missing_1a256b3b": {
-        "message": "Mangler"
     },
     "module_90d9fd32": {
         "message": "Forløb"
@@ -1574,12 +1487,6 @@
     "not_superset_strict_24e06f36": {
         "message": "Ikke overmængde (streng)"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "Intet planlagt i dag. Vælger det seneste element."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "Intet planlagt i dag. Vælger det næste element."
-    },
     "nu_1c0f6848": {
         "message": "Ny"
     },
@@ -1654,9 +1561,6 @@
     },
     "pause_12af3bb4": {
         "message": "Pause"
-    },
-    "peer_review_74f26a13": {
-        "message": "Elev-elev vurdering"
     },
     "pentagon_17d82ea3": {
         "message": "Femkant"
@@ -1814,9 +1718,6 @@
     "red_8258edf3": {
         "message": "Rød"
     },
-    "redo_363c58b7": {
-        "message": "Annuller fortryd"
-    },
     "relationships_6602af70": {
         "message": "Forhold"
     },
@@ -1831,9 +1732,6 @@
     },
     "replace_e61834a7": {
         "message": "Erstat"
-    },
-    "replies_4a8577c8": {
-        "message": "Svar"
     },
     "reset_95a81614": {
         "message": "Nulstil"
@@ -1933,9 +1831,6 @@
     },
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Gemte Icon Maker-ikoner"
-    },
-    "science_8d92214a": {
-        "message": "Videnskab"
     },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "Skærmlæsere kan ikke bestemme, hvad der vises i et billede uden alternativ tekst, og filnavne er ofte en meningsløs række tal og bogstaver, der ikke beskriver konteksten eller betydningen."
@@ -2054,9 +1949,6 @@
     "small_b070434a": {
         "message": "Lille"
     },
-    "social_studies_13fa30c7": {
-        "message": "Sociale studier"
-    },
     "solid_circle_9f061dfc": {
         "message": "Farvet cirkel"
     },
@@ -2126,12 +2018,6 @@
     "start_recording_9a65141a": {
         "message": "Start optagelse"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Stålblå"
     },
@@ -2147,9 +2033,6 @@
     "submit_a3cc6859": {
         "message": "Aflever"
     },
-    "submitted_318fad53": {
-        "message": "Afleveret"
-    },
     "subscript_59744f96": {
         "message": "Sænket skrift"
     },
@@ -2164,9 +2047,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Kommer efter lig med"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Succes: Opgaveliste oprettet"
     },
     "sum_b0842d31": {
         "message": "Sum"
@@ -2234,9 +2114,6 @@
     "tagalog_74906db7": {
         "message": "Tagalog"
     },
-    "task_16b0ef38": {
-        "message": "Opgave"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2273,9 +2150,6 @@
     "thai_8f9bc548": {
         "message": "Thai"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "Den bedste opgave"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Dokumentets forhåndsvisning bliver behandlet i øjeblikket. Prøv igen senere."
     },
@@ -2302,9 +2176,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "Den valgte fil overstiger grænsen på { maxSize } byte"
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "Der er ikke planlagt noget i dag."
     },
     "therefore_d860e024": {
         "message": "Derfor"
@@ -2354,29 +2225,14 @@
     "to_be_posted_when_d24bf7dc": {
         "message": "Skal slås op: { when }"
     },
-    "to_do_1d554f36": {
-        "message": "Opgaveliste"
-    },
     "to_do_when_2783d78f": {
         "message": "Opgaveliste: { when }"
-    },
-    "today_76e10f9c": {
-        "message": "I dag"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "I dag kl. { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "Skift { summary } gruppe"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "Skift værktøjstip"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "I morgen"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "I morgen kl. { date }"
     },
     "tools_2fcf772e": {
         "message": "Værktøjer"
@@ -2410,9 +2266,6 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Kan ikke bestemme webadressen til ressourcevalg"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Kan ikke markeres som færdig."
     },
     "union_e6b57a53": {
         "message": "Union"
@@ -2659,12 +2512,6 @@
     },
     "yes_dde87d5": {
         "message": "Ja"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "I går kl. { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "I går"
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"

@@ -41,9 +41,6 @@
     "basic_554cdc0a": {
         "message": "기본"
     },
-    "calendar_event_89aadc1c": {
-        "message": "행사"
-    },
     "cancel_caeb1e68": {
         "message": "취소"
     },
@@ -121,9 +118,6 @@
     },
     "format_4247a9c5": {
         "message": "형식"
-    },
-    "graded_25cd3fcd": {
-        "message": "평가됨"
     },
     "grades_a61eba0a": {
         "message": "평점"
@@ -239,9 +233,6 @@
     "pages_e5414c2c": {
         "message": "페이지"
     },
-    "peer_review_74f26a13": {
-        "message": "피어 리뷰"
-    },
     "people_b4ebb13c": {
         "message": "사용자"
     },
@@ -290,9 +281,6 @@
     "submit_a3cc6859": {
         "message": "제출"
     },
-    "submitted_318fad53": {
-        "message": "제출됨"
-    },
     "syllabus_f191f65b": {
         "message": "요강"
     },
@@ -304,15 +292,6 @@
     },
     "title_ee03d132": {
         "message": "제목"
-    },
-    "to_do_1d554f36": {
-        "message": "할 일"
-    },
-    "today_76e10f9c": {
-        "message": "오늘"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "내일"
     },
     "up_c553575d": {
         "message": "위로"
@@ -334,8 +313,5 @@
     },
     "yes_dde87d5": {
         "message": "예"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "어제"
     }
 }

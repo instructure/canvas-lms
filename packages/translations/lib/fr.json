@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "Une super discussion."
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "Un merveilleux travail."
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Accéder à l’éditeur HTML embelli"
     },
@@ -74,14 +68,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (coproduit)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "Un fantastique travail de type discussion."
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Une erreur est survenue pendant la lecture du fichier."
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Une erreur s''est produite lors de la tentative de rejet de l''opportunité."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Une erreur est survenue lors de la réalisation d''une requête réseau"
@@ -218,14 +206,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Événement de calendrier"
-    },
     "cancel_caeb1e68": {
         "message": "Annuler"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Agenda Canvas"
     },
     "cap_product_3a5265a6": {
         "message": "Produit de la famille"
@@ -472,9 +454,6 @@
     },
     "date_added_ed5ad465": {
         "message": "Date ajoutée"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "le { date } à { time }"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Icône décorative"
@@ -731,12 +710,6 @@
     "eta_b8828f99": {
         "message": "Êta"
     },
-    "exciting_discussion_9f67bd0a": {
-        "message": "Discussion passionnante"
-    },
-    "excused_cf8792eb": {
-        "message": "Excusé"
-    },
     "exists_2e62bdaa": {
         "message": "Existe"
     },
@@ -748,9 +721,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "Étendez pour afficher { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "Étendu"
     },
     "external_link_d3f9e62a": {
         "message": "Lien externe"
@@ -773,38 +743,11 @@
     "f_function_fe422d65": {
         "message": "F (fonction)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "Échec de la récupération de la liste de cours"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Échec de la récupération des contenus de fichiers"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "Impossible d’obtenir la liste des choses à faire"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "Impossible de jeter un œil à votre avenir"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "Impossible de jeter un œil à votre passé"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Échec de la suppression de la chose à faire"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Échec de la récupération de nouvelles activités"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Échec du chargement des opportunités"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Impossible de récupérer le contenu de l’outil externe"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Échec de l''enregistrement de la chose à faire"
-    },
-    "feedback_6dcc1991": {
-        "message": "Commentaire"
     },
     "file_name_8fd421ff": {
         "message": "Nom du fichier"
@@ -884,9 +827,6 @@
     "fullscreen_873bf53f": {
         "message": "Plein écran"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "Questionnaire amusant"
-    },
     "galician_7e4508b5": {
         "message": "Galicien"
     },
@@ -908,14 +848,8 @@
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "Aller à la barre d''outils de l''éditeur"
     },
-    "graded_25cd3fcd": {
-        "message": "Noté"
-    },
     "grades_a61eba0a": {
         "message": "Notes"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Notes chargées"
     },
     "greater_than_e98af662": {
         "message": "Supérieur à"
@@ -1190,9 +1124,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "Arts de la langue"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "Icône Arts de la langue"
     },
@@ -1201,9 +1132,6 @@
     },
     "large_9c5e80e7": {
         "message": "Grand"
-    },
-    "late_2be42b88": {
-        "message": "En retard"
     },
     "latvian_2bbb6aab": {
         "message": "Letton"
@@ -1319,14 +1247,8 @@
     "load_more_35d33c7": {
         "message": "En charger plus"
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "Chargé(s) { count, plural,\n     =0 {# éléments}\n    one {# élément}\n  other {# éléments}\n}"
-    },
     "loading_25990131": {
         "message": "Chargement..."
-    },
-    "loading_725811ca": {
-        "message": "chargement"
     },
     "loading_bde52856": {
         "message": "Chargement"
@@ -1345,9 +1267,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "Chargement des dossiers"
-    },
-    "loading_grades_c842c887": {
-        "message": "Chargement des notes"
     },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Chargement de l’élément de substitution pour { fileName }"
@@ -1394,9 +1313,6 @@
     "maps_to_e5ef7382": {
         "message": "Correspond à"
     },
-    "math_ede93050": {
-        "message": "Mathématiques"
-    },
     "math_icon_ad4e9d03": {
         "message": "Icône maths"
     },
@@ -1441,9 +1357,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Divers"
-    },
-    "missing_1a256b3b": {
-        "message": "Manquant"
     },
     "module_90d9fd32": {
         "message": "Module"
@@ -1574,12 +1487,6 @@
     "not_superset_strict_24e06f36": {
         "message": "Pas un sur-ensemble de (strict)"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "Rien de prévu aujourd''hui. Sélectionner l''élément le plus récent."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "Rien de prévu aujourd''hui. Sélection de l''élément suivant"
-    },
     "nu_1c0f6848": {
         "message": "Nu"
     },
@@ -1654,9 +1561,6 @@
     },
     "pause_12af3bb4": {
         "message": "Mettre en pause"
-    },
-    "peer_review_74f26a13": {
-        "message": "Révision par les pairs"
     },
     "pentagon_17d82ea3": {
         "message": "Pentagone"
@@ -1814,9 +1718,6 @@
     "red_8258edf3": {
         "message": "Rouge"
     },
-    "redo_363c58b7": {
-        "message": "Refaire"
-    },
     "relationships_6602af70": {
         "message": "Relations"
     },
@@ -1831,9 +1732,6 @@
     },
     "replace_e61834a7": {
         "message": "Remplacer"
-    },
-    "replies_4a8577c8": {
-        "message": "Réponses"
     },
     "reset_95a81614": {
         "message": "Réinitialiser"
@@ -1933,9 +1831,6 @@
     },
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Icônes Icon Maker enregistrées"
-    },
-    "science_8d92214a": {
-        "message": "Science"
     },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "Les lecteurs d''écran sont incapables d’identifier ce qui est affiché sur une image si celles-ci n’ont pas de texte alternatif, et les fichiers sont souvent constitués d’une chaîne de caractères sans signification particulière."
@@ -2054,9 +1949,6 @@
     "small_b070434a": {
         "message": "Petit"
     },
-    "social_studies_13fa30c7": {
-        "message": "Sciences sociales"
-    },
     "solid_circle_9f061dfc": {
         "message": "Cercle rempli"
     },
@@ -2126,12 +2018,6 @@
     "start_recording_9a65141a": {
         "message": "Démarrer l''enregistrement"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Bleu métallisé"
     },
@@ -2147,9 +2033,6 @@
     "submit_a3cc6859": {
         "message": "Soumettre"
     },
-    "submitted_318fad53": {
-        "message": "Soumis"
-    },
     "subscript_59744f96": {
         "message": "En indice"
     },
@@ -2164,9 +2047,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Suit par-dessus signe égal"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Opération réussie : À faire créé"
     },
     "sum_b0842d31": {
         "message": "Somme"
@@ -2234,9 +2114,6 @@
     "tagalog_74906db7": {
         "message": "Tagalog"
     },
-    "task_16b0ef38": {
-        "message": "Tâche"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2273,9 +2150,6 @@
     "thai_8f9bc548": {
         "message": "Thaï"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "Le meilleur travail"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "Traitement en cours de l’aperçu du document. Veuillez réessayer plus tard."
     },
@@ -2302,9 +2176,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "Le fichier sélectionné dépasse la taille limite de { maxSize } octets"
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "Rien n’est planifié pour aujourd''hui."
     },
     "therefore_d860e024": {
         "message": "Donc"
@@ -2354,29 +2225,14 @@
     "to_be_posted_when_d24bf7dc": {
         "message": "À poster : { when }"
     },
-    "to_do_1d554f36": {
-        "message": "À faire"
-    },
     "to_do_when_2783d78f": {
         "message": "À faire : { when }"
-    },
-    "today_76e10f9c": {
-        "message": "Aujourd’hui"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Aujourd''hui à { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "Activer/Désactiver groupe { summary }"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "Basculer l’info-bulle"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Demain"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Demain à { date }"
     },
     "tools_2fcf772e": {
         "message": "Outils"
@@ -2410,9 +2266,6 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Impossible de déterminer l’url de sélection de la ressource"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Impossible de marquer comme terminé."
     },
     "union_e6b57a53": {
         "message": "Union"
@@ -2659,12 +2512,6 @@
     },
     "yes_dde87d5": {
         "message": "Oui"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "Hier à { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Hier"
     },
     "yiddish_f96986df": {
         "message": "Yiddish"

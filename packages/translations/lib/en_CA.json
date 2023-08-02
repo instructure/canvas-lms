@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "A great discussion"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "A wonderful assignment"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Access the pretty HTML editor"
     },
@@ -74,14 +68,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Coproduct)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "An amazing discussion assignment"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "An error occured reading the file"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "An error occurred attempting to dismiss the opportunity."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "An error occurred making a network request"
@@ -218,14 +206,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Calendar Event"
-    },
     "cancel_caeb1e68": {
         "message": "Cancel"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Canvas Planner"
     },
     "cap_product_3a5265a6": {
         "message": "Cap Product"
@@ -472,9 +454,6 @@
     },
     "date_added_ed5ad465": {
         "message": "Date Added"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date } at { time }"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "Decorative Icon"
@@ -731,12 +710,6 @@
     "eta_b8828f99": {
         "message": "Eta"
     },
-    "exciting_discussion_9f67bd0a": {
-        "message": "Exciting discussion"
-    },
-    "excused_cf8792eb": {
-        "message": "Excused"
-    },
     "exists_2e62bdaa": {
         "message": "Exists"
     },
@@ -748,9 +721,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "Expand to see { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "Extended"
     },
     "external_link_d3f9e62a": {
         "message": "External Link"
@@ -773,38 +743,11 @@
     "f_function_fe422d65": {
         "message": "F (function)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "Failed getting course list"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Failed getting file contents"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "Failed getting To Do list"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "Failed peeking into your future"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "Failed peeking into your past"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Failed to delete to do"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Failed to get new activity"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Failed to load opportunities"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "Failed to retrieve content from external tool"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Failed to save to do"
-    },
-    "feedback_6dcc1991": {
-        "message": "Feedback"
     },
     "file_name_8fd421ff": {
         "message": "File name"
@@ -884,9 +827,6 @@
     "fullscreen_873bf53f": {
         "message": "Fullscreen"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "Fun quiz"
-    },
     "galician_7e4508b5": {
         "message": "Galician"
     },
@@ -908,14 +848,8 @@
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "Go to the editor''s toolbar"
     },
-    "graded_25cd3fcd": {
-        "message": "Graded"
-    },
     "grades_a61eba0a": {
         "message": "Grades"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Grades Loaded"
     },
     "greater_than_e98af662": {
         "message": "Greater Than"
@@ -1190,9 +1124,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "Language Arts"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "Language Arts Icon"
     },
@@ -1201,9 +1132,6 @@
     },
     "large_9c5e80e7": {
         "message": "Large"
-    },
-    "late_2be42b88": {
-        "message": "Late"
     },
     "latvian_2bbb6aab": {
         "message": "Latvian"
@@ -1319,14 +1247,8 @@
     "load_more_35d33c7": {
         "message": "Load More"
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "Loaded { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
-    },
     "loading_25990131": {
         "message": "Loading..."
-    },
-    "loading_725811ca": {
-        "message": "loading"
     },
     "loading_bde52856": {
         "message": "Loading"
@@ -1345,9 +1267,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "Loading folders"
-    },
-    "loading_grades_c842c887": {
-        "message": "Loading Grades"
     },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "Loading placeholder for { fileName }"
@@ -1394,9 +1313,6 @@
     "maps_to_e5ef7382": {
         "message": "Maps To"
     },
-    "math_ede93050": {
-        "message": "Math"
-    },
     "math_icon_ad4e9d03": {
         "message": "Math Icon"
     },
@@ -1441,9 +1357,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "Miscellaneous"
-    },
-    "missing_1a256b3b": {
-        "message": "Missing"
     },
     "module_90d9fd32": {
         "message": "Module"
@@ -1574,12 +1487,6 @@
     "not_superset_strict_24e06f36": {
         "message": "Not Superset (Strict)"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "Nothing planned today. Selecting most recent item."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "Nothing planned today. Selecting next item."
-    },
     "nu_1c0f6848": {
         "message": "Nu"
     },
@@ -1654,9 +1561,6 @@
     },
     "pause_12af3bb4": {
         "message": "Pause"
-    },
-    "peer_review_74f26a13": {
-        "message": "Peer Review"
     },
     "pentagon_17d82ea3": {
         "message": "Pentagon"
@@ -1814,9 +1718,6 @@
     "red_8258edf3": {
         "message": "Red"
     },
-    "redo_363c58b7": {
-        "message": "Redo"
-    },
     "relationships_6602af70": {
         "message": "Relationships"
     },
@@ -1831,9 +1732,6 @@
     },
     "replace_e61834a7": {
         "message": "Replace"
-    },
-    "replies_4a8577c8": {
-        "message": "Replies"
     },
     "reset_95a81614": {
         "message": "Reset"
@@ -1933,9 +1831,6 @@
     },
     "saved_icon_maker_icons_df86e2a1": {
         "message": "Saved Icon Maker Icons"
-    },
-    "science_8d92214a": {
-        "message": "Science"
     },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "Screen readers cannot determine what is displayed in an image without alternative text, and filenames are often meaningless strings of numbers and letters that do not describe the context or meaning."
@@ -2054,9 +1949,6 @@
     "small_b070434a": {
         "message": "Small"
     },
-    "social_studies_13fa30c7": {
-        "message": "Social Studies"
-    },
     "solid_circle_9f061dfc": {
         "message": "Solid Circle"
     },
@@ -2126,12 +2018,6 @@
     "start_recording_9a65141a": {
         "message": "Start Recording"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "Steel Blue"
     },
@@ -2147,9 +2033,6 @@
     "submit_a3cc6859": {
         "message": "Submit"
     },
-    "submitted_318fad53": {
-        "message": "Submitted"
-    },
     "subscript_59744f96": {
         "message": "Subscript"
     },
@@ -2164,9 +2047,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Succeeds Equal"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Success: To Do created"
     },
     "sum_b0842d31": {
         "message": "Sum"
@@ -2234,9 +2114,6 @@
     "tagalog_74906db7": {
         "message": "Tagalog"
     },
-    "task_16b0ef38": {
-        "message": "Task"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2273,9 +2150,6 @@
     "thai_8f9bc548": {
         "message": "Thai"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "The best assignment"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "The document preview is currently being processed. Please try again later."
     },
@@ -2302,9 +2176,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "The selected file exceeds the { maxSize } Byte limit"
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "There is nothing planned for today."
     },
     "therefore_d860e024": {
         "message": "Therefore"
@@ -2354,29 +2225,14 @@
     "to_be_posted_when_d24bf7dc": {
         "message": "To Be Posted: { when }"
     },
-    "to_do_1d554f36": {
-        "message": "To Do"
-    },
     "to_do_when_2783d78f": {
         "message": "To Do: { when }"
-    },
-    "today_76e10f9c": {
-        "message": "Today"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Today at { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "Toggle { summary } group"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "Toggle tooltip"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Tomorrow"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Tomorrow at { date }"
     },
     "tools_2fcf772e": {
         "message": "Tools"
@@ -2410,9 +2266,6 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "Unable to determine resource selection url"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Unable to mark as complete."
     },
     "union_e6b57a53": {
         "message": "Union"
@@ -2659,12 +2512,6 @@
     },
     "yes_dde87d5": {
         "message": "Yes"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "Yesterday at { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Yesterday"
     },
     "yiddish_f96986df": {
         "message": "Yiddish"

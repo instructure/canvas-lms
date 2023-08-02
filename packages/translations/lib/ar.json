@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "نقاش رائع"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "مهمة رائعة"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "الوصول إلى محرر HTML الأنيق"
     },
@@ -74,14 +68,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg (Coproduct)"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "مهمة نقاش مذهلة"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "حدث خطأ أثناء قراءة الملف"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "حدث خطأ أثناء محاولة تجاهل الفرصة."
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "حدث خطأ أثناء إجراء طلب شبكة"
@@ -218,14 +206,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "حدث التقويم"
-    },
     "cancel_caeb1e68": {
         "message": "إلغاء"
-    },
-    "canvas_planner_98ed106": {
-        "message": "مخطِط Canvas"
     },
     "cap_product_3a5265a6": {
         "message": "Cap Product"
@@ -472,9 +454,6 @@
     },
     "date_added_ed5ad465": {
         "message": "تاريخ الإضافة"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date } في { time }"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "أيقونة زينة"
@@ -731,12 +710,6 @@
     "eta_b8828f99": {
         "message": "Eta"
     },
-    "exciting_discussion_9f67bd0a": {
-        "message": "نقاش مثير"
-    },
-    "excused_cf8792eb": {
-        "message": "معفى"
-    },
     "exists_2e62bdaa": {
         "message": "موجود"
     },
@@ -748,9 +721,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "التوسيع لرؤية { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "موسع"
     },
     "external_link_d3f9e62a": {
         "message": "الرابط الخارجي"
@@ -773,38 +743,11 @@
     "f_function_fe422d65": {
         "message": "F (دالة)"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "تعذر الحصول على قائمة المساق"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "تعذر الحصول على محتويات الملف"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "تعذر الحصول على قائمة المهام"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "تعذر اختلاس النظر في مستقبلك"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "تعذر اختلاس النظر في ماضيك"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "تعذر حذف قائمة مهام"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "تعذر الحصول على نشاط جديد"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "تعذر تحميل الفرص"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "تعذر استرداد المحتوى من الأداة الخارجية"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "تعذر حفظ قائمة مهام"
-    },
-    "feedback_6dcc1991": {
-        "message": "الملاحظات"
     },
     "file_name_8fd421ff": {
         "message": "اسم الملف"
@@ -884,9 +827,6 @@
     "fullscreen_873bf53f": {
         "message": "ملء الشاشة"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "اختبار موجز مرح"
-    },
     "galician_7e4508b5": {
         "message": "الغاليسية"
     },
@@ -908,14 +848,8 @@
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "الانتقال إلى شريط الأدوات الخاص بالمحرر"
     },
-    "graded_25cd3fcd": {
-        "message": "تم تقييم الدرجة"
-    },
     "grades_a61eba0a": {
         "message": "الدرجات"
-    },
-    "grades_loaded_5056277c": {
-        "message": "تم تحميل الدرجات"
     },
     "greater_than_e98af662": {
         "message": "أكبر من"
@@ -1190,9 +1124,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "آداب اللغة"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "أيقونة آداب اللغة"
     },
@@ -1201,9 +1132,6 @@
     },
     "large_9c5e80e7": {
         "message": "كبير"
-    },
-    "late_2be42b88": {
-        "message": "متأخر"
     },
     "latvian_2bbb6aab": {
         "message": "اللاتفية"
@@ -1319,14 +1247,8 @@
     "load_more_35d33c7": {
         "message": "تحميل المزيد"
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "تم تحميل { count, plural,\n     =0 {# من العناصر}\n    one {# عنصر}\n  other {# من العناصر}\n}"
-    },
     "loading_25990131": {
         "message": "جارٍ التحميل..."
-    },
-    "loading_725811ca": {
-        "message": "يتم الآن التحميل"
     },
     "loading_bde52856": {
         "message": "جارٍ التحميل"
@@ -1345,9 +1267,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "جارٍ تحميل المجلدات"
-    },
-    "loading_grades_c842c887": {
-        "message": "جارٍ تحميل الدرجات"
     },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "جارٍ تحميل عنصر النائب لـ { fileName }"
@@ -1394,9 +1313,6 @@
     "maps_to_e5ef7382": {
         "message": "Maps To"
     },
-    "math_ede93050": {
-        "message": "الرياضيات"
-    },
     "math_icon_ad4e9d03": {
         "message": "أيقونة الرياضيات"
     },
@@ -1441,9 +1357,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "متنوعات"
-    },
-    "missing_1a256b3b": {
-        "message": "مفقود"
     },
     "module_90d9fd32": {
         "message": "الوحدة"
@@ -1574,12 +1487,6 @@
     "not_superset_strict_24e06f36": {
         "message": "Not Superset (Strict)"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "لم يتم اليوم تخطيط أي شيء. تحديد أحدث العناصر."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "لم يتم اليوم تخطيط أي شيء. تحديد العنصر التالي."
-    },
     "nu_1c0f6848": {
         "message": "Nu"
     },
@@ -1654,9 +1561,6 @@
     },
     "pause_12af3bb4": {
         "message": "إيقاف مؤقت"
-    },
-    "peer_review_74f26a13": {
-        "message": "المراجعة النظيرة"
     },
     "pentagon_17d82ea3": {
         "message": "خماسي"
@@ -1814,9 +1718,6 @@
     "red_8258edf3": {
         "message": "أحمر"
     },
-    "redo_363c58b7": {
-        "message": "إعادة"
-    },
     "relationships_6602af70": {
         "message": "العلاقات"
     },
@@ -1831,9 +1732,6 @@
     },
     "replace_e61834a7": {
         "message": "استبدال"
-    },
-    "replies_4a8577c8": {
-        "message": "ردود"
     },
     "reset_95a81614": {
         "message": "إعادة التعيين"
@@ -1933,9 +1831,6 @@
     },
     "saved_icon_maker_icons_df86e2a1": {
         "message": "تم حفظ أيقونة صانع الأيقونات"
-    },
-    "science_8d92214a": {
-        "message": "العلوم"
     },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "لا يمكن لقارئات الشاشة تحديد المعروض في صورة بدون نص بديل وفي الغالب تكون أسماء الملفات سلسلة بلا معنى من الأرقام والأحرف التي لا تصف السياق أو المعنى."
@@ -2054,9 +1949,6 @@
     "small_b070434a": {
         "message": "صغير"
     },
-    "social_studies_13fa30c7": {
-        "message": "الدراسات الاجتماعية"
-    },
     "solid_circle_9f061dfc": {
         "message": "Solid Circle"
     },
@@ -2126,12 +2018,6 @@
     "start_recording_9a65141a": {
         "message": "بدء التسجيل"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "أزرق فولاذي"
     },
@@ -2147,9 +2033,6 @@
     "submit_a3cc6859": {
         "message": "إرسال"
     },
-    "submitted_318fad53": {
-        "message": "تم الإرسال"
-    },
     "subscript_59744f96": {
         "message": "منخفض"
     },
@@ -2164,9 +2047,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "Succeeds Equal"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "نجاح: تم إنشاء قائمة مهام"
     },
     "sum_b0842d31": {
         "message": "Sum"
@@ -2234,9 +2114,6 @@
     "tagalog_74906db7": {
         "message": "التغالوغ"
     },
-    "task_16b0ef38": {
-        "message": "مهمة"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2273,9 +2150,6 @@
     "thai_8f9bc548": {
         "message": "التايوانية"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "أفضل مهمة"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "تجري معالجة معاينة المستند حاليًا. الرجاء إعادة المحاولة لاحقًا."
     },
@@ -2302,9 +2176,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "الملف المحدد يتجاوز حد { maxSize } بايت"
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "لا يوجد شيء مخطط اليوم."
     },
     "therefore_d860e024": {
         "message": "Therefore"
@@ -2354,29 +2225,14 @@
     "to_be_posted_when_d24bf7dc": {
         "message": "المقرر نشره: { when }"
     },
-    "to_do_1d554f36": {
-        "message": "قائمة المهام"
-    },
     "to_do_when_2783d78f": {
         "message": "قائمة مهام: { when }"
-    },
-    "today_76e10f9c": {
-        "message": "اليوم"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "اليوم الساعة { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "تبديل مجموعة { summary }"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "تبديل تلميح الأداة"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "غدًا"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "غدًا الساعة { date }"
     },
     "tools_2fcf772e": {
         "message": "الأدوات"
@@ -2410,9 +2266,6 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "يتعذر تحديد عنوان URL تحديد الموارد"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "يتعذر وضع علامة مكتمل."
     },
     "union_e6b57a53": {
         "message": "Union"
@@ -2659,12 +2512,6 @@
     },
     "yes_dde87d5": {
         "message": "نعم"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "أمس الساعة { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "أمس"
     },
     "yiddish_f96986df": {
         "message": "اليديشية"

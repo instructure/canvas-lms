@@ -47,9 +47,6 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Γεγονός στο Ημερολόγιο"
-    },
     "cancel_caeb1e68": {
         "message": "Ακύρωση"
     },
@@ -143,9 +140,6 @@
     "embed_image_1080badc": {
         "message": "Ενσωμάτωση εικόνας"
     },
-    "excused_cf8792eb": {
-        "message": "Δικαιολογημένος/η"
-    },
     "external_tools_6e77821": {
         "message": "Εξωτερικά Εργαλεία"
     },
@@ -160,9 +154,6 @@
     },
     "generating_preview_45b53be0": {
         "message": "Δημιουργία προεπισκόπησης..."
-    },
-    "graded_25cd3fcd": {
-        "message": "Βαθμολογημένα"
     },
     "grades_a61eba0a": {
         "message": "Βαθμοί"
@@ -224,9 +215,6 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Συντομεύσεις πληκτρολογίου"
     },
-    "late_2be42b88": {
-        "message": "Πρόσφατο/α"
-    },
     "light_blue_5374f600": {
         "message": "Μπλε Ανοιχτό"
     },
@@ -241,9 +229,6 @@
     },
     "loading_25990131": {
         "message": "Φόρτωση..."
-    },
-    "loading_725811ca": {
-        "message": "φόρτωση"
     },
     "loading_bde52856": {
         "message": "Φόρτωση"
@@ -265,9 +250,6 @@
     },
     "misc_3b692ea7": {
         "message": "Διάφορα"
-    },
-    "missing_1a256b3b": {
-        "message": "Απομένει"
     },
     "module_90d9fd32": {
         "message": "Ενότητα"
@@ -314,9 +296,6 @@
     "pages_e5414c2c": {
         "message": "Σελίδες"
     },
-    "peer_review_74f26a13": {
-        "message": "Αξιολόγηση Ομότιμων"
-    },
     "people_b4ebb13c": {
         "message": "Κοινό"
     },
@@ -359,9 +338,6 @@
     "replace_e61834a7": {
         "message": "Αντικατάσταση"
     },
-    "replies_4a8577c8": {
-        "message": "Απαντήσεις"
-    },
     "reset_95a81614": {
         "message": "Επαναφορά"
     },
@@ -389,9 +365,6 @@
     "submit_a3cc6859": {
         "message": "Υποβολή"
     },
-    "submitted_318fad53": {
-        "message": "Υποβλήθηκαν"
-    },
     "syllabus_f191f65b": {
         "message": "Αναλυτικό Πρόγραμμα"
     },
@@ -415,15 +388,6 @@
     },
     "title_ee03d132": {
         "message": "Τίτλος"
-    },
-    "to_do_1d554f36": {
-        "message": "Υποχρεώσεις"
-    },
-    "today_76e10f9c": {
-        "message": "Σήμερα"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Αύριο"
     },
     "unpublished_dfd8801": {
         "message": "μη δημοσιευμένο"
@@ -460,9 +424,6 @@
     },
     "yes_dde87d5": {
         "message": "Ναι"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Χτες"
     },
     "zoom_f3e54d69": {
         "message": "Μεγένθυνση"
