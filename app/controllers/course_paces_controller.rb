@@ -338,8 +338,15 @@ class CoursePacesController < ApplicationController
     jobs_progress = Progress.where(tag: "course_pace_publish", context: @context.course_paces).is_pending.map do |progress|
       pace = progress.context
       if pace&.workflow_state == "active"
+        pace_context = context_for(pace)
+        # If the pace context is nil, then the context was deleted and we should destroy the progress
+        if pace_context.nil?
+          progress.destroy
+          next
+        end
+
         {
-          pace_context: CoursePacing::PaceContextsPresenter.as_json(context_for(pace)),
+          pace_context: CoursePacing::PaceContextsPresenter.as_json(pace_context),
           progress_context_id: progress.context_id
         }
       else

@@ -255,6 +255,28 @@ describe CoursePacesController do
         js_env = controller.js_env
         expect(js_env[:PACES_PUBLISHING].length).to eq(1)
       end
+
+      it "removes the progress if the enrollment is no longer active" do
+        student_enrollment = @course1.enroll_student(@student, enrollment_state: "active", allow_multiple_enrollments: true)
+        # Stop other publishing progresses
+        Progress.where(tag: "course_pace_publish").destroy_all
+        student_enrollment_pace_model(student_enrollment:).create_publish_progress
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(1)
+        student_pace_progress = Progress.find_by(tag: "course_pace_publish")
+        student_enrollment.destroy
+        # The enrollment destroy queues up the course pace
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(2)
+        expect(Progress.all).to include(student_pace_progress)
+        user_session(@teacher1)
+
+        get :index, params: { course_id: @course1.id }
+        expect(response).to be_successful
+
+        js_env = controller.js_env
+        expect(js_env[:PACES_PUBLISHING].length).to eq(1)
+        expect(Progress.where(tag: "course_pace_publish").count).to eq(1)
+        expect(Progress.all).not_to include(student_pace_progress)
+      end
     end
 
     context "progress" do
