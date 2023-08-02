@@ -1873,7 +1873,11 @@ describe AssignmentsApiController, type: :request do
         )
       end
 
-      let(:new_course) { create_course }
+      let(:new_course) do
+        new_course = create_course
+        new_course.enroll_teacher(@teacher, enrollment_state: "active")
+        new_course
+      end
 
       it 'sets the assignment "resource_map" to a value indicating a map is not needed' do
         expect_any_instance_of(Assignment).not_to receive(:resource_map=)
@@ -1925,6 +1929,7 @@ describe AssignmentsApiController, type: :request do
         course.name = "target course"
         course.workflow_state = "available"
         course.save!
+        course.enroll_teacher(@teacher, enrollment_state: "active")
         course
       end
 
@@ -1977,6 +1982,31 @@ describe AssignmentsApiController, type: :request do
         expect(duplicated_assignments.count).to eq 2
         new_assignment = duplicated_assignments.where.not(id: failed_assignment.id).first
         expect(new_assignment.workflow_state).to eq("duplicating")
+      end
+
+      it "prevents duplicating an assignment that the user does not have permission to update" do
+        account = Account.create!
+        target_course = account.courses.create!
+        target_assignment = target_course.assignments.create!
+        url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
+              "?target_assignment_id=#{target_assignment.id}&target_course_id=#{target_course.id}"
+        api_call_as_user(
+          @teacher,
+          :post,
+          url,
+          {
+            controller: "assignments_api",
+            action: "duplicate",
+            format: "json",
+            course_id: @course.id.to_s,
+            assignment_id: assignment.id.to_s,
+            target_assignment_id: target_assignment.id,
+            target_course_id: target_course.id
+          },
+          {},
+          {},
+          { expected_status: 401 }
+        )
       end
 
       context "when result_type is specified (Quizzes.Next serialization)" do
