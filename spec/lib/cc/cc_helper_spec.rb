@@ -297,42 +297,26 @@ describe CC::CCHelper do
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
 
-    it "copies pages correctly when the title starts with a number" do
-      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
-      page = @course.wiki_pages.create(title: "9000, the level is over")
-      html = <<~HTML
-        <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
-      HTML
-      doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css("a").pluck(:href)
-      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
-    end
-
-    it "copies pages correctly when the title consists only of a number" do
-      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
-      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
-      page = @course.wiki_pages.create(title: "9000")
-      html = <<~HTML
-        <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
-      HTML
-      doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css("a").pluck(:href)
-      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
-    end
-
-    it "copies pages correctly when the url is an old slug" do
+    it "copies the correct page when the url is an old slug" do
       Account.site_admin.enable_feature! :permanent_page_links
       allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: false)
       page = @course.wiki_pages.create(title: "9000, the level is over")
       page.wiki_page_lookups.create!(slug: "old-url")
-      html = <<~HTML
-        <a href="/courses/#{@course.id}/wiki/old-url">This course's wiki page</a>
-      HTML
+      html = %(<a href="/courses/#{@course.id}/pages/old-url">This course's wiki page</a>)
       doc = Nokogiri::HTML5(@exporter.html_content(html))
       urls = doc.css("a").pluck(:href)
-      expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}"
+    end
+
+    it "creates a page url with a migration id" do
+      allow(HostUrl).to receive_messages(protocol: "http", context_host: "www.example.com:8080")
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      page = @course.wiki_pages.create(title: "beautiful title")
+      html = %(<a href="/courses/#{@course.id}/pages/#{page.url}">This course's wiki page</a>)
+      doc = Nokogiri::HTML5(@exporter.html_content(html))
+      urls = doc.css("a").pluck(:href)
+      expect(urls[0]).to eq "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}"
     end
 
     it "uses the key_generator to translate links" do
@@ -350,7 +334,7 @@ describe CC::CCHelper do
 
     it "preserves query parameters on links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, for_course_copy: true)
-      @course.wiki_pages.create!(title: "something")
+      page = @course.wiki_pages.create!(title: "something")
       other_page = @course.wiki_pages.create!(title: "LinkByTitle")
       assignment = @course.assignments.create!(name: "Thing")
       mod = @course.context_modules.create!(name: "Stuff")
@@ -362,8 +346,8 @@ describe CC::CCHelper do
         <a href="/courses/#{@course.id}/modules/items/#{tag.id}?seriously=0">i-Tem</a>
       HTML
       translated = @exporter.html_content(html)
-      expect(translated).to include "$WIKI_REFERENCE$/pages/something?embedded=true"
-      expect(translated).to include "$WIKI_REFERENCE$/pages/#{other_page.url}?embedded=true"
+      expect(translated).to include "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(page)}?embedded=true"
+      expect(translated).to include "$WIKI_REFERENCE$/pages/#{CC::CCHelper.create_key(other_page)}?embedded=true"
       expect(translated).to include "$CANVAS_OBJECT_REFERENCE$/assignments/#{CC::CCHelper.create_key(assignment)}?bamboozled=true"
       expect(translated).to include "$CANVAS_COURSE_REFERENCE$/modules/items/#{CC::CCHelper.create_key(tag)}?seriously=0"
     end

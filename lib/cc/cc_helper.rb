@@ -284,7 +284,8 @@ module CC
           end
           if page
             query = translate_module_item_query(match.query)
-            "#{WIKI_TOKEN}/#{match.type}/#{page.url}#{query}"
+            migration_id = @key_generator.create_key(page)
+            "#{WIKI_TOKEN}/#{match.type}/#{migration_id}#{query}"
           else
             "#{WIKI_TOKEN}/#{match.type}/#{match.obj_id}#{match.query}"
           end

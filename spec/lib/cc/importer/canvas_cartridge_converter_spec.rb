@@ -787,7 +787,7 @@ describe "Canvas Cartridge importing" do
 
   it "imports wiki pages" do
     # make sure that the wiki page we're linking to in the test below exists
-    @copy_from.wiki_pages.create!(title: "assignments", body: "ohai")
+    page = @copy_from.wiki_pages.create!(title: "assignments", body: "ohai")
     @copy_to.wiki_pages.create!(title: "assignments", body: "ohai")
     mod = @copy_from.context_modules.create!(name: "some module")
     mod2 = @copy_to.context_modules.create(name: "some module")
@@ -809,7 +809,7 @@ describe "Canvas Cartridge importing" do
     body_with_link = %(<p>Watup? <strong>eh?</strong>
       <a href="/courses/%s/assignments">Assignments</a>
       <a href="/courses/%s/file_contents/course%%20files/tbe_banner.jpg">Some file</a>
-      <a href="/courses/%s/#{@copy_to.wiki.path}/assignments">Assignments wiki link</a>
+      <a href="/courses/%s/pages/#{CC::CCHelper.create_key(page)}">Assignments wiki link</a>
       <a href="/courses/%s/modules">Modules</a>
       <a href="/courses/%s/modules/%s">some module</a>
       <img src="/courses/%s/files/%s/preview" alt="picture.png" /></p>
