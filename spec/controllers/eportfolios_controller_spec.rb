@@ -510,7 +510,7 @@ describe EportfoliosController do
       Attachment.where(id: @old_zipfile).update_all(created_at: 1.day.ago)
     end
 
-    it "hards delete old zips if there are no associated attachments" do
+    it "hard deletes old zips if there are no associated attachments" do
       expect(@portfolio.attachments.count).to eq 1
       expect(@old_zipfile.related_attachments.exists?).to be_falsey
 
@@ -522,7 +522,7 @@ describe EportfoliosController do
       expect(@portfolio.attachments.first.id).not_to eq @old_zipfile.id
     end
 
-    it "hards delete old zips even if there are associated attachments" do
+    it "hard deletes old zips even if there are associated attachments" do
       expect(@portfolio.attachments.count).to eq 1
       cloned_att = @old_zipfile.clone_for(@user)
       cloned_att.workflow_state = "to_be_zipped"
@@ -548,6 +548,15 @@ describe EportfoliosController do
       to_zip = @portfolio.attachments[0]
       ContentZipper.new.zip_eportfolio(to_zip, @portfolio)
       expect(@portfolio.attachments[0].workflow_state).to include "zipped"
+    end
+
+    it "deals with long page names" do
+      @portfolio.update name: "blah"
+      long_category = @portfolio.eportfolio_categories.create! name: "A" * 200
+      long_category.eportfolio_entries.create! name: "B" * 200, eportfolio: @portfolio
+      to_zip = @portfolio.attachments.first
+      ContentZipper.new.zip_eportfolio(to_zip, @portfolio)
+      expect(@portfolio.attachments.first.workflow_state).to eq "zipped"
     end
   end
 end
