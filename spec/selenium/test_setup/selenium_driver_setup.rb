@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "webdrivers/chromedriver"
 require_relative "common_helper_methods/custom_alert_actions"
 require_relative "common_helper_methods/custom_screen_actions"
 require_relative "patches/selenium/webdriver/remote/w3c/bridge"
@@ -251,12 +250,7 @@ module SeleniumDriverSetup
 
     def ruby_chrome_driver
       puts "Thread: provisioning local chrome driver"
-      # in your selenium.yml you can define a different chromedriver version
-      # by modifying 'chromedriver_version: <version>' for the version you want.
-      # otherwise this will use the default version matching what is used in docker.
-      Webdrivers::Chromedriver.required_version = CONFIG[:chromedriver_version]
-
-      Selenium::WebDriver.for :chrome, capabilities: desired_capabilities
+      Selenium::WebDriver.for :chrome, options: desired_capabilities
     end
 
     def ruby_safari_driver
@@ -294,11 +288,12 @@ module SeleniumDriverSetup
         options.log_level = :debug
       when :chrome
         options = Selenium::WebDriver::Options.chrome
-        options.add_argument("no-sandbox")
-        options.add_argument("start-maximized")
-        options.add_argument("disable-dev-shm-usage")
+        options.browser_version = CONFIG[:browser_version] if CONFIG[:browser_version]
+        options.args << "no-sandbox"
+        options.args << "start-maximized"
+        options.args << "disable-dev-shm-usage"
         if ENV["DISABLE_CORS"]
-          options.add_argument("disable-web-security")
+          options.args << "disable-web-security"
         end
         options.logging_prefs = {
           browser: "ALL",
@@ -346,10 +341,12 @@ module SeleniumDriverSetup
                               capabilities: desired_capabilities)
     end
 
-    def_delegator :driver_capabilities, :browser_name
+    def browser_name
+      driver.capabilities[:browser_name]
+    end
 
     def browser_version
-      driver_capabilities.version
+      driver.capabilities[:browser_version]
     end
 
     def driver_capabilities
