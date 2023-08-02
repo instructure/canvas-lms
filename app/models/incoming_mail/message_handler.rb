@@ -139,9 +139,9 @@ module IncomingMail
                    TEXT
                  else # including IncomingMessageProcessor::UnknownAddressError
                    InstStatsd::Statsd.increment("incoming_mail_processor.message_processing_error.catch_all")
-                   error_info = { tags: { type: :message_processing_error_catch_all }, ref: get_ref_uuid }
+                   error_info = { tags: { type: :message_processing_error_catch_all }, extra: { ref: get_ref_uuid } }
                    Canvas::Errors.capture(error, error_info, :error)
-                   I18n.t("lib.incoming_message_processor.failure_message.body", <<~TEXT, subject:, ref: error_info[:ref]).gsub(/^ +/, "")
+                   I18n.t("lib.incoming_message_processor.failure_message.body", <<~TEXT, subject:, ref: error_info.dig(:extra, :ref)).to_s.gsub(/^ +/, "")
                      The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,
