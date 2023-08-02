@@ -160,7 +160,7 @@ ready(() => {
           key: 'announcement-no-notification-on-edit',
           variant: 'info',
           text: I18n.t(
-            'Editing an announcement will create a notification in the User Dashboard and Course Activity Stream. If you want users to receive the edited announcement via their notification settings, you will need to create a new announcement.'
+            'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
           ),
         }
     ReactDOM.render(
