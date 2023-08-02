@@ -19,15 +19,22 @@
 import $ from 'jquery'
 import '@canvas/backbone'
 import _ from 'lodash'
+import moment from 'moment-timezone'
+import tz from '@canvas/timezone'
 import {fireEvent, within, getByText} from '@testing-library/dom'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
 
 jest.mock('@canvas/rce/RichContentEditor')
 
+const defaultTZ = 'Asia/Tokyo'
+
 describe('EditEventView', () => {
+  beforeAll(() => {
+    moment.tz.setDefault(defaultTZ)
+  })
   beforeEach(() => {
-    window.ENV = {FEATURES: {}}
+    window.ENV = {FEATURES: {}, TIMEZONE: 'Asia/Tokyo'}
     document.body.innerHTML = '<div id="application"><form id="content"></form></div>'
   })
 
@@ -60,6 +67,12 @@ describe('EditEventView', () => {
   it('renders', () => {
     render()
     expect(within(document.body).getByText('Edit Calendar Event')).not.toBeNull()
+  })
+
+  it('defaults to today if no start date is given', () => {
+    render({start_at: undefined})
+    const today = tz.format(moment().startOf('day').toDate(), 'date.formats.default')
+    expect(within(document.body).getByDisplayValue(today)).toBeInTheDocument()
   })
 
   describe('conferences', () => {

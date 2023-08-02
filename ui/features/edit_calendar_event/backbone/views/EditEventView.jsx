@@ -91,6 +91,13 @@ export default class EditCalendarEventView extends Backbone.View {
         )
       }
 
+      if (!picked_params.start_date) {
+        picked_params.start_date = tz.format(
+          moment().tz(ENV.TIMEZONE).startOf('day').toDate(),
+          'date.formats.default'
+        )
+      }
+
       if (picked_params.new_context_code) {
         picked_params.context_code = picked_params.new_context_code
       }
@@ -214,12 +221,16 @@ export default class EditCalendarEventView extends Backbone.View {
       const eventStart = moment.tz(start, ENV.TIMEZONE)
 
       const rrule = this.model.get('rrule')
-      const freq = rrule ? rruleToFrequencyOptionValue(eventStart, rrule) : 'not-repeat'
+      const freq =
+        rrule && eventStart.isValid()
+          ? rruleToFrequencyOptionValue(eventStart, rrule)
+          : 'not-repeat'
 
       ReactDOM.render(
         <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
           <FrequencyPicker
-            date={eventStart.toISOString(true)}
+            date={eventStart.isValid() ? eventStart.toISOString(true) : undefined}
+            interaction={eventStart.isValid() ? 'enabled' : 'disabled'}
             locale={ENV.LOCALE || 'en'}
             timezone={ENV.TIMEZONE}
             initialFrequency={freq}
