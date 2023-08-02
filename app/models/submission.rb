@@ -1709,7 +1709,7 @@ class Submission < ActiveRecord::Base
     return true if @regraded
     return false if grade_matches_current_submission == false # nil is treated as true
 
-    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status).any?
+    changes.slice(:score, :submitted_at, :seconds_late_override, :late_policy_status, :custom_grade_status_id).any?
   end
   private :late_policy_relevant_changes?
 

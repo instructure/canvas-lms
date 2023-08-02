@@ -1592,6 +1592,45 @@ describe Submission do
       end
     end
 
+    context "custom grade statuses" do
+      let(:custom_grade_status) do
+        admin = account_admin_user(account: @assignment.root_account)
+        @assignment.root_account.custom_grade_statuses.create!(
+          name: "Custom Status",
+          color: "#ABC",
+          created_by: admin
+        )
+      end
+
+      it "does not apply the late policy when score changes if a custom status is applied" do
+        Timecop.freeze(2.days.ago(@date)) do
+          @assignment.submit_homework(@student, body: "a body")
+          submission.update!(custom_grade_status:)
+          expect { @assignment.grade_student(@student, grade: 600, grader: @teacher) }.not_to change {
+            submission.reload.points_deducted
+          }.from(nil)
+        end
+      end
+
+      it "applies the late policy for a late submission when a custom status is removed" do
+        Timecop.freeze(2.days.ago(@date)) do
+          submission.update!(custom_grade_status:)
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 600, grader: @teacher)
+          expect { submission.update!(custom_grade_status: nil) }.to change {
+            submission.reload.points_deducted
+          }.from(nil).to(100)
+        end
+      end
+
+      it "does not apply the missing policy when a custom status is applied" do
+        submission.update_columns(score: nil, grade: nil, posted_at: nil, workflow_state: "unsubmitted")
+        expect { submission.update!(custom_grade_status:) }.not_to change {
+          submission.reload.score
+        }.from(nil)
+      end
+    end
+
     it "does not apply the late policy when what-if score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")

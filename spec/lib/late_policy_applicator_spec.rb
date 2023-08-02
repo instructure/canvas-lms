@@ -233,6 +233,15 @@ describe LatePolicyApplicator do
     end
 
     context "when the course has a late policy" do
+      let(:custom_grade_status) do
+        admin = account_admin_user(account: @course.root_account)
+        @course.root_account.custom_grade_statuses.create!(
+          color: "#ABC",
+          name: "yolo",
+          created_by: admin
+        )
+      end
+
       it "does not apply the late policy to submissions unless late_submission_deduction_enabled or missing_submission_deduction_enabled" do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
         @late_policy.update_columns(late_submission_deduction_enabled: false, missing_submission_deduction_enabled: false)
@@ -261,6 +270,13 @@ describe LatePolicyApplicator do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
 
         expect { @late_policy_applicator.process }.to change { @late_submission2.reload.score }.by(-10)
+      end
+
+      it "does not apply the late policy to otherwise late submissions that have a custom status" do
+        @late_submission2.update_columns(custom_grade_status_id: custom_grade_status.id)
+        @late_policy_applicator = LatePolicyApplicator.new(@course)
+
+        expect { @late_policy_applicator.process }.not_to change { @late_submission2.reload.score }
       end
 
       it "does not apply the late policy to late submissions for concluded students" do

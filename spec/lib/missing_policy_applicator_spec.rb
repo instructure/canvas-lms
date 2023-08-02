@@ -91,6 +91,15 @@ describe MissingPolicyApplicator do
       )
     end
 
+    let(:custom_grade_status) do
+      admin = account_admin_user(account: @course.root_account)
+      @course.root_account.custom_grade_statuses.create!(
+        color: "#ABC",
+        name: "yolo",
+        created_by: admin
+      )
+    end
+
     let(:applicator) { described_class.new }
 
     before(:once) do
@@ -119,6 +128,23 @@ describe MissingPolicyApplicator do
       submission.reload
 
       expect(submission.workflow_state).to eql "graded"
+    end
+
+    it "ignores otherwise missing submissions that have been marked with a custom status" do
+      late_policy_missing_enabled
+      create_recent_assignment
+      submission = @course.submissions.first
+      submission.update_columns(
+        grade: nil,
+        posted_at: nil,
+        score: nil,
+        workflow_state: "unsubmitted",
+        custom_grade_status_id: custom_grade_status.id
+      )
+
+      expect { applicator.apply_missing_deductions }.not_to change {
+        submission.reload.score
+      }.from(nil)
     end
 
     it "ignores submissions for unpublished assignments" do
