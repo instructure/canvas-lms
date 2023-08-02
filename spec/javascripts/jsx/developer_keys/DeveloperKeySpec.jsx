@@ -19,11 +19,10 @@
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
-import {Link} from '@instructure/ui-link'
-import {Img} from '@instructure/ui-img'
 
 import DeveloperKey from 'ui/features/developer_keys_v2/react/DeveloperKey'
 
+// eslint-disable-next-line react/prefer-stateless-function
 class TestTable extends React.Component {
   render() {
     return (
@@ -139,13 +138,13 @@ test('includes No Email when userName is empty string and email is missing', () 
 
 test('includes an image when name is present', () => {
   const component = renderComponent(defaultProps)
-  ok(TestUtils.findRenderedComponentWithType(component, Img))
+  ok(TestUtils.findRenderedDOMComponentWithTag(component, 'img'))
 })
 
 test('includes an img box when name is null', () => {
   const propsModified = updateDefaultProps({developerKey: {name: null}})
   const component = renderComponent(propsModified)
-  ok(TestUtils.findRenderedComponentWithType(component, Img))
+  ok(TestUtils.findRenderedDOMComponentWithTag(component, 'img'))
 })
 
 test('does not inactive when workflow_state is active', () => {
@@ -154,13 +153,13 @@ test('does not inactive when workflow_state is active', () => {
 
 test('includes a user link', () => {
   const component = renderComponent(defaultProps)
-  ok(TestUtils.findRenderedComponentWithType(component, Link))
+  ok(TestUtils.findRenderedDOMComponentWithTag(component, 'a'))
 })
 
 test('does not include a user link when user_id is null', () => {
   const propsModified = updateDefaultProps({developerKey: {user_id: null}})
   const component = renderComponent(propsModified)
-  equal(TestUtils.scryRenderedComponentsWithType(component, Link).length, 0)
+  equal(TestUtils.scryRenderedDOMComponentsWithTag(component, 'a').length, 0)
 })
 
 test('includes a redirect_uri', () => {

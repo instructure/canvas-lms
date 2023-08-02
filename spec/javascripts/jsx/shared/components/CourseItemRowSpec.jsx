@@ -143,7 +143,7 @@ test('renders unread indicator if isRead: false', () => {
   const rowNode = tree.find('Badge')
   ok(rowNode.exists())
 
-  const srNode = tree.find('.ic-item-row__content-col Heading ScreenReaderContent')
+  const srNode = tree.find('.ic-item-row__content-col Heading ScreenReaderContent').first()
   ok(srNode.exists())
   ok(srNode.text().includes('unread,'))
 })

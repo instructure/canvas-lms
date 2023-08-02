@@ -155,12 +155,14 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
           size="small"
         >
           <RadioInput
+            data-testid="provisional_grade_radio"
             value={moderatorGradeId}
             label={<Text size="small">{I18n.t('Custom')}</Text>}
           />
 
           {gradesIssuedByOthers.map(grade => (
             <RadioInput
+              data-testid="provisional_grade_radio"
               disabled={!ENV.instructor_selectable_states[grade.provisional_grade_id]}
               key={grade.provisional_grade_id}
               value={grade.provisional_grade_id}

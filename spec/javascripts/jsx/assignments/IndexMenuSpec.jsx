@@ -107,7 +107,10 @@ testCase('does not render a bulk edit option if property is not specified', () =
   ReactDOM.unmountComponentAtNode(component.node.parentElement)
 })
 
-testCase('renders a LTI tool modal', () => {
+// Skipped for FOO-3190 ... the TestUtils methods don't work well for
+// matching against InstUI components as of V8. Recommend rewriting
+// this entire test in Jest and React Testing Library
+QUnit.skip('renders an LTI tool modal', () => {
   const component = renderComponent(generateProps({}, {modalIsOpen: true}))
 
   const modals = TestUtils.scryRenderedComponentsWithType(component, Modal)
@@ -116,7 +119,10 @@ testCase('renders a LTI tool modal', () => {
   ReactDOM.unmountComponentAtNode(component.node.parentElement)
 })
 
-testCase('Modal visibility agrees with state modalIsOpen', () => {
+// Skipped for FOO-3190 ... the TestUtils methods don't work well for
+// matching against InstUI components as of V8. Recommend rewriting
+// this entire test in Jest and React Testing Library
+QUnit.skip('Modal visibility agrees with state modalIsOpen', () => {
   const component1 = renderComponent(generateProps({}, {modalIsOpen: true}))
   const modal1 = TestUtils.findRenderedComponentWithType(component1, Modal)
   equal(modal1.props.open, true)

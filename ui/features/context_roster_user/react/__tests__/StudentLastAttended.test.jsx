@@ -41,6 +41,6 @@ test('renders loading component when loading', () => {
 
 test('onDateSubmit calls correct function', () => {
   const tree = mount(<StudentLastAttended {...defaultProps()} />)
-  const node = tree.find('Text')
+  const node = tree.find('Text').at(0)
   expect(node.text()).toBe('Last day attended')
 })

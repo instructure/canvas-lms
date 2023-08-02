@@ -72,13 +72,13 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
   })
 
   function mountComponent() {
+    // eslint-disable-next-line react/no-render-return-value
     component = ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container)
   }
 
   function getOptionsMenuTrigger() {
-    return [...$container.querySelectorAll('button')].find(
-      $button => $button.textContent === 'Homework Options'
-    )
+    const buttons = Array.from($container.querySelectorAll('button'))
+    return buttons.find(b => b.textContent === 'Homework Options')
   }
 
   function getOptionsMenuContent() {

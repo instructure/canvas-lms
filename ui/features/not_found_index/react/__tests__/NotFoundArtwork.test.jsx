@@ -29,12 +29,12 @@ test('renders the NotFoundArtwork component', () => {
 
 test('renders the NotFoundArtwork renders correct header', () => {
   const tree = mount(<NotFoundArtwork {...defaultProps()} />)
-  const node = tree.find('Heading')
+  const node = tree.find('Heading').at(0)
   expect(node.text()).toBe('Whoops... Looks like nothing is here!')
 })
 
 test('renders the NotFoundArtwork component help description', () => {
   const tree = mount(<NotFoundArtwork {...defaultProps()} />)
-  const node = tree.find('Text')
+  const node = tree.find('Text').at(0)
   expect(node.text()).toBe("We couldn't find that page!")
 })

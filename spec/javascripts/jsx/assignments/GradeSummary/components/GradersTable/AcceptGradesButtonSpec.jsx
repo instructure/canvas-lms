@@ -58,7 +58,10 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is labeled for screen readers with "Accept grades by"', () => {
-      equal(wrapper.find('button ScreenReaderContent').text(), 'Accept grades by Jackie Chan')
+      equal(
+        wrapper.find('button ScreenReaderContent').first().text(),
+        'Accept grades by Jackie Chan'
+      )
     })
 
     test('is not read-only', () => {
@@ -66,7 +69,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      strictEqual(wrapper.find('Button').prop('disabled'), null)
+      strictEqual(wrapper.find('Button').first().prop('disabled'), null)
     })
 
     test('calls the onClick prop when clicked', () => {
@@ -93,7 +96,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      strictEqual(wrapper.find('Button').prop('disabled'), null)
+      strictEqual(wrapper.find('Button').first().prop('disabled'), null)
     })
 
     test('does not call the onClick prop when clicked', () => {
@@ -118,7 +121,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      strictEqual(wrapper.find('Button').prop('disabled'), null)
+      strictEqual(wrapper.find('Button').first().prop('disabled'), null)
     })
 
     test('does not call the onClick prop when clicked', () => {
@@ -143,7 +146,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is disabled', () => {
-      strictEqual(wrapper.find('Button').prop('disabled'), true)
+      strictEqual(wrapper.find('Button').first().prop('disabled'), true)
     })
 
     test('does not call the onClick prop when clicked', () => {
@@ -163,7 +166,10 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is labeled for screen readers with "Accept grades by"', () => {
-      equal(wrapper.find('button ScreenReaderContent').text(), 'Accept grades by Jackie Chan')
+      equal(
+        wrapper.find('button ScreenReaderContent').first().text(),
+        'Accept grades by Jackie Chan'
+      )
     })
 
     test('is not read-only', () => {
@@ -171,7 +177,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      equal(wrapper.find('Button').prop('disabled'), null)
+      equal(wrapper.find('Button').first().prop('disabled'), null)
     })
 
     test('calls the onClick prop when clicked', () => {
@@ -194,7 +200,10 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is labeled for screen readers with "Accept grades by"', () => {
-      equal(wrapper.find('button ScreenReaderContent').text(), 'Accept grades by Jackie Chan')
+      equal(
+        wrapper.find('button ScreenReaderContent').first().text(),
+        'Accept grades by Jackie Chan'
+      )
     })
 
     test('is not read-only', () => {
@@ -202,7 +211,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is disabled', () => {
-      strictEqual(wrapper.find('Button').prop('disabled'), true)
+      strictEqual(wrapper.find('Button').first().prop('disabled'), true)
     })
 
     test('does not call the onClick prop when clicked', () => {

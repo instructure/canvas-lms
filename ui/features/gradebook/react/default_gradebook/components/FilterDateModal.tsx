@@ -78,7 +78,7 @@ export default function FilterNavDateModal({
       as="form"
       open={isOpen}
       onDismiss={onCloseDateModal}
-      onSubmit={(event: Event) => {
+      onSubmit={event => {
         event.preventDefault()
         onSelectDates(startDateValue, endDateValue)
         onCloseDateModal()

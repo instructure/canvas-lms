@@ -90,7 +90,7 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
     }
 
     function getTooltip() {
-      const $trigger = $container.querySelector('[aria-describedby^="Tooltip__"]')
+      const $trigger = $container.querySelector('[aria-describedby^="Tooltip_"]')
       return $trigger && document.querySelector(`#${$trigger.getAttribute('aria-describedby')}`)
     }
 

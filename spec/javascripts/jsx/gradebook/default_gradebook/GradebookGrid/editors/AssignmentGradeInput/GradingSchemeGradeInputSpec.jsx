@@ -19,6 +19,7 @@
 /* eslint-disable qunit/no-identical-names */
 
 import React from 'react'
+import {findDOMNode} from 'react-dom'
 import {mount} from 'enzyme'
 import AssignmentGradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentGradeInput/index'
 import fakeENV from 'helpers/fakeENV'
@@ -33,7 +34,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
 
   suiteHooks.beforeEach(() => {
     fakeENV.setup({
-      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
     const assignment = {
       pointsPossible: 10,
@@ -101,7 +102,8 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
   }
 
   function getRenderedOptions() {
-    return [...$menuContent.querySelectorAll('[role="menuitem"]')]
+    // eslint-disable-next-line react/no-find-dom-node
+    return Array.from(findDOMNode($menuContent).querySelectorAll('[role="menuitem"]'))
   }
 
   function clickMenuItem(optionText) {

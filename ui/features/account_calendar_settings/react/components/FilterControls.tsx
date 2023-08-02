@@ -112,7 +112,12 @@ export const FilterControls = ({
           size="small"
           width="18rem"
           isInline={true}
-          onChange={(_, data) => setFilterValue(data.value)}
+          onChange={(_, data) => {
+            const {value} = data
+            if (!Object.values(FilterType).includes(value as FilterType))
+              throw new RangeError(`Unexpected filter type "${value}!`)
+            setFilterValue(value as FilterType)
+          }}
         >
           {FILTER_OPTIONS.map(option => (
             <SimpleSelectOption
