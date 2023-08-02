@@ -833,6 +833,11 @@ class AssignmentsApiController < ApplicationController
 
     return unless authorized_action(old_assignment, @current_user, :create)
 
+    if target_course.present?
+      course_permission = target_course.root_account.feature_enabled?(:granular_permissions_manage_assignments) ? :manage_assignments_add : :manage_assignments
+      return unless authorized_action(target_course, @current_user, course_permission)
+    end
+
     new_assignment = old_assignment.duplicate(
       user: @current_user,
       # in case of failure retry, just reuse the title of failed assignment
