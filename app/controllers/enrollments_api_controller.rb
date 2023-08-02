@@ -700,8 +700,30 @@ class EnrollmentsApiController < ApplicationController
       return render_create_errors([@@errors[:concluded_course]])
     end
 
-    params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].key?(:limit_privileges_to_course_section)
-    params[:enrollment].slice!(:enrollment_state, :section, :limit_privileges_to_course_section, :associated_user_id, :role, :start_at, :end_at, :self_enrolled, :no_notify)
+    if params[:enrollment].key?(:limit_privileges_to_course_section)
+      params[:enrollment][:limit_privileges_to_course_section] =
+        value_to_boolean(params[:enrollment][:limit_privileges_to_course_section])
+    end
+
+    if params[:enrollment][:temporary_enrollment_source_user_id].present?
+      temporary_enrollment_source_user_id = params[:enrollment][:temporary_enrollment_source_user_id]
+    end
+
+    params[:enrollment].slice!(
+      :enrollment_state,
+      :section,
+      :limit_privileges_to_course_section,
+      :associated_user_id,
+      :role,
+      :start_at,
+      :end_at,
+      :self_enrolled,
+      :no_notify
+    )
+
+    if @domain_root_account&.feature_enabled?(:temporary_enrollments)
+      params[:enrollment][:temporary_enrollment_source_user_id] = temporary_enrollment_source_user_id
+    end
 
     SubmissionLifecycleManager.with_executing_user(@current_user) do
       @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(allow_multiple_enrollments: true))

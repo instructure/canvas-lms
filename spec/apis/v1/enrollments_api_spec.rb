@@ -224,6 +224,59 @@ describe EnrollmentsApiController, type: :request do
         expect(enrollment.limit_privileges_to_course_section).to be true
       end
 
+      context "temporary enrollments" do
+        before :once do
+          teacher_in_course(active_all: true)
+          @account = Account.default
+        end
+
+        it "creates an association when feature flag is enabled" do
+          @account.enable_feature!(:temporary_enrollments)
+          role_id = @teacher.enrollments.take.role_id
+          json = api_call_as_user @admin,
+                                  :post,
+                                  @path,
+                                  @path_options,
+                                  {
+                                    enrollment: {
+                                      start_at: 1.day.ago,
+                                      end_at: 1.day.from_now,
+                                      user_id: @unenrolled_user.id,
+                                      role_id:,
+                                      course_section_id: @section.id,
+                                      temporary_enrollment_source_user_id: @teacher.id
+                                    }
+                                  }
+          enrollment = Enrollment.find(json["id"])
+          expect(enrollment).to be_an_instance_of TeacherEnrollment
+          expect(enrollment.course_section).to eq @section
+          expect(enrollment.temporary_enrollment_source_user_id).to eq @teacher.id
+        end
+
+        it "does not create an association when feature flag is disabled" do
+          @account.disable_feature!(:temporary_enrollments)
+          role_id = @teacher.enrollments.take.role_id
+          json = api_call_as_user @admin,
+                                  :post,
+                                  @path,
+                                  @path_options,
+                                  {
+                                    enrollment: {
+                                      start_at: 1.day.ago,
+                                      end_at: 1.day.from_now,
+                                      user_id: @unenrolled_user.id,
+                                      role_id:,
+                                      course_section_id: @section.id,
+                                      temporary_enrollment_source_user_id: @teacher.id
+                                    }
+                                  }
+          enrollment = Enrollment.find(json["id"])
+          expect(enrollment).to be_an_instance_of TeacherEnrollment
+          expect(enrollment.course_section).to eq @section
+          expect(enrollment.temporary_enrollment_source_user_id).to be_nil
+        end
+      end
+
       it "interprets 'false' correctly" do
         json = api_call :post,
                         @path,

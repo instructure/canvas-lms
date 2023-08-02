@@ -2471,6 +2471,8 @@ class Course < ActiveRecord::Base
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
+    temporary_enrollment_source_user_id =
+      account.feature_enabled?(:temporary_enrollments) ? opts[:temporary_enrollment_source_user_id] : nil
 
     role = opts[:role] || shard.activate { Enrollment.get_built_in_role_for_type(type, root_account_id: self.root_account_id) }
 
@@ -2479,20 +2481,26 @@ class Course < ActiveRecord::Base
     self_enrolled = opts[:self_enrolled]
     section ||= default_section
     enrollment_state ||= available? ? "invited" : "creation_pending"
-    if type == "TeacherEnrollment" || type == "TaEnrollment" || type == "DesignerEnrollment"
+    if type.include?("TeacherEnrollment") || type.include?("TaEnrollment") || type.include?("DesignerEnrollment")
       enrollment_state = "invited" if enrollment_state == "creation_pending"
     elsif enrollment_state == "invited" && !available?
       enrollment_state = "creation_pending"
     end
+
     Course.unique_constraint_retry do
+      scope = all_enrollments.where(user_id: user,
+                                    type:,
+                                    role_id: role,
+                                    associated_user_id:)
+      if account.feature_enabled?(:temporary_enrollments)
+        scope = scope.where(temporary_enrollment_source_user_id:)
+      end
       e = if opts[:allow_multiple_enrollments]
-            all_enrollments.where(user_id: user, type:, role_id: role, associated_user_id:, course_section_id: section.id).first
+            scope.where(course_section_id: section.id).first
           else
-            # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
-            all_enrollments
-              .where(user_id: user, type:, role_id: role, associated_user_id:)
-              .order(Arel.sql("course_section_id<>#{section.id}"))
-              .first
+            # order by course_section_id<>section.id so that if there *is* an existing
+            # enrollment for this section, we get it (false orders before true)
+            scope.order(Arel.sql("course_section_id<>#{section.id}")).first
           end
       if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
@@ -2522,6 +2530,7 @@ class Course < ActiveRecord::Base
         )
       end
       e.associated_user_id = associated_user_id
+      e.temporary_enrollment_source_user_id = temporary_enrollment_source_user_id
       e.role = role
       e.self_enrolled = self_enrolled
       e.start_at = start_at
