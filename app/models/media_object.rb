@@ -38,7 +38,6 @@ class MediaObject < ActiveRecord::Base
   validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, ->(media_object) { where(attachment_id: [nil, media_object.attachment_id]).order(:locale) }, dependent: :destroy, inverse_of: :media_object
   has_many :attachments_by_media_id, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :media_object_by_media_id
-  has_many :active_attachments_by_media_id, -> { active }, class_name: "Attachment", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :active_media_object_by_media_id
   before_create :create_attachment
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
@@ -111,7 +110,8 @@ class MediaObject < ActiveRecord::Base
   # upload to complete. Wrap it in a timeout if you ever want it to give up
   # waiting.
   def self.add_media_files(attachments, wait_for_completion)
-    KalturaMediaFileHandler.new.add_media_files(attachments, wait_for_completion)
+    media_attachments = Array(attachments).reject { |att| att.media_object_by_media_id && att.media_entry_id != "maybe" }
+    KalturaMediaFileHandler.new.add_media_files(media_attachments, wait_for_completion) if media_attachments.present?
   end
 
   def self.bulk_migration(csv, root_account_id)

@@ -466,16 +466,23 @@ describe MediaObject do
   end
 
   describe ".add_media_files" do
+    before do
+      @attachment = Attachment.new
+      @kaltura_media_file_handler = double("KalturaMediaFileHandler")
+      allow(KalturaMediaFileHandler).to receive(:new).and_return(@kaltura_media_file_handler)
+    end
+
     it "delegates to the KalturaMediaFileHandler to make a bulk upload to kaltura" do
-      kaltura_media_file_handler = double("KalturaMediaFileHandler")
-      expect(KalturaMediaFileHandler).to receive(:new).and_return(kaltura_media_file_handler)
-
-      attachments = [Attachment.new]
       wait_for_completion = true
+      expect(@kaltura_media_file_handler).to receive(:add_media_files).with([@attachment], wait_for_completion).and_return(:retval)
+      expect(MediaObject.add_media_files(@attachment, wait_for_completion)).to eq :retval
+    end
 
-      expect(kaltura_media_file_handler).to receive(:add_media_files).with(attachments, wait_for_completion).and_return(:retval)
+    it "doesn't try to upload when all attachments have media objects already" do
+      @attachment.media_entry_id = media_object.media_id
 
-      expect(MediaObject.add_media_files(attachments, wait_for_completion)).to eq :retval
+      expect(@kaltura_media_file_handler).not_to receive(:add_media_files)
+      MediaObject.add_media_files(@attachment, false)
     end
   end
 
@@ -643,16 +650,6 @@ describe MediaObject do
       other_attachment = attachment_model(media_entry_id: media_object.media_id)
       attachment_model(media_entry_id: "something else")
       expect(media_object.attachments_by_media_id).to match_array([attachment, other_attachment])
-    end
-  end
-
-  describe "#active_attachments_by_media_id" do
-    it "returns active attachments with the given media_id" do
-      attachment = media_object.attachment
-      attachment.destroy
-      other_attachment = attachment_model(media_entry_id: media_object.media_id)
-      attachment_model(media_entry_id: "something else")
-      expect(media_object.active_attachments_by_media_id).to match_array([other_attachment])
     end
   end
 end

@@ -35,13 +35,6 @@ describe KalturaMediaFileHandler do
       allow(kaltura_client).to receive(:startSession)
     end
 
-    it "returns without action when all attachments have media objects already" do
-      expect(kaltura_client).not_to receive(:bulkUploadAdd)
-      attachment.media_entry_id = media_object.media_id
-      res = KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
-      expect(res).to be_nil
-    end
-
     context "with successful upload" do
       before do
         allow(kaltura_client).to receive(:bulkUploadAdd) do |files|

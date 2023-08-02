@@ -491,18 +491,21 @@ describe Course do
 
   describe "import_media_objects" do
     before do
-      attachment_model(uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"))
+      @kmh = double(KalturaMediaFileHandler)
+      allow(KalturaMediaFileHandler).to receive(:new).and_return(@kmh)
+      MediaObject.create!(media_id: "maybe")
+      attachment_model(uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4"), media_entry_id: "maybe")
     end
 
     it "waits for media objects on canvas cartridge import" do
       migration = double(canvas_import?: true)
-      expect(MediaObject).to receive(:add_media_files).with([@attachment], true)
+      expect(@kmh).to receive(:add_media_files).with([@attachment], true)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
 
     it "does not wait for media objects on other import" do
       migration = double(canvas_import?: false)
-      expect(MediaObject).to receive(:add_media_files).with([@attachment], false)
+      expect(@kmh).to receive(:add_media_files).with([@attachment], false)
       Importers::CourseContentImporter.import_media_objects([@attachment], migration)
     end
   end
