@@ -1428,15 +1428,8 @@ class RCEWrapper extends React.Component {
     const setupCallback = options.setup
 
     const canvasPlugins = rcsExists
-      ? [
-          'instructure_links',
-          'instructure_image',
-          'instructure_documents',
-          'instructure_equation',
-          'instructure_rce_external_tools',
-          'a11y_checker',
-        ]
-      : ['instructure_links']
+      ? ['instructure_image', 'instructure_documents', 'instructure_equation']
+      : []
 
     if (rcsExists && !this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
@@ -1614,6 +1607,7 @@ class RCEWrapper extends React.Component {
           'wordcount',
           'instructure_wordcount',
           'instructure_studio_media_options',
+          'instructure_rce_external_tools',
           ...pastePlugins,
           ...canvasPlugins,
         ],
