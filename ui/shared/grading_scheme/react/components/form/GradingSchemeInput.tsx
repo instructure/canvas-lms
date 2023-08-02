@@ -131,17 +131,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
 
     useImperativeHandle(ref, () => ({
       savePressed: () => {
-        const data = formState.rows.map(row => ({
-          name: row.letterGrade,
-          value: rangeDisplayStringToDecimal(row.minRangeDisplay, formState.scalingFactor),
-        }))
-
-        const dataToSave = {
-          title: formState.title,
-          data,
-          scalingFactor: formState.scalingFactor / (formState.pointsBased ? 1 : 100),
-          pointsBased: formState.pointsBased,
-        }
+        const dataToSave = formStateToSaveData(formState)
         const isValid = gradingSchemeIsValid(dataToSave)
 
         setShowAlert(!isValid)
@@ -150,6 +140,20 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         }
       },
     }))
+
+    function formStateToSaveData(currentFormState: GradingSchemeInputState) {
+      const data = currentFormState.rows.map(row => ({
+        name: row.letterGrade,
+        value: rangeDisplayStringToDecimal(row.minRangeDisplay, currentFormState.scalingFactor),
+      }))
+
+      return {
+        title: currentFormState.title,
+        data,
+        scalingFactor: currentFormState.scalingFactor / (currentFormState.pointsBased ? 1 : 100),
+        pointsBased: currentFormState.pointsBased,
+      }
+    }
 
     const handlePointsBasedChanged = (newValue: string) => {
       if (formState.pointsBased && newValue === 'percentage') {
@@ -323,15 +327,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
       <View>
         {showAlert && formState ? (
           <GradingSchemeValidationAlert
-            formData={{
-              title: formState.title,
-              data: formState.rows.map(row => ({
-                name: row.letterGrade,
-                value: rangeDisplayStringToDecimal(row.minRangeDisplay, formState.scalingFactor),
-              })),
-              scalingFactor: formState.scalingFactor,
-              pointsBased: formState.pointsBased,
-            }}
+            formData={formStateToSaveData(formState)}
             onClose={() => setShowAlert(false)}
           />
         ) : (
