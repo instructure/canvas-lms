@@ -47,7 +47,7 @@ describe "announcements" do
     it "shows the no notifications on edit info alert when editing an announcement", ignore_js_errors: true do
       @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
       get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}/edit"
-      expect(fj("div:contains('Editing an announcement will create a notification in the User Dashboard and Course Activity Stream. If you want users to receive the edited announcement via their notification settings, you will need to create a new announcement.')")).to be_present
+      expect(fj("div:contains('Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.')")).to be_present
     end
 
     it "allows saving of section announcement", priority: "1" do
