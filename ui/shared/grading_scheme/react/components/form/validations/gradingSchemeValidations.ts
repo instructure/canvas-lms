@@ -53,7 +53,7 @@ export const rowDataIsValidNumbers = (gradingSchemeFormData: {
   return (
     gradingSchemeFormData.data.filter(dataRow => {
       // filter out the rows with invalid minRanges
-      return !Number.isNaN(dataRow.value) && dataRow.value >= 0
+      return !Number.isNaN(dataRow.value) && dataRow.value >= 0 && dataRow.value <= 1.0
     }).length === gradingSchemeFormData.data.length
   )
 }

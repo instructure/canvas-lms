@@ -88,3 +88,29 @@ export const FORM_INPUT_OVERLAPPING_RANGES: GradingSchemeEditableData = {
   scalingFactor: 1,
   pointsBased: false,
 }
+
+export const FORM_INPUT_DUPLICATE_NAMED_RANGES: GradingSchemeEditableData = {
+  data: [
+    {name: 'A', value: 0.9},
+    {name: 'A', value: 0.8},
+    {name: 'C', value: 0.7},
+    {name: 'D', value: 0.6},
+    {name: 'F', value: 0.0},
+  ],
+  title: 'A Grading Scheme',
+  scalingFactor: 1,
+  pointsBased: false,
+}
+
+export const FORM_INPUT_MISSING_RANGE_NAME: GradingSchemeEditableData = {
+  data: [
+    {name: 'A', value: 0.9},
+    {name: '', value: 0.8},
+    {name: 'C', value: 0.7},
+    {name: 'D', value: 0.6},
+    {name: 'F', value: 0.0},
+  ],
+  title: 'A Grading Scheme',
+  scalingFactor: 1,
+  pointsBased: false,
+}

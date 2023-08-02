@@ -27,6 +27,8 @@ import {
   SHORT_FORM_INPUT,
   VALID_FORM_INPUT_POINTS_BASED,
   SHORT_FORM_INPUT_POINTS_BASED,
+  FORM_INPUT_DUPLICATE_NAMED_RANGES,
+  FORM_INPUT_MISSING_RANGE_NAME,
 } from './fixtures'
 import {GradingSchemeInput, GradingSchemeInputHandle} from '../GradingSchemeInput'
 
@@ -104,6 +106,14 @@ describe('GradingSchemeInput', () => {
     expect(letterGradeInputs[1].value).toBe('B')
     expect(letterGradeInputs[2].value).toBe('C')
     expect(letterGradeInputs[3].value).toBe('D')
+
+    const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
+    expect(maxRangeCells.length).toBe(5)
+    // note: the first result is also inside of the first row
+    expect(maxRangeCells[1].querySelector('input')?.value).toBe('4')
+    expect(maxRangeCells[2].textContent).toBe('< 3')
+    expect(maxRangeCells[3].textContent).toBe('< 2')
+    expect(maxRangeCells[4].textContent).toBe('< 1')
 
     const minRangeCells = screen.getAllByLabelText('Lower limit of range')
 
@@ -404,7 +414,7 @@ describe('GradingSchemeInput', () => {
     })
   })
 
-  it('validation error displayed when a max range is not a number', () => {
+  it('validation error displayed for points scheme when a max range is not a number', () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -415,7 +425,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        pointsBasedGradingSchemesFeatureEnabled={false}
+        pointsBasedGradingSchemesFeatureEnabled={true}
       />
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
@@ -426,10 +436,14 @@ describe('GradingSchemeInput', () => {
     userEvent.type(rangeInputs[0], 'foo') // give the 1st highRange an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed when a max range is over 100', () => {
+  it('validation error displayed for points scheme when upper range is over 100', () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -440,7 +454,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-        pointsBasedGradingSchemesFeatureEnabled={false}
+        pointsBasedGradingSchemesFeatureEnabled={true}
       />
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
@@ -450,10 +464,90 @@ describe('GradingSchemeInput', () => {
     userEvent.type(rangeInputs[0], '300') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed when a range is not a number', () => {
+  it('validation error displayed for points scheme when a lower range is not a number', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormDataByInputType={{
+          percentage: VALID_FORM_INPUT,
+          points: VALID_FORM_INPUT_POINTS_BASED,
+        }}
+        schemeInputType="points"
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+        pointsBasedGradingSchemesFeatureEnabled={true}
+      />
+    )
+
+    const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
+    userEvent.type(rangeInputs[0], 'foo') // give the 1st row a non numeric value
+
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
+    expect(onSave).toHaveBeenCalledTimes(0)
+  })
+
+  it('validation error displayed for points scheme when a lower range is below 0', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormDataByInputType={{
+          percentage: SHORT_FORM_INPUT,
+          points: VALID_FORM_INPUT_POINTS_BASED,
+        }}
+        schemeInputType="points"
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+        pointsBasedGradingSchemesFeatureEnabled={true}
+      />
+    )
+    const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
+    userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
+
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
+    expect(onSave).toHaveBeenCalledTimes(0)
+  })
+
+  it('validation error displayed for points scheme when a lower range is above 100', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormDataByInputType={{
+          percentage: SHORT_FORM_INPUT,
+          points: VALID_FORM_INPUT_POINTS_BASED,
+        }}
+        schemeInputType="points"
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+        pointsBasedGradingSchemesFeatureEnabled={true}
+      />
+    )
+    const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
+    userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
+
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
+    expect(onSave).toHaveBeenCalledTimes(0)
+  })
+
+  it('validation error displayed when a lower range is not a number', () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -483,10 +577,14 @@ describe('GradingSchemeInput', () => {
     expect(maxRangeCells[4].textContent).toBe('< 60%')
 
     act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed when a range is not between 0 and 100', () => {
+  it('validation error displayed when a lower range is below 0', () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -504,10 +602,39 @@ describe('GradingSchemeInput', () => {
     userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed on parent imperative save button press when title is missing', () => {
+  it('validation error displayed when a lower range is above 100', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormDataByInputType={{
+          percentage: SHORT_FORM_INPUT,
+          points: VALID_FORM_INPUT_POINTS_BASED,
+        }}
+        schemeInputType="percentage"
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+        pointsBasedGradingSchemesFeatureEnabled={false}
+      />
+    )
+    const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
+    userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
+
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
+    expect(onSave).toHaveBeenCalledTimes(0)
+  })
+
+  it('validation error displayed when title is missing', () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -522,10 +649,14 @@ describe('GradingSchemeInput', () => {
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Grading Scheme Name is required. Add a name and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
-  it('validation error displayed on parent imperative save button press when ranges overlap', () => {
+  it('validation error displayed when ranges overlap', () => {
     const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
     render(
       <GradingSchemeInput
@@ -540,6 +671,54 @@ describe('GradingSchemeInput', () => {
       />
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
+    expect(onSave).toHaveBeenCalledTimes(0)
+  })
+
+  it('validation error displayed when ranges have duplicate names', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormDataByInputType={{
+          percentage: FORM_INPUT_DUPLICATE_NAMED_RANGES,
+          points: VALID_FORM_INPUT_POINTS_BASED,
+        }}
+        schemeInputType="percentage"
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+        pointsBasedGradingSchemesFeatureEnabled={false}
+      />
+    )
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
+    expect(onSave).toHaveBeenCalledTimes(0)
+  })
+
+  it('validation error displayed when a range has a missing name', () => {
+    const gradingSchemeInputRef = React.createRef<GradingSchemeInputHandle>()
+    render(
+      <GradingSchemeInput
+        initialFormDataByInputType={{
+          percentage: FORM_INPUT_MISSING_RANGE_NAME,
+          points: VALID_FORM_INPUT_POINTS_BASED,
+        }}
+        schemeInputType="percentage"
+        onSave={onSave}
+        ref={gradingSchemeInputRef}
+        pointsBasedGradingSchemesFeatureEnabled={false}
+      />
+    )
+    act(() => gradingSchemeInputRef.current?.savePressed())
+    const validationError = screen.getByText(
+      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
+    )
+    expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
   })
 
