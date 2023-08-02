@@ -89,9 +89,6 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "رویداد تقویم"
-    },
     "cancel_caeb1e68": {
         "message": "لغو"
     },
@@ -248,9 +245,6 @@
     "estonian_5e8e2fa4": {
         "message": "استونیایی"
     },
-    "excused_cf8792eb": {
-        "message": "معاف شد"
-    },
     "external_tools_6e77821": {
         "message": "ابزارهای بیرونی"
     },
@@ -292,9 +286,6 @@
     },
     "german_3ec99bbb": {
         "message": "آلمانی"
-    },
-    "graded_25cd3fcd": {
-        "message": "نمره گذاری شده"
     },
     "grades_a61eba0a": {
         "message": "نمره ها"
@@ -395,9 +386,6 @@
     "korean_da812d9": {
         "message": "کره‌ای"
     },
-    "late_2be42b88": {
-        "message": "با تأخیر"
-    },
     "latvian_2bbb6aab": {
         "message": "لتونی"
     },
@@ -418,9 +406,6 @@
     },
     "loading_25990131": {
         "message": "در حال بارگذاری..."
-    },
-    "loading_725811ca": {
-        "message": "در حال بارگذاری"
     },
     "loading_bde52856": {
         "message": "در حال بارگذاری"
@@ -463,9 +448,6 @@
     },
     "misc_3b692ea7": {
         "message": "متفرقه"
-    },
-    "missing_1a256b3b": {
-        "message": "جا افتاده"
     },
     "module_90d9fd32": {
         "message": "ماژول"
@@ -535,9 +517,6 @@
     },
     "pause_12af3bb4": {
         "message": "مکث"
-    },
-    "peer_review_74f26a13": {
-        "message": "بازبینی گروهی"
     },
     "people_b4ebb13c": {
         "message": "افراد"
@@ -665,9 +644,6 @@
     "submit_a3cc6859": {
         "message": "ارسال"
     },
-    "submitted_318fad53": {
-        "message": "ارسال شد"
-    },
     "swahili_5caeb4ba": {
         "message": "سواحیلی"
     },
@@ -713,17 +689,8 @@
     "title_ee03d132": {
         "message": "عنوان"
     },
-    "to_do_1d554f36": {
-        "message": "برای اقدام"
-    },
-    "today_76e10f9c": {
-        "message": "امروز"
-    },
     "toggle_tooltip_d3b7cb86": {
         "message": "تغییر ابزار راهنما"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "فردا"
     },
     "top_66e0adb6": {
         "message": "بالا"
@@ -790,9 +757,6 @@
     },
     "yes_dde87d5": {
         "message": "بله"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "دیروز"
     },
     "yiddish_f96986df": {
         "message": "ییدیش"

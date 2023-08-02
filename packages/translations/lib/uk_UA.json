@@ -20,9 +20,6 @@
     "alt_text_611fb322": {
         "message": "Альтернативний текст"
     },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "Виникла помилка при спробі відхилити цю можливість."
-    },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "Сталася помилка при виконанні запиту мережі"
     },
@@ -71,14 +68,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "Календарна подія"
-    },
     "cancel_caeb1e68": {
         "message": "Скасувати"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Планувальник Canvas"
     },
     "changes_you_made_may_not_be_saved_4e8db973": {
         "message": "Зроблені Вами зміни можуть бути не збережені."
@@ -146,9 +137,6 @@
     "cyan_c1d5f68a": {
         "message": "Зелено-синій колір"
     },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date } в { time }"
-    },
     "decorative_image_fde98579": {
         "message": "Декоративне зображення"
     },
@@ -203,26 +191,8 @@
     "embed_image_1080badc": {
         "message": "Вставити забраження"
     },
-    "excused_cf8792eb": {
-        "message": "Виправдано"
-    },
     "external_tools_6e77821": {
         "message": "Зовнішні інструменти"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "Не вдалося видалити завдання"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "Не вдалося отримати нову активність"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "Не вдалося завантажити можливості"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "Не вдалося зберегти завдання"
-    },
-    "feedback_6dcc1991": {
-        "message": "Зворотній зв''язок"
     },
     "files_c300e900": {
         "message": "Файли"
@@ -236,14 +206,8 @@
     "generating_preview_45b53be0": {
         "message": "Генерується попередній перегляд..."
     },
-    "graded_25cd3fcd": {
-        "message": "Оцінено"
-    },
     "grades_a61eba0a": {
         "message": "Оцінки"
-    },
-    "grades_loaded_5056277c": {
-        "message": "Оцінки завантажені"
     },
     "greek_65c5b3f7": {
         "message": "Грецький"
@@ -305,9 +269,6 @@
     "keyboard_shortcuts_ed1844bd": {
         "message": "Гарячі клавіши"
     },
-    "late_2be42b88": {
-        "message": "Пізніше"
-    },
     "light_blue_5374f600": {
         "message": "Світло-блакитний"
     },
@@ -320,23 +281,14 @@
     "links_to_an_external_site_de74145d": {
         "message": "Посилання на зовнішній сайт."
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "Завантажено { count, plural,\n     =0 {# items}\n    one {# item}\n  other {# items}\n}"
-    },
     "loading_25990131": {
         "message": "Завантаження..."
-    },
-    "loading_725811ca": {
-        "message": "завантаження"
     },
     "loading_bde52856": {
         "message": "Завантаження"
     },
     "loading_failed_b3524381": {
         "message": "Невдале завантаження..."
-    },
-    "loading_grades_c842c887": {
-        "message": "Завантаження оцінок"
     },
     "locked_762f138b": {
         "message": "Заблоковано"
@@ -352,9 +304,6 @@
     },
     "misc_3b692ea7": {
         "message": "Різне"
-    },
-    "missing_1a256b3b": {
-        "message": "Відсутній"
     },
     "module_90d9fd32": {
         "message": "Розділ"
@@ -389,12 +338,6 @@
     "none_3b5e34d2": {
         "message": "Ніхто"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "На сьогодні нічого не заплановано. Виберіть елемент, який використовували останнім."
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "На сьогодні нічого не заплановано. Виберіть наступний елемент."
-    },
     "open_this_keyboard_shortcuts_dialog_9658b83a": {
         "message": "Вікрити діалогове вікно гарячих клавіш"
     },
@@ -409,9 +352,6 @@
     },
     "pages_e5414c2c": {
         "message": "Сторінки"
-    },
-    "peer_review_74f26a13": {
-        "message": "Експертна оцінка"
     },
     "people_b4ebb13c": {
         "message": "Люди"
@@ -458,9 +398,6 @@
     "replace_e61834a7": {
         "message": "Замінити"
     },
-    "replies_4a8577c8": {
-        "message": "Відповіді"
-    },
     "reset_95a81614": {
         "message": "Скинути"
     },
@@ -485,26 +422,11 @@
     "start_over_f7552aa9": {
         "message": "Почати з початку"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "submit_a3cc6859": {
         "message": "Підтвердити"
     },
-    "submitted_318fad53": {
-        "message": "Підтверджено"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "Успіх: План робіт створений"
-    },
     "syllabus_f191f65b": {
         "message": "Навчальний план"
-    },
-    "task_16b0ef38": {
-        "message": "Завдання"
     },
     "teal_f729a294": {
         "message": "Бірюзовий"
@@ -533,26 +455,8 @@
     "title_ee03d132": {
         "message": "Назва"
     },
-    "to_do_1d554f36": {
-        "message": "Зробити"
-    },
-    "today_76e10f9c": {
-        "message": "Сьогодні"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "Сьогодні в { date }"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "Завтра"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "Завтра в { date }"
-    },
     "top_66e0adb6": {
         "message": "Верх"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "Неможливо позначити як завершений."
     },
     "unpublished_dfd8801": {
         "message": "Неопублікований"
@@ -583,11 +487,5 @@
     },
     "yes_dde87d5": {
         "message": "Так"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "Вчора в { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "Вчора"
     }
 }

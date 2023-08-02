@@ -1,10 +1,4 @@
 {
-    "a_great_discussion_6526a6d9": {
-        "message": "精彩的讨论"
-    },
-    "a_wonderful_assignment_d3139d9b": {
-        "message": "精彩的作业"
-    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "访问精美 HTML 编辑器"
     },
@@ -74,14 +68,8 @@
     "amalg_coproduct_c589fb12": {
         "message": "Amalg（余积）"
     },
-    "an_amazing_discussion_assignment_e5c8bd6b": {
-        "message": "精彩的讨论作业"
-    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "读取文件时发生错误"
-    },
-    "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-        "message": "尝试拒绝该机会时出现错误。"
     },
     "an_error_occurred_making_a_network_request_d1bda348": {
         "message": "发出网络请求时出错"
@@ -218,14 +206,8 @@
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
     },
-    "calendar_event_89aadc1c": {
-        "message": "日历事件"
-    },
     "cancel_caeb1e68": {
         "message": "取消"
-    },
-    "canvas_planner_98ed106": {
-        "message": "Canvas 计划程序"
     },
     "cap_product_3a5265a6": {
         "message": "卡积"
@@ -472,9 +454,6 @@
     },
     "date_added_ed5ad465": {
         "message": "按添加日期排序"
-    },
-    "date_at_time_dbdb1b99": {
-        "message": "{ date }，时间 { time }"
     },
     "decorative_icon_9a7f3fc3": {
         "message": "装饰性图标"
@@ -731,12 +710,6 @@
     "eta_b8828f99": {
         "message": "Eta"
     },
-    "exciting_discussion_9f67bd0a": {
-        "message": "精彩的讨论"
-    },
-    "excused_cf8792eb": {
-        "message": "已请假"
-    },
     "exists_2e62bdaa": {
         "message": "存在"
     },
@@ -748,9 +721,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "展开以查看 { types }"
-    },
-    "extended_9a58dcb6": {
-        "message": "扩展"
     },
     "external_link_d3f9e62a": {
         "message": "外部链接"
@@ -773,38 +743,11 @@
     "f_function_fe422d65": {
         "message": "F（函数）"
     },
-    "failed_getting_course_list_49846a93": {
-        "message": "获取课程列表失败"
-    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "文件内容获取失败"
     },
-    "failed_getting_to_do_list_10ce2833": {
-        "message": "获取待办事项列表失败"
-    },
-    "failed_peeking_into_your_future_e95b9306": {
-        "message": "无法查看未来"
-    },
-    "failed_peeking_into_your_past_5bec2323": {
-        "message": "无法查看过去"
-    },
-    "failed_to_delete_to_do_64edff49": {
-        "message": "删除待办事项出错"
-    },
-    "failed_to_get_new_activity_17e7ec7c": {
-        "message": "获取新活动失败"
-    },
-    "failed_to_load_opportunities_52ab6404": {
-        "message": "加载机遇失败"
-    },
     "failed_to_retrieve_content_from_external_tool_5899c213": {
         "message": "无法从外部工具检索内容"
-    },
-    "failed_to_save_to_do_ddc7503b": {
-        "message": "保存待办事项出错"
-    },
-    "feedback_6dcc1991": {
-        "message": "反馈"
     },
     "file_name_8fd421ff": {
         "message": "文件名称"
@@ -884,9 +827,6 @@
     "fullscreen_873bf53f": {
         "message": "全屏"
     },
-    "fun_quiz_47ab0b0": {
-        "message": "趣味测验"
-    },
     "galician_7e4508b5": {
         "message": "加利西亚语"
     },
@@ -908,14 +848,8 @@
     "go_to_the_editor_s_toolbar_a5cb875f": {
         "message": "前往编辑器的工具栏"
     },
-    "graded_25cd3fcd": {
-        "message": "已评分"
-    },
     "grades_a61eba0a": {
         "message": "评分"
-    },
-    "grades_loaded_5056277c": {
-        "message": "已加载评分"
     },
     "greater_than_e98af662": {
         "message": "大于"
@@ -1190,9 +1124,6 @@
     "lambda_4f602498": {
         "message": "Lambda"
     },
-    "language_arts_35b79a8b": {
-        "message": "语言艺术"
-    },
     "language_arts_icon_a798b0f8": {
         "message": "语言艺术图标"
     },
@@ -1201,9 +1132,6 @@
     },
     "large_9c5e80e7": {
         "message": "大"
-    },
-    "late_2be42b88": {
-        "message": "延迟"
     },
     "latvian_2bbb6aab": {
         "message": "拉脱维亚语"
@@ -1319,14 +1247,8 @@
     "load_more_35d33c7": {
         "message": "加载更多"
     },
-    "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
-        "message": "已加载 { count, plural,\n     =0 {#  项}\n    one {# 项}\n  other {# 项}\n}"
-    },
     "loading_25990131": {
         "message": "加载中……"
-    },
-    "loading_725811ca": {
-        "message": "正在加载"
     },
     "loading_bde52856": {
         "message": "正在加载"
@@ -1345,9 +1267,6 @@
     },
     "loading_folders_d8b5869e": {
         "message": "正在加载文件夹"
-    },
-    "loading_grades_c842c887": {
-        "message": "正在加载评分"
     },
     "loading_placeholder_for_filename_792ef5e8": {
         "message": "正在加载{ fileName }的占位符"
@@ -1394,9 +1313,6 @@
     "maps_to_e5ef7382": {
         "message": "映射到"
     },
-    "math_ede93050": {
-        "message": "数学"
-    },
     "math_icon_ad4e9d03": {
         "message": "数学图标"
     },
@@ -1441,9 +1357,6 @@
     },
     "miscellaneous_e9818229": {
         "message": "其他"
-    },
-    "missing_1a256b3b": {
-        "message": "缺失"
     },
     "module_90d9fd32": {
         "message": "单元"
@@ -1574,12 +1487,6 @@
     "not_superset_strict_24e06f36": {
         "message": "非超集（严格）"
     },
-    "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-        "message": "今天没有计划。选择最近的项目。"
-    },
-    "nothing_planned_today_selecting_next_item_f6718aa": {
-        "message": "今天没有计划。选择下一个项目。"
-    },
     "nu_1c0f6848": {
         "message": "Nu"
     },
@@ -1654,9 +1561,6 @@
     },
     "pause_12af3bb4": {
         "message": "暂停"
-    },
-    "peer_review_74f26a13": {
-        "message": "同伴互评"
     },
     "pentagon_17d82ea3": {
         "message": "五角形"
@@ -1814,9 +1718,6 @@
     "red_8258edf3": {
         "message": "红色"
     },
-    "redo_363c58b7": {
-        "message": "重新操作"
-    },
     "relationships_6602af70": {
         "message": "关系"
     },
@@ -1831,9 +1732,6 @@
     },
     "replace_e61834a7": {
         "message": "替换"
-    },
-    "replies_4a8577c8": {
-        "message": "回复"
     },
     "reset_95a81614": {
         "message": "重置"
@@ -1933,9 +1831,6 @@
     },
     "saved_icon_maker_icons_df86e2a1": {
         "message": "保存的图标编辑器图标"
-    },
-    "science_8d92214a": {
-        "message": "科学"
     },
     "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
         "message": "如果没有替换文本，且文件名通常是不描述上下文或意义的无意义的数字和字母字符串，则屏幕读取器无法确定图像显示的内容。"
@@ -2054,9 +1949,6 @@
     "small_b070434a": {
         "message": "小"
     },
-    "social_studies_13fa30c7": {
-        "message": "社会研究"
-    },
     "solid_circle_9f061dfc": {
         "message": "实心圆"
     },
@@ -2126,12 +2018,6 @@
     "start_recording_9a65141a": {
         "message": "开始录制"
     },
-    "startdatetime_enddatetime_20abc10e": {
-        "message": "{ startDateTime } - { endDateTime }"
-    },
-    "startdatetime_endtime_49741bbe": {
-        "message": "{ startDateTime } - { endTime }"
-    },
     "steel_blue_14296f08": {
         "message": "钢青色"
     },
@@ -2147,9 +2033,6 @@
     "submit_a3cc6859": {
         "message": "提交"
     },
-    "submitted_318fad53": {
-        "message": "已提交"
-    },
     "subscript_59744f96": {
         "message": "下标"
     },
@@ -2164,9 +2047,6 @@
     },
     "succeeds_equal_158e8c3a": {
         "message": "后于等于"
-    },
-    "success_to_do_created_e34ed395": {
-        "message": "成功：创建的待办列表"
     },
     "sum_b0842d31": {
         "message": "总和"
@@ -2234,9 +2114,6 @@
     "tagalog_74906db7": {
         "message": "塔加拉族语"
     },
-    "task_16b0ef38": {
-        "message": "任务"
-    },
     "tau_880974b7": {
         "message": "Tau"
     },
@@ -2273,9 +2150,6 @@
     "thai_8f9bc548": {
         "message": "泰语"
     },
-    "the_best_assignment_15e98be1": {
-        "message": "最佳作业"
-    },
     "the_document_preview_is_currently_being_processed__7d9ea135": {
         "message": "目前正在处理文档预览。请稍后再试。"
     },
@@ -2302,9 +2176,6 @@
     },
     "the_selected_file_exceeds_the_maxsize_byte_limit_f7e8c771": {
         "message": "所选文件超过 { maxSize } 字节限制"
-    },
-    "there_is_nothing_planned_for_today_e09bfc8c": {
-        "message": "今天没有计划。"
     },
     "therefore_d860e024": {
         "message": "因此"
@@ -2354,29 +2225,14 @@
     "to_be_posted_when_d24bf7dc": {
         "message": "待发布：{ when }"
     },
-    "to_do_1d554f36": {
-        "message": "待办事项"
-    },
     "to_do_when_2783d78f": {
         "message": "待办事项：{ when }"
-    },
-    "today_76e10f9c": {
-        "message": "今天"
-    },
-    "today_at_date_8ac30d6": {
-        "message": "今天 { date }"
     },
     "toggle_summary_group_413df9ac": {
         "message": "切换{ summary }组"
     },
     "toggle_tooltip_d3b7cb86": {
         "message": "切换工具提示"
-    },
-    "tomorrow_9a6c9a00": {
-        "message": "明天"
-    },
-    "tomorrow_at_date_b53f2cf1": {
-        "message": "明天 { date }"
     },
     "tools_2fcf772e": {
         "message": "工具"
@@ -2410,9 +2266,6 @@
     },
     "unable_to_determine_resource_selection_url_7867e060": {
         "message": "无法确定资源选择 url"
-    },
-    "unable_to_mark_as_complete_8141856d": {
-        "message": "无法标记为完成"
     },
     "union_e6b57a53": {
         "message": "并集"
@@ -2659,12 +2512,6 @@
     },
     "yes_dde87d5": {
         "message": "是"
-    },
-    "yesterday_at_date_1aa6d18e": {
-        "message": "昨天 { date }"
-    },
-    "yesterday_c6bd6abf": {
-        "message": "昨天"
     },
     "yiddish_f96986df": {
         "message": "意第绪语"
