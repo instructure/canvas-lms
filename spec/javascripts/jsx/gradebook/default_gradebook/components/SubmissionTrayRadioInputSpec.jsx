@@ -80,12 +80,12 @@ QUnit.module('SubmissionTrayRadioInput', hooks => {
 
   test('renders with the radio option enabled when disabled is false', () => {
     wrapper = mountComponent({disabled: false})
-    strictEqual(wrapper.find('RadioInput').props().disabled, false)
+    strictEqual(wrapper.find('RadioInput').first().props().disabled, false)
   })
 
   test('renders with the radio option disabled when disabled is true', () => {
     wrapper = mountComponent({disabled: true})
-    strictEqual(wrapper.find('RadioInput').props().disabled, true)
+    strictEqual(wrapper.find('RadioInput').first().props().disabled, true)
   })
 
   test('renders with the radio option selected when checked is true', () => {

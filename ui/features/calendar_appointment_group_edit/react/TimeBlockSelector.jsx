@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
@@ -74,22 +73,18 @@ export default class TimeBlockSelector extends React.Component {
   }
 
   deleteRow = slotEventId => {
-    const newRows = this.state.timeBlockRows.filter(e => e.slotEventId !== slotEventId)
-    this.setState({
-      timeBlockRows: newRows,
+    this.setState(({timeBlockRows}) => {
+      const newRows = timeBlockRows.filter(e => e.slotEventId !== slotEventId)
+      return {timeBlockRows: newRows}
     })
   }
 
   addRow = (timeData = {}) => {
-    const newRows = [
-      {
-        slotEventId: uniqueId(),
-        timeData,
-      },
-    ]
-    this.setState({
-      timeBlockRows: this.state.timeBlockRows.concat(newRows),
-    })
+    const newRow = {
+      slotEventId: uniqueId(),
+      timeData,
+    }
+    this.setState(({timeBlockRows}) => ({timeBlockRows: timeBlockRows.concat([newRow])}))
   }
 
   addRowsFromBlocks = timeBlocks => {
@@ -115,11 +110,10 @@ export default class TimeBlockSelector extends React.Component {
   }
 
   handleSlotDivision = () => {
+    // eslint-disable-next-line react/no-find-dom-node
     const node = ReactDOM.findDOMNode(this)
-    const minuteValue = $('#TimeBlockSelector__DivideSection-Input', node).val()
-    if (!NumberHelper.validate(minuteValue)) {
-      return
-    }
+    const minuteValue = node.querySelector('#TimeBlockSelector__DivideSection-Input', node)?.value
+    if (!NumberHelper.validate(minuteValue)) return
     const timeManager = new TimeBlockListManager(this.getNewSlotData())
     timeManager.split(minuteValue)
     const newBlocks = timeManager.blocks.map(block => ({
@@ -131,11 +125,11 @@ export default class TimeBlockSelector extends React.Component {
   }
 
   handleSetData = (timeslotId, data) => {
-    const newRows = this.state.timeBlockRows.slice()
-    const rowToUpdate = newRows.find(r => r.slotEventId === timeslotId)
-    rowToUpdate.timeData = data
-    this.setState({
-      timeBlockRows: newRows,
+    this.setState(({timeBlockRows}) => {
+      const newRows = timeBlockRows.slice()
+      const rowToUpdate = newRows.find(r => r.slotEventId === timeslotId)
+      rowToUpdate.timeData = data
+      return {timeBlockRows: newRows}
     })
   }
 

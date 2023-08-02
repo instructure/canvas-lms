@@ -135,7 +135,7 @@ export default function FilterNav({
       <Alert
         screenReaderOnly={true}
         liveRegionPoliteness="assertive"
-        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        liveRegion={() => document.getElementById('flash_screenreader_holder') as HTMLElement}
       >
         {announcement}
       </Alert>

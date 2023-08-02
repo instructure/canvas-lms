@@ -52,30 +52,41 @@ module CustomWaitMethods
   # If we're looking for the loading image, we can't just do a normal assertion, because the image
   # could end up getting loaded too quickly.
   def wait_for_transient_element(selector)
+    puts "wait for transient element #{selector}"
     driver.execute_script(<<~JS)
       window.__WAIT_FOR_LOADING_IMAGE = 0
       window.__WAIT_FOR_LOADING_IMAGE_CALLBACK = null
 
       var _checkAddedNodes = function(addedNodes) {
-        for(var newNode of addedNodes) {
-          if(newNode.matches('#{selector}') || newNode.querySelector('#{selector}')) {
-            window.__WAIT_FOR_LOADING_IMAGE = 1
+        try {
+          for(var newNode of addedNodes) {
+            if (!([Node.ELEMENT_NODE, Node.DOCUMENT_NODE, Node.DOCUMENT_FRAGMENT_NODE].includes(newNode.nodeType))) continue
+            if (newNode.matches('#{selector}') || newNode.querySelector('#{selector}')) {
+              window.__WAIT_FOR_LOADING_IMAGE = 1
+            }
           }
+        } catch (e) {
+          console.error('CHECK ADDED NODES FAILED'); console.error(e)
         }
       }
 
       var _checkRemovedNodes = function(removedNodes) {
-        if(window.__WAIT_FOR_LOADING_IMAGE !== 1) {
-          return
-        }
-
-        for(var newNode of removedNodes) {
-          if(newNode.matches('#{selector}') || newNode.querySelector('#{selector}')) {
-            observer.disconnect()
-
-            window.__WAIT_FOR_LOADING_IMAGE = 2
-            window.__WAIT_FOR_LOADING_IMAGE_CALLBACK && window.__WAIT_FOR_LOADING_IMAGE_CALLBACK()
+        try {
+          if(window.__WAIT_FOR_LOADING_IMAGE !== 1) {
+            return
           }
+
+          for(var newNode of removedNodes) {
+            if (!([Node.ELEMENT_NODE, Node.DOCUMENT_NODE, Node.DOCUMENT_FRAGMENT_NODE].includes(newNode.nodeType))) continue
+            if (newNode.matches('#{selector}') || newNode.querySelector('#{selector}')) {
+              observer.disconnect()
+
+              window.__WAIT_FOR_LOADING_IMAGE = 2
+              window.__WAIT_FOR_LOADING_IMAGE_CALLBACK && window.__WAIT_FOR_LOADING_IMAGE_CALLBACK()
+            }
+          }
+        } catch (e) {
+          console.error('CHECK REMOVED NODES FAILED'); console.error(e)
         }
       }
 

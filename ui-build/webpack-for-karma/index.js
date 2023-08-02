@@ -173,6 +173,7 @@ module.exports = {
     },
     fallback: {
       path: false, // for minimatch
+      stream: require.resolve('stream-browserify'),
     },
     extensions: ['.mjs', '.js', '.jsx', '.ts', '.tsx'],
     modules: [
@@ -197,7 +198,7 @@ module.exports = {
       RESOURCE_EMBER_GRADEBOOK_SPEC,
       RESOURCE_JSX_SPEC,
       WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
-      process: {env: {}},
+      process: {browser: true, env: {}},
     }),
 
     new EnvironmentPlugin({

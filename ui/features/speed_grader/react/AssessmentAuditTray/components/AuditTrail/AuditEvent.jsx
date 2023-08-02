@@ -69,7 +69,7 @@ export default class AuditEvent extends PureComponent {
         <Focusable>
           {({focused}) => (
             <Badge placement="start center" type="notification" variant="danger">
-              <View as="div" padding="none none none small">
+              <View as="div" padding="none none none small" data-testid="audit_event_badge">
                 <Tooltip
                   on={['click', 'focus', 'hover']}
                   placement="start"

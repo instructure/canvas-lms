@@ -29,19 +29,25 @@ QUnit.module('SubmissionCommentUpdateForm', hooks => {
   }
 
   function cancelButton() {
-    return wrapper.find('button').at(0)
+    return wrapper
+      .find('button')
+      .findWhere(b => b.text() === 'Cancel')
+      .first()
   }
 
   function submitButton() {
-    return wrapper.find('button').at(1)
+    return wrapper
+      .find('button')
+      .findWhere(b => b.text() === 'Submit')
+      .first()
   }
 
   function cancelButtonComponent() {
-    return wrapper.find('Button').at(0)
+    return wrapper.find('Button[data-testid="comment-cancel-button"]').first()
   }
 
   function submitButtonComponent() {
-    return wrapper.find('Button').at(1)
+    return wrapper.find('Button[data-testid="comment-submit-button"]').first()
   }
 
   hooks.beforeEach(() => {
@@ -192,7 +198,7 @@ QUnit.module('SubmissionCommentUpdateForm', hooks => {
 
   test('TextArea has a placeholder message', () => {
     wrapper = mountComponent()
-    strictEqual(wrapper.find('TextArea').prop('placeholder'), 'Leave a comment')
+    strictEqual(wrapper.find('TextArea').first().prop('placeholder'), 'Leave a comment')
   })
 
   test('TextArea has a label', () => {

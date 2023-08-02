@@ -58,18 +58,18 @@ test('it has an Avatar', function () {
 
 test('the avatar names the author', function () {
   this.wrapper = this.mountComponent()
-  strictEqual(this.wrapper.find('Avatar').prop('name'), this.defaultProps().author)
+  strictEqual(this.wrapper.find('Avatar').first().prop('name'), this.defaultProps().author)
 })
 
 test('the avatar has alt text', function () {
   this.wrapper = this.mountComponent()
   const expectedAltText = `Avatar for ${this.defaultProps().author}`
-  strictEqual(this.wrapper.find('Avatar').prop('alt'), expectedAltText)
+  strictEqual(this.wrapper.find('Avatar').first().prop('alt'), expectedAltText)
 })
 
 test("the avatar soruce is the author's avatar url", function () {
   this.wrapper = this.mountComponent()
-  strictEqual(this.wrapper.find('Avatar').prop('src'), this.defaultProps().authorAvatarUrl)
+  strictEqual(this.wrapper.find('Avatar').first().prop('src'), this.defaultProps().authorAvatarUrl)
 })
 
 test("links the avatar to the author's url", function () {

@@ -100,8 +100,8 @@ test('renders title as a link', () => {
   const discussion = {locked: false, title: 'blerp'}
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('Link')
-  ok(node.text().includes(discussion.title))
   ok(node.exists())
+  ok(node.first().text().includes(discussion.title))
   tree.unmount()
 })
 
@@ -195,8 +195,8 @@ test('when feature flag is off, renders anonymous discussion lock explanation fo
   const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
   const tree = mount(<DiscussionRow {...makeProps({canReadAsAdmin: true, discussion})} />)
   const node = tree.find('.discussion-availability Link')
-  ok(node.text().includes('Discussions/Announcements Redesign'))
   ok(node.exists())
+  ok(node.first().text().includes('Discussions/Announcements Redesign'))
   tree.unmount()
   fakeENV.teardown()
 })
@@ -242,8 +242,8 @@ test('renders a last reply at date', () => {
   const tree = mount(<DiscussionRow {...makeProps()} />)
   const node = tree.find('.last-reply-at')
   ok(node.exists())
-  ok(node.text().includes('Last post at'))
-  ok(node.text().includes('2/14'))
+  ok(node.first().text().includes('Last post at'))
+  ok(node.first().text().includes('2/14'))
   tree.unmount()
 })
 
@@ -416,7 +416,7 @@ test('does not render the SectionsTooltip component in a blueprint course', () =
   tree.unmount()
 })
 
-test('does not render master course lock icon if masterCourseData is not provided', assert => {
+test('does not render master course lock icon if masterCourseData is not provided', done => {
   const masterCourseData = null
   const rowRef = row => {
     notOk(row.masterCourseLock)
@@ -426,7 +426,7 @@ test('does not render master course lock icon if masterCourseData is not provide
   notOk(tree.instance().masterCourseLock)
 })
 
-test('renders master course lock icon if masterCourseData is provided', assert => {
+test('renders master course lock icon if masterCourseData is provided', done => {
   const masterCourseData = {isMasterCourse: true, masterCourse: {id: '1'}}
   const rowRef = row => {
     ok(row.masterCourseLock)

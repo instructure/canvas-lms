@@ -104,7 +104,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   test('has "Show Details" text if detailsVisible is false', () => {
     mountComponent({}, {detailsVisible: false})
-    strictEqual(wrapper.find('Link').text(), 'Show Details')
+    strictEqual(wrapper.find('Link').first().text(), 'Show Details')
   })
 
   test('hides the main container if detailsVisible is true', () => {
@@ -114,7 +114,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   test('has "Hide Details" text if detailsVisible is true', () => {
     mountComponent()
-    strictEqual(wrapper.find('Link').text(), 'Hide Details')
+    strictEqual(wrapper.find('Link').first().text(), 'Hide Details')
   })
 
   test('shows the main container if detailsVisible is true', () => {
@@ -221,8 +221,9 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     ]
 
     mountComponent({provisionalGrades})
+    const inputs = Array.from(wrapper.getDOMNode().querySelectorAll('input'))
     deepEqual(
-      wrapper.find('RadioInput').map(input => input.prop('value')),
+      inputs.map(input => input.value),
       ['custom', '2', '3', '1']
     )
   })
@@ -251,8 +252,9 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     ]
 
     mountComponent({provisionalGrades})
+    const inputs = Array.from(wrapper.getDOMNode().querySelectorAll('input'))
     deepEqual(
-      wrapper.find('RadioInput').map(input => input.prop('value')),
+      inputs.map(input => input.value),
       ['custom', '3', '2', '1']
     )
   })

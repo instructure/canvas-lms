@@ -117,12 +117,12 @@ QUnit.module('SubmissionCommentCreateForm', hooks => {
 
   test('TextArea is empty', () => {
     wrapper = mountComponent()
-    strictEqual(wrapper.find('TextArea').prop('value'), '')
+    strictEqual(wrapper.find('TextArea').first().prop('value'), '')
   })
 
   test('TextArea has a placeholder message', () => {
     wrapper = mountComponent()
-    strictEqual(wrapper.find('TextArea').prop('placeholder'), 'Leave a comment')
+    strictEqual(wrapper.find('TextArea').first().prop('placeholder'), 'Leave a comment')
   })
 
   test('TextArea has a label', () => {

@@ -124,7 +124,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
   }
 
   function getUnpostedCount() {
-    return getUnpostedSummary().querySelector('[id^="Badge__"]')
+    return getUnpostedSummary().querySelector('[id^="Badge_"]')
   }
 
   function getUnpostedSummary() {

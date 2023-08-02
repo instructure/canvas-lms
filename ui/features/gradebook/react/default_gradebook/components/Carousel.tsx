@@ -62,6 +62,7 @@ export default class Carousel extends Component<CarouselProps> {
   render() {
     const leftArrow = (
       <IconButton
+        data-testid="left-arrow-button"
         disabled={this.props.disabled}
         ref={button => {
           this.leftArrow = button
@@ -76,6 +77,7 @@ export default class Carousel extends Component<CarouselProps> {
 
     const rightArrow = (
       <IconButton
+        data-testid="right-arrow-button"
         disabled={this.props.disabled}
         ref={button => {
           this.rightArrow = button

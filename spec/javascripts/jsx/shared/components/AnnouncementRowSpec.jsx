@@ -96,7 +96,7 @@ test('renders "Posted on" date label if announcement is not delayed', () => {
   const announcement = {delayed_post_at: null, posted_at: test_date}
   const tree = mount(<AnnouncementRow {...makeProps({announcement})} />)
   const node = tree.find('.ic-item-row__meta-content-timestamp Text')
-  ok(node.text().includes('Jan 24, 2018'))
+  ok(node.first().text().includes('Jan 24, 2018'))
 })
 
 test('renders the SectionsTooltip component if canHaveSections: true', () => {

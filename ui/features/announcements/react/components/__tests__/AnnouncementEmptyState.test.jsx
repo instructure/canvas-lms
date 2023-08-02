@@ -34,7 +34,7 @@ test('renders the AnnouncementsEmptyState component when teacher', () => {
   const props = defaultProps()
   props.canCreate = true
   const tree = mount(<AnnouncementEmptyState {...defaultProps()} />)
-  const node = tree.find('Text')
+  const node = tree.find('Text').at(0)
   expect(node.text()).toBe('Create announcements above')
 })
 
@@ -42,6 +42,6 @@ test('renders the AnnouncementsEmptyState component when student', () => {
   const props = defaultProps()
   props.canCreate = false
   const tree = mount(<AnnouncementEmptyState {...props} />)
-  const node = tree.find('Text')
+  const node = tree.find('Text').at(0)
   expect(node.text()).toBe('Check back later')
 })

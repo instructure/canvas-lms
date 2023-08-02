@@ -169,7 +169,7 @@ couldBeEither.forEach(placementName => {
 
   it(`${placementName}: does not display alert when placement supports deep linking and resource link and deep linking chosen`, () => {
     const wrapper = mount(<Placement {...props({placementName})} />)
-    wrapper.find('ToggleDetails').simulate('click')
+    wrapper.find('ToggleDetails').at(0).simulate('click')
     expect(wrapper.exists('Alert')).toBeFalsy()
   })
 })

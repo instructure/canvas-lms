@@ -125,7 +125,7 @@ const ApplyScoreToUngradedModal = ({assignmentGroup, onApply, onClose, open}: Pr
         <RadioInputGroup
           description={I18n.t('Apply to:')}
           name="artifactScope"
-          onChange={(_event: Event, value: string) => {
+          onChange={(_event, value) => {
             setArtifactScope(value)
           }}
           value={artifactScope}

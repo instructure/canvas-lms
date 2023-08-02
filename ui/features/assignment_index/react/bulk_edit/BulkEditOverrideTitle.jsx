@@ -32,10 +32,10 @@ function BulkEditOverrideTitle({assignmentName, overrideTitle, overrideBase}) {
 
   return (
     <View as="div" padding={`0 0 0 ${indent}`}>
-      <Tooltip renderTip={visibleTitle}>
+      <Tooltip renderTip={visibleTitle || ' '}>
         <Text as="div" lineHeight="double" size={size}>
           <PresentationContent>
-            <div className="ellipsis">{visibleTitle}</div>
+            <div className="ellipsis">{visibleTitle || ' '}</div>
           </PresentationContent>
           <ScreenReaderContent>{`${assignmentName}: ${srSubTitle}`}</ScreenReaderContent>
         </Text>

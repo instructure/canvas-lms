@@ -46,7 +46,11 @@ const I18n = useI18nScope('conferences')
 
 if (ENV.can_create_conferences) {
   if (ENV.render_alternatives) {
-    renderConferenceAlternatives()
+    const node = document.getElementById('conference-alternatives-container')
+    if (!node) {
+      throw new Error('Could not find #conference-alternatives-container')
+    }
+    renderConferenceAlternatives(node)
   }
 }
 

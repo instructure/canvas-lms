@@ -22,17 +22,11 @@ import DeveloperKeyScopesMethod from '../ScopesMethod'
 
 const props = {
   method: 'get',
-  margin: 'small small medium large',
 }
 
 it('renders the correct method', () => {
   const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
   expect(wrapper.find('span').first().text()).toContain(props.method)
-})
-
-it('allows setting a margin', () => {
-  const wrapper = mount(<DeveloperKeyScopesMethod {...props} />)
-  expect(wrapper.html()).toContain('style="margin: 1rem 1rem 1.5rem 2.25rem;')
 })
 
 describe('variant map', () => {

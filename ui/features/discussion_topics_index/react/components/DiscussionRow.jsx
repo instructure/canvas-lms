@@ -90,6 +90,7 @@ const dropTarget = {
     if (dragIndex === hoverIndex) {
       return
     }
+    // eslint-disable-next-line react/no-find-dom-node
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect()
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
     const clientOffset = monitor.getClientOffset()
@@ -113,7 +114,6 @@ class DiscussionRow extends Component {
     canPublish: bool.isRequired,
     canReadAsAdmin: bool.isRequired,
     cleanDiscussionFocus: func.isRequired,
-    connectDragPreview: func,
     connectDragSource: func,
     connectDropTarget: func,
     contextType: string.isRequired,
@@ -136,7 +136,6 @@ class DiscussionRow extends Component {
     isDragging: bool,
     isMasterCourse: bool.isRequired,
     masterCourseData: masterCourseDataShape,
-    moveCard: func,
     onMoveDiscussion: func,
     toggleSubscriptionState: func.isRequired,
     updateDiscussion: func.isRequired,
@@ -145,9 +144,6 @@ class DiscussionRow extends Component {
   }
 
   static defaultProps = {
-    connectDragPreview(component) {
-      return component
-    },
     connectDragSource(component) {
       return component
     },
@@ -162,7 +158,6 @@ class DiscussionRow extends Component {
     displayMasteryPathsLink: false,
     displayMasteryPathsPill: false,
     masteryPathsPillLabel: '',
-    moveCard: () => {},
     onMoveDiscussion: null,
   }
 

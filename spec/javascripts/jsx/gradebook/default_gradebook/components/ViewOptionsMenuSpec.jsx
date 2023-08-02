@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {findDOMNode} from 'react-dom'
 import {mount} from 'enzyme'
 import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu'
 
@@ -78,12 +79,13 @@ function mouseover($el) {
 }
 
 function getMenuItemWithLabel($parent, label) {
-  const $children = [...$parent.querySelectorAll('[role^="menuitem"]')]
+  // eslint-disable-next-line react/no-find-dom-node
+  const $children = Array.from(findDOMNode($parent).querySelectorAll('[role^="menuitem"]'))
   return $children.find($child => $child.textContent.trim() === label)
 }
 
 function getFlyoutWithLabel($parent, label) {
-  const $children = [...$parent.querySelectorAll('[role="button"]')]
+  const $children = Array.from($parent.querySelectorAll('[role="button"]'))
   return $children.find($child => $child.textContent.trim() === label)
 }
 
