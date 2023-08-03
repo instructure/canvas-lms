@@ -98,9 +98,9 @@ module Canvas::OAuth
           keys: [
             rsa_key_pair.public_jwk
           ]
-        }
+        }.to_json
       end
-      let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
+      let(:stubbed_response) { instance_double(Net::HTTPOK, { body: public_jwk_url_response }) }
 
       context "when there is no public jwk" do
         before do
@@ -125,7 +125,7 @@ module Canvas::OAuth
       end
 
       context "when an empty object is returned" do
-        let(:public_jwk_url_response) { {} }
+        let(:public_jwk_url_response) { {}.to_json }
 
         before do
           dev_key.update!(public_jwk_url: url)
@@ -138,7 +138,7 @@ module Canvas::OAuth
       end
 
       context "when the url is not valid giving a 404" do
-        let(:stubbed_response) { double(success?: false, parsed_response: public_jwk_url_response.to_json) }
+        let(:stubbed_response) { instance_double(Net::HTTPNotFound, body: public_jwk_url_response) }
 
         before do
           dev_key.update!(public_jwk_url: url)
@@ -147,7 +147,7 @@ module Canvas::OAuth
         let(:public_jwk_url_response) do
           {
             success?: false, code: "404"
-          }
+          }.to_json
         end
 
         it do
