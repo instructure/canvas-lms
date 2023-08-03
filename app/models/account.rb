@@ -2316,14 +2316,15 @@ class Account < ActiveRecord::Base
 
   # Forces the default setting to overwrite each user's preference
   def update_user_dashboards
-    User.where(id: user_account_associations.select(:user_id))
-        .where("#{User.table_name}.preferences LIKE ?", "%:dashboard_view:%")
-        .find_in_batches do |batch|
+    User.where(id: root_account.pseudonyms.active.joins(:user).where("#{User.table_name}.preferences LIKE ?", "%:dashboard_view:%").select(:user_id)).find_in_batches do |batch|
       users = batch.reject do |user|
         user.preferences[:dashboard_view].nil? ||
           user.dashboard_view(self) == default_dashboard_view
       end
       users.each do |user|
+        # don't write to the shadow record
+        user = User.find(user.id) unless user.canonical?
+
         user.preferences.delete(:dashboard_view)
         user.save!
       end

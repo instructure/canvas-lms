@@ -2192,12 +2192,12 @@ describe Account do
       @account = Account.create!
 
       @user1 = user_factory(active_all: true)
-      @account.account_users.create!(user: @user1)
+      @account.pseudonyms.create!(unique_id: "user1", user: @user1)
       @user1.dashboard_view = "activity"
       @user1.save
 
       @user2 = user_factory(active_all: true)
-      @account.account_users.create!(user: @user2)
+      @account.pseudonyms.create!(unique_id: "user2", user: @user2)
       @user2.dashboard_view = "cards"
       @user2.save
     end
