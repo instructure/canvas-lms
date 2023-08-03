@@ -893,7 +893,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def publish
-    self.workflow_state = "active"
+    # follows the logic of setting post_delayed in other places of this file
+    self.workflow_state = (delayed_post_at && delayed_post_at > Time.now) ? "post_delayed" : "active"
     self.last_reply_at = Time.now
     self.posted_at = Time.now
   end
