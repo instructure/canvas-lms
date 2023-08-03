@@ -282,3 +282,13 @@ submission_stickers:
       state: allowed_on # enable for automated testing builds and local testing
     development:
       state: allowed_on # enable for local development
+anonymous_grading_with_new_quizzes:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Anonymous Grading with New Quizzes
+  description: Allows instructors to enable anonymous grading for New Quizzes.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
