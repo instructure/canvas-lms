@@ -23,6 +23,7 @@ const I18n = useI18nScope('outcomes.user_outcome_results')
 
 $(document).ready(() => {
   const showAllArtifacts = $('#show_all_artifacts_link')
+  const hideOutcomeBtn = $('#hide_unassessed_outcomes_link')
   showAllArtifacts.click(event => {
     event.preventDefault()
     $('tr.artifact_details').toggle()
@@ -31,5 +32,12 @@ $(document).ready(() => {
     } else {
       showAllArtifacts.text(I18n.t('Show All Artifacts'))
     }
+  })
+  hideOutcomeBtn.click(e => {
+    e.preventDefault()
+    $('tr.js_unassessed_outcome').toggle('slow')
+    if (hideOutcomeBtn.text() === I18n.t('Hide Unassessed Outcomes'))
+      hideOutcomeBtn.text(I18n.t('Show Unassessed Outcomes'))
+    else hideOutcomeBtn.text(I18n.t('Hide Unassessed Outcomes'))
   })
 })

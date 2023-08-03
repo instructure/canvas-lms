@@ -29,6 +29,7 @@
   </div>
   <div class="show_all_artificts">
     <a href="#" class="btn button-sidebar-wide" id="show_all_artifacts_link"><%= t "#buttons.show_all_artifacts", "Show All Artifacts" %></a>
+    <a href="#" class="btn button-sidebar-wide" id="hide_unassessed_outcomes_link"><%= t "#buttons.hide_unassessed_outcomes", "Hide Unassessed Outcomes" %></a>
   </div>
 <% end %>
 
@@ -86,9 +87,9 @@
 </thead>
 <tbody>
   <% @outcomes.each do |outcome| %>
-    <tr>
+    <% results = @results_for_outcome[outcome.id] || [] %>
+    <tr class=" <%= 'js_unassessed_outcome' if results.length == 0 %>">
       <td class="short_description"><%= outcome.short_description %></td>
-      <% results = @results_for_outcome[outcome.id] || [] %>
       <td class="attempts">
         <%= t :attempts_from_artifacts, "%{attempts} *from %{artifacts}*", :wrapper => '<div class="sub_attempt">\1</div>', :attempts => t(:attempts, "attempt", :count => results.map{|r| [1, r.attempt || 0].max }.sum), :artifacts => t(:artifacts, "artifact", :count => results.length) %>
       </td>
