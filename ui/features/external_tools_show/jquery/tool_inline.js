@@ -56,17 +56,11 @@ ready(() => {
       break
     case 'self':
       $toolForm.removeAttr('target')
-      try {
-        $toolForm.submit()
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
+      $toolForm.submit()
       break
     default:
       // Firefox throws an error when submitting insecure content
-      try {
-        $toolForm.submit()
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
+      $toolForm.submit()
 
       $('#tool_content').bind('load', () => {
         if (
