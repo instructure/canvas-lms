@@ -803,7 +803,7 @@ describe DiscussionTopic do
         expect(topic.locked?).to be_falsey
       end
 
-      it "is post_delayed when delayed_post_at is in the future" do
+      it "is post_delayed and remains like than even after publishing when delayed_post_at is in the future" do
         topic = delayed_discussion_topic(title: "title",
                                          message: "content here",
                                          delayed_post_at: Time.now + 1.day,
@@ -811,6 +811,8 @@ describe DiscussionTopic do
         topic.update_based_on_date
         expect(topic.workflow_state).to eql "post_delayed"
         expect(topic.locked?).to be_falsey
+        topic.publish!
+        expect(topic.workflow_state).to eql "post_delayed"
       end
 
       it "is locked when lock_at is in the past" do
