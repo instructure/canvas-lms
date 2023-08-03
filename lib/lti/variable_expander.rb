@@ -959,18 +959,18 @@ module Lti
                        default_name: "com_instructure_assignment_restrict_quantitative_data"
 
     # returns the grading scheme data for the course
-    # it is an array of arrays of grade levels
+    # it is an array of objects of grade levels
     # @example
     #  ```
     #  [
-    #    ["A", 94.0],
-    #    ["A-", 90.0],
-    #    ["B+", 87.0],
+    #    {name: "A", value: 94.0},
+    #    {name: "A-", value: 90.0},
+    #    {name: "B+", value: 87.0},
     #  ]
     #  ```
     register_expansion "com.instructure.Course.gradingScheme",
                        [],
-                       -> { @context.grading_standard_or_default.data.to_json },
+                       -> { @context.grading_standard_or_default.data.map { |grading_standard_data_row| { name: grading_standard_data_row[0], value: grading_standard_data_row[1] } }.to_json },
                        COURSE_GUARD,
                        default_name: "com_instructure_course_grading_scheme"
 

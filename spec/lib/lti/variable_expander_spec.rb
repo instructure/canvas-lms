@@ -551,7 +551,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq "[[\"A\",90],[\"B\",80],[\"C\",70],[\"D\",60],[\"F\",0]]"
+          expect(exp_hash[:test]).to eq "[{\"name\":\"A\",\"value\":90},{\"name\":\"B\",\"value\":80},{\"name\":\"C\",\"value\":70},{\"name\":\"D\",\"value\":60},{\"name\":\"F\",\"value\":0}]"
         end
 
         it "provides the default grading standard if no specific one is set" do
@@ -565,7 +565,7 @@ module Lti
           )
 
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test]).to eq "[[\"A\",0.94],[\"A-\",0.9],[\"B+\",0.87],[\"B\",0.84],[\"B-\",0.8],[\"C+\",0.77],[\"C\",0.74],[\"C-\",0.7],[\"D+\",0.67],[\"D\",0.64],[\"D-\",0.61],[\"F\",0.0]]"
+          expect(exp_hash[:test]).to eq "[{\"name\":\"A\",\"value\":0.94},{\"name\":\"A-\",\"value\":0.9},{\"name\":\"B+\",\"value\":0.87},{\"name\":\"B\",\"value\":0.84},{\"name\":\"B-\",\"value\":0.8},{\"name\":\"C+\",\"value\":0.77},{\"name\":\"C\",\"value\":0.74},{\"name\":\"C-\",\"value\":0.7},{\"name\":\"D+\",\"value\":0.67},{\"name\":\"D\",\"value\":0.64},{\"name\":\"D-\",\"value\":0.61},{\"name\":\"F\",\"value\":0.0}]"
         end
       end
 
