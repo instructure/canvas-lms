@@ -40,7 +40,7 @@ describe "announcements" do
       @course.workflow_state = "unpublished"
       @course.save!
       AnnouncementNewEdit.visit_new(@course)
-      expect(fj("div:contains('You must publish your course for students to receive announcement notifications. Notifications will not be sent retroactively from announcements created before publishing the course.')")).to be_present
+      expect(fj("div:contains('Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.')")).to be_present
     end
 
     # ignore RCE error since it has nothing to do with the test
