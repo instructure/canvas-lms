@@ -42,9 +42,11 @@ import {Tag} from '@instructure/ui-tag'
 import {nanoid} from 'nanoid'
 import {AddressBookItem} from './AddressBookItem'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useEffect, useMemo, useState, useRef, useCallback} from 'react'
+import React, {useEffect, useMemo, useState, useRef, useCallback, useContext} from 'react'
 import {TOTAL_RECIPIENTS} from '../../../graphql/Queries'
 import {useQuery} from 'react-apollo'
+
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -116,6 +118,7 @@ export const AddressBook = ({
   const ariaAddressBookLabel = I18n.t('Address Book')
   const [menuItemCurrent, setMenuItemCurrent] = useState(null)
   const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
+  const {setOnSuccess} = useContext(AlertManagerContext)
 
   const {refetch: refetchTotalRecipients} = useQuery(TOTAL_RECIPIENTS, {
     skip: true,
@@ -167,6 +170,13 @@ export const AddressBook = ({
   const onItemRefSet = useCallback(refCurrent => {
     setMenuItemCurrent(refCurrent)
   }, [])
+
+  // useEffect to call set on success when browser is safari with highlighted option text
+  useEffect(() => {
+    if (isMenuOpen && /^apple\s/i.test(navigator?.vendor)) {
+      setOnSuccess(selectedItem?.name)
+    }
+  }, [isMenuOpen, selectedItem, setOnSuccess])
 
   // Update width to match componentViewRef width
   useEffect(() => {
@@ -255,7 +265,13 @@ export const AddressBook = ({
 
   // Render individual menu items
   const renderMenuItem = (menuItem, isLast) => {
-    const { itemType, name: menuItemName, id: menuId, totalRecipientCount, observerEnrollments } = menuItem
+    const {
+      itemType,
+      name: menuItemName,
+      id: menuId,
+      totalRecipientCount,
+      observerEnrollments,
+    } = menuItem
 
     const isSubmenu = itemType === SUBMENU_TYPE
     const isHeader = itemType === HEADER_TEXT_TYPE
@@ -279,7 +295,7 @@ export const AddressBook = ({
       )
     }
     const iconBefore = isBackButton ? <IconArrowOpenStartLine /> : null
-  
+
     const isSelected = selectedItem?.id === menuId
     const hasPopup = !!(isContext || isSubmenu)
 
