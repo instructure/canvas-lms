@@ -34,13 +34,57 @@ import CustomRecurrenceModal from '../RecurringEvents/CustomRecurrenceModal/Cust
 const {Option} = SimpleSelect as any
 const I18n = useScope('calendar_frequency_picker')
 
+type FrequencyPickerErrorState = {
+  hasError: boolean
+  errorMessage: string
+}
+
+export class FrequencyPickerErrorBoundary extends React.Component {
+  state: FrequencyPickerErrorState
+
+  constructor(props: any) {
+    super(props)
+    this.state = {
+      hasError: false,
+      errorMessage: '',
+    }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return {
+      hasError: true,
+      errorMessage: error.message,
+    }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <p>{I18n.t('There was an error rendering.')}</p>
+          <p>{this.state.errorMessage}</p>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
+
+export class FrequencyPickerError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'FrequencyPickerError'
+  }
+}
+
 export type OnFrequencyChange = (frequency: FrequencyOptionValue, RRule: string | null) => void
 export type FrequencyPickerWidth = 'auto' | 'fit'
 
 export type FrequencyPickerProps = {
-  readonly date: Date | string
+  readonly date?: Date | string
   readonly timezone: string
-  readonly initialFrequency: FrequencyOptionValue
+  readonly interaction?: 'enabled' | 'disabled'
+  readonly initialFrequency?: FrequencyOptionValue
   readonly rrule?: string
   readonly locale: string
   readonly width?: FrequencyPickerWidth
@@ -54,7 +98,8 @@ function getFrequencySelectWidth(width: FrequencyPickerWidth, options: Frequency
 export default function FrequencyPicker({
   date,
   timezone,
-  initialFrequency,
+  interaction = 'enabled',
+  initialFrequency = 'not-repeat',
   rrule,
   locale,
   width = 'fit',
@@ -76,6 +121,19 @@ export default function FrequencyPicker({
     getFrequencySelectWidth(width, options)
   )
   const freqPickerRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (date === undefined && interaction === 'enabled') {
+      throw new FrequencyPickerError(
+        'FrequencyPicker: date is required when interaction is enabled'
+      )
+    }
+    if (date === undefined && initialFrequency !== 'not-repeat') {
+      throw new FrequencyPickerError(
+        'FrequencyPicker: date is required when initialFrequency is not not-repeat'
+      )
+    }
+  }, [date, initialFrequency, interaction])
 
   useEffect(() => {
     if (frequency !== 'custom') {
@@ -158,6 +216,7 @@ export default function FrequencyPicker({
         inputRef={node => {
           freqPickerRef.current = node
         }}
+        interaction={interaction}
         renderLabel={I18n.t('frequency', 'Frequency:')}
         data-testid="frequency-picker"
         value={frequency}

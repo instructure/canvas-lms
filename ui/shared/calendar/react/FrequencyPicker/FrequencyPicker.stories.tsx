@@ -102,7 +102,7 @@ export default {
 } as Meta
 
 const Template: Story<FrequencyPickerProps> = args => {
-  const {date, initialFrequency, locale, timezone, width} = args
+  const {date, interaction, initialFrequency, locale, timezone, width} = args
 
   I18n.locale = locale
   moment.tz.setDefault(timezone)
@@ -124,6 +124,7 @@ const Template: Story<FrequencyPickerProps> = args => {
         <FrequencyPicker
           key={date}
           date={date}
+          interaction={interaction}
           initialFrequency={frequency}
           rrule={frequency === 'saved-custom' ? RRule : undefined}
           locale={locale}
@@ -150,6 +151,14 @@ export const Default = Template.bind({})
 Default.args = {
   date: moment().format('YYYY-MM-DD'),
   initialFrequency: 'not-repeat',
+  locale: 'en',
+  timezone: moment.tz.guess(),
+}
+
+export const Disabled = Template.bind({})
+Disabled.args = {
+  date: undefined,
+  interaction: 'disabled',
   locale: 'en',
   timezone: moment.tz.guess(),
 }

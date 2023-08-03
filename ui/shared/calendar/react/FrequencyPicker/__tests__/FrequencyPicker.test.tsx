@@ -19,7 +19,7 @@
 import React from 'react'
 import moment from 'moment-timezone'
 import {render, screen} from '@testing-library/react'
-import FrequencyPicker from '../FrequencyPicker'
+import FrequencyPicker, {FrequencyPickerErrorBoundary} from '../FrequencyPicker'
 import userEvent from '@testing-library/user-event'
 import {FrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
 
@@ -27,6 +27,7 @@ const defaultTZ = 'Asia/Tokyo'
 
 const defaultProps = (overrides: object = {}) => ({
   date: moment.tz('2001-04-12', defaultTZ).toDate(), // a Thursday
+  interaction: 'enabled' as const,
   initialFrequency: 'weekly-day' as FrequencyOptionValue,
   locale: 'en',
   timezone: defaultTZ,
@@ -75,6 +76,12 @@ describe('FrequencyPicker', () => {
 
       rerender(<FrequencyPicker {...props} initialFrequency="every-weekday" />)
       expect(getByDisplayValue('Every weekday (Monday to Friday)')).toBeInTheDocument()
+    })
+
+    it('disabled when interaction is disabled', () => {
+      const props = defaultProps({interaction: 'disabled'})
+      const {getByDisplayValue} = render(<FrequencyPicker {...props} />)
+      expect(getByDisplayValue('Weekly on Thursday')).toBeDisabled()
     })
 
     it('with custom frequency opens the modal', () => {
@@ -148,6 +155,38 @@ describe('FrequencyPicker', () => {
       expect(modal).toBeInTheDocument()
       userEvent.click(getByRole('button', {name: /done/i}))
       expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
+    })
+
+    describe('with errors', () => {
+      it('the error boundary fallback when enabled with no date', () => {
+        const props = defaultProps({date: undefined})
+        const {getByText} = render(
+          <FrequencyPickerErrorBoundary>
+            <FrequencyPicker {...props} />
+          </FrequencyPickerErrorBoundary>
+        )
+        expect(getByText('There was an error rendering.')).toBeInTheDocument()
+        expect(
+          getByText('FrequencyPicker: date is required when interaction is enabled')
+        ).toBeInTheDocument()
+      })
+
+      it('the error boundary fallback with no date and a recurring frequency', () => {
+        const props = defaultProps({
+          date: undefined,
+          interaction: 'disabled',
+          initialFrequency: 'weekly-day',
+        })
+        const {getByText} = render(
+          <FrequencyPickerErrorBoundary>
+            <FrequencyPicker {...props} />
+          </FrequencyPickerErrorBoundary>
+        )
+        expect(getByText('There was an error rendering.')).toBeInTheDocument()
+        expect(
+          getByText('FrequencyPicker: date is required when initialFrequency is not not-repeat')
+        ).toBeInTheDocument()
+      })
     })
   })
 

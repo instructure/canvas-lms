@@ -36,7 +36,9 @@ import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/DeleteCale
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
-import FrequencyPicker from '@canvas/calendar/react/FrequencyPicker/FrequencyPicker'
+import FrequencyPicker, {
+  FrequencyPickerErrorBoundary,
+} from '@canvas/calendar/react/FrequencyPicker/FrequencyPicker'
 import {rruleToFrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
 
 const I18n = useI18nScope('calendar.edit')
@@ -214,11 +216,8 @@ export default class EditCalendarEventView extends Backbone.View {
   renderRecurringEventFrequencyPicker() {
     if (ENV.FEATURES.calendar_series) {
       const pickerNode = document.getElementById('recurring_event_frequency_picker')
-      const start =
-        this.$el.find('[name="start_time"]').data('iso8601') ||
-        this.$el.find('[name="start_date"]').data('iso8601') ||
-        this.model.get('start_date')
-      const eventStart = moment.tz(start, ENV.TIMEZONE)
+      const start = this.$el.find('[name="start_date"]').val()
+      const eventStart = start ? moment(start) : moment('invalid')
 
       const rrule = this.model.get('rrule')
       const freq =
@@ -226,18 +225,23 @@ export default class EditCalendarEventView extends Backbone.View {
           ? rruleToFrequencyOptionValue(eventStart, rrule)
           : 'not-repeat'
 
+      const date = eventStart.isValid() ? eventStart.toISOString(true) : undefined
+
       ReactDOM.render(
         <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
-          <FrequencyPicker
-            date={eventStart.isValid() ? eventStart.toISOString(true) : undefined}
-            interaction={eventStart.isValid() ? 'enabled' : 'disabled'}
-            locale={ENV.LOCALE || 'en'}
-            timezone={ENV.TIMEZONE}
-            initialFrequency={freq}
-            rrule={rrule}
-            width="fit"
-            onChange={this.handleFrequencyChange}
-          />
+          <FrequencyPickerErrorBoundary>
+            <FrequencyPicker
+              key={date || 'not-repeat'}
+              date={date}
+              interaction={eventStart.isValid() ? 'enabled' : 'disabled'}
+              locale={ENV.LOCALE || 'en'}
+              timezone={ENV.TIMEZONE}
+              initialFrequency={freq}
+              rrule={rrule}
+              width="fit"
+              onChange={this.handleFrequencyChange}
+            />
+          </FrequencyPickerErrorBoundary>
         </div>,
         pickerNode
       )
