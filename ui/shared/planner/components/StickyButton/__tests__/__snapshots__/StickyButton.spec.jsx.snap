@@ -59,7 +59,7 @@ exports[`adds aria-hidden when specified 1`] = `
     pointer-events: none;
     opacity: 0.5;
   }
-  
+
   .StickyButton-styles__icon {
     display: block;
     font-size: 0.75rem;
@@ -67,12 +67,12 @@ exports[`adds aria-hidden when specified 1`] = `
     transform: translate3d(0, -0.0625rem, 0);
     transition: all 0.2s;
   }
-  
+
   .StickyButton-styles__direction--up .StickyButton-styles__layout,
   .StickyButton-styles__direction--down .StickyButton-styles__layout {
     padding-inline-end: 0.5rem;
   }
-  
+
   .StickyButton-styles__layout {
     box-sizing: border-box;
     display: flex;
@@ -81,9 +81,9 @@ exports[`adds aria-hidden when specified 1`] = `
     height: 100%;
     padding: 0 0.75rem;
   }
-  
+
   .StickyButton-styles__newActivityButton {
-    offset-inline-start: 0;
+    inset-inline-end: 0;
     top: 100%;
     position: absolute;
   }
@@ -173,7 +173,7 @@ exports[`renders 1`] = `
     pointer-events: none;
     opacity: 0.5;
   }
-  
+
   .StickyButton-styles__icon {
     display: block;
     font-size: 0.75rem;
@@ -181,12 +181,12 @@ exports[`renders 1`] = `
     transform: translate3d(0, -0.0625rem, 0);
     transition: all 0.2s;
   }
-  
+
   .StickyButton-styles__direction--up .StickyButton-styles__layout,
   .StickyButton-styles__direction--down .StickyButton-styles__layout {
     padding-inline-end: 0.5rem;
   }
-  
+
   .StickyButton-styles__layout {
     box-sizing: border-box;
     display: flex;
@@ -195,9 +195,9 @@ exports[`renders 1`] = `
     height: 100%;
     padding: 0 0.75rem;
   }
-  
+
   .StickyButton-styles__newActivityButton {
-    offset-inline-start: 0;
+    inset-inline-end: 0;
     top: 100%;
     position: absolute;
   }
