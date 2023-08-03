@@ -229,7 +229,7 @@ export const AddressBookContainer = props => {
     if (loading && !data) {
       return []
     }
-  
+
     // Extract contextData: { id, name, and context_type}
     let contextData = (data?.legacyNode?.recipients?.contextsConnection?.nodes || []).map(c => {
       return {
@@ -239,23 +239,25 @@ export const AddressBookContainer = props => {
         itemType: CONTEXT_TYPE,
       }
     })
-    
+
     // Extract userData: {_id, id, name, commonCoursesInfo, observerEnrollments, and itemType}
     let userData = (data?.legacyNode?.recipients?.usersConnection?.nodes || []).map(u => {
       return {
         _id: u._id,
         id: u.id,
         name: u.name,
-        commonCoursesInfo: props.includeCommonCourses ? getCommonCoursesInformation(u.commonCoursesConnection) : [],
+        commonCoursesInfo: props.includeCommonCourses
+          ? getCommonCoursesInformation(u.commonCoursesConnection)
+          : [],
         observerEnrollments: u?.observerEnrollmentsConnection?.nodes || [],
-        itemType: USER_TYPE
+        itemType: USER_TYPE,
       }
     })
-  
+
     // Ensure contextData and userData are not null.
     contextData = contextData || []
     userData = userData || []
-  
+
     // Set isLast property to the last items in contextData and userData if they are not loading.
     // this is used to know which menu item will trigger a fetchMore call.
     if (userData.length > 0 && !loading) {
@@ -264,10 +266,10 @@ export const AddressBookContainer = props => {
     if (contextData.length > 0 && !loading) {
       contextData[contextData.length - 1].isLast = true
     }
-  
+
     // Set the state for canSendAllMessage based on the data object.
     setCanSendAllMessage(!!data?.legacyNode?.recipients?.sendMessagesAll)
-  
+
     // Remove duplicates from contextData and userData arrays based on their id property.
     contextData = [...new Map(contextData.map(item => [item.id, item])).values()]
     userData = [...new Map(userData.map(item => [item.id, item])).values()]
@@ -277,16 +279,18 @@ export const AddressBookContainer = props => {
       const selection = filterHistory[filterHistory.length - 1]?.subMenuSelection
       // Filter the menuData based on the subMenuSelection value.
       const filteredMenuData = selection.includes('Course')
-        ? { contextData, userData: [] }
-        : { userData, contextData: [] }
+        ? {contextData, userData: []}
+        : {userData, contextData: []}
       return filteredMenuData
     }
     // If the filter is on the initialCourseMenu, count up the context totals
     // Otherwise use the totalRecipientCount for the selected context
-    let totalRecipientCount = filterHistory[filterHistory.length - 1]?.context?.totalRecipientCount || contextData.reduce((total, item) => total + (item?.userCount || 0), 0)
-    
+    const totalRecipientCount =
+      filterHistory[filterHistory.length - 1]?.context?.totalRecipientCount ||
+      contextData.reduce((total, item) => total + (item?.userCount || 0), 0)
+
     // If there is no subMenuSelection, return the full menuData with both contextData, userData, and recipient count data.
-    return { contextData, userData, totalRecipientCount }
+    return {contextData, userData, totalRecipientCount}
   }, [loading, data, filterHistory, searchTerm, props.includeCommonCourses])
   const handleSelect = (item, isContext, isBackButton, isSubmenu) => {
     if (isContext) {
