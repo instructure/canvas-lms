@@ -575,6 +575,8 @@ describe AccountsController do
       @student.dashboard_view = "activity"
       @student.save!
 
+      @account.pseudonyms.create!(unique_id: "student", user: @student)
+
       expect(@subaccount.default_dashboard_view).to be_nil
       # Tests against user-set dashboard views
       expect(@student.dashboard_view(@subaccount)).to eq "activity"
