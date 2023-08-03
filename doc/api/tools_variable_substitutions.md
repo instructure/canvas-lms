@@ -751,16 +751,16 @@ true
 ```
 ## com.instructure.Course.gradingScheme
 returns the grading scheme data for the course
-it is an array of arrays of grade levels.
+it is an array of objects of grade levels.
 
 **Availability**: *when launched in a course*  
 **Launch Parameter**: *com_instructure_course_grading_scheme*  
 
 ```
 [
-  ["A", 94.0],
-  ["A-", 90.0],
-  ["B+", 87.0],
+  {name: "A", value: 94.0},
+  {name: "A-", value: 90.0},
+  {name: "B+", value: 87.0},
 ]
 ```
 ## com.Instructure.membership.roles
