@@ -152,7 +152,7 @@ ready(() => {
           key: 'announcement-course-unpublished-alert',
           variant: 'warning',
           text: I18n.t(
-            'You must publish your course for students to receive announcement notifications. Notifications will not be sent retroactively from announcements created before publishing the course.'
+            'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Delay Posting option and set to publish on a future date.'
           ),
         }
       : {
