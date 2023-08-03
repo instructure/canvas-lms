@@ -122,7 +122,7 @@ export default function buildStyle() {
     pointer-events: none;
     opacity: 0.5;
   }
-  
+
   .${classNames.icon} {
     display: block;
     font-size: 0.75rem;
@@ -130,12 +130,12 @@ export default function buildStyle() {
     transform: translate3d(0, -0.0625rem, 0);
     transition: all 0.2s;
   }
-  
+
   .${classNames.directionUp} .${classNames.layout},
   .${classNames.directionDown} .${classNames.layout} {
     padding-inline-end: ${theme.hasIconRightPadding};
   }
-  
+
   .${classNames.layout} {
     box-sizing: border-box;
     display: flex;
@@ -144,9 +144,9 @@ export default function buildStyle() {
     height: 100%;
     padding: ${theme.padding};
   }
-  
+
   .${classNames.newActivityButton} {
-    offset-inline-start: 0;
+    inset-inline-end: 0;
     top: 100%;
     position: absolute;
   }
