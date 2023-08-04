@@ -86,20 +86,19 @@ describe "Screenreader Gradebook" do
   end
 
   it "can select a student" do
-    skip "unskip w/ EVAL-3356 BUG student select showing first name first instead of last name"
     simple_setup
     simple_grade
     EnhancedSRGB.visit(@course.id)
     student_dropdown_options = ["No Student Selected", @students[0].sortable_name, @students[1].sortable_name]
     expect(EnhancedSRGB.student_dropdown_options).to eq(student_dropdown_options)
 
-    click_option '[data-testid="content-selection-student-select"]', @students[0].sortable_name
-    assignment_points = ["(#{@grade_array[0]} / 20)", "(#{@grade_array[2]} / 20)"]
-    expect(ff("#student_information .assignment-subtotal-grade .points").map(&:text)).to eq(assignment_points)
+    click_option(EnhancedSRGB.student_dropdown, @students[0].sortable_name)
+    assignment_points = ["75% (#{@grade_array[0]} / 20)", "55.0% (#{@grade_array[2]} / 20)"]
+    expect(EnhancedSRGB.assign_subtotal_grade.map(&:text)).to eq(assignment_points)
 
-    click_option '[data-testid="content-selection-student-select"]', @students[1].sortable_name
-    assignment_points = ["(#{@grade_array[1]} / 20)", "(#{@grade_array[3]} / 20)"]
-    expect(ff("#student_information .assignment-subtotal-grade .points").map(&:text)).to eq(assignment_points)
+    click_option(EnhancedSRGB.student_dropdown, @students[1].sortable_name)
+    assignment_points = ["60% (#{@grade_array[1]} / 20)", "15% (#{@grade_array[3]} / 20)"]
+    expect(EnhancedSRGB.assign_subtotal_grade.map(&:text)).to eq(assignment_points)
   end
 
   it "can select a student using buttons" do
@@ -160,7 +159,7 @@ describe "Screenreader Gradebook" do
   it "sets default grade" do
     simple_setup(2)
     EnhancedSRGB.visit(@course.id)
-    click_option(EnhancedSRGB.student_dropdown, @students[0].name) # fix w/ EVAL-3356 BUG student select showing first name first instead of last name
+    click_option(EnhancedSRGB.student_dropdown, @students[0].sortable_name)
     EnhancedSRGB.select_assignment(@assign1)
 
     EnhancedSRGB.default_grade.click

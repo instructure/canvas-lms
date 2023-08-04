@@ -145,7 +145,7 @@ class EnhancedSRGB
     end
 
     def assign_subtotal_grade
-      f('td[data-testid="subtotal-grade"]')
+      ff('td[data-testid="subtotal-grade"]')
     end
 
     def secondary_id_label
@@ -301,7 +301,7 @@ class EnhancedSRGB
     end
 
     def select_student(student)
-      click_option(student_dropdown, student.name) # Change with EVAL-3356
+      click_option(student_dropdown, student.sortable_name)
     end
 
     def student_dropdown_options

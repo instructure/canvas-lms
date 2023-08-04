@@ -149,6 +149,7 @@ export type GradebookStudentDetails = {
   loginId: string
   name: string
   hiddenName: string
+  sortableName: string
 }
 
 export type GradebookUserSubmissionDetails = {

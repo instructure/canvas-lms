@@ -15,11 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
-// import {act, render, within} from '@testing-library/react'
+import {MockedProvider} from '@apollo/react-testing'
+import {render} from '@testing-library/react'
+import ContentSelection from '..'
+import {defaultSortableStudents, makeContentSelectionProps} from './fixtures'
 
-describe('Content Selection Tests', () => {
-  it('runs', () => {})
+describe('Content Selection', () => {
+  describe('student dropdown', () => {
+    it('displays the sortableName in the student dropdown', () => {
+      const props = makeContentSelectionProps({students: defaultSortableStudents})
+      const {getByTestId} = render(
+        <MockedProvider>
+          <ContentSelection {...props} />
+        </MockedProvider>
+      )
+      const studentDropdown = getByTestId('content-selection-student-select')
+      expect(studentDropdown).toHaveTextContent('Last, First')
+      expect(studentDropdown).toHaveTextContent('Last2, First2')
+    })
+  })
 })

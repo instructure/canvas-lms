@@ -156,7 +156,7 @@ export function studentDisplayName(
   student: SortableStudent | GradebookStudentDetails,
   hideStudentNames: boolean
 ): string {
-  return hideStudentNames ? student.hiddenName ?? I18n.t('Student') : student.name
+  return hideStudentNames ? student.hiddenName ?? I18n.t('Student') : student.sortableName
 }
 
 export function sortAssignments(

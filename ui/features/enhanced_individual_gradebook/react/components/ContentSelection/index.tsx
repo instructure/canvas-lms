@@ -31,7 +31,7 @@ import {studentDisplayName} from '../../../utils/gradebookUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
-type Props = {
+export type ContentSelectionComponentProps = {
   courseId: string
   assignments?: SortableAssignment[]
   students?: SortableStudent[]
@@ -51,7 +51,7 @@ export default function ContentSelection({
   gradebookOptions,
   onAssignmentChange,
   onStudentChange,
-}: Props) {
+}: ContentSelectionComponentProps) {
   const [selectedStudentIndex, setSelectedStudentIndex] = useState<number>(0)
   const [selectedAssignmentIndex, setSelectedAssignmentIndex] = useState<number>(0)
   const {studentSubmissions} = useCurrentStudentInfo(courseId, selectedStudentId)
@@ -168,7 +168,9 @@ export default function ContentSelection({
           >
             {studentDropdownOptions.map(option => (
               <option key={option.id} value={option.id}>
-                {option.data ? studentDisplayName(option.data, hideStudentNames) : option.name}
+                {option.data
+                  ? studentDisplayName(option.data, hideStudentNames)
+                  : option.sortableName}
               </option>
             ))}
           </select>
