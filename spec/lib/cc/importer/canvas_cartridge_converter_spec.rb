@@ -1293,7 +1293,7 @@ describe "Canvas Cartridge importing" do
     expect(mo.media_tracks.where(locale: "tlh").first.content).to eql("Qapla'")
     expect(mo.media_tracks.where(locale: "bad").first).to be_nil
 
-    expect(migration.migration_issues.map(&:description)).to include "Subtitles could not be imported from media.flv.bad.subtitles"
+    expect(migration.migration_issues.map(&:description)).to include "Subtitles (bad) could not be imported for media.flv"
 
     expect(@copy_to.attachments.where(migration_id: "abc").first).to be_deleted
     expect(@copy_to.attachments.where(migration_id: "def").first).to be_deleted

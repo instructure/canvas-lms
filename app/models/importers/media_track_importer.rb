@@ -43,7 +43,7 @@ module Importers
 
     def self.import_from_migration(attachment, media_object, track, migration)
       content = track["content"]
-      unless content.present?
+      if content.blank?
         file = migration.context.attachments.where(migration_id: track[:migration_id]).first
         return unless file
 
@@ -51,17 +51,18 @@ module Importers
         file.open { |data| content << data }
       end
 
-      mt = attachment.media_tracks.find_or_initialize_by(media_object:, locale: track["locale"])
+      mt = attachment.media_tracks.find_or_initialize_by(locale: track["locale"])
       mt.mark_as_importing!(migration)
       return if attachment.downstream_changes?(migration, "media_tracks_content") && !attachment.editing_restricted?(:content)
 
       mt.kind = track["kind"]
+      mt.media_object = media_object
       mt.content = content
       begin
         mt.save!
       rescue => e
         er = Canvas::Errors.capture_exception(:import_media_tracks, e)[:error_report]
-        error_message = t("Subtitles could not be imported from %{file}", file: file.display_name)
+        error_message = t("Subtitles (%{lang}) could not be imported for %{file}", lang: track["locale"], file: attachment.display_name)
         migration.add_warning(error_message, error_report_id: er)
       end
       # remove temporary file
