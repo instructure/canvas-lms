@@ -46,6 +46,8 @@ media_links_use_attachment_id:
     instead of the original
   applies_to: SiteAdmin
   environments:
+    ci:
+      state: allowed_on
     development:
       state: allowed_on
 
