@@ -31,7 +31,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Event, Which} from '@canvas/calendar/react/Types'
+import {Event, Which} from './types'
 
 const I18n = useI18nScope('calendar_event')
 

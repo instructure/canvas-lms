@@ -27,7 +27,7 @@ import {
   changeUntilDate,
 } from '../../RecurrenceEndPicker/__tests__/RecurrenceEndPicker.test'
 import {changeFreq} from '../../RepeatPicker/__tests__/RepeatPicker.test'
-import {weekdaysFromMoment} from '../../RepeatPicker/RepeatPicker'
+import {weekdaysFromMoment} from '../../utils'
 import CustomRecurrence, {CustomRecurrenceProps} from '../CustomRecurrence'
 
 const defaultTZ = 'Asia/Tokyo'

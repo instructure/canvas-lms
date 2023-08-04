@@ -23,7 +23,7 @@ import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
 jest.mock('@canvas/calendar/jquery/CommonEvent/index')
-jest.mock('@canvas/calendar/react/UpdateCalendarEventDialog', () => ({
+jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
   renderUpdateCalendarEventDialog: jest.fn(),
 }))
 

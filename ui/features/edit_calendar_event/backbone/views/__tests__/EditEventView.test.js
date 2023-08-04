@@ -24,10 +24,10 @@ import tz from '@canvas/timezone'
 import {fireEvent, within, getByText} from '@testing-library/dom'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
-import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/UpdateCalendarEventDialog'
+import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 
 jest.mock('@canvas/rce/RichContentEditor')
-jest.mock('@canvas/calendar/react/UpdateCalendarEventDialog', () => ({
+jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
   renderUpdateCalendarEventDialog: jest.fn(),
 }))
 

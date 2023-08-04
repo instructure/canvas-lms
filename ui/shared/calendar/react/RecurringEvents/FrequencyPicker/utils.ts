@@ -18,22 +18,11 @@
 
 import {Moment} from 'moment-timezone'
 import {useScope} from '@canvas/i18n'
-import RRuleHelper, {RRuleHelperSpec} from '../RecurringEvents/RRuleHelper'
-import {AllRRULEDayValues} from '../RecurringEvents/types'
-import {cardinalDayInMonth} from '../RecurringEvents/RepeatPicker/RepeatPicker'
-import RRuleToNaturalLanguage from '../RecurringEvents/RRuleNaturalLanguage'
-
-export type FrequencyOptionValue =
-  | 'not-repeat'
-  | 'daily'
-  | 'weekly-day'
-  | 'monthly-nth-day'
-  | 'annually'
-  | 'every-weekday'
-  | 'saved-custom'
-  | 'custom'
-export type FrequencyOption = {id: FrequencyOptionValue; label: string}
-export type FrequencyOptionsArray = FrequencyOption[]
+import RRuleHelper, {RRuleHelperSpec} from '../RRuleHelper'
+import {AllRRULEDayValues, FrequencyOptionValue} from '../types'
+import {cardinalDayInMonth, weekdayInMonth} from '../utils'
+import RRuleToNaturalLanguage from '../RRuleNaturalLanguage'
+import {FrequencyOption} from './FrequencyPicker'
 
 const FrequencyCounts = {
   daily: 200, // Backend maximum is 200
@@ -45,47 +34,12 @@ const FrequencyCounts = {
 
 const I18n = useScope('calendar_frequency_picker')
 
-export function getSelectTextWidth(strings: string[]) {
-  const testdiv = document.createElement('div')
-  testdiv.setAttribute('style', 'position: absolute; left: -9999px; visibility: hidden;')
-  testdiv.innerHTML = `<div><div>${strings.join('</div><div>')}</div></div>`
-  document.body.appendChild(testdiv)
-  const w = `${testdiv.getBoundingClientRect().width + 24 + 12 + 14 + 2}px`
-  testdiv.remove()
-  return w
-}
-
-// Gets the index of the weekday of the month of the given moment.
-// If is the last -1 is returned.
-const weekdayInMonth = (eventStart: Moment): number => {
-  let day = eventStart.clone().startOf('month').day(eventStart.day())
-  const days = []
-
-  // Sometimes it can return a weekday of previous month
-  if (day.date() > 7) {
-    day.add(7, 'd')
-  }
-
-  const month = day.month()
-  while (month === day.month()) {
-    days.push(day)
-    day = day.clone().add(7, 'd')
-  }
-
-  let index = days.findIndex(d => d.date() === eventStart.date())
-  if (index + 1 >= days.length) {
-    index = -1
-  }
-
-  return index
-}
-
 export const generateFrequencyOptions = (
   eventStart: Moment,
   locale: string = 'en',
   timezone: string,
   rrule: string | null
-): FrequencyOptionsArray => {
+): FrequencyOption[] => {
   const day = I18n.lookup('date.day_names').at(eventStart.day())
   const month = I18n.lookup('date.month_names').at(eventStart.month() + 1)
   const date = eventStart.date()
@@ -97,7 +51,7 @@ export const generateFrequencyOptions = (
     I18n.t('fourth', 'fourth'),
     I18n.t('last', 'last'),
   ].at(weekdayIndex)
-  const opts: FrequencyOptionsArray = [
+  const opts: FrequencyOption[] = [
     {id: 'not-repeat', label: I18n.t('not_repeat', 'Does not repeat')},
     {id: 'daily', label: I18n.t('daily', 'Daily')},
     {
@@ -154,7 +108,7 @@ export const generateFrequencyOptions = (
   return opts
 }
 
-export const generateFrequencyRRule = (
+export const generateFrequencyRRULE = (
   id: FrequencyOptionValue,
   eventStart: Moment
 ): string | null => {
@@ -196,7 +150,7 @@ export const generateFrequencyRRule = (
   }
 }
 
-export const rruleToFrequencyOptionValue = (
+export const RRULEToFrequencyOptionValue = (
   eventStart: Moment,
   rrule: string | null | undefined
 ): FrequencyOptionValue => {

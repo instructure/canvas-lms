@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import ReactDOM from 'react-dom'
 import React, {useState, useEffect, useLayoutEffect, useCallback} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
@@ -40,10 +41,9 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
-import FrequencyPicker from '@canvas/calendar/react/FrequencyPicker/FrequencyPicker'
-import {rruleToFrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
-import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/UpdateCalendarEventDialog'
-import ReactDOM from 'react-dom'
+import {RRULEToFrequencyOptionValue} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
+import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
+import FrequencyPicker from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
 
@@ -458,7 +458,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             locale={locale}
             timezone={timezone}
             width="auto"
-            initialFrequency={rruleToFrequencyOptionValue(
+            initialFrequency={RRULEToFrequencyOptionValue(
               moment.tz(date, timezone),
               event.object.rrule
             )}

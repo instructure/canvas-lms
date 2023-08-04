@@ -24,8 +24,7 @@ import FrequencyPicker, {
   FrequencyPickerProps,
 } from '../FrequencyPicker'
 import userEvent from '@testing-library/user-event'
-import {FrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
-import {UnknownSubset} from '../../RecurringEvents/types'
+import {FrequencyOptionValue, UnknownSubset} from '../../types'
 
 const defaultTZ = 'Asia/Tokyo'
 
