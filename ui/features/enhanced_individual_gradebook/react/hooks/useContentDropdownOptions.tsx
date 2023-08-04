@@ -32,6 +32,7 @@ const I18n = useI18nScope('enhanced_individual_gradebook_content_selection')
 type DropDownOption<T> = {
   id: string
   name: string
+  sortableName: string
   data?: T
 }
 
@@ -41,8 +42,16 @@ type AssignmentDropdownOption = DropDownOption<SortableAssignment>[]
 const DEFAULT_STUDENT_DROPDOWN_TEXT = I18n.t('No Student Selected')
 const DEFAULT_ASSIGNMENT_DROPDOWN_TEXT = I18n.t('No Assignment Selected')
 
-const defaultStudentDropdownOptions = {id: '-1', name: DEFAULT_STUDENT_DROPDOWN_TEXT}
-const defaultAssignmentDropdownOptions = {id: '-1', name: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT}
+const defaultStudentDropdownOptions = {
+  id: '-1',
+  name: DEFAULT_STUDENT_DROPDOWN_TEXT,
+  sortableName: DEFAULT_STUDENT_DROPDOWN_TEXT,
+}
+const defaultAssignmentDropdownOptions = {
+  id: '-1',
+  name: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT,
+  sortableName: DEFAULT_ASSIGNMENT_DROPDOWN_TEXT,
+}
 
 const defaultAllowedEnrollmentStates = ['active', 'invited']
 
@@ -80,7 +89,8 @@ export const useUserDropdownOptions = ({
       defaultStudentDropdownOptions,
       ...filteredStudents.map(student => ({
         id: student.id,
-        name: student.sortableName,
+        name: student.name,
+        sortableName: student.sortableName,
         data: student,
       })),
     ]
@@ -135,6 +145,7 @@ export const useAssignmentDropdownOptions = ({
         id: assignment.id,
         name: assignment.name,
         data: assignment,
+        sortableName: assignment.sortableName,
       })),
     ]
     setAssignmentDropdownOptions(assignmentOptions)

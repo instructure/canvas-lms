@@ -53,7 +53,7 @@ describe "Screenreader Gradebook Student Information" do
     it "displays student's grades" do
       EnhancedSRGB.select_student(student)
       expect(EnhancedSRGB.final_grade.text).to eq("30% (3 / 10 points)")
-      expect(EnhancedSRGB.assign_subtotal_grade.text).to eq("30% (3 / 10)")
+      expect(EnhancedSRGB.assign_subtotal_grade.first.text).to eq("30% (3 / 10)")
       expect_new_page_load { EnhancedSRGB.switch_to_default_gradebook }
       expect(Gradebook::Cells.get_total_grade(student)).to eq("30%")
     end

@@ -130,6 +130,7 @@ export type SortableStudent = UserConnection & {
   sections: string[]
   hiddenName?: string
   state: string
+  sortableName: string
 }
 
 export enum ApiCallStatus {
