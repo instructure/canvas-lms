@@ -24,7 +24,7 @@ import I18n from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import moment from 'moment'
-import {FrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
+import {FrequencyOptionValue} from '../utils'
 
 I18n.translations.en = {
   'date.day_names': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],

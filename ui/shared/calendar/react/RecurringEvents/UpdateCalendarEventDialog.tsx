@@ -28,8 +28,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Which, CalendarEvent} from '@canvas/calendar/react/Types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {Which, CalendarEvent} from './types'
 
 const I18n = useI18nScope('calendar_event')
 

@@ -27,8 +27,15 @@ import {px} from '@instructure/ui-utils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
 import {AllRRULEDayValues, FrequencyValue, MonthlyModeValue, SelectedDaysArray} from '../types'
+import {
+  cardinalDayInMonth,
+  getMonthlyMode,
+  getSelectTextWidth,
+  getWeekdayName,
+  isLastWeekdayInMonth,
+  weekdaysFromMoment,
+} from '../utils'
 
 const I18n = useScope('calendar_custom_recurring_event_repeat_picker')
 
@@ -54,34 +61,6 @@ export type OnRepeatPickerChangeType = {
   pos?: number
 }
 
-type CardinalDayInMonth = {
-  cardinal: number
-  last: boolean
-  dayOfWeek: number // 0-6, Sunday-Saturday
-}
-
-export const weekdaysFromMoment = (m: moment.Moment): SelectedDaysArray => [
-  AllRRULEDayValues[m.day()],
-]
-export const cardinalDayInMonth = (m: moment.Moment): CardinalDayInMonth => {
-  let last = false
-  const n = Math.ceil(m.date() / 7)
-  if (n >= 4 && m.clone().add(1, 'week').month() !== m.month()) {
-    last = true
-  }
-  return {cardinal: n, last, dayOfWeek: m.day()}
-}
-
-export const getWeekdayName = (
-  datetime: moment.Moment,
-  locale: string,
-  timezone: string
-): string => {
-  return new Intl.DateTimeFormat(locale, {weekday: 'long', timeZone: timezone}).format(
-    datetime.toDate()
-  )
-}
-
 export const getByMonthdateString = (
   datetime: moment.Moment,
   locale: string,
@@ -99,38 +78,8 @@ export const getByMonthdateString = (
   return monthdateStrings[cardinal.cardinal - 1]
 }
 
-export const isLastWeekdayInMonth = (m: moment.Moment): boolean => {
-  const n = Math.ceil(m.date() / 7)
-  return n >= 4 && m.clone().add(1, 'week').month() !== m.month()
-}
-
 export const getLastWeekdayInMonthString = (dayname: string): string => {
   return I18n.t('on the last %{dayname}', {dayname})
-}
-
-function getSelectTextWidth(strings: string[]) {
-  const testdiv = document.createElement('div')
-  testdiv.setAttribute('style', 'position: absolute; left: -9999px; visibility: hidden;')
-  testdiv.innerHTML = `<div><div>${strings.join('</div><div>')}</div></div>`
-  document.body.appendChild(testdiv)
-  const w = `${testdiv.getBoundingClientRect().width + 24 + 12 + 14 + 2}px`
-  testdiv.remove()
-  return w
-}
-
-function getMonthlyMode(
-  freq: FrequencyValue,
-  weekdays?: SelectedDaysArray,
-  pos?: number
-): MonthlyModeValue {
-  if (freq === 'MONTHLY' && Array.isArray(weekdays) && typeof pos === 'number') {
-    if (pos >= 0) {
-      return 'BYMONTHDAY'
-    } else {
-      return 'BYLASTMONTHDAY'
-    }
-  }
-  return 'BYMONTHDATE'
 }
 
 export default function RepeatPicker({

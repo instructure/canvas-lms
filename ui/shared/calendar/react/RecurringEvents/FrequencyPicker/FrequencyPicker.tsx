@@ -21,18 +21,18 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import React, {useCallback, useRef, useEffect, useState} from 'react'
 import moment, {Moment} from 'moment-timezone'
 import {
-  FrequencyOptionValue,
-  FrequencyOption,
-  FrequencyOptionsArray,
   generateFrequencyOptions,
-  generateFrequencyRRule,
-  getSelectTextWidth,
-  rruleToFrequencyOptionValue,
-} from './FrequencyPickerUtils'
-import CustomRecurrenceModal from '../RecurringEvents/CustomRecurrenceModal/CustomRecurrenceModal'
+  generateFrequencyRRULE,
+  RRULEToFrequencyOptionValue,
+} from './utils'
+import CustomRecurrenceModal from '../CustomRecurrenceModal/CustomRecurrenceModal'
+import {getSelectTextWidth} from '../utils'
+import {FrequencyOptionValue} from '../types'
 
 const {Option} = SimpleSelect as any
 const I18n = useScope('calendar_frequency_picker')
+
+export type FrequencyOption = {id: FrequencyOptionValue; label: string}
 
 type FrequencyPickerErrorState = {
   hasError: boolean
@@ -91,7 +91,7 @@ export type FrequencyPickerProps = {
   readonly onChange: OnFrequencyChange
 }
 
-function getFrequencySelectWidth(width: FrequencyPickerWidth, options: FrequencyOptionsArray) {
+function getFrequencySelectWidth(width: FrequencyPickerWidth, options: FrequencyOption[]) {
   return width === 'fit' ? getSelectTextWidth(options.map(opt => opt.label)) : 'auto'
 }
 
@@ -109,12 +109,12 @@ export default function FrequencyPicker({
   const [parsedMoment, setParsedMoment] = useState<Moment>(moment.tz(date, timezone))
   const [isModalOpen, setIsModalOpen] = useState<boolean>(initialFrequency === 'custom')
   const [currRRule, setCurrRRule] = useState<string | null>(() => {
-    return rrule || generateFrequencyRRule(frequency, parsedMoment)
+    return rrule || generateFrequencyRRULE(frequency, parsedMoment)
   })
   const [customRRule, setCustomRRule] = useState<string | null>(() => {
     return frequency === 'saved-custom' && rrule ? rrule : null
   })
-  const [options, setOptions] = useState<FrequencyOptionsArray>(
+  const [options, setOptions] = useState<FrequencyOption[]>(
     generateFrequencyOptions(parsedMoment, locale, timezone, customRRule)
   )
   const [selectTextWidth, setSelectTextWidth] = useState<string>(() =>
@@ -149,7 +149,7 @@ export default function FrequencyPicker({
     const newMoment = moment.tz(date, timezone)
     setParsedMoment(newMoment)
     if (frequency !== 'custom' && frequency !== 'saved-custom') {
-      setCurrRRule(generateFrequencyRRule(frequency, newMoment))
+      setCurrRRule(generateFrequencyRRULE(frequency, newMoment))
     }
   }, [date, frequency, timezone])
 
@@ -157,7 +157,7 @@ export default function FrequencyPicker({
     const newOpts = generateFrequencyOptions(parsedMoment, locale, timezone, customRRule)
     if (
       newOpts.length !== options.length ||
-      newOpts.some((opt, i) => opt.label !== options[i].label)
+      newOpts.some((opt: FrequencyOption, i: number) => opt.label !== options[i].label)
     ) {
       setOptions(newOpts)
       setSelectTextWidth(getFrequencySelectWidth(width, newOpts))
@@ -172,7 +172,7 @@ export default function FrequencyPicker({
       } else if (option.id === 'saved-custom') {
         setCurrRRule(customRRule)
       } else {
-        const newRRule = generateFrequencyRRule(option.id, parsedMoment)
+        const newRRule = generateFrequencyRRULE(option.id, parsedMoment)
         setCurrRRule(newRRule)
       }
     },
@@ -189,7 +189,7 @@ export default function FrequencyPicker({
     if (currRRule === null) {
       freq = 'not-repeat'
     } else {
-      freq = rruleToFrequencyOptionValue(parsedMoment, currRRule)
+      freq = RRULEToFrequencyOptionValue(parsedMoment, currRRule)
       if (freq === 'custom') {
         freq = 'saved-custom'
       }

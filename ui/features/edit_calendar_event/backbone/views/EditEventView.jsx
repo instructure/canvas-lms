@@ -32,15 +32,15 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import unflatten from 'obj-unflatten'
 import deparam from 'deparam'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
-import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/DeleteCalendarEventDialog'
+import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/DeleteCalendarEventDialog'
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
 import FrequencyPicker, {
   FrequencyPickerErrorBoundary,
-} from '@canvas/calendar/react/FrequencyPicker/FrequencyPicker'
-import {rruleToFrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
-import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/UpdateCalendarEventDialog'
+} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
+import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
+import {RRULEToFrequencyOptionValue} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 
 const I18n = useI18nScope('calendar.edit')
 
@@ -223,7 +223,7 @@ export default class EditCalendarEventView extends Backbone.View {
       const rrule = this.model.get('rrule')
       const freq =
         rrule && eventStart.isValid()
-          ? rruleToFrequencyOptionValue(eventStart, rrule)
+          ? RRULEToFrequencyOptionValue(eventStart, rrule)
           : 'not-repeat'
 
       const date = eventStart.isValid() ? eventStart.toISOString(true) : undefined

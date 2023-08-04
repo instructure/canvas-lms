@@ -16,6 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export type Event = {
+  id: string
+  // a lot of other attributes that don't matter to me
+}
+
+export type Which = 'one' | 'following' | 'all'
+
+export type CalendarEvent = {
+  readonly url: string
+  readonly series_head: boolean
+}
+
+export type CommonEvent = {
+  readonly calendarEvent: CalendarEvent
+}
+
 export type UnknownSubset<T> = {
   [K in keyof T]?: T[K]
 }
@@ -28,3 +44,13 @@ export type MonthlyModeValue = 'BYMONTHDATE' | 'BYMONTHDAY' | 'BYLASTMONTHDAY'
 export type RRULEDayValue = 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA'
 export type SelectedDaysArray = RRULEDayValue[]
 export const AllRRULEDayValues: SelectedDaysArray = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA']
+
+export type FrequencyOptionValue =
+  | 'not-repeat'
+  | 'daily'
+  | 'weekly-day'
+  | 'monthly-nth-day'
+  | 'annually'
+  | 'every-weekday'
+  | 'saved-custom'
+  | 'custom'

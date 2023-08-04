@@ -21,14 +21,11 @@ import {render, act, fireEvent, screen} from '@testing-library/react'
 import moment from 'moment-timezone'
 import RepeatPicker, {
   RepeatPickerProps,
-  cardinalDayInMonth,
   getByMonthdateString,
   getLastWeekdayInMonthString,
-  getWeekdayName,
-  isLastWeekdayInMonth,
-  weekdaysFromMoment,
 } from '../RepeatPicker'
 import {UnknownSubset} from '../../types'
+import {cardinalDayInMonth, weekdaysFromMoment} from '../../utils'
 
 export function changeFreq(from: string, to: string): void {
   const freq = screen.getByDisplayValue(from)
@@ -62,49 +59,6 @@ describe('RepeatPicker', () => {
   })
 
   describe('utilities', () => {
-    it('cardinalDayInMonth returns the correct day', () => {
-      expect(cardinalDayInMonth(moment('2023-06-02'))).toEqual({
-        cardinal: 1,
-        last: false,
-        dayOfWeek: 5,
-      })
-      expect(cardinalDayInMonth(moment('2023-06-09'))).toEqual({
-        cardinal: 2,
-        last: false,
-        dayOfWeek: 5,
-      })
-      expect(cardinalDayInMonth(moment('2023-06-16'))).toEqual({
-        cardinal: 3,
-        last: false,
-        dayOfWeek: 5,
-      })
-      expect(cardinalDayInMonth(moment('2023-06-23'))).toEqual({
-        cardinal: 4,
-        last: false,
-        dayOfWeek: 5,
-      })
-      expect(cardinalDayInMonth(moment('2023-06-30'))).toEqual({
-        cardinal: 5,
-        last: true,
-        dayOfWeek: 5,
-      })
-      expect(cardinalDayInMonth(moment('2023-07-25'))).toEqual({
-        cardinal: 4,
-        last: true,
-        dayOfWeek: 2,
-      })
-    })
-
-    it('getWeekdayName returns the dates day of the week', () => {
-      expect(getWeekdayName(moment('2023-06-05'), 'en', defaultTZ)).toEqual('Monday')
-      expect(getWeekdayName(moment('2023-06-06'), 'en', defaultTZ)).toEqual('Tuesday')
-      expect(getWeekdayName(moment('2023-06-07'), 'en', defaultTZ)).toEqual('Wednesday')
-      expect(getWeekdayName(moment('2023-06-08'), 'en', defaultTZ)).toEqual('Thursday')
-      expect(getWeekdayName(moment('2023-06-09'), 'en', defaultTZ)).toEqual('Friday')
-      expect(getWeekdayName(moment('2023-06-10'), 'en', defaultTZ)).toEqual('Saturday')
-      expect(getWeekdayName(moment('2023-06-11'), 'en', defaultTZ)).toEqual('Sunday')
-    })
-
     it('getByMonthdateString returns the correct string', () => {
       expect(getByMonthdateString(moment('2023-07-03'), 'en', defaultTZ)).toEqual(
         'on the first Monday'
@@ -123,23 +77,8 @@ describe('RepeatPicker', () => {
       )
     })
 
-    it('isLastWeekdayInMonth returns the correct boolean', () => {
-      expect(isLastWeekdayInMonth(moment('2023-06-29'))).toEqual(true)
-      expect(isLastWeekdayInMonth(moment('2023-06-22'))).toEqual(false)
-    })
-
     it('getLastWeekdayInMonthString returns the formatted string', () => {
       expect(getLastWeekdayInMonthString('Fizzday')).toEqual('on the last Fizzday')
-    })
-
-    it('weekdaysFromMoment returns the correct weekdays', () => {
-      expect(weekdaysFromMoment(moment('2023-06-05'))).toEqual(['MO'])
-      expect(weekdaysFromMoment(moment('2023-06-06'))).toEqual(['TU'])
-      expect(weekdaysFromMoment(moment('2023-06-07'))).toEqual(['WE'])
-      expect(weekdaysFromMoment(moment('2023-06-08'))).toEqual(['TH'])
-      expect(weekdaysFromMoment(moment('2023-06-09'))).toEqual(['FR'])
-      expect(weekdaysFromMoment(moment('2023-06-10'))).toEqual(['SA'])
-      expect(weekdaysFromMoment(moment('2023-06-11'))).toEqual(['SU'])
     })
   })
 
