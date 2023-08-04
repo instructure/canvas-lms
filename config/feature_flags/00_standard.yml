@@ -43,6 +43,14 @@ admin_analytics_new_filter_ui:
     admin_analytics_new_filter_ui_description: Enables the new Admin Analytics Filter UI.
   root_opt_in: true
   beta: true
+k20_course_readiness_alpha_testing:
+  state: hidden
+  applies_to: Account
+  display_name: K20 - Course Readiness Alpha Testing
+  description:
+    k20_course_readiness_alpha_testing_description: This flag is for institutions participating in Advanced Analytics Alpha testing. This flag enables the Course Readiness dashboard for these institutions.
+  root_opt_in: true
+  beta: true
 k20_course_readiness:
   state: hidden
   applies_to: Account
