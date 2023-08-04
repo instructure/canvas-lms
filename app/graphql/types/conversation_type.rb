@@ -62,6 +62,17 @@ module Types
       end
     end
 
+    field :conversation_messages_count, Int, null: false
+    def conversation_messages_count
+      scope = ConversationMessage
+              .where(conversation_id: object.id)
+              .joins(:conversation_message_participants)
+
+      scope.where(conversation_message_participants: { user_id: current_user.id, workflow_state: "active" })
+           .or(scope.where(conversation_message_participants: { user_id: current_user.id, workflow_state: nil }))
+           .select("distinct(conversation_messages.id)").count
+    end
+
     field :conversation_participants_connection, Types::ConversationParticipantType.connection_type, null: true
     def conversation_participants_connection
       load_association(:conversation_participants)
