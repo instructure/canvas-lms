@@ -67,6 +67,7 @@ export const GRADEBOOK_QUERY = gql`
             dropHighest
             dropLowest
           }
+          sisId
           state
           position
           assignmentsConnection(filter: {gradingPeriodId: null}) {

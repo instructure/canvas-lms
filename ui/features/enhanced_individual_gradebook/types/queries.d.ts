@@ -72,6 +72,7 @@ export type AssignmentGroupConnection = {
     drop_highest?: number
     never_drop?: string[]
   }
+  sisId: string | null
   state: string
   position: number
   assignmentsConnection: {

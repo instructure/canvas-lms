@@ -15,13 +15,51 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import $ from 'jquery'
 import React from 'react'
-// import {act, render, within} from '@testing-library/react'
+import {render} from '@testing-library/react'
+import AssignmentInformation, {AssignmentInformationComponentProps} from '..'
+import {assignmentInfoDefaultProps} from './fixtures'
 
 describe('Assignment Information Tests', () => {
-  it('runs', () => {
-    expect(true).toBe(true)
+  beforeEach(() => {
+    $.subscribe = jest.fn()
+  })
+  const renderAssignmentInformation = (props: AssignmentInformationComponentProps) => {
+    return render(<AssignmentInformation {...props} />)
+  }
+  describe('render tests', () => {
+    it('displayed default text when an assignment has not been selected', () => {
+      const props = {...assignmentInfoDefaultProps, assignment: undefined}
+      const {getByText} = renderAssignmentInformation(props)
+      expect(
+        getByText('Select an assignment to view additional information here.')
+      ).toBeInTheDocument()
+    })
+
+    it('displays the assignment name', () => {
+      const {name = ''} = assignmentInfoDefaultProps.assignment ?? {}
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      const assignmentNameNode = getByTestId('assignment-information-name')
+      expect(assignmentNameNode).toHaveAttribute(
+        'href',
+        assignmentInfoDefaultProps.assignment?.htmlUrl
+      )
+      expect(assignmentNameNode).toHaveTextContent(name)
+    })
+
+    it('displays the assignment speedgrader link', () => {
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
+      const speedGraderUrl = '/courses/1/gradebook/speed_grader?assignment_id=1'
+      const speedGraderUrlNode = getByTestId('assignment-speedgrader-link')
+      expect(speedGraderUrlNode).toHaveAttribute('href', speedGraderUrl)
+      expect(speedGraderUrlNode).toHaveTextContent('See this assignment in speedgrader')
+    })
+
+    it("displays the assignment's submission types", () => {
+      const {getByTestId} = renderAssignmentInformation({...assignmentInfoDefaultProps})
+      expect(getByTestId('assignment-submission-info')).toHaveTextContent('Online text entry')
+      expect(getByTestId('assignment-submission-info')).toHaveTextContent('Online upload')
+    })
   })
 })

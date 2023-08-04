@@ -98,8 +98,8 @@ export function mapAssignmentGroupQueryResults(
         rules: curr.rules,
         id: curr.id,
         position: curr.position,
-        integration_data: {}, // TODO: Get Data
-        sis_source_id: null, // TODO: Get data
+        integration_data: {},
+        sis_source_id: curr.sisId,
         invalid: totalGroupPoints === 0,
         gradingPeriodsIds: _.uniq(assignmentGroupGradingPeriods),
       }
