@@ -203,7 +203,6 @@ describe "Screenreader Gradebook grading" do
     end
 
     it "on resubmitted assignments" do
-      skip "unskip w/ EVAL-3360 BUG: resubmission message (This assignment has been resubmitted since it was graded) not displayed"
       # grade assignment
       assignment_1.grade_student(student, grade: 8, grader: teacher)
 
@@ -220,14 +219,14 @@ describe "Screenreader Gradebook grading" do
       EnhancedSRGB.select_assignment(assignment_1)
 
       # indicates assignment_1 was resubmitted
-      expect(f(".resubmitted.muted")).to include_text("This assignment has been resubmitted")
+      expect(f(".resubmitted_assignment_label")).to include_text("This assignment has been resubmitted")
 
       # grade the assignment again
       EnhancedSRGB.grade_srgb_assignment(EnhancedSRGB.main_grade_input, 10)
       EnhancedSRGB.tab_out_of_input(EnhancedSRGB.main_grade_input)
 
       # warning should be removed
-      expect(f("#content")).not_to contain_css(".resubmitted.muted em")
+      expect(f("#content")).not_to contain_css(".resubmitted_assignment_label")
     end
   end
 

@@ -244,6 +244,7 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     cachedDueDate: submission.cached_due_date,
     deductedPoints: submission.points_deducted,
     enteredGrade: submission.entered_grade,
+    gradeMatchesCurrentSubmission: submission.grade_matches_current_submission,
   }
 }
 
