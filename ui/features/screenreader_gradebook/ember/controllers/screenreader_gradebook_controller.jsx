@@ -1515,15 +1515,15 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   }.property('selectedAssignment'),
 
   submissionTypes: {
-    discussion_topic: I18n.t('discussion_topic', 'Discussion topic'),
-    online_quiz: I18n.t('online_quiz', 'Online quiz'),
-    on_paper: I18n.t('on_paper', 'On paper'),
-    none: I18n.t('none', 'None'),
-    external_tool: I18n.t('external_tool', 'External tool'),
-    online_text_entry: I18n.t('online_text_entry', 'Online text entry'),
-    online_url: I18n.t('online_url', 'Online URL'),
-    online_upload: I18n.t('online_upload', 'Online upload'),
-    media_recording: I18n.t('media_recordin', 'Media recording'),
+    discussion_topic: I18n.t('Discussion topic'),
+    online_quiz: I18n.t('Online quiz'),
+    on_paper: I18n.t('On paper'),
+    none: I18n.t('None'),
+    external_tool: I18n.t('External tool'),
+    online_text_entry: I18n.t('Online text entry'),
+    online_url: I18n.t('Online URL'),
+    online_upload: I18n.t('Online upload'),
+    media_recording: I18n.t('Media recording'),
   },
 
   assignmentIndex: function () {

@@ -173,7 +173,6 @@ describe "Screenreader Gradebook" do
   end
 
   it "can select an assignment" do
-    skip "unskip in EVAL-2852 submission types are shown in snake case instead of human readable"
     a1 = basic_percent_setup
     a2 = @course.assignments.create!(
       title: "Test 2",
