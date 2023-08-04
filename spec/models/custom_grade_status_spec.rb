@@ -149,7 +149,7 @@ describe CustomGradeStatus do
       course_with_student(account: root_account, active_all: true)
       @course.assignments.create!
       score = @course.enrollments.find_by(user: @student).scores.first
-      score.update!(custom_grade_status: @status)
+      score.update!(custom_grade_status: @status, override_score: 90.0)
       @status.deleted_by = user
       expect { @status.destroy }.to change { score.reload.custom_grade_status_id }.from(@status.id).to(nil)
     end

@@ -45,7 +45,12 @@ describe Mutations::UpsertCustomGradeStatus do
         }
       }
     GQL
-    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
+    context = {
+      current_user: user_executing,
+      domain_root_account: @course.root_account,
+      request: ActionDispatch::TestRequest.create,
+      session: {},
+    }
     CanvasSchema.execute(mutation_command, context:)
   end
 
@@ -86,10 +91,12 @@ describe Mutations::UpsertCustomGradeStatus do
       expect(result["_id"]).to eq CustomGradeStatus.first.id.to_s
     end
 
-    it "does not allow updating a custom grade status for another account" do
-      CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: Account.create!, created_by: @admin)
+    it "does not find a custom grade status for another account" do
+      new_account = Account.create!
+      new_admin = account_admin_user(account: new_account)
+      CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: new_account, created_by: new_admin)
       result = execute_with_input(update_query)
-      expect(result.dig("errors", 0, "message")).to eq "Insufficient permissions"
+      expect(result.dig("errors", 0, "message")).to eq "custom grade status not found"
     end
   end
 

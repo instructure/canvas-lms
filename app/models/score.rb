@@ -38,11 +38,17 @@ class Score < ActiveRecord::Base
             allow_nil: true
 
   validate :scorable_association_check
+  validate :must_be_overridden_to_have_custom_status
 
   before_validation :set_course_score, unless: :course_score_changed?
   before_save :set_root_account_id
 
   set_policy do
+    given do |user, _session|
+      course.grants_any_right?(user, :manage_grades)
+    end
+    can :read and can :update_custom_status
+
     given do |user, _session|
       (user&.id == enrollment.user_id && !course.hide_final_grades?) ||
         course.grants_any_right?(user, :manage_grades, :view_all_grades) ||
@@ -116,6 +122,12 @@ class Score < ActiveRecord::Base
   delegate :score_to_grade, to: :course
 
   private
+
+  def must_be_overridden_to_have_custom_status
+    if custom_grade_status_id && !overridden?
+      errors.add(:custom_grade_status_id, "cannot be set when the score is not overridden")
+    end
+  end
 
   def set_root_account_id
     self.root_account_id ||= enrollment&.root_account_id

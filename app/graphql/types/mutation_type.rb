@@ -49,6 +49,7 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the overridden final score for the associated enrollment, optionally limited to a specific
     grading period. This will supersede the computed final score/grade if present.
   MD
+  field :set_override_status, mutation: Mutations::SetOverrideStatus
   field :set_assignment_post_policy, <<~MD, mutation: Mutations::SetAssignmentPostPolicy
     Sets the post policy for the assignment.
   MD

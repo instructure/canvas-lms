@@ -45,7 +45,12 @@ describe Mutations::UpsertStandardGradeStatus do
         }
       }
     GQL
-    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
+    context = {
+      current_user: user_executing,
+      domain_root_account: @course.root_account,
+      request: ActionDispatch::TestRequest.create,
+      session: {},
+    }
     CanvasSchema.execute(mutation_command, context:)
   end
 
@@ -86,10 +91,10 @@ describe Mutations::UpsertStandardGradeStatus do
       expect(result["_id"]).to eq StandardGradeStatus.first.id.to_s
     end
 
-    it "does not allow updating a standard grade status for another account" do
+    it "does not find a standard grade status for another account" do
       StandardGradeStatus.create(status_name: "late", color: "#000000", root_account: Account.create!)
       result = execute_with_input(update_query)
-      expect(result.dig("errors", 0, "message")).to eq "Insufficient permissions"
+      expect(result.dig("errors", 0, "message")).to eq "standard grade status not found"
     end
   end
 
