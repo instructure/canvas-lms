@@ -224,6 +224,9 @@ class CoursePace < ActiveRecord::Base
       # Maintain the weights of the module items
       course_pace_module_items.each(&:restore_attributes)
 
+      # Explicitly complete the progress so we aren't left with any hanging progresses
+      progress.complete! if progress&.running?
+
       # Mark as published
       log_module_items_count
       update(workflow_state: "active", published_at: DateTime.current)
