@@ -188,7 +188,6 @@ describe "Screenreader Gradebook" do
   end
 
   it "displays/removes warning message for resubmitted assignments" do
-    skip "unskip w/ EVAL-3360 BUG resubmitted message is not displayed: This assignment has been resubmitted since it was graded last."
     assignment = basic_percent_setup
     assignment.submit_homework(@students[0], submission_type: "online_text_entry", body: "Hello!")
     assignment.grade_student(@students[0], grade: 12, grader: @teacher)
@@ -198,10 +197,10 @@ describe "Screenreader Gradebook" do
     EnhancedSRGB.visit(@course.id)
     EnhancedSRGB.select_assignment(assignment)
     EnhancedSRGB.select_student(@students[0])
-    expect(f("p.resubmitted")).to be_displayed
+    expect(f(".resubmitted_assignment_label")).to be_displayed
 
-    replace_content f("#student_and_assignment_grade"), "15\t"
-    expect(f("#content")).not_to contain_css("p.resubmitted")
+    replace_content EnhancedSRGB.main_grade_input, "15\t"
+    expect(f("#content")).not_to contain_css(".resubmitted_assignment_label")
   end
 
   it "grades match default gradebook grades" do

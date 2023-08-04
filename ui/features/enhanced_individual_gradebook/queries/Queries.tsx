@@ -153,6 +153,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           gradingPeriodId
           deductedPoints
           enteredGrade
+          gradeMatchesCurrentSubmission
         }
       }
     }

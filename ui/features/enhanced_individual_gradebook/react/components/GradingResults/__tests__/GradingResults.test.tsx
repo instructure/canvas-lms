@@ -442,4 +442,47 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('submission_details_grade_input')).not.toBeDisabled()
     })
   })
+  describe('the submission is resubmitted', () => {
+    let props: GradingResultsComponentProps
+    beforeEach(() => {
+      props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions:
+          gradingResultsDefaultProps.studentSubmissions?.map(submission => ({
+            ...submission,
+            gradeMatchesCurrentSubmission: false,
+          })) ?? undefined,
+      }
+    })
+    it('renders the assignment has been resubmitted text', () => {
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('resubmitted_assignment_label')).toHaveTextContent(
+        'This assignment has been resubmitted since it was graded last.'
+      )
+    })
+    it('does not render the assignment has been resubmitted text', () => {
+      const modifiedProps = {
+        ...props,
+        studentSubmissions:
+          props.studentSubmissions?.map(submission => ({
+            ...submission,
+            gradeMatchesCurrentSubmission: true,
+          })) ?? undefined,
+      }
+      const {queryByTestId} = renderGradingResults(modifiedProps)
+      expect(queryByTestId('resubmitted_assignment_label')).toBeNull()
+    })
+    it('does not render the assignment has been resubmitted text when assignment has not been graded', () => {
+      const modifiedProps = {
+        ...props,
+        studentSubmissions:
+          props.studentSubmissions?.map(submission => ({
+            ...submission,
+            gradeMatchesCurrentSubmission: null,
+          })) ?? undefined,
+      }
+      const {queryByTestId} = renderGradingResults(modifiedProps)
+      expect(queryByTestId('resubmitted_assignment_label')).toBeNull()
+    })
+  })
 })

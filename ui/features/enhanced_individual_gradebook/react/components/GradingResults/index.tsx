@@ -234,7 +234,7 @@ export default function GradingResults({
               handleSubmitGrade={submitGrade}
               handleChangePassFailStatus={handleChangePassFailStatus}
             />
-            <View as="div">
+            <View as="div" margin="small 0 0 0">
               {submission.late && (
                 <>
                   <View display="inline-block">
@@ -305,7 +305,21 @@ export default function GradingResults({
                 This grade is currently dropped for this student.
               </p>
             )}
-            <View as="div" className="span4" margin="medium 0 0 0" width="14.6rem">
+            {submission.gradeMatchesCurrentSubmission !== null &&
+              !submission.gradeMatchesCurrentSubmission && (
+                <View
+                  as="div"
+                  margin="large 0 0 0"
+                  className="resubmitted_assignment_label"
+                  data-testid="resubmitted_assignment_label"
+                >
+                  <Text color="secondary">
+                    {I18n.t('This assignment has been resubmitted since it was graded last.')}
+                  </Text>
+                </View>
+              )}
+
+            <View as="div" className="span4" margin="small 0 0 0" width="14.6rem">
               <Button
                 data-testid="submission-details-button"
                 display="block"
