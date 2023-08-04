@@ -34,11 +34,15 @@ module Gradebook
         user_id = enrollment_ids_to_user_ids[score.enrollment_id]
         score_map = map[user_id] ||= {}
 
+        custom_grade_status_id = score.custom_grade_status_id
+
         if score.course_score?
           score_map[:course_grade] = grade_info_from_score(score)
+          score_map[:course_grade][:custom_grade_status_id] = custom_grade_status_id
         else
           gp_map = score_map[:grading_period_grades] ||= {}
           gp_map[score.grading_period_id] = grade_info_from_score(score)
+          gp_map[score.grading_period_id][:custom_grade_status_id] = custom_grade_status_id
         end
       end
     end

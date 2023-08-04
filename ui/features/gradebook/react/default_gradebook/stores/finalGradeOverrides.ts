@@ -20,12 +20,30 @@ import {GetState, SetState} from 'zustand'
 import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
 import type {GradebookStore} from './index'
 import type {FinalGradeOverrideMap} from '@canvas/grading/grading.d'
+import type GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
+import type GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 
+type StudentInfo = {
+  id: string
+  avatarUrl: string
+  name: string
+  gradesUrl: string
+  enrollmentId: string
+}
 export type FinalGradeOverrideState = {
   allowFinalGradeOverride: boolean
   areFinalGradeOverridesLoaded: boolean
   finalGradeOverrides: FinalGradeOverrideMap
+  finalGradeOverrideTrayProps: {
+    gradeEntry?: GradeOverrideEntry
+    gradeInfo?: GradeOverrideInfo
+    isOpen: boolean
+    isFirstStudent: boolean
+    isLastStudent: boolean
+    studentInfo?: StudentInfo
+  }
   fetchFinalGradeOverrides: () => Promise<void>
+  toggleFinalGradeOverrideTray: (isOpen?: boolean) => void
 }
 
 export default (
@@ -46,6 +64,22 @@ export default (
           areFinalGradeOverridesLoaded: true,
         })
       }
+    })
+  },
+
+  finalGradeOverrideTrayProps: {
+    isOpen: false,
+    isFirstStudent: false,
+    isLastStudent: false,
+  },
+
+  toggleFinalGradeOverrideTray: (isOpen?: boolean): void => {
+    const existingProps = get().finalGradeOverrideTrayProps
+    set({
+      finalGradeOverrideTrayProps: {
+        ...existingProps,
+        isOpen: isOpen ?? !existingProps.isOpen,
+      },
     })
   },
 })

@@ -16,39 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {FinalGradeOverrideMap} from '@canvas/grading/grading'
 
-export type ApiResponse<T> = {
-  data: T
-  status: number
-  link?: {
-    next?: {
-      url: string
-    }
+export const gradeOverrideCustomStatus = (
+  finalGradeOverrides: FinalGradeOverrideMap,
+  studentId: string,
+  gradingPeriodId?: string
+): string | null | undefined => {
+  const overridesForStudent = finalGradeOverrides[studentId]
+  if (!overridesForStudent) return null
+
+  if (!gradingPeriodId || gradingPeriodId === '0') {
+    return overridesForStudent.courseGrade?.customGradeStatusId
   }
-}
 
-export type ApiRequest = {
-  path: string
-  method: string
-  body?: string | object
-  headers?: Record<string, string>
-}
-
-export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
-  const {json, response, link} = await doFetchApi(request)
-
-  return {
-    data: json as T,
-    status: (response as Response).status,
-    link,
-  }
-}
-
-export enum ApiCallStatus {
-  NOT_STARTED = 'NOT_STARTED',
-  NO_CHANGE = 'NO_CHANGE',
-  PENDING = 'PENDING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
+  return overridesForStudent.gradingPeriodGrades?.[gradingPeriodId]?.customGradeStatusId
 }

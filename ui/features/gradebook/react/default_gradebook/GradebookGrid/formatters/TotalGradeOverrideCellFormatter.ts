@@ -20,6 +20,8 @@
 import _ from 'underscore'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import type Gradebook from '../../Gradebook'
+import useStore from '../../stores'
+import {gradeOverrideCustomStatus} from '../../FinalGradeOverrides/FinalGradeOverride.utils'
 
 function renderStartContainer(gradeInfo) {
   let content = ''
@@ -30,13 +32,21 @@ function renderStartContainer(gradeInfo) {
   return `<div class="Grid__GradeCell__StartContainer">${content}</div>`
 }
 
-function render(formattedGrade, gradeInfo) {
+function render(formattedGrade, gradeInfo, studentId, selectedGradingPeriodId) {
   const escapedGrade = _.escape(formattedGrade)
+
+  const {finalGradeOverrides} = useStore.getState()
+  const customGradeStatusId = gradeOverrideCustomStatus(
+    finalGradeOverrides,
+    studentId,
+    selectedGradingPeriodId
+  )
+  const colorClass = customGradeStatusId ? `custom-grade-status-${customGradeStatusId}` : ''
 
   // xsslint safeString.identifier escapedGrade
   // xsslint safeString.function renderStartContainer
   return `
-    <div class="gradebook-cell">
+    <div class="gradebook-cell ${colorClass}">
       ${renderStartContainer(gradeInfo)}
       <div class="Grid__GradeCell__Content">
         <span class="Grade">${escapedGrade}</span>
@@ -49,6 +59,8 @@ function render(formattedGrade, gradeInfo) {
 type Getters = {
   getGradeInfoForUser(studentId: string): any
   formatGradeInfo(gradeInfo: any): string
+  customGradeStatusesEnabled: boolean
+  getSelectedGradingPeriodId(): string | null
 }
 
 export default class TotalGradeOverrideCellFormatter {
@@ -75,6 +87,10 @@ export default class TotalGradeOverrideCellFormatter {
       formatGradeInfo(gradeInfo) {
         return gradeEntry.formatGradeInfoForDisplay(gradeInfo)
       },
+      customGradeStatusesEnabled: gradebook.options.custom_grade_statuses_enabled,
+      getSelectedGradingPeriodId() {
+        return gradebook.gradingPeriodId
+      },
     }
 
     this.render = this.render.bind(this)
@@ -83,6 +99,8 @@ export default class TotalGradeOverrideCellFormatter {
   render(_row, _cell, _value, _columnDef, student /* dataContext */) {
     const gradeInfo = this.options.getGradeInfoForUser(student.id)
     const formattedGrade = this.options.formatGradeInfo(gradeInfo)
-    return render(formattedGrade, gradeInfo)
+    const studentId = this.options.customGradeStatusesEnabled ? student.id : null
+    const selectedGradingPeriodId = this.options.getSelectedGradingPeriodId()
+    return render(formattedGrade, gradeInfo, studentId, selectedGradingPeriodId)
   }
 }

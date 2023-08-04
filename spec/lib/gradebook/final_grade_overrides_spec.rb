@@ -56,6 +56,8 @@ describe Gradebook::FinalGradeOverrides do
     @assignment.grade_student(@student_1, grade: "85%", grader: @teacher)
     @assignment.grade_student(@student_2, grade: "85%", grader: @teacher)
     @assignment.grade_student(@test_student, grade: "85%", grader: @teacher)
+
+    @custom_status = CustomGradeStatus.create(name: "Test Status", color: "#000000", root_account: @course.root_account, created_by: @teacher)
   end
 
   it "includes user ids for each user with an overridden course grade" do
@@ -117,6 +119,16 @@ describe Gradebook::FinalGradeOverrides do
 
   it "returns an empty map when no students were given final grade overrides" do
     expect(final_grade_overrides).to be_empty
+  end
+
+  it "includes custom grade status id on the course grade & grading period grade" do
+    @student_enrollment_1.scores.find_by!(grading_period: @grading_period_1).update!(override_score: 90, custom_grade_status: @custom_status)
+    @student_enrollment_2.scores.find_by!(course_score: true).update!(override_score: 88, custom_grade_status: @custom_status)
+
+    grading_period_overrides = final_grade_overrides[@student_1.id][:grading_period_grades]
+    expect(grading_period_overrides[@grading_period_1.id][:custom_grade_status_id]).to equal(@custom_status.id)
+
+    expect(final_grade_overrides[@student_2.id][:course_grade][:custom_grade_status_id]).to equal(@custom_status.id)
   end
 
   describe "bulk updates" do
