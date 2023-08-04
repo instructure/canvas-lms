@@ -1252,8 +1252,8 @@ describe "Canvas Cartridge importing" do
       </media_tracks>
     XML
     expect(@converter.convert_media_tracks(doc)).to eql({
-                                                          "xyz" => [{ "migration_id" => "abc", "kind" => "subtitles", "locale" => "en" },
-                                                                    { "migration_id" => "def", "kind" => "subtitles", "locale" => "tlh" }]
+                                                          "xyz" => [{ "content" => "", "migration_id" => "abc", "kind" => "subtitles", "locale" => "en" },
+                                                                    { "content" => "", "migration_id" => "def", "kind" => "subtitles", "locale" => "tlh" }]
                                                         })
   end
 

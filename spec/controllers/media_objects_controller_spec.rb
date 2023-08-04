@@ -94,8 +94,6 @@ describe MediaObjectsController do
     end
 
     context "with media_links_use_attachment_id ON" do
-      before { Account.site_admin.enable_feature!(:media_links_use_attachment_id) }
-
       it "uses the correct json helper" do
         course_with_teacher_logged_in
         mo = MediaObject.create! media_id: "_media_id", course: @course
@@ -681,10 +679,6 @@ describe MediaObjectsController do
   end
 
   describe "index_media_attachments" do
-    before :once do
-      Account.site_admin.enable_feature!(:media_links_use_attachment_id)
-    end
-
     before do
       # We don't actually want to ping kaltura during these tests
       allow(MediaObject).to receive(:media_id_exists?).and_return(true)
@@ -990,7 +984,7 @@ describe MediaObjectsController do
         expect(media_attachment_api_json["can_add_captions"]).to be(true)
       end
 
-      it "returns false if the user cannot add captions to the media object" do
+      it "returns true as long as user can update attachment" do
         teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: @course.root_account.id)
         RoleOverride.create!(
           permission: "manage_content",
@@ -999,11 +993,11 @@ describe MediaObjectsController do
           account: @course.root_account
         )
         expect(@attachment.grants_right?(@teacher, :update)).to be(true)
-        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(false)
+        expect(@media_object.grants_right?(@teacher, :add_captions)).to be(true)
 
         user_session(@teacher)
         media_attachment_api_json = controller.media_attachment_api_json(@attachment, @media_object, @teacher, session)
-        expect(media_attachment_api_json["can_add_captions"]).to be(false)
+        expect(media_attachment_api_json["can_add_captions"]).to be(true)
       end
 
       it "returns false if the user cannot update the attachment" do

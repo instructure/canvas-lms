@@ -85,13 +85,13 @@ class MediaObject < ActiveRecord::Base
         ((self.user && self.user == user) || context&.grants_right?(user, :manage_content))
     end
     can :add_captions and can :delete_captions
-    ##################### End legacy permission block ##########################
 
     given do |user|
       !context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
-        Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && attachment.grants_right?(user, :update)
+        Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && attachment&.grants_right?(user, :update)
     end
     can :add_captions and can :delete_captions
+    ##################### End legacy permission block ##########################
 
     given do |user|
       context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
