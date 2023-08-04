@@ -232,11 +232,13 @@ export type FinalGradeOverride = {
   courseGrade?: {
     percentage?: number | null
     schemeKey?: string | null
+    customGradeStatusId?: string | null
   }
   gradingPeriodGrades?: {
     [gradingPeriodId: string]: {
       percentage?: number | null
       schemeKey?: string | null
+      customGradeStatusId?: string | null
     }
   }
 }

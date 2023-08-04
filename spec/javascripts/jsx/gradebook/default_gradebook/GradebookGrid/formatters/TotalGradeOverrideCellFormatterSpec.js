@@ -18,6 +18,7 @@
 
 import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import TotalGradeOverrideCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/TotalGradeOverrideCellFormatter'
+import useStore from 'ui/features/gradebook/react/default_gradebook/stores'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
@@ -184,6 +185,60 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
       test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
         gradebook.gradingPeriodId = '1502'
         equal(getGrade(), '–')
+      })
+    })
+
+    QUnit.module('when final grade override has custom status', hooks => {
+      function renderCustomStatusCell(gradingPeriodId = '0', featureFlagEnabled = true) {
+        gradebook.finalGradeOverrides._datastore.setGrades(finalGradeOverrides)
+        gradebook.options.custom_grade_statuses_enabled = featureFlagEnabled
+        gradebook.gradingPeriodId = gradingPeriodId
+        const formatter = new TotalGradeOverrideCellFormatter(gradebook)
+        $fixture.innerHTML = formatter.render(
+          0, // row
+          0, // cell
+          null, // value
+          null, // column definition
+          {id: '1101'} // student (dataContext)
+        )
+        return $fixture
+      }
+
+      hooks.beforeEach(() => {
+        useStore.setState({
+          finalGradeOverrides: {
+            1101: {
+              courseGrade: {
+                customGradeStatusId: '1',
+              },
+              gradingPeriodGrades: {
+                11: {
+                  customGradeStatusId: '2',
+                },
+              },
+            },
+          },
+        })
+      })
+
+      test('does not render cell color change when custom status FF is OFF', () => {
+        renderCustomStatusCell('0', false)
+        notOk($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1'))
+      })
+
+      test('renders the custom grade status cell color', () => {
+        renderCustomStatusCell()
+        ok($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-1'))
+      })
+
+      test('renders the custom grade status cell color for correct grading period', () => {
+        renderCustomStatusCell('11')
+        ok($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2'))
+      })
+
+      test('renders no color class when non existent grading period is passed', () => {
+        renderCustomStatusCell('12')
+        notOk($fixture.querySelector('.gradebook-cell').classList.contains('custom-grade-status-2'))
       })
     })
   })

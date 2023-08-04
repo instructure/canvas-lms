@@ -24,6 +24,29 @@ import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import FinalGradeOverrides from '../../../../FinalGradeOverrides/index'
 import TotalGradeOverrideCellPropFactory from '../TotalGradeOverrideCellPropFactory'
 import {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import useStore from '../../../../stores'
+
+const mockTotalGradeOverrideStore = () => {
+  jest.spyOn(useStore, 'getState').mockImplementation(() => {
+    return {
+      finalGradeOverrideTrayProps: {
+        isFirstStudent: false,
+        isLastStudent: false,
+        studentInfo: {
+          id: '1',
+          avatarUrl: 'https://canvas.instructure.com/images/messages/avatar-50.png',
+          name: 'Student, Test',
+          gradesUrl: 'https://canvas.instructure.com/courses/1/grades#tab-assignments',
+          enrollmentId: '222',
+        },
+        gradeInfo: new GradeOverrideInfo({}),
+        isOpen: false,
+      },
+    }
+  })
+
+  return jest.spyOn(useStore, 'setState')
+}
 
 describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
   let gradebook
@@ -67,6 +90,14 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
         studentCanReceiveGradeOverride(id) {
           return {1101: true, 1102: false}[id]
         },
+
+        gridData: {
+          rows: [{}, {}],
+        },
+
+        options: {
+          custom_grade_statuses_enabled: false,
+        },
       }
 
       gradebook.finalGradeOverrides = new FinalGradeOverrides(gradebook)
@@ -79,8 +110,25 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
       })
 
       editorOptions = {
-        item: {id: '1101'},
+        item: {
+          id: '1101',
+          name: 'Some Student',
+          avatar_url: 'https://canvas.instructure.com/images/messages/avatar-55.png',
+          enrollments: [
+            {
+              id: '222',
+              grades: {
+                html_url: 'https://canvas.instructure.com/courses/1101/grades',
+              },
+            },
+          ],
+        },
+        activeRow: 1,
       }
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
     })
 
     function getProps() {
@@ -165,6 +213,29 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
     it('sets .studentIsGradeable to false when the student is not gradeable', () => {
       editorOptions.item.id = '1102'
       expect(getProps().studentIsGradeable).toBe(false)
+    })
+
+    describe('finalGradeOverrideTrayProps state', () => {
+      it('correctly sets finalGradeOverrideTrayProps state', () => {
+        const mockSetState = mockTotalGradeOverrideStore()
+        const {gradeEntry, gradeInfo} = getProps()
+        expect(mockSetState).toHaveBeenLastCalledWith({
+          finalGradeOverrideTrayProps: {
+            isFirstStudent: false,
+            isLastStudent: true,
+            studentInfo: {
+              id: '1101',
+              avatarUrl: 'https://canvas.instructure.com/images/messages/avatar-55.png',
+              name: 'Some Student',
+              gradesUrl: 'https://canvas.instructure.com/courses/1101/grades#tab-assignments',
+              enrollmentId: '222',
+            },
+            isOpen: false,
+            gradeEntry,
+            gradeInfo,
+          },
+        })
+      })
     })
   })
 })

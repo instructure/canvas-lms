@@ -19,11 +19,26 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconExpandStartLine} from '@instructure/ui-icons'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {View} from '@instructure/ui-view'
 
 import GradeInput from '../GradeInput/GradeInput'
 import {gradeEntry, gradeInfo} from '../GradeInput/PropTypes'
 import CellEditorComponent from '../CellEditorComponent'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
+import useStore from '../../../stores'
+
+const I18n = useI18nScope('gradebook')
+
+const themeOverrides = {
+  [IconButton.theme]: {
+    iconPadding: '0 3px',
+    smallHeight: '23px',
+  },
+}
 
 export default class EditableCell extends CellEditorComponent {
   static propTypes = {
@@ -105,36 +120,53 @@ export default class EditableCell extends CellEditorComponent {
     const gradeIsInvalid = this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid
 
     return (
-      <div className={`Grid__GradeCell ${this.props.gradeEntry.enterGradesAs}`}>
-        <div className="Grid__GradeCell__StartContainer">
-          {gradeIsInvalid && (
-            <InvalidGradeIndicator
-              elementRef={ref => {
-                this.invalidGradeIndicator = ref
+      <ApplyTheme theme={themeOverrides}>
+        <div className={`Grid__GradeCell ${this.props.gradeEntry.enterGradesAs}`}>
+          <div className="Grid__GradeCell__StartContainer">
+            {gradeIsInvalid && (
+              <InvalidGradeIndicator
+                elementRef={ref => {
+                  this.invalidGradeIndicator = ref
+                }}
+              />
+            )}
+          </div>
+
+          <div
+            className="Grid__GradeCell__Content"
+            ref={ref => {
+              this.contentContainer = ref
+            }}
+          >
+            <GradeInput
+              disabled={this.props.gradeIsUpdating}
+              gradeEntry={this.props.gradeEntry}
+              gradeInfo={this.props.gradeInfo}
+              pendingGradeInfo={this.props.pendingGradeInfo}
+              ref={ref => {
+                this.gradeInput = ref
               }}
             />
-          )}
-        </div>
+          </div>
 
-        <div
-          className="Grid__GradeCell__Content"
-          ref={ref => {
-            this.contentContainer = ref
-          }}
-        >
-          <GradeInput
-            disabled={this.props.gradeIsUpdating}
-            gradeEntry={this.props.gradeEntry}
-            gradeInfo={this.props.gradeInfo}
-            pendingGradeInfo={this.props.pendingGradeInfo}
-            ref={ref => {
-              this.gradeInput = ref
-            }}
-          />
+          <View as="div" className="Grid__GradeCell__EndContainer">
+            {this.props.customGradeStatusesEnabled && (
+              <View as="div" className="Grid__GradeCell__Options">
+                <IconButton
+                  onClick={() => {
+                    const {toggleFinalGradeOverrideTray} = useStore.getState()
+                    toggleFinalGradeOverrideTray()
+                  }}
+                  size="small"
+                  renderIcon={IconExpandStartLine}
+                  color="secondary"
+                  screenReaderLabel={I18n.t('Open total grade override tray')}
+                />
+              </View>
+            )}
+          </View>
         </div>
-
-        <div className="Grid__GradeCell__EndContainer" />
-      </div>
+      </ApplyTheme>
     )
   }
 }
