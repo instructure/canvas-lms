@@ -79,5 +79,7 @@ module Types
     def enrollment
       load_association(:enrollment)
     end
+
+    field :custom_grade_status_id, ID, null: true
   end
 end

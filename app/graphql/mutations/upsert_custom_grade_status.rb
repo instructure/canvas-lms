@@ -27,8 +27,8 @@ module Mutations
     def resolve(input:)
       raise GraphQL::ExecutionError, "custom gradebook statuses feature flag is disabled" unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
 
-      root_account = context[:request].env["canvas.domain_root_account"] || LoadAccount.default_domain_root_account
-      custom_grade_status = input[:id] ? CustomGradeStatus.active.find(input[:id]) : CustomGradeStatus.new(root_account:, created_by: current_user)
+      root_account = context[:domain_root_account]
+      custom_grade_status = input[:id] ? root_account.custom_grade_statuses.active.find(input[:id]) : CustomGradeStatus.new(root_account:, created_by: current_user)
 
       required_permission = custom_grade_status.new_record? ? :create : :update
       unless custom_grade_status.grants_right?(current_user, session, required_permission)
