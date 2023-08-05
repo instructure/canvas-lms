@@ -867,6 +867,25 @@ describe ContentMigration do
           expect(MediaObject.where(media_id:).count).to eq 1
         end.to change { MediaTrack.count }.by(1)
       end
+
+      it "doesn't crash when another type of file is linked in HTML" do
+        img_att = attachment_model(context: @copy_from, uploaded_data: stub_png_data, filename: "homework.png")
+        media_id = "0_deadbeef"
+        media_object = course_factory.media_objects.create!(media_id:)
+        att = Attachment.create!(filename: "video.mp4", uploaded_data: StringIO.new("pixels and frames and stuff"), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+        att.media_entry_id = media_id
+        att.content_type = "video/mp4"
+        att.save!
+        att.media_tracks.create!(content: "en subs", media_object_id: media_object, kind: "subtitles", locale: "en", user_id: att.user_id)
+
+        @copy_from.announcements.create!(title: "links", message: <<~HTML)
+          <p><img src="/courses/#{@copy_from.id}/files/#{img_att.id}/preview" alt="assoc_1.png" /></p>
+          <p><iframe data-media-type="video" src="/media_attachments_iframe/#{att}?type=video" data-media-id="#{media_id}"></iframe></p>
+        HTML
+        run_course_copy
+
+        expect(@copy_to.attachments.find_by(filename: "video.mp4").media_tracks.length).to eq 1
+      end
     end
 
     it "imports calendar events" do
