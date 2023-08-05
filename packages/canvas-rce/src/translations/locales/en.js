@@ -32,6 +32,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Add another" },
   "add_cc_subtitles_55f0394e": { "message": "Add CC/Subtitles" },
   "add_image_60b2de07": { "message": "Add Image" },
+  "add_one_9e34a6f8": { "message": "Add one!" },
   "additional_considerations_f3801683": {
     "message": "Additional considerations"
   },
@@ -657,13 +658,31 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No accessibility issues were detected."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "No announcements created yet."
+  },
+  "no_announcements_found_20185afc": { "message": "No announcements found." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "No assignments created yet."
+  },
+  "no_assignments_found_79e46d7f": { "message": "No assignments found." },
   "no_changes_to_save_d29f6e91": { "message": "No changes to save." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "No discussions created yet."
+  },
+  "no_discussions_found_9284063b": { "message": "No discussions found." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No file chosen" },
   "no_headers_9bc7dc7f": { "message": "No headers" },
+  "no_modules_created_yet_c71b6d4d": { "message": "No modules created yet." },
+  "no_modules_found_2df43a40": { "message": "No modules found." },
+  "no_pages_created_yet_c379fa6e": { "message": "No pages created yet." },
+  "no_pages_found_6799350": { "message": "No pages found." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "No preview is available for this file."
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "No quizzes created yet." },
+  "no_quizzes_found_c80c537a": { "message": "No quizzes found." },
   "no_results_940393cf": { "message": "No results." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "No results found for { filterTerm }"
