@@ -15891,9 +15891,9 @@ es-ES:
   play_media_comment_8614d30f: "Reproducir comentario multimedia"
   play_media_comment_by_name_from_createdat_515b3b: "Reproducir comentario multimedia de %{name} desde %{createdAt}."
   playback: 
-    notes: Comentarios
+    notes: Anotaciones
     podcast: Podcast
-    presentation: Presentación
+    presentation: Grabación
     statistics: Estadísticas
     video: Vídeo
   please_add_a_due_date_1d433d2: "Añadir una fecha de entrega"
