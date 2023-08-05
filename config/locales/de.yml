@@ -6284,7 +6284,7 @@ de:
   choose_a_date_cd0263fe: "Wählen Sie ein Datum."
   choose_a_file_to_upload_a63bac0f: "Wählen Sie eine Datei zum Hochladen aus."
   choose_a_file_to_upload_from_your_device_d1b50d4c: "Wählen Sie eine Datei von Ihrem Gerät zum Hochladen aus"
-  choose_a_quiz_engine_8820d521: "Wählen eines Quizsystems"
+  choose_a_quiz_engine_8820d521: "Wählen Sie ein Quiz-System"
   choose_a_submission_type_8f45651a: "Wählen Sie eine Abgabeart"
   choose_a_timezone_d9c52998: "Eine Zeitzone auswählen"
   choose_additional_calendars_to_add_to_your_canvas__fdd2a72a: "Wählen Sie weitere Kalender aus, um sie zu Ihrem Canvas-Kalender hinzuzufügen."
@@ -12560,7 +12560,7 @@ de:
   final_grade_6e94d99e: "Gesamtnote:"
   final_grade_a22c596: "endgültige Note"
   final_grade_info_2aa35d25: Gesamtnoteninfo
-  final_grade_override_be8a21cd: "Außerkraftsetzen der Gesamtnote"
+  final_grade_override_be8a21cd: "Überschreiben der Gesamtnote"
   final_grade_override_in_gradebook_history_767147c: "Überschreiben der Gesamtnote im Notenbuchverlauf"
   final_grade_score_fe69a301: "Abschlussnote: %{score}"
   final_grade_with_teacher_notes_33c8de7c: "Abschlussnote mit Lehrendenoten"
@@ -20569,7 +20569,7 @@ de:
   outcomes_service_alignment_migration_5b4391ad: "Migration für Serviceausrichtung für Lernergebnisse"
   outcomes_tutorial_tray_ebfce995: "Fach für Lernergebnis-Tutorials"
   over_time_bee1a733: "im Lauf der Zeit"
-  override_3de65b2c: "Außer Kraft setzen"
+  override_3de65b2c: Überschreiben
   override_grade_385adf30: "Note überschreiben"
   override_score_53994655: "Punktzahl überschreiben"
   override_score_5f3c1189: "Punktzahl überschreiben"
@@ -21138,7 +21138,7 @@ de:
           
           Für jede/n veröffentlichte/n Studierende\*n gibt es in der CSV-Datei eine oder mehrere Zeilen. Das heißt, es gibt eine Zeile für jede Anmeldung die die/der Studierende\*r im Stammkonto des Kurses hat.  In den meisten Fällen gibt es eine Zeile pro Kursteilnehmer\*in. Falls die/der Studierende\*r jedoch mehrere Anmeldungen hat, gibt es für jede Anmeldung eine Zeile.
           
-          Falls mit der Option „Überschreiben der Gesamtnote zulassen“ die Funktion zum Außerkraftsetzen der Gesamtnote aktiviert ist, erhalten Studierenden mit einer geänderten Note/Punktzahl diese, anstelle der errechneten Punktzahl und Note.
+          Falls mit der Option „Überschreiben der Gesamtnote zulassen“ die Funktion zum Überschreiben der Gesamtnote aktiviert ist, erhalten Studierenden mit einer geänderten Note/Punktzahl diese, anstelle der errechneten Punktzahl und Note.
       labels: 
         format_type: Ausgabeformattyp
         include_final_grade_overrides: "Überschreiben der Gesamtnote zulassen"
