@@ -16810,9 +16810,9 @@ ca:
   play_media_comment_8614d30f: "Reprodueix el comentari multimèdia"
   play_media_comment_by_name_from_createdat_515b3b: "Reprodueix el comentari multimèdia de %{name} enviat el %{createdAt}."
   playback: 
-    notes: Comentaris
+    notes: Anotacions
     podcast: Podcast
-    presentation: Presentació
+    presentation: Enregistrament
     statistics: Estadístiques
     video: Vídeo
   please_add_a_due_date_1d433d2: "Afegiu una data de lliurament"
