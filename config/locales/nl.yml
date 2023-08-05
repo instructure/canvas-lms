@@ -3996,8 +3996,8 @@ nl:
   assignment_comments_e43ed898: "Commentaren op opdracht"
   assignment_configuration_4153cb88: Opdrachtconfiguratie
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} is beoordeeld voor %{name}."
-  assignment_created_assignment_name_course_name_324a5639: "Opdracht gemaakt - %{assignment_name}, %{course_name}"
-  assignment_created_b3ee04d7: "Opdracht gemaakt"
+  assignment_created_assignment_name_course_name_324a5639: "Opdracht aangemaakt - %{assignment_name}, %{course_name}"
+  assignment_created_b3ee04d7: "Opdracht aangemaakt"
   assignment_d8387b78: opdracht
   assignment_dates_dccc98de: Opdrachtdatums
   assignment_dates_saved_successfully_78e0f355: "Opdrachtdatums zijn opgeslagen."
@@ -19926,7 +19926,7 @@ nl:
       appointment_reserved_by_user: "Afspraak gereserveerd door de gebruiker"
       appointment_reserved_for_user: "Afspraak gereserveerd voor de gebruiker"
       assignment_changed: "Opdracht gewijzigd"
-      assignment_created: "Opdracht gemaakt"
+      assignment_created: "Opdracht aangemaakt"
       assignment_due_date_changed: "Inleverdatum voor opdracht gewijzigd"
       assignment_due_date_override_changed: "Overschrijving van inleverdatum voor opdracht gewijzigd"
       assignment_graded: "Opdracht beoordeeld"
