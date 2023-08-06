@@ -21,6 +21,7 @@ import '../tinymce/hy'
 
 const locale = {
   "add_8523c19b": { "message": "Ավելացնել" },
+  "add_one_9e34a6f8": { "message": "Մեկն ավելացնել" },
   "all_4321c3a1": { "message": "Բոլորը" },
   "alpha_15d59033": { "message": "Alpha" },
   "announcement_fb4cb645": { "message": "Հայտարարություն" },
@@ -135,6 +136,7 @@ const locale = {
   "new_quiz_34aacba6": { "message": "Նոր թեստ" },
   "next_40e12421": { "message": "Հաջորդը" },
   "no_e16d9132": { "message": "Ոչ" },
+  "no_pages_created_yet_c379fa6e": { "message": "Դեռևս ոչ մի էջ չի ստեղծվել:" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Այս ֆայլի նախնական դիտումը հասանելի չէ:"
   },
