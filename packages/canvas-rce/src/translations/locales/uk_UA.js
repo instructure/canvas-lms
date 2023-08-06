@@ -22,6 +22,7 @@ import '../tinymce/uk_UA'
 const locale = {
   "accessibility_checker_b3af1f6c": { "message": "Перевірка доступності" },
   "add_8523c19b": { "message": "Додати" },
+  "add_one_9e34a6f8": { "message": "Додати одного!" },
   "align_11050992": { "message": "Вирівняти" },
   "all_4321c3a1": { "message": "Всі" },
   "alpha_15d59033": { "message": "Альфа" },
@@ -166,6 +167,7 @@ const locale = {
   "new_quiz_34aacba6": { "message": "Нова контрольна робота" },
   "next_40e12421": { "message": "Далі" },
   "no_e16d9132": { "message": "Ні" },
+  "no_pages_created_yet_c379fa6e": { "message": "Немає створених сторінок." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Попередній перегляд  для цього файлу недоступний."
   },

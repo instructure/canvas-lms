@@ -21,6 +21,7 @@ import '../tinymce/he_IL'
 
 const locale = {
   "add_8523c19b": { "message": "הוספה" },
+  "add_one_9e34a6f8": { "message": "הוספת אחד!" },
   "all_4321c3a1": { "message": "כל" },
   "alpha_15d59033": { "message": "אלפא" },
   "an_error_occurred_making_a_network_request_d1bda348": {
@@ -139,6 +140,7 @@ const locale = {
   "new_quiz_34aacba6": { "message": "בוחן חדש" },
   "next_40e12421": { "message": "הבא" },
   "no_e16d9132": { "message": "לא" },
+  "no_pages_created_yet_c379fa6e": { "message": "לא נוצרו עדיין דפים" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "אין תצוגה מקדימה לקובץ זה"
   },
