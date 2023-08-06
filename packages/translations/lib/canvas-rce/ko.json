@@ -1,5 +1,6 @@
 {
   "add_8523c19b": { "message": "추가" },
+  "add_one_9e34a6f8": { "message": "추가하기!" },
   "all_4321c3a1": { "message": "전부" },
   "alpha_15d59033": { "message": "알파" },
   "announcement_fb4cb645": { "message": "공지 사항" },
@@ -79,6 +80,9 @@
   "new_quiz_34aacba6": { "message": "새 퀴즈" },
   "next_40e12421": { "message": "다음" },
   "no_e16d9132": { "message": "아니요" },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "아직 페이지를 만들지 않았습니다."
+  },
   "no_results_940393cf": { "message": "No results." },
   "none_3b5e34d2": { "message": "없음" },
   "operators_a2ef9a93": { "message": "연산자" },

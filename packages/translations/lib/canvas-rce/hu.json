@@ -7,6 +7,7 @@
   "add_another_f4e50d57": { "message": "Másik hozzáadása" },
   "add_cc_subtitles_55f0394e": { "message": "Felirat hozzáadása" },
   "add_image_60b2de07": { "message": "Kép hozzáadása" },
+  "add_one_9e34a6f8": { "message": "Adjon hozzá egyet!" },
   "additional_considerations_f3801683": { "message": "További szempontok" },
   "aleph_f4ffd155": { "message": "Aleph" },
   "align_11050992": { "message": "Igazítás" },
@@ -509,6 +510,9 @@
   "no_changes_to_save_d29f6e91": { "message": "Nincs mentendő módosítás." },
   "no_e16d9132": { "message": "Nem" },
   "no_file_chosen_9a880793": { "message": "Nincs fájl kiválasztva" },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Még nincsenek oldalak létrehozva."
+  },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Ehhez a fájlhoz nincs előnézet."
   },

@@ -17,6 +17,9 @@
     "add_image_60b2de07": {
         "message": "Kép hozzáadása"
     },
+    "add_one_9e34a6f8": {
+        "message": "Adjon hozzá egyet!"
+    },
     "additional_considerations_f3801683": {
         "message": "További szempontok"
     },
@@ -1237,6 +1240,9 @@
     },
     "no_file_chosen_9a880793": {
         "message": "Nincs fájl kiválasztva"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Még nincsenek oldalak létrehozva."
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Ehhez a fájlhoz nincs előnézet."

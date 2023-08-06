@@ -12,6 +12,7 @@
   "add_another_f4e50d57": { "message": "Legg til ei ny" },
   "add_cc_subtitles_55f0394e": { "message": "Legg til undertekstar" },
   "add_image_60b2de07": { "message": "Legg til bilde" },
+  "add_one_9e34a6f8": { "message": "Legg til ein." },
   "additional_considerations_f3801683": { "message": "Ekstra omsyn" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Nabolenker med samme URL bør være ei lenke."
@@ -594,6 +595,7 @@
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen filer er valde" },
   "no_headers_9bc7dc7f": { "message": "Ingen overskrifter" },
+  "no_pages_created_yet_c379fa6e": { "message": "Ingen sider er oppretta." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Førehandsvising er ikkje tilgjengeleg for denne fila."
   },
