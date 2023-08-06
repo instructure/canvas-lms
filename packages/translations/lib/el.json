@@ -2,6 +2,9 @@
     "add_8523c19b": {
         "message": "Πρόσθεση"
     },
+    "add_one_9e34a6f8": {
+        "message": "Προσθήκη!"
+    },
     "all_4321c3a1": {
         "message": "Όλα"
     },
@@ -274,6 +277,9 @@
     },
     "no_e16d9132": {
         "message": "μη δημοσιευμένο"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Δεν έχουν δημιουργηθεί σελίδες ακόμη."
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Δεν υπάρχει διαθέσιμη προεπισκόπηση για αυτό το αρχείο."

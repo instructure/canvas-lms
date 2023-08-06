@@ -2,6 +2,9 @@
     "add_8523c19b": {
         "message": "הוספה"
     },
+    "add_one_9e34a6f8": {
+        "message": "הוספת אחד!"
+    },
     "all_4321c3a1": {
         "message": "כל"
     },
@@ -295,6 +298,9 @@
     },
     "no_e16d9132": {
         "message": "לא"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "לא נוצרו עדיין דפים"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "אין תצוגה מקדימה לקובץ זה"

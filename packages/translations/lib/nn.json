@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Legg til bilde"
     },
+    "add_one_9e34a6f8": {
+        "message": "Legg til ein."
+    },
     "additional_considerations_f3801683": {
         "message": "Ekstra omsyn"
     },
@@ -1378,6 +1381,9 @@
     },
     "no_headers_9bc7dc7f": {
         "message": "Ingen overskrifter"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Ingen sider er oppretta."
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Førehandsvising er ikkje tilgjengeleg for denne fila."

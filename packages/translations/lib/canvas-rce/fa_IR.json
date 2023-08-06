@@ -1,5 +1,6 @@
 {
   "add_8523c19b": { "message": "افزودن" },
+  "add_one_9e34a6f8": { "message": "افزودن یک مورد!" },
   "additional_considerations_f3801683": { "message": "ملاحظات اضافی" },
   "all_4321c3a1": { "message": "همه" },
   "alpha_15d59033": { "message": "آلفا" },
@@ -139,6 +140,9 @@
   "new_quiz_34aacba6": { "message": "آزمون جدید" },
   "next_40e12421": { "message": "بعدی" },
   "no_e16d9132": { "message": "خیر" },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "هنوز هیچ صفحه ای ایجاد نشده است"
+  },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "هیچ پیش نمایشی برای این فایل موجود نیست."
   },

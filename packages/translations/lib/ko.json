@@ -2,6 +2,9 @@
     "add_8523c19b": {
         "message": "추가"
     },
+    "add_one_9e34a6f8": {
+        "message": "추가하기!"
+    },
     "all_4321c3a1": {
         "message": "전부"
     },
@@ -217,6 +220,9 @@
     },
     "no_e16d9132": {
         "message": "아니요"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "아직 페이지를 만들지 않았습니다."
     },
     "no_results_940393cf": {
         "message": "No results."
