@@ -146,12 +146,12 @@ export default function FrequencyPicker({
   }, [initialFrequency])
 
   useEffect(() => {
-    const newMoment = moment(date)
+    const newMoment = moment.tz(date, timezone)
     setParsedMoment(newMoment)
     if (frequency !== 'custom' && frequency !== 'saved-custom') {
       setCurrRRule(generateFrequencyRRule(frequency, newMoment))
     }
-  }, [date, frequency])
+  }, [date, frequency, timezone])
 
   useEffect(() => {
     const newOpts = generateFrequencyOptions(parsedMoment, locale, timezone, customRRule)
