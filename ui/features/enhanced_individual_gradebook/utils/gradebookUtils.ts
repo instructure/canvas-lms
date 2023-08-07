@@ -218,6 +218,8 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
     submissionType: submission.submission_type,
     state: submission.workflow_state,
     cachedDueDate: submission.cached_due_date,
+    deductedPoints: submission.points_deducted,
+    enteredGrade: submission.entered_grade,
   }
 }
 

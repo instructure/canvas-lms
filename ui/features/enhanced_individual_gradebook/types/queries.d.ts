@@ -170,6 +170,8 @@ export type GradebookUserSubmissionDetails = {
   redoRequest: boolean
   cachedDueDate: string | null
   gradingPeriodId?: string
+  deductedPoints: null | string | number
+  enteredGrade: string | null
 }
 
 export type GradebookStudentQueryResponse = {

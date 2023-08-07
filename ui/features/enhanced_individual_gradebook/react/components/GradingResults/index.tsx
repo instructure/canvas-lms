@@ -37,10 +37,11 @@ import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
 import {outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
-type Props = {
+export type GradingResultsComponentProps = {
   currentStudent?: GradebookStudentDetails
   studentSubmissions?: GradebookUserSubmissionDetails[]
   assignment?: AssignmentConnection
@@ -60,7 +61,7 @@ export default function GradingResults({
   loadingStudent,
   currentStudentHiddenName,
   onSubmissionSaved,
-}: Props) {
+}: GradingResultsComponentProps) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
   const [gradeInput, setGradeInput] = useState<string>('')
   const [excusedChecked, setExcusedChecked] = useState<boolean>(false)
@@ -76,7 +77,7 @@ export default function GradingResults({
   useEffect(() => {
     if (submission) {
       setExcusedChecked(submission.excused)
-      setGradeInput(submission.excused ? I18n.t('Excused') : submission.grade ?? '-')
+      setGradeInput(submission.excused ? I18n.t('Excused') : submission.enteredGrade ?? '-')
     }
   }, [submission])
 
@@ -179,7 +180,7 @@ export default function GradingResults({
               </Text>
             </View>
 
-            <View as="div" className="grade">
+            <View as="div" className="grade" margin="0 0 small 0">
               <TextInput
                 display="inline-block"
                 width="14rem"
@@ -193,6 +194,53 @@ export default function GradingResults({
               <View as="span" margin="0 0 0 small">
                 {outOfText(assignment, submission)}
               </View>
+            </View>
+
+            <View as="div">
+              {submission.late && (
+                <>
+                  <View display="inline-block">
+                    <View
+                      data-testid="submission_late_penalty_label"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text color="danger">{I18n.t('Late Penalty')}</Text>
+                    </View>
+                    <View
+                      data-testid="late_penalty_final_grade_label"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text>{I18n.t('Final Grade')}</Text>
+                    </View>
+                  </View>
+                  <View display="inline-block">
+                    <View
+                      data-testid="submission_late_penalty_value"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text color="danger">
+                        {!Number.isNaN(Number(submission.deductedPoints))
+                          ? I18n.n(-Number(submission.deductedPoints)) || ' -'
+                          : ' -'}
+                      </Text>
+                    </View>
+                    <View
+                      data-testid="late_penalty_final_grade_value"
+                      as="div"
+                      padding="0 0 0 small"
+                    >
+                      <Text>
+                        {submission.grade != null
+                          ? GradeFormatHelper.formatGrade(submission.grade)
+                          : ' -'}
+                      </Text>
+                    </View>
+                  </View>
+                </>
+              )}
             </View>
 
             {assignment.gradingType !== 'pass_fail' && (

@@ -32,6 +32,14 @@ class EnhancedSRGB
       f('[data-testid="student_and_assignment_grade_input"]')
     end
 
+    def submission_late_penalty_label
+      f('[data-testid="submission_late_penalty_label"]')
+    end
+
+    def late_penalty_final_grade_label
+      f('[data-testid="late_penalty_final_grade_label"]')
+    end
+
     def excuse_checkbox
       f("#excuse_assignment")
     end

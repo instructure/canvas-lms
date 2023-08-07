@@ -173,13 +173,12 @@ describe "Screenreader Gradebook grading" do
     end
 
     it "on late submissions" do
-      skip "unskip w/ EVAL-3358 BUG: late submissions do not have late penalty and final grade displayed"
       login_to_srgb
       EnhancedSRGB.select_assignment(assignment_1)
 
       expect(EnhancedSRGB.submission_status_pill).to include_text("LATE")
-      expect(f(".submission_late_penalty")).to include_text("Late Penalty")
-      expect(f(".submission_final_grade")).to include_text("Final Grade")
+      expect(EnhancedSRGB.submission_late_penalty_label).to include_text("Late Penalty")
+      expect(EnhancedSRGB.late_penalty_final_grade_label).to include_text("Final Grade")
     end
 
     it "on missing submissions" do

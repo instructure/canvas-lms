@@ -135,6 +135,8 @@ const GRADEBOOK_STUDENT_QUERY_MOCK_RESPONSE = {
             userId: '5',
             cachedDueDate: '2023-05-12T23:59:59-06:00',
             gradingPeriodId: '1',
+            deductedPoints: null,
+            enteredGrade: '68%',
           },
         ],
       },
