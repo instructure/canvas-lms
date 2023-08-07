@@ -208,8 +208,10 @@ class ContentTag < ActiveRecord::Base
       klass = type.constantize
       next unless klass < ActiveRecord::Base
 
-      if klass.new.respond_to?(:could_be_locked=)
-        klass.where(id: ids).update_all_locked_in_order(could_be_locked: true)
+      next unless klass.new.respond_to?(:could_be_locked=)
+
+      ids.sort.each_slice(1000) do |slice|
+        klass.where(id: slice).update_all_locked_in_order(could_be_locked: true)
       end
     end
   end
