@@ -64,6 +64,7 @@ Rails.configuration.to_prepare do
         AuthenticationMethods::AccessTokenScopeError
         AuthenticationMethods::LoggedOutError
         ActionController::InvalidAuthenticityToken
+        Delayed::Backend::JobExpired
         Folio::InvalidPage
         Turnitin::Errors::SubmissionNotScoredError
         Rack::QueryParser::InvalidParameterError
