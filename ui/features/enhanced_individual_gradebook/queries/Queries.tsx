@@ -150,6 +150,8 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
           userId
           cachedDueDate
           gradingPeriodId
+          deductedPoints
+          enteredGrade
         }
       }
     }
