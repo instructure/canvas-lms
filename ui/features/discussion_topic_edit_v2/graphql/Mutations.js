@@ -87,7 +87,7 @@ export const CREATE_GROUP_CATEGORY = gql`
     $contextId: ID!
     $contextType: String!
     $name: String
-    $selfSignUp: String
+    $selfSignup: String
     $numberOfGroups: Int
     $numberOfStudentsPerGroup: Int
     $autoLeader: String
@@ -99,7 +99,7 @@ export const CREATE_GROUP_CATEGORY = gql`
         contextId: $contextId
         contextType: $contextType
         name: $name
-        selfSignup: $selfSignUp
+        selfSignup: $selfSignup
         numberOfGroups: $numberOfGroups
         numberOfStudentsPerGroup: $numberOfStudentsPerGroup
         autoLeader: $autoLeader

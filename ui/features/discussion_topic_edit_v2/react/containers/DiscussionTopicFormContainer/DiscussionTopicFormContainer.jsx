@@ -80,7 +80,7 @@ export default function DiscussionTopicFormContainer() {
       // addToTodo,
       todoDate,
       // isGroupDiscussion,
-      // groupSetId,
+      // groupCategoryId,
       availableFrom,
       availableUntil,
       shouldPublish,

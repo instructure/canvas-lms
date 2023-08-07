@@ -19,13 +19,13 @@
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import CreateGroupCategoryModal from '../CreateGroupCategoryModal'
+import GroupCategoryModal from '../GroupCategoryModal'
 
 const setup = (onSubmit = jest.fn()) => {
-  return render(<CreateGroupCategoryModal show={true} onSubmit={onSubmit} />)
+  return render(<GroupCategoryModal show={true} onSubmit={onSubmit} />)
 }
 
-describe('CreateGroupCategoryModal', () => {
+describe('GroupCategoryModal', () => {
   it('renders', () => {
     const {getByText} = setup()
     expect(getByText('Group Set Name')).toBeInTheDocument()

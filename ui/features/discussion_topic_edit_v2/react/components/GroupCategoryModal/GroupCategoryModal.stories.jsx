@@ -16,24 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-
-import CreateGroupCategoryModalContainer from './CreateGroupCategoryModalContainer'
+import React, {useState, useCallback} from 'react'
+import GroupCategoryModal from './GroupCategoryModal'
 import {Button} from '@instructure/ui-buttons'
 
 export default {
-  title: 'Examples/Discussion Create\\Edit/Components/CreateGroupCategoryModalContainer',
-  component: CreateGroupCategoryModalContainer,
+  title: 'Examples/Discussion Create\\Edit/Components/GroupCategoryModal',
+  component: GroupCategoryModal,
   argTypes: {},
 }
 
 export function Primary() {
+  const [color, setColor] = useState(null)
+
   const [show, setShow] = useState(false)
 
+  const onSubmit = useCallback(({groupName: newColor}) => {
+    setColor(newColor)
+  }, [])
+
   return (
-    <div style={{padding: '100px'}}>
-      <Button onClick={() => setShow(!show)}>Create New Group Category</Button>
-      <CreateGroupCategoryModalContainer show={show} setShow={setShow} />
+    <div style={{backgroundColor: color, padding: '100px'}}>
+      <Button onClick={() => setShow(!show)}>Open Modal</Button>
+      <GroupCategoryModal show={show} setShow={setShow} onSubmit={onSubmit} />
     </div>
   )
 }
+Primary.args = {}

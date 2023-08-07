@@ -35,18 +35,18 @@ import {useScope as usei18NScope} from '@canvas/i18n'
 
 const I18N = usei18NScope('discussion_create')
 
-export default function CreateGroupCategoryModal({show, setShow, onSubmit}) {
+export default function GroupCategoryModal({show, setShow, onSubmit}) {
   const defaultFocusElementRef = useRef(null)
 
   // Form properties
   const [groupName, setGroupName] = useState('')
   const [groupStructure, setGroupStructure] = useState('')
-  const [allowSelfSignUp, setAllowSelfSignUp] = useState(false)
+  const [allowSelfSignup, setAllowSelfSignup] = useState(false)
   const [requireSameSection, setRequireSameSection] = useState(false)
   const [autoAssignGroupLeader, setAutoAssignGroupLeader] = useState(false)
   const [numberOfGroups, setNumberOfGroups] = useState(0)
   const [numberOfStudentsPerGroup, setNumberOfStudentsPerGroup] = useState(0)
-  const [groupLeaderAssignmentMethod, setGroupLeaderAssignmentMethod] = useState('')
+  const [groupLeaderAssignmentMethod, setGroupLeaderAssignmentMethod] = useState(null)
 
   const handleNumberChange = (
     value,
@@ -66,19 +66,19 @@ export default function CreateGroupCategoryModal({show, setShow, onSubmit}) {
   const clearFields = () => {
     setGroupName('')
     setGroupStructure('')
-    setAllowSelfSignUp(false)
+    setAllowSelfSignup(false)
     setRequireSameSection(false)
     setAutoAssignGroupLeader(false)
     setNumberOfGroups(0)
     setNumberOfStudentsPerGroup(0)
-    setGroupLeaderAssignmentMethod('')
+    setGroupLeaderAssignmentMethod(null)
   }
 
   const submitForm = () => {
     onSubmit({
       groupName,
       groupStructure,
-      allowSelfSignUp,
+      allowSelfSignup,
       requireSameSection,
       autoAssignGroupLeader,
       numberOfGroups,
@@ -148,19 +148,19 @@ export default function CreateGroupCategoryModal({show, setShow, onSubmit}) {
               <Checkbox
                 label={I18N.t('Allow')}
                 value="allow"
-                checked={allowSelfSignUp}
+                checked={allowSelfSignup}
                 onChange={event => {
                   const checked = event.target.checked
                   setRequireSameSection(checked && requireSameSection)
                   setAutoAssignGroupLeader(checked && autoAssignGroupLeader)
-                  setGroupLeaderAssignmentMethod(checked ? groupLeaderAssignmentMethod : '')
-                  setAllowSelfSignUp(checked)
+                  setGroupLeaderAssignmentMethod(checked ? groupLeaderAssignmentMethod : null)
+                  setAllowSelfSignup(checked)
                 }}
               />
               <Checkbox
                 label={I18N.t('Require group members to be in the same section')}
                 value="same-section"
-                disabled={!allowSelfSignUp}
+                disabled={!allowSelfSignup}
                 checked={requireSameSection}
                 onChange={event => setRequireSameSection(event.target.checked)}
               />
@@ -241,7 +241,7 @@ export default function CreateGroupCategoryModal({show, setShow, onSubmit}) {
                 }
               />
             ) : null}
-            {allowSelfSignUp ? (
+            {allowSelfSignup ? (
               <FormFieldGroup description={I18N.t('Leadership')} rowSpacing="small">
                 <Checkbox
                   label={I18N.t('Automatically assign a student group leader')}
@@ -249,7 +249,7 @@ export default function CreateGroupCategoryModal({show, setShow, onSubmit}) {
                   checked={autoAssignGroupLeader}
                   onChange={event => {
                     const checked = event.target.checked
-                    setGroupLeaderAssignmentMethod(checked ? groupLeaderAssignmentMethod : '')
+                    setGroupLeaderAssignmentMethod(checked ? groupLeaderAssignmentMethod : null)
                     setAutoAssignGroupLeader(checked)
                   }}
                 />
@@ -288,13 +288,13 @@ export default function CreateGroupCategoryModal({show, setShow, onSubmit}) {
   )
 }
 
-CreateGroupCategoryModal.propTypes = {
+GroupCategoryModal.propTypes = {
   show: PropTypes.bool,
   setShow: PropTypes.func,
   onSubmit: PropTypes.func,
 }
 
-CreateGroupCategoryModal.defaultProps = {
+GroupCategoryModal.defaultProps = {
   show: false,
   setShow: () => {},
   onSubmit: () => {},
