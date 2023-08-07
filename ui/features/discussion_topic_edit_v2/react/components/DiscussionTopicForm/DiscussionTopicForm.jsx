@@ -19,6 +19,7 @@
 import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
+import GroupCategoryModalContainer from '../../containers/GroupCategoryModalContainer/GroupCategoryModalContainer'
 import {useScope as usei18NScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
@@ -70,7 +71,7 @@ export default function DiscussionTopicForm({
   const [addToTodo, setAddToTodo] = useState(false)
   const [todoDate, setTodoDate] = useState(null)
   const [isGroupDiscussion, setIsGroupDiscussion] = useState(false)
-  const [groupSetId, setGroupSetId] = useState(null)
+  const [groupCategoryId, setGroupCategoryId] = useState(null)
 
   const [availableFrom, setAvailableFrom] = useState(null)
   const [availableUntil, setAvailableUntil] = useState(null)
@@ -88,6 +89,8 @@ export default function DiscussionTopicForm({
   // const [peerReviewAssignment, setPeerReviewAssignment] = useState('off')
   // const [assignTo, setAssignTo] = useState('')
   // const [dueDate, setDueDate] = useState(0)
+
+  const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
 
   useEffect(() => {
     if (!isEditing || !currentDiscussionTopic) return
@@ -108,7 +111,7 @@ export default function DiscussionTopicForm({
     setAddToTodo(!!currentDiscussionTopic.todoDate)
     setTodoDate(currentDiscussionTopic.todoDate)
     setIsGroupDiscussion(!!currentDiscussionTopic.groupSet)
-    setGroupSetId(currentDiscussionTopic.groupSet?._id)
+    setGroupCategoryId(currentDiscussionTopic.groupSet?._id)
 
     setAvailableFrom(currentDiscussionTopic.delayedPostAt)
     setAvailableUntil(currentDiscussionTopic.lockAt)
@@ -167,7 +170,7 @@ export default function DiscussionTopicForm({
         addToTodo,
         todoDate,
         isGroupDiscussion,
-        groupSetId,
+        groupCategoryId,
         availableFrom,
         availableUntil,
         shouldPublish: isEditing ? published : shouldPublish,
@@ -255,7 +258,7 @@ export default function DiscussionTopicForm({
               if (value !== 'off') {
                 setIsGraded(false)
                 setIsGroupDiscussion(false)
-                setGroupSetId(null)
+                setGroupCategoryId(null)
               }
               setDiscussionAnonymousState(value)
             }}
@@ -379,7 +382,7 @@ export default function DiscussionTopicForm({
               value="group-discussion"
               checked={isGroupDiscussion}
               onChange={() => {
-                setGroupSetId(!isGroupDiscussion ? '' : groupSetId)
+                setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
                 setIsGroupDiscussion(!isGroupDiscussion)
               }}
             />
@@ -389,14 +392,14 @@ export default function DiscussionTopicForm({
               <SimpleSelect
                 renderLabel={I18N.t('Group Set')}
                 defaultValue=""
-                value={groupSetId}
+                value={groupCategoryId}
                 onChange={(_event, newChoice) => {
                   const value = newChoice.value
                   if (value === 'new-group-category') {
                     // new group category workflow here
-                    // setGroupSetId(the new category)
+                    setShowGroupCategoryModal(true)
                   } else {
-                    setGroupSetId(value)
+                    setGroupCategoryId(value)
                   }
                 }}
                 placeholder={I18N.t('Select Group')}
@@ -416,6 +419,12 @@ export default function DiscussionTopicForm({
                   New Group Category
                 </SimpleSelect.Option>
               </SimpleSelect>
+
+              <GroupCategoryModalContainer
+                show={showGroupCategoryModal}
+                setShow={setShowGroupCategoryModal}
+                afterCreate={setGroupCategoryId}
+              />
             </View>
           )}
         </FormFieldGroup>

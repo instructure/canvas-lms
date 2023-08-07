@@ -23,16 +23,16 @@ import {useMutation} from 'react-apollo'
 import {CREATE_GROUP_CATEGORY} from '../../../graphql/Mutations'
 
 import LoadingIndicator from '@canvas/loading-indicator'
-import CreateGroupCategoryModal from '../../components/CreateGroupCategoryModal/CreateGroupCategoryModal'
+import GroupCategoryModal from '../../components/GroupCategoryModal/GroupCategoryModal'
 
-export default function CreateGroupCategoryModalContainer({show, setShow, afterCreate}) {
+export default function GroupCategoryModalContainer({show, setShow, afterCreate}) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createGroupCategory, {data, loading}] = useMutation(CREATE_GROUP_CATEGORY, {
     onCompleted: completionData => {
       const new_group_category = completionData?.createGroupCategory?.groupCategory
-      const group_category_id = new_group_category?.id
+      const group_category_id = new_group_category?._id
       if (group_category_id) {
-        afterCreate(new_group_category.name)
+        afterCreate(new_group_category._id)
         setShow(false)
       } else {
         // TODO: handle this
@@ -51,26 +51,22 @@ export default function CreateGroupCategoryModalContainer({show, setShow, afterC
   const onSubmit = useCallback(
     ({
       groupName,
-      groupStructure,
-      allowSelfSignUp,
+      allowSelfSignup,
       requireSameSection,
-      autoAssignGroupLeader,
       numberOfGroups,
-      studentsPerGroup,
+      numberOfStudentsPerGroup,
+      autoAssignGroupLeader,
       groupLeaderAssignmentMethod,
     }) =>
       createGroupCategory({
         variables: {
           contextId: ENV.course_id, // TODO: add context_id to js_env
           contextType: 'Course',
-          groupName,
-          groupStructure,
-          allowSelfSignUp,
-          requireSameSection,
-          autoAssignGroupLeader,
+          name: groupName,
+          selfSignup: allowSelfSignup ? (requireSameSection ? 'restricted' : 'enabled') : null,
           numberOfGroups,
-          studentsPerGroup,
-          groupLeaderAssignmentMethod,
+          numberOfStudentsPerGroup,
+          autoLeader: autoAssignGroupLeader && groupLeaderAssignmentMethod,
         },
       }),
     [createGroupCategory]
@@ -81,18 +77,16 @@ export default function CreateGroupCategoryModalContainer({show, setShow, afterC
     return <LoadingIndicator />
   }
 
-  return (
-    <CreateGroupCategoryModal show={show} setShow={setShow} onSubmit={() => {} /* onSubmit */} />
-  )
+  return <GroupCategoryModal show={show} setShow={setShow} onSubmit={() => {} /* onSubmit */} />
 }
 
-CreateGroupCategoryModalContainer.propTypes = {
+GroupCategoryModalContainer.propTypes = {
   show: PropTypes.bool,
   setShow: PropTypes.func,
   afterCreate: PropTypes.func,
 }
 
-CreateGroupCategoryModalContainer.defaultProps = {
+GroupCategoryModalContainer.defaultProps = {
   show: false,
   setShow: () => {},
   afterCreate: () => {},
