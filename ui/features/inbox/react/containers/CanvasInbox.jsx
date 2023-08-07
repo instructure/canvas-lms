@@ -801,6 +801,7 @@ const CanvasInbox = () => {
                         }
                         onReadStateChange={handleReadState}
                         scope={scope}
+                        conversationsQueryOption={conversationsQueryOption}
                       />
                     ) : (
                       <View padding="small">

@@ -58,6 +58,7 @@ const props = {
           body: 'This is the body text for the message.',
         },
       ],
+      count: 2,
       participants: [
         {user: {name: 'Bob Barker'}},
         {user: {name: 'Sally Ford'}},
@@ -82,6 +83,7 @@ const props = {
           body: 'This conversation has a much longer body which should be too long to completely display.',
         },
       ],
+      count: 1,
       participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
     },
     {
@@ -101,6 +103,7 @@ const props = {
           body: 'This conversation has a much longer body which should be too long to completely display.',
         },
       ],
+      count: 1,
       participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
     },
     {
@@ -121,6 +124,7 @@ const props = {
           body: 'This conversation has a much longer body which should be too long to completely display.',
         },
       ],
+      count: 1,
       participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
     },
     {
@@ -141,6 +145,7 @@ const props = {
           body: 'This conversation has a much longer body which should be too long to completely display.',
         },
       ],
+      count: 1,
       participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
     },
   ],

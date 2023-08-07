@@ -155,7 +155,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col width="auto">
                   <Badge
-                    count={props.conversation.messages.length}
+                    count={props.conversation.count}
                     countUntil={99}
                     standalone={true}
                     theme={{
@@ -171,7 +171,7 @@ export const ConversationListItem = ({...props}) => {
                             one: '1 message',
                             other: '%{count} messages',
                           },
-                          {count: props.conversation.messages.length}
+                          {count: props.conversation.count}
                         )}
                       >
                         {formattedCount}
@@ -308,6 +308,7 @@ export const ConversationListItem = ({...props}) => {
     props.isUnread,
     isSubmissionCommentsType,
     props.conversation._id,
+    props.conversation.count,
     props.isLast,
     props.truncateSize,
   ])
