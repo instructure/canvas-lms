@@ -941,7 +941,7 @@ class ContextExternalTool < ActiveRecord::Base
     host = url&.host
     port = url&.port
     d = domain.downcase.gsub(%r{https?://}, "")
-    !!(host && ("." + host + (port ? ":#{port}" : "")).match(/\.#{d}\z/))
+    !!(host && ("." + host + (port ? ":#{port}" : "")).match(/\.#{Regexp.escape(d)}\z/))
   end
 
   def matches_domain?(url, use_environment_overrides: false)
