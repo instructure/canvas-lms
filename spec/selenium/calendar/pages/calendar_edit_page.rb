@@ -22,6 +22,10 @@ require_relative "../../common"
 module CalendarEditPage
   #------------------------- Selectors --------------------------
 
+  def calendar_rce_selector
+    ".ic-RichContentEditor"
+  end
+
   def calendar_start_date_selector
     "[name='start_date']"
   end
@@ -29,7 +33,16 @@ module CalendarEditPage
   def create_event_button_selector
     "//button[contains(text() ,'Create Event')]"
   end
+
+  def rce_iframe_selector
+    "iframe"
+  end
+
   #------------------------- Elements ---------------------------
+
+  def calendar_rce
+    f(calendar_rce_selector)
+  end
 
   def calendar_start_date
     f(calendar_start_date_selector)
@@ -37,6 +50,10 @@ module CalendarEditPage
 
   def create_event_button
     fxpath(create_event_button_selector)
+  end
+
+  def rce_iframe
+    f(rce_iframe_selector)
   end
 
   #----------------------- Actions/Methods ----------------------
@@ -48,5 +65,9 @@ module CalendarEditPage
 
   def click_create_event_button
     create_event_button.click
+  end
+
+  def wait_for_calendar_rce
+    wait_for_tiny(f(rce_iframe_selector, f(calendar_rce_selector)))
   end
 end
