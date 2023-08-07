@@ -59,6 +59,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
           isSubmissionComments
         )
         inboxConversation.messages = conversation?.commentsConnection.nodes
+        inboxConversation.count = conversation?.commentsConnection.nodes.length || 0
       } else {
         inboxConversation.id = conversation?.id
         inboxConversation._id = conversation?.conversation?._id
@@ -71,6 +72,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
         inboxConversation.label = conversation?.label
         inboxConversation.messages =
           conversation?.conversation?.conversationMessagesConnection.nodes
+        inboxConversation.count = conversation?.conversation?.conversationMessagesCount || 0
         inboxConversation.participants =
           conversation.conversation.conversationParticipantsConnection.nodes
         inboxConversation.participantString = getParticipantsString(

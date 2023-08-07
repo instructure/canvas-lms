@@ -63,6 +63,34 @@ export const MessageDetailContainer = props => {
       )
 
     cache.writeQuery({...options, data})
+
+    let legacyNode
+    try {
+      const queryResult = JSON.parse(
+        JSON.stringify(cache.readQuery(props.conversationsQueryOption))
+      )
+      legacyNode = queryResult.legacyNode
+    } catch (e) {
+      // readQuery throws an exception if the query isn't already in the cache
+      // If its not in the cache we don't want to do anything
+      return
+    }
+
+    // This mutation allows to delete multiple messages at once
+    // but the mutation is run with only one.
+    const conversationMessageId = result.data.deleteConversationMessages.conversationMessageIds[0]
+    const matchingConversation = legacyNode.conversationsConnection.nodes.find(c =>
+      c.conversation.conversationMessagesConnection.nodes.find(m => m._id === conversationMessageId)
+    )
+
+    if (matchingConversation) {
+      matchingConversation.conversation.conversationMessagesCount--
+    }
+
+    cache.writeQuery({
+      ...props.conversationsQueryOption,
+      data: {legacyNode},
+    })
   }
 
   const handleDeleteConversationMessage = conversationMessageId => {
@@ -355,4 +383,5 @@ MessageDetailContainer.propTypes = {
   onBack: PropTypes.func,
   setCanReply: PropTypes.func,
   scope: PropTypes.string,
+  conversationsQueryOption: PropTypes.object,
 }

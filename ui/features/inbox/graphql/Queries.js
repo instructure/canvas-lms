@@ -185,6 +185,7 @@ export const CONVERSATIONS_QUERY = gql`
                   ...ConversationMessage
                 }
               }
+              conversationMessagesCount
             }
           }
           pageInfo {

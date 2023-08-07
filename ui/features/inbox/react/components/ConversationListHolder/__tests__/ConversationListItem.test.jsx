@@ -35,6 +35,7 @@ const submissionsCommentsMock = () => {
     lastMessageContent: 'Hey!',
     participantString: 'Hank Mccoy',
     messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()],
+    count: 3,
   }
 }
 
@@ -76,6 +77,7 @@ describe('ConversationListItem', () => {
             body: 'This is the body text for the message.',
           },
         ],
+        count: 2,
         participants: [
           {user: {name: 'Bob Barker'}},
           {user: {name: 'Sally Ford'}},

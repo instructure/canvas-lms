@@ -108,11 +108,14 @@ const ComposeModalManager = props => {
     }
 
     if (props.isReply || props.isReplyAll || props.isForward) {
-      legacyNode.conversationsConnection.nodes
-        .find(c => c.conversation._id === props.conversation._id)
-        .conversation.conversationMessagesConnection.nodes.unshift(
-          result.data.addConversationMessage.conversationMessage
-        )
+      const conversation = legacyNode.conversationsConnection.nodes.find(
+        c => c.conversation._id === props.conversation._id
+      ).conversation
+
+      conversation.conversationMessagesConnection.nodes.unshift(
+        result.data.addConversationMessage.conversationMessage
+      )
+      conversation.conversationMessagesCount++
     } else {
       legacyNode.conversationsConnection.nodes.unshift(
         ...result.data.createConversation.conversations

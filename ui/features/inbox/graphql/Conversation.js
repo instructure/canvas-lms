@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, bool, shape, string} from 'prop-types'
+import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import gql from 'graphql-tag'
@@ -55,6 +55,7 @@ export const Conversation = {
     conversationMessagesConnection: shape({
       nodes: arrayOf(ConversationMessage.shape),
     }),
+    conversationMessagesCount: number,
     conversationParticipantsConnection: shape({
       nodes: arrayOf(ConversationParticipant.shape),
     }),
@@ -98,6 +99,7 @@ export const Conversation = {
       pageInfo: PageInfo.mock({hasNextPage: false}),
       __typename: 'ConversationMessageConnection',
     },
+    conversationMessagesCount = 3,
     conversationParticipantsConnection = {
       nodes: [
         ConversationParticipant.mock({
@@ -129,6 +131,7 @@ export const Conversation = {
     contextName,
     subject,
     conversationMessagesConnection,
+    conversationMessagesCount,
     conversationParticipantsConnection,
     canReply,
     isPrivate,
