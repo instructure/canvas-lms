@@ -21,6 +21,7 @@ require_relative "../helpers/calendar2_common"
 require_relative "pages/calendar_page"
 require_relative "pages/calendar_recurrence_modal_page"
 require_relative "pages/calendar_edit_page"
+require "rrule"
 
 describe "recurring events" do
   include_context "in-process server selenium tests"
@@ -186,7 +187,8 @@ describe "recurring events" do
 
     it "displays the frequency picker on calendar event edit page" do
       get "/courses/#{@course.id}/calendar_events/new"
-
+      wait_for_ajaximations
+      wait_for_calendar_rce
       expect(frequency_picker).to be_displayed
       expect(frequency_picker_value).to eq("Does not repeat")
     end
@@ -194,6 +196,7 @@ describe "recurring events" do
     it "selects the daily frequency in the calendar event modal" do
       get "/courses/#{@course.id}/calendar_events/new"
       wait_for_ajaximations
+      wait_for_calendar_rce
       expect(frequency_picker).to be_displayed
       select_frequency_option("Daily")
       expect(frequency_picker_value).to eq("Daily")
@@ -201,6 +204,8 @@ describe "recurring events" do
 
     it "creates recurring event and verifies monthly calendar" do
       get "/courses/#{@course.id}/calendar_events/new"
+      wait_for_ajaximations
+      wait_for_calendar_rce
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
       select_frequency_option("Daily")
@@ -216,7 +221,8 @@ describe "recurring events" do
 
       Timecop.freeze(t) do
         get "/courses/#{@course.id}/calendar_events/new"
-
+        wait_for_ajaximations
+        wait_for_calendar_rce
         enter_calendar_start_date(format_date_for_view(t, "%b %e, %Y"))
         select_frequency_option("Weekly on #{day}")
         expect(frequency_picker_value).to eq("Weekly on #{day}")
@@ -228,7 +234,8 @@ describe "recurring events" do
 
     it "selects monthly with specific day in frequency picker in dropdown" do
       get "/courses/#{@course.id}/calendar_events/new"
-
+      wait_for_ajaximations
+      wait_for_calendar_rce
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
 
@@ -241,7 +248,8 @@ describe "recurring events" do
 
     it "selects annually with specific day in frequency picker in dropdown" do
       get "/courses/#{@course.id}/calendar_events/new"
-
+      wait_for_ajaximations
+      wait_for_calendar_rce
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
 
@@ -255,6 +263,7 @@ describe "recurring events" do
 
     it "shows the selected values from calendar modal on edit page" do
       get "/calendar2"
+      wait_for_ajaximations
       create_new_calendar_event
       select_frequency_option("Daily")
       expect(frequency_picker_value).to eq("Daily")
@@ -275,6 +284,8 @@ describe "recurring events" do
 
     it "goes to custom modal when custom is selected" do
       get "/courses/#{@course.id}/calendar_events/new"
+      wait_for_ajaximations
+      wait_for_calendar_rce
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
       select_frequency_option("Custom")
@@ -283,6 +294,8 @@ describe "recurring events" do
 
     it "makes custom change and returns to modal and new value in frequency field" do
       get "/courses/#{@course.id}/calendar_events/new"
+      wait_for_ajaximations
+      wait_for_calendar_rce
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
 
@@ -296,6 +309,8 @@ describe "recurring events" do
 
     it "cancels custom change and returns to modal and original value in frequency field" do
       get "/courses/#{@course.id}/calendar_events/new"
+      wait_for_ajaximations
+      wait_for_calendar_rce
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
 
@@ -309,6 +324,8 @@ describe "recurring events" do
 
     it "selects canned frequency and sees it in custom recurring modal" do
       get "/courses/#{@course.id}/calendar_events/new"
+      wait_for_ajaximations
+      wait_for_calendar_rce
       newdate = "July 20, 2023"
       enter_calendar_start_date(newdate)
 
@@ -316,6 +333,73 @@ describe "recurring events" do
       select_frequency_option("Custom")
 
       expect(repeat_frequency_picker_value).to eq("Week")
+    end
+  end
+
+  context "delete recurring events" do
+    before :once do
+      course_with_teacher(active_all: true, new_user: true)
+    end
+
+    before do
+      user_session(@teacher)
+      today = Date.today
+      start_at = Date.new(today.year, today.month, 15)
+      create_calendar_event_series(@course, "event in a series", start_at)
+    end
+
+    it "deletes 'this event' from a series" do
+      get "/calendar"
+
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      hover_and_click delete_event_link_selector
+      event_series_this_event.click
+      event_series_delete_button.click
+      wait_for_ajax_requests
+      expect(events_in_a_series.length).to eq 2
+
+      # make sure it was actually deleted and not just removed from the interface
+      get("/calendar")
+      expect(events_in_a_series.length).to eq 2
+    end
+
+    it "deletes 'this event and all following' from a series" do
+      get "/calendar"
+
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      hover_and_click delete_event_link_selector
+      event_series_following_events.click
+      event_series_delete_button.click
+      wait_for_ajax_requests
+      expect(events_in_a_series.length).to eq 1
+
+      # make sure it was actually deleted and not just removed from the interface
+      get("/calendar")
+      expect(events_in_a_series.length).to eq 1
+    end
+
+    it "deletes 'all events' from a series" do
+      get "/calendar"
+
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      hover_and_click delete_event_link_selector
+      event_series_all_events.click
+      event_series_delete_button.click
+      wait_for_ajax_requests
+      expect(calendar_content).not_to contain_jqcss(events_in_a_series_selector)
+
+      # make sure it was actually deleted and not just removed from the interface
+      get("/calendar")
+      expect(calendar_content).not_to contain_jqcss(events_in_a_series_selector)
     end
   end
 end

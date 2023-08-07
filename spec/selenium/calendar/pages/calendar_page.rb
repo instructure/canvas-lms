@@ -21,12 +21,20 @@ require_relative "../../common"
 
 module CalendarPage
   #------------------------- Selectors --------------------------
+  def calendar_content_selector
+    "#content"
+  end
+
   def create_new_event_btn_selector
     "#create_new_event_link"
   end
 
   def delete_confirm_button_selector
     "//*[@aria-label='Confirm Deletion']//button[.//*[. = 'Delete']]"
+  end
+
+  def delete_event_link_selector
+    ".delete_event_link"
   end
 
   def edit_event_modal_selector
@@ -43,6 +51,14 @@ module CalendarPage
 
   def edit_event_modal_submit_btn_selector
     "#edit_calendar_event_form button.event_button"
+  end
+
+  def event_title_input_selector
+    "[data-testid='calendar-event-form'] placeholder='Input Event Title...'"
+  end
+
+  def events_in_a_series_selector
+    "#content .fc-event:visible:contains('event in a series')"
   end
 
   def events_in_month_view_selector
@@ -70,6 +86,10 @@ module CalendarPage
     ff(events_in_month_view_selector)
   end
 
+  def calendar_content
+    f(calendar_content_selector)
+  end
+
   def create_new_event_btn
     f(create_new_event_btn_selector)
   end
@@ -92,6 +112,14 @@ module CalendarPage
 
   def edit_event_modal_submit_btn
     f(edit_event_modal_submit_btn_selector)
+  end
+
+  def event_title_input
+    f(event_title_input_selector)
+  end
+
+  def events_in_a_series
+    ffj(events_in_a_series_selector)
   end
 
   def frequency_picker
@@ -140,6 +168,11 @@ module CalendarPage
   def enter_new_event_date(date_text)
     replace_content(edit_event_date_input, date_text)
     edit_event_date_input.send_keys(:enter)
+  end
+
+  def enter_event_title(title_text)
+    replace_content(event_title_input, title_text)
+    event_title_input.send_keys(:tab)
   end
 
   def frequency_picker_value
