@@ -19,21 +19,28 @@
 import React from 'react'
 import moment from 'moment-timezone'
 import {render, screen} from '@testing-library/react'
-import FrequencyPicker, {FrequencyPickerErrorBoundary} from '../FrequencyPicker'
+import FrequencyPicker, {
+  FrequencyPickerErrorBoundary,
+  FrequencyPickerProps,
+} from '../FrequencyPicker'
 import userEvent from '@testing-library/user-event'
 import {FrequencyOptionValue} from '@canvas/calendar/react/FrequencyPicker/FrequencyPickerUtils'
+import {UnknownSubset} from '../../RecurringEvents/types'
 
 const defaultTZ = 'Asia/Tokyo'
 
-const defaultProps = (overrides: object = {}) => ({
-  date: moment.tz('2001-04-12', defaultTZ).toDate(), // a Thursday
-  interaction: 'enabled' as const,
-  initialFrequency: 'weekly-day' as FrequencyOptionValue,
-  locale: 'en',
-  timezone: defaultTZ,
-  onChange: jest.fn(),
-  ...overrides,
-})
+const defaultProps = (overrides: UnknownSubset<FrequencyPickerProps> = {}) => {
+  const tz = overrides.timezone || defaultTZ
+  return {
+    date: moment.tz('2001-04-12', tz).toDate(), // a Thursday
+    interaction: 'enabled' as const,
+    initialFrequency: 'weekly-day' as FrequencyOptionValue,
+    locale: 'en',
+    timezone: tz,
+    onChange: jest.fn(),
+    ...overrides,
+  }
+}
 
 const selectOption = (buttonName: RegExp, optionName: RegExp) => {
   userEvent.click(
@@ -58,25 +65,64 @@ describe('FrequencyPicker', () => {
   })
 
   describe('renders', () => {
-    it('with default the given frequency', () => {
-      const props = defaultProps()
-      const {getByDisplayValue, rerender} = render(
-        <FrequencyPicker {...props} initialFrequency="daily" />
-      )
-      expect(getByDisplayValue('Daily')).toBeInTheDocument()
+    for (const TZ of ['Asia/Tokyo', 'Europe/Budapest', 'America/New_York']) {
+      // eslint-disable-next-line jest/valid-describe
+      describe(`in timezone ${TZ}`, () => {
+        it('with the given initial frequency', () => {
+          const props = defaultProps({timezone: TZ})
+          const {getByDisplayValue, rerender} = render(
+            <FrequencyPicker {...props} initialFrequency="daily" />
+          )
+          expect(getByDisplayValue('Daily')).toBeInTheDocument()
 
-      rerender(<FrequencyPicker {...props} initialFrequency="weekly-day" />)
-      expect(getByDisplayValue('Weekly on Thursday')).toBeInTheDocument()
+          rerender(<FrequencyPicker {...props} initialFrequency="weekly-day" />)
+          expect(getByDisplayValue('Weekly on Thursday')).toBeInTheDocument()
 
-      rerender(<FrequencyPicker {...props} initialFrequency="monthly-nth-day" />)
-      expect(getByDisplayValue('Monthly on the second Thursday')).toBeInTheDocument()
+          rerender(<FrequencyPicker {...props} initialFrequency="monthly-nth-day" />)
+          expect(getByDisplayValue('Monthly on the second Thursday')).toBeInTheDocument()
 
-      rerender(<FrequencyPicker {...props} initialFrequency="annually" />)
-      expect(getByDisplayValue('Annually on April 12')).toBeInTheDocument()
+          rerender(<FrequencyPicker {...props} initialFrequency="annually" />)
+          expect(getByDisplayValue('Annually on April 12')).toBeInTheDocument()
 
-      rerender(<FrequencyPicker {...props} initialFrequency="every-weekday" />)
-      expect(getByDisplayValue('Every weekday (Monday to Friday)')).toBeInTheDocument()
-    })
+          rerender(<FrequencyPicker {...props} initialFrequency="every-weekday" />)
+          expect(getByDisplayValue('Every weekday (Monday to Friday)')).toBeInTheDocument()
+        })
+
+        it('with open modal with the current selected frequency', () => {
+          const props = defaultProps({timezone: TZ})
+          const {getByText, getByDisplayValue} = render(<FrequencyPicker {...props} />)
+          selectOption(/frequency:/i, /weekly on thursday/i)
+          selectOption(/frequency:/i, /custom/i)
+          const modal = getByText('Custom Repeating Event')
+          expect(modal).toBeInTheDocument()
+
+          const thursdayCheckbox = getByDisplayValue('TH')
+          expect(thursdayCheckbox).toBeInTheDocument()
+          expect(thursdayCheckbox).toBeChecked()
+        })
+
+        it('the modal with the given custom rrule', () => {
+          const props = defaultProps({timezone: TZ})
+          const {getByText, getByDisplayValue} = render(
+            <FrequencyPicker
+              {...props}
+              initialFrequency="saved-custom"
+              rrule="FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE;COUNT=5"
+            />
+          )
+          expect(getByDisplayValue('Weekly on Mon, Wed, 5 times')).toBeInTheDocument()
+
+          selectOption(/frequency:/i, /Weekly on Mon, Wed, 5 times/)
+          selectOption(/frequency/i, /custom/i)
+          const modal = getByText('Custom Repeating Event')
+          expect(modal).toBeInTheDocument()
+          expect(getByDisplayValue('Week')).toBeInTheDocument()
+          expect(getByDisplayValue('MO')).toBeChecked()
+          expect(getByDisplayValue('WE')).toBeChecked()
+          expect(getByDisplayValue('5')).toBeInTheDocument()
+        })
+      })
+    }
 
     it('disabled when interaction is disabled', () => {
       const props = defaultProps({interaction: 'disabled'})
@@ -89,40 +135,6 @@ describe('FrequencyPicker', () => {
       const {getByText} = render(<FrequencyPicker {...props} initialFrequency="custom" />)
       const modal = getByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
-    })
-
-    it('with open modal with the current selected frequency', () => {
-      const props = defaultProps()
-      const {getByText, getByDisplayValue} = render(<FrequencyPicker {...props} />)
-      selectOption(/frequency:/i, /weekly on thursday/i)
-      selectOption(/frequency:/i, /custom/i)
-      const modal = getByText('Custom Repeating Event')
-      expect(modal).toBeInTheDocument()
-
-      const thursdayCheckbox = getByDisplayValue('TH')
-      expect(thursdayCheckbox).toBeInTheDocument()
-      expect(thursdayCheckbox).toBeChecked()
-    })
-
-    it('the modal with the given custom rrule', () => {
-      const props = defaultProps()
-      const {getByText, getByDisplayValue} = render(
-        <FrequencyPicker
-          {...props}
-          initialFrequency="saved-custom"
-          rrule="FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE;COUNT=5"
-        />
-      )
-      expect(getByDisplayValue('Weekly on Mon, Wed, 5 times')).toBeInTheDocument()
-
-      selectOption(/frequency:/i, /Weekly on Mon, Wed, 5 times/)
-      selectOption(/frequency/i, /custom/i)
-      const modal = getByText('Custom Repeating Event')
-      expect(modal).toBeInTheDocument()
-      expect(getByDisplayValue('Week')).toBeInTheDocument()
-      expect(getByDisplayValue('MO')).toBeChecked()
-      expect(getByDisplayValue('WE')).toBeChecked()
-      expect(getByDisplayValue('5')).toBeInTheDocument()
     })
 
     it('returns focus to the frequency picker button when the modal is closed', () => {
@@ -157,6 +169,8 @@ describe('FrequencyPicker', () => {
       expect(container.querySelector('label')).toHaveStyle({width: 'auto'})
     })
 
+    // it's really annoying that I can't supress the exception being logged to the console
+    // even though it's being caught by the error boundary
     describe('with errors', () => {
       it('the error boundary fallback when enabled with no date', () => {
         const props = defaultProps({date: undefined})
