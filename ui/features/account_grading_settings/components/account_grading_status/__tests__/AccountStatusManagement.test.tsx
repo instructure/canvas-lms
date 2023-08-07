@@ -19,7 +19,7 @@
 import React from 'react'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import {MockedProvider} from '@apollo/react-testing'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {AccountStatusManagement} from '../AccountStatusManagement'
 import {setupGraphqlMocks} from './fixtures'
 
@@ -124,8 +124,9 @@ describe('Account Grading Status Management', () => {
     const deleteButton = statusToDelete?.querySelectorAll('button')[1]
     fireEvent.click(deleteButton)
     await new Promise(resolve => setTimeout(resolve, 0))
-
-    expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(1)
+    const confirmDeleteButton = getByTestId('confirm-button')
+    fireEvent.click(confirmDeleteButton)
+    await waitFor(() => expect(queryAllByTestId(/custom\-status\-[0-9]/)).toHaveLength(1))
     expect(queryAllByTestId(/custom\-status\-new\-[0-2]/)).toHaveLength(2)
   })
 

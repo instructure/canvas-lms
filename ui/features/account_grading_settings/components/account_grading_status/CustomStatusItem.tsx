@@ -19,6 +19,8 @@
 import React, {useRef} from 'react'
 import {GradingStatusListItem} from '@canvas/grading-status-list-item'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
+import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 // @ts-expect-error
 import {IconTrashSolid} from '@instructure/ui-icons'
@@ -29,6 +31,7 @@ import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
 import {Flex} from '@instructure/ui-flex'
 
+const I18n = useI18nScope('account_grading_status')
 const {Item: FlexItem} = Flex as any
 
 type CustomStatusItemProps = {
@@ -47,6 +50,21 @@ export const CustomStatusItem = ({
 }: CustomStatusItemProps) => {
   const {color, name, id} = gradeStatus
   const customStatusItemRef = useRef<HTMLDivElement | undefined>(undefined)
+  const confirmStatusDelete = async () => {
+    const confirmed = await showConfirmationDialog({
+      body: I18n.t(
+        'Are you sure you want to delete this custom status? This action cannot be undone. All submissions and scores currently marked with this custom status will have their status removed.'
+      ),
+      confirmColor: 'danger',
+      confirmText: I18n.t('Delete'),
+      label: I18n.t('Delete Custom Status?'),
+      size: 'small',
+    })
+
+    if (confirmed) {
+      handleStatusDelete(id)
+    }
+  }
   return (
     <View as="div" margin="small 0 0 0" data-testid={`custom-status-${gradeStatus.id}`}>
       <GradingStatusListItem
@@ -75,7 +93,7 @@ export const CustomStatusItem = ({
               withBackground={false}
               withBorder={false}
               screenReaderLabel="Delete Status"
-              onClick={() => handleStatusDelete(id)}
+              onClick={confirmStatusDelete}
             >
               <IconTrashSolid />
             </IconButton>

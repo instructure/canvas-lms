@@ -34,13 +34,14 @@ export default function ConfirmationDialog({
   confirmText,
   onConfirm,
   onReject,
+  size = 'medium'
 }) {
   return (
     <CanvasModal
       label={label}
       onDismiss={onReject}
       open={open}
-      size="medium"
+      size={size}
       footer={
         <>
           <Button data-testid="cancel-button" onClick={onReject}>
@@ -62,7 +63,7 @@ export default function ConfirmationDialog({
   )
 }
 
-export async function showConfirmationDialog({label, body, confirmText, confirmColor}) {
+export async function showConfirmationDialog({label, body, confirmText, confirmColor, size = 'medium'}) {
   let resolver
   const returnedPromise = new Promise(resolve => {
     resolver = resolve
@@ -97,6 +98,7 @@ export async function showConfirmationDialog({label, body, confirmText, confirmC
         confirmText={confirmText}
         onConfirm={confirmationFunction}
         onReject={rejectFunction}
+        size={size}
       >
         {body}
       </ConfirmationDialog>,
