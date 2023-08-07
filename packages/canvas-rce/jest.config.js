@@ -37,9 +37,9 @@ module.exports = {
     '<rootDir>/jest/jest-setup-framework.js',
     '<rootDir>/../../jest/stubInstUi.js',
   ],
-  testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
+  testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/canvas'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
-  modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/lib', '<rootDir>/canvas'],
+  modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/canvas'],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
   testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
   moduleNameMapper: {

@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from '../../../../format-message'
+const formatMessage = require('../../../../format-message')
 
-export default [
+module.exports = [
   {
     name: formatMessage('Basic'),
     commands: [
