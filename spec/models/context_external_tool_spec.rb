@@ -853,6 +853,15 @@ describe ContextExternalTool do
     end
   end
 
+  describe "#matches_tool_domain?" do
+    it "escapes the tool domain" do
+      tool = external_tool_model(opts: { domain: "foo.bar.com" })
+      tool.save
+      expect(tool.matches_tool_domain?("https://waz.fooxbar.com")).to be false
+      expect(tool.matches_tool_domain?("https://waz.foo.bar.com")).to be true
+    end
+  end
+
   describe "#duplicated_in_context?" do
     shared_examples_for "detects duplication in contexts" do
       subject { second_tool.duplicated_in_context? }
