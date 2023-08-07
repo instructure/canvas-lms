@@ -14,5 +14,4 @@ rm -rf es/*
 
 yarn build:types
 yarn installTranslations
-yarn build:cjs
 yarn build:es

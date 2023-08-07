@@ -2,8 +2,7 @@
   "name": "@instructure/canvas-rce",
   "version": "5.7.0",
   "description": "A component wrapping Canvas's usage of Tinymce",
-  "main": "lib/index.js",
-  "module": "es/index.js",
+  "main": "es/index.js",
   "scripts": {
     "i18n:extract": "format-message extract \"src/**/*.[jt]s*\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",
@@ -37,17 +36,15 @@
     "build:all": "scripts/build.js",
     "build:es": "babel --out-dir es src --ignore '**/__tests__,**/__mocks__' --extensions '.ts,.tsx,.js,.jsx'",
     "build:types": "tsc",
-    "build:cjs": "babel --out-dir lib src --ignore '**/__tests__,**/__mocks__' --config-file=./babel.config.cjs.js --extensions '.ts,.tsx,.js,.jsx'",
     "build:canvas": "scripts/build-canvas",
     "build:watch": "yarn clean:es && yarn build:es --watch",
-    "build:cjs:watch": "yarn build:cjs --watch",
     "build:cafe": "wp --config webpack.testcafe.config.js",
     "prepublishOnly": "yarn build:all && yarn test",
     "fmt:check": "prettier -l '**/*.js*' '**/*.ts*'",
     "fmt:fix": "prettier --write '**/*.js*' '**/*.ts*'",
     "clean": "rm -rf lib && yarn clean:es && rm -rf coverage && yarn demo:clean",
     "clean:es": "rm -rf es",
-    "generate-svgs": "yarn build:cjs && scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js",
+    "generate-svgs": "yarn build:es && node --experimental-modules scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js",
     "publishToNpm": "scripts/publishToNpm.sh"
   },
   "keywords": [

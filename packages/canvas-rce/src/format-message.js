@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import formatMessage from 'format-message'
+const formatMessage = require('format-message')
 
 const ns = formatMessage.namespace()
 
@@ -24,4 +24,4 @@ ns.addLocale = translations => {
   ns.setup({translations: {...ns.setup().translations, ...translations}})
 }
 
-export default ns
+module.exports = ns
