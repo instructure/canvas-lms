@@ -95,4 +95,19 @@ describe('SpeedGraderStatusMenu', () => {
     selectMenuItem('None')
     expect(props.updateSubmission).toHaveBeenLastCalledWith({latePolicyStatus: 'none'})
   })
+
+  it('renders custom statuses when they are present', () => {
+    props.customStatuses = [{id: '1', name: 'Custom Status 1'}, {id: '2', name: 'Custom Status 2'}]
+    const {getByRole, getByText} = renderComponent()
+    const trigger = getByRole('button', {name: /Edit status/i})
+    fireEvent.click(trigger)
+    expect(getByText('Custom Status 1')).toBeInTheDocument()
+    expect(getByText('Custom Status 2')).toBeInTheDocument()
+  })
+
+  it('invokes updateSubmission prop callback with the custom status id when a custom status is selected', () => {
+    props.customStatuses = [{id: '14', name: 'Custom Status 1'}, {id: '23', name: 'Custom Status 2'}]
+    selectMenuItem('Custom Status 1')
+    expect(props.updateSubmission).toHaveBeenLastCalledWith({customGradeStatusId: '14'})
+  })
 })

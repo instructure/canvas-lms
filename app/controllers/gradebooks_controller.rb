@@ -1080,6 +1080,7 @@ class GradebooksController < ApplicationController
           ),
           course_id: @context.id,
           assignment_id: @assignment.id,
+          custom_grade_statuses: Account.site_admin.feature_enabled?(:custom_gradebook_statuses) ? @domain_root_account.custom_grade_statuses.active.as_json(include_root: false) : [],
           assignment_title: @assignment.title,
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: "full") : nil,
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),

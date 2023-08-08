@@ -516,6 +516,32 @@ describe SpeedGrader::Assignment do
       end
     end
 
+    describe "custom grade statuses" do
+      let(:submission_json) do
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        json[:submissions].detect { |submission| submission[:user_id] == @student_1.id.to_s }
+      end
+
+      let(:custom_grade_status) { CustomGradeStatus.create!(name: "custom", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher) }
+
+      it "includes the submission's custom grade status in the custom_grade field when the feature flag is enabled" do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        @assignment.submission_for_student(@student_1).update!(custom_grade_status:)
+        expect(submission_json["custom_grade_status_id"]).to eq custom_grade_status.id.to_s
+      end
+
+      it "includes nil for the custom_grade field if the submission does not have a custom grade status" do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+        expect(submission_json["custom_grade_status_id"]).to be_nil
+      end
+
+      it "does not include the custom grade status in the custom_grade field when the feature flag is disabled" do
+        Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+        @assignment.submission_for_student(@student_1).update!(custom_grade_status:)
+        expect(submission_json["custom_grade_status_id"]).to be_nil
+      end
+    end
+
     describe "attachment JSON" do
       let(:viewed_at_time) { Time.zone.now }
 

@@ -3,17 +3,21 @@
     {{#if ../showSubmissionStatus}}
       {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{proxy_submitter_label_text}}{{/t}}
     {{/if}}
-    {{#if late_policy_status}}
-      <span class="submission-status-pill submission-{{late_policy_status}}-pill"></span>
+    {{#if custom_grade_status_id}}
+      <span class="submission-custom-grade-status-pill-{{custom_grade_status_id}}"></span>
     {{else}}
-      {{#if late}}
-        <span class="submission-late-pill"></span>
+      {{#if late_policy_status}}
+        <span class="submission-status-pill submission-{{late_policy_status}}-pill"></span>
       {{else}}
-        {{#if missing}}
-          <span class="submission-missing-pill"></span>
+        {{#if late}}
+          <span class="submission-late-pill"></span>
         {{else}}
-          {{#if excused}}
-            <span class="submission-excused-pill"></span>
+          {{#if missing}}
+            <span class="submission-missing-pill"></span>
+          {{else}}
+            {{#if excused}}
+              <span class="submission-excused-pill"></span>
+            {{/if}}
           {{/if}}
         {{/if}}
       {{/if}}
@@ -31,11 +35,15 @@
         {{else}}
           {{#t}}Submission {{_index}}{{/t}}
         {{/if}}
-        {{#if late}}
-          {{#t}}LATE{{/t}}
+        {{#if custom_grade_status_name}}
+          {{custom_grade_status_name}}
         {{else}}
-          {{#if missing}}
-            {{#t}}MISSING{{/t}}
+          {{#if late}}
+            {{#t}}LATE{{/t}}
+          {{else}}
+            {{#if missing}}
+              {{#t}}MISSING{{/t}}
+            {{/if}}
           {{/if}}
         {{/if}}
         {{#if grade}}
