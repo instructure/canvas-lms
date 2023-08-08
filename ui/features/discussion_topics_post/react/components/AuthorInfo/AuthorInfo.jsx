@@ -50,6 +50,11 @@ export const AuthorInfo = props => {
     return avatarSize === 'medium' ? '11px' : '7px'
   }
 
+  // author is not a role found in courseroles,
+  // so we can always assume that if there is 1 course role,
+  // the author in this component will have to roles (author, and the course role)
+  const hasMultipleRoles = props.author?.courseRoles?.length > 0
+
   return (
     <Responsive
       match="media"
@@ -120,7 +125,9 @@ export const AuthorInfo = props => {
             <Flex direction="column" margin="0 0 0 small">
               {hasAuthor && (
                 <Flex.Item>
-                  <Flex direction={responsiveProps.nameAndRoleDirection}>
+                  <Flex
+                    direction={hasMultipleRoles ? 'column' : responsiveProps.nameAndRoleDirection}
+                  >
                     <Flex.Item padding="0 small 0 0">
                       <Text
                         weight="bold"

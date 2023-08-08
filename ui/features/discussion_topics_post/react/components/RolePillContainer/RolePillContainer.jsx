@@ -31,6 +31,7 @@ const ROLE_HIERARCHY = ['Author', 'TeacherEnrollment', 'TaEnrollment', 'Designer
 
 export function RolePillContainer({...props}) {
   const baseRolesToDisplay = sortDiscussionRoles(props.discussionRoles)
+  const hasMultipleRoles = baseRolesToDisplay?.length > 1
   return (
     <Responsive
       match="media"
@@ -52,10 +53,13 @@ export function RolePillContainer({...props}) {
       render={(responsiveProps, matches) => (
         <>
           {baseRolesToDisplay.length > 0 && (
-            <InlineList delimiter={responsiveProps.delimiter} data-testid="pill-container">
+            <InlineList
+              delimiter={hasMultipleRoles ? 'pipe' : responsiveProps.delimiter}
+              data-testid="pill-container"
+            >
               {baseRolesToDisplay.map(baseRole => (
                 <InlineList.Item key={baseRole}>
-                  {matches.includes('desktop') ? (
+                  {matches.includes('desktop') && !hasMultipleRoles ? (
                     <Pill data-testid={`pill-${baseRole}`}>{baseRole}</Pill>
                   ) : (
                     <Text size="x-small" transform="uppercase" data-testid={`mobile-${baseRole}`}>
