@@ -56,10 +56,12 @@ unless defined?(CANVAS_RAILS)
       ].uniq
 
       result = nil
-      keys.each do |key|
-        result = Net::HTTP.get_response(URI("http://localhost:8500/v1/kv/#{key}?stale"))
-        result = nil unless result.is_a?(Net::HTTPSuccess)
-        break if result
+      Net::HTTP.start("localhost", 8500, connect_timeout: 1, read_timeout: 1) do |http|
+        keys.each do |key|
+          result = http.request_get("/v1/kv/#{key}?stale")
+          result = nil unless result.is_a?(Net::HTTPSuccess)
+          break if result
+        end
       end
       CANVAS_RAILS = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : SUPPORTED_RAILS_VERSIONS.first
     rescue

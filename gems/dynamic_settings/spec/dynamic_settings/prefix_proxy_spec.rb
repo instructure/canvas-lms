@@ -143,10 +143,10 @@ module DynamicSettings
 
           it "fails immediately if the circuit breaker is tripped" do
             allow(circuit_breaker).to receive(:tripped?).and_return(true)
-            expect(Diplomat::Kv).to receive(:get_all).and_raise(Diplomat::KeyNotFound)
+            expect(Diplomat::Kv).not_to receive(:get_all)
             expect(proxy).not_to receive(:sleep)
 
-            expect { proxy.fetch("baz") }.to raise_error(Diplomat::KeyNotFound)
+            expect { proxy.fetch("baz") }.to raise_error(Diplomat::UnknownStatus)
           end
 
           it "trips the circuit breaker" do
