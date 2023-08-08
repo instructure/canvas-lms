@@ -81,8 +81,7 @@ describe "Discussion Topic Show" do
       expect(f("input[placeholder='Search entries or author...']")).to be_present
       expect(fj("span:contains('Jul 9, 2017')")).to be_present
       expect(fj("span[data-testid='author_name']:contains('teacher')")).to be_present
-      expect(f("span[data-testid='pill-Author']")).to be_present
-      expect(f("span[data-testid='pill-Teacher']")).to be_present
+      expect(ff("ul[data-testid='pill-container'] li").collect(&:text)).to eq ["AUTHOR", "TEACHER"]
       f("button[data-testid='discussion-post-menu-trigger']").click
       expect(fj("span:contains('Mark All as Read')")).to be_present
       expect(fj("span:contains('Edit')")).to be_present
