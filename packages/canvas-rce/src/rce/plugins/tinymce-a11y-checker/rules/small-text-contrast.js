@@ -20,6 +20,8 @@ import formatMessage from '../../../../format-message'
 import contrast from 'wcag-element-contrast'
 import {onlyContainsLink, createStyleString, splitStyleAttribute, hasTextNode} from '../utils/dom'
 import rgbHex from '../utils/rgb-hex'
+import {stringifyRGBA} from '../utils/colors'
+import uid from '@instructure/uid'
 
 export default {
   id: 'small-text-contrast',
@@ -36,7 +38,8 @@ export default {
   data: elem => {
     const styles = window.getComputedStyle(elem)
     return {
-      color: styles.color,
+      color: stringifyRGBA(contrast.parseRGBA(styles.color)),
+      id: uid(),
     }
   },
 

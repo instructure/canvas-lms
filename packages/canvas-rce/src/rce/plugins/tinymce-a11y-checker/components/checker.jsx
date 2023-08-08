@@ -442,10 +442,14 @@ export default class Checker extends React.Component {
                               onClick={() => this.prevError()}
                               margin="0 small 0 0"
                               aria-label="Previous"
+                              disabled={this.state.errors.length < 2}
                             >
                               {formatMessage('Prev')}
                             </Button>
-                            <Button onClick={() => this.nextError()}>
+                            <Button
+                              onClick={() => this.nextError()}
+                              disabled={this.state.errors.length < 2}
+                            >
                               {formatMessage('Next')}
                             </Button>
                           </GridCol>
@@ -534,6 +538,7 @@ export default class Checker extends React.Component {
             name={f.dataKey}
             value={this.state.formState[f.dataKey] || ''}
             onChange={this.updateFormState}
+            key={this.state.formState.id}
           />
         )
       case f.textarea:
