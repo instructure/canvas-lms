@@ -30,15 +30,20 @@
 #
 class Loaders::SISIDLoader < GraphQL::Batch::Loader
   # +scope+ is any ActiveRecord scope
-  def initialize(scope)
+  def initialize(scope, root_account: nil)
     super()
     @scope = scope
+    @root_account = root_account
   end
 
   # :nodoc:
   def perform(ids)
-    # Fun fact, the REST api would let you search for things based on sis_id even if you didn't have read/edit
-    # permissions for SIS. For now we'll keep that behavior.
+    # limit the query to results within the specified @root_account if available
+    @scope = @scope.where(root_account_id: @root_account) if @root_account && @scope.method_defined?(:root_account)
+
+    # Fun fact, the REST api would let you search for things based on sis_id
+    # even if you didn't have read/edit permissions for SIS. For now we'll
+    # keep that behavior.
     @scope.where(sis_source_id: ids).each { |o| fulfill(o.sis_source_id, o) }
 
     ids.each { |id| fulfill(id, nil) unless fulfilled?(id) }
