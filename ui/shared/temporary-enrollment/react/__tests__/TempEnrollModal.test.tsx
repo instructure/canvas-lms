@@ -24,6 +24,17 @@ const props = {
   user: {id: '1', name: 'student1'},
   canReadSIS: true,
   accountId: '1',
+  roles: [
+    {id: '234', label: 'Teacher', base_role_name: 'TeacherEnrollment'},
+    {id: '123', label: 'Student', base_role_name: 'StudentEnrollment'},
+  ],
+  permissions: {
+    teacher: true,
+    ta: true,
+    student: true,
+    observer: true,
+    designer: true,
+  },
 }
 
 describe('TempEnrollModal', () => {

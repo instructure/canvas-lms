@@ -30,14 +30,16 @@ function makeProps() {
       sortable_name: 'foo',
       avatar_url: 'http://someurl',
     },
-    handleOpenEditUserDialog: jest.fn,
-    handleSubmitEditUserForm: jest.fn,
-    handleCloseEditUserDialog: jest.fn,
+    roles: [{id: '19', label: 'Teacher', base_role_name: 'TeacherEnrollment'}],
+    handleOpenEditUserDialog: jest.fn(),
+    handleSubmitEditUserForm: jest.fn(),
+    handleCloseEditUserDialog: jest.fn(),
     permissions: {
       can_masquerade: true,
       can_message_users: true,
       can_edit_users: true,
       can_temp_enroll: true,
+      can_manage_admin_users: true,
     },
   }
 }
