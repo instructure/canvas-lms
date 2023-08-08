@@ -40,12 +40,10 @@ test('it calls onChange prop with proper values when the picker changes', () => 
   expect(true).toBeTruthy()
 })
 
-test('it calls onChange prop with the value when the text value changes', () => {
+test('it calls onChange prop with the value when the text input blurs', () => {
   const changeSpy = jest.fn()
-  const ref = React.createRef()
   const {getByTestId} = render(
     <ColorField
-      ref={ref}
       label="color"
       value="rgba(100,100,100,0.7)"
       onChange={changeSpy}
@@ -54,31 +52,7 @@ test('it calls onChange prop with the value when the text value changes', () => 
   )
 
   const colorTextInput = getByTestId('color-field-text-input')
-  fireEvent.change(colorTextInput, {target: {value: 'rgba(200, 200, 200, 0.7)'}})
+  fireEvent.blur(colorTextInput, {target: {value: 'rgba(100, 100, 100, 1)'}})
 
-  expect(changeSpy).toHaveBeenCalledWith(expect.anything(), 'rgba(200, 200, 200, 0.7)')
-})
-
-describe('stringifyRGBA', () => {
-  it('handles rgba', () => {
-    const rgba = {
-      r: 100,
-      g: 100,
-      b: 100,
-      a: 0.7,
-    }
-
-    expect(ColorField.stringifyRGBA(rgba)).toBe('rgba(100, 100, 100, 0.7)')
-  })
-
-  it('handles rgb', () => {
-    const rgba = {
-      r: 100,
-      g: 100,
-      b: 100,
-      a: 1,
-    }
-
-    expect(ColorField.stringifyRGBA(rgba)).toBe('rgb(100, 100, 100)')
-  })
+  expect(changeSpy).toHaveBeenCalledWith({target: {name: 'testing', value: 'rgba(100, 100, 100, 1)'}})
 })

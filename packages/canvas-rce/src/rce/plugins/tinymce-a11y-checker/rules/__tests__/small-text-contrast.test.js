@@ -17,6 +17,7 @@
  */
 
 import rule from '../small-text-contrast'
+import * as uid from '@instructure/uid'
 
 let el
 
@@ -66,9 +67,11 @@ describe('test', () => {
 
 describe('data', () => {
   test('returns the color matching the elements existing color', () => {
-    el.style.color = 'blue'
+    uid.default = jest.fn(() => '123')
+    el.style.color = '#fff'
     expect(rule.data(el)).toEqual({
-      color: 'blue',
+      color: 'rgba(255, 255, 255, 1)',
+      id: '123',
     })
   })
 })
