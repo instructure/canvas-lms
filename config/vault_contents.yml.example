@@ -19,6 +19,8 @@ development:
       canvas_security:
         encryption_secret: "astringthatisactually32byteslong"
         signing_secret: "astringthatisactually32byteslong"
+      lti_platform_storage:
+        signing_secret: "astringthatisactually32byteslong"
 #      canvas_cdn_creds:
 #        aws_access_key_id: <access_key_id>
 #        aws_secret_access_key: <secret_access_key>

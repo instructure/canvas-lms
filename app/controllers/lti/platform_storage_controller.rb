@@ -115,7 +115,7 @@ module Lti
     end
 
     def signing_secret
-      CanvasSecurity.services_signing_secret
+      Lti::PlatformStorage.signing_secret
     end
   end
 end
