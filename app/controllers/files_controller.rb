@@ -713,7 +713,7 @@ class FilesController < ApplicationController
           @headers = false
           @show_left_side = false
         end
-        if attachment.content_type&.match(%r{\Avideo/|audio/})
+        if attachment.content_type&.match(%r{\Avideo/|audio/|application/pdf})
           attachment.context_module_action(@current_user, :read)
         end
         format.html do

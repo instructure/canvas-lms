@@ -617,6 +617,14 @@ describe FilesController do
         expect(@module.evaluate_for(@student).state).to be(:completed)
       end
 
+      it "marks pdf files viewed when rendering html with file_preview" do
+        @file = attachment_model(context: @course, uploaded_data: stub_file_data("test.pdf", "asdf", "application/pdf"))
+        file_in_a_module
+        get "show", params: { course_id: @course.id, id: @file.id }, format: :html
+        @module.reload
+        expect(@module.evaluate_for(@student).state).to be(:completed)
+      end
+
       it "redirects to the user's files URL when browsing to an attachment with the same path as a deleted attachment" do
         owned_file = course_file
         owned_file.display_name = "holla"
