@@ -8049,6 +8049,100 @@ describe Course do
     end
   end
 
+  describe "#default_grading_standard" do
+    before do
+      @root = Account.default
+      @course = Account.default.courses.build
+      @course.update(root_account_id: @root.id)
+    end
+
+    def default_scheme(context)
+      gs = GradingStandard.new(context:, title: "My Grading Standard", data: { "A" => 0.94, "B" => 0, })
+      gs.save!
+      gs
+    end
+
+    it "returns nil if no grading standards exist" do
+      expect(@course.default_grading_standard).to be_nil
+    end
+
+    it "returns the default grading standard if one exists" do
+      grading_standard = default_scheme(@course)
+      @course.grading_standard = grading_standard
+      @course.save!
+      expect(@course.default_grading_standard).to eq grading_standard
+    end
+
+    it "returns the account default grading standard if no course default exists" do
+      grading_standard = default_scheme(@course.account)
+      @course.account.grading_standard = grading_standard
+      @course.account.save!
+      expect(@course.default_grading_standard).to eq grading_standard
+    end
+  end
+
+  describe "#grading_standard_enabled" do
+    before do
+      @root = Account.default
+      @course = Account.default.courses.build
+      @course.update(root_account_id: @root.id)
+    end
+
+    def default_scheme(context)
+      gs = GradingStandard.new(context:, title: "My Grading Standard", data: { "A" => 0.94, "B" => 0, })
+      gs.save!
+      gs
+    end
+
+    it "returns false if no grading standards exist" do
+      expect(@course.grading_standard_enabled).to be_falsey
+    end
+
+    it "returns true if a grading standard exists" do
+      @course.grading_standard = default_scheme(@course)
+      @course.save!
+      expect(@course.grading_standard_enabled).to be_truthy
+    end
+
+    it "returns true if the account has a grading standard" do
+      @course.account.grading_standard = default_scheme(@course.account)
+      @course.account.save!
+      expect(@course.grading_standard_enabled).to be_truthy
+    end
+  end
+
+  describe "#course_grading_standard_enabled" do
+    before do
+      @root = Account.default
+      @course = Account.default.courses.build
+      @course.update(root_account_id: @root.id)
+    end
+
+    def default_scheme(context)
+      gs = GradingStandard.new(context:, title: "My Grading Standard", data: { "A" => 0.94, "B" => 0, })
+      gs.save!
+      gs
+    end
+
+    it "returns false if no course grading standard" do
+      expect(@course.course_grading_standard_enabled).to be_falsey
+    end
+
+    it "returns true if a course grading standard exists" do
+      @course.grading_standard = default_scheme(@course)
+      @course.save!
+
+      expect(@course.course_grading_standard_enabled).to be_truthy
+    end
+
+    it "returns false even if the account has a grading standard" do
+      @course.account.grading_standard = default_scheme(@course.account)
+      @course.account.save!
+
+      expect(@course.course_grading_standard_enabled).to be_falsey
+    end
+  end
+
   describe "#destroy" do
     it "records deleted_at" do
       course_model

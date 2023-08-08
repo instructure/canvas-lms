@@ -848,7 +848,7 @@ class AssignmentsController < ApplicationController
         hash[:group_user_type] = "student"
 
         if Account.site_admin.feature_enabled?(:grading_scheme_updates)
-          hash[:COURSE_DEFAULT_GRADING_SCHEME_ID] = context.grading_standard_id
+          hash[:COURSE_DEFAULT_GRADING_SCHEME_ID] = context.grading_standard_id || context.default_grading_standard&.id
         end
       end
 

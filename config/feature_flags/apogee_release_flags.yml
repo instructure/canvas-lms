@@ -296,7 +296,7 @@ default_account_grading_scheme:
   state: hidden
   applies_to: SiteAdmin
   display_name: Default Grading Scheme for Accounts
-  description: Allow administrators to set a default grading scheme for accounts. This grading scheme will be the default for all courses in the account, but individual courses can overwrite with their own default.
+  description: Allow administrators to set a default grading scheme for accounts. This grading scheme will be the default for all courses in the account, but individual courses can overwrite it with their own default.
   environments:
     ci:
       state: allowed_on # enable for automated testing builds and local testing
