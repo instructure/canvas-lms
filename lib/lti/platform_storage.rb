@@ -38,5 +38,9 @@ module Lti
     def self.flag_enabled?
       Account.site_admin.feature_enabled?(:lti_platform_storage)
     end
+
+    def self.signing_secret
+      Rails.application&.credentials&.dig(:lti_platform_storage, :signing_secret)
+    end
   end
 end
