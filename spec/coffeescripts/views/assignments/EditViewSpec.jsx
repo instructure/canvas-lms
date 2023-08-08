@@ -1674,6 +1674,13 @@ QUnit.module('EditView: anonymous grading', hooks => {
     strictEqual(view.$el.find('input#assignment_anonymous_grading').length, 1)
   })
 
+  test('shows warning text under checkbox when assignment is Quiz LTI', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = true
+    const view = editView({is_quiz_lti_assignment: true})
+    strictEqual(view.toJSON().anonymousGradingEnabled, true)
+    strictEqual(view.$el.find('#anonymous-lti-text').length, 1)
+  })
+
   test('is disabled when group assignment is enabled', () => {
     ENV.ANONYMOUS_GRADING_ENABLED = true
     ENV.GROUP_CATEGORIES = [{id: '1', name: 'Group Category #1'}]
@@ -1682,6 +1689,15 @@ QUnit.module('EditView: anonymous grading', hooks => {
     view.afterRender() // call this because it's called before everything is rendered in the specs
     const anonymousGradingCheckbox = view.$el.find('input#assignment_anonymous_grading')
 
+    strictEqual(anonymousGradingCheckbox.prop('disabled'), true)
+  })
+
+  test('is disabled when editing a quiz lti assignment with anonymous grading turned on', () => {
+    ENV.ANONYMOUS_GRADING_ENABLED = true
+    const view = editView({is_quiz_lti_assignment: true, anonymous_grading: true})
+    view.$el.appendTo($('#fixtures'))
+    view.afterRender()
+    const anonymousGradingCheckbox = view.$el.find('input#assignment_anonymous_grading')
     strictEqual(anonymousGradingCheckbox.prop('disabled'), true)
   })
 })
