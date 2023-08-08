@@ -157,6 +157,10 @@ module DynamicSettings
       end
 
       begin
+        if circuit_breaker&.tripped?
+          raise Diplomat::UnknownStatus, "Consul is unavailable because the circuit breaker has tripped"
+        end
+
         # okay now pre-cache an entire tree
         tree_key = [tree, service, environment].compact.join("/")
         # This longer TTL is important for race condition for now.
@@ -219,9 +223,6 @@ module DynamicSettings
           end
         end
 
-        return failsafe_cache_file.read if failsafe_cache_file&.exist?
-        return kwargs[:failsafe] if kwargs.key?(:failsafe)
-
         if retry_limit && retry_base && retry_count < retry_limit && !circuit_breaker&.tripped?
           # capture this to make sure that we have SOME
           # signal that the problem is continuing, even if our
@@ -236,7 +237,10 @@ module DynamicSettings
         end
 
         # retries failed; trip the circuit breaker and avoid retries for some amount of time
-        circuit_breaker&.trip
+        circuit_breaker&.trip unless circuit_breaker&.tripped?
+
+        return failsafe_cache_file.read if failsafe_cache_file&.exist?
+        return kwargs[:failsafe] if kwargs.key?(:failsafe)
 
         raise
       end

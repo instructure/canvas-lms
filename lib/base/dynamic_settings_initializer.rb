@@ -49,8 +49,8 @@ module DynamicSettingsInitializer
     # this got pulled out into a local gem
     ::DynamicSettings.cache = LocalCache
     ::DynamicSettings.request_cache = RequestCache
-    ::DynamicSettings.fallback_recovery_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) }
-    ::DynamicSettings.retry_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) }
+    ::DynamicSettings.fallback_recovery_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) if defined?(Canvas::Errors) }
+    ::DynamicSettings.retry_lambda = ->(e) { Canvas::Errors.capture_exception(:consul, e, :warn) if defined?(Canvas::Errors) }
     ::DynamicSettings.logger = Rails.logger
   end
 end
