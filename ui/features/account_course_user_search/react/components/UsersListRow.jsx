@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {string, func, shape, bool} from 'prop-types'
+import {string, func, object, shape, arrayOf} from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -35,7 +35,31 @@ import {TempEnrollModal} from '@canvas/temporary-enrollment/react/TempEnrollModa
 
 const I18n = useI18nScope('account_course_user_search')
 
-export default function UsersListRow({accountId, user, permissions, handleSubmitEditUserForm}) {
+export default function UsersListRow({
+  accountId,
+  user,
+  permissions,
+  handleSubmitEditUserForm,
+  roles,
+}) {
+  // don't show tempEnroll if permission to create enrollments are missing
+  const canTempEnroll =
+    permissions.can_temp_enroll &&
+    (permissions.can_manage_admin_users ||
+      (permissions.can_add_designer &&
+        permissions.can_add_student &&
+        permissions.can_add_teacher &&
+        permissions.can_add_ta &&
+        permissions.can_add_observer))
+
+  const enrollPerm = {
+    teacher: permissions.can_add_teacher || permissions.can_manage_admin_users,
+    ta: permissions.can_add_ta || permissions.can_manage_admin_users,
+    student: permissions.can_add_student || permissions.can_manage_admin_users,
+    observer: permissions.can_add_observer || permissions.can_manage_admin_users,
+    designer: permissions.can_add_observer || permissions.can_manage_admin_users,
+  }
+
   return (
     <Table.Row>
       <Table.RowHeader>
@@ -51,8 +75,14 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
       <Table.Cell data-heap-redact-text="">{user.sis_user_id}</Table.Cell>
       <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
       <Table.Cell>
-        {permissions.can_temp_enroll && (
-          <TempEnrollModal user={user} canReadSIS={permissions.can_read_sis} accountId={accountId}>
+        {canTempEnroll && (
+          <TempEnrollModal
+            user={user}
+            canReadSIS={permissions.can_read_sis}
+            permissions={enrollPerm}
+            accountId={accountId}
+            roles={roles}
+          >
             <Tooltip
               data-testid="user-list-row-tooltip"
               renderTip={I18n.t('Temporarily enroll %{name}', {name: user.name})}
@@ -136,12 +166,13 @@ UsersListRow.propTypes = {
   accountId: string.isRequired,
   user: CreateOrUpdateUserModal.propTypes.user.isRequired,
   handleSubmitEditUserForm: func.isRequired,
-  permissions: shape({
-    can_masquerade: bool,
-    can_message_users: bool,
-    can_edit_users: bool,
-    can_read_sis: bool,
-  }).isRequired,
+  permissions: object.isRequired,
+  roles: arrayOf(
+    shape({
+      id: string.isRequired,
+      label: string.isRequired,
+    })
+  ).isRequired,
 }
 
 UsersListRow.displayName = 'Row'

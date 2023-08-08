@@ -19,7 +19,7 @@
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
-import {arrayOf, string, object, func} from 'prop-types'
+import {arrayOf, string, object, func, shape} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import UsersListRow from './UsersListRow'
 import UsersListHeader from './UsersListHeader'
@@ -92,6 +92,7 @@ export default class UsersList extends React.Component {
           {this.props.users.map(user => (
             <UsersListRow
               handleSubmitEditUserForm={this.props.handleSubmitEditUserForm}
+              roles={this.props.roles}
               key={user.id}
               accountId={this.props.accountId}
               user={user}
@@ -112,4 +113,10 @@ UsersList.propTypes = {
   searchFilter: object.isRequired,
   onUpdateFilters: func.isRequired,
   sortColumnHeaderRef: func.isRequired,
+  roles: arrayOf(
+    shape({
+      id: string.isRequired,
+      label: string.isRequired,
+    })
+  ).isRequired,
 }

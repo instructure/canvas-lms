@@ -1559,6 +1559,7 @@ class AccountsController < ApplicationController
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),
       can_temp_enroll: @account.grants_right?(@current_user, session, :manage_temp_enroll_add),
+      can_read_sis: @account.grants_right?(@current_user, session, :read_sis),
       can_masquerade: @account.grants_right?(@current_user, session, :become_user),
       can_message_users: @account.grants_right?(@current_user, session, :send_messages),
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
@@ -1573,6 +1574,11 @@ class AccountsController < ApplicationController
     }
     if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
       js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
+      js_permissions[:can_add_ta] = @account.grants_right?(@current_user, session, :add_ta_to_course)
+      js_permissions[:can_add_student] = @account.grants_right?(@current_user, session, :add_student_to_course)
+      js_permissions[:can_add_teacher] = @account.grants_right?(@current_user, session, :add_teacher_to_course)
+      js_permissions[:can_add_designer] = @account.grants_right?(@current_user, session, :add_designer_to_course)
+      js_permissions[:can_add_observer] = @account.grants_right?(@current_user, session, :add_observer_to_course)
     else
       js_permissions[:can_manage_admin_users] = @account.grants_right?(@current_user, session, :manage_admin_users)
     end

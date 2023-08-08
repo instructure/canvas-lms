@@ -30,8 +30,14 @@ import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {Table} from '@instructure/ui-table'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = useI18nScope('temporary_enrollment')
 
+interface AssignUser {
+  name: string
+  sis_user_id: string
+  email: string
+  login_id: string
+}
 interface Props {
   readonly user: {
     name: string
@@ -43,6 +49,7 @@ interface Props {
   searchSuccess: Function
   readonly canReadSIS?: boolean
   readonly accountId: string
+  readonly foundEnroll?: AssignUser
 }
 
 export function TempEnrollSearch(props: Props) {
@@ -51,7 +58,8 @@ export function TempEnrollSearch(props: Props) {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
-  const [enrollment, setEnrollment] = useState(null)
+  const emptyEnroll = {name: '', sis_user_id: '', email: '', login_id: ''}
+  const [enrollment, setEnrollment] = useState<AssignUser>(emptyEnroll)
 
   // user_lists.json does not always return email, sis id, and login
   const fetchUserDetails = async (user: any) => {
@@ -61,10 +69,14 @@ export function TempEnrollSearch(props: Props) {
         method: 'GET',
       })
       setEnrollment(json)
+      setMessage('')
+      props.searchSuccess(json)
     } catch (error: any) {
       setMessage(error)
-      setEnrollment(null)
+      setEnrollment(emptyEnroll)
       props.searchFail()
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -72,19 +84,19 @@ export function TempEnrollSearch(props: Props) {
     const foundUser = response.users[0]
     if (typeof foundUser === 'undefined') {
       setMessage(I18n.t('User could not be found.'))
-      setEnrollment(null)
+      setEnrollment(emptyEnroll)
       props.searchFail()
+      setLoading(false)
     } else if (response.users.length === 1 && foundUser.user_id !== props.user.id) {
       // api could return more than 1, which we don't want
       fetchUserDetails(foundUser)
-      setMessage('')
-      props.searchSuccess(enrollment)
     } else {
       setMessage(
         I18n.t('The user found matches the source user. Please search for a different user.')
       )
-      setEnrollment(null)
+      setEnrollment(emptyEnroll)
       props.searchFail()
+      setLoading(false)
     }
   }
 
@@ -118,7 +130,7 @@ export function TempEnrollSearch(props: Props) {
   }
 
   useEffect(() => {
-    if (props.page === 1) {
+    if (props.page === 1 && !props.foundEnroll) {
       setLoading(true)
       const findUser = async () => {
         try {
@@ -130,13 +142,14 @@ export function TempEnrollSearch(props: Props) {
           handleResponse(json)
         } catch (error: any) {
           setMessage(error.message)
-          setEnrollment(null)
+          setEnrollment(emptyEnroll)
           props.searchFail()
-        } finally {
           setLoading(false)
         }
       }
       findUser()
+    } else if (props.foundEnroll) {
+      setEnrollment({...props.foundEnroll})
     }
     // useEffect hook should only be triggered when page is changed
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -167,7 +180,7 @@ export function TempEnrollSearch(props: Props) {
   if (loading) {
     return <Spinner renderTitle="Retrieving user information" size="large" />
   }
-  if (props.page === 1 && enrollment !== null) {
+  if (props.page === 1 && enrollment.name !== '') {
     // user confirmation page
     return (
       <>

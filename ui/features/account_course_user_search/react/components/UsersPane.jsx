@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shape, func, string} from 'prop-types'
+import {shape, func, string, arrayOf} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce, isEmpty} from 'lodash'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -39,7 +39,12 @@ export default class UsersPane extends React.Component {
       dispatch: func.isRequired,
       subscribe: func.isRequired,
     }).isRequired,
-    roles: UsersToolbar.propTypes.roles,
+    roles: arrayOf(
+      shape({
+        id: string.isRequired,
+        label: string.isRequired,
+      })
+    ).isRequired,
     onUpdateQueryParams: func.isRequired,
     queryParams: shape({
       page: string,
@@ -146,6 +151,7 @@ export default class UsersPane extends React.Component {
 
         {!isEmpty(users) && !isLoading && (
           <UsersList
+            roles={this.props.roles}
             searchFilter={this.state.userList.searchFilter}
             onUpdateFilters={this.handleUpdateSearchFilter}
             accountId={accountId.toString()}
