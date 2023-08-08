@@ -281,7 +281,7 @@ const DiscussionTopicManager = props => {
       // In that case, we are required to do a page refresh to get all the entries (implemented with isUserMissingInitialPost)
       // thus we bascially want to not do 'else if (currentDiscussion && newDiscussionEntry)' which contains updateCache logic.
       // Discussion.initialPostRequiredForCurrentUser is based on user and topic so if the user meets this reuqire, then
-      // this doesnt run and cacheing resumes as normal.
+      // this doesnt run and caching resumes as normal.
       if (currentDiscussion.legacyNode.initialPostRequiredForCurrentUser) {
         setIsUserMissingInitialPost(currentDiscussion.legacyNode.initialPostRequiredForCurrentUser)
       } else if (currentDiscussion && newDiscussionEntry) {

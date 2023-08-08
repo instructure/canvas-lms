@@ -410,6 +410,7 @@ export const DiscussionThreadContainer = props => {
       message,
       attachment: file,
       parentId: getParentId(),
+      depth: props.discussionEntry.depth,
       rootEntryId: props.discussionEntry.rootEntryId,
       quotedEntry:
         quotedEntryId && typeof buildQuotedReply === 'function'
