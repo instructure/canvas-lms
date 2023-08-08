@@ -45,13 +45,15 @@ module DataFixup::BackfillUrlsOnWikiPageLookups
           root_account_id: page.root_account_id
         }
       end
-      WikiPageLookup.transaction do
-        WikiPageLookup.upsert_all(
-          lookups,
-          unique_by: %i[context_id context_type slug],
-          on_duplicate: Arel.sql("slug = 'page_id:' || #{WikiPageLookup.quoted_table_name}.wiki_page_id")
-        )
-        WikiPage.joins(:wiki_page_lookups).where(current_lookup_id: nil).update_all("current_lookup_id=wiki_page_lookups.id")
+      lookups.each_slice(1000) do |lookup_slice|
+        WikiPageLookup.transaction do
+          WikiPageLookup.upsert_all(
+            lookup_slice,
+            unique_by: %i[context_id context_type slug],
+            on_duplicate: Arel.sql("slug = 'page_id:' || #{WikiPageLookup.quoted_table_name}.wiki_page_id")
+          )
+          WikiPage.joins(:wiki_page_lookups).where(current_lookup_id: nil).where(id: lookup_slice.pluck(:wiki_page_id)).update_all("current_lookup_id=wiki_page_lookups.id")
+        end
       end
     end
   end
