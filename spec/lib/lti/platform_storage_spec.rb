@@ -62,4 +62,19 @@ describe Lti::PlatformStorage do
       end
     end
   end
+
+  describe "::signing_secret" do
+    subject { Lti::PlatformStorage.signing_secret }
+
+    let(:signing_secret) { "sekret" }
+
+    before do
+      allow(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials: {})) unless Rails.application.present?
+      allow(Rails.application.credentials).to receive(:dig).with(:lti_platform_storage, :signing_secret).and_return(signing_secret)
+    end
+
+    it "should return value from vault" do
+      expect(subject).to eq signing_secret
+    end
+  end
 end
