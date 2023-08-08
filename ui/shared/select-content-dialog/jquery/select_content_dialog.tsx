@@ -79,6 +79,7 @@ type LtiLaunchDefinition = {
   definition_type: 'ContextExternalTool' | 'Lti::MessageHandler'
   definition_id: string
   name: string
+  url: string
   description: string
   domain: string
   // todo: the key here is actually a subset of string
@@ -250,8 +251,21 @@ export function handleContentItemResult(
   if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
     setDefaultToolValues(result, tool)
   }
-
-  $('#external_tool_create_url').val(result.url)
+  const populateUrl = (url: string) => {
+    if (url && url !== '') {
+      if (
+        $('#external_tool_create_url').val() === '' ||
+        window.ENV.FEATURES.lti_overwrite_user_url_input_select_content_dialog
+      ) {
+        $('#external_tool_create_url').val(url)
+      }
+    }
+  }
+  if (typeof result.url !== 'undefined' && result.url !== '') {
+    populateUrl(result.url)
+  } else if (tool.url !== '') {
+    populateUrl(tool.url)
+  }
   if (typeof result.title !== 'undefined') {
     $('#external_tool_create_title').val(result.title)
   } else if ($('#external_tool_create_title').is(':visible')) {

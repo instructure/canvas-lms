@@ -218,3 +218,10 @@ developer_key_page_checkboxes:
     If enabled, root accounts and subaccounts will see toggle switches for enabling
     and disabling keys on the developer keys page. Siteadmin will still see the
     disable/allow/enable buttons.
+lti_overwrite_user_url_input_select_content_dialog:
+  state: on
+  applies_to: RootAccount
+  display_name: Overwrite user LTI URL input on select content dialog
+  description: |-
+    If enabled, the user's LTI URL input on the select content dialog will be overwritten 
+    if the tool responds with a valid LTI URL.
