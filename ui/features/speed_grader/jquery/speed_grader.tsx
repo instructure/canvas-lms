@@ -1291,13 +1291,14 @@ function statusMenuComponent(submission) {
       selection={determineSubmissionSelection(submission)}
       updateSubmission={updateSubmissionAndPageEffects}
       cachedDueDate={submission.cached_due_date}
+      customStatuses={ENV.custom_grade_statuses}
     />
   )
 }
 
-function getLateMissingAndExcusedPills() {
+function getStatusPills() {
   return document.querySelectorAll(
-    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill'
+    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill, [class^="submission-custom-grade-status-pill-"]'
   )
 }
 
@@ -1313,7 +1314,7 @@ function updateSubmissionAndPageEffects(data?: {
       refreshGrades(() => {
         EG.showSubmissionDetails()
         if (availableMountPointForStatusMenu()) {
-          styleSubmissionStatusPills(getLateMissingAndExcusedPills())
+          styleSubmissionStatusPills(getStatusPills())
           const mountPoint = availableMountPointForStatusMenu()
           if (!mountPoint) throw new Error('SpeedGrader: mount point for status menu not found')
           renderStatusMenu(statusMenuComponent(submission), mountPoint)
@@ -2559,7 +2560,7 @@ EG = {
     if (mountPoint) {
       const isInModeration = isModerated && !window.jsonData.grades_published_at
       const shouldRender = isMostRecent && !isClosedForSubmission && !isConcluded && !isInModeration
-      styleSubmissionStatusPills(getLateMissingAndExcusedPills())
+      styleSubmissionStatusPills(getStatusPills())
       const component = shouldRender ? statusMenuComponent(this.currentStudent.submission) : null
       renderStatusMenu(component, mountPoint)
     }
@@ -2632,6 +2633,10 @@ EG = {
         return {
           value: i,
           late_policy_status: EG.currentStudent.submission.late_policy_status,
+          custom_grade_status_name: ENV.custom_grade_statuses
+            ?.find(status => status.id === s.custom_grade_status_id)
+            ?.name.toUpperCase(),
+          custom_grade_status_id: s.custom_grade_status_id,
           late: s.late,
           missing: s.missing,
           excused: EG.currentStudent.submission.excused,
@@ -2653,7 +2658,7 @@ EG = {
       })
     }
     $multiple_submissions.html($.raw(innerHTML || ''))
-    StatusPill.renderPills()
+    StatusPill.renderPills(ENV.custom_grade_statuses)
   },
 
   showSubmissionDetails() {
@@ -2694,7 +2699,10 @@ EG = {
       const extended =
         currentSubmission.submission_history[index].submission?.late_policy_status === 'extended' ||
         currentSubmission.submission_history[index]?.late_policy_status === 'extended'
-      if (missing || late || extended) {
+      const customStatus =
+        !!currentSubmission.submission_history[index].submission?.custom_grade_status_id ||
+        !!currentSubmission.submission_history[index]?.custom_grade_status_id
+      if (missing || late || extended || customStatus) {
         this.refreshSubmissionsToView()
         $submission_details.show()
       } else {

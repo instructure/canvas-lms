@@ -29,7 +29,9 @@ export function styleSubmissionStatusPills(pills) {
 }
 
 export function determineSubmissionSelection(submission) {
-  if (submission.excused) {
+  if (submission.custom_grade_status_id) {
+    return submission.custom_grade_status_id
+  } else if (submission.excused) {
     return 'excused'
   } else if (submission.missing) {
     return 'missing'

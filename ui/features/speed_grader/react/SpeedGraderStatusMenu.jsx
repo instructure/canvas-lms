@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {func, number, string, oneOf} from 'prop-types'
+import {func, number, string, oneOf, array} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {IconEditLine} from '@instructure/ui-icons'
@@ -29,30 +29,40 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 
 const I18n = useI18nScope('speed_grader')
 
-const statusesMap = {
-  extended: I18n.t('Extended'),
-  excused: I18n.t('Excused'),
-  late: I18n.t('Late'),
-  missing: I18n.t('Missing'),
-  none: I18n.t('None'),
-}
-
 export default function SpeedGraderStatusMenu(props) {
+  const statusesMap = {
+    extended: I18n.t('Extended'),
+    excused: I18n.t('Excused'),
+    late: I18n.t('Late'),
+    missing: I18n.t('Missing'),
+    none: I18n.t('None'),
+  }
+  props.customStatuses?.forEach(status => {
+    statusesMap[status.id] = status.name
+  })
   const handleSelection = (_, newSelection) => {
     if (newSelection === props.selection) {
       return
     }
-
-    const data = newSelection === 'excused' ? {excuse: true} : {latePolicyStatus: newSelection}
-    if (newSelection === 'late') {
-      data.secondsLateOverride = props.secondsLate
+    let data = {latePolicyStatus: newSelection}
+    if (newSelection === 'excused') {
+      data = {excuse: true}
+    } else if (newSelection === 'late') {
+      data = {latePolicyStatus: newSelection, secondsLateOverride: props.secondsLate}
+    } else if (!isNaN(parseInt(newSelection))) {
+      data = {customGradeStatusId: newSelection}
     }
-
     props.updateSubmission(data)
   }
 
-  const optionValues = ['late', 'missing', 'excused', 'none']
-  if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) optionValues.splice(3, 0, 'extended')
+  const optionValues = ['late', 'missing', 'excused']
+  if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) {
+    optionValues.push('extended')
+  }
+  props.customStatuses?.forEach(status => {
+    optionValues.push(status.id)
+  })
+  optionValues.push('none')
 
   const menuOptions = optionValues.map(status => (
     <Menu.Item
@@ -121,4 +131,5 @@ SpeedGraderStatusMenu.propTypes = {
   selection: string.isRequired,
   updateSubmission: func.isRequired,
   cachedDueDate: string,
+  customStatuses: array,
 }

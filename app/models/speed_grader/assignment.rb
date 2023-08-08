@@ -67,6 +67,13 @@ module SpeedGrader
           end
         )
 
+      submission_json_fields <<
+        (
+          if Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+            :custom_grade_status_id
+          end
+        )
+
       attachment_json_fields = %i[
         id
         comment_id

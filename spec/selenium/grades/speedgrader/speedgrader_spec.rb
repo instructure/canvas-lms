@@ -398,6 +398,7 @@ describe "Speedgrader" do
 
     context "submission status" do
       before do
+        Account.site_admin.enable_feature!(:custom_gradebook_statuses)
         assignment = @course.assignments.create!(points_possible: 20)
         @submission = assignment.submissions.find_by!(user: @students[0])
         @submission.update!(late_policy_status: "missing")
@@ -406,11 +407,14 @@ describe "Speedgrader" do
         @submission = assignment.submissions.find_by!(user: @students[2])
         @submission.update!(late_policy_status: "late")
         assignment.grade_student(@students[3], grader: @teacher, excused: true)
+        @submission = assignment.submissions.find_by!(user: @students[4])
+        @custom_status = CustomGradeStatus.create!(name: "Custom Status", color: "#000000", root_account_id: @course.root_account_id, created_by: @teacher)
+        @submission.update!(custom_grade_status: @custom_status)
         user_session(@teacher)
         Speedgrader.visit(@course.id, assignment.id)
       end
 
-      it "displays correct missing status pill for each student submission" do
+      it "displays correct status pill for each student submission" do
         expect(f(".submission-missing-pill")).to be_displayed
         Speedgrader.click_next_student_btn
         expect(f(".submission-extended-pill")).to be_displayed
@@ -418,6 +422,8 @@ describe "Speedgrader" do
         expect(f(".submission-late-pill")).to be_displayed
         Speedgrader.click_next_student_btn
         expect(f(".submission-excused-pill")).to be_displayed
+        Speedgrader.click_next_student_btn
+        expect(f(".submission-custom-grade-status-pill-#{@custom_status.id}")).to be_displayed
       end
     end
   end

@@ -19,6 +19,7 @@
 import {EnvCommonNewUserTutorial} from '@canvas/global/env/EnvCommon'
 import {GradebookOptions} from '../../../features/gradebook/react/default_gradebook/gradebook.d'
 import {GradingScheme} from '@canvas/grading_scheme'
+import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 /**
  * Generic Gradebook environment.
@@ -98,6 +99,7 @@ export interface EnvGradebookSpeedGrader {
   course_id: string
   assignment_id: string
   assignment_title: string
+  custom_grade_statuses: GradeStatus[]
   rubric: null | unknown
   nonScoringRubrics: boolean
   outcome_extra_credit_enabled: boolean

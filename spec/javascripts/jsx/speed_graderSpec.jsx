@@ -335,6 +335,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         grading_role: 'moderator',
         help_url: 'example.com/support',
         show_help_menu_item: false,
+        custom_grade_statuses: [{id: '1', name: 'Custom Status'}],
       })
       setupFixtures('<span id="multiple_submissions"></span>')
       sandbox.stub($, 'ajaxJSON')
@@ -479,6 +480,18 @@ QUnit.module('SpeedGrader', rootHooks => {
     const submissionDropdown = document.getElementById('multiple_submissions')
     const firstSubmission = submissionDropdown.getElementsByTagName('option')[0]
     notOk(firstSubmission.innerHTML.includes('MISSING'))
+    SpeedGrader.teardown()
+  })
+
+  test('submission that has a custom status is tagged with it in the SpeedGrader submission view dropdown', () => {
+    SpeedGrader.setup()
+    SpeedGrader.EG.currentStudent.submission.custom_grade_status_id = '1'
+    SpeedGrader.EG.currentStudent.submission.submission_history[0].custom_grade_status_id = '1'
+    SpeedGrader.EG.currentStudent.submission.submission_history[1].custom_grade_status_id = '1'
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionDropdown = document.getElementById('multiple_submissions')
+    const firstSubmission = submissionDropdown.getElementsByTagName('option')[0]
+    ok(firstSubmission.innerHTML.includes('CUSTOM STATUS'))
     SpeedGrader.teardown()
   })
 
