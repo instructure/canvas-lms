@@ -527,4 +527,22 @@ describe GradingStandard do
       end
     end
   end
+
+  describe "accounts" do
+    let_once(:root_account) { Account.create! }
+    let_once(:subaccount) { Account.create(root_account:) }
+    let_once(:course) { Course.create!(account: root_account) }
+
+    let_once(:data) { [["A", 94], ["F", 0]] }
+
+    context "when deleted" do
+      it "removes association on account" do
+        grading_standard = GradingStandard.new(context: subaccount, workflow_state: "active", data:)
+        subaccount.grading_standard = grading_standard
+        subaccount.save!
+
+        expect { grading_standard.destroy }.to change { subaccount.reload.grading_standard_id }.from(grading_standard.id).to(nil)
+      end
+    end
+  end
 end

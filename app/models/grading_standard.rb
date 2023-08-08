@@ -19,11 +19,13 @@
 #
 
 class GradingStandard < ActiveRecord::Base
-  include Workflow
+  include Canvas::SoftDeletable
 
   belongs_to :context, polymorphic: [:account, :course], required: true
   belongs_to :user
   has_many :assignments
+
+  has_many :accounts, inverse_of: :grading_standard, dependent: :nullify
 
   validates :workflow_state, presence: true
   validates :data, presence: true
@@ -200,7 +202,8 @@ class GradingStandard < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
-    save
+
+    run_callbacks(:destroy) { save }
   end
 
   def grading_scheme

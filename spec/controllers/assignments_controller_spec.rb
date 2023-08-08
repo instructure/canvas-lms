@@ -292,6 +292,19 @@ describe AssignmentsController do
         get "edit", params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to be_nil
       end
+
+      it "sets COURSE_DEFAULT_GRADING_SCHEME_ID to account value if course has none" do
+        Account.site_admin.enable_feature!(:grading_scheme_updates)
+        gs = GradingStandard.new(context: @course.account, title: "My Grading Standard", data: { "A" => 0.94, "B" => 0, })
+        gs.save!
+        @course.account.update_attribute :grading_standard_id, gs.id
+
+        user_session @teacher
+        get "edit", params: { course_id: @course.id, id: @assignment.id }
+
+        expect(@course.account.grading_standard_id).to eq gs.id
+        expect(assigns[:js_env][:COURSE_DEFAULT_GRADING_SCHEME_ID]).to eq gs.id
+      end
     end
 
     context "draft state" do

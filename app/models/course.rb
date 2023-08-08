@@ -2594,6 +2594,11 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def course_grading_standard_enabled
+    !!grading_standard_id
+  end
+  alias_method :course_grading_standard_enabled?, :course_grading_standard_enabled
+
   def grading_standard_enabled
     !!grading_standard_id || account.grading_standard_enabled?
   end
@@ -2606,6 +2611,7 @@ class Course < ActiveRecord::Base
       self.grading_standard = self.grading_standard_id = nil
     end
   end
+  alias_method :course_grading_standard_enabled=, :grading_standard_enabled=
 
   def readable_default_wiki_editing_roles
     roles = default_wiki_editing_roles || "teachers"

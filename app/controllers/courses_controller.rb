@@ -4143,6 +4143,7 @@ class CoursesController < ApplicationController
       :restrict_quantitative_data,
       :grading_standard,
       :grading_standard_enabled,
+      :course_grading_standard_enabled,
       :locale,
       :integration_id,
       :hide_final_grades,
