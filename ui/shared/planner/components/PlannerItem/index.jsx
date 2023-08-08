@@ -226,41 +226,69 @@ export class PlannerItem_raw extends Component {
   linkLabel() {
     const assignmentType = this.assignmentType()
     const datetimeformat = this.props.allDay === true ? 'LL' : 'LLLL'
-    const params = {
-      assignmentType,
-      title: this.props.title,
-      datetime: this.props.date ? this.props.date.format(datetimeformat) : null,
-    }
+    const title = this.props.title
+    const datetime = this.props.date ? this.props.date.format(datetimeformat) : null
 
     if (this.props.date) {
       if (this.props.allDay) {
-        return I18n.t('%{assignmentType} %{title}, all day on %{datetime}.', params)
+        return I18n.t('%{assignmentType} %{title}, all day on %{datetime}.', {
+          assignmentType,
+          title,
+          datetime,
+        })
       }
 
       if (this.props.associated_item === 'Calendar Event') {
         if (this.showEndTime()) {
-          params.endTime = this.props.endTime.format('LT')
-          return I18n.t('%{assignmentType} %{title}, at %{datetime} until %{endTime}', params)
+          return I18n.t('%{assignmentType} %{title}, at %{datetime} until %{endTime}', {
+            assignmentType,
+            title,
+            datetime,
+            endTime: this.props.endTime.format('LT')
+          })
         } else {
-          return I18n.t('%{assignmentType} %{title}, at %{datetime}.', params)
+          return I18n.t('%{assignmentType} %{title}, at %{datetime}.', {
+            assignmentType,
+            title,
+            datetime,
+          })
         }
       }
 
       if (this.hasDueTime()) {
         if (this.props.dateStyle === 'todo') {
-          return I18n.t('%{assignmentType} %{title} has a to do time at %{datetime}.', params)
+          return I18n.t('%{assignmentType} %{title} has a to do time at %{datetime}.', {
+            assignmentType,
+            title,
+            datetime,
+          })
         } else if (this.props.associated_item === 'Peer Review') {
-          return I18n.t('%{assignmentType} %{title}, reminder %{datetime}.', params)
+          return I18n.t('%{assignmentType} %{title}, reminder %{datetime}.', {
+            assignmentType,
+            title,
+            datetime,
+          })
         } else {
-          return I18n.t('%{assignmentType} %{title}, due %{datetime}.', params)
+          return I18n.t('%{assignmentType} %{title}, due %{datetime}.', {
+            assignmentType,
+            title,
+            datetime,
+          })
         }
       }
 
       if (this.props.associated_item === 'Announcement') {
-        return I18n.t('%{assignmentType} %{title} posted %{datetime}.', params)
+        return I18n.t('%{assignmentType} %{title} posted %{datetime}.', {
+          assignmentType,
+          title,
+          datetime,
+        })
       }
     }
-    return I18n.t('%{assignmentType} %{title}.', params)
+    return I18n.t('%{assignmentType} %{title}.', {
+      assignmentType,
+      title,
+    })
   }
 
   openCalendarEventModal = () => {
