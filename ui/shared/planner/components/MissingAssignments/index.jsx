@@ -48,18 +48,21 @@ export const convertSubmissionType = submissionTypes => {
 }
 
 export const getMissingItemsText = (isExpanded, count) => {
-  return I18n.t(
-    isExpanded
-      ? {
+  return isExpanded
+    ? I18n.t(
+        {
           one: 'Hide 1 missing item',
           other: 'Hide %{count} missing items',
-        }
-      : {
+        },
+        {count}
+      )
+    : I18n.t(
+        {
           one: 'Show 1 missing item',
           other: 'Show %{count} missing items',
         },
-    {count}
-  )
+        {count}
+      )
 }
 
 function MissingAssignment({
