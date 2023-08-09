@@ -86,6 +86,7 @@ export function updateFinalGradeOverride(
         overrideScore: ${grade && grade.percentage}
       }) {
         grades {
+          customGradeStatusId
           overrideScore
         }
       }
@@ -97,8 +98,8 @@ export function updateFinalGradeOverride(
       .mutate({mutation})
       // @ts-ignore
       .then(response => {
-        const {overrideScore} = response.data.setOverrideScore.grades
-        return overrideScore != null ? {percentage: overrideScore} : null
+        const {overrideScore, customGradeStatusId} = response.data.setOverrideScore.grades
+        return overrideScore != null ? {percentage: overrideScore, customGradeStatusId} : null
       })
       .catch((/* error */) => {
         showFlashAlert({

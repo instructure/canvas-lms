@@ -43,6 +43,7 @@ const I18n = useI18nScope('gradebook')
 
 export type TotalGradeOverrideTrayProps = {
   customGradeStatuses: GradeStatus[]
+  handleDismiss: (manualDismiss: boolean) => void
   selectedGradingPeriodId?: string
   navigateDown: () => void
   navigateUp: () => void
@@ -59,6 +60,7 @@ export function TotalGradeOverrideTrayProvider(props: TotalGradeOverrideTrayProp
 export function TotalGradeOverrideTray({
   customGradeStatuses,
   selectedGradingPeriodId,
+  handleDismiss,
   navigateDown,
   navigateUp,
 }: TotalGradeOverrideTrayProps) {
@@ -92,8 +94,9 @@ export function TotalGradeOverrideTray({
 
   const {name, avatarUrl, gradesUrl, enrollmentId} = studentInfo
 
-  const dismissTray = () => {
+  const dismissTray = (manualDismiss: boolean) => {
     toggleFinalGradeOverrideTray(false)
+    handleDismiss(manualDismiss)
   }
 
   const handleRadioInputChanged = async (newCustomStatusId: string | null) => {
@@ -128,7 +131,7 @@ export function TotalGradeOverrideTray({
     <Tray
       label={I18n.t('Final Grade Override Tray')}
       open={isOpen}
-      onDismiss={dismissTray}
+      onDismiss={() => dismissTray(false)}
       shouldContainFocus={true}
       shouldCloseOnDocumentClick={true}
       size="small"
@@ -137,7 +140,7 @@ export function TotalGradeOverrideTray({
       <View as="div" padding="0" data-testid="total-grade-override-tray">
         <CloseButton
           placement="start"
-          onClick={dismissTray}
+          onClick={() => dismissTray(true)}
           screenReaderLabel={I18n.t('Close total grade override tray')}
         />
 
