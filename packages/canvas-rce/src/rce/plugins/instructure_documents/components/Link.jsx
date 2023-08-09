@@ -146,7 +146,7 @@ export default function Link(props) {
         position="relative"
         focusPosition="inset"
         focusColor="info"
-        tabIndex="0"
+        tabIndex={0}
         aria-describedby={props.describedByID}
         elementRef={elementRef}
         background="primary"

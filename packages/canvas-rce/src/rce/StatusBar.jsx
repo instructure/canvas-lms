@@ -170,7 +170,7 @@ export default function StatusBar(props) {
   }
 
   function tabIndexForBtn(itemId) {
-    const tabindex = focusedBtnId === itemId ? '0' : '-1'
+    const tabindex = focusedBtnId === itemId ? 0 : -1
     return tabindex
   }
 

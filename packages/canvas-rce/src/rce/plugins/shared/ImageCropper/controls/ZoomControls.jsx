@@ -69,7 +69,7 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
   }
 
   return (
-    <Flex.Item title={formatMessage('Zoom')} role="toolbar" tabindex="-1">
+    <Flex.Item title={formatMessage('Zoom')} role="toolbar" tabindex={-1}>
       <View display="inline-block" margin="0 small 0 0">
         <CustomNumberInput
           value={round(scaleRatio * 100)}
