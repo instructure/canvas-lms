@@ -5138,8 +5138,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         {this.options.custom_grade_statuses_enabled && (
           <TotalGradeOverrideTrayProvider
             customGradeStatuses={this.options.custom_grade_statuses}
-            navigateDown={() => this.gradebookGrid?.grid?.navigateDown()}
-            navigateUp={() => this.gradebookGrid?.grid?.navigateUp()}
+            handleDismiss={(manualDismiss: boolean) => {
+              this.gradebookGrid?.gridSupport?.helper.focus()
+              if (manualDismiss) {
+                this.gradebookGrid?.gridSupport?.helper.beginEdit()
+              }
+            }}
+            navigateDown={() => {
+              this.gradebookGrid?.grid?.navigateDown()
+              this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
+            }}
+            navigateUp={() => {
+              this.gradebookGrid?.grid?.navigateUp()
+              this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
+            }}
             selectedGradingPeriodId={this.gradingPeriodId}
           />
         )}

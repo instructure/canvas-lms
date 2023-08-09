@@ -156,6 +156,7 @@ export default class EditableCell extends CellEditorComponent {
                   onClick={() => {
                     const {toggleFinalGradeOverrideTray} = useStore.getState()
                     toggleFinalGradeOverrideTray()
+                    this.props.onTrayOpen()
                   }}
                   size="small"
                   renderIcon={IconExpandStartLine}

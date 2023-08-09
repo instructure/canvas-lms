@@ -79,6 +79,10 @@ export default class TotalGradeOverrideCellPropFactory {
         finalGradeOverrides?.updateGrade(userId, updatedGradeInfo)
       },
 
+      onTrayOpen: () => {
+        this._gradebook.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
+      },
+
       pendingGradeInfo,
       studentIsGradeable: this._gradebook.studentCanReceiveGradeOverride(userId),
     }

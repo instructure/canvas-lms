@@ -28,6 +28,7 @@ import * as FinalGradeOverrideHooks from '../../hooks/useFinalGradeOverrideCusto
 describe('TotalGradeOverrideTray Tests', () => {
   const navigateUp = jest.fn()
   const navigateDown = jest.fn()
+  const handleDismiss = jest.fn()
   const getComponent = (props: Partial<TotalGradeOverrideTrayProps> = {}) => {
     const trayProps: TotalGradeOverrideTrayProps = {
       customGradeStatuses: [
@@ -35,6 +36,7 @@ describe('TotalGradeOverrideTray Tests', () => {
         {id: '2', color: '#FFFFFF', name: 'Custom Status 2'},
         {id: '3', color: '#EEEEEE', name: 'Custom Status 3'},
       ],
+      handleDismiss,
       selectedGradingPeriodId: '0',
       navigateDown,
       navigateUp,
@@ -240,6 +242,15 @@ describe('TotalGradeOverrideTray Tests', () => {
       expect(
         updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
       ).toEqual('1')
+    })
+
+    it('calls handleDismiss with true when the button is clicked', () => {
+      const {getByText} = getComponent()
+      const cancelButton = getByText('Close total grade override tray')
+
+      fireEvent.click(cancelButton)
+
+      expect(handleDismiss).toHaveBeenCalledWith(true)
     })
   })
 })
