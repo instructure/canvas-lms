@@ -46,7 +46,7 @@ module.exports = {
     // jest can't import css
     '\\.(css|less)$': '<rootDir>/src/rce/__mocks__/styleMock.js',
     // mock the tinymce-react Editor component
-    '@tinymce/tinymce-react': '<rootDir>/src/rce/__mocks__/tinymceReact.js',
+    '@tinymce/tinymce-react': '<rootDir>/src/rce/__mocks__/tinymceReact.jsx',
   },
 
   transform: {
