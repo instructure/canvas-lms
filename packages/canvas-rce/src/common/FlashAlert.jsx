@@ -56,6 +56,19 @@ const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jqu
 const screenreaderMessageHolderId = 'flash_screenreader_holder'
 const TIMEOUT = 10000
 
+function getLiveRegion() {
+  // return element where flash screenreader messages go.
+  // create if necessary
+  let liveRegion = document.getElementById(screenreaderMessageHolderId)
+  if (!liveRegion) {
+    liveRegion = document.createElement('div')
+    liveRegion.id = screenreaderMessageHolderId
+    liveRegion.setAttribute('role', 'alert')
+    document.body.appendChild(liveRegion)
+  }
+  return liveRegion
+}
+
 // An Alert with a message and "Details" button which surfaces
 // more info about the error when pressed.
 // Is displayed at the top of the document, and will close itself after a while
@@ -84,19 +97,6 @@ export default class FlashAlert extends React.Component {
       isOpen: true,
     }
     this.timerId = 0
-  }
-
-  getLiveRegion() {
-    // return element where flash screenreader messages go.
-    // create if necessary
-    let liveRegion = document.getElementById(screenreaderMessageHolderId)
-    if (!liveRegion) {
-      liveRegion = document.createElement('div')
-      liveRegion.id = screenreaderMessageHolderId
-      liveRegion.setAttribute('role', 'alert')
-      document.body.appendChild(liveRegion)
-    }
-    return liveRegion
   }
 
   showDetails = () => {
@@ -176,7 +176,7 @@ export default class FlashAlert extends React.Component {
           onDismiss={this.closeAlert}
           margin="small auto"
           timeout={this.props.timeout}
-          liveRegion={this.getLiveRegion}
+          liveRegion={getLiveRegion}
           transition="fade"
           screenReaderOnly={this.props.screenReaderOnly}
         >
@@ -220,6 +220,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
         error={err}
         variant={type}
         onClose={closeAlert.bind(null, parent)}
+        liveRegion={getLiveRegion}
         screenReaderOnly={srOnly}
       />,
       parent

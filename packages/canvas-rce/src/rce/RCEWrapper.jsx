@@ -1873,6 +1873,7 @@ class RCEWrapper extends React.Component {
                     onBlur={this.handleBlurEditor}
                     onNodeChange={this.onNodeChange}
                     onEditorChange={this.onEditorChange}
+                    liveRegion={() => document.getElementById('flash_screenreader_holder')}
                   />
                 </div>
                 <StatusBar
