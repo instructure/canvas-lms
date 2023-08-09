@@ -175,9 +175,8 @@ export default class DeveloperKeyModal extends React.Component {
         this.props.handleSuccessfulSave()
         this.closeModal()
       })
-      .catch(errors => {
+      .catch(() => {
         this.setState({isSaving: false})
-        $.flashError(I18n.t('Failed to save changes: %{errors}%', {errors}))
       })
   }
 

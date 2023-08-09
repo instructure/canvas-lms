@@ -615,13 +615,13 @@ describe('receiving an HTTP response', () => {
           errors: [
             {
               field: 'lti_key',
-              message: 'tool configuration must have public jwk or public jwk url',
+              message: 'Tool configuration must have public jwk or public jwk url',
               error_code: null,
             },
           ],
         },
       })
-      expect(flashStub).toHaveBeenCalledWith('Request failed with status code 422')
+      expect(flashStub).toHaveBeenCalledWith('Tool configuration must have public jwk or public jwk url')
       expect(closeModal).not.toHaveBeenCalled()
       done()
     })
