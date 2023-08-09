@@ -60,7 +60,6 @@ export const useSubmitScore = () => {
       const delocalizedGrade = GradeFormatHelper.delocalizeGrade(gradeInput)
       const isExcusedText =
         gradeInput?.toUpperCase() === 'EXCUSED' || gradeInput?.toUpperCase() === 'EX'
-
       if (
         delocalizedGrade === submission.grade ||
         ((delocalizedGrade === '-' || delocalizedGrade === '') && submission.grade === null) ||

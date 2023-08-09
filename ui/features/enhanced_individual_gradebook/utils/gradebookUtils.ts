@@ -54,6 +54,25 @@ import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
+export const passFailStatusOptions = [
+  {
+    label: I18n.t('Ungraded'),
+    value: ' ',
+  },
+  {
+    label: I18n.t('Complete'),
+    value: 'complete',
+  },
+  {
+    label: I18n.t('Incomplete'),
+    value: 'incomplete',
+  },
+  {
+    label: I18n.t('Excused'),
+    value: 'EX',
+  },
+]
+
 export function mapAssignmentGroupQueryResults(
   assignmentGroup: AssignmentGroupConnection[],
   assignmentGradingPeriodMap: AssignmentGradingPeriodMap
@@ -250,7 +269,7 @@ export function outOfText(
   } else if (gradingType === 'letter_grade' || gradingType === 'pass_fail') {
     return I18n.t('(%{score} out of %{points})', {
       points: I18n.n(pointsPossible),
-      score: submission.enteredScore,
+      score: submission.enteredScore ?? ' -',
     })
   } else if (pointsPossible === null || pointsPossible === undefined) {
     return I18n.t('No points possible')
