@@ -1170,6 +1170,7 @@ describe Canvas::LiveEvents do
     it "triggers a live event with assignment details" do
       expect_event("assignment_updated",
                    hash_including({
+                     anonymous_grading: @assignment.anonymous_grading,
                      assignment_id: @assignment.global_id.to_s,
                      context_id: @course.global_id.to_s,
                      context_uuid: @course.uuid,
