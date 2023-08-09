@@ -131,28 +131,26 @@ describe('FilterTray', () => {
   })
 
   it('Pressing tab from the first date input field will allow the user to reach the delete filter preset button when all fields are empty', () => {
-    const {getByText, getAllByTestId, getByTestId} = render(<FilterTray {...defaultProps} />)
+    const {getByText, getByTestId} = render(<FilterTray {...defaultProps} />)
     userEvent.click(getByText('Toggle Create Filter Preset'))
-    const startDate = getAllByTestId('date-input')[0]
+    const startDate = getByTestId('start-date-input')
     userEvent.click(startDate)
     userEvent.tab()
-    const endDate = getAllByTestId('date-input')[1]
+    const endDate = getByTestId('end-date-input')
     expect(endDate).toHaveFocus()
     userEvent.tab()
     expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
   })
 
   it('Pressing tab from the first date input field with a date will allow the user to reach the delete filter preset button', () => {
-    const {getByText, getAllByText, getAllByTestId, getByTestId} = render(
-      <FilterTray {...defaultProps} />
-    )
+    const {getByText, getAllByText, getByTestId} = render(<FilterTray {...defaultProps} />)
     userEvent.click(getByText('Toggle Create Filter Preset'))
-    const startDate = getAllByTestId('date-input')[0]
+    const startDate = getByTestId('start-date-input')
     userEvent.click(startDate)
     const button = getAllByText('1')[0]
     userEvent.click(button)
     userEvent.tab()
-    const endDate = getAllByTestId('date-input')[1]
+    const endDate = getByTestId('end-date-input')
     expect(endDate).toHaveFocus()
     userEvent.tab()
     expect(getByTestId('delete-filter-preset-button')).toHaveFocus()
