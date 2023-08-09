@@ -126,7 +126,7 @@ export default function Link(props) {
             position="relative"
             as="div"
             role="button"
-            tabIndex="0"
+            tabIndex={0}
             background="primary"
             display="block"
             width="100%"

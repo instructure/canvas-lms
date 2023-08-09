@@ -49,7 +49,7 @@ export const RotationControls = ({rotation, onChange}) => {
     onChange(calculateRotation(getNearestRectAngle(rotation, false) + BUTTON_ROTATION_DEGREES))
 
   return (
-    <Flex.Item margin="0 medium 0 0" title={formatMessage('Rotation')} role="toolbar" tabindex="-1">
+    <Flex.Item margin="0 medium 0 0" title={formatMessage('Rotation')} role="toolbar" tabindex={-1}>
       <View display="inline-block" margin="0 small 0 0">
         <CustomNumberInput
           value={rotation}

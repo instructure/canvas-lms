@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {func, string} from 'prop-types'
+import {func, string, number} from 'prop-types'
 import {DraggableCore} from 'react-draggable'
 import keycode from 'keycode'
 import {View} from '@instructure/ui-view'
@@ -49,11 +49,11 @@ export default function ResizeHandle(props) {
     setIsFocused(false)
   }
 
-  function handleDragStart(e) {
+  function handleDragStart(_e) {
     setDragging(true)
   }
 
-  function handleDragStop(e) {
+  function handleDragStop(_e) {
     setDragging(false)
   }
 
@@ -97,11 +97,11 @@ export default function ResizeHandle(props) {
 ResizeHandle.propTypes = {
   onDrag: func,
   onFocus: func,
-  tabIndex: string,
+  tabIndex: number,
   'data-btn-id': string,
 }
 
 ResizeHandle.defaultProps = {
   onDrag: () => {},
-  tabIndex: '-1',
+  tabIndex: -1,
 }

@@ -216,7 +216,7 @@ ContentMigration.prototype.onProgress = function (event) {
           valueNow: event.loaded,
           renderValue: this.progressValue,
           formatScreenReaderValue: this.progressValue,
-          tabindex: '0',
+          tabindex: 0,
         }),
         mountPoint
       )

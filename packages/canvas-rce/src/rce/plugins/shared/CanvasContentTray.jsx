@@ -473,7 +473,7 @@ export default function CanvasContentTray(props) {
           as="div"
           height={getTrayHeight()}
           overflowY="hidden"
-          tabIndex="-1"
+          tabIndex={-1}
           data-canvascontenttray-content={true}
         >
           <Flex.Item padding="medium" shadow="above">
