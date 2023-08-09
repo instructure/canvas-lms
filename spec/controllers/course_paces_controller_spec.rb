@@ -644,6 +644,16 @@ describe CoursePacesController do
       expect(json_response["context_type"]).to eq("CoursePace")
       expect(json_response["workflow_state"]).to eq("queued")
     end
+
+    it "emits course_pacing.publishing.count_exceeding_limit to statsd when pace publishing proccesses exceeded limit" do
+      allow(InstStatsd::Statsd).to receive(:count).and_call_original
+
+      Progress.destroy_all
+      50.times { @course_pace.create_publish_progress(run_at: Time.now) }
+
+      post :publish, params: { course_id: @course.id, id: @course_pace.id }
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.publishing.count_exceeding_limit", 51)
+    end
   end
 
   describe "POST #compress_dates" do
