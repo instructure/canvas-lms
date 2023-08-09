@@ -128,7 +128,7 @@ describe Score do
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
 
-      it "is invalid when a custom status is set and a score override is not" do
+      it "is invalid when trying to set a custom status on a score without an override" do
         account = score.course.root_account
         custom_grade_status = account.custom_grade_statuses.create!(
           color: "#ABC",
@@ -139,6 +139,23 @@ describe Score do
           score.validate
           score.errors.full_messages.first
         }.from(nil).to("Custom grade status cannot be set when the score is not overridden")
+      end
+
+      it "is valid when clearing an override on a score with a custom status (the status gets cleared)" do
+        account = score.course.root_account
+        custom_grade_status = account.custom_grade_statuses.create!(
+          color: "#ABC",
+          created_by: account_admin_user(account:),
+          name: "custom status"
+        )
+        score.update!(override_score: 88.0, custom_grade_status:)
+        expect { score.override_score = nil }.to change {
+          score.validate
+          {
+            errors: score.errors.full_messages.first,
+            custom_grade_status_id: score.custom_grade_status_id
+          }
+        }.from({ errors: nil, custom_grade_status_id: custom_grade_status.id }).to({ errors: nil, custom_grade_status_id: nil })
       end
     end
   end
@@ -169,6 +186,34 @@ describe Score do
         score.update!(root_account_id: second_account.id)
         expect(score.root_account_id).to eq second_account.id
       end
+    end
+  end
+
+  describe "custom_grade_status_id" do
+    let(:custom_grade_status) do
+      account = score.course.root_account
+      account.custom_grade_statuses.create!(
+        color: "#ABC",
+        created_by: account_admin_user(account:),
+        name: "custom status"
+      )
+    end
+
+    let(:overridden_score) do
+      score.update!(override_score: 88.0, custom_grade_status:)
+      score
+    end
+
+    it "nils out the custom_grade_status_id when the override_score is removed" do
+      expect { overridden_score.update!(override_score: nil) }.to change {
+        overridden_score.custom_grade_status_id
+      }.from(custom_grade_status.id).to(nil)
+    end
+
+    it "keeps the custom_grade_status_id when the override_score is changed to a non-nil value" do
+      expect { overridden_score.update!(override_score: 94.0) }.not_to change {
+        overridden_score.custom_grade_status_id
+      }.from(custom_grade_status.id)
     end
   end
 

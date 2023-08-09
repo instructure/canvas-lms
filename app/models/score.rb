@@ -41,6 +41,7 @@ class Score < ActiveRecord::Base
   validate :must_be_overridden_to_have_custom_status
 
   before_validation :set_course_score, unless: :course_score_changed?
+  before_validation :remove_custom_status_if_override_being_removed
   before_save :set_root_account_id
 
   set_policy do
@@ -126,6 +127,12 @@ class Score < ActiveRecord::Base
   def must_be_overridden_to_have_custom_status
     if custom_grade_status_id && !overridden?
       errors.add(:custom_grade_status_id, "cannot be set when the score is not overridden")
+    end
+  end
+
+  def remove_custom_status_if_override_being_removed
+    if will_save_change_to_override_score? && override_score.nil? && custom_grade_status_id.present?
+      self.custom_grade_status_id = nil
     end
   end
 
