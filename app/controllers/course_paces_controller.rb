@@ -292,6 +292,8 @@ class CoursePacesController < ApplicationController
   include K5Mode
   include GranularPermissionEnforcement
 
+  COURSE_PACES_PUBLISHING_LIMIT = 50
+
   def index
     add_crumb(t("Course Pacing"))
     @course_pace = @context.course_paces.primary.first
@@ -433,6 +435,7 @@ class CoursePacesController < ApplicationController
 
   def publish
     publish_course_pace
+    log_course_paces_publishing
     render json: progress_json(@progress, @current_user, session)
   end
 
@@ -748,5 +751,10 @@ class CoursePacesController < ApplicationController
 
   def publish_course_pace
     @progress = @course_pace.create_publish_progress(run_at: Time.now)
+  end
+
+  def log_course_paces_publishing
+    count = paces_publishing.length
+    InstStatsd::Statsd.count("course_pacing.publishing.count_exceeding_limit", count) if count > COURSE_PACES_PUBLISHING_LIMIT
   end
 end
