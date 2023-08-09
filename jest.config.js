@@ -28,7 +28,7 @@ module.exports = {
     // jest can't import the icons
     '@instructure/ui-icons/es/svg': '<rootDir>/packages/canvas-rce/src/rce/__tests__/_mockIcons.js',
     // mock the tinymce-react Editor react component
-    '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js',
+    '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.jsx',
     'decimal.js/decimal.mjs': 'decimal.js/decimal.js',
     // https://github.com/ai/nanoid/issues/363
     '^nanoid(/(.*)|$)': 'nanoid$1',
