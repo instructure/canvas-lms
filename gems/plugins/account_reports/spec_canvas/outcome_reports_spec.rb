@@ -59,7 +59,7 @@ describe "Outcome Reports" do
 
     @section = @course1.course_sections.first
     assignment_model(course: @course1, title: "English Assignment")
-    outcome_group = @root_account.root_outcome_group
+    @outcome_group = @root_account.root_outcome_group
     @outcome = outcome_model(context: @root_account, short_description: "Spelling")
     @rubric = Rubric.create!(context: @course1)
     @rubric.data = [
@@ -93,9 +93,9 @@ describe "Outcome Reports" do
     @submission.submitted_at = 1.week.ago
     @submission.save!
     @outcome.reload
-    outcome_group.add_outcome(@outcome)
+    @outcome_group.add_outcome(@outcome)
     @outcome.reload
-    outcome_group.add_outcome(@outcome)
+    @outcome_group.add_outcome(@outcome)
   end
 
   before do
@@ -119,10 +119,11 @@ describe "Outcome Reports" do
   end
 
   def verify(row, values, row_index: nil)
-    user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_outcome_result, quiz_submission, pseudonym =
+    user, assignment, outcome, outcome_group, outcome_result, course, section, submission, quiz, question, quiz_outcome_result, quiz_submission, pseudonym =
       values.values_at(:user,
                        :assignment,
                        :outcome,
+                       :outcome_group,
                        :outcome_result,
                        :course,
                        :section,
@@ -163,6 +164,8 @@ describe "Outcome Reports" do
       "section sis id" => section&.sis_source_id,
       "submission date" => quiz_submission&.finished_at&.iso8601 || submission&.submitted_at&.iso8601,
       "submission score" => quiz_submission&.score || submission&.grade&.to_f,
+      "learning outcome group title" => outcome_group&.title,
+      "learning outcome group id" => outcome_group&.id,
       "learning outcome name" => outcome&.short_description,
       "learning outcome friendly name" => outcome&.display_name,
       "learning outcome id" => outcome&.id,
@@ -197,7 +200,8 @@ describe "Outcome Reports" do
       course: @course1,
       section: @section,
       assignment: @assignment,
-      outcome: @outcome
+      outcome: @outcome,
+      outcome_group: @outcome_group
     }
   end
   let(:user1_values) do
@@ -262,6 +266,15 @@ describe "Outcome Reports" do
       end
 
       let(:report_params) { { account: @sub_account } }
+      let(:common_values) do
+        {
+          course: @course1,
+          section: @section,
+          assignment: @assignment,
+          outcome: @outcome,
+          outcome_group: @sub_account.root_outcome_group
+        }
+      end
 
       it "filters courses in a sub account" do
         expect(report.length).to eq 1
@@ -340,6 +353,7 @@ describe "Outcome Reports" do
           section: @enrollment1.course_section,
           assignment: @assessment1.submission.assignment,
           outcome: @outcome,
+          outcome_group: @subaccount1.root_outcome_group,
           outcome_result: LearningOutcomeResult.find_by(artifact: @assessment1),
           submission: @assessment1.submission
         }
@@ -351,13 +365,16 @@ describe "Outcome Reports" do
           section: @enrollment2.course_section,
           assignment: @assessment2.submission.assignment,
           outcome: @outcome,
+          outcome_group: @subaccount2.root_outcome_group,
           outcome_result: LearningOutcomeResult.find_by(artifact: @assessment2),
           submission: @assessment2.submission
         }
       end
 
       it "includes results for all subaccounts when run from the root account" do
-        combined_values = all_values + [user2_subaccount_values, user1_subaccount_values]
+        values1 = user2_subaccount_values.merge({ outcome_group: @outcome_group })
+        values2 = user1_subaccount_values.merge({ outcome_group: @outcome_group })
+        combined_values = all_values + [values1, values2]
         combined_values.sort_by! { |v| v[:user].sortable_name }
         verify_all(report, combined_values)
       end
@@ -423,7 +440,7 @@ describe "Outcome Reports" do
 
     context "with quiz question results" do
       before(:once) do
-        outcome_group = @root_account.root_outcome_group
+        @outcome_group = @root_account.root_outcome_group
         @quiz_outcome = @root_account.created_learning_outcomes.create!(short_description: "new outcome")
         @quiz = @course1.quizzes.create!(title: "quiz", shuffle_answers: true, quiz_type: "assignment")
         @q1 = @quiz.quiz_questions.create!(question_data: true_false_question_data)
@@ -440,7 +457,7 @@ describe "Outcome Reports" do
         @quiz_submission.submission_data["question_#{@q2.id}"] = answer_2 + 1
         Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
         @quiz_outcome.reload
-        outcome_group.add_outcome(@quiz_outcome)
+        @outcome_group.add_outcome(@quiz_outcome)
         @quiz_outcome_result = LearningOutcomeResult.find_by(artifact: @quiz_submission)
         @new_quiz = @course1.assignments.create!(title: "New Quiz", submission_types: "external_tool")
         @new_quiz_submission = @new_quiz.grade_student(@user1, grade: "10", grader: @teacher).first
@@ -455,6 +472,7 @@ describe "Outcome Reports" do
           quiz: @quiz,
           quiz_submission: @quiz_submission,
           outcome: @quiz_outcome,
+          outcome_group: @outcome_group,
           course: @course1,
           assignment: @quiz.assignment,
           section: @section,
@@ -855,6 +873,8 @@ describe "Outcome Reports" do
             expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
             expect(results[i]["learning outcome mastered"]).to be false
             expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
+            expect(results[i]["learning outcome group title"]).to eq @outcome_group.title
+            expect(results[i]["learning outcome group id"]).to eq @outcome_group.id
 
             # 2 attempts were returned so we are looking at 1st attempt
             expect(results[i]["attempt"]).to eq(2)
@@ -947,6 +967,8 @@ describe "Outcome Reports" do
             expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
             expect(results[i]["learning outcome mastered"]).to be false
             expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
+            expect(results[i]["learning outcome group title"]).to eq @outcome_group.title
+            expect(results[i]["learning outcome group id"]).to eq @outcome_group.id
 
             # 2 attempts were returned so we are looking at 1st attempt
             expect(results[i]["attempt"]).to eq(2)
@@ -1038,6 +1060,8 @@ describe "Outcome Reports" do
             expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
             expect(results[i]["learning outcome mastered"]).to be false
             expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
+            expect(results[i]["learning outcome group title"]).to eq @outcome_group.title
+            expect(results[i]["learning outcome group id"]).to eq @outcome_group.id
 
             # 2 attempts were returned so we are looking at 2nd attempt
             expect(results[i]["attempt"]).to eq(2)

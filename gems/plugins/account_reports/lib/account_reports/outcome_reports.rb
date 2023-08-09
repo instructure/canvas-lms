@@ -60,6 +60,8 @@ module AccountReports
         "learning outcome mastered",
         "learning outcome rating",
         "learning outcome rating points",
+        "learning outcome group title",
+        "learning outcome group id",
         "account id",
         "account name",
         "enrollment state"
@@ -101,6 +103,8 @@ module AccountReports
         "learning outcome mastered",
         "learning outcome rating",
         "learning outcome rating points",
+        "learning outcome group title",
+        "learning outcome group id",
         "account id",
         "account name",
         "enrollment state"
@@ -136,6 +140,8 @@ module AccountReports
                                lo.id                  AS "learning outcome id",
                                lo.display_name        AS "learning outcome friendly name",
                                lo.data                AS "learning outcome data",
+                               g.title                AS "learning outcome group title",
+                               g.id                   AS "learning outcome group id",
                                r.attempt              AS "attempt",
                                r.hide_points          AS "learning outcome points hidden",
                                r.score                AS "outcome score",
@@ -177,6 +183,8 @@ module AccountReports
                                  AND lol.context_type = 'Account'
                                  AND lol.tag_type = 'learning_outcome_association'
                                  AND lol.workflow_state != 'deleted'
+                               INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g ON g.id = lol.associated_asset_id
+                                 AND lol.associated_asset_type = 'LearningOutcomeGroup'
                                  LEFT JOIN #{LearningOutcomeResult.quoted_table_name} r ON (r.user_id=pseudonyms.user_id
                                    AND r.content_tag_id = ct.id)
                                  LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
@@ -206,6 +214,8 @@ module AccountReports
                                 learning_outcomes.id                        AS "learning outcome id",
                                 learning_outcomes.display_name              AS "learning outcome friendly name",
                                 learning_outcomes.data                      AS "learning outcome data",
+                                g.title                                     AS "learning outcome group title",
+                                g.id                                        AS "learning outcome group id",
                                 c.name                                      AS "course name",
                                 c.id                                        AS "course id",
                                 c.sis_source_id                             AS "course sis id",
@@ -218,6 +228,8 @@ module AccountReports
                               .joins(<<~SQL.squish)
                                 INNER JOIN #{LearningOutcome.quoted_table_name} ON learning_outcomes.id = content_tags.content_id
                                   AND content_tags.content_type = 'LearningOutcome'
+                                INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g ON g.id = content_tags.associated_asset_id
+                                  AND content_tags.associated_asset_type = 'LearningOutcomeGroup'
                                 INNER JOIN #{ContentTag.quoted_table_name} cct ON cct.content_id = content_tags.content_id AND cct.context_type = 'Course'
                                 INNER JOIN #{Course.quoted_table_name} c ON cct.context_id = c.id
                                 INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
@@ -337,6 +349,8 @@ module AccountReports
         student["learning outcome id"] = outcome["learning outcome id"]
         student["learning outcome friendly name"] = outcome["learning outcome friendly name"]
         student["learning outcome data"] = outcome["learning outcome data"]
+        student["learning outcome group title"] = outcome["learning outcome group title"]
+        student["learning outcome group id"] = outcome["learning outcome group id"]
         student["course name"] = course.name
         student["course id"] = course.id
         student["course sis id"] = course.sis_source_id
@@ -445,6 +459,8 @@ module AccountReports
                           COALESCE(qr.possible, r.possible)           AS "learning outcome points possible",
                           COALESCE(qr.mastery, r.mastery)             AS "learning outcome mastered",
                           learning_outcomes.data                      AS "learning outcome data",
+                          g.title                                     AS "learning outcome group title",
+                          g.id                                        AS "learning outcome group id",
                           COALESCE(qr.attempt, r.attempt)             AS "attempt",
                           r.hide_points                               AS "learning outcome points hidden",
                           COALESCE(qr.score, r.score)                 AS "outcome score",
@@ -463,6 +479,8 @@ module AccountReports
                           acct.name                                   AS "account name"
                         SQL
                         .joins(<<~SQL.squish)
+                          INNER JOIN #{LearningOutcomeGroup.quoted_table_name} g ON g.id = content_tags.associated_asset_id
+                            AND content_tags.associated_asset_type = 'LearningOutcomeGroup'
                           INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
                             AND content_tags.content_type = 'LearningOutcome'
                           INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
