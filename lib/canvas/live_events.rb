@@ -238,28 +238,30 @@ module Canvas::LiveEvents
       assignment.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
 
     event = {
+      anonymous_grading: assignment.anonymous_grading,
+      assignment_group_id: assignment.global_assignment_group_id,
       assignment_id: assignment.global_id,
       assignment_id_duplicated_from: assignment.duplicate_of&.global_id&.to_s,
       context_id: assignment.global_context_id,
-      context_uuid: assignment.context.uuid,
       context_type: assignment.context_type,
-      assignment_group_id: assignment.global_assignment_group_id,
-      workflow_state: assignment.workflow_state,
-      title: LiveEvents.truncate(assignment.title),
+      context_uuid: assignment.context.uuid,
+      created_on_blueprint_sync: created_on_blueprint_sync || false,
       description: LiveEvents.truncate(assignment.description),
       due_at: assignment.due_at,
-      unlock_at: assignment.unlock_at,
-      lock_at: assignment.lock_at,
-      updated_at: assignment.updated_at,
-      points_possible: assignment.points_possible,
-      lti_assignment_id: assignment.lti_context_id,
       lti_assignment_description: LiveEvents.truncate(assignment.description),
+      lti_assignment_id: assignment.lti_context_id,
       lti_resource_link_id: assignment.lti_resource_link_id,
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
+      lock_at: assignment.lock_at,
+      points_possible: assignment.points_possible,
+      resource_map: assignment.resource_map,
       submission_types: assignment.submission_types,
-      created_on_blueprint_sync: created_on_blueprint_sync || false,
-      resource_map: assignment.resource_map
+      title: LiveEvents.truncate(assignment.title),
+      unlock_at: assignment.unlock_at,
+      updated_at: assignment.updated_at,
+      workflow_state: assignment.workflow_state
     }
+
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.environment_specific_domain
     event[:domain] = domain if domain
