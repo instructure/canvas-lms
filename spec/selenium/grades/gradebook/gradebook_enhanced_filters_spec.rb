@@ -461,6 +461,7 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.select_filter_preset_dropdown_option("Submissions", "Dropped")
         Gradebook.select_filter_preset_dropdown_option("Modules", @module1.name)
         Gradebook.save_filter_preset
+        Gradebook.apply_filters_button.click
         Gradebook.enable_filter_preset("preset1")
 
         expect(Gradebook.filter_pill(@section1.name)).to be_displayed
@@ -477,6 +478,8 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.select_filter_preset_dropdown_option("Sections", @section1.name)
         Gradebook.select_filter_preset_dropdown_option("Modules", @module2.name)
         Gradebook.save_filter_preset
+
+        Gradebook.apply_filters_button.click
         Gradebook.enable_filter_preset("preset1")
 
         expect(Gradebook.fetch_assignment_names).to eq [@a2.name]
@@ -491,6 +494,8 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.select_filter_preset_dropdown_option("Sections", @section1.name)
         Gradebook.select_filter_preset_dropdown_option("Modules", @module2.name)
         Gradebook.save_filter_preset
+
+        Gradebook.apply_filters_button.click
         Gradebook.enable_filter_preset("preset1")
         Gradebook.clear_all_filters
 
