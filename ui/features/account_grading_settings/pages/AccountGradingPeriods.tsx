@@ -26,9 +26,11 @@ export const AccountGradingPeriods = () => {
     throw new Error('account id is not present on path')
   }
   const accountId = pathMatch.params.accountId
+  const rootAccountId = ENV.DOMAIN_ROOT_ACCOUNT_ID
+
   // Note: these env vars are required downstream in api callers used by the grading periods management page,
   // in addition to being required to be passed in to this component itself as props
-  ENV.ENROLLMENT_TERMS_URL = `/api/v1/accounts/${accountId}/terms`
+  ENV.ENROLLMENT_TERMS_URL = `/api/v1/accounts/${rootAccountId}/terms`
   ENV.GRADING_PERIOD_SETS_URL = `/api/v1/accounts/${accountId}/grading_period_sets`
   ENV.GRADING_PERIOD_SET_UPDATE_URL = `/api/v1/accounts/${accountId}/grading_period_sets/{{id}}`
   ENV.GRADING_PERIODS_UPDATE_URL = `/api/v1/grading_period_sets/{{set_id}}/grading_periods/batch_update`
