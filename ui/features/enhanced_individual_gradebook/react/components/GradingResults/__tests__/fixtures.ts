@@ -17,7 +17,34 @@
  */
 
 import {GradingResultsComponentProps} from '..'
-import {AssignmentConnection, GradebookOptions, GradebookSortOrder} from '../../../../types'
+import {
+  AssignmentConnection,
+  GradebookUserSubmissionDetails,
+  GradebookOptions,
+  GradebookSortOrder,
+} from '../../../../types'
+
+export const defaultStudentSubmissions: GradebookUserSubmissionDetails = {
+  grade: '95',
+  id: '1',
+  score: 95,
+  enteredScore: 95,
+  assignmentId: '1',
+  submissionType: 'online_upload',
+  proxySubmitter: 'teacher1',
+  submittedAt: new Date('2023-08-10T08:00:00Z'),
+  state: 'Graded',
+  excused: false,
+  late: false,
+  latePolicyStatus: '',
+  missing: false,
+  userId: 'bob9977',
+  redoRequest: false,
+  cachedDueDate: '2023-08-09T23:59:59Z',
+  gradingPeriodId: '',
+  deductedPoints: 0,
+  enteredGrade: '95',
+}
 
 export const defaultAssignment: AssignmentConnection = {
   id: '1',
@@ -46,6 +73,7 @@ export const defaultAssignment: AssignmentConnection = {
 export const defaultGradebookOptions: GradebookOptions = {
   contextUrl: '/courses/1',
   sortOrder: GradebookSortOrder.Alphabetical,
+  changeGradeUrl: 'testUrl',
   customOptions: {
     includeUngradedAssignments: false,
     hideStudentNames: false,
@@ -71,29 +99,7 @@ export const gradingResultsDefaultProps: GradingResultsComponentProps = {
     hiddenName: 'Bob',
     sortableName: 'Lee, Bob',
   },
-  studentSubmissions: [
-    {
-      grade: '95',
-      id: '1',
-      score: 95,
-      enteredScore: 95,
-      assignmentId: '1',
-      submissionType: 'online_upload',
-      proxySubmitter: 'teacher1',
-      submittedAt: new Date('2023-08-10T08:00:00Z'),
-      state: 'Graded',
-      excused: false,
-      late: false,
-      latePolicyStatus: '',
-      missing: false,
-      userId: 'bob9977',
-      redoRequest: false,
-      cachedDueDate: '2023-08-09T23:59:59Z',
-      gradingPeriodId: '',
-      deductedPoints: 0,
-      enteredGrade: '95',
-    },
-  ],
+  studentSubmissions: [defaultStudentSubmissions],
   gradebookOptions: defaultGradebookOptions,
   loadingStudent: false,
   currentStudentHiddenName: '',

@@ -170,6 +170,7 @@ export const setupGraphqlMocks = (overrides: MockedResponse[] = []): MockedRespo
 export const defaultGradebookOptions: GradebookOptions = {
   contextUrl: '/courses/1',
   sortOrder: GradebookSortOrder.Alphabetical,
+  changeGradeUrl: 'testUrl',
   customOptions: {
     includeUngradedAssignments: false,
     hideStudentNames: false,

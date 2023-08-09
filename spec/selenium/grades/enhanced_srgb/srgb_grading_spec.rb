@@ -127,12 +127,11 @@ describe "Screenreader Gradebook grading" do
     end
 
     it "displays correct points for graded by Complete/Incomplete" do
-      skip "unskip w/ EVAL-3357 BUG complete incomplete assignments do not have drop down or correct label out of"
       EnhancedSRGB.select_assignment(assignment_3)
-      click_option("#student_and_assignment_grade", "Complete")
-      EnhancedSRGB.tab_out_of_input(EnhancedSRGB.main_grade_input)
+      click_option(EnhancedSRGB.pass_fail_grade_select, "Complete")
+      EnhancedSRGB.tab_out_of_input(EnhancedSRGB.pass_fail_grade_select)
 
-      expect(f("#grading div.ember-view")).to include_text("10 out of 10")
+      expect(EnhancedSRGB.out_of_text).to include_text("10 out of 10")
     end
 
     it "displays correct points for graded by Letter Grade" do
