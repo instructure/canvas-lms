@@ -172,6 +172,30 @@ module Crystalball
   end
 
   class Predictor
+    module Helpers
+      module AffectedExampleGroupsDetector
+        def detect_examples(files, map)
+          # prepend CRYSTALBALL_REPO_PATH to each file in files for plugins
+          if ENV["CRYSTALBALL_REPO_PATH"]&.include?("gems/plugins")
+            files = files.map do |file|
+              if file.include?(ENV["CRYSTALBALL_REPO_PATH"][/gems.+/])
+                file
+              else
+                ENV["CRYSTALBALL_REPO_PATH"][/gems.+/] + file
+              end
+            end
+            Crystalball.log :info, "Modified Plugin Filepath: #{files}"
+          end
+
+          map.example_groups.filter_map do |uid, example_group_map|
+            uid if files.any? { |file| example_group_map.include?(file) }
+          end
+        end
+      end
+    end
+  end
+
+  class Predictor
     # Queues a total re-run if any files are added. If no new files, don't add any predictions
     # Possible git operation types for SourceDiff include: ['new', 'modified', 'moved', 'deleted]
     class ChangedFiles
@@ -232,6 +256,20 @@ module Crystalball
 
     private
 
+    def filter(example_groups)
+      example_groups.compact.select do |example_group|
+        # Example_group filepath is realtive to the root of the repo, so we need to chdir to the root
+        Dir.chdir("/usr/src/app") do
+          if Pathname.new(example_group.split("[").first).exist?
+            true
+          else
+            Crystalball.log :info, "Filepath does not exist, removing from prediction: #{Pathname.new(example_group.split("[").first)}"
+            false
+          end
+        end
+      end.uniq
+    end
+
     def includes_root?(prediction_list)
       prediction_list.include?(".") ||
         prediction_list.include?("./.") ||
@@ -241,7 +279,7 @@ module Crystalball
     def filter_out_specs(prediction_list)
       prediction_list.reject do |spec|
         if spec =~ %r{gems/.*spec\.rb} && spec !~ %r{gems/plugins/.*/spec_canvas/.*spec\.rb}
-          puts "Filtering out #{spec}"
+          Crystalball.log :info, "Filtering out #{spec}"
           true
         else
           false
