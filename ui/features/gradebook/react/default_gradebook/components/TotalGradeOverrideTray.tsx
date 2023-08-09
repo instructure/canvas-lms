@@ -64,8 +64,6 @@ export function TotalGradeOverrideTray({
 }: TotalGradeOverrideTrayProps) {
   const {finalGradeOverrideTrayProps, toggleFinalGradeOverrideTray, finalGradeOverrides} =
     useStore()
-  const {isOpen, isFirstStudent, isLastStudent, studentInfo, gradeEntry, gradeInfo} =
-    finalGradeOverrideTrayProps
 
   const {saveFinalOverrideCustomStatus, saveCallStatus} = useFinalGradeOverrideCustomStatus()
 
@@ -74,6 +72,13 @@ export function TotalGradeOverrideTray({
       showFlashError(I18n.t('There was an error saving the custom grade status.'))(new Error())
     }
   }, [saveCallStatus])
+
+  if (!finalGradeOverrideTrayProps) {
+    return null
+  }
+
+  const {isOpen, isFirstStudent, isLastStudent, studentInfo, gradeEntry, gradeInfo} =
+    finalGradeOverrideTrayProps
 
   if (!studentInfo) {
     return null
