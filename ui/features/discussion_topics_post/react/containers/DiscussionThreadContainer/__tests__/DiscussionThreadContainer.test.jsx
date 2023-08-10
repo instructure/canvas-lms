@@ -260,6 +260,21 @@ describe('DiscussionThreadContainer', () => {
         expect(goToTopic.mock.calls.length).toBe(1)
       })
     })
+
+    it('Should call props.setHighlightEntryId when go to parent is pressed', async () => {
+      const setHighlightEntryId = jest.fn()
+      const parentId = '1'
+      const {getByTestId} = setup(
+        defaultProps({propOverrides: {setHighlightEntryId, parentId, depth: 2}})
+      )
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      fireEvent.click(getByTestId('toParent'))
+
+      await waitFor(() => {
+        expect(setHighlightEntryId.mock.calls.length).toBe(1)
+      })
+    })
   })
 
   describe('Unread Badge', () => {
