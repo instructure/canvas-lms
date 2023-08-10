@@ -129,9 +129,8 @@ gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.2"
 gem "sanitize", "~> 6.0", require: false
-gem "sentry-ruby", "5.1.0"
-gem "sentry-rails", "5.1.0"
-gem "sentry-inst_jobs", "1.0.2"
+gem "sentry-rails", "~> 5.10"
+gem "sentry-inst_jobs", "~> 5.10"
 gem "simple_oauth", "0.3.1", require: false
 gem "twilio-ruby", "5.36.0", require: false
 gem "vault", "0.15.0", require: false
