@@ -486,7 +486,7 @@ GEM
       rack
     canvas_webex (0.18.2)
       railties
-    capybara (3.39.0)
+    capybara (3.39.2)
       addressable
       matrix
       mini_mime (>= 0.1.3)
@@ -1133,9 +1133,9 @@ GEM
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
-    watir (7.1.0)
+    watir (7.3.0)
       regexp_parser (>= 1.2, < 3)
-      selenium-webdriver (~> 4.0)
+      selenium-webdriver (~> 4.2)
     wcag_color_contrast (0.1.0)
     webmock (3.18.1)
       addressable (>= 2.8.0)
