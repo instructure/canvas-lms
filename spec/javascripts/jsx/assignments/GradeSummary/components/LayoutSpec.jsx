@@ -99,7 +99,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
   QUnit.module('when students have not yet loaded', () => {
     test('displays a spinner', () => {
       mountComponent()
-      strictEqual(wrapper.find('Spinner').length, 1)
+      strictEqual(wrapper.find('Spinner').at(0).length, 1)
     })
   })
 

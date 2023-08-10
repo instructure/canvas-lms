@@ -18,6 +18,7 @@
 
 import React from 'react'
 
+import {mount} from 'enzyme'
 import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
@@ -46,10 +47,8 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
   }
 
   test('renders a Modal', () => {
-    const component = TestUtils.renderIntoDocument(
-      <ExternalToolModalLauncher {...generateProps()} />
-    )
-    const modalCount = TestUtils.scryRenderedComponentsWithType(component, Modal).length
+    const wrapper = mount(<ExternalToolModalLauncher {...generateProps()} />)
+    const modalCount = wrapper.find(Modal).length
 
     equal(modalCount, 1)
   })
@@ -113,7 +112,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
     TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...props} />)
     $(window).trigger('externalContentReady')
 
-    equal(1, stub.callCount)
+    equal(stub.callCount, 1)
     sandbox.restore()
   })
 
@@ -126,7 +125,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
     TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...props} />)
     $(window).trigger('externalContentCancel')
 
-    equal(1, stub.callCount)
+    equal(stub.callCount, 1)
     sandbox.restore()
   })
 

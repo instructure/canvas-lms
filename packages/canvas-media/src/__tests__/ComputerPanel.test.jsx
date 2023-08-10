@@ -84,6 +84,15 @@ describe('UploadMedia: ComputerPanel', () => {
     liveRegion.id = LIVE_REGION_ID
     liveRegion.setAttribute('role', 'alert')
     document.body.appendChild(liveRegion)
+
+    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+    window.matchMedia =
+      window.matchMedia ||
+      (() => ({
+        matches: false,
+        addListener: () => {},
+        removeListener: () => {},
+      }))
   })
 
   afterEach(() => {
@@ -200,6 +209,17 @@ describe('UploadMedia: ComputerPanel', () => {
     })
   })
   describe('shows closed captions panel', () => {
+    beforeEach(() => {
+      global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+      window.matchMedia =
+        window.matchMedia ||
+        (() => ({
+          matches: false,
+          addListener: () => {},
+          removeListener: () => {},
+        }))
+    })
+
     it('when uploading videos', async () => {
       HTMLElement.prototype.scrollIntoView = jest.fn()
       const aFile = new File(['foo'], 'foo.mov', {

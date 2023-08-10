@@ -330,7 +330,7 @@ export default class AddPeople extends React.Component {
         }}
         shouldCloseOnDocumentClick={false}
         size="medium"
-        tabIndex="-1"
+        tabIndex={-1}
         liveRegion={getLiveRegion}
       >
         <Modal.Header>
@@ -343,7 +343,7 @@ export default class AddPeople extends React.Component {
             onClick={this.close}
             screenReaderLabel={cancelLabel}
           />
-          <Heading tabIndex="-1">{modalTitle}</Heading>
+          <Heading tabIndex={-1}>{modalTitle}</Heading>
         </Modal.Header>
         <Modal.Body>
           <div

@@ -23,9 +23,8 @@ import {Modal} from '@instructure/ui-modal'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TempEnrollSearch} from './TempEnrollSearch'
-import {TempEnrollAssign} from './TempEnrollAssign'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = useI18nScope('account_course_user_search')
 
 interface Props {
   readonly children: ReactElement
@@ -35,51 +34,17 @@ interface Props {
     avatar_url?: string
   }
   readonly canReadSIS?: boolean
-  readonly permissions: {
-    teacher: boolean
-    ta: boolean
-    student: boolean
-    observer: boolean
-    designer: boolean
-  }
   readonly accountId: string
-  readonly roles: {id: string; label: string; base_role_name: string}[]
 }
 
 export function TempEnrollModal(props: Props) {
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState(0)
-  const [enrollment, setEnrollment] = useState(null)
 
   const renderScreen = () => {
-    if (page === 2) {
-      return (
-        <TempEnrollAssign
-          user={props.user}
-          enrollment={enrollment}
-          roles={props.roles}
-          goBack={() => {
-            setPage(p => p - 1)
-          }}
-          permissions={props.permissions}
-        />
-      )
-    } else if (enrollment === null) {
-      return (
-        <TempEnrollSearch
-          accountId={props.accountId}
-          canReadSIS={props.canReadSIS}
-          user={props.user}
-          page={page}
-          searchFail={() => {
-            setPage(0)
-            setEnrollment(null)
-          }}
-          searchSuccess={(e: any) => {
-            setEnrollment(e)
-          }}
-        />
-      )
+    if (page >= 2) {
+      // placeholder
+      return null
     } else {
       return (
         <TempEnrollSearch
@@ -87,28 +52,17 @@ export function TempEnrollModal(props: Props) {
           canReadSIS={props.canReadSIS}
           user={props.user}
           page={page}
-          searchFail={() => {
-            setPage(0)
-            setEnrollment(null)
-          }}
-          searchSuccess={(e: any) => {
-            setEnrollment(e)
-          }}
-          foundEnroll={enrollment}
+          searchFail={() => setPage(0)}
+          // will set the enrollment in future commit
+          searchSuccess={() => {}}
         />
       )
     }
   }
 
-  if (page > 2) {
-    setOpen(false)
-    setPage(0)
-  }
-
   return (
     <>
       <Modal
-        overflow="scroll"
         open={open}
         onDismiss={() => {
           setOpen(false)
@@ -119,7 +73,7 @@ export function TempEnrollModal(props: Props) {
         theme={{smallMaxWidth: '30em'}}
       >
         <Modal.Header>
-          <Heading tabIndex="-1">
+          <Heading tabIndex={-1}>
             {I18n.t('Create a Temporary Enrollment for %{name}', {name: props.user.name})}
           </Heading>
         </Modal.Header>
@@ -134,14 +88,13 @@ export function TempEnrollModal(props: Props) {
             {I18n.t('Cancel')}
           </Button>
           &nbsp;
-          {page === 1 ? (
+          {page > 0 ? (
             <Button
               onClick={() => {
                 setPage(p => p - 1)
-                setEnrollment(null)
               }}
             >
-              {I18n.t('Start Over')}
+              {I18n.t('Back')}
             </Button>
           ) : null}
           &nbsp;
@@ -151,7 +104,7 @@ export function TempEnrollModal(props: Props) {
               setPage(p => p + 1)
             }}
           >
-            {page === 2 ? I18n.t('Submit') : I18n.t('Next')}
+            {I18n.t('Next')}
           </Button>
           &nbsp;
         </Modal.Footer>

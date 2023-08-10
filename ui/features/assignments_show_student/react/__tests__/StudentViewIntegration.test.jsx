@@ -47,6 +47,7 @@ describe('student view integration tests', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     }
+    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
   })
 
   afterEach(() => {

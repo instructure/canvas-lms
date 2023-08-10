@@ -33,7 +33,7 @@ export default function TimeZoneSelect({
   let idval = 0 // for setting ids on options, which are necessary for Select's inner workings but don't matter to us
 
   function onChangeTimezone(event, value) {
-    event.persist()
+    event.persist?.()
     event.target.value = value // this is how our onChange expects the result
     onChange(event, value) // so it works either way, instui Select callback, or traditional
   }

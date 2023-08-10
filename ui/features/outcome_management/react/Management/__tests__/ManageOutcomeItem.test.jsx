@@ -145,10 +145,7 @@ describe('ManageOutcomeItem', () => {
   it('displays disabled caret button with "not-allowed" cursor if no description', () => {
     const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
-    expect(queryByTestId('icon-arrow-right').closest('button').style).toHaveProperty(
-      'cursor',
-      'not-allowed'
-    )
+    expect(queryByTestId('icon-arrow-right').closest('button')).toHaveStyle('cursor: not-allowed')
   })
 
 
@@ -255,9 +252,8 @@ describe('ManageOutcomeItem', () => {
       it('disables caret button and changes cursor to "not-allowed" if no description', () => {
         const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeDisabled()
-        expect(queryByTestId('icon-arrow-right').closest('button').style).toHaveProperty(
-          'cursor',
-          'not-allowed'
+        expect(queryByTestId('icon-arrow-right').closest('button')).toHaveStyle(
+          'cursor: not-allowed'
         )
       })
     })

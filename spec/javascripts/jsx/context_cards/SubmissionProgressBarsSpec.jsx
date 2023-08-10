@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import SubmissionProgressBars from '@canvas/context-cards/react/SubmissionProgressBars'
-import {ProgressBar as InstUIProgress} from '@instructure/ui-progress'
-import {shallow} from 'enzyme'
+import {ProgressBar} from '@instructure/ui-progress'
+import {shallow, mount} from 'enzyme'
 
 const user = {_id: 1}
 
@@ -127,7 +127,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
       subject = TestUtils.renderIntoDocument(<SubmissionProgressBars submissions={[]} />)
     })
 
-    QUnit.module('when submission is excused', () => {
+    QUnit.module('when submission is excused (2)', () => {
       test('it returns `excused`', () => {
         submission = {id: 1, excused: true, assignment: {points_possible: 25}}
         grade = SubmissionProgressBars.displayScreenreaderGrade(submission)
@@ -135,7 +135,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
       })
     })
 
-    QUnit.module('when grade is a percentage', () => {
+    QUnit.module('when grade is a percentage (2)', () => {
       test('it returns the grade', () => {
         const percentage = '80%'
         submission = {
@@ -149,7 +149,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
       })
     })
 
-    QUnit.module('when grade is complete or incomplete', () => {
+    QUnit.module('when grade is complete or incomplete (2)', () => {
       test('renders `complete` or `incomplete`', () => {
         submission = {
           id: 1,
@@ -168,7 +168,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
       })
     })
 
-    QUnit.module('when grade is a random string', () => {
+    QUnit.module('when grade is a random string (2)', () => {
       test('it renders `score/points_possible`', () => {
         const pointsPossible = 25
         score = '15'
@@ -187,7 +187,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
       })
     })
 
-    QUnit.module('by default', () => {
+    QUnit.module('by default (2)', () => {
       test('it renders `score/points_possible`', () => {
         const pointsPossible = 25
         grade = '15'
@@ -228,7 +228,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
       })
     })
 
-    QUnit.module('when grade is `complete`', () => {
+    QUnit.module('when grade is `complete` (2)', () => {
       test('renders icon with `icon-check` class', () => {
         subject = TestUtils.renderIntoDocument(
           <SubmissionProgressBars
@@ -250,7 +250,7 @@ QUnit.module('StudentContextTray/Progress', hooks => {
   })
 
   QUnit.module('render', () => {
-    test('renders one InstUIProgress component per submission', () => {
+    test('renders one ProgressBar component per submission', () => {
       const submissions = [
         {
           id: 1,
@@ -274,9 +274,10 @@ QUnit.module('StudentContextTray/Progress', hooks => {
           assignment: {points_possible: 25},
         },
       ]
-      subject = TestUtils.renderIntoDocument(<SubmissionProgressBars submissions={submissions} />)
-      const instUIProgressBars = TestUtils.scryRenderedComponentsWithType(subject, InstUIProgress)
-      equal(instUIProgressBars.length, submissions.length)
+      const wrapper = mount(<SubmissionProgressBars submissions={submissions} />)
+
+      const ProgressBarBars = wrapper.find(ProgressBar) // Assuming ProgressBar is the name of the component
+      equal(ProgressBarBars.length, submissions.length)
     })
 
     test('ignores submissions with null grades', () => {
