@@ -364,15 +364,6 @@ describe Types::DiscussionEntryType do
   end
 
   context "isolated view" do
-    it "Allows querying for discussion subentries" do
-      Account.site_admin.enable_feature!(:isolated_view)
-      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
-      DiscussionEntry.where(id: parent).update_all(legacy: false)
-
-      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to be_empty
-    end
-
     it "returns nil for subentries count on non root entries" do
       Account.site_admin.enable_feature!(:isolated_view)
       sub_entry
@@ -382,15 +373,6 @@ describe Types::DiscussionEntryType do
   end
 
   context "split screen view" do
-    it "allows querying for discussion subentries" do
-      Account.site_admin.enable_feature!(:split_screen_view)
-      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
-      DiscussionEntry.where(id: parent).update_all(legacy: false)
-
-      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to be_empty
-    end
-
     it "returns count for subentries count on non root entries" do
       Account.site_admin.enable_feature!(:split_screen_view)
       sub_entry
@@ -400,18 +382,24 @@ describe Types::DiscussionEntryType do
   end
 
   context "inline view" do
-    it "allows querying for discussion subentries" do
-      discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
-      DiscussionEntry.where(id: parent).update_all(legacy: false)
-
-      result = GraphQLTypeTester.new(parent, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
-      expect(result).to be_empty
-    end
-
     it "returns count for subentries count on non root entries" do
       sub_entry
       DiscussionEntry.where(id: parent).update_all(legacy: false)
       expect(GraphQLTypeTester.new(parent, current_user: @teacher).resolve("subentriesCount")).to be 1
+    end
+
+    it "returns the correct subentries that were created on the 3rd level using quote" do
+      first_level = discussion_entry.discussion_topic.discussion_entries.create!(message: "1st level", parent_id: discussion_entry.id, user: @teacher)
+      second_level = discussion_entry.discussion_topic.discussion_entries.create!(message: "2nd level", parent_id: first_level.id, user: @teacher)
+      third_level = discussion_entry.discussion_topic.discussion_entries.create!(message: "3rd level w/quote", parent_id: second_level.id, quoted_entry_id: second_level.id, user: @teacher)
+
+      first_level.update(legacy: false)
+      second_level.update(legacy: false)
+      third_level.update(legacy: false)
+
+      result = GraphQLTypeTester.new(second_level, current_user: @teacher).resolve("discussionSubentriesConnection { nodes { message } }")
+      expect(result.count).to be 1
+      expect(result[0]).to eq third_level.message
     end
   end
 
