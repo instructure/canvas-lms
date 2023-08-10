@@ -36,6 +36,9 @@ class Account < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
   belongs_to :parent_account, class_name: "Account"
 
+  # temporary scope to allow us to deprecate the faculty journal feature. should be removed (along with all references) upon deprecation completion
+  scope :having_user_notes_enabled, -> { Account.site_admin.feature_enabled?(:deprecate_faculty_journal) ? Account.none : where(enable_user_notes: true) }
+
   has_many :courses
   has_many :custom_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id
   has_many :standard_grade_statuses, inverse_of: :root_account, foreign_key: :root_account_id

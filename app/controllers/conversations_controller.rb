@@ -302,7 +302,7 @@ class ConversationsController < ApplicationController
           MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
         }
 
-        notes_enabled_accounts = @current_user.associated_accounts.where(enable_user_notes: true)
+        notes_enabled_accounts = @current_user.associated_accounts.having_user_notes_enabled
 
         hash[:NOTES_ENABLED] = notes_enabled_accounts.any?
         hash[:CAN_ADD_NOTES_FOR_ACCOUNT] = notes_enabled_accounts.any? { |a| a.grants_right?(@current_user, :manage_students) }
