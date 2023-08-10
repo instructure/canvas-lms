@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
@@ -53,11 +52,14 @@ test('it renders TimeBlockSelectRows in their own container', () => {
 
 test('handleSlotDivision divides slots and adds new rows to the selector', () => {
   const component = TestUtils.renderIntoDocument(<TimeBlockSelector {...props} />)
+  // eslint-disable-next-line react/no-find-dom-node
   const domNode = ReactDOM.findDOMNode(component)
-  $('#TimeBlockSelector__DivideSection-Input', domNode).val(60)
+  const input = domNode.querySelector('#TimeBlockSelector__DivideSection-Input')
+  input.value = 60
+  TestUtils.Simulate.change(input)
   const newRow = component.state.timeBlockRows[0]
-  newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
-  newRow.timeData.endTime = new Date('Oct 26 2016 15:00')
+  newRow.timeData.startTime = new Date('2016-10-26T15:00:00.000Z')
+  newRow.timeData.endTime = new Date('2016-10-26T20:00:00.000Z')
   component.setState({
     timeBlockRows: [newRow, {timeData: {startTime: null, endTime: null}}],
   })
@@ -108,8 +110,11 @@ test('handleSetData setting time data', () => {
 test('calls onChange when there are modifications made', () => {
   props.onChange = sinon.spy()
   const component = TestUtils.renderIntoDocument(<TimeBlockSelector {...props} />)
+  // eslint-disable-next-line react/no-find-dom-node
   const domNode = ReactDOM.findDOMNode(component)
-  $('#TimeBlockSelector__DivideSection-Input', domNode).val(60)
+  const input = domNode.querySelector('#TimeBlockSelector__DivideSection-Input')
+  input.value = 60
+  TestUtils.Simulate.change(input)
   const newRow = component.state.timeBlockRows[0]
   newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
   newRow.timeData.endTime = new Date('Oct 26 2016 15:00')

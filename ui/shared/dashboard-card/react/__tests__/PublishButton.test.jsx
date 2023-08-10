@@ -105,7 +105,7 @@ describe('PublishButton', () => {
 
   it('renders SR content correctly', () => {
     const wrapper = mount(<PublishButton {...createMockProps({defaultView: 'assignments'})} />)
-    const screenReaderNode = wrapper.find('ScreenReaderContent')
+    const screenReaderNode = wrapper.find('ScreenReaderContent').first()
     expect(screenReaderNode.text()).toBe('nickname')
   })
 })
