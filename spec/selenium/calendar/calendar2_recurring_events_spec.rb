@@ -402,4 +402,181 @@ describe "recurring events" do
       expect(calendar_content).not_to contain_jqcss(events_in_a_series_selector)
     end
   end
+
+  context "calendar event recurrence modal interactions" do
+    before :once do
+      course_with_teacher(active_all: true, new_user: true)
+    end
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "allows for selection of days with day view" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      enter_repeat_interval(5)
+      expect(repeat_interval_value).to eq("5")
+
+      click_done_button
+      expect(frequency_picker_value).to eq("Every 5 days, 5 times")
+    end
+
+    it "shows an error with too many occurrences in AFTER mode" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      enter_repeat_interval(5)
+      expect(repeat_interval_value).to eq("5")
+
+      enter_recurrence_end_count(401)
+      expect(recurrence_end_count_value).to eq("401")
+
+      expect(custom_recurrence_modal.text).to include("Exceeds 400 occurrences limit")
+
+      enter_recurrence_end_count(400)
+      expect(recurrence_end_count_value).to eq("400")
+      expect(custom_recurrence_modal.text).not_to include("Exceeds 400 occurrences limit")
+    end
+
+    it "shows an error with too many occurrences in ON mode" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      click_on_radio_button
+      enter_recurrence_end_date("August 30, 2027")
+
+      expect(custom_recurrence_modal.text).to include("Exceeds 400 events.")
+      expect(custom_recurrence_modal.text).to include("Please pick an earlier date")
+
+      enter_recurrence_end_date("August 30, 2023")
+
+      expect(custom_recurrence_modal.text).not_to include("Exceeds 400 events.")
+      expect(custom_recurrence_modal.text).not_to include("Please pick an earlier date")
+    end
+
+    it "allows for selection of number of months with 'On day' month type" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      enter_new_event_date("July 20, 2023")
+
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      enter_repeat_interval(5)
+      expect(repeat_interval_value).to eq("5")
+
+      select_repeat_frequency("Month")
+      select_repeat_month_mode("on day 20")
+
+      click_done_button
+      expect(frequency_picker_value).to eq("Every 5 months on day 20, 5 times")
+    end
+
+    it "allows for selection of number of months with 'On the' month type" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      enter_new_event_date("July 20, 2023")
+
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      enter_repeat_interval(5)
+      expect(repeat_interval_value).to eq("5")
+
+      select_repeat_frequency("Month")
+      select_repeat_month_mode("on the third Thursday")
+
+      click_done_button
+      expect(frequency_picker_value).to eq("Every 5 months on the third Thu, 5 times")
+    end
+
+    it "allows for selection of days for week type" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      enter_new_event_date("July 20, 2023")
+
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      enter_repeat_interval(5)
+      expect(repeat_interval_value).to eq("5")
+
+      select_repeat_frequency("Week")
+      click_day_selection_checkbox("Mo")
+      click_day_selection_checkbox("We")
+      click_day_selection_checkbox("Th")
+
+      expect(element_value_for_attr(day_of_week_input("Mo"), "aria-checked")).to eq("true")
+      expect(element_value_for_attr(day_of_week_input("We"), "aria-checked")).to eq("true")
+      expect(element_value_for_attr(day_of_week_input("Th"), "aria-checked")).to eq("false")
+
+      click_done_button
+      expect(frequency_picker_value).to eq("Every 5 weeks on Mon, Wed, 5 times")
+    end
+
+    it "allows for selection of days for week type with specific end date" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      enter_new_event_date("July 20, 2023")
+
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      select_repeat_frequency("Week")
+      click_day_selection_checkbox("Tu")
+      click_day_selection_checkbox("Th")
+
+      click_on_radio_button
+      enter_recurrence_end_date("August 30, 2023")
+
+      click_done_button
+
+      expect(frequency_picker_value).to eq("Weekly on Tue until Aug 30, 2023")
+    end
+
+    it "allows for selection of years with specific end date" do
+      get "/calendar2#view_name=month&view_start=2023-07-01"
+
+      wait_for_ajaximations
+      create_new_calendar_event
+      enter_new_event_date("July 20, 2023")
+
+      select_frequency_option("Custom")
+      expect(custom_recurrence_modal).to be_displayed
+
+      select_repeat_frequency("Year")
+
+      enter_repeat_interval(2)
+      expect(repeat_interval_value).to eq("2")
+
+      click_on_radio_button
+      enter_recurrence_end_date("August 30, 2027")
+
+      click_done_button
+
+      expect(frequency_picker_value).to eq("Every 2 years on Jul 20 until Aug 30, 2027")
+    end
+  end
 end

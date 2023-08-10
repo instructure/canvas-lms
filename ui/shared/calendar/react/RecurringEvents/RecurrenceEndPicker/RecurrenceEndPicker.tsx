@@ -380,6 +380,7 @@ export default function RecurrenceEndPicker({
         >
           <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
             <NumberInput
+              data-testid="recurrence-end-count-input"
               display="inline-block"
               interaction={mode === 'AFTER' ? 'enabled' : 'disabled'}
               renderLabel={() => ''}
