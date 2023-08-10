@@ -5,4 +5,4 @@ source "https://rubygems.org"
 gemspec
 
 gem "canvas_slug", path: "../canvas_slug"
-gem "multipart", path: "../multipart"
+gem "legacy_multipart", path: "../legacy_multipart"

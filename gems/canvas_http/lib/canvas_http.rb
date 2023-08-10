@@ -186,10 +186,10 @@ module CanvasHttp
   def self.add_form_data(request, form_data, multipart:, streaming:)
     if multipart
       if streaming
-        request.body_stream, header = Multipart::Post.new.prepare_query_stream(form_data)
+        request.body_stream, header = LegacyMultipart::Post.prepare_query_stream(form_data)
         request.content_length = request.body_stream.size
       else
-        request.body, header = Multipart::Post.new.prepare_query(form_data)
+        request.body, header = LegacyMultipart::Post.prepare_query(form_data)
       end
       request.content_type = header["Content-type"]
     elsif form_data.is_a?(String)

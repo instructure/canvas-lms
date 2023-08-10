@@ -20,9 +20,9 @@
 
 require "spec_helper"
 
-describe Multipart::SequencedStream do
+describe LegacyMultipart::SequencedStream do
   def test_copy(content, content_string)
-    source = Multipart::SequencedStream.new([StringIO.new("prefix|"), content, StringIO.new("|suffix")])
+    source = LegacyMultipart::SequencedStream.new([StringIO.new("prefix|"), content, StringIO.new("|suffix")])
     destination = StringIO.new
     IO.copy_stream(source, destination)
     destination.rewind

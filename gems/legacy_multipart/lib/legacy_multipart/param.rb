@@ -17,25 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# From: http://deftcode.com/code/flickr_upload/multipartpost.rb
-## Helper class to prepare an HTTP POST request with a file upload
-## Mostly taken from
-# http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/113774
-### WAS:
-## Anything that's broken and wrong probably the fault of Bill Stilwell
-# #(bill@marginalia.org)
-### NOW:
-## Everything wrong is due to keith@oreilly.com
+module LegacyMultipart
+  class Param
+    attr_accessor :k, :v
 
-require "mime/types"
-require "net/http"
-require "cgi"
-require "base64"
+    def self.from(k, v)
+      if v.respond_to?(:read)
+        FileParam.new(k, v)
+      else
+        Param.new(k, v)
+      end
+    end
 
-module Multipart
-  require "multipart/file_param"
-  require "multipart/param"
-  require "multipart/terminator"
-  require "multipart/sequenced_stream"
-  require "multipart/post"
+    def initialize(k, v)
+      @k = k
+      @v = v
+    end
+
+    def to_multipart_stream(boundary)
+      StringIO.new("--#{boundary}\r\n" \
+                   "Content-Disposition: form-data; name=\"#{k}\"\r\n" \
+                   "\r\n" +
+                   v.to_s +
+                   "\r\n")
+    end
+  end
 end

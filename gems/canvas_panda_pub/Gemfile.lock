@@ -2,7 +2,7 @@ PATH
   remote: ../canvas_http
   specs:
     canvas_http (1.0.0)
-      multipart
+      legacy_multipart
 
 PATH
   remote: ../canvas_slug
@@ -11,9 +11,9 @@ PATH
       swearjar (~> 1.4)
 
 PATH
-  remote: ../multipart
+  remote: ../legacy_multipart
   specs:
-    multipart (0.0.1)
+    legacy_multipart (0.0.1)
       canvas_slug
       mime-types (~> 3.2)
 
@@ -89,7 +89,7 @@ DEPENDENCIES
   canvas_http!
   canvas_panda_pub!
   canvas_slug!
-  multipart!
+  legacy_multipart!
   rake
   rspec (~> 3.0)
   webmock (~> 3.0)

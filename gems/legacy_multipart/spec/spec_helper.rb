@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,12 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Multipart
-  class Terminator
-    def to_multipart_stream(boundary)
-      StringIO.new("--#{boundary}--\r\n")
-    end
-  end
+require "rack/test"
 
-  TERMINATOR = Terminator.new
+require "legacy_multipart"
+
+RSpec.configure do |config|
+  config.run_all_when_everything_filtered = true
+  config.filter_run :focus
+
+  config.order = "random"
 end

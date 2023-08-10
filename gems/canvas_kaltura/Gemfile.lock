@@ -2,7 +2,7 @@ PATH
   remote: ../canvas_http
   specs:
     canvas_http (1.0.0)
-      multipart
+      legacy_multipart
 
 PATH
   remote: ../canvas_slug
@@ -16,9 +16,9 @@ PATH
     canvas_sort (1.0.0)
 
 PATH
-  remote: ../multipart
+  remote: ../legacy_multipart
   specs:
-    multipart (0.0.1)
+    legacy_multipart (0.0.1)
       canvas_slug
       mime-types (~> 3.2)
 
@@ -29,7 +29,7 @@ PATH
       canvas_http
       canvas_slug
       canvas_sort
-      multipart
+      legacy_multipart
       nokogiri
 
 GEM
@@ -92,7 +92,7 @@ DEPENDENCIES
   canvas_kaltura!
   canvas_slug!
   canvas_sort!
-  multipart!
+  legacy_multipart!
   rake
   rspec (~> 3.12)
   webmock (~> 3.18)

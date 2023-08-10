@@ -11,10 +11,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "multipart"
+  spec.add_dependency "legacy_multipart"
 
   spec.add_development_dependency "bundler", "~> 2.2"
-  spec.add_development_dependency "multipart"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.12"
   spec.add_development_dependency "webmock", "~> 3.18"

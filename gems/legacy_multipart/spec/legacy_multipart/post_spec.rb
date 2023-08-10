@@ -20,7 +20,7 @@
 
 require "spec_helper"
 
-describe Multipart::Post do
+describe LegacyMultipart::Post do
   def parse_params(query, header)
     Rack::Multipart.parse_multipart({ "CONTENT_TYPE" => header["Content-type"], "CONTENT_LENGTH" => query.size, "rack.input" => StringIO.new(query) })
   end

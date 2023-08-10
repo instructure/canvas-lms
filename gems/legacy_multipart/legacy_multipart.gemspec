@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Gem::Specification.new do |spec|
-  spec.name          = "multipart"
+  spec.name          = "legacy_multipart"
   spec.version       = "0.0.1"
   spec.authors       = ["Raphael Weiner"]
   spec.email         = ["rweiner@pivotallabs.com"]
