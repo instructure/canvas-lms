@@ -1150,7 +1150,7 @@ GEM
     xpath (3.2.0)
       nokogiri (~> 1.8)
     ya2yaml (0.31)
-    yard (0.9.26)
+    yard (0.9.34)
     yard-appendix (0.1.8)
       yard (>= 0.8.0)
     zeitwerk (2.6.11)
