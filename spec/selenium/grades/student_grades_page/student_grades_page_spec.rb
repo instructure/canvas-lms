@@ -282,9 +282,8 @@ describe "gradebook - logged in as a student" do
         expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
 
         # Verify that the 2 group rows have the correct values
-        # TODO: VICE-3663 FIX so group totals appear.
-        # expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 N/A 0.00/0.00"
-        # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
+        expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 N/A 0.00/0.00"
+        expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
 
         # Verify that the total is correct
         # No points possible, because it doesn't make sense when there are weighted grading periods/ assignment groups.
@@ -323,9 +322,8 @@ describe "gradebook - logged in as a student" do
         expect(f("body")).not_to contain_jqcss("tr:contains('Dropped')")
 
         # Verify that the 2 group rows have the correct values
-        # TODO: uncomment with VICE-3663 so the groups appear
-        # expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 N/A 0.00/0.00"
-        # expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
+        expect(f("tr[data-testid='agtotal-Group 1']").text).to eq "Group 1 N/A 0.00/0.00"
+        expect(f("tr[data-testid='agtotal-Group 2']").text).to eq "Group 2 N/A 0.00/0.00"
 
         # Verify that the total is correct
         # No points possible, because it doesn't make sense when there are weighted grading periods/ assignment groups.
