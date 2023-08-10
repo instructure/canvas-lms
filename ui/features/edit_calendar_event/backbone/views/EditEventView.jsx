@@ -346,6 +346,7 @@ export default class EditCalendarEventView extends Backbone.View {
         },
         delUrl: this.model.url(),
         isRepeating: !!this.model.get('series_uuid'),
+        isSeriesHead: !!this.model.get('series_head'),
       })
     } else {
       const msg = I18n.t(

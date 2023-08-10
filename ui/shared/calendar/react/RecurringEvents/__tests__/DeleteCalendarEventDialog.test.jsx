@@ -37,6 +37,7 @@ const defaultProps = {
   onDeleted: handleDeleted,
   delUrl: '.',
   isRepeating: true,
+  isSeriesHead: false,
 }
 
 function renderDialog(overrideProps = {}) {
@@ -66,6 +67,16 @@ describe('DeleteCalendarEventDialog', () => {
     expect(getByText('This event')).toBeInTheDocument()
     expect(getByText('All events')).toBeInTheDocument()
     expect(getByText('This and all following events')).toBeInTheDocument()
+  })
+
+  it('renders event series dialog except "following" option for a head event', () => {
+    const {getByText, queryByText} = renderDialog({
+      isSeriesHead: true,
+    })
+    expect(getByText('Confirm Deletion')).toBeInTheDocument()
+    expect(getByText('This event')).toBeInTheDocument()
+    expect(getByText('All events')).toBeInTheDocument()
+    expect(queryByText('This and all following events')).not.toBeInTheDocument()
   })
 
   it('closes on cancel', () => {
