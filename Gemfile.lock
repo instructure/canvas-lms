@@ -902,7 +902,7 @@ GEM
     ratom-nokogiri (0.10.11)
       nokogiri (>= 1.5.6, < 2.0)
     rchardet (1.8.0)
-    rdiscount (2.2.7)
+    rdiscount (2.2.7.1)
     redcarpet (3.6.0)
     redis (4.1.4)
     redis-scripting (1.0.1)
