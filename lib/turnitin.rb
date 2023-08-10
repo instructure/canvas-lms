@@ -344,8 +344,7 @@ module Turnitin
       params = prepare_params(command, fcmd, args)
 
       if post
-        mp = Multipart::Post.new
-        query, headers = mp.prepare_query(params)
+        query, headers = LegacyMultipart::Post.prepare_query(params)
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
         http_response = http.start do |con|

@@ -7,7 +7,7 @@ PATH
 PATH
   remote: .
   specs:
-    multipart (0.0.1)
+    legacy_multipart (0.0.1)
       canvas_slug
       mime-types (~> 3.2)
 
@@ -47,7 +47,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 2.2)
   canvas_slug!
-  multipart!
+  legacy_multipart!
   rack (~> 2.2)
   rack-test (~> 1.1)
   rake

@@ -21,7 +21,7 @@
 require "spec_helper"
 require "webmock"
 require "tempfile"
-require "multipart"
+require "legacy_multipart"
 
 WebMock.enable!
 

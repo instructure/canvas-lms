@@ -27,8 +27,7 @@ shared_examples_for "file uploads api" do
   # an array of [k,v] params so that the order of the params can be
   # defined
   def send_multipart(url, post_params = {}, http_headers = {}, method = :post)
-    mp = Multipart::Post.new
-    query, headers = mp.prepare_query(post_params)
+    query, headers = LegacyMultipart::Post.prepare_query(post_params)
 
     # A bug in the testing adapter in Rails 3-2-stable doesn't corretly handle
     # translating this header to the Rack/CGI compatible version:

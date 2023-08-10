@@ -23,7 +23,7 @@ require "csv"
 require "net/http"
 require "uri"
 require "nokogiri"
-require "multipart"
+require "legacy_multipart"
 
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
@@ -363,7 +363,7 @@ module CanvasKaltura
 
     def postRequest(service, action, params)
       requestParams = "service=#{service}&action=#{action}"
-      multipart_body, headers = Multipart::Post.new.prepare_query(params)
+      multipart_body, headers = LegacyMultipart::Post.prepare_query(params)
       response = sendRequest(
         Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
         multipart_body

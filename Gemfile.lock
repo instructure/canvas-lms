@@ -187,12 +187,12 @@ PATH
       activesupport (>= 3.2)
       tzinfo
     canvas_http (1.0.0)
-      multipart
+      legacy_multipart
     canvas_kaltura (1.0.0)
       canvas_http
       canvas_slug
       canvas_sort
-      multipart
+      legacy_multipart
       nokogiri
     canvas_mimetype_fu (0.0.1)
     canvas_panda_pub (1.0.0)
@@ -269,6 +269,9 @@ PATH
       utf8_cleaner
     json_token (0.0.1)
       json
+    legacy_multipart (0.0.1)
+      canvas_slug
+      mime-types (~> 3.2)
     linked_in (1.0.0)
       nokogiri
       oauth
@@ -283,9 +286,6 @@ PATH
       activesupport
       i18n
       oauth
-    multipart (0.0.1)
-      canvas_slug
-      mime-types (~> 3.2)
     paginated_collection (1.0.0)
       folio-pagination (~> 0.0.12)
       will_paginate (~> 3.0)
@@ -729,7 +729,7 @@ GEM
     msgpack (1.7.2)
     multi_json (1.15.0)
     multi_xml (0.6.0)
-    multipart-post (2.1.1)
+    multipart-post (2.3.0)
     mustache (1.1.1)
     net-http (0.3.2)
       uri
@@ -1278,6 +1278,7 @@ DEPENDENCIES
   json-schema (~> 2.8.1)
   json_schemer (~> 0.2)
   json_token!
+  legacy_multipart!
   letter_opener (= 1.7.0)
   link_header (= 0.0.8)
   linked_in!
@@ -1293,7 +1294,6 @@ DEPENDENCIES
   mini_magick (= 4.11.0)
   moodle_importer!
   multi_json (= 1.15.0)
-  multipart!
   net-http (~> 0.1)
   net-imap (= 0.2.3)
   net-ldap (= 0.16.3)
