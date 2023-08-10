@@ -845,7 +845,7 @@ GEM
     prawn-table (0.2.2)
       prawn (>= 1.3.0, < 3.0.0)
     promise.rb (0.7.4)
-    prosopite (1.3.0)
+    prosopite (1.3.3)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
