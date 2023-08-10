@@ -110,10 +110,8 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
         else
           object.root_discussion_replies
         end
-      elsif object.legacy?
-        object.legacy_subentries
       else
-        DiscussionEntry.none
+        object.discussion_subentries
       end
     end
   end
