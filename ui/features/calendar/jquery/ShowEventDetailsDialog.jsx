@@ -102,6 +102,7 @@ export default class ShowEventDetailsDialog {
         },
         delUrl: url,
         isRepeating: !!event.calendarEvent?.series_uuid,
+        isSeriesHead: !!event.calendarEvent?.series_head,
       })
     } else {
       return $('<div />').confirmDelete({

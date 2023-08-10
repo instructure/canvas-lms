@@ -124,8 +124,10 @@ const UpdateCalendarEventDialog = ({
           onChange={(_event: Event, value: Which) => setWhich(value)}
         >
           <RadioInput value="one" label={I18n.t('This event')} />
-          {event.series_head && <RadioInput value="all" label={I18n.t('All events')} />}
-          <RadioInput value="following" label={I18n.t('This and all following events')} />
+          <RadioInput value="all" label={I18n.t('All events')} />
+          {!event.series_head && (
+            <RadioInput value="following" label={I18n.t('This and all following events')} />
+          )}
         </RadioInputGroup>
       </View>
     </CanvasModal>

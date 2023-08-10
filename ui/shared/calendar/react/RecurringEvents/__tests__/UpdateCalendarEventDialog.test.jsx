@@ -28,7 +28,7 @@ import {
 
 const eventMock = {
   url: 'http://localhost',
-  series_head: true,
+  series_head: false,
 }
 
 const paramsMock = {
@@ -69,19 +69,17 @@ describe('UpdateCalendarEventDialog', () => {
     expect(getByText('This and all following events')).toBeInTheDocument()
   })
 
-  it('renders event series dialog excluding all for a not head event', () => {
+  it('renders event series dialog except "following" option for a head event', () => {
     const {getByText, queryByText} = renderDialog({
       event: {
-        calendarEvent: {
-          url: 'http://localhost',
-          series_head: false,
-        },
+        url: 'http://localhost',
+        series_head: true,
       },
     })
     expect(getByText('Confirm Changes')).toBeInTheDocument()
     expect(getByText('This event')).toBeInTheDocument()
-    expect(queryByText('All events')).not.toBeInTheDocument()
-    expect(getByText('This and all following events')).toBeInTheDocument()
+    expect(getByText('All events')).toBeInTheDocument()
+    expect(queryByText('This and all following events')).not.toBeInTheDocument()
   })
 
   it('closes on cancel', async () => {

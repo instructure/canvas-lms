@@ -42,7 +42,9 @@ type Props = {
   readonly onDeleted: (deletedEvents: [Event]) => void
   readonly delUrl: string
   readonly isRepeating: boolean
+  readonly isSeriesHead: boolean
 }
+
 const DeleteCalendarEventDialog = ({
   isOpen,
   onCancel,
@@ -50,6 +52,7 @@ const DeleteCalendarEventDialog = ({
   onDeleted,
   delUrl,
   isRepeating,
+  isSeriesHead,
 }: Props) => {
   const [which, setWhich] = useState<Which>('one')
   const [isDeleting, setIsDeleting] = useState<boolean>(false)
@@ -119,7 +122,9 @@ const DeleteCalendarEventDialog = ({
       >
         <RadioInput value="one" label={I18n.t('This event')} />
         <RadioInput value="all" label={I18n.t('All events')} />
-        <RadioInput value="following" label={I18n.t('This and all following events')} />
+        {!isSeriesHead && (
+          <RadioInput value="following" label={I18n.t('This and all following events')} />
+        )}
       </RadioInputGroup>
     )
   }
