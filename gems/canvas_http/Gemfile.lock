@@ -20,7 +20,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.1)
+    addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
     crack (0.4.5)
       rexml
@@ -29,7 +29,7 @@ GEM
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2023.0218.1)
-    public_suffix (5.0.1)
+    public_suffix (5.0.3)
     rake (13.0.6)
     rexml (3.2.6)
     rspec (3.12.0)
