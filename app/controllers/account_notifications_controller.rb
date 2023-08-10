@@ -345,7 +345,7 @@ class AccountNotificationsController < ApplicationController
 
   def require_account_admin
     require_account_context
-    return false unless authorized_action(@account, @current_user, :manage_alerts)
+    false unless authorized_action(@account, @current_user, :manage_alerts)
   end
 
   def roles_to_add(role_params)

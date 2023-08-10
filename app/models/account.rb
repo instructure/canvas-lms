@@ -1288,12 +1288,12 @@ class Account < ActiveRecord::Base
 
   def get_account_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role&.account_role?
+    role if role&.account_role?
   end
 
   def get_course_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role&.course_role?
+    role if role&.course_role?
   end
 
   def get_role_by_name(role_name)
@@ -1325,7 +1325,7 @@ class Account < ActiveRecord::Base
 
   def get_role_by_id(role_id)
     role = Role.get_role_by_id(role_id)
-    return role if valid_role?(role)
+    role if valid_role?(role)
   end
 
   def valid_role?(role)

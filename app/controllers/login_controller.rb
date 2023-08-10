@@ -115,8 +115,9 @@ class LoginController < ApplicationController
   def logout_landing
     # logged in; ask them to log out
     return render :logout_confirm if @current_user
+
     # not logged in at all; send them to login
-    return redirect_to login_url unless flash[:logged_out]
+    redirect_to login_url unless flash[:logged_out]
     # just barely logged out. render a landing page asking them to log in again.
     # render :logout_landing
   end

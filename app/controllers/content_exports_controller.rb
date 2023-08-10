@@ -27,7 +27,7 @@ class ContentExportsController < ApplicationController
   def require_permission
     get_context
     @context ||= @current_user # if we're going through the dashboard
-    return unless authorized_action(@context, @current_user, [:read, :read_as_admin], all_rights: true)
+    authorized_action(@context, @current_user, [:read, :read_as_admin], all_rights: true)
   end
 
   def index

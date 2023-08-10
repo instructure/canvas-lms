@@ -103,7 +103,7 @@ module ConditionalRelease
     end
 
     def json_includes
-      return Rule.includes_for_json if include_param.include? "all"
+      Rule.includes_for_json if include_param.include? "all"
     end
 
     def add_ordering_to(attrs)

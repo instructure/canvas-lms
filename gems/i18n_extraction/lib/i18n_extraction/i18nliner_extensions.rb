@@ -70,7 +70,7 @@ module I18nExtraction::Extensions
       def pattern
         @pattern ||= begin
           calls = (I18nliner::Extractors::RubyExtractor::TRANSLATE_CALLS + LABEL_CALLS).map { |c| Regexp.escape(c.to_s) }
-          /(^|\W)(#{calls.join('|')})(\W|$)/
+          /(^|\W)(#{calls.join("|")})(\W|$)/
         end
       end
     end

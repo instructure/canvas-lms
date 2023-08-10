@@ -334,7 +334,7 @@ module CanvasKaltura
                           :getDownloadUrl,
                           ks: @ks,
                           id: assetId)
-      return result.content if result
+      result&.content
     end
 
     # This is not a true Kaltura API call, but generates the url for a "playlist"

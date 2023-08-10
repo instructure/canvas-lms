@@ -65,7 +65,7 @@ class ImmersiveReaderController < ApplicationController
   end
 
   def require_config
-    return render json: { message: "Service not found" }, status: :not_found unless ir_config.present?
+    render json: { message: "Service not found" }, status: :not_found unless ir_config.present?
   end
 
   def service_url

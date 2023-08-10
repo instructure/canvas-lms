@@ -173,7 +173,7 @@ class Bookmarks::BookmarksController < ApplicationController
       @bookmark = Bookmarks::Bookmark.where(id: params[:id], user_id:).take
     end
 
-    return head :not_found unless @bookmark.present?
+    head :not_found unless @bookmark.present?
   end
 
   def valid_params

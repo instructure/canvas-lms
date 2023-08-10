@@ -29,7 +29,7 @@ describe Api::V1::ContextModule do
       end
 
       def value_to_boolean(object)
-        return true if object
+        !!object
       end
 
       def course_context_modules_item_redirect_url(opts = {})

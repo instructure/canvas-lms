@@ -213,6 +213,6 @@ class TermsApiController < ApplicationController
   end
 
   def require_account_access
-    return false unless authorized_action(@context, @current_user, :read_terms)
+    authorized_action(@context, @current_user, :read_terms)
   end
 end
