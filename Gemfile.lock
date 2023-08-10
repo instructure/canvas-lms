@@ -908,7 +908,7 @@ GEM
     redis-scripting (1.0.1)
       redis (>= 3.0)
     regexp_parser (2.7.0)
-    reline (0.3.2)
+    reline (0.3.7)
       io-console (~> 0.5)
     request_store (1.5.1)
       rack (>= 1.4)
