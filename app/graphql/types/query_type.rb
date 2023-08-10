@@ -44,7 +44,8 @@ module Types
     def account(id: nil, sis_id: nil)
       raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
       return GraphQLNodeLoader.load("Account", id, context) if id
-      return GraphQLNodeLoader.load("AccountBySis", sis_id, context) if sis_id
+
+      GraphQLNodeLoader.load("AccountBySis", sis_id, context) if sis_id
     end
 
     field :course, Types::CourseType, null: true do
@@ -58,7 +59,8 @@ module Types
     def course(id: nil, sis_id: nil)
       raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
       return GraphQLNodeLoader.load("Course", id, context) if id
-      return GraphQLNodeLoader.load("CourseBySis", sis_id, context) if sis_id
+
+      GraphQLNodeLoader.load("CourseBySis", sis_id, context) if sis_id
     end
 
     field :assignment, Types::AssignmentType, null: true do
@@ -72,7 +74,8 @@ module Types
     def assignment(id: nil, sis_id: nil)
       raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
       return GraphQLNodeLoader.load("Assignment", id, context) if id
-      return GraphQLNodeLoader.load("AssignmentBySis", sis_id, context) if sis_id
+
+      GraphQLNodeLoader.load("AssignmentBySis", sis_id, context) if sis_id
     end
 
     field :assignment_group, Types::AssignmentGroupType, null: true do
@@ -86,7 +89,8 @@ module Types
     def assignment_group(id: nil, sis_id: nil)
       raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
       return GraphQLNodeLoader.load("AssignmentGroup", id, context) if id
-      return GraphQLNodeLoader.load("AssignmentGroupBySis", sis_id, context) if sis_id
+
+      GraphQLNodeLoader.load("AssignmentGroupBySis", sis_id, context) if sis_id
     end
 
     field :submission, Types::SubmissionType, null: true do
@@ -111,7 +115,8 @@ module Types
     def term(id: nil, sis_id: nil)
       raise GraphQL::ExecutionError, "Must specify exactly one of id or sisId" if (id && sis_id) || !(id || sis_id)
       return GraphQLNodeLoader.load("Term", id, context) if id
-      return GraphQLNodeLoader.load("TermBySis", sis_id, context) if sis_id
+
+      GraphQLNodeLoader.load("TermBySis", sis_id, context) if sis_id
     end
 
     field :all_courses,
@@ -207,7 +212,8 @@ module Types
       raise GraphQL::ExecutionError, "Must specify exactly one of id or name" if (id && name) || !(id || name)
 
       return GraphQLNodeLoader.load("InternalSetting", id, context) if id
-      return GraphQLNodeLoader.load("InternalSettingByName", name, context) if name
+
+      GraphQLNodeLoader.load("InternalSettingByName", name, context) if name
     end
 
     field :internal_settings, [Types::InternalSettingType], null: true do

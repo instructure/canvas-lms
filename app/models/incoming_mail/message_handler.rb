@@ -171,7 +171,7 @@ module IncomingMail
 
     def parse_tag(tag)
       match = tag.match(/^(\h+)-([0-9~]+)(?:-([0-9]+))?$/)
-      return match[1], match[2], match[3] if match
+      [match[1], match[2], match[3]] if match
     end
 
     def get_original_message(original_message_id, timestamp)

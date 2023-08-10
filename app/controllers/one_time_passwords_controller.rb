@@ -33,10 +33,10 @@ class OneTimePasswordsController < ApplicationController
   end
 
   def disallow_masquerading
-    return render_unauthorized_action if @real_current_user
+    render_unauthorized_action if @real_current_user
   end
 
   def require_otp
-    return render_unauthorized_action unless @current_user.otp_secret_key
+    render_unauthorized_action unless @current_user.otp_secret_key
   end
 end

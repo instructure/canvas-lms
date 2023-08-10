@@ -125,7 +125,8 @@ module ConditionalRelease
 
       def percent_from_points(points, points_possible)
         return points.to_f / points_possible.to_f if points.present? && points_possible.to_f.nonzero?
-        return points.to_f / 100 if points.present? # mirror Canvas rule
+
+        points.to_f / 100 if points.present? # mirror Canvas rule
       end
 
       private

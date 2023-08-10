@@ -519,7 +519,7 @@ class WikiPage < ActiveRecord::Base
     # Convert to ascii chars unless the string matches
     # a script we want to store in unicode
     return title.to_s.to_url unless title.match?(
-      /#{use_unicode_scripts.map { |s| "\\p{#{s}}" }.join('|')}/
+      /#{use_unicode_scripts.map { |s| "\\p{#{s}}" }.join("|")}/
     )
 
     # Return title with unicode chars, replacing chars like ? and &

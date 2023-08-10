@@ -2473,7 +2473,7 @@ class CoursesController < ApplicationController
 
   def confirm_action
     params[:event] ||= (@context.claimed? || @context.created? || @context.completed?) ? "delete" : "conclude"
-    return unless authorized_action(@context, @current_user, permission_for_event(params[:event]))
+    authorized_action(@context, @current_user, permission_for_event(params[:event]))
   end
 
   def conclude_user
@@ -3835,7 +3835,7 @@ class CoursesController < ApplicationController
   end
 
   def link_validator
-    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
+    authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
     # render view
   end
 

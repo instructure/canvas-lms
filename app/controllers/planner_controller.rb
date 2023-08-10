@@ -160,7 +160,7 @@ class PlannerController < ApplicationController
   def set_user
     if params.key?(:user_id)
       @user = api_find(User, params[:user_id])
-      return unless @user == @current_user || authorized_action(@user, @current_user, :read_as_parent)
+      @user == @current_user || authorized_action(@user, @current_user, :read_as_parent)
     elsif params.key?(:observed_user_id)
       return render_unauthorized_action if !params.key?(:context_codes) || params[:context_codes].empty?
 
@@ -168,7 +168,7 @@ class PlannerController < ApplicationController
       # observers can only specify course context_codes
       course_ids = Course.find_all_by_asset_string(params[:context_codes]).pluck(:id)
       valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-      return render_unauthorized_action unless (course_ids - valid_course_ids).empty?
+      render_unauthorized_action unless (course_ids - valid_course_ids).empty?
     else
       @user = @current_user
     end

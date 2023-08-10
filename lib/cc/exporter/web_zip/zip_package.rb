@@ -277,7 +277,8 @@ module CC::Exporter::WebZip
 
     def requirement_type(modul)
       return :one if modul.requirement_count == 1
-      return :all if modul.completion_requirements.count > 0
+
+      :all if modul.completion_requirements.count > 0
     end
 
     def mod_item_or_content_locked?(item)

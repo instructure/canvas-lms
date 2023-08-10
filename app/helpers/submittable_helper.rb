@@ -19,8 +19,8 @@
 
 module SubmittableHelper
   def check_differentiated_assignments(submittable)
-    return render_unauthorized_action if submittable.for_assignment? &&
-                                         !submittable.assignment.visible_to_user?(@current_user)
+    render_unauthorized_action if submittable.for_assignment? &&
+                                  !submittable.assignment.visible_to_user?(@current_user)
   end
 
   def enforce_assignment_visible(submittable)

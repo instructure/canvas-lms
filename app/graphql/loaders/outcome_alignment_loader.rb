@@ -213,7 +213,8 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
     return "quiz" unless alignment[:quiz_id].nil?
     return "discussion" unless alignment[:discussion_id].nil?
     return "new_quiz" if alignment[:assignment_id].present? && alignment[:assignment_submission_types] == "external_tool"
-    return "assignment" unless alignment[:assignment_id].nil?
+
+    "assignment" unless alignment[:assignment_id].nil?
   end
 
   def base_url(alignment)
