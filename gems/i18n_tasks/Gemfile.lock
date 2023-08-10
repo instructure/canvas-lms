@@ -78,7 +78,7 @@ GEM
     ruby2ruby (2.5.0)
       ruby_parser (~> 3.1)
       sexp_processor (~> 4.6)
-    ruby_parser (3.20.1)
+    ruby_parser (3.20.3)
       sexp_processor (~> 4.16)
     sexp_processor (4.17.0)
     simplecov (0.22.0)
