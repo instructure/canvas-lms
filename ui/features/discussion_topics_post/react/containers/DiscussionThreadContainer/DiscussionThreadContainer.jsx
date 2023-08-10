@@ -472,8 +472,7 @@ export const DiscussionThreadContainer = props => {
                             props.depth === 0
                               ? null
                               : () => {
-                                  const topOffset = props.parentRefCurrent.offsetTop
-                                  window.scrollTo(0, topOffset - 44)
+                                  props.setHighlightEntryId(props.discussionEntry.parentId)
                                 }
                           }
                           goToTopic={props.goToTopic}
