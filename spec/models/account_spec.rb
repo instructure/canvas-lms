@@ -2788,6 +2788,24 @@ describe Account do
     end
   end
 
+  describe ".having_user_notes_enabled" do
+    let!(:enabled_account) { account_model(enable_user_notes: true) }
+
+    before { account_model(enable_user_notes: false) }
+
+    context "when the deprecate_faculty_journal flag is disabled" do
+      before { Account.site_admin.disable_feature!(:deprecate_faculty_journal) }
+
+      it "only returns accounts having user notes enabled" do
+        expect(Account.having_user_notes_enabled).to match_array [enabled_account]
+      end
+    end
+
+    it "returns no accounts" do
+      expect(Account.having_user_notes_enabled).to be_empty
+    end
+  end
+
   context "account grading standards" do
     before do
       account_model
