@@ -770,6 +770,11 @@ class Assignment < ActiveRecord::Base
     true
   end
 
+  def ab_guid_through_rubric
+    # ab_guid is an academic benchmark guid - it can be saved on the assignmenmt itself, or accessed through this association
+    rubric&.learning_outcome_alignments&.map { |loa| loa.learning_outcome.vendor_guid }&.compact || []
+  end
+
   def update_student_submissions(updating_user)
     graded_at = Time.zone.now
     submissions.graded.preload(:user).find_each do |s|

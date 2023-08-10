@@ -29,6 +29,8 @@ describe AssignmentsApiController, type: :request do
   include Api::V1::Submission
   include LtiSpecHelper
 
+  specs_require_sharding
+
   context "locked api item" do
     let(:item_type) { "assignment" }
 
@@ -101,6 +103,18 @@ describe AssignmentsApiController, type: :request do
       @course.assignments.create!(title: "Example Assignment")
       json = api_get_assignments_index_from_course(@course)
       expect(json.first).to have_key("in_closed_grading_period")
+    end
+
+    it "includes ab_guid in returned json when included[]='ab_guid' is passed" do
+      @course.assignments.create!(title: "Example Assignment")
+      json = api_get_assignments_index_from_course(@course, include: ["ab_guid"])
+      expect(json.first).to have_key("ab_guid")
+    end
+
+    it "does not include ab_guid in returned json when included[]='ab_guid' is not passed" do
+      @course.assignments.create!(title: "Example Assignment")
+      json = api_get_assignments_index_from_course(@course)
+      expect(json.first).not_to have_key("ab_guid")
     end
 
     it "includes due_date_required in returned json" do
@@ -285,8 +299,6 @@ describe AssignmentsApiController, type: :request do
         end
 
         describe "sharding" do
-          specs_require_sharding
-
           before do
             @shard1.activate do
               account = Account.create!
@@ -3776,6 +3788,71 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.submission_types).to eq "not_graded"
     end
 
+    it "leaves ab_guid alone if not included in update params" do
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        submission_types: "online_text_entry",
+        grading_type: "percent",
+        ab_guid: ["a", "b"]
+      )
+      api_update_assignment_call(@course, @assignment, title: "new title")
+      expect(response).to be_successful
+      expect(@assignment.reload.ab_guid).to eq ["a", "b"]
+    end
+
+    it "updates ab_guid if included in update params" do
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        submission_types: "online_text_entry",
+        grading_type: "percent",
+        ab_guid: ["a", "b"]
+      )
+      api_update_assignment_call(@course, @assignment, ab_guid: ["c", "d"])
+      expect(response).to be_successful
+      expect(@assignment.reload.ab_guid).to eq ["c", "d"]
+    end
+
+    it "updates ab_guid to empty array if included in update params and empty" do
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        submission_types: "online_text_entry",
+        grading_type: "percent",
+        ab_guid: ["a", "b"]
+      )
+      api_update_assignment_call(@course, @assignment, ab_guid: [])
+      expect(response).to be_successful
+      expect(@assignment.reload.ab_guid).to eq []
+    end
+
+    it "updates ab_guid to empty array if included in update params and is empty string" do
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        submission_types: "online_text_entry",
+        grading_type: "percent",
+        ab_guid: ["a", "b"]
+      )
+      api_update_assignment_call(@course, @assignment, ab_guid: "")
+      expect(response).to be_successful
+      expect(@assignment.reload.ab_guid).to eq []
+    end
+
+    it "updates ab_guid to a single element array if a string is passed in" do
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        submission_types: "online_text_entry",
+        grading_type: "percent",
+        ab_guid: ["a", "b"]
+      )
+      api_update_assignment_call(@course, @assignment, ab_guid: "c")
+      expect(response).to be_successful
+      expect(@assignment.reload.ab_guid).to eq ["c"]
+    end
+
     describe "annotatable attachment" do
       before(:once) do
         @assignment = @course.assignments.create!(name: "Some Assignment")
@@ -6426,6 +6503,67 @@ describe AssignmentsApiController, type: :request do
                           id: @assignment.id })
         expect(json).to have_key("description")
         expect(json).not_to have_key("can_submit")
+      end
+    end
+
+    context "ab_guid" do
+      before do
+        course_with_student_logged_in(course_name: "Course 1", active_all: 1)
+        @course.start_at = 14.days.ago
+        @course.save!
+        @assignment = @course.assignments.create!(title: "Assignment 1",
+                                                  points_possible: 10,
+                                                  submission_types: "online_text_entry",
+                                                  ab_guid: ["1234"])
+        account = Account.default
+        outcome = account.created_learning_outcomes.create!(
+          title: "My Outcome",
+          description: "Description of my outcome",
+          vendor_guid: "vendorguid9000"
+        )
+        rating = [{ id: "rat1",
+                    description: "Full Marks",
+                    long_description: "Student did a great job.",
+                    points: 5.0 }]
+        criteria = [{ id: 1, points: 9000, learning_outcome_id: outcome.id, description: "description", long_description: "long description", ratings: rating }]
+
+        @assignment2 = @course.assignments.create!(title: "Assignment 2")
+        @rubric = @course.rubrics.create!(title: "My Rubric", context: @course, data: criteria)
+        @assignment2.rubric = @rubric
+        @assignment2.save!
+        @assignment2.rubric_association.context = @course
+        @assignment2.rubric_association.save!
+
+        @assignment3 = @course.assignments.create!(title: "Assignment 3")
+      end
+
+      def get_assignment_with_guid(assignment_id)
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}?include[]=ab_guid",
+                 { controller: "assignments_api",
+                   action: "show",
+                   format: "json",
+                   course_id: @course.id.to_s,
+                   id: assignment_id,
+                   include: ["ab_guid"] })
+      end
+
+      it "returns ab_guid when it is included in include param" do
+        json = get_assignment_with_guid(@assignment.id)
+        expect(json).to have_key("ab_guid")
+        expect(json["ab_guid"]).to eq(["1234"])
+      end
+
+      it "returns vendor_id through rubrics if no ab_guid is present" do
+        json = get_assignment_with_guid(@assignment2.id)
+        expect(json).to have_key("ab_guid")
+        expect(json["ab_guid"]).to eq(["vendorguid9000"])
+      end
+
+      it "returns an empty array if ab_guid is requested and none exists on assignment or through rubric" do
+        json = get_assignment_with_guid(@assignment3.id)
+        expect(json).to have_key("ab_guid")
+        expect(json["ab_guid"]).to eq([])
       end
     end
   end

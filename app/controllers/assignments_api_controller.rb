@@ -661,6 +661,12 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "ab_guid": {
+#           "description": "(Optional) The academic benchmark(s) associated with the assignment or the assignment's rubric. Only included if 'ab_guid' is included in the 'include' parameter.",
+#           "example": ["ABCD","EFGH"],
+#           "type": "array",
+#           "items": {"type": "string"}
+#         },
 #         "annotatable_attachment_id": {
 #           "description": "The id of the attachment to be annotated by students. Relevant only if submission_types includes 'student_annotation'.",
 #           "type": "integer"
@@ -758,7 +764,7 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"|"can_edit"|"score_statistics"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"|"can_edit"|"score_statistics"|"ab_guid"]
   #   Optional information to include with each assignment:
   #   submission:: The current user's current +Submission+
   #   assignment_visibility:: An array of ids of students who can see the assignment
@@ -767,6 +773,7 @@ class AssignmentsApiController < ApplicationController
   #   observed_users:: An array of submissions for observed users
   #   can_edit:: an extra Boolean value will be included with each +Assignment+ (and +AssignmentDate+ if +all_dates+ is supplied) to indicate whether the caller can edit the assignment or date. Moderated grading and closed grading periods may restrict a user's ability to edit an assignment.
   #   score_statistics:: An object containing min, max, and mean score on this assignment. This will not be included for students if there are less than 5 graded assignments or if disabled by the instructor. Only valid if 'submission' is also included.
+  #   ab_guid:: An array of guid strings for academic benchmarks
   # @argument search_term [String]
   #   The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Boolean]
@@ -1021,6 +1028,10 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations.preload(assignments, :score_statistic)
       end
 
+      if include_params.include?("ab_guid")
+        ActiveRecord::Associations.preload(assignments, rubric: { learning_outcome_alignments: :learning_outcome })
+      end
+
       mc_status = setup_master_course_restrictions(assignments, context)
 
       assignments.map do |assignment|
@@ -1047,6 +1058,7 @@ class AssignmentsApiController < ApplicationController
                         preloaded_user_content_attachments: preloaded_attachments,
                         include_can_edit: include_params.include?("can_edit"),
                         include_score_statistics: include_params.include?("score_statistics"),
+                        include_ab_guid: include_params.include?("ab_guid"),
                         master_course_status: mc_status)
       end
     end
@@ -1054,7 +1066,7 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"|"score_statistics"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"|"score_statistics"|"ab_guid"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
@@ -1098,7 +1110,8 @@ class AssignmentsApiController < ApplicationController
         include_can_edit: included_params.include?("can_edit"),
         include_score_statistics: included_params.include?("score_statistics"),
         include_can_submit: included_params.include?("can_submit"),
-        include_webhook_info: included_params.include?("webhook_info")
+        include_webhook_info: included_params.include?("webhook_info"),
+        include_ab_guid: included_params.include?("ab_guid")
       }
 
       result_json = if use_quiz_json?
