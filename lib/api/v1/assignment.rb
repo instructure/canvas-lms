@@ -458,6 +458,10 @@ module Api::V1::Assignment
                            (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
     end
 
+    if opts[:include_ab_guid]
+      hash["ab_guid"] = assignment.ab_guid.presence || assignment.ab_guid_through_rubric
+    end
+
     hash["restrict_quantitative_data"] = assignment.restrict_quantitative_data?(user, true) || false
 
     hash
@@ -732,6 +736,14 @@ module Api::V1::Assignment
     if update_params.key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
       assignment.assignment_group = assignment.context.assignment_groups.where(id: ag_id).first
+    end
+
+    if update_params.key?("ab_guid")
+      assignment.ab_guid.clear
+      ab_guids = update_params.delete("ab_guid").presence
+      Array(ab_guids).each do |guid|
+        assignment.ab_guid << guid if guid.present?
+      end
     end
 
     if update_params.key?("group_category_id") && !assignment.group_category_deleted_with_submissions?
@@ -1151,7 +1163,8 @@ module Api::V1::Assignment
       { "allowed_extensions" => strong_anything },
       { "integration_data" => strong_anything },
       { "external_tool_tag_attributes" => strong_anything },
-      ({ "submission_types" => strong_anything } if should_update_submission_types)
+      ({ "submission_types" => strong_anything } if should_update_submission_types),
+      { "ab_guid" => strong_anything },
     ].compact
   end
 
