@@ -90,23 +90,23 @@ describe('TempEnrollAssign', () => {
   })
 
   it('changes summary when date and time changes', async () => {
-    const screen = render(<TempEnrollAssign {...props} />)
-    const startDate = await screen.findByLabelText('Begins On')
+    const {findByLabelText, findByTestId} = render(<TempEnrollAssign {...props} />)
+    const startDate = await findByLabelText('Begins On')
+    const endDate = await findByLabelText('Until')
     fireEvent.input(startDate, {target: {value: 'Apr 10 2022'}})
     fireEvent.blur(startDate)
-    const endDate = await screen.findByLabelText('Until')
     fireEvent.input(endDate, {target: {value: 'Apr 12 2022'}})
     fireEvent.blur(endDate)
-    expect(await screen.findByText(new RegExp('4/10/2022'))).toBeInTheDocument()
-    expect(await screen.findByText(new RegExp('4/12/2022'))).toBeInTheDocument()
+    expect((await findByTestId('temp-enroll-summary')).textContent).toBe(
+      "Canvas will enroll Melvin as a ROLE in John Smith's selected courses from 4/10/2022, 12:00 AM - 4/12/2022, 12:00 AM"
+    )
   })
 
-  it('shows error when start date is before end date', async () => {
+  it('shows error when start date is after end date', async () => {
     const screen = render(<TempEnrollAssign {...props} />)
     const endDate = await screen.findByLabelText('Until')
     fireEvent.input(endDate, {target: {value: 'Apr 10 2022'}})
     fireEvent.blur(endDate)
-
     expect(await screen.findByText('The end date must be after the start date')).toBeInTheDocument()
   })
 

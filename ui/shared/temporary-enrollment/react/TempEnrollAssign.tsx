@@ -30,6 +30,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import RoleSearchSelect from './RoleSearchSelect'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
+import {EnrollmentTree} from './EnrollmentTree'
 
 const I18n = useI18nScope('temporary_enrollment')
 
@@ -54,20 +55,23 @@ interface Props {
 export function TempEnrollAssign(props: Props) {
   const [roleChoice, setRoleChoice] = useState('')
   const [dateMsg, setDateMsg] = useState('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [listEnroll, setListEnroll] = useState<{}[]>([])
   const [loading, setLoading] = useState(true)
-
-  // setting default dates
-  const defaultStart = new Date()
-  const defaultEnd = new Date(defaultStart)
-  defaultEnd.setDate(defaultEnd.getDate() + 1)
-  defaultStart.setHours(0, 0, 0)
-  defaultEnd.setHours(0, 0, 0)
-  const [startDate, setStartDate] = useState(defaultStart)
-  const [endDate, setEndDate] = useState(defaultEnd)
+  const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date())
 
   const statesList = ['active', 'completed', 'invited']
+
+  // setting default dates
+  useEffect(() => {
+    const defaultStart = new Date()
+    const defaultEnd = new Date(defaultStart)
+    defaultEnd.setDate(defaultEnd.getDate() + 1)
+    defaultStart.setHours(0, 0, 0)
+    defaultEnd.setHours(0, 0, 0)
+    setStartDate(defaultStart)
+    setEndDate(defaultEnd)
+  }, [])
 
   const handleEnrollments = (json: []) => {
     setListEnroll([...json])
@@ -76,9 +80,10 @@ export function TempEnrollAssign(props: Props) {
   useEffect(() => {
     if (endDate.getTime() <= startDate.getTime()) {
       setDateMsg(I18n.t('The start date must be before the end date'))
-    } else {
+    } else if (dateMsg !== '') {
       setDateMsg('')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endDate, startDate])
 
   useEffect(() => {
@@ -144,133 +149,136 @@ export function TempEnrollAssign(props: Props) {
     return <Spinner renderTitle="Retrieving user enrollments" size="large" />
   }
   return (
-    <Grid>
-      <Grid.Row>
-        <Grid.Col width={1}>
-          <Button
-            onClick={() => {
-              props.goBack()
-            }}
-          >
-            {I18n.t('Back')}
-          </Button>
-        </Grid.Col>
-      </Grid.Row>
-      <Grid.Row vAlign="middle">
-        <Grid.Col width={1}>
-          <Avatar
-            size="small"
-            margin="small"
-            name={props.user.name}
-            src={props.user.avatar_url}
-            data-fs-exclude={true}
-            data-heap-redact-attributes="name"
-          />
-        </Grid.Col>
-        <Grid.Col>
-          <Text>
-            {I18n.t('%{enroll} will receive temporary enrollments from %{user}', {
-              enroll: props.enrollment.name,
-              user: props.user.name,
-            })}
-          </Text>
-        </Grid.Col>
-      </Grid.Row>
-      {dateMsg === '' ? null : (
+    <>
+      <Grid>
         <Grid.Row>
-          <Grid.Col width={10}>
-            <Alert variant="error">{I18n.t('The end date must be after the start date')}</Alert>
+          <Grid.Col width={1}>
+            <Button
+              onClick={() => {
+                props.goBack()
+              }}
+            >
+              {I18n.t('Back')}
+            </Button>
           </Grid.Col>
         </Grid.Row>
-      )}
-      <Grid.Row vAlign="top">
-        <Grid.Col width={8}>
-          <DateTimeInput
-            data-testId="start-date-input"
-            layout="columns"
-            isRequired={true}
-            description={
-              <ScreenReaderContent>
-                {I18n.t('Start Date for %{enroll}', {enroll: props.enrollment.name})}
-              </ScreenReaderContent>
-            }
-            dateRenderLabel={I18n.t('Begins On')}
-            timeRenderLabel={I18n.t('Time')}
-            prevMonthLabel={I18n.t('Prev')}
-            nextMonthLabel={I18n.t('Next')}
-            value={startDate.toISOString()}
-            onChange={(e: any, value: any) => {
-              setStartDate(new Date(value))
-            }}
-            invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
-          />
-        </Grid.Col>
-        <Grid.Col>
-          <RoleSearchSelect
-            noResultsLabel={I18n.t('No roles available')}
-            noSearchMatchLabel={I18n.t('')}
-            id="termFilter"
-            placeholder={I18n.t('Select a Role')}
-            isLoading={false}
-            label={I18n.t('Find Role')}
-            value={roleChoice}
-            onChange={(e: any) => setRoleChoice(e.target.id)}
-          >
-            {roleOptions}
-          </RoleSearchSelect>
-        </Grid.Col>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Col width={8}>
-          <DateTimeInput
-            data-testId="end-date-input"
-            layout="columns"
-            isRequired={true}
-            description={
-              <ScreenReaderContent>
-                {I18n.t('End Date for %{enroll}', {enroll: props.enrollment.name})}
-              </ScreenReaderContent>
-            }
-            dateRenderLabel={I18n.t('Until')}
-            timeRenderLabel={I18n.t('Time')}
-            prevMonthLabel={I18n.t('Prev')}
-            nextMonthLabel={I18n.t('Next')}
-            value={endDate.toISOString()}
-            onChange={(e: any, value: any) => {
-              setEndDate(new Date(value))
-            }}
-            invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
-          />
-        </Grid.Col>
-      </Grid.Row>
-      <Grid.Row>
-        <Grid.Col>
-          <Text>
-            {I18n.t(
-              "Canvas will enroll %{recipient} as a %{role} in %{source}'s selected courses from %{start} - %{end}",
-              {
-                recipient: props.enrollment.name,
-                role: roleLabel,
-                source: props.user.name,
-                start: startDate.toLocaleString([], {
-                  year: 'numeric',
-                  month: 'numeric',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                }),
-                end: endDate.toLocaleString([], {
-                  year: 'numeric',
-                  month: 'numeric',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                }),
+        <Grid.Row vAlign="middle">
+          <Grid.Col width={1}>
+            <Avatar
+              size="small"
+              margin="small"
+              name={props.user.name}
+              src={props.user.avatar_url}
+              data-fs-exclude={true}
+              data-heap-redact-attributes="name"
+            />
+          </Grid.Col>
+          <Grid.Col>
+            <Text>
+              {I18n.t('%{enroll} will receive temporary enrollments from %{user}', {
+                enroll: props.enrollment.name,
+                user: props.user.name,
+              })}
+            </Text>
+          </Grid.Col>
+        </Grid.Row>
+        {dateMsg === '' ? null : (
+          <Grid.Row>
+            <Grid.Col width={10}>
+              <Alert variant="error">{I18n.t('The end date must be after the start date')}</Alert>
+            </Grid.Col>
+          </Grid.Row>
+        )}
+        <Grid.Row vAlign="top">
+          <Grid.Col width={8}>
+            <DateTimeInput
+              data-testId="start-date-input"
+              layout="columns"
+              isRequired={true}
+              description={
+                <ScreenReaderContent>
+                  {I18n.t('Start Date for %{enroll}', {enroll: props.enrollment.name})}
+                </ScreenReaderContent>
               }
-            )}
-          </Text>
-        </Grid.Col>
-      </Grid.Row>
-    </Grid>
+              dateRenderLabel={I18n.t('Begins On')}
+              timeRenderLabel={I18n.t('Time')}
+              prevMonthLabel={I18n.t('Prev')}
+              nextMonthLabel={I18n.t('Next')}
+              value={startDate.toISOString()}
+              onChange={(e: any, value: any) => {
+                setStartDate(new Date(value))
+              }}
+              invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
+            />
+          </Grid.Col>
+          <Grid.Col>
+            <RoleSearchSelect
+              noResultsLabel={I18n.t('No roles available')}
+              noSearchMatchLabel={I18n.t('')}
+              id="termFilter"
+              placeholder={I18n.t('Select a Role')}
+              isLoading={false}
+              label={I18n.t('Find Role')}
+              value={roleChoice}
+              onChange={(e: any) => setRoleChoice(e.target.id)}
+            >
+              {roleOptions}
+            </RoleSearchSelect>
+          </Grid.Col>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Col width={8}>
+            <DateTimeInput
+              data-testId="end-date-input"
+              layout="columns"
+              isRequired={true}
+              description={
+                <ScreenReaderContent>
+                  {I18n.t('End Date for %{enroll}', {enroll: props.enrollment.name})}
+                </ScreenReaderContent>
+              }
+              dateRenderLabel={I18n.t('Until')}
+              timeRenderLabel={I18n.t('Time')}
+              prevMonthLabel={I18n.t('Prev')}
+              nextMonthLabel={I18n.t('Next')}
+              value={endDate.toISOString()}
+              onChange={(e: any, value: any) => {
+                setEndDate(new Date(value))
+              }}
+              invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
+            />
+          </Grid.Col>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Col>
+            <Text data-testid="temp-enroll-summary">
+              {I18n.t(
+                "Canvas will enroll %{recipient} as a %{role} in %{source}'s selected courses from %{start} - %{end}",
+                {
+                  recipient: props.enrollment.name,
+                  role: roleLabel,
+                  source: props.user.name,
+                  start: startDate.toLocaleString([], {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  }),
+                  end: endDate.toLocaleString([], {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  }),
+                }
+              )}
+            </Text>
+          </Grid.Col>
+        </Grid.Row>
+      </Grid>
+      <EnrollmentTree list={listEnroll} roles={props.roles} selectRoleId={roleChoice} />
+    </>
   )
 }
