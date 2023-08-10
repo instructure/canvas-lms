@@ -1128,7 +1128,7 @@ GEM
       aws-sigv4
     vericite_api (1.5.3)
       json (>= 1.4.6)
-    version_gem (1.1.2)
+    version_gem (1.1.3)
     virtus (2.0.0)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
