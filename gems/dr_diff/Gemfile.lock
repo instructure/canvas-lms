@@ -15,7 +15,7 @@ GEM
     httparty (0.21.0)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    mini_mime (1.1.2)
+    mini_mime (1.1.5)
     mini_portile2 (2.8.4)
     multi_xml (0.6.0)
     rspec (3.12.0)
