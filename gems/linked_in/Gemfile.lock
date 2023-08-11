@@ -9,7 +9,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.5.0)
-    hashie (4.1.0)
+    hashie (5.0.0)
     mini_portile2 (2.8.4)
     nokogiri (1.13.10)
       mini_portile2 (~> 2.8.0)
