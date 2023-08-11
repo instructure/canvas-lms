@@ -209,6 +209,7 @@ class Assignment < ActiveRecord::Base
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
+  validates :sis_source_id, uniqueness: { scope: :root_account_id }, allow_nil: true
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -330,12 +331,13 @@ class Assignment < ActiveRecord::Base
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.grades_published_at = nil
-    %i[migration_id
-       lti_context_id
-       turnitin_id
-       discussion_topic
+    %i[discussion_topic
+       integration_data
        integration_id
-       integration_data].each do |attr|
+       lti_context_id
+       migration_id
+       sis_source_id
+       turnitin_id].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
@@ -599,6 +601,11 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
+  # ensure a root_account_id is set before validation so that we can
+  # properly validate sis_source_id uniqueness by root_account_id
+  before_validation :set_root_account_id, on: :create
+  before_create :set_muted
+
   before_save :ensure_post_to_sis_valid,
               :process_if_quiz,
               :default_values,
@@ -612,8 +619,6 @@ class Assignment < ActiveRecord::Base
   def delete_observer_alerts
     observer_alerts.in_batches(of: 10_000).delete_all
   end
-
-  before_create :set_root_account_id, :set_muted
 
   after_save  :update_submissions_and_grades_if_details_changed,
               :update_grading_period_grades,

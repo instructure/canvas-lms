@@ -1554,6 +1554,13 @@ describe Assignment do
       expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
     end
 
+    it "does not duplicate the sis_source_id" do
+      assignment = @course.assignments.create!(sis_source_id: "abc")
+      new_assignment = assignment.duplicate
+      expect(new_assignment).to be_valid
+      expect(new_assignment.sis_source_id).to be_nil
+    end
+
     it "does not duplicate grades_published_at" do
       assignment = @course.assignments.create!(title: "whee", points_possible: 10)
       assignment.grades_published_at = Time.zone.now
@@ -10837,7 +10844,7 @@ describe Assignment do
       Assignment.create!(course: @course, name: "some assignment", sis_source_id: "BLAH")
       expect do
         Assignment.create!(course: @course, name: "some assignment", sis_source_id: "BLAH")
-      end.to raise_error(ActiveRecord::RecordNotUnique)
+      end.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 
