@@ -390,6 +390,35 @@ describe CourseSection, "moving to new course" do
       expect(@enrollment.workflow_state).to eq("deleted")
     end
 
+    it "clears gradebook filters for the section when destroyed" do
+      teacher = @course.enroll_teacher(User.create, enrollment_state: :active).user
+      teacher.set_preference(
+        :gradebook_settings,
+        @course.global_id,
+        { "filter_rows_by" => { "section_id" => @section.id.to_s } }
+      )
+
+      expect { @section.destroy }.to change {
+        settings = teacher.reload.get_preference(:gradebook_settings, @course.global_id)
+        settings.dig("filter_rows_by", "section_id")
+      }.from(@section.id.to_s).to(nil)
+    end
+
+    it "doesn't clear gradebook filters for other sections when destroyed" do
+      new_section = @course.course_sections.create!
+      teacher = @course.enroll_teacher(User.create, enrollment_state: :active).user
+      teacher.set_preference(
+        :gradebook_settings,
+        @course.global_id,
+        { "filter_rows_by" => { "section_id" => new_section.id.to_s } }
+      )
+
+      expect { @section.destroy }.not_to change {
+        settings = teacher.reload.get_preference(:gradebook_settings, @course.global_id)
+        settings.dig("filter_rows_by", "section_id")
+      }.from(new_section.id.to_s)
+    end
+
     it "doesn't associate with deleted discussion topics" do
       course = course_factory({ course_name: "Course 1", active_all: true })
       section = course.course_sections.create!
