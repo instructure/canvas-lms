@@ -801,6 +801,7 @@ class MessageableUser
             enrollments.user_id=users.id AND
             enrollments.course_id=groups.context_id
           INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id
+          LEFT JOIN roles ON roles.id = enrollments.role_id
         SQL
         where(:workflow_state => 'accepted').
         where("groups.workflow_state<>'deleted'").
