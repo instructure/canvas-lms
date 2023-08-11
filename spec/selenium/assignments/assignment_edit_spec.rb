@@ -151,4 +151,29 @@ describe "assignment" do
       expect(@new_quiz.reload.omit_from_final_grade).to be true
     end
   end
+
+  context "due date" do
+    before do
+      course_with_teacher(active_all: true)
+      user_session(@teacher)
+    end
+
+    it "fills the due date field from a selection in the popup calendar" do
+      time = DateTime.new(2023, 8, 9, 12, 0, 0, 0, 0) # this is a Wednesday
+      Timecop.freeze(time) do
+        @assignment = @course.assignments.create!(due_at: time, points_possible: 10)
+
+        AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment.id)
+        AssignmentCreateEditPage.due_date_picker_btn.click
+        expect(AssignmentCreateEditPage.due_date_picker_popup).to be_displayed
+
+        # click the next day (Thursday the 10th)
+        f("td.ui-datepicker-current-day + td").click
+        AssignmentCreateEditPage.due_date_picker_done_btn.click
+        expect(AssignmentCreateEditPage.due_date_input.attribute("value")).to eq(
+          format_time_for_datepicker(DateTime.new(2023, 8, 10, 12, 0, 0, 0, 0))
+        )
+      end
+    end
+  end
 end
