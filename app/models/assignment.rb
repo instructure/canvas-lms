@@ -134,6 +134,7 @@ class Assignment < ActiveRecord::Base
   belongs_to :grader_section, class_name: "CourseSection", optional: true
   belongs_to :final_grader, class_name: "User", optional: true
   has_many :active_groups, -> { merge(GroupCategory.active).merge(Group.active) }, through: :group_category, source: :groups
+  has_many :assigned_students, through: :submissions, source: :user
 
   belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
   has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
@@ -2560,8 +2561,8 @@ class Assignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, &block)
-    return visible_students_for_speed_grader(user:, includes:, group_id:, section_id:) unless grade_as_group?
+  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, ignore_student_visibility: false, &block)
+    return visible_students_for_speed_grader(user:, includes:, group_id:, section_id:, ignore_student_visibility:) unless grade_as_group?
 
     submissions = self.submissions.to_a
     user_ids_with_submissions = submissions.select(&:has_submission?).to_set(&:user_id)
@@ -2587,7 +2588,7 @@ class Assignment < ActiveRecord::Base
     enrollment_priority = { "active" => 1, "inactive" => 2 }
     enrollment_priority.default = 100
 
-    visible_student_ids = visible_students_for_speed_grader(user:, includes:).to_set(&:id)
+    visible_student_ids = visible_students_for_speed_grader(user:, includes:, ignore_student_visibility:).to_set(&:id)
 
     reps_and_others = groups_and_ungrouped(user, includes:).filter_map do |group_name, group_info|
       group_students = group_info[:users]
@@ -2636,7 +2637,7 @@ class Assignment < ActiveRecord::Base
   # using this method instead of students_with_visibility so we
   # can add the includes and students_visible_to/participating_students scopes.
   # group_id and section_id filters may optionally be supplied.
-  def visible_students_for_speed_grader(user:, includes: [:inactive], group_id: nil, section_id: nil)
+  def visible_students_for_speed_grader(user:, includes: [:inactive], group_id: nil, section_id: nil, ignore_student_visibility: false)
     @visible_students_for_speed_grader ||= {}
     @visible_students_for_speed_grader[[user.global_id, includes, group_id]] ||= begin
       student_scope = if user.present?
@@ -2644,7 +2645,15 @@ class Assignment < ActiveRecord::Base
                       else
                         context.participating_students
                       end
-      students = students_with_visibility(student_scope).order_by_sortable_name.distinct
+
+      student_scope = if ignore_student_visibility
+                        student_scope.where(id: assigned_students)
+                      else
+                        students_with_visibility(student_scope)
+                      end
+
+      students = student_scope.order_by_sortable_name.distinct
+
       if group_id.present?
         students = students.joins(:group_memberships)
                            .where(group_memberships: { group_id:, workflow_state: :accepted })

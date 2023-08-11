@@ -2103,6 +2103,30 @@ describe Assignment do
         expect(representatives[3].name).to eql(@initial_student.name)
       end
     end
+
+    context "differentiated assignments and deactivated students" do
+      before do
+        @student_enrollment = @enrollment
+        @assignment = @course.assignments.create!(assignment_valid_attributes.merge(only_visible_to_overrides: true))
+        create_adhoc_override_for_assignment(@assignment, @student_enrollment.user)
+        @student_enrollment.deactivate
+      end
+
+      it "excludes deactivated students by default" do
+        representatives = @assignment.representatives(user: @teacher)
+        expect(representatives).not_to include @initial_student
+      end
+
+      it "includes deactivated students if passed ignore_student_visibility" do
+        representatives = @assignment.representatives(user: @teacher, ignore_student_visibility: true)
+        expect(representatives).to include @initial_student
+      end
+
+      it "excludes deactivated students if the includes param does not have :inactive" do
+        representatives = @assignment.representatives(user: @teacher, includes: [:completed], ignore_student_visibility: true)
+        expect(representatives).not_to include @initial_student
+      end
+    end
   end
 
   context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
