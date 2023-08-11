@@ -60,9 +60,11 @@ export const DiscussionEntryVersionHistory = props => {
       <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
         <Text size={props.textSize}>
           <Link
+            as="button"
             onClick={() => {
               setOpen(true)
             }}
+            margin="0 0 small 0"
           >
             {I18n.t('View History')}
           </Link>

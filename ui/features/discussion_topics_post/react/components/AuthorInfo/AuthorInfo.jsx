@@ -173,7 +173,7 @@ export const AuthorInfo = props => {
                   </Flex>
                 </Flex.Item>
               )}
-              <Flex.Item overflowX="hidden">
+              <Flex.Item overflowX="hidden" padding="xx-small 0 0 xx-small">
                 <Timestamps
                   author={props.author}
                   editor={props.editor}
