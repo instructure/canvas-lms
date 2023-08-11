@@ -380,7 +380,12 @@ class CourseSection < ActiveRecord::Base
     enrollments.not_fake.each(&:destroy)
     assignment_overrides.each(&:destroy)
     discussion_topic_section_visibilities&.each(&:destroy)
-    save!
+    result = save!
+    delay_if_production(
+      priority: Delayed::LOW_PRIORITY,
+      strand: "RemoveSectionFromGradebookFilters:#{global_course_id}"
+    ).remove_from_gradebook_filters
+    result
   end
 
   def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
@@ -425,5 +430,17 @@ class CourseSection < ActiveRecord::Base
     return unless course.enable_course_paces?
 
     course_paces.published.find_each(&:create_publish_progress)
+  end
+
+  private
+
+  def remove_from_gradebook_filters
+    gradebook_settings = UserPreferenceValue.where(key: "gradebook_settings", sub_key: global_course_id)
+    gradebook_settings.find_each do |setting|
+      if setting.value.dig("filter_rows_by", "section_id") == id.to_s
+        setting.value["filter_rows_by"]["section_id"] = nil
+        setting.save
+      end
+    end
   end
 end
