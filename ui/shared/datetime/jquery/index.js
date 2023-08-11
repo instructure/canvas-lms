@@ -148,7 +148,7 @@ $.fn.datepicker = function (options) {
     // timezone, not necessarily what's reflected by ENV.TIMEZONE.
     $input.data('inputdate', changeTimezone(inputdate, {desiredTZ: ENV.TIMEZONE}))
     const formatter = new Intl.DateTimeFormat(ENV.LOCALE || navigator.language, format)
-    $input.val(formatter.format(inputdate)).change().trigger('change')
+    $input.val(formatter.format(inputdate)).change()
   }
   if (!$.fn.datepicker.timepicker_initialized) {
     $(document).delegate('.ui-datepicker-ok', 'click', () => {
