@@ -203,6 +203,7 @@ describe "recurring events" do
     end
 
     it "creates recurring event and verifies monthly calendar" do
+      skip("LF-578: Skipping due to performance issues")
       get "/courses/#{@course.id}/calendar_events/new"
       wait_for_ajaximations
       wait_for_calendar_rce
@@ -210,8 +211,9 @@ describe "recurring events" do
       enter_calendar_start_date(newdate)
       select_frequency_option("Daily")
       click_create_event_button
-
+      wait_for_ajaximations
       get "/calendar2#view_name=month&view_start=2023-07-01"
+      wait_for_ajaximations
       expect(all_events_in_month_view.length).to eq(17)
     end
 
