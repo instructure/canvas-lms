@@ -456,6 +456,7 @@ export default class GradebookSettingsModal extends React.Component<
                         this.setViewOption('columnSortSettings', {criterion, direction})
                       },
                     }}
+                    finalGradeOverrideEnabled={this.props.courseFeatures.finalGradeOverrideEnabled}
                     statusColors={{
                       currentValues: this.state.viewOptions.statusColors,
                       onChange: (colors: GradebookViewOptions['statusColors']) => {
