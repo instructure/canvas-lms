@@ -200,13 +200,16 @@ describe "interaction with differentiated assignments" do
       create_da_assignment
     end
 
-    it "hides students from speedgrader if they don't have Differentiated assignment visibility" do
+    it "hides students from speedgrader if they are not assigned, and includes assigned students without visibility" do
       @s1, @s2, @s3 = create_users_in_course(@course, 3, return_type: :record, section_id: @default_section.id)
       @s4, @s5 = create_users_in_course(@course, 2, return_type: :record, section_id: @section1.id)
       create_section_override_for_assignment(@da_assignment, course_section: @section1)
-      @da_assignment.grade_student(@s3, grade: 10, grader: @teacher)
+      @course.enrollments.find_by(user: @s4).deactivate
+      @teacher.set_preference(:gradebook_settings, @course.global_id, {
+                                "show_inactive_enrollments" => "true",
+                                "show_concluded_enrollments" => "false"
+                              })
 
-      # evaluate for our data
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@da_assignment.id}"
       f(".ui-selectmenu-icon").click
       [@s1, @s2, @s3].each do |student|

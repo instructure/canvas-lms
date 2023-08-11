@@ -119,7 +119,8 @@ module SpeedGrader
           user: current_user,
           includes:,
           group_id: group_id_filter,
-          section_id: section_id_filter
+          section_id: section_id_filter,
+          ignore_student_visibility: true
         ) { |rep, others| others.each { |s| res[:context][:rep_for_student][s.id] = rep.id } }
 
       unless assignment.anonymize_students?

@@ -1774,7 +1774,7 @@ describe SpeedGrader::Assignment do
       expect(students).to include(active_student.id.to_s)
     end
 
-    it "returns active and inactive students and enrollments when inactive enromments is true" do
+    it "returns active and inactive students and enrollments when inactive enrollments is true" do
       gradebook_settings[test_course.global_id]["show_inactive_enrollments"] = "true"
       teacher.preferences[:gradebook_settings] = gradebook_settings
       json = SpeedGrader::Assignment.new(assignment, teacher).json
@@ -1809,6 +1809,50 @@ describe SpeedGrader::Assignment do
       json = SpeedGrader::Assignment.new(assignment, teacher).json
       students = json["context"]["students"].pluck("id")
       expect(students).to include(active_student.id.to_s, concluded_student.id.to_s)
+    end
+
+    context "differentiated assignments" do
+      before do
+        assignment.update!(only_visible_to_overrides: true)
+      end
+
+      it "returns inactive students when inactive enrollments is true" do
+        create_adhoc_override_for_assignment(assignment, inactive_student)
+        gradebook_settings[test_course.global_id]["show_inactive_enrollments"] = "true"
+        teacher.preferences[:gradebook_settings] = gradebook_settings
+        json = SpeedGrader::Assignment.new(assignment, teacher).json
+
+        students = json["context"]["students"].pluck("id")
+        expect(students).to include inactive_student.id.to_s
+      end
+
+      it "does not return inactive students when inactive enrollments is false" do
+        create_adhoc_override_for_assignment(assignment, inactive_student)
+        teacher.preferences[:gradebook_settings] = gradebook_settings
+        json = SpeedGrader::Assignment.new(assignment, teacher).json
+
+        students = json["context"]["students"].pluck("id")
+        expect(students).not_to include inactive_student.id.to_s
+      end
+
+      it "returns concluded students when concluded enrollments is true" do
+        create_adhoc_override_for_assignment(assignment, concluded_student)
+        gradebook_settings[test_course.global_id]["show_concluded_enrollments"] = "true"
+        teacher.preferences[:gradebook_settings] = gradebook_settings
+        json = SpeedGrader::Assignment.new(assignment, teacher).json
+
+        students = json["context"]["students"].pluck("id")
+        expect(students).to include concluded_student.id.to_s
+      end
+
+      it "does not return concluded students when concluded enrollments is false" do
+        create_adhoc_override_for_assignment(assignment, concluded_student)
+        teacher.preferences[:gradebook_settings] = gradebook_settings
+        json = SpeedGrader::Assignment.new(assignment, teacher).json
+
+        students = json["context"]["students"].pluck("id")
+        expect(students).not_to include concluded_student.id.to_s
+      end
     end
   end
 
