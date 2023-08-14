@@ -33,6 +33,7 @@ class LtiApiController < ApplicationController
     end
 
     @xml = Nokogiri::XML.parse(request.body)
+    puts "grade_passback triggered: body: #{request.body}"
 
     lti_response = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
     render :body => lti_response.to_xml, :content_type => 'application/xml'
