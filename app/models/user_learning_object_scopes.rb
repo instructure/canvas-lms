@@ -302,6 +302,8 @@ module UserLearningObjectScopes
                AND assessor_asset.assignment_id = assignments.id")
                          .where(assessor_id: id)
                          .where(assessor_asset: { course_id: shard_course_ids })
+                         .joins("INNER JOIN #{Enrollment.quoted_table_name} AS enrollments ON enrollments.user_id = assessment_requests.user_id
+               AND enrollments.course_id = assessor_asset.course_id AND enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
       ar_scope = ar_scope.incomplete unless scope_only
       ar_scope = ar_scope.for_courses(shard_course_ids)
 

@@ -574,6 +574,11 @@ describe UserLearningObjectScopes do
 
       expect(@reviewer.submissions_needing_peer_review.length).to eq 0
     end
+
+    it "does not include assessment requests when the user of the assessment is not an active enrollment" do
+      @assessment_request.user.enrollments.update_all(workflow_state: "inactive")
+      expect(@reviewer.submissions_needing_peer_review.length).to eq 0
+    end
   end
 
   context "assignments_needing_grading" do
