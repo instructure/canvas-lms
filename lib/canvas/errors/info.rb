@@ -35,6 +35,7 @@ module Canvas
         @rci = opts.fetch(:request_context_id, RequestContextGenerator.request_id)
         @type = opts.fetch(:type, nil)
         @canvas_error_info = opts.fetch(:canvas_error_info, {})
+        @course = opts.fetch(:course, nil)
       end
 
       # The ideal hash format to pass to Canvas::Errors.capture().
@@ -47,7 +48,8 @@ module Canvas
             account_id: @account.try(:global_id),
             user_id: @user.try(:global_id),
             type: @type,
-            canvas_domain: ENV['CANVAS_DOMAIN']
+            canvas_domain: ENV['CANVAS_DOMAIN'],
+            course: @course
           },
           extra: {
             request_context_id: @rci,
