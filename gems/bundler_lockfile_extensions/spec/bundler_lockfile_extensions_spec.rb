@@ -326,16 +326,49 @@ describe "BundlerLockfileExtensions" do
         gemfile: "local_test/Gemfile")
     RUBY
     contents = <<~RUBY
-      gem "activesupport", "7.0.4.3"
-      gem "concurrent-ruby", "1.0.2"
+      gem "snaky_hash", "2.0.1"
     RUBY
 
     with_gemfile(definitions, contents) do
       create_local_gem("local_test", <<~RUBY)
-        spec.add_dependency "activesupport", "7.0.4.3"
+        spec.add_dependency "zendesk_api", "1.28.0"
       RUBY
 
-      expect { invoke_bundler("install") }.to raise_error(%r{concurrent-ruby \([0-9.]+\) in local_test/Gemfile.lock does not match the default lockfile's version \(@1.0.2\)})
+      expect { invoke_bundler("install") }.to raise_error(%r{hashie \(4[0-9.]+\) in local_test/Gemfile.lock does not match the default lockfile's version \(@([0-9.]+)\)})
+    end
+  end
+
+  it "removes transitive deps from secondary lockfiles when they disappear from the primary lockfile" do
+    contents = <<~RUBY
+      gem "pact-mock_service", "3.11.0"
+    RUBY
+
+    with_gemfile(all_gems_definitions, contents, all_gems_preamble) do
+      # get 3.11.0 intalled
+      invoke_bundler("install")
+
+      write_gemfile(all_gems_definitions, <<~RUBY, all_gems_preamble)
+        gem "pact-mock_service", "~> 3.11.0"
+      RUBY
+
+      # update the lockfiles with the looser dependency (but with 3.11.0)
+      invoke_bundler("install")
+
+      expect(File.read("Gemfile.lock")).to include("filelock")
+      full_lock = File.read("Gemfile.full.lock")
+      expect(full_lock).to include("filelock")
+
+      # update the default lockfile to 3.11.2
+      invoke_bundler("update")
+
+      # but revert the full lockfile, and re-sync it
+      # as part of a regular bundle install
+      File.write("Gemfile.full.lock", full_lock)
+
+      invoke_bundler("install")
+
+      expect(File.read("Gemfile.lock")).not_to include("filelock")
+      expect(File.read("Gemfile.full.lock")).not_to include("filelock")
     end
   end
 
