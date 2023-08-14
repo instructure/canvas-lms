@@ -184,6 +184,10 @@ function setPageHtmlFixture() {
             </div>
           </td>
         </tr>
+        <tr class="student_assignment editable final_grade" data-muted="false">
+          <td class="status" scope="row"></td>
+          <td class="assignment_score" title="Click to test a different score"></td>
+        </tr>
       </table>
       <input type="text" id="grade_entry" style="display: none;" />
       <a id="revert_score_template" class="revert_score_link" >Revert Score</i></a>
@@ -478,6 +482,15 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
       GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
       const $grade = $fixtures.find('.final_grade .grade').first()
       strictEqual($grade.text(), '72%')
+    })
+
+    test('when there is a custom status in the ENV, renders a status pill span class', () => {
+      ENV.final_override_custom_grade_status_id = '42'
+      ENV.effective_final_score = 84
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $status = $fixtures.find('.final_grade .status').first().children().first()
+      ok($status.length)
+      ok($status.hasClass('submission-custom-grade-status-pill-42'), 'has class for custom status')
     })
   })
 })

@@ -227,6 +227,7 @@ class GradebooksController < ApplicationController
                     end
 
       js_hash[:effective_final_score] = total_score.effective_final_score if total_score&.overridden?
+      js_hash[:final_override_custom_grade_status_id] = total_score.custom_grade_status_id if total_score&.overridden? && Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
     end
 
     js_env(js_hash)

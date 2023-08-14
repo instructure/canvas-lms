@@ -529,6 +529,10 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
   $finalGradeRow.find('.grade').text(finalGrade)
   $finalGradeRow.find('.score_teaser').text(teaserText)
 
+  if (overrideScorePresent() && ENV?.final_override_custom_grade_status_id) {
+    $finalGradeRow.find('.status').html('').append(`<span class='submission-custom-grade-status-pill-${ENV.final_override_custom_grade_status_id}'></span>`)
+  }
+
   const pointsPossibleText = finalGradePointsPossibleText(groupWeightingScheme, scoreAsPoints)
   $finalGradeRow.find('.points_possible').text(pointsPossibleText)
 
