@@ -41,13 +41,13 @@ describe('Account Grading Status Management', () => {
     )
   }
 
-  // FOO-3708: This is an extremely fragile test that relies on a specific CSS class
-  // to find the color of the status. It's obviously not reliable to rely on a detail
-  // inside InstUI for this, and with InstUI 8 using Emotion, this function will have
-  // to be completely rewritten. Skipping tests that rely on it for now.
   const getStatusColor = (element: HTMLElement) => {
     const style = window.getComputedStyle(element.firstChild as Element) as {[key: string]: any}
-    return style._values['--View__fOyUs-backgroundPrimary']
+    const backgroundKey = Object.keys(style._values).find(key => key.includes('background'))
+
+    if (!backgroundKey) return ''
+
+    return style._values[backgroundKey]
   }
 
   beforeEach(async () => {
@@ -98,8 +98,7 @@ describe('Account Grading Status Management', () => {
     expect(queryAllByTestId('edit-status-popover')).toHaveLength(0)
   })
 
-  // FOO-3708, see related comment above
-  it.skip('should pick new color for status item', async () => {
+  it('should pick new color for status item', async () => {
     const {getByTestId} = renderGradingStatusManagement()
     await new Promise(resolve => setTimeout(resolve, 0))
     const standardStatusItem = getByTestId('standard-status-1')
@@ -156,8 +155,7 @@ describe('Account Grading Status Management', () => {
     expect(customStatusItemUpdated.textContent).toContain('New Status 10')
   })
 
-  // FOO-3708, see related comment above
-  it.skip('should add a new custom status item', async () => {
+  it('should add a new custom status item', async () => {
     const {getByTestId, queryAllByTestId} = renderGradingStatusManagement()
     await new Promise(resolve => setTimeout(resolve, 0))
     const newStatusItem = getByTestId('custom-status-new-0').querySelector('span') as Element
