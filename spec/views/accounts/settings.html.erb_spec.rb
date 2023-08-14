@@ -195,20 +195,20 @@ describe "accounts/settings" do
         Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).to have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
 
       it "does not show the setting by default" do
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
 
       it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
         Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
         render
 
-        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names_value")
       end
     end
   end
