@@ -1789,6 +1789,13 @@ class RoleOverride < ActiveRecord::Base
         label_v2: -> { t("Users - view login IDs") },
         available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
         true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment]
+      },
+      view_admin_analytics: {
+        label: -> { I18n.t("Admin Analytics - view and export data") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        applies_to_concluded: true,
+        account_allows: ->(a) { a.feature_enabled?(:admin_analytics_view_permission) }
       }
     }
   )
