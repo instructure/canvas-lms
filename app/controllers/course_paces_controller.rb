@@ -630,12 +630,15 @@ class CoursePacesController < ApplicationController
   def load_and_run_progress
     @progress = latest_progress
     if @progress
-      # start delayed job if it's not already started
       if @progress.queued?
-        if @progress.delayed_job.present?
-          @progress.delayed_job.update(run_at: Time.now)
-        else
+        case [@progress.delayed_job_id.present?, @progress.delayed_job.present?]
+        in [false, _]
+          @course_pace.run_publish_progress(@progress)
+        in [true, false]
+          @progress.fail!
           @progress = publish_course_pace
+        in [true, true]
+          @progress.delayed_job.update(run_at: Time.now)
         end
       end
       @progress_json = progress_json(@progress, @current_user, session)

@@ -280,6 +280,31 @@ describe CoursePacesController do
     end
 
     context "progress" do
+      it "queues up a new job using the same progress if the delayed_job_id is missing" do
+        progress = @course_pace.create_publish_progress
+        delayed_job = progress.delayed_job
+        progress.update!(delayed_job_id: nil)
+        delayed_job.destroy
+        get :index, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(Progress.last.id).to eq(progress.id)
+        progress.reload
+        expect(progress.delayed_job_id).not_to be_nil
+        expect(progress.delayed_job).not_to be_nil
+      end
+
+      it "creates a new progress and job if the delayed_job is missing" do
+        progress = @course_pace.create_publish_progress
+        progress.delayed_job.destroy
+        get :index, params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(progress.reload.failed?).to be_truthy
+        new_progress = Progress.last
+        expect(new_progress.tag).to eq("course_pace_publish")
+        expect(new_progress.delayed_job_id).not_to be_nil
+        expect(new_progress.delayed_job).not_to be_nil
+      end
+
       it "starts the progress' delayed job if queued" do
         progress = @course_pace.create_publish_progress
         delayed_job = progress.delayed_job
