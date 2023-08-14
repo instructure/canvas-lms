@@ -33,6 +33,7 @@ class LtiApiController < ApplicationController
     end
 
     @xml = Nokogiri::XML.parse(request.body)
+    puts "grade_passback triggered: body: #{request.body}"
 
     lti_response = check_outcome BasicLTI::BasicOutcomes.process_request(@tool, @xml)
     render :body => lti_response.to_xml, :content_type => 'application/xml'
@@ -188,6 +189,8 @@ class LtiApiController < ApplicationController
       error_info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts).to_h
       error_info[:extra][:xml] = @xml.to_s if @xml
       capture_outputs = Canvas::Errors.capture("Grade pass back #{outcome.code_major}", error_info)
+      puts "ERROR INFO for grade pass back: #{error_info}"
+      Sentry.capture("Grade pass back #{outcome.code_major}", error_info)
       outcome.description += "\n[EID_#{capture_outputs[:error_report]}]"
     end
 
