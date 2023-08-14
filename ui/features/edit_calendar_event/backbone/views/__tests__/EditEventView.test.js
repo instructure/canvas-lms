@@ -20,7 +20,6 @@ import $ from 'jquery'
 import '@canvas/backbone'
 import _ from 'lodash'
 import moment from 'moment-timezone'
-import tz from '@canvas/timezone'
 import {fireEvent, within, getByText} from '@testing-library/dom'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
@@ -75,7 +74,12 @@ describe('EditEventView', () => {
 
   it('defaults to today if no start date is given', () => {
     render({start_at: undefined})
-    const today = tz.format(moment().startOf('day').toDate(), 'date.formats.default')
+    const today = Intl.DateTimeFormat('en', {
+      timeZone: defaultTZ,
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date())
     expect(within(document.body).getByDisplayValue(today)).toBeInTheDocument()
   })
 
