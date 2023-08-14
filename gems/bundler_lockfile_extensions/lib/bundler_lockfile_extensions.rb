@@ -286,7 +286,7 @@ module BundlerLockfileExtensions
         ::Bundler.ui.level = "warn"
         begin
           definition.resolve_with_cache!
-        rescue ::Bundler::GemNotFound
+        rescue ::Bundler::GemNotFound, ::Bundler::VersionConflict
           definition = ::Bundler::Definition.build(lockfile_definition[:gemfile], lockfile, false)
           definition.resolve_remotely!
           resolved_remotely = true
