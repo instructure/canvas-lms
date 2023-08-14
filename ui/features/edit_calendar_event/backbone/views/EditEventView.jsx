@@ -82,23 +82,29 @@ export default class EditCalendarEventView extends Backbone.View {
         'course_sections',
         'rrule'
       )
-      if (picked_params.start_at) {
-        picked_params.start_date = tz.format(
-          $.fudgeDateForProfileTimezone(picked_params.start_at),
-          'date.formats.default'
-        )
+      if (picked_params.start_date) {
+        // this comes from the calendar via url params when editing an event
+        picked_params.start_date = new Intl.DateTimeFormat(ENV.LOCALE, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: ENV.TIMEZONE,
+        }).format(new Date(picked_params.start_date))
+      } else if (picked_params.start_at) {
+        // this comes from the query to canvas for the event
+        picked_params.start_date = new Intl.DateTimeFormat(ENV.LOCALE, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: ENV.TIMEZONE,
+        }).format(new Date(picked_params.start_at))
       } else {
-        picked_params.start_date = tz.format(
-          $.fudgeDateForProfileTimezone(picked_params.start_date),
-          'date.formats.default'
-        )
-      }
-
-      if (!picked_params.start_date) {
-        picked_params.start_date = tz.format(
-          moment().tz(ENV.TIMEZONE).startOf('day').toDate(),
-          'date.formats.default'
-        )
+        picked_params.start_date = new Intl.DateTimeFormat(ENV.LOCALE, {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+          timeZone: ENV.TIMEZONE,
+        }).format(new Date())
       }
 
       if (picked_params.new_context_code) {

@@ -306,7 +306,7 @@ module Calendar2Common
     input_timed_calendar_event_fields(new_date, start_time, end_time)
     expect_new_page_load { edit_calendar_event_form_more_options.click }
     expect(more_options_date_field.property("value")).to eq(
-      format_date_for_view(new_date, "%Y-%m-%d")
+      format_date_for_view(new_date, :medium)
     )
     expect(more_options_start_time_field.property("value")).to eq(start_time)
     expect(more_options_end_time_field.property("value")).to eq(end_time)
