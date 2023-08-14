@@ -1183,6 +1183,13 @@ describe EnrollmentsApiController, type: :request do
           expect(json.pluck("course_id")).to match_array [course0.id]
         end
 
+        it "returns error when using an invalid state" do
+          course_with_student user: @student, enrollment_state: "invited", active_course: true
+          json = api_call_as_user @student, :get, @user_path, @user_params.merge(state: %w[invalid_state])
+
+          expect(json["error"]).to eq("Invalid state invalid_state")
+        end
+
         describe "grade summary" do
           let!(:grade_assignments) do
             first     = @course.assignments.create! due_at: 1.month.ago

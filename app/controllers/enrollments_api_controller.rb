@@ -959,6 +959,15 @@ class EnrollmentsApiController < ApplicationController
     user = api_find(User, params[:user_id])
 
     if user == @current_user
+      if params[:state].present?
+        valid_states = %w[active inactive rejected invited creation_pending pending_active pending_invited completed current_and_invited current_and_future current_and_concluded]
+
+        params[:state].each do |state|
+          unless valid_states.include?(state)
+            return render(json: { error: "Invalid state #{state}" }, status: :bad_request)
+          end
+        end
+      end
       # if user is requesting for themselves, just return all of their
       # enrollments without any extra checking.
       enrollments = if params[:state].present?
