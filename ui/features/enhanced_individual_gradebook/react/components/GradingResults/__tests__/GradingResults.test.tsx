@@ -182,5 +182,61 @@ describe('Grading Results Tests', () => {
       userEvent.click(getByTestId('proxy-submission-button'))
       expect(getByTestId('proxyInputFileDrop')).toBeInTheDocument()
     })
+
+    it('disables the grade input when a moderated assignment has not posted grades', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+          moderatedGrading: true,
+          gradesPublished: false,
+        },
+      }
+      const {getByTestId} = renderGradingResults(modifiedProps)
+      expect(getByTestId('student_and_assignment_grade_input')).toBeDisabled()
+    })
+
+    it('enables the grade input when a moderated assignment has posted grades', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+          moderatedGrading: true,
+          gradesPublished: true,
+        },
+      }
+      const {getByTestId} = renderGradingResults(modifiedProps)
+      expect(getByTestId('student_and_assignment_grade_input')).not.toBeDisabled()
+    })
+
+    it('disables the submission details grade input and update grade button when moderated assignment grades have not been posted', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+          moderatedGrading: true,
+          gradesPublished: false,
+        },
+      }
+      const {getByTestId} = renderGradingResults(modifiedProps)
+      userEvent.click(getByTestId('submission-details-button'))
+      expect(getByTestId('submission-details-grade-input')).toBeDisabled()
+      expect(getByTestId('submission-details-submit-button')).toBeDisabled()
+    })
+
+    it('enables the submission details grade input and update grade button when moderated assignment grades have been posted', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+          moderatedGrading: true,
+          gradesPublished: true,
+        },
+      }
+      const {getByTestId} = renderGradingResults(modifiedProps)
+      userEvent.click(getByTestId('submission-details-button'))
+      expect(getByTestId('submission-details-grade-input')).not.toBeDisabled()
+      expect(getByTestId('submission-details-submit-button')).not.toBeDisabled()
+    })
   })
 })

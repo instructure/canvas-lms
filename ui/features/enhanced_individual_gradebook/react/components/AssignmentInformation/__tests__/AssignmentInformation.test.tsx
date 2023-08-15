@@ -19,7 +19,7 @@ import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentInformation, {AssignmentInformationComponentProps} from '..'
-import {assignmentInfoDefaultProps} from './fixtures'
+import {assignmentInfoDefaultProps, defaultAssignment} from './fixtures'
 
 describe('Assignment Information Tests', () => {
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('Assignment Information Tests', () => {
     })
 
     it("displays the assignment's submission types", () => {
-      const {getByTestId} = renderAssignmentInformation({...assignmentInfoDefaultProps})
+      const {getByTestId} = renderAssignmentInformation(assignmentInfoDefaultProps)
       expect(getByTestId('assignment-submission-info')).toHaveTextContent('Online text entry')
       expect(getByTestId('assignment-submission-info')).toHaveTextContent('Online upload')
     })
@@ -73,6 +73,31 @@ describe('Assignment Information Tests', () => {
           : undefined,
       })
       expect(queryByTestId('message-students-who-button')).toBeNull()
+    })
+    it('disables the default grade button when a moderated assignment is selected and has not been published', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+          moderatedGrading: true,
+          gradesPublished: false,
+        },
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('default-grade-button')).toBeDisabled()
+    })
+
+    it('enables the default grade button when a moderated assignment is selected and has been published', () => {
+      const props = {
+        ...assignmentInfoDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+          moderatedGrading: true,
+          gradesPublished: true,
+        },
+      }
+      const {getByTestId} = renderAssignmentInformation(props)
+      expect(getByTestId('default-grade-button')).not.toBeDisabled()
     })
   })
 })

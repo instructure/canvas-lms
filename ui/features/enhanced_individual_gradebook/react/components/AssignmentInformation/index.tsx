@@ -285,6 +285,7 @@ function AssignmentActions({
             color="secondary"
             onClick={() => setShowSetDefaultGradeModal(true)}
             data-testid="default-grade-button"
+            disabled={assignment.moderatedGrading && !assignment.gradesPublished}
           >
             {I18n.t('Set default grade')}
           </Button>

@@ -16,33 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AssignmentConnection} from 'features/enhanced_individual_gradebook/types'
 import {AssignmentInformationComponentProps} from '..'
 import {defaultGradebookOptions} from '../../__tests__/fixtures'
 
+export const defaultAssignment: AssignmentConnection = {
+  id: '1',
+  assignmentGroupId: '1',
+  allowedAttempts: 1,
+  anonymousGrading: false,
+  anonymizeStudents: false,
+  courseId: '1',
+  dueAt: null,
+  gradeGroupStudentsIndividually: false,
+  gradesPublished: false,
+  gradingType: 'points',
+  htmlUrl: '/courses/1/assignments/1',
+  moderatedGrading: false,
+  hasSubmittedSubmissions: false,
+  name: 'Missing Assignment 1',
+  omitFromFinalGrade: false,
+  pointsPossible: 10,
+  postManually: false,
+  submissionTypes: ['online_text_entry', 'online_upload'],
+  published: true,
+  workflowState: 'published',
+  gradingPeriodId: '1',
+}
+
 export const assignmentInfoDefaultProps: AssignmentInformationComponentProps = {
-  assignment: {
-    id: '1',
-    assignmentGroupId: '1',
-    allowedAttempts: 1,
-    anonymousGrading: false,
-    anonymizeStudents: false,
-    courseId: '1',
-    dueAt: null,
-    gradeGroupStudentsIndividually: false,
-    gradesPublished: false,
-    gradingType: 'points',
-    htmlUrl: '/courses/1/assignments/1',
-    moderatedGrading: false,
-    hasSubmittedSubmissions: false,
-    name: 'Missing Assignment 1',
-    omitFromFinalGrade: false,
-    pointsPossible: 10,
-    postManually: false,
-    submissionTypes: ['online_text_entry', 'online_upload'],
-    published: true,
-    workflowState: 'published',
-    gradingPeriodId: '1',
-  },
+  assignment: defaultAssignment,
   gradebookOptions: defaultGradebookOptions,
   handleSetGrades: () => {},
   assignmentGroupInvalid: false,

@@ -295,7 +295,10 @@ function SubmissionGradeForm({
               display="inline-block"
               width="4rem"
               value={gradeInput}
-              disabled={submitScoreStatus === ApiCallStatus.PENDING}
+              disabled={
+                submitScoreStatus === ApiCallStatus.PENDING ||
+                (assignment.moderatedGrading && !assignment.gradesPublished)
+              }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGradeInput(e.target.value)}
               data-testid="submission-details-grade-input"
             />
@@ -305,7 +308,10 @@ function SubmissionGradeForm({
         <FlexItem align="start">
           <Button
             data-testid="submission-details-submit-button"
-            disabled={submitScoreStatus === ApiCallStatus.PENDING}
+            disabled={
+              submitScoreStatus === ApiCallStatus.PENDING ||
+              (assignment.moderatedGrading && !assignment.gradesPublished)
+            }
             onClick={() => submitGrade()}
           >
             {I18n.t('Update Grade')}

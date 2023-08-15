@@ -197,7 +197,10 @@ export default function GradingResults({
                 display="inline-block"
                 width="14rem"
                 value={gradeInput}
-                disabled={submitScoreStatus === ApiCallStatus.PENDING}
+                disabled={
+                  submitScoreStatus === ApiCallStatus.PENDING ||
+                  (assignment.moderatedGrading && !assignment.gradesPublished)
+                }
                 renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
                 data-testid="student_and_assignment_grade_input"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGradeInput(e.target.value)}
@@ -266,7 +269,10 @@ export default function GradingResults({
                     id="excuse_assignment"
                     name="excuse_assignment"
                     checked={excusedChecked}
-                    disabled={submitScoreStatus === ApiCallStatus.PENDING}
+                    disabled={
+                      submitScoreStatus === ApiCallStatus.PENDING ||
+                      (assignment.moderatedGrading && !assignment.gradesPublished)
+                    }
                     onChange={markExcused}
                   />
                   {I18n.t('Excuse This Assignment for the Selected Student')}
