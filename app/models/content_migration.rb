@@ -1157,7 +1157,7 @@ class ContentMigration < ActiveRecord::Base
   ASSET_ID_MAP_TYPES = %w[Assignment Announcement Attachment ContentTag ContextModule DiscussionTopic Quizzes::Quiz WikiPage].freeze
 
   MIGRATION_DATA_FIELDS = {
-    "WikiPage" => %i[url],
+    "WikiPage" => %i[url current_lookup_id],
     "Attachment" => %i[media_entry_id]
   }.freeze
 
