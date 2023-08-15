@@ -51,7 +51,7 @@ GEM
       httpclient
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2023.0218.1)
+    mime-types-data (3.2023.0808)
     minitest (5.19.0)
     public_suffix (5.0.3)
     rake (13.0.6)
