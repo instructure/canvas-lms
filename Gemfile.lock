@@ -1070,7 +1070,7 @@ GEM
     sqlite3 (1.6.3-arm64-darwin)
     sqlite3 (1.6.3-x86_64-darwin)
     sqlite3 (1.6.3-x86_64-linux)
-    stackprof (0.2.24)
+    stackprof (0.2.25)
     statsd-ruby (1.5.0)
     stormbreaker (0.0.8)
       axe-core-api (~> 4.1.0)
