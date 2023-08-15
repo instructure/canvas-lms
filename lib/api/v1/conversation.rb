@@ -59,7 +59,7 @@ module Api::V1::Conversation
     # Changing to account context means users can reply to admins, even if the admin messages from a
     # course they aren't enrolled in
     result[:context_code] =
-      if conversation.conversation.context_type.eql?("Course") && AccountUser.where(user_id: current_user.id).exists?
+      if conversation.conversation.context_type.eql?("Course") && AccountUser.active.where(user_id: current_user.id).exists?
         "account_#{@domain_root_account.id}"
       else
         conversation.conversation.context_code
