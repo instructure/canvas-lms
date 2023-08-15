@@ -29,7 +29,7 @@ export interface ResponseMessages {
   sendGenericError: (message?: string | undefined) => void
   sendBadRequestError: (message: any) => void
   sendWrongOriginError: () => void
-  sendUnsupportedSubjectError: () => void
+  sendUnsupportedSubjectError: (message?: string | undefined) => void
   isResponse: (message: any) => boolean
 }
 
@@ -90,8 +90,8 @@ const buildResponseMessages = ({
     sendError(WRONG_ORIGIN_ERROR_CODE)
   }
 
-  const sendUnsupportedSubjectError = () => {
-    sendError(UNSUPPORTED_SUBJECT_ERROR_CODE)
+  const sendUnsupportedSubjectError = (message?: string) => {
+    sendError(UNSUPPORTED_SUBJECT_ERROR_CODE, message)
   }
 
   const isResponse = message => !!message.data?.subject?.endsWith('.response')
