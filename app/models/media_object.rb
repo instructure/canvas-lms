@@ -217,7 +217,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.mediaUpdate(media_id, name: user_entered_title)
-    unless res[:error]
+    unless res.nil? || res[:error]
       self.title = user_entered_title
       save
     end
