@@ -148,6 +148,28 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
 
         cache.writeQuery({...subEntriesOptions, data: currentSubentriesQueryData})
       }
+
+      const parentQueryOptions = {
+        query: DISCUSSION_SUBENTRIES_QUERY,
+        variables: {
+          ...variables,
+          discussionEntryID:
+            parentEntryData.parentId || parentEntryData.rootEntryId || parentEntryData._id,
+        },
+      }
+
+      const parentQueryData = JSON.parse(JSON.stringify(cache.readQuery(parentQueryOptions)))
+
+      if (parentQueryData) {
+        const nodes = parentQueryData.legacyNode.discussionSubentriesConnection.nodes
+        const entryIndex = nodes.findIndex(entry => entry._id === newDiscussionEntry.parentId)
+        const currentEntry = nodes[entryIndex]
+
+        currentEntry.subentriesCount = (currentEntry.subentriesCount || 0) + 1
+
+        cache.writeQuery({...parentQueryOptions, data: parentQueryData})
+      }
+
       return true
     } else {
       return false
