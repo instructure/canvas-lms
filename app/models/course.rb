@@ -2472,7 +2472,7 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
     temporary_enrollment_source_user_id =
-      account.feature_enabled?(:temporary_enrollments) ? opts[:temporary_enrollment_source_user_id] : nil
+      root_account.feature_enabled?(:temporary_enrollments) ? opts[:temporary_enrollment_source_user_id] : nil
 
     role = opts[:role] || shard.activate { Enrollment.get_built_in_role_for_type(type, root_account_id: self.root_account_id) }
 
@@ -2492,7 +2492,7 @@ class Course < ActiveRecord::Base
                                     type:,
                                     role_id: role,
                                     associated_user_id:)
-      if account.feature_enabled?(:temporary_enrollments)
+      if root_account.feature_enabled?(:temporary_enrollments)
         scope = scope.where(temporary_enrollment_source_user_id:)
       end
       e = if opts[:allow_multiple_enrollments]
