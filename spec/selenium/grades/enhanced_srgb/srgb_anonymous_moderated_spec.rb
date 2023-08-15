@@ -114,7 +114,6 @@ describe "Individual View Gradebook" do
     end
 
     it "excludes the muted assignment from the assignment list" do
-      skip "unskip w/ EVAL-3354 BUG muted anonymous assignment is still displayed"
       EnhancedSRGB.select_student(@student1)
       EnhancedSRGB.assignment_dropdown.click
 

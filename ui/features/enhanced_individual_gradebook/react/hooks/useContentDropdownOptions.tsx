@@ -139,6 +139,10 @@ export const useAssignmentDropdownOptions = ({
       )
     }
 
+    if (selectedStudentId) {
+      filteredAssignments = filteredAssignments.filter(assignment => !assignment.anonymizeStudents)
+    }
+
     const assignmentOptions: AssignmentDropdownOption = [
       defaultAssignmentDropdownOptions,
       ...filteredAssignments.map(assignment => ({
