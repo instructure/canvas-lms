@@ -37,7 +37,7 @@ import {
 } from '../../../types'
 import Notes from './Notes'
 import {useGradebookNotes} from '../../hooks/useGradebookNotes'
-import FinalGradeOverrideTextBox from './FinalGradeOverrideTextBox'
+import FinalGradeOverrideContainer from './FinalGradeOverrideContainer'
 import {
   calculateGradesForStudent,
   getLetterGrade,
@@ -342,7 +342,7 @@ export default function StudentInformation({
             </View>
           </View>
           {finalGradeOverrideEnabled && allowFinalGradeOverride && (
-            <FinalGradeOverrideTextBox
+            <FinalGradeOverrideContainer
               pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
               finalGradeOverride={finalGradeOverrides[student.id]}
               enrollmentId={student.enrollments[0]?.id}
