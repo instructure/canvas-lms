@@ -364,7 +364,7 @@ const DiscussionTopicManager = props => {
                 {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
                   <Mask onClick={() => setSplitScreenViewOpen(false)} />
                 )}
-                <DrawerLayout.Content label="Splitscreen View Content" style={{overflowY: 'unset'}}>
+                <DrawerLayout.Content label="Splitscreen View Content">
                   <View display="block" padding="medium medium 0 small" height="100vh">
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
