@@ -689,6 +689,36 @@ describe "recurring events" do
       expect(events.length).to eq 3
     end
 
+    it "updates the event calendar correctly" do
+      get "/calendar"
+
+      wait_for_ajaximations
+      events = events_in_a_series
+      events.each do |e|
+        e.click
+        expect(event_details_modal.text).to include("Unnamed Course")
+        click_event_details_modal_close_button
+      end
+
+      events[1].click
+      click_edit_event_button
+
+      select_event_calendar("nobody@example.com")
+
+      click_submit_button
+      event_series_all_events.click
+      click_edit_confirm_button
+      wait_for_ajaximations
+
+      events = events_in_a_series
+
+      events.each do |e|
+        e.click
+        expect(event_details_modal.text).to include("nobody@example.com")
+        click_event_details_modal_close_button
+      end
+    end
+
     it "goes to edit update page after change" do
       get "/calendar"
 

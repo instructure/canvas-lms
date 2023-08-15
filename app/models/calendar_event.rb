@@ -55,6 +55,7 @@ class CalendarEvent < ActiveRecord::Base
                             remove_child_events
                             all_day
                             comments
+                            context_code
                             important_dates
                             series_uuid
                             rrule
