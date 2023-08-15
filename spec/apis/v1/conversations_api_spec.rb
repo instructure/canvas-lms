@@ -302,6 +302,45 @@ describe ConversationsController, type: :request do
         expect(json.pluck("id").sort).to eq @conversations.map(&:conversation_id).sort
       end
 
+      context "admin is disabled" do
+        def setup_data
+          # setting up a teacher with removed admin.
+          # the teacher and student share two coures.
+          # the conversation is from one course, but
+          # returns from either filter, if the admin was active.
+
+          teacher = User.create!(name: "teacher")
+          student = User.create!(name: "student")
+
+          # creating courses with methods, ensures tags are setup properly
+          course_with_teacher(name: "first course", active_course: true, active_enrollment: true, user: teacher)
+          @course_1 = @course
+          @course_2 = course_with_student(name: "second course", active_course: true, active_enrollment: true, user: student)
+          @course_2 = @course
+          @course_1.enroll_student(student, enrollment_state: :active)
+          @course_2.enroll_teacher(teacher, enrollment_state: :active)
+
+          account_admin_user(user: teacher)
+          # deactivate admin status
+          teacher.account_users.destroy_all
+
+          conversation = Conversation.initiate([student, teacher], false, context_type: "Course", context_id: @course_1.id)
+          conversation.add_message(teacher, "hello")
+          conversation.add_message(student, "hello back")
+          @user = teacher
+        end
+
+        it "sets context_code to course" do
+          setup_data
+          json_course_1 = api_call(:get,
+                                   "/api/v1/conversations.json?filter=#{@course_1.asset_string}",
+                                   { controller: "conversations", action: "index", format: "json", filter: @course_1.asset_string, scope: "default" })
+
+          expect(json_course_1[0]["context_code"]).to_not eq(Account.default.asset_string)
+          expect(json_course_1[0]["context_code"]).to eq(@course_1.asset_string)
+        end
+      end
+
       context "tag context on default shard" do
         before :once do
           Shard.default.activate do
