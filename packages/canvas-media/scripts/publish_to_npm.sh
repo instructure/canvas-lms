@@ -62,14 +62,14 @@ if [[ ! $? -eq 0 ]]; then
 fi
 
 PACKAGE_VERSION=$(cat package.json | grep "version" | awk '{print $2}' | sed 's/[",]//g')
-CHANGELOG_LINK="<https://gerrit.instructure.com/plugins/gitiles/canvas-lms/+/refs/heads/master/packages/canvas-rce/CHANGELOG.md | here>"
-SLACK_MESSAGE="canvas-rce version $PACKAGE_VERSION has been published to NPM \n\nSee the full list of changes $CHANGELOG_LINK."
+CHANGELOG_LINK="<https://gerrit.instructure.com/plugins/gitiles/canvas-lms/+/refs/heads/master/packages/canvas-media/CHANGELOG.md | here>"
+SLACK_MESSAGE="canvas-media version $PACKAGE_VERSION has been published to NPM \n\nSee the full list of changes $CHANGELOG_LINK."
 
 if [ -z "$SKIP_ALERT" ]; then
     (
       aws --region us-east-1 sqs send-message \
         --queue-url https://sqs.us-east-1.amazonaws.com/636161780776/slack-lambda \
-        --message-body "{\"channel\":\"#ask-learning-foundations\",\"username\":\"RCE Publish\",\"text\":\"$SLACK_MESSAGE\"}"
+        --message-body "{\"channel\":\"#ask-learning-foundations\",\"username\":\"Canvas Media Publish\",\"text\":\"$SLACK_MESSAGE\"}"
     ) || echo "Failed to send Slack message."
 else
     echo "Would have sent a Slack message:"
