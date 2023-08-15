@@ -441,7 +441,7 @@ describe('CalendarEventDetailsForm', () => {
       expect(defaultProps.closeCB).toHaveBeenCalled()
       expect(defaultProps.event.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          'calendar_event[rrule]': 'FREQ=DAILY;INTERVAL=1;COUNT=200',
+          'calendar_event[rrule]': 'FREQ=DAILY;INTERVAL=1;COUNT=365',
         }),
         expect.anything(),
         expect.anything()
