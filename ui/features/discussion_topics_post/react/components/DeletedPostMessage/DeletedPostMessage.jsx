@@ -42,7 +42,7 @@ export function DeletedPostMessage({...props}) {
         },
       }}
       render={responsiveProps => (
-        <>
+        <View as="div" margin="0 0 0 small" padding="0 0 0 xx-small">
           {props.deleterName && (
             <View as="div">
               <Text size={responsiveProps.deletedByTextSize} weight="bold">
@@ -63,7 +63,7 @@ export function DeletedPostMessage({...props}) {
             })}
           </Text>
           {props.children}
-        </>
+        </View>
       )}
     />
   )
