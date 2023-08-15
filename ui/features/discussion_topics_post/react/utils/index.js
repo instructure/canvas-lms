@@ -308,7 +308,7 @@ export const buildQuotedReply = (nodes, previewId) => {
         id: previewId,
         author: {shortName: getDisplayName(reply)},
         createdAt: reply.createdAt,
-        previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),
+        previewMessage: reply.message,
       }
       return false
     }
