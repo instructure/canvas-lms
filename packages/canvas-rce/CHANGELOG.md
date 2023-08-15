@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.8.0 - 2023-08-15
+
+### Fixed
+- An issue where filenames are incorrectly recognized in the accessibility checker
+- An issue where the accessibility checker's color picker would not work with invalid RGBA values
+- An issue where the RCS is required to use the new external tools plugin
+
+### Changed
+- Removed CJS build from package
+- Renamed .js files to .jsx
+- Upgraded react-aria-live dependency to v2.0.5
+- Removed h1 option from the Headings menu dropdown
+- Only typeset math in user content
+- Reduced amount of console errors when running jest tests by providing missing props, fixing async issues, etc in tests
+
+### Added
+- New translations
+- Improved messaging in the Add Course Link tray when there's no results
+- Explanations for inherited media captions
+
 ## 5.7.0 - 2023-07-18
 
 ### Fixed
