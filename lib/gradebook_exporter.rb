@@ -193,12 +193,12 @@ class GradebookExporter
           row.concat([nil] * group_filler_length)
           row.concat(buffer_columns(:points)) if include_points?
           row.concat(buffer_columns(:total_scores))
-        end
 
-        row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
-        if include_final_grade_override?
-          row.concat(buffer_columns(:override_score))
-          row.concat(buffer_columns(:override_grade)) if @course.grading_standard_enabled?
+          row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
+          if include_final_grade_override?
+            row.concat(buffer_columns(:override_score))
+            row.concat(buffer_columns(:override_grade)) if @course.grading_standard_enabled?
+          end
         end
 
         lengths_match = header.length == row.length
@@ -413,10 +413,14 @@ class GradebookExporter
   end
 
   def show_totals?
-    return false if !@options[:current_view] && @course.grading_periods?
+    # show totals if the course is not using grading periods
     return true unless @course.grading_periods?
-    return true if @options[:grading_period_id].try(:to_i) != 0
 
+    # show totals if we're exporting the gradebook for a specific grading period
+    return true if filter_by_grading_period?
+
+    # otherwise, show or hide totals based on the "Display Totals for All Grading
+    # Periods" option.
     @course.display_totals_for_all_grading_periods?
   end
 
@@ -435,9 +439,14 @@ class GradebookExporter
 
     @grading_period = nil
     # grading_period_id == 0 means no grading period selected
-    if @options[:grading_period_id].to_i != 0
+    if filter_by_grading_period?
       @grading_period = GradingPeriod.for(@course).find_by(id: @options[:grading_period_id])
     end
+  end
+
+  def filter_by_grading_period?
+    gp_id = @options[:grading_period_id]
+    @options[:current_view].present? && gp_id.present? && gp_id.to_i != 0
   end
 
   def custom_gradebook_columns
