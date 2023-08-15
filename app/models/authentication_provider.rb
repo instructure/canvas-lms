@@ -308,7 +308,7 @@ class AuthenticationProvider < ActiveRecord::Base
       when "locale"
         # convert _ to -, be lenient about case, and perform fallbacks
         value = value.tr("_", "-")
-        lowercase_locales = I18n.available_locales.map(&:to_s).map(&:downcase)
+        lowercase_locales = I18n.available_locales.map { |locale| locale.to_s.downcase }
         while value.include?("-")
           break if lowercase_locales.include?(value.downcase)
 

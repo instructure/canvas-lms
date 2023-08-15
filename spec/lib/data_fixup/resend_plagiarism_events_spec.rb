@@ -44,7 +44,7 @@ describe DataFixup::ResendPlagiarismEvents do
           DataFixup::ResendPlagiarismEvents.run
           djs = Delayed::Job.where(tag: "DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time").order(:id)
           expect(djs.count).to eq 2
-          expect(djs.map(&:payload_object).map(&:args)).to eq([[@submission_two.submitted_at, Time.zone.now, false],
+          expect(djs.map { |j| j.payload_object.args }).to eq([[@submission_two.submitted_at, Time.zone.now, false],
                                                                [@submission.submitted_at, @submission_two.submitted_at, false]])
           expect(djs.map(&:run_at)).to eq([10.seconds.from_now, 1.year.from_now])
         end

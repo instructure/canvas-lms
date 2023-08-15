@@ -39,7 +39,7 @@ class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
     errors = (input[:conversation_ids] - c_ids).index_with { "Unable to find Conversation" }
 
     conversation_participants = current_user.all_conversations.where(conversation_id: c_ids)
-    cp_ids = conversation_participants.map(&:conversation_id).map(&:to_s)
+    cp_ids = conversation_participants.map { |cp| cp.conversation_id.to_s }
     errors.merge!((c_ids - cp_ids).index_with { "Insufficient permissions" })
 
     # update_all cannot be used as the ConversationParticipant model

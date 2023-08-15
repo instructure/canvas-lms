@@ -76,7 +76,7 @@ describe ContentMigration do
       @cm.copy_options = { assignments: { mig_id(from_assign) => true } }
       run_course_copy
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
-      to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
+      to_outcomes = to_assign.rubric.learning_outcome_alignments.map { |a| a.learning_outcome.migration_id }
       expect(to_outcomes).to eql [mig_id(@outcome)]
     end
 
@@ -92,7 +92,7 @@ describe ContentMigration do
       run_course_copy
 
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
-      to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
+      to_outcomes = to_assign.rubric.learning_outcome_alignments.map { |a| a.learning_outcome.migration_id }
       expect(to_outcomes).to eql [mig_id(@outcome)]
     end
 

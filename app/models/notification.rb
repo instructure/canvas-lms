@@ -165,7 +165,7 @@ class Notification < Switchman::UnshardedRecord
     # graphql types cannot have spaces we have used underscores
     # and we don't allow editing system notification types
     @configurable_types ||= YAML.safe_load(ERB.new(File.read(Canvas::MessageHelper.find_message_path("notification_types.yml"))).result)
-                                .map(&:first).map(&:last)
+                                .pluck("category")
                                 .reject { |type| type.include?("DEPRECATED") }
                                 .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
   end

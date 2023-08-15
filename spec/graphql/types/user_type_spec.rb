@@ -866,7 +866,7 @@ describe Types::UserType do
     end
 
     it "does not return duplicate observers if an observer is observing multiple students in the course" do
-      recipients = [@student, @other_student, @third_student].map(&:id).map(&:to_s)
+      recipients = [@student, @other_student, @third_student].map { |u| u.id.to_s }
       result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
       expect(result).to eq [@observer.id.to_s]
     end

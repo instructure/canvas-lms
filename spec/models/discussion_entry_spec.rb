@@ -181,13 +181,13 @@ describe DiscussionEntry do
       topic = @course.discussion_topics.create!(user: @teacher, message: "Hi there")
       entry = topic.discussion_entries.create!(user: @student, message: "Hi I'm a student")
 
-      to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
+      to_users = entry.messages_sent[@notification_name].map(&:user_id)
       expect(to_users).to include(@teacher.id) # teacher is auto-subscribed
       expect(to_users).not_to include(@student.id) # posters are auto-subscribed, but student is not notified of his own post
       expect(to_users).not_to include(@non_posting_student.id)
 
       entry = topic.discussion_entries.create!(user: @teacher, message: "Nice to meet you")
-      to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
+      to_users = entry.messages_sent[@notification_name].map(&:user_id)
       expect(to_users).not_to include(@teacher.id) # author
       expect(to_users).to include(@student.id)
       expect(to_users).not_to include(@non_posting_student.id)
@@ -195,7 +195,7 @@ describe DiscussionEntry do
       topic.subscribe(@non_posting_student)
       entry = topic.discussion_entries.create!(user: @teacher, message: "Welcome to the class")
       # now that the non_posting_student is subscribed, he should get notified of posts
-      to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
+      to_users = entry.messages_sent[@notification_name].map(&:user_id)
       expect(to_users).not_to include(@teacher.id)
       expect(to_users).to include(@student.id)
       expect(to_users).to include(@non_posting_student.id)

@@ -291,8 +291,8 @@ describe "Outcome Groups API", type: :request do
                       action: "link_index",
                       account_id: @account.id,
                       format: "json")
-      expected_outcome_ids = @links.map(&:content).map(&:id).sort
-      expected_group_ids = @links.map(&:associated_asset).map(&:id).sort
+      expected_outcome_ids = @links.map(&:content_id).sort
+      expected_group_ids = @links.map(&:associated_asset_id).sort
       expect(json.map { |j| j["outcome"]["id"] }.sort).to eq expected_outcome_ids
       expect(json.map { |j| j["outcome_group"]["id"] }.sort).to eq expected_group_ids
     end
@@ -309,7 +309,7 @@ describe "Outcome Groups API", type: :request do
       # intentionally not manually sorting either the expected or returned:
       # - expected should be sorted by id because of creation time
       # - returned should be sorted by id because of pagination ordering
-      expected_outcome_ids = @links.take(2).map(&:content).map(&:id)
+      expected_outcome_ids = @links.take(2).map(&:content_id)
       expect(json.map { |j| j["outcome"]["id"] }).to eq expected_outcome_ids
     end
 
@@ -496,7 +496,7 @@ describe "Outcome Groups API", type: :request do
 
         friendly_description = "a friendly description"
         json = exec_call
-        expected_outcome_descriptions = @links.take(2).map(&:content).map(&:description)
+        expected_outcome_descriptions = @links.take(2).map { |link| link.content.description }
         expected_outcome_descriptions.append(friendly_description)
         expect(json.map { |j| j["outcome"]["friendly_description"] }).to eq expected_outcome_descriptions
       end

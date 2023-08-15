@@ -3175,7 +3175,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def annotated_document?
-    !!submission_types&.match?(/student_annotation/)
+    !!submission_types&.include?("student_annotation")
   end
 
   def readable_submission_type(submission_type)
