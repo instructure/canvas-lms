@@ -109,6 +109,18 @@ module CalendarPage
     "//*[@aria-label='Confirm Changes']//label[../input[@value = 'following']]"
   end
 
+  def event_calendar_selector_input_selector
+    "[data-testid='edit-calendar-event-form-context']"
+  end
+
+  def event_details_modal_selector
+    ".event-details"
+  end
+
+  def event_details_modal_close_button_selector
+    ".event-details .popover_close"
+  end
+
   #------------------------- Elements ---------------------------
   def all_events_in_month_view
     ff(events_in_month_view_selector)
@@ -182,6 +194,18 @@ module CalendarPage
     f(use_section_dates_checkbox_selector)
   end
 
+  def event_calendar_selector_input
+    f(event_calendar_selector_input_selector)
+  end
+
+  def event_details_modal
+    f(event_details_modal_selector)
+  end
+
+  def event_details_modal_close_button
+    f(event_details_modal_close_button_selector)
+  end
+
   #----------------------- Actions/Methods ----------------------
   def add_calendar_event_title(title_text)
     replace_content(edit_event_title_input, title_text)
@@ -242,5 +266,13 @@ module CalendarPage
   def submit_calendar_event_changes
     edit_event_modal_submit_btn.click
     wait_for_ajaximations
+  end
+
+  def select_event_calendar(calendar_text)
+    click_option(event_calendar_selector_input, calendar_text)
+  end
+
+  def click_event_details_modal_close_button
+    event_details_modal_close_button.click
   end
 end

@@ -911,6 +911,8 @@ class CalendarEventsApiController < ApplicationController
     params_for_update[:series_uuid] ||= target_event.series_uuid
     params_for_update[:start_at] ||= target_event.start_at.iso8601
     params_for_update[:end_at] ||= target_event.end_at.iso8601
+    params_for_update[:context] = Context.find_by_asset_string(params_for_update[:context_code]) if params_for_update[:context_code]
+    params_for_update.delete(:context_code)
 
     if which == "one" && rrule.present? && rrule_changed
       render json: { message: t("You may not update one event with a new rrule.") }, status: :bad_request
