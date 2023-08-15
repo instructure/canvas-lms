@@ -39,9 +39,9 @@ GEM
       activerecord (>= 5.2)
     builder (3.2.4)
     byebug (11.1.3)
-    code_ownership (1.33.1)
+    code_ownership (1.34.2)
       code_teams (~> 1.0)
-      packs
+      packs-specification
       sorbet-runtime (>= 0.5.10821)
     code_teams (1.0.2)
       sorbet-runtime
@@ -82,7 +82,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.13.10-x86_64-linux)
       racc (~> 1.4)
-    packs (0.0.6)
+    packs-specification (0.0.10)
       sorbet-runtime
     raabro (1.4.0)
     racc (1.7.1)
@@ -115,7 +115,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.1)
-    sorbet-runtime (0.5.10932)
+    sorbet-runtime (0.5.10965)
     thor (1.2.2)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
