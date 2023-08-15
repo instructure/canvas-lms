@@ -401,6 +401,9 @@ export default function RecurrenceEndPicker({
                   return
                 handleCountChange(event, Math.ceil(countNumber) - 1)
               }}
+              messages={
+                CountValidator.isValidCount(countNumber, mode) ? [] : [{text: '', type: 'error'}]
+              }
             />
             <div style={{...alignMe, whiteSpace: 'nowrap'}}>
               <Text as="span">{I18n.t('occurrences (max %{max})', {max: MAX_COUNT})}</Text>
