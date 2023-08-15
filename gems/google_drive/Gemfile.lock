@@ -107,7 +107,7 @@ GEM
     hashdiff (1.0.1)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
-    jwt (2.5.0)
+    jwt (2.7.1)
     launchy (2.5.2)
       addressable (~> 2.8)
     loofah (2.21.3)

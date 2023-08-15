@@ -32,14 +32,16 @@ describe "Canvas::Twilio" do
              phone_number: number)
     end
 
-    lookups = double("Canvas::Twilio.client.lookups")
+    v2 = double("Canvas::Twilio.client.lookups.v2")
     # Expectations are matched last to first, so add our catch-all expectation before the number specific ones
-    allow(lookups).to receive(:phone_numbers).with(anything).and_return(
+    allow(v2).to receive(:phone_numbers).with(anything).and_return(
       make_phone_number_stub("anything", Canvas::Twilio::DEFAULT_COUNTRY)
     )
+    lookups = double("Canvas::Twilio.client.lookups", v2:)
+
     # Now add one expectation for each number+country mapping
     phone_number_countries.each do |number, country_code|
-      allow(lookups).to receive(:phone_numbers).with(number).and_return(
+      allow(v2).to receive(:phone_numbers).with(number).and_return(
         make_phone_number_stub(number.inspect, country_code)
       )
     end
