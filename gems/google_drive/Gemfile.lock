@@ -202,7 +202,7 @@ GEM
       multi_json (~> 1.10)
     strscan (3.0.6)
     thor (1.2.2)
-    timecop (0.9.6)
+    timecop (0.9.8)
     timeout (0.4.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
