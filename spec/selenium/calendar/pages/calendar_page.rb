@@ -25,16 +25,32 @@ module CalendarPage
     "#content"
   end
 
+  def close_edit_button_selector
+    "//*[@aria-label='Confirm Changes']//button[.//*[. = 'Close']]"
+  end
+
   def create_new_event_btn_selector
     "#create_new_event_link"
+  end
+
+  def delete_event_link_selector
+    ".delete_event_link"
+  end
+
+  def edit_confirm_modal_selector
+    "[aria-label='Confirm Changes']"
   end
 
   def delete_confirm_button_selector
     "//*[@aria-label='Confirm Deletion']//button[.//*[. = 'Delete']]"
   end
 
-  def delete_event_link_selector
-    ".delete_event_link"
+  def edit_confirm_button_selector
+    "//*[@aria-label='Confirm Changes']//button[.//*[. = 'Confirm']]"
+  end
+
+  def edit_event_button_selector
+    "//button[. = 'Edit']"
   end
 
   def edit_event_modal_selector
@@ -54,7 +70,7 @@ module CalendarPage
   end
 
   def event_title_input_selector
-    "[data-testid='calendar-event-form'] placeholder='Input Event Title...'"
+    "[data-testid='calendar-event-form'] [placeholder='Input Event Title...']"
   end
 
   def events_in_a_series_selector
@@ -81,6 +97,18 @@ module CalendarPage
     "#use_section_dates"
   end
 
+  def this_event_radio_button_selector
+    "//*[@aria-label='Confirm Changes']//label[../input[@value = 'one']]"
+  end
+
+  def all_events_radio_button_selector
+    "//*[@aria-label='Confirm Changes']//label[../input[@value = 'all']]"
+  end
+
+  def this_and_following_event_radio_button_selector
+    "//*[@aria-label='Confirm Changes']//label[../input[@value = 'following']]"
+  end
+
   #------------------------- Elements ---------------------------
   def all_events_in_month_view
     ff(events_in_month_view_selector)
@@ -90,12 +118,28 @@ module CalendarPage
     f(calendar_content_selector)
   end
 
+  def close_edit_button
+    fxpath(close_edit_button_selector)
+  end
+
   def create_new_event_btn
     f(create_new_event_btn_selector)
   end
 
   def delete_confirm_button
     fxpath(delete_confirm_button_selector)
+  end
+
+  def edit_confirm_button
+    fxpath(edit_confirm_button_selector)
+  end
+
+  def edit_confirm_modal
+    f(edit_confirm_modal_selector)
+  end
+
+  def edit_event_button
+    fxpath(edit_event_button_selector)
   end
 
   def edit_event_date_input
@@ -141,6 +185,18 @@ module CalendarPage
   #----------------------- Actions/Methods ----------------------
   def add_calendar_event_title(title_text)
     replace_content(edit_event_title_input, title_text)
+  end
+
+  def click_close_edit_button
+    close_edit_button.click
+  end
+
+  def click_edit_confirm_button
+    edit_confirm_button.click
+  end
+
+  def click_edit_event_button
+    edit_event_button.click
   end
 
   def click_delete_confirm_button

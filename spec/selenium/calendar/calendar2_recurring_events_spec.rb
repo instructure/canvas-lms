@@ -581,4 +581,168 @@ describe "recurring events" do
       expect(frequency_picker_value).to eq("Every 2 years on Jul 20 until Aug 30, 2027")
     end
   end
+
+  context "update recurring events" do
+    before :once do
+      course_with_teacher(active_all: true, new_user: true)
+    end
+
+    before do
+      user_session(@teacher)
+      today = Date.today
+      start_at = Date.new(today.year, today.month, 15)
+      create_calendar_event_series(@course, "event in a series", start_at)
+    end
+
+    it "updates all events from series head" do
+      get "/calendar"
+
+      wait_for_ajaximations
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[0].click
+      click_edit_event_button
+      expect(frequency_picker_value).to eq("Daily, 3 times")
+
+      select_frequency_option("Custom")
+      enter_recurrence_end_count(2)
+      click_done_button
+
+      expect(frequency_picker_value).to eq("Daily, 2 times")
+
+      click_submit_button
+      event_series_all_events.click
+      click_edit_confirm_button
+      wait_for_ajaximations
+
+      events = events_in_a_series
+      expect(events.length).to eq 2
+    end
+
+    it "updates one event in the series" do
+      get "/calendar"
+
+      wait_for_ajaximations
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      click_edit_event_button
+      expect(frequency_picker_value).to eq("Daily, 3 times")
+
+      enter_event_title("updated event title")
+
+      click_submit_button
+      event_series_this_event.click
+      click_edit_confirm_button
+      wait_for_ajaximations
+
+      events = events_in_a_series
+      # events_in_a_series returns all events with the original title
+      expect(events.length).to eq 2
+    end
+
+    it "updates this and following events in the series" do
+      get "/calendar"
+
+      wait_for_ajaximations
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      click_edit_event_button
+      expect(frequency_picker_value).to eq("Daily, 3 times")
+
+      enter_event_title("updated event title")
+
+      click_submit_button
+      event_series_following_events.click
+      click_edit_confirm_button
+      wait_for_ajaximations
+
+      events = events_in_a_series
+      # events_in_a_series returns all events with the original title
+      expect(events.length).to eq 1
+    end
+
+    it "cancels update of events in the series" do
+      get "/calendar"
+
+      wait_for_ajaximations
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      click_edit_event_button
+      expect(frequency_picker_value).to eq("Daily, 3 times")
+
+      enter_event_title("updated event title")
+
+      click_submit_button
+      event_series_following_events.click
+      click_close_edit_button
+      wait_for_ajaximations
+
+      events = events_in_a_series
+      # events_in_a_series returns all events with the original title
+      expect(events.length).to eq 3
+    end
+
+    it "goes to edit update page after change" do
+      get "/calendar"
+
+      wait_for_ajaximations
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      click_edit_event_button
+      expect(frequency_picker_value).to eq("Daily, 3 times")
+
+      enter_event_title("updated event title")
+
+      click_more_options_button
+      wait_for_ajaximations
+      wait_for_calendar_rce
+
+      expect(element_value_for_attr(calendar_event_title, "value")).to eq("updated event title")
+      click_update_event_button
+      event_series_following_events.click
+      click_edit_confirm_button
+      wait_for_ajaximations
+
+      events = events_in_a_series
+      # events_in_a_series returns all events with the original title
+      expect(events.length).to eq 1
+    end
+
+    it "cancels edit from update page" do
+      get "/calendar"
+      wait_for_ajaximations
+      events = events_in_a_series
+      expect(events.length).to eq 3
+
+      events[1].click
+      click_edit_event_button
+      expect(frequency_picker_value).to eq("Daily, 3 times")
+
+      enter_event_title("updated event title")
+      click_more_options_button
+      wait_for_ajaximations
+      wait_for_calendar_rce
+      expect(element_value_for_attr(calendar_event_title, "value")).to eq("updated event title")
+
+      click_update_event_button
+      event_series_following_events.click
+      click_close_edit_button
+      wait_for_ajaximations
+      click_update_cancel_button
+      wait_for_ajaximations
+
+      events = events_in_a_series
+      # events_in_a_series returns all events with the original title
+      expect(events.length).to eq 3
+    end
+  end
 end

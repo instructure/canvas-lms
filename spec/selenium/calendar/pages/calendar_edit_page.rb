@@ -22,6 +22,10 @@ require_relative "../../common"
 module CalendarEditPage
   #------------------------- Selectors --------------------------
 
+  def calendar_event_title_selector
+    "#calendar_event_title"
+  end
+
   def calendar_rce_selector
     ".ic-RichContentEditor"
   end
@@ -38,7 +42,19 @@ module CalendarEditPage
     "iframe"
   end
 
+  def update_cancel_button_selector
+    "//*[@role = 'button' and contains(text() ,'Cancel')]"
+  end
+
+  def update_event_button_selector
+    "//button[contains(text() ,'Update Event')]"
+  end
+
   #------------------------- Elements ---------------------------
+
+  def calendar_event_title
+    f(calendar_event_title_selector)
+  end
 
   def calendar_rce
     f(calendar_rce_selector)
@@ -56,15 +72,36 @@ module CalendarEditPage
     f(rce_iframe_selector)
   end
 
+  def update_cancel_button
+    fxpath(update_cancel_button_selector)
+  end
+
+  def update_event_button
+    fxpath(update_event_button_selector)
+  end
+
   #----------------------- Actions/Methods ----------------------
+
+  def enter_calendar_event_title(title)
+    calendar_start_date.send_keys([:control, "a"], :backspace)
+    replace_content(calednar_event_title, title, tab_out: true)
+  end
 
   def enter_calendar_start_date(date)
     calendar_start_date.send_keys([:control, "a"], :backspace)
     replace_content(calendar_start_date, date, tab_out: true)
   end
 
+  def click_update_cancel_button
+    update_cancel_button.click
+  end
+
   def click_create_event_button
     create_event_button.click
+  end
+
+  def click_update_event_button
+    update_event_button.click
   end
 
   def wait_for_calendar_rce

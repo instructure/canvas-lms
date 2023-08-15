@@ -78,12 +78,12 @@ module Calendar2Common
     rr = RRule::Rule.new(rrule, dtstart: start_at, tzid: Time.zone.tzinfo.name)
     event_attributes = { title:, rrule:, series_uuid: SecureRandom.uuid }
     dtstart_list = rr.all
-
-    dtstart_list.map do |dtstart|
+    dtstart_list.each_with_index do |dtstart, i|
       event_attributes["start_at"] = dtstart.iso8601
       event_attributes["end_at"] = (dtstart + duration).iso8601
       event_attributes["context_code"] = context.asset_string
       event = context.calendar_events.build(event_attributes)
+      event.series_head = true if i == 0
       event.updating_user = @teacher
       event.save!
     end
