@@ -260,7 +260,7 @@ function AssignmentActions({
 
   return (
     <>
-      {!gradebookOptions.customOptions.hideStudentNames && (
+      {!gradebookOptions.customOptions.hideStudentNames && !assignment.anonymizeStudents && (
         <View as="div" className="pad-box no-sides">
           <Button
             color="secondary"

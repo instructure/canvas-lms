@@ -61,5 +61,18 @@ describe('Assignment Information Tests', () => {
       expect(getByTestId('assignment-submission-info')).toHaveTextContent('Online text entry')
       expect(getByTestId('assignment-submission-info')).toHaveTextContent('Online upload')
     })
+
+    it('does not display the message students who button when the selected assignment is anonymous', () => {
+      const {queryByTestId} = renderAssignmentInformation({
+        ...assignmentInfoDefaultProps,
+        assignment: assignmentInfoDefaultProps.assignment
+          ? {
+              ...assignmentInfoDefaultProps.assignment,
+              anonymizeStudents: true,
+            }
+          : undefined,
+      })
+      expect(queryByTestId('message-students-who-button')).toBeNull()
+    })
   })
 })

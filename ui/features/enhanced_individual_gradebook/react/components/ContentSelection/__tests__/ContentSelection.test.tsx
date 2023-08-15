@@ -106,4 +106,36 @@ describe('Content Selection', () => {
       expect(getByTestId('next-assignment-button')).toHaveFocus()
     })
   })
+  describe('assignment dropdown', () => {
+    it('displays assigned anonymous assignments when no student is selected', () => {
+      defaultSortableAssignments[0].anonymizeStudents = true
+      const props = makeContentSelectionProps({
+        students: defaultSortableStudents,
+        selectedStudentId: null,
+        assignments: defaultSortableAssignments,
+      })
+      const {getByTestId} = render(
+        <MockedProvider>
+          <ContentSelection {...props} />
+        </MockedProvider>
+      )
+      const assignmentDropdown = getByTestId('content-selection-assignment-select')
+      expect(assignmentDropdown).toHaveTextContent('Assignment 1')
+    })
+    it('does not display assigned anonymous assignments when a student is selected', () => {
+      defaultSortableAssignments[0].anonymizeStudents = true
+      const props = makeContentSelectionProps({
+        students: defaultSortableStudents,
+        selectedStudentId: '1',
+        assignments: defaultSortableAssignments,
+      })
+      const {getByTestId} = render(
+        <MockedProvider>
+          <ContentSelection {...props} />
+        </MockedProvider>
+      )
+      const assignmentDropdown = getByTestId('content-selection-assignment-select')
+      expect(assignmentDropdown).not.toHaveTextContent('Assignment 1')
+    })
+  })
 })
