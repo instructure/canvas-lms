@@ -1224,13 +1224,19 @@ describe ContentMigration do
         @dst = course_factory
         @old = @src.assignments.create! title: "foo"
         @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+
+        @old_wp = @src.wiki_pages.create! title: "bar"
+        @new_wp = @dst.wiki_pages.create!(
+          title: "bar",
+          migration_id: CC::CCHelper.create_key(@old_wp, global: true)
+        )
         @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
         @cm.workflow_state = "imported"
         @cm.source_course = @src
         @cm.save!
       end
 
-      it "returns a url to a file containing the asset map" do
+      def expect_map_to_be_generated
         allow(HostUrl).to receive(:default_host).and_return("pineapple.edu")
         url = @cm.asset_map_url(generate_if_needed: true)
         @cm.reload
@@ -1242,8 +1248,13 @@ describe ContentMigration do
                              "source_host" => "pineapple.edu",
                              "contains_migration_ids" => false,
                              "resource_mapping" => {
-                               "assignments" => { @old.id.to_s => @new.id.to_s }
+                               "assignments" => { @old.id.to_s => @new.id.to_s },
+                               "pages" => { @old_wp.id.to_s => @new_wp.id.to_s }
                              } })
+      end
+
+      it "returns a url to a file containing the asset map" do
+        expect_map_to_be_generated
       end
 
       context "when not on a test cluster" do
@@ -1285,6 +1296,20 @@ describe ContentMigration do
           content_migration.asset_map_url(generate_if_needed: true)
         end
       end
+
+      context "when the permanent_page_links flag is on" do
+        before do
+          Account.site_admin.enable_feature!(:permanent_page_links)
+        end
+
+        after do
+          Account.site_admin.disable_feature!(:permanent_page_links)
+        end
+
+        it "generates the asset map" do
+          expect_map_to_be_generated
+        end
+      end
     end
 
     context "when the :content_migration_asset_map_v2 flag is on" do
@@ -1294,6 +1319,13 @@ describe ContentMigration do
         @dst = course_factory
         @old = @src.assignments.create! title: "foo"
         @new = @dst.assignments.create! title: "foo", migration_id: CC::CCHelper.create_key(@old, global: true)
+
+        @old_wp = @src.wiki_pages.create! title: "bar"
+        @new_wp = @dst.wiki_pages.create!(
+          title: "bar",
+          migration_id: CC::CCHelper.create_key(@old_wp, global: true)
+        )
+
         @cm = @dst.content_migrations.build(migration_type: "course_copy_importer")
         @cm.workflow_state = "imported"
         @cm.source_course = @src
@@ -1318,6 +1350,7 @@ describe ContentMigration do
         expect(@cm.asset_map_attachment.context).to eq @cm
         json = JSON.parse(@cm.asset_map_attachment.open.read)
         old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
         expect(json).to eq({ "source_course" => @src.id.to_s,
                              "source_host" => "pineapple.edu",
                              "contains_migration_ids" => true,
@@ -1330,6 +1363,21 @@ describe ContentMigration do
                                  old_migration_id => {
                                    "source" => { "id" => @old.id.to_s },
                                    "destination" => { "id" => @new.id.to_s }
+                                 }
+                               },
+                               "pages" => {
+                                 @old_wp.id.to_s => @new_wp.id.to_s,
+                                 old_wp_migration_id => {
+                                   "source" => {
+                                     "id" => @old_wp.id.to_s,
+                                     "url" => @old_wp.url.to_s,
+                                     "current_lookup_id" => @old_wp.current_lookup_id
+                                   },
+                                   "destination" => {
+                                     "id" => @new_wp.id.to_s,
+                                     "url" => @new_wp.url.to_s,
+                                     "current_lookup_id" => @new_wp.current_lookup_id
+                                   }
                                  }
                                }
                              },
@@ -1349,6 +1397,7 @@ describe ContentMigration do
         expect(@cm.asset_map_attachment.context).to eq @cm
         json = JSON.parse(@cm.asset_map_attachment.open.read)
         old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+        old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
         expect(json).to eq({ "source_course" => nil,
                              "source_host" => nil,
                              "contains_migration_ids" => true,
@@ -1360,10 +1409,114 @@ describe ContentMigration do
                                  old_migration_id => {
                                    "source" => {},
                                    "destination" => { "id" => @new.id.to_s }
+                                 },
+                               },
+                               "pages" => {
+                                 old_wp_migration_id => {
+                                   "source" => {},
+                                   "destination" => {
+                                     "id" => @new_wp.id.to_s,
+                                     "url" => @new_wp.url.to_s,
+                                     "current_lookup_id" => @new_wp.current_lookup_id
+                                   }
                                  }
                                }
                              },
                              "attachment_path_id_lookup" => nil })
+      end
+
+      context "when the permanent_page_links flag is on" do
+        before do
+          Account.site_admin.enable_feature!(:permanent_page_links)
+        end
+
+        after do
+          Account.site_admin.disable_feature!(:permanent_page_links)
+        end
+
+        it "returns a url to a file containing the asset map" do
+          url = @cm.asset_map_url(generate_if_needed: true)
+
+          @cm.reload
+          expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+          expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+          expect(@cm.asset_map_attachment.context).to eq @cm
+          json = JSON.parse(@cm.asset_map_attachment.open.read)
+          old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+          old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
+          expect(json).to eq({ "source_course" => @src.id.to_s,
+                               "source_host" => "pineapple.edu",
+                               "contains_migration_ids" => true,
+                               "destination_course" => @dst.id.to_s,
+                               "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                               "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                               "resource_mapping" => {
+                                 "assignments" => {
+                                   @old.id.to_s => @new.id.to_s,
+                                   old_migration_id => {
+                                     "source" => { "id" => @old.id.to_s },
+                                     "destination" => { "id" => @new.id.to_s }
+                                   }
+                                 },
+                                 "pages" => {
+                                   @old_wp.id.to_s => @new_wp.id.to_s,
+                                   old_wp_migration_id => {
+                                     "source" => {
+                                       "id" => @old_wp.id.to_s,
+                                       "url" => @old_wp.url.to_s,
+                                       "current_lookup_id" => @old_wp.current_lookup_id
+                                     },
+                                     "destination" => {
+                                       "id" => @new_wp.id.to_s,
+                                       "url" => @new_wp.url.to_s,
+                                       "current_lookup_id" => @new_wp.current_lookup_id
+                                     }
+                                   }
+                                 }
+                               },
+                               "attachment_path_id_lookup" => nil })
+        end
+
+        it "returns a url to a file containing the asset map for QTI imports" do
+          @cm.source_course = nil
+          @cm.migration_type = "qti_converter"
+          @cm.save!
+
+          url = @cm.asset_map_url(generate_if_needed: true)
+
+          @cm.reload
+          expect(url).to include "/files/#{@cm.asset_map_attachment.id}/download"
+          expect(url).to include "verifier=#{@cm.asset_map_attachment.uuid}"
+          expect(@cm.asset_map_attachment.context).to eq @cm
+          json = JSON.parse(@cm.asset_map_attachment.open.read)
+          old_migration_id = CC::CCHelper.create_key(@old.class.asset_string(@old.id), global: true)
+          old_wp_migration_id = CC::CCHelper.create_key(@old_wp.class.asset_string(@old_wp.id), global: true)
+          expect(json).to eq({ "source_course" => nil,
+                               "source_host" => nil,
+                               "contains_migration_ids" => true,
+                               "destination_course" => @dst.id.to_s,
+                               "destination_hosts" => ["apple.edu", "kiwi.edu"],
+                               "destination_root_folder" => Folder.root_folders(@dst).first.name + "/",
+                               "resource_mapping" => {
+                                 "assignments" => {
+                                   old_migration_id => {
+                                     "source" => {},
+                                     "destination" => { "id" => @new.id.to_s }
+                                   }
+                                 },
+                                 "pages" => {
+                                   old_wp_migration_id => {
+                                     "source" => {},
+                                     "destination" => {
+                                       "id" => @new_wp.id.to_s,
+                                       "url" => @new_wp.url.to_s,
+                                       "current_lookup_id" => @new_wp.current_lookup_id
+                                     }
+                                   }
+                                 }
+                               },
+                               "attachment_path_id_lookup" => nil })
+        end
       end
     end
   end
