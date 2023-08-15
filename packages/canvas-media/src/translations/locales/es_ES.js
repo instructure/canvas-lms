@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armenio" },
   "belarusian_b2f19c76": { "message": "Bielorruso" },
   "bulgarian_feccab7e": { "message": "Búlgaro" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Los subtítulos de un curso plantilla no se pueden eliminar."
+  },
   "catalan_16f6b78f": { "message": "Catalán" },
   "chinese_111d37f6": { "message": "Chino" },
   "chinese_simplified_7f0bd370": { "message": "Chino simplificado" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Ucraniano" },
   "vietnamese_e7a76583": { "message": "Vietnamita" },
   "welsh_42ab94b1": { "message": "Galés" },
-  "yiddish_f96986df": { "message": "Yidis" }
+  "yiddish_f96986df": { "message": "Yidis" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Lo puedes reemplazar al cargar un nuevo archivo de subtítulos."
+  }
 }
 
 

@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armeens" },
   "belarusian_b2f19c76": { "message": "Wit-Russisch" },
   "bulgarian_feccab7e": { "message": "Bulgaars" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Ondertiteling overgenomen van een bovenliggende cursus kan niet worden verwijderd."
+  },
   "catalan_16f6b78f": { "message": "Catalaans" },
   "chinese_111d37f6": { "message": "Chinees" },
   "chinese_simplified_7f0bd370": { "message": "Chinees - Vereenvoudigd" },
@@ -91,7 +94,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Oekraïens" },
   "vietnamese_e7a76583": { "message": "Vietnamees" },
   "welsh_42ab94b1": { "message": "Welsh" },
-  "yiddish_f96986df": { "message": "Jiddisch" }
+  "yiddish_f96986df": { "message": "Jiddisch" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Je kunt dit vervangen door een nieuw ondertitelingsbestand te uploaden."
+  }
 }
 
 

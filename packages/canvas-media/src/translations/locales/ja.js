@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "英語（米語）" },
   "belarusian_b2f19c76": { "message": "ベラルーシ語" },
   "bulgarian_feccab7e": { "message": "ブルガリア語" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "ペアレントコースから継承されたキャプションは削除できません。"
+  },
   "catalan_16f6b78f": { "message": "カタロニア語" },
   "chinese_111d37f6": { "message": "中国語" },
   "chinese_simplified_7f0bd370": { "message": "中国語（簡体字）" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "ウクライナ語" },
   "vietnamese_e7a76583": { "message": "ベトナム語" },
   "welsh_42ab94b1": { "message": "ウェールズ語" },
-  "yiddish_f96986df": { "message": "イディッシュ語" }
+  "yiddish_f96986df": { "message": "イディッシュ語" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "新しいキャプションファイルをアップロードすることで置換することができます。"
+  }
 }
 
 
