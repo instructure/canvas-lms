@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "添加影像"
     },
+    "add_one_9e34a6f8": {
+        "message": "添加一個！"
+    },
     "additional_considerations_f3801683": {
         "message": "其他考慮因素"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "便帽產品"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "自父項課程繼承的字幕已移除。"
     },
     "catalan_16f6b78f": {
         "message": "加泰隆尼亞語"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "並無偵察任何可訪問性問題。"
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "尚未建立通告。"
+    },
+    "no_announcements_found_20185afc": {
+        "message": "找不到通告。"
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "尚未建立作業列表。"
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "找不到作業列表。"
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "沒有要儲存的變更。"
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "尚未建立討論區。"
+    },
+    "no_discussions_found_9284063b": {
+        "message": "找不到討論區。"
     },
     "no_e16d9132": {
         "message": "否"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "無標題"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "尚未建立單元。"
+    },
+    "no_modules_found_2df43a40": {
+        "message": "找不到單元。"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "尚未創建任何頁面。"
+    },
+    "no_pages_found_6799350": {
+        "message": "找不到頁面。"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "本檔案不支援預覽。"
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "尚未建立測驗。"
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "找不到測驗。"
     },
     "no_results_940393cf": {
         "message": "無結果。"
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "意第緒語"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "您可以透過上傳新的字幕檔來取代。"
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "您在圖示製作者收集箱中有未儲存的變更。是否要繼續，但不儲存這些變更？"

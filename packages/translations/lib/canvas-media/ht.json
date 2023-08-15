@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "Amenyen" },
   "belarusian_b2f19c76": { "message": "Byeloris" },
   "bulgarian_feccab7e": { "message": "Bilga" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Lejand ki eritye de yon kou paran paka elimine."
+  },
   "catalan_16f6b78f": { "message": "Catalan" },
   "chinese_111d37f6": { "message": "Chinwa" },
   "chinese_simplified_7f0bd370": { "message": "Chinwa Senplifye" },
@@ -69,5 +72,8 @@
   "ukrainian_945b00b7": { "message": "Ikrenyen" },
   "vietnamese_e7a76583": { "message": "Vyentamyen" },
   "welsh_42ab94b1": { "message": "Galwa" },
-  "yiddish_f96986df": { "message": "Yiddish" }
+  "yiddish_f96986df": { "message": "Yiddish" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Ou ka monte yon nouvo fichye lejand pou ka ranplase."
+  }
 }

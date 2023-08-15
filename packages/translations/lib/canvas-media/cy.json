@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "Armeneg" },
   "belarusian_b2f19c76": { "message": "Belarwseg" },
   "bulgarian_feccab7e": { "message": "Bwlgareg" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Does dim modd tynnu capsiynau sydd wedi’u hetifeddu o gwrs rhiant."
+  },
   "catalan_16f6b78f": { "message": "Catalaneg" },
   "chinese_111d37f6": { "message": "Tsieinëeg" },
   "chinese_simplified_7f0bd370": { "message": "Tsieinëeg Syml" },
@@ -71,5 +74,8 @@
   "ukrainian_945b00b7": { "message": "Wcreineg" },
   "vietnamese_e7a76583": { "message": "Fietnameg" },
   "welsh_42ab94b1": { "message": "Cymraeg" },
-  "yiddish_f96986df": { "message": "Iddew-Almaeneg" }
+  "yiddish_f96986df": { "message": "Iddew-Almaeneg" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Gallwch chi ddisodli drwy lwytho ffeil capsiwn newydd i fyny."
+  }
 }

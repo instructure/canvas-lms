@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Adicionar imagem"
     },
+    "add_one_9e34a6f8": {
+        "message": "Adicionar uma!"
+    },
     "additional_considerations_f3801683": {
         "message": "Considerações adicionais"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Produto de limite"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "As legendas herdadas de um curso principal não podem ser removidas."
     },
     "catalan_16f6b78f": {
         "message": "Catalão"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Sem problemas de acessibilidades detectados."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Nenhum anúncio criado ainda."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Nenhum anúncio encontrado."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Nenhuma tarefa criada ainda."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Nenhuma tarefa encontrada."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Não há alterações para salvar."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Nenhuma discussão criada ainda."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Nenhuma discussão encontrada."
     },
     "no_e16d9132": {
         "message": "Não"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Sem cabeçalhos"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Nenhum módulo criado ainda."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Nenhum módulo encontrado."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Nenhuma página criada ainda."
+    },
+    "no_pages_found_6799350": {
+        "message": "Nenhuma página encontrada."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Nenhuma pré-visualização disponível para esse arquivo."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Nenhum teste criado ainda."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Nenhum teste encontrado."
     },
     "no_results_940393cf": {
         "message": "Sem resultados."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Iídiche"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Você pode substituir carregando um novo arquivo de legenda."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Você tem alterações não salvas na bandeja do Criador de Ícones. Você deseja continuar sem salvar essas alterações?"

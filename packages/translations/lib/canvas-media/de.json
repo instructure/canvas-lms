@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "Armenisch" },
   "belarusian_b2f19c76": { "message": "Weißrussisch" },
   "bulgarian_feccab7e": { "message": "Bulgarisch" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Beschriftungen, die von einem übergeordneten Kurs geerbt wurden, können nicht entfernt werden."
+  },
   "catalan_16f6b78f": { "message": "Katalanisch" },
   "chinese_111d37f6": { "message": "Chinesisch" },
   "chinese_simplified_7f0bd370": { "message": "Vereinfachtes Chinesisch" },
@@ -69,5 +72,8 @@
   "ukrainian_945b00b7": { "message": "Ukrainisch" },
   "vietnamese_e7a76583": { "message": "Vietnamesisch" },
   "welsh_42ab94b1": { "message": "Walisisch" },
-  "yiddish_f96986df": { "message": "Jiddisch" }
+  "yiddish_f96986df": { "message": "Jiddisch" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Sie können sie durch das Hochladen einer neuen Untertiteldatei ersetzen."
+  }
 }

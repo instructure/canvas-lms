@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "亞美尼亞語" },
   "belarusian_b2f19c76": { "message": "白俄羅斯語" },
   "bulgarian_feccab7e": { "message": "保加利亞語" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "自父項課程繼承的字幕已移除。"
+  },
   "catalan_16f6b78f": { "message": "加泰隆尼亞語" },
   "chinese_111d37f6": { "message": "中文" },
   "chinese_simplified_7f0bd370": { "message": "簡體中文" },
@@ -69,5 +72,8 @@
   "ukrainian_945b00b7": { "message": "烏克蘭語" },
   "vietnamese_e7a76583": { "message": "緬甸語" },
   "welsh_42ab94b1": { "message": "威爾斯語" },
-  "yiddish_f96986df": { "message": "意第緒語" }
+  "yiddish_f96986df": { "message": "意第緒語" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "您可以透過上傳新的字幕檔來取代。"
+  }
 }

@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Dodaj sliko"
     },
+    "add_one_9e34a6f8": {
+        "message": "Dodajte eno."
+    },
     "additional_considerations_f3801683": {
         "message": "Dodatni razmisleki"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Izdelek s pokrovom"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Napisov, podedovanih od nadrejenega predmeta, ni mogoče odstraniti."
     },
     "catalan_16f6b78f": {
         "message": "katalonščina"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Ni zaznanih težav z dostopnostjo."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Ustvarjeno ni še nobeno obvestilo."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Najti ni mogoče nobenega obvestila."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Ustvarjena ni še nobena naloga."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Najti ni mogoče nobene naloge."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Ni sprememb, ki bi jih bilo mogoče shraniti."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Ustvarjena ni še nobena razprava."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Najti ni mogoče nobene razprave."
     },
     "no_e16d9132": {
         "message": "Ne"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Ni glav."
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Ustvarjen ni še noben modul."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Najti ni mogoče nobenega modula."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Ustvarjena ni še nobena stran."
+    },
+    "no_pages_found_6799350": {
+        "message": "Najti ni mogoče nobene strani."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Za to datoteko predogled ni na voljo."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Ustvarjen ni še noben kviz."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Najti ni mogoče nobenega kviza."
     },
     "no_results_940393cf": {
         "message": "Ni rezultatov."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "jidiš"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Zamenjate ga lahko, tako da naložite novo datoteko z napisi."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "V pladnju ustvarjalnika ikon imate neshranjene spremembe. Ali želite nadaljevati brez shranjevanja teh sprememb?"

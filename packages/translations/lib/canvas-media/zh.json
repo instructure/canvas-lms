@@ -5,6 +5,9 @@
   "armenian_12da6118": { "message": "亚美尼亚语" },
   "belarusian_b2f19c76": { "message": "白俄罗斯语" },
   "bulgarian_feccab7e": { "message": "保加利亚语" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "无法删除从父课程继承的字幕。"
+  },
   "catalan_16f6b78f": { "message": "加泰罗尼亚语" },
   "chinese_111d37f6": { "message": "中文" },
   "chinese_simplified_7f0bd370": { "message": "简体中文" },
@@ -69,5 +72,8 @@
   "ukrainian_945b00b7": { "message": "乌克兰语" },
   "vietnamese_e7a76583": { "message": "越南语" },
   "welsh_42ab94b1": { "message": "威尔士语" },
-  "yiddish_f96986df": { "message": "意第绪语" }
+  "yiddish_f96986df": { "message": "意第绪语" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "您可以通过上传新的字幕文件进行替换。"
+  }
 }

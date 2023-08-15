@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "添加图像"
     },
+    "add_one_9e34a6f8": {
+        "message": "添加一个!"
+    },
     "additional_considerations_f3801683": {
         "message": "其他考虑事项"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "卡积"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "无法删除从父课程继承的字幕。"
     },
     "catalan_16f6b78f": {
         "message": "加泰罗尼亚语"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "没有发现辅助功能问题。"
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "尚未创建公告。"
+    },
+    "no_announcements_found_20185afc": {
+        "message": "未找到公告。"
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "尚未创建作业。"
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "未找到作业。"
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "没有更改要保存。"
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "尚未创建讨论。"
+    },
+    "no_discussions_found_9284063b": {
+        "message": "未找到讨论。"
     },
     "no_e16d9132": {
         "message": "否"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "无标题"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "尚未创建单元。"
+    },
+    "no_modules_found_2df43a40": {
+        "message": "未找到单元。"
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "尚未创建页面。"
+    },
+    "no_pages_found_6799350": {
+        "message": "未找到页面。"
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "没有预览可用于此文件。"
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "尚未创建测验。"
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "未找到测验。"
     },
     "no_results_940393cf": {
         "message": "无结果。"
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "意第绪语"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "您可以通过上传新的字幕文件进行替换。"
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "“图标编辑器”托盘中有未保存的更改。是否要继续操作而不保存这些更改？"

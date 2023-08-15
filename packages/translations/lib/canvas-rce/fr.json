@@ -14,6 +14,7 @@
   "add_another_f4e50d57": { "message": "Ajouter un autre" },
   "add_cc_subtitles_55f0394e": { "message": "Ajouter CC/Sous-titres" },
   "add_image_60b2de07": { "message": "Ajouter une image" },
+  "add_one_9e34a6f8": { "message": "Ajoutez-en un/une !" },
   "additional_considerations_f3801683": {
     "message": "Considérations supplémentaires"
   },
@@ -670,15 +671,39 @@
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Aucun problème d''accessibilité n’a été détecté."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Aucune annonce créée à ce jour."
+  },
+  "no_announcements_found_20185afc": { "message": "Aucune annonce trouvée." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Aucun travail créé à ce jour."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Aucun travail trouvé." },
   "no_changes_to_save_d29f6e91": {
     "message": "Aucune modification à enregistrer."
   },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Aucune discussion créée à ce jour."
+  },
+  "no_discussions_found_9284063b": { "message": "Aucune discussion trouvée." },
   "no_e16d9132": { "message": "Non" },
   "no_file_chosen_9a880793": { "message": "Aucun fichier sélectionné" },
   "no_headers_9bc7dc7f": { "message": "Absence d’en-têtes" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Aucun module créé à ce jour."
+  },
+  "no_modules_found_2df43a40": { "message": "Aucun module trouvé." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Aucune page créée à ce jour."
+  },
+  "no_pages_found_6799350": { "message": "Aucune page trouvée." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Aucun aperçu n’est disponible pour ce fichier."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Aucun quiz créé à ce jour."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Aucun quiz trouvé." },
   "no_results_940393cf": { "message": "Aucun résultat." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Aucun résultat trouvé pour { filterTerm }"

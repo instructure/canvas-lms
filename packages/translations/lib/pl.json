@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Dodaj zdjęcie"
     },
+    "add_one_9e34a6f8": {
+        "message": "Dodaj jedną!"
+    },
     "additional_considerations_f3801683": {
         "message": "Dodatkowe kwestie"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "G mnożenie"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Napisów odziedziczonych z kursu nadrzędnego nie można usunąć."
     },
     "catalan_16f6b78f": {
         "message": "Kataloński"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Nie wykryto problemów z dostępnością."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Nie utworzono jeszcze żadnych ogłoszeń."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Nie odnaleziono ogłoszeń."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Nie utworzono jeszcze żadnych zadań."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Nie odnaleziono zadań."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Brak zmian do zapisania"
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Nie utworzono jeszcze żadnych dyskusji."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Nie odnaleziono dyskusji."
     },
     "no_e16d9132": {
         "message": "Nie"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Brak nagłówków"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Nie utworzono jeszcze żadnych modułów."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Nie odnaleziono modułów."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Nie utworzono jeszcze żadnych stron."
+    },
+    "no_pages_found_6799350": {
+        "message": "Nie odnaleziono stron."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Nie ma możliwości podglądu tego pliku."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Nie utworzono jeszcze żadnych testów."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Nie odnaleziono testów."
     },
     "no_results_940393cf": {
         "message": "Brak wyników."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Jidysz"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Można je przywrócić, przesyłając nowy plik z napisami."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Masz niezapisane zmiany w panelu Icon Maker. Czy chcesz kontynuować bez zapisywania tych zmian?"

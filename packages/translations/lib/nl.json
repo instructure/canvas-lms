@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Afbeelding toevoegen"
     },
+    "add_one_9e34a6f8": {
+        "message": "Voer er één toe!"
+    },
     "additional_considerations_f3801683": {
         "message": "Extra overwegingen"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Cap-product"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Ondertiteling overgenomen van een bovenliggende cursus kan niet worden verwijderd."
     },
     "catalan_16f6b78f": {
         "message": "Catalaans"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Geen toegankelijkheidsproblemen gevonden."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Er zijn nog geen aankondigingen gemaakt."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Geen aankondigingen gevonden."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Er zijn nog geen opdrachten gemaakt."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Geen opdrachten gevonden."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Geen wijzigingen om op te slaan."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Er zijn nog geen discussies gemaakt."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Geen discussies gevonden."
     },
     "no_e16d9132": {
         "message": "Nee"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Geen kopteksten"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Er zijn nog geen modules gemaakt."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Geen modules gevonden."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Er zijn nog geen pagina''s gemaakt."
+    },
+    "no_pages_found_6799350": {
+        "message": "Geen pagina''s gevonden."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Er is geen voorbeeld voor dit bestand beschikbaar."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Er zijn nog geen toetsen gemaakt."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Geen toetsen gevonden."
     },
     "no_results_940393cf": {
         "message": "Geen resultaten."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Je kunt dit vervangen door een nieuw ondertitelingsbestand te uploaden."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Je hebt niet-opgeslagen wijzigingen in het menu Pictogrammenmaker. Wil je doorgaan zonder deze wijzigingen op te slaan?"
