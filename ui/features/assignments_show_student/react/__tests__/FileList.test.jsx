@@ -23,10 +23,6 @@ import {render} from '@testing-library/react'
 import FileList from '../FileList'
 
 describe('FileList', () => {
-  beforeAll(() => {
-    window.URL.createObjectURL = jest.fn()
-  })
-
   const files = [
     new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
     new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'}),

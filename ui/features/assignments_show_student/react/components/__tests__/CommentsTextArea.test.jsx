@@ -76,7 +76,6 @@ function mockContext(children) {
 
 describe('CommentTextArea', () => {
   beforeAll(() => {
-    window.URL.createObjectURL = jest.fn()
     $('body').append('<div role="alert" id="flash_screenreader_holder" />')
   })
 

@@ -234,3 +234,11 @@ if (!('structuredClone' in window)) {
     value: obj => JSON.parse(JSON.stringify(obj)),
   })
 }
+
+if (typeof window.URL.createObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
+}
+
+if (typeof window.URL.revokeObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
+}

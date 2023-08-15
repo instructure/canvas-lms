@@ -79,8 +79,8 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  window.URL.createObjectURL = jest.fn().mockReturnValue('perry_preview')
   uploadFileModule.uploadFile = jest.fn().mockResolvedValue(null)
+  global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
 })
 
 describe('FileUpload', () => {
@@ -234,8 +234,8 @@ describe('FileUpload', () => {
       expect(props.onUploadRequested).toHaveBeenCalledWith(
         expect.objectContaining({
           files: [
-            expect.objectContaining({preview: 'perry_preview'}),
-            expect.objectContaining({preview: 'perry_preview'}),
+            expect.objectContaining({preview: 'http://example.com/whatever'}),
+            expect.objectContaining({preview: 'http://example.com/whatever'}),
           ],
         })
       )
