@@ -32,6 +32,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Ajoute yon lòt" },
   "add_cc_subtitles_55f0394e": { "message": "Ajoute CC/Soutit" },
   "add_image_60b2de07": { "message": "Ajoute Imaj" },
+  "add_one_9e34a6f8": { "message": "Ajoute yonn!" },
   "additional_considerations_f3801683": { "message": "Lòt konsiderasyon" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Lyen Adjasan ak menm URL yo dwe yon lyen inik."
@@ -634,13 +635,31 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Nou pa t detekte okenn pwoblèm aksesibilite."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Poko gen anons ki kreye."
+  },
+  "no_announcements_found_20185afc": { "message": "Yo pa jwenn anons." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Poko gen sesyon ki kreye."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Yo pa jwenn sesyon." },
   "no_changes_to_save_d29f6e91": { "message": "Pa gen chanjman pou sovgade." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Poko gen diskisyon ki kreye."
+  },
+  "no_discussions_found_9284063b": { "message": "Yo pa jwenn diskisyon." },
   "no_e16d9132": { "message": "Non" },
   "no_file_chosen_9a880793": { "message": "Pa gen fichye chwazi" },
   "no_headers_9bc7dc7f": { "message": "Okenn antèt" },
+  "no_modules_created_yet_c71b6d4d": { "message": "Poko gen modil ki kreye." },
+  "no_modules_found_2df43a40": { "message": "Yo pa jwenn modil." },
+  "no_pages_created_yet_c379fa6e": { "message": "Poko gen paj ki kreye." },
+  "no_pages_found_6799350": { "message": "Yo pa jwenn paj." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Pa gen apèsi disponib pou fichye sa a."
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "Poko gen quiz ki kreye." },
+  "no_quizzes_found_c80c537a": { "message": "Yo pa jwenn quiz." },
   "no_results_940393cf": { "message": "Okenn rezilta." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nou pa jwenn rezilta pou { filterTerm }"

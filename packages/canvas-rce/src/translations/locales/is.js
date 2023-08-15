@@ -32,6 +32,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Bæta við öðrum" },
   "add_cc_subtitles_55f0394e": { "message": "Bæta við skjátexta" },
   "add_image_60b2de07": { "message": "Bæta við mynd" },
+  "add_one_9e34a6f8": { "message": "Bæta einum við!" },
   "additional_considerations_f3801683": { "message": "Auka umhugsunarefni" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Samliggjandi tenglar með sömu vefslóð eiga að vera stakur tengill."
@@ -652,15 +653,41 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Engin vandamál fundust varðandi aðgengileika."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Engar tilkynningar búnar til ennþá."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Engar tilkynningar fundust."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Engin verkefni búin til ennþá."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Engin verkefni fundust." },
   "no_changes_to_save_d29f6e91": {
     "message": "Engar breytingar til að vista."
   },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Engar umræður búnar til ennþá."
+  },
+  "no_discussions_found_9284063b": { "message": "Engar umræður fundust." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Engin skrá valin" },
   "no_headers_9bc7dc7f": { "message": "Engir hausar" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Ekkert námsefni búið til ennþá."
+  },
+  "no_modules_found_2df43a40": { "message": "Ekkert námsefni fannst." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Engar síður búnar til ennþá."
+  },
+  "no_pages_found_6799350": { "message": "Engar síður fundust." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Engin forskoðun tiltæk fyrir þessa skrá."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Engin próf búin til ennþá."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Engin próf fundust." },
   "no_results_940393cf": { "message": "Engar niðurstöður." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Engar niðurstöður fundust fyrir { filterTerm }"

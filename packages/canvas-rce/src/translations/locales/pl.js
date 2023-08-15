@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Dodaj kolejne" },
   "add_cc_subtitles_55f0394e": { "message": "Dodaj CC/napisy" },
   "add_image_60b2de07": { "message": "Dodaj zdjęcie" },
+  "add_one_9e34a6f8": { "message": "Dodaj jedną!" },
   "additional_considerations_f3801683": { "message": "Dodatkowe kwestie" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Sąsiadujące łącza o tym samym adresie URL powinny stanowić pojedyncze łącze."
@@ -665,13 +666,37 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Nie wykryto problemów z dostępnością."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Nie utworzono jeszcze żadnych ogłoszeń."
+  },
+  "no_announcements_found_20185afc": { "message": "Nie odnaleziono ogłoszeń." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Nie utworzono jeszcze żadnych zadań."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Nie odnaleziono zadań." },
   "no_changes_to_save_d29f6e91": { "message": "Brak zmian do zapisania" },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Nie utworzono jeszcze żadnych dyskusji."
+  },
+  "no_discussions_found_9284063b": { "message": "Nie odnaleziono dyskusji." },
   "no_e16d9132": { "message": "Nie" },
   "no_file_chosen_9a880793": { "message": "Nie wybrano pliku" },
   "no_headers_9bc7dc7f": { "message": "Brak nagłówków" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Nie utworzono jeszcze żadnych modułów."
+  },
+  "no_modules_found_2df43a40": { "message": "Nie odnaleziono modułów." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Nie utworzono jeszcze żadnych stron."
+  },
+  "no_pages_found_6799350": { "message": "Nie odnaleziono stron." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Nie ma możliwości podglądu tego pliku."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Nie utworzono jeszcze żadnych testów."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Nie odnaleziono testów." },
   "no_results_940393cf": { "message": "Brak wyników." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nie znaleziono wyników dla { filterTerm }"

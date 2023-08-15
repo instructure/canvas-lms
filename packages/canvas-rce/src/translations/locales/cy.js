@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Ychwanegu un arall" },
   "add_cc_subtitles_55f0394e": { "message": "Ychwanegu CC/Is-deitlau" },
   "add_image_60b2de07": { "message": "Ychwanegu Delwedd" },
+  "add_one_9e34a6f8": { "message": "Ychwanegu un!" },
   "additional_considerations_f3801683": {
     "message": "Ystyriaethau ychwanegol"
   },
@@ -679,13 +680,43 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Heb ganfod problemau o ran hygyrchedd."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Does dim cyhoeddiadau wedi’u creu eto."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Heb ddod o hyd i gyhoeddiadau."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Does dim aseiniadau wedi’u creu eto."
+  },
+  "no_assignments_found_79e46d7f": {
+    "message": "Heb ddod o hyd i aseiniadau."
+  },
   "no_changes_to_save_d29f6e91": { "message": "Dim newidiadau i’w cadw." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Does dim trafodaethau wedi’u creu eto."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Heb ddod o hyd i drafodaethau."
+  },
   "no_e16d9132": { "message": "Na" },
   "no_file_chosen_9a880793": { "message": "Dim ffeil wedi’i dewis" },
   "no_headers_9bc7dc7f": { "message": "Dim pennawd" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Does dim modiwlau wedi’u creu eto."
+  },
+  "no_modules_found_2df43a40": { "message": "Heb ddod o hyd i fodiwlau." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Does dim tudalennau wedi’u creu eto."
+  },
+  "no_pages_found_6799350": { "message": "Heb ddod o hyd i dudalennau." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Does dim rhagolwg ar gael ar gyfer y ffeil hon."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Does dim cwisiau wedi’u creu eto."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Heb ddod o hyd i gwisiau." },
   "no_results_940393cf": { "message": "Dim canlyniadau." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Heb ddod o hyd i ganlyniadau ar gyfer { filterTerm }"
