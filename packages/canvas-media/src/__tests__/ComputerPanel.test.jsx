@@ -21,14 +21,6 @@ import {act, render, fireEvent, waitFor} from '@testing-library/react'
 import ComputerPanel from '../ComputerPanel'
 import {ACCEPTED_FILE_TYPES} from '../acceptedMediaFileTypes'
 
-// polyfill URL.createObjectURL
-if (window.URL) {
-  window.URL = {
-    createObjectURL: _file => 'blob://junk',
-    revokeObjectURL: _url => undefined,
-  }
-}
-
 const uploadMediaTranslations = {
   UploadMediaStrings: {
     ADD_CLOSED_CAPTIONS_OR_SUBTITLES: 'Add CC/Subtitles',

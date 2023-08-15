@@ -38,9 +38,7 @@ window.scroll = () => {}
  */
 /* eslint-disable no-console */
 const globalError = global.console.error
-const ignoredErrors = [
-  /A theme registry has already been initialized/,
-]
+const ignoredErrors = [/A theme registry has already been initialized/]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
   /Translation for .* in "en" is missing/,
@@ -70,3 +68,11 @@ global.console = {
   debug: console.debug,
 }
 /* eslint-enable no-console */
+
+if (typeof window.URL.createObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'createObjectURL', {value: () => 'http://example.com/whatever'})
+}
+
+if (typeof window.URL.revokeObjectURL === 'undefined') {
+  Object.defineProperty(window.URL, 'revokeObjectURL', {value: () => undefined})
+}

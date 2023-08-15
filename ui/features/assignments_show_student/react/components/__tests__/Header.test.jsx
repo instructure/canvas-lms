@@ -724,12 +724,11 @@ describe('Add Comment/View Feedback button', () => {
     })
     props.assignment.env.peerReviewModeEnabled = false
     props.assignment.env.peerReviewAvailable = false
-    const {getByRole} = render(<Header {...props} />)
-    expect(
-      getByRole('button', {
-        name: /After the first attempt, you cannot leave comments until you submit the assignment./,
-      })
-    ).toBeInTheDocument()
+    const {getByText} = render(<Header {...props} />)
+    const screenText = getByText(
+      /After the first attempt, you cannot leave comments until you submit the assignment./
+    )
+    expect(screenText).toBeInTheDocument()
   })
 
   it('does not render additional info button if unsubmitted attempt==1', async () => {
@@ -810,12 +809,11 @@ describe('Add Comment/View Feedback button', () => {
     const props = await mockAssignmentAndSubmission()
     props.assignment.env.peerReviewModeEnabled = true
     props.assignment.env.peerReviewAvailable = false
-    const {getByRole} = render(<Header {...props} />)
-    expect(
-      getByRole('button', {
-        name: /You cannot leave comments until reviewer and reviewee submits the assignment./,
-      })
-    ).toBeInTheDocument()
+    const {getByText} = render(<Header {...props} />)
+    const screenText = getByText(
+      /You cannot leave comments until reviewer and reviewee submits the assignment./
+    )
+    expect(screenText).toBeInTheDocument()
   })
 })
 

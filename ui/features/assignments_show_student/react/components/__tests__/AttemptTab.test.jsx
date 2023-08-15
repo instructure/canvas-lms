@@ -193,7 +193,6 @@ describe('ContentTabs', () => {
       beforeAll(() => {
         $('body').append('<div role="alert" id="flash_screenreader_holder" />')
         uploadFileModule.uploadFiles = jest.fn()
-        window.URL.createObjectURL = jest.fn()
       })
 
       it('shows a file preview for an uploaded file', async () => {
@@ -238,7 +237,6 @@ describe('ContentTabs', () => {
     beforeAll(async () => {
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
       uploadFileModule.uploadFiles = jest.fn()
-      window.URL.createObjectURL = jest.fn()
 
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
@@ -671,6 +669,8 @@ describe('ContentTabs', () => {
         uploadedFileCount += 1
         return {id: `${uploadedFileCount}`}
       })
+
+      global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
     })
 
     afterEach(() => {

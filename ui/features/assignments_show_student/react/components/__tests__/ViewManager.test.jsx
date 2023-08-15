@@ -90,6 +90,7 @@ async function makeProps(opts = {}) {
 }
 
 describe('ViewManager', () => {
+  const originalEnv = window.ENV
   beforeEach(() => {
     window.ENV = {
       context_asset_string: 'test_1',
@@ -99,6 +100,10 @@ describe('ViewManager', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     }
+  })
+
+  afterEach(() => {
+    window.ENV = originalEnv
   })
 
   describe('New Attempt Button', () => {

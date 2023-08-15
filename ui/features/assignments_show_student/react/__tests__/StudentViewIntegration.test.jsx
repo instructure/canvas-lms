@@ -134,7 +134,6 @@ describe('student view integration tests', () => {
     // displayed happens as a result of a cache write and these higher level
     // components re-rendering
     it('displays the new file after it has been uploaded', async () => {
-      window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFile = jest.fn()
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
@@ -163,7 +162,6 @@ describe('student view integration tests', () => {
     })
 
     it('displays a progress bar for each new file being uploaded', async () => {
-      window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFiles = jest.fn()
       uploadFileModule.uploadFiles.mockReturnValueOnce([
         {id: '1', name: 'file1.jpg'},
