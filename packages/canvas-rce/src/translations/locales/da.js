@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Tilføj en mere" },
   "add_cc_subtitles_55f0394e": { "message": "Tilføj undertekster" },
   "add_image_60b2de07": { "message": "Tilføj billede" },
+  "add_one_9e34a6f8": { "message": "Tilføj en!" },
   "additional_considerations_f3801683": {
     "message": "Yderligere overvejelser"
   },
@@ -665,13 +666,37 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Der blev ikke fundet nogen tilgængelighedsproblemer."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Der er ikke oprettet beskeder endnu."
+  },
+  "no_announcements_found_20185afc": { "message": "Ingen beskeder fundet." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Der er ikke oprettet opgaver endnu."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Ingen opgaver fundet." },
   "no_changes_to_save_d29f6e91": { "message": "Ingen ændringer at gemme." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Der er ikke oprettet diskussioner endnu."
+  },
+  "no_discussions_found_9284063b": { "message": "Ingen diskussioner fundet." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil valgt" },
   "no_headers_9bc7dc7f": { "message": "Ingen overskrifter" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Der er ikke oprettet moduler endnu."
+  },
+  "no_modules_found_2df43a40": { "message": "Ingen moduler fundet." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Der er ikke oprettet sider endnu."
+  },
+  "no_pages_found_6799350": { "message": "Ingen sider fundet." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Der findes ikke forhåndsvisning for denne fil."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Der er ikke oprettet test endnu."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Ingen test fundet." },
   "no_results_940393cf": { "message": "Ingen resultater." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultater fundet for { filterTerm }"

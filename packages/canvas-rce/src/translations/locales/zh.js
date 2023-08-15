@@ -31,6 +31,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "新增" },
   "add_cc_subtitles_55f0394e": { "message": "添加抄送/副标题" },
   "add_image_60b2de07": { "message": "添加图像" },
+  "add_one_9e34a6f8": { "message": "添加一个!" },
   "additional_considerations_f3801683": { "message": "其他考虑事项" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "具有相同 URL 的相邻链接应该为一个单链接。"
@@ -591,13 +592,25 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "没有发现辅助功能问题。"
   },
+  "no_announcements_created_yet_c44a94f4": { "message": "尚未创建公告。" },
+  "no_announcements_found_20185afc": { "message": "未找到公告。" },
+  "no_assignments_created_yet_1b236d87": { "message": "尚未创建作业。" },
+  "no_assignments_found_79e46d7f": { "message": "未找到作业。" },
   "no_changes_to_save_d29f6e91": { "message": "没有更改要保存。" },
+  "no_discussions_created_yet_ff99abe3": { "message": "尚未创建讨论。" },
+  "no_discussions_found_9284063b": { "message": "未找到讨论。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "没有选择文件" },
   "no_headers_9bc7dc7f": { "message": "无标题" },
+  "no_modules_created_yet_c71b6d4d": { "message": "尚未创建单元。" },
+  "no_modules_found_2df43a40": { "message": "未找到单元。" },
+  "no_pages_created_yet_c379fa6e": { "message": "尚未创建页面。" },
+  "no_pages_found_6799350": { "message": "未找到页面。" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "没有预览可用于此文件。"
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "尚未创建测验。" },
+  "no_quizzes_found_c80c537a": { "message": "未找到测验。" },
   "no_results_940393cf": { "message": "无结果。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "未找到{ filterTerm }的结果"

@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "もう 1 つ追加" },
   "add_cc_subtitles_55f0394e": { "message": "CC /字幕を追加" },
   "add_image_60b2de07": { "message": "画像を追加" },
+  "add_one_9e34a6f8": { "message": "1 ページ追加" },
   "additional_considerations_f3801683": { "message": "さらなる考慮事項" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "同じURLを持つ隣接リンクは1つのリンクでなければなりません。"
@@ -649,13 +650,41 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "アクセシビリティの問題は検出されませんでした。"
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "アナウンスはまだ作成されていません。"
+  },
+  "no_announcements_found_20185afc": {
+    "message": "アナウンスが見つかりません。"
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "課題はまだ作成されていません。"
+  },
+  "no_assignments_found_79e46d7f": { "message": "課題が見つかりません。" },
   "no_changes_to_save_d29f6e91": { "message": "保存する変更はありません。" },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "ディスカッションはまだ作成されていません。"
+  },
+  "no_discussions_found_9284063b": {
+    "message": "ディスカッションが見つかりません。"
+  },
   "no_e16d9132": { "message": "いいえ" },
   "no_file_chosen_9a880793": { "message": "ファイルが選択されていません" },
   "no_headers_9bc7dc7f": { "message": "ヘッダーなし" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "モジュールはまだ作成されていません。"
+  },
+  "no_modules_found_2df43a40": { "message": "モジュールが見つかりません。" },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "ページはまだ作成されていません。"
+  },
+  "no_pages_found_6799350": { "message": "ページが見つかりません。" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "このファイルでは、プレビューは利用できません。"
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "小テストはまだ作成されていません。"
+  },
+  "no_quizzes_found_c80c537a": { "message": "小テストが見つかりません。" },
   "no_results_940393cf": { "message": "結果がありません。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "{ filterTerm }の結果が見つかりませんでした"

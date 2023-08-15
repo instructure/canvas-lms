@@ -34,6 +34,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Tāpiri tētahi atu" },
   "add_cc_subtitles_55f0394e": { "message": "Tāpiri CC/Ngā Tohuwai" },
   "add_image_60b2de07": { "message": "Tāpiri Āhua" },
+  "add_one_9e34a6f8": { "message": "Tāpiri kotahi!" },
   "additional_considerations_f3801683": { "message": "Ētahi atu whakāro" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Ko ngā hononga hono ki te URL kotahi me kotahi te hononga."
@@ -672,13 +673,37 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Kaore he whakaurunga take i kitea."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Kare ano he panui i hanga."
+  },
+  "no_announcements_found_20185afc": { "message": "Karekau he panui i kitea." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Karekau he taumahi i hangaia."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Karekau he taumahi i kitea." },
   "no_changes_to_save_d29f6e91": { "message": "Kaore he huringa hei tiaki." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Karekau he korerorero i hanga."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Karekau he korerorero i kitea."
+  },
   "no_e16d9132": { "message": "Kahore" },
   "no_file_chosen_9a880793": { "message": "Kaore he kōnae i tīpakotia" },
   "no_headers_9bc7dc7f": { "message": "Kaore ngā pane" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Kaore ano kia hangahia nga waahanga."
+  },
+  "no_modules_found_2df43a40": { "message": "Karekau he waahanga i kitea." },
+  "no_pages_created_yet_c379fa6e": { "message": "Anō No whārangi hanga." },
+  "no_pages_found_6799350": { "message": "Karekau he wharangi i kitea." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Ko te wātea hoki tēnei kōnae he arokite."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Kaore ano kia hangahia he patapatai."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Karekau he patapatai i kitea." },
   "no_results_940393cf": { "message": "Kaore he hua." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Kaore i kitea he hua mo { filterTerm }"

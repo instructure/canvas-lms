@@ -31,6 +31,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "添加其他" },
   "add_cc_subtitles_55f0394e": { "message": "添加副本/字幕" },
   "add_image_60b2de07": { "message": "添加影像" },
+  "add_one_9e34a6f8": { "message": "添加一個！" },
   "additional_considerations_f3801683": { "message": "其他考慮因素" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "URL 相同的相鄰連結應為單一連結。"
@@ -599,13 +600,25 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "並無偵察任何可訪問性問題。"
   },
+  "no_announcements_created_yet_c44a94f4": { "message": "尚未建立通告。" },
+  "no_announcements_found_20185afc": { "message": "找不到通告。" },
+  "no_assignments_created_yet_1b236d87": { "message": "尚未建立作業列表。" },
+  "no_assignments_found_79e46d7f": { "message": "找不到作業列表。" },
   "no_changes_to_save_d29f6e91": { "message": "沒有要儲存的變更。" },
+  "no_discussions_created_yet_ff99abe3": { "message": "尚未建立討論區。" },
+  "no_discussions_found_9284063b": { "message": "找不到討論區。" },
   "no_e16d9132": { "message": "否" },
   "no_file_chosen_9a880793": { "message": "未選擇檔案" },
   "no_headers_9bc7dc7f": { "message": "無標題" },
+  "no_modules_created_yet_c71b6d4d": { "message": "尚未建立單元。" },
+  "no_modules_found_2df43a40": { "message": "找不到單元。" },
+  "no_pages_created_yet_c379fa6e": { "message": "尚未創建任何頁面。" },
+  "no_pages_found_6799350": { "message": "找不到頁面。" },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "本檔案不支援預覽。"
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "尚未建立測驗。" },
+  "no_quizzes_found_c80c537a": { "message": "找不到測驗。" },
   "no_results_940393cf": { "message": "無結果。" },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "找不到 { filterTerm } 的結果"

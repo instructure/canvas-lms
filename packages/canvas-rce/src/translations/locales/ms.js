@@ -32,6 +32,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Tambah yang lain" },
   "add_cc_subtitles_55f0394e": { "message": "Tambah CC/Sari Kata" },
   "add_image_60b2de07": { "message": "Tambah Imej" },
+  "add_one_9e34a6f8": { "message": "Tambah satu!" },
   "additional_considerations_f3801683": { "message": "Pertimbangan tambahan" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Pautan berhampiran dengan URL yang sama sepatutnya dijadikan pautan tunggal."
@@ -664,13 +665,31 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Tiada isu kebolehcapaian dikesan."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Belum ada pengumuman dicipta."
+  },
+  "no_announcements_found_20185afc": { "message": "Tiada pengumuman ditemui." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Belum ada tugasan dicipta."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Tiada tugasan ditemui." },
   "no_changes_to_save_d29f6e91": { "message": "Tiada perubahan disimpan." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Belum ada perbincangan dicipta."
+  },
+  "no_discussions_found_9284063b": { "message": "Tiada perbincangan ditemui." },
   "no_e16d9132": { "message": "Tidak" },
   "no_file_chosen_9a880793": { "message": "Tiada fail dipilih" },
   "no_headers_9bc7dc7f": { "message": "Tiada pengepala" },
+  "no_modules_created_yet_c71b6d4d": { "message": "Belum ada modul dicipta." },
+  "no_modules_found_2df43a40": { "message": "Tiada modul ditemui." },
+  "no_pages_created_yet_c379fa6e": { "message": "Belum ada halaman dicipta." },
+  "no_pages_found_6799350": { "message": "Tiada halaman ditemui." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Tiada pratonton tersedia untuk fail ini."
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "Belum ada kuiz dicipta." },
+  "no_quizzes_found_c80c537a": { "message": "Tiada kuiz dicipta." },
   "no_results_940393cf": { "message": "Tiada hasil." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Tiada hasil ditemui untuk { filterTerm }"

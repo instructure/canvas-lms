@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Aggiungi un altro" },
   "add_cc_subtitles_55f0394e": { "message": "Aggiungi CC/Sottotitoli" },
   "add_image_60b2de07": { "message": "Aggiungi Immagine" },
+  "add_one_9e34a6f8": { "message": "Aggiungine uno." },
   "additional_considerations_f3801683": {
     "message": "Ulteriori considerazioni"
   },
@@ -689,13 +690,39 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Nessun problema di accessibilità rilevato."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Nessun annuncio ancora creato."
+  },
+  "no_announcements_found_20185afc": { "message": "Nessun annuncio trovato." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Nessun compito ancora creato."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Nessun compito trovato." },
   "no_changes_to_save_d29f6e91": { "message": "Nessuna modifica da salvare." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Nessuna discussione ancora creata."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Nessuna discussione trovata."
+  },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "Nessun file scelto" },
   "no_headers_9bc7dc7f": { "message": "Nessuna intestazione" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Nessun modulo ancora creato."
+  },
+  "no_modules_found_2df43a40": { "message": "Nessun modulo trovato." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Nessuna pagina ancora creata."
+  },
+  "no_pages_found_6799350": { "message": "Nessuna pagina trovata." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Nessuna anteprima disponibile per questo file."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Nessun quiz ancora creato."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Nessun quiz trovato." },
   "no_results_940393cf": { "message": "Nessun risultato." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Nessun risultato trovato per { filterTerm }"

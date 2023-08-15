@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Legg til en annen" },
   "add_cc_subtitles_55f0394e": { "message": "Legg til CC/Undertekst" },
   "add_image_60b2de07": { "message": "Legg til bilde" },
+  "add_one_9e34a6f8": { "message": "Legg til én!" },
   "additional_considerations_f3801683": { "message": "Ekstra hensyn" },
   "adjacent_links_with_the_same_url_should_be_a_singl_7a1f7f6c": {
     "message": "Lenker ved siden av hverandre med samme URL bør være samme lenke."
@@ -661,13 +662,37 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Ingen tiljengelighetsproblemer ble oppdaget."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Ingen kunngjøring opprettet ennå."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Ingen kunngjøringer funnet."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Ingen oppgave opprettet ennå."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Ingen oppgaver funnet." },
   "no_changes_to_save_d29f6e91": { "message": "Ingen endringer å lagre." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Ingen diskusjoner opprettet ennå."
+  },
+  "no_discussions_found_9284063b": { "message": "Ingen diskusjoner funnet." },
   "no_e16d9132": { "message": "Nei" },
   "no_file_chosen_9a880793": { "message": "Ingen fil valgt" },
   "no_headers_9bc7dc7f": { "message": "Ingen titler" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Ingen moduler opprettet ennå."
+  },
+  "no_modules_found_2df43a40": { "message": "Ingen moduler funnet." },
+  "no_pages_created_yet_c379fa6e": { "message": "Ingen sider opprettet ennå." },
+  "no_pages_found_6799350": { "message": "Ingen sider funnet." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Ingen forhåndsvisning er tilgjengelig for denne filen."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Ingen quizer opprettet ennå."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Ingen quizer funnet." },
   "no_results_940393cf": { "message": "Ingen resultater." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Ingen resultat funnet for { filterTerm }"

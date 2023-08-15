@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Einen weiteren hinzufügen" },
   "add_cc_subtitles_55f0394e": { "message": "CC / Untertitel hinzufügen" },
   "add_image_60b2de07": { "message": "Bild hinzufügen" },
+  "add_one_9e34a6f8": { "message": "Eine hinzufügen!" },
   "additional_considerations_f3801683": {
     "message": "Zusätzliche Überlegungen"
   },
@@ -665,15 +666,43 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Es wurden keine Zugangsprobleme festgestellt."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Es wurden noch keine Ankündigungen erstellt."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "Keine Ankündigungen gefunden."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Es wurden noch keine Aufgaben erstellt."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Keine Aufgaben gefunden." },
   "no_changes_to_save_d29f6e91": {
     "message": "Keine Änderungen zu speichern."
+  },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Es wurden noch keine Diskussionen erstellt."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "Keine Diskussionen gefunden."
   },
   "no_e16d9132": { "message": "Nein" },
   "no_file_chosen_9a880793": { "message": "Keine Datei ausgewählt" },
   "no_headers_9bc7dc7f": { "message": "Keine Header" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Es wurden noch keine Module erstellt."
+  },
+  "no_modules_found_2df43a40": { "message": "Keine Module gefunden." },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Es wurden noch keine Seiten erstellt."
+  },
+  "no_pages_found_6799350": { "message": "Keine Seiten gefunden." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Für diese Datei ist keine Vorschau verfügbar."
   },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Es wurden noch keine Quizze erstellt."
+  },
+  "no_quizzes_found_c80c537a": { "message": "Keine Quizze gefunden." },
   "no_results_940393cf": { "message": "Keine Ergebnisse." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Es wurden keine Ergebnisse für { filterTerm } gefunden."
