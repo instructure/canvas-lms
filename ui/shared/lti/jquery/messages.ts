@@ -26,7 +26,7 @@ import {
 } from '@canvas/rce/plugins/canvas_mentions/constants'
 import {LtiMessageHandler} from './lti_message_handler'
 import buildResponseMessages from './response_messages'
-import {getKey, hasKey} from './util'
+import {getKey, hasKey, deleteKey} from './util'
 
 // page-global storage for data relevant to LTI postMessage events
 const ltiState: {
@@ -56,13 +56,16 @@ const SUBJECT_ALLOW_LIST = [
   'toggleCourseNavigationMenu',
 ] as const
 
-type SubjectId = typeof SUBJECT_ALLOW_LIST[number]
+type SubjectId = (typeof SUBJECT_ALLOW_LIST)[number]
 
 const isAllowedSubject = (subject: unknown): subject is SubjectId =>
   typeof subject === 'string' && (SUBJECT_ALLOW_LIST as ReadonlyArray<string>).includes(subject)
 
 const isIgnoredSubject = (subject: unknown): subject is SubjectId =>
   typeof subject === 'string' && (SUBJECT_IGNORE_LIST as ReadonlyArray<string>).includes(subject)
+
+const isUnsupportedInRCE = (subject: unknown): subject is SubjectId =>
+  typeof subject === 'string' && (UNSUPPORTED_IN_RCE as ReadonlyArray<string>).includes(subject)
 
 // These are handled elsewhere so ignore them
 const SUBJECT_IGNORE_LIST = [
@@ -75,6 +78,14 @@ const SUBJECT_IGNORE_LIST = [
   MENTIONS_SELECTION_MESSAGE,
   'betterchat.is_mini_chat',
   'defaultToolContentReady',
+] as const
+
+const UNSUPPORTED_IN_RCE = [
+  'lti.frameResize',
+  'lti.enableScrollEvents',
+  'lti.scrollToTop',
+  'lti.setUnloadMessage',
+  'lti.removeUnloadMessage',
 ] as const
 
 const isObject = (u: unknown): u is object => {
@@ -101,7 +112,7 @@ const isDevtoolMessageData = (data: unknown): boolean => {
  * code that was present in the previous style. It may not be necessary.
  */
 const handlers: Record<
-  typeof SUBJECT_ALLOW_LIST[number],
+  (typeof SUBJECT_ALLOW_LIST)[number],
   () => Promise<{default: LtiMessageHandler<any>}>
 > = {
   'lti.enableScrollEvents': () => import(`./subjects/lti.enableScrollEvents`),
@@ -151,7 +162,20 @@ async function ltiMessageHandler(
     return false
   }
 
-  const targetWindow = e.source as Window
+  // the RCE (via TinyMCE) presents its editor box in an iframe
+  // and sends along the window name in the message for explicit
+  // identification
+  const nameFromMessage = getKey('frameName', message) as string
+  deleteKey('frameName', message)
+
+  const isFromRce = !!nameFromMessage
+  let targetWindow = e.source as Window
+  // insanely weird behavior where sending a message from the RCE iframe
+  // makes 'source' the parent Canvas window, only present in some browsers
+  if (targetWindow === window && isFromRce) {
+    // @ts-ignore TS7015 - it's ok to access frames by name not index
+    targetWindow = window.frames[nameFromMessage]
+  }
 
   // look at messageType for backwards compatibility
   const subject = getKey('subject', message) || getKey('messageType', message)
@@ -168,6 +192,11 @@ async function ltiMessageHandler(
     return false
   } else if (!isAllowedSubject(subject)) {
     responseMessages.sendUnsupportedSubjectError()
+    return false
+  } else if (isUnsupportedInRCE(subject) && isFromRce) {
+    // Since tools launched from within an active RCE are inside a nested
+    // iframe, some subjects can't find the tool frame and so are not supported
+    responseMessages.sendUnsupportedSubjectError('Not supported inside Rich Content Editor')
     return false
   } else if (platformStorageFeatureFlag && subject.includes('org.imsglobal.')) {
     responseMessages.sendUnsupportedSubjectError()

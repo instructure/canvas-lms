@@ -64,7 +64,7 @@ function unloadMessage(message = 'unload message') {
   }
 }
 
-function postMessageEvent(data, source) {
+function postMessageEvent(data, source = {postMessage: () => {}}) {
   return {
     data: JSON.stringify(data),
     source,
@@ -93,9 +93,10 @@ QUnit.module('Messages', suiteHooks => {
     `)
     const el = $('#content-wrapper')
     const toolContentWrapper = el.find('.tool_content_wrapper')
+    const iframe = $('iframe')
 
     equal(toolContentWrapper.height(), 100)
-    await ltiMessageHandler(postMessageEvent(resizeMessage))
+    await ltiMessageHandler(postMessageEvent(resizeMessage), iframe[0].contentWindow)
     equal(toolContentWrapper.height(), finalHeight)
   })
 

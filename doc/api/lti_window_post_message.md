@@ -51,9 +51,6 @@ Messages sent by a tool that has been launched from a Canvas mobile app will not
 
 ## lti.capabilities
 
-**Note: the LTI Platform Storage spec is still under final review before publishing**
-**as of January 2023, and so the specifics of this message are subject to change.**
-
 **At one point, this message type was named 'org.imsglobal.lti.capabilities', but the prefix**
 **was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
 
@@ -78,9 +75,6 @@ window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 
 ## lti.put_data
 
-**Note: the LTI Platform Storage spec is still under final review before publishing**
-**as of January 2023, and so the specifics of this message are subject to change.**
-
 **At one point, this message type was named 'org.imsglobal.lti.put_data', but the prefix**
 **was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
 
@@ -90,9 +84,22 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-as defined [here](file.lti_dev_key_config.html#step-2). Currently, Canvas does not yet
-support this use case, and the wildcard origin `*` should still be used. Full support for the target
-origin will be enabled on August 19, 2023 (July 17 for Beta), as described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677).
+as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
+is the entity receiving the message. To enable this feature, Canvas also requires that messages
+with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
+Full support for this method of sending this message will be enabled on August 19, 2023 (July 17 for Beta), as
+described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677). For now, tools are still allowed
+to send this message directly to the parent window and use the wildcard `*` origin.
+
+All LTI login and launch requests include the `lti_storage_target` parameter, which signals to the
+tool which frame should receive these messages. The default value is `_parent`, which means messages
+should be sent to `window.parent`. When the value is something else (like `post_message_forwarding`),
+the tool should send message to the frame with that name present at `window.parent.frames[lti_storage_target]`.
+
+**Note:** When a tool is launched from within an active RCE (Rich Content Editor) this sibling
+frame may not be available, since the RCE uses an iframe to represent the editor box. If the
+message sent to this frame using this origin doesn't receive a timely response, the tool should
+fall back to sending the message to the parent window using the wildcard `*` origin.
 
 **Required properties:**
 
@@ -109,6 +116,16 @@ Returned postMessage includes the following properties:
 - message_id: the same message_id provided in the initial message
 
 ```js
+window.parent.frames['post_message_forwarding'].postMessage(
+  {
+    subject: 'lti.put_data',
+    key: 'hello',
+    value: 'world',
+    message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f',
+  },
+  'http://sso.canvaslms.com'
+)
+
 window.parent.postMessage(
   {
     subject: 'lti.put_data',
@@ -122,9 +139,6 @@ window.parent.postMessage(
 
 ## lti.get_data
 
-**Note: the LTI Platform Storage spec is still under final review before publishing**
-**as of January 2023, and so the specifics of this message are subject to change.**
-
 **At one point, this message type was named 'org.imsglobal.lti.get_data', but the prefix**
 **was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
 
@@ -134,9 +148,22 @@ only stored in the user's browser, and is short-lived. Part of the LTI Platform 
 defined [here](https://www.imsglobal.org/spec/lti-pm-s/v0p1).
 
 The spec requires that this message's target origin be set to the platform's OIDC Authorization url
-as defined [here](file.lti_dev_key_config.html#step-2). Currently, Canvas does not yet
-support this use case, and the wildcard origin `*` should still be used. Full support for the target
-origin will be enabled on August 19, 2023 (July 17 for Beta), as described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677).
+as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
+is the entity receiving the message. To enable this feature, Canvas also requires that messages
+with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
+Full support for this method of sending this message will be enabled on August 19, 2023 (July 17 for Beta), as
+described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677). For now, tools are still allowed
+to send this message directly to the parent window and use the wildcard `*` origin.
+
+All LTI login and launch requests include the `lti_storage_target` parameter, which signals to the
+tool which frame should receive these messages. The default value is `_parent`, which means messages
+should be sent to `window.parent`. When the value is something else (like `post_message_forwarding`),
+the tool should send message to the frame with that name present at `window.parent.frames[lti_storage_target]`.
+
+**Note:** When a tool is launched from within an active RCE (Rich Content Editor) this sibling
+frame may not be available, since the RCE uses an iframe to represent the editor box. If the
+message sent to this frame using this origin doesn't receive a timely response, the tool should
+fall back to sending the message to the parent window using the wildcard `*` origin.
 
 **Required properties:**
 
@@ -152,6 +179,15 @@ Returning postMessage includes the following properties:
 - message_id: the same message_id provided in the initial message
 
 ```js
+window.parent.frames['post_message_forwarding'].postMessage(
+  {
+    subject: 'lti.get_data',
+    key: 'hello',
+    message_id: '14556a4f-e9af-43f7-bd1f-d3e260d05a9f',
+  },
+  'http://sso.canvaslms.com'
+)
+
 window.parent.postMessage(
   {
     subject: 'lti.get_data',

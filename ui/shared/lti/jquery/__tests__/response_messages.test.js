@@ -175,4 +175,13 @@ describe('response_messages', () => {
       code: 'unsupported_subject',
     })
   })
+
+  describe('sendUnsupportedSubjectError with message', () => {
+    const message = 'wrong context'
+
+    expectCodeAndMessageInError({
+      subject: builder => builder.sendUnsupportedSubjectError(message),
+      code: 'unsupported_subject',
+    })
+  })
 })
