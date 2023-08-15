@@ -15,6 +15,12 @@ base_gems = Gem.loaded_specs.keys.to_set
 
 require "shellwords"
 
+output = `git status --porcelain --untracked=no`.strip
+unless output.empty?
+  warn "git status is not clean; please commit or stash your changes first"
+  exit 1
+end
+
 config = YAML.safe_load_file(File.expand_path("bundle_update_config.yml", __dir__))
 ignored_gems = config["ignored_gems"].to_set
 cohort_gems = config["cohort_gems"]
@@ -90,6 +96,11 @@ until gems_to_update.empty?
   puts "Updating #{parent_gem || gem}..."
 
   system("bundle update #{gem} --quiet")
+
+  unless $?.success?
+    system("git reset --hard HEAD > #{IO::NULL}")
+    next
+  end
 
   output = `git status --porcelain --untracked=no`.strip
   # couldn't update; should have warned anyway
