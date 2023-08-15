@@ -142,7 +142,7 @@ gem "week_of_month",
     ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
 gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 
-gem "faraday", "0.17.4"
+gem "faraday", "~> 0.17"
 
 path "../gems" do
   gem "activesupport-suspend_callbacks"
