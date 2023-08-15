@@ -56,3 +56,9 @@ export function hasKey<K extends string, T extends object>(
 export function getKey(key: string, o: unknown): unknown {
   return typeof o === 'object' && o !== null && hasKey(key, o) ? o[key] : undefined
 }
+
+export function deleteKey(key: string, o: unknown): void {
+  if (typeof o === 'object' && o !== null && hasKey(key, o)) {
+    delete o[key]
+  }
+}

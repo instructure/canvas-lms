@@ -1010,7 +1010,72 @@ class RCEWrapper extends React.Component {
 
     this.fixToolbarKeyboardNavigation()
 
+    this.forwardPostMessages()
+
     this.props.onInitted?.(editor)
+  }
+
+  static editorFrameName = 'active_rce_frame'
+
+  /**
+   * Forwards postMessages from child frames, like LTI tools
+   * embedded in the editor, to the parent frame.
+   * Also forwards response postMessages from the parent
+   * back to the child frame that sent it.
+   *
+   * Initializes message listener.
+   */
+  forwardPostMessages = () => {
+    const windowReferences = {}
+    const rceWindow = this.editor.getWin()
+    // explicitly assign name for reference by parent window
+    rceWindow.name = `${RCEWrapper.editorFrameName}_${this.id}`
+
+    rceWindow.addEventListener(
+      'message',
+      this.forwardPostMessagesHandler(rceWindow, windowReferences)
+    )
+  }
+
+  /**
+   * Forwards postMessages from child frames, like LTI tools
+   * embedded in the editor, to the parent frame.
+   * Also forwards response postMessages from the parent
+   * back to the child frame that sent it.
+   * Requires that the message data is an object, since it attaches
+   * `toolOrigin` to it. Uses `toolOrigin` on response messages
+   * to determine which child frame should get the message.
+   *
+   * Actual handler function with parameters passed for testing.
+   */
+  forwardPostMessagesHandler = (rceWindow, windowReferences) => e => {
+    let message
+    try {
+      message = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
+    } catch (err) {
+      // unparseable message may not be meant for our handlers
+      return false
+    }
+
+    if (e.origin === rceWindow.origin) {
+      // message is from Canvas window, forward to tool
+      const targetOrigin = message.toolOrigin
+      if (!targetOrigin) {
+        return false
+      }
+
+      const targetWindow = windowReferences[targetOrigin]
+      delete message.toolOrigin
+
+      targetWindow?.postMessage(message, targetOrigin)
+    } else {
+      // message is from tool, forward to Canvas window
+      windowReferences[e.origin] = e.source
+      message.toolOrigin = e.origin
+      message.frameName = rceWindow.name
+
+      rceWindow.parent.postMessage(message, rceWindow.origin)
+    }
   }
 
   /**

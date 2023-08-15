@@ -122,6 +122,54 @@ describe('ltiMessageHander', () => {
     })
   })
 
+  describe('when message is sent from tool in active RCE', () => {
+    const frameName = 'active_rce_frame'
+    const source = {name: frameName, postMessage: jest.fn()}
+
+    beforeAll(() => {
+      // the RCE iframe is now named and so can be
+      // directly referenced from the parent window
+      global.frames[frameName] = source
+    })
+
+    afterAll(() => {
+      delete global.frames[frameName]
+    })
+
+    it('processes message', async () => {
+      const event = postMessageEvent({subject: 'lti.showAlert', frameName}, null, source)
+      expect(await ltiMessageHandler(event)).toBe(true)
+    })
+
+    describe('when subject is not supported in active RCE', () => {
+      it('does not process message', async () => {
+        const event = postMessageEvent({subject: 'lti.scrollToTop', frameName}, null, source)
+        expect(await ltiMessageHandler(event)).toBe(false)
+      })
+
+      it('sends unsupported subject response with some context', async () => {
+        const event = postMessageEvent({subject: 'lti.scrollToTop', frameName}, null, source)
+        expect(event.source.postMessage).toHaveBeenCalledWith(
+          expect.objectContaining({
+            error: {
+              code: 'unsupported_subject',
+              message: 'Not supported inside Rich Content Editor',
+            },
+          }),
+          null
+        )
+      })
+    })
+
+    describe('when browser bug means event source is the parent window', () => {
+      it('still sends message to RCE window', async () => {
+        const event = postMessageEvent({subject: 'lti.showAlert', frameName}, null, window)
+        expect(await ltiMessageHandler(event)).toBe(true)
+        expect(source.postMessage).toHaveBeenCalled()
+      })
+    })
+  })
+
   describe('response messages', () => {
     describe('when message handler succeeds', () => {
       afterEach(() => {

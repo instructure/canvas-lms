@@ -1150,4 +1150,124 @@ describe('RCEWrapper', () => {
       })
     })
   })
+
+  describe('#forwardPostMessages', () => {
+    it('sets name on window object', () => {
+      createMountedElement()
+      expect(rce.editor.getWin().name).toBe(`${RCEWrapper.editorFrameName}_${rce.id}`)
+    })
+  })
+
+  describe('#forwardPostMessagesHandler', () => {
+    let rceWindow, windowReferences, origin, source, message
+
+    beforeEach(() => {
+      createMountedElement()
+    })
+
+    const subject = () =>
+      rce.forwardPostMessagesHandler(rceWindow, windowReferences)({data: message, origin, source})
+
+    describe('when message is not JSON string or JS object', () => {
+      beforeEach(() => {
+        message = 'abcdefghi'
+      })
+
+      it('returns false', () => {
+        expect(subject()).toBe(false)
+      })
+    })
+
+    describe('with message from child to parent', () => {
+      beforeEach(() => {
+        rceWindow = {
+          origin: 'https://parent.domain.com',
+          name: 'active_rce_frame_myUniqId',
+          parent: {
+            postMessage: jest.fn(),
+          },
+        }
+        windowReferences = {}
+        message = {subject: 'hello_world', key: 'value'}
+        origin = 'https://test.tool.com'
+        source = {
+          postMessage: jest.fn(),
+        }
+      })
+
+      it('stores source window keyed by origin', () => {
+        subject()
+        expect(windowReferences[origin]).toBe(source)
+      })
+
+      it('posts message to top parent', () => {
+        subject()
+        expect(rceWindow.parent.postMessage).toHaveBeenCalled()
+      })
+
+      it('attaches origin and frameName to message', () => {
+        subject()
+        expect(rceWindow.parent.postMessage).toHaveBeenCalledWith(
+          {...message, toolOrigin: origin, frameName: 'active_rce_frame_myUniqId'},
+          expect.anything()
+        )
+      })
+
+      it('addresses message to parent domain', () => {
+        subject()
+        expect(rceWindow.parent.postMessage).toHaveBeenCalledWith(
+          expect.anything(),
+          rceWindow.origin
+        )
+      })
+    })
+
+    describe('with message from parent to child', () => {
+      beforeEach(() => {
+        message = {subject: 'hello_world', key: 'value', toolOrigin: 'https://test.tool.com'}
+        rceWindow = {
+          origin: 'https://parent.domain.com',
+          name: 'active_rce_frame_myUniqId',
+          parent: {
+            postMessage: jest.fn(),
+          },
+        }
+        origin = 'https://parent.domain.com'
+        source = {
+          postMessage: jest.fn(),
+        }
+        windowReferences = {
+          'https://test.tool.com': source,
+        }
+      })
+
+      describe('when message has no toolOrigin', () => {
+        beforeEach(() => {
+          message = {subject: 'hello_world', key: 'value'}
+        })
+
+        it('returns false', () => {
+          expect(subject()).toBe(false)
+        })
+      })
+
+      it('posts message to source window', () => {
+        subject()
+        expect(source.postMessage).toHaveBeenCalled()
+      })
+
+      it('addresses message to toolOrigin', () => {
+        subject()
+        expect(source.postMessage).toHaveBeenCalledWith(expect.anything(), 'https://test.tool.com')
+      })
+
+      it('removes toolOrigin from message', () => {
+        subject()
+        expect(source.postMessage).toHaveBeenCalledWith(
+          {subject: 'hello_world', key: 'value'},
+          expect.anything()
+        )
+      })
+    })
+  })
 })
