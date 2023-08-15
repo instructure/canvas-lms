@@ -536,21 +536,34 @@ describe GradebookExporter do
       describe "with grading periods" do
         describe "assignments in the selected grading period are exported" do
           describe "export entire gradebook" do
-            before do
-              @csv = exporter(grading_period_id: @last_period.id).to_csv
-              @rows = CSV.parse(@csv, headers: true)
-              @headers = @rows.headers
+            let(:headers) do
+              csv = exporter(grading_period_id: @last_period.id, current_view: false).to_csv
+              CSV.parse(csv, headers: true).headers
             end
 
             it "exports assignments from all grading periods" do
-              expect(@headers).to include @no_due_date_assignment.title_with_id,
-                                          @current_assignment.title_with_id,
-                                          @past_assignment.title_with_id,
-                                          @future_assignment.title_with_id
+              expect(headers).to include @no_due_date_assignment.title_with_id,
+                                         @current_assignment.title_with_id,
+                                         @past_assignment.title_with_id,
+                                         @future_assignment.title_with_id
             end
 
-            it "does not export totals columns" do
-              expect(@headers).to_not include "Final Score (#{@last_period.title})"
+            it "does not export totals columns when 'Display Totals for All Grading Periods' disabled" do
+              @group.update!(display_totals_for_all_grading_periods: false)
+              expect(headers).to_not include "Final Score"
+            end
+
+            it "does not throw an error when final grade override is enabled and not exporting totals, and there are hidden assignments" do
+              enable_final_grade_override!
+              @group.update!(display_totals_for_all_grading_periods: false)
+              assignment = @course.assignments.create!
+              assignment.ensure_post_policy(post_manually: true)
+              expect { headers }.not_to raise_error
+            end
+
+            it "exports totals columns when 'Display Totals for All Grading Periods' enabled" do
+              @group.update!(display_totals_for_all_grading_periods: true)
+              expect(headers).to include "Final Score"
             end
           end
 
