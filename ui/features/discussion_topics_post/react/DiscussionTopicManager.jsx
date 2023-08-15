@@ -370,7 +370,7 @@ const DiscussionTopicManager = props => {
                   <Mask onClick={() => closeView()} />
                 )}
                 <DrawerLayout.Content label="Splitscreen View Content">
-                  <View display="block" padding="medium medium 0 small" height="100vh">
+                <View display="block" padding="medium medium 0 small" height={isSplitScreenViewOpen ? "100vh" : "100%"}>
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}
