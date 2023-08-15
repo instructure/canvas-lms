@@ -162,7 +162,7 @@ describe('generateFrequencyRRULE', () => {
 
     it('daily event', () => {
       const result = generateFrequencyRRULE('daily', datetime)
-      expect(result).toEqual('FREQ=DAILY;INTERVAL=1;COUNT=200')
+      expect(result).toEqual('FREQ=DAILY;INTERVAL=1;COUNT=365')
     })
 
     it('weekly event', () => {
@@ -182,7 +182,7 @@ describe('generateFrequencyRRULE', () => {
 
     it('every-weekday event', () => {
       const result = generateFrequencyRRULE('every-weekday', datetime)
-      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=200')
+      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=260')
     })
 
     it('custom event', () => {
@@ -205,7 +205,7 @@ describe('generateFrequencyRRULE', () => {
 
     it('a daily event', () => {
       const result = generateFrequencyRRULE('daily', datetime)
-      expect(result).toEqual('FREQ=DAILY;INTERVAL=1;COUNT=200')
+      expect(result).toEqual('FREQ=DAILY;INTERVAL=1;COUNT=365')
     })
 
     it('a weekly event', () => {
@@ -225,7 +225,7 @@ describe('generateFrequencyRRULE', () => {
 
     it('a every-weekday event', () => {
       const result = generateFrequencyRRULE('every-weekday', datetime)
-      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=200')
+      expect(result).toEqual('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1;COUNT=260')
     })
 
     it('custom', () => {
@@ -238,7 +238,7 @@ describe('generateFrequencyRRULE', () => {
 describe('RRULEToFrequencyOptionValue', () => {
   it('returns daily for a matching rrule', () => {
     const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-    const rrule = 'FREQ=DAILY;INTERVAL=1;COUNT=200'
+    const rrule = 'FREQ=DAILY;INTERVAL=1;COUNT=365'
     expect(RRULEToFrequencyOptionValue(eventStart, rrule)).toEqual('daily')
   })
 
@@ -268,13 +268,13 @@ describe('RRULEToFrequencyOptionValue', () => {
 
   it('returns every-weekday for a matching rrule', () => {
     const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-    const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=200'
+    const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=260'
     expect(RRULEToFrequencyOptionValue(eventStart, rrule)).toEqual('every-weekday')
   })
 
   it('returns custom for an rrule with interval not 1', () => {
     const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
-    const rrule = 'FREQ=DAILY;INTERVAL=2;COUNT=200'
+    const rrule = 'FREQ=DAILY;INTERVAL=2;COUNT=365'
     expect(RRULEToFrequencyOptionValue(eventStart, rrule)).toEqual('saved-custom')
   })
 
