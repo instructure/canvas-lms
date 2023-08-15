@@ -45,7 +45,7 @@
     "clean": "rm -rf lib && yarn clean:es && rm -rf coverage && yarn demo:clean",
     "clean:es": "rm -rf es",
     "generate-svgs": "yarn build:es && node --experimental-modules scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js",
-    "publishToNpm": "scripts/publishToNpm.sh"
+    "publishToNpm": "scripts/publish_to_npm.sh"
   },
   "keywords": [
     "canvas",
