@@ -60,13 +60,13 @@ describe "Individual View Gradebook" do
     end
 
     it "prevents grading for the assignment before grades are posted" do
-      skip "unskip w/ EVAL-3355 BUG not disabling grade input for moderated muted assignment"
       EnhancedSRGB.visit(@course.id)
       EnhancedSRGB.select_student(@student1)
       EnhancedSRGB.select_assignment(@moderated_assignment)
-      scroll_into_view('[data-testid="student_and_assignment_grade"]')
+      scroll_into_view('[data-testid="student_and_assignment_grade_input"]')
 
       expect(EnhancedSRGB.main_grade_input.attribute("disabled")).to eq "true"
+      expect(EnhancedSRGB.excuse_checkbox.attribute("disabled")).to eq "true"
     end
 
     context "when grades are posted" do
