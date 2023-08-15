@@ -100,7 +100,7 @@ gem "net-pop", "0.1.1", require: false
 gem "net-smtp", "0.3.1", require: false
 gem "nokogiri", "~> 1.13.8", require: false # 1.14 breaks nokogiri-xmlsec
 gem "oauth", "~> 1.1", require: false
-gem "oauth2", "1.4.4", require: false
+gem "oauth2", "~> 1.4", require: false
 gem "oj", "3.10.16"
 gem "outrigger", "3.0.1"
 gem "parallel", "1.22.1", require: false
