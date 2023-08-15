@@ -54,9 +54,12 @@ export const ReplyPreview = ({...props}) => {
       render={responsiveProps => {
         const showTruncatedText = () => {
           return shouldShowTruncatedText && message.length > TRUNCATE_LENGTH ? (
-            <Text size={responsiveProps.textSize}>{`${message.slice(0, 165)} ...`}</Text>
+            <Text
+              size={responsiveProps.textSize}
+              dangerouslySetInnerHTML={{__html: `${message.slice(0, 165)} ...`}}
+            />
           ) : (
-            <Text size={responsiveProps.textSize}>{message}</Text>
+            <Text size={responsiveProps.textSize} dangerouslySetInnerHTML={{__html: message}} />
           )
         }
 
