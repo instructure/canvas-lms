@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armênio" },
   "belarusian_b2f19c76": { "message": "Bielorrusso" },
   "bulgarian_feccab7e": { "message": "Búlgaro" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "As legendas herdadas de um curso principal não podem ser removidas."
+  },
   "catalan_16f6b78f": { "message": "Catalão" },
   "chinese_111d37f6": { "message": "Chinês" },
   "chinese_simplified_7f0bd370": { "message": "Chinês simplificado" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Ucraniano" },
   "vietnamese_e7a76583": { "message": "Vietnamita" },
   "welsh_42ab94b1": { "message": "Galês" },
-  "yiddish_f96986df": { "message": "Iídiche" }
+  "yiddish_f96986df": { "message": "Iídiche" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Você pode substituir carregando um novo arquivo de legenda."
+  }
 }
 
 

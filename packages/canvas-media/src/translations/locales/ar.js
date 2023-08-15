@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "الأرمينية" },
   "belarusian_b2f19c76": { "message": "البيلاروسية" },
   "bulgarian_feccab7e": { "message": "البلغارية" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "لا يمكن إزالة التسميات التوضيحية الموروثة من مساق أصلي."
+  },
   "catalan_16f6b78f": { "message": "الكاتالونية" },
   "chinese_111d37f6": { "message": "الصينية" },
   "chinese_simplified_7f0bd370": { "message": "الصينية المبسطة" },
@@ -91,7 +94,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "الأوكرانية" },
   "vietnamese_e7a76583": { "message": "الفيتنامية" },
   "welsh_42ab94b1": { "message": "الويلزية" },
-  "yiddish_f96986df": { "message": "اليديشية" }
+  "yiddish_f96986df": { "message": "اليديشية" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "يمكنك استبداله بتحميل ملف تسمية توضيحية جديد."
+  }
 }
 
 

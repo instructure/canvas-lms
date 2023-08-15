@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armensk" },
   "belarusian_b2f19c76": { "message": "Hviterussisk" },
   "bulgarian_feccab7e": { "message": "Bulgarsk" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Bildetekster som er arvet fra et overordnet emne, kan ikke fjernes."
+  },
   "catalan_16f6b78f": { "message": "Katalansk" },
   "chinese_111d37f6": { "message": "Kinesisk" },
   "chinese_simplified_7f0bd370": { "message": "Forenklet kinesisk" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Ukrainsk" },
   "vietnamese_e7a76583": { "message": "Viatnemesisk" },
   "welsh_42ab94b1": { "message": "Walisisk" },
-  "yiddish_f96986df": { "message": "Jiddisk" }
+  "yiddish_f96986df": { "message": "Jiddisk" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Du kan erstatte den ved å laste opp en ny bildetekstfil."
+  }
 }
 
 

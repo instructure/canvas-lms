@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "armenščina" },
   "belarusian_b2f19c76": { "message": "beloruščina" },
   "bulgarian_feccab7e": { "message": "bolgarščina" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Napisov, podedovanih od nadrejenega predmeta, ni mogoče odstraniti."
+  },
   "catalan_16f6b78f": { "message": "katalonščina" },
   "chinese_111d37f6": { "message": "kitajščina" },
   "chinese_simplified_7f0bd370": { "message": "poenostavljena kitajščina" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "ukrajinščina" },
   "vietnamese_e7a76583": { "message": "vietnamščina" },
   "welsh_42ab94b1": { "message": "valižanščina" },
-  "yiddish_f96986df": { "message": "jidiš" }
+  "yiddish_f96986df": { "message": "jidiš" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Zamenjate ga lahko, tako da naložite novo datoteko z napisi."
+  }
 }
 
 
