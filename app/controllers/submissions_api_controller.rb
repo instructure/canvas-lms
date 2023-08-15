@@ -905,7 +905,7 @@ class SubmissionsApiController < ApplicationController
         end
 
         if submission.key?(:custom_grade_status_id)
-          custom_status = @context.root_account.custom_grade_statuses.active.find(submission[:custom_grade_status_id])
+          custom_status = @context.custom_grade_statuses.find(submission[:custom_grade_status_id])
         end
 
         @submissions.each do |sub|

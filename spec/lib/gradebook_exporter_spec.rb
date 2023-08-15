@@ -238,9 +238,25 @@ describe GradebookExporter do
 
         let_once(:override_headers) { expected_headers.push("Override Score") }
 
-        it "includes the Override Score and Override Grade headers when the course has a grading standard" do
+        it "includes Override Status" do
           actual_headers = CSV.parse(csv, headers: true).headers
-          expect(actual_headers).to match_array(override_headers.push("Override Grade"))
+          expect(actual_headers).to include "Override Status"
+        end
+
+        it "does not include Override Status when 'Custom Status Labels' is disabled" do
+          Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+          actual_headers = CSV.parse(csv, headers: true).headers
+          expect(actual_headers).not_to include "Override Status"
+        end
+
+        it "includes the Override Score when the course has a grading standard" do
+          actual_headers = CSV.parse(csv, headers: true).headers
+          expect(actual_headers).to include "Override Score"
+        end
+
+        it "includes the Override Grade headers when the course has a grading standard" do
+          actual_headers = CSV.parse(csv, headers: true).headers
+          expect(actual_headers).to include "Override Grade"
         end
 
         it "omits the Override Grade header when the course lacks a grading standard" do
@@ -904,26 +920,32 @@ describe GradebookExporter do
   end
 
   describe "#show_overall_totals" do
+    let(:now) { Time.zone.now }
     let(:enrollment) { @student.enrollments.find_by(course: @course) }
+    let(:student_row) { CSV.parse(exporter.to_csv, headers: true)[2] }
 
     before(:once) do
       student_in_course(course: @course, active_all: true)
-    end
+      @course.default_post_policy.update!(post_manually: true)
 
-    # this test is needed to guarantee the stubbing in the following specs on
-    # enrollment reflects reality and isn't a false positive.
-    it "includes the student enrollment in the course" do
-      exporter = GradebookExporter.new(@course, @teacher)
+      posted_graded_assignment = @course.assignments.create!(due_at: now, points_possible: 10)
+      posted_graded_assignment.grade_student(@student, score: 10, grader: @teacher)
+      posted_graded_assignment.post_submissions
 
-      expect(exporter).to receive(:enrollments_for_csv).with([enrollment]).and_call_original
-      exporter.to_csv
+      posted_ungraded_assignment = @course.assignments.create!(due_at: now, points_possible: 10)
+      posted_ungraded_assignment.post_submissions
+
+      unposted_graded_assignment = @course.assignments.create!(due_at: now, points_possible: 30)
+      unposted_graded_assignment.grade_student(@student, score: 24, grader: @teacher)
+
+      @course.assignments.create!(due_at: now, points_possible: 5)
     end
 
     context "when a grading period is present" do
       let(:group) { Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course) }
       let(:grading_period) do
         group.grading_periods.create!(
-          start_date: 1.week.ago, end_date: 1.week.from_now, title: "test period"
+          start_date: 1.week.ago(now), end_date: 1.week.from_now(now), title: "test period"
         )
       end
       let(:exporter) do
@@ -936,86 +958,57 @@ describe GradebookExporter do
         GradebookExporter.new(@course, @teacher, exporter_options)
       end
 
-      before do
-        allow(exporter).to receive(:enrollments_for_csv).and_return([enrollment])
+      it "includes the scores for the grading period" do
+        aggregate_failures do
+          expect(student_row["Current Score (#{grading_period.title})"]).to eq "100.00"
+          expect(student_row["Unposted Current Score (#{grading_period.title})"]).to eq "85.00"
+          expect(student_row["Final Score (#{grading_period.title})"]).to eq "18.18"
+          expect(student_row["Unposted Final Score (#{grading_period.title})"]).to eq "61.82"
+        end
       end
 
-      it "includes the computed current score for the grading period" do
-        expect(enrollment).to receive(:computed_current_score).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
+      it "includes the grades for the grading period" do
+        aggregate_failures do
+          expect(student_row["Current Grade (#{grading_period.title})"]).to eq "A"
+          expect(student_row["Unposted Current Grade (#{grading_period.title})"]).to eq "B"
+          expect(student_row["Final Grade (#{grading_period.title})"]).to eq "F"
+          expect(student_row["Unposted Final Grade (#{grading_period.title})"]).to eq "D-"
+        end
       end
 
-      it "includes the unposted current score for the grading period" do
-        expect(enrollment).to receive(:unposted_current_score).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the computed final score for the grading period" do
-        expect(enrollment).to receive(:computed_final_score).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the unposted final score for the grading period" do
-        expect(enrollment).to receive(:unposted_final_score).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the computed current grade for the grading period" do
-        expect(enrollment).to receive(:computed_current_grade).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the unposted current grade for the grading period" do
-        expect(enrollment).to receive(:unposted_current_grade).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the computed final grade for the grading period" do
-        expect(enrollment).to receive(:computed_final_grade).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the unposted final grade for the grading period" do
-        expect(enrollment).to receive(:unposted_final_grade).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the computed current points for the grading period" do
-        expect(enrollment).to receive(:computed_current_points).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
-      end
-
-      it "includes the computed final points for the grading period" do
-        expect(enrollment).to receive(:computed_final_points).with({ grading_period_id: grading_period.id })
-        exporter.to_csv
+      it "includes the points for the grading period" do
+        aggregate_failures do
+          expect(student_row["Current Points (#{grading_period.title})"]).to eq "10.00"
+          expect(student_row["Final Points (#{grading_period.title})"]).to eq "10.00"
+        end
       end
 
       context "when final grade override is enabled for the course" do
-        before { enable_final_grade_override! }
-
-        let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
+        before do
+          enable_final_grade_override!
+          custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+            name: "Potato",
+            color: "#964B00",
+            created_by: @teacher
+          )
+          enrollment.find_score(grading_period:).update!(override_score: 64.0, custom_grade_status:)
+        end
 
         it "includes the overridden score for the current grading period" do
-          aggregate_failures do
-            expect(enrollment).to receive(:override_score).with({ grading_period_id: grading_period.id }).and_return(64)
-            expect(parsed_csv[1]["Override Score (#{grading_period.title})"]).to eq("64")
-          end
+          expect(student_row["Override Score (#{grading_period.title})"]).to eq("64.0")
         end
 
         it "includes the overridden grade for the current grading period if the course has a grading standard" do
-          aggregate_failures do
-            expect(enrollment).to receive(:override_grade).with({ grading_period_id: grading_period.id }).and_return("D")
-            expect(parsed_csv[1]["Override Grade (#{grading_period.title})"]).to eq("D")
-          end
+          expect(student_row["Override Grade (#{grading_period.title})"]).to eq("D")
+        end
+
+        it "includes the override status for the current grading period" do
+          expect(student_row["Override Status (#{grading_period.title})"]).to eq "Potato"
         end
 
         it "omits the overridden grade for the current grading period if the course has no grading standard" do
           @course.update!(grading_standard_id: nil)
-
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_grade)
-            expect(parsed_csv.headers).not_to include("Override Grade")
-          end
+          expect(student_row).not_to have_key "Override Grade (#{grading_period.title})"
         end
       end
 
@@ -1023,40 +1016,25 @@ describe GradebookExporter do
         before do
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
+          enrollment.find_score(grading_period:).update!(override_score: 64.0)
         end
 
-        let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
-
         it "does not include the overridden score for the current grading period" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_score)
-            expect(parsed_csv.headers).not_to include("Override Score")
-          end
+          expect(student_row).not_to have_key "Override Score (#{grading_period.title})"
         end
 
         it "does not include the overridden grade for the current grading period" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_grade)
-            expect(parsed_csv.headers).not_to include("Override Grade")
-          end
+          expect(student_row).not_to have_key "Override Grade (#{grading_period.title})"
         end
       end
 
       context "when final grade override is not enabled for the course" do
-        let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
-
         it "does not include the overridden score for the current grading period" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_score)
-            expect(parsed_csv.headers).not_to include("Override Score")
-          end
+          expect(student_row).not_to have_key "Override Score (#{grading_period.title})"
         end
 
         it "does not include the overridden grade for the current grading period" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_grade)
-            expect(parsed_csv.headers).not_to include("Override Grade")
-          end
+          expect(student_row).not_to have_key "Override Grade (#{grading_period.title})"
         end
       end
     end
@@ -1064,75 +1042,52 @@ describe GradebookExporter do
     context "when no grading period is supplied" do
       let(:exporter) { GradebookExporter.new(@course, @teacher) }
 
-      before do
-        allow(exporter).to receive(:enrollments_for_csv).and_return([enrollment])
+      it "includes the scores for the grading period" do
+        aggregate_failures do
+          expect(student_row["Current Score"]).to eq "100.00"
+          expect(student_row["Unposted Current Score"]).to eq "85.00"
+          expect(student_row["Final Score"]).to eq "18.18"
+          expect(student_row["Unposted Final Score"]).to eq "61.82"
+        end
       end
 
-      it "includes the computed current score for the course" do
-        expect(enrollment).to receive(:computed_current_score).with(Score.params_for_course)
-        exporter.to_csv
-      end
-
-      it "includes the unposted current score for the course" do
-        expect(enrollment).to receive(:unposted_current_score).with(Score.params_for_course)
-        exporter.to_csv
-      end
-
-      it "includes the computed final score for the course" do
-        expect(enrollment).to receive(:computed_final_score).with(Score.params_for_course)
-        exporter.to_csv
-      end
-
-      it "includes the unposted final score for the course" do
-        expect(enrollment).to receive(:unposted_final_score).with(Score.params_for_course)
-        exporter.to_csv
-      end
-
-      it "includes the computed current grade for the course" do
-        expect(enrollment).to receive(:computed_current_grade).with(Score.params_for_course)
-        exporter.to_csv
-      end
-
-      it "includes the unposted current grade for the course" do
-        expect(enrollment).to receive(:unposted_current_grade).with(Score.params_for_course)
-        exporter.to_csv
-      end
-
-      it "includes the computed final grade for the course" do
-        expect(enrollment).to receive(:computed_final_grade).with(Score.params_for_course)
-        exporter.to_csv
-      end
-
-      it "includes the unposted final grade for the course" do
-        expect(enrollment).to receive(:unposted_final_grade).with(Score.params_for_course)
-        exporter.to_csv
+      it "includes the grades for the grading period" do
+        aggregate_failures do
+          expect(student_row["Current Grade"]).to eq "A"
+          expect(student_row["Unposted Current Grade"]).to eq "B"
+          expect(student_row["Final Grade"]).to eq "F"
+          expect(student_row["Unposted Final Grade"]).to eq "D-"
+        end
       end
 
       context "when final grade override is enabled for the course" do
-        before { enable_final_grade_override! }
+        before do
+          enable_final_grade_override!
+          custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+            name: "Potato",
+            color: "#964B00",
+            created_by: @teacher
+          )
+          enrollment.find_score.update!(override_score: 78.0, custom_grade_status:)
+        end
 
         let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
 
         it "includes the overridden score for the course" do
-          aggregate_failures do
-            expect(enrollment).to receive(:override_score).with(Score.params_for_course).and_return(78)
-            expect(parsed_csv[1]["Override Score"]).to eq("78")
-          end
+          expect(student_row["Override Score"]).to eq "78.0"
         end
 
         it "includes the overridden grade for the course" do
-          aggregate_failures do
-            expect(enrollment).to receive(:override_grade).with(Score.params_for_course).and_return("C+")
-            expect(parsed_csv[1]["Override Grade"]).to eq("C+")
-          end
+          expect(student_row["Override Grade"]).to eq "C+"
         end
 
         it "omits the overridden grade for the course if the course has no grading standard" do
           @course.update!(grading_standard_id: nil)
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_grade)
-            expect(parsed_csv.headers).not_to include("Override Grade")
-          end
+          expect(student_row).not_to have_key "Override Grade"
+        end
+
+        it "includes the override status for the course" do
+          expect(student_row["Override Status"]).to eq "Potato"
         end
       end
 
@@ -1142,38 +1097,22 @@ describe GradebookExporter do
           @course.update!(allow_final_grade_override: false)
         end
 
-        let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
-
         it "does not include the overridden score for the course" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_score)
-            expect(parsed_csv.headers).not_to include("Override Score")
-          end
+          expect(student_row).not_to have_key "Override Score"
         end
 
         it "does not include the overridden grade for the course" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_grade)
-            expect(parsed_csv.headers).not_to include("Override Grade")
-          end
+          expect(student_row).not_to have_key "Override Grade"
         end
       end
 
       context "when final grade override is not enabled for the course" do
-        let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
-
         it "does not include the overridden score for the course" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_score)
-            expect(parsed_csv.headers).not_to include("Override Score")
-          end
+          expect(student_row).not_to have_key "Override Score"
         end
 
         it "does not include the overridden grade for the course" do
-          aggregate_failures do
-            expect(enrollment).not_to receive(:override_grade)
-            expect(parsed_csv.headers).not_to include("Override Grade")
-          end
+          expect(student_row).not_to have_key "Override Grade"
         end
       end
     end

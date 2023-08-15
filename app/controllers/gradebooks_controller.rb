@@ -70,7 +70,7 @@ class GradebooksController < ApplicationController
              student_grade_summary_upgrade: Account.site_admin.feature_enabled?(:student_grade_summary_upgrade),
              can_clear_badge_counts: Account.site_admin.grants_right?(@current_user, :manage_students),
              POINTS_BASED_GRADING_SCHEMES_ENABLED: Account.site_admin.feature_enabled?(:points_based_grading_schemes),
-             custom_grade_statuses: @context.root_account.custom_grade_statuses.active.as_json(include_root: false)
+             custom_grade_statuses: @context.custom_grade_statuses.as_json(include_root: false)
            })
     return render :grade_summary_list unless @presenter.student
 
@@ -490,7 +490,7 @@ class GradebooksController < ApplicationController
     standard_status_hash = standard_statuses.pluck(:status_name, :color).to_h
     colors = standard_status_hash.merge!(gradebook_settings(:colors))
 
-    custom_grade_statuses = custom_grade_statuses_enabled ? root_account.custom_grade_statuses.active.as_json(include_root: false) : []
+    custom_grade_statuses = custom_grade_statuses_enabled ? @context.custom_grade_statuses.as_json(include_root: false) : []
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
@@ -1083,7 +1083,7 @@ class GradebooksController < ApplicationController
           ),
           course_id: @context.id,
           assignment_id: @assignment.id,
-          custom_grade_statuses: Account.site_admin.feature_enabled?(:custom_gradebook_statuses) ? @domain_root_account.custom_grade_statuses.active.as_json(include_root: false) : [],
+          custom_grade_statuses: Account.site_admin.feature_enabled?(:custom_gradebook_statuses) ? @context.custom_grade_statuses.as_json(include_root: false) : [],
           assignment_title: @assignment.title,
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: "full") : nil,
           nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
