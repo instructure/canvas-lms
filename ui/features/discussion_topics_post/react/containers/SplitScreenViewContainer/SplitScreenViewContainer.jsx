@@ -448,7 +448,7 @@ export const SplitScreenViewContainer = props => {
           goToTopic={props.goToTopic}
           isHighlighted={props.highlightEntryId === props.discussionEntryId}
         >
-          {props.RCEOpen && (
+          {props.RCEOpen && props.isTrayFinishedOpening && (
             <View
               display="block"
               background="primary"
@@ -582,6 +582,7 @@ SplitScreenViewContainer.propTypes = {
   relativeEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
+  isTrayFinishedOpening: PropTypes.bool,
 }
 
 export default SplitScreenViewContainer

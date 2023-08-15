@@ -93,6 +93,7 @@ describe('SplitScreenViewContainer', () => {
     goToTopic,
     setHighlightEntryId: jest.fn(),
     ...overrides,
+    isTrayFinishedOpening: true,
   })
 
   it('should render', () => {

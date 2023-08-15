@@ -111,6 +111,10 @@ const DiscussionTopicManager = props => {
 
   const [isGradedDiscussion, setIsGradedDiscussion] = useState(false)
 
+  // The DrawTray will cause the DiscussionEdit to mount first when it starts transitioning open, then un-mount and remount when it finishes opening
+  // With RCE Draft enabled, this causes the draft message to appear twice each time the RCE is mounted.
+  const [isTrayFinishedOpening, setIsTrayFinishedOpening] = useState(false)
+
   const discussionManagerUtilities = {
     replyFromId,
     setReplyFromId,
@@ -188,6 +192,7 @@ const DiscussionTopicManager = props => {
       setIsolatedViewOpen(false)
     }
     if (ENV.split_screen_view) {
+      setIsTrayFinishedOpening(false)
       setSplitScreenViewOpen(false)
     }
   }
@@ -362,7 +367,7 @@ const DiscussionTopicManager = props => {
                 }}
               >
                 {isSplitScreenViewOverlayed && isSplitScreenViewOpen && (
-                  <Mask onClick={() => setSplitScreenViewOpen(false)} />
+                  <Mask onClick={() => closeView()} />
                 )}
                 <DrawerLayout.Content label="Splitscreen View Content">
                   <View display="block" padding="medium medium 0 small" height="100vh">
@@ -449,7 +454,8 @@ const DiscussionTopicManager = props => {
                   label="Splitscreen View Tray"
                   open={isSplitScreenViewOpen}
                   placement="end"
-                  onDismiss={() => setSplitScreenViewOpen(false)}
+                  onEntered={() => setIsTrayFinishedOpening(true)}
+                  onDismiss={() => closeView()}
                   data-testid="drawer-layout-tray"
                 >
                   {ENV.split_screen_view && !ENV.isolated_view && threadParentEntryId && (
@@ -468,6 +474,7 @@ const DiscussionTopicManager = props => {
                         goToTopic={goToTopic}
                         highlightEntryId={highlightEntryId}
                         setHighlightEntryId={setHighlightEntryId}
+                        isTrayFinishedOpening={isTrayFinishedOpening}
                       />
                     </View>
                   )}
