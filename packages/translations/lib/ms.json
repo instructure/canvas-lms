@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Tambah Imej"
     },
+    "add_one_9e34a6f8": {
+        "message": "Tambah satu!"
+    },
     "additional_considerations_f3801683": {
         "message": "Pertimbangan tambahan"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Hadkan Produk"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Kapsyen yang diwarisi daripada kursus induk tidak boleh dialih keluar."
     },
     "catalan_16f6b78f": {
         "message": "Catalan"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Tiada isu kebolehcapaian dikesan."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Belum ada pengumuman dicipta."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Tiada pengumuman ditemui."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Belum ada tugasan dicipta."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Tiada tugasan ditemui."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Tiada perubahan disimpan."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Belum ada perbincangan dicipta."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Tiada perbincangan ditemui."
     },
     "no_e16d9132": {
         "message": "Tidak"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Tiada pengepala"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Belum ada modul dicipta."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Tiada modul ditemui."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Belum ada halaman dicipta."
+    },
+    "no_pages_found_6799350": {
+        "message": "Tiada halaman ditemui."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Tiada pratonton tersedia untuk fail ini."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Belum ada kuiz dicipta."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Tiada kuiz dicipta."
     },
     "no_results_940393cf": {
         "message": "Tiada hasil."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Bahasa Yiddish"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Anda boleh membuat gantian dengan memuat naik fail kapsyen baharu."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Anda mempunyai perubahan tidak disimpan dalam dulang Pembuat Ikon. Adakah anda ingin menerukan tanpa menyimpan perubahan ini?"

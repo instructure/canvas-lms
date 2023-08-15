@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Bæta við mynd"
     },
+    "add_one_9e34a6f8": {
+        "message": "Bæta einum við!"
+    },
     "additional_considerations_f3801683": {
         "message": "Auka umhugsunarefni"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Stafafeldi"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Ekki er hægt að fjarlægja skjátexta sem erfðir eru frá foreldrisnámskeiði."
     },
     "catalan_16f6b78f": {
         "message": "Katalónska"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Engin vandamál fundust varðandi aðgengileika."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Engar tilkynningar búnar til ennþá."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Engar tilkynningar fundust."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Engin verkefni búin til ennþá."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Engin verkefni fundust."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Engar breytingar til að vista."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Engar umræður búnar til ennþá."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Engar umræður fundust."
     },
     "no_e16d9132": {
         "message": "Nei"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Engir hausar"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Ekkert námsefni búið til ennþá."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Ekkert námsefni fannst."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Engar síður búnar til ennþá."
+    },
+    "no_pages_found_6799350": {
+        "message": "Engar síður fundust."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Engin forskoðun tiltæk fyrir þessa skrá."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Engin próf búin til ennþá."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Engin próf fundust."
     },
     "no_results_940393cf": {
         "message": "Engar niðurstöður."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddíska"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Þú getur skipt út með því að hlaða upp nýrri skjátextaskrá."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Þú ert með óvistaðar breytingar í Tákngerðar bakkanum. Viltu halda áfram án þess að vista þessar breytingar?"

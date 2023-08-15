@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Tāpiri Āhua"
     },
+    "add_one_9e34a6f8": {
+        "message": "Tāpiri kotahi!"
+    },
     "additional_considerations_f3801683": {
         "message": "Ētahi atu whakāro"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Hua potae"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Ko nga tapanga i tuku iho mai i te akoranga matua e kore e taea te tango."
     },
     "catalan_16f6b78f": {
         "message": "Catalan"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Kaore he whakaurunga take i kitea."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Kare ano he panui i hanga."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Karekau he panui i kitea."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Karekau he taumahi i hangaia."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Karekau he taumahi i kitea."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Kaore he huringa hei tiaki."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Karekau he korerorero i hanga."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Karekau he korerorero i kitea."
     },
     "no_e16d9132": {
         "message": "Kahore"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Kaore ngā pane"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Kaore ano kia hangahia nga waahanga."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Karekau he waahanga i kitea."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Anō No whārangi hanga."
+    },
+    "no_pages_found_6799350": {
+        "message": "Karekau he wharangi i kitea."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Ko te wātea hoki tēnei kōnae he arokite."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Kaore ano kia hangahia he patapatai."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Karekau he patapatai i kitea."
     },
     "no_results_940393cf": {
         "message": "Kaore he hua."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Yiddish"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Ka taea e koe te whakakapi ma te tuku i tetahi konae tapanga hou."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "He huringa kare ano koe i tiakina i roto i te Paepae Kaihanga Ata. Me haere tonu me te kore e tiaki i enei huringa?"

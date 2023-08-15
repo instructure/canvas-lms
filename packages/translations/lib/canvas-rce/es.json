@@ -14,6 +14,7 @@
   "add_another_f4e50d57": { "message": "Agregar otro" },
   "add_cc_subtitles_55f0394e": { "message": "Agregar CC/subtítulos" },
   "add_image_60b2de07": { "message": "Agregar imagen" },
+  "add_one_9e34a6f8": { "message": "Agregar uno." },
   "additional_considerations_f3801683": {
     "message": "Consideraciones adicionales"
   },
@@ -664,12 +665,46 @@
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "No se detectaron problemas de accesibilidad."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Todavía no se ha creado ningún anuncio."
+  },
+  "no_announcements_found_20185afc": {
+    "message": "No se han encontrado anuncios."
+  },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Todavía no se ha creado ninguna tarea."
+  },
+  "no_assignments_found_79e46d7f": { "message": "No encontramos tareas." },
   "no_changes_to_save_d29f6e91": { "message": "No hay cambios para guardar." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Todavía no se ha creado ningún debate."
+  },
+  "no_discussions_found_9284063b": {
+    "message": "No se ha encontrado ningún debate."
+  },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No se seleccionó ningún archivo" },
   "no_headers_9bc7dc7f": { "message": "Sin encabezados" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Todavía no se ha creado ningún módulo."
+  },
+  "no_modules_found_2df43a40": {
+    "message": "No se ha encontrado ningún módulo."
+  },
+  "no_pages_created_yet_c379fa6e": {
+    "message": "Todavía no se ha creado ninguna página."
+  },
+  "no_pages_found_6799350": {
+    "message": "No se ha encontrado ninguna página."
+  },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "La vista previa de este archivo no está disponible."
+  },
+  "no_quizzes_created_yet_1a2370b9": {
+    "message": "Todavía no se han creado evaluaciones."
+  },
+  "no_quizzes_found_c80c537a": {
+    "message": "No se han encontrado evaluaciones."
   },
   "no_results_940393cf": { "message": "No hay resultados." },
   "no_results_found_for_filterterm_ad1b04c8": {

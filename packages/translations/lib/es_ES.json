@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Añadir imagen"
     },
+    "add_one_9e34a6f8": {
+        "message": "Añadir uno"
+    },
     "additional_considerations_f3801683": {
         "message": "Consideraciones adicionales"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Producto cap"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Los subtítulos de un curso plantilla no se pueden eliminar."
     },
     "catalan_16f6b78f": {
         "message": "Catalán"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "No se han detectado problemas de accesibilidad."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Todavía no se ha creado ningún anuncio."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "No se han encontrado anuncios."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Todavía no se ha creado ninguna actividad."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "No se han encontrado actividades."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "No se han guardado los cambios."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Todavía no se ha creado ningún foro de discusión."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "No se han encontrado foros de discusión."
     },
     "no_e16d9132": {
         "message": "No"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Sin encabezados"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Todavía no se ha creado ningún módulo."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "No se han encontrado módulos."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Todavía no se ha creado ninguna página."
+    },
+    "no_pages_found_6799350": {
+        "message": "No se han encontrado páginas."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "La vista previa de este archivo no está disponible."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Todavía no se ha creado ninguna prueba."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "No se han encontrado pruebas."
     },
     "no_results_940393cf": {
         "message": "No hay resultados."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Yidis"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Lo puedes reemplazar al cargar un nuevo archivo de subtítulos."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Tienes cambios sin guardar en la bandeja del creador de iconos. ¿Quieres continuar sin guardar esos cambios?"

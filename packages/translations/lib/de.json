@@ -26,6 +26,9 @@
     "add_image_60b2de07": {
         "message": "Bild hinzufügen"
     },
+    "add_one_9e34a6f8": {
+        "message": "Eine hinzufügen!"
+    },
     "additional_considerations_f3801683": {
         "message": "Zusätzliche Überlegungen"
     },
@@ -211,6 +214,9 @@
     },
     "cap_product_3a5265a6": {
         "message": "Cap-Produkt"
+    },
+    "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+        "message": "Beschriftungen, die von einem übergeordneten Kurs geerbt wurden, können nicht entfernt werden."
     },
     "catalan_16f6b78f": {
         "message": "Katalanisch"
@@ -1427,8 +1433,26 @@
     "no_accessibility_issues_were_detected_f8d3c875": {
         "message": "Es wurden keine Zugangsprobleme festgestellt."
     },
+    "no_announcements_created_yet_c44a94f4": {
+        "message": "Es wurden noch keine Ankündigungen erstellt."
+    },
+    "no_announcements_found_20185afc": {
+        "message": "Keine Ankündigungen gefunden."
+    },
+    "no_assignments_created_yet_1b236d87": {
+        "message": "Es wurden noch keine Aufgaben erstellt."
+    },
+    "no_assignments_found_79e46d7f": {
+        "message": "Keine Aufgaben gefunden."
+    },
     "no_changes_to_save_d29f6e91": {
         "message": "Keine Änderungen zu speichern."
+    },
+    "no_discussions_created_yet_ff99abe3": {
+        "message": "Es wurden noch keine Diskussionen erstellt."
+    },
+    "no_discussions_found_9284063b": {
+        "message": "Keine Diskussionen gefunden."
     },
     "no_e16d9132": {
         "message": "Nein"
@@ -1439,8 +1463,26 @@
     "no_headers_9bc7dc7f": {
         "message": "Keine Header"
     },
+    "no_modules_created_yet_c71b6d4d": {
+        "message": "Es wurden noch keine Module erstellt."
+    },
+    "no_modules_found_2df43a40": {
+        "message": "Keine Module gefunden."
+    },
+    "no_pages_created_yet_c379fa6e": {
+        "message": "Es wurden noch keine Seiten erstellt."
+    },
+    "no_pages_found_6799350": {
+        "message": "Keine Seiten gefunden."
+    },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "Für diese Datei ist keine Vorschau verfügbar."
+    },
+    "no_quizzes_created_yet_1a2370b9": {
+        "message": "Es wurden noch keine Quizze erstellt."
+    },
+    "no_quizzes_found_c80c537a": {
+        "message": "Keine Quizze gefunden."
     },
     "no_results_940393cf": {
         "message": "Keine Ergebnisse."
@@ -2515,6 +2557,9 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"
+    },
+    "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+        "message": "Sie können sie durch das Hochladen einer neuen Untertiteldatei ersetzen."
     },
     "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
         "message": "Sie haben nicht gespeicherte Änderungen im Icon Maker-Fach. Möchten Sie fortfahren, ohne diese Änderungen zu speichern?"
