@@ -526,5 +526,3 @@ class SubmissionLifecycleManager
     end
   end
 end
-
-DueDateCacher = SubmissionLifecycleManager
