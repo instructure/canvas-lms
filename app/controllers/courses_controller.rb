@@ -3954,7 +3954,7 @@ class CoursesController < ApplicationController
       Canvas::ICU.collation_key(course_enrollments.first.course.nickname_for(@current_user))
     end
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
-    courses = enrollments_by_course.map(&:first).map(&:course)
+    courses = enrollments_by_course.map { |ces| ces.first.course }
     preloads = %i[account root_account]
     preload_teachers(courses) if includes.include?("teachers")
     preloads << :grading_standard if includes.include?("total_scores")

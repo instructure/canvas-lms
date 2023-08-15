@@ -79,7 +79,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
   end
 
   def self.find_all_for(user, contexts, channel: nil)
-    raise ArgumentError, "can only pass one type of context" if contexts.map(&:class).map(&:name).uniq.length > 1
+    raise ArgumentError, "can only pass one type of context" if contexts.uniq(&:class).length > 1
 
     if channel&.notification_policy_overrides&.loaded?
       loaded_policies_for(contexts, channel)

@@ -579,7 +579,7 @@ describe "Outcome Results API", type: :request do
       describe "user_ids parameter" do
         it "restricts results to specified users" do
           # api endpoint requires an array of strings
-          student_ids = outcome_students[0..1].map(&:id).map(&:to_s)
+          student_ids = outcome_students[0..1].map { |u| u.id.to_s }
           @user = @teacher
 
           api_call(:get,
@@ -632,7 +632,7 @@ describe "Outcome Results API", type: :request do
         end
 
         it "can take sis_user_ids" do
-          student_ids = outcome_students[0..1].map(&:id).map(&:to_s)
+          student_ids = outcome_students[0..1].map { |u| u.id.to_s }
           sis_id_student = outcome_students[2]
           pseudonym = pseudonym_model
           pseudonym.user_id = sis_id_student.id
@@ -864,7 +864,7 @@ describe "Outcome Results API", type: :request do
       end
 
       it "filters by outcome group id" do
-        outcome_ids = @outcome_group.child_outcome_links.map(&:content).map(&:id).sort
+        outcome_ids = @outcome_group.child_outcome_links.map(&:content_id).sort
         api_call(:get,
                  outcome_rollups_url(outcome_course, outcome_group_id: @outcome_group.id, include: ["outcomes"]),
                  controller: "outcome_results",
@@ -911,7 +911,7 @@ describe "Outcome Results API", type: :request do
         it "restricts aggregate to specified users" do
           outcome_students
           #  rollups api requires that user_ids is an array
-          student_id_str = outcome_students[0..1].map(&:id).map(&:to_s)
+          student_id_str = outcome_students[0..1].map { |u| u.id.to_s }
           @user = @teacher
           api_call(:get,
                    outcome_rollups_url(outcome_course, aggregate: "course", user_ids: student_id_str),

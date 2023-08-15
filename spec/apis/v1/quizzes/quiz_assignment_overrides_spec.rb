@@ -63,7 +63,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                       },
                       {
                         quiz_assignment_overrides: [{
-                          quiz_ids: [@quiz].map(&:id).map(&:to_s)
+                          quiz_ids: [@quiz.id.to_s]
                         }]
                       })
 
@@ -104,7 +104,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                       },
                       {
                         quiz_assignment_overrides: [{
-                          quiz_ids: [@quiz].map(&:id).map(&:to_s)
+                          quiz_ids: [@quiz.id.to_s]
                         }]
                       })
 
@@ -165,7 +165,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
                       },
                       {
                         quiz_assignment_overrides: [{
-                          quiz_ids: [@quiz].map(&:id).map(&:to_s)
+                          quiz_ids: [@quiz.id.to_s]
                         }]
                       })
 

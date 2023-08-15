@@ -1935,7 +1935,7 @@ describe ConversationsController, type: :request do
       api_call(:post,
                "/api/v1/conversations/#{real_conversation.id}/add_message",
                { controller: "conversations", action: "add_message", id: real_conversation.id.to_s, format: "json" },
-               { body: "ok", recipients: [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
+               { body: "ok", recipients: [@bob, @billy, @jane, @joe].map { |u| u.id.to_s } })
       real_conversation.reload
       new_message = real_conversation.conversation_messages.first
       expect(new_message.conversation_message_participants.size).to eq 4

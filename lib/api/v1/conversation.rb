@@ -27,7 +27,7 @@ module Api::V1::Conversation
     valid_convos = conversations.select(&:conversation)
     include_context_name = options.delete(:include_context_name)
     if include_context_name
-      context_names_by_type_and_id = Context.names_by_context_types_and_ids(valid_convos.map(&:conversation).map(&:context_components))
+      context_names_by_type_and_id = Context.names_by_context_types_and_ids(valid_convos.map { |cp| cp.conversation.context_components })
     end
     valid_convos.map do |c|
       result = conversation_json(c, current_user, session, options)

@@ -270,7 +270,7 @@ describe "admin_tools" do
         expect(select).not_to be_nil
         expect(select).to be_displayed
 
-        options = ffj("#loggingType > option").map(&:text).map(&:strip)
+        options = ffj("#loggingType > option").map { |e| e.text.strip }
         expect(options).to include("Select a Log type")
         expect(options).to include("Login / Logout Activity")
         expect(options).to include("Grade Change Activity")

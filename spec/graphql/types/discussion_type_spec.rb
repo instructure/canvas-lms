@@ -677,7 +677,7 @@ describe Types::DiscussionType do
 
     describe "mentionable users connection" do
       it "finds lists the user" do
-        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.users.map(&:id).map(&:to_s))
+        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.users.map { |u| u.id.to_s })
       end
     end
 
@@ -753,7 +753,7 @@ describe Types::DiscussionType do
 
     describe "mentionable users connection" do
       it "finds lists the user" do
-        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.participating_users_in_context.map(&:id).map(&:to_s))
+        expect(discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq(discussion.context.participating_users_in_context.map { |u| u.id.to_s })
       end
     end
   end

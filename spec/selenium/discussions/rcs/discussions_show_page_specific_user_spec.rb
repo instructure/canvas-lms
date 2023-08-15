@@ -208,7 +208,7 @@ describe "discussions" do
         f("#discussion-title").send_keys("New Discussion")
         type_in_tiny "textarea[name=message]", "Discussion topic message"
         f("#has_group_category").click
-        drop_down = get_options("#assignment_group_category_id").map(&:text).map(&:strip)
+        drop_down = get_options("#assignment_group_category_id").map { |e| e.text.strip }
         expect(drop_down).to include("category 1")
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }
@@ -248,7 +248,7 @@ describe "discussions" do
         wait_for_ajaximations
         click_option("#assignment_group_id", assignment_group.name)
         f("#has_group_category").click
-        drop_down = get_options("#assignment_group_category_id").map(&:text).map(&:strip)
+        drop_down = get_options("#assignment_group_category_id").map { |e| e.text.strip }
         expect(drop_down).to include("category 1")
         click_option("#assignment_group_category_id", @category1.name)
         expect_new_page_load { submit_form(".form-actions") }

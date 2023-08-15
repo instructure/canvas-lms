@@ -136,7 +136,7 @@ describe Outcomes::CSVImporter do
 
       parents = [by_guid["a"], by_guid["b"]]
       parents.each do |parent|
-        expect(parent.child_outcome_links.map(&:content).map(&:vendor_guid)).to eq(["c"])
+        expect(parent.child_outcome_links.map { |l| l.content.vendor_guid }).to eq(["c"])
       end
     end
 

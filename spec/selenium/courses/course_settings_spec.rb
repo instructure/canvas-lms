@@ -81,7 +81,7 @@ describe "course settings" do
       expect(homeroom_selection).to be_displayed
 
       homeroom_selection.click
-      options = ff("#course_homeroom_course_id option").map(&:text).map(&:strip)
+      options = ff("#course_homeroom_course_id option").map { |e| e.text.strip }
       expect(options).to include "homeroom1"
       expect(options).to include "homeroom2"
     end

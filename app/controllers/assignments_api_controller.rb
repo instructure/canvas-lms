@@ -977,7 +977,7 @@ class AssignmentsApiController < ApplicationController
                     end
 
       if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
-        invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
+        invalid_ids = params[:assignment_ids] - assignments.map { |a| a.id.to_s }
         return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(",")}" }, status: :bad_request
       end
 
