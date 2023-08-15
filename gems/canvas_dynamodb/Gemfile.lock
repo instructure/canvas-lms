@@ -9,7 +9,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     aws-eventstream (1.2.0)
-    aws-partitions (1.802.0)
+    aws-partitions (1.804.0)
     aws-sdk-applicationautoscaling (1.75.0)
       aws-sdk-core (~> 3, >= 3.177.0)
       aws-sigv4 (~> 1.1)
