@@ -620,6 +620,19 @@ describe Enrollment do
         @enrollment.scores.find_by(grading_period: period).update!(override_score: 71.0)
         expect(@enrollment.override_grade(grading_period_id: period.id)).to eq "C-"
       end
+
+      it "optionally accepts a score to use" do
+        period_group = @course.grading_period_groups.create!
+        period = period_group.grading_periods.create!(
+          close_date: 1.day.from_now,
+          end_date: 1.day.from_now,
+          start_date: 1.day.ago,
+          title: "period"
+        )
+        score = @enrollment.scores.find_by(grading_period: period)
+        score.update!(override_score: 71.0)
+        expect(@enrollment.override_grade(score:)).to eq "C-"
+      end
     end
 
     describe "override_score" do
@@ -664,6 +677,19 @@ describe Enrollment do
         )
         @enrollment.scores.find_by(grading_period: period).update!(override_score: 71.0)
         expect(@enrollment.override_score(grading_period_id: period.id)).to be 71.0
+      end
+
+      it "optionally accepts a score to use" do
+        period_group = @course.grading_period_groups.create!
+        period = period_group.grading_periods.create!(
+          close_date: 1.day.from_now,
+          end_date: 1.day.from_now,
+          start_date: 1.day.ago,
+          title: "period"
+        )
+        score = @enrollment.scores.find_by(grading_period: period)
+        score.update!(override_score: 71.0)
+        expect(@enrollment.override_score(score:)).to eq 71.0
       end
     end
 

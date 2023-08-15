@@ -1188,6 +1188,9 @@ class Enrollment < ActiveRecord::Base
 
   def find_score(id_opts = nil)
     id_opts ||= Score.params_for_course
+    given_score = id_opts.delete(:score)
+    return given_score if given_score
+
     valid_keys = %i[course_score grading_period grading_period_id assignment_group assignment_group_id]
     return nil if id_opts.except(*valid_keys).any?
 

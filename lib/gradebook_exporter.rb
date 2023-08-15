@@ -31,6 +31,7 @@ class GradebookExporter
     grading_standard: ["Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"].freeze,
     override_score: ["Override Score"].freeze,
     override_grade: ["Override Grade"].freeze,
+    override_status: ["Override Status"].freeze,
     points: ["Current Points", "Final Points"].freeze,
     total_scores: ["Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score"].freeze
   }.freeze
@@ -164,6 +165,7 @@ class GradebookExporter
         if include_final_grade_override?
           header.concat(buffer_column_headers(:override_score))
           header.concat(buffer_column_headers(:override_grade)) if @course.grading_standard_enabled?
+          header.concat(buffer_column_headers(:override_status)) if custom_statuses_enabled?
         end
       end
       csv << header
@@ -198,6 +200,7 @@ class GradebookExporter
           if include_final_grade_override?
             row.concat(buffer_columns(:override_score))
             row.concat(buffer_columns(:override_grade)) if @course.grading_standard_enabled?
+            row.concat(buffer_columns(:override_status)) if custom_statuses_enabled?
           end
         end
 
@@ -233,6 +236,7 @@ class GradebookExporter
 
           # Override Grade is always read-only
           row.concat(buffer_columns(:override_grade, read_only)) if @course.grading_standard_enabled?
+          row.concat(buffer_columns(:override_status)) if custom_statuses_enabled?
         end
       end
 
@@ -405,8 +409,10 @@ class GradebookExporter
     end
 
     if include_final_grade_override?
-      result << student_enrollment.override_score(score_opts)
-      result << student_enrollment.override_grade(score_opts) if @course.grading_standard_enabled?
+      score = student_enrollment.find_score(score_opts)
+      result << student_enrollment.override_score(score:)
+      result << student_enrollment.override_grade(score:) if @course.grading_standard_enabled?
+      result << custom_status(score) if custom_statuses_enabled?
     end
 
     result
@@ -486,5 +492,19 @@ class GradebookExporter
     else
       "Manual Posting"
     end
+  end
+
+  def custom_status(score)
+    score&.custom_grade_status_id && custom_statuses[score.custom_grade_status_id]
+  end
+
+  def custom_statuses
+    @custom_statuses ||= @course.custom_grade_statuses.pluck(:id, :name).to_h
+  end
+
+  def custom_statuses_enabled?
+    return @custom_statuses_enabled if defined?(@custom_statuses_enabled)
+
+    @custom_statuses_enabled = Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
   end
 end

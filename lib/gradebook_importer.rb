@@ -465,7 +465,8 @@ class GradebookImporter
     "Final Points",
     "Final Grade",
     "Override Score",
-    "Override Grade"
+    "Override Grade",
+    "Override Status"
   ].freeze
 
   def strip_non_assignment_columns(stripped_row)

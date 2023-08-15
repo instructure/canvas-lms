@@ -231,6 +231,7 @@ class Course < ActiveRecord::Base
   has_many :grading_periods, through: :grading_period_groups
   has_many :usage_rights, as: :context, inverse_of: :context, class_name: "UsageRights", dependent: :destroy
 
+  has_many :custom_grade_statuses, -> { active }, through: :root_account
   has_many :sis_post_grades_statuses
 
   has_many :progresses, as: :context, inverse_of: :context
