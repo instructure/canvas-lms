@@ -265,7 +265,7 @@ GEM
     statsd-ruby (1.4.0)
     strscan (3.0.6)
     thor (1.2.2)
-    timecop (0.9.6)
+    timecop (0.9.8)
     timeout (0.4.0)
     twitter-text (3.1.0)
       idn-ruby

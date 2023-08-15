@@ -1100,7 +1100,7 @@ GEM
     thor (1.2.2)
     thread_safe (0.3.6)
     thrift (0.9.3.0)
-    timecop (0.9.6)
+    timecop (0.9.8)
     timeout (0.4.0)
     tins (1.32.1)
       sync
