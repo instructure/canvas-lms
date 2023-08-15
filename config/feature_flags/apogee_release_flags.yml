@@ -217,7 +217,7 @@ individual_gradebook_enhancements:
     to Individual Gradebook
   environments:
     ci:
-      state: on # enable for automated testings builds and local testing
+      state: allowed_on # enable for automated testings builds and local testing
     development:
       state: allowed_on # enable for local development
 hide_zero_point_quizzes_option:

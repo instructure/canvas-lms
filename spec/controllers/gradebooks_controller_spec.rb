@@ -1021,6 +1021,20 @@ describe GradebooksController do
         expect(response).to render_template("gradebooks/gradebook")
       end
 
+      it "renders enhanced individual gradebook when individual_enhanced & individual_gradebook_enhancements is enabled" do
+        @course.root_account.enable_feature!(:individual_gradebook_enhancements)
+        @admin.set_preference(:gradebook_version, "individual_enhanced")
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("layouts/application")
+      end
+
+      it "renders traditional gradebook when individual_gradebook_enhancements is disabled" do
+        @course.root_account.disable_feature!(:individual_gradebook_enhancements)
+        @admin.set_preference(:gradebook_version, "individual_enhanced")
+        get "show", params: { course_id: @course.id }
+        expect(response).to render_template("gradebooks/gradebook")
+      end
+
       describe "score to ungraded" do
         before do
           options = Gradebook::ApplyScoreToUngradedSubmissions::Options.new(

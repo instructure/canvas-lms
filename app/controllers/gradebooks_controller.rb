@@ -320,7 +320,8 @@ class GradebooksController < ApplicationController
         return
       end
 
-      if gradebook_version == "individual_enhanced"
+      individual_enhanced_enabled = @context.root_account.feature_enabled?(:individual_gradebook_enhancements)
+      if gradebook_version == "individual_enhanced" && individual_enhanced_enabled
         show_enhanced_individual_gradebook
       elsif ["srgb", "individual"].include?(gradebook_version)
         show_individual_gradebook
