@@ -397,6 +397,7 @@ const DiscussionTopicManager = props => {
                               discussionTopicQuery.data.legacyNode.canReplyAnonymously,
                           }),
                         })
+                        setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
                       }}
                       isHighlighted={isTopicHighlighted}
                     />

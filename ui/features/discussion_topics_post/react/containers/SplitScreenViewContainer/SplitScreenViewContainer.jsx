@@ -234,6 +234,7 @@ export const SplitScreenViewContainer = props => {
         !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
     })
     createDiscussionEntry({variables, optimisticResponse})
+    props.setHighlightEntryId('DISCUSSION_ENTRY_PLACEHOLDER')
   }
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
