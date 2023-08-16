@@ -59,7 +59,7 @@ const consoleMessagesToIgnore = {
   ],
 }
 
-export function filterUselessConsoleMessages(originalConsole = console) {
+export default function filterUselessConsoleMessages(originalConsole = console) {
   Object.keys(consoleMessagesToIgnore).forEach(key => {
     const original = originalConsole[key]
     originalConsole[key] = function () {

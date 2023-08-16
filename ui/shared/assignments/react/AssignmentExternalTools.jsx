@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
-import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@instructure/js-utils'
+import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@canvas/util/xhr'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('moderated_grading')

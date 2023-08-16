@@ -18,7 +18,7 @@
 
 import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
-import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
+import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 import {
   getContextCodesFromState,
   transformApiToInternalItem,

@@ -15,7 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import getCookie from '@instructure/get-cookie'
+
+declare global {
+  interface Window {
+    prefetched_xhrs?: Record<string, Promise<Response>>
+  }
+}
 
 // These are helpful methods you can use along side the ruby ApplicationHelper::prefetch_xhr helper method in canvas
 
@@ -28,7 +35,7 @@ import getCookie from '@instructure/get-cookie'
  * @param {String} id
  * @returns {Promise<Response>} fetchResponsePromise
  */
-export function getPrefetchedXHR(id) {
+export function getPrefetchedXHR(id: string) {
   return window.prefetched_xhrs && window.prefetched_xhrs[id]
 }
 
@@ -42,7 +49,7 @@ export function getPrefetchedXHR(id) {
  * @param {String} id
  * @returns {Promise<Response>} fetchResponsePromise
  */
-export function consumePrefetchedXHR(id) {
+export function consumePrefetchedXHR(id: string) {
   if (window.prefetched_xhrs) {
     const value = window.prefetched_xhrs[id]
     delete window.prefetched_xhrs[id]
@@ -56,11 +63,8 @@ export function consumePrefetchedXHR(id) {
  * Store a fetch response promise assigned to the given id. This function is
  * intended for specs so that they do not need awareness of the implementation
  * details for how prefetched requests are managed.
- *
- * @param {String} id
- * @param {Promise<Response>} fetchResponsePromise
  */
-export function setPrefetchedXHR(id, fetchResponsePromise) {
+export function setPrefetchedXHR(id: string, fetchResponsePromise: Promise<Response>) {
   window.prefetched_xhrs = window.prefetched_xhrs || {}
   window.prefetched_xhrs[id] = fetchResponsePromise
 }
@@ -77,55 +81,58 @@ export function clearPrefetchedXHRs() {
 /**
  * Transforms a `fetch` request into something that looks like an `axios` response
  * with a `.data` and `.headers` property, so you can pass it to our parseLinkHeaders stuff
- *
- * @param {Promise<Response>} fetchRequest
- * @returns {Promise<import("axios").AxiosResponse>}
  */
-export function asAxios(fetchRequest, type = 'json') {
+export function asAxios<T>(
+  fetchRequest: Promise<Response>,
+  type: 'json' | 'text' = 'json'
+):
+  | Promise<{
+      data: T
+      headers: {
+        link: string | null
+      }
+    }>
+  | undefined {
   if (!fetchRequest) return
+
   return fetchRequest.then(checkStatus).then(res =>
     res
       .clone()
       [type]()
       .then(data => {
-        return {data, headers: {link: res.headers.get('Link')}}
+        return {
+          data,
+          headers: {link: res.headers.get('Link')},
+        }
       })
   )
 }
 
 /**
  * Takes a `fetch` request and returns a promise of the json data of the response
- *
- * @param {Promise<Response>} fetchRequest
- * @returns {Promise<JSON_data>}
  */
-export function asJson(fetchRequest) {
+export function asJson(fetchRequest: Promise<Response>) {
   if (!fetchRequest) return
-  return fetchRequest.then(checkStatus).then(res => res.clone().json())
+  return fetchRequest.then(checkStatus).then((res: Response) => res.clone().json())
 }
 
 /**
  * Takes a `fetch` request and returns a promise of the text of the response
- *
- * @param {Promise<Response>} fetchRequest
- * @returns {Promise<USVString>}
  */
-export function asText(fetchRequest) {
+export function asText(fetchRequest: Promise<Response>) {
   if (!fetchRequest) return
   return fetchRequest.then(checkStatus).then(res => res.clone().text())
 }
 
 /**
  * filter a response to raise an error on a 400+ status
- *
- * @param {Promise<Response>} response
- * @returns {Promise<Response>}
  */
-export function checkStatus(response) {
+export function checkStatus(response: Response) {
   if (response.status < 400) {
     return response
   } else {
     const error = new Error(response.statusText)
+    // @ts-expect-error
     error.response = response
     throw error
   }
@@ -140,6 +147,6 @@ export const defaultFetchOptions = {
   headers: {
     Accept: 'application/json+canvas-string-ids, application/json',
     'X-Requested-With': 'XMLHttpRequest',
-    'X-CSRF-Token': getCookie('_csrf_token')
-  }
+    'X-CSRF-Token': getCookie('_csrf_token'),
+  },
 }

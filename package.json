@@ -21,7 +21,6 @@
     "@instructure/brandable_css": "^3",
     "@instructure/canvas-theme": "^7",
     "@instructure/debounce": "^7",
-    "@instructure/js-utils": "*",
     "@instructure/media-capture": "~8.4.1-rc.16",
     "@instructure/outcomes-ui": "2.0.0",
     "@instructure/react-crop": "^5.0.1",

@@ -27,7 +27,7 @@ import AssignmentGroupWeightsView from './backbone/views/AssignmentGroupWeightsV
 import ToggleShowByView from './backbone/views/ToggleShowByView'
 import _ from 'underscore'
 import splitAssetString from '@canvas/util/splitAssetString'
-import {getPrefetchedXHR} from '@instructure/js-utils'
+import {getPrefetchedXHR} from '@canvas/util/xhr'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
@@ -108,6 +108,7 @@ ready(() => {
 
   // kick it all off
   course.trigger('change')
+  // eslint-disable-next-line promise/catch-or-return
   getPrefetchedXHR('assignment_groups_url')
     .then(res =>
       res.json().then(data => {

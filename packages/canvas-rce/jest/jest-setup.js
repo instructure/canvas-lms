@@ -19,7 +19,7 @@
 // Several components use aphrodite, which tries to manipulate the dom
 // on a timer which expires after the test completes and the document no longer exists
 import {StyleSheetTestUtils} from 'aphrodite'
-import {filterUselessConsoleMessages} from '@instructure/js-utils'
+import filterUselessConsoleMessages from '@instructure/filter-console-messages'
 
 /**
  * We want to ensure errors and warnings get appropriate eyes. If

@@ -22,7 +22,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {Link} from '@instructure/ui-link'
 import {bool} from 'prop-types'
-import {defaultFetchOptions} from '@instructure/js-utils'
+import {defaultFetchOptions} from '@canvas/util/xhr'
 
 const I18n = useI18nScope('terms_of_service_modal')
 

@@ -18,6 +18,7 @@
 
 import canvasBaseTheme from '@instructure/canvas-theme'
 import canvasHighContrastTheme from '@instructure/canvas-high-contrast-theme'
+import filterUselessConsoleMessages from '../../packages/filter-console-messages'
 import moment from 'moment'
 import './initializers/fakeRequireJSFallback'
 // must run before retriggerEarlyClicks to make sure data-method is
@@ -74,12 +75,7 @@ isolate(enableDTNPI)({
 // messages, and if deprecation reporting is enabled, arrange to inject and
 // set up Sentry for it.
 if (process.env.NODE_ENV !== 'production') {
-  const setupConsoleMessageFilter = async () => {
-    const {filterUselessConsoleMessages} = await import(
-      /* webpackChunkName: "[request]" */
-      '@instructure/js-utils/es/filterUselessConsoleMessages'
-    )
-
+  const setupConsoleMessageFilter = () => {
     try {
       filterUselessConsoleMessages(console)
     } catch (e) {

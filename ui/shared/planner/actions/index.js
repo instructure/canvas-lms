@@ -17,7 +17,7 @@
  */
 import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
-import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
+import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 import parseLinkHeader from 'parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
