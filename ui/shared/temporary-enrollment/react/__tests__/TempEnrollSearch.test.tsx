@@ -57,7 +57,7 @@ describe('TempEnrollSearch', () => {
 
   it('shows search page', () => {
     const {getByText} = render(<TempEnrollSearch page={0} {...props} />)
-    expect(getByText('Find an assignee of temporary enrollments from user1')).toBeInTheDocument()
+    expect(getByText('Find a recipient of temporary enrollments from user1')).toBeInTheDocument()
   })
 
   it('displays error message when API call fails', async () => {
@@ -93,9 +93,10 @@ describe('TempEnrollSearch', () => {
     )
     fetchMock.get('/api/v1/users/2', mockFindUser.users[0])
     const {queryByText} = render(<TempEnrollSearch page={1} {...props} />)
-    // in a future commit, this will be changed to the found user on the confirmation screen
     await waitFor(() =>
-      expect(queryByText('This user is ready to be assigned temporary enrollments.')).toBeTruthy()
+      expect(
+        queryByText('The user below is ready to be assigned temporary enrollments.')
+      ).toBeTruthy()
     )
   })
 

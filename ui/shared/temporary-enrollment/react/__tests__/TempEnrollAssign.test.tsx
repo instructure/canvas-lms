@@ -49,6 +49,8 @@ const props = {
   permissions: truePermissions,
   roles: [{id: '91', label: 'Student', base_role_name: 'StudentEnrollment'}],
   goBack: backCall,
+  setEnrollmentStatus: jest.fn(),
+  doSubmit: () => false,
 }
 
 const johnEnrollments = [
@@ -98,7 +100,7 @@ describe('TempEnrollAssign', () => {
     fireEvent.input(endDate, {target: {value: 'Apr 12 2022'}})
     fireEvent.blur(endDate)
     expect((await findByTestId('temp-enroll-summary')).textContent).toBe(
-      "Canvas will enroll Melvin as a ROLE in John Smith's selected courses from 4/10/2022, 12:00 AM - 4/12/2022, 12:00 AM"
+      "Canvas will enroll Melvin as a ROLE in John Smith's selected courses from Sun, Apr 10, 2022, 12:00 AM - Tue, Apr 12, 2022, 12:00 AM"
     )
   })
 
@@ -107,7 +109,9 @@ describe('TempEnrollAssign', () => {
     const endDate = await screen.findByLabelText('Until')
     fireEvent.input(endDate, {target: {value: 'Apr 10 2022'}})
     fireEvent.blur(endDate)
-    expect(await screen.findByText('The end date must be after the start date')).toBeInTheDocument()
+    expect(
+      await screen.findByText('The start date must be before the end date')
+    ).toBeInTheDocument()
   })
 
   it('hides roles the user does not have permission to enroll', async () => {

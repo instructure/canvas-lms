@@ -41,6 +41,7 @@ export function translateState(workflow: string) {
   switch (workflow) {
     case 'created':
     case 'claimed':
+    case 'unpublished':
       return I18n.t('unpublished')
     case 'available':
       return I18n.t('published')

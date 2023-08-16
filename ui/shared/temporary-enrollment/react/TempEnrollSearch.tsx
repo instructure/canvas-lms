@@ -29,12 +29,17 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {Table} from '@instructure/ui-table'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('temporary_enrollment')
 
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+// @ts-expect-error
+const FlexItem = Flex.Item as any
+
 interface AssignUser {
   name: string
-  sis_user_id: string
+  sis_user_id: string | null
   email: string
   login_id: string
 }
@@ -104,24 +109,28 @@ export function TempEnrollSearch(props: Props) {
     return (
       <>
         <Text weight="bold">
-          {I18n.t('Find an assignee of temporary enrollments from %{name}', {
+          {I18n.t('Find a recipient of temporary enrollments from %{name}', {
             name: props.user.name,
           })}
         </Text>
         <Grid>
           <Grid.Row vAlign="middle">
-            <Grid.Col width={1}>
-              <Avatar
-                size="large"
-                margin="small"
-                name={props.user.name}
-                src={props.user.avatar_url}
-                data-fs-exclude={true}
-                data-heap-redact-attributes="name"
-              />
-            </Grid.Col>
             <Grid.Col>
-              <Text size="large">{props.user.name}</Text>
+              <Flex as="div" margin="small 0 small 0">
+                <FlexItem>
+                  <Avatar
+                    size="large"
+                    margin="0 small 0 0"
+                    name={props.user.name}
+                    src={props.user.avatar_url}
+                    data-fs-exclude={true}
+                    data-heap-redact-attributes="name"
+                  />
+                </FlexItem>
+                <FlexItem shouldShrink={true}>
+                  <Text size="large">{props.user.name}</Text>
+                </FlexItem>
+              </Flex>
             </Grid.Col>
           </Grid.Row>
         </Grid>
@@ -186,7 +195,7 @@ export function TempEnrollSearch(props: Props) {
       <>
         {renderAvatar()}
         <Alert variant="success">
-          {I18n.t('This user is ready to be assigned temporary enrollments.')}
+          {I18n.t('The user below is ready to be assigned temporary enrollments.')}
         </Alert>
         <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>
           <Table.Head>

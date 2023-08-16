@@ -23,28 +23,51 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
 
+interface RoleChoice {
+  id: string
+  baseRoleName: string
+}
+
 interface Props {
   list: {}[]
   roles: {id: string; label: string; base_role_name: string}[]
-  selectRoleId: string
+  selectedRole: RoleChoice
+  createEnroll?: Function
 }
 
 export interface NodeStructure {
+  children: NodeStructure[]
   enrollId?: string
   id: string
+  isCheck: boolean
+  isMismatch?: boolean
+  isMixed: boolean
+  isToggle?: boolean
   label: string
   parent?: NodeStructure
-  children: NodeStructure[]
-  isCheck: boolean
-  isToggle?: boolean
-  isMixed: boolean
-  isMismatch?: boolean
   workState?: string
+}
+
+interface Section {
+  course_section_id: string
+  course_id: string
+  id: string
 }
 
 export function EnrollmentTree(props: Props) {
   const [tree, setTree] = useState<NodeStructure[]>([])
   const [loading, setLoading] = useState(true)
+
+  function splitArrayByProperty(arr: any[], property: string | number) {
+    return arr.reduce((result: {[x: string]: any[]}, obj: {[x: string]: any}) => {
+      const index = obj[property]
+      if (!result[index]) {
+        result[index] = []
+      }
+      result[index].push(obj)
+      return result
+    }, {})
+  }
 
   const sortByBase = (a: NodeStructure, b: NodeStructure) => {
     const aId = a.id.slice(1)
@@ -76,10 +99,17 @@ export function EnrollmentTree(props: Props) {
   }
 
   useEffect(() => {
+    if (props.createEnroll) {
+      props.createEnroll(tree)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.createEnroll])
+
+  useEffect(() => {
     if (!loading) {
-      if (props.selectRoleId !== '') {
+      if (props.selectedRole.baseRoleName !== '') {
         for (const roles in tree) {
-          if (tree[roles].id.slice(1) === props.selectRoleId) {
+          if (tree[roles].label.toLowerCase() === props.selectedRole.baseRoleName.toLowerCase()) {
             tree[roles].isToggle = true
             // set mismatch for all sections and courses with role
             for (const course of tree[roles].children) {
@@ -101,7 +131,7 @@ export function EnrollmentTree(props: Props) {
     }
     setTree([...tree])
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.selectRoleId, loading])
+  }, [props.selectedRole.baseRoleName, loading])
 
   // builds basic object tree
   useEffect(() => {
@@ -145,24 +175,21 @@ export function EnrollmentTree(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  function splitArrayByProperty(arr: any[], property: string | number) {
-    return arr.reduce((result: {[x: string]: any[]}, obj: {[x: string]: any}) => {
-      const index = obj[property]
-      if (!result[index]) {
-        result[index] = []
-      }
-      result[index].push(obj)
-      return result
-    }, {})
-  }
-
   const getRoles = (role: any[], rNode: NodeStructure) => {
     const coursePromises = []
-    let promise
+
     for (const [, value] of Object.entries(role)) {
-      promise = getCourses(value, rNode)
-      coursePromises.push(promise)
+      const coursePromise = getCourses(value, rNode).catch(error => {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching courses for role:', value, error)
+
+        // preserve the role structure and coursePromises continuity by returning null
+        return null
+      })
+
+      coursePromises.push(coursePromise)
     }
+
     return Promise.all(coursePromises)
   }
 
@@ -170,7 +197,18 @@ export function EnrollmentTree(props: Props) {
     const courseId = course[0].course_id
     const cId = 'c' + courseId
     const childArray: NodeStructure[] = []
-    const cJson = await doFetchApi({path: `/api/v1/courses/${courseId}`})
+
+    let cJson
+    try {
+      cJson = await doFetchApi({path: `/api/v1/courses/${courseId}`})
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching course data for ID:', courseId, error)
+
+      // re-throw the error to be caught by the calling function
+      throw error
+    }
+
     const cNode = {
       isMismatch: false,
       id: cId,
@@ -182,39 +220,55 @@ export function EnrollmentTree(props: Props) {
       workState: cJson.json.workflow_state,
       isMixed: false,
     }
-    cNode.children = []
+
+    const secPromises = [cJson]
     rNode.children.push(cNode)
 
-    const secPromises = []
-    let promise
-    secPromises.push(cJson)
     for (const section of course) {
-      promise = getSections(section, cNode)
-      secPromises.push(promise)
+      const sectionPromise = getSectionDetails(section, cNode).catch(error => {
+        // eslint-disable-next-line no-console
+        console.error('Error fetching section data for section:', section, error)
+      })
+
+      secPromises.push(sectionPromise)
     }
+
     return Promise.all(secPromises)
   }
 
-  const getSections = async (
-    section: {course_section_id: string; course_id: string; id: string},
-    cNode: NodeStructure
-  ) => {
-    const sId = 's' + section.course_section_id
-    const sJson = await doFetchApi({
-      path: `/api/v1/courses/${section.course_id}/sections/${section.course_section_id}`,
-    })
-    const sNode = {
-      isMismatch: false,
-      id: sId,
-      label: sJson.json.name,
-      parent: cNode,
-      isCheck: cNode.isCheck,
-      children: [],
-      enrollId: section.id,
-      isMixed: false,
+  const getSectionDetails = async (
+    section: Section,
+    courseNode: NodeStructure
+  ): Promise<any | null> => {
+    try {
+      const sectionJson = await doFetchApi({
+        path: `/api/v1/courses/${section.course_id}/sections/${section.course_section_id}`,
+      })
+
+      const sectionNode = {
+        isMismatch: false,
+        id: `s${section.course_section_id}`,
+        label: sectionJson.json.name,
+        parent: courseNode,
+        isCheck: courseNode.isCheck,
+        children: [],
+        enrollId: section.id,
+        isMixed: false,
+      }
+
+      courseNode.children.push(sectionNode)
+
+      return sectionJson
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `Error fetching section details for course_section_id: ${section.course_section_id} and course_id: ${section.course_id}`,
+        error
+      )
+
+      // returning null as fallback
+      return null
     }
-    cNode.children.push(sNode)
-    return sJson
   }
 
   const locateNode = (node: NodeStructure) => {
@@ -239,7 +293,7 @@ export function EnrollmentTree(props: Props) {
   const updateTreeCheck = (node: NodeStructure, newState: boolean) => {
     // change all children to match status of parent
     const {currNode, rId} = locateNode(node)
-    const isRole = rId.slice(1) === props.selectRoleId || props.selectRoleId === ''
+    const isRole = rId.slice(1) === props.selectedRole.id || props.selectedRole.id === ''
     if (currNode.children) {
       for (const c of currNode.children) {
         c.isMismatch = isRole ? false : newState
