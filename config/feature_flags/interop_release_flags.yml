@@ -218,6 +218,18 @@ developer_key_page_checkboxes:
     If enabled, root accounts and subaccounts will see toggle switches for enabling
     and disabling keys on the developer keys page. Siteadmin will still see the
     disable/allow/enable buttons.
+tune_lti_context_id_history_query:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Use alternate settings for LTI Context.id.history query
+  description: |-
+    In some accounts with a large number of content migrations, the query
+    that populates the Context.id.history LTI variable expansion may
+    time out regardless of the length of the history for that context.
+    Enabling this will run the query with different settings that may
+    improve performance. Caution: for some accounts where this query
+    doesn't already time out, enabling this may cause the query to take
+    much longer and even time out.
 lti_overwrite_user_url_input_select_content_dialog:
   state: on
   applies_to: RootAccount
