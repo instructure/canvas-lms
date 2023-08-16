@@ -1112,6 +1112,56 @@ describe DiscussionTopicsController do
       expect(ErrorReport.last).to be_nil
     end
 
+    context "attachment permissions" do
+      before :once do
+        @ann = @course.announcements.create!(message: "testing")
+      end
+
+      context "when allow_student_forum_attachments is false" do
+        before :once do
+          @course.allow_student_forum_attachments = false
+          @course.save!
+        end
+
+        it "does not allow students to add attachments" do
+          user_session(@student)
+          get "show", params: { course_id: @course.id, id: @ann.id }
+          # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_falsey
+        end
+
+        it "allows teachers to add attachments" do
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: @ann.id }
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+        end
+      end
+
+      context "when allow_student_forum_attachments is true" do
+        before :once do
+          @course.allow_student_forum_attachments = true
+          @course.save!
+        end
+
+        it "allows students to add attachments" do
+          user_session(@student)
+          get "show", params: { course_id: @course.id, id: @ann.id }
+          # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+        end
+
+        it "allows teachers to add attachments" do
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: @ann.id }
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
+          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+        end
+      end
+    end
+
     context "in a homeroom course" do
       before do
         @course.account.enable_as_k5_account!

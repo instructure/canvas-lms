@@ -76,7 +76,7 @@ export default class TopicView extends Backbone.View {
     this.model.set('id', ENV.DISCUSSION.TOPIC.ID)
     // overwrite cid so Reply::getModelAttributes gets the right "go to parent" link
     this.model.cid = 'main'
-    this.model.set('canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH)
+    this.model.set('canAttach', ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH_TOPIC)
     this.filterModel = this.options.filterModel
     this.filterModel.on('change', this.hideIfFiltering, this)
     this.topic = new DiscussionTopic({id: ENV.DISCUSSION.TOPIC.ID})
