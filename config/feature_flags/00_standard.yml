@@ -35,14 +35,6 @@ admin_analytics:
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
   beta: true
-admin_analytics_new_filter_ui:
-  state: hidden
-  applies_to: Account
-  display_name: Admin Analytics - New Filter UI
-  description:
-    admin_analytics_new_filter_ui_description: Enables the new Admin Analytics Filter UI.
-  root_opt_in: true
-  beta: true
 k20_course_readiness_alpha_testing:
   state: hidden
   applies_to: Account
