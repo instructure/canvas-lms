@@ -114,7 +114,7 @@ gem "rails-observers", "0.1.5"
 gem "ratom-nokogiri", "0.10.11", require: false
 gem "redcarpet", "~> 3.6", require: false
 gem "regexp_parser", "~> 2.8", require: false
-gem "retriable", "1.4.1"
+gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false
 gem "rotp", "~> 6.2", require: false
 gem "rss", "~> 0.3", require: false

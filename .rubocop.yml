@@ -94,6 +94,7 @@ Rails:
   Severity: error
   Exclude:
     - "bin/**/*"
+    - "gems/google_drive/**/*"
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/Blank:

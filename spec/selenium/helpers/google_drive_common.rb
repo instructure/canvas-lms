@@ -35,11 +35,10 @@ module GoogleDriveCommon
       .to receive(:authorized?)
       .and_return(authorized)
 
-    data = double("data", id: 1, to_json: { id: 1 }, alternateLink: "http://localhost/googleDoc")
-    doc = double("doc", data:)
-    adapter = double("google_adapter", create_doc: doc, acl_add: nil, acl_remove: nil)
+    doc = instance_double("Google::Apis::DriveV3::File", id: 1, web_view_link: "http://localhost/googleDoc", to_h: {})
+    adapter = instance_double("GoogleDrive::Connection", create_doc: doc, acl_add: nil, acl_remove: nil)
     allow_any_instance_of(GoogleDocsCollaboration)
-      .to receive(:google_adapter_for_user)
+      .to receive(:google_drive_for_user)
       .and_return(adapter)
 
     allow_any_instance_of(GoogleDocsCollaboration)

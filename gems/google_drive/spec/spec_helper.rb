@@ -42,9 +42,3 @@ RSpec.configure do |config|
     WebMock.allow_net_connect!
   end
 end
-
-module Rails
-  def self.cache
-    @cache ||= ActiveSupport::Cache::MemoryStore.new
-  end
-end

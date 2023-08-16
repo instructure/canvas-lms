@@ -31,10 +31,7 @@ class GoogleDocsCollaboration < Collaboration
 
   def delete_document
     if document_id && user
-      # google docs expected an object
-      # drive just wants an id
-      doc = document_id
-      google_adapter_for_user.delete_doc(doc)
+      google_drive_for_user.delete_doc(document_id)
     end
   end
 
@@ -44,18 +41,18 @@ class GoogleDocsCollaboration < Collaboration
       name = nil if name && name.empty?
       name ||= I18n.t("lib.google_docs.default_document_name", "Instructure Doc")
 
-      result = google_adapter_for_user.create_doc(name)
+      result = google_drive_for_user.create_doc(name)
       if result
-        self.document_id = result.data.id
-        self.data = result.data.to_json
+        self.document_id = result.id
+        self.data = result.to_h.to_json
 
-        self.url = result.data.alternateLink
+        self.url = result.web_view_link
       end
     end
   end
 
   def user_can_access_document_type?(user)
-    return !!google_adapter_user_service(user) if self.user && user
+    return !!google_user_service(user) if self.user && user
 
     false
   end
@@ -63,15 +60,18 @@ class GoogleDocsCollaboration < Collaboration
   def authorize_user(user)
     return unless document_id
 
-    service_user_id = google_adapter_user_service(user).service_user_id rescue nil
+    service = google_user_service(user)
+    service_user_id = service&.service_user_id
+    service_user_name = service&.service_user_name
     collaborator = collaborators.where(user_id: user).first
 
     if collaborator
       if collaborator.authorized_service_user_id != service_user_id
-        google_adapter_for_user.acl_remove(document_id, [collaborator.authorized_service_user_id]) if collaborator.authorized_service_user_id
+        if collaborator.authorized_service_user_id
+          google_drive_for_user.acl_remove(document_id, [service_user_id])
+        end
 
-        user_param = service_user_id
-        google_adapter_for_user.acl_add(document_id, [user_param])
+        google_drive_for_user.acl_add(document_id, [service_user_name])
         collaborator.update(authorized_service_user_id: service_user_id)
       end
     else
@@ -81,11 +81,11 @@ class GoogleDocsCollaboration < Collaboration
   end
 
   def remove_users_from_document(users_to_remove)
-    users_to_remove = users_to_remove.map do |user|
-      user_service = google_user_service(user, GOOGLE_DRIVE_SERVICE) and user_service.service_user_id
+    users_to_remove = users_to_remove.filter_map do |user|
+      authorized_service_user_id_for(user)
     end
 
-    google_adapter_for_user.acl_remove(document_id, users_to_remove) if document_id
+    google_drive_for_user.acl_remove(document_id, users_to_remove) if document_id
   end
 
   def add_users_to_document(new_users)
@@ -97,15 +97,11 @@ class GoogleDocsCollaboration < Collaboration
                end
 
       user_ids = new_users.filter_map do |user|
-        google_user_service(user, GOOGLE_DRIVE_SERVICE).service_user_id rescue nil
+        google_user_service(user)&.service_user_name
       end
 
-      google_adapter_for_user.acl_add(document_id, user_ids, domain)
+      google_drive_for_user.acl_add(document_id, user_ids, domain)
     end
-  end
-
-  def parse_data
-    @entry_data ||= JSON.parse(data)
   end
 
   def self.config
@@ -113,32 +109,24 @@ class GoogleDocsCollaboration < Collaboration
   end
 
   def authorized_service_user_id_for(user)
-    service = google_adapter_user_service(user)
-    service&.service_user_id
+    google_user_service(user)&.service_user_id
   end
 
   private
 
-  def google_user_service(user, service_domain = GOOGLE_DRIVE_SERVICE)
-    google_services = user.user_services.where(service_domain:).to_a
-    google_services.find(&:service_user_id)
+  def google_user_service(user)
+    user.user_services.where(service: "google_drive").first
   end
 
   def google_drive_for_user
-    refresh_token, access_token = Rails.cache.fetch(["google_drive_tokens", user].cache_key) do
-      service = user.user_services.where(service: "google_drive").first
-      service && [service.token, service.secret]
+    @google_drive_for_user ||= begin
+      refresh_token, access_token = Rails.cache.fetch(["google_drive_tokens", user].cache_key) do
+        service = google_user_service(user)
+        service && [service.token, service.secret]
+      end
+      raise GoogleDrive::NoTokenError unless refresh_token && access_token
+
+      GoogleDrive::Connection.new(refresh_token, access_token, ApplicationController.google_drive_timeout)
     end
-    raise GoogleDrive::NoTokenError unless refresh_token && access_token
-
-    GoogleDrive::Connection.new(refresh_token, access_token, ApplicationController.google_drive_timeout)
-  end
-
-  def google_adapter_for_user
-    google_drive_for_user
-  end
-
-  def google_adapter_user_service(user)
-    google_user_service(user)
   end
 end
