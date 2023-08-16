@@ -58,7 +58,7 @@ Entry.prototype.defaults = function () {
     replies: [],
 
     // Client side attributes not persisted with the server
-    canAttach: ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH,
+    canAttach: ENV.DISCUSSION.PERMISSIONS.CAN_ATTACH_ENTRIES,
 
     // so we can branch for new stuff
     new: false,
