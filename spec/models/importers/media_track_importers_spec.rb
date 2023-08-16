@@ -38,4 +38,12 @@ describe Importers::MediaTrackImporter do
       expect(@cm.warnings).to include("Subtitles (en) could not be imported for media_with_captions.mp4")
     end
   end
+
+  describe "process_migration" do
+    it "doesn't crash when the attachment for the media track isn't found" do
+      attachment_model(display_name: "media_with_captions", uploaded_data: stub_file_data("media_with_captions", "asdf", "unknown/unknown"), migration_id: "hi")
+      data = { "media_tracks" => { "hi" => [{ "migration_id" => "hi", "kind" => "subtitles", "locale" => "en", "content" => "WEBVTT\n00:00.001 --> 00:00.900\n- Hi!" }] } }
+      expect { Importers::MediaTrackImporter.process_migration(data, @cm) }.not_to raise_error
+    end
+  end
 end

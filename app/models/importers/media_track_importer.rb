@@ -28,9 +28,9 @@ module Importers
       media_attachments = migration.context.attachments.where.not(media_entry_id: nil).preload(:media_object_by_media_id)
       data.each do |file_id, track_list|
         media_attachment = media_attachments.find { |ma| ma.migration_id == file_id }
-        media_attachment.mark_as_importing!(migration)
         next unless (media_object = media_attachment&.media_object_by_media_id)
 
+        media_attachment.mark_as_importing!(migration)
         track_list.each do |track|
           import_from_migration(media_attachment, media_object, track, migration)
         end
