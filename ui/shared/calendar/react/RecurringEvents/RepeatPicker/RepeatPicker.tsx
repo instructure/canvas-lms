@@ -262,7 +262,7 @@ export default function RepeatPicker({
   return (
     <div>
       <fieldset style={{borderStyle: 'none', margin: 0, padding: '0'}}>
-        <legend style={{marginBottom: '.75rem'}}>
+        <legend style={{marginBottom: '.75rem', borderStyle: 'none'}}>
           <span style={{whiteSpace: 'nowrap'}}>
             <Text weight="bold">{I18n.t('Repeat every:')}</Text>
           </span>
