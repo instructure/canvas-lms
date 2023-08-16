@@ -233,3 +233,11 @@ improved_no_results_messaging:
     If enabled, the course link tray will display more helpful messaging
     if there are no results for a given resource type.
   applies_to: SiteAdmin
+
+differentiated_modules:
+  state: hidden
+  display_name: Differentiated Modules
+  description: |-
+    If enabled, modules and module items become assignable to specific
+    individuals and groups.
+  applies_to: SiteAdmin
