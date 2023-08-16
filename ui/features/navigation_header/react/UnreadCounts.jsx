@@ -55,7 +55,7 @@ import React, {useRef, useState, useEffect, useCallback} from 'react'
 import {createPortal} from 'react-dom'
 import {any, bool, func, number, string} from 'prop-types'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
-import {defaultFetchOptions} from '@instructure/js-utils'
+import {defaultFetchOptions} from '@canvas/util/xhr'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('UnreadCounts')

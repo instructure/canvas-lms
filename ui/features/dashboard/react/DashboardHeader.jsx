@@ -29,7 +29,7 @@ import {
   renderToDoSidebar,
   responsiviser,
 } from '@canvas/planner'
-import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
+import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import DashboardOptionsMenu from './DashboardOptionsMenu'

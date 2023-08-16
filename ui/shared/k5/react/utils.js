@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import PropTypes from 'prop-types'
 
-import {asJson, defaultFetchOptions} from '@instructure/js-utils'
+import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import AssignmentGroupGradeCalculator from '@canvas/grading/AssignmentGroupGradeCalculator'

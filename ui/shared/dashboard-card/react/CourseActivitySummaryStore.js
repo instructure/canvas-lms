@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {asJson, defaultFetchOptions} from '@instructure/js-utils'
+import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 import createStore from '@canvas/util/createStore'
 
 /**

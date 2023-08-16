@@ -23,7 +23,7 @@ import {MediaPlayer} from '@instructure/ui-media-player'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
-import {asJson, defaultFetchOptions} from '@instructure/js-utils'
+import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 
 const I18n = useI18nScope('CanvasMediaPlayer')
 

@@ -18,7 +18,7 @@
 
 import {createActions} from 'redux-actions'
 import axios from 'axios'
-import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
+import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 import {transformApiToInternalItem, findNextLink, buildURL} from '../utilities/apiUtils'
 import {identifiableThunk} from '../utilities/redux-identifiable-thunk'
 import {getCourseList, gotCourseList} from './loading-actions'

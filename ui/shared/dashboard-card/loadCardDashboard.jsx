@@ -22,7 +22,7 @@ import getDroppableDashboardCardBox from './react/getDroppableDashboardCardBox'
 import DashboardCard from './react/DashboardCard'
 import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {asJson, checkStatus, getPrefetchedXHR} from '@instructure/js-utils'
+import {asJson, checkStatus, getPrefetchedXHR} from '@canvas/util/xhr'
 import buildURL from 'axios/lib/helpers/buildURL'
 import {useScope as useI18nScope} from '@canvas/i18n'
 

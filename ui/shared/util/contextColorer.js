@@ -17,7 +17,7 @@
 
 import _ from 'underscore'
 import rgb2hex from './rgb2hex'
-import {defaultFetchOptions} from '@instructure/js-utils'
+import {defaultFetchOptions} from './xhr'
 
 export default {
   persistContextColors(colorsByContext, userId) {

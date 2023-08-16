@@ -19,7 +19,7 @@
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-import {filterUselessConsoleMessages} from '@instructure/js-utils'
+import filterUselessConsoleMessages from '@instructure/filter-console-messages'
 import rceFormatMessage from '@instructure/canvas-rce/es/format-message'
 import {up as configureDateTime} from '../ui/boot/initializers/configureDateTime'
 import {up as configureDateTimeMomentParser} from '../ui/boot/initializers/configureDateTimeMomentParser'

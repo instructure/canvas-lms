@@ -18,7 +18,7 @@
 
 import {SetState, GetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
+import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import {maxAssignmentCount, otherGradingPeriodAssignmentIds} from '../Gradebook.utils'
 import type {GradebookStore} from './index'
 import type {GradingPeriodAssignmentMap} from '../gradebook.d'
@@ -105,6 +105,7 @@ export default (
     }
 
     return (
+      // @ts-expect-error
       promise
         // @ts-expect-error until consumePrefetchedXHR and dispatch.getJSON support generics
         .then((data: {grading_period_assignments: GradingPeriodAssignmentMap}) => {

@@ -21,7 +21,7 @@ import {SetState, GetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
 import {getContentForStudentIdChunk} from './studentsState.utils'
-import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
+import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import type {
   AssignmentUserSubmissionMap,
   Student,
@@ -91,6 +91,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): S
     }
 
     return (
+      // @ts-expect-error
       promise
         // @ts-expect-error until consumePrefetchedXHR and dispatch.getJSON support generics
         .then((data: {user_ids: string[]}) => {
