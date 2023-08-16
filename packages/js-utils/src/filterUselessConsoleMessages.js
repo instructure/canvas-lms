@@ -31,6 +31,7 @@ const consoleMessagesToIgnore = {
     // see https://github.com/instructure/instructure-ui/issues/815
     'Invalid prop `messages[0].text` of type `object` supplied to',
     /unknown pseudo-class selector/,
+    /or more breakpoints which are currently applied at the same time/,
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up
