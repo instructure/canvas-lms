@@ -1933,7 +1933,7 @@ describe CalendarEventsApiController, type: :request do
                           { controller: "calendar_events_api", action: "update", id: target_event_id, format: "json" },
                           { calendar_event: { title: "new title", rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=4" }, which: "one" })
           assert_status(400)
-          expect(json["message"]).to eql "You may not update one event with a new rrule."
+          expect(json["message"]).to eql "You may not update one event with a new schedule."
         end
 
         it "returns an error when which='all' the event is not the head event and the start date changes" do

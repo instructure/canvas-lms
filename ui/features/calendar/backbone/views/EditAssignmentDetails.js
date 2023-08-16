@@ -251,10 +251,6 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
   }
 
   onSaveFail(xhr) {
-    let resp
-    if ((resp = JSON.parse(xhr.responseText))) {
-      showFlashAlert({message: resp.error, err: null, type: 'error'})
-    }
     this.closeCB()
     this.disableWhileLoadingOpts = {}
     return super.onSaveFail(xhr)

@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {render, act, within} from '@testing-library/react'
 import {getByText as domGetByText, waitFor} from '@testing-library/dom'
 
@@ -31,22 +30,14 @@ const eventMock = {
   series_head: false,
 }
 
-const paramsMock = {
-  'calendar_event[title]': 'test',
-}
 const handleCancel = jest.fn()
 const handleUpdate = jest.fn()
-const handleUpdated = jest.fn()
-const handleError = jest.fn()
 
 const defaultProps = {
   event: eventMock,
-  params: paramsMock,
   isOpen: true,
   onCancel: handleCancel,
   onUpdate: handleUpdate,
-  onUpdated: handleUpdated,
-  onError: handleError,
 }
 
 function renderDialog(overrideProps = {}) {
@@ -54,13 +45,7 @@ function renderDialog(overrideProps = {}) {
   return render(<UpdateCalendarEventDialog {...props} />)
 }
 
-jest.mock('@canvas/do-fetch-api-effect')
-
 describe('UpdateCalendarEventDialog', () => {
-  beforeEach(() => doFetchApi.mockImplementation(() => Promise.resolve({})))
-
-  afterEach(() => doFetchApi.mockClear())
-
   it('renders event series dialog', () => {
     const {getByText} = renderDialog()
     expect(getByText('Confirm Changes')).toBeInTheDocument()
@@ -88,66 +73,11 @@ describe('UpdateCalendarEventDialog', () => {
     expect(handleCancel).toHaveBeenCalled()
   })
 
-  it('calls callbacks when updating', async () => {
+  it('calls callbacks with selected option', () => {
     const {getByText} = renderDialog()
+    act(() => getByText('All events').click())
     act(() => getByText('Confirm').closest('button').click())
-    expect(handleUpdate).toHaveBeenCalled()
-    await waitFor(() => expect(handleUpdated).toHaveBeenCalled())
-  })
-
-  it('calls callbacks when updating has errors', async () => {
-    const {getByText} = renderDialog()
-    doFetchApi.mockImplementationOnce(() => Promise.reject())
-    act(() => getByText('Confirm').closest('button').click())
-    expect(handleUpdate).toHaveBeenCalled()
-    await waitFor(() => expect(handleError).toHaveBeenCalled())
-  })
-
-  describe('sends correct params when', () => {
-    const selectEventOption = optionText => {
-      const {getByText} = renderDialog()
-      getByText(optionText).click()
-      act(() => getByText('Confirm').closest('button').click())
-    }
-
-    it('"this event" is selected', () => {
-      selectEventOption('This event')
-      expect(doFetchApi.mock.calls.length).toBe(1)
-      expect(doFetchApi.mock.calls[0][0].params.which).toBe('one')
-    })
-
-    it('"this and all following" is selected', () => {
-      selectEventOption('This and all following events')
-      expect(doFetchApi.mock.calls.length).toBe(1)
-      expect(doFetchApi.mock.calls[0][0].params.which).toBe('following')
-    })
-
-    it('"all events" is selected', () => {
-      selectEventOption('All events')
-      expect(doFetchApi.mock.calls.length).toBe(1)
-      expect(doFetchApi.mock.calls[0][0].params.which).toBe('all')
-    })
-  })
-
-  describe('while updating is in flight', () => {
-    beforeEach(() => {
-      doFetchApi.mockImplementation(() => new Promise(resolve => setTimeout(() => resolve()), 1))
-    })
-
-    it('shows cancel and update tooltip', () => {
-      const {getByRole, getAllByText} = renderDialog()
-      const confirmButton = getByRole('button', {name: 'Confirm'})
-      act(() => confirmButton.click())
-      expect(getAllByText('Wait for update to complete').length).toEqual(2)
-    })
-
-    it('renders a spinner inside the update button', () => {
-      const {getByRole} = renderDialog()
-      const confirmButton = getByRole('button', {name: 'Confirm'})
-      act(() => confirmButton.click())
-      const spinner = within(confirmButton).getByRole('img', {name: 'Updating'})
-      expect(spinner).toBeInTheDocument()
-    })
+    expect(handleUpdate).toHaveBeenCalledWith('all')
   })
 
   describe('render function', () => {

@@ -20,15 +20,12 @@ import $ from 'jquery'
 import '@canvas/backbone'
 import _ from 'lodash'
 import moment from 'moment-timezone'
-import {fireEvent, within, getByText} from '@testing-library/dom'
+import {fireEvent, within, getByText, waitFor} from '@testing-library/dom'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
-import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
+import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 
 jest.mock('@canvas/rce/RichContentEditor')
-jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
-  renderUpdateCalendarEventDialog: jest.fn(),
-}))
 
 const defaultTZ = 'Asia/Tokyo'
 
@@ -39,6 +36,9 @@ describe('EditEventView', () => {
   beforeEach(() => {
     window.ENV = {FEATURES: {}, TIMEZONE: 'Asia/Tokyo'}
     document.body.innerHTML = '<div id="application"><form id="content"></form></div>'
+    jest
+      .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
+      .mockImplementation(() => Promise.resolve('all'))
   })
 
   afterEach(() => {
@@ -294,24 +294,31 @@ describe('EditEventView', () => {
       expect(within(document.body).queryByText('Frequency:')).not.toBeVisible()
     })
 
-    it('render update calendar event dialog', async () => {
+    it('renders update calendar event dialog', async () => {
       const view = render({series_uuid: '123'})
-
       view.submit(null)
 
-      expect(renderUpdateCalendarEventDialog).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          event: expect.objectContaining({
-            id: 1,
-            title: 'My Event',
-          }),
-          params: expect.objectContaining({
-            'calendar_event[title]': 'My Event',
-          }),
-          isOpen: true,
-        })
+      await waitFor(() =>
+        expect(
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
+        ).toHaveBeenCalledWith(expect.objectContaining(view.model.attributes))
       )
+    })
+
+    it('submits which params for recurring events', async () => {
+      expect.assertions(1)
+      const view = render({
+        rrule: 'FREQ=DAILY;INTERVAL=1;COUNT=3',
+        series_uuid: '123',
+      })
+      view.renderWhichEditDialog = jest.fn(() => Promise.resolve('all'))
+      view.model.save = jest.fn(() => {
+        expect(view.model.get('which')).toEqual('all')
+      })
+      view.submit(null)
+      await waitFor(() => {
+        if (view.model.get('which') !== 'all') throw new Error('which was not set')
+      })
     })
   })
 })

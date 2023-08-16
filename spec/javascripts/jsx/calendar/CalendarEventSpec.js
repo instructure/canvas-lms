@@ -67,5 +67,22 @@ QUnit.module('Calendar', () => {
         strictEqual(calendarEvent.hideSpinner.callCount, 1)
       })
     })
+
+    QUnit.module('#url()', () => {
+      test('url for a new event', () => {
+        const calendarEvent = new CalendarEvent()
+        strictEqual(calendarEvent.url(), '/api/v1/calendar_events/')
+      })
+
+      test('url for an existing event', () => {
+        const calendarEvent = new CalendarEvent({id: 1})
+        strictEqual(calendarEvent.url(), '/api/v1/calendar_events/1')
+      })
+
+      test('url for an existing event in a series', () => {
+        const calendarEvent = new CalendarEvent({id: 1, which: 'all'})
+        strictEqual(calendarEvent.url(), '/api/v1/calendar_events/1?which=all')
+      })
+    })
   })
 })
