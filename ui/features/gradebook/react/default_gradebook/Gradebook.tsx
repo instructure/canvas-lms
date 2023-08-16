@@ -5144,6 +5144,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
                 this.gradebookGrid?.gridSupport?.helper.beginEdit()
               }
             }}
+            handleOnGradeChange={(studentId, grade) =>
+              this.finalGradeOverrides?.updateGrade(studentId, grade)
+            }
             navigateDown={() => {
               this.gradebookGrid?.grid?.navigateDown()
               this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
@@ -5152,6 +5155,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
               this.gradebookGrid?.grid?.navigateUp()
               this.gradebookGrid?.gridSupport?.helper.commitCurrentEdit()
             }}
+            pointsBasedGradingSchemesFeatureEnabled={!!ENV.POINTS_BASED_GRADING_SCHEMES_ENABLED}
             selectedGradingPeriodId={this.gradingPeriodId}
           />
         )}

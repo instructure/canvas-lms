@@ -18,8 +18,9 @@
 
 import React, {useEffect} from 'react'
 import {ApolloProvider, createClient} from '@canvas/apollo'
+import {FinalGradeOverrideTextBox} from '@canvas/final-grade-override'
+import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Avatar} from '@instructure/ui-avatar'
@@ -29,7 +30,6 @@ import {ApplyTheme} from '@instructure/ui-themeable'
 import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {TextInput} from '@instructure/ui-text-input'
 import GradeOverrideTrayRadioInputGroup from './GradeOverrideTrayRadioInputGroup'
 import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
@@ -44,9 +44,11 @@ const I18n = useI18nScope('gradebook')
 export type TotalGradeOverrideTrayProps = {
   customGradeStatuses: GradeStatus[]
   handleDismiss: (manualDismiss: boolean) => void
+  handleOnGradeChange: (studentId: string, grade: GradeOverrideInfo) => void
   selectedGradingPeriodId?: string
   navigateDown: () => void
   navigateUp: () => void
+  pointsBasedGradingSchemesFeatureEnabled: boolean
 }
 
 export function TotalGradeOverrideTrayProvider(props: TotalGradeOverrideTrayProps) {
@@ -61,8 +63,10 @@ export function TotalGradeOverrideTray({
   customGradeStatuses,
   selectedGradingPeriodId,
   handleDismiss,
+  handleOnGradeChange,
   navigateDown,
   navigateUp,
+  pointsBasedGradingSchemesFeatureEnabled,
 }: TotalGradeOverrideTrayProps) {
   const {finalGradeOverrideTrayProps, toggleFinalGradeOverrideTray, finalGradeOverrides} =
     useStore()
@@ -86,13 +90,19 @@ export function TotalGradeOverrideTray({
     return null
   }
 
+  const {id: studentId} = studentInfo
+
   const selectedCustomStatusId = gradeOverrideCustomStatus(
     finalGradeOverrides,
-    studentInfo.id,
+    studentId,
     selectedGradingPeriodId
   )
 
   const {name, avatarUrl, gradesUrl, enrollmentId} = studentInfo
+
+  const getNullableSelectedGradingPeriodId = (): string | null | undefined => {
+    return selectedGradingPeriodId === '0' ? null : selectedGradingPeriodId
+  }
 
   const dismissTray = (manualDismiss: boolean) => {
     toggleFinalGradeOverrideTray(false)
@@ -100,7 +110,7 @@ export function TotalGradeOverrideTray({
   }
 
   const handleRadioInputChanged = async (newCustomStatusId: string | null) => {
-    const gradingPeriodId = selectedGradingPeriodId === '0' ? null : selectedGradingPeriodId
+    const gradingPeriodId = getNullableSelectedGradingPeriodId()
     await saveFinalOverrideCustomStatus(newCustomStatusId, enrollmentId, gradingPeriodId)
 
     const finalGradeOverrideToUpdate = {...finalGradeOverrides[studentInfo.id]}
@@ -126,6 +136,8 @@ export function TotalGradeOverrideTray({
     gradeEntry && gradeInfo ? gradeEntry.formatGradeInfoForInput(gradeInfo) : ''
 
   const radioInputDisabled = gradeInfoInput === '' || saveCallStatus === ApiCallStatus.PENDING
+
+  const studentFinalGradeOverrides = finalGradeOverrides[studentId]
 
   return (
     <Tray
@@ -175,10 +187,15 @@ export function TotalGradeOverrideTray({
           </View>
 
           <View as="div" margin="medium 0">
-            <TextInput
-              renderLabel={<ScreenReaderContent>{I18n.t('Grade Override')}</ScreenReaderContent>}
-              value={gradeInfoInput}
-              disabled={true}
+            <FinalGradeOverrideTextBox
+              onGradeChange={newGrade => {
+                handleOnGradeChange(studentId, newGrade)
+              }}
+              pointsBasedGradingSchemesFeatureEnabled={pointsBasedGradingSchemesFeatureEnabled}
+              finalGradeOverride={studentFinalGradeOverrides}
+              gradingPeriodId={getNullableSelectedGradingPeriodId()}
+              gradingScheme={gradeEntry?.gradingScheme}
+              showPercentageLabel={false}
               width="4rem"
             />
           </View>
