@@ -104,11 +104,12 @@ export default function AssignmentInformation({
     online_url: I18n.t('Online URL'),
     online_upload: I18n.t('Online upload'),
     media_recording: I18n.t('Media recording'),
+    student_annotation: I18n.t('Student annotation'),
   }
 
   const readableSubmissionTypes = submissionTypes
     ?.map(snakeCase => translatedSubmissionTypes[snakeCase])
-    .join(',')
+    .join(', ')
 
   const speedGraderUrl = () => {
     return `${contextUrl}/gradebook/speed_grader?assignment_id=${assignment.id}`
