@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "active_support"
-require "google/api_client"
+require "google/apis/drive_v3"
 
 module GoogleDrive
   require "google_drive/no_token_error"

@@ -20,9 +20,9 @@
 
 describe GoogleDocsCollaboration do
   def stub_service
-    google_drive_connection = double(retrieve_access_token: "asdf123", acl_add: nil, acl_remove: nil)
+    google_drive_connection = instance_double("GoogleDrive::Connection", acl_add: nil, acl_remove: nil)
     allow(GoogleDrive::Connection).to receive(:new).and_return(google_drive_connection)
-    file = double(data: double(id: 1, to_json: "{id: 1}", alternateLink: "http://google.com"))
+    file = instance_double("Google::Apis::DriveV3::File", id: 1, to_h: { id: 1, web_view_link: "http://google.com" }, web_view_link: "http://google.com")
     allow(google_drive_connection).to receive(:create_doc).with("title").and_return(file)
   end
 

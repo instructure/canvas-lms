@@ -82,11 +82,6 @@ describe Collaboration do
       google_docs_collaboration_model
     end
 
-    it "is able to parse the data stored as JSON" do
-      ae = @collaboration.parse_data
-      expect(ae["title"]).to eql("Biology 100 Collaboration")
-    end
-
     it "has Google Docs as a default service name" do
       expect(@collaboration.service_name).to eql("Google Docs")
     end

@@ -319,22 +319,11 @@ class UsersController < ApplicationController
     elsif params[:code] && params[:state] && params[:service] == "google_drive"
 
       begin
-        client = google_drive_client
-        client.authorization.code = params[:code]
-        client.authorization.fetch_access_token!
+        drive = google_drive_client
+        drive.authorization.code = params[:code]
+        drive.authorization.fetch_access_token!
 
-        # we should look into consolidating this and connection.rb
-        drive = Rails.cache.fetch(["google_drive_v2"].cache_key) do
-          client.discovered_api("drive", "v2")
-        end
-
-        result = client.execute!(api_method: drive.about.get)
-
-        if result.status == 200
-          user_info = result.data
-        else
-          raise "Error getting user info from Google"
-        end
+        result = drive.get_about(fields: "user")
 
         json = Canvas::Security.decode_jwt(params[:state])
         render_unauthorized_action and return unless json["nonce"] && json["nonce"] == session[:oauth_gdrive_nonce]
@@ -345,15 +334,15 @@ class UsersController < ApplicationController
           UserService.register(
             service: "google_drive",
             service_domain: "drive.google.com",
-            token: client.authorization.refresh_token,
-            secret: client.authorization.access_token,
+            token: drive.authorization.refresh_token,
+            secret: drive.authorization.access_token,
             user: logged_in_user,
-            service_user_id: user_info["permissionId"],
-            service_user_name: user_info["user"]["emailAddress"]
+            service_user_id: result.user.permission_id,
+            service_user_name: result.user.email_address
           )
         else
-          session[:oauth_gdrive_access_token] = client.authorization.access_token
-          session[:oauth_gdrive_refresh_token] = client.authorization.refresh_token
+          session[:oauth_gdrive_access_token] = drive.authorization.access_token
+          session[:oauth_gdrive_refresh_token] = drive.authorization.refresh_token
         end
 
         flash[:notice] = t("google_drive_added", "Google Drive account successfully added!")
@@ -361,7 +350,7 @@ class UsersController < ApplicationController
       rescue Signet::AuthorizationError => e
         Canvas::Errors.capture_exception(:oauth, e, :info)
         flash[:error] = t("google_drive_authorization_failure", "Google Drive failed authorization for current user!")
-      rescue Google::APIClient::ClientError => e
+      rescue Google::Apis::Error => e
         Canvas::Errors.capture_exception(:oauth, e, :warn)
         flash[:error] = e.to_s
       end
@@ -2937,6 +2926,16 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def google_drive_client
+    settings = Canvas::Plugin.find(:google_drive).try(:settings) || {}
+    client_secrets = {
+      client_id: settings[:client_id],
+      client_secret: settings[:client_secret_dec],
+      redirect_uri: settings[:redirect_uri]
+    }.with_indifferent_access
+    GoogleDrive::Client.create(client_secrets)
+  end
 
   def generate_grading_period_id(period_id)
     # nil and '' will get converted to 0 in the .to_i call

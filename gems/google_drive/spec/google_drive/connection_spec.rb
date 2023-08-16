@@ -54,18 +54,13 @@ describe GoogleDrive::Connection do
   end
 
   describe "API interaction" do
-    before do
-      stub_request(:get, "https://www.googleapis.com/discovery/v1/apis/drive/v2/rest")
-        .to_return(
-          status: 200,
-          body: load_fixture("discovered_api.json"),
-          headers: { "Content-Type" => "application/json" }
-        )
-    end
-
     describe "#create_doc" do
       it "wraps a timeout in a drive connection exception" do
-        allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+        allow(connection).to receive(:force_token_update)
+        stub_request(:post, "https://www.googleapis.com/drive/v3/files?fields=id,webViewLink")
+          .to_return do
+            raise HTTPClient::ReceiveTimeoutError
+          end
         expect { connection.create_doc("Docname") }.to(
           raise_error(GoogleDrive::ConnectionException) do |e|
             expect(e.message).to eq("Google Drive connection timed out")
@@ -76,8 +71,8 @@ describe GoogleDrive::Connection do
 
     describe "#authorized?" do
       it "returns false when there ConnectionException" do
-        GoogleDrive::Connection.config = GoogleDrive::Connection.config = proc do
-        end
+        stub_request(:get, "https://www.googleapis.com/drive/v3/about?fields=user")
+          .to_return(status: 500, body: "", headers: {})
 
         expect(connection.authorized?).to be false
       end
@@ -89,7 +84,7 @@ describe GoogleDrive::Connection do
       end
 
       it "returns true when response is 200" do
-        stub_request(:get, "https://www.googleapis.com/drive/v2/about")
+        stub_request(:get, "https://www.googleapis.com/drive/v3/about?fields=user")
           .to_return(status: 200, body: "", headers: {})
 
         expect(connection.authorized?).to be true
