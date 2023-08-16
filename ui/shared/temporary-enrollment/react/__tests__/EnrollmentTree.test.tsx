@@ -26,7 +26,10 @@ const simpleProps = {
     {id: '92', base_role_name: 'StudentEnrollment', label: 'StudentRole'},
     {id: '93', base_role_name: 'TeacherEnrollment', label: 'SubTeacherRole'},
   ],
-  selectRoleId: '',
+  selectedRole: {
+    id: '',
+    baseRoleName: '',
+  },
   list: [
     {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
     {id: '2', course_id: '11', course_section_id: '111', role_id: '92'},
@@ -37,16 +40,38 @@ const simpleProps = {
 const complexProps = {
   roles: [
     {id: '92', base_role_name: 'StudentEnrollment', label: 'StudentRole'},
-    {id: '93', base_role_name: 'TeacherEnrollment', label: 'SubTeacherRole'},
+    {id: '93', base_role_name: 'TeacherEnrollment', label: 'SubTeacherRole'}, // Custom role
     {id: '94', base_role_name: 'DesignerEnrollment', label: 'DesignRole'},
   ],
-  selectRoleId: '',
+  selectedRole: {
+    id: '',
+    baseRoleName: '',
+  },
   list: [
     {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
     {id: '2', course_id: '11', course_section_id: '111', role_id: '92'},
     {id: '3', course_id: '11', course_section_id: '112', role_id: '92'},
     {id: '4', course_id: '11', course_section_id: '112', role_id: '94'},
   ],
+}
+
+const submitProps = {
+  roles: [
+    {id: '92', base_role_name: 'StudentEnrollment', label: 'StudentRole'},
+    {id: '93', base_role_name: 'TeacherEnrollment', label: 'SubTeacherRole'},
+    {id: '94', base_role_name: 'DesignerEnrollment', label: 'DesignRole'},
+  ],
+  selectedRole: {
+    id: '',
+    baseRoleName: '',
+  },
+  list: [
+    {id: '1', course_id: '11', course_section_id: '111', role_id: '93'},
+    {id: '2', course_id: '11', course_section_id: '111', role_id: '92'},
+    {id: '3', course_id: '11', course_section_id: '112', role_id: '92'},
+    {id: '4', course_id: '11', course_section_id: '112', role_id: '94'},
+  ],
+  createEnroll: jest.fn(),
 }
 
 describe('EnrollmentTree', () => {
@@ -135,5 +160,11 @@ describe('EnrollmentTree', () => {
     const allChecked = getAllByRole('checkbox', {checked: true})
     // parent + child + default
     expect(allChecked.length).toBe(3)
+  })
+
+  it('calls createEnroll when available', async () => {
+    const {getByText} = render(<EnrollmentTree {...submitProps} />)
+    await waitFor(() => expect(getByText('SubTeacherRole')).toBeInTheDocument())
+    expect(submitProps.createEnroll).toHaveBeenCalledTimes(1)
   })
 })

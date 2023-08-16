@@ -143,7 +143,7 @@ export default function RoleSearchSelect(props: Props) {
     setSelectedOptionId(id)
     setIsShowingOptions(false)
     setAnnouncement(I18n.t('%{option} selected. List collapsed.', {option: selectedOption?.name}))
-    onChange(event, selectedOption)
+    onChange(event, {id, option: selectedOption})
   }
 
   function onBlur(e: any) {
