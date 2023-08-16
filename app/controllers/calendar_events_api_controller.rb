@@ -915,12 +915,12 @@ class CalendarEventsApiController < ApplicationController
     params_for_update.delete(:context_code)
 
     if which == "one" && rrule.present? && rrule_changed
-      render json: { message: t("You may not update one event with a new rrule.") }, status: :bad_request
+      render json: { message: t("You may not update one event with a new schedule.") }, status: :bad_request
       return
     end
 
     all_date_change_ok = false
-    if which == "all" && Date.parse(params_for_update[:start_at]) != target_event.start_at.to_date
+    if which == "all" && Time.parse(params_for_update[:start_at]).utc.to_date != target_event.start_at&.utc&.to_date
       if target_event.series_head?
         all_date_change_ok = true
       else

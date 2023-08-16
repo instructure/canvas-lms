@@ -28,6 +28,7 @@ import {TimeSelect} from '@instructure/ui-time-select'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
 import {IconInfoLine} from '@instructure/ui-icons'
+import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
@@ -51,32 +52,6 @@ const screenReaderMessageCallback = msg => {
   return () => showFlashAlert({message: msg, type: 'info', srOnly: true})
 }
 
-const renderWhichEditDialog = (selectedEvent, params) => {
-  let modalContainer = document.getElementById('update_modal_container')
-  if (!modalContainer) {
-    modalContainer = document.createElement('div')
-    modalContainer.id = 'update_modal_container'
-    document.body.appendChild(modalContainer)
-  }
-
-  renderUpdateCalendarEventDialog(modalContainer, {
-    event: selectedEvent.calendarEvent,
-    params,
-    isOpen: true,
-    onCancel: () => ReactDOM.unmountComponentAtNode(modalContainer),
-    onUpdate: which => $.publish('CommonEvent/eventSavingFromSeries', {selectedEvent, which}),
-    onUpdated: (_, which) => {
-      ReactDOM.unmountComponentAtNode(modalContainer)
-      $.publish('CommonEvent/eventSavedFromSeries', {selectedEvent, which})
-      screenReaderMessageCallback(I18n.t('The events were successfully updated'))
-    },
-    onError: (_, which) => {
-      $.publish('CommonEvent/eventSavedFromSeriesFailed', {selectedEvent, which})
-      screenReaderMessageCallback(I18n.t('Events update failed'))
-    },
-  })
-}
-
 const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContextCB, timezone}) => {
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
   const locale = ENV?.MOMENT_LOCALE || ENV?.LOCALE || 'en'
@@ -94,10 +69,10 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const [shouldShowConferences, setShouldShowConferences] = useState(false)
   const [isImportant, setImportant] = useState(event.important_dates)
   const [isBlackout, setBlackout] = useState(event.blackout_date)
-  const [moreOptionsLink, setMoreOptionsLink] = useState('#')
   const [startMessages, setStartMessages] = useState([])
   const [endMessages, setEndMessages] = useState([])
   const [firstRender, setFirstRender] = useState(true)
+  const [isWorking, setIsWorking] = useState(false)
 
   const allContexts = event.allPossibleContexts
 
@@ -135,16 +110,8 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       if (!shouldShowBlackoutDateCheckbox()) setBlackout(false)
 
       if (propagate !== false) contextChangeCB(context.asset_string)
-
-      setMoreOptionsLink(getMoreOptionsHref())
     },
-    [
-      context,
-      event.contextInfo,
-      shouldShowBlackoutDateCheckbox,
-      contextChangeCB,
-      getMoreOptionsHref,
-    ]
+    [context, event.contextInfo, shouldShowBlackoutDateCheckbox, contextChangeCB]
   )
 
   const contextFromCode = useCallback(
@@ -300,7 +267,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
     return momentTime
   }
 
-  const formSubmit = jsEvent => {
+  const formSubmit = async jsEvent => {
     jsEvent.preventDefault()
 
     const startAt = addTimeToDate(startTime)
@@ -365,8 +332,14 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       const newEvent = commonEventFactory(objectData, event.possibleContexts())
       newEvent.save(
         params,
-        screenReaderMessageCallback(I18n.t('The event was successfully created')),
-        screenReaderMessageCallback(I18n.t('Event creation failed'))
+        () => {
+          screenReaderMessageCallback(I18n.t('The event was successfully created'))
+          closeCB()
+        },
+        () => {
+          screenReaderMessageCallback(I18n.t('Event creation failed'))
+          closeCB()
+        }
       )
     } else {
       event.title = params['calendar_event[title]']
@@ -386,23 +359,30 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       }
 
       if (ENV?.FEATURES?.calendar_series && event.calendarEvent?.series_uuid) {
-        renderWhichEditDialog(event, params)
-      } else {
-        event.save(
-          params,
-          screenReaderMessageCallback(I18n.t('The event was successfully updated')),
-          screenReaderMessageCallback(I18n.t('Event update failed'))
-        )
+        const which = await renderUpdateCalendarEventDialog(event)
+        if (which === undefined) return
+        $.publish('CommonEvent/eventSavingFromSeries', {selectedEvent: event, which})
+        params.which = which
       }
+      event.save(
+        params,
+        () => {
+          screenReaderMessageCallback(I18n.t('The event was successfully updated'))
+          closeCB()
+        },
+        () => {
+          closeCB()
+        }
+      )
     }
-
-    return closeCB()
+    setIsWorking(true)
   }
 
   return (
     <View as="form" data-testid="calendar-event-form" onSubmit={formSubmit} margin="small">
       <FormFieldGroup description="" rowSpacing="small" vAlign="middle">
         <TextInput
+          data-testid="edit-calendar-event-form-title"
           renderLabel={I18n.t('Title:')}
           value={title}
           placeholder={I18n.t('Input Event Title...')}
@@ -468,6 +448,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         )}
         {shouldShowLocationField() && (
           <TextInput
+            data-testid="edit-calendar-event-form-location"
             disabled={!shouldEnableLocationField()}
             renderLabel={I18n.t('Location:')}
             value={shouldEnableLocationField() ? location : ''}
@@ -565,20 +546,34 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
         )}
         <Flex justifyItems="end" margin="medium none none none">
           <Flex.Item padding="none x-small" shouldShrink={true}>
-            <Button
-              data-testid="edit-calendar-event-more-options-button"
-              href={moreOptionsLink}
-              type="button"
-              color="secondary"
-              onClick={moreOptionsClick}
-            >
-              {I18n.t('More Options')}
-            </Button>
+            <Tooltip renderTip={I18n.t('A save is in progress')} on={isWorking ? undefined : []}>
+              <Button
+                data-testid="edit-calendar-event-more-options-button"
+                type="button"
+                color="secondary"
+                onClick={e => (isWorking ? e.preventDefault() : moreOptionsClick(e))}
+              >
+                {I18n.t('More Options')}
+              </Button>
+            </Tooltip>
           </Flex.Item>
           <Flex.Item padding="none xxx-small" shouldShrink={true}>
-            <Button data-testid="edit-calendar-event-submit-button" type="submit" color="primary">
-              {I18n.t('Submit')}
-            </Button>
+            <Tooltip renderTip={I18n.t('A save is in progress')} on={isWorking ? undefined : []}>
+              <Button
+                data-testid="edit-calendar-event-submit-button"
+                color="primary"
+                onClick={e => {
+                  isWorking ? e.preventDefault() : formSubmit(e)
+                }}
+                type="submit"
+              >
+                {isWorking ? (
+                  <Spinner renderTitle={I18n.t('Saving')} size="x-small" />
+                ) : (
+                  I18n.t('Submit')
+                )}
+              </Button>
+            </Tooltip>
           </Flex.Item>
         </Flex>
       </FormFieldGroup>

@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import tz from '@canvas/timezone'
 import moment from 'moment-timezone'
 import Backbone from '@canvas/backbone'
@@ -41,6 +40,7 @@ import FrequencyPicker, {
 } from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
 import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import {RRULEToFrequencyOptionValue} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
+import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 
 const I18n = useI18nScope('calendar.edit')
 
@@ -468,44 +468,22 @@ export default class EditCalendarEventView extends Backbone.View {
     return this.saveEvent(eventData)
   }
 
-  renderWhichEditDialog(eventData) {
-    const modalNode = document.getElementById('which_edit_modal')
-    const params = {}
-    Object.keys(eventData).forEach(key => (params[`calendar_event[${key}]`] = eventData[key]))
-
-    return renderUpdateCalendarEventDialog(modalNode, {
-      event: this.model.attributes,
-      params,
-      isOpen: true,
-      onCancel: () => ReactDOM.unmountComponentAtNode(modalNode),
-      onUpdated: () => this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully')),
-      onError: response => {
-        showFlashAlert({
-          message: response.message,
-          err: null,
-          type: 'error',
-        })
-        ReactDOM.unmountComponentAtNode(modalNode)
-      },
-    })
-  }
-
-  saveEvent(eventData) {
+  async saveEvent(eventData) {
     RichContentEditor.closeRCE(this.$('textarea'))
 
     if (ENV?.FEATURES?.calendar_series && this.model.get('series_uuid')) {
-      return this.renderWhichEditDialog(eventData)
+      const which = await renderUpdateCalendarEventDialog(this.model.attributes)
+      if (which === undefined) return
+      this.model.set('which', which)
     }
 
     return this.$el.disableWhileLoading(
       this.model.save(eventData, {
         success: () => this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully')),
-        error: (_model, response, _options) =>
-          showFlashAlert({
-            message: response.responseText,
-            err: null,
-            type: 'error',
-          }),
+        error: (model, response, _options) => {
+          CommonEventShowError(JSON.parse(response.responseText))
+        },
+        skipDefaultError: true,
       })
     )
   }

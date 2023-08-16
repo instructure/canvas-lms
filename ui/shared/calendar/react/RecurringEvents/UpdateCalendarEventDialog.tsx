@@ -23,89 +23,42 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button} from '@instructure/ui-buttons'
 // @ts-expect-error
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
-import {Spinner} from '@instructure/ui-spinner'
-// @ts-expect-error
-import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Which, CalendarEvent} from './types'
 
 const I18n = useI18nScope('calendar_event')
 
 type Props = {
   readonly event: CalendarEvent
-  readonly params: object
   readonly isOpen: boolean
   readonly onUpdate?: (which: Which) => void
   readonly onCancel?: () => void
-  readonly onUpdated?: (updatedEvents: [Event], which: Which) => void
-  readonly onError?: (response: any, which: Which) => void
 }
 
-const UpdateCalendarEventDialog = ({
-  event,
-  params,
-  isOpen,
-  onUpdate,
-  onCancel,
-  onUpdated,
-  onError,
-}: Props) => {
+const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) => {
   const [which, setWhich] = useState<Which>('one')
-  const [isUpdating, setIsUpdating] = useState<boolean>(false)
 
   const handleCancel = useCallback(() => {
     onCancel?.()
   }, [onCancel])
 
   const handleSubmit = useCallback(() => {
-    setIsUpdating(true)
     onUpdate?.(which)
-
-    const handleSuccess = (data: any) => {
-      setIsUpdating(false)
-      onUpdated?.(data, which)
-    }
-
-    const handleError = (response: any) => {
-      setIsUpdating(false)
-      onError?.(response, which)
-    }
-    const requestParams = {...params, which}
-
-    doFetchApi({
-      path: event.url,
-      method: 'PUT',
-      params: requestParams,
-    })
-      .then(handleSuccess)
-      .catch(handleError)
-  }, [event, params, onUpdate, onUpdated, onError, which])
+  }, [onUpdate, which])
 
   const renderFooter = useCallback((): JSX.Element => {
-    const tipText = I18n.t('Wait for update to complete')
     return (
       <Flex as="section" justifyItems="end">
-        <Tooltip renderTip={isUpdating && tipText} on={isUpdating ? ['hover', 'focus'] : []}>
-          <Button color="secondary" margin="0 small 0" onClick={() => isUpdating || handleCancel()}>
-            {I18n.t('Cancel')}
-          </Button>
-        </Tooltip>
-        <Tooltip renderTip={isUpdating && tipText} on={isUpdating ? ['hover', 'focus'] : []}>
-          <Button color="primary" onClick={() => isUpdating || handleSubmit()}>
-            {isUpdating ? (
-              <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
-                <Spinner size="x-small" renderTitle={I18n.t('Updating')} />
-              </div>
-            ) : (
-              I18n.t('Confirm')
-            )}
-          </Button>
-        </Tooltip>
+        <Button color="secondary" margin="0 small 0" onClick={handleCancel}>
+          {I18n.t('Cancel')}
+        </Button>
+        <Button color="primary" onClick={handleSubmit}>
+          {I18n.t('Confirm')}
+        </Button>
       </Flex>
     )
-  }, [handleCancel, handleSubmit, isUpdating])
+  }, [handleCancel, handleSubmit])
 
   return (
     <CanvasModal
@@ -134,8 +87,32 @@ const UpdateCalendarEventDialog = ({
   )
 }
 
-function renderUpdateCalendarEventDialog(element: Element, props: Props): void {
-  ReactDOM.render(<UpdateCalendarEventDialog {...props} />, element)
+const renderUpdateCalendarEventDialog = (selectedEvent: CalendarEvent) => {
+  let modalContainer = document.getElementById('update_modal_container')
+  if (!modalContainer) {
+    modalContainer = document.createElement('div')
+    modalContainer.id = 'update_modal_container'
+    document.body.appendChild(modalContainer)
+  }
+
+  const whichPromise = new Promise(resolve => {
+    ReactDOM.render(
+      <UpdateCalendarEventDialog
+        event={selectedEvent}
+        isOpen={true}
+        onCancel={() => {
+          ReactDOM.unmountComponentAtNode(modalContainer as HTMLElement)
+          resolve(undefined)
+        }}
+        onUpdate={which => {
+          ReactDOM.unmountComponentAtNode(modalContainer as HTMLElement)
+          resolve(which)
+        }}
+      />,
+      modalContainer as HTMLElement
+    )
+  })
+  return whichPromise
 }
 
 export {UpdateCalendarEventDialog, renderUpdateCalendarEventDialog}

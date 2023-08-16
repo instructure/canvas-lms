@@ -22,6 +22,7 @@ import fcUtil from '../fcUtil'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
 import splitAssetString from '@canvas/util/splitAssetString'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('calendar')
 
@@ -142,20 +143,36 @@ Object.assign(CommonEvent.prototype, {
   save(params, success, error) {
     const onSuccess = data => {
       this.copyDataFromObject(data)
-      $.publish('CommonEvent/eventSaved', this)
+      if (params.which) {
+        $.publish('CommonEvent/eventSavedFromSeries', {selectedEvent: this, which: params.which})
+      } else {
+        $.publish('CommonEvent/eventSaved', this)
+      }
       if (typeof success === 'function') return success()
     }
 
     const onError = data => {
-      this.copyDataFromObject(data)
-      $.publish('CommonEvent/eventSaveFailed', this)
-      if (typeof error === 'function') return error()
+      this.copyDataFromObject({...this.calendarEvent, ...data})
+      if (params.which) {
+        $.publish('CommonEvent/eventSavedFromSeriesFailed', {
+          selectedEvent: this,
+          which: params.which,
+        })
+      } else {
+        $.publish('CommonEvent/eventSaveFailed', this)
+      }
+      CommonEventShowError(data)
+      if (typeof error === 'function') return error(data)
     }
 
     const [method, url] = this.methodAndURLForSave()
 
     this.forceMinimumDuration() // so short events don't look squished while waiting for ajax
-    $.publish('CommonEvent/eventSaving', this)
+    if (params.which) {
+      $.publish('CommonEvent/eventSavingFromSeries', {selectedEvent: this, which: params.which})
+    } else {
+      $.publish('CommonEvent/eventSaving', this)
+    }
     return $.ajaxJSON(url, method, params, onSuccess, onError)
   },
 
@@ -282,3 +299,31 @@ Object.assign(CommonEvent.prototype, {
     return this.calendarEvent.all_context_codes.match(new RegExp(`\\b${context_code}\\b`))
   },
 })
+
+export function CommonEventShowError(errResponse) {
+  let msg
+  if (errResponse.status === 'unauthorized') {
+    msg = I18n.t('You are not authorized to perform that action')
+  } else if ('message' in errResponse) {
+    // sometimes calendar_events_api_controller renders this json
+    msg = errResponse.message
+  } else if ('error' in errResponse) {
+    msg = errResponse.error
+  } else if ('errors' in errResponse) {
+    if (Array.isArray(errResponse.errors)) {
+      // returned if an exception is raised
+      msg = errResponse.errors[0]?.message
+    } else {
+      // returned if @event.errors has a value
+      msg = errResponse.errors[Object.keys(errResponse.errors)?.[0]]?.[0].message
+    }
+  } else if ('responseText' in errResponse) {
+    msg = errResponse.responseText
+  }
+  msg ||= JSON.stringify(errResponse)
+  showFlashAlert({
+    message: msg,
+    err: null,
+    type: 'error',
+  })
+}

@@ -572,7 +572,7 @@ module Calendar2Common
   end
 
   def edit_calendar_event_form_more_options
-    f("a[data-testid='edit-calendar-event-more-options-button']")
+    f("button[data-testid='edit-calendar-event-more-options-button']")
   end
 
   def edit_calendar_event_form_submit_button

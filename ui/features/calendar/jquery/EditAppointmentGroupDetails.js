@@ -31,6 +31,7 @@ import {publish as jqueryPublish} from 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 
 const I18n = useI18nScope('EditAppointmentGroupDetails')
 
@@ -362,7 +363,7 @@ export default class EditAppointmentGroupDetails {
       })
       this.closeCB(true)
     }
-    const onError = () => {}
+    const onError = CommonEventShowError
 
     const method = this.editing() ? 'PUT' : 'POST'
 

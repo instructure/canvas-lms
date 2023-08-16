@@ -87,6 +87,15 @@ export default class CalendarEvent extends Backbone.Model {
     return result
   }
 
+  url() {
+    if (this.isNew()) return this.urlRoot
+    let retval = this.urlRoot + encodeURIComponent(this.id)
+    if (this.get('which')) {
+      retval += `?which=${this.get('which')}`
+    }
+    return retval
+  }
+
   fetch(opts = {}) {
     let sectionsDfd, syncDfd
 

@@ -17,20 +17,20 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render} from '@testing-library/react'
+import $ from 'jquery'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
+import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 
 jest.mock('@canvas/calendar/jquery/CommonEvent/index')
-jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
-  renderUpdateCalendarEventDialog: jest.fn(),
-}))
+jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
 
 let defaultProps = eventFormProps()
 
-const changeValue = (component, role, name, value) => {
-  const child = component.getByRole(role, {name})
+const changeValue = (component, testid, value) => {
+  const child = component.getByTestId(testid)
   expect(child).toBeInTheDocument()
   act(() => child.click())
   fireEvent.change(child, {target: {value}})
@@ -38,8 +38,8 @@ const changeValue = (component, role, name, value) => {
   return child
 }
 
-const setTime = (component, label, time) => {
-  const clock = component.getByRole('combobox', {name: label})
+const setTime = (component, testid, time) => {
+  const clock = component.getByTestId(testid)
   act(() => clock.click())
   fireEvent.click(component.getByText(time))
   return clock
@@ -51,21 +51,24 @@ const select = (component, role, name) => {
   act(() => child.click())
 }
 
-const testTimezone = (timezone, inputDate, expectedDate, time) => {
+const testTimezone = async (timezone, inputDate, expectedDate, time) => {
   defaultProps.timezone = timezone
   const component = render(<CalendarEventDetailsForm {...defaultProps} />)
-  const date = changeValue(component, 'combobox', 'Date:', inputDate)
+  const date = changeValue(component, 'edit-calendar-event-form-date', inputDate)
   expect(date.value).toBe('Thu, Jul 14, 2022')
-  if (time) setTime(component, 'From:', time)
+  if (time) setTime(component, 'event-form-end-time', time)
   select(component, 'button', 'Submit')
 
-  expect(defaultProps.event.save).toHaveBeenCalledWith(
-    expect.objectContaining({
-      'calendar_event[start_at]': expectedDate,
-    }),
-    expect.anything(),
-    expect.anything()
+  waitFor(() =>
+    expect(defaultProps.event.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        'calendar_event[start_at]': expectedDate,
+      }),
+      expect.any(Function),
+      expect.any(Function)
+    )
   )
+  await waitFor(() => expect(defaultProps.closeCB).toHaveBeenCalled())
 }
 
 const testBlackoutDateSuccess = () => {
@@ -77,8 +80,8 @@ const testBlackoutDateSuccess = () => {
     expect.objectContaining({
       'calendar_event[blackout_date]': true,
     }),
-    expect.anything(),
-    expect.anything()
+    expect.any(Function),
+    expect.any(Function)
   )
   defaultProps.event.contextInfo = userContext
   defaultProps.event.blackout_date = false
@@ -98,6 +101,12 @@ describe('CalendarEventDetailsForm', () => {
     commonEventFactory.mockImplementation(
       jest.requireActual('@canvas/calendar/jquery/CommonEvent/index').default
     )
+    $.ajaxJSON = (_url, _method, _params, onSuccess, _onError) => {
+      onSuccess({})
+    }
+    jest
+      .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
+      .mockImplementation(() => Promise.resolve('all'))
   })
 
   afterEach(() => {
@@ -111,7 +120,8 @@ describe('CalendarEventDetailsForm', () => {
     expect(defaultProps.contextChangeCB).toHaveBeenCalled()
     select(component, 'button', 'Submit')
 
-    expect(defaultProps.closeCB).toHaveBeenCalled()
+    await waitFor(() => expect(defaultProps.closeCB).toHaveBeenCalled())
+
     // event.possibleContexts() is only called when a the event is new.
     expect(defaultProps.event.possibleContexts).toHaveBeenCalled()
     defaultProps.event.isNewEvent = () => false
@@ -120,17 +130,16 @@ describe('CalendarEventDetailsForm', () => {
   it('renders main elements and updates an event with valid parameters', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    changeValue(component, 'textbox', 'Title:', 'Class Party')
-    changeValue(component, 'textbox', 'Location:', 'The Zoo')
-    changeValue(component, 'combobox', 'Date:', '2022-07-23T00:00:00.000Z')
-    setTime(component, 'From:', '2:00 AM')
-    setTime(component, 'To:', '3:00 PM')
+    changeValue(component, 'edit-calendar-event-form-title', 'Class Party')
+    changeValue(component, 'edit-calendar-event-form-location', 'The Zoo')
+    changeValue(component, 'edit-calendar-event-form-date', '2022-07-23T00:00:00.000Z')
+    setTime(component, 'event-form-start-time', '2:00 AM')
+    setTime(component, 'event-form-end-time', '3:00 PM')
     select(component, 'button', 'Calendar:')
     select(component, 'option', 'Geometry')
     expect(component.getByText('More Options')).toBeInTheDocument()
     select(component, 'button', 'Submit')
-
-    expect(defaultProps.closeCB).toHaveBeenCalled()
+    await waitFor(() => expect(defaultProps.closeCB).toHaveBeenCalled())
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
         'calendar_event[title]': 'Class Party',
@@ -142,35 +151,60 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[important_dates]': false,
         'calendar_event[blackout_date]': false,
       }),
-      expect.anything(),
-      expect.anything()
+      expect.any(Function),
+      expect.any(Function)
+    )
+  })
+
+  it('shows UpdateCalendarEventsDialog when saving a recurring event', async () => {
+    ENV.FEATURES.calendar_series = true
+
+    const props = eventFormProps()
+    props.event.calendarEvent = {
+      ...props.event.calendarEvent,
+      rrule: 'FREQ=DAILY;INTERVAL=1;COUNT=3',
+      series_uuid: '123',
+    }
+
+    const component = render(<CalendarEventDetailsForm {...props} />)
+    select(component, 'button', 'Submit')
+
+    expect(UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog).toHaveBeenCalled()
+    await waitFor(() =>
+      expect(props.event.save).toHaveBeenCalledWith(
+        expect.objectContaining({which: 'all'}),
+        expect.any(Function),
+        expect.any(Function)
+      )
     )
   })
 
   it('can change the date multiple times', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    let date = changeValue(component, 'combobox', 'Date:', '2022-07-03T00:00:00.000Z')
+    let date = changeValue(component, 'edit-calendar-event-form-date', '2022-07-03T00:00:00.000Z')
     expect(date.value).toBe('Sun, Jul 3, 2022')
-    date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
+    date = changeValue(component, 'edit-calendar-event-form-date', '2022-07-14T00:00:00.000Z')
     expect(date.value).toBe('Thu, Jul 14, 2022')
-    date = changeValue(component, 'combobox', 'Date:', '2022-07-23T00:00:00.000Z')
+    date = changeValue(component, 'edit-calendar-event-form-date', '2022-07-23T00:00:00.000Z')
     expect(date.value).toBe('Sat, Jul 23, 2022')
     select(component, 'button', 'Submit')
 
-    expect(defaultProps.event.save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-23T00:00:00.000Z',
-      }),
-      expect.anything(),
-      expect.anything()
+    await waitFor(() =>
+      expect(defaultProps.event.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          'calendar_event[start_at]': '2022-07-23T00:00:00.000Z',
+        }),
+        expect.any(Function),
+        expect.any(Function)
+      )
     )
   })
 
   it('can keep the same date when the date input is clicked and blurred', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
+    const date = changeValue(component, 'edit-calendar-event-form-date', '2022-07-14T00:00:00.000Z')
     expect(date.value).toBe('Thu, Jul 14, 2022')
 
     for (let i = 0; i < 30; i++) {
@@ -180,12 +214,14 @@ describe('CalendarEventDetailsForm', () => {
 
     select(component, 'button', 'Submit')
 
-    expect(defaultProps.event.save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-14T00:00:00.000Z',
-      }),
-      expect.anything(),
-      expect.anything()
+    await waitFor(() =>
+      expect(defaultProps.event.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          'calendar_event[start_at]': '2022-07-14T00:00:00.000Z',
+        }),
+        expect.any(Function),
+        expect.any(Function)
+      )
     )
   })
 
@@ -255,8 +291,8 @@ describe('CalendarEventDetailsForm', () => {
   it('cannot have end time before start time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const start = setTime(component, 'From:', '5:00 AM')
-    setTime(component, 'To:', '4:00 AM')
+    const start = setTime(component, 'event-form-start-time', '5:00 AM')
+    setTime(component, 'event-form-end-time', '4:00 AM')
 
     const errMessage = component.getByText('End time cannot be before Start time')
     expect(errMessage).toBeInTheDocument()
@@ -268,8 +304,8 @@ describe('CalendarEventDetailsForm', () => {
   it('cannot have start time after end time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const end = setTime(component, 'To:', '2:00 AM')
-    setTime(component, 'From:', '2:30 AM')
+    const end = setTime(component, 'event-form-end-time', '2:00 AM')
+    setTime(component, 'event-form-start-time', '2:30 AM')
 
     const errMessage = component.getByText('Start Time cannot be after End Time')
     expect(errMessage).toBeInTheDocument()
@@ -289,8 +325,8 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[web_conference][conference_type]': 'BigBlueButton',
         'calendar_event[web_conference][name]': 'BigBlueButton',
       }),
-      expect.anything(),
-      expect.anything()
+      expect.any(Function),
+      expect.any(Function)
     )
   })
 
@@ -304,8 +340,8 @@ describe('CalendarEventDetailsForm', () => {
       expect.objectContaining({
         'calendar_event[web_conference]': '',
       }),
-      expect.anything(),
-      expect.anything()
+      expect.any(Function),
+      expect.any(Function)
     )
   })
 
@@ -320,8 +356,8 @@ describe('CalendarEventDetailsForm', () => {
       expect.objectContaining({
         'calendar_event[important_dates]': true,
       }),
-      expect.anything(),
-      expect.anything()
+      expect.any(Function),
+      expect.any(Function)
     )
   })
 
@@ -336,8 +372,8 @@ describe('CalendarEventDetailsForm', () => {
       expect.objectContaining({
         'calendar_event[important_dates]': true,
       }),
-      expect.anything(),
-      expect.anything()
+      expect.any(Function),
+      expect.any(Function)
     )
   })
 
@@ -443,24 +479,21 @@ describe('CalendarEventDetailsForm', () => {
         expect.objectContaining({
           'calendar_event[rrule]': 'FREQ=DAILY;INTERVAL=1;COUNT=365',
         }),
-        expect.anything(),
-        expect.anything()
+        expect.any(Function),
+        expect.any(Function)
       )
     })
 
     it('with not-repeat option selected does not contain RRULE on submit', async () => {
       const component = render(<CalendarEventDetailsForm {...defaultProps} />)
       select(component, 'button', 'Submit')
-      select(component, 'button', 'Submit')
-      select(component, 'button', 'Submit')
 
-      expect(defaultProps.closeCB).toHaveBeenCalled()
       expect(defaultProps.event.save).toHaveBeenCalledWith(
         expect.not.objectContaining({
           'calendar_event[rrule]': expect.anything(),
         }),
-        expect.anything(),
-        expect.anything()
+        expect.any(Function),
+        expect.any(Function)
       )
     })
 
