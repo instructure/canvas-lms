@@ -38,7 +38,7 @@ export type FinalGradeOverrideTextBoxProps = {
   gradingScheme?: DeprecatedGradingScheme | null
   width?: string
   onGradeChange: (grade: GradeOverrideInfo) => void
-  gradingPeriodId?: string
+  gradingPeriodId?: string | null
   pointsBasedGradingSchemesFeatureEnabled: boolean
   disabled?: boolean
   showPercentageLabel?: boolean
