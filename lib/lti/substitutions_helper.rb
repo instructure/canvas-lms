@@ -264,15 +264,19 @@ module Lti
       last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pluck(:id).first
       return "" unless last_migration_id
 
+      use_alternate_settings = @root_account.feature_enabled?(:tune_lti_context_id_history_query)
+
       # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
       # until a new copy is made to _this_ course
-      Rails.cache.fetch(["recursive_copied_course_lti_context_ids", @context.global_id, last_migration_id].cache_key) do
+      Rails.cache.fetch(["recursive_copied_course_lti_context_ids", @context.global_id, last_migration_id, use_alternate_settings].cache_key) do
         # Finds content migrations for this course and recursively, all content
         # migrations for the source course of the migration -- that is, all
         # content migrations that directly or indirectly provided content to
         # this course. From there we get the unique list of courses, ordering by
         # which has the migration with the latest timestamp.
-        results = Course.connection.with_statement_timeout do
+        results = Course.transaction do
+          Course.connection.statement_timeout = 30 # seconds
+          Course.connection.set("cpu_tuple_cost", 0.2, local: true) if use_alternate_settings
           Course.from(<<~SQL.squish)
             (WITH RECURSIVE all_contexts AS (
               SELECT context_id, source_course_id
