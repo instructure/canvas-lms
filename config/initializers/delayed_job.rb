@@ -120,24 +120,6 @@ Delayed::Worker.on_max_failures = proc do |_job, err|
   err.is_a?(Delayed::Backend::RecordNotFound)
 end
 
-module DelayedJobConfig
-  class << self
-    def config
-      @config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["delayed_jobs.yml", failsafe_cache: Rails.root.join("config")] || "{}")
-    end
-
-    def strands_to_send_to_statsd
-      @strands_to_send_to_statsd ||= (config["strands_to_send_to_statsd"] || []).to_set
-    end
-
-    def reload
-      @config = @strands_to_send_to_statsd = nil
-      config
-    end
-    Canvas::Reloader.on_reload { DelayedJobConfig.reload }
-  end
-end
-
 ### lifecycle callbacks
 
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|

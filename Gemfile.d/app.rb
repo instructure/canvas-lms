@@ -77,10 +77,10 @@ gem "ims-lti", "2.3.3", require: "ims"
 gem "rrule", "0.4.4", require: false
 
 gem "inst_access", "0.1.2"
-gem "inst_statsd", "2.2.0"
+gem "inst_statsd", "~> 3.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
-gem "inst-jobs-statsd", "2.2.0"
+gem "inst-jobs-statsd", "~> 3.0"
 # if updating json gem it will need to be hotfixed because if a newer version of
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.
