@@ -119,7 +119,7 @@ gem "regexp_parser", "~> 2.8", require: false
 gem "retriable", "1.4.1"
 gem "ritex", "1.0.1", require: false
 gem "rotp", "~> 6.2", require: false
-gem "rss", "0.2.9", require: false
+gem "rss", "~> 0.3", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
