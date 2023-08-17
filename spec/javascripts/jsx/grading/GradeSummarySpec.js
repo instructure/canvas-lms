@@ -1605,7 +1605,34 @@ QUnit.module('GradeSummary', () => {
             },
             {
               id: '3',
-              attempt: null,
+              attempt: 0,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '4',
+              attempt: 1,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '5',
+              attempt: 2,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '6',
+              attempt: 3,
               author_name: 'test user',
               created_at: '2022-09-27T19:32:17Z',
               edited_at: null,
@@ -1660,6 +1687,14 @@ QUnit.module('GradeSummary', () => {
       test('gets props getSubmissionCommentsTrayProps for correct assignmentId', () => {
         const commentTrayProps = GradeSummary.getSubmissionCommentsTrayProps('17')
         deepEqual(commentTrayProps, expectedCommentTrayProps)
+      })
+
+      test('it sets attempts less than 1 or null to the value 1', () => {
+        const commentTrayProps = GradeSummary.getSubmissionCommentsTrayProps('22')
+        const {attempts} = commentTrayProps
+        equal(attempts[1].length, 3)
+        equal(attempts[2].length, 1)
+        equal(attempts[3].length, 1)
       })
     })
     QUnit.module('handleSubmissionsCommentTray', () => {

@@ -717,7 +717,7 @@ function getSubmissionCommentsTrayProps(assignmentId) {
   const matchingSubmission = ENV.submissions.find(x => x.assignment_id === assignmentId)
   const {submission_comments, assignment_url: assignmentUrl} = matchingSubmission
   const attempts = submission_comments.reduce((attemptsMessages, comment) => {
-    const currentAttempt = comment.attempt ?? 1
+    const currentAttempt = comment.attempt < 1 ? 1 : comment.attempt
 
     if (attemptsMessages[currentAttempt]) {
       attemptsMessages[currentAttempt].push(comment)
