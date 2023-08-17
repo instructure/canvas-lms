@@ -21,7 +21,6 @@
 
 gem "bootsnap", "~> 1.16", require: false
 gem "rails", "~> 7.0.4"
-gem "tzinfo", "2.0.4"
 gem "switchman", "~> 3.5"
 gem "guardrail", "3.0.2"
 gem "switchman-inst-jobs", "4.0.13"

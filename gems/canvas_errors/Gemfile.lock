@@ -117,7 +117,7 @@ GEM
     rspec-support (3.12.1)
     sorbet-runtime (0.5.10965)
     thor (1.2.2)
-    tzinfo (2.0.4)
+    tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     zeitwerk (2.6.11)
 

@@ -204,7 +204,7 @@ GEM
     thor (1.2.2)
     timecop (0.9.8)
     timeout (0.4.0)
-    tzinfo (2.0.4)
+    tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     webmock (3.18.1)
       addressable (>= 2.8.0)

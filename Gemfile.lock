@@ -1110,7 +1110,7 @@ GEM
     twitter-text (3.1.0)
       idn-ruby
       unf (~> 0.1.0)
-    tzinfo (2.0.4)
+    tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
@@ -1384,7 +1384,6 @@ DEPENDENCIES
   turnitin_api!
   twilio-ruby (~> 6.4)
   twitter!
-  tzinfo (= 2.0.4)
   utf8_cleaner!
   vault (= 0.15.0)
   vericite_api (= 1.5.3)
