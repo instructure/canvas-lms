@@ -83,7 +83,6 @@ declare global {
     change: any
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>
-    decodeFromHex: (str: string) => string
     disableWhileLoading: any
     encodeToHex: (str: string) => string
     fileSize: (size: number) => string

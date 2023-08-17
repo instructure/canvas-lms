@@ -32,15 +32,6 @@ $.encodeToHex = function (str) {
   }
   return hex
 }
-$.decodeFromHex = function (str) {
-  let r = ''
-  let i = 0
-  while (i < str.length) {
-    r += unescape('%' + str.substring(i, i + 2))
-    i += 2
-  }
-  return r
-}
 
 // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
 // note that raw returns a SafeString object, so you may want to call toString
