@@ -28,8 +28,11 @@ jest.mock('../../../../util/utils', () => ({
 
 const defaultProps = {
   conversationMessage: {
-    author: {name: 'Tom Thompson'},
-    recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+    author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+    recipients: [
+      {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+      {name: 'Billy Harris', shortName: 'Billy Harris'},
+    ],
     createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
     body: 'This is the body text for the message.',
   },
@@ -72,8 +75,11 @@ describe('MessageDetailItem', () => {
   it('renders with a link when a link is present', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'a link to google.com',
       },
@@ -94,8 +100,11 @@ describe('MessageDetailItem', () => {
   it('renders with an xss attempt', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: "<script>alert('XSS')</script>",
       },
@@ -114,8 +123,11 @@ describe('MessageDetailItem', () => {
   it('shows attachment links if they exist', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
         attachmentsConnection: {
@@ -132,8 +144,11 @@ describe('MessageDetailItem', () => {
   it('shows media attachment link if it exists', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
         mediaComment: {
@@ -159,8 +174,11 @@ describe('MessageDetailItem', () => {
   it('does not render the reply or reply all options when function is not provided', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
       },
@@ -184,8 +202,11 @@ describe('MessageDetailItem', () => {
   it('sends the selected option to the provided callback function', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+        recipients: [
+          {name: 'Tom Thompson', shortName: 'Tom Thompson'},
+          {name: 'Billy Harris', shortName: 'Billy Harris'},
+        ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
       },

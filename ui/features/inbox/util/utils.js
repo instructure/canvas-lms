@@ -34,7 +34,11 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
   return querySizes
 }
 
-const DEFAULT_USER_PROPERTIES = {_id: null, name: I18n.t('DELETED USER')}
+const DEFAULT_USER_PROPERTIES = {
+  _id: null,
+  name: I18n.t('DELETED USER'),
+  shortName: I18n.t('DELETED USER'),
+}
 
 // Takes in data from either a VIEWABLE_SUBMISSIONS_QUERY or CONVERSATIONS_QUERY
 // Outputs an inbox conversation wrapper
@@ -78,7 +82,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
         inboxConversation.participantString = getParticipantsString(
           inboxConversation?.participants,
           isSubmissionComments,
-          inboxConversation?.messages[inboxConversation.messages.length - 1]?.author?.name ||
+          inboxConversation?.messages[inboxConversation.messages.length - 1]?.author?.shortName ||
             DEFAULT_USER_PROPERTIES.name
         )
         inboxConversation.isPrivate = conversation?.conversation?.isPrivate
@@ -145,10 +149,11 @@ const getSubmissionCommentsParticipantString = messages => {
 }
 const getConversationParticipantString = (participants, conversationOwnerName) => {
   const participantString = participants
-    .filter(p => p?.user?.name !== conversationOwnerName)
+    .filter(p => p?.user?.shortName !== conversationOwnerName)
     .reduce((prev, curr) => {
-      if (!curr?.user?.name && DEFAULT_USER_PROPERTIES.name === conversationOwnerName) return prev
-      return prev + ', ' + (curr?.user?.name || DEFAULT_USER_PROPERTIES.name)
+      if (!curr?.user?.shortName && DEFAULT_USER_PROPERTIES.name === conversationOwnerName)
+        return prev
+      return prev + ', ' + (curr?.user?.shortName || DEFAULT_USER_PROPERTIES.name)
     }, '')
   return conversationOwnerName + participantString
 }
