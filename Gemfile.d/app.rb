@@ -24,7 +24,7 @@ gem "rails", "~> 7.0.4"
 gem "switchman", "~> 3.5"
 gem "guardrail", "3.0.2"
 gem "switchman-inst-jobs", "4.0.13"
-gem "irb", "1.4.1"
+gem "irb", "~> 1.7"
 
 gem "academic_benchmarks", "1.1.2", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
