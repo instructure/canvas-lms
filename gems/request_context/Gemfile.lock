@@ -124,10 +124,10 @@ GEM
       sorbet-runtime
     concurrent-ruby (1.2.2)
     crass (1.0.6)
+    date (3.3.3)
     debug_inspector (1.1.0)
     deep_merge (1.2.2)
     diff-lcs (1.5.0)
-    digest (3.1.1)
     digest-murmurhash (1.1.1)
     diplomat (2.6.4)
       deep_merge (~> 1.2)
@@ -177,20 +177,15 @@ GEM
     mini_portile2 (2.8.4)
     minitest (5.19.0)
     multipart-post (2.3.0)
-    net-imap (0.2.3)
-      digest
+    net-imap (0.3.7)
+      date
       net-protocol
-      strscan
-    net-pop (0.1.1)
-      digest
+    net-pop (0.1.2)
       net-protocol
-      timeout
     net-protocol (0.2.1)
       timeout
-    net-smtp (0.3.1)
-      digest
+    net-smtp (0.3.3)
       net-protocol
-      timeout
     nio4r (2.5.9)
     nokogiri (1.13.10)
       mini_portile2 (~> 2.8.0)
@@ -257,7 +252,6 @@ GEM
       concurrent-ruby (~> 1.0, >= 1.0.2)
     sorbet-runtime (0.5.10965)
     statsd-ruby (1.5.0)
-    strscan (3.0.6)
     thor (1.2.2)
     timecop (0.9.8)
     timeout (0.4.0)
