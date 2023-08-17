@@ -89,7 +89,7 @@ gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"
 gem "mail", "2.7.1", require: false
 gem "marginalia", "1.11.1", require: false
-gem "mime-types", "3.3.1"
+gem "mime-types", "~> 3.5"
 gem "mini_magick", "4.11.0"
 gem "multi_json", "1.15.0"
 gem "net-http", "~> 0.1", require: false
