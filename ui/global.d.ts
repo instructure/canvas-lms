@@ -113,7 +113,6 @@ declare global {
     showIf: ShowIf
     titleize: (str: string) => string
     underscore: (str: string) => string
-    youTubeID: (path: string) => string
   }
 
   declare interface JQueryStatic {

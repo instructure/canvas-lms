@@ -103,12 +103,3 @@ $.queryParam = function (name) {
 $.capitalize = function (string) {
   return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
 }
-
-INST.youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/
-$.youTubeID = function (path) {
-  const match = path.match(INST.youTubeRegEx)
-  if (match && match[match.length - 1]) {
-    return match[match.length - 1]
-  }
-  return null
-}
