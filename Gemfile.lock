@@ -737,7 +737,7 @@ GEM
     net-imap (0.3.7)
       date
       net-protocol
-    net-ldap (0.16.3)
+    net-ldap (0.18.0)
     net-pop (0.1.2)
       net-protocol
     net-protocol (0.2.1)
@@ -1290,7 +1290,7 @@ DEPENDENCIES
   multi_json (= 1.15.0)
   net-http (~> 0.1)
   net-imap (~> 0.3)
-  net-ldap (= 0.16.3)
+  net-ldap (~> 0.18)
   net-pop (~> 0.1)
   net-smtp (~> 0.3)
   nokogiri (~> 1.13.8)
