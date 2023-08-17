@@ -25,6 +25,9 @@ const locale = {
   "armenian_12da6118": { "message": "Armeniska" },
   "belarusian_b2f19c76": { "message": "Vitryska" },
   "bulgarian_feccab7e": { "message": "Bulgariska" },
+  "captions_inherited_from_a_parent_course_cannot_be__9248fa3a": {
+    "message": "Undertexten som ärvts från en överordnad kurs kan inte tas bort."
+  },
   "catalan_16f6b78f": { "message": "Katalanska" },
   "chinese_111d37f6": { "message": "Kinesiska" },
   "chinese_simplified_7f0bd370": { "message": "Förenklad kinesiska" },
@@ -89,7 +92,10 @@ const locale = {
   "ukrainian_945b00b7": { "message": "Ukrainska" },
   "vietnamese_e7a76583": { "message": "Vietnamesiska" },
   "welsh_42ab94b1": { "message": "Walesiska" },
-  "yiddish_f96986df": { "message": "Jiddisch" }
+  "yiddish_f96986df": { "message": "Jiddisch" },
+  "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
+    "message": "Du kan ersätta genom att ladda upp en ny undertextfil."
+  }
 }
 
 
