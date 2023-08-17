@@ -41,6 +41,24 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     return validation_error(I18n.t("Invalid context")) unless discussion_topic_context
 
+    # TODO: these were taken from the front-end, they still need to be implemented here
+    # isAnnouncement: false,
+    # discussionType: 'side_comment',
+    # delayedPostAt: availableFrom,
+    # lockAt: availableUntil,
+    # podcastEnabled: enablePodcastFeed,
+    # podcastHasStudentPosts: includeRepliesInFeed,
+    # requireInitialPost: respondBeforeReply,
+    # pinned: false,
+    # todoDate,
+    # groupCategoryId: null,
+    # allowRating: allowLiking,
+    # onlyGradersCanRate: onlyGradersCanLike,
+    # anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
+    # isAnonymousAuthor: anonymousAuthorState,
+    # specificSections: sectionIdsToPostTo,
+    # locked: false,
+
     discussion_topic = DiscussionTopic.new(
       {
         context_id: discussion_topic_context.id,
