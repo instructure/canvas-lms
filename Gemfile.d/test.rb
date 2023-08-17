@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :test do
-  gem "rails-dom-testing", "2.0.3"
+  gem "rails-dom-testing", "~> 2.1"
   gem "rails-controller-testing", "1.0.5"
 
   gem "dotenv", "~> 2.8", require: false
