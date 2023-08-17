@@ -26,6 +26,7 @@ import _ from 'underscore'
 import tz from '@canvas/timezone'
 import moment from 'moment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import decodeFromHex from '@canvas/util/decodeFromHex'
 import withinMomentDates from '../momentDateHelper'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import userSettings from '@canvas/user-settings'
@@ -1234,7 +1235,7 @@ export default class Calendar {
         data = deparam(window.location.hash.substring(1)) || {}
       } else {
         // legacy
-        data = $.parseJSON($.decodeFromHex(window.location.hash.substring(1))) || {}
+        data = $.parseJSON(decodeFromHex(window.location.hash.substring(1))) || {}
       }
     } catch (e) {
       data = {}

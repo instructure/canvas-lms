@@ -21,6 +21,7 @@ import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import decodeFromHex from '@canvas/util/decodeFromHex'
 import ColorPicker from '@canvas/color-picker'
 import userSettings from '@canvas/user-settings'
 import contextListTemplate from '../jst/contextList.handlebars'
@@ -38,7 +39,7 @@ class VisibleContextManager {
     this.$holder = $holder
     const fragmentData = (() => {
       try {
-        return $.parseJSON($.decodeFromHex(window.location.hash.substring(1))) || {}
+        return $.parseJSON(decodeFromHex(window.location.hash.substring(1))) || {}
       } catch (e) {
         return {}
       }
