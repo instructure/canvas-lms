@@ -47,7 +47,7 @@ gem "barby", "0.6.8", require: false
   gem "rqrcode", "1.2.0", require: false
   gem "chunky_png", "1.4.0", require: false
 gem "bcrypt", "~> 3.1"
-gem "bigdecimal", "3.1.3"
+gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 5.3", require: false
 gem "builder", "3.2.4"
 gem "business_time", "0.13.0"
