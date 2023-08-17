@@ -33,6 +33,7 @@ const locale = {
   "add_another_f4e50d57": { "message": "Lägg till en till" },
   "add_cc_subtitles_55f0394e": { "message": "Lägg till CC/undertext" },
   "add_image_60b2de07": { "message": "Lägg till bild" },
+  "add_one_9e34a6f8": { "message": "Lägg till en!" },
   "additional_considerations_f3801683": {
     "message": "Ytterliggare hänsynstaganden"
   },
@@ -671,13 +672,33 @@ const locale = {
   "no_accessibility_issues_were_detected_f8d3c875": {
     "message": "Inga tillgänglighetsproblem upptäcktes."
   },
+  "no_announcements_created_yet_c44a94f4": {
+    "message": "Inga meddelanden har skapats än."
+  },
+  "no_announcements_found_20185afc": { "message": "Inga meddelande hittades." },
+  "no_assignments_created_yet_1b236d87": {
+    "message": "Inga uppgifter har skapats än."
+  },
+  "no_assignments_found_79e46d7f": { "message": "Inga uppgifter hittades." },
   "no_changes_to_save_d29f6e91": { "message": "Inga ändringar att spara." },
+  "no_discussions_created_yet_ff99abe3": {
+    "message": "Inga diskussioner har skapats än."
+  },
+  "no_discussions_found_9284063b": { "message": "Inga diskussioner hittades." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil har valts" },
   "no_headers_9bc7dc7f": { "message": "Inga rubriker" },
+  "no_modules_created_yet_c71b6d4d": {
+    "message": "Inga moduler har skapats än."
+  },
+  "no_modules_found_2df43a40": { "message": "Inga moduler hittades." },
+  "no_pages_created_yet_c379fa6e": { "message": "Inga sidor har skapats än." },
+  "no_pages_found_6799350": { "message": "Inga sidor hittades." },
   "no_preview_is_available_for_this_file_f940114a": {
     "message": "Förhandsvisning är inte tillgänglig för den här filen."
   },
+  "no_quizzes_created_yet_1a2370b9": { "message": "Inga quiz har skapats än." },
+  "no_quizzes_found_c80c537a": { "message": "Inga quiz hittades." },
   "no_results_940393cf": { "message": "Inga resultat." },
   "no_results_found_for_filterterm_ad1b04c8": {
     "message": "Inga resultat hittades för { filterTerm }"
