@@ -73,7 +73,7 @@ gem "i18nliner", "~> 0.2.4"
 gem "icalendar", "~> 2.9", require: false
 gem "diplomat", "~> 2.6", require: false
 gem "ims-lti", "2.3.3", require: "ims"
-gem "rrule", "0.4.4", require: false
+gem "rrule", "~> 0.5", require: false
 
 gem "inst_access", "0.1.2"
 gem "inst_statsd", "~> 3.0"
