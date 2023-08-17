@@ -918,7 +918,7 @@ GEM
     retriable (1.4.1)
     rexml (3.2.6)
     ritex (1.0.1)
-    rotp (6.2.0)
+    rotp (6.2.2)
     rqrcode (1.2.0)
       chunky_png (~> 1.0)
       rqrcode_core (~> 0.2)
@@ -1335,7 +1335,7 @@ DEPENDENCIES
   respondus_soap_endpoint!
   retriable (= 1.4.1)
   ritex (= 1.0.1)
-  rotp (= 6.2.0)
+  rotp (~> 6.2)
   rqrcode (= 1.2.0)
   rrule (= 0.4.4)
   rspec (~> 3.12)
