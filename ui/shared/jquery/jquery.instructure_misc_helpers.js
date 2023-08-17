@@ -102,17 +102,6 @@ $.titleize = function (string) {
   return $.map(res.split(/\s/), word => (word[0] || '').toUpperCase() + word.substring(1)).join(' ')
 }
 
-$.fileSize = function (bytes) {
-  const factor = 1024
-  if (bytes < factor) {
-    return parseInt(bytes, 10) + ' bytes'
-  } else if (bytes < factor * factor) {
-    return parseInt(bytes / factor, 10) + 'KB'
-  } else {
-    return Math.round((10.0 * bytes) / factor / factor) / 10.0 + 'MB'
-  }
-}
-
 // return query string parameter
 // $.queryParam("name") => qs value or null
 $.queryParam = function (name) {

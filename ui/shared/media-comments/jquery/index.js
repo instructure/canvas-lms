@@ -20,11 +20,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import pubsub from 'jquery-tinypubsub'
 import $ from 'jquery'
+import fileSize from '@canvas/util/fileSize'
 import htmlEscape from 'html-escape'
 import './mediaComment'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
 
@@ -213,7 +214,7 @@ $.mediaComment.upload_delegate = {
     $('#media_upload_settings').css('visibility', file ? 'visible' : 'hidden')
     $('#media_upload_title').val(file.title)
     $('#media_upload_display_title').text(file.title)
-    $('#media_upload_file_size').text($.fileSize(file.bytesTotal))
+    $('#media_upload_file_size').text(fileSize(file.bytesTotal))
 
     $('#media_upload_feedback_text').html('')
     $('#media_upload_feedback').css('visibility', 'hidden')
