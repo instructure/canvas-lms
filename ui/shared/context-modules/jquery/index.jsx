@@ -72,6 +72,7 @@ import ContextModulesPublishMenu from '../react/ContextModulesPublishMenu'
 import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 import {underscoreString} from '@canvas/convert-case'
 import {selectContentDialog} from '@canvas/select-content-dialog'
+import DifferentiatedModulesTray from '@canvas/differentiated-modules'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -2515,6 +2516,19 @@ $(document).ready(function () {
     )
   }
 
+  function renderDifferentiatedModulesTray(open, returnFocusTo) {
+    ReactDOM.render(
+      <DifferentiatedModulesTray
+        open={open}
+        onDismiss={() => {
+          renderDifferentiatedModulesTray(false, returnFocusTo)
+          returnFocusTo.focus()
+        }}
+      />,
+      document.getElementById('differentiated-modules-mount-point')
+    )
+  }
+
   $(document).on('click', '.module_copy_to', event => {
     event.preventDefault()
     const moduleId = $(event.target).closest('.context_module').data('module-id').toString()
@@ -2547,6 +2561,12 @@ $(document).ready(function () {
     const selection = {content_id, content_type}
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
     renderSendToTray(true, selection, returnFocusTo)
+  })
+
+  $('.assign_module_link').on('click keyclick', function (event) {
+    event.preventDefault()
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+    renderDifferentiatedModulesTray(true, returnFocusTo)
   })
 })
 
