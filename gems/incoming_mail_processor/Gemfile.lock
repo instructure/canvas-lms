@@ -37,7 +37,7 @@ PATH
       canvas_errors
       html_text_helper
       inst_statsd
-      mail (~> 2.7.1)
+      mail (~> 2.8)
       net-imap
       net-pop
       net-smtp
@@ -135,8 +135,11 @@ GEM
     loofah (2.21.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    mail (2.7.1)
+    mail (2.8.1)
       mini_mime (>= 0.1.1)
+      net-imap
+      net-pop
+      net-smtp
     method_source (1.0.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
