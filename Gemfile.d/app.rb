@@ -90,7 +90,7 @@ gem "link_header", "0.0.8"
 gem "mail", "~> 2.8", require: false
 gem "marginalia", "1.11.1", require: false
 gem "mime-types", "~> 3.5"
-gem "mini_magick", "4.11.0"
+gem "mini_magick", "~> 4.12"
 gem "multi_json", "1.15.0"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
