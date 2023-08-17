@@ -60,15 +60,6 @@ $.replaceTags = function (text, mapping_or_name, maybe_value) {
   }
 }
 
-$.titleize = function (string) {
-  const res = (string || '')
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/_/g, ' ')
-    .replace(/\s+/, ' ')
-    .replace(/^\s/, '')
-  return $.map(res.split(/\s/), word => (word[0] || '').toUpperCase() + word.substring(1)).join(' ')
-}
-
 // return query string parameter
 // $.queryParam("name") => qs value or null
 $.queryParam = function (name) {

@@ -109,7 +109,6 @@ declare global {
     queryParam: (name: string) => string
     raw: (str: string) => string
     showIf: ShowIf
-    titleize: (str: string) => string
     underscore: (str: string) => string
   }
 

@@ -26,6 +26,19 @@ import 'jqueryui/dialog'
 
 const I18n = useI18nScope('findLinkForService')
 
+function titleize(inputString) {
+  const processedString = (inputString || '')
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/_/g, ' ')
+    .replace(/\s+/, ' ')
+    .replace(/^\s/, '')
+
+  return processedString
+    .split(/\s/)
+    .map(word => (word.charAt(0) || '').toUpperCase() + word.substring(1))
+    .join(' ')
+}
+
 export function getUserServices(service_types, success, error) {
   if (!$.isArray(service_types)) {
     service_types = [service_types]
@@ -148,7 +161,7 @@ export function findLinkForService(service_type, callback) {
   $dialog.find('.results').empty()
   $dialog.dialog({
     title: I18n.t('titles.bookmark_search', 'Bookmark Search: %{service_name}', {
-      service_name: $.titleize(service_type),
+      service_name: titleize(service_type),
     }),
     open() {
       $dialog.find('input:visible:first').focus().select()
