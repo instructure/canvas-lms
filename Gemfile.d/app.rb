@@ -61,8 +61,8 @@ gem "folio-pagination", "0.0.12", require: "folio/rails"
 gem "ffi", "~> 1.15", require: false
 gem "gepub", "1.0.15"
 gem "apollo-federation", "~> 3.8"
-gem "graphql", "1.12.14"
-gem "graphql-batch", "0.4.3"
+gem "graphql", "~> 1.12.7"
+gem "graphql-batch", "~> 0.5"
 gem "hashery", "2.1.2", require: false
 gem "highline", "~> 2.0", require: false
 gem "httparty", "~> 0.21"
