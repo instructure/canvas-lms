@@ -361,7 +361,8 @@ GEM
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
     active_model-better_errors (1.6.7)
       activemodel (>= 3.0)
-    active_record_query_trace (1.8)
+    active_record_query_trace (1.8.2)
+      activerecord (>= 6.0.0)
     activejob (7.0.7)
       activesupport (= 7.0.7)
       globalid (>= 0.3.6)
@@ -1159,7 +1160,7 @@ DEPENDENCIES
   account_reports!
   active_model-better_errors (= 1.6.7)
   active_model_serializers (= 0.9.0alpha1)!
-  active_record_query_trace (= 1.8)
+  active_record_query_trace (~> 1.8)
   activerecord-pg-extensions (= 0.4.4)
   activesupport-suspend_callbacks!
   acts_as_list!
