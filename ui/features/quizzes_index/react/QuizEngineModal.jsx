@@ -57,9 +57,8 @@ function QuizEngineModal({setOpen, onDismiss}) {
   const classicDesc = (
     <div style={{paddingLeft: '1.75rem', maxWidth: '23.5rem'}}>
       <Text weight="light">
-        {I18n.t(`For the time being, if you need security from
-        3rd-party tools, Speedgrader, or CSVs for student
-        response analysis, this is the better choice.`)}
+        {I18n.t(`At this time, CSV downloads for quiz and item analysis 
+        or student analysis are available through Classic Quizzes.`)}
       </Text>
     </div>
   )
@@ -154,10 +153,10 @@ function QuizEngineModal({setOpen, onDismiss}) {
         defaultValue={option}
         description=""
       >
-        <RadioInput key={CLASSIC} value={CLASSIC} label={classicLabel} size="large" />
-        {classicDesc}
         <RadioInput key={NEW} value={NEW} label={newQuizLabel} size="large" />
         {newDesc}
+        <RadioInput key={CLASSIC} value={CLASSIC} label={classicLabel} size="large" />
+        {classicDesc}
       </RadioInputGroup>
       <hr />
       <Checkbox
