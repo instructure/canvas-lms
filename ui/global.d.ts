@@ -84,7 +84,6 @@ declare global {
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>
     disableWhileLoading: any
-    encodeToHex: (str: string) => string
     fileSize: (size: number) => string
     fillTemplateData: any
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>

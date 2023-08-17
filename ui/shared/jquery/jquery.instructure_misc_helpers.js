@@ -21,18 +21,6 @@ import htmlEscape from 'html-escape'
 
 if (!('INST' in window)) window.INST = {}
 
-$.encodeToHex = function (str) {
-  let hex = ''
-  for (let i = 0; i < str.length; i++) {
-    let part = str.charCodeAt(i).toString(16)
-    while (part.length < 2) {
-      part = '0' + part
-    }
-    hex += part
-  }
-  return hex
-}
-
 // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
 // note that raw returns a SafeString object, so you may want to call toString
 // if you're using it elsewhere
