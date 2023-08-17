@@ -21,18 +21,6 @@ import htmlEscape from 'html-escape'
 
 if (!('INST' in window)) window.INST = {}
 
-// Return the first value which passes a truth test
-$.detect = function (collection, callback) {
-  let result
-  $.each(collection, (index, value) => {
-    if (callback.call(value, value, index, collection)) {
-      result = value
-      return false // we found it, break the $.each() loop iteration by returning false
-    }
-  })
-  return result
-}
-
 $.encodeToHex = function (str) {
   let hex = ''
   for (let i = 0; i < str.length; i++) {
