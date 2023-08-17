@@ -473,7 +473,7 @@ GEM
       msgpack (~> 1.2)
     brakeman (5.4.1)
     brotli (0.4.0)
-    browser (5.1.0)
+    browser (5.3.1)
     builder (3.2.4)
     business_time (0.13.0)
       activesupport (>= 3.2.0)
@@ -1196,7 +1196,7 @@ DEPENDENCIES
   bootsnap (= 1.13.0)
   brakeman (~> 5.4)
   broadcast_policy!
-  browser (= 5.1.0)
+  browser (~> 5.3)
   builder (= 3.2.4)
   bundler (~> 2.2)
   business_time (= 0.13.0)
