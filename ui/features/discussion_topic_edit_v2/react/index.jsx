@@ -24,6 +24,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
+import DiscussionTopicFormContainer from './containers/DiscussionTopicFormContainer/DiscussionTopicFormContainer'
 
 const I18n = useI18nScope('discussion_topics_edit')
 
@@ -50,7 +51,7 @@ export const DiscussionTopicEdit = _props => {
           />
         }
       >
-        <div>Page coming soon</div>
+        <DiscussionTopicFormContainer />
       </ErrorBoundary>
     </ApolloProvider>
   )

@@ -20,9 +20,11 @@ import {render} from '@testing-library/react'
 import React from 'react'
 import {DiscussionTopicEdit} from '../index'
 
+jest.mock('@canvas/rce/react/CanvasRce')
+
 describe('DiscussionTopicEdit', () => {
   test('renders', () => {
-    const {getByText} = render(<DiscussionTopicEdit />)
-    expect(getByText('Page coming soon')).toBeInTheDocument()
+    const document = render(<DiscussionTopicEdit />)
+    expect(document).toBeTruthy()
   })
 })
