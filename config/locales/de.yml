@@ -2670,7 +2670,7 @@ de:
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Erlaubt die Ausrichtung von Ergebnissen an Inhalten ohne Bewertung"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Bewertern die Anzeige des Bewertungsaudit-Fachs in SpeedGrader für anonyme oder moderierte Aufgaben erlauben."
   allows_blueprint_course_settings_to_be_exported_an_a34bb7f: "Ermöglicht das Exportieren und Kopieren von Einstellungen eines Musterkurses in einen anderen Musterkurs."
-  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Ermöglicht es Musterkursen, Änderungen der Ressourcen-ID von Aufgaben zu verfolgen."
+  allows_blueprint_courses_to_keep_track_of_assignme_3faaa416: "Ermöglicht es Blueprint-Kursen, Änderungen der Ressourcen-ID von Aufgaben zu verfolgen."
   allows_canvas_to_send_iwork_files_to_docviewer_220f4753: "Erlaubt es Canvas, iWork-Dateien an Docviewer zu senden."
   allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Ermöglicht die Veröffentlichung von Kursseiten nach einem Zeitplan"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Ermöglicht das Einrichten von studentischen Gruppen per CSV-Upload"
@@ -2938,7 +2938,7 @@ de:
   allows_user_to_delete_course_sections_allows_user__649d2d0d: "Erlaubt dem Benutzer, Kursabschnitte zu löschen. Erlaubt dem Benutzer, einen Benutzer aus einem Kursabschnitt zu löschen."
   allows_user_to_delete_question_banks_in_a_course_o_d9cd0b2f: "Erlaubt dem/der Benutzer\\*in, Fragenpools in einem Kurs oder Konto zu löschen."
   allows_user_to_delete_quizzes_in_a_course_acdbdfba: "Erlaubt dem/der Benutzer\\*in, Quizze in einem Kurs zu löschen."
-  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Erlaubt dem/der Benutzer\\*in, einen Kurs zum Musterkurs zu erklären."
+  allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Erlaubt dem/der Benutzer\\*in, einen Kurs zum Blueprint-Kurs zu erklären."
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Erlaubt dem Benutzer, einen Kurs zum Musterkurs zu erklären. Erlaubt dem Benutzer, die Musterkurseinstellungen in den Kurseinstellungen zu verwalten. Erlaubt dem Benutzer, zugehörige Kurse hinzuzufügen."
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
       Erlaubt dem Benutzer, einen Kurs zum Musterkurs zu erklären. Erlaubt dem Benutzer, die Musterkurseinstellungen in den Kurseinstellungen zu verwalten.
@@ -2961,18 +2961,18 @@ de:
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Erlaubt dem Benutzer, die Aufgabendetails bei einzelnen Diskussionen zu bearbeiten. Module: Erlaubt dem Benutzer, neue Aufgaben zu einem Modul hinzuzufügen."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Erlaubt dem Benutzer, die Aufgabendetails bei einzelnen Diskussionen zu bearbeiten."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Erlaubt dem Benutzer, bei einzelnen Diskussionen die Sperreinstellungen für Musterinhalte zu ändern."
-  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Erlaubt einem/einer Benutzer\\*in, der in einem Muster-Hauptkurs eingeschrieben ist, die Muster-Inhalt-Sperreinstellungen für einzelne Einstellungen zu ändern."
-  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Erlaubt einem/einer Benutzer\\*in, die Muster-Inhalt-Sperreinstellungen für einzelne Gespräche zu ändern."
+  allows_user_to_edit_blueprint_content_lock_setting_58a85315: "Erlaubt einem/einer Benutzer\\*in, der in einem Blueprint-Hauptkurs eingeschrieben ist, die Blueprint-Inhalt-Sperreinstellungen für einzelne Einstellungen zu ändern."
+  allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Erlaubt einem/einer Benutzer\\*in, die Blueprint-Inhalt-Sperreinstellungen für einzelne Gespräche zu ändern."
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Erlaubt dem Benutzer, die Sperreinstellungen für Musterinhalte bei einzelnen Einstellungen zu ändern, wenn der Benutzer in einem Muster-Hauptkurs angemeldet ist."
-  allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Erlaubt einem/einer Benutzer\\*in, Sperreinstellungen für Musterkurse auf der Seitenindexseite und für eine einzelne Seite in einem Muster-Hauptkurs zu ändern."
-  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "Erlaubt einem/einer Benutzer\\*in in einem Musterkurs die Muster-Content-Sperreinstellungen für einzelne Seiten zu ändern."
-  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: "Erlaubt einem/einer Benutzer\\*in, Mustersperreinstellungen auf der Seitenindexseite und für eine einzelne Seite in einem Muster-Hauptkurs zu ändern."
+  allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Erlaubt einem/einer Benutzer\\*in, Sperreinstellungen für Blueprint-Kurse auf der Seitenindexseite und für eine einzelne Seite in einem Blueprint-Hauptkurs zu ändern."
+  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "Erlaubt einem/einer Benutzer\\*in in einem Blueprint-Kurs die Blueprint-Content-Sperreinstellungen für einzelne Seiten zu ändern."
+  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: "Erlaubt einem/einer Benutzer\\*in, Blueprint-Sperreinstellungen auf der Seitenindexseite und für eine einzelne Seite in einem Blueprint-Hauptkurs zu ändern."
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Erlaubt dem Benutzer, die Mustersperreinstellungen auf der Seiten-Indexseite in einem Muster-Hauptkurs zu ändern."
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
       Erlaubt dem Benutzer, die Mustersperreinstellungen auf den Aufgaben- und Quiz-Indexseiten
       in einem Muster-Hauptkurs zu ändern.
-  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "Erlaubt einem/einer Benutzer\\*in, Mustersperreinstellungen auf der Aufgaben- und der Quizindexseite in einem Muster-Hauptkurs zu ändern."
-  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "Erlaubt einem/einer Benutzer\\*in, Mustersperreinstellungen auf der Aufgaben- und der Diskussionsindexseite in einem Muster-Hauptkurs zu ändern."
+  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "Erlaubt einem/einer Benutzer\\*in, Blueprint-Sperreinstellungen auf der Aufgaben- und der Quizindexseite in einem Blueprint-Hauptkurs zu ändern."
+  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "Erlaubt einem/einer Benutzer\\*in, Blueprint-Sperreinstellungen auf der Aufgaben- und der Diskussionsindexseite in einem Blueprint-Hauptkurs zu ändern."
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Erlaubt dem Benutzer, die Mustersperreinstellungen auf der Diskussions-Indexseite in einem Muster-Hauptkurs zu ändern."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Erlaubt dem Benutzer, die Mustersperreinstellungen auf der Dateienseite in einem Muster-Hauptkurs zu ändern."
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Erlaubt dem Benutzer, die Mustersperreinstellungen auf den Aufgaben- und Quiz-Indexseiten in einem Muster-Hauptkurs zu ändern."
@@ -3013,7 +3013,7 @@ de:
   allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: "Erlaubt dem/der Benutzer\\*in, die Aufgabengruppengewichtung in einem Kurs zu aktivieren und zu ändern."
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Erlaubt dem Benutzer, das Notenbuch in eine durch Kommas getrennte CSV-Datei zu exportieren. Ermöglicht dem Benutzer den Zugriff auf das Notenbuch der Lernleistungsziele (falls aktiviert)."
   allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "Erlaubt dem/der Benutzer\\*in, das Notenbuch in eine durch Kommas getrennte CSV-Datei zu exportieren."
-  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Erlaubt dem/der Benutzer\\*in, Musterkurse auf der Kontoebene herauszufiltern. Erlaubt dem/der Benutzer\\*in, zugehörige Kurse hinzuzufügen."
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Erlaubt dem/der Benutzer\\*in, Blueprint-Kurse auf der Kontoebene herauszufiltern. Erlaubt dem/der Benutzer\\*in, zugehörige Kurse hinzuzufügen."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Erlaubt dem Benutzer, Musterkurse auf der Kontoebene auszufiltern. Erlaubt dem Benutzer, zugehörige Kurse hinzuzufügen."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Erlaubt dem Benutzer, Musterkurse auf der Kontoebene auszufiltern.
@@ -3037,7 +3037,7 @@ de:
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Erlaubt dem/der Benutzer\\*in, Diskussionsbeiträgen zuzustimmen (Like), wenn das Kontrollkästchen „Nur Benoter können zustimmen (Like)“ ausgewählt ist."
   allows_user_to_lock_unlock_selected_announcements__fbe4df6a: "Erlaubt Benutzer\\*innen die Sperrung´/Entsperrung ausgewählter Ankündigungen, einzeln oder im Ganzen."
   allows_user_to_manage_assignment_settings_35d94690: "Erlaubt dem/der Benutzer\\*in, die Aufgabeneinstellungen zu verwalten."
-  allows_user_to_manage_blueprint_course_settings_in_697362c5: "Erlaubt dem/der Benutzer\\*in, die Musterkurseinstellungen in den Kurseinstellungen zu verwalten."
+  allows_user_to_manage_blueprint_course_settings_in_697362c5: "Erlaubt dem/der Benutzer\\*in, die Blueprint-Kurseinstellungen in den Kurseinstellungen zu verwalten."
   allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Erlaubt dem/der Benutzer\\*in, die Funktionsoptionen in den Kontoeinstellungen zu verwalten."
   allows_user_to_manage_feature_previews_in_account__3c90a6f: "Ermöglicht es dem Benutzer, die Vorschau von Funktionen in den Kontoeinstellungen zu verwalten."
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
@@ -3143,7 +3143,7 @@ de:
       Erlaubt dem Benutzer, Musterkurse zu synchronisieren. Erlaubt dem Benutzer, den Verlauf der Musterkurssynchronisierung anzuzeigen. Erlaubt dem Benutzer, die Kurse im Konto anzuzeigen und zu verwalten. Erlaubt dem Benutzer, die Schaltfläche der Kurseinrichtungs-Checkliste anzuzeigen.
               Erlaubt dem Benutzer, in den Kurseinstellungen auf die Registerkarte „Navigation“ zuzugreifen. Erlaubt dem Benutzer, auf der Registerkarte „Kursdetails“ das Kursbild, den Namen, den Kurscode, die Zeitzone, das Unterkonto, das Semester und andere Optionen zu ändern.
               Erlaubt dem Benutzer, auf die Schaltflächen „Studentenansicht“ (Teststudent), „Diesen Kurs kopieren“, „Kurs-Content zurücksetzen“ und „Kurs dauerhaft löschen“ zuzugreifen. Erlaubt dem Benutzer, studentische Kontextkarten in Antworten auf Ankündigungen und Diskussionen zu sehen.
-  allows_user_to_sync_blueprint_courses_db4fcc03: "Erlaubt dem/der Benutzer\\*in, Musterkurse zu synchronisieren."
+  allows_user_to_sync_blueprint_courses_db4fcc03: "Erlaubt dem/der Benutzer\\*in, Blueprint-Kurse zu synchronisieren."
   allows_user_to_update_a_student_s_section_enrollme_80420ac9: "Ermöglicht dem/der Benutzer\\*in, die Abschnittsanmeldung oder -rolle einer/eines Studierenden zu aktualisieren."
   allows_user_to_update_modules_edit_module_settings_1f5cf0ae: "Erlaubt Benutzer\\*innen die Aktualisierung von Modulen (Bearbeiten von Moduleinstellungen, Veröffentlichen, Aufheben der Veröffentlichung, Stapelverarbeitung)."
   allows_user_to_view_a_content_migration_content_li_6906f889: "Erlaubt Benutzer\\*innen die Anzeige einer Liste von Migrationsinhalten nach Typ."
@@ -3198,7 +3198,7 @@ de:
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "Erlaubt dem dem/der Benutzer\\*in die Semester für das Konto anzuzeigen und zu verwalten."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "Erlaubt dem/der Benutzer\\*in, die Registerkarten „Einstellungen“ und „Benachrichtigungen“ in den Kontoeinstellungen anzuzeigen und zu verwalten."
   allows_user_to_view_and_modify_login_information_f_78f3a544: "Erlaubt dem/der Benutzer\\*in, die Anmeldeinformationen eines Benutzers anzuzeigen und zu ändern."
-  allows_user_to_view_blueprint_sync_history_d545cb7d: "Erlaubt dem/der Benutzer\\*in, den Verlauf der Musterkurssynchronisierung anzuzeigen."
+  allows_user_to_view_blueprint_sync_history_d545cb7d: "Erlaubt dem/der Benutzer\\*in, den Verlauf der Blueprint-Kurssynchronisierung anzuzeigen."
   allows_user_to_view_canvas_insights_f4f7ba8b: "Erlaubt dem Benutzer, Canvas Insights zu sehen."
   allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "Erlaubt dem Benutzer, die Schaltflächen „Startseite auswählen“ und „Checkliste für Kurseinstellungen“ anzuzeigen."
   allows_user_to_view_course_activity_information_fo_e420113b: "Erlaubt dem/der Benutzer\\*in, die Informationen zu Kursaktivitäten für das Konto anzuzeigen."
@@ -5287,17 +5287,17 @@ de:
   blocked_singletons_30f3cd86: "Blockierte Singletons"
   blocked_strands_faece22a: "Blockierte Streifen"
   blue_daf8fea9: Blau
-  blueprint_5cca2ef: Muster
-  blueprint_course_associations_72c9609: Musterkursverknüpfungen
-  blueprint_course_e16ed131: Musterkurs
+  blueprint_5cca2ef: Blueprint
+  blueprint_course_associations_72c9609: Blueprint-Kursverknüpfungen
+  blueprint_course_e16ed131: Blueprint-Kurs
   blueprint_course_id_9ee357fb: blueprint_course_id
-  blueprint_course_information_term_course_10d5cf30: "Musterkursinformationen: %{term} - %{course}"
-  blueprint_courses_9dd321b8: Musterkurse
-  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Entwurfskurse – hinzufügen/bearbeiten/verknüpfen/löschen"
+  blueprint_course_information_term_course_10d5cf30: "Blueprint-Kursinformationen: %{term} - %{course}"
+  blueprint_courses_9dd321b8: Blueprint-Kurse
+  blueprint_courses_add_edit_associate_delete_bc26d5c2: "Blueprint-Kurse – hinzufügen/bearbeiten/verknüpfen/löschen"
   blueprint_courses_are_an_account_level_feature_opt_3388f731: "Musterkurse sind eine Option auf Kontoebene.\n\n\n\
       \x20     Um Mustersperreinstellungen auf der Diskussionen-Indexseite zu ändern, müssen die Optionen „Kurs hinzufügen/ändern/löschen“ und „Diskussionen moderieren“ ebenfalls aktiviert sein. "
   blueprint_courses_are_an_account_level_feature_opt_e1f9ec2d: "„Musterkurse“ ist eine Option auf Kontoebene. Um Mustersperreinstellungen auf der Diskussionen-Indexseite zu ändern, müssen die Optionen „Kurs hinzufügen / ändern / löschen“ und „Diskussionen moderieren“ ebenfalls aktiviert sein. "
-  blueprint_courses_create_edit_associate_delete_bf41988e: "Muster-Kurse (erstellen/bearbeiten/verknüpfen/löschen)"
+  blueprint_courses_create_edit_associate_delete_bf41988e: "Blueprint-Kurse (erstellen/bearbeiten/verknüpfen/löschen)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "„Musterkurse“ ist eine Option auf Kontoebene. Kursrollen können einen Musterkurs nur verwalten, wenn sie als Lehrer-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden. Für den Zugriff auf die Musterkurs-Seitenleiste muss die Option „Kurse – Kurse hinzufügen / ändern / löschen“ aktiviert sein. Um einen zugeordneten Kurs hinzuzufügen, müssen die Optionen „Kurse – Liste anzeigen“ und „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um Sperreinstellungen auf eine Musterobjekttyp zu ändern, muss die Option „Kurse – hinzufügen / ändern / löschen“ aktiviert sein."
   blueprint_courses_is_an_account_level_feature_opti_390ed2e7: "„Musterkurse“ ist eine Option auf Kontoebene. Um assoziierte Kurse hinzuzufügen, müssen die Optionen „Musterkurs – hinzufügen / ändern / assoziieren / löschen“ und „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
   blueprint_courses_is_an_account_level_feature_opti_3a0161d3: "„Musterkurse“ ist eine Option auf Kontoebene. Kursrollen können Musterkurse nur verwalten, wenn sie als Lehrer-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden. Für den Zugriff auf die Musterkurs-Seitenleiste muss die Option „Kurse – Kurse hinzufügen / ändern / löschen“ aktiviert sein. Um einen zugeordneten Kurs hinzuzufügen, müssen die Optionen „Kurse – Liste anzeigen“ und „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um Sperreinstellungen auf eine Musterobjekttyp zu ändern, muss die Option „Kurse – hinzufügen / ändern / löschen“ aktiviert sein."
@@ -5345,20 +5345,20 @@ de:
   blueprint_courses_must_be_enabled_for_an_account_b_aae26429: |-
       Musterkurse müssen für ein Konto von einem Admin aktiviert werden. So bearbeiten Sie die Sperreinstellungen auf der Seitenindexseite, „Seiten – Update“, „Musterkurs – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: Admin – verwalten/aktualisieren.
               Falls diese zusätzlichen Berechtigungen aktiviert sind, die Berechtigung „Seiten – Update“ jedoch deaktiviert ist, kann der Benutzer trotzdem noch Content-Sperreinstellungen für einzelne Seiten in einem Muster-Kurs anpassen.
-  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "Musterkurse für ein Konto müssen durch einen Admin aktiviert werden."
+  blueprint_courses_must_be_enabled_for_an_account_b_c630f425: "Blueprint-Kurse für ein Konto müssen durch einen Admin aktiviert werden."
   blueprint_courses_must_be_enabled_for_an_account_b_e8e1984d: |-
       Musterkurse für ein Konto müssen durch einen Admin aktiviert werden.
       Kursrollen können Inhalte in einem Musterkurs nur verwalten, wenn sie als Lehrer-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden.
       Falls diese Berechtigung deaktiviert ist und „Diskussionen – anzeigen“ aktiviert ist, kann ein Benutzer weiterhin Inhaltssperreinstellungen für einzelne Diskussionen in einem Muster-Hauptkurs anpassen.
-  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Musterkurse für ein Konto müssen durch einen Admin aktiviert werden."
+  blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Blueprint-Kurse für ein Konto müssen durch einen Admin aktiviert werden."
   blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Musterkurse für ein Konto müssen durch einen Admin aktiviert werden. Kursrollen können Inhalte in einem Musterkurs nur verwalten, wenn sie als Lehrer-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden. Um Mustersperreinstellungen auf der Diskussionen-Indexseite zu ändern, muss die Option „Diskussionen – moderieren“ ebenfalls aktiviert sein."
-  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Musterkurse für ein Konto müssen durch einen Admin aktiviert werden. Kursrollen können Inhalt in Musterkursen nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden."
-  blueprint_information_95dcef55: Musterinformationen
-  blueprint_locking_is_only_available_for_published__c8c97e3f: "Das Sperren von Blaupausen ist nur für veröffentlichte Schritte verfügbar."
-  blueprint_locking_is_only_available_for_the_course_68ec4266: "Das Sperren von Blaupausen ist nur für den Schritt auf Kursebene verfügbar."
-  blueprint_resource_id_support_ae48c0b9: "Unterstützung der Muster-Ressourcen-ID"
-  blueprint_settings_233e909a: Mustereinstellungen
-  blueprint_sync_90d0dfd5: Mustersynchronisierung
+  blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Blueprint-Kurse für ein Konto müssen durch einen Admin aktiviert werden. Kursrollen können Inhalt in Blueprint-Kursen nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Blueprint-Kurs hinzugefügt wurden."
+  blueprint_information_95dcef55: Blueprint-Informationen
+  blueprint_locking_is_only_available_for_published__c8c97e3f: "Das Sperren von Blueprint-Pausen ist nur für veröffentlichte Schritte verfügbar."
+  blueprint_locking_is_only_available_for_the_course_68ec4266: "Das Sperren von Blueprint-Pausen ist nur für den Schritt auf Kursebene verfügbar."
+  blueprint_resource_id_support_ae48c0b9: "Unterstützung der Blueprint-Ressourcen-ID"
+  blueprint_settings_233e909a: Blueprint-Einstellungen
+  blueprint_sync_90d0dfd5: Blueprint-Synchronisierung
   bmp_e297149c: BMP
   body_9f663faf: Text
   body_f48fe5cd: "Text:"
@@ -6111,7 +6111,7 @@ de:
   cannot_give_outcomes_extra_credit_696208f0: "Kann Ergebnissen keine Extrapunkte geben"
   cannot_grade_at_this_time_489744b0: "Kann zu diesem Zeitpunkt nicht benotet werden"
   cannot_have_a_blueprint_course_with_observers_d00b3deb: "Einen Blueprint-Kurs mit Beobachtern gibt es nicht."
-  cannot_have_a_blueprint_course_with_students_248e3e76: "Darf keinen Musterkurs mit Studierenden haben"
+  cannot_have_a_blueprint_course_with_students_248e3e76: "Darf keinen Blueprint-Kurs mit Studierenden haben"
   cannot_have_duplicate_or_empty_row_names_fix_the_n_4fce15dd: "Doppelte oder leere Zeilennamen sind nicht möglich. Korrigieren Sie die Namen und klicken Sie erneut auf „Speichern“."
   cannot_have_negative_ranges_or_ranges_that_are_gre_1086d6db: "Negative Bereiche oder Bereiche, die größer als 100 sind, sind nicht möglich. Korrigieren Sie die Bereiche und klicken Sie erneut auf „Speichern“."
   cannot_have_overlapping_or_empty_ranges_fix_the_ra_18ce528b: "Überlappende oder leere Bereiche sind nicht möglich. Korrigieren Sie die Bereiche und klicken Sie erneut auf „Speichern“."
@@ -7311,7 +7311,7 @@ de:
         default_select_folder: "Ordner auswählen"
         upload_to: "Hochladen nach"
       import_blueprint_settings: 
-        checkbox_label: "Einstellungen für Musterkurs importieren"
+        checkbox_label: "Einstellungen für Blueprint-Kurs importieren"
       import_quizzes_next_view: 
         import_new_quizzes: "Vorhandene Quizze als *Neue Quizze* importieren"
         import_new_quizzes_help_text: "Neue Quizzes ist das neue Bewertungssystem für Canvas. %{p_p}Für weitere Informationen, wenden Sie sich an Ihre/n Systemadministrator\\*in, oder besuchen Sie"
@@ -7979,7 +7979,7 @@ de:
   conversations_send_messages_to_individual_course_m_733620b: "Konversationen – einzelnen Kursteilnehmern Mitteilungen senden."
   copy_9748f9f: Kopieren
   copy_assignment_name_to_another_course_b62d0a54: "Aufgabe %{name} in einen anderen Kurs kopieren"
-  copy_blueprint_course_settings_31a97e96: "Einstellungen für Musterkurs kopieren"
+  copy_blueprint_course_settings_31a97e96: "Einstellungen für Blueprint-Kurs kopieren"
   copy_list_of_shard_ids_d51cd846: "Liste der Teilabschnitts-IDs kopieren"
   copy_operation_started_successfully_b2f236a1: "Kopiervorgang erfolgreich gestartet"
   copy_page_to_another_course_405cc07c: "Seite in einen anderen Kurs kopieren"
@@ -8535,8 +8535,8 @@ de:
   course_image_settings_eba3ec55: Kursbildeinstellungen
   course_implemented_apps_fa658f5a: "Kursimplementierte Apps"
   course_import_html_using_gem_812d0af5: "HTML-Kursimport mit Gem"
-  course_is_already_associated_with_a_blueprint_4d9407cb: "Der Kurs ist bereits mit einem Muster verknüpft."
-  course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Der Kurs kann nicht als Muster verwendet werden"
+  course_is_already_associated_with_a_blueprint_4d9407cb: "Der Kurs ist bereits mit einem Blueprint verknüpft."
+  course_is_ineligible_to_be_set_as_a_blueprint_8e25ebcc: "Der Kurs kann nicht als Blueprint verwendet werden"
   course_landing_page_49a53ade: Kurs-Startseite
   course_level_notification_preferences_require_a_co_2f0a618: "Benachrichtigungseinstellungen auf Kursebene erfordern eine Aktualisierung des course_id-Kurses"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Benachrichtigungen auf Kursebene werden von den Benachrichtigungseinstellungen auf Kontoebene geerbt. Durch das Anpassen der Benachrichtigungen für diesen Kurs werden die Benachrichtigungen auf Kontoebene überschrieben."
@@ -8668,11 +8668,11 @@ de:
   course_results_updated_df9d1c95: "Kursergebnisse aktualisiert."
   course_role_role_type_119c2f64: "Kursrolle: %{role_type}"
   course_roles_1314f962: Kursrollen
-  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Kursrollen können Musterkurse nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden."
+  course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Kursrollen können Blueprint-Kurse nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Blueprint-Kurs hinzugefügt wurden."
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Kursrollen können Musterkurse nur verwalten, wenn sie als Lehrer-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden. Für den Zugriff auf die Musterkurs-Seitenleiste muss die Option „Kurse – Kurse hinzufügen / ändern / löschen“ aktiviert sein. Um einen zugeordneten Kurs hinzuzufügen, müssen die Optionen „Kurse – Liste anzeigen“ und „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um Sperreinstellungen auf eine Musterobjekttyp zu ändern, muss die Option „Kurse – hinzufügen / ändern / löschen“ aktiviert sein."
   course_roles_can_only_manage_blueprint_courses_if__9e80fcc5: "Kursrollen können Musterkurse nur verwalten, wenn sie als Lehrer-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden. Um assoziierte Kurse zu verwalten, müssen „Kurse – Liste anzeigen“ und „Kurse verwalten – hinzufügen“ ebenfalls aktiviert sein. Ändern von Sperreinstellungen für Dateien, „Kurse verwalten“: „Admin – verwalten/aktualisieren“ und „Kursdateien – bearbeiten“ müssen ebenfalls aktiviert sein. Ändern von Sperreinstellungen für Quizze, „Kurse verwalten“: „Admin – verwalten/aktualisieren“ und „Aufgaben- und Quizze – hinzufügen/bearbeiten/löschen“ müssen ebenfalls aktiviert sein."
-  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Kursrollen können Inhalt in Musterkursen nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden."
-  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Kursrollen können Inhalte in einem Musterkurs nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Musterkurs hinzugefügt wurden."
+  course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Kursrollen können Inhalt in Blueprint-Kursen nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Blueprint-Kurs hinzugefügt wurden."
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Kursrollen können Inhalte in einem Blueprint-Kurs nur verwalten, wenn sie als Lehrende-, TA- oder Designerrolle zum Blueprint-Kurs hinzugefügt wurden."
   course_roles_d2d5d666: Kursrollen
   course_roster_78f70e97: "Liste der Kursteilnehmenden"
   course_rubrics_881dcf0: Kurs-Bewertungsschemata
@@ -9106,7 +9106,7 @@ de:
         allow_student_organized_groups: "Studierende das Organisieren eigener Gruppen erlauben"
         banner_image: "Großes Banner"
         blueprint: "Kurs als Musterkurs aktivieren"
-        blueprint_course: Musterkurs
+        blueprint_course: Blueprint-Kurs
         card_image: Kartenbild
         conclude_at: Endet
         conditional_release: Leistungsziel-Pfade
@@ -11256,7 +11256,7 @@ de:
   enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: "Aktivieren Sie die Funktionsmarkierungen byte_order_mark und semi_colon_field_separator auf Benutzerebene, um für Ergebnisexporte zwischen Ein und Aus wechseln zu können."
   enable_cbcd2eef: "Aktivieren "
   enable_content_security_policy_8bd0b492: "Richtlinie zur Inhalt-Sicherheit aktivieren"
-  enable_course_as_a_blueprint_course_8515ffd5: "Kurs als Musterkurs aktivieren"
+  enable_course_as_a_blueprint_course_8515ffd5: "Kurs als Blueprint-Kurs aktivieren"
   enable_course_as_a_course_template_5299afb6: "Kurs als Kursvorlage aktivieren"
   enable_dashboard_images_for_courses_5af458b0: "Dashboard-Bilder für Kurse aktivieren"
   enable_distributed_internal_analytics_29e76618: "Verteilte interne Analysen aktivieren"
@@ -12339,7 +12339,7 @@ de:
   failed_to_delete_role_label_27959de3: "Löschen Rolle fehlgeschlagen %{label}"
   failed_to_delete_selected_pages_26fa87db: "Fehler beim Löschen der ausgewählten Seiten"
   failed_to_delete_to_do_64edff49: "Löschen der Aufgabe fehlgeschlagen"
-  failed_to_export_blueprint_course_settings_1ced8c6: "Exportieren der Einstellungen des Musterkurses fehlgeschlagen"
+  failed_to_export_blueprint_course_settings_1ced8c6: "Exportieren der Einstellungen des Blueprint-Kurses fehlgeschlagen"
   failed_to_export_context_info_acb07497: "Exportieren von Kontextinformationen fehlgeschlagen"
   failed_to_export_course_paces_e17583ba: "Fehler beim Exportieren von Kurstempi"
   failed_to_export_pace_plans_9832daac: "Export von Pace-Plans fehlgeschlagen"
@@ -14782,7 +14782,7 @@ de:
   how_many_minutes_ecca5ee7: "Wie viele Minuten?"
   howard_assignment_scores_96556db2: "Howard Aufgabenpunkte"
   howard_assignments_report_f3254802: "Howard Aufgabenbericht"
-  however_if_these_additional_permissions_are_enable_35d3082c: "Falls diese zusätzlichen Berechtigungen aktiviert sind, die Berechtigung „Seiten – Update“ jedoch deaktiviert ist, kann der/die Benutzer\\*in trotzdem noch Content-Sperreinstellungen für einzelne Seiten in einem Muster-Hauptkurs anpassen."
+  however_if_these_additional_permissions_are_enable_35d3082c: "Falls diese zusätzlichen Berechtigungen aktiviert sind, die Berechtigung „Seiten – Update“ jedoch deaktiviert ist, kann der/die Benutzer\\*in trotzdem noch Content-Sperreinstellungen für einzelne Seiten in einem Blueprint-Hauptkurs anpassen."
   html5_first_videos_description: |-
       Standardmäßig versucht Canvas zuerst Flash für die Videowiedergabe zu verwenden. Aktivieren Sie diese Option, damit zuerst versucht wird HTML5
       und dann Flash zu verwenden.
@@ -14865,7 +14865,7 @@ de:
       Wenn ein mit der Platzierung konfiguriertes LTI-Werkzeug installiert ist, wird ein neuer Eintrag in der
       Dropdown-Liste für den Zuordnungstyp angezeigt, um die Zuordnung für das Werkzeug schnell zu konfigurieren.
   if_blueprint_courses_add_edit_associate_delete_and_82f7ee06: "Falls die Berechtigungen „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse – verwalten/aktualisieren“ aktiviert sind, „Aufgaben und Quizze – bearbeiten“ jedoch nicht aktiviert ist, können Musterkurs-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
-  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Wenn „Entwurfskurse - Hinzufügen/Bearbeiten/Verknüpfen/Löschen“ und „Kurse - Verwalten“ aktiviert sind, aber „Aufgaben und Quizze –  Bearbeiten“ nicht aktiviert ist, können die Entwurfs-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
+  if_blueprint_courses_add_edit_associate_delete_and_9ebd192d: "Wenn „Blueprint-Kurse - Hinzufügen/Bearbeiten/Verknüpfen/Löschen“ und „Kurse - Verwalten“ aktiviert sind, aber „Aufgaben und Quizze –  Bearbeiten“ nicht aktiviert ist, können die Blueprint-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
@@ -14876,7 +14876,7 @@ de:
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Wenn „Kurse - Hinzufügen/Bearbeiten/Löschen“ und „Kurse - Löschen rückgängig machen“ ebenfalls aktiviert sind, kann ein Benutzer auf Kontoebene gelöschte Kurse in den Admin-Tools wiederherstellen."
   if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "Falls „Kurse – hinzufügen“ aktiviert und „Kurse – Liste anzeigen“ deaktiviert ist, können Benutzer in den Kontoeinstellungen mit der Schaltfläche „Neuen Kurs hinzufügen“ einen neuen Kurs hinzufügen."
   if_courses_manage_and_courses_undelete_are_also_en_9047d4b3: "Wenn „Kurse - Verwalten“ und „Kurse - Löschen rückgängig machen“ ebenfalls aktiviert sind, kann ein/e Benutzer\\*in auf Kontoebene gelöschte Kurse in den Admin-Tools wiederherstellen."
-  if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "Wenn „Kurse - verwalten“ aktiviert ist, aber Entwurfskurse - hinzufügen/bearbeiten/zuordnen/löschen“ nicht aktiviert ist, können Benutzer\\*innen weiterhin Entwurfskurse synchronisieren und den Synchronisierungsverlauf anzeigen."
+  if_courses_manage_is_enabled_but_blueprint_courses_28a42664: "Wenn „Kurse - verwalten“ aktiviert ist, aber Blueprint-Kurse - hinzufügen/bearbeiten/zuordnen/löschen“ nicht aktiviert ist, können Benutzer\\*innen weiterhin Blueprint-Kurse synchronisieren und den Synchronisierungsverlauf anzeigen."
   if_courses_manage_update_and_courses_undelete_are__670ab844: "Wenn „Kurse - Verwalten / Aktualisieren“ und „Kurse - Löschen rückgängig machen“ ebenfalls aktiviert sind, kann ein Benutzer auf Kontoebene gelöschte Kurse in den Admin-Tools wiederherstellen."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Wenn diese Funktion deaktiviert ist, wird die Seite „Lernziele“ schreibgeschützt und die Schaltfläche „Bewertungsschemata verwalten“ wird ausgeblendet. Die Benutzer können über „Aufgaben“ weiterhin auf einzelne Aufgabenbewertungsschemata zugreifen."
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Falls deaktiviert, kann der Benutzer immer noch Dateien anzeigen und in eine ZIP-Datei herunterladen."
@@ -15098,8 +15098,8 @@ de:
   if_the_open_registration_account_setting_is_enable_e7f97cf0: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, dürfen Benutzer\\*innen mit dieser Berechtigung von der Seite „Kurse“ aus per E-Mail-Adresse oder Anmelde-ID Lehrende hinzufügen, auch wenn diese noch kein Canvas-Konto haben."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Studenten oder Beobachter über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der Student oder Beobachter noch kein Canvas-Konto hat."
   if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Wenn die Option ausgewählt ist, dass Benutzer\\*innen erst einen Beitrag schreiben müssen, bevor sie die Antworten sehen können, müssen die Benutzer eine Antwort schreiben, um alle Beiträge zu sehen, es sei denn, Diskussionen - moderieren ist ebenfalls aktiviert."
-  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Falls die Berechtigung „Seiten – Update“ deaktiviert ist, kann der/die Benutzer\\*in trotzdem noch Content-Sperreinstellungen für einzelne Seiten in einem Muster-Hauptkurs anpassen."
-  if_these_additional_permissions_are_enabled_but_as_d264879d: "Falls diese zusätzlichen Berechtigungen aktiviert sind, jedoch „Aufgaben und Quizze – hinzufügen/bearbeiten/löschen“ nicht aktiviert ist, können Mustersperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
+  if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Falls die Berechtigung „Seiten – Update“ deaktiviert ist, kann der/die Benutzer\\*in trotzdem noch Content-Sperreinstellungen für einzelne Seiten in einem Blueprint-Hauptkurs anpassen."
+  if_these_additional_permissions_are_enabled_but_as_d264879d: "Falls diese zusätzlichen Berechtigungen aktiviert sind, jedoch „Aufgaben und Quizze – hinzufügen/bearbeiten/löschen“ nicht aktiviert ist, können Blueprint-Sperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden."
   if_this_account_already_uses_sftp_please_reach_out_377296d1: "Falls dieses Konto bereits SFTP benutzt, wenden Sie sich in Slack an #Canvas-SRE. Ihr Benutzername entspricht nicht unserem Standard für Benutzernamen."
   if_this_account_does_not_use_sftp_currently_press__eb1b3b88: "Falls dieses Konto derzeit nicht SFTP verwendet, klicken Sie auf „Aktivieren“, um eine/n SFTP-Benutzer\\*in einzurichten."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Falls diese Berechtigung deaktiviert ist und „Kurse – hinzufügen / ändern / löschen“ aktiviert ist, können Benutzer anhand der Schaltfläche „Neuen Kurs hinzufügen“ in den Kontoeinstellungen einen neuen Kurs hinzufügen."
@@ -15132,7 +15132,7 @@ de:
       Um Benutzer über die SIS-ID zu Kursen hinzuzufügen, muss mindestens eine der Optionen „Benutzer – Studenten zu Kursen hinzufügen oder daraus entfernen“ und „Benutzer – Lehrer, Kursdesigner oder TAs zu Kursen hinzufügen oder daraus entfernen“ ebenfalls aktiviert sein.
   if_this_permission_is_enabled_users_do_not_need_th_fb3f761e: "Falls diese Berechtigung aktiviert ist, wird die Aktivierung der Berechtigung „SIS-Daten – lesen“ nicht benötigt. Die Kontoberechtigung setzt die Kursberechtigung außer Kraft."
   if_this_permission_is_not_enabled_users_can_view_i_3d9f22da: "Falls diese Berechtigung nicht aktiviert ist, können die Benutzer\\*innen Objekt-Pools anzeigen, die von ihnen erstellt wurden, sowie solche, die mit ihnen geteilt wurden, entweder von einem anderen Benutzer oder indirekt über den Kurs, in dem sie als Lehrende eingeschrieben sind."
-  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Falls diese Berechtigung deaktiviert ist und „Diskussionen – anzeigen“ aktiviert ist, kann der/die Benutzer\\*in weiterhin Inhaltssperreinstellungen für einzelne Diskussionen in einem Muster-Hauptkurs anpassen."
+  if_this_setting_is_disabled_and_discussions_view_i_8a068652: "Falls diese Berechtigung deaktiviert ist und „Diskussionen – anzeigen“ aktiviert ist, kann der/die Benutzer\\*in weiterhin Inhaltssperreinstellungen für einzelne Diskussionen in einem Blueprint-Hauptkurs anpassen."
   if_true_will_used_the_serialized_submission_for_su_f2bed2e0: "Falls TRUE, wird die serialisierte Abgabe für das submitted_at-Datum verwendet."
   if_users_manage_login_details_or_statistics_view_i_22ca94b8: "Falls „Benutzer – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_users_manage_login_details_or_statistics_view_i_c5c82003: "Falls „Benutzer – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
@@ -15585,9 +15585,9 @@ de:
   invalid_address_book_strategy_904a7ada: "Ungültige Adressbuchstrategie."
   invalid_authenticity_token_b753558c: "Ungültiges Authentizitäts-Token"
   invalid_aws_configuration_e8a6ae0f: "Ungültige AWS-Konfiguration"
-  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Ungültiger Mustereinschränkungstyp %{type} für Element %{id}"
-  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Ungültige Mustereinschränkungstypen im importierten Paket; Standardwerte werden verwendet"
-  invalid_blueprint_restrictions_for_item_id_63aae663: "Ungültige Mustereinschränkungen für das Element %{id}"
+  invalid_blueprint_locked_item_type_type_for_item_i_4d2b053d: "Ungültiger Blueprint-Einschränkungstyp %{type} für Element %{id}"
+  invalid_blueprint_restriction_types_in_imported_pa_e714d929: "Ungültige Blueprint-Einschränkungstypen im importierten Paket; Standardwerte werden verwendet"
+  invalid_blueprint_restrictions_for_item_id_63aae663: "Ungültige Blueprint-Einschränkungen für das Element %{id}"
   invalid_byday_byday_6e361e78: "BYDAY %{byday} ungültig"
   invalid_bymonth_bymonth_91f621b3: "BYMONTH %{bymonth} ungültig"
   invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY %{bymonthday} ungültig"
@@ -16025,7 +16025,7 @@ de:
   learn_more_about_the_differences_a1217479: "Weitere Informationen über die Unterschiede."
   learn_more_about_this_feature_in_the_course_pacing_687ceb39: "Weitere Informationen zu dieser Funktion finden Sie in *Benutzergruppe Kurs-Pacing*."
   learn_more_about_this_feature_in_the_pace_plans_us_75a8078b: "Sie erfahren mehr über diese Funktion in der *Benutzergruppe „Pace Plans“*."
-  learn_more_about_using_commons_and_blueprints_3df953f6: "Weitere Informationen zur Verwendung von Commons und Mustern"
+  learn_more_about_using_commons_and_blueprints_3df953f6: "Weitere Informationen zur Verwendung von Commons und Blueprints"
   learn_more_about_video_conferencing_5f0e76e4: "Weitere Informationen über Videokonferenzen"
   learn_more_in_the_canvas_community_3bba7b11: "Sie erfahren mehr in der Canvas-Community"
   learning_analytics_beta_view_46deb4c8: "Lernanalysen (Beta) – Anzeigen"
@@ -17539,38 +17539,38 @@ de:
     assignment_unpublished_module: "Diese Aufgabe gehört zu einem nicht veröffentlichten Modul und ist noch nicht verfügbar."
     blueprint_content_added: 
       email: 
-        body: "Musterkursänderungen wurden synchronisiert in %{name}."
+        body: "Blueprint-Kursänderungen wurden synchronisiert in %{name}."
         details_link: "Änderungen anzeigen: %{link}"
         html: 
-          body: "Musterkursänderungen wurden synchronisiert in %{name}."
+          body: "Blueprint-Kursänderungen wurden synchronisiert in %{name}."
           details_link: "Änderungen anzeigen"
-          subject: "Mustersynchronisierung: %{name}"
-        subject: "Mustersynchronisierung: %{name}"
+          subject: "Blueprint-Synchronisierung: %{name}"
+        subject: "Blueprint-Synchronisierung: %{name}"
       sms: 
-        body: "Musterkursänderungen wurden synchronisiert in %{name}."
+        body: "Blueprint-Kursänderungen wurden synchronisiert in %{name}."
         link_message: "Mehr Infos unter %{url}"
       summary: 
-        body: "Mustersynchronisierung: Änderungen synchronisiert in %{name}."
-        subject: "Mustersynchronisierung: %{name}"
+        body: "Blueprint-Synchronisierung: Änderungen synchronisiert in %{name}."
+        subject: "Blueprint-Synchronisierung: %{name}"
       twitter: 
-        tweet: "Canvas-Warnung – Musterkursänderungen synchronisiert mit %{name}"
+        tweet: "Canvas-Warnung – Blueprint-Kursänderungen synchronisiert mit %{name}"
     blueprint_sync_complete: 
       email: 
-        body: "Ihr Musterkurs %{name} hat die Änderungen in allen verknüpften Kursen synchronisiert."
+        body: "Ihr Blueprint-Kurs %{name} hat die Änderungen in allen verknüpften Kursen synchronisiert."
         details_link: "Mehr Infos: %{link}"
         html: 
-          body: "Ihr Musterkurs %{name} hat die Änderungen in allen verknüpften Kursen synchronisiert."
+          body: "Ihr Blueprint-Kurs %{name} hat die Änderungen in allen verknüpften Kursen synchronisiert."
           details_link: "Mehr Infos"
-          subject: "Mustersynchronisierung beendet: %{name}"
-        subject: "Mustersynchronisierung beendet: %{name}"
+          subject: "Blueprint-Synchronisierung beendet: %{name}"
+        subject: "Blueprint-Synchronisierung beendet: %{name}"
       sms: 
-        body: "Musterkursänderungen wurden synchronisiert mit %{name}."
+        body: "Blueprint-Kursänderungen wurden synchronisiert mit %{name}."
         link_message: "Mehr Infos unter %{url}"
       summary: 
-        body: "Mustersynchronisierung: Änderungen synchronisiert mit %{name}."
-        subject: "Mustersynchronisierung beendet: %{name}"
+        body: "Blueprint-Synchronisierung: Änderungen synchronisiert mit %{name}."
+        subject: "Blueprint-Synchronisierung beendet: %{name}"
       twitter: 
-        tweet: "Canvas-Warnung – Musterkursänderungen synchronisiert mit %{name}"
+        tweet: "Canvas-Warnung – Blueprint-Kursänderungen synchronisiert mit %{name}"
     collaboration_invitation: 
       email: 
         body: |-
@@ -19929,8 +19929,8 @@ de:
     blueprint_description: |-
         *Nur Lehrende und Administrator\*in:*
         
-        Der Inhalt wurde aus einem Musterkurs in einen verknüpften Kurse synchronisiert.
-    blueprint_display: Mustersynchronisierung
+        Der Inhalt wurde aus einem Blueprint-Kurs in einen verknüpften Kurse synchronisiert.
+    blueprint_display: Blueprint-Synchronisierung
     calendar_description: "Neue und geänderte Elemente in Ihrem Kurskalender"
     calendar_display: Kalender
     categories: 
@@ -19940,7 +19940,7 @@ de:
       appointment_availability: Terminverfügbarkeit
       appointment_cancelations: Terminstornierungen
       appointment_signups: Terminanmeldungen
-      blueprint: Muster
+      blueprint: Blueprint
       calendar: Kalender
       content_link_error: Inhalt-Link-Fehler
       course_content: Kursinhalt
@@ -20043,8 +20043,8 @@ de:
       assignment_resubmitted: "Aufgabe erneut abgegeben"
       assignment_submitted: "Aufgabe abgegeben"
       assignment_submitted_late: "Aufgabe verspätet abgegeben"
-      blueprint_content_added: "Muster-Content hinzugefügt"
-      blueprint_sync_complete: "Mustersynchronisierung abgeschlossen"
+      blueprint_content_added: "Blueprint-Content hinzugefügt"
+      blueprint_sync_complete: "Blueprint-Synchronisierung abgeschlossen"
       collaboration_invitation: "Einladung zu Zusammenarbeit"
       confirm_email_communication_channel: "E-Mail-Kommunikationskanal bestätigen"
       confirm_registration: "Registrierung bestätigen"
@@ -26323,7 +26323,7 @@ de:
   show_older_replies_e85891b3: "Ältere Antworten anzeigen"
   show_one_question_at_a_time_271e346d: "Fragen einzeln anzeigen"
   show_online_classes_only_f9d7b938: "Nur Online-Klassen zeigen"
-  show_only_blueprint_courses_9fb37b41: "Nur Modellkurse zeigen"
+  show_only_blueprint_courses_9fb37b41: "Nur Blueprint-Kurse zeigen"
   show_only_disabled_calendars_cb8e2bdc: "Nur deaktivierte Kalender anzeigen"
   show_only_enabled_calendars_8caef0df: "Nur aktivierte Kalender anzeigen"
   show_only_public_courses_517ad255: "Nur öffentliche Kurse anzeigen"
@@ -28419,7 +28419,7 @@ de:
   this_influences_the_user_interface_for_setting_due_12b7e7c0: "Dies beeinflusst die Benutzeroberfläche zur Festlegung von Fälligkeitsdaten. Es ändert sich nicht, wenn vorhandene Aufgaben fällig sind."
   this_influences_the_user_interface_for_setting_due_be0f0273: "Dies beeinflusst die Benutzeroberfläche zur Festlegung von Fälligkeitsdaten. Die fällige Zeit für vorhandene Aufgaben wird dadurch nicht geändert."
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Diese Integration ist nicht aktiviert. Bitte aktivieren Sie sie, um mit Einstellungen zu interagieren."
-  this_is_a_blueprint_course_5e7b47fe: "Dies ist ein Entwurfskurs"
+  this_is_a_blueprint_course_5e7b47fe: "Dies ist ein Blueprint-Kurs"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dies ist eine durch Kommas getrennte Liste mit vertrauenswürdigen URLs. Wenn ein URL in der Liste als vertrauenswürdig angesehen wird, wird das CSRF-Token bei der Anmeldung bei Canvas umgangen."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dies ist ein abgeschlossener Kurs. Aus diesem Grund stehen nur abgeschlossene Einschreibungen zur Verfügung."
   this_is_a_course_template_99bbe698: "Das ist eine Kursvorlage"
@@ -28992,7 +28992,7 @@ de:
   to_add_announcements_discussions_moderate_must_als_a83fd681: "Zum Hinzufügen von Ansagen muss „Diskussionen – moderieren“ ebenfalls aktiviert sein."
   to_add_associated_courses_blueprint_courses_add_ed_224e93a3: "Um assoziierte Kurse hinzuzufügen, müssen „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten – hinzufügen“ ebenfalls aktiviert sein."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "Um assoziierte Kurse hinzuzufügen, müssen die Optionen „Musterkurs – hinzufügen / ändern / assoziieren / löschen“ und „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
-  to_add_associated_courses_blueprint_courses_add_ed_c1567d8a: "Um verknüpfte Kurse hinzufügen zu können, müssen die Berechtigungen „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse – hinzufügen“ ebenfalls aktiviert sein."
+  to_add_associated_courses_blueprint_courses_add_ed_c1567d8a: "Um verknüpfte Kurse hinzufügen zu können, müssen die Berechtigungen „Blueprint-Kurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse – hinzufügen“ ebenfalls aktiviert sein."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "Um Benutzergruppen, Kurse und Anmeldungen hinzuzufügen, klicken Sie auf SIS-Importe."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "Um Gruppen hinzufügen, ändern oder löschen zu können, muss „Gruppen – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
   to_add_groups_groups_add_must_also_be_enabled_33680f91: "Um Gruppen hinzufügen zu können, muss die Berechtigung „Gruppen – hinzufügen“ ebenfalls aktiviert sein."
@@ -29129,7 +29129,7 @@ de:
   to_edit_assignment_details_on_individual_discussio_99f718a7: "Um Aufgabendetails bei einzelnen Diskussionen ändern zu können, muss „Diskussionen – verwalten“ ebenfalls aktiviert sein."
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "Um Musterkurseinstellungen in den Kurseinstellungen zu ändern, muss die Option „Musterkurs – hinzufügen / ändern / assoziieren / löschen“ ebenfalls aktiviert sein. Um einen zugeordneten Kurs hinzuzufügen, müssen die Optionen „Musterkurs – hinzufügen / ändern / assoziieren / löschen“ und „Kurse – Liste anzeigen“ ebenfalls aktiviert sein. Zum Ändern von Sperreinstellungen für ein Musterobjekt muss diese Berechtigung aktiviert sein. Um Sperreinstellungen für Dateien zu ändern, muss die Option „Kursdateien – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um Sperreinstellungen für Quizze zu ändern, muss die Option „Aufgaben und Quizze – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "Um Mustersperreinstellungen auf der Aufgaben-Indexseite zu ändern, muss die Option „Kurs hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Falls diese Berechtigung nicht aktiviert ist, und „Kurs hinzufügen / ändern / löschen“ aktiviert ist, können Mustersperreinstellungen für eine Aufgabe auf der Detailseite der Aufgabe verwaltet werden. Um Mustersperreinstellungen für ein einzelnes Quiz oder auf der Quizze-Indexseite zu ändern, muss die Option „Kurs hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
-  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "Um Mustersperreinstellungen auf der Diskussionsindexseite ändern zu können, muss „Diskussionen – moderieren“ ebenfalls aktiviert sein."
+  to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "Um Blueprint-Sperreinstellungen auf der Diskussionsindexseite ändern zu können, muss „Diskussionen – moderieren“ ebenfalls aktiviert sein."
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Um Mustersperreinstellungen auf der Diskussionen-Indexseite zu ändern, müssen die Optionen „Kurse hinzufügen / ändern / löschen“ und „Diskussionen moderieren“ ebenfalls aktiviert sein. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Um Mustersperreinstellungen auf der Diskussionen-Indexseite zu ändern, müssen „Kurs hinzufügen / ändern / löschen“ und „Diskussionen anzeigen“ ebenfalls aktiviert sein. Falls diese Berechtigung nicht aktiviert ist, und „Kurs hinzufügen / ändern / löschen“ und „Diskussionen anzeigen“ aktiviert sind, können Mustersperreinstellungen für einzelne Diskussionen geändert werden."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Um Mustersperreinstellungen auf der Seiten-Indexseite zu ändern, muss die Option „Kurs hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Falls diese Berechtigung nicht aktiviert ist, und „Kurs hinzufügen / ändern / löschen“ aktiviert ist, können Mustersperreinstellungen für einzelne Seiten geändert werden."
@@ -29146,18 +29146,18 @@ de:
   to_edit_groups_groups_manage_must_also_be_enabled_64b30525: "Zum Bearbeiten von Gruppen muss die Berechtigung „Gruppen – verwalten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_for_course_files_course_file_392f6f70: "Um die Sperreinstellungen für Kursdateien zu bearbeiten, müssen „Kursdateien - bearbeiten“, „Musterkurses - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten / aktualisieren“ ebenfalls aktiviert sein."
   to_edit_lock_settings_for_course_files_course_file_60ff11c0: "Um die Sperreinstellungen für Kursdateien zu ändern, „Kursdateien – bearbeiten“, „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ muss ebenfalls aktiviert werden."
-  to_edit_lock_settings_for_course_files_course_file_92273739: "Um die Sperreinstellungen für Kursdateien zu bearbeiten, müssen „Kursdateien - bearbeiten“, „Musterkurses - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten“ ebenfalls aktiviert sein."
-  to_edit_lock_settings_from_the_assignments_index_p_261082c7: "Um die Sperreinstellungen auf der Aufgaben-Indexseite zu bearbeiten, müssen „Musterkurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten“ ebenfalls aktiviert sein."
+  to_edit_lock_settings_for_course_files_course_file_92273739: "Um die Sperreinstellungen für Kursdateien zu bearbeiten, müssen „Kursdateien - bearbeiten“, „Blueprint-Kurses - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten“ ebenfalls aktiviert sein."
+  to_edit_lock_settings_from_the_assignments_index_p_261082c7: "Um die Sperreinstellungen auf der Aufgaben-Indexseite zu bearbeiten, müssen „Blueprint-Kurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_from_the_assignments_index_p_53f2f063: "Um die Sperreinstellungen auf der Aufgaben-Indexseite zu bearbeiten, müssen „Musterkurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten / Aktualisieren“ ebenfalls aktiviert sein."
   to_edit_lock_settings_from_the_assignments_index_p_625d6230: |-
       Sperreinstellungen auf der Seitenindexseite ändern, „Seiten – Update“, „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ muss ebenfalls aktiviert werden. Falls diese zusätzlichen Berechtigungen aktiviert sind, „Aufgaben und Quizze – hinzufügen/bearbeiten/ löschen“ jedoch nicht aktiviert ist, können die Mustersperreinstellungen für eine Aufgabe auf der Detailseite der Aufgaben verwaltet werden.
               Um die Sperreinstellungen für ein einzelnes Quiz oder auf der Quizindexseite zu ändern, Musterkurse –hinzufügen/bearbeiten/verknüpfen/löschen und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ muss ebenfalls aktiviert werden.
   to_edit_lock_settings_from_the_assignments_index_p_b216dcbf: "Um Sperreinstellungen auf der Aufgabenindexseite ändern zu können, muss „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ ebenfalls aktiviert werden."
   to_edit_lock_settings_from_the_discussions_index_p_d344c544: "Um die Sperreinstellungen auf der Diskussionen-Indexseite zu bearbeiten, müssen „Musterkurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten / Aktualisieren“ ebenfalls aktiviert sein."
-  to_edit_lock_settings_from_the_discussions_index_p_d6743898: "Um die Sperreinstellungen auf der Diskussionen-Indexseite zu bearbeiten, müssen „Musterkurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten“ ebenfalls aktiviert sein."
+  to_edit_lock_settings_from_the_discussions_index_p_d6743898: "Um die Sperreinstellungen auf der Diskussionen-Indexseite zu bearbeiten, müssen „Blueprint-Kurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_from_the_discussions_index_p_ecdb9900: "Ändern der Sperreinstellungen auf der Diskussionsindexseite, „Musterkurs – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ muss ebenfalls aktiviert werden."
   to_edit_lock_settings_on_an_individual_quiz_or_on__787741ac: "Um die Sperreinstellungen eines einzelnen Quizzes oder auf der Quizindexseite ändern zu können, müssen „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ ebenfalls aktiviert werden."
-  to_edit_lock_settings_on_an_individual_quiz_or_on__b31e1b60: "Um die Sperreinstellungen für ein einzelnes Quiz oder auf der Quiz-Indexseite zu bearbeiten, müssen „Musterkurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten“ ebenfalls aktiviert sein."
+  to_edit_lock_settings_on_an_individual_quiz_or_on__b31e1b60: "Um die Sperreinstellungen für ein einzelnes Quiz oder auf der Quiz-Indexseite zu bearbeiten, müssen „Blueprint-Kurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_an_individual_quiz_or_on__eeb62722: "Um die Sperreinstellungen für ein einzelnes Quiz oder auf der Quiz-Indexseite zu bearbeiten, müssen „Musterkurse - Hinzufügen / Bearbeiten / Zuordnen / Löschen“ und „Kurse - Verwalten / Aktualisieren“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_files_courses_manage_and__f4718695: "Um die Sperreinstellungen für Dateien zu bearbeiten, müssen „Kurse - verwalten“ und „Kursdateien - bearbeiten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: "Um die Sperreinstellungen für Dateien zu bearbeiten, müssen „Kurse - verwalten / aktualisieren“ und „Kursdateien - bearbeiten“ ebenfalls aktiviert sein."
@@ -29171,7 +29171,7 @@ de:
   to_edit_lock_settings_on_the_discussions_index_pag_789c61ae: "Um die Sperreinstellungen auf der Diskussionen-Indexseite zu bearbeiten, müssen „Kurse - Verwalten / Aktualisieren“ und „Diskussionen - Anzeigen“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_the_discussions_index_pag_9488110a: "Um die Sperreinstellungen auf der Diskussionen-Indexseite zu bearbeiten, müssen „Kurse - Verwalten“ und „Diskussionen - Anzeigen“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: "Um die Sperreinstellungen auf der Seiten Indexseite zu bearbeiten, müssen „Seiten - aktualisieren“, „Musterkurse - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten / aktualisieren“ ebenfalls aktiviert sein."
-  to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "Um die Sperreinstellungen auf der Seiten Indexseite zu bearbeiten, müssen „Seiten - aktualisieren“, „Musterkurse - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten“ ebenfalls aktiviert sein."
+  to_edit_lock_settings_on_the_pages_index_page_page_5e65b3d6: "Um die Sperreinstellungen auf der Seiten Indexseite zu bearbeiten, müssen „Seiten - aktualisieren“, „Blueprint-Kurse - hinzufügen / bearbeiten / zuordnen / löschen“ und „Kurse - verwalten“ ebenfalls aktiviert sein."
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "Um die Sperreinstellungen auf der Seitenindexseite ändern zu können, müssen „Seiten – Update“, „Musterkurs – hinzufügen/bearbeiten/verknüpfen/löschen“ und „Kurse verwalten“: „Admin – verwalten/aktualisieren“ aktiviert werden."
   to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "Um Quizze ändern zu können, muss die Berechtigung „Aufgaben und Quizze – verwalten/bearbeiten“ ebenfalls aktiviert sein."
   to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "Um die Kurs-SIS-ID zu bearbeiten, müssen „Kurse - verwalten“ und „SIS-Daten - verwalten“ ebenfalls aktiviert sein."
