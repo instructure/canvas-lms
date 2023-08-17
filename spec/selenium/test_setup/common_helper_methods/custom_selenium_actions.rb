@@ -511,16 +511,10 @@ module CustomSeleniumActions
     # el.clear doesn't work with textboxes that have a pattern attribute that's why we have :backspace.
     # We are treating the chrome browser different because Selenium cannot send :command key to chrome on Mac.
     # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
-    if SeleniumDriverSetup.saucelabs_test_run?
-      el.click
-      el.send_keys [((driver.browser == :safari) ? :command : :control), "a"]
-      el.send_keys(value)
-    else
-      driver.execute_script("arguments[0].select();", el)
-      keys = value.to_s.empty? ? [:backspace] : []
-      keys << value
-      el.send_keys(*keys)
-    end
+    driver.execute_script("arguments[0].select();", el)
+    keys = value.to_s.empty? ? [:backspace] : []
+    keys << value
+    el.send_keys(*keys)
 
     el.send_keys(:tab) if options[:tab_out]
     el.send_keys(:return) if options[:press_return]

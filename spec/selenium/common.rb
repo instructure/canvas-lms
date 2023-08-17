@@ -19,7 +19,6 @@
 #
 require "nokogiri"
 require "selenium-webdriver"
-require "sauce_whisk"
 require_relative "test_setup/custom_selenium_rspec_matchers"
 require_relative "test_setup/selenium_driver_setup"
 require_relative "test_setup/selenium_extensions"
@@ -124,7 +123,7 @@ shared_context "in-process server selenium tests" do
     ActiveRecord::Base.connection.class.prepend(SynchronizeConnection)
   end
 
-  after do |example|
+  after do
     begin
       clear_timers!
       # while disallow_requests! would generally get these, there's a small window
@@ -151,26 +150,10 @@ shared_context "in-process server selenium tests" do
     rescue Selenium::WebDriver::Error::WebDriverError
       # we want to ignore selenium errors when attempting to wait here
     end
-
-    if SeleniumDriverSetup.saucelabs_test_run?
-      job_id = driver.session_id
-      job = SauceWhisk::Jobs.fetch job_id
-      old_name = job.name
-      job.name = old_name.prepend(example.metadata[:full_description].to_s + " - ")
-      job.passed = example.exception.nil?
-      job.save
-
-      driver.quit
-      SeleniumDriverSetup.reset!
-    end
   end
 
   # logs everything that showed up in the browser console during selenium tests
   after do |example|
-    # safari driver and edge driver do not support driver.manage.logs
-    # don't run for sauce labs smoke tests
-    next if SeleniumDriverSetup.saucelabs_test_run?
-
     if example.exception
       html = f("body").attribute("outerHTML")
       document = Nokogiri::HTML5(html)
