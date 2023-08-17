@@ -85,7 +85,7 @@ class EnhancedSRGB
     end
 
     def submit_for_student_button
-      f("#proxy_upload_trigger")
+      f('[data-testid="proxy-submission-button"]')
     end
 
     def notes_field

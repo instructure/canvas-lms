@@ -17,32 +17,51 @@
  */
 
 import {GradingResultsComponentProps} from '..'
-import {GradebookSortOrder} from '../../../../types'
+import {AssignmentConnection, GradebookOptions, GradebookSortOrder} from '../../../../types'
+
+export const defaultAssignment: AssignmentConnection = {
+  id: '1',
+  assignmentGroupId: '1',
+  allowedAttempts: 1,
+  anonymousGrading: false,
+  anonymizeStudents: false,
+  courseId: '1',
+  dueAt: null,
+  gradeGroupStudentsIndividually: false,
+  gradesPublished: false,
+  gradingType: 'points',
+  htmlUrl: '/courses/1/assignments/1',
+  moderatedGrading: false,
+  hasSubmittedSubmissions: false,
+  name: 'Missing Assignment 1',
+  omitFromFinalGrade: false,
+  pointsPossible: 10,
+  postManually: false,
+  submissionTypes: ['online_text_entry', 'online_upload'],
+  published: true,
+  workflowState: 'published',
+  gradingPeriodId: '1',
+}
+
+export const defaultGradebookOptions: GradebookOptions = {
+  contextUrl: '/courses/1',
+  sortOrder: GradebookSortOrder.Alphabetical,
+  customOptions: {
+    includeUngradedAssignments: false,
+    hideStudentNames: false,
+    showConcludedEnrollments: false,
+    showNotesColumn: false,
+    showTotalGradeAsPoints: false,
+    allowFinalGradeOverride: false,
+  },
+  gradingStandardScalingFactor: 1,
+  gradingStandardPointsBased: false,
+  pointsBasedGradingSchemesFeatureEnabled: false,
+  proxySubmissionEnabled: false,
+}
 
 export const gradingResultsDefaultProps: GradingResultsComponentProps = {
-  assignment: {
-    id: '1',
-    assignmentGroupId: '1',
-    allowedAttempts: 1,
-    anonymousGrading: false,
-    anonymizeStudents: false,
-    courseId: '1',
-    dueAt: null,
-    gradeGroupStudentsIndividually: false,
-    gradesPublished: false,
-    gradingType: 'points',
-    htmlUrl: '/courses/1/assignments/1',
-    moderatedGrading: false,
-    hasSubmittedSubmissions: false,
-    name: 'Missing Assignment 1',
-    omitFromFinalGrade: false,
-    pointsPossible: 10,
-    postManually: false,
-    submissionTypes: ['online_text_entry', 'online_upload'],
-    published: true,
-    workflowState: 'published',
-    gradingPeriodId: '1',
-  },
+  assignment: defaultAssignment,
   courseId: '1',
   currentStudent: {
     enrollments: [],
@@ -59,7 +78,7 @@ export const gradingResultsDefaultProps: GradingResultsComponentProps = {
       score: 95,
       enteredScore: 95,
       assignmentId: '1',
-      submissionType: 'Online',
+      submissionType: 'online_upload',
       proxySubmitter: 'teacher1',
       submittedAt: new Date('2023-08-10T08:00:00Z'),
       state: 'Graded',
@@ -75,21 +94,7 @@ export const gradingResultsDefaultProps: GradingResultsComponentProps = {
       enteredGrade: '95',
     },
   ],
-  gradebookOptions: {
-    sortOrder: GradebookSortOrder.Alphabetical,
-    changeGradeUrl: 'testUrl',
-    customOptions: {
-      includeUngradedAssignments: false,
-      hideStudentNames: false,
-      showConcludedEnrollments: false,
-      showNotesColumn: false,
-      showTotalGradeAsPoints: false,
-      allowFinalGradeOverride: false,
-    },
-    gradingStandardScalingFactor: 1,
-    gradingStandardPointsBased: false,
-    pointsBasedGradingSchemesFeatureEnabled: false,
-  },
+  gradebookOptions: defaultGradebookOptions,
   loadingStudent: false,
   currentStudentHiddenName: '',
   onSubmissionSaved: () => {},

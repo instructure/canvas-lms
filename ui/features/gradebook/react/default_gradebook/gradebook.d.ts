@@ -148,6 +148,7 @@ export type GradebookOptions = {
   post_grades_feature: boolean
   post_grades_ltis: Lti[]
   post_manually: boolean
+  proxy_submissions_allowed: boolean
   publish_to_sis_enabled: boolean
   publish_to_sis_url: string
   re_upload_submissions_url: string

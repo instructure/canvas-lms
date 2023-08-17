@@ -36,6 +36,7 @@ import {
 import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
+import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {outOfText, submitterPreviewText} from '../../../utils/gradebookUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
@@ -66,6 +67,7 @@ export default function GradingResults({
   const [gradeInput, setGradeInput] = useState<string>('')
   const [excusedChecked, setExcusedChecked] = useState<boolean>(false)
   const [modalOpen, setModalOpen] = useState<boolean>(false)
+  const [proxyUploadModalOpen, setProxyUploadModalOpen] = useState<boolean>(false)
 
   const {submit, submitExcused, submitScoreError, submitScoreStatus, savedSubmission} =
     useSubmitScore()
@@ -130,6 +132,16 @@ export default function GradingResults({
         </View>
       </>
     )
+  }
+
+  const reloadSubmission = (proxyDetails: any) => {
+    proxyDetails = {
+      submissionType: proxyDetails.submission_type,
+      proxySubmitter: proxyDetails.proxy_submitter,
+      workflowState: proxyDetails.workflow_state,
+      submittedAt: proxyDetails.submitted_at,
+    }
+    onSubmissionSaved({...submission, ...proxyDetails})
   }
 
   if (loadingStudent) {
@@ -273,6 +285,18 @@ export default function GradingResults({
                 {I18n.t('Submission Details')}
               </Button>
             </View>
+            <View as="div" className="span4" margin="medium" width="14.6rem">
+              {gradebookOptions.proxySubmissionEnabled &&
+                assignment.submissionTypes.includes('online_upload') && (
+                  <Button
+                    data-testid="proxy-submission-button"
+                    display="block"
+                    onClick={() => setProxyUploadModalOpen(true)}
+                  >
+                    {I18n.t('Submit for Student')}
+                  </Button>
+                )}
+            </View>
           </View>
         </View>
       </View>
@@ -288,6 +312,17 @@ export default function GradingResults({
         handleClose={() => setModalOpen(false)}
         onGradeChange={handleGradeChange}
         onPostComment={handlePostComment}
+      />
+      <ProxyUploadModal
+        data-testid="proxy-upload-modal"
+        open={proxyUploadModalOpen}
+        onClose={() => {
+          setProxyUploadModalOpen(false)
+        }}
+        assignment={assignment}
+        student={currentStudent}
+        submission={submission}
+        reloadSubmission={reloadSubmission}
       />
     </>
   )
