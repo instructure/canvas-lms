@@ -907,7 +907,7 @@ GEM
     redis (4.1.4)
     redis-scripting (1.0.1)
       redis (>= 3.0)
-    regexp_parser (2.7.0)
+    regexp_parser (2.8.1)
     reline (0.3.7)
       io-console (~> 0.5)
     request_store (1.5.1)
@@ -1335,7 +1335,7 @@ DEPENDENCIES
   redcarpet (~> 3.6)
   redis (= 4.1.4)
   redis-scripting (= 1.0.1)
-  regexp_parser (= 2.7.0)
+  regexp_parser (~> 2.8)
   request_context!
   respondus_soap_endpoint!
   retriable (= 1.4.1)
