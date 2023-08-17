@@ -567,7 +567,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
-    ffi (1.14.2)
+    ffi (1.15.5)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -1248,7 +1248,7 @@ DEPENDENCIES
   event_stream!
   factory_bot (= 6.2.1)
   faraday (~> 0.17)
-  ffi (= 1.14.2)
+  ffi (~> 1.15)
   ffi-icu (= 0.4.0)!
   flakey_spec_catcher (~> 0.12)
   folio-pagination (= 0.0.12)
