@@ -500,20 +500,23 @@ class DiscussionTopicsController < ApplicationController
     add_crumb t :create_new_crumb, "Create new"
 
     if @context.root_account.feature_enabled?(:discussion_create)
-      hash = { is_announcement: params[:is_announcement] }
+      hash = { is_announcement: params[:is_announcement] || "false" }
       if @context.grants_right?(@current_user, session, :read)
+        hash[:context_id] = @context.id
         if @context.is_a?(Course)
-          hash[:course_id] = @context.id.to_s
+          hash[:context_type] = "Course"
         elsif @context.is_a?(Group)
-          hash[:group_id] = @context.id.to_s
+          hash[:context_type] = "Group"
         end
       end
+      hash[:is_student] = context.user_is_student?(@current_user, include_fake_student: true)
       js_env(hash)
       js_bundle :discussion_topic_edit_v2
       css_bundle :discussions_index, :learning_outcomes
       render html: "", layout: (params[:embed] == "true") ? "mobile_embed" : true
       return
     end
+
     edit
   end
 
