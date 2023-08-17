@@ -525,8 +525,10 @@ GEM
     db-query-matchers (0.11.0)
       activesupport (>= 4.0, < 7.1)
       rspec (>= 3.0)
-    ddtrace (0.42.0)
+    ddtrace (0.54.2)
+      debase-ruby_core_source (<= 0.10.14)
       msgpack
+    debase-ruby_core_source (0.10.14)
     debug_inspector (1.1.0)
     deep_merge (1.2.2)
     descendants_tracker (0.0.4)
@@ -1231,7 +1233,7 @@ DEPENDENCIES
   csv_diff!
   database_cleaner (~> 2.0)
   db-query-matchers (= 0.11.0)
-  ddtrace (= 0.42.0)
+  ddtrace (~> 0.54)
   digest-murmurhash (= 1.1.1)
   diigo!
   diplomat (~> 2.6)
