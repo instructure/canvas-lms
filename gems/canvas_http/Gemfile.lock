@@ -26,7 +26,7 @@ GEM
       rexml
     diff-lcs (1.5.0)
     hashdiff (1.0.1)
-    mime-types (3.3.1)
+    mime-types (3.5.0)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2023.0808)
     public_suffix (5.0.3)
