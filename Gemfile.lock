@@ -699,8 +699,8 @@ GEM
     language_server-protocol (3.17.0.3)
     launchy (2.5.2)
       addressable (~> 2.8)
-    letter_opener (1.7.0)
-      launchy (~> 2.2)
+    letter_opener (1.8.1)
+      launchy (>= 2.2, < 3)
     link_header (0.0.8)
     loofah (2.21.3)
       crass (~> 1.0.2)
@@ -1275,7 +1275,7 @@ DEPENDENCIES
   json_schemer (~> 0.2)
   json_token!
   legacy_multipart!
-  letter_opener (= 1.7.0)
+  letter_opener (~> 1.8)
   link_header (= 0.0.8)
   linked_in!
   live_events!
