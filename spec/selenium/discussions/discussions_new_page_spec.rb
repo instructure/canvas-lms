@@ -48,7 +48,7 @@ describe "discussions" do
     stub_rcs_config
   end
 
-  context "on the new page" do
+  context "when discussion_create feature flag is OFF" do
     let(:url) { "/courses/#{course.id}/discussion_topics/new" }
 
     context "as a teacher" do
@@ -405,6 +405,50 @@ describe "discussions" do
             expect(ff("button[type='submit']").length).to eq 1
           end
         end
+      end
+    end
+  end
+
+  context "when discussion_create feature flag is ON", ignore_js_errors: true do
+    before do
+      Account.site_admin.enable_feature! :discussion_create
+      # we will turn react_discussions_post on here as well (altough it is not required)
+      Account.site_admin.enable_feature! :react_discussions_post
+    end
+
+    context "as a teacher" do
+      before do
+        user_session(teacher)
+      end
+
+      it "creates a new discussion topic successfully" do
+        title = "My Test Topic"
+        message = "replying to topic"
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("input[placeholder='Topic Title']").send_keys title
+        type_in_tiny("textarea", message)
+        f("button[data-testid='save-and-publish-button']").click
+        wait_for_ajaximations
+        dt = DiscussionTopic.last
+        expect(dt.title).to eq title
+        expect(dt.message).to include message
+        expect(dt).to be_published
+        expect(fj("div[data-testid='discussion-topic-container'] span:contains('#{title}')")).to be_present
+      end
+
+      it "shows course sections or course group categories" do
+        new_section
+        group_category
+        group
+        get "/courses/#{course.id}/discussion_topics/new"
+        f("[data-testid='section-select']").click
+        # verify all sections exist in the dropdown
+        expect(f("[data-testid='section-opt-#{default_section.id}']")).to be_present
+        expect(f("[data-testid='section-opt-#{new_section.id}']")).to be_present
+        force_click("input[data-testid='group-discussion-checkbox']")
+        f("input[placeholder='Select Group']").click
+        # very group category exists in the dropdown
+        expect(f("[data-testid='group-category-opt-#{group_category.id}']")).to be_present
       end
     end
   end

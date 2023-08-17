@@ -20,7 +20,7 @@ import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import AnonymousResponseSelector from '@canvas/discussions/react/components/AnonymousResponseSelector/AnonymousResponseSelector'
 import GroupCategoryModalContainer from '../../containers/GroupCategoryModalContainer/GroupCategoryModalContainer'
-import {useScope as usei18NScope} from '@canvas/i18n'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -35,7 +35,7 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 import CanvasMultiSelect from '@canvas/multi-select'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 
-const I18N = usei18NScope('discussion_create')
+const I18n = useI18nScope('discussion_create')
 
 export default function DiscussionTopicForm({
   isEditing,
@@ -122,11 +122,11 @@ export default function DiscussionTopicForm({
   const validateTitle = newTitle => {
     if (newTitle.length > 255) {
       setTitleValidationMessages([
-        {text: I18N.t('Title must be less than 255 characters.'), type: 'error'},
+        {text: I18n.t('Title must be less than 255 characters.'), type: 'error'},
       ])
       return false
     } else if (newTitle.length === 0) {
-      setTitleValidationMessages([{text: I18N.t('Title must not be empty.'), type: 'error'}])
+      setTitleValidationMessages([{text: I18n.t('Title must not be empty.'), type: 'error'}])
       return false
     } else {
       setTitleValidationMessages([{text: '', type: 'success'}])
@@ -140,7 +140,7 @@ export default function DiscussionTopicForm({
       return true
     } else if (newAvailableUntil < newAvailableFrom) {
       setAvailabilityValidationMessages([
-        {text: I18N.t('Date must be after date available.'), type: 'error'},
+        {text: I18n.t('Date must be after date available.'), type: 'error'},
       ])
       return false
     } else {
@@ -184,9 +184,9 @@ export default function DiscussionTopicForm({
     <>
       <FormFieldGroup description="" rowSpacing="small">
         <TextInput
-          renderLabel={I18N.t('Topic Title')}
-          type={I18N.t('text')}
-          placeholder={I18N.t('Topic Title')}
+          renderLabel={I18n.t('Topic Title')}
+          type={I18n.t('text')}
+          placeholder={I18n.t('Topic Title')}
           value={title}
           onChange={(_event, value) => {
             validateTitle(value)
@@ -215,8 +215,9 @@ export default function DiscussionTopicForm({
         {!isGraded && !isGroupDiscussion && (
           <View display="block" padding="medium none">
             <CanvasMultiSelect
-              label={I18N.t('Post to')}
-              assistiveText={I18N.t(
+              data-testid="section-select"
+              label={I18n.t('Post to')}
+              assistiveText={I18n.t(
                 'Select sections to post to. Type or use arrow keys to navigate. Multiple selections are allowed.'
               )}
               selectedOptionIds={sectionIdsToPostTo}
@@ -241,18 +242,23 @@ export default function DiscussionTopicForm({
               width={inputWidth}
             >
               {[allSectionsOption, ...sections].map(({_id: id, name: label}) => (
-                <CanvasMultiSelect.Option id={id} value={`opt-${id}`} key={id}>
+                <CanvasMultiSelect.Option
+                  id={id}
+                  value={`opt-${id}`}
+                  key={id}
+                  data-testid={`section-opt-${id}`}
+                >
                   {label}
                 </CanvasMultiSelect.Option>
               ))}
             </CanvasMultiSelect>
           </View>
         )}
-        <Text size="large">{I18N.t('Options')}</Text>
+        <Text size="large">{I18n.t('Options')}</Text>
         <View display="block" margin="medium 0">
           <RadioInputGroup
             name="anonymous"
-            description={I18N.t('Anonymous Discussion')}
+            description={I18n.t('Anonymous Discussion')}
             value={discussionAnonymousState}
             onChange={(_event, value) => {
               if (value !== 'off') {
@@ -267,21 +273,21 @@ export default function DiscussionTopicForm({
             <RadioInput
               key="off"
               value="off"
-              label={I18N.t(
+              label={I18n.t(
                 'Off: student names and profile pictures will be visible to other members of this course'
               )}
             />
             <RadioInput
               key="partial_anonymity"
               value="partial_anonymity"
-              label={I18N.t(
+              label={I18n.t(
                 'Partial: students can choose to reveal their name and profile picture'
               )}
             />
             <RadioInput
               key="full_anonymity"
               value="full_anonymity"
-              label={I18N.t('Full: student names and profile pictures will be hidden')}
+              label={I18n.t('Full: student names and profile pictures will be hidden')}
             />
           </RadioInputGroup>
           {!isEditing && discussionAnonymousState === 'partial_anonymity' && isStudent && (
@@ -296,13 +302,13 @@ export default function DiscussionTopicForm({
         </View>
         <FormFieldGroup description="" rowSpacing="small">
           <Checkbox
-            label={I18N.t('Participants must respond to the topic before viewing other replies')}
+            label={I18n.t('Participants must respond to the topic before viewing other replies')}
             value="must-respond-before-viewing-replies"
             checked={respondBeforeReply}
             onChange={() => setRespondBeforeReply(!respondBeforeReply)}
           />
           <Checkbox
-            label={I18N.t('Enable podcast feed')}
+            label={I18n.t('Enable podcast feed')}
             value="enable-podcast-feed"
             checked={enablePodcastFeed}
             onChange={() => {
@@ -313,7 +319,7 @@ export default function DiscussionTopicForm({
           {enablePodcastFeed && (
             <View display="block" padding="none none none large">
               <Checkbox
-                label={I18N.t('Include student replies in podcast feed')}
+                label={I18n.t('Include student replies in podcast feed')}
                 value="include-student-replies-in-podcast-feed"
                 checked={includeRepliesInFeed}
                 onChange={() => setIncludeRepliesInFeed(!includeRepliesInFeed)}
@@ -322,7 +328,7 @@ export default function DiscussionTopicForm({
           )}
           {discussionAnonymousState === 'off' && (
             <Checkbox
-              label={I18N.t('Graded')}
+              label={I18n.t('Graded')}
               value="graded"
               checked={isGraded}
               onChange={() => setIsGraded(!isGraded)}
@@ -330,7 +336,7 @@ export default function DiscussionTopicForm({
             />
           )}
           <Checkbox
-            label={I18N.t('Allow liking')}
+            label={I18n.t('Allow liking')}
             value="allow-liking"
             checked={allowLiking}
             onChange={() => {
@@ -342,7 +348,7 @@ export default function DiscussionTopicForm({
             <View display="block" padding="none none none large">
               <FormFieldGroup description="" rowSpacing="small">
                 <Checkbox
-                  label={I18N.t('Only graders can like')}
+                  label={I18n.t('Only graders can like')}
                   value="only-graders-can-like"
                   checked={onlyGradersCanLike}
                   onChange={() => setOnlyGradersCanLike(!onlyGradersCanLike)}
@@ -352,7 +358,7 @@ export default function DiscussionTopicForm({
           )}
           {!isGraded && (
             <Checkbox
-              label={I18N.t('Add to student to-do')}
+              label={I18n.t('Add to student to-do')}
               value="add-to-student-to-do"
               checked={addToTodo}
               onChange={() => {
@@ -367,18 +373,19 @@ export default function DiscussionTopicForm({
                 description=""
                 dateRenderLabel=""
                 timeRenderLabel=""
-                prevMonthLabel={I18N.t('previous')}
-                nextMonthLabel={I18N.t('next')}
+                prevMonthLabel={I18n.t('previous')}
+                nextMonthLabel={I18n.t('next')}
                 onChange={(_event, newDate) => setTodoDate(newDate)}
                 value={todoDate}
-                invalidDateTimeMessage={I18N.t('Invalid date and time')}
+                invalidDateTimeMessage={I18n.t('Invalid date and time')}
                 layout="columns"
               />
             </View>
           )}
           {discussionAnonymousState === 'off' && (
             <Checkbox
-              label={I18N.t('This is a Group Discussion')}
+              data-testid="group-discussion-checkbox"
+              label={I18n.t('This is a Group Discussion')}
               value="group-discussion"
               checked={isGroupDiscussion}
               onChange={() => {
@@ -390,7 +397,7 @@ export default function DiscussionTopicForm({
           {discussionAnonymousState === 'off' && isGroupDiscussion && (
             <View display="block" padding="none none none large">
               <SimpleSelect
-                renderLabel={I18N.t('Group Set')}
+                renderLabel={I18n.t('Group Set')}
                 defaultValue=""
                 value={groupCategoryId}
                 onChange={(_event, newChoice) => {
@@ -402,11 +409,16 @@ export default function DiscussionTopicForm({
                     setGroupCategoryId(value)
                   }
                 }}
-                placeholder={I18N.t('Select Group')}
+                placeholder={I18n.t('Select Group')}
                 width={inputWidth}
               >
                 {groupCategories.map(({_id: id, name: label}) => (
-                  <SimpleSelect.Option key={id} id={`opt-${id}`} value={id}>
+                  <SimpleSelect.Option
+                    key={id}
+                    id={`opt-${id}`}
+                    value={id}
+                    data-testid={`group-category-opt-${id}`}
+                  >
                     {label}
                   </SimpleSelect.Option>
                 ))}
@@ -416,7 +428,7 @@ export default function DiscussionTopicForm({
                   value="new-group-category"
                   renderBeforeLabel={IconAddLine}
                 >
-                  New Group Category
+                  {I18n.t('New Group Category')}
                 </SimpleSelect.Option>
               </SimpleSelect>
 
@@ -433,33 +445,33 @@ export default function DiscussionTopicForm({
         ) : (
           <FormFieldGroup description="" width={inputWidth}>
             <DateTimeInput
-              description={I18N.t('Available from')}
+              description={I18n.t('Available from')}
               dateRenderLabel=""
               timeRenderLabel=""
-              prevMonthLabel={I18N.t('previous')}
-              nextMonthLabel={I18N.t('next')}
+              prevMonthLabel={I18n.t('previous')}
+              nextMonthLabel={I18n.t('next')}
               value={availableFrom}
               onChange={(_event, newAvailableFrom) => {
                 validateAvailability(newAvailableFrom, availableUntil)
                 setAvailableFrom(newAvailableFrom)
               }}
-              datePlaceholder={I18N.t('Select Date')}
-              invalidDateTimeMessage={I18N.t('Invalid date and time')}
+              datePlaceholder={I18n.t('Select Date')}
+              invalidDateTimeMessage={I18n.t('Invalid date and time')}
               layout="columns"
             />
             <DateTimeInput
-              description={I18N.t('Until')}
+              description={I18n.t('Until')}
               dateRenderLabel=""
               timeRenderLabel=""
-              prevMonthLabel={I18N.t('previous')}
-              nextMonthLabel={I18N.t('next')}
+              prevMonthLabel={I18n.t('previous')}
+              nextMonthLabel={I18n.t('next')}
               value={availableUntil}
               onChange={(_event, newAvailableUntil) => {
                 validateAvailability(availableFrom, newAvailableUntil)
                 setAvailableUntil(newAvailableUntil)
               }}
-              datePlaceholder={I18N.t('Select Date')}
-              invalidDateTimeMessage={I18N.t('Invalid date and time')}
+              datePlaceholder={I18n.t('Select Date')}
+              invalidDateTimeMessage={I18n.t('Invalid date and time')}
               messages={availabiltyValidationMessages}
               layout="columns"
             />
@@ -473,18 +485,24 @@ export default function DiscussionTopicForm({
           padding="large none"
         >
           <Button type="button" color="secondary">
-            {I18N.t('Cancel')}
+            {I18n.t('Cancel')}
           </Button>
           <Button
             type="submit"
             onClick={() => submitForm(true)}
             color="secondary"
             margin="xxx-small"
+            data-testid="save-and-publish-button"
           >
-            {I18N.t('Save and Publish')}
+            {I18n.t('Save and Publish')}
           </Button>
-          <Button type="submit" onClick={() => submitForm(false)} color="primary">
-            {I18N.t('Save')}
+          <Button
+            type="submit"
+            data-testid="save-button"
+            onClick={() => submitForm(false)}
+            color="primary"
+          >
+            {I18n.t('Save')}
           </Button>
         </View>
       </FormFieldGroup>

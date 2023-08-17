@@ -19,20 +19,29 @@
 import React, {useCallback} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
-import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
+import {COURSE_QUERY, DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 
 import LoadingIndicator from '@canvas/loading-indicator'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 
 export default function DiscussionTopicFormContainer() {
-  const is_editing = !!ENV.discussion_topic_id
-  const {data: topic_data, loading: topic_is_loading} = useQuery(DISCUSSION_TOPIC_QUERY, {
+  const {data: courseData, loading: courseIsLoading} = useQuery(COURSE_QUERY, {
     variables: {
-      discussionTopicId: 120 /* ENV.disscusion_topic_id, */,
+      courseId: ENV.context_id, // TODO: what if it's a group?
     },
   })
-  const currentDiscussionTopic = topic_data?.legacyNode
+  const currentCourse = courseData?.legacyNode
+  const sections = currentCourse?.sectionsConnection?.nodes
+  const groupCategories = currentCourse?.groupSetsConnection?.nodes
+
+  const isEditing = !!ENV.discussion_topic_id
+  const {data: topicData, loading: topicIsLoading} = useQuery(DISCUSSION_TOPIC_QUERY, {
+    variables: {
+      discussionTopicId: ENV.discussion_topic_id,
+    },
+  })
+  const currentDiscussionTopic = topicData?.legacyNode
 
   const [createDiscussionTopic] = useMutation(CREATE_DISCUSSION_TOPIC, {
     onCompleted: completionData => {
@@ -42,10 +51,12 @@ export default function DiscussionTopicFormContainer() {
       if (discussion_topic_id && context_type) {
         if (context_type === 'Course') {
           window.location.assign(
-            `/courses/${ENV.course_id}/discussion_topics/${discussion_topic_id}`
+            `/courses/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
           )
         } else if (context_type === 'Group') {
-          window.location.assign(`/groups/${ENV.group_id}/discussion_topics/${discussion_topic_id}`)
+          window.location.assign(
+            `/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
+          )
         } else {
           // TODO: show error page and/or redirect
           // eslint-disable-next-line no-console
@@ -68,45 +79,48 @@ export default function DiscussionTopicFormContainer() {
     ({
       title,
       message,
-      sectionIdsToPostTo,
-      discussionAnonymousState,
-      anonymousAuthorState,
-      respondBeforeReply,
-      enablePodcastFeed,
-      includeRepliesInFeed,
+      // TODO: implement these as the backend becomes ready for them
+      // isAnnouncement,
+      // sectionIdsToPostTo,
+      // discussionAnonymousState,
+      // anonymousAuthorState,
+      // respondBeforeReply,
+      // enablePodcastFeed,
+      // includeRepliesInFeed,
       // isGraded, (phase 2)
-      allowLiking,
-      onlyGradersCanLike,
+      // allowLiking,
+      // onlyGradersCanLike,
       // addToTodo,
-      todoDate,
+      // todoDate,
       // isGroupDiscussion,
       // groupCategoryId,
-      availableFrom,
-      availableUntil,
+      // availableFrom,
+      // availableUntil,
       shouldPublish,
     }) => {
       createDiscussionTopic({
         variables: {
-          contextId: ENV.course_id,
+          contextId: ENV.context_id,
           contextType: 'Course',
-          isAnnouncement: false,
           title,
           message,
-          discussionType: 'side_comment',
-          delayedPostAt: availableFrom,
-          lockAt: availableUntil,
-          podcastEnabled: enablePodcastFeed,
-          podcastHasStudentPosts: includeRepliesInFeed,
-          requireInitialPost: respondBeforeReply,
-          pinned: false,
-          todoDate,
-          groupCategoryId: null,
-          allowRating: allowLiking,
-          onlyGradersCanRate: onlyGradersCanLike,
-          anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
-          isAnonymousAuthor: anonymousAuthorState,
-          specificSections: sectionIdsToPostTo,
-          locked: false,
+          // TODO: implement these as the backend becomes ready for them
+          // isAnnouncement:,
+          // discussionType: 'side_comment',
+          // delayedPostAt: availableFrom,
+          // lockAt: availableUntil,
+          // podcastEnabled: enablePodcastFeed,
+          // podcastHasStudentPosts: includeRepliesInFeed,
+          // requireInitialPost: respondBeforeReply,
+          // pinned: false,
+          // todoDate,
+          // groupCategoryId: null,
+          // allowRating: allowLiking,
+          // onlyGradersCanRate: onlyGradersCanLike,
+          // anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
+          // isAnonymousAuthor: anonymousAuthorState,
+          // specificSections: sectionIdsToPostTo,
+          // locked: false,
           published: shouldPublish,
         },
       })
@@ -114,6 +128,7 @@ export default function DiscussionTopicFormContainer() {
     [createDiscussionTopic]
   )
 
+  // TODO implement this update discussion mutation when the backend is ready
   // const updateDiscussionTopicOnSubmit = useCallback(
   //   ({
   //     title,
@@ -166,19 +181,24 @@ export default function DiscussionTopicFormContainer() {
   //   [updateDiscussionTopic]
   // )
 
-  if (topic_is_loading) {
+  if (courseIsLoading || topicIsLoading) {
     return <LoadingIndicator />
   }
 
   return (
     <DiscussionTopicForm
-      isEditing={is_editing}
+      isEditing={isEditing}
       currentDiscussionTopic={currentDiscussionTopic}
-      isStudent={false /* ENV.is_student */}
-      sections={[]}
-      groupCategories={[]}
+      isStudent={ENV.is_student}
+      sections={sections}
+      groupCategories={groupCategories}
       onSubmit={
-        createDiscussionTopicOnSubmit /* is_editing ? updateDiscussionTopicOnSubmit : ... */
+        isEditing
+          ? () => {
+              // eslint-disable-next-line no-console
+              console.log('change this to call updateDiscussionTopicOnSubmit later')
+            }
+          : createDiscussionTopicOnSubmit
       }
     />
   )
