@@ -28,6 +28,8 @@ module Types
 
     field :name, String, null: false
 
+    field :short_name, String, null: false
+
     field :common_courses_connection, Types::EnrollmentType.connection_type, null: true
     def common_courses_connection
       Promise.all([

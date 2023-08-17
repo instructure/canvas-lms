@@ -32,14 +32,16 @@ export const MessageDetailParticipants = ({...props}) => {
   const [participantsExpanded, setParticipantsExpanded] = useState(false)
 
   const uniqueMessageRecipients = props.conversationMessage?.recipients?.filter(
-    p => p.name !== props.conversationMessage?.author?.name
+    p => p.shortName !== props.conversationMessage?.author?.shortName
   )
 
   const participantsToShow = participantsExpanded
     ? uniqueMessageRecipients
     : uniqueMessageRecipients.slice(0, PARTICIPANT_EXPANSION_THRESHOLD)
 
-  const participantStr = `, ${participantsToShow.map(participant => participant.name).join(', ')}`
+  const participantStr = `, ${participantsToShow
+    .map(participant => participant.shortName)
+    .join(', ')}`
 
   const participantCount = uniqueMessageRecipients.length - PARTICIPANT_EXPANSION_THRESHOLD
   const participantExpansionButtonText = participantsExpanded
@@ -55,7 +57,7 @@ export const MessageDetailParticipants = ({...props}) => {
       <Flex.Item shouldShrink={true} shouldGrow={true}>
         <View overflowX="hidden" overflowY="hidden" width="100%" display="block">
           <Text weight="bold" size={props.participantsSize}>
-            {props.conversationMessage?.author?.name}
+            {props.conversationMessage?.author?.shortName}
           </Text>
           {!participantsToShow.length ? null : (
             <Text size={props.participantsSize} data-testid="participant-list">

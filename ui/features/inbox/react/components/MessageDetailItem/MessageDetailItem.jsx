@@ -75,7 +75,7 @@ export const MessageDetailItem = ({...props}) => {
               <Avatar
                 size={responsiveProps.avatar}
                 margin="small small small none"
-                name={props.conversationMessage?.author?.name}
+                name={props.conversationMessage?.author?.shortName}
                 src={props.conversationMessage?.author?.avatarUrl}
               />
             </Flex.Item>

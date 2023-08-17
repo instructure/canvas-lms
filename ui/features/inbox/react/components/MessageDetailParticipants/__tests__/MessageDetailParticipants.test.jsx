@@ -26,8 +26,8 @@ describe('MessageDetailParticipants', () => {
   it('renders with provided data', () => {
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson',},
+        recipients: [{name: 'Tom Thompson', shortName: 'Tom Thompson',}, {name: 'Billy Harris', shortName: 'Billy Harris'}],
       },
     }
 
@@ -40,7 +40,7 @@ describe('MessageDetailParticipants', () => {
     const participantList = []
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
         recipients: participantList,
       },
     }
@@ -50,27 +50,27 @@ describe('MessageDetailParticipants', () => {
 
   it('renders with limited list until expanded', () => {
     const participantList = [
-      {name: 'Bob Barker'},
-      {name: 'Sally Ford'},
-      {name: 'Russel Franks'},
-      {name: 'Dipali Vega'},
-      {name: 'Arlet Tuân'},
-      {name: 'Tshepo Jehoiachin'},
-      {name: 'Ráichéal Mairead'},
-      {name: 'Renāte Tarik'},
-      {name: "Jocelin 'Avshalom"},
-      {name: 'Marisa Ninurta'},
-      {name: 'Régine Teige'},
-      {name: 'Norman Iustina'},
-      {name: 'Ursula Siddharth'},
-      {name: 'Cristoforo Gülnarə'},
-      {name: 'Katka Lauge'},
-      {name: 'Sofia Fernanda'},
-      {name: 'Orestes Etheldreda'},
+      {name: 'Bob Barker', shortName: 'Bob Barker'},
+      {name: 'Sally Ford', shortName: 'Sally Ford'},
+      {name: 'Russel Franks', shortName: 'Russel Franks'},
+      {name: 'Dipali Vega', shortName: 'Dipali Vega'},
+      {name: 'Arlet Tuân', shortName: 'Arlet Tuân'},
+      {name: 'Tshepo Jehoiachin', shortName: 'Tshepo Jehoiachin'},
+      {name: 'Ráichéal Mairead', shortName: 'Ráichéal Mairead'},
+      {name: 'Renāte Tarik', shortName: 'Renāte Tarik'},
+      {name: "Jocelin 'Avshalom", shortName: "Jocelin 'Avshalom"},
+      {name: 'Marisa Ninurta', shortName: 'Marisa Ninurta'},
+      {name: 'Régine Teige', shortName: 'Régine Teige'},
+      {name: 'Norman Iustina', shortName: 'Norman Iustina'},
+      {name: 'Ursula Siddharth', shortName: 'Ursula Siddharth'},
+      {name: 'Cristoforo Gülnarə', shortName: 'Cristoforo Gülnarə'},
+      {name: 'Katka Lauge', shortName: 'Katka Lauge'},
+      {name: 'Sofia Fernanda', shortName: 'Sofia Fernanda'},
+      {name: 'Orestes Etheldreda', shortName: 'Orestes Etheldreda'},
     ]
     const props = {
       conversationMessage: {
-        author: {name: 'Tom Thompson'},
+        author: {name: 'Tom Thompson', shortName: 'Tom Thompson'},
         recipients: participantList,
       },
     }
