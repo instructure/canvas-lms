@@ -19,8 +19,9 @@
 import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import GradingResults, {GradingResultsComponentProps} from '..'
-import {gradingResultsDefaultProps} from './fixtures'
+import {gradingResultsDefaultProps, defaultAssignment, defaultGradebookOptions} from './fixtures'
 import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../../../queries/Queries'
 import {MockedProvider} from '@apollo/react-testing'
 
@@ -127,6 +128,59 @@ describe('Grading Results Tests', () => {
       expect(queryByTestId('late_penalty_final_grade_label')).toBeNull()
       expect(queryByTestId('submission_late_penalty_values')).toBeNull()
       expect(queryByTestId('late_penalty_final_grade_values')).toBeNull()
+    })
+
+    it('renders the proxy submit button when the FF is enabled and submission types include online upload', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        gradebookOptions: {
+          ...defaultGradebookOptions,
+          proxySubmissionEnabled: true,
+        },
+      }
+      const {getByTestId} = renderGradingResults(modifiedProps)
+      expect(getByTestId('proxy-submission-button')).toBeInTheDocument()
+    })
+
+    it('does not render the proxy submit button when the FF is disabled', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        proxySubmissionEnabled: false,
+      }
+      const {queryByTestId} = renderGradingResults(modifiedProps)
+      expect(queryByTestId('proxy-submission-button')).not.toBeInTheDocument()
+    })
+
+    it('does not render the proxy submit button when online upload is not a submission type', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+          submissionTypes: ['online_text_entry'],
+        },
+        gradebookOptions: {
+          ...defaultGradebookOptions,
+          proxySubmissionEnabled: true,
+        },
+      }
+      const {queryByTestId} = renderGradingResults(modifiedProps)
+      expect(queryByTestId('proxy-submission-button')).not.toBeInTheDocument()
+    })
+
+    it('renders the proxy submit modal when the submit for student button is clicked', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        assignment: {
+          ...defaultAssignment,
+        },
+        gradebookOptions: {
+          ...defaultGradebookOptions,
+          proxySubmissionEnabled: true,
+        },
+      }
+      const {getByTestId} = renderGradingResults(modifiedProps)
+      userEvent.click(getByTestId('proxy-submission-button'))
+      expect(getByTestId('proxyInputFileDrop')).toBeInTheDocument()
     })
   })
 })

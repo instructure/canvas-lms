@@ -92,6 +92,7 @@ export type GradebookOptions = {
   groupWeightingScheme?: string | null
   finalGradeOverrideEnabled?: boolean | null
   pointsBasedGradingSchemesFeatureEnabled: boolean
+  proxySubmissionEnabled: boolean
   publishToSisEnabled?: boolean | null
   publishToSisUrl?: string | null
   reorderCustomColumnsUrl?: string | null
