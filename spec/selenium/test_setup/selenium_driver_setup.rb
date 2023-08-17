@@ -74,11 +74,6 @@ module SeleniumDriverSetup
       @driver = nil
     end
 
-    def saucelabs_test_run?
-      SeleniumDriverSetup::CONFIG[:remote_url].present? &&
-        SeleniumDriverSetup::CONFIG[:remote_url].downcase.include?("saucelabs")
-    end
-
     def run
       begin
         [
@@ -86,7 +81,6 @@ module SeleniumDriverSetup
           Thread.new { start_driver },
         ].each(&:join)
       rescue Selenium::WebDriver::Error::WebDriverError
-        driver.quit if saucelabs_test_run?
       rescue
         puts "selenium startup failed: #{$ERROR_INFO}"
         puts "exiting :'("

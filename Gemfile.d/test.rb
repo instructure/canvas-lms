@@ -35,7 +35,6 @@ group :test do
   gem "shoulda-matchers", "~> 5.3"
 
   gem "once-ler", "2.0.1"
-  gem "sauce_whisk", "~> 0.3"
 
   gem "selenium-webdriver", "~> 4.11.0", require: false
   gem "testrailtagging", "0.3.8.7", require: false
