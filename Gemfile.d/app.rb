@@ -131,7 +131,7 @@ gem "sentry-rails", "~> 5.10"
 gem "sentry-inst_jobs", "~> 5.10"
 gem "simple_oauth", "0.3.1", require: false
 gem "twilio-ruby", "~> 6.4", require: false
-gem "vault", "0.15.0", require: false
+gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
 gem "week_of_month",

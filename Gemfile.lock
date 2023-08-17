@@ -1120,7 +1120,7 @@ GEM
     unicode-version (1.3.0)
     uri (0.12.2)
     uri_template (0.7.0)
-    vault (0.15.0)
+    vault (0.17.0)
       aws-sigv4
     vericite_api (1.5.3)
       json (>= 1.4.6)
@@ -1383,7 +1383,7 @@ DEPENDENCIES
   twilio-ruby (~> 6.4)
   twitter!
   utf8_cleaner!
-  vault (= 0.15.0)
+  vault (~> 0.17)
   vericite_api (= 1.5.3)
   wcag_color_contrast (= 0.1.0)
   webmock (~> 3.18)
