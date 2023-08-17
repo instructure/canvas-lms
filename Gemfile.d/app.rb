@@ -57,7 +57,7 @@ gem "canvas_webex", "0.18.2"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "code_ownership", "~> 1.33"
 gem "ddtrace", "0.42.0", require: false
-gem "docx", "0.6.2"
+gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "1.2.12", require: "encrypted_cookie_store"
 gem "folio-pagination", "0.0.12", require: "folio/rails"
 gem "ffi", "~> 1.15", require: false
