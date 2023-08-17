@@ -19,7 +19,7 @@
 
 # NOTE: Indented gems are meant to indicate optional dependencies of parent gems
 
-gem "bootsnap", "1.13.0", require: false
+gem "bootsnap", "~> 1.16", require: false
 gem "rails", "~> 7.0.4"
 gem "tzinfo", "2.0.4"
 gem "switchman", "~> 3.5"
