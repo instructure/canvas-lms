@@ -278,6 +278,22 @@ describe GradingStandard do
       decimal_part = score.to_s.split(".")[1]
       expect(decimal_part.length).to be <= 3
     end
+
+    context "points-based scheme" do
+      before do
+        @gs = GradingStandard.new(context: @course)
+        @gs.data = [["Exceeds Mastery", 0.75], ["Mastery", 0.5], ["Near Mastery", 0.25], ["Below Mastery", 0]]
+        @gs.points_based = true
+        @gs.scaling_factor = 4.0
+        @gs.save!
+      end
+
+      it "returns a score that is 0.1 less than the next upper bound" do
+        score = @gs.grade_to_score("Near Mastery")
+        expect(score).to eq 47.5
+        expect(score / (100 / @gs.scaling_factor)).to eq 1.9
+      end
+    end
   end
 
   context "place in scheme" do

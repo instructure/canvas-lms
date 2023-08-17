@@ -116,9 +116,17 @@ class GradingStandard < ActiveRecord::Base
     # otherwise, we step down just 1/10th of a point, which is the
     # granularity we support right now
     elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= BigDecimal("0.01")
-      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("1.0")
+      if points_based
+        (((ordered_scheme[idx - 1].last * scaling_factor) - BigDecimal("0.1")) / scaling_factor) * BigDecimal("100.0")
+      else
+        (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("1.0")
+      end
     elsif idx
-      (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("0.1")
+      if points_based
+        (((ordered_scheme[idx - 1].last * scaling_factor) - BigDecimal("0.1")) / scaling_factor) * BigDecimal("100.0")
+      else
+        (ordered_scheme[idx - 1].last * BigDecimal("100.0")) - BigDecimal("0.1")
+      end
     else
       nil
     end
