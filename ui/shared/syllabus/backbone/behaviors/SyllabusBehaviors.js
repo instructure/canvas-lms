@@ -279,6 +279,8 @@ const bindToEditSyllabus = function (course_summary_enabled) {
       /*
       xsslint safeString.property syllabus_body
       */
+      // removing the 'enhanced' class allows any math in the syllabus to re-render on save
+      $course_syllabus.removeClass('enhanced')
       $course_syllabus.loadingImage('remove').html(data.course.syllabus_body)
       $course_syllabus.data('syllabus_body', data.course.syllabus_body)
       $course_syllabus_details.hide()
