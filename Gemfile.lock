@@ -520,6 +520,7 @@ GEM
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
+    date (3.3.3)
     db-query-matchers (0.11.0)
       activesupport (>= 4.0, < 7.1)
       rspec (>= 3.0)
@@ -531,7 +532,6 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.5.0)
     dig_rb (1.0.1)
-    digest (3.1.1)
     digest-murmurhash (1.1.1)
     diplomat (2.6.4)
       deep_merge (~> 1.2)
@@ -734,21 +734,16 @@ GEM
     mustache (1.1.1)
     net-http (0.3.2)
       uri
-    net-imap (0.2.3)
-      digest
+    net-imap (0.3.7)
+      date
       net-protocol
-      strscan
     net-ldap (0.16.3)
-    net-pop (0.1.1)
-      digest
+    net-pop (0.1.2)
       net-protocol
-      timeout
     net-protocol (0.2.1)
       timeout
-    net-smtp (0.3.1)
-      digest
+    net-smtp (0.3.3)
       net-protocol
-      timeout
     netrc (0.11.0)
     nio4r (2.5.9)
     nokogiri (1.13.10)
@@ -1074,7 +1069,6 @@ GEM
       axe-core-rspec (~> 4.1.0)
       axe-core-selenium (~> 4.1.0)
       rspec (~> 3.8)
-    strscan (3.0.6)
     swearjar (1.4.0)
     switchman (3.5.8)
       activerecord (>= 6.1.4, < 7.1)
@@ -1295,10 +1289,10 @@ DEPENDENCIES
   moodle_importer!
   multi_json (= 1.15.0)
   net-http (~> 0.1)
-  net-imap (= 0.2.3)
+  net-imap (~> 0.3)
   net-ldap (= 0.16.3)
-  net-pop (= 0.1.1)
-  net-smtp (= 0.3.1)
+  net-pop (~> 0.1)
+  net-smtp (~> 0.3)
   nokogiri (~> 1.13.8)
   oauth (~> 1.1)
   oauth2 (~> 1.4)
