@@ -1,0 +1,31 @@
+name: quizzes
+owned_globs:
+  - app/controllers/quizzes/**/*
+  - app/controllers/quizzes_next/**/*
+  - app/helpers/new_quizzes_features_helper.rb
+  - app/helpers/quizzes_helper.rb
+  - app/models/exporters/quizzes2_exporter.rb
+  - app/models/importers/quiz_group_importer.rb
+  - app/models/importers/quiz_importer.rb
+  - app/models/importers/quiz_question_importer.rb
+  - app/models/quizzes/**/*
+  - app/models/quizzes_next/**/*
+  - app/models/quiz_migration_alert.rb
+  - app/models/quizzes.rb
+  - app/presenters/quizzes/**/*
+  - app/serializers/quizzes/**/*
+  - app/serializers/quizzes_next/**/*
+  - app/views/quizzes/**/*
+  - lib/tasks/canvas/quizzes.rake
+  - ui/features/quiz_history/**/*
+  - ui/features/quiz_log_auditing/**/*
+  - ui/features/quiz_migration_alerts/**/*
+  - ui/features/quiz_show/**/*
+  - ui/features/quiz_statistics/**/*
+  - ui/features/quiz_submission/**/*
+  - ui/features/quizzes/**/*
+  - ui/features/quizzes_access_code/**/*
+  - ui/features/quizzes_index/**/*
+  - ui/shared/quiz-legacy-client-apps/**/*
+  - ui/shared/quiz-log-auditings/**/*
+  - ui/shared/quizzes/**/*
