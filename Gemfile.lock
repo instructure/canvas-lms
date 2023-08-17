@@ -823,7 +823,7 @@ GEM
       racc
     parslet (2.0.0)
     pdf-core (0.9.0)
-    pdf-reader (2.5.0)
+    pdf-reader (2.11.0)
       Ascii85 (~> 1.0)
       afm (~> 0.2.1)
       hashery (~> 2.0)
@@ -1311,7 +1311,7 @@ DEPENDENCIES
   pact_broker-client (~> 1.66)
   paginated_collection!
   parallel (~> 1.23)
-  pdf-reader (= 2.5.0)
+  pdf-reader (~> 2.11)
   pg (~> 1.5)
   pg_query (= 2.2.0)
   prawn-emoji (~> 5.3)

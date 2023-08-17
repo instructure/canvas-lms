@@ -2984,7 +2984,7 @@ describe Attachment do
       it "updates the word count for a PDF" do
         attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
         @attachment.update_word_count
-        expect(@attachment.word_count).to eq 3320
+        expect(@attachment.word_count).to eq 3328
       end
 
       it "updates the word count for a DOCX file" do

@@ -103,7 +103,7 @@ gem "oauth2", "~> 1.4", require: false
 gem "oj", "~> 3.16"
 gem "outrigger", "3.0.1"
 gem "parallel", "~> 1.23", require: false
-gem "pdf-reader", "2.5.0"
+gem "pdf-reader", "~> 2.11"
 gem "pg_query", "2.2.0"
 gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "~> 1.4"
