@@ -79,7 +79,6 @@ declare global {
 
   declare interface JQuery {
     scrollTo: (y: number, x?: number) => void
-    capitalize: (str: string) => string
     change: any
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>

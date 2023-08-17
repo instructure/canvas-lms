@@ -114,6 +114,7 @@ export function findLinkForService(service_type, callback) {
           }
           for (const idx in data) {
             data[idx].short_title = data[idx].title
+            // eslint-disable-next-line eqeqeq
             if (data[idx].title == data[idx].description) {
               data[idx].short_title = truncateText(data[idx].description, {max: 30})
             }

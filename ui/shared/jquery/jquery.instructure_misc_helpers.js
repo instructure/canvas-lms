@@ -69,7 +69,3 @@ $.queryParam = function (name) {
   if (results == null) return results
   else return decodeURIComponent(results[1].replace(/\+/g, ' '))
 }
-
-$.capitalize = function (string) {
-  return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
-}

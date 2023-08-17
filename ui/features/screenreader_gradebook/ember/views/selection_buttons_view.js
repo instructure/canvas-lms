@@ -18,6 +18,10 @@
 import Ember from 'ember'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+function capitalize(inputString) {
+  return inputString.charAt(0).toUpperCase() + inputString.substring(1).toLowerCase()
+}
+
 const I18n = useI18nScope('sr_gradebook')
 
 const SelectionButtonsView = Ember.View.extend({
@@ -32,12 +36,12 @@ const SelectionButtonsView = Ember.View.extend({
   }.property('type'),
 
   previousLabel: function () {
-    const type = this.get('type').capitalize()
+    const type = capitalize(this.get('type'))
     return I18n.t('previous_object', 'Previous %{type}', {type})
   }.property('type'),
 
   nextLabel: function () {
-    const type = this.get('type').capitalize()
+    const type = capitalize(this.get('type'))
     return I18n.t('next_object', 'Next %{type}', {type})
   }.property('type'),
 
