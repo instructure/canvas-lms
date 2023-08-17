@@ -618,7 +618,7 @@ GEM
     hashery (2.1.2)
     hashie (4.1.0)
     headless (2.3.1)
-    highline (2.0.3)
+    highline (2.1.0)
     http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
@@ -1251,7 +1251,7 @@ DEPENDENCIES
   guardrail (= 3.0.2)
   hashery (= 2.1.2)
   headless (= 2.3.1)
-  highline (= 2.0.3)
+  highline (~> 2.0)
   html_text_helper!
   httparty (~> 0.21)
   i18n (~> 1.12)
