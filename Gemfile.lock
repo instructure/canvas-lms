@@ -638,7 +638,7 @@ GEM
       ruby_parser (~> 3.10)
       sexp_processor (~> 4.10)
       ya2yaml (= 0.31)
-    icalendar (2.7.0)
+    icalendar (2.9.0)
       ice_cube (~> 0.16)
     ice_cube (0.16.4)
     ice_nine (0.11.2)
@@ -1258,7 +1258,7 @@ DEPENDENCIES
   i18n_extraction!
   i18n_tasks!
   i18nliner (~> 0.2.4)
-  icalendar (= 2.7.0)
+  icalendar (~> 2.9)
   ims-lti (= 2.3.3)
   incoming_mail_processor!
   inst-jobs (~> 3.1)
