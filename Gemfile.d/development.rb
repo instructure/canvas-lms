@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :development do
-  gem "letter_opener", "1.7.0"
+  gem "letter_opener", "~> 1.8"
   gem "spring", "~> 4.0"
   gem "spring-commands-parallel-rspec", "1.1.0"
   gem "spring-commands-rspec", "1.0.4"
