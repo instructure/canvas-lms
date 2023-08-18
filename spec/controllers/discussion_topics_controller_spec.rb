@@ -1117,47 +1117,97 @@ describe DiscussionTopicsController do
         @ann = @course.announcements.create!(message: "testing")
       end
 
-      context "when allow_student_forum_attachments is false" do
+      context "when react_discussions_post is disabled" do
         before :once do
-          @course.allow_student_forum_attachments = false
-          @course.save!
+          Account.default.disable_feature!(:react_discussions_post)
         end
 
-        it "does not allow students to add attachments" do
-          user_session(@student)
-          get "show", params: { course_id: @course.id, id: @ann.id }
-          # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_falsey
+        context "when allow_student_forum_attachments is false" do
+          before :once do
+            @course.allow_student_forum_attachments = false
+            @course.save!
+          end
+
+          it "does not allow students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_falsey
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+          end
         end
 
-        it "allows teachers to add attachments" do
-          user_session(@teacher)
-          get "show", params: { course_id: @course.id, id: @ann.id }
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+        context "when allow_student_forum_attachments is true" do
+          before :once do
+            @course.allow_student_forum_attachments = true
+            @course.save!
+          end
+
+          it "allows students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
+            expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+          end
         end
       end
 
-      context "when allow_student_forum_attachments is true" do
+      context "when react_discussions_post is enabled" do
         before :once do
-          @course.allow_student_forum_attachments = true
-          @course.save!
+          Account.default.enable_feature!(:react_discussions_post)
         end
 
-        it "allows students to add attachments" do
-          user_session(@student)
-          get "show", params: { course_id: @course.id, id: @ann.id }
-          # CAN_ATTACH_TOPIC is false because the the student has no create_forum permission
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_falsey
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+        context "when allow_student_forum_attachments is false" do
+          before :once do
+            @course.allow_student_forum_attachments = false
+            @course.save!
+          end
+
+          it "does not allow students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_falsey
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_truthy
+          end
         end
 
-        it "allows teachers to add attachments" do
-          user_session(@teacher)
-          get "show", params: { course_id: @course.id, id: @ann.id }
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_TOPIC]).to be_truthy
-          expect(assigns[:js_env][:DISCUSSION][:PERMISSIONS][:CAN_ATTACH_ENTRIES]).to be_truthy
+        context "when allow_student_forum_attachments is true" do
+          before :once do
+            @course.allow_student_forum_attachments = true
+            @course.save!
+          end
+
+          it "allows students to add attachments" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_truthy
+          end
+
+          it "allows teachers to add attachments" do
+            user_session(@teacher)
+            get "show", params: { course_id: @course.id, id: @ann.id }
+            expect(assigns[:js_env][:can_attach_entries]).to be_truthy
+          end
         end
       end
     end

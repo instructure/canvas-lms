@@ -725,6 +725,17 @@ class DiscussionTopicsController < ApplicationController
     end
 
     @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
+    can_attach_topic = @topic.grants_right?(@current_user, session, :attach)
+    # Looking at the DiscussionEntry model, the policy for allowing to attach files to replies is
+    # almost identical to the DiscussionTopic model, the code below adds the extra condition that
+    # DiscussionEntry has but DiscussionTopic doesn't.
+    can_attach_entries = can_attach_topic ||
+                         (
+                           @context.respond_to?(:allow_student_forum_attachments) &&
+                           @context.allow_student_forum_attachments &&
+                           @context.grants_right?(@current_user, session, :post_to_forum) &&
+                           @topic.available_for?(@current_user)
+                         )
 
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post)
@@ -799,7 +810,6 @@ class DiscussionTopicsController < ApplicationController
 
       edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
       edit_url += "?embed=true" if params[:embed] == "true"
-
       js_env({
                course_id: params[:course_id] || @context.course&.id,
                EDIT_URL: edit_url,
@@ -815,6 +825,9 @@ class DiscussionTopicsController < ApplicationController
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
+               # although there is a permissions object in DiscussionEntry type, it's only accessible if a discussion entry
+               # is being replied to. We need this env var so that replying to the topic can use this
+               can_attach_entries:,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
                  GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
@@ -878,17 +891,6 @@ class DiscussionTopicsController < ApplicationController
               named_context_url(@context, endpoint, @topic, *params)
             end
 
-            can_attach_topic = @topic.grants_right?(@current_user, session, :attach)
-            # Looking at the DiscussionEntry model, the policy for allowing to attach files to replies is
-            # almost identical to the DiscussionTopic model, the code below adds the extra condition that
-            # DiscussionEntry has but DiscussionTopic doesn't.
-            can_attach_entries = can_attach_topic ||
-                                 (
-                                   @context.respond_to?(:allow_student_forum_attachments) &&
-                                   @context.allow_student_forum_attachments &&
-                                   @context.grants_right?(@current_user, session, :post_to_forum) &&
-                                   @topic.available_for?(@current_user)
-                                 )
             env_hash = {
               APP_URL: named_context_url(@context, :context_discussion_topic_url, @topic),
               TOPIC: {
