@@ -104,7 +104,7 @@ gem "oj", "~> 3.16"
 gem "outrigger", "3.0.1"
 gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
-gem "pg_query", "2.2.0"
+gem "pg_query", "~> 4.2", require: false
 gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "~> 1.4"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
