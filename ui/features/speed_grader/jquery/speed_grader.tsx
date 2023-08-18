@@ -134,8 +134,6 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
-import {gradeToScoreUpperBound} from '@canvas/grading/GradingSchemeHelper'
-import {scoreToGrade} from '@instructure/grading-utils'
 import replaceTags from '@canvas/util/replaceTags'
 
 // @ts-expect-error
@@ -2760,20 +2758,7 @@ EG = {
 
         outOf = [' / ', I18n.n(window.jsonData.points_possible), ' (', percent, ')'].join('')
       }
-
-      if (ENV.restrict_quantitative_data) {
-        if (!window.jsonData.points_possible) {
-          $average_score_wrapper.hide()
-        } else {
-          const letterGradeAverage = scoreToGrade(
-            Math.round(100 * (avg(scores) / window.jsonData.points_possible)),
-            ENV.grading_scheme
-          )
-          $average_score.text(letterGradeAverage, ENV.grading_scheme)
-        }
-      } else {
-        $average_score.text([I18n.n(roundWithPrecision(avg(scores), 2)) + outOf].join(''))
-      }
+      $average_score.text([I18n.n(roundWithPrecision(avg(scores), 2)) + outOf].join(''))
     } else {
       // there are no submissions that have been graded.
       $average_score_wrapper.hide()
@@ -3614,25 +3599,7 @@ EG = {
       formData['submission[score]'] = grade
     } else {
       // Any manually entered grade is a grade.
-      let formattedGrade
-      // if type points or percent, then we need to submit number grade because update_submission api doesnt process letter_grade for those assignment types
-      // if zero points possible, we cannot convert letter to score.
-      if (
-        ENV.restrict_quantitative_data &&
-        !(window.jsonData.points_possible === 0) &&
-        Number.isNaN(Number(grade))
-      ) {
-        if (ENV.grading_type === 'points') {
-          formattedGrade =
-            window.jsonData.points_possible *
-            (gradeToScoreUpperBound(grade, ENV.grading_scheme) / 100)
-        } else if (EG.isGradingTypePercent()) {
-          formattedGrade = `${gradeToScoreUpperBound(grade, ENV.grading_scheme)}%`
-        }
-      }
-      if (!formattedGrade) {
-        formattedGrade = EG.formatGradeForSubmission(grade)
-      }
+      const formattedGrade = EG.formatGradeForSubmission(grade)
 
       if (formattedGrade === 'NaN') {
         return $.flashError(I18n.t('Invalid Grade'))
@@ -3731,34 +3698,8 @@ EG = {
       $grade.val(submission.grade as string)
     } else {
       grade = EG.getGradeToShow(submission)
-
-      if (
-        ENV.restrict_quantitative_data &&
-        EG.shouldParseGrade() &&
-        !(ENV.grading_type === 'percent' && window.jsonData.points_possible === 0) &&
-        !(submission.entered_score === null)
-      ) {
-        let letterGrade
-        if (window.jsonData.points_possible === 0) {
-          if (submission.entered_score > 0) {
-            letterGrade = scoreToGrade(100, ENV.grading_scheme)
-          } else if (submission.entered_score === 0) {
-            letterGrade = 'complete'
-          } else {
-            letterGrade = submission.entered_score
-          }
-        } else {
-          letterGrade = scoreToGrade(
-            Math.round(100 * (submission.entered_score / window.jsonData.points_possible)),
-            ENV.grading_scheme
-          )
-        }
-        $grade.val(letterGrade)
-      } else {
-        $grade.val(grade.entered)
-      }
+      $grade.val(grade.entered)
     }
-
     if (submission.points_deducted) {
       $deduction_box.removeClass('hidden')
       $points_deducted.text(grade.pointsDeducted)

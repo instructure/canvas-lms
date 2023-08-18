@@ -56,38 +56,6 @@ describe "speed grader - grade display" do
       average = (grade / points * 100).to_int
       expect(Speedgrader.average_grade).to include_text("#{grade.to_int} / #{points.to_int} (#{average}%)")
     end
-
-    it "coerces average score to letter grade when user is quantitative data restricted" do
-      @assignment.grade_student(@students[0], grade: "9", grader: @teacher)
-      # truthy feature flag
-      Account.default.enable_feature! :restrict_quantitative_data
-
-      # truthy setting
-      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-      Account.default.save!
-      @course.restrict_quantitative_data = true
-      @course.save!
-
-      Speedgrader.visit(@course.id, @assignment.id)
-      expect(Speedgrader.average_grade.text).to eq "A-"
-    end
-
-    it "does not show average when user is quantitative data and points possible is falsy" do
-      @assignment.points_possible = 0
-      @assignment.save!
-      @assignment.grade_student(@students[0], grade: "9", grader: @teacher)
-      # truthy feature flag
-      Account.default.enable_feature! :restrict_quantitative_data
-
-      # truthy setting
-      Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
-      Account.default.save!
-      @course.restrict_quantitative_data = true
-      @course.save!
-
-      Speedgrader.visit(@course.id, @assignment.id)
-      expect(Speedgrader.average_grade.text).to eq ""
-    end
   end
 
   context "late_policy_pills" do
