@@ -472,7 +472,7 @@ GEM
     bluecloth (2.2.0)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
-    brakeman (5.4.1)
+    brakeman (6.0.1)
     brotli (0.4.0)
     browser (5.3.1)
     builder (3.2.4)
@@ -1192,7 +1192,7 @@ DEPENDENCIES
   bluecloth (= 2.2.0)
   bookmarked_collection!
   bootsnap (~> 1.16)
-  brakeman (~> 5.4)
+  brakeman (~> 6.0)
   broadcast_policy!
   browser (~> 5.3)
   builder (= 3.2.4)

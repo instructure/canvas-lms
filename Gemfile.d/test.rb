@@ -22,7 +22,7 @@ group :test do
   gem "rails-controller-testing", "1.0.5"
 
   gem "dotenv", "~> 2.8", require: false
-  gem "brakeman", "~> 5.4", require: false
+  gem "brakeman", "~> 6.0", require: false
   gem "simplecov", "~> 0.22", require: false
   gem "simplecov-rcov", "~> 0.3", require: false
   gem "puma", "~> 5.6.5", require: false
