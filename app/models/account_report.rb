@@ -107,12 +107,12 @@ class AccountReport < ActiveRecord::Base
     created? || running?
   end
 
-  def run_report(type = nil)
+  def run_report(type = nil, attempt: 1)
     parameters["locale"] = infer_locale(user:, root_account: account)
     self.report_type ||= type
     if AccountReport.available_reports[self.report_type]
       begin
-        AccountReports.generate_report(self)
+        AccountReports.generate_report(self, attempt:)
       rescue
         mark_as_errored
       end
