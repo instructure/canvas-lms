@@ -396,9 +396,9 @@ GEM
     afm (0.2.2)
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
-    apollo-federation (1.1.5)
-      google-protobuf (~> 3.7)
-      graphql (>= 1.9.8)
+    apollo-federation (3.8.3)
+      google-protobuf (~> 3.22)
+      graphql (>= 1.10.14)
     aroi (1.0.0)
       activerecord (>= 5.2)
       activesupport (>= 5.2)
@@ -1173,7 +1173,7 @@ DEPENDENCIES
   addressable (~> 2.8)
   adheres_to_policy!
   after_transaction_commit (= 2.2.2)
-  apollo-federation (= 1.1.5)
+  apollo-federation (~> 3.8)
   attachment_fu!
   authlogic (= 6.4.2)
   autoextend!
