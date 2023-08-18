@@ -105,7 +105,6 @@ declare global {
     }) => void
     mediaComment: any
     mediaCommentThumbnail: (size?: 'normal' | 'small') => void
-    queryParam: (name: string) => string
     raw: (str: string) => string
     showIf: ShowIf
     underscore: (str: string) => string

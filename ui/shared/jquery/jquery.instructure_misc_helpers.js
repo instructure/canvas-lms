@@ -38,13 +38,3 @@ $.each(['html', 'append', 'prepend'], function (idx, method) {
     return orig.apply(this, args)
   }
 })
-
-// return query string parameter
-// $.queryParam("name") => qs value or null
-$.queryParam = function (name) {
-  name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]')
-  const regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
-  const results = regex.exec(window.location.search)
-  if (results == null) return results
-  else return decodeURIComponent(results[1].replace(/\+/g, ' '))
-}
