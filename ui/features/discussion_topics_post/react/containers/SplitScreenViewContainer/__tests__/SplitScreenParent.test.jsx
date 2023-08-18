@@ -72,6 +72,30 @@ describe('SplitScreenParent', () => {
     onSuccessStub.mockClear()
   })
 
+
+  it('should render the reply preview', () => {
+    const quotedEntry = {
+      quotedEntry: {
+        createdAt: '2021-08-10T12:10:38-06:00',
+        previewMessage:
+          'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
+        author: {
+          shortName: 'Albus Dumbledore',
+        },
+        editor: {
+          shortName: 'Albus Dumbledore',
+        },
+        deleted: false,
+      },
+    }
+    const container = setup(
+      defaultProps({
+        discussionEntryOverrides: {...quotedEntry},
+      })
+    )
+    expect(container.getByTestId('reply-preview')).toBeInTheDocument()
+  })
+
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', () => {
       const onToggleUnread = jest.fn()
