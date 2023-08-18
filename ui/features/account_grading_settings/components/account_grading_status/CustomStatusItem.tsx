@@ -81,6 +81,7 @@ export const CustomStatusItem = ({
             <EditStatusPopover
               currentColor={color}
               customStatusName={name}
+              editButtonLabel={`${I18n.t('Custom Status')} ${name}`}
               handleEditSave={handleEditSave}
               isCustomStatus={true}
               isOpen={isEditOpen}
@@ -92,7 +93,7 @@ export const CustomStatusItem = ({
               size="small"
               withBackground={false}
               withBorder={false}
-              screenReaderLabel="Delete Status"
+              screenReaderLabel={I18n.t('Delete Status %{name}', {name})}
               onClick={confirmStatusDelete}
             >
               <IconTrashSolid />
