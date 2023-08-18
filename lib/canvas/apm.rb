@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "ddtrace"
+require "datadog/tracing"
 
 module Canvas
   # This module is currently a wrapper for managing connecting with ddtrace
@@ -120,7 +120,7 @@ module Canvas
       end
 
       def rate_sampler
-        Datadog::RateSampler.new(sample_rate)
+        Datadog::Tracing::Sampling::RateSampler.new(sample_rate)
       end
 
       def enable_apm!
@@ -130,14 +130,15 @@ module Canvas
           # this is filtered on the datadog UI side
           # to make sure we don't analyze _everything_
           # which would be very expensive
-          c.analytics_enabled = analytics_enabled?
-          c.tracer sampler:, debug: debug_mode
-          c.use :aws
-          c.use :faraday
-          c.use :graphql
-          c.use :http
-          c.use :rails
-          c.use :redis
+          c.tracing.analytics.enabled = analytics_enabled?
+          c.diagnostics.debug = debug_mode
+          c.tracing.sampler = sampler
+          c.tracing.instrument :aws
+          c.tracing.instrument :faraday
+          c.tracing.instrument :graphql
+          c.tracing.instrument :http
+          c.tracing.instrument :rails
+          c.tracing.instrument :redis
         end
         Delayed::Worker.plugins << Canvas::Apm::InstJobs::Plugin
       end
@@ -177,7 +178,7 @@ module Canvas
       def tracer
         return Canvas::Apm::StubTracer.instance unless configured?
 
-        @tracer || Datadog.tracer
+        @tracer || Datadog::Tracing
       end
 
       # Alternatively you can just call this to get
