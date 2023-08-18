@@ -889,7 +889,7 @@ RSpec.describe ApplicationController do
 
         before do
           controller.instance_variable_set(:@context, course)
-          allow(course).to receive(:grants_right?).and_return true
+          allow(course).to receive(:grants_any_right?).and_return true
         end
 
         it "redirects for an assignment" do
