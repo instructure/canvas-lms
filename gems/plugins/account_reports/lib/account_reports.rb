@@ -106,7 +106,7 @@ module AccountReports
     REPORTS.select { |report, _details| enabled_reports.include?(report) }
   end
 
-  def self.generate_report(account_report)
+  def self.generate_report(account_report, attempt: 1)
     account_report.capture_job_id
     account_report.update(workflow_state: "running", start_at: Time.zone.now)
     begin
@@ -114,6 +114,10 @@ module AccountReports
         REPORTS[account_report.report_type].proc.call(account_report)
       end
     rescue => e
+      if retry_exception?(e) && attempt < Setting.get("account_report_attempts", "3").to_i
+        account_report.run_report(attempt: attempt + 1) # this will queue a new job
+        return
+      end
       error_report_id = report_on_exception(e, { user: account_report.user })
       title = account_report.report_type.to_s.titleize
       error_message = "Generating the report, #{title}, failed."
@@ -125,6 +129,10 @@ module AccountReports
       finalize_report(account_report, error_message)
       @er = nil
     end
+  end
+
+  def self.retry_exception?(exception)
+    exception.is_a?(PG::ConnectionBad)
   end
 
   def self.report_on_exception(exception, context, level: :error)
