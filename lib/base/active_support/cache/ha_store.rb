@@ -25,9 +25,10 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
 
   def initialize(consul_datacenters: nil,
                  consul_event: nil,
-                 **additional_options)
-    super(**additional_options)
-    options[:lock_timeout] ||= 5
+                 lock_timeout: 5,
+                 **kwargs)
+    super(**kwargs)
+    options[:lock_timeout] = lock_timeout
     options[:consul_datacenters] = consul_datacenters
     options[:consul_event] = consul_event
   end

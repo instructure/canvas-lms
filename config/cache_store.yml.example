@@ -10,7 +10,9 @@ development:
   # # separate redis instance for cache and for data.
   #
   # url:
-  # - localhost
-  # db: 0
-  #
+  # - redis://localhost/0
+  # connect_timeout: 0.5
+  # circuit_breaker:
+  #   error_threshold: 1
+  #   error_timeout: 2
   #

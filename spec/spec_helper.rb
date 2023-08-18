@@ -556,7 +556,7 @@ RSpec.configure do |config|
   config.before do
     if CanvasCache::Redis.enabled? && CanvasCache::Redis.redis_used
       # yes, we really mean to run this dangerous redis command
-      GuardRail.activate(:deploy) { CanvasCache::Redis.redis.flushdb }
+      GuardRail.activate(:deploy) { CanvasCache::Redis.redis.flushdb(failsafe: nil) }
     end
     CanvasCache::Redis.redis_used = false
   end

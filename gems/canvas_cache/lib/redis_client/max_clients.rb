@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Copyright (C) 2021 - present Instructure, Inc.
+#
+# Copyright (C) 2023 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,10 +16,30 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-Rails.configuration.to_prepare do
-  # to avoid having to pull this out as a full engine yet.
-  # we may extract Setting into an engine or an abstract gem
-  # or something, for now this pattern breaks the explicit dependency.
-  CanvasCache.settings_store = Setting
+class RedisClient
+  MaxNumberOfClientsReachedError = Class.new(ConnectionError)
+
+  module MaxClients
+    def connect(*)
+      protect_from_max_clients { super }
+    end
+
+    def call(*)
+      protect_from_max_clients { super }
+    end
+
+    def call_pipelined(*)
+      protect_from_max_clients { super }
+    end
+
+    def protect_from_max_clients
+      yield
+    rescue CommandError => e
+      raise MaxNumberOfClientsReachedError, e.message if e.message.include?("max number of clients reached")
+
+      raise
+    end
+  end
 end

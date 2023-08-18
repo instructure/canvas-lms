@@ -4,5 +4,7 @@ source "https://rubygems.org"
 
 gemspec
 
+gem "canvas_cache", path: "../canvas_cache"
 gem "canvas_slug", path: "../canvas_slug"
+gem "config_file", path: "../config_file"
 gem "legacy_multipart", path: "../legacy_multipart"

@@ -644,7 +644,7 @@ class Pseudonym < ActiveRecord::Base
 
     redis_key = Pseudonym.cas_ticket_key(ticket)
 
-    !!Canvas.redis.get(redis_key)
+    !Canvas.redis.get(redis_key, failsafe: nil).nil?
   end
 
   def self.expire_cas_ticket(ticket)

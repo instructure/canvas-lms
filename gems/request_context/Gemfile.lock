@@ -6,10 +6,8 @@ PATH
       config_file
       digest-murmurhash (>= 1.1.0)
       guardrail (>= 2.0.0)
-      inst_statsd (>= 2.1.0)
-      redis (>= 4.1.0)
+      redis (~> 5.0)
       redis-scripting (>= 1.0.0)
-      sentry-ruby (~> 5.10)
     canvas_errors (0.1.0)
       activesupport
       code_ownership
@@ -68,9 +66,6 @@ GEM
     aes_key_wrap (1.1.0)
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
-    aroi (1.0.0)
-      activerecord (>= 5.2)
-      activesupport (>= 5.2)
     base64 (0.1.1)
     bindata (2.4.15)
     builder (3.2.4)
@@ -81,6 +76,7 @@ GEM
     code_teams (1.0.2)
       sorbet-runtime
     concurrent-ruby (1.2.2)
+    connection_pool (2.4.1)
     crass (1.0.6)
     debug (1.8.0)
       irb (>= 1.5.0)
@@ -92,7 +88,6 @@ GEM
     diplomat (2.6.4)
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
-    dogstatsd-ruby (5.6.1)
     erubi (1.12.0)
     et-orbi (1.2.7)
       tzinfo
@@ -119,10 +114,6 @@ GEM
       debug_inspector (~> 1.0)
       fugit (~> 1.3)
       railties (>= 6.0)
-    inst_statsd (3.0.4)
-      aroi (>= 0.0.7)
-      dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
-      statsd-ruby (~> 1.0)
     io-console (0.6.0)
     irb (1.8.1)
       rdoc
@@ -176,7 +167,10 @@ GEM
     rake (13.0.6)
     rdoc (6.5.0)
       psych (>= 4.0.0)
-    redis (4.1.4)
+    redis (5.0.7)
+      redis-client (>= 0.9.0)
+    redis-client (0.17.0)
+      connection_pool
     redis-scripting (1.0.1)
       redis (>= 3.0)
     reline (0.3.8)
@@ -195,10 +189,7 @@ GEM
       rspec-support (~> 3.12.0)
     rspec-support (3.12.1)
     ruby2_keywords (0.0.5)
-    sentry-ruby (5.11.0)
-      concurrent-ruby (~> 1.0, >= 1.0.2)
     sorbet-runtime (0.5.10965)
-    statsd-ruby (1.5.0)
     stringio (3.0.8)
     thor (1.2.2)
     timecop (0.9.8)
