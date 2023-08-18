@@ -25,7 +25,7 @@ group :test do
   gem "brakeman", "~> 6.0", require: false
   gem "simplecov", "~> 0.22", require: false
   gem "simplecov-rcov", "~> 0.3", require: false
-  gem "puma", "~> 5.6.5", require: false
+  gem "puma", "~> 6.3", require: false
 
   gem "db-query-matchers", "0.11.0"
   gem "rspec", "~> 3.12"
