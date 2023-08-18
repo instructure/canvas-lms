@@ -39,6 +39,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import Conference from '@canvas/calendar-conferences/react/Conference'
 import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('calendar')
 
@@ -70,7 +71,7 @@ export default class ShowEventDetailsDialog {
     if (event.deleteObjectURL) {
       url = event.deleteObjectURL
     } else if (event.assignment) {
-      url = $.replaceTags(this.event.deleteURL, 'id', this.event.object.id)
+      url = replaceTags(this.event.deleteURL, 'id', this.event.object.id)
     }
 
     if (ENV.FEATURES.calendar_series) {

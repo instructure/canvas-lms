@@ -39,6 +39,7 @@ import 'jquery-tinypubsub'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/util/jquery/fixDialogButtons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('edit_rubric')
 
@@ -612,13 +613,13 @@ const rubricEditing = {
     $rubric.fillFormData(rubric)
     rubricEditing.isEditing = false
 
-    let url = $.replaceTags($rubric.find('.edit_rubric_url').attr('href'), 'rubric_id', rubric.id)
+    let url = replaceTags($rubric.find('.edit_rubric_url').attr('href'), 'rubric_id', rubric.id)
     $rubric
       .find('.edit_rubric_link')
       .attr('href', url)
       .showIf(rubric.permissions.update_association)
 
-    url = $.replaceTags(
+    url = replaceTags(
       $rubric.find('.delete_rubric_url').attr('href'),
       'association_id',
       rubric.rubric_association_id

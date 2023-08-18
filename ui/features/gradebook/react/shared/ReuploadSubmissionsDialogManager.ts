@@ -24,6 +24,7 @@ import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submission
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 import type {Assignment} from '../../../../api.d'
 
 class ReuploadSubmissionsDialogManager {
@@ -47,7 +48,7 @@ class ReuploadSubmissionsDialogManager {
   ) {
     this.assignment = assignment
     this.downloadedSubmissionsMap = downloadedSubmissionsMap
-    this.reuploadUrl = $.replaceTags(reuploadUrlTemplate, 'assignment_id', assignment.id)
+    this.reuploadUrl = replaceTags(reuploadUrlTemplate, 'assignment_id', assignment.id)
     this.showDialog = this.showDialog.bind(this)
     this.userAssetString = userAssetString
     this.reuploadForm = null

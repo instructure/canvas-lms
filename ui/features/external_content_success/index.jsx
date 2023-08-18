@@ -24,6 +24,7 @@ import '@canvas/rails-flash-notifications'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('external_content.success')
 
@@ -110,8 +111,8 @@ ExternalContentSuccess.start = async function () {
   await this.processLtiMessages(lti_response_messages, document.querySelector('.ic-app'))
 
   if (ENV.oembed) {
-    const url = $.replaceTags(
-      $.replaceTags(
+    const url = replaceTags(
+      replaceTags(
         $('#oembed_retrieve_url').attr('href'),
         'endpoint',
         encodeURIComponent(ENV.oembed.endpoint)

@@ -23,6 +23,7 @@ import {truncateText} from '@canvas/util/TextHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('findLinkForService')
 
@@ -157,7 +158,7 @@ export function findLinkForService(service_type, callback) {
   $dialog.find('.search_button').text(I18n.t('buttons.search', 'Search'))
   $dialog.find('form img').attr('src', `/images/${service_type}_small_icon.png`)
   let url = '/search/bookmarks?service_type=%7B%7B+service_type+%7D%7D'
-  url = $.replaceTags(url, 'service_type', service_type)
+  url = replaceTags(url, 'service_type', service_type)
   $dialog.data('reference_url', url)
   $dialog.find('.results').empty()
   $dialog.dialog({

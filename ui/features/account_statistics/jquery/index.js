@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers' // replaceTags
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('accounts.statistics')
 
@@ -63,7 +63,7 @@ $(document).ready(() => {
     event.preventDefault()
     const $link = $(this)
     const name = $link.attr('data-name')
-    const url = $.replaceTags($('.over_time_url').attr('href'), 'attribute', $link.attr('data-key'))
+    const url = replaceTags($('.over_time_url').attr('href'), 'attribute', $link.attr('data-key'))
     $link.text(I18n.t('loading...'))
     $.ajaxJSON(
       url,

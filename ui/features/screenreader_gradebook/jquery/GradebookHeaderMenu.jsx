@@ -39,6 +39,7 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-kyle-menu'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('gradebookHeaderMenu')
 
@@ -313,7 +314,7 @@ export default class GradebookHeaderMenu {
 
   downloadSubmissions() {
     let base
-    const url = $.replaceTags(
+    const url = replaceTags(
       this.gradebook.options.download_assignment_submissions_url,
       'assignment_id',
       this.assignment.id
@@ -352,7 +353,7 @@ export default class GradebookHeaderMenu {
           }
         })
     }
-    const url = $.replaceTags(
+    const url = replaceTags(
       this.gradebook.options.re_upload_submissions_url,
       'assignment_id',
       this.assignment.id

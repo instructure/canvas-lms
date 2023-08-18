@@ -39,27 +39,6 @@ $.each(['html', 'append', 'prepend'], function (idx, method) {
   }
 })
 
-$.replaceOneTag = function (text, name, value) {
-  if (!text) {
-    return text
-  }
-  name = (name || '').toString()
-  value = (value || '').toString().replace(/\s/g, '+')
-  const itemExpression = new RegExp('(%7B|{){2}[\\s|%20|+]*' + name + '[\\s|%20|+]*(%7D|}){2}', 'g')
-  return text.replace(itemExpression, value)
-}
-// backwards compatible with only one tag
-$.replaceTags = function (text, mapping_or_name, maybe_value) {
-  if (typeof mapping_or_name === 'object') {
-    for (const name in mapping_or_name) {
-      text = $.replaceOneTag(text, name, mapping_or_name[name])
-    }
-    return text
-  } else {
-    return $.replaceOneTag(text, mapping_or_name, maybe_value)
-  }
-}
-
 // return query string parameter
 // $.queryParam("name") => qs value or null
 $.queryParam = function (name) {

@@ -21,6 +21,7 @@ import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('speed_grader_helpers')
 
@@ -193,7 +194,7 @@ const speedGraderHelpers = {
   },
 
   plagiarismResubmitUrl(submission, anonymizableUserId) {
-    return $.replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), {
+    return replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), {
       [anonymizableUserId]: submission[anonymizableUserId],
     })
   },
