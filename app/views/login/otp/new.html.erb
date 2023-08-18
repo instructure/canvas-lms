@@ -75,9 +75,9 @@ out a set of back-up codes, in case your normal multi-factor device is unavailab
           </div>
           <div class="col-xs-4">
             <% provisioning_uri = ROTP::TOTP.new(session[:pending_otp_secret_key]).provisioning_uri("#{@domain_root_account.name} Canvas- #{@current_pseudonym.unique_id}") %>
-            <% qr_code = Barby::QrCode.new(provisioning_uri) %>
+            <% qr_code = RQRCode::QRCode.new(provisioning_uri, level: :l) %>
             <div class="otp-qr-code">
-              <img src="data:image/png;base64,<%= Base64.encode64(qr_code.to_png(:xdim => 4)).strip %>">
+              <img src="data:image/png;base64,<%= Base64.encode64(qr_code.as_png(module_px_size: 4).to_s).strip %>">
             </div>
           </div>
         </div>
