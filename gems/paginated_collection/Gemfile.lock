@@ -3,7 +3,7 @@ PATH
   specs:
     paginated_collection (1.0.0)
       folio-pagination (~> 0.0.12)
-      will_paginate (~> 3.0)
+      will_paginate (>= 3.0, < 5.0)
 
 GEM
   remote: https://rubygems.org/
@@ -31,7 +31,7 @@ GEM
     sqlite3 (1.6.3-arm64-darwin)
     sqlite3 (1.6.3-x86_64-darwin)
     sqlite3 (1.6.3-x86_64-linux)
-    will_paginate (3.3.0)
+    will_paginate (4.0.0)
 
 PLATFORMS
   aarch64-linux
