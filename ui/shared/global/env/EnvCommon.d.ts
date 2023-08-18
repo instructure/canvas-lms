@@ -176,6 +176,7 @@ export type SiteAdminFeatureId =
   | 'developer_key_page_checkboxes'
   | 'improved_no_results_messaging'
   | 'differentiated_modules'
+  | 'enhanced_course_creation_account_fetching'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_FEATURES

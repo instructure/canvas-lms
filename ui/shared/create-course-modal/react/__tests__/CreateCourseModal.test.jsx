@@ -73,6 +73,7 @@ const MCC_ACCOUNT = {
   workflow_state: 'active',
 }
 
+const COURSE_CREATION_COURSES_URL = '/api/v1/course_creation_accounts?per_page=100'
 const MANAGEABLE_COURSES_URL = '/api/v1/manageable_accounts?per_page=100'
 const TEACHER_ENROLLMENTS_URL = encodeURI(
   '/api/v1/users/self/courses?per_page=100&include[]=account&enrollment_type=teacher'
@@ -355,6 +356,29 @@ describe('CreateCourseModal', () => {
         getByLabelText('Which account will this course be associated with?')
       ).toBeInTheDocument()
       expect(getByText('Course Details')).toBeInTheDocument()
+    })
+  })
+
+  describe('with enhanced_course_creation_picker FF ON', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.enhanced_course_creation_account_fetching = true
+      fetchMock.get(COURSE_CREATION_COURSES_URL, MANAGEABLE_COURSES)
+    })
+
+    afterEach(() => {
+      window.ENV.FEATURES.enhanced_course_creation_account_fetching = false
+      fetchMock.restore()
+    })
+
+    it('fetches accounts from enrollments api', async () => {
+      render(<CreateCourseModal {...getProps()} />)
+      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
+      render(<CreateCourseModal {...getProps({permissions: 'teacher'})} />)
+      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
+      render(<CreateCourseModal {...getProps({permissions: 'student'})} />)
+      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
+      render(<CreateCourseModal {...getProps({permissions: 'no_enrollments'})} />)
+      expect(fetchMock.calls()[0][0]).toEqual("/api/v1/course_creation_accounts?per_page=100")
     })
   })
 })

@@ -361,6 +361,7 @@ class ApplicationController < ActionController::Base
     developer_key_page_checkboxes
     improved_no_results_messaging
     differentiated_modules
+    enhanced_course_creation_account_fetching
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
