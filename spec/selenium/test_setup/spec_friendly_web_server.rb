@@ -34,7 +34,7 @@ class SpecFriendlyWebServer
     end
 
     def start_server(app, port)
-      @server = Puma::Server.new(app, Puma::Events.stdio)
+      @server = Puma::Server.new(app)
       @server.add_tcp_listener(bind_address, port)
       Thread.new do
         @server.run
