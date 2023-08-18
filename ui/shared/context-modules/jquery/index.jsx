@@ -2524,6 +2524,8 @@ $(document).ready(function () {
           renderDifferentiatedModulesTray(false, returnFocusTo)
           returnFocusTo.focus()
         }}
+        initialTab='assign-to'
+        assignOnly={false}
       />,
       document.getElementById('differentiated-modules-mount-point')
     )
