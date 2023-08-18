@@ -458,6 +458,7 @@ const DiscussionTopicManager = props => {
                   onEntered={() => setIsTrayFinishedOpening(true)}
                   onDismiss={() => closeView()}
                   data-testid="drawer-layout-tray"
+                  shouldCloseOnDocumentClick={false}
                 >
                   {ENV.split_screen_view && !ENV.isolated_view && threadParentEntryId && (
                     <View as="div" maxWidth={responsiveProps.viewPortWidth}>

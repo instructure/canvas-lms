@@ -33,15 +33,8 @@ describe "threaded discussions" do
 
   before do
     stub_rcs_config
-  end
-
-  it "toggles splitscreen" do
     Account.site_admin.enable_feature! :react_discussions_post
     Account.site_admin.enable_feature! :split_screen_view
-
-    # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
-    @teacher.preferences[:discussions_splitscreen_view] = false
-    @teacher.save!
 
     @first_reply = @topic.discussion_entries.create!(
       user: @student,
@@ -54,6 +47,13 @@ describe "threaded discussions" do
       root_entry_id: @first_reply.id,
       parent_id: @first_reply.id
     )
+  end
+
+  it "toggles splitscreen" do
+    # initially set user preference discussions_split_screen, so 'Inline will be the initial View'
+    @teacher.preferences[:discussions_splitscreen_view] = false
+    @teacher.save!
+
     user_session(@teacher)
     Discussion.visit(@course, @topic)
 
@@ -83,5 +83,23 @@ describe "threaded discussions" do
 
     # check ss closes
     expect(f("body")).not_to contain_jqcss("div[data-testid='drawer-layout-tray']")
+  end
+
+  it "allows you to click the mobile RCE without closing", ignore_js_errors: true do
+    driver.manage.window.resize_to(565, 836)
+
+    # initially set user preference discussions_split_screen, so 'split-screen will be the initial View'
+    @teacher.preferences[:discussions_splitscreen_view] = true
+    @teacher.save!
+
+    user_session(@teacher)
+    Discussion.visit(@course, @topic)
+
+    f("button[data-testid='threading-toolbar-reply']").click
+    wait_for_ajaximations
+    f(".tox-edit-area__iframe").click
+
+    wait_for_ajaximations
+    expect(f("span[data-testid='discussions-split-screen-view-content']")).to be_truthy
   end
 end
