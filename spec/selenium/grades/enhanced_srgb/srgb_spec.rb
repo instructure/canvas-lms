@@ -118,29 +118,29 @@ describe "Screenreader Gradebook" do
     EnhancedSRGB.next_student.click
     expect(EnhancedSRGB.next_student.attribute("disabled")).to be_truthy
     expect(EnhancedSRGB.student_information_name).to include_text(@students[2].name)
-    # expect(EnhancedSRGB.previous_student).to eq driver.switch_to.active_element
-    # uncomment w/ EVAL-3363 BUG focus does not switch to previous button when you are on the last student
+    expect(EnhancedSRGB.previous_student).to eq driver.switch_to.active_element
 
     # click twice to go back to first student
     EnhancedSRGB.previous_student.click
     EnhancedSRGB.previous_student.click
     expect(EnhancedSRGB.student_information_name).to include_text(@students[0].name)
-    # expect(EnhancedSRGB.next_student).to eq driver.switch_to.active_element
-    # uncomment w/ EVAL-3363 BUG focus does not switch to next button when you are on the last student
+    EnhancedSRGB.previous_student.click
+    expect(EnhancedSRGB.next_student).to eq driver.switch_to.active_element
   end
 
   it "can select an assignment using buttons" do
     simple_setup
     EnhancedSRGB.visit(@course.id)
-    EnhancedSRGB.select_assignment(@assign1)
 
     expect(EnhancedSRGB.previous_assignment.attribute("disabled")).to be_truthy
     expect(EnhancedSRGB.next_assignment.attribute("disabled")).not_to be_truthy
 
     EnhancedSRGB.next_assignment.click
+    EnhancedSRGB.next_assignment.click
     expect(EnhancedSRGB.previous_assignment.attribute("disabled")).not_to be_truthy
     expect(EnhancedSRGB.next_assignment.attribute("disabled")).to be_truthy
 
+    EnhancedSRGB.previous_assignment.click
     EnhancedSRGB.previous_assignment.click
     expect(EnhancedSRGB.previous_assignment.attribute("disabled")).to be_truthy
   end

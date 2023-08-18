@@ -19,7 +19,12 @@ import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {render} from '@testing-library/react'
 import ContentSelection from '..'
-import {defaultSortableStudents, makeContentSelectionProps} from './fixtures'
+import {
+  defaultSortableAssignments,
+  defaultSortableStudents,
+  makeContentSelectionProps,
+} from './fixtures'
+import userEvent from '@testing-library/user-event'
 
 describe('Content Selection', () => {
   describe('student dropdown', () => {
@@ -33,6 +38,72 @@ describe('Content Selection', () => {
       const studentDropdown = getByTestId('content-selection-student-select')
       expect(studentDropdown).toHaveTextContent('Last, First')
       expect(studentDropdown).toHaveTextContent('Last2, First2')
+    })
+
+    it('moves the focus to the previous student button when the last listed student is selected', () => {
+      const props = makeContentSelectionProps({
+        students: defaultSortableStudents,
+        assignments: defaultSortableAssignments,
+      })
+      const {getByTestId} = render(
+        <MockedProvider>
+          <ContentSelection {...props} />
+        </MockedProvider>
+      )
+      userEvent.click(getByTestId('next-student-button'))
+      userEvent.click(getByTestId('next-student-button'))
+      userEvent.click(getByTestId('next-student-button'))
+      expect(getByTestId('next-student-button')).toBeDisabled()
+      expect(getByTestId('previous-student-button')).toHaveFocus()
+    })
+
+    it('moves the focus to the next student button when the first listed student is selected', () => {
+      const props = makeContentSelectionProps({
+        students: defaultSortableStudents,
+        assignments: defaultSortableAssignments,
+      })
+      const {getByTestId} = render(
+        <MockedProvider>
+          <ContentSelection {...props} />
+        </MockedProvider>
+      )
+      userEvent.click(getByTestId('next-student-button'))
+      userEvent.click(getByTestId('previous-student-button'))
+      expect(getByTestId('previous-student-button')).toBeDisabled()
+      expect(getByTestId('next-student-button')).toHaveFocus()
+    })
+
+    it('moves the focus to the previous assignment button when the last listed assignment is selected', () => {
+      const props = makeContentSelectionProps({
+        students: defaultSortableStudents,
+        assignments: defaultSortableAssignments,
+      })
+      const {getByTestId} = render(
+        <MockedProvider>
+          <ContentSelection {...props} />
+        </MockedProvider>
+      )
+      userEvent.click(getByTestId('next-assignment-button'))
+      userEvent.click(getByTestId('next-assignment-button'))
+      userEvent.click(getByTestId('next-assignment-button'))
+      expect(getByTestId('next-assignment-button')).toBeDisabled()
+      expect(getByTestId('previous-assignment-button')).toHaveFocus()
+    })
+
+    it('moves the focus to the next assignment button when the first listed assignment is selected', () => {
+      const props = makeContentSelectionProps({
+        students: defaultSortableStudents,
+        assignments: defaultSortableAssignments,
+      })
+      const {getByTestId} = render(
+        <MockedProvider>
+          <ContentSelection {...props} />
+        </MockedProvider>
+      )
+      userEvent.click(getByTestId('next-assignment-button'))
+      userEvent.click(getByTestId('previous-assignment-button'))
+      expect(getByTestId('previous-assignment-button')).toBeDisabled()
+      expect(getByTestId('next-assignment-button')).toHaveFocus()
     })
   })
 })

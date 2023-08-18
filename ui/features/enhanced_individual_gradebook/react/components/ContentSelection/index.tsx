@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 
@@ -55,6 +55,10 @@ export default function ContentSelection({
   const [selectedStudentIndex, setSelectedStudentIndex] = useState<number>(0)
   const [selectedAssignmentIndex, setSelectedAssignmentIndex] = useState<number>(0)
   const {studentSubmissions} = useCurrentStudentInfo(courseId, selectedStudentId)
+  const nextAssignmentRef = useRef<HTMLButtonElement>(null)
+  const nextStudentRef = useRef<HTMLButtonElement>(null)
+  const previousAssignmentRef = useRef<HTMLButtonElement>(null)
+  const previousStudentRef = useRef<HTMLButtonElement>(null)
 
   const {
     sortOrder,
@@ -129,6 +133,12 @@ export default function ContentSelection({
     setSelectedStudentIndex(selectedIndex)
     const selectedStudent = studentDropdownOptions[selectedIndex]?.data
     onStudentChange(selectedStudent?.id)
+
+    if (selectedIndex <= 0) {
+      nextStudentRef.current?.focus()
+    } else if (selectedIndex >= studentDropdownOptions.length - 1) {
+      previousStudentRef.current?.focus()
+    }
   }
 
   const handleChangeAssignment = (
@@ -139,8 +149,16 @@ export default function ContentSelection({
     setSelectedAssignmentIndex(selectedIndex)
     const selectedAssignment = assignmentDropdownOptions[selectedIndex]?.data
     onAssignmentChange(selectedAssignment?.id)
+
+    if (selectedIndex <= 0) {
+      nextAssignmentRef.current?.focus()
+    }
+    if (selectedIndex >= assignmentDropdownOptions.length - 1) {
+      previousAssignmentRef.current?.focus()
+    }
   }
   const {hideStudentNames} = gradebookOptions.customOptions
+
   return (
     <>
       <View as="div" className="row-fluid">
@@ -180,8 +198,9 @@ export default function ContentSelection({
                 data-testid="previous-student-button"
                 type="button"
                 className="btn btn-block next_object"
-                disabled={selectedStudentIndex <= 1}
+                disabled={selectedStudentIndex <= 0}
                 onClick={() => handleChangeStudent(undefined, selectedStudentIndex - 1)}
+                ref={previousStudentRef}
               >
                 {I18n.t('Previous Student')}
               </button>
@@ -193,6 +212,7 @@ export default function ContentSelection({
                 className="btn btn-block next_object"
                 disabled={selectedStudentIndex >= studentDropdownOptions.length - 1}
                 onClick={() => handleChangeStudent(undefined, selectedStudentIndex + 1)}
+                ref={nextStudentRef}
               >
                 {I18n.t('Next Student')}
               </button>
@@ -230,8 +250,9 @@ export default function ContentSelection({
                 data-testid="previous-assignment-button"
                 type="button"
                 className="btn btn-block next_object"
-                disabled={selectedAssignmentIndex <= 1}
+                disabled={selectedAssignmentIndex <= 0}
                 onClick={() => handleChangeAssignment(undefined, selectedAssignmentIndex - 1)}
+                ref={previousAssignmentRef}
               >
                 {I18n.t('Previous Assignment')}
               </button>
@@ -243,6 +264,7 @@ export default function ContentSelection({
                 className="btn btn-block next_object"
                 disabled={selectedAssignmentIndex >= assignmentDropdownOptions.length - 1}
                 onClick={() => handleChangeAssignment(undefined, selectedAssignmentIndex + 1)}
+                ref={nextAssignmentRef}
               >
                 {I18n.t('Next Assignment')}
               </button>
