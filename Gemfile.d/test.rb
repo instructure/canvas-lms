@@ -50,7 +50,7 @@ group :test do
   gem "pact-messages", "0.2.0"
   gem "pact_broker-client", "~> 1.66"
   gem "database_cleaner", "~> 2.0"
-  gem "json-schema", "~> 2.8.1"
+  gem "json-schema", "~> 4.0"
 
   gem "rspecq", github: "kyler-instructure/rspecq", ref: "8cea6a3225cf0856a26c6c6b93a5ea5605082aa0"
   gem "flakey_spec_catcher", "~> 0.12", require: false
