@@ -410,10 +410,10 @@ describe Pseudonym do
     end
 
     it "checks cas ticket expiration" do
-      expect(Canvas.redis).to receive(:get).with(redis_key).and_return(nil)
+      expect(Canvas.redis).to receive(:get).with(redis_key, failsafe: nil).and_return(nil)
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_falsey
 
-      expect(Canvas.redis).to receive(:get).with(redis_key).and_return(true)
+      expect(Canvas.redis).to receive(:get).with(redis_key, failsafe: nil).and_return(true)
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_truthy
     end
 

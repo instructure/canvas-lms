@@ -75,7 +75,7 @@ module Canvas::Security
       ip.present? || ip = "no_ip"
       total_allowed = Setting.get("login_attempts_total", "20").to_i
       ip_allowed = Setting.get("login_attempts_per_ip", "10").to_i
-      total, from_this_ip = Canvas.redis.hmget(login_attempts_key(pseudonym), "total", ip)
+      total, from_this_ip = Canvas.redis.hmget(login_attempts_key(pseudonym), "total", ip, failsafe: nil)
       (!total || total.to_i < total_allowed) && (!from_this_ip || from_this_ip.to_i < ip_allowed)
     end
 
@@ -83,8 +83,7 @@ module Canvas::Security
     def self.successful_login!(pseudonym)
       return unless Canvas.redis_enabled? && pseudonym
 
-      Canvas.redis.del(login_attempts_key(pseudonym))
-      nil
+      Canvas.redis.del(login_attempts_key(pseudonym), failsafe: nil)
     end
 
     # log a failed login attempt
@@ -93,12 +92,12 @@ module Canvas::Security
 
       key = login_attempts_key(pseudonym)
       exptime = Setting.get("login_attempts_ttl", 5.minutes.to_s).to_i
-      redis = Canvas.redis
-      redis.hset(key, "unique_id", pseudonym.unique_id)
-      redis.hincrby(key, "total", 1)
-      redis.hincrby(key, ip, 1) if ip.present?
-      redis.expire(key, exptime)
-      nil
+      Canvas.redis.pipelined(failsafe: nil) do |pipeline|
+        pipeline.hset(key, "unique_id", pseudonym.unique_id)
+        pipeline.hincrby(key, "total", 1)
+        pipeline.hincrby(key, ip, 1) if ip.present?
+        pipeline.expire(key, exptime)
+      end
     end
 
     # returns time in seconds
@@ -106,7 +105,7 @@ module Canvas::Security
       if allow_login_attempt?(pseudonym, ip)
         0
       else
-        Canvas.redis.ttl(login_attempts_key(pseudonym))
+        Canvas.redis.ttl(login_attempts_key(pseudonym), failsafe: 0)
       end
     end
 

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "redis"
+
 module CanvasHttp
   # For managing host specific failure history
   # so that in cases where there is a downstream service
@@ -46,20 +48,24 @@ module CanvasHttp
       def tripped?(domain)
         return false if redis_client.nil?
 
-        !redis_client.get(tripped_key(domain)).nil?
+        !redis_client.get(tripped_key(domain), failsafe: nil).nil?
       end
 
       def trip_if_necessary(domain)
         return if redis_client.nil?
 
         key = threshold_key(domain)
-        redis_client.setnx(key, 0)
-        redis_client.expire(key, window(domain))
-        current_count = redis_client.incr(key)
+        current_count = redis_client.pipelined do |pipeline|
+          pipeline.setnx(key, 0)
+          pipeline.expire(key, window(domain))
+          pipeline.incr(key)
+        end.last
         if current_count > threshold(domain)
           redis_client.setex(tripped_key(domain), interval(domain), "1")
           CanvasHttp.logger.warn("CANVAS_HTTP CB_TRIP ON #{domain} | interval: #{interval(domain)} | thresh: #{threshold(domain)} | window: #{window(domain)}")
         end
+      rescue Redis::BaseConnectionError
+        # ignore
       end
 
       def tripped_key(domain)

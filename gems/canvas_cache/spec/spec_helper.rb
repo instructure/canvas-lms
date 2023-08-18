@@ -108,6 +108,8 @@ RSpec.configure do |config|
     allow(Rails).to receive(:root).and_return(target_location)
 
     # make sure redis is in a stable state before every spec
+    CanvasCache::Redis.redis._client.config.circuit_breaker&.instance_variable_set(:@state, :closed)
+    CanvasCache::Redis.redis._client.config.circuit_breaker&.instance_variable_get(:@errors)&.clear
     GuardRail.activate(:deploy) { CanvasCache::Redis.redis.flushdb }
   end
 end

@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/instructure/rspecq.git
+  revision: d7fa5536da01cccb5109ba05c9e236d6660da593
+  specs:
+    rspecq (0.7.1)
+      redis (>= 4.0, < 6.0)
+      rspec-core
+      rspec_junit_formatter
+      sentry-ruby
+
+GIT
   remote: https://github.com/kreynolds/cassandra-cql.git
   revision: 02b5abbe441a345c051a180327932566fd66bb36
   ref: 02b5abbe441a345c051a180327932566fd66bb36
@@ -6,17 +16,6 @@ GIT
     cassandra-cql (1.2.3)
       simple_uuid (>= 0.2.0)
       thrift_client (>= 0.7.1, < 0.10)
-
-GIT
-  remote: https://github.com/kyler-instructure/rspecq.git
-  revision: 8cea6a3225cf0856a26c6c6b93a5ea5605082aa0
-  ref: 8cea6a3225cf0856a26c6c6b93a5ea5605082aa0
-  specs:
-    rspecq (0.7.1)
-      redis
-      rspec-core
-      rspec_junit_formatter
-      sentry-ruby
 
 GIT
   remote: https://github.com/twitter/thrift_client.git
@@ -140,10 +139,8 @@ PATH
       config_file
       digest-murmurhash (>= 1.1.0)
       guardrail (>= 2.0.0)
-      inst_statsd (>= 2.1.0)
-      redis (>= 4.1.0)
+      redis (~> 5.0)
       redis-scripting (>= 1.0.0)
-      sentry-ruby (~> 5.10)
     canvas_color (0.0.1)
     canvas_crummy (0.0.1)
     canvas_dynamodb (0.0.1)
@@ -157,6 +154,7 @@ PATH
       activesupport (>= 3.2)
       tzinfo
     canvas_http (1.0.0)
+      canvas_cache
       legacy_multipart
     canvas_kaltura (1.0.0)
       canvas_http
@@ -460,6 +458,7 @@ GEM
     colored (1.2)
     colorize (1.1.0)
     concurrent-ruby (1.2.2)
+    connection_pool (2.4.1)
     crack (0.4.5)
       rexml
     crass (1.0.6)
@@ -880,7 +879,15 @@ GEM
     rdoc (6.5.0)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
-    redis (4.1.4)
+    redis (5.0.7)
+      redis-client (>= 0.9.0)
+    redis-client (0.17.0)
+      connection_pool
+    redis-cluster-client (0.6.1)
+      redis-client (~> 0.12)
+    redis-clustering (5.0.7)
+      redis (= 5.0.7)
+      redis-cluster-client (>= 0.3.7)
     redis-scripting (1.0.1)
       redis (>= 3.0)
     regexp_parser (2.8.1)
@@ -1275,7 +1282,7 @@ DEPENDENCIES
   rails-observers (= 0.1.5)
   ratom-nokogiri (= 0.10.11)
   redcarpet (~> 3.6)
-  redis (= 4.1.4)
+  redis-clustering (~> 5.0)
   redis-scripting (= 1.0.1)
   request_context!
   respondus_soap_endpoint!

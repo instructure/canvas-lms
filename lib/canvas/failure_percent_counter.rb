@@ -45,7 +45,8 @@ module Canvas
       result = FailurePercentCounter.lua.run(:failure_rate,
                                              [@count_key],
                                              [@fail_key, now, @period, @min_samples],
-                                             @redis)
+                                             @redis,
+                                             failsafe: 0.0)
       result.to_f
     end
 
@@ -56,7 +57,8 @@ module Canvas
       FailurePercentCounter.lua.run(:increment_counter,
                                     [@count_key],
                                     [key, now, SecureRandom.uuid, @period.ceil],
-                                    @redis)
+                                    @redis,
+                                    failsafe: nil)
     end
   end
 end

@@ -94,7 +94,7 @@ development:
       # attachment_specific_file_domain: true
       # ha_cache.yml: |
       #   cache_store: ha_store
-      #   servers:
+      #   url:
       #    - redis://localhost/2
       #   # keep stale data for up to 1 week in the cache
       #   race_condition_ttl: 604800
@@ -116,6 +116,10 @@ development:
       #   consul_datacenters:
       #   - dc1
       #   - dc2
+      #   connect_timeout: 0.5
+      #   circuit_breaker:
+      #     error_threshold: 1
+      #     error_timeout: 2
       # clone_url_strand.yml: |
       #   lti1.instructure.com: lti1
       #   lti2.instructure.com: lti2

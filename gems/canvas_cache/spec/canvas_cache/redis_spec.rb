@@ -44,11 +44,6 @@ describe CanvasCache::Redis do
     end
   end
 
-  it "shoulds not ignore redis guards when not enabled" do
-    allow(ConfigFile).to receive(:load).with("redis").and_return(nil)
-    expect(CanvasCache::Redis).to_not be_ignore_redis_guards
-  end
-
   describe "with redis" do
     before do
       skip("redis required to test") unless CanvasCache::Redis.enabled?
@@ -99,39 +94,26 @@ describe CanvasCache::Redis do
     end
 
     describe "exceptions" do
-      before do
-        CanvasCache::Redis.patch
-      end
-
-      after do
-        CanvasCache::Redis.reset_redis_failure
-      end
-
-      it "protects against errnos" do
-        expect(redis_client._client).to receive(:write).and_raise(Errno::ETIMEDOUT).once
-        expect(redis_client.set("blah", "blah")).to be_nil
-      end
-
       it "protects against max # of client errors" do
-        expect(redis_client._client).to receive(:write).and_raise(Redis::CommandError.new("ERR max number of clients reached")).once
-        expect(redis_client.set("blah", "blah")).to be_nil
+        expect(redis_client._client.send(:raw_connection)).to receive(:call).and_raise(RedisClient::CommandError.new("ERR max number of clients reached")).once
+        expect { redis_client.set("blah", "blah") }.to raise_error(Redis::ConnectionError)
+        # a second call has tripped the circuit breaker
+        expect { redis_client.set("blah", "blah") }.to raise_error(Redis::CannotConnectError)
       end
 
       it "passes through other command errors" do
-        expect(InstStatsd::Statsd).not_to receive(:increment)
-
-        expect(redis_client._client).to receive(:write).and_raise(Redis::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
+        expect(redis_client._client.send(:raw_connection)).to receive(:call).and_raise(RedisClient::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
         expect { redis_client.evalsha("xxx") }.to raise_error(Redis::CommandError)
 
-        expect(redis_client._client).to receive(:write).and_raise(Redis::CommandError.new("ERR no such key")).once
+        expect(redis_client._client.send(:raw_connection)).to receive(:call).and_raise(RedisClient::CommandError.new("ERR no such key")).once
         expect { redis_client.get("no-such-key") }.to raise_error(Redis::CommandError)
       end
 
       describe "redis failure" do
-        let(:cache) { ActiveSupport::Cache::RedisCacheStore.new(url: "redis://localhost:1234") }
+        let(:cache) { ActiveSupport::Cache::RedisCacheStore.new(url: "redis://localhost:1234", circuit_breaker: { error_threshold: 1, error_timeout: 2 }) }
 
         before do
-          allow(cache.redis._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError)
+          expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError)
         end
 
         it "does not fail cache.read" do
@@ -150,19 +132,19 @@ describe CanvasCache::Redis do
 
         it "does not fail cache.write" do
           override_cache(cache) do
-            expect(Rails.cache.write("blah", "someval")).to be_nil
+            expect(Rails.cache.write("blah", "someval")).to be false
           end
         end
 
         it "does not fail cache.delete" do
           override_cache(cache) do
-            expect(Rails.cache.delete("blah")).to eq 0
+            expect(Rails.cache.delete("blah")).to be false
           end
         end
 
         it "does not fail cache.delete for a ring" do
           override_cache(ActiveSupport::Cache::RedisCacheStore.new(url: ["redis://localhost:1234", "redis://localhost:4567"])) do
-            expect(Rails.cache.delete("blah")).to eq 0
+            expect(Rails.cache.delete("blah")).to be false
           end
         end
 
@@ -170,51 +152,6 @@ describe CanvasCache::Redis do
           override_cache(cache) do
             expect(Rails.cache.exist?("blah")).to be_falsey
           end
-        end
-
-        it "does not fail cache.delete_matched" do
-          override_cache(cache) do
-            expect { Rails.cache.delete_matched("blah") }.not_to raise_error
-          end
-        end
-
-        it "fails separate servers separately" do
-          cache = ActiveSupport::Cache::RedisCacheStore.new(url: [redis_client.id, "redis://nonexistent:1234/0"])
-          client = cache.redis
-          key2 = 2
-          while client.node_for("1") == client.node_for(key2.to_s)
-            key2 += 1
-          end
-          key2 = key2.to_s
-          expect(client.node_for("1")).not_to eq client.node_for(key2)
-          expect(client.nodes.last.id).to eq "redis://nonexistent:1234/0"
-          expect(client.nodes.last._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
-
-          cache.write("1", true, use_new_rails: false)
-          cache.write(key2, true, use_new_rails: false)
-          # one returned nil, one returned true; we don't know which one which key ended up on
-          expect([
-            cache.fetch("1", use_new_rails: false),
-            cache.fetch(key2, use_new_rails: false)
-          ].compact).to eq [true]
-        end
-
-        it "does not fail raw redis commands" do
-          expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
-          expect(redis_client.setnx("my_key", 5)).to be_nil
-        end
-
-        it "returns a non-nil structure for mget" do
-          expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
-          expect(redis_client.mget(%w[k1 k2 k3])).to eq []
-        end
-
-        it "distinguishes between failure and not exists for set nx" do
-          redis_client.del("my_key")
-          expect(redis_client.set("my_key", 5, nx: true)).to be true
-          expect(redis_client.set("my_key", 5, nx: true)).to be false
-          expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
-          expect(redis_client.set("my_key", 5, nx: true)).to be_nil
         end
       end
     end
@@ -330,64 +267,33 @@ describe CanvasCache::Redis do
       expect(log_lines).to be_empty
     end
 
-    it "does not ignore redis guards by default" do
-      expect(CanvasCache::Redis).to_not be_ignore_redis_guards
-    end
-
-    describe "CanvasCache::RedisWrapper" do
+    describe "RedisClient::Twemproxy" do
       it "raises on unsupported commands" do
         expect { redis_client.keys }.to raise_error(CanvasCache::Redis::UnsupportedRedisMethod)
       end
     end
 
-    describe "handle_redis_failure" do
+    context "with error protection" do
       before do
-        CanvasCache::Redis.patch
+        CanvasCache::Redis.reset_config!
+        CanvasCache::Redis.disconnect!
       end
 
       after do
-        CanvasCache::Redis.reset_redis_failure
+        CanvasCache::Redis.reset_config!
+        CanvasCache::Redis.disconnect!
       end
 
-      it "logs any redis error when they occur" do
-        messages = []
-        expect(Rails.logger).to receive(:error) do |message|
-          messages << message
-        end.at_least(:once)
-        CanvasCache::Redis.handle_redis_failure({ "failure" => "val" }, "local_fake_redis") do
-          raise Redis::InheritedError, "intentional failure"
-        end
-        # we don't log the second message under spring, cause reasons; we only
-        # care about the primary message anyway
-        msgs = messages.select { |m| m.include?("Query failure") }
-        expect(msgs.length).to eq(1)
-        m = msgs.first
-        expect(m).to match(/\[REDIS\] Query failure/)
-        expect(m).to match(/\(local_fake_redis\)/)
-        expect(m).to match(/InheritedError/)
-      end
+      it "uses the circuit breaker properly" do
+        expect(ConfigFile).to receive(:load).with("redis").and_return(url: ["redis://redis-test-node-42:9999/"])
+        expect(RedisClient::RubyConnection).to receive(:new).and_raise(RedisClient::TimeoutError, "intentional failure").twice
 
-      it "tracks failure only briefly for local redis" do
-        local_node = "localhost:9999"
-        expect(CanvasCache::Redis.redis_failure?(local_node)).to be_falsey
-        CanvasCache::Redis.last_redis_failure[local_node] = Time.now
-        expect(CanvasCache::Redis.redis_failure?(local_node)).to be_truthy
-        Timecop.travel(4) do
-          expect(CanvasCache::Redis.redis_failure?(local_node)).to be_falsey
-        end
-      end
+        now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        allow(Process).to receive(:clock_gettime).and_return(now)
+        expect { redis_client.get("mykey") }.to raise_error(Redis::CannotConnectError)
 
-      it "circuit breaks for standard nodes for a different amount of time" do
-        remote_node = "redis-test-node-42:9999"
-        expect(CanvasCache::Redis.redis_failure?(remote_node)).to be_falsey
-        CanvasCache::Redis.last_redis_failure[remote_node] = Time.now
-        expect(CanvasCache::Redis.redis_failure?(remote_node)).to be_truthy
-        Timecop.travel(4) do
-          expect(CanvasCache::Redis.redis_failure?(remote_node)).to be_truthy
-        end
-        Timecop.travel(400) do
-          expect(CanvasCache::Redis.redis_failure?(remote_node)).to be_falsey
-        end
+        allow(Process).to receive(:clock_gettime).and_return(now + 4)
+        expect { redis_client.get("mykey") }.to raise_error(Redis::CannotConnectError)
       end
     end
   end

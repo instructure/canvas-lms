@@ -101,7 +101,7 @@ module ActiveSupport
             instrument(:write, name, **options) do
               entry = ::ActiveSupport::Cache::Entry.new(result, **options)
               failsafe :write_entry, returning: false do
-                redis.set(frd_key, Marshal.dump(entry), options.merge(raw: true)) # write to the key generated in the lua script
+                redis.set(frd_key, Marshal.dump(entry)) # write to the key generated in the lua script
               end
             end
             result
