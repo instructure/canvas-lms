@@ -84,7 +84,7 @@ gem "inst-jobs-statsd", "~> 3.0"
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.
 gem "json", "~> 2.6.1"
-gem "json_schemer", "~> 0.2"
+gem "json_schemer", "~> 1.0"
 gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"
 gem "mail", "~> 2.8", require: false

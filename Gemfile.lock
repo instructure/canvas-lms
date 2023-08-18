@@ -553,8 +553,6 @@ GEM
       pygments.rb
       redcarpet
     dumb_delegator (1.0.0)
-    ecma-re-validator (0.4.0)
-      regexp_parser (~> 2.2)
     encrypted_cookie_store-instructure (1.2.12)
       actionpack (>= 4.2, < 7.1)
     erubi (1.12.0)
@@ -691,12 +689,10 @@ GEM
       httpclient
     json-schema (4.0.0)
       addressable (>= 2.8)
-    json_schemer (0.2.25)
-      ecma-re-validator (~> 0.3)
+    json_schemer (1.0.3)
       hana (~> 1.3)
       regexp_parser (~> 2.0)
       simpleidn (~> 0.2)
-      uri_template (~> 0.7)
     jwt (2.7.1)
     language_server-protocol (3.17.0.3)
     launchy (2.5.2)
@@ -1121,7 +1117,6 @@ GEM
       unicode-version (~> 1.0)
     unicode-version (1.3.0)
     uri (0.12.2)
-    uri_template (0.7.0)
     vault (0.17.0)
       aws-sigv4
     vericite_api (1.5.3)
@@ -1278,7 +1273,7 @@ DEPENDENCIES
   json (~> 2.6.1)
   json-jwt (~> 1.13)
   json-schema (~> 4.0)
-  json_schemer (~> 0.2)
+  json_schemer (~> 1.0)
   json_token!
   legacy_multipart!
   letter_opener (~> 1.8)
