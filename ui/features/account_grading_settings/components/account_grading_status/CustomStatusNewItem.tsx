@@ -52,14 +52,21 @@ export const CustomStatusNewItem = ({
         setElementRef={ref => (customStatusItemRef.current = ref)}
       >
         <View
-          as="span"
+          as="button"
           margin="0 0 0 x-small"
           display="inline-block"
           width="100%"
+          height="100%"
+          position="relative"
+          tabIndex="0"
+          textAlign="start"
+          borderWidth="0"
+          borderColor="transparent"
+          background="transparent"
           onClick={() => handleEditStatusToggle()}
         >
           <Text as="div" size="medium" color="brand" weight="bold" wrap="break-word">
-            <IconAddSolid color="brand" title="Add Status" />
+            <IconAddSolid color="brand" />
             <View as="span" margin="0 0 0 x-small" display="inline-block">
               {I18n.t('Add Status')}
             </View>

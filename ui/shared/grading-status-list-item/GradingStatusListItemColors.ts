@@ -16,6 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('color_picker_colors')
+
 export type Color = {
   name: string
   hexcode: string
@@ -32,6 +36,19 @@ export const defaultColors: Record<string, string> = {
   pink: '#F8EAF6',
   lavender: '#F0E8EF',
   white: '#FFFFFF',
+}
+
+export const defaultColorLabels: Record<string, string> = {
+  salmon: I18n.t('Salmon'),
+  orange: I18n.t('Orange'),
+  yellow: I18n.t('Yellow'),
+  brown: I18n.t('Brown'),
+  green: I18n.t('Green'),
+  blue: I18n.t('Blue'),
+  steel: I18n.t('Steel'),
+  pink: I18n.t('Pink'),
+  lavender: I18n.t('Lavender'),
+  white: I18n.t('White'),
 }
 
 export const colorPickerColors = Object.keys(defaultColors).reduce((obj: Color[], key: string) => {

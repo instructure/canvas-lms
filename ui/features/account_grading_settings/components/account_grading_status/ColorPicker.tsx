@@ -57,6 +57,7 @@ const getHexValue = (color: string) => {
 
 type ColorPickerProps = {
   colors: Color[]
+  colorLabels: Record<string, string>
   defaultColor: string
   allowWhite: boolean
   setStatusColor: (color: string) => void
@@ -65,6 +66,7 @@ type ColorPickerProps = {
 
 export const ColorPicker = ({
   colors,
+  colorLabels,
   defaultColor,
   allowWhite,
   setStatusColor,
@@ -109,6 +111,7 @@ export const ColorPicker = ({
         <ColorRow
           key={`color-row-${i}`}
           colors={colors.slice(i, i + COLORS_PER_ROW)}
+          colorLabels={colorLabels}
           currentColor={currentColor}
           handleOnClick={setCurrentColor}
         />
@@ -167,23 +170,33 @@ const ColorPreview = ({currentColor, isValidHex}: ColorPreviewProps) => {
 
 type ColorRowsProps = {
   colors: Color[]
+  colorLabels: Record<string, string>
   currentColor: string
   handleOnClick: (hexcode: string) => void
 }
-const ColorRow = ({colors, currentColor, handleOnClick}: ColorRowsProps) => {
+const ColorRow = ({colors, colorLabels, currentColor, handleOnClick}: ColorRowsProps) => {
   return (
     <Flex wrap="wrap" justifyItems="space-between" margin="small 0 0 0">
       {colors.map(color => {
-        const {hexcode} = color
+        const {hexcode, name: colorName} = color
         const isSelected = currentColor === hexcode
+        const colorLabel = colorLabels[colorName]
         return (
-          <FlexItem key={color.name}>
+          <FlexItem key={colorName}>
             <ColorTile
               isSelected={isSelected}
               hexcode={hexcode}
               handleOnClick={() => handleOnClick(hexcode)}
             >
-              {isSelected && <IconCheckSolid />}
+              <ScreenReaderContent>
+                {I18n.t('Color Option %{colorLabel}, hex code: %{hexcode}', {colorLabel, hexcode})}
+              </ScreenReaderContent>
+              {isSelected && (
+                <>
+                  <ScreenReaderContent>{I18n.t('Currently Selected Color')}</ScreenReaderContent>
+                  <IconCheckSolid />
+                </>
+              )}
             </ColorTile>
           </FlexItem>
         )

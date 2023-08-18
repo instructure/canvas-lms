@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {colorPickerColors} from '@canvas/grading-status-list-item'
+import {colorPickerColors, defaultColorLabels} from '@canvas/grading-status-list-item'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 // @ts-expect-error
@@ -37,6 +37,7 @@ const {Item: FlexItem} = Flex as any
 type EditStatusPopoverProps = {
   currentColor: string
   customStatusName?: string
+  editButtonLabel?: string
   hideRenderTrigger?: boolean
   isOpen: boolean
   isCustomStatus?: boolean
@@ -47,6 +48,7 @@ type EditStatusPopoverProps = {
 export const EditStatusPopover = ({
   currentColor,
   customStatusName,
+  editButtonLabel,
   isCustomStatus,
   isOpen,
   positionTarget,
@@ -70,7 +72,9 @@ export const EditStatusPopover = ({
             size="small"
             withBackground={false}
             withBorder={false}
-            screenReaderLabel={I18n.t('Open Edit Status Dialog')}
+            screenReaderLabel={I18n.t('Open Edit Status Dialog for %{editButtonLabel}', {
+              editButtonLabel,
+            })}
             onClick={handleEditStatusToggle}
           >
             <IconEditSolid />
@@ -83,7 +87,7 @@ export const EditStatusPopover = ({
           <View as="div" margin="small 0 0 0">
             <TextInput
               data-testid="custom-status-name-input"
-              renderLabel={I18n.t('Custom Status')}
+              renderLabel={I18n.t('Custom Status Name')}
               value={updatedCustomStatusName ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setUpdatedCustomStatusName(e.target.value.substring(0, 14))
@@ -99,6 +103,7 @@ export const EditStatusPopover = ({
         <ColorPicker
           allowWhite={true}
           colors={colorPickerColors}
+          colorLabels={defaultColorLabels}
           defaultColor={currentColor}
           setStatusColor={setSelectedColor}
           setIsValidColor={setIsSelectedColorValid}
