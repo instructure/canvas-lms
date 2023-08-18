@@ -270,6 +270,7 @@ export const SplitScreenParent = props => {
                       props.discussionEntry.author
                     )}
                     updateDraftCache={props.updateDraftCache}
+                    quotedEntry={props.discussionEntry.quotedEntry}
                     attachment={props.discussionEntry.attachment}
                   >
                     {threadActions.length > 0 && (
