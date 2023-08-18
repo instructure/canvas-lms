@@ -44,6 +44,7 @@ import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
 import ClearBadgeCountsButton from '../react/ClearBadgeCountsButton'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import useStore from '../react/stores'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('gradingGradeSummary')
 
@@ -149,7 +150,7 @@ const GradeSummary = {
     const assignmentId = GradeSummary.getAssignmentId($assignment)
 
     if (shouldUpdate) {
-      const url = $.replaceTags(
+      const url = replaceTags(
         $('.update_submission_url').attr('href'),
         'assignment_id',
         assignmentId

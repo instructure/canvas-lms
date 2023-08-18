@@ -17,9 +17,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import '@canvas/jquery/jquery.instructure_misc_helpers'
 import type {Assignment} from '../../../../api.d'
+import replaceTags from '@canvas/util/replaceTags'
 
 class DownloadSubmissionsDialogManager {
   assignment: Assignment
@@ -36,7 +35,7 @@ class DownloadSubmissionsDialogManager {
     submissionsDownloading: (assignmentId: string) => void
   ) {
     this.assignment = assignment
-    this.downloadUrl = $.replaceTags(downloadUrlTemplate, 'assignment_id', assignment.id)
+    this.downloadUrl = replaceTags(downloadUrlTemplate, 'assignment_id', assignment.id)
     this.showDialog = this.showDialog.bind(this)
     this.submissionsDownloading = submissionsDownloading
   }

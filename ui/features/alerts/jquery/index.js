@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -21,7 +22,7 @@ import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms' // validateForm, formErrors, errorBox
-import '@canvas/jquery/jquery.instructure_misc_helpers' // replaceTags
+import replaceTags from '@canvas/util/replaceTags'
 import 'jquery-tinypubsub' // /\.publish/
 import 'jqueryui/button'
 
@@ -168,10 +169,10 @@ $(function () {
     }
     const rand = Math.floor(Math.random() * 100000000)
     $alert.find('input').each(function () {
-      $(this).attr('id', $.replaceTags($(this).attr('id'), 'id', rand))
+      $(this).attr('id', replaceTags($(this).attr('id'), 'id', rand))
     })
     $alert.find('label').each(function () {
-      $(this).attr('for', $.replaceTags($(this).attr('for'), 'id', rand))
+      $(this).attr('for', replaceTags($(this).attr('for'), 'id', rand))
     })
     $alert.insertBefore($blank)
     $alert.find('.edit_link').trigger('click')

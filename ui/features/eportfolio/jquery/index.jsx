@@ -40,7 +40,8 @@ import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormDat
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications' /* $.screenReaderFlashMessageExclusive */
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, scrollSidebar */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* scrollSidebar */
+import replaceTags from '@canvas/util/replaceTags'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
@@ -612,7 +613,7 @@ $(document).ready(function () {
           const name = templateData.name
           $section.find('.attachment_id').text(id)
           let url = $('.eportfolio_download_url').attr('href')
-          url = $.replaceTags(url, 'uuid', uuid)
+          url = replaceTags(url, 'uuid', uuid)
           if ($file.hasClass('image')) {
             const $image = $('#eportfolio_view_image').clone(true).removeAttr('id')
             $image.find('.eportfolio_image').attr('src', url).attr('alt', name)
@@ -637,7 +638,7 @@ $(document).ready(function () {
       const $section = $(this).data('section')
       $section.find('.attachment_id').text(attachment.id)
       let url = $('.eportfolio_download_url').attr('href')
-      url = $.replaceTags(url, 'uuid', attachment.uuid)
+      url = replaceTags(url, 'uuid', attachment.uuid)
       if (attachment['content-type'].indexOf('image') !== -1) {
         const $image = $('#eportfolio_view_image').clone(true).removeAttr('id')
         $image.find('.eportfolio_image').attr('src', url).attr('alt', attachment.display_name)
@@ -728,8 +729,8 @@ $(document).ready(function () {
       } catch (e) {}
       /* eslint-enable no-empty */
       let url = $(this).find('.eportfolio_named_entry_url').attr('href')
-      url = $.replaceTags(url, 'category_slug', entry.category_slug)
-      url = $.replaceTags(url, 'slug', entry.slug)
+      url = replaceTags(url, 'category_slug', entry.category_slug)
+      url = replaceTags(url, 'slug', entry.slug)
       window.location.href = url
       $(document).triggerHandler('page_added', data)
     },
@@ -816,8 +817,8 @@ $(document).ready(function () {
     if (event.type === 'page_updated') {
       let page_url = $('#page_blank .page_url').attr('href')
       let rename_page_url = $('#page_blank .rename_page_url').attr('href')
-      page_url = $.replaceTags(page_url, 'slug', entry.slug)
-      rename_page_url = $.replaceTags(page_url, 'id', entry.id)
+      page_url = replaceTags(page_url, 'slug', entry.slug)
+      rename_page_url = replaceTags(page_url, 'id', entry.id)
       $page.find('.page_url').attr('href', page_url)
       $page.find('.rename_page_url').attr('href', rename_page_url)
     }

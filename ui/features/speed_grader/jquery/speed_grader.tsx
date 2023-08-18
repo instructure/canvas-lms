@@ -136,6 +136,7 @@ import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {EnvGradebookSpeedGrader} from '@canvas/global/env/EnvGradebook'
 import {gradeToScoreUpperBound} from '@canvas/grading/GradingSchemeHelper'
 import {scoreToGrade} from '@instructure/grading-utils'
+import replaceTags from '@canvas/util/replaceTags'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -2089,7 +2090,7 @@ EG = {
         $assignment_submission_originality_report_url
       )
       const tooltip = I18n.t('Similarity Score - See detailed report')
-      let reportUrl = $.replaceTags(urlContainer.attr('href'), {
+      let reportUrl = replaceTags(urlContainer.attr('href'), {
         [anonymizableUserId]: submission[anonymizableUserId],
         asset_string: assetString,
       })
@@ -2185,7 +2186,7 @@ EG = {
       let reportUrl
       let tooltip
       if (!isAnonymous) {
-        reportUrl = $.replaceTags($assignment_submission_vericite_report_url.attr('href'), {
+        reportUrl = replaceTags($assignment_submission_vericite_report_url.attr('href'), {
           user_id: submission.user_id,
           asset_string: assetString,
         })
@@ -2263,7 +2264,7 @@ EG = {
       $vericiteInfoContainer_.append($vericiteInfo)
 
       if (vericiteAsset_.status === 'error' && isMostRecent) {
-        const resubmitUrl = $.replaceTags(
+        const resubmitUrl = replaceTags(
           $assignment_submission_resubmit_to_vericite_url.attr('href'),
           {user_id: submission[anonymizableUserId]}
         )
@@ -2652,7 +2653,7 @@ EG = {
         singleSubmission: submissionHistory.length === 1,
         submissions: templateSubmissions,
         linkToQuizHistory: window.jsonData.too_many_quiz_submissions,
-        quizHistoryHref: $.replaceTags(ENV.quiz_history_url, {
+        quizHistoryHref: replaceTags(ENV.quiz_history_url, {
           user_id: this.currentStudent[anonymizableId],
         }),
       })
@@ -4010,7 +4011,7 @@ EG = {
   },
 
   selectProvisionalGrade(provisionalGradeId: string, refetchOnSuccess: boolean = false) {
-    const selectGradeUrl = $.replaceTags(ENV.provisional_select_url, {
+    const selectGradeUrl = replaceTags(ENV.provisional_select_url, {
       provisional_grade_id: provisionalGradeId,
     })
 

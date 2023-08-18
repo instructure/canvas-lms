@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -32,6 +33,7 @@ import PaginatedList from './PaginatedList'
 import enrollmentTemplate from '../jst/enrollment.handlebars'
 import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('section')
 
@@ -175,7 +177,7 @@ $(document).ready(function () {
     $.screenReaderFlashMessage(confirmingText)
     $('#sis_id_holder,#account_name_holder').hide()
     $('#course_autocomplete_account_name').hide()
-    const url = $.replaceTags($('#course_confirm_crosslist_url').attr('href'), 'id', course.id)
+    const url = replaceTags($('#course_confirm_crosslist_url').attr('href'), 'id', course.id)
     latest_course_id = course.id
     const course_id_before_get = latest_course_id
     $.ajaxJSON(

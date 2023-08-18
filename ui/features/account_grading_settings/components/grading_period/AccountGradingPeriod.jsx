@@ -25,6 +25,7 @@ import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('AccountGradingPeriod')
 
@@ -61,7 +62,7 @@ export default class AccountGradingPeriod extends React.Component {
     event.stopPropagation()
     const confirmMessage = I18n.t('Are you sure you want to delete this grading period?')
     if (!window.confirm(confirmMessage)) return null
-    const url = $.replaceTags(this.props.deleteGradingPeriodURL, 'id', this.props.period.id)
+    const url = replaceTags(this.props.deleteGradingPeriodURL, 'id', this.props.period.id)
 
     axios
       .delete(url)

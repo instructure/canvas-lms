@@ -47,6 +47,7 @@ import {contentItemProcessorPrechecks} from '@canvas/deep-linking/ContentItemPro
 import {ResourceLinkContentItem} from '@canvas/deep-linking/models/ResourceLinkContentItem'
 import {EnvContextModules} from '@canvas/global/env/EnvContextModules'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import replaceTags from '@canvas/util/replaceTags'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -456,8 +457,8 @@ export const Events = {
         .dialog('option', 'height', height || frameHeight || 400)
         .dialog('open')
       $dialog.triggerHandler('dialogresize')
-      let url = $.replaceTags(
-        $('#select_content_resource_selection_url').attr('href'),
+      let url = replaceTags(
+        $('#select_content_resource_selection_url').attr('href') as string,
         'id',
         tool.definition_id
       )

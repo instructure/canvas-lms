@@ -29,6 +29,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
+import replaceTags from '@canvas/util/replaceTags'
 
 const I18n = useI18nScope('question_bank')
 
@@ -128,7 +129,7 @@ export function attachPageEvents(_e) {
 
   if ($('#more_questions').length > 0) {
     $('.display_question .move').remove()
-    const url = $.replaceTags($('#bank_urls .more_questions_url').attr('href'), 'page', 1)
+    const url = replaceTags($('#bank_urls .more_questions_url').attr('href'), 'page', 1)
     $.ajaxJSON(
       url,
       'GET',
@@ -153,7 +154,7 @@ export function attachPageEvents(_e) {
     const currentPage = parseInt($more_questions.attr('data-current-page'), 10)
     const totalPages = parseInt($more_questions.attr('data-total-pages'), 10)
     let url = $(this).attr('href')
-    url = $.replaceTags(url, 'page', currentPage + 1)
+    url = replaceTags(url, 'page', currentPage + 1)
     $link.text('loading more questions...').addClass('loading')
     $.ajaxJSON(
       url,
