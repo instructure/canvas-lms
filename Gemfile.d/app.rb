@@ -43,9 +43,7 @@ gem "aws-sdk-kms", "~> 1.63", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
-gem "barby", "0.6.8", require: false
-  gem "rqrcode", "1.2.0", require: false
-  gem "chunky_png", "1.4.0", require: false
+gem "rqrcode", "~> 2.2", require: false
 gem "bcrypt", "~> 3.1"
 gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 5.3", require: false

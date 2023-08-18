@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "barby"
-require "barby/barcode/qr_code"
-require "barby/outputter/png_outputter"
+require "rqrcode"
 require "rotp"
 
 class Login::OtpController < ApplicationController
