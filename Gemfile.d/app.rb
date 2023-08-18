@@ -111,7 +111,6 @@ gem "prawn-rails", "~> 1.4"
 gem "prosopite", "~> 1.3"
 gem "rack", "~> 2.2"
 gem "rack-brotli", "~> 1.2"
-gem "rack-test", "1.1.0"
 gem "rake", "~> 13.0"
 gem "rails-observers", "0.1.5"
 gem "ratom-nokogiri", "0.10.11", require: false
