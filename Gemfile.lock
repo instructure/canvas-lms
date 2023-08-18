@@ -159,7 +159,7 @@ PATH
       json_token
       paginated_collection
       rails (>= 3.2)
-      will_paginate (~> 3.0)
+      will_paginate (>= 3.0, < 5.0)
     broadcast_policy (1.0.0)
       activesupport
       after_transaction_commit
@@ -288,7 +288,7 @@ PATH
       oauth
     paginated_collection (1.0.0)
       folio-pagination (~> 0.0.12)
-      will_paginate (~> 3.0)
+      will_paginate (>= 3.0, < 5.0)
     request_context (0.1.0)
       actionpack
       canvas_security
@@ -1144,7 +1144,7 @@ GEM
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    will_paginate (3.3.0)
+    will_paginate (4.0.0)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     ya2yaml (0.31)
@@ -1389,7 +1389,6 @@ DEPENDENCIES
   wcag_color_contrast (= 0.1.0)
   webmock (~> 3.18)
   week_of_month (= 1.2.5)!
-  will_paginate (= 3.3.0)
   workflow!
   yard (~> 0.9)
   yard-appendix (= 0.1.8)
