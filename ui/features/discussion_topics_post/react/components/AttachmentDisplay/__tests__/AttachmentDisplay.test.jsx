@@ -27,12 +27,24 @@ const setup = props => {
 }
 
 describe('AttachmentDisplay', () => {
+  afterEach(() => {
+    window.ENV = {}
+  })
+
   it('displays AttachButton when there is no attachment', () => {
+    window.ENV.can_attach_entries = true
     const {queryByText} = setup()
     expect(queryByText('Attach')).toBeTruthy()
   })
 
+  it('does not display AttachButton when can_attach_entries is false', () => {
+    window.ENV.can_attach_entries = false
+    const {queryByText} = setup()
+    expect(queryByText('Attach')).toBeFalsy()
+  })
+
   it('only allows one attachment at a time', () => {
+    window.ENV.can_attach_entries = true
     const {queryByTestId} = setup()
     expect(queryByTestId('attachment-input')).toHaveAttribute('type', 'file')
     expect(queryByTestId('attachment-input')).not.toHaveAttribute('multiple')

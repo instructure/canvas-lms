@@ -111,10 +111,12 @@ export function AttachmentDisplay(props) {
         props.attachment?._id ? (
           <AttachmentButton attachment={props.attachment} onDeleteItem={removeAttachment} />
         ) : (
-          <UploadButton
-            attachmentToUpload={props.attachmentToUpload}
-            onAttachmentUpload={addAttachment}
-          />
+          ENV.can_attach_entries && (
+            <UploadButton
+              attachmentToUpload={props.attachmentToUpload}
+              onAttachmentUpload={addAttachment}
+            />
+          )
         )
       }
     />
