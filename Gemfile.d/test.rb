@@ -56,11 +56,7 @@ group :test do
   gem "flakey_spec_catcher", "~> 0.12", require: false
   gem "factory_bot", "6.2.1", require: false
   gem "rspec_junit_formatter", require: false
-  # axe-core* versions at or above 4.2 have difficulties with iframes. Keep these at 4.1.0 until fixes are investigated
-  gem "axe-core-selenium", "~> 4.1.0", require: false
-  gem "axe-core-rspec", "~> 4.1.0", require: false
-  gem "axe-core-api", "~> 4.1.0", require: false
-  gem "stormbreaker", "0.0.8", require: false
+  gem "stormbreaker", "~> 1.0", require: false
 
   # performance tools for instrumenting rspec tests
   gem "stackprof", "~> 0.2"
