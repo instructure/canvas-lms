@@ -150,7 +150,7 @@ describe Canvas::Apm do
       Canvas::Apm.reset!
       Canvas::Apm.hostname = "testbox"
       expect(Canvas::Apm).to be_configured
-      expect(Canvas::Apm.tracer).to eq(Datadog.tracer)
+      expect(Canvas::Apm.tracer).to eq(Datadog::Tracing)
     end
 
     it "traces arbitrary code" do
