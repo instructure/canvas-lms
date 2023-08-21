@@ -38,9 +38,11 @@ import filterConferenceTypes from '@canvas/calendar-conferences/filterConference
 import FrequencyPicker, {
   FrequencyPickerErrorBoundary,
 } from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
+import Course from '@canvas/courses/backbone/models/Course'
 import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import {RRULEToFrequencyOptionValue} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('calendar.edit')
 
@@ -216,7 +218,7 @@ export default class EditCalendarEventView extends Backbone.View {
   _handleFrequencyChange(newFrequency, newRRule) {
     if (newFrequency !== 'custom') {
       this.model.set('rrule', newRRule)
-      this.renderRecurringEventFrequencyPicker(newFrequency, newRRule)
+      this.renderRecurringEventFrequencyPicker()
     }
   }
 
@@ -234,6 +236,14 @@ export default class EditCalendarEventView extends Backbone.View {
 
       const date = eventStart.isValid() ? eventStart.toISOString(true) : undefined
 
+      let courseEndAt
+
+      if (this.course) {
+        courseEndAt = this.course.get('restrict_enrollments_to_course_dates')
+          ? this.course.get('end_at')
+          : this.course.get('term')?.end_at
+      }
+
       ReactDOM.render(
         <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
           <FrequencyPickerErrorBoundary>
@@ -247,6 +257,7 @@ export default class EditCalendarEventView extends Backbone.View {
               rrule={rrule}
               width="fit"
               onChange={this.handleFrequencyChange}
+              courseEndAt={courseEndAt || undefined}
             />
           </FrequencyPickerErrorBoundary>
         </div>,
@@ -262,6 +273,23 @@ export default class EditCalendarEventView extends Backbone.View {
     this.$el.find('[name="start_date"]').on('change', () => {
       this.renderRecurringEventFrequencyPicker()
     })
+
+    const context_code = this.model.get('context_code')
+    const [context_type, context_id] = context_code.split('_')
+    if (context_type === 'course') {
+      this.course = new Course()
+      this.course.urlRoot = `/api/v1/courses/${context_id}?include[]=term`
+      this.course
+        .fetch()
+        .done(() => this.renderRecurringEventFrequencyPicker())
+        .fail(err =>
+          showFlashAlert({
+            message: 'Failed to fetch course data.',
+            err,
+            type: 'error',
+          })
+        )
+    }
   }
 
   render() {

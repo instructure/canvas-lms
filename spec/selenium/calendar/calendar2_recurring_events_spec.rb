@@ -27,7 +27,7 @@ describe "recurring events" do
   include_context "in-process server selenium tests"
   include Calendar2Common
   include CalendarPage
-  include CalendarRecurrenceModelPage
+  include CalendarRecurrenceModalPage
   include CalendarEditPage
 
   context "calendar event modal" do
@@ -126,9 +126,11 @@ describe "recurring events" do
   context "calendar event modal interactions with custom recurring modal" do
     before :once do
       course_with_teacher(active_all: true, new_user: true)
+      @course.update!(name: "Programming 101")
     end
 
     before do
+      @course.update!(conclude_at: "April 12, 2024", restrict_enrollments_to_course_dates: true)
       user_session(@teacher)
     end
 
@@ -138,6 +140,27 @@ describe "recurring events" do
 
       select_frequency_option("Custom")
       expect(custom_recurrence_modal).to be_displayed
+    end
+
+    it "shows course end date in custom modal" do
+      get "/calendar2"
+      create_new_calendar_event
+
+      select_event_calendar("Programming 101")
+      select_frequency_option("Custom")
+      expect(custom_recurrence_text).to include("Course ends April 12, 2024")
+    end
+
+    it "shows course term end date in custom modal" do
+      @term = Account.default.enrollment_terms.create(name: "Fall", end_at: "April 12, 2024")
+      @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
+
+      get "/calendar2"
+      create_new_calendar_event
+
+      select_event_calendar("Programming 101")
+      select_frequency_option("Custom")
+      expect(custom_recurrence_text).to include("Course ends April 12, 2024")
     end
 
     it "makes custom change and returns to modal and new value in frequency field" do
@@ -282,6 +305,7 @@ describe "recurring events" do
     end
 
     before do
+      @course.update!(conclude_at: "April 12, 2024", restrict_enrollments_to_course_dates: true)
       user_session(@teacher)
     end
 
@@ -293,6 +317,29 @@ describe "recurring events" do
       enter_calendar_start_date(newdate)
       select_frequency_option("Custom")
       expect(custom_recurrence_modal).to be_displayed
+    end
+
+    it "shows course end date in custom modal" do
+      get "/courses/#{@course.id}/calendar_events/new"
+      wait_for_ajaximations
+      wait_for_calendar_rce
+      newdate = "July 20, 2023"
+      enter_calendar_start_date(newdate)
+      select_frequency_option("Custom")
+      expect(custom_recurrence_text).to include("Course ends April 12, 2024")
+    end
+
+    it "shows course term end date in custom modal" do
+      @term = Account.default.enrollment_terms.create(name: "Fall", end_at: "April 12, 2024")
+      @course.update!(enrollment_term: @term, restrict_enrollments_to_course_dates: false)
+
+      get "/courses/#{@course.id}/calendar_events/new"
+      wait_for_ajaximations
+      wait_for_calendar_rce
+      newdate = "July 20, 2023"
+      enter_calendar_start_date(newdate)
+      select_frequency_option("Custom")
+      expect(custom_recurrence_text).to include("Course ends April 12, 2024")
     end
 
     it "makes custom change and returns to modal and new value in frequency field" do

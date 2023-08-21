@@ -89,6 +89,7 @@ export type FrequencyPickerProps = {
   readonly locale: string
   readonly width?: FrequencyPickerWidth
   readonly onChange: OnFrequencyChange
+  readonly courseEndAt?: string
 }
 
 function getFrequencySelectWidth(width: FrequencyPickerWidth, options: FrequencyOption[]) {
@@ -104,6 +105,7 @@ export default function FrequencyPicker({
   locale,
   width = 'fit',
   onChange,
+  courseEndAt,
 }: FrequencyPickerProps) {
   const [frequency, setFrequency] = useState<FrequencyOptionValue>(initialFrequency)
   const [parsedMoment, setParsedMoment] = useState<Moment>(moment.tz(date, timezone))
@@ -233,7 +235,7 @@ export default function FrequencyPicker({
         eventStart={parsedMoment.toISOString(true)}
         locale={locale}
         timezone={timezone}
-        courseEndAt={undefined}
+        courseEndAt={courseEndAt}
         RRULE={currRRule || ''}
         isOpen={isModalOpen}
         onClose={handleCloseModal}

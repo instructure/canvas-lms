@@ -19,7 +19,7 @@
 
 require_relative "../../common"
 
-module CalendarRecurrenceModelPage
+module CalendarRecurrenceModalPage
   #------------------------- Selectors --------------------------
   def after_radio_button_selector
     "//*[@aria-label='Custom Repeating Event']//label[../input[@value = 'AFTER']]"
@@ -67,6 +67,10 @@ module CalendarRecurrenceModelPage
 
   def repeat_interval_selector
     "[data-testid='repeat-interval']"
+  end
+
+  def custom_recurrence_selector
+    "[data-testid='custom-recurrence']"
   end
 
   #------------------------- Elements ---------------------------
@@ -117,6 +121,10 @@ module CalendarRecurrenceModelPage
 
   def repeat_interval
     f(repeat_interval_selector)
+  end
+
+  def custom_recurrence
+    f(custom_recurrence_selector)
   end
 
   #----------------------- Actions/Methods ----------------------
@@ -178,4 +186,6 @@ module CalendarRecurrenceModelPage
   def select_repeat_frequency(frequency)
     click_option(repeat_frequency_selector, frequency)
   end
+
+  delegate :text, to: :custom_recurrence, prefix: true
 end
