@@ -21,7 +21,6 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import GoogleDocsTreeView from '../backbone/views/GoogleDocsTreeView'
 import HomeworkSubmissionLtiContainer from '../backbone/HomeworkSubmissionLtiContainer'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
@@ -299,9 +298,6 @@ $(document).ready(function () {
   $(document).fragmentChange((event, hash) => {
     if (hash && hash.indexOf('#submit') == 0) {
       $('.submit_assignment_link').triggerHandler('click', true)
-      if (hash === '#submit_google_doc') {
-        $('#submit_assignment_tabs').tabs('select', '.google_doc_form')
-      }
     }
   })
 
@@ -372,10 +368,6 @@ $(document).ready(function () {
           }
         }
 
-        if (ui.newTab.attr('aria-controls') === 'submit_google_doc_form') {
-          listGoogleDocs()
-        }
-
         if (ui.newTab.context.classList[0] === 'external-tool') {
           ui.newTab.find('a').click()
         }
@@ -386,11 +378,6 @@ $(document).ready(function () {
           if (!RichContentEditor.callOnRCE($el, 'exists?')) {
             RichContentEditor.loadNewEditor($el, {manageParent: true})
           }
-        }
-
-        // list Google Docs if Google Docs tab is active
-        if (ui.tab.attr('aria-controls') === 'submit_google_doc_form') {
-          listGoogleDocs()
         }
       },
     })
@@ -455,33 +442,6 @@ $(document).ready(function () {
     toggleRemoveAttachmentLinks()
   })
 
-  function listGoogleDocs() {
-    const url = window.location.pathname + '/list_google_docs'
-    $.get(
-      url,
-      {},
-      (data, _textStatus) => {
-        const tree = new GoogleDocsTreeView({model: data})
-        $('div#google_docs_container').html(tree.el)
-        tree.render()
-        tree.on('activate-file', file_id => {
-          $('#submit_google_doc_form').find("input[name='google_doc[document_id]']").val(file_id)
-          const submitButton = $('#submit_google_doc_form').find('[disabled].btn-primary')
-          if (submitButton) {
-            submitButton.removeAttr('disabled')
-          }
-        })
-      },
-      'json'
-    )
-  }
-
-  $(document).on('click', '#auth-google', function (e) {
-    e.preventDefault()
-    const href = $(this).attr('href')
-    reauth(href)
-  })
-
   // Post message for anybody to listen to //
   if (window.opener) {
     try {
@@ -495,35 +455,6 @@ $(document).ready(function () {
     } catch (e) {
       console.error(e)
     }
-  }
-
-  function reauth(auth_url) {
-    const modal = window.open(
-      auth_url,
-      'Authorize Google Docs',
-      'menubar=no,directories=no,location=no,height=500,width=500'
-    )
-    $(window).on('message', event => {
-      event = event.originalEvent
-      if (
-        !event ||
-        !event.data ||
-        event.origin !== window.location.protocol + '//' + window.location.host
-      )
-        return
-
-      if (event.data.type === 'event' && event.data.payload === 'done') {
-        if (modal) modal.close()
-
-        reloadGoogleDrive()
-      }
-    })
-  }
-
-  function reloadGoogleDrive() {
-    $('#submit_google_doc_form.auth').hide()
-    $('#submit_google_doc_form.submit_assignment_form').removeClass('hide')
-    listGoogleDocs()
   }
 
   function toggleRemoveAttachmentLinks() {
@@ -594,22 +525,6 @@ $(document).ready(function () {
         }
       })
   }
-})
-
-$('#submit_google_doc_form').submit(() => {
-  // make sure we have a document selected
-  if (!$('#submit_google_doc_form').find("input[name='google_doc[document_id]']").val()) {
-    return false
-  }
-
-  $('#uploading_google_doc_message').dialog({
-    title: I18n.t('titles.uploading', 'Uploading Submission'),
-    modal: true,
-    overlay: {
-      backgroundColor: '#000',
-      opacity: 0.7,
-    },
-  })
 })
 
 $(document).ready(() => {

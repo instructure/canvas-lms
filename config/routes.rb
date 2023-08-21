@@ -331,10 +331,6 @@ CanvasRails::Application.routes.draw do
         get :submissions
       end
 
-      member do
-        get :list_google_docs
-      end
-
       get "lti/resource/:resource_link_id",
           controller: "lti/message",
           action: "resource",

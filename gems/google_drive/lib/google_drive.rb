@@ -27,6 +27,4 @@ module GoogleDrive
   require "google_drive/masquerading_exception"
   require "google_drive/client"
   require "google_drive/connection"
-  require "google_drive/entry"
-  require "google_drive/folder"
 end

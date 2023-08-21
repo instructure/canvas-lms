@@ -50,54 +50,8 @@ module GoogleDrive
       with_timeout_protection { with_retries { api_client.execute(options) } }
     end
 
-    def client_execute!(options)
-      with_timeout_protection { with_retries { api_client.execute!(options) } }
-    end
-
     def force_token_update
       with_timeout_protection { api_client.authorization.update_token! }
-    end
-
-    def download(document_id, extensions)
-      response = client_execute!(
-        api_method: drive.files.get,
-        parameters: { fileId: normalize_document_id(document_id) }
-      )
-
-      file = response.data.to_hash
-      entry = GoogleDrive::Entry.new(file, extensions)
-      @uri = entry.download_url
-      if @uri.nil?
-        raise WorkflowError, "Fetched entry contains no url, cannot download"
-      end
-
-      redirect_limit = 3
-      loop do
-        raise(ConnectionException) if redirect_limit <= 0
-
-        result = client_execute(uri: @uri)
-
-        case result.status
-        when 200
-          file_name = file["title"]
-          name_extension = file_name[/\.([a-z]+$)/, 1]
-          file_extension = name_extension || file_extension_from_header(result.headers, entry)
-
-          # file_name should contain the file_extension
-          file_name += ".#{file_extension}" unless name_extension
-          content_type = result.headers["Content-Type"].sub(/; charset=[^;]+/, "")
-          return [result, file_name, file_extension, content_type]
-        when 307
-          @uri = result.response["Location"]
-          redirect_limit -= 1
-        else
-          raise ConnectionException, result.error_message
-        end
-      end
-    end
-
-    def list_with_extension_filter(extensions)
-      list extensions
     end
 
     def create_doc(name)
@@ -218,50 +172,8 @@ module GoogleDrive
       raise
     end
 
-    def list(extensions)
-      client_params = {
-        api_method: drive.files.list,
-        parameters: { maxResults: 0, q: "trashed=false" }
-      }
-      list_data = client_execute!(client_params).data.to_hash
-      folderize_list(list_data, extensions)
-    end
-
     def normalize_document_id(doc_id)
       doc_id.gsub(/^.+:/, "")
-    end
-
-    def folderize_list(documents, extensions)
-      root = GoogleDrive::Folder.new("/")
-      folders = { nil => root }
-
-      documents["items"].each do |doc_entry|
-        next unless doc_entry["downloadUrl"] || doc_entry["exportLinks"]
-
-        entry = GoogleDrive::Entry.new(doc_entry, extensions)
-        if folders.key?(entry.folder)
-          folder = folders[entry.folder]
-        else
-          folder = GoogleDrive::Folder.new(get_folder_name_by_id(documents["items"], entry.folder))
-          root.add_folder folder
-          folders[entry.folder] = folder
-        end
-        is_folder = doc_entry["mimeType"] && doc_entry["mimeType"] == "application/vnd.google-apps.folder"
-        folder.add_file(entry) unless is_folder
-      end
-
-      if extensions.present?
-        root = root.select { |e| extensions.include?(e.extension) }
-      end
-
-      root
-    end
-
-    def get_folder_name_by_id(entries, folder_id)
-      elements = entries.select do |entry|
-        entry["id"] == folder_id
-      end
-      elements.first ? elements.first["title"] : "Unknown Folder"
     end
 
     def api_client
@@ -275,16 +187,6 @@ module GoogleDrive
       @drive ||= Rails.cache.fetch("google_drive_v2") do
         api_client.discovered_api("drive", "v2")
       end
-    end
-
-    def file_extension_from_header(headers, entry)
-      file_extension = (entry.extension.present? && entry.extension) || "unknown"
-
-      if headers["content-disposition"]&.match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
-        file_extension = Regexp.last_match[:file_extension]
-      end
-
-      file_extension
     end
   end
 end
