@@ -873,6 +873,7 @@ class GroupsController < ApplicationController
       submit_assignment = value_to_boolean(params[:submit_assignment])
       opts = { check_quota: true, submit_assignment: }
       if submit_assignment && @context.respond_to?(:submissions_folder)
+        opts[:check_quota] = false
         opts[:folder] = @context.submissions_folder
       end
       api_attachment_preflight(@context, request, opts)
