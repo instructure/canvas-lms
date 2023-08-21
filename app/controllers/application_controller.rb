@@ -913,7 +913,7 @@ class ApplicationController < ActionController::Base
     if session[:pending_otp] && params[:controller] != "login/otp"
       return render plain: "Please finish logging in", status: :forbidden if request.xhr?
 
-      reset_session
+      destroy_session
       redirect_to login_url
     end
   end

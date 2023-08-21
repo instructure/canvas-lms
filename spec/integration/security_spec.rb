@@ -19,6 +19,7 @@
 #
 
 require "nokogiri"
+require "rotp"
 
 describe "security" do
   describe "session fixation" do
@@ -252,6 +253,27 @@ describe "security" do
       expect(pers1).not_to eq pers2
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{creds}" }
       expect(response).to redirect_to("https://www.example.com/login")
+    end
+
+    it "clears pseudonym_credentials when pending otp check fails" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      @user.update!(otp_secret_key: ROTP::Base32.random)
+      https!
+
+      post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
+                                      "pseudonym_session[password]" => "asdfasdf",
+                                      "pseudonym_session[remember_me]" => "1" }
+
+      expect(response).to redirect_to(otp_login_url)
+      expect(session[:pending_otp]).to be true
+      expect(cookies[:pseudonym_credentials]).to be_present
+
+      get "/"
+
+      expect(response).to redirect_to login_url
+      expect(session[:pending_otp]).not_to be_present
+      expect(cookies[:pseudonym_credentials]).not_to be_present
     end
 
     context "sharding" do
