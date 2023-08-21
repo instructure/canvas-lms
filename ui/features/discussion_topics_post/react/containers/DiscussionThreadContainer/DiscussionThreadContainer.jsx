@@ -29,6 +29,7 @@ import {
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   DELETE_DISCUSSION_ENTRY,
+  UPDATE_DISCUSSION_THREAD_READ_STATE,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY,
 } from '../../../graphql/Mutations'
@@ -55,7 +56,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import theme from '@instructure/canvas-theme'
 import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
-import {useMutation, useQuery} from 'react-apollo'
+import {useMutation, useQuery, useApolloClient} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {Text} from '@instructure/ui-text'
@@ -238,6 +239,15 @@ export const DiscussionThreadContainer = props => {
     })
     return rootEntryDraftMessage
   }
+
+  const client = useApolloClient()
+  const resetDiscussionCache = () => {
+    client.resetStore()
+  }
+
+  const [updateDiscussionThreadReadState] = useMutation(UPDATE_DISCUSSION_THREAD_READ_STATE, {
+    update: resetDiscussionCache,
+  })
 
   // Condense SplitScreen to one variable & link with the SplitScreenButton
   const splitScreenOn = ENV.split_screen_view && props.userSplitScreenPreference
@@ -499,6 +509,16 @@ export const DiscussionThreadContainer = props => {
                                   }
                                 }
                               : null
+                          }
+                          onMarkThreadAsRead={readState =>
+                            updateDiscussionThreadReadState({
+                              variables: {
+                                discussionEntryId: props.discussionEntry.rootEntryId
+                                  ? props.discussionEntry.rootEntryId
+                                  : props.discussionEntry.id,
+                                read: readState
+                              }
+                            })
                           }
                         />
                       ) : null

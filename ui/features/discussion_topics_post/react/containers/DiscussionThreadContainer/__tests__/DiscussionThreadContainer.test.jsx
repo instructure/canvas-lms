@@ -165,6 +165,15 @@ describe('DiscussionThreadContainer', () => {
       })
     })
 
+    it('Should render Mark Thread as Unread and Read', () => {
+      const {getByTestId, getAllByText} = setup(defaultProps())
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(getAllByText('Mark Thread as Unread').length).toBe(1)
+      expect(getAllByText('Mark Thread as Read').length).toBe(1)
+    })
+
     describe('error handling', () => {
       it('indicates the failure to the user', async () => {
         const {getByTestId} = setup(
