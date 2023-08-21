@@ -40,6 +40,7 @@ type Props = {
   readonly onCancel: () => void
   readonly onDeleting: (which: Which) => void
   readonly onDeleted: (deletedEvents: [Event]) => void
+  readonly onUpdated: (updatedEvents: [Event]) => void
   readonly delUrl: string
   readonly isRepeating: boolean
   readonly isSeriesHead: boolean
@@ -50,6 +51,7 @@ const DeleteCalendarEventDialog = ({
   onCancel,
   onDeleting,
   onDeleted,
+  onUpdated,
   delUrl,
   isRepeating,
   isSeriesHead,
@@ -76,15 +78,31 @@ const DeleteCalendarEventDialog = ({
     })
       .then(checkStatus)
       .then(res => res.json())
-      .then(deletedEvents => {
+      .then(result => {
         setIsDeleting(false)
-        onDeleted(deletedEvents)
+        const sortedEvents = {
+          deleted: [],
+          updated: [],
+        }
+        const returnedEvents = Array.isArray(result) ? result : [result]
+        returnedEvents.reduce((runningResult, currentValue) => {
+          if (currentValue.workflow_state === 'deleted') {
+            runningResult.deleted.push(currentValue)
+          } else {
+            runningResult.updated.push(currentValue)
+          }
+          return runningResult
+        }, sortedEvents)
+        onDeleted(sortedEvents.deleted)
+        if (sortedEvents.updated.length > 0) {
+          onUpdated(sortedEvents.updated)
+        }
       })
       .catch(_err => {
         setIsDeleting(false)
         showFlashAlert({message: I18n.t('Delete failed'), type: 'error'})
       })
-  }, [delUrl, onDeleted, onDeleting, which])
+  }, [delUrl, onDeleted, onDeleting, onUpdated, which])
 
   const renderFooter = useCallback((): JSX.Element => {
     const tiptext = I18n.t('Wait for delete to complete')

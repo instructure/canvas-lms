@@ -1807,13 +1807,19 @@ describe CalendarEventsApiController, type: :request do
                           "/api/v1/calendar_events/#{target_event_id}?which=following",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "following", format: "json" })
           assert_status(200)
-          expect(json.length).to eq 2
+
+          expect(json.length).to eq 3
+          updated_events = json.select { |e| e["workflow_state"] == "active" }
+          deleted_events = json.select { |e| e["workflow_state"] == "deleted" }
+          expect(updated_events.length).to eq 1
+          expect(deleted_events.length).to eq 2
           expect(json[0].keys).to match_array expected_series_fields
-          expect(json[0]["id"]).to be target_event_id
+          expect(deleted_events[0]["id"]).to be target_event_id
           expect(json[1]["id"]).to be @event_series["duplicates"][1]["calendar_event"]["id"]
 
           remaining_events = CalendarEvent.where(series_uuid:, workflow_state: "active")
           expect(remaining_events.length).to eql series_count - 2
+          expect(remaining_events[0].rrule).to eql "FREQ=WEEKLY;INTERVAL=1;COUNT=1"
         end
 
         it "deletes all in the series" do
@@ -1924,6 +1930,7 @@ describe CalendarEventsApiController, type: :request do
           end
           orig_series = CalendarEvent.where(series_uuid:)
           expect(orig_series.length).to be 1
+          expect(orig_series[0].rrule).to eq "FREQ=WEEKLY;INTERVAL=1;COUNT=1"
         end
 
         it "returns an error when which='one' and the rrule changed" do

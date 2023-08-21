@@ -841,6 +841,8 @@ class CalendarEventsApiController < ApplicationController
     events = find_which_series_events(target_event: @event, which: params[:which], for_update: false)
     return if events.blank?
 
+    front_half_events = []
+
     events.each do |event|
       return false unless authorized_action(event, @current_user, :delete) && check_for_past_signup(@event.parent_event)
     end
@@ -860,6 +862,26 @@ class CalendarEventsApiController < ApplicationController
           raise ActiveRecord::Rollback
         end
       end
+
+      if params[:which] == "following"
+        # the remaining series just got shorter. reflect that in the rrrule
+        front_half_events = (find_which_series_events(target_event: @event, which: "all", for_update: false) - events).to_a
+        unless front_half_events.empty?
+          params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(@event[:rrule], front_half_events.length)).permit(:rrule)
+          front_half_events.each do |event|
+            event.updating_user = @current_user
+            unless event.grants_any_right?(@current_user, session, :update)
+              error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.update(params_for_update_front_half)
+              error = { message: t("Failed updating an event in the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
+          end
+        end
+      end
     end
     CalendarEvent.skip_touch_context(false)
 
@@ -867,7 +889,8 @@ class CalendarEventsApiController < ApplicationController
 
     @event.context.touch # assume all events in the series belong to the same context
 
-    json = events.map do |event|
+    json = (events + front_half_events).map do |event|
+      event.reload
       event_json(event, @current_user, session, include: includes(["web_conference", "series_natural_language"]))
     end
     render json:
@@ -971,11 +994,17 @@ class CalendarEventsApiController < ApplicationController
     )
     return false if rr.nil?
 
+    params_for_update_front_half = nil
+    front_half_events = []
     if (all_events.length > events.length && date_time_changed) || rrule_changed
       # updating date-time for half a series starts a new series
       if all_events.length > events.length
+        params_for_update[:rrule] = update_rrule_count(rrule, events.length) unless rrule_changed
         params_for_update[:series_uuid] = SecureRandom.uuid
         new_series_head = true
+
+        front_half_events = (all_events - events).to_a
+        params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(rrule, all_events.length - events.length)).permit(:rrule)
       end
     else
       params_for_update[:series_uuid] = target_event[:series_uuid]
@@ -1035,6 +1064,20 @@ class CalendarEventsApiController < ApplicationController
             error = { message: t("Failed updating an event in the series, update not saved") }
             raise ActiveRecord::Rollback
           end
+        end
+      end
+
+      # if we updated this-and-all-following, we had to update the front half's rrule
+      front_half_events.each do |event|
+        event.updating_user = @current_user
+        unless event.grants_any_right?(@current_user, session, :update)
+          error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
+          raise ActiveRecord::Rollback
+        end
+
+        unless event.update(params_for_update_front_half)
+          error = { message: t("Failed updating an event in the series, update not saved") }
+          raise ActiveRecord::Rollback
         end
       end
     end
@@ -1973,6 +2016,21 @@ class CalendarEventsApiController < ApplicationController
     if event_count > per_page
       InstStatsd::Statsd.increment("calendar.events_api.per_page_exceeded.count")
       InstStatsd::Statsd.count("calendar.events_api.per_page_exceeded.value", event_count)
+    end
+  end
+
+  def update_rrule_count(old_rrule, new_count)
+    old_rrule.sub(/(COUNT=)(\d+)/, "\\1#{new_count}")
+  end
+
+  def update_rrule_count_or_until(old_rrule, new_count)
+    if old_rrule.include?("COUNT")
+      update_rrule_count(old_rrule, new_count)
+    else
+      # I feel a little hinky about replacing UNTIL with a COUNT
+      # We could use rr.all(limie: new_count) and grab the last
+      # one's date as the UNTIL, but this is simpler and I like simple
+      old_rrule.gsub(/UNTIL=[^;]+/, "COUNT=#{new_count}")
     end
   end
 end

@@ -185,6 +185,7 @@ export default class Calendar {
       'CommonEvent/eventsDeletingFromSeries': this.eventsDeletingFromSeries,
       'CommonEvent/eventDeleted': this.eventDeleted,
       'CommonEvent/eventsDeletedFromSeries': this.eventsDeletedFromSeries,
+      'CommonEvent/eventsUpdatedFromSeriesDelete': this.eventsUpdatedFromSeriesDelete,
       'CommonEvent/eventSaving': this.eventSaving,
       'CommonEvent/eventSavingFromSeries': this.eventSavingFromSeries,
       'CommonEvent/eventSaved': this.eventSaved,
@@ -963,6 +964,30 @@ export default class Calendar {
     candidateEvents.forEach(e => {
       $.publish('CommonEvent/eventSaveFailed', e)
     })
+  }
+
+  // When we delete an event + all following from a series
+  // the remaining events get updated with a new rrule
+  eventsUpdatedFromSeriesDelete = ({updatedEvents}) => {
+    const candidateEventsInCalendar = this.calendar.fullCalendar('getEventCache').filter(c => {
+      if (c.eventType === 'calendar_event') {
+        const updatedEventIndex = updatedEvents.findIndex(e => c.calendarEvent.id === e.id)
+        if (updatedEventIndex >= 0) {
+          c.calendarEvent = c.object = updatedEvents[updatedEventIndex]
+          c.series_natural_language = c.calendarEvent.series_natural_language
+          return true
+        }
+      }
+      return false
+    })
+
+    candidateEventsInCalendar.forEach(e => {
+      this.updateEvent(e)
+      $.publish('CommonEvent/eventSaved', e)
+    })
+
+    // this.dataSource.clearCache()
+    // this.calendar.fullCalendar('refetchEvents')
   }
 
   // When an assignment event is updated, update its related overrides.
