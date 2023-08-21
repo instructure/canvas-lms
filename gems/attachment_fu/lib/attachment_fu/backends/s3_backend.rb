@@ -32,7 +32,8 @@ module AttachmentFu # :nodoc:
     #
     # Configuration is done via <tt>RAILS_ROOT/config/amazon_s3.yml</tt> and is loaded according to the <tt>RAILS_ENV</tt>.
     # The minimum connection options that you must specify are a bucket name, your access key id and your secret access key.
-    # If you don't already have your access keys, all you need to sign up for the S3 service is an account at Amazon.
+    # (Alternatively, a <tt>vault_credential_path</tt> can be specified to assume a role via Vault). If you don't already
+    # have your access keys, all you need to sign up for the S3 service is an account at Amazon.
     # You can sign up for S3 and get access keys by visiting http://aws.amazon.com/s3.
     #
     # Example configuration (RAILS_ROOT/config/amazon_s3.yml)
@@ -41,16 +42,22 @@ module AttachmentFu # :nodoc:
     #     bucket_name: appname_development
     #     access_key_id: <your key>
     #     secret_access_key: <your key>
+    #     # (or)
+    #     vault_credential_path: <path to vault credential>
     #
     #   test:
     #     bucket_name: appname_test
     #     access_key_id: <your key>
     #     secret_access_key: <your key>
+    #     # (or)
+    #     vault_credential_path: <path to vault credential>
     #
     #   production:
     #     bucket_name: appname
     #     access_key_id: <your key>
     #     secret_access_key: <your key>
+    #     # (or)
+    #     vault_credential_path: <path to vault credential>
     #
     # You can change the location of the config path by passing a full path to the :s3_config_path option.
     #
@@ -58,9 +65,16 @@ module AttachmentFu # :nodoc:
     #
     # === Required configuration parameters
     #
+    # * <tt>:bucket_name</tt> - A unique bucket name (think of the bucket_name as being like a database name).
+    #
+    # Additionally, you must specify one of the following sets of credentials:
+    #
     # * <tt>:access_key_id</tt> - The access key id for your S3 account. Provided by Amazon.
     # * <tt>:secret_access_key</tt> - The secret access key for your S3 account. Provided by Amazon.
-    # * <tt>:bucket_name</tt> - A unique bucket name (think of the bucket_name as being like a database name).
+    #
+    # (OR)
+    #
+    # * <tt>:vault_credential_path</tt> - The path to a Vault credential that can be used to assume a role
     #
     # If any of these required arguments is missing, a MissingAccessKey exception will be raised from AWS::S3.
     #
@@ -156,7 +170,9 @@ module AttachmentFu # :nodoc:
 
       def self.load_s3_config(path = nil)
         s3_config_path = path || Rails.root.join("config/amazon_s3.yml")
-        YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
+        config = YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
+        config[:credentials] = Canvas::AwsCredentialProvider.new("s3_creds", config.delete(:vault_credential_path)) if config[:vault_credential_path]
+        config
       end
 
       # Overwrites the base filename writer in order to store the old filename
