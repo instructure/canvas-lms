@@ -29,6 +29,10 @@ module Types
     global_id_field :id
 
     field :title, String, null: true
+    field :is_last, Boolean, null: false
+    def is_last
+      object.last?
+    end
 
     field :start_date, DateTimeType, null: true
     field :end_date, DateTimeType, null: true
