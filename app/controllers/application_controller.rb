@@ -2070,7 +2070,7 @@ class ApplicationController < ActionController::Base
         @resource_title = @tag.title
       end
       @resource_url = @tag.url
-      @tool = ContextExternalTool.find_external_tool(tag.url, context, tag.content_id)
+      @tool = ContextExternalTool.from_content_tag(tag, context)
 
       @assignment&.prepare_for_ags_if_needed!(@tool)
 

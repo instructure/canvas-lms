@@ -285,14 +285,6 @@ class ContextExternalTool < ActiveRecord::Base
     RUBY
   end
 
-  def self.tool_for_assignment(assignment)
-    tag = assignment.external_tool_tag
-    return unless tag
-
-    launch_url = assignment.external_tool_tag.url
-    find_external_tool(launch_url, assignment.context)
-  end
-
   def deployment_id
     "#{id}:#{Lti::Asset.opaque_identifier_for(context)}"[0..254]
   end
@@ -995,6 +987,13 @@ class ContextExternalTool < ActiveRecord::Base
       (Utils::HashUtils.sort_nested_data(settings_was) != Utils::HashUtils.sort_nested_data(settings))
   end
 
+  def self.from_assignment(assignment)
+    tag = assignment.external_tool_tag
+    return unless tag
+
+    from_content_tag(tag, assignment.context)
+  end
+
   def self.from_content_tag(tag, context)
     return nil if tag.blank? || context.blank?
 
@@ -1009,8 +1008,9 @@ class ContextExternalTool < ActiveRecord::Base
     # no matches found.
     find_external_tool(
       tag.url,
-      context
-    ) || tag.content
+      context,
+      content&.id
+    )
   end
 
   def self.contexts_to_search(context, include_federated_parent: false)

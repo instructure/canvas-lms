@@ -23,7 +23,7 @@ module Turnitin
       assignment = submission.assignment
       user = submission.user
       tool = assignment.external_tool_tag.content
-      tool ||= ContextExternalTool.find_external_tool(assignment.external_tool_tag.url, assignment.context)
+      tool ||= ContextExternalTool.from_assignment(assignment)
       tii_client = TiiClient.new(
         user,
         assignment,

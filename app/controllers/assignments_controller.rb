@@ -272,8 +272,7 @@ class AssignmentsController < ApplicationController
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
 
         if @assignment.submission_types == "external_tool" && Account.site_admin.feature_enabled?(:external_tools_for_a2) && @unlocked
-          tag = @assignment.external_tool_tag
-          @tool = ContextExternalTool.find_external_tool(tag.url, @context, tag.content_id)
+          @tool = ContextExternalTool.from_assignment(@assignment)
 
           js_env({ LTI_TOOL: "true" })
         end

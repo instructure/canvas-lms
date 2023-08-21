@@ -54,14 +54,6 @@ module Lti::Messages
 
     private
 
-    def tool_from_tag(tag, context)
-      ContextExternalTool.find_external_tool(
-        tag.url,
-        context,
-        tag.content_id
-      )
-    end
-
     def tag_from_resource_link
       ContentTag.find_by(associated_asset: resource_link) if resource_link
     end
@@ -111,7 +103,7 @@ module Lti::Messages
         unless @assignment.external_tool?
           raise launch_error.new(nil, api_message: "Assignment not configured for external tool launches")
         end
-        unless tool_from_tag(@assignment.external_tool_tag, @context) == @tool
+        unless ContextExternalTool.from_assignment(@assignment) == @tool
           raise launch_error.new(nil, api_message: "Assignment not configured for launches with specified tool")
         end
 

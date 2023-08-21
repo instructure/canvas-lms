@@ -3149,7 +3149,7 @@ describe ContextExternalTool do
       end
     end
 
-    describe ".find_tool_for_assignment" do
+    describe ".from_assignment" do
       let(:tool) do
         @course.context_external_tools.create(
           name: "a",
@@ -3163,13 +3163,13 @@ describe ContextExternalTool do
         a = @course.assignments.create!(title: "test",
                                         submission_types: "external_tool",
                                         external_tool_tag_attributes: { url: tool.url })
-        expect(described_class.tool_for_assignment(a)).to eq tool
+        expect(described_class.from_assignment(a)).to eq tool
       end
 
       it "returns nil if there is no content tag" do
         a = @course.assignments.create!(title: "test",
                                         submission_types: "external_tool")
-        expect(described_class.tool_for_assignment(a)).to be_nil
+        expect(described_class.from_assignment(a)).to be_nil
       end
     end
 
