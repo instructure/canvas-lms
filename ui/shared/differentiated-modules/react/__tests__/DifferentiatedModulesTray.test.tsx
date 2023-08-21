@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import DifferentiatedModulesTray, {
   DifferentiatedModulesTrayProps,
 } from '../DifferentiatedModulesTray'
@@ -33,7 +33,7 @@ describe('DifferentiatedModulesTray', () => {
   const renderComponent = (overrides = {}) =>
     render(<DifferentiatedModulesTray {...props} {...overrides} />)
 
-  it('should render', () => {
+  it('renders', () => {
     const {getByText} = renderComponent()
     expect(getByText('Edit Module Settings')).toBeInTheDocument()
   })
@@ -55,5 +55,17 @@ describe('DifferentiatedModulesTray', () => {
     const {getByTestId} = renderComponent({assignOnly: false})
     expect(getByTestId('assign-to-panel')).toBeInTheDocument()
     expect(getByTestId('settings-panel')).toBeInTheDocument()
+  })
+
+  it('always opens to the initialTab', async () => {
+    const {getByRole, rerender} = renderComponent({assignOnly: false})
+    expect(getByRole('tab', {name: /Assign To/})).toHaveAttribute('aria-selected', 'true')
+    getByRole('tab', {name: /Settings/}).click()
+    await waitFor(() => {
+      expect(getByRole('tab', {name: /Settings/})).toHaveAttribute('aria-selected', 'true')
+    })
+    rerender(<DifferentiatedModulesTray {...props} open={false} assignOnly={false} />)
+    rerender(<DifferentiatedModulesTray {...props} assignOnly={false} />)
+    expect(getByRole('tab', {name: /Assign To/})).toHaveAttribute('aria-selected', 'true')
   })
 })
