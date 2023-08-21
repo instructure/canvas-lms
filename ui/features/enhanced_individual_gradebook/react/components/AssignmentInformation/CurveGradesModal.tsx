@@ -21,7 +21,10 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {AssignmentConnection, SubmissionConnection, SubmissionGradeChange} from '../../../types'
-import {mapToSubmissionGradeChange} from '../../../utils/gradebookUtils'
+import {
+  mapToSubmissionGradeChange,
+  isInPastGradingPeriodAndNotAdmin,
+} from '../../../utils/gradebookUtils'
 import {Submission} from '../../../../../api.d'
 
 async function loadCurveGradesDialog() {
@@ -80,7 +83,12 @@ export function CurveGradesModal({assignment, contextUrl, submissions, handleGra
   })
 
   return (
-    <Button color="secondary" onClick={showDialog} data-testid="curve-grades-button">
+    <Button
+      disabled={isInPastGradingPeriodAndNotAdmin(assignment)}
+      color="secondary"
+      onClick={showDialog}
+      data-testid="curve-grades-button"
+    >
       {I18n.t('Curve Grades')}
     </Button>
   )

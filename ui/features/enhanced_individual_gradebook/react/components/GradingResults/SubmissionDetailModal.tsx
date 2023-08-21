@@ -46,7 +46,11 @@ import {
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
 } from '../../../types'
-import {submitterPreviewText, passFailStatusOptions} from '../../../utils/gradebookUtils'
+import {
+  submitterPreviewText,
+  disableGrading,
+  passFailStatusOptions,
+} from '../../../utils/gradebookUtils'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {usePostComment} from '../../hooks/useComments'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -323,10 +327,7 @@ function SubmissionGradeForm({
         <FlexItem align="start">
           <Button
             data-testid="submission-details-submit-button"
-            disabled={
-              submitScoreStatus === ApiCallStatus.PENDING ||
-              (assignment.moderatedGrading && !assignment.gradesPublished)
-            }
+            disabled={disableGrading(assignment, submitScoreStatus)}
             onClick={() => submitGrade()}
           >
             {I18n.t('Update Grade')}

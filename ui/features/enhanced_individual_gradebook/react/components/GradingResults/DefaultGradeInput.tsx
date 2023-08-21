@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {outOfText, passFailStatusOptions} from '../../../utils/gradebookUtils'
+import {outOfText, passFailStatusOptions, disableGrading} from '../../../utils/gradebookUtils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
@@ -78,6 +78,7 @@ export default function DefaultGradeInput({
             isInline={true}
             onChange={handleChangePassFailStatus}
             value={passFailStatusOptions[passFailStatusIndex].value}
+            interaction={disableGrading(assignment, submitScoreStatus) ? 'disabled' : undefined}
             data-testid={`${context}_select`}
             onBlur={() => handleSubmitGrade?.()}
           >
@@ -98,10 +99,7 @@ export default function DefaultGradeInput({
             display="inline-block"
             width="14rem"
             value={gradeInput}
-            disabled={
-              submitScoreStatus === ApiCallStatus.PENDING ||
-              (assignment.moderatedGrading && !assignment.gradesPublished)
-            }
+            disabled={disableGrading(assignment, submitScoreStatus)}
             data-testid={`${context}_input`}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               handleSetGradeInput(e.target.value)

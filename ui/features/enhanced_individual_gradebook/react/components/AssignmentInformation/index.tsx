@@ -24,6 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import {
   AssignmentConnection,
   GradebookOptions,
@@ -31,7 +32,11 @@ import {
   SubmissionConnection,
   SubmissionGradeChange,
 } from '../../../types'
-import {computeAssignmentDetailText} from '../../../utils/gradebookUtils'
+import {
+  computeAssignmentDetailText,
+  disableGrading,
+  isInPastGradingPeriodAndNotAdmin,
+} from '../../../utils/gradebookUtils'
 import MessageStudentsWhoModal from './MessageStudentsWhoModal'
 import DefaultGradeModal from './DefaultGradeModal'
 import {CurveGradesModal} from './CurveGradesModal'
@@ -285,7 +290,7 @@ function AssignmentActions({
             color="secondary"
             onClick={() => setShowSetDefaultGradeModal(true)}
             data-testid="default-grade-button"
-            disabled={assignment.moderatedGrading && !assignment.gradesPublished}
+            disabled={disableGrading(assignment)}
           >
             {I18n.t('Set default grade')}
           </Button>
@@ -298,9 +303,15 @@ function AssignmentActions({
             handleSetGrades={onSetGrades}
           />
         </>
-        {/* {{#if disableAssignmentGrading}}
-          {{#t}}Unable to set default grade because this assignment is due in a closed grading period for at least one student{{/t}}
-          {{/if}} */}
+        {isInPastGradingPeriodAndNotAdmin(assignment) && (
+          <View padding="0 0 0 xx-small">
+            <Text data-testid="default-grade-warning">
+              {I18n.t(
+                'Unable to set default grade because this assignment is due in a closed grading period for at least one student'
+              )}
+            </Text>
+          </View>
+        )}
       </View>
       <View as="div" className="pad-box no-sides">
         {assignment.pointsPossible ? (
@@ -311,11 +322,15 @@ function AssignmentActions({
             contextUrl={gradebookOptions.contextUrl}
           />
         ) : null}
-
-        {/* {{#if disableAssignmentGrading}}
-            {{#t}}Unable to curve grades because this assignment is due in a closed grading period for at least one student{{/t}}
-            {{/if}}
-          {{/if}} */}
+        {isInPastGradingPeriodAndNotAdmin(assignment) && (
+          <View padding="0 0 0 xx-small">
+            <Text data-testid="curve-grade-warning">
+              {I18n.t(
+                'Unable to curve grades because this assignment is due in a closed grading period for at least one student'
+              )}
+            </Text>
+          </View>
+        )}
       </View>
     </>
   )

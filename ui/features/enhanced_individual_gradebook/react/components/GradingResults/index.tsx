@@ -35,7 +35,11 @@ import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
-import {submitterPreviewText, passFailStatusOptions} from '../../../utils/gradebookUtils'
+import {
+  submitterPreviewText,
+  disableGrading,
+  passFailStatusOptions,
+} from '../../../utils/gradebookUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import DefaultGradeInput from './DefaultGradeInput'
 
@@ -287,11 +291,9 @@ export default function GradingResults({
                     type="checkbox"
                     id="excuse_assignment"
                     name="excuse_assignment"
+                    data-testid="excuse_assignment_checkbox"
                     checked={excusedChecked}
-                    disabled={
-                      submitScoreStatus === ApiCallStatus.PENDING ||
-                      (assignment.moderatedGrading && !assignment.gradesPublished)
-                    }
+                    disabled={disableGrading(assignment, submitScoreStatus)}
                     onChange={markExcused}
                   />
                   {I18n.t('Excuse This Assignment for the Selected Student')}
