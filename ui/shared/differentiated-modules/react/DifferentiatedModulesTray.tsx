@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -36,7 +36,7 @@ const {Item: FlexItem} = Flex as any
 export interface DifferentiatedModulesTrayProps {
   open: boolean
   onDismiss: () => void
-  initialTab: 'settings' | 'assign-to'
+  initialTab?: 'settings' | 'assign-to'
   assignOnly?: boolean
 }
 
@@ -50,6 +50,11 @@ export default function DifferentiatedModulesTray({
   assignOnly = true,
 }: DifferentiatedModulesTrayProps) {
   const [selectedTab, setSelectedTab] = useState(initialTab)
+
+  useEffect(() => {
+    if (!open) setSelectedTab(initialTab)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   function Header() {
     return (
