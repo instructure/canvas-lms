@@ -246,28 +246,6 @@ describe "assignments" do
       end
     end
 
-    context "google drive" do
-      before do
-        PluginSetting.create!(name: "google_drive", settings: {})
-        setup_google_drive
-      end
-
-      after do
-        click_away_accept_alert
-      end
-
-      # This plugin is deprecated and all associated code will soon be removed.
-      # Just make sure the user can't access the form even if it is enabled for now.
-      it "has no google doc tab even if google docs is enabled", priority: "1" do
-        @assignment.update(submission_types: "online_upload")
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        f(".submit_assignment_link").click
-        wait_for_animations
-
-        expect(f("#content")).not_to contain_css("a[href*='submit_google_doc_form']")
-      end
-    end
-
     it "lists the assignments" do
       ag = @course.assignment_groups.first
 

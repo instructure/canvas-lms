@@ -444,9 +444,6 @@ class AssignmentsController < ApplicationController
           @current_student_submissions = @assignment.submissions.where.not(submissions: { submission_type: nil }).where(user_id: visible_student_ids).to_a
         end
 
-        # this will set @user_has_google_drive
-        user_has_google_drive
-
         @can_direct_share = @context.grants_right?(@current_user, session, :direct_share)
         @can_link_to_speed_grader = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.can_view_speed_grader?(@current_user)
 
@@ -504,41 +501,6 @@ class AssignmentsController < ApplicationController
         context.apply_enrollment_visibility(context.student_enrollments, current_user).pluck(:user_id)
       end
     student_ids.any? && assignment.submissions.where(user_id: student_ids, submission_type: types).exists?
-  end
-
-  def list_google_docs
-    assignment ||= @context.assignments.find(params[:id])
-    # prevent masquerading users from accessing google docs
-    if assignment.allow_google_docs_submission? && @real_current_user.blank?
-      docs = {}
-      status_code = :ok
-      begin
-        docs = google_drive_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDrive::NoTokenError,
-             Google::APIClient::AuthorizationError => e
-        Canvas::Errors.capture_exception(:oauth, e, :warn)
-        docs = { errors: { base: t("Auth failure in connecting to Google Drive.") } }
-        status_code = :unauthorized
-      rescue GoogleDrive::ConnectionException => e
-        Canvas::Errors.capture_exception(:oauth, e, :warn)
-        docs = { errors: { base: t("Unable to connect to Google Drive.") } }
-        status_code = :gateway_timeout
-      rescue ArgumentError => e
-        Canvas::Errors.capture_exception(:oauth, e)
-      rescue => e
-        Canvas::Errors.capture_exception(:oauth, e)
-        raise e
-      end
-      respond_to do |format|
-        format.json { render json: docs.to_hash, status: status_code }
-      end
-    else
-      error_object = { errors:
-        { base: t("errors.google_docs_masquerade_rejected", "Unable to connect to Google Docs as a masqueraded user.") } }
-      respond_to do |format|
-        format.json { render json: error_object, status: :bad_request }
-      end
-    end
   end
 
   def rubric
