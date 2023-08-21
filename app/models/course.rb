@@ -2467,7 +2467,9 @@ class Course < ActiveRecord::Base
 
   def enroll_user(user, type = "StudentEnrollment", opts = {})
     enrollment_state = opts[:enrollment_state]
-    enrollment_state ||= "active" if type == "ObserverEnrollment" && user.registered?
+    if (type == "ObserverEnrollment" || opts[:temporary_enrollment_source_user_id]) && user.registered?
+      enrollment_state ||= "active"
+    end
     section = opts[:section]
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
