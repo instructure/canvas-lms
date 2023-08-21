@@ -3024,6 +3024,43 @@ describe Enrollment do
     end
   end
 
+  describe "temporary enrollments" do
+    before(:once) do
+      Account.default.enable_feature!(:temporary_enrollments)
+      @source_user = user_factory(active_all: true)
+      @temporary_enrollment_recipient = user_factory(active_all: true)
+      temporary_enrollment_recipient2 = user_factory(active_all: true)
+      @course1 = course_with_teacher(active_all: true, user: @source_user).course
+      @recipient_temp_enrollment = @course1.enroll_user(
+        @temporary_enrollment_recipient,
+        "TeacherEnrollment",
+        { role: teacher_role, temporary_enrollment_source_user_id: @source_user.id }
+      )
+      course2 = course_with_teacher(active_all: true, user: @source_user).course
+      @recipient2_temp_enrollment = course2.enroll_user(
+        temporary_enrollment_recipient2,
+        "TeacherEnrollment",
+        { role: teacher_role, temporary_enrollment_source_user_id: @source_user.id }
+      )
+    end
+
+    it "should retrieve temporary enrollments for recipient" do
+      expect(Enrollment.temporary_enrollments_for_recipient(@temporary_enrollment_recipient).take)
+        .to eq(@recipient_temp_enrollment)
+    end
+
+    it "should retrieve temporary enrollments for course and recipient" do
+      expect(Enrollment.temporary_enrollments_for_course_and_recipient(
+        @course1, @temporary_enrollment_recipient
+      ).take).to eq(@recipient_temp_enrollment)
+    end
+
+    it "should retrieve temporary enrollment recipients for source user" do
+      expect(Enrollment.temporary_enrollment_recipients_for_source_user(@source_user).sort)
+        .to eq([@recipient_temp_enrollment, @recipient2_temp_enrollment].sort)
+    end
+  end
+
   describe "#can_be_deleted_by" do
     describe "on a student enrollment without granular_permissions_manage_users" do
       let(:user) { double(id: 42) }

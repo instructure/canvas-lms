@@ -653,6 +653,46 @@ describe Api::V1::User do
         end
       end
     end
+
+    describe "Temporary Enrollments" do
+      let_once(:source_user) { user_factory(active_all: true) }
+      let_once(:temporary_enrollment_recipient) { user_factory(active_all: true) }
+      let_once(:temp_course) { course_with_teacher(active_all: true, user: source_user).course }
+      let_once(:temp_enrollment) do
+        temp_course.enroll_user(
+          temporary_enrollment_recipient,
+          "TeacherEnrollment",
+          { role: teacher_role, temporary_enrollment_source_user_id: source_user.id }
+        )
+      end
+      let_once(:subject) { account_admin_user(account: temp_course.account) }
+
+      before do
+        temp_enrollment.update!(temporary_enrollment_source_user_id: source_user.id)
+      end
+
+      context "when feature flag is enabled" do
+        before(:once) do
+          temp_course.root_account.enable_feature!(:temporary_enrollments)
+        end
+
+        it "includes temporary_enrollment_source_user_id attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).to include("temporary_enrollment_source_user_id")
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before(:once) do
+          temp_course.root_account.disable_feature!(:temporary_enrollments)
+        end
+
+        it "excludes temporary_enrollment_source_user_id attribute" do
+          enrollment_json = @test_api.enrollment_json(temp_enrollment.reload, subject, nil)
+          expect(enrollment_json).not_to include("temporary_enrollment_source_user_id")
+        end
+      end
+    end
   end
 
   context "user_json_is_admin?" do
