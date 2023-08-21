@@ -35,7 +35,6 @@ export const assignmentGroupRow = (
   queryData,
   calculateOnlyGradedAssignments = false
 ) => {
-
   const groupAssignments = queryData?.assignmentsConnection?.nodes?.filter(assignment => {
     return assignment?.assignmentGroup?._id === assignmentGroup?._id
   })
