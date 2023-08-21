@@ -99,6 +99,9 @@ export default class ShowEventDetailsDialog {
             publish('CommonEvent/eventsDeletedFromSeries', {deletedEvents})
           }
         },
+        onUpdated: updatedEvents => {
+          $.publish('CommonEvent/eventsUpdatedFromSeriesDelete', {updatedEvents})
+        },
         delUrl: url,
         isRepeating: !!event.calendarEvent?.series_uuid,
         isSeriesHead: !!event.calendarEvent?.series_head,

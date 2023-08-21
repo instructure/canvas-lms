@@ -29,12 +29,14 @@ import {
 const handleCancel = jest.fn()
 const handleDeleting = jest.fn()
 const handleDeleted = jest.fn()
+const handleUpdated = jest.fn()
 
 const defaultProps = {
   isOpen: true,
   onCancel: handleCancel,
   onDeleting: handleDeleting,
   onDeleted: handleDeleted,
+  onUpdated: handleUpdated,
   delUrl: '.',
   isRepeating: true,
   isSeriesHead: false,
@@ -47,7 +49,10 @@ function renderDialog(overrideProps = {}) {
 
 describe('DeleteCalendarEventDialog', () => {
   beforeEach(() => {
-    fetchMock.delete('.', ['deleted event'])
+    fetchMock.delete('.', [
+      {title: 'deleted event', workflow_state: 'deleted'},
+      {title: 'updated event', workflow_state: 'active'},
+    ])
   })
 
   afterEach(() => {
@@ -90,7 +95,10 @@ describe('DeleteCalendarEventDialog', () => {
     act(() => getByText('Delete').closest('button').click())
     expect(handleDeleting).toHaveBeenCalled()
     await fetchMock.flush(true)
-    expect(handleDeleted).toHaveBeenCalledWith(['deleted event'])
+    expect(handleDeleted).toHaveBeenCalledWith([
+      {title: 'deleted event', workflow_state: 'deleted'},
+    ])
+    expect(handleUpdated).toHaveBeenCalledWith([{title: 'updated event', workflow_state: 'active'}])
   })
 
   it('sends which=one when "this event" is seleted', async () => {
