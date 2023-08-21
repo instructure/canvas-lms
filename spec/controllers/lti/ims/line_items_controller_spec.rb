@@ -54,6 +54,8 @@ module Lti
       let(:score_max) { 50 }
       let(:scope_to_remove) { "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem" }
 
+      before { assignment }
+
       shared_examples "assignment with wrong tool" do
         let(:other_tool) do
           ContextExternalTool.create!(

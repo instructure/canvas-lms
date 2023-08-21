@@ -1469,11 +1469,7 @@ class ExternalToolsController < ApplicationController
     elsif launch_url && module_item.blank?
       @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
     elsif module_item
-      @tool = ContextExternalTool.find_external_tool(
-        module_item.url,
-        @context,
-        module_item.content_id
-      )
+      @tool = ContextExternalTool.from_content_tag(module_item, @context)
     else
       return unless find_tool(tool_id, launch_type)
     end
