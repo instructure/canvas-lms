@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import ReactDOM from 'react-dom'
 import React, {useState, useEffect, useLayoutEffect, useCallback} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
@@ -444,6 +443,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             )}
             rrule={event?.object?.rrule || null}
             onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
+            courseEndAt={context.course_conclude_at || undefined}
           />
         )}
         {shouldShowLocationField() && (

@@ -99,6 +99,9 @@ class CalendarsController < ApplicationController
         default_due_time: context.is_a?(Course) && context.default_due_time,
         can_view_context: context.grants_right?(@current_user, session, :read)
       }
+      if context.is_a?(Course)
+        info[:course_conclude_at] = context.restrict_enrollments_to_course_dates ? context.conclude_at : context.enrollment_term.end_at
+      end
       if context.respond_to?(:course_sections) && !context.is_a?(Account)
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|
           hash = { id:, asset_string: "course_section_#{id}", name: }
