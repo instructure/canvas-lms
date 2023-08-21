@@ -5,9 +5,6 @@ new_quizzes_migration:
   description: Allow migration of quizzes during course copy and import
   applies_to: RootAccount
   beta: true
-  environments:
-    production:
-      state: hidden
 new_quizzes_third_party_imports:
   state: allowed
   display_name: New Quizzes third party importing
@@ -21,18 +18,12 @@ migrate_to_new_quizzes_by_default:
   description: Sets the default option for course copy and importing to New Quizzes
   applies_to: RootAccount
   beta: true
-  environments:
-    production:
-      state: hidden
 require_migration_to_new_quizzes:
   state: allowed
   display_name: New Quizzes migration required
   description:  Disable New Quiz importing and migration checkboxes, defaulting them to enabled
   applies_to: RootAccount
   beta: true
-  environments:
-    production:
-      state: hidden
 new_quizzes_assignment_build_button:
   display_name: New Quizzes Assignment Build Button
   description: Add a Build button on the Assignment edit page for New Quizzes Assignments
