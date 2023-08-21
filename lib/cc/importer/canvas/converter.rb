@@ -46,7 +46,8 @@ module CC::Importer::Canvas
       unzip_archive
       set_progress(5)
 
-      @manifest = open_file(@package_root.item_path(MANIFEST_FILE))
+      # this is cheating; we don't deal properly with namespaces
+      @manifest = open_file_xml(@package_root.item_path(MANIFEST_FILE)).remove_namespaces!
       get_all_resources(@manifest)
 
       convert_all_course_settings

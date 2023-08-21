@@ -87,7 +87,8 @@ module CC::Exporter::Epub::Converters
     def export(export_type)
       unzip_archive
 
-      @manifest = open_file(@package_root.item_path(MANIFEST_FILE))
+      # this is cheating; we don't deal properly with namespaces
+      @manifest = open_file_xml(@package_root.item_path(MANIFEST_FILE)).remove_namespaces!
       get_all_resources(@manifest)
 
       @course[:title] = get_node_val(@manifest, "string")
