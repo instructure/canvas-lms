@@ -55,6 +55,7 @@ export const defaultSortableAssignments: SortableAssignment[] = [
     assignmentGroupPosition: 1,
     sortableName: 'assignment 1',
     sortableDueDate: 20230704,
+    inClosedGradingPeriod: false,
   },
   {
     id: '2',
@@ -81,6 +82,7 @@ export const defaultSortableAssignments: SortableAssignment[] = [
     assignmentGroupPosition: 2,
     sortableName: 'assignment 2',
     sortableDueDate: 20230705,
+    inClosedGradingPeriod: false,
   },
   {
     id: '3',
@@ -107,6 +109,7 @@ export const defaultSortableAssignments: SortableAssignment[] = [
     assignmentGroupPosition: 3,
     sortableName: 'assignment 3',
     sortableDueDate: 20230705,
+    inClosedGradingPeriod: false,
   },
 ]
 

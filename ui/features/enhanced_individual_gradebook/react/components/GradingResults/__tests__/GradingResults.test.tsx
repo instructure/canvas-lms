@@ -404,4 +404,42 @@ describe('Grading Results Tests', () => {
       })
     })
   })
+  describe('the assignment is in a closed grading period', () => {
+    let props: GradingResultsComponentProps
+    beforeEach(() => {
+      props = {
+        ...gradingResultsDefaultProps,
+        assignment: gradingResultsDefaultProps.assignment && {
+          ...gradingResultsDefaultProps.assignment,
+          inClosedGradingPeriod: true,
+        },
+      }
+    })
+    it('grade input and excuse checkbox are disabled when assignment is in a closed grading period and user is not an admin', () => {
+      ENV.current_user_roles = ['teacher']
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('student_and_assignment_grade_input')).toBeDisabled()
+      expect(getByTestId('excuse_assignment_checkbox')).toBeDisabled()
+    })
+    it('grade input is not disabled when assignment is in a closed grading period and user is an admin', () => {
+      ENV.current_user_roles = ['admin']
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('student_and_assignment_grade_input')).toBeEnabled()
+      expect(getByTestId('excuse_assignment_checkbox')).toBeEnabled()
+    })
+    it('submission details grade input and update grade button are disabled when assignment is in a closed grading period and user is not an admin', () => {
+      ENV.current_user_roles = ['teacher']
+      const {getByTestId} = renderGradingResults(props)
+      userEvent.click(getByTestId('submission-details-button'))
+      expect(getByTestId('submission-details-submit-button')).toBeDisabled()
+      expect(getByTestId('submission_details_grade_input')).toBeDisabled()
+    })
+    it('submission details grade input and update grade button are not disabled when assignment is in a closed grading period and user is an admin', () => {
+      ENV.current_user_roles = ['admin']
+      const {getByTestId} = renderGradingResults(props)
+      userEvent.click(getByTestId('submission-details-button'))
+      expect(getByTestId('submission-details-submit-button')).toBeEnabled()
+      expect(getByTestId('submission_details_grade_input')).not.toBeDisabled()
+    })
+  })
 })

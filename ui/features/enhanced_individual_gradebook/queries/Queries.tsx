@@ -92,6 +92,7 @@ export const GRADEBOOK_QUERY = gql`
               postManually
               published
               hasSubmittedSubmissions
+              inClosedGradingPeriod
             }
           }
         }

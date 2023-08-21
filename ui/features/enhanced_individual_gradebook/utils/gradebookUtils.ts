@@ -29,6 +29,7 @@ import tz from '@canvas/timezone'
 import userSettings from '@canvas/user-settings'
 
 import {
+  ApiCallStatus,
   AssignmentConnection,
   AssignmentDetailCalculationText,
   AssignmentGradingPeriodMap,
@@ -503,4 +504,19 @@ function mapToSortableAssignment(
     assignmentGroupPosition,
     gradingPeriodId,
   }
+}
+
+export function isInPastGradingPeriodAndNotAdmin(assignment: AssignmentConnection): boolean {
+  return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_roles?.includes('admin')
+}
+
+export function disableGrading(
+  assignment: AssignmentConnection,
+  submitScoreStatus?: ApiCallStatus
+): boolean {
+  return (
+    submitScoreStatus === ApiCallStatus.PENDING ||
+    isInPastGradingPeriodAndNotAdmin(assignment) ||
+    (assignment.moderatedGrading && !assignment.gradesPublished)
+  )
 }

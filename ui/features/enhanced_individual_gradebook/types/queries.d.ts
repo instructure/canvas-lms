@@ -61,6 +61,7 @@ export type AssignmentConnection = {
   published: boolean
   gradingPeriodId?: string | null
   hasSubmittedSubmissions: boolean
+  inClosedGradingPeriod: boolean | null
 }
 
 export type AssignmentGroupConnection = {

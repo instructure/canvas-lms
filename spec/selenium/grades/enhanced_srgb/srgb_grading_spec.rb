@@ -253,7 +253,6 @@ describe "Screenreader Gradebook grading" do
     end
 
     it "assignment in closed gp should not be gradable" do
-      skip "BUG: unskip w/ EVAL-3361 assignment in closed gp should have grade input disabled"
       assignment = @course.assignments.create!(due_at: 18.days.ago, title: "assign in closed")
       EnhancedSRGB.visit(@course.id)
       EnhancedSRGB.select_grading_period(@gp_closed.title)

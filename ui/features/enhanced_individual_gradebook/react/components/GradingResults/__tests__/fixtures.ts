@@ -68,6 +68,7 @@ export const defaultAssignment: AssignmentConnection = {
   published: true,
   workflowState: 'published',
   gradingPeriodId: '1',
+  inClosedGradingPeriod: false,
 }
 
 export const defaultGradebookOptions: GradebookOptions = {
