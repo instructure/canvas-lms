@@ -1,0 +1,71 @@
+<%
+# Copyright (C) 2023 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<style>
+  ul#assignment_student_details {
+    list-style: none;
+    padding: 0;
+    border-top: 1px solid #BBB;
+    border-bottom: 1px solid #BBB;
+    width: 100%;
+    font-size: 1.1em;
+    padding: 0.5em 0.25em;
+    margin: 0 0 1em;
+  }
+
+  ul#assignment_student_details li {
+    display: inline-block;
+  }
+
+  .title {
+    font-weight: bold;
+  }
+
+  .value {
+    padding-inline-end: 2.5em;
+  }
+</style>
+
+<base target="_top" />
+<ul id="assignment_student_details">
+  <li>
+    <span class="title"><%= t("Due") %></span>
+    <span class="value">
+      <% if @assignment.multiple_due_dates_apply_to?(@current_user) %>
+        <%=  t("Multiple Due Dates") %>
+      <% elsif due_at = @assignment.overridden_for(@current_user).due_at %>
+        <span <%= context_sensitive_datetime_title(due_at, @assignment.context) %>>
+          <%= datetime_string(due_at) %>
+        </span>
+      <% else %>
+        <%= t("No due date") %>
+      <% end %>
+    </span>
+  </li>
+
+  <li>
+    <span class="title"><%= t("Points") %></span>
+    <span class="value"><%= render_score(@assignment.points_possible) || 0 %></span>
+  </li>
+
+  <li>
+    <span class="title"><%= t("Questions") %></span>
+    <span class="value"><%= @question_count || 0 %></span>
+  </li>
+  <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
+</ul>

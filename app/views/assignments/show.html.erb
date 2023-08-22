@@ -20,6 +20,21 @@
   #right-side-wrapper {
     height: 100%;
   }
+
+  .assignment_header {
+    border-bottom: 1px solid #a4a4a4;
+    overflow: hidden;
+  }
+
+  #assignment_head {
+    margin-top: 0;
+    font-weight: bold;
+  }
+
+  .lock_explanation {
+    text-align: left;
+    margin-top: 20px;
+  }
 </style>
 
 <% provide :page_title, @assignment.title %>
@@ -27,8 +42,13 @@
 
 <% if @show_locked_page %>
 
-  <h1><%= @assignment.title %></h1>
-  <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
+  <div class="assignment_header">
+    <h1 id="assignment_head"><%= @assignment.title %></h1>
+    <%= render :partial => "assignment_details" %>
+    <div class="lock_explanation">
+      <%= @locked.is_a?(Hash) ? lock_explanation(@locked, 'assignment', @context) : t(:assignment_locked, "This assignment is currently locked.") %>
+    </div>
+  </div>
 
 <% else %>
 
