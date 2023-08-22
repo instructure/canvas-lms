@@ -1090,7 +1090,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.filterAssignmentByModule,
       this.filterAssignmentByStartDate,
       this.filterAssignmentByEndDate,
-      filterAssignmentsBySubmissionsFn(this.props.appliedFilters, this.submissionStateMap),
+      filterAssignmentsBySubmissionsFn(
+        this.props.appliedFilters,
+        this.submissionStateMap,
+        this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
+      ),
     ]
     const matchesAllFilters = (assignment: Assignment) =>
       assignmentFilters.every(filter => filter(assignment))
@@ -1216,7 +1220,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       filterStudentBySubmissionFn(
         this.props.appliedFilters,
         this.submissionStateMap,
-        this.filteredAssignmentIds
+        this.filteredAssignmentIds,
+        this.options.custom_grade_statuses_enabled ? this.options.custom_grade_statuses : []
       )
     )
 
@@ -5106,6 +5111,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
                 assignmentGroups={this.state.assignmentGroups}
                 sections={this.state.sections}
                 studentGroupCategories={this.options.student_groups}
+                customStatuses={
+                  this.options.custom_grade_statuses_enabled
+                    ? this.options.custom_grade_statuses
+                    : []
+                }
               />
             )}
         </div>

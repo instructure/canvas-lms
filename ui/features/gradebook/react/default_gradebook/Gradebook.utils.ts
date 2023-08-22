@@ -29,6 +29,7 @@ import filterTypes from './constants/filterTypes'
 import type {
   ColumnSizeSettings,
   CustomColumn,
+  CustomStatusIdString,
   Filter,
   FilterPreset,
   FilterType,
@@ -58,6 +59,7 @@ import type {
 import type {GridColumn, SlickGridKeyboardEvent} from './grid'
 import {columnWidths} from './initialState'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
+import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
@@ -317,8 +319,17 @@ export const serializeFilter = (filterPreset: PartialFilterPreset): GradebookFil
   }
 }
 
-export const compareFilterSetByUpdatedDate = (a: FilterPreset, b: FilterPreset) =>
-  new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+export const compareFilterSetByUpdatedDate = (a: FilterPreset, b: FilterPreset) => {
+  return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+}
+
+export const mapCustomStatusToIdString = (customStatus: GradeStatus): CustomStatusIdString => {
+  return `custom-status-${customStatus.id}`
+}
+
+export const getCustomStatusIdStrings = (customStatuses: GradeStatus[]): CustomStatusIdString[] => {
+  return customStatuses.map(status => mapCustomStatusToIdString(status))
+}
 
 export const getLabelForFilter = (
   filter: Filter,
@@ -326,8 +337,13 @@ export const getLabelForFilter = (
   gradingPeriods: Pick<GradingPeriod, 'id' | 'title'>[],
   modules: Pick<Module, 'id' | 'name'>[],
   sections: Pick<Section, 'id' | 'name'>[],
-  studentGroupCategories: StudentGroupCategoryMap
+  studentGroupCategories: StudentGroupCategoryMap,
+  customStatuses: GradeStatus[]
 ) => {
+  const customStatusesMap = customStatuses.reduce((acc, status) => {
+    acc[mapCustomStatusToIdString(status)] = status.name
+    return acc
+  }, {} as Record<CustomStatusIdString, string>)
   if (!filter.type) throw new Error('missing condition type')
 
   if (filter.type === 'section') {
@@ -348,26 +364,24 @@ export const getLabelForFilter = (
       I18n.t('Student Group')
     )
   } else if (filter.type === 'submissions') {
-    if (filter.value === 'has-ungraded-submissions') {
-      return I18n.t('Has ungraded submissions')
-    } else if (filter.value === 'has-submissions') {
-      return I18n.t('Has submissions')
-    } else if (filter.value === 'has-no-submissions') {
-      return I18n.t('Has no submissions')
-    } else if (filter.value === 'has-unposted-grades') {
-      return I18n.t('Has unposted grades')
-    } else if (filter.value === 'late') {
-      return I18n.t('Late')
-    } else if (filter.value === 'missing') {
-      return I18n.t('Missing')
-    } else if (filter.value === 'resubmitted') {
-      return I18n.t('Resubmitted')
-    } else if (filter.value === 'dropped') {
-      return I18n.t('Dropped')
-    } else if (filter.value === 'excused') {
-      return I18n.t('Excused')
-    } else if (filter.value === 'extended') {
-      return I18n.t('Extended')
+    if (!filter.value) {
+      throw new Error('missing submissions filter value')
+    }
+    const filterNameMap: Record<string, string> = {
+      'has-ungraded-submissions': I18n.t('Has ungraded submissions'),
+      'has-submissions': I18n.t('Has submissions'),
+      'has-no-submissions': I18n.t('Has no submissions'),
+      'has-unposted-grades': I18n.t('Has unposted grades'),
+      late: I18n.t('Late'),
+      missing: I18n.t('Missing'),
+      resubmitted: I18n.t('Resubmitted'),
+      dropped: I18n.t('Dropped'),
+      excused: I18n.t('Excused'),
+      extended: I18n.t('Extended'),
+      ...customStatusesMap,
+    }
+    if (filter.value in filterNameMap) {
+      return filterNameMap[filter.value]
     } else {
       throw new Error('invalid submissions filter value')
     }
@@ -584,10 +598,13 @@ export const wasSubmitted = (s: Submission | MissingSubmission) =>
   Boolean(s.submitted_at) && !['unsubmitted', 'deleted'].includes(s.workflow_state || '')
 
 // filters should run either .some() or .every()
-export const categorizeFilters = (appliedFilters: Filter[]) => {
-  const submissionFilters = findFilterValuesOfType('submissions', appliedFilters)
-
-  const filtersNeedingSome = submissionFilters.filter(filter =>
+export const categorizeFilters = (appliedFilters: Filter[], customStatuses: GradeStatus[]) => {
+  const submissionFilters = findFilterValuesOfType(
+    'submissions',
+    appliedFilters
+  ) as SubmissionFilterValue[]
+  const customStatusIds = getCustomStatusIdStrings(customStatuses)
+  const filtersNeedingSome: SubmissionFilterValue[] = submissionFilters.filter(filter =>
     [
       'dropped',
       'excused',
@@ -598,6 +615,7 @@ export const categorizeFilters = (appliedFilters: Filter[]) => {
       'late',
       'missing',
       'resubmitted',
+      ...customStatusIds,
     ].includes(filter)
   )
 
@@ -608,11 +626,15 @@ export const categorizeFilters = (appliedFilters: Filter[]) => {
   return {filtersNeedingSome, filtersNeedingEvery}
 }
 
-export function filterSubmission(filters: string[], submission: Submission | MissingSubmission) {
+export function filterSubmission(
+  filters: SubmissionFilterValue[],
+  submission: Submission | MissingSubmission,
+  customStatuses: GradeStatus[]
+) {
   if (filters.length === 0) {
     return true
   }
-
+  const customStatusIds = getCustomStatusIdStrings(customStatuses)
   return filters.every(filter => {
     if (filter === 'has-ungraded-submissions') {
       return doesSubmissionNeedGrading(submission)
@@ -634,6 +656,8 @@ export function filterSubmission(filters: string[], submission: Submission | Mis
       return submission.excused
     } else if (filter === 'extended') {
       return submission.late_policy_status === 'extended'
+    } else if (customStatusIds.includes(filter)) {
+      return `custom-status-${submission.custom_grade_status_id}` === filter
     } else {
       return false
     }
@@ -641,13 +665,18 @@ export function filterSubmission(filters: string[], submission: Submission | Mis
 }
 
 export function filterSubmissionsByCategorizedFilters(
-  filtersNeedingSome: string[],
-  filtersNeedingEvery: string[],
-  submissions: (Submission | MissingSubmission)[]
+  filtersNeedingSome: SubmissionFilterValue[],
+  filtersNeedingEvery: SubmissionFilterValue[],
+  submissions: (Submission | MissingSubmission)[],
+  customStatuses: GradeStatus[]
 ) {
   const hasMatch =
-    submissions.some(submission => filterSubmission(filtersNeedingSome, submission)) &&
-    submissions.every(submission => filterSubmission(filtersNeedingEvery, submission))
+    submissions.some(submission =>
+      filterSubmission(filtersNeedingSome, submission, customStatuses)
+    ) &&
+    submissions.every(submission =>
+      filterSubmission(filtersNeedingEvery, submission, customStatuses)
+    )
 
   return hasMatch
 }
@@ -655,9 +684,13 @@ export function filterSubmissionsByCategorizedFilters(
 export const filterStudentBySubmissionFn = (
   appliedFilters: Filter[],
   submissionStateMap: SubmissionStateMap,
-  assignmentIds: string[]
+  assignmentIds: string[],
+  customStatuses: GradeStatus[]
 ) => {
-  const submissionFilters = findFilterValuesOfType('submissions', appliedFilters)
+  const submissionFilters = findFilterValuesOfType(
+    'submissions',
+    appliedFilters
+  ) as SubmissionFilterValue[]
 
   return (student: Student) => {
     if (submissionFilters.length === 0) {
@@ -670,15 +703,19 @@ export const filterStudentBySubmissionFn = (
     )
 
     // when sorting rows, we only use .some to determine visiblity
-    return filterSubmissionsByCategorizedFilters(submissionFilters, [], submissions)
+    return filterSubmissionsByCategorizedFilters(submissionFilters, [], submissions, customStatuses)
   }
 }
 
 export const filterAssignmentsBySubmissionsFn = (
   appliedFilters: Filter[],
-  submissionStateMap: SubmissionStateMap
+  submissionStateMap: SubmissionStateMap,
+  customStatuses: GradeStatus[]
 ) => {
-  const {filtersNeedingSome, filtersNeedingEvery} = categorizeFilters(appliedFilters)
+  const {filtersNeedingSome, filtersNeedingEvery} = categorizeFilters(
+    appliedFilters,
+    customStatuses
+  )
 
   return (assignment: Assignment) => {
     if (filtersNeedingSome.length === 0 && filtersNeedingEvery.length === 0) {
@@ -690,9 +727,9 @@ export const filterAssignmentsBySubmissionsFn = (
     const result = filterSubmissionsByCategorizedFilters(
       filtersNeedingSome,
       filtersNeedingEvery,
-      submissions
+      submissions,
+      customStatuses
     )
-
     return result
   }
 }

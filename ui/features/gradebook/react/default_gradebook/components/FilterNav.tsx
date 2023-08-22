@@ -33,6 +33,7 @@ import FilterDropdown from './FilterDropdown'
 import FilterNavDateModal from './FilterDateModal'
 import FilterTray from './FilterTray'
 import {useFilterDropdownData} from './FilterNav.utils'
+import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
@@ -44,6 +45,7 @@ export type FilterNavProps = {
   sections: Section[]
   gradingPeriods: CamelizedGradingPeriod[]
   studentGroupCategories: StudentGroupCategoryMap
+  customStatuses: GradeStatus[]
 }
 
 export default function FilterNav({
@@ -52,6 +54,7 @@ export default function FilterNav({
   modules,
   sections,
   studentGroupCategories,
+  customStatuses,
 }: FilterNavProps) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [isDateModalOpen, setIsDateModalOpen] = useState(false)
@@ -75,7 +78,8 @@ export default function FilterNav({
       gradingPeriods,
       modules,
       sections,
-      studentGroupCategories
+      studentGroupCategories,
+      customStatuses
     )
 
     const handleDeleteFilterClick = () => {
@@ -121,6 +125,7 @@ export default function FilterNav({
     sections,
     studentGroupCategories,
     onToggleFilterPreset,
+    customStatuses,
     onToggleDateModal: () => setIsDateModalOpen(true),
   })
 
