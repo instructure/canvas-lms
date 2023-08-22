@@ -93,11 +93,18 @@
         <% if @current_user_submission.excused? %>
           <span><%= t "This assignment has been excused." %></span>
         <% else %>
+         <% if !@assignment.restrict_quantitative_data?(@current_user, check_extra_permissions: true) %>
           <div><%= t 'labels.grade', "Grade: %{grade} *(%{points_possible} pts possible)*", {
             :grade => i18n_grade(@current_user_submission.grade, @assignment.grading_type),
             :points_possible => n(round_if_whole(@assignment.points_possible)),
             :wrapper => '<span style="font-size: 0.8em;">\1</span>'
           } %></div>
+        <% else %>
+          <div><%= t 'labels.rqd_grade', "Grade: %{grade}", {
+            :grade => @assignment.score_to_grade(@current_user_submission.score, @current_user_submission.grade, true),
+            :wrapper => '<span style="font-size: 0.8em;">\1</span>'
+          } %></div>
+        <% end %>
           <div><%= t 'labels.graded_anonymously', "Graded Anonymously: %{value}", {
             :value => @current_user_submission.graded_anonymously ? t('labels.yes', "yes") : t('labels.no', "no")
           } %></div>
