@@ -54,6 +54,7 @@ class WikiPage < ActiveRecord::Base
 
   belongs_to :current_lookup, class_name: "WikiPageLookup"
   has_many :wiki_page_lookups, inverse_of: :wiki_page
+  has_many :wiki_page_embeddings, inverse_of: :wiki_page
   has_one :master_content_tag, class_name: "MasterCourses::MasterContentTag", inverse_of: :wiki_page
 
   acts_as_url :title, sync_url: true
@@ -73,6 +74,7 @@ class WikiPage < ActiveRecord::Base
               if: proc { context.try(:conditional_release?) }
   after_save :create_lookup, if: :should_create_lookup?
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
+  after_save :generate_embeddings, if: -> { (saved_change_to_body? || saved_change_to_title?) && OpenAi.smart_search_available?(root_account) }
 
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")
@@ -101,6 +103,21 @@ class WikiPage < ActiveRecord::Base
   def ensure_wiki_and_context
     self.wiki_id ||= (context.wiki_id || context.wiki.id)
   end
+
+  def generate_embeddings
+    return unless OpenAi.smart_search_available?(root_account)
+
+    # TODO: chunk content and create multiple
+    embedding = OpenAi.generate_embedding(body)[0]
+    # TODO: delete via the association once pgvector is available everywhere
+    # (without :dependent, that would try to nullify the fk in violation of the constraint
+    #  but with :dependent, instances without pgvector would try to access the nonexistent table when a page is deleted)
+    shard.activate do
+      WikiPageEmbedding.where(wiki_page_id: self).delete_all
+    end
+    wiki_page_embeddings.create!(embedding:)
+  end
+  handle_asynchronously :generate_embeddings, priority: Delayed::LOW_PRIORITY
 
   def context
     if !association(:context).loaded? &&

@@ -711,6 +711,8 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.3.0)
     mustache (1.1.1)
+    neighbor (0.3.0)
+      activerecord (>= 6.1)
     net-http (0.3.2)
       uri
     net-imap (0.3.7)
@@ -1250,6 +1252,7 @@ DEPENDENCIES
   mini_magick (~> 4.12)
   moodle_importer!
   multi_json (= 1.15.0)
+  neighbor (~> 0.3)
   net-http (~> 0.1)
   net-ldap (~> 0.18)
   oauth (~> 1.1)

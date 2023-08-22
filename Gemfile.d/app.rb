@@ -73,6 +73,7 @@ gem "marginalia", "1.11.1", require: false
 gem "mime-types", "~> 3.5"
 gem "mini_magick", "~> 4.12"
 gem "multi_json", "1.15.0"
+gem "neighbor", "~> 0.3"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
 gem "oauth", "~> 1.1", require: false
