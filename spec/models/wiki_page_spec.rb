@@ -1095,4 +1095,31 @@ describe WikiPage do
       end
     end
   end
+
+  describe "#generate_embeddings" do
+    before do
+      skip "not available" unless ActiveRecord::Base.connection.table_exists?("wiki_page_embeddings")
+
+      expect(OpenAi).to receive(:smart_search_available?).at_least(:once).and_return(true)
+      allow(OpenAi).to receive(:generate_embedding).and_return([[1] * 1536])
+    end
+
+    before :once do
+      course_factory
+    end
+
+    it "generates an embedding when creating a page" do
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    end
+
+    it "replaces an embedding if it already exists" do
+      wiki_page_model(title: "test", body: "foo")
+      run_jobs
+      @page.update body: "bar"
+      run_jobs
+      expect(@page.reload.wiki_page_embeddings.count).to eq 1
+    end
+  end
 end

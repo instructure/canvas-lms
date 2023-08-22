@@ -1,0 +1,7 @@
+---
+smart_search:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Smart Search
+  description: AI driven smart search feature.
+
