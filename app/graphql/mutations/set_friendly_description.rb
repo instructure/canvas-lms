@@ -57,17 +57,15 @@ class Mutations::SetFriendlyDescription < Mutations::BaseMutation
       friendly_description.workflow_state = "active"
       friendly_description.description = description
       friendly_description.save!
-      return {
-        outcome_friendly_description: friendly_description
-      }
-    elsif friendly_description.persisted?
-      friendly_description.destroy
-      return {
-        outcome_friendly_description: friendly_description
-      }
+
+    else
+      friendly_description.destroy if friendly_description.persisted?
+      friendly_description.description = ""
     end
 
-    {}
+    {
+      outcome_friendly_description: friendly_description
+    }
   end
 
   private
