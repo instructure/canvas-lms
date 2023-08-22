@@ -97,7 +97,7 @@ gem "net-pop", "~> 0.1", require: false
 gem "net-smtp", "~> 0.3", require: false
 gem "nokogiri", "~> 1.14", require: false
 gem "oauth", "~> 1.1", require: false
-gem "oauth2", "~> 1.4", require: false
+gem "oauth2", "~> 2.0", require: false
 gem "oj", "~> 3.16"
 gem "outrigger", "3.0.1"
 gem "parallel", "~> 1.23", require: false

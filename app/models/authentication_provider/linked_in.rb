@@ -92,8 +92,8 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
   def client_options
     {
       site: "https://api.linkedin.com",
-      authorize_url: "https://www.linkedin.com/uas/oauth2/authorization",
-      token_url: "https://www.linkedin.com/uas/oauth2/accessToken"
+      authorize_url: "https://www.linkedin.com/oauth/v2/authorization",
+      token_url: "https://www.linkedin.com/oauth/v2/accessToken"
     }
   end
 
@@ -107,5 +107,9 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
     else
       "r_liteprofile"
     end
+  end
+
+  def token_options
+    { client_secret: }
   end
 end
