@@ -83,9 +83,7 @@ export default class ShowEventDetailsDialog {
       }
       renderDeleteCalendarEventDialog(delModalContainer, {
         isOpen: true,
-        onCancel: () => {
-          renderDeleteCalendarEventDialog(delModalContainer, {isOpen: false})
-        },
+        onCancel: () => ReactDOM.unmountComponentAtNode(delModalContainer),
         onDeleting: which => {
           if (which === 'one') {
             publish('CommonEvent/eventDeleting', event)
