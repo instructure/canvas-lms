@@ -166,5 +166,18 @@ describe SIS::CSV::DiffGenerator do
       groups = csvs.find { |f| f[:file] == "groups.csv" }
       expect(File.read(groups[:fullpath])).to eq("group_id,status\ngroup_1,active\ngroup_2,active\n")
     end
+
+    it "skips diffing if column headers change" do
+      previous = {
+        course: [csv("courses", "course_id,short_name,status\ncourse_1,test1,active\n")]
+      }
+      current = {
+        course: [csv("courses", "course_id,short_name,long_name,status\ncourse_1,test1,,active\n")]
+      }
+      csvs = subject.generate_csvs(previous, current)
+      data = File.read(csvs.first[:fullpath])
+      expect(data).to eq "course_id,short_name,long_name,status\ncourse_1,test1,,active\n"
+      expect(@batch.sis_batch_errors.first.message).to include "CSV headers do not match"
+    end
   end
 end
