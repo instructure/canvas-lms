@@ -89,7 +89,7 @@ class Mathml {
             mathImageHelper.catchEquationImages(message[1])
           })
           window.MathJax.Hub.Register.MessageHook('Math Processing Error', function (message) {
-            const elem = message[1]
+            const elem = Array.isArray(message[1]) ? message[1][0] : message[1]
             // ".math_equation_latex" is the elem we added for MathJax to typeset the image equation
             if (elem.parentElement?.classList.contains('math_equation_latex')) {
               // The equation we image we were trying to replace and failed is up 1 and back 1.
@@ -103,7 +103,7 @@ class Mathml {
             }
           })
           window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
-            const elem = message[1]
+            const elem = Array.isArray(message[1]) ? message[1][0] : message[1]
             mathImageHelper.removeStrayEquationImages(elem)
             mathImageHelper.nearlyInfiniteStyleFix(elem)
             elem
@@ -120,7 +120,8 @@ class Mathml {
           // Since we want to ignore <math> in .hidden-readable spans, let's remove the MathJunk™
           // right after MathJax adds it.
           window.MathJax.Hub.Register.MessageHook('End Math', function (message) {
-            $(message[1])
+            const elm = Array.isArray(message[1]) ? message[1][0] : message[1]
+            $(elm)
               .find('.hidden-readable [class^="MathJax"], .hidden-readable [id^="MathJax"]')
               .remove()
           })
@@ -291,6 +292,7 @@ const mathImageHelper = {
   },
 
   catchEquationImages(refnode) {
+    refnode = Array.isArray(refnode) ? refnode[0] : refnode
     // find equation images and replace with inline LaTeX
     const eqimgs = refnode.querySelectorAll('img.equation_image')
     if (eqimgs.length > 0) {

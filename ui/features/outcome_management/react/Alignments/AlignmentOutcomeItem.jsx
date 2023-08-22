@@ -116,6 +116,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                 as="div"
                 padding="0 small 0 0"
                 data-testid="alignment-summary-description-truncated"
+                className="user_content"
               >
                 <PresentationContent>
                   <div
@@ -137,6 +138,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                 as="div"
                 padding="0 small 0 0"
                 data-testid="alignment-summary-description-expanded"
+                className="user_content"
                 dangerouslySetInnerHTML={{__html: description}}
               />
             )}

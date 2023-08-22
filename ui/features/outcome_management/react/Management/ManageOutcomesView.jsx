@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
@@ -56,6 +56,13 @@ const ManageOutcomesView = ({
   const groupDescription = outcomeGroup?.description
   const outcomes = outcomeGroup?.outcomes
   const outcomesCount = outcomeGroup?.outcomesCount
+
+  const [isEnhanced, setIsEnhanced] = useState(false)
+
+  useEffect(()=>{
+    // for rendering math equations in outcome descriptions
+    setIsEnhanced(!isEnhanced)
+  }, [outcomes, selectedOutcomes]);
 
   if (loading && !outcomeGroup) {
     return (
@@ -179,6 +186,7 @@ const ManageOutcomesView = ({
                 removeOutcomeStatus={removeOutcomesStatus[linkId]}
                 onMenuHandler={onOutcomeMenuHandler}
                 onCheckboxHandler={onSelectOutcomesHandler}
+                isEnhanced={isEnhanced}
               />
             )
           )}

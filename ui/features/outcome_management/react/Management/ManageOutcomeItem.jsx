@@ -53,6 +53,7 @@ const ManageOutcomeItem = ({
   onMenuHandler,
   onCheckboxHandler,
   canUnlink,
+  isEnhanced,
 }) => {
   const {
     contextType,
@@ -174,6 +175,7 @@ const ManageOutcomeItem = ({
                 ratings={ratings}
                 truncated={truncated}
                 setShouldExpand={setShouldExpand}
+                isEnhanced={isEnhanced}
               />
             </View>
           )}
@@ -199,6 +201,7 @@ ManageOutcomeItem.propTypes = {
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
   canUnlink: PropTypes.bool.isRequired,
+  isEnhanced: PropTypes.bool
 }
 
 export default memo(ManageOutcomeItem)
