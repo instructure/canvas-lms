@@ -41,6 +41,7 @@ const OutcomeDescription = ({
   masteryPoints,
   ratings,
   setShouldExpand,
+  isEnhanced,
 }) => {
   const {friendlyDescriptionFF, isStudent, accountLevelMasteryScalesFF} = useCanvasContext()
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
@@ -69,7 +70,7 @@ const OutcomeDescription = ({
   return (
     <View>
       {truncated && truncatedDescription && (
-        <View as="div" padding="0 small 0 0" data-testid="description-truncated">
+        <View as="div" padding="0 small 0 0" data-testid="description-truncated" className={isEnhanced ? "user_content": "user_content unenhanced"}>
           <PresentationContent>
             <TruncateText
               data-testid="description-truncated-content"
@@ -97,6 +98,7 @@ const OutcomeDescription = ({
             padding="0 small small small"
             background="secondary"
             data-testid="friendly-description-expanded"
+            className="user_content"
           >
             <Text wrap="break-word">{friendlyDescription}</Text>
           </View>
@@ -108,12 +110,13 @@ const OutcomeDescription = ({
           as="div"
           padding="0 small 0 0"
           data-testid="description-expanded"
+          className="user_content"
           dangerouslySetInnerHTML={{__html: fullDescription}}
         />
       )}
 
       {!truncated && fullDescription && fullDescriptionIsFriendlyDescription && (
-        <View as="div" padding="0 small 0 0" data-testid="description-expanded">
+        <View as="div" padding="0 small 0 0" data-testid="description-expanded" className="user_content">
           <Text wrap="break-word">{fullDescription}</Text>
         </View>
       )}
@@ -153,6 +156,7 @@ OutcomeDescription.propTypes = {
   friendlyDescription: PropTypes.string,
   truncated: PropTypes.bool.isRequired,
   setShouldExpand: PropTypes.func.isRequired,
+  isEnhanced: PropTypes.bool
 }
 
 export default OutcomeDescription
