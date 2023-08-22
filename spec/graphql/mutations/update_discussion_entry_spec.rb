@@ -203,5 +203,18 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       expect(result.dig("data", "updateDiscussionEntry")).to be_nil
       expect(result.dig("errors", 0, "message")).to eq "not found"
     end
+
+    it "returns validation_error when user does not have attach permissions" do
+      current_attachment_id = @entry.attachment_id
+      attachment = attachment_with_context(@student)
+      attachment.update!(user: @student)
+      @course.update!(allow_student_forum_attachments: false)
+
+      result = run_mutation(discussion_entry_id: @entry.id, file_id: attachment.id)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "errors", 0, "message")).to eq "Insufficient attach permissions"
+      expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "attachment", "_id")).to be_nil
+      expect(@entry.reload.attachment_id).to eq current_attachment_id
+    end
   end
 end
