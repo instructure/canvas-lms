@@ -160,7 +160,7 @@ export default class GradingSchemeInput extends Component {
   handleSelect(event, value) {
     const gradeInfo = getGradeInfo(value, this.props)
     const formattedGrade = GradeFormatHelper.formatGradeInfo(gradeInfo)
-    this.setState({gradeInfo, value: formattedGrade})
+    this.setState({gradeInfo, value: GradeFormatHelper.replaceDashWithMinus(formattedGrade)})
   }
 
   handleTextChange(event) {
@@ -239,7 +239,7 @@ export default class GradingSchemeInput extends Component {
           >
             {this.props.gradingScheme.map(([key]) => (
               <Menu.Item key={key} value={key}>
-                {key}
+                {GradeFormatHelper.replaceDashWithMinus(key)}
               </Menu.Item>
             ))}
 

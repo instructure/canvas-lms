@@ -180,6 +180,26 @@ QUnit.module('GradingSchemeHelper', () => {
       strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('   !^   ', gradingScheme), 50)
     })
 
+    test('matches grades with trailing en-dash to keys with trailing en-dash', () => {
+      gradingScheme = [
+        ['A', 0.95],
+        ['A-', 0.9],
+        ['B', 0.85],
+      ]
+      const enDash = '-'
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound(`A${enDash}`, gradingScheme), 90)
+    })
+
+    test('matches grades with trailing minus to keys with trailing en-dash', () => {
+      gradingScheme = [
+        ['A', 0.95],
+        ['A-', 0.9],
+        ['B', 0.85],
+      ]
+      const minus = '−'
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound(`A${minus}`, gradingScheme), 90)
+    })
+
     test('matches emoji scheme keys', () => {
       gradingScheme = [
         ['😂', 0.9],

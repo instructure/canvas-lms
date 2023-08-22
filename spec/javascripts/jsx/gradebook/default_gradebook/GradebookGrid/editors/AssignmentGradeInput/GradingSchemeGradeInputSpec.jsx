@@ -23,6 +23,7 @@ import {findDOMNode} from 'react-dom'
 import {mount} from 'enzyme'
 import AssignmentGradeInput from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentGradeInput/index'
 import fakeENV from 'helpers/fakeENV'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput', suiteHooks => {
   let $container
@@ -168,10 +169,10 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
   })
 
   QUnit.module('#componentWillReceiveProps()', () => {
-    test('sets the input value to the entered score of the updated submission', () => {
+    test('sets the input value to the entered score of the updated submission, with minus replacing en-dash', () => {
       mountComponent()
       wrapper.setProps({submission: {...props.submission, enteredScore: 8.0, enteredGrade: 'B-'}})
-      equal(getTextInputValue(), 'B-')
+      equal(getTextInputValue(), 'B−')
     })
 
     test('displays "Excused" as the input value when the updated submission is excused', () => {
@@ -655,7 +656,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
       props.submission = {...props.submission, enteredScore: 8.13, enteredGrade: 'B-'}
       mountComponent()
       wrapper.instance().focus()
-      equal(document.getSelection().toString(), 'B-')
+      equal(document.getSelection().toString(), 'B−')
     })
 
     test('does not take focus from the grading scheme menu button', () => {
@@ -939,8 +940,8 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
       })
     })
 
-    test('uses the grading scheme key for each grading scheme option', () => {
-      const expectedLabels = props.gradingScheme.map(([key]) => key) // ['A+', 'A', …, 'F']
+    test('uses the grading scheme key (with trailing dashes replaced with minus) for each grading scheme option', () => {
+      const expectedLabels = props.gradingScheme.map(([key]) => GradeFormatHelper.replaceDashWithMinus(key)) // ['A+', 'A', …, 'F']
       mountComponent()
       return clickToOpen().then(() => {
         const optionsText = getRenderedOptions().map($option => $option.textContent)

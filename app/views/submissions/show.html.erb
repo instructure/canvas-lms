@@ -16,11 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 <%
-  # this is superficial and should be fine, since this is only showing data, not saving data
-  entered_grade = @assignment.restrict_quantitative_data?(@current_user) ?
-    @assignment.score_to_grade(@submission.score, nil, true)
-    : @submission.entered_grade
-
   presenter = Submission::ShowPresenter.new(
     submission: @submission,
     current_user: @current_user,
@@ -46,19 +41,19 @@
   show_updated_plagiarism_icons = @assignment.context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
 
   js_env({
-    :RUBRIC_ASSESSMENT => {
+    GRADING_TYPE: @assignment.grading_type,
+    RUBRIC_ASSESSMENT: {
       assessment_type: assessment_type,
       assessor_id: @current_user ? @current_user.id : "null",
       **rubric_assessment_user_param
     },
-
-    :SUBMISSION => {
+    SUBMISSION: {
       assignment_id: @assignment.id,
       # don't leak grades if submission is not posted
       points_possible: @assignment.points_possible, # score below is useless without points possible
       submission: if @submission.user_can_read_grade?(@current_user, session)
         @submission.attributes.merge(
-          entered_grade: entered_grade,
+          entered_grade: presenter.entered_grade,
           entered_score: @submission.entered_score
         )
       else
@@ -101,7 +96,7 @@
                     <% if @submission.excused? %>
                       <%= t "Excused" %>
                     <% else %>
-                        <%= i18n_grade(round_if_whole(entered_grade), @submission.grading_type) %>
+                        <%= i18n_grade(round_if_whole(presenter.entered_grade), @submission.grading_type) %>
                     <% end %>
                   </span>
                 <% end %>

@@ -112,6 +112,26 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('late_penalty_final_grade_value')).toHaveTextContent('-')
     })
 
+    it('displays minus grades using the minus character (so screenreaders properly announce the value)', () => {
+      const dash = '-'
+      const minus = '−'
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [
+          {
+            ...defaultStudentSubmissions,
+            late: true,
+            enteredGrade: `B${dash}`,
+            enteredScore: 8,
+            grade: `B${dash}`,
+            score: 8,
+          },
+        ],
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('late_penalty_final_grade_value')).toHaveTextContent(`B${minus}`)
+    })
+
     it('renders the correct final grade and late penalty values when submission has been graded and late', () => {
       const props = {
         ...gradingResultsDefaultProps,
@@ -282,6 +302,40 @@ describe('Grading Results Tests', () => {
       expect(queryByTestId('dropped-assignment-message')).not.toBeInTheDocument()
     })
   })
+
+  describe('the assignment grading type is letter grade', () => {
+    let modifiedDefaultStudentSubmission: GradebookUserSubmissionDetails
+    let modifiedDefaultAssignment: AssignmentConnection
+
+    beforeEach(() => {
+      modifiedDefaultStudentSubmission = {
+        ...defaultStudentSubmissions,
+        enteredGrade: 'A-',
+        enteredScore: 9.0,
+        score: 9.0,
+        grade: 'A-',
+      }
+
+      modifiedDefaultAssignment = {
+        ...defaultAssignment,
+        gradingType: 'letter_grade',
+      }
+    })
+
+    it('renders minus grades with the en-dash character replaced with the minus character', () => {
+      const props = {
+        ...gradingResultsDefaultProps,
+        studentSubmissions: [modifiedDefaultStudentSubmission],
+        assignment: modifiedDefaultAssignment,
+      }
+      const {getByTestId} = renderGradingResults(props)
+      expect(getByTestId('student_and_assignment_grade_input')).toHaveValue('A−')
+
+      userEvent.click(getByTestId('submission-details-button'))
+      expect(getByTestId('submission_details_grade_input')).toHaveValue('A−')
+    })
+  })
+
   describe('the assignment grading type is pass fail', () => {
     let modifiedDefaultStudentSubmissions: GradebookUserSubmissionDetails
     let modifiedDefaultAssignments: AssignmentConnection

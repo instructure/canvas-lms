@@ -3700,12 +3700,20 @@ EG = {
         }
 
         if (submission.entered_grade != null) {
+          const formatGradeOpts =
+            ENV.grading_type === 'letter_grade' ? {gradingType: ENV.grading_type} : {}
           if (submission.entered_grade !== '' && !Number.isNaN(Number(submission.entered_grade))) {
-            grade.entered = GradeFormatHelper.formatGrade(round(submission.entered_grade, 2))
-            grade.adjusted = GradeFormatHelper.formatGrade(round(submission.grade, 2))
+            grade.entered = GradeFormatHelper.formatGrade(
+              round(submission.entered_grade, 2),
+              formatGradeOpts
+            )
+            grade.adjusted = GradeFormatHelper.formatGrade(
+              round(submission.grade, 2),
+              formatGradeOpts
+            )
           } else {
-            grade.entered = GradeFormatHelper.formatGrade(submission.entered_grade)
-            grade.adjusted = GradeFormatHelper.formatGrade(submission.grade)
+            grade.entered = GradeFormatHelper.formatGrade(submission.entered_grade, formatGradeOpts)
+            grade.adjusted = GradeFormatHelper.formatGrade(submission.grade, formatGradeOpts)
           }
         }
       }

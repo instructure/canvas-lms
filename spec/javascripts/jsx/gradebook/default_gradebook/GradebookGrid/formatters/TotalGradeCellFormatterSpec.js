@@ -35,7 +35,7 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
     gradebook = createGradebook({
       grading_standard: [
         ['A', 0.9],
-        ['B', 0.8],
+        ['B-', 0.8],
         ['C', 0.7],
         ['D', 0.6],
         ['<b>F</b>', 0.0],
@@ -192,8 +192,8 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
     strictEqual(renderCell().querySelectorAll('i.icon-warning').length, 1)
   })
 
-  test('renders a letter grade when using a grading standard', () => {
-    equal(renderCell().querySelector('.letter-grade-points').innerText, 'B')
+  test('renders a letter grade (with trailing en-dashes replaced with minus) when using a grading standard', () => {
+    equal(renderCell().querySelector('.letter-grade-points').innerText, 'B−')
   })
 
   test('escapes the value of the letter grade when using a grading standard', () => {

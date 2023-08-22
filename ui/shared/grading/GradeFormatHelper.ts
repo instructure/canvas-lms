@@ -26,6 +26,7 @@ import type {FormatGradeOptions, SubmissionData} from './grading.d'
 
 const I18n = useI18nScope('sharedGradeFormatHelper')
 
+const LETTER_GRADE = 'letter_grade'
 const POINTS = 'points'
 const PERCENT = 'percent'
 const PASS_FAIL = 'pass_fail'
@@ -38,6 +39,12 @@ const FAIL_GRADES = ['incomplete', 'fail']
 const UNGRADED = '–'
 const QUANTITATIVE_GRADING_TYPES = [POINTS, PERCENT, GPA_SCALE]
 const QUALITATIVE_GRADING_TYPES = ['pass_fail', 'letter_grade']
+
+function replaceDashWithMinus(grade) {
+  if (typeof grade !== 'string') return grade
+
+  return grade.replace(/(.+)-$/, '$1−')
+}
 
 function isPassFail(grade, gradeType: null | string = null) {
   if (gradeType) {
@@ -88,7 +95,12 @@ function normalizeCompleteIncompleteGrade(grade) {
 }
 
 function shouldFormatGradingType(gradingType) {
-  return gradingType === POINTS || gradingType === PERCENT || gradingType === PASS_FAIL
+  return (
+    gradingType === POINTS ||
+    gradingType === PERCENT ||
+    gradingType === PASS_FAIL ||
+    gradingType === LETTER_GRADE
+  )
 }
 
 function shouldFormatGrade(grade, gradingType) {
@@ -116,18 +128,20 @@ function formatPercentageGrade(score, options) {
   })
 }
 
-function formatGradingSchemeGrade(score, grade, options) {
+function formatGradingSchemeGrade(score, grade, options = {}) {
+  let formattedGrade
   if (options?.restrict_quantitative_data && options.pointsPossible === 0 && score >= 0) {
-    return scoreToGrade(100, options.gradingScheme)
-  }
-  if (options.pointsPossible) {
+    formattedGrade = scoreToGrade(100, options.gradingScheme)
+  } else if (options.pointsPossible) {
     const percent = scoreToPercentage(score, options.pointsPossible)
-    return scoreToGrade(percent, options.gradingScheme)
+    formattedGrade = scoreToGrade(percent, options.gradingScheme)
   } else if (grade != null) {
-    return grade
+    formattedGrade = grade
   } else {
-    return scoreToGrade(score, options.gradingScheme)
+    formattedGrade = scoreToGrade(score, options.gradingScheme)
   }
+
+  return replaceDashWithMinus(formattedGrade)
 }
 
 function formatCompleteIncompleteGrade(score, grade, options) {
@@ -195,12 +209,14 @@ const GradeFormatHelper = {
       if (isPassFail(parsedGrade, options.gradingType)) {
         parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade)
         formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete')
+      } else if (parsedGrade && options.gradingType === LETTER_GRADE) {
+        formattedGrade = formatGradingSchemeGrade(null, parsedGrade)
       } else if (
         options.restrict_quantitative_data &&
         options.score != null &&
         options.pointsPossible != null
       ) {
-        // at this stage, gradingType is either points or mercent, or the passed grade is a number
+        // at this stage, gradingType is either points or percent, or the passed grade is a number
         formattedGrade = formatGradingSchemeGrade(options.score, null, {
           gradingScheme: options.grading_scheme,
           pointsPossible: options.pointsPossible,
@@ -322,6 +338,7 @@ const GradeFormatHelper = {
     }
   },
 
+  replaceDashWithMinus,
   UNGRADED,
   QUANTITATIVE_GRADING_TYPES,
   QUALITATIVE_GRADING_TYPES,

@@ -44,6 +44,28 @@ describe GradeSummaryAssignmentPresenter do
                                         @submission)
   end
 
+  describe "#published_grade" do
+    it "returns the empty string when not a letter grade assignment" do
+      @assignment.grade_student(@student, grader: @teacher, score: 12)
+      expect(presenter.published_grade).to eq ""
+    end
+
+    it "returns the letter grade in parens when a letter grade assignment" do
+      @assignment.update!(grading_type: "letter_grade")
+      @assignment.grade_student(@student, grader: @teacher, score: 12)
+      @submission.reload
+      expect(presenter.published_grade).to eq "(A)"
+    end
+
+    it "replaces trailing en-dashes with the minus character (so screenreaders read 'minus')" do
+      @assignment.update!(grading_type: "letter_grade")
+      @assignment.grade_student(@student, grader: @teacher, score: 11)
+      @submission.reload
+      minus = "−"
+      expect(presenter.published_grade).to eq "(A#{minus})"
+    end
+  end
+
   describe "#plagiarism_attachment?" do
     it "returns true if the submission has an OriginalityReport" do
       OriginalityReport.create(originality_score: 0.8,

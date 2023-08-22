@@ -42,9 +42,9 @@ describe "Gradebook" do
     end
 
     it "is maintained on page refresh post grade update", priority: "1" do
-      Gradebook::Cells.select_scheme_grade(@students[0], @assignment, "A-")
+      Gradebook::Cells.select_scheme_grade(@students[0], @assignment, "A−")
       refresh_page
-      expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq("A-")
+      expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq("A−")
     end
   end
 end

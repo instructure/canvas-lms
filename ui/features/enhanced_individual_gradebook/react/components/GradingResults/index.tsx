@@ -97,7 +97,15 @@ export default function GradingResults({
         }
       }
       setExcusedChecked(submission.excused)
-      setGradeInput(submission.excused ? I18n.t('Excused') : submission.enteredGrade ?? '-')
+      if (submission.excused) {
+        setGradeInput(I18n.t('Excused'))
+      } else if (submission.enteredGrade == null) {
+        setGradeInput('-')
+      } else if (assignment?.gradingType === 'letter_grade') {
+        setGradeInput(GradeFormatHelper.replaceDashWithMinus(submission.enteredGrade))
+      } else {
+        setGradeInput(submission.enteredGrade)
+      }
     }
   }, [assignment, submission])
 
@@ -200,6 +208,15 @@ export default function GradingResults({
     setPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === data.value))
   }
 
+  const latePenaltyFinalGradeDisplay = (grade: string | null) => {
+    if (grade == null) {
+      return ' -'
+    }
+
+    const displayGrade = GradeFormatHelper.formatGrade(grade)
+    return GradeFormatHelper.replaceDashWithMinus(displayGrade)
+  }
+
   return (
     <>
       <View as="div" data-testid="grading-results">
@@ -270,11 +287,7 @@ export default function GradingResults({
                       as="div"
                       padding="0 0 0 small"
                     >
-                      <Text>
-                        {submission.grade != null
-                          ? GradeFormatHelper.formatGrade(submission.grade)
-                          : ' -'}
-                      </Text>
+                      <Text>{latePenaltyFinalGradeDisplay(submission.grade)}</Text>
                     </View>
                   </View>
                 </>

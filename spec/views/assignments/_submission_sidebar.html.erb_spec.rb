@@ -102,6 +102,17 @@ describe "assignments/_submission_sidebar" do
       expect(html.css("div.module div").text).to include "Grade: 23"
     end
 
+    it "renders a letter grade with trailing en-dash replaced with minus" do
+      en_dash = "-"
+      minus = "−"
+      assignment.update!(grading_type: "letter_grade", points_possible: 10)
+      assignment.grade_student(student, grader: teacher, grade: "B#{en_dash}")
+      assign(:current_user_submission, submission)
+      render
+      html = Nokogiri::HTML5.fragment(response.body)
+      expect(html.css("div.module div").text).to include "Grade: B#{minus}"
+    end
+
     it "renders submission comments" do
       comment = submission.add_comment(author: teacher, comment: "a comment!")
       assign(:current_user_submission, submission)
