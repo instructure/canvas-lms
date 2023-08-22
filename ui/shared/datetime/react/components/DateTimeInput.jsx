@@ -169,9 +169,9 @@ function DateTimeInput(props) {
 
   return (
     <FormFieldGroup
-      colSpacing="medium"
+      colSpacing={props.colSpacing || "medium"}
       vAlign="top"
-      layout="stacked"
+      layout={props.layout || "stacked"}
       rowSpacing="small"
       messages={goodMessage(formatDateTime(inputValue))}
       description={props.description}
@@ -204,6 +204,8 @@ DateTimeInput.propTypes = {
   onChange: func.isRequired,
   value: string,
   description: node.isRequired,
+  colSpacing: string,
+  layout: string,
 }
 
 function dontRerender(prevProps, props) {
@@ -213,6 +215,8 @@ function dontRerender(prevProps, props) {
   if (prevProps.locale !== props.locale) return false
   if (prevProps.timezone !== props.timezone) return false
   if (prevProps.description !== props.description) return false
+  if (prevProps.colSpacing !== props.colSpacing) return false
+  if (prevProps.layout !== props.layout) return false
   return true
 }
 

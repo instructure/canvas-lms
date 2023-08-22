@@ -20,7 +20,7 @@ import React, {useState, useEffect} from 'react'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
@@ -99,7 +99,7 @@ export default function DifferentiatedModulesTray({
               renderTitle={I18n.t('Settings')}
               isSelected={selectedTab === 'settings'}
             >
-              <SettingsPanel />
+              <SettingsPanel moduleName="Temporary Placeholder" />
             </Tabs.Panel>
             <Tabs.Panel
               id="assign-to"
@@ -115,10 +115,30 @@ export default function DifferentiatedModulesTray({
     )
   }
 
+  function Footer() {
+    return (
+      <View as="div" padding="small" background="secondary" borderWidth="small none none none">
+        <Flex as="div" justifyItems="end">
+          <FlexItem>
+            <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
+          </FlexItem>
+          <FlexItem margin="0 0 0 small">
+            <Button color="primary">{I18n.t('Update Module')}</Button>
+          </FlexItem>
+        </Flex>
+      </View>
+    )
+  }
+
   return (
     <Tray open={open} label={I18n.t('Edit Module Settings')} placement="end" size="regular">
-      <Header />
-      <Body />
+      <Flex direction="column" justifyItems="space-between" height="100vh">
+        <FlexItem overflowX="hidden" shouldGrow={true}>
+          <Header />
+          <Body />
+        </FlexItem>
+        <Footer />
+      </Flex>
     </Tray>
   )
 }

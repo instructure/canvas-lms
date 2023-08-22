@@ -45,6 +45,13 @@ describe('DifferentiatedModulesTray', () => {
     expect(onDismiss).toHaveBeenCalled()
   })
 
+  it('calls onDismiss when cancel button is clicked', () => {
+    const onDismiss = jest.fn()
+    const {getByRole} = renderComponent({onDismiss})
+    getByRole('button', {name: /cancel/i}).click()
+    expect(onDismiss).toHaveBeenCalled()
+  })
+
   it('does not render tabs when assignOnly is true', () => {
     const {queryByTestId} = renderComponent()
     expect(queryByTestId('assign-to-panel')).not.toBeInTheDocument()
