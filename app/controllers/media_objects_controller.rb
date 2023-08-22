@@ -285,6 +285,10 @@ class MediaObjectsController < ApplicationController
   end
 
   def iframe_media_player
+    if !Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
+      return redirect_to(media_object_iframe_path(@media_object.media_id, params: request.query_parameters))
+    end
+
     # Exclude all global includes from this page
     @exclude_account_js = true
     @embeddable = true
