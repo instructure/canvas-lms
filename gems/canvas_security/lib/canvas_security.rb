@@ -281,7 +281,7 @@ module CanvasSecurity
   def self.decrypt_encrypted_jwt(token, signing_secret, encryption_secret, ignore_expiration: false)
     begin
       signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
-    rescue OpenSSL::Cipher::CipherError => e
+    rescue JSON::JWE::DecryptionFailed => e
       # this seems to happen if the token is of a valid shape,
       # but signed by some OTHER encryption secret?
       CanvasErrors.capture_exception(:security_auth, e, :warn)

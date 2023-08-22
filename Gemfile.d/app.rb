@@ -70,7 +70,7 @@ gem "i18n", "~> 1.12"
 gem "i18nliner", "~> 0.2.4"
 gem "icalendar", "~> 2.9", require: false
 gem "diplomat", "~> 2.6", require: false
-gem "ims-lti", "2.3.3", require: "ims"
+gem "ims-lti", "~> 2.3", require: "ims"
 gem "rrule", "~> 0.5", require: false
 
 gem "inst_access", "0.1.2"
@@ -136,7 +136,7 @@ gem "week_of_month",
     github: "instructure/week-of-month",
     ref: "b3013639e9474f302b5a6f27e4e45313e8d24902"
 
-gem "faraday", "~> 0.17"
+gem "faraday", "~> 2.7"
 
 path "../gems" do
   gem "activesupport-suspend_callbacks"
