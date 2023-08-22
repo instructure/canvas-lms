@@ -19,6 +19,7 @@
 import React, {useEffect, useMemo, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {getFinalGradeOverrides} from '@canvas/grading/FinalGradeOverrideApi'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {
   AssignmentGroupCriteriaMap,
   FinalGradeOverrideMap,
@@ -211,7 +212,9 @@ export default function StudentInformation({
       : ''
 
     const letterGradeText = gradingStandard
-      ? ` - ${getLetterGrade(possible, score, gradingStandard)}`
+      ? ` - ${GradeFormatHelper.replaceDashWithMinus(
+          getLetterGrade(possible, score, gradingStandard)
+        )}`
       : ''
 
     return `${finalGradeText}${pointsText}${letterGradeText}`

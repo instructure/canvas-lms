@@ -27,6 +27,7 @@ import listFormatterPolyfill from '@canvas/util/listFormatter'
 import type Gradebook from '../../Gradebook'
 import type {Assignment} from '../../../../../../api.d'
 import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('gradebook')
 
@@ -181,7 +182,7 @@ export default class TotalGradeCellFormatter {
     let letterGrade
     const scheme = this.options.getGradingStandard()
     if (grade.possible && scheme) {
-      letterGrade = scoreToGrade(percentage, scheme.data)
+      letterGrade = GradeFormatHelper.replaceDashWithMinus(scoreToGrade(percentage, scheme.data))
     }
 
     let displayAsScaledPoints = false

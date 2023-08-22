@@ -484,7 +484,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
     } else {
       letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme) || I18n.t('N/A')
     }
-    $('.final_grade .letter_grade').text(letterGrade)
+    $('.final_grade .letter_grade').text(GradeFormatHelper.replaceDashWithMinus(letterGrade))
   }
 
   if (!gradeChanged && overrideScorePresent()) {

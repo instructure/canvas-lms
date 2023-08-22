@@ -139,7 +139,7 @@ describe "Screenreader Gradebook grading" do
       EnhancedSRGB.grade_srgb_assignment(EnhancedSRGB.main_grade_input, 8)
       EnhancedSRGB.tab_out_of_input(EnhancedSRGB.main_grade_input)
 
-      expect(EnhancedSRGB.main_grade_input).to have_value("B-")
+      expect(EnhancedSRGB.main_grade_input).to have_value("B−")
     end
 
     it "displays submission details modal with correct grade" do

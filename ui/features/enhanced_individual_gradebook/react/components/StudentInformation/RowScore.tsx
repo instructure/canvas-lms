@@ -18,6 +18,7 @@
 
 import React from 'react'
 import type {DeprecatedGradingScheme} from '@canvas/grading/grading'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getLetterGrade, scoreToPercentage, scoreToScaledPoints} from '../../../utils/gradebookUtils'
 
@@ -71,7 +72,7 @@ export default function RowScore({
   const letterGradeScore = isPercentInvalid
     ? '-'
     : gradingScheme
-    ? getLetterGrade(possible, score, gradingScheme.data)
+    ? GradeFormatHelper.replaceDashWithMinus(getLetterGrade(possible, score, gradingScheme.data))
     : '-'
 
   const weightText = weight ? I18n.n(weight, {percentage: true}) : '-'

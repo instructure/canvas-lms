@@ -93,6 +93,17 @@ test('returns the given grade when it is a letter grade', () => {
   equal(GradeFormatHelper.formatGrade('A'), 'A')
 })
 
+test('replaces trailing en-dash characters with minus characters', () => {
+  equal(GradeFormatHelper.formatGrade('B-', {gradingType: 'letter_grade'}), 'B−')
+})
+
+test('does not transform en-dash characters that are not trailing', () => {
+  equal(
+    GradeFormatHelper.formatGrade('smarty-pants', {gradingType: 'letter_grade'}),
+    'smarty-pants'
+  )
+})
+
 test('returns the given grade when it is a mix of letters and numbers', () => {
   equal(GradeFormatHelper.formatGrade('A3'), 'A3')
 })

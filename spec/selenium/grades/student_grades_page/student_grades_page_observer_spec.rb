@@ -121,9 +121,9 @@ describe "gradebook" do
         fj("li:contains('Student 1')").click
         fj("button:contains('Apply')").click
         wait_for_ajaximations
-        expect(f(".student_assignment.final_grade").text).to eq "Total: B-"
-        expect(f("tr[data-testid='total_row']").text).to eq "Total B-"
-        expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B-"
+        expect(f(".student_assignment.final_grade").text).to eq "Total: B−"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total B−"
+        expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B−"
       end
 
       it "can change the course filter" do

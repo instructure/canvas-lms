@@ -19,6 +19,8 @@
 #
 
 module AssignmentsHelper
+  include GradeDisplay
+
   def completed_link_options
     {
       title: I18n.t("tooltips.finished", "finished")
@@ -123,6 +125,9 @@ module AssignmentsHelper
         return I18n.n(round_if_whole(number), percentage: (grading_type == "percent"))
       end
     end
+
+    return replace_dash_with_minus(grade) if grading_type == "letter_grade"
+
     grade
   end
 end

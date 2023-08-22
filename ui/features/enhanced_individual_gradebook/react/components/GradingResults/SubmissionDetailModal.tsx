@@ -48,6 +48,7 @@ import {
   passFailStatusOptions,
 } from '../../../utils/gradebookUtils'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {usePostComment} from '../../hooks/useComments'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import DefaultGradeInput from './DefaultGradeInput'
@@ -285,7 +286,16 @@ function SubmissionGradeForm({
           setPassFailStatusIndex(0)
         }
       }
-      setGradeInput(submission.excused ? I18n.t('EX') : submission.grade ?? '-')
+
+      if (submission.excused) {
+        setGradeInput(I18n.t('EX'))
+      } else if (submission.grade == null) {
+        setGradeInput('-')
+      } else if (assignment?.gradingType === 'letter_grade') {
+        setGradeInput(GradeFormatHelper.replaceDashWithMinus(submission.grade))
+      } else {
+        setGradeInput(submission.grade)
+      }
     }
   }, [assignment, submission])
 

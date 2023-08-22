@@ -18,8 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class GradesPresenter
+  include GradeDisplay
+
   def initialize(enrollments)
     @enrollments = enrollments
+  end
+
+  def grade(course:, user:, grades:, grading_periods:)
+    student_grade = grades.dig(:student_enrollments, course.id)
+    if course.hide_final_grades? || hide_all_grading_periods_grade?(course:, grading_period: grading_periods[course.id])
+      "--"
+    elsif !student_grade
+      I18n.t("no grade")
+    elsif course.restrict_quantitative_data?(user)
+      raw_grade = course.score_to_grade(student_grade, user:)
+      replace_dash_with_minus(raw_grade)
+    else
+      I18n.n(student_grade, percentage: true)
+    end
   end
 
   def student_enrollments
@@ -70,6 +86,10 @@ class GradesPresenter
   end
 
   private
+
+  def hide_all_grading_periods_grade?(course:, grading_period:)
+    grading_period.present? && grading_period[:selected_period_id] == 0 && !course.display_totals_for_all_grading_periods?
+  end
 
   def observer_enrollments
     @observer_enrollments ||= current_enrollments.select { |e| e.is_a?(ObserverEnrollment) && e.associated_user_id }

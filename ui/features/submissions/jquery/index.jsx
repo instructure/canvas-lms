@@ -103,17 +103,30 @@ function submissionLoaded(data) {
   }
   $('.submission_header').loadingImage('remove')
 }
-function callIfSet(value, fn) {
-  return value == null ? '' : fn.call(this, value)
+function callIfSet(value, fn, ...additionalArgs) {
+  return value == null ? '' : fn.call(this, value, ...additionalArgs)
 }
 function roundAndFormat(value) {
   return I18n.n(round(value, round.DEFAULT))
+}
+function formatGradeOptions() {
+  if (ENV.GRADING_TYPE === 'letter_grade') {
+    return { gradingType: ENV.GRADING_TYPE }
+  }
+
+  return {}
 }
 function showGrade(submission) {
   if (['pass', 'fail', 'complete', 'incomplete'].indexOf(submission.entered_grade) > -1) {
     $('.grading_box').val(submission.entered_grade)
   } else {
-    $('.grading_box').val(callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade))
+    $('.grading_box').val(
+      callIfSet(
+        submission.entered_grade,
+        GradeFormatHelper.formatGrade,
+        formatGradeOptions()
+      )
+    )
   }
   $('.late_penalty').text(callIfSet(-submission.points_deducted, roundAndFormat))
   $('.published_grade').text(callIfSet(submission.published_grade, GradeFormatHelper.formatGrade))
@@ -122,7 +135,12 @@ function showGrade(submission) {
   if (submission.excused) {
     $('.entered_grade').text(I18n.t('Excused'))
   } else {
-    $('.entered_grade').text(callIfSet(submission.entered_grade, GradeFormatHelper.formatGrade))
+    const formattedGrade = callIfSet(
+      submission.entered_grade,
+      GradeFormatHelper.formatGrade,
+      formatGradeOptions()
+    )
+    $('.entered_grade').text(formattedGrade)
   }
 
   if (!submission.excused && submission.points_deducted) {

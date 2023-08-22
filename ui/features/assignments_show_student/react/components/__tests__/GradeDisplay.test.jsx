@@ -170,7 +170,7 @@ describe('GradeDisplay', () => {
       const {getByTestId} = render(
         <GradeDisplay receivedGrade="A-" pointsPossible={5} gradingType="letter_grade" />
       )
-      expect(getByTestId('grade-display')).toHaveTextContent('A-')
+      expect(getByTestId('grade-display')).toHaveTextContent('A−')
     })
 
     it('renders no displayed text if no grade has been awarded', () => {

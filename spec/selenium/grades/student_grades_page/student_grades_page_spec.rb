@@ -565,10 +565,10 @@ describe "gradebook - logged in as a student" do
 
       # the all the grades and grading period selected is based on current period
       expect(f("#grading_period_select_menu").attribute(:value)).to eq current_period_name
-      expect(f("div.final_grade").text).to eq "Total: B-"
-      expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
-      expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B-"
-      expect(f("tr[data-testid='total_row']").text).to eq "Total B-"
+      expect(f("div.final_grade").text).to eq "Total: B−"
+      expect(fj(current_assignment_selector).text).to include "GRADED\nB−\nYour grade has been updated"
+      expect(f("tr[data-testid='agtotal-Assignments']").text).to eq "Assignments B−"
+      expect(f("tr[data-testid='total_row']").text).to eq "Total B−"
       expect(f("body")).not_to contain_jqcss(future_assignment_selector)
 
       # switch to future grading period and check that everything is based on the future period
@@ -589,11 +589,11 @@ describe "gradebook - logged in as a student" do
       wait_for_ajaximations
 
       expect(fj(future_assignment_selector).text).to include "GRADED\nA\nYour grade has been updated"
-      expect(fj(current_assignment_selector).text).to include "GRADED\nB-\nYour grade has been updated"
+      expect(fj(current_assignment_selector).text).to include "GRADED\nB−\nYour grade has been updated"
 
       # Make sure the grading period totals show because display_totals_for_all_grading_periods is true
       expect(fj("tr[data-testid='gradingPeriod-#{future_period.id}']").text).to eq "Future Grading Period A"
-      expect(fj("tr[data-testid='gradingPeriod-#{current_period.id}']").text).to eq "Current Grading Period B-"
+      expect(fj("tr[data-testid='gradingPeriod-#{current_period.id}']").text).to eq "Current Grading Period B−"
 
       group.update(display_totals_for_all_grading_periods: false)
       group.save!

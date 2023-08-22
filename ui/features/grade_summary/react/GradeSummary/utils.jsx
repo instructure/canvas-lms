@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {ASSIGNMENT_SORT_OPTIONS, ASSIGNMENT_NOT_APPLICABLE, ASSIGNMENT_STATUS} from './constants'
+import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {IconCheckLine, IconXLine} from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 
@@ -211,15 +212,17 @@ export const getDisplayScore = (assignment, gradingStandard) => {
       assignment?.gradingType === 'percent' ||
       assignment?.gradingType === 'points')
   ) {
-    return getAssignmentLetterGrade(assignment, gradingStandard)
+    const letterGrade = getAssignmentLetterGrade(assignment, gradingStandard)
+    return GradeFormatHelper.replaceDashWithMinus(letterGrade)
   } else if (
     assignment?.gradingType === 'letter_grade' ||
     assignment?.gradingType === 'gpa_scale'
   ) {
-    return getAssignmentLetterGrade(
+    const letterGrade = getAssignmentLetterGrade(
       assignment,
       assignment?.gradingStandard ? assignment?.gradingStandard : gradingStandard
     )
+    return GradeFormatHelper.replaceDashWithMinus(letterGrade)
   } else if (assignment?.gradingType === 'percentage') {
     return `${getAssignmentPercentage(assignment)}%`
   } else if (assignment?.gradingType === 'pass_fail') {
@@ -250,7 +253,7 @@ export const scorePercentageToLetterGrade = (score, gradingStandard) => {
       letter = gradeLevel.letterGrade
     }
   })
-  return letter
+  return GradeFormatHelper.replaceDashWithMinus(letter)
 }
 
 // **************************** DROP ASSIGNMENT FROM ASSIGNMENT GROUP ****************************

@@ -94,7 +94,7 @@ export interface EnvGradebookSpeedGrader {
   instructor_selectable_states: unknown
   final_grader_id: unknown
   grading_role: unknown
-  grading_type: unknown
+  grading_type: string
   lti_retrieve_url: string
   course_id: string
   assignment_id: string

@@ -114,15 +114,15 @@ describe('FinalGradeOverrideTextBox', () => {
       expect(getByTestId('final-grade-override-textbox')).toBeInTheDocument()
     })
 
-    it('replaces the input with the letter grade when the user inputs a valid grade', async () => {
+    it('replaces the input with the letter grade (replacing trailing en-dash with minus) when the user inputs a valid grade', async () => {
       const {getByTestId} = renderTextBox()
       const input = getByTestId('final-grade-override-textbox')
-      fireEvent.change(input, {target: {value: '95'}})
+      fireEvent.change(input, {target: {value: '90'}})
       fireEvent.blur(input)
       const args = mockedOnGradeChange.mock.calls[0][0]
       expect(args.valid).toBeTruthy()
-      expect(args.grade.percentage).toEqual(95)
-      expect(args.grade.schemeKey).toEqual('A')
+      expect(args.grade.percentage).toEqual(90)
+      expect(args.grade.schemeKey).toEqual('A−')
     })
 
     it('does not change the grade when the user enters the same grade', async () => {

@@ -239,4 +239,36 @@ describe Submission::ShowPresenter do
       end
     end
   end
+
+  describe "#entered_grade" do
+    before do
+      @teacher = course.enroll_teacher(User.create!, active_all: true).user
+      @student = course.enroll_student(User.create!, active_all: true).user
+      @assignment = course.assignments.create!(points_possible: 10, grading_type: "points")
+    end
+
+    let(:en_dash) { "-" }
+    let(:minus) { "−" }
+    let(:presenter) do
+      Submission::ShowPresenter.new(submission: @assignment.submissions.find_by(user: @student), current_user: @student)
+    end
+
+    it "returns the entered grade" do
+      @assignment.grade_student(@student, grader: @teacher, grade: "8")
+      expect(presenter.entered_grade).to eq "8"
+    end
+
+    it "returns a letter grade with trailing en-dash replaced with minus if 'Restrict Quantitative Data' is enabled" do
+      course.root_account.enable_feature!(:restrict_quantitative_data)
+      course.update!(restrict_quantitative_data: true)
+      @assignment.grade_student(@student, grader: @teacher, grade: "8")
+      expect(presenter.entered_grade).to eq "B#{minus}"
+    end
+
+    it "returns a letter grade with trailing en-dash replaced with minus if the assignment type is letter grade" do
+      @assignment.update!(grading_type: "letter_grade")
+      @assignment.grade_student(@student, grader: @teacher, grade: "B#{en_dash}")
+      expect(presenter.entered_grade).to eq "B#{minus}"
+    end
+  end
 end
