@@ -31,10 +31,12 @@ import {
   compareFilterSetByUpdatedDate,
   deserializeFilter,
   doFiltersMatch,
+  getCustomStatusIdStrings,
   isFilterNotEmpty,
 } from '../Gradebook.utils'
 import GradebookApi from '../apis/GradebookApi'
 import type {GradebookStore} from './index'
+import {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
 const I18n = useI18nScope('gradebook')
 
@@ -50,7 +52,8 @@ export type FiltersState = {
   toggleFilter: (filter: Filter) => void
   initializeAppliedFilters: (
     initialRowFilterSettings: InitialRowFilterSettings,
-    initialColumnFilterSettings: InitialColumnFilterSettings
+    initialColumnFilterSettings: InitialColumnFilterSettings,
+    customGradeStatuses: GradeStatus[]
   ) => void
   initializeStagedFilters: () => void
   fetchFilters: () => Promise<void>
@@ -114,7 +117,8 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
 
   initializeAppliedFilters: (
     initialRowFilterSettings: InitialRowFilterSettings,
-    initialColumnFilterSettings: InitialColumnFilterSettings
+    initialColumnFilterSettings: InitialColumnFilterSettings,
+    customStatuses: GradeStatus[]
   ) => {
     const appliedFilters: Filter[] = []
 
@@ -147,7 +151,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         created_at: new Date().toISOString(),
       })
     }
-
+    const customStatusIds = getCustomStatusIdStrings(customStatuses)
     if (
       [
         'has-ungraded-submissions',
@@ -160,6 +164,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         'dropped',
         'excused',
         'extended',
+        ...customStatusIds,
       ].includes(initialColumnFilterSettings.submissions || '')
     ) {
       appliedFilters.push({

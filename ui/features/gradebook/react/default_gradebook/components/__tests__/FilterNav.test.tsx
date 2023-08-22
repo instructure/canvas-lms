@@ -159,6 +159,18 @@ const defaultProps: FilterNavProps = {
       ],
     },
   },
+  customStatuses: [
+    {
+      id: '1',
+      name: 'Custom Status 1',
+      color: '#000000',
+    },
+    {
+      id: '2',
+      name: 'Custom Status 2',
+      color: '#000000',
+    },
+  ],
 }
 
 const defaultAppliedFilters: Filter[] = [
@@ -271,6 +283,23 @@ describe('FilterNav', () => {
     )
   })
 
+  it('render custom status filter', () => {
+    store.setState({
+      appliedFilters: [
+        {
+          id: '1',
+          type: 'submissions',
+          value: 'custom-status-1',
+          created_at: new Date().toISOString(),
+        },
+      ],
+    })
+    const {getByTestId} = render(<FilterNav {...defaultProps} />)
+    expect(getByTestId(`applied-filter-${defaultProps.customStatuses[0].name}`)).toHaveTextContent(
+      defaultProps.customStatuses[0].name
+    )
+  })
+
   it('render All Grading Periods filter', () => {
     store.setState({
       appliedFilters: [
@@ -344,6 +373,28 @@ describe('Filter dropdown', () => {
     expect(getByText('Grading Periods')).toBeVisible()
     expect(getByText('Assignment Groups')).toBeVisible()
     expect(getByText('Student Groups')).toBeVisible()
+    expect(getByText('Status')).toBeVisible()
+    expect(getByText('Submissions')).toBeVisible()
+    expect(getByText('Start & End Date')).toBeVisible()
+  })
+
+  it('Custom Statuses and regular statuses are shown in the status filter', async () => {
+    const {getByText} = render(<FilterNav {...defaultProps} />)
+    userEvent.click(getByText('Apply Filters'))
+    userEvent.click(getByText('Status'))
+    const customStatusNames = defaultProps.customStatuses.map(status => status.name)
+    const allStatusNames = [
+      'Late',
+      'Missing',
+      'Resubmitted',
+      'Dropped',
+      'Excused',
+      'Extended',
+      ...customStatusNames,
+    ]
+    allStatusNames.forEach(statusName => {
+      expect(getByText(statusName)).toBeVisible()
+    })
   })
 
   it('Clicking filter preset activates condition', async () => {

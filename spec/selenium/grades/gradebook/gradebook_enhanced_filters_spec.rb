@@ -31,6 +31,7 @@ describe "Enhanced Gradebook Filters" do
 
   before(:once) do
     Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
+    Account.site_admin.enable_feature!(:custom_gradebook_statuses)
     init_course_with_students(2)
     create_course_late_policy
     create_assignments
@@ -43,6 +44,13 @@ describe "Enhanced Gradebook Filters" do
     @student2 = @students[1]
     @a5 = @course.assignments.create!(
       title: "assignment five",
+      grading_type: "points",
+      points_possible: 10,
+      due_at: 7.days.from_now(@now),
+      submission_types: "online_text_entry"
+    )
+    @a6 = @course.assignments.create!(
+      title: "assignment six",
       grading_type: "points",
       points_possible: 10,
       due_at: 7.days.from_now(@now),
@@ -71,10 +79,12 @@ describe "Enhanced Gradebook Filters" do
     @group1.save!
     @group2.add_user(@student2)
     @group2.save!
+    @custom_status = CustomGradeStatus.create!(name: "No Presentado", color: "#00ffff", created_by: @teacher, root_account_id: @course.root_account_id)
     Submission.find_by(assignment_id: @a2.id, user_id: @student1).update!(late_policy_status: "missing")
     Submission.find_by(assignment_id: @a2.id, user_id: @student2).update!(late_policy_status: "late")
     Submission.find_by(assignment_id: @a3.id, user_id: @student1).update!(late_policy_status: "extended")
     Submission.find_by(assignment_id: @a3.id, user_id: @student2).update!(grade_matches_current_submission: false, workflow_state: "submitted")
+    Submission.find_by(assignment_id: @a6.id, user_id: @student1).update!(custom_grade_status_id: @custom_status.id)
     @a2.grade_student(@student2, grade: 10, grader: @teacher)
     @a5.grade_student(@student2, grade: 10, grader: @teacher)
   end
@@ -118,7 +128,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_assignment_names).to eq [@a2.name]
 
         Gradebook.remove_student_or_assignment_filter(@a2.name)
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
       end
 
       it "can filter and unfilter by module" do
@@ -128,7 +138,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_assignment_names).to eq [@a2.name]
 
         Gradebook.select_filter_menu_item(@module2.name)
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
       end
 
       it "can filter and unfilter by section" do
@@ -158,7 +168,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_assignment_names).to eq [@a1.name]
 
         Gradebook.select_filter_menu_item(@gp_closed.title)
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
       end
 
       it "can filter and unfilter by assignment group" do
@@ -168,7 +178,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_assignment_names).to eq [@a2.name, @a3.name]
 
         Gradebook.select_filter_menu_item(@assignment_group2.name)
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
       end
 
       it "can filter and unfilter by excused status" do
@@ -179,7 +189,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student1.name]
 
         Gradebook.select_filter_menu_item("Excused")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -191,7 +201,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student2.name]
 
         Gradebook.select_filter_menu_item("Late")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -203,7 +213,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student1.name]
 
         Gradebook.select_filter_menu_item("Missing")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -215,7 +225,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student2.name]
 
         Gradebook.select_filter_menu_item("Resubmitted")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -227,7 +237,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student1.name]
 
         Gradebook.select_filter_menu_item("Dropped")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -239,7 +249,19 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student1.name]
 
         Gradebook.select_filter_menu_item("Extended")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
+      end
+
+      it "can filter and unfilter by custom status" do
+        Gradebook.apply_filters_button.click
+        Gradebook.select_filter_type_menu_item("Status")
+        Gradebook.select_filter_menu_item("No Presentado")
+        expect(Gradebook.fetch_assignment_names).to eq [@a6.name]
+        expect(Gradebook.fetch_student_names).to eq [@student1.name]
+
+        Gradebook.select_filter_menu_item("No Presentado")
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -251,7 +273,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student2.name]
 
         Gradebook.select_filter_menu_item("Has Ungraded Submissions")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -263,7 +285,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
 
         Gradebook.select_filter_menu_item("Has Submissions")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -271,11 +293,11 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.apply_filters_button.click
         Gradebook.select_filter_type_menu_item("Submissions")
         Gradebook.select_filter_menu_item("Has No Submissions")
-        expect(Gradebook.fetch_assignment_names).to eq [@a5.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a5.name, @a6.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
 
         Gradebook.select_filter_menu_item("Has No Submissions")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -287,7 +309,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student2.name]
 
         Gradebook.select_filter_menu_item("Has Unposted Grades")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -297,14 +319,14 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.input_start_date(6.days.from_now(@now))
         Gradebook.input_end_date(8.days.from_now(@now))
         Gradebook.apply_date_filter
-        expect(Gradebook.fetch_assignment_names).to eq [@a5.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a5.name, @a6.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
 
         Gradebook.select_filter_type_menu_item("Start & End Date")
         Gradebook.clear_start_date_input
         Gradebook.clear_end_date_input
         Gradebook.apply_date_filter
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
 
@@ -364,7 +386,7 @@ describe "Enhanced Gradebook Filters" do
         expect(Gradebook.fetch_student_names).to eq [@student1.name]
 
         Gradebook.clear_filter("Has submissions")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
 
         Gradebook.clear_filter("group1")
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
@@ -399,7 +421,7 @@ describe "Enhanced Gradebook Filters" do
 
         Gradebook.clear_filter("Start Date #{format_date_for_view(1.day.from_now(@now), "%-m/%-d/%Y")}")
         Gradebook.clear_filter("End Date #{format_date_for_view(3.days.from_now(@now), "%-m/%-d/%Y")}")
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
       end
     end
 
@@ -499,7 +521,7 @@ describe "Enhanced Gradebook Filters" do
         Gradebook.enable_filter_preset("preset1")
         Gradebook.clear_all_filters
 
-        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a2.name, @a3.name]
+        expect(Gradebook.fetch_assignment_names).to eq [@a4.name, @a5.name, @a6.name, @a2.name, @a3.name]
         expect(Gradebook.fetch_student_names).to eq [@student1.name, @student2.name]
       end
     end

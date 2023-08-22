@@ -293,6 +293,8 @@ export type Filter = {
   created_at: string
 }
 
+export type CustomStatusIdString = `custom-status-${string}`
+
 export type SubmissionFilterValue =
   | 'dropped'
   | 'excused'
@@ -304,6 +306,7 @@ export type SubmissionFilterValue =
   | 'late'
   | 'missing'
   | 'resubmitted'
+  | CustomStatusIdString
 
 export type FilterPreset = {
   id: string

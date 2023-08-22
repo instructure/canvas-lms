@@ -116,7 +116,10 @@ export default function GradebookData(props: Props) {
     })
     initializeAppliedFilters(
       props.gradebookEnv.settings.filter_rows_by || {},
-      props.gradebookEnv.settings.filter_columns_by || {}
+      props.gradebookEnv.settings.filter_columns_by || {},
+      props.gradebookEnv.custom_grade_statuses_enabled
+        ? props.gradebookEnv.custom_grade_statuses
+        : []
     )
   }, [
     courseId,
@@ -127,6 +130,8 @@ export default function GradebookData(props: Props) {
     props.gradebookEnv.course_settings.allow_final_grade_override,
     props.gradebookEnv.reorder_custom_columns_url,
     initializeAppliedFilters,
+    props.gradebookEnv.custom_grade_statuses_enabled,
+    props.gradebookEnv.custom_grade_statuses,
   ])
 
   // Data loading logic goes here
