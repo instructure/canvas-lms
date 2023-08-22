@@ -73,20 +73,12 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     end
 
     user = JSON.parse(params[:user]) if params[:user]
-    id_token.merge!(user["name"].slice("firstName", "lastName")) if user["name"]
+    id_token.merge!(user["name"].slice("firstName", "lastName")) if user && user["name"]
     id_token
   end
 
   def claims(token)
     token
-  end
-
-  def generate_authorize_url(redirect_uri, state)
-    # wtf Apple https://forums.developer.apple.com/thread/122458
-    # we _could_ update faraday, which has been fixed to deal with this as well,
-    # but that's a long rabbit whole of other gems that would need updating and
-    # have very large breaking changes, so far riskier
-    super.gsub("+", "%20")
   end
 
   protected
