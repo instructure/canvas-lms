@@ -108,6 +108,7 @@ describe "recurring events" do
     end
 
     it "creates daily recurring event and verifies on month view calendar" do
+      skip("LF-578 - needs update to ajax time to work properly")
       get "/calendar2#view_name=month&view_start=2023-07-01"
       create_new_calendar_event
       newdate = "July 20, 2023"
