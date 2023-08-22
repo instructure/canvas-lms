@@ -22,6 +22,7 @@ import {useSearchParams} from 'react-router-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import userSettings from '@canvas/user-settings'
 import {View} from '@instructure/ui-view'
+import gradingHelpers from '@canvas/grading/AssignmentGroupGradeCalculator'
 
 import {AssignmentGroupCriteriaMap} from '../../../../shared/grading/grading.d'
 import AssignmentInformation from './AssignmentInformation'
@@ -63,6 +64,7 @@ export default function EnhancedIndividualGradebook() {
     useState<AssignmentSubmissionsMap>({})
   const [students, setStudents] = useState<SortableStudent[]>()
   const [assignments, setAssignments] = useState<SortableAssignment[]>()
+  const [assignmentDropped, setAssignmentDropped] = useState<boolean>(false)
 
   const courseId = ENV.GRADEBOOK_OPTIONS?.context_id || ''
   const [searchParams, setSearchParams] = useSearchParams()
@@ -148,6 +150,48 @@ export default function EnhancedIndividualGradebook() {
     }
   }, [data, error])
 
+  useEffect(() => {
+    if (!selectedAssignment || !assignments || !studentSubmissions || !assignmentGroupMap) {
+      return
+    }
+    const assignmentGroup = assignmentGroupMap[selectedAssignment?.assignmentGroupId ?? '']
+
+    const relevantSubmissions = studentSubmissions.filter(submission => {
+      const submissionAssignment = assignments?.find(a => a.id === submission.assignmentId)
+      if (
+        assignmentGroup?.assignments
+          .map(assignment => assignment.id)
+          .includes(submissionAssignment?.id || '') &&
+        !!submission.grade
+      ) {
+        return submission
+      }
+      return null
+    })
+
+    const droppableSubmissions = relevantSubmissions.map(submission => {
+      const submissionAssignment = assignments?.find(a => a.id === submission.assignmentId)
+      return {
+        score: submission.score,
+        grade: submission.grade,
+        total: submissionAssignment?.pointsPossible || 0,
+        assignment_id: submissionAssignment?.id,
+        workflow_state: submissionAssignment?.workflowState,
+        excused: submission.excused,
+        id: submission.id,
+        submission: {assignment_id: submissionAssignment?.id},
+      }
+    })
+
+    const assignmentIdsToKeep = gradingHelpers
+      .dropAssignments(droppableSubmissions, assignmentGroup?.rules)
+      .map(s => s.assignment_id)
+    const droppedAssignmentIds: (string | undefined)[] = droppableSubmissions
+      .filter(s => !assignmentIdsToKeep.includes(s.assignment_id))
+      .map(s => s.assignment_id)
+    setAssignmentDropped(droppedAssignmentIds.includes(selectedAssignment.id))
+  }, [selectedAssignment, assignments, studentSubmissions, assignmentGroupMap])
+
   const invalidAssignmentGroups = Object.keys(assignmentGroupMap).reduce((invalidKeys, groupId) => {
     const {invalid, name, gradingPeriodsIds} = assignmentGroupMap[groupId]
     const {selectedGradingPeriodId} = gradebookOptions
@@ -222,6 +266,7 @@ export default function EnhancedIndividualGradebook() {
     },
     [selectedStudentId, updateSubmissionDetails]
   )
+
   return (
     <View as="div">
       <View as="div" className="row-fluid">
@@ -291,6 +336,7 @@ export default function EnhancedIndividualGradebook() {
         loadingStudent={loadingStudent}
         onSubmissionSaved={handleSubmissionSaved}
         currentStudentHiddenName={currentStudentHiddenName}
+        dropped={assignmentDropped}
       />
 
       <div className="hr" style={{margin: 10, padding: 10, borderBottom: '1px solid #eee'}} />

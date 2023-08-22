@@ -247,6 +247,24 @@ describe('Grading Results Tests', () => {
       expect(getByTestId('submission_details_grade_input')).not.toBeDisabled()
       expect(getByTestId('submission-details-submit-button')).not.toBeDisabled()
     })
+
+    it('renders a message indicating that the current assignment is dropped when dropped is true', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        dropped: true,
+      }
+      const {getByTestId} = renderGradingResults(modifiedProps)
+      expect(getByTestId('dropped-assignment-message')).toBeInTheDocument()
+    })
+
+    it('does not render a message indicating that the current assignment is dropped when dropped is false', () => {
+      const modifiedProps = {
+        ...gradingResultsDefaultProps,
+        dropped: false,
+      }
+      const {queryByTestId} = renderGradingResults(modifiedProps)
+      expect(queryByTestId('dropped-assignment-message')).not.toBeInTheDocument()
+    })
   })
   describe('the assignment grading type is pass fail', () => {
     let modifiedDefaultStudentSubmissions: GradebookUserSubmissionDetails

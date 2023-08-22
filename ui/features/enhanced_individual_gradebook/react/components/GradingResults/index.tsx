@@ -50,6 +50,7 @@ export type GradingResultsComponentProps = {
   loadingStudent: boolean
   currentStudentHiddenName: string
   onSubmissionSaved: (submission: GradebookUserSubmissionDetails) => void
+  dropped: boolean
 }
 
 export default function GradingResults({
@@ -61,6 +62,7 @@ export default function GradingResults({
   loadingStudent,
   currentStudentHiddenName,
   onSubmissionSaved,
+  dropped,
 }: GradingResultsComponentProps) {
   const submission = studentSubmissions?.find(s => s.assignmentId === assignment?.id)
   const [gradeInput, setGradeInput] = useState<string>('')
@@ -291,7 +293,11 @@ export default function GradingResults({
                 </label>
               </div>
             )}
-
+            {dropped && (
+              <p className="dropped muted" data-testid="dropped-assignment-message">
+                This grade is currently dropped for this student.
+              </p>
+            )}
             <View as="div" className="span4" margin="medium 0 0 0" width="14.6rem">
               <Button
                 data-testid="submission-details-button"

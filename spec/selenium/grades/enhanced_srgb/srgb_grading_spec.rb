@@ -188,7 +188,6 @@ describe "Screenreader Gradebook grading" do
     end
 
     it "on dropped assignments" do
-      skip "unskip w/ EVAL-3359 BUG: dropped assignments do not have 'This grade is currently dropped for this student.' message"
       # create an assignment group with drop lowest 1 score rule
       EnhancedSRGB.drop_lowest(test_course, 1)
 
@@ -200,7 +199,7 @@ describe "Screenreader Gradebook grading" do
       EnhancedSRGB.select_assignment(assignment_1)
 
       # indicates assignment_1 was dropped
-      expect(f(".dropped.muted")).to include_text("This grade is currently dropped for this student.")
+      expect(EnhancedSRGB.dropped_message).to include_text("This grade is currently dropped for this student.")
     end
 
     it "on resubmitted assignments" do

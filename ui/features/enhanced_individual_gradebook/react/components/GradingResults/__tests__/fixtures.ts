@@ -103,5 +103,6 @@ export const gradingResultsDefaultProps: GradingResultsComponentProps = {
   gradebookOptions: defaultGradebookOptions,
   loadingStudent: false,
   currentStudentHiddenName: '',
+  dropped: false,
   onSubmissionSaved: () => {},
 }
