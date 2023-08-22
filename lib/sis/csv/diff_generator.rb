@@ -106,7 +106,7 @@ module SIS
               }
             end
           rescue CsvDiff::Failure => e
-            add_warning(current_csv, I18n.t("Couldn't generate diff: %{message}", message: e.message))
+            add_warning(csvs.first, I18n.t("Couldn't generate diff: %{message}", message: e.message))
             generated.concat(csvs)
           end
         end
