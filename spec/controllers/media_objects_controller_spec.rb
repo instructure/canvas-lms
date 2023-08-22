@@ -942,6 +942,26 @@ describe MediaObjectsController do
       get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
       assert_status(200)
     end
+
+    context "with the media_links_use_attachment_id feature flag disabled" do
+      before do
+        Account.site_admin.disable_feature!(:media_links_use_attachment_id)
+      end
+
+      it "redirects to media_objects_iframe" do
+        user_session(@student)
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id }
+        expect(response).to be_redirect
+        expect(response.location).to eq "http://test.host/media_objects_iframe/0_deadbeef"
+      end
+
+      it "redirects to media_objects_iframe with query params" do
+        user_session(@student)
+        get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, embed: true, foo: "bar" }
+        expect(response).to be_redirect
+        expect(response.location).to eq "http://test.host/media_objects_iframe/0_deadbeef?embed=true&foo=bar"
+      end
+    end
   end
 
   describe "#media_attachment_api_json" do
