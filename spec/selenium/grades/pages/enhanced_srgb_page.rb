@@ -200,6 +200,10 @@ class EnhancedSRGB
       f('[data-testid="default-grade-close-button"]')
     end
 
+    def dropped_message
+      f('[data-testid="dropped-assignment-message"]')
+    end
+
     def curve_grade_button
       f('[data-testid="curve-grades-button"]')
     end

@@ -114,7 +114,11 @@ export function mapAssignmentGroupQueryResults(
           }
         }),
         group_weight: curr.groupWeight,
-        rules: curr.rules,
+        rules: {
+          drop_lowest: curr.rules.dropLowest,
+          drop_highest: curr.rules.dropHighest,
+          never_drop: curr.rules.neverDrop,
+        },
         id: curr.id,
         position: curr.position,
         integration_data: {},

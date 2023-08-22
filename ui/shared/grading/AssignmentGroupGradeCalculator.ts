@@ -24,6 +24,7 @@ import type {AggregateGrade, AssignmentGroupGrade, SubmissionGradeCriteria} from
 type DroppableSubmission = {
   total: number
   drop?: boolean
+  assignment_id?: string
 }
 
 function partition(collection, partitionFn) {

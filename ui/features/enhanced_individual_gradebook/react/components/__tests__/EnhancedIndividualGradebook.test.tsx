@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
 import axios from 'axios'
 import {MockedProvider} from '@apollo/react-testing'
 import {render, within, fireEvent} from '@testing-library/react'
@@ -68,6 +69,7 @@ describe('Enhanced Individual Gradebook', () => {
     mockedAxios.get.mockResolvedValue({
       data: [],
     })
+    $.subscribe = jest.fn()
   })
   afterEach(() => {
     jest.spyOn(ReactRouterDom, 'useSearchParams').mockClear()
@@ -264,6 +266,34 @@ describe('Enhanced Individual Gradebook', () => {
       expect(assignmentInformationName).toBeInTheDocument()
       expect(
         within(assignmentInformationName).getByText('Missing Assignment 1')
+      ).toBeInTheDocument()
+    })
+
+    it('renders a dropped message if the assignment is being dropped from grade calculation for the current student', async () => {
+      mockUserSettings()
+      const {getByTestId} = renderEnhancedIndividualGradebook()
+      await new Promise(resolve => setTimeout(resolve, 0))
+      fireEvent.change(getByTestId('content-selection-assignment-select'), {target: {value: '1'}})
+      fireEvent.change(getByTestId('content-selection-student-select'), {target: {value: '5'}})
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      const gradingResults = getByTestId('grading-results')
+      expect(
+        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 1')
+      ).toBeInTheDocument()
+      expect(
+        within(gradingResults).queryByText('This grade is currently dropped for this student.')
+      ).not.toBeInTheDocument()
+
+      fireEvent.change(getByTestId('content-selection-assignment-select'), {target: {value: '2'}})
+      fireEvent.change(getByTestId('content-selection-student-select'), {target: {value: '5'}})
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      expect(
+        within(gradingResults).getByText('Grade for Student 1 - Missing Assignment 2')
+      ).toBeInTheDocument()
+      expect(
+        within(gradingResults).getByText('This grade is currently dropped for this student.')
       ).toBeInTheDocument()
     })
   })

@@ -68,9 +68,9 @@ export type AssignmentGroupConnection = {
   name: string
   groupWeight: number
   rules: {
-    drop_lowest?: number
-    drop_highest?: number
-    never_drop?: string[]
+    dropLowest?: number
+    dropHighest?: number
+    neverDrop?: string[]
   }
   sisId: string | null
   state: string
