@@ -20,6 +20,8 @@
 require "simple_oauth"
 require "inst_statsd"
 require "active_support/core_ext/string/filters"
+require "faraday/follow_redirects"
+require "faraday/multipart"
 
 module TurnitinApi
   class OutcomesResponseTransformer
@@ -93,7 +95,7 @@ module TurnitinApi
         conn.request :multipart
         conn.request :url_encoded
         conn.response :json, content_type: /\bjson$/
-        conn.use FaradayMiddleware::FollowRedirects
+        conn.response :follow_redirects
         conn.adapter :net_http
       end
     end

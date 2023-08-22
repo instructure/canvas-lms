@@ -21,7 +21,6 @@ require "json"
 require "securerandom"
 require "simple_oauth"
 require "faraday"
-require "faraday_middleware"
 
 module TurnitinApi
   require "turnitin_api/version"
