@@ -121,7 +121,7 @@ gem "rss", "~> 0.3", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
-gem "rubyzip", "2.3.0", require: "zip"
+gem "rubyzip", "~> 2.3", require: "zip"
 gem "saml2", "3.1.2"
 gem "sanitize", "~> 6.0", require: false
 gem "sentry-rails", "~> 5.10"
