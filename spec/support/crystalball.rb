@@ -203,6 +203,8 @@ module Crystalball
       include Strategy
 
       CONFIG_CHANGES = [%r{config/.*.rb$}, %r{config/feature_flags/.*yml}, /Dockerfile/, /Jenkinsfile/, %r{build/new-jenkins/}].freeze
+      GEMFILE_CHANGES = [/Gemfile.lock/].freeze
+      PLUGINS_GEMFILE_CHANGES = [%r{Gemfile.d/.*.rb}, /.*.gemspec/].freeze
 
       # @param [Crystalball::SourceDiff] diff - the diff from which to predict
       #   which specs should run
@@ -231,6 +233,14 @@ module Crystalball
             ["."]
           elsif file_changes["modified"].find { |path| CONFIG_CHANGES.any? { |config_path| path =~ config_path } }
             Crystalball.log :warn, "Crystalball detected ruby config/ file changes!"
+            Crystalball.log :warn, "Crystalball requesting entire suite re-run"
+            ["."]
+          elsif file_changes["modified"].find { |path| GEMFILE_CHANGES.any? { |gemfile_path| path =~ gemfile_path } }
+            Crystalball.log :warn, "Crystalball detected Gemfile.lock changes!"
+            Crystalball.log :warn, "Crystalball requesting entire suite re-run"
+            ["."]
+          elsif ENV["CRYSTALBALL_REPO_PATH"]&.include?("gems/plugins") && file_changes["modified"].find { |path| PLUGINS_GEMFILE_CHANGES.any? { |gemfile_path| path =~ gemfile_path } }
+            Crystalball.log :warn, "Crystalball detected Plugin Gemfile/Gemfile.lock changes!"
             Crystalball.log :warn, "Crystalball requesting entire suite re-run"
             ["."]
           else
