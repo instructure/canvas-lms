@@ -1008,7 +1008,7 @@ GEM
       sexp_processor (~> 4.16)
     rubycas-client (2.3.9)
       activesupport
-    rubyzip (2.3.0)
+    rubyzip (2.3.2)
     saml2 (3.1.2)
       activesupport (>= 3.2, < 7.1)
       nokogiri (>= 1.5.8, < 2.0)
@@ -1345,7 +1345,7 @@ DEPENDENCIES
   ruby-duration (= 3.2.3)
   ruby-rtf (= 0.0.5)
   rubycas-client (= 2.3.9)
-  rubyzip (= 2.3.0)
+  rubyzip (~> 2.3)
   saml2 (= 3.1.2)
   sanitize (~> 6.0)
   scrypt (= 3.0.7)
