@@ -2929,7 +2929,6 @@ class User < ActiveRecord::Base
   end
 
   def suspended?
-    active_pseudonyms = pseudonyms.shard(self).active
     active_pseudonyms.empty? ? false : active_pseudonyms.all?(&:suspended?)
   end
 
