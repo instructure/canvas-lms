@@ -933,6 +933,7 @@ describe BasicLTI::BasicOutcomes do
 
       context "when quizzes_next_submission_history is off" do
         before do
+          allow(tool.context.root_account).to receive(:feature_enabled?).and_call_original
           allow(tool.context.root_account).to receive(:feature_enabled?)
             .with(:quizzes_next_submission_history).and_return(false)
         end

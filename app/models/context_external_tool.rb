@@ -1078,18 +1078,20 @@ class ContextExternalTool < ActiveRecord::Base
     prefer_1_1: false
   )
     GuardRail.activate(:secondary) do
-      preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
-      can_use_preferred_tool = preferred_tool && contexts_to_search(context).member?(preferred_tool.context)
+      preferred_tool = ContextExternalTool.where(id: preferred_tool_id).first if preferred_tool_id # don't raise an exception if it's not found
+      original_client_id = preferred_tool&.developer_key_id
+      can_use_preferred_tool = preferred_tool&.active? && contexts_to_search(context).member?(preferred_tool.context)
 
       # always use the preferred_tool_id if url isn't provided
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
       sorted_external_tools = find_and_order_tools(
-        context,
-        preferred_tool_id,
-        exclude_tool_id,
-        preferred_client_id,
+        context:,
+        preferred_tool_id:,
+        exclude_tool_id:,
+        preferred_client_id:,
+        original_client_id:,
         only_1_3:,
         prefer_1_1:
       )
@@ -1127,13 +1129,14 @@ class ContextExternalTool < ActiveRecord::Base
   # the right tool, making it possible to eventually perform the rest of the URL matching
   # in SQL as well.
   def self.find_and_order_tools(
-    context,
-    preferred_tool_id_param, exclude_tool_id, preferred_client_id,
+    context:,
+    preferred_tool_id: nil, exclude_tool_id: nil, preferred_client_id: nil,
+    original_client_id: nil,
     only_1_3: false,
     prefer_1_1: false
   )
     context.shard.activate do
-      preferred_tool_id = Shard.integral_id_for(preferred_tool_id_param)
+      preferred_tool_id = Shard.integral_id_for(preferred_tool_id)
       contexts = contexts_to_search(context)
       context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
 
@@ -1153,6 +1156,13 @@ class ContextExternalTool < ActiveRecord::Base
       # is in an actual id format
       if preferred_tool_id
         order_clauses << sort_by_sql_string("#{quoted_table_name}.id = #{preferred_tool_id}")
+      end
+
+      # prefer tools from the original developer key when requested,
+      # and over other order clauses like context
+      prefer_original_client_id = context.root_account.feature_enabled?(:lti_find_external_tool_prefer_original_client_id)
+      if prefer_original_client_id && (original_client_id = Shard.integral_id_for(original_client_id))
+        order_clauses.prepend(sort_by_sql_string("developer_key_id = #{original_client_id}"))
       end
 
       query = ContextExternalTool.where(context: contexts).active

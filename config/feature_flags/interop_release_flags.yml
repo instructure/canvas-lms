@@ -237,3 +237,11 @@ lti_overwrite_user_url_input_select_content_dialog:
   description: |-
     If enabled, the user's LTI URL input on the select content dialog will be overwritten 
     if the tool responds with a valid LTI URL.
+lti_find_external_tool_prefer_original_client_id:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Prefer LTI tools with a matching client ID when finding an external tool
+  description: |-
+    When possible, the LTI tool finding logic will prefer tools installed from the same
+    developer key as the original tool. This prevents the edge case where multiple developer
+    keys share the same domain, and a tool from the wrong developer key would be matched first.

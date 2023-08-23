@@ -1868,11 +1868,55 @@ describe ContextExternalTool do
         it_behaves_like "matches tool with overrides"
       end
     end
+
+    context "when closest matching tool is from a different developer key" do
+      let(:url) { "http://test.com" }
+      let(:tool_params) do
+        {
+          name: "a",
+          url:,
+          consumer_key: "12345",
+          shared_secret: "secret",
+          developer_key: original_key
+        }
+      end
+      let(:original_key) { DeveloperKey.create! }
+      let(:other_key) { DeveloperKey.create! }
+      let(:original_tool) { @course.context_external_tools.create!(tool_params) }
+      let(:matching_tool) { @course.root_account.context_external_tools.create!(tool_params) }
+      let(:closest_tool) { @course.context_external_tools.create!(tool_params.merge(developer_key: other_key)) }
+
+      before do
+        original_tool.destroy!
+        matching_tool
+        closest_tool
+      end
+
+      context "and the flag is disabled" do
+        before do
+          @course.root_account.disable_feature!(:lti_find_external_tool_prefer_original_client_id)
+        end
+
+        it "returns the closest matching tool" do
+          expect(ContextExternalTool.find_external_tool(url, @course, original_tool.id)).to eq closest_tool
+        end
+      end
+
+      context "and the flag is enabled" do
+        before do
+          @course.root_account.enable_feature!(:lti_find_external_tool_prefer_original_client_id)
+        end
+
+        it "prefers tool from the same developer key" do
+          expect(ContextExternalTool.find_external_tool(url, @course, original_tool.id)).to eq matching_tool
+        end
+      end
+    end
   end
 
   describe "find_and_order_tools" do
     subject do
-      ContextExternalTool.find_and_order_tools(@course, preferred_tool_id, exclude_tool_id, preferred_client_id).to_a
+      ContextExternalTool.find_and_order_tools(context: @course, preferred_tool_id:, exclude_tool_id:, preferred_client_id:, original_client_id:).to_a
     end
 
     let(:tool1) { external_tool_model(context: @course, opts: { name: "tool1" }) }
@@ -1882,6 +1926,7 @@ describe ContextExternalTool do
     let(:preferred_tool_id) { nil }
     let(:exclude_tool_id) { nil }
     let(:preferred_client_id) { nil }
+    let(:original_client_id) { nil }
     let(:key) { DeveloperKey.create! }
 
     before do
@@ -2001,7 +2046,7 @@ describe ContextExternalTool do
 
       context "when prefer_1_1 is true" do
         subject do
-          ContextExternalTool.find_and_order_tools(@course, preferred_tool_id, exclude_tool_id, preferred_client_id, prefer_1_1: true).to_a
+          ContextExternalTool.find_and_order_tools(context: @course, preferred_tool_id:, exclude_tool_id:, preferred_client_id:, prefer_1_1: true).to_a
         end
 
         it "sorts 1.1 tools to the front and 1.3 tools to the back" do
@@ -2030,6 +2075,47 @@ describe ContextExternalTool do
 
       it "sorts tool with that id to the front" do
         expect(subject.first).to eq tool2
+      end
+    end
+
+    context "when closest matching tool is from a different developer key" do
+      let(:preferred_tool_id) { tool3.id }
+      let(:original_client_id) { key.id }
+
+      before do
+        # preferred tool is gone,
+        tool3.developer_key = key
+        tool3.save!
+        tool3.destroy!
+
+        # the tool we actually want is farther up in context chain
+        tool1.context = @course.account
+        tool1.developer_key = key
+        tool1.save!
+
+        # the tool that matches first is from the wrong dev key
+        tool2.developer_key = DeveloperKey.create!
+        tool2.save!
+      end
+
+      context "and flag is enabled" do
+        before do
+          @course.root_account.enable_feature!(:lti_find_external_tool_prefer_original_client_id)
+        end
+
+        it "prefers tool from the same developer key" do
+          expect(subject.first).to eq tool1
+        end
+      end
+
+      context "and flag is disabled" do
+        before do
+          @course.root_account.disable_feature!(:lti_find_external_tool_prefer_original_client_id)
+        end
+
+        it "prefers tool from closer context" do
+          expect(subject.first).to eq tool2
+        end
       end
     end
 
