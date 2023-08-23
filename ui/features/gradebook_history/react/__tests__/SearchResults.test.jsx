@@ -142,7 +142,7 @@ describe('SearchResultsRow', () => {
     it('italicizes the assignment name', () => {
       const {container} = render(<WrappedComponent {...overrideItem} />)
       const textElement = container.querySelectorAll('td')[4].querySelector('span')
-      expect(window.getComputedStyle(textElement).fontStyle).toBe('italic')
+      expect(textElement).toHaveStyle('font-style: italic')
     })
   })
 })

@@ -74,7 +74,7 @@ describe "student groups" do
       before do
         seed_students(2)
         get "/courses/#{@course.id}/groups"
-        f('button[data-test-id="add-group-button"]').click
+        f('button[data-testid="add-group-button"]').click
         wait_for_ajaximations
       end
 

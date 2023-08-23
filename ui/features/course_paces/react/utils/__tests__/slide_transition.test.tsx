@@ -42,21 +42,21 @@ describe('SlideTransition', () => {
 
   it('shrinks vertically when collapsed', () => {
     const {getByTestId} = renderComponent({direction: 'vertical', expanded: false})
-    expect(getByTestId('course-paces-collapse').style.getPropertyValue('max-height')).toBe('0')
+    expect(getByTestId('course-paces-collapse')).toHaveStyle('max-height: 0')
   })
 
   it('restores height when expanded', () => {
     const {getByTestId} = renderComponent({direction: 'vertical', expanded: true})
-    expect(getByTestId('course-paces-collapse').style.getPropertyValue('max-height')).toBe('100px')
+    expect(getByTestId('course-paces-collapse')).toHaveStyle('max-height: 100px')
   })
 
   it('shrinks horizontally when collapsed', () => {
     const {getByTestId} = renderComponent({direction: 'horizontal', expanded: false})
-    expect(getByTestId('course-paces-collapse').style.getPropertyValue('width')).toBe('0px')
+    expect(getByTestId('course-paces-collapse')).toHaveStyle('width: 0px')
   })
 
   it('restores width when expanded', () => {
     const {getByTestId} = renderComponent({direction: 'horizontal', expanded: true})
-    expect(getByTestId('course-paces-collapse').style.getPropertyValue('width')).toBe('100px')
+    expect(getByTestId('course-paces-collapse')).toHaveStyle('width: 100px')
   })
 })

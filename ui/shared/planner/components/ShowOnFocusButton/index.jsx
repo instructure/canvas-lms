@@ -80,7 +80,11 @@ export default class ShowOnFocusButton extends Component {
 
   renderInvisibleButton() {
     const {srProps} = this.props
-    return <ScreenReaderContent {...srProps}>{this.renderButton()}</ScreenReaderContent>
+    return (
+      <ScreenReaderContent data-testid="screenreader-content" {...srProps}>
+        {this.renderButton()}
+      </ScreenReaderContent>
+    )
   }
 
   render() {

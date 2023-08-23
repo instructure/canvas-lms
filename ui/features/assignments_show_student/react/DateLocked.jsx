@@ -35,7 +35,7 @@ export default function DateLocked(props) {
       <Flex.Item>
         <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
           <Flex.Item>
-            <Heading size="large" data-test-id="assignments-2-date-locked" margin="small">
+            <Heading size="large" data-testid="assignments-2-date-locked" margin="small">
               {INST.lockExplanation({unlock_at: props.date}, props.type)}
             </Heading>
           </Flex.Item>

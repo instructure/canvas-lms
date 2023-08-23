@@ -68,7 +68,7 @@ class StudentAssignmentPageV2
     end
 
     def details_toggle
-      f("button[data-test-id='assignments-2-assignment-toggle-details']")
+      f("button[data-testid='assignments-2-assignment-toggle-details']")
     end
 
     def assignment_group_link
@@ -192,11 +192,11 @@ class StudentAssignmentPageV2
     end
 
     def missing_pill
-      f("span[data-test-id='missing-pill']")
+      f("span[data-testid='missing-pill']")
     end
 
     def late_pill
-      f("span[data-test-id='late-pill']")
+      f("span[data-testid='late-pill']")
     end
 
     def rubric_toggle

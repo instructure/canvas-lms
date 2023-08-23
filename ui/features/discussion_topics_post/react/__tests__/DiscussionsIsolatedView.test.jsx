@@ -32,6 +32,7 @@ import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobal
 injectGlobalAlertContainers()
 
 jest.mock('@canvas/rce/RichContentEditor')
+jest.mock('@canvas/rce/react/CanvasRce')
 jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),

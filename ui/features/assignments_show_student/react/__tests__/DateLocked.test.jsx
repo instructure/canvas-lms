@@ -37,7 +37,7 @@ afterEach(() => {
 
 it('renders normally', () => {
   ReactDOM.render(<DateLocked date="TEST" type="assignment" />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignments-2-date-locked"]')
+  const element = $('[data-testid="assignments-2-date-locked"]')
   expect(element).toHaveLength(1)
 })
 

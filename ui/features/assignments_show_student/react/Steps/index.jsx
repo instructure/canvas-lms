@@ -96,12 +96,12 @@ class Steps extends Component {
         // eslint-disable-next-line react/forbid-foreign-prop-types
         {...omitProps(this.props, {...Steps.propTypes, ...View.propTypes})}
         margin={this.props.margin}
-        data-test-id="assignment-2-step-index"
+        data-testid="assignment-2-step-index"
         as="div"
         className={this.props.isCollapsed ? 'steps-container-collapsed steps-main' : 'steps-main'}
       >
         <div
-          data-test-id={this.props.isCollapsed ? 'steps-container-collapsed' : 'steps-main'}
+          data-testid={this.props.isCollapsed ? 'steps-container-collapsed' : 'steps-main'}
           className="progressionContainer"
           aria-hidden="true"
         >

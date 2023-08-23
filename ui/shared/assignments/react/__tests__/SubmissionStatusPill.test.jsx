@@ -36,9 +36,9 @@ afterEach(() => {
 
 it('does not render with null status', () => {
   ReactDOM.render(<SubmissionStatusPill />, document.getElementById('fixtures'))
-  const excusedPill = $('[data-test-id="excused-pill"]')
-  const missingPill = $('[data-test-id="missing-pill"]')
-  const latePill = $('[data-test-id="late-pill"]')
+  const excusedPill = $('[data-testid="excused-pill"]')
+  const missingPill = $('[data-testid="missing-pill"]')
+  const latePill = $('[data-testid="late-pill"]')
   expect(excusedPill).toHaveLength(0)
   expect(missingPill).toHaveLength(0)
   expect(latePill).toHaveLength(0)
@@ -46,7 +46,7 @@ it('does not render with null status', () => {
 
 it('renders excused when given excused only', () => {
   ReactDOM.render(<SubmissionStatusPill excused={true} />, document.getElementById('fixtures'))
-  const excusedPill = $('[data-test-id="excused-pill"]')
+  const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
 })
 
@@ -55,9 +55,9 @@ it('renders only excused even when submission is also missing', () => {
     <SubmissionStatusPill excused={true} submissionStatus="missing" />,
     document.getElementById('fixtures')
   )
-  const excusedPill = $('[data-test-id="excused-pill"]')
+  const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
-  const missingPill = $('[data-test-id="missing-pill"]')
+  const missingPill = $('[data-testid="missing-pill"]')
   expect(missingPill).toHaveLength(0)
 })
 
@@ -66,9 +66,9 @@ it('renders only excused even when submission is also late', () => {
     <SubmissionStatusPill excused={true} submissionStatus="late" />,
     document.getElementById('fixtures')
   )
-  const excusedPill = $('[data-test-id="excused-pill"]')
+  const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
-  const latePill = $('[data-test-id="late-pill"]')
+  const latePill = $('[data-testid="late-pill"]')
   expect(latePill).toHaveLength(0)
 })
 
@@ -77,9 +77,9 @@ it('renders late when given late', () => {
     <SubmissionStatusPill submissionStatus="late" />,
     document.getElementById('fixtures')
   )
-  const latePill = $('[data-test-id="late-pill"]')
+  const latePill = $('[data-testid="late-pill"]')
   expect(latePill.text()).toEqual('Late')
-  const excusedPill = $('[data-test-id="excused-pill"]')
+  const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill).toHaveLength(0)
 })
 
@@ -88,8 +88,8 @@ it('renders missing when given missing', () => {
     <SubmissionStatusPill submissionStatus="missing" />,
     document.getElementById('fixtures')
   )
-  const missingPill = $('[data-test-id="missing-pill"]')
+  const missingPill = $('[data-testid="missing-pill"]')
   expect(missingPill.text()).toEqual('Missing')
-  const excusedPill = $('[data-test-id="excused-pill"]')
+  const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill).toHaveLength(0)
 })

@@ -18,8 +18,10 @@
 
 let defaultThemeSpy
 let highContrastThemeSpy
+let originalEnv
 
 beforeEach(() => {
+  originalEnv = JSON.parse(JSON.stringify(window.ENV))
   defaultThemeSpy = jest.spyOn(require('@instructure/canvas-theme').default, 'use')
   highContrastThemeSpy = jest.spyOn(
     require('@instructure/canvas-high-contrast-theme').default,
@@ -28,7 +30,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  global.ENV = {}
+  window.ENV = originalEnv
   jest.clearAllMocks()
   jest.resetModules()
 })
@@ -44,7 +46,7 @@ describe('K-5 theme', () => {
   })
 
   it('is based off of the high contrast canvas theme when ENV.use_high_contrast is set', () => {
-    global.ENV = {use_high_contrast: true}
+    window.ENV.use_high_contrast = true
     const k5Theme = require('../k5-theme').default
     k5Theme.use()
 
@@ -70,7 +72,7 @@ describe('K-5 theme', () => {
   })
 
   it('does not override font when ENV.USE_CLASSIC_FONT is true', () => {
-    global.ENV = {USE_CLASSIC_FONT: true}
+    window.ENV.USE_CLASSIC_FONT = true
     const k5Theme = require('../k5-theme').default
     k5Theme.use()
     expect(k5Theme.variables.typography.fontFamily).not.toMatch(/Balsamiq Sans/)

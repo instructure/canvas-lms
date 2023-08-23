@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {paceContextsActions} from '../actions/pace_contexts'
 import {actions as uiActions} from '../actions/ui'
-import {
+import type {
   APIPaceContextTypes,
   OrderType,
   PaceContext,

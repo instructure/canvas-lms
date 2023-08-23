@@ -36,8 +36,8 @@ describe('LoadingSkeleton', () => {
   it('passes the width and height props to the view', () => {
     const {getByText} = render(<LoadingSkeleton {...getProps()} />)
     const skeleton = getByText('Loading').parentNode
-    expect(skeleton.style.maxWidth).toBe('10em')
-    expect(skeleton.style.height).toBe('1em')
+    expect(skeleton).toHaveStyle('max-width: 10em')
+    expect(skeleton).toHaveStyle('height: 1em')
   })
 
   it('renders the shimmer box', () => {

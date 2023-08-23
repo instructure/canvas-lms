@@ -42,7 +42,7 @@ export default function AssignmentToggleDetails(props) {
     <div className="a2-toggle-details-container">
       <ToggleDetails
         defaultExpanded={true}
-        data-test-id="assignments-2-assignment-toggle-details"
+        data-testid="assignments-2-assignment-toggle-details"
         summary={<Text weight="bold">{I18n.t('Details')}</Text>}
       >
         <View margin="0" padding="0">
@@ -50,7 +50,7 @@ export default function AssignmentToggleDetails(props) {
           <div
             className="user_content"
             dangerouslySetInnerHTML={{__html: AssignmentDetailsText(props.description)}}
-            data-test-id="assignments-2-assignment-toggle-details-text"
+            data-testid="assignments-2-assignment-toggle-details-text"
           />
         </View>
       </ToggleDetails>

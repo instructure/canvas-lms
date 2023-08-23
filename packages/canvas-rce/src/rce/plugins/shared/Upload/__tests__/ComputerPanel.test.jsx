@@ -23,6 +23,10 @@ import ComputerPanel from '../ComputerPanel'
 afterEach(cleanup)
 
 describe('UploadFile: ComputerPanel', () => {
+  beforeEach(() => {
+    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+  })
+
   it('shows a failure message if the file is rejected', () => {
     const notAnImageFile = new File(['foo'], 'foo.txt', {
       type: 'text/plain',

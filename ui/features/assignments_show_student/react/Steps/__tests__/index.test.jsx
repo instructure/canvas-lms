@@ -37,19 +37,19 @@ afterEach(() => {
 
 it('should render', () => {
   ReactDOM.render(<Steps />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignment-2-step-index"]')
+  const element = $('[data-testid="assignment-2-step-index"]')
   expect(element).toHaveLength(1)
 })
 
 it('should not render collapsed class when not collapsed', () => {
   ReactDOM.render(<Steps isCollapsed={false} />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="steps-container-collapsed"]')
+  const element = $('[data-testid="steps-container-collapsed"]')
   expect(element).toHaveLength(0)
 })
 
 it('should render collapsed class when collapsed', () => {
   ReactDOM.render(<Steps isCollapsed={true} />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="steps-container-collapsed"]')
+  const element = $('[data-testid="steps-container-collapsed"]')
   expect(element).toHaveLength(1)
 })
 

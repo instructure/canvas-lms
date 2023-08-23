@@ -3,6 +3,7 @@
 exports[`renders a ScreenReaderContent by default 1`] = `
 <ScreenReaderContent
   as="span"
+  data-testid="screenreader-content"
 >
   <Link
     as="button"

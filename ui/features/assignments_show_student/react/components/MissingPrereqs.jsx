@@ -44,7 +44,7 @@ export default function MissingPrereqs(props) {
       <Flex.Item>
         <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
           <Flex.Item>
-            <Text weight="normal" data-test-id="assignments-2-pre-req-title" margin="small">
+            <Text weight="normal" data-testid="assignments-2-pre-req-title" margin="small">
               {I18n.t(
                 'This assignment is currently unavailable because you have not yet completed prerequisites set by your instructor.'
               )}

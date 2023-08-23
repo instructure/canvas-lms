@@ -44,7 +44,7 @@ module Gradebook
   BACKSPACE_KEY = "\u0008"
 
   def self.gradebook_settings_cog
-    f('[data-test-id="gradebook-settings-button"]')
+    f('[data-testid="gradebook-settings-button"]')
   end
 
   def self.notes_option
@@ -189,7 +189,7 @@ module Gradebook
   end
 
   def self.gradebook_settings_button
-    f('[data-test-id="gradebook-settings-button"]')
+    f('[data-testid="gradebook-settings-button"]')
   end
 
   def self.filters_element

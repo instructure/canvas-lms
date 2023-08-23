@@ -53,8 +53,8 @@ describe('LoadingWrapper', () => {
     const {getByText, getByTestId} = render(<LoadingWrapper {...getProps({isLoading: true})} />)
     const skeletonWrapper = getByTestId('skeleton-wrapper')
     expect(getByText('Loading content...')).toBeInTheDocument()
-    expect(skeletonWrapper.style.width).toBe('10em')
-    expect(skeletonWrapper.style.height).toBe('5em')
+    expect(skeletonWrapper).toHaveStyle('width: 10em')
+    expect(skeletonWrapper).toHaveStyle('height: 5em')
   })
 
   it('renders custom skeletons if renderCustomSkeleton is provided', () => {
