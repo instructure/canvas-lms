@@ -506,7 +506,7 @@ describe "outcomes" do
           expect(alignment_summary_alignment_stat_type(0)).to eq("Coverage")
           expect(alignment_summary_alignment_stat_average(0)).to eq("0.3")
           expect(alignment_summary_alignment_stat_description(0)).to eq("Avg. Alignments per Outcome")
-          expect(alignment_summary_alignment_stat_name(1)).to eq("1 ALIGNABLE ARTIFACT")
+          expect(alignment_summary_alignment_stat_name(1)).to eq("1 ASSESSABLE ARTIFACT")
           expect(alignment_summary_alignment_stat_percent(1)).to eq("100%")
           expect(alignment_summary_alignment_stat_type(1)).to eq("With Alignments")
           expect(alignment_summary_alignment_stat_average(1)).to eq("1.0")
