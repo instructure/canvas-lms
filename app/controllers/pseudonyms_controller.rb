@@ -263,6 +263,26 @@ class PseudonymsController < ApplicationController
   #     * student_other
   #     * teacher
   #
+  # @argument user[existing_user_id] [String]
+  #   A Canvas User ID to identify a user in a trusted account (alternative to `id`,
+  #   `existing_sis_user_id`, or `existing_integration_id`). This parameter is
+  #   not available in OSS Canvas.
+  #
+  # @argument user[existing_integration_id] [String]
+  #   An Integration ID to identify a user in a trusted account (alternative to `id`,
+  #   `existing_user_id`, or `existing_sis_user_id`). This parameter is not
+  #   available in OSS Canvas.
+  #
+  # @argument user[existing_sis_user_id] [String]
+  #   An SIS User ID to identify a user in a trusted account (alternative to `id`,
+  #   `existing_integration_id`, or `existing_user_id`). This parameter is not
+  #   available in OSS Canvas.
+  #
+  # @argument user[trusted_account] [String]
+  #   The domain of the account to search for the user. This field is required when
+  #   identifying a user in a trusted account. This parameter is not available in OSS
+  #   Canvas.
+  #
   # @example_request
   #
   #   #create a facebook login for user with ID 123
@@ -271,6 +291,16 @@ class PseudonymsController < ApplicationController
   #        -F 'login[unique_id]=112233445566' \
   #        -F 'login[authentication_provider_id]=facebook' \
   #        -H 'Authorization: Bearer <token>'
+  #
+  # @example_request
+  #
+  #   #create a login for user in another trusted account:
+  #   curl 'https://<canvas>/api/v1/accounts/<account_id>/logins' \
+  #        -F 'user[existing_user_sis_id]=SIS42' \
+  #        -F 'user[trusted_account]=canvas.example.edu' \
+  #        -F 'login[unique_id]=112233445566' \
+  #        -H 'Authorization: Bearer <token>'
+  #
   def create
     return unless get_user
 
