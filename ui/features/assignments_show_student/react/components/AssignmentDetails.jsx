@@ -29,7 +29,7 @@ const I18n = useI18nScope('assignments_2_student_header_date_title')
 export default function AssignmentDetails({assignment}) {
   return (
     <>
-      <Heading margin="0" as="h2" data-test-id="title" theme={{h2FontWeight: 300}}>
+      <Heading margin="0" as="h2" data-testid="title" theme={{h2FontWeight: 300}}>
         <TruncateText maxLines={1} truncate="character">
           {assignment.name}
         </TruncateText>
@@ -42,7 +42,7 @@ export default function AssignmentDetails({assignment}) {
             <>
               {assignment.env.peerReviewModeEnabled && ' | '}
               <FriendlyDatetime
-                data-test-id="due-date"
+                data-testid="due-date"
                 prefix={I18n.t('Due:')}
                 format={I18n.t('#date.formats.full_with_weekday')}
                 dateTime={assignment.dueAt}

@@ -36,6 +36,6 @@ afterEach(() => {
 
 it('renders normally', () => {
   ReactDOM.render(<MissingPrereqs moduleUrl="TEST" />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignments-2-pre-req-title"]')
+  const element = $('[data-testid="assignments-2-pre-req-title"]')
   expect(element).toHaveLength(1)
 })

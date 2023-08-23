@@ -61,11 +61,11 @@ QUnit.module('AssessmentAuditTray AuditEvent', suiteHooks => {
     })
 
     function getBadge() {
-      return $container.querySelector('[id^="Badge__"]')
+      return $container.querySelector('[data-testid="audit_event_badge"]')
     }
 
     function getTooltip() {
-      const $trigger = $container.querySelector('[aria-describedby^="Tooltip__"]')
+      const $trigger = $container.querySelector('[aria-describedby^="Tooltip_"]')
       return $trigger && document.querySelector(`#${$trigger.getAttribute('aria-describedby')}`)
     }
 

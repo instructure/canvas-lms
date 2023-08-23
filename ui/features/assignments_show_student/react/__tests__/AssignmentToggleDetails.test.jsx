@@ -45,7 +45,7 @@ it('renders normally', () => {
     <AssignmentToggleDetails description={assignment.description} />,
     document.getElementById('fixtures')
   )
-  const element = $('[data-test-id="assignments-2-assignment-toggle-details-text"]')
+  const element = $('[data-testid="assignments-2-assignment-toggle-details-text"]')
   expect(element.text()).toEqual(assignment.description)
 })
 
@@ -59,6 +59,6 @@ it('renders normally an assignment with no content', () => {
     <AssignmentToggleDetails description={assignment.description} />,
     document.getElementById('fixtures')
   )
-  const element = $('[data-test-id="assignments-2-assignment-toggle-details-text"]')
+  const element = $('[data-testid="assignments-2-assignment-toggle-details-text"]')
   expect(element.text()).toEqual('No additional details were added for this assignment.')
 })

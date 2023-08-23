@@ -258,7 +258,7 @@ const StudentView = createReactClass({
           color="primary"
           renderIcon={IconAddLine}
           onClick={this._onNewGroupButtonClick}
-          data-test-id="add-group-button"
+          data-testid="add-group-button"
         >
           <PresentationContent>{I18n.t('Group')}</PresentationContent>
           <ScreenReaderContent>{I18n.t('Add new group')}</ScreenReaderContent>

@@ -99,13 +99,13 @@ test('moves focus to "+ People" button when deleting the top user', () => {
 test('does not show sections when they are hidden by the hideSectionsOnCourseUsersPage setting', () => {
   ENV.course.hideSectionsOnCourseUsersPage = true
   $('#fixtures').append(rosterViewOne.render().el)
-  const $cell = $('#fixtures').find('[data-test-id="section-column-cell"]')
+  const $cell = $('#fixtures').find('[data-testid="section-column-cell"]')
   strictEqual($cell.length, 0)
 })
 
 test('shows sections when they are not hidden by the hideSectionsOnCourseUsersPage setting', () => {
   ENV.course.hideSectionsOnCourseUsersPage = false
   $('#fixtures').append(rosterViewOne.render().el)
-  const $cell = $('#fixtures').find('[data-test-id="section-column-cell"]')
+  const $cell = $('#fixtures').find('[data-testid="section-column-cell"]')
   strictEqual($cell.length, 1)
 })

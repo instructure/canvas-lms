@@ -249,7 +249,7 @@ describe "manage groups" do
     other_student = @student
 
     get "/courses/#{@course.id}/groups"
-    f('button[data-test-id="add-group-button"]').click
+    f('button[data-testid="add-group-button"]').click
     wait_for_ajaximations
     f("#group-name").send_keys("group name")
     click_option("#join-level-select", "invitation_only", :value)

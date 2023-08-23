@@ -129,6 +129,7 @@ export type GradebookSettingsModalProps = {
     }) => void
     setCoursePostPolicy: (coursePostPolicy: {courseId?: string; postManually: boolean}) => void
   }
+  // eslint-disable-next-line react/no-unused-prop-types
   ref: React.RefObject<any>
 }
 
@@ -146,7 +147,7 @@ type State = {
     postManually: boolean
   }
   processingRequests: boolean
-  selectedTab: string
+  selectedTab: string | undefined
   viewOptions: GradebookViewOptions | null
   viewOptionsLastSaved: GradebookViewOptions | null
 }
@@ -360,10 +361,6 @@ export default class GradebookSettingsModal extends React.Component<
     })
   }
 
-  changeTab = (_ev, {id}) => {
-    this.setState({selectedTab: id})
-  }
-
   render() {
     const includeAdvancedTab = this.props.courseFeatures.finalGradeOverrideEnabled
     const tab = this.state.selectedTab
@@ -396,7 +393,11 @@ export default class GradebookSettingsModal extends React.Component<
             </Flex>
           </FlexItem>
           <FlexItem shouldGrow={true} shouldShrink={true} overflowX="hidden">
-            <Tabs onRequestTabChange={this.changeTab}>
+            <Tabs
+              onRequestTabChange={(_ev, {id}) => {
+                this.setState({selectedTab: id})
+              }}
+            >
               <TabsPanel
                 renderTitle={I18n.t('Late Policies')}
                 id="tab-panel-late"

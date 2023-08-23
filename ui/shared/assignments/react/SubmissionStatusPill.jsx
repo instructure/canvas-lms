@@ -25,22 +25,22 @@ const I18n = useI18nScope('assignments_2')
 
 export default function SubmissionStatusPill(props) {
   if (props.excused) {
-    return <Pill data-test-id="excused-pill">{I18n.t('Excused')}</Pill>
+    return <Pill data-testid="excused-pill">{I18n.t('Excused')}</Pill>
   } else if (props.submissionStatus === 'missing') {
     return (
-      <Pill data-test-id="missing-pill" color="danger">
+      <Pill data-testid="missing-pill" color="danger">
         {I18n.t('Missing')}
       </Pill>
     )
   } else if (props.submissionStatus === 'late') {
     return (
-      <Pill data-test-id="late-pill" color="info">
+      <Pill data-testid="late-pill" color="info">
         {I18n.t('Late')}
       </Pill>
     )
   } else if (props.submissionStatus === 'extended') {
     return (
-      <Pill data-test-id="extended-pill" color="info">
+      <Pill data-testid="extended-pill" color="info">
         {I18n.t('Extended')}
       </Pill>
     )

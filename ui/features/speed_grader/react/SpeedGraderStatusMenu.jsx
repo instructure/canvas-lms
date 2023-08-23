@@ -111,7 +111,7 @@ export default function SpeedGraderStatusMenu(props) {
             />
             {props.cachedDueDate ? (
               <FriendlyDatetime
-                data-test-id="original-due-date"
+                data-testid="original-due-date"
                 prefix={I18n.t('Due:')}
                 format={I18n.t('#date.formats.full_with_weekday')}
                 dateTime={props.cachedDueDate}

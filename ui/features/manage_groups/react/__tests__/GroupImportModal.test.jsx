@@ -20,6 +20,10 @@ import GroupImportModal from '../GroupImportModal'
 import * as apiClient from '../apiClient'
 
 describe('GroupImportModal', () => {
+  beforeEach(() => {
+    global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
+  })
+
   it('adds an error message when an unsupported filetype is selected', async () => {
     const badFile = new File(['(⌐□_□)'], 'file.png', {type: 'image/png'})
     const {findByText, findByLabelText} = render(

@@ -141,14 +141,14 @@ export default class GenericErrorPage extends React.Component {
             <Spinner renderTitle={I18n.t('Loading')} margin="0 0 0 medium" />
           )}
           {this.state.commentPosted && this.state.commentPostError && (
-            <View display="block" data-test-id="generic-error-comments-submitted">
+            <View display="block" data-testid="generic-error-comments-submitted">
               <Text color="danger" margin="x-small">
                 {I18n.t('Comment failed to post! Please try again later.')}
               </Text>
             </View>
           )}
           {this.state.commentPosted && !this.state.commentPostError && (
-            <View display="block" data-test-id="generic-error-comments-submitted">
+            <View display="block" data-testid="generic-error-comments-submitted">
               <Text margin="x-small">{I18n.t('Comment submitted!')}</Text>
             </View>
           )}

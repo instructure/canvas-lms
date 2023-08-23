@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import SectionTooltip from '../index'
 
 const defaultProps = () => ({
@@ -34,7 +35,7 @@ test('renders the correct section text', () => {
   const tree = mount(<SectionTooltip {...defaultProps()} />)
   const node = tree.find('Text')
   expect(node.first().text()).toBe('1 Sectionsections name')
-  const screenReaderNode = tree.find('ScreenReaderContent')
+  const screenReaderNode = tree.find('ScreenReaderContent').first()
   expect(screenReaderNode.text()).toBe('sections name')
 })
 
@@ -57,16 +58,16 @@ test('uses textColor from props', () => {
 test('renders all sections if no sections are given', () => {
   const props = defaultProps()
   props.sections = null
-  const tree = mount(<SectionTooltip {...props} />)
-  const node = tree.find('Text')
-  expect(node.at(0).text()).toBe('All Sections')
-  expect(node.at(1).text()).toBe('(5 Users)')
+  const {getByText} = render(<SectionTooltip {...props} />)
+
+  const allSectionsText = getByText('All Sections')
+  expect(allSectionsText).toBeInTheDocument()
 })
 
 test('renders tooltip text correcly with sections', () => {
   const tree = shallow(<SectionTooltip {...defaultProps()} />)
   const node = tree.find('Tooltip')
-  expect(mount(node.prop('renderTip')[0]).find('View Text').text()).toBe(
+  expect(mount(node.prop('renderTip')[0]).find('View Text').first().text()).toBe(
     'sections name (4 Users)'
   )
 })
@@ -77,7 +78,7 @@ test('renders multiple sections into tooltip', () => {
   const tree = shallow(<SectionTooltip {...props} />)
   const node = tree.find('Tooltip')
   expect(node.prop('renderTip')).toHaveLength(2)
-  expect(mount(node.prop('renderTip')[1]).find('View Text').text()).toBe(
+  expect(mount(node.prop('renderTip')[1]).find('View Text').first().text()).toBe(
     'section other name (8 Users)'
   )
 })

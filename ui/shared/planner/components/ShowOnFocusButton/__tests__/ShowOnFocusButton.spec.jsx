@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow, mount} from 'enzyme'
+import {shallow} from 'enzyme'
+import {render, fireEvent} from '@testing-library/react'
 import ShowOnFocusButton from '../index'
 
 it('renders a ScreenReaderContent by default', () => {
@@ -26,18 +27,20 @@ it('renders a ScreenReaderContent by default', () => {
 })
 
 it('renders a Button when it has focus', () => {
-  const wrapper = mount(<ShowOnFocusButton>Button</ShowOnFocusButton>)
-
-  wrapper.find('Link').simulate('focus')
-  expect(wrapper.find('ScreenReaderContent').exists()).toBe(false)
+  const {getByRole, queryByRole} = render(<ShowOnFocusButton>Button</ShowOnFocusButton>)
+  const buttonElement = getByRole('button')
+  fireEvent.focus(buttonElement)
+  const screenReaderContent = queryByRole('a')
+  expect(screenReaderContent).not.toBeInTheDocument()
 })
 
 it('renders ScreeenReaderContent after blur', () => {
-  const wrapper = mount(<ShowOnFocusButton>Button</ShowOnFocusButton>)
+  const {getByRole, queryByTestId} = render(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  wrapper.find('Link').simulate('focus')
-  expect(wrapper.find('ScreenReaderContent').exists()).toBe(false)
+  const buttonElement = getByRole('button')
+  fireEvent.focus(buttonElement)
+  expect(queryByTestId('screenreader-content')).not.toBeInTheDocument()
 
-  wrapper.find('Link').simulate('blur')
-  expect(wrapper.find('ScreenReaderContent').exists()).toBe(true)
+  fireEvent.blur(buttonElement)
+  expect(queryByTestId('screenreader-content')).toBe(null)
 })

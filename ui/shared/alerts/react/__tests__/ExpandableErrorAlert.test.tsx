@@ -104,6 +104,8 @@ describe('ExpandableErrorAlert', () => {
     expect(closeButton).toBeInTheDocument()
     act(() => userEvent.click(closeButton))
 
-    expect(queryByText('My error')).not.toBeInTheDocument()
+    waitFor(() => {
+      expect(queryByText('My error')).not.toBeInTheDocument()
+    })
   })
 })

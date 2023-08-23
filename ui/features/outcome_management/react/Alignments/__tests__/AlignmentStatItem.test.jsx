@@ -86,7 +86,7 @@ describe('AlignmentStatItem', () => {
 
   it('ScreenReaderContent is available when tooltip is displayed', () => {
     const tree = mount(<AlignmentStatItem {...defaultProps({type: 'artifact'})} />)
-    const screenReaderNode = tree.find('ScreenReaderContent')
+    const screenReaderNode = tree.find('ScreenReaderContent').first()
     expect(screenReaderNode.text()).toBe('Outcomes may be aligned to rubrics and quizzes')
   })
 

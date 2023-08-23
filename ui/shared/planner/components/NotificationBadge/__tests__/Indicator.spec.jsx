@@ -22,7 +22,7 @@ import Indicator from '../Indicator'
 
 it('renders screenreader content with the title', () => {
   const wrapper = mount(<Indicator title="a title" variant="primary" />)
-  expect(wrapper.find('ScreenReaderContent').text()).toBe('a title')
+  expect(wrapper.find('ScreenReaderContent').first().text()).toBe('a title')
 })
 
 it('renders a badge with the specified variant', () => {
