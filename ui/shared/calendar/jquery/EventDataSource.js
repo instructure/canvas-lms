@@ -27,6 +27,7 @@ import moment from 'moment'
 export default class EventDataSource {
   constructor(contexts) {
     this.eventSaved = this.eventSaved.bind(this)
+    this.eventsSavedFromSeries = this.eventsSavedFromSeries.bind(this)
     this.eventDeleted = this.eventDeleted.bind(this)
     this.eventWithId = this.eventWithId.bind(this)
     this.clearCache = this.clearCache.bind(this)
@@ -75,10 +76,17 @@ export default class EventDataSource {
     // all.) This might end up being confusing.
     $.subscribe('CommonEvent/eventDeleted', this.eventDeleted)
     $.subscribe('CommonEvent/eventSaved', this.eventSaved)
+    $.subscribe('CommonEvent/eventsSavedFromSeries', this.eventsSavedFromSeries)
   }
 
   eventSaved(event) {
     return this.addEventToCache(event)
+  }
+
+  eventsSavedFromSeries(events) {
+    events.seriesEvents.forEach(event => {
+      this.addEventToCache(event)
+    })
   }
 
   eventDeleted(event) {

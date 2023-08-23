@@ -18,7 +18,9 @@
 
 import React from 'react'
 import $ from 'jquery'
+import moment from 'moment-timezone'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {screen} from '@testing-library/dom'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
@@ -504,6 +506,53 @@ describe('CalendarEventDetailsForm', () => {
       select(component, 'option', 'Custom...')
       const modal = await component.findByText('Custom Repeating Event')
       expect(modal).toBeInTheDocument()
+    })
+
+    it('does not reset when the date changes', async () => {
+      const props = {...defaultProps}
+      props.event = commonEventFactory(null, [userContext, courseContext])
+      const nextDate = props.event.startDate().clone().add(1, 'day').format('ddd, MMM D, YYYY')
+
+      const component = render(<CalendarEventDetailsForm {...props} />)
+      select(component, 'button', 'Frequency:')
+      select(component, 'option', 'Daily')
+      await waitFor(() => expect(component.queryByDisplayValue('Daily')).toBeInTheDocument())
+      changeValue(component, 'edit-calendar-event-form-date', nextDate)
+      expect(component.queryByDisplayValue('Daily')).toBeInTheDocument()
+    })
+
+    it('tracks day of week when the date changes', async () => {
+      const props = {...defaultProps}
+      props.event = commonEventFactory(null, [userContext, courseContext])
+      const d = moment('2023-08-28') // a monday
+      props.event.date = d.toDate()
+      props.event.startDate = jest.fn(() => moment(props.event.date))
+      const nextDate = d.clone().add(1, 'day').format('ddd, MMM D, YYYY')
+
+      const component = render(<CalendarEventDetailsForm {...props} />)
+      select(component, 'button', 'Frequency:')
+      screen.getByText('Weekly on Monday').click()
+      await waitFor(() =>
+        expect(component.queryByDisplayValue('Weekly on Monday')).toBeInTheDocument()
+      )
+      changeValue(component, 'edit-calendar-event-form-date', nextDate)
+      expect(component.queryByDisplayValue('Weekly on Tuesday')).toBeInTheDocument()
+    })
+
+    it('does not change the custom frequency when the date changes', async () => {
+      const props = {...defaultProps}
+      props.event = commonEventFactory(null, [userContext, courseContext])
+      const d = moment('2023-08-28') // a monday
+      props.event.date = d.toDate()
+      props.event.startDate = jest.fn(() => moment(props.event.date))
+      props.event.object.rrule = 'FREQ=WEEKLY;BYDAY=MO;INTERVAL=1;COUNT=5'
+      const nextDate = d.clone().add(1, 'day').format('ddd, MMM D, YYYY')
+
+      const component = render(<CalendarEventDetailsForm {...props} />)
+      expect(component.queryByDisplayValue('Weekly on Mon, 5 times')).toBeInTheDocument()
+
+      changeValue(component, 'edit-calendar-event-form-date', nextDate)
+      expect(component.queryByDisplayValue('Weekly on Mon, 5 times')).toBeInTheDocument()
     })
   })
 })

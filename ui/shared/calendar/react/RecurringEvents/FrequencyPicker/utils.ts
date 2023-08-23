@@ -108,6 +108,13 @@ export const generateFrequencyOptions = (
   return opts
 }
 
+// Return the RRULE corresponding to the given frequency option
+// Will return null if the frequency  is not one of the presets.
+// This boils down to 3 cases:
+// 1. The option is 'not-repeat'
+// 2. The option is 'custom' or 'saved-custom'
+// 3. The option is invalid
+// The calling code needs to differenciate between 1 and 2.
 export const generateFrequencyRRULE = (
   id: FrequencyOptionValue,
   eventStart: Moment
@@ -203,4 +210,35 @@ export const RRULEToFrequencyOptionValue = (
     return 'every-weekday'
   }
   return 'saved-custom'
+}
+
+export const updateRRuleForNewDate = (
+  newEventStart: Moment,
+  rrule: string | null
+): string | null => {
+  if (rrule === null || rrule === undefined) return null
+
+  const spec: RRuleHelperSpec = RRuleHelper.parseString(rrule)
+
+  if (spec.freq === 'YEARLY') {
+    spec.month = newEventStart.month() + 1
+    spec.monthdate = newEventStart.date()
+  } else if (spec.freq === 'MONTHLY') {
+    if (spec.month !== undefined) {
+      spec.month = newEventStart.month() + 1
+    }
+    if (spec.monthdate !== undefined) {
+      spec.monthdate = newEventStart.date()
+    }
+    if (spec.pos !== undefined && spec.weekdays !== undefined) {
+      const cdim = cardinalDayInMonth(newEventStart)
+      spec.pos = cdim.last ? -1 : cdim.cardinal
+      spec.weekdays = [AllRRULEDayValues[cdim.dayOfWeek]]
+    }
+  } else if (spec.freq === 'WEEKLY') {
+    if (spec.weekdays !== undefined) {
+      spec.weekdays = [AllRRULEDayValues[newEventStart.weekday()]]
+    }
+  }
+  return new RRuleHelper(spec).toString()
 }

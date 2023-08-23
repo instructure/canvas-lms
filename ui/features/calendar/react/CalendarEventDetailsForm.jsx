@@ -41,7 +41,10 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
 import {View} from '@instructure/ui-view'
-import {RRULEToFrequencyOptionValue} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
+import {
+  updateRRuleForNewDate,
+  RRULEToFrequencyOptionValue,
+} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import FrequencyPicker from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
 
@@ -64,6 +67,9 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
   const [startTime, setStartTime] = useState(initTime(event.calendarEvent?.start_at))
   const [endTime, setEndTime] = useState(initTime(event.calendarEvent?.end_at))
   const [rrule, setRRule] = useState(event.object.rrule ? event.object.rrule : null)
+  const [frequency, setFrequency] = useState(
+    rrule ? RRULEToFrequencyOptionValue(moment.tz(date, timezone), rrule) : null
+  )
   const [webConference, setWebConference] = useState(event.webConference)
   const [shouldShowConferences, setShouldShowConferences] = useState(false)
   const [isImportant, setImportant] = useState(event.important_dates)
@@ -245,11 +251,22 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
     window.location.href = buildEditEventUrl().toString()
   }
 
-  const handleFrequencyChange = (newFrequency, newRRule) => {
+  const handleFrequencyChange = useCallback((newFrequency, newRRule) => {
     if (newFrequency !== 'custom') {
       setRRule(newRRule)
     }
-  }
+    setFrequency(newFrequency)
+  }, [])
+
+  const handleDateChange = useCallback(
+    d => {
+      setDate(d)
+      if (rrule === null || frequency === 'saved-custom') return
+      const newRRule = updateRRuleForNewDate(moment.tz(d, timezone), rrule)
+      setRRule(newRRule)
+    },
+    [frequency, rrule, timezone]
+  )
 
   const addTimeToDate = time => {
     // dateTime is set to the correct date but the incorrect time
@@ -349,7 +366,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       event.webConference = shouldEnableConferenceField() ? webConference : null
       event.important_info = isImportant
       event.blackout_date = isBlackout
-      if (event.can_change_context && context.asset_string !== event.object.context_code) {
+      if (event.can_change_context) {
         event.old_context_code = event.object.context_code
         event.removeClass(`group_${event.old_context_code}`)
         event.object.context_code = context.asset_string
@@ -360,7 +377,6 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
       if (ENV?.FEATURES?.calendar_series && event.calendarEvent?.series_uuid) {
         const which = await renderUpdateCalendarEventDialog(event)
         if (which === undefined) return
-        $.publish('CommonEvent/eventSavingFromSeries', {selectedEvent: event, which})
         params.which = which
       }
       event.save(
@@ -393,7 +409,7 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
           renderLabel={I18n.t('Date:')}
           selectedDate={date?.toISOString()}
           formatDate={dateFormatter}
-          onSelectedDateChange={setDate}
+          onSelectedDateChange={handleDateChange}
           width="100%"
           display="block"
           timezone={timezone}
@@ -437,11 +453,8 @@ const CalendarEventDetailsForm = ({event, closeCB, contextChangeCB, setSetContex
             locale={locale}
             timezone={timezone}
             width="auto"
-            initialFrequency={RRULEToFrequencyOptionValue(
-              moment.tz(date, timezone),
-              event.object.rrule
-            )}
-            rrule={event?.object?.rrule || null}
+            initialFrequency={frequency}
+            rrule={rrule}
             onChange={(newFrequency, newRRule) => handleFrequencyChange(newFrequency, newRRule)}
             courseEndAt={context.course_conclude_at || undefined}
           />

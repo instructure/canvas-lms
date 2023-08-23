@@ -42,6 +42,7 @@ export default class UndatedEventsList {
       'CommonEvent/eventDeleted': this.eventDeleted,
       'CommonEvent/eventSaving': this.eventSaving,
       'CommonEvent/eventSaved': this.eventSaved,
+      'CommonEvent/eventsSavedFromSeries': this.eventsSavedFromSeries,
       'Calendar/visibleContextListChanged': this.visibleContextListChanged,
     })
 
@@ -154,6 +155,10 @@ export default class UndatedEventsList {
   }
 
   eventSaved = () => {
+    this.load()
+  }
+
+  eventsSavedFromSeries = () => {
     this.load()
   }
 

@@ -457,10 +457,12 @@ describe "calendar2" do
       end
 
       it "can edit timed events in calendar in Denver" do
+        puts ">>> testing in Denver"
         test_timed_calendar_event_in_tz("America/Denver")
       end
 
       it "can edit timed events in calendar in Tokyo" do
+        puts ">>> testing in Tokyo"
         test_timed_calendar_event_in_tz("Asia/Tokyo")
       end
 

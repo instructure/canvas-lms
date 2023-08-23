@@ -270,6 +270,7 @@ module Calendar2Common
   end
 
   def test_timed_calendar_event_in_tz(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
+    puts ">>> TZ #{time_zone}, #{Time.zone}"
     @user.time_zone = time_zone
     @user.save!
     @date = @user.time_zone.now.beginning_of_day

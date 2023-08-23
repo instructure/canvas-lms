@@ -77,6 +77,10 @@ module CalendarPage
     "#content .fc-event:visible:contains('event in a series')"
   end
 
+  def updated_events_in_a_series_selector
+    "#content .fc-event:visible:contains('event updated in a series')"
+  end
+
   def events_in_month_view_selector
     ".fc-event"
   end
@@ -176,6 +180,10 @@ module CalendarPage
 
   def events_in_a_series
     ffj(events_in_a_series_selector)
+  end
+
+  def updated_events_in_a_series
+    ffj(updated_events_in_a_series_selector)
   end
 
   def frequency_picker
