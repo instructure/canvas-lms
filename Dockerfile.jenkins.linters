@@ -2,6 +2,8 @@ FROM local/webpack-builder
 
 USER docker
 COPY --chown=docker:docker . /usr/src/app
+SHELL ["/usr/bin/bash", "-c"]
+RUN vendor_files=(vendor/*); if [ ${#vendor_files[@]} -gt 1 ]; then bundle config --global frozen false ; fi
 RUN cp -v docker-compose/config/redis.yml config && \
   cp -v docker-compose/config/selenium.yml config/ && \
   cp -vR docker-compose/config/new-jenkins/* config/ && \

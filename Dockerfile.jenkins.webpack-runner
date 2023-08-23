@@ -6,6 +6,7 @@ RUN \
   --mount=type=bind,from=local/webpack-cache-previous,target=/mount/webpack-cache-previous \
   tar --no-same-owner -xf /cache-helper/webpack-runner-dependencies.tar -C ${APP_HOME} && \
   tar --no-same-owner -xf /cache-helper/webpack-runner-vendor.tar -C ${APP_HOME} && \
+  if [ -n "$(tar tf /cache-helper/webpack-runner-vendor.tar)" ]; then bundle config --global frozen false ; fi && \
   tar --no-same-owner -xf /cache-helper/webpack-runner.tar -C ${APP_HOME} && \
   { { cd /mount/webpack-assets-previous/usr/src/app && cp --parents -rf public/dist/brandable_css ${APP_HOME}; } || true; } && \
   { { cd /mount/webpack-cache-previous && cp --parents -rf node_modules/.cache ${APP_HOME}; } || true; }
