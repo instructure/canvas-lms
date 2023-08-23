@@ -132,9 +132,9 @@ module RuboCop
             unless replica_identity_present?(table_name)
               # put the complaint on the last line of the block
               if %i[str sym].include?(table_name.type)
-                example = "e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value.to_s.split("_").map(&:capitalize).join.sub(/s$/, "")}`"
+                example = "e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value.to_s.camelcase.singularize}`"
               end
-              add_offense nil, location: last_line_range(node), message: <<~TEXT, severity: :warning
+              add_offense nil, location: last_line_range(node), message: <<~TEXT, severity: :info
                 Use `add_replica_identity` after the create_table block
                 #{example}
               TEXT
