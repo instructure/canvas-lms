@@ -72,9 +72,9 @@ Submission
 
 <h2 id="submission_created">submission_created</h2>
 
-**Definition:** The event is emitted anytime an end user or API request submits or re-submits an assignment.
+**Definition:** The event is emitted anytime an end user or API request submits or re-submits an assignment. This applies to assignments and new quizzes, not classic quizzes. Use quiz_submitted for classic quiz submissions.
 
-**Trigger:** Triggered when a submission gets updated and has not yet been submitted.
+**Trigger:** Triggered when an assignment or new quizzes submission gets updated and has not yet been submitted.
 
 
 
