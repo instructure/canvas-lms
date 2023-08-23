@@ -35,9 +35,7 @@ describe "recurring events" do
       course_with_teacher(active_all: true, new_user: true)
     end
 
-    before do
-      user_session(@teacher)
-    end
+    before { user_session(@teacher) }
 
     it "displays the frequency picker on calendar event modal" do
       get "/calendar2"
@@ -116,6 +114,7 @@ describe "recurring events" do
 
       select_frequency_option("Daily")
       click_submit_button
+
       # show the events are in july calendar (includes both July and first week of August events on this view)
       get "/calendar2#view_name=month&view_start=2023-07-01"
 
@@ -205,9 +204,7 @@ describe "recurring events" do
       course_with_teacher(active_all: true, new_user: true)
     end
 
-    before do
-      user_session(@teacher)
-    end
+    before { user_session(@teacher) }
 
     it "displays the frequency picker on calendar event edit page" do
       get "/courses/#{@course.id}/calendar_events/new"
@@ -460,9 +457,7 @@ describe "recurring events" do
       course_with_teacher(active_all: true, new_user: true)
     end
 
-    before do
-      user_session(@teacher)
-    end
+    before { user_session(@teacher) }
 
     it "allows for selection of days with day view" do
       get "/calendar2#view_name=month&view_start=2023-07-01"
@@ -676,26 +671,25 @@ describe "recurring events" do
       wait_for_ajaximations
       events = events_in_a_series
       expect(events.length).to eq 3
-
       events[1].click
       click_edit_event_button
       expect(frequency_picker_value).to eq("Daily, 3 times")
-
-      enter_event_title("updated event title")
+      enter_event_title("event updated in a series")
 
       click_submit_button
       event_series_this_event.click
       click_edit_confirm_button
       wait_for_ajaximations
+      upd_events = updated_events_in_a_series
+      expect(upd_events.length).to eq 1
 
-      events = events_in_a_series
       # events_in_a_series returns all events with the original title
+      events = events_in_a_series
       expect(events.length).to eq 2
     end
 
     it "updates this and following events in the series" do
       get "/calendar"
-
       wait_for_ajaximations
       events = events_in_a_series
       expect(events.length).to eq 3
@@ -704,15 +698,18 @@ describe "recurring events" do
       click_edit_event_button
       expect(frequency_picker_value).to eq("Daily, 3 times")
 
-      enter_event_title("updated event title")
+      enter_event_title("event updated in a series")
 
       click_submit_button
       event_series_following_events.click
       click_edit_confirm_button
       wait_for_ajaximations
 
-      events = events_in_a_series
+      upd_events = updated_events_in_a_series
+      expect(upd_events.length).to eq 2
+
       # events_in_a_series returns all events with the original title
+      events = events_in_a_series
       expect(events.length).to eq 1
     end
 
@@ -735,6 +732,7 @@ describe "recurring events" do
       wait_for_ajaximations
 
       events = events_in_a_series
+
       # events_in_a_series returns all events with the original title
       expect(events.length).to eq 3
     end
@@ -793,6 +791,7 @@ describe "recurring events" do
       wait_for_ajaximations
 
       events = events_in_a_series
+
       # events_in_a_series returns all events with the original title
       expect(events.length).to eq 1
     end
@@ -821,6 +820,7 @@ describe "recurring events" do
       wait_for_ajaximations
 
       events = events_in_a_series
+
       # events_in_a_series returns all events with the original title
       expect(events.length).to eq 3
     end

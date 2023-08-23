@@ -40,7 +40,10 @@ import FrequencyPicker, {
 } from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
 import Course from '@canvas/courses/backbone/models/Course'
 import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
-import {RRULEToFrequencyOptionValue} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
+import {
+  RRULEToFrequencyOptionValue,
+  updateRRuleForNewDate,
+} from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/utils'
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
@@ -119,6 +122,12 @@ export default class EditCalendarEventView extends Backbone.View {
         !!(attrs.start_at && attrs.start_at.equals(attrs.end_at)) &&
         attrs.start_at.equals(attrs.start_at.clearTime())
       this.model.set(attrs)
+      this.frequency = attrs.rrule
+        ? RRULEToFrequencyOptionValue(
+            moment.tz(attrs.start_date, 'MMM D, YYYY', ENV.TIMEZONE),
+            attrs.rrule
+          )
+        : 'not-repeat'
       this.render()
 
       // populate inputs with params passed through the url
@@ -218,6 +227,7 @@ export default class EditCalendarEventView extends Backbone.View {
   _handleFrequencyChange(newFrequency, newRRule) {
     if (newFrequency !== 'custom') {
       this.model.set('rrule', newRRule)
+      this.frequency = newFrequency
       this.renderRecurringEventFrequencyPicker()
     }
   }
@@ -229,11 +239,6 @@ export default class EditCalendarEventView extends Backbone.View {
       const eventStart = start ? moment.tz(start, 'MMM D, YYYY', ENV.TIMEZONE) : moment('invalid')
 
       const rrule = this.model.get('rrule')
-      const freq =
-        rrule && eventStart.isValid()
-          ? RRULEToFrequencyOptionValue(eventStart, rrule)
-          : 'not-repeat'
-
       const date = eventStart.isValid() ? eventStart.toISOString(true) : undefined
 
       let courseEndAt
@@ -253,7 +258,7 @@ export default class EditCalendarEventView extends Backbone.View {
               interaction={eventStart.isValid() ? 'enabled' : 'disabled'}
               locale={ENV.LOCALE || 'en'}
               timezone={ENV.TIMEZONE}
-              initialFrequency={freq}
+              initialFrequency={this.frequency}
               rrule={rrule}
               width="fit"
               onChange={this.handleFrequencyChange}
@@ -271,6 +276,11 @@ export default class EditCalendarEventView extends Backbone.View {
     this.renderRecurringEventFrequencyPicker()
 
     this.$el.find('[name="start_date"]').on('change', () => {
+      const start = this.$el.find('[name="start_date"]').val()
+      const eventStart = start ? moment.tz(start, 'MMM D, YYYY', ENV.TIMEZONE) : moment('invalid')
+      if (eventStart.isValid() && this.model.get('rrule') && this.frequency !== 'saved-custom') {
+        this.model.set('rrule', updateRRuleForNewDate(eventStart, this.model.get('rrule')))
+      }
       this.renderRecurringEventFrequencyPicker()
     })
 

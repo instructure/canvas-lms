@@ -21,6 +21,7 @@ import {
   generateFrequencyOptions,
   generateFrequencyRRULE,
   RRULEToFrequencyOptionValue,
+  updateRRuleForNewDate,
 } from '../utils'
 
 const defaultTZ = 'America/New_York'
@@ -300,5 +301,43 @@ describe('RRULEToFrequencyOptionValue', () => {
     const eventStart = moment.tz('2023-07-17T00:00:00', defaultTZ)
     const rrule = ''
     expect(RRULEToFrequencyOptionValue(eventStart, rrule)).toEqual('custom')
+  })
+})
+
+describe('updateRRuleForNewDate', () => {
+  it('reutrns null when the rrule is  null', () => {
+    expect(updateRRuleForNewDate(moment.tz('2023-07-17T00:00:00', defaultTZ), null)).toBeNull()
+  })
+
+  it('updates a weekly rrule to match the new day of the week', () => {
+    const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO;COUNT=52'
+    const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
+    expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
+      'FREQ=WEEKLY;INTERVAL=1;BYDAY=TU;COUNT=52'
+    )
+  })
+
+  it('updates a monthly rrule to match the neew day of the week', () => {
+    const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=MO;BYSETPOS=3;COUNT=12'
+    const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
+    expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
+      'FREQ=MONTHLY;INTERVAL=1;BYDAY=TU;BYSETPOS=3;COUNT=12'
+    )
+  })
+
+  it('updates a monthly rrule to match the new day of the month', () => {
+    const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=17;COUNT=12'
+    const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
+    expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
+      'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=18;COUNT=12'
+    )
+  })
+
+  it('updates a yearly rrule to match the new date', () => {
+    const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=17;COUNT=5'
+    const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
+    expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
+      'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=18;COUNT=5'
+    )
   })
 })

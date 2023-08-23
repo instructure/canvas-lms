@@ -142,10 +142,10 @@ Object.assign(CommonEvent.prototype, {
 
   save(params, success, error) {
     const onSuccess = data => {
-      this.copyDataFromObject(data)
-      if (params.which) {
-        $.publish('CommonEvent/eventSavedFromSeries', {selectedEvent: this, which: params.which})
+      if (params.which && Array.isArray(data)) {
+        $.publish('CommonEvent/eventsUpdatedFromSeries', {updatedEvents: data})
       } else {
+        this.copyDataFromObject(data)
         $.publish('CommonEvent/eventSaved', this)
       }
       if (typeof success === 'function') return success()
@@ -154,7 +154,7 @@ Object.assign(CommonEvent.prototype, {
     const onError = data => {
       this.copyDataFromObject({...this.calendarEvent, ...data})
       if (params.which) {
-        $.publish('CommonEvent/eventSavedFromSeriesFailed', {
+        $.publish('CommonEvent/eventsSavedFromSeriesFailed', {
           selectedEvent: this,
           which: params.which,
         })
@@ -169,7 +169,7 @@ Object.assign(CommonEvent.prototype, {
 
     this.forceMinimumDuration() // so short events don't look squished while waiting for ajax
     if (params.which) {
-      $.publish('CommonEvent/eventSavingFromSeries', {selectedEvent: this, which: params.which})
+      $.publish('CommonEvent/eventsSavingFromSeries', {selectedEvent: this, which: params.which})
     } else {
       $.publish('CommonEvent/eventSaving', this)
     }
