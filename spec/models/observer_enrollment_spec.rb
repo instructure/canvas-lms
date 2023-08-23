@@ -47,6 +47,11 @@ describe ObserverEnrollment do
       expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({})
     end
 
+    it "manually concluded students are returned when grade summary is set to true" do
+      @student_enrollment.update_attribute(:workflow_state, "completed")
+      expect(ObserverEnrollment.observed_students(@course1, @observer, grade_summary: true).length).to eq(1)
+    end
+
     describe "date restricted future sections" do
       let(:unrestricted_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2, include_restricted_access: false) }
       let(:all_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2) }

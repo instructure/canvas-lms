@@ -144,7 +144,7 @@ describe GradeSummaryPresenter do
       @student = User.create!
       @teacher = User.create!
       @course.enroll_teacher(@teacher, active_all: true)
-      @course.enroll_student(@student, active_all: true)
+      @student_enrollment1 = @course.enroll_student(@student, active_all: true)
     end
 
     it "returns all of the observed students, if there are multiple" do
@@ -156,6 +156,16 @@ describe GradeSummaryPresenter do
 
       presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
       expect(presenter.students.map(&:id)).to match_array [@student.id, student_two.id]
+    end
+
+    it "returns the observed student that has the enrollment manually concluded" do
+      @observer = User.create!
+      @observer_enrollment1 = @course.observer_enrollments.create!(user_id: @observer, associated_user_id: @student)
+
+      @student_enrollment1.update_attribute(:workflow_state, "completed")
+      @observer_enrollment1.update_attribute(:workflow_state, "completed")
+      presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
+      expect(presenter.students.map(&:id)).to match_array [@student.id]
     end
 
     it "returns an array with a single student if there is only one student" do
