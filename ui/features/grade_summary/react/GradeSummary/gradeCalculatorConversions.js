@@ -114,24 +114,33 @@ export const convertGradingPeriod = gradingPeriod => {
     endDate: gradingPeriod.endDate, // Date
     id: gradingPeriod._id, // string
     isClosed: isInPast(gradingPeriod.closeDate), // boolean
-    isLast: false, // boolean
+    isLast: gradingPeriod.isLast, // boolean
     startDate: gradingPeriod.startDate, // Date
     title: gradingPeriod.title, // string
     weight: gradingPeriod.weight, // number
   }
 }
 
-export const convertGradingPeriodSet = (gradingPeriods, courseData) => {
+export const convertGradingPeriodSet = relevantGradingPeriodGroup => {
+  const gradingPeriods = relevantGradingPeriodGroup?.gradingPeriodsConnection?.nodes
+  if (!gradingPeriods) return null
+  let gradingPeriodGroupCloseDate
+  gradingPeriods.forEach(period => {
+    if (period.isLast) {
+      gradingPeriodGroupCloseDate = period.closeDate
+    }
+  })
+
   return {
-    createdAt: courseData.createdAt, // Date
-    displayTotalsForAllGradingPeriods: courseData.displayTotals, // boolean
-    enrollmentTermIDs: courseData.enrollmentTermIDs, // string[]
-    gradingPeriods: gradingPeriods.map(period => convertGradingPeriod(period)), // CamelizedGradingPeriod[]
-    id: courseData._id, // string
-    isClosed: isInPast(courseData.closeDate), // boolean
+    createdAt: null, // Date
+    displayTotalsForAllGradingPeriods: relevantGradingPeriodGroup?.displayTotals, // boolean
+    enrollmentTermIDs: relevantGradingPeriodGroup?.enrollmentTermIDs, // string[]
+    gradingPeriods: gradingPeriods?.map(period => convertGradingPeriod(period)), // CamelizedGradingPeriod[]
+    id: relevantGradingPeriodGroup._id, // string
+    isClosed: isInPast(gradingPeriodGroupCloseDate), // boolean
     permissions: null, // unknown
-    title: courseData.title, // string
-    weighted: courseData.applyGroupWeights, // boolean
+    title: relevantGradingPeriodGroup?.title, // string
+    weighted: relevantGradingPeriodGroup?.weighted, // boolean
   }
 }
 
@@ -176,6 +185,18 @@ export const convertAssignmentGroupCriteriaMap = (assignmentGroups, assignments)
   return assignmentGroupCriteriaMap
 }
 
+export const convertEffectiveDueDates = assignments => {
+  const effectiveDueDates = {}
+  assignments.forEach(assignment => {
+    effectiveDueDates[assignment._id] = {
+      due_at: assignment.dueAt,
+      grading_period_id: assignment.gradingPeriodId,
+      in_closed_grading_period: false,
+    }
+  })
+  return effectiveDueDates
+}
+
 /*
 To use the course grade calculator, you need to pass in the following:
 - submissions: an array of submissions
@@ -191,7 +212,13 @@ assignments and submissions to be in separate arrays, but the GraphQL API return
 other. The course grade calculator also expects the assignment groups to be in an object with the assignment
 group ids as keys, but the GraphQL API returns them in an array.
 */
-export const calculateCourseGrade = (gradingPeriods, assignmentGroups, assignments) => {
+export const calculateCourseGrade = (
+  relevantGradingPeriodGroup,
+  assignmentGroups,
+  assignments,
+  calculateOnlyGradedAssignments,
+  applyGroupWeights
+) => {
   const convertedSubmissions = assignments.map(assignment => {
     return convertToSubmissionCriteria(
       assignment.submissionsConnection.nodes[0],
@@ -200,14 +227,16 @@ export const calculateCourseGrade = (gradingPeriods, assignmentGroups, assignmen
     )
   })
 
-  // const convertedGradingPeriods = convertGradingPeriodSet(gradingPeriods, {})
+  const convertedGradingPeriods = convertGradingPeriodSet(relevantGradingPeriodGroup)
+
+  const convertedEffectiveDueDates = convertEffectiveDueDates(assignments)
 
   return CourseGradeCalculator.calculate(
     convertedSubmissions,
     convertAssignmentGroupCriteriaMap(assignmentGroups, assignments),
-    'points',
-    true,
-    null,
-    []
+    applyGroupWeights ? 'percent' : 'points',
+    calculateOnlyGradedAssignments,
+    convertedGradingPeriods,
+    convertedEffectiveDueDates
   )
 }
