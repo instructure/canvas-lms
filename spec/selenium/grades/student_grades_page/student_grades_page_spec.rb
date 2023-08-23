@@ -169,17 +169,17 @@ describe "gradebook - logged in as a student" do
       @course.update(enrollment_term: term)
 
       # create grading_period_group and grading_periods
-      grading_period_group = backend_group_helper.create_for_account(@course.root_account)
-      grading_period_group.weighted = true
-      grading_period_group.update(display_totals_for_all_grading_periods: true, weighted: true)
-      grading_period_group.save!
-      term.update_attribute(:grading_period_group_id, grading_period_group)
+      @grading_period_group = backend_group_helper.create_for_account(@course.root_account)
+      @grading_period_group.weighted = true
+      @grading_period_group.update(display_totals_for_all_grading_periods: true, weighted: true)
+      @grading_period_group.save!
+      term.update_attribute(:grading_period_group_id, @grading_period_group)
 
       # Create Grading periods with Grading period weights
-      @current_period = backend_period_helper.create_with_weeks_for_group(grading_period_group, 1, -3, @current_period_name)
+      @current_period = backend_period_helper.create_with_weeks_for_group(@grading_period_group, 1, -3, @current_period_name)
       @current_period.update(weight: 75)
       @current_period.save
-      @past_period = backend_period_helper.create_with_weeks_for_group(grading_period_group, 5, 2, @past_period_name)
+      @past_period = backend_period_helper.create_with_weeks_for_group(@grading_period_group, 5, 2, @past_period_name)
       @past_period.update(weight: 25)
       @past_period.save
 
@@ -254,8 +254,8 @@ describe "gradebook - logged in as a student" do
         expect(dropped_assignments_text.any? { |str| str.include?(@assignment_11.title) }).to be true
 
         # Verify that the 2 group rows have the correct values
-        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/1,110.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period N/A 0.00/40.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/100.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period N/A 0.00/100.00"
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
@@ -391,7 +391,7 @@ describe "gradebook - logged in as a student" do
 
         # Verify that the 2 grading period rows have the correct values
         expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 33.50% 19.00/110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 33.50% 33.50/100.00"
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
@@ -417,12 +417,12 @@ describe "gradebook - logged in as a student" do
         expect(excused_assignments_text.any? { |str| str.include?(@assignment_7.title) }).to be true
 
         # Verify that the 2 group rows have the correct values
-        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/1,110.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 19.75% 19.00/120.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/100.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 19.75% 19.75/100.00"
 
         # Verify that the total is correct
         # Points possible is not shown in React, because it doesn't make sense with weighted grading periods/ assignment groups.
-        expect(f("tr[data-testid='total_row']").text).to eq "Total 19.75%"
+        expect(f("tr[data-testid='total_row']").text).to eq "Total 14.81%"
       end
 
       it "correctly displays all grading periods as default when there is no current grading period" do
@@ -443,7 +443,7 @@ describe "gradebook - logged in as a student" do
         StudentGradesPage.visit_as_student(@course)
         expect(f("#grading_period_select_menu").attribute("value")).to eq @all_grading_periods
         expect(f("tr[data-testid='gradingPeriod-#{@past_period.id}']").text).to eq "Past Grading Period N/A 0.00/0.00"
-        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 33.50% 19.00/110.00"
+        expect(f("tr[data-testid='gradingPeriod-#{@current_period.id}']").text).to eq "Current Grading Period 33.50% 33.50/100.00"
         expect(f("tr[data-testid='total_row']").text).to eq "Total 33.50%"
       end
 
@@ -498,8 +498,8 @@ describe "gradebook - logged in as a student" do
         before do
           @course.apply_assignment_group_weights = false
           @course.save!
-          @past_period.update!(weight: 0)
-          @current_period.update!(weight: 0)
+          @grading_period_group.weighted = false
+          @grading_period_group.save!
         end
 
         it "shows score / points possible in total row" do

@@ -24,16 +24,15 @@ import {Text} from '@instructure/ui-text'
 import {
   formatNumber,
   scorePercentageToLetterGrade,
-  getGradingPeriodTotalPoints,
   getGradingPeriodPercentage,
-  getGradingPeriodEarnedPoints,
   filteredAssignments,
 } from '../utils'
 
 export const gradingPeriodRow = (
   gradingPeriod,
   queryData,
-  calculateOnlyGradedAssignments = false
+  calculateOnlyGradedAssignments = false,
+  courseLevelGrades = {}
 ) => {
   const filterByGradingPeriod = filteredAssignments(
     queryData,
@@ -41,6 +40,11 @@ export const gradingPeriodRow = (
   ).filter(assignment => {
     return assignment?.gradingPeriodId === gradingPeriod?._id
   })
+
+  const courseLevelScore = courseLevelGrades?.score || 0
+  const courseLevelPossible = courseLevelGrades?.possible || 0
+
+  const percentageFromCourseLevelGrades = (courseLevelScore / courseLevelPossible) * 100
 
   const periodPercentage = getGradingPeriodPercentage(
     gradingPeriod,
@@ -52,24 +56,10 @@ export const gradingPeriodRow = (
   const letterGrade =
     periodPercentage === ASSIGNMENT_NOT_APPLICABLE
       ? periodPercentage
-      : scorePercentageToLetterGrade(periodPercentage, queryData?.gradingStandard)
+      : scorePercentageToLetterGrade(percentageFromCourseLevelGrades, queryData?.gradingStandard)
 
-  const formattedScore = `${
-    formatNumber(
-      getGradingPeriodEarnedPoints(
-        gradingPeriod,
-        filterByGradingPeriod,
-        queryData?.assignmentGroupsConnection?.nodes
-      )
-    ) || '-'
-  }/${
-    formatNumber(
-      getGradingPeriodTotalPoints(
-        gradingPeriod,
-        filterByGradingPeriod,
-        queryData?.assignmentGroupsConnection?.nodes
-      )
-    ) || '-'
+  const formattedScore = `${formatNumber(courseLevelScore) || '-'}/${
+    formatNumber(courseLevelPossible) || '-'
   }`
 
   return (
@@ -83,7 +73,7 @@ export const gradingPeriodRow = (
             {Number.isNaN(Number.parseFloat(periodPercentage)) ||
             periodPercentage === ASSIGNMENT_NOT_APPLICABLE
               ? ASSIGNMENT_NOT_APPLICABLE
-              : `${formatNumber(periodPercentage)}%`}
+              : `${formatNumber(percentageFromCourseLevelGrades)}%`}
           </Text>
         </Table.Cell>
       )}

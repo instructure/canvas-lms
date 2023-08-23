@@ -26,15 +26,13 @@ import {Text} from '@instructure/ui-text'
 import {
   formatNumber,
   scorePercentageToLetterGrade,
-  getCourseEarnedPoints,
-  getCourseTotalPoints,
   getTotal,
   filteredAssignments,
 } from '../utils'
 
 const I18n = useI18nScope('grade_summary')
 
-export const totalRow = (queryData, calculateOnlyGradedAssignments = false) => {
+export const totalRow = (queryData, calculateOnlyGradedAssignments = false, courseLevelGrades) => {
   const applicableAssignments = filteredAssignments(queryData, calculateOnlyGradedAssignments)
   let total = getTotal(
     applicableAssignments,
@@ -43,21 +41,28 @@ export const totalRow = (queryData, calculateOnlyGradedAssignments = false) => {
     queryData?.applyGroupWeights
   )
 
+  const courseLevelScore = courseLevelGrades?.score || 0
+  const courseLevelPossible = courseLevelGrades?.possible || 0
+
+  const percentageFromCourseLevelGrades = (courseLevelScore / courseLevelPossible) * 100
+
   if (total === ASSIGNMENT_NOT_APPLICABLE) {
     if (!calculateOnlyGradedAssignments || ENV.current_grading_period_id === '0') {
       total = 0
     }
   }
   const formattedTotal =
-    total === ASSIGNMENT_NOT_APPLICABLE ? ASSIGNMENT_NOT_APPLICABLE : `${formatNumber(total)}%`
+    total === ASSIGNMENT_NOT_APPLICABLE
+      ? ASSIGNMENT_NOT_APPLICABLE
+      : `${formatNumber(percentageFromCourseLevelGrades)}%`
 
   const letterGrade =
     total === ASSIGNMENT_NOT_APPLICABLE
       ? total
-      : scorePercentageToLetterGrade(total, queryData?.gradingStandard)
+      : scorePercentageToLetterGrade(percentageFromCourseLevelGrades, queryData?.gradingStandard)
 
-  const earnedPoints = formatNumber(getCourseEarnedPoints(applicableAssignments)) || '-'
-  const totalPoints = formatNumber(getCourseTotalPoints(applicableAssignments)) || '-'
+  const earnedPoints = formatNumber(courseLevelScore) || '-'
+  const totalPoints = formatNumber(courseLevelPossible) || '-'
   const hasWeightedGradingPeriods = queryData?.gradingPeriodsConnection?.nodes?.some(
     gradingPeriod => {
       return gradingPeriod.weight != null && gradingPeriod.weight > 0

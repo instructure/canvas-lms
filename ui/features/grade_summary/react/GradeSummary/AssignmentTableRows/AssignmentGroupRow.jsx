@@ -25,15 +25,14 @@ import {
   getAssignmentGroupPercentage,
   formatNumber,
   scorePercentageToLetterGrade,
-  getAssignmentGroupEarnedPoints,
-  getAssignmentGroupTotalPoints,
   filteredAssignments,
 } from '../utils'
 
 export const assignmentGroupRow = (
   assignmentGroup,
   queryData,
-  calculateOnlyGradedAssignments = false
+  calculateOnlyGradedAssignments = false,
+  courseLevelGrades = {}
 ) => {
   const groupAssignments = queryData?.assignmentsConnection?.nodes?.filter(assignment => {
     return assignment?.assignmentGroup?._id === assignmentGroup?._id
@@ -54,18 +53,20 @@ export const assignmentGroupRow = (
     false
   )
 
+  const courseLevelScore = courseLevelGrades?.score || 0
+  const courseLevelPossible = courseLevelGrades?.possible || 0
+
+  const percentageFromCourseLevelGrades = (courseLevelScore / courseLevelPossible) * 100
+
   const formattedScore =
     assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE
       ? assignmentGroupPercentage
-      : `${formatNumber(assignmentGroupPercentage)}%`
+      : `${formatNumber(percentageFromCourseLevelGrades)}%`
 
   const letterGrade =
     assignmentGroupPercentage === ASSIGNMENT_NOT_APPLICABLE
       ? assignmentGroupPercentage
-      : scorePercentageToLetterGrade(assignmentGroupPercentage, queryData?.gradingStandard)
-
-  const earnedPoints = getAssignmentGroupEarnedPoints(assignmentGroup, applicableAssignments, false)
-  const totalPoints = getAssignmentGroupTotalPoints(assignmentGroup, applicableAssignments, false)
+      : scorePercentageToLetterGrade(percentageFromCourseLevelGrades, queryData?.gradingStandard)
 
   return (
     <Table.Row key={assignmentGroup?._id} data-testid={`agtotal-${assignmentGroup?.name}`}>
@@ -81,7 +82,9 @@ export const assignmentGroupRow = (
         <Text weight="bold">
           {ENV.restrict_quantitative_data
             ? letterGrade
-            : `${formatNumber(earnedPoints) || '-'}/${formatNumber(totalPoints) || '-'}`}
+            : `${formatNumber(courseLevelScore) || '-'}/${
+                formatNumber(courseLevelPossible) || '-'
+              }`}
         </Text>
       </Table.Cell>
     </Table.Row>
