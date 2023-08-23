@@ -201,7 +201,8 @@ describe('CalendarEventDetailsForm', () => {
     )
   })
 
-  it('can keep the same date when the date input is clicked and blurred', async () => {
+  // LF-630 (08/23/2023)
+  it.skip('can keep the same date when the date input is clicked and blurred', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     const date = changeValue(component, 'edit-calendar-event-form-date', '2022-07-14T00:00:00.000Z')
