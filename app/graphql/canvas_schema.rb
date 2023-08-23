@@ -64,6 +64,7 @@ class CanvasSchema < GraphQL::Schema
     when Group then Types::GroupType
     when GroupCategory then Types::GroupSetType
     when GradingPeriod then Types::GradingPeriodType
+    when GradingPeriodGroup then Types::GradingPeriodGroupType
     when GradingStandard then Types::GradingStandardType
     when ContextModule then Types::ModuleType
     when PostPolicy then Types::PostPolicyType

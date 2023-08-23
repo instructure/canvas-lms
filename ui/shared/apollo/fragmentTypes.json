@@ -123,6 +123,9 @@
             "name": "GradingPeriod"
           },
           {
+            "name": "GradingPeriodGroup"
+          },
+          {
             "name": "Group"
           },
           {
@@ -324,6 +327,9 @@
             "name": "GradingPeriod"
           },
           {
+            "name": "GradingPeriodGroup"
+          },
+          {
             "name": "Group"
           },
           {
@@ -493,6 +499,9 @@
           },
           {
             "name": "GradingPeriod"
+          },
+          {
+            "name": "GradingPeriodGroup"
           },
           {
             "name": "Group"
