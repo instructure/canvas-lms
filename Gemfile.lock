@@ -1076,7 +1076,7 @@ GEM
       axe-core-selenium (~> 4.1)
       rspec (~> 3.8)
     swearjar (1.4.0)
-    switchman (3.5.8)
+    switchman (3.5.9)
       activerecord (>= 6.1.4, < 7.1)
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
