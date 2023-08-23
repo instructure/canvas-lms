@@ -1136,6 +1136,12 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def effective_final_grade_custom_status_id(id_opts = nil)
+    score = find_score(id_opts)
+
+    score.custom_grade_status_id if score&.overridden? && course.allow_final_grade_override?
+  end
+
   def override_grade(id_opts = nil)
     return nil unless course.allow_final_grade_override? && course.grading_standard_enabled?
 
