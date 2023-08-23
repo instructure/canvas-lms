@@ -4368,6 +4368,7 @@ describe Course do
         context "when including final grade overrides" do
           before(:once) do
             @course.update!(grading_standard_id: 0)
+            Account.site_admin.disable_feature!(:custom_gradebook_statuses)
           end
 
           before do
@@ -4375,12 +4376,12 @@ describe Course do
             @course.update!(allow_final_grade_override: true)
           end
 
-          def csv_output
+          def csv_output(include_final_grade_overrides: true)
             @course.generate_grade_publishing_csv_output(
               @ase,
               @user,
               @pseudonym,
-              include_final_grade_overrides: true
+              include_final_grade_overrides:
             )
           end
 
@@ -4419,6 +4420,42 @@ describe Course do
             @ase[1].scores.find_by(course_score: true).update!(final_score: nil, override_score: nil)
             enrollment_ids = csv_output[0][0]
             expect(enrollment_ids).not_to include @ase[1].id
+          end
+
+          context "when including custom grade statuses" do
+            before do
+              Account.site_admin.enable_feature!(:custom_gradebook_statuses)
+              @custom_grade_status = CustomGradeStatus.create!(name: "new status", color: "#000000", root_account_id: @course.root_account_id, created_by: user_model)
+              @ase[1].scores.find_by(course_score: true).update!(final_score: 0, override_score: 100, custom_grade_status: @custom_grade_status)
+            end
+
+            it "includes custom_grade_status in the csv output" do
+              output = csv_output[0][1]
+              expect(output).to include("custom_grade_status")
+              expect(output).to include(
+                "#{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,100.0,A,#{@custom_grade_status.name}\n"
+              )
+            end
+
+            it "does not include custom_grade_status in the csv output if include_final_grade_overrides is disabled" do
+              @course.update!(allow_final_grade_override: false)
+              output = csv_output(include_final_grade_overrides: false)[0][1]
+              expect(output).to include(
+                "#{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,0.0,F\n"
+              )
+              expect(output).not_to include("custom_grade_status")
+              expect(output).not_to include(@custom_grade_status.name)
+            end
+
+            it "does not include custom_grade_status if feature flag is disabled" do
+              Account.site_admin.disable_feature!(:custom_gradebook_statuses)
+              output = csv_output[0][1]
+              expect(output).to include(
+                "#{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,100.0,A\n"
+              )
+              expect(output).not_to include("custom_grade_status")
+              expect(output).not_to include(@custom_grade_status.name)
+            end
           end
         end
 

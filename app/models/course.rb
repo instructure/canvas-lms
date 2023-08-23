@@ -2279,6 +2279,7 @@ class Course < ActiveRecord::Base
 
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false)
     ActiveRecord::Associations.preload(enrollments, { user: :pseudonyms })
+    custom_gradebook_statuses_enabled = Account.site_admin.feature_enabled?(:custom_gradebook_statuses) && include_final_grade_overrides
 
     enrollment_ids = []
 
@@ -2297,7 +2298,12 @@ class Course < ActiveRecord::Base
         score
       ]
       column_names << "grade" if grading_standard_enabled?
+      column_names << "custom_grade_status" if custom_gradebook_statuses_enabled
       csv << column_names
+
+      if include_final_grade_overrides
+        custom_grade_status_map = custom_grade_statuses.pluck(:id, :name).to_h
+      end
 
       enrollments.each do |enrollment|
         next if include_final_grade_overrides && !enrollment.effective_final_score
@@ -2308,6 +2314,11 @@ class Course < ActiveRecord::Base
         if include_final_grade_overrides
           grade = enrollment.effective_final_grade
           score = enrollment.effective_final_score
+
+          if custom_gradebook_statuses_enabled
+            custom_grade_status_id = enrollment.effective_final_grade_custom_status_id
+            custom_grade_status_name = custom_grade_status_map[custom_grade_status_id]
+          end
         else
           grade = enrollment.computed_final_grade
           score = enrollment.computed_final_score
@@ -2332,6 +2343,7 @@ class Course < ActiveRecord::Base
             score
           ]
           row << grade if grading_standard_enabled?
+          row << custom_grade_status_name if custom_gradebook_statuses_enabled
           csv << row
         end
       end
