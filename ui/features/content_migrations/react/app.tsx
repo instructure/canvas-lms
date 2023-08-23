@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2023 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,5 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './setup'
-import './react/app'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import ready from '@instructure/ready'
+import ContentMigrationsTable from './components/migrations_table'
+
+ready(() => {
+  if (document.getElementById('content_migration_table')) {
+    ReactDOM.render(<ContentMigrationsTable />, document.getElementById('content_migration_table'))
+  }
+})
