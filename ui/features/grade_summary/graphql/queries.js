@@ -22,6 +22,7 @@ import {AssignmentGroup} from './AssignmentGroup'
 import {Assignment} from './Assignment'
 import {GradingStandard} from './GradingStandard'
 import {GradingPeriod} from './GradingPeriod'
+import {GradingPeriodGroup} from './GradingPeriodGroup'
 import {Submission} from './Submission'
 
 export const ASSIGNMENTS = gql`
@@ -54,6 +55,9 @@ export const ASSIGNMENTS = gql`
             ...GradingPeriod
           }
         }
+        relevantGradingPeriodGroup {
+          ...GradingPeriodGroup
+        }
       }
     }
   }
@@ -61,5 +65,6 @@ export const ASSIGNMENTS = gql`
   ${Assignment.fragment}
   ${GradingStandard.fragment}
   ${GradingPeriod.fragment}
+  ${GradingPeriodGroup.fragment}
   ${Submission.fragment}
 `

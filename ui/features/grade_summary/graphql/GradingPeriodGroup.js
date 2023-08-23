@@ -17,60 +17,63 @@
  */
 
 import gql from 'graphql-tag'
-import {bool, float, string} from 'prop-types'
+import {bool, string} from 'prop-types'
 
-export const GradingPeriod = {
+import {GradingPeriod} from './GradingPeriod'
+
+export const GradingPeriodGroup = {
   fragment: gql`
-    fragment GradingPeriod on GradingPeriod {
-      _id
+    fragment GradingPeriodGroup on GradingPeriodGroup {
       createdAt
       displayTotals
-      closeDate
-      title
-      weight
-      isLast
+      enrollmentTermIds
+      _id
       id
-      startDate
+      title
       updatedAt
-      endDate
+      weighted
+      gradingPeriodsConnection {
+        nodes {
+          ...GradingPeriod
+        }
+      }
     }
+    ${GradingPeriod.fragment}
   `,
   shape: {
-    _id: string,
     createdAt: string,
     displayTotals: bool,
-    closeDate: string,
-    title: string,
-    weight: float,
-    isLast: bool,
+    enrollmentTermIds: [string],
+    _id: string,
     id: string,
-    startDate: string,
+    title: string,
     updatedAt: string,
-    endDate: string,
+    weighted: bool,
+    gradingPeriodsConnection: {
+      nodes: [GradingPeriod.shape],
+    },
   },
   mock: ({
     _id = '1',
-    createdAt = '2020-01-01',
-    closeDate = '2020-01-03',
-    title = 'Grading Period 1',
-    weight = 50,
-    isLast = false,
-    displayTotals = true,
     id = '1',
-    startDate = '2020-01-01',
+    title = 'Grading Period Group 1',
+    createdAt = '2020-01-01',
     updatedAt = '2020-01-01',
-    endDate = '2020-01-02',
+    displayTotals = true,
+    enrollmentTermIds = ['1'],
+    weighted = true,
+    gradingPeriodsConnection = {
+      nodes: [GradingPeriod.mock()],
+    },
   } = {}) => ({
     _id,
-    createdAt,
-    closeDate,
-    title,
-    weight,
-    isLast,
-    displayTotals,
     id,
-    startDate,
+    title,
+    createdAt,
     updatedAt,
-    endDate,
+    displayTotals,
+    enrollmentTermIds,
+    weighted,
+    gradingPeriodsConnection,
   }),
 }
