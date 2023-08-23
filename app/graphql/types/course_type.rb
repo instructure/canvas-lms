@@ -230,6 +230,9 @@ module Types
       GradingPeriod.for(course).order(:start_date)
     end
 
+    field :relevant_grading_period_group, GradingPeriodGroupType, null: true
+    delegate :relevant_grading_period_group, to: :object
+
     field :grading_standard, GradingStandardType, null: true
     def grading_standard
       object.grading_standard_or_default

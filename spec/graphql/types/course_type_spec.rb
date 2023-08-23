@@ -92,6 +92,17 @@ describe Types::CourseType do
     end
   end
 
+  describe "relevantGradingPeriodGroup" do
+    let!(:grading_period_group) { Account.default.grading_period_groups.create!(title: "a test group") }
+
+    it "returns the grading period group for the course" do
+      enrollment_term = course.enrollment_term
+      enrollment_term.update(grading_period_group_id: grading_period_group.id)
+      expect(course.relevant_grading_period_group).to eq grading_period_group
+      expect(course_type.resolve("relevantGradingPeriodGroup { _id }")).to eq grading_period_group.id.to_s
+    end
+  end
+
   describe "assignmentsConnection" do
     let_once(:assignment) do
       course.assignments.create! name: "asdf", workflow_state: "unpublished"
