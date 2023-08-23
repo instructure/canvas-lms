@@ -57,7 +57,7 @@ describe('AlignmentSummaryHeader', () => {
   it('displays alignment statistics', () => {
     const {getByText} = render(<AlignmentSummaryHeader {...defaultProps()} />)
     expect(getByText(/OUTCOMES/)).toBeInTheDocument()
-    expect(getByText(/ALIGNABLE ARTIFACTS/)).toBeInTheDocument()
+    expect(getByText(/ASSESSABLE ARTIFACTS/)).toBeInTheDocument()
   })
 
   it('displays filter dropdown', () => {
@@ -78,12 +78,12 @@ describe('AlignmentSummaryHeader', () => {
     expect(getByText(/979 OUTCOMES/)).toBeInTheDocument()
   })
 
-  it('displays total alignable artifacts', () => {
+  it('displays total assessable artifacts', () => {
     const {getAllByTestId} = render(
       <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 878})} />
     )
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[1])
-    expect(getByText(/878 ALIGNABLE ARTIFACTS/)).toBeInTheDocument()
+    expect(getByText(/878 ASSESSABLE ARTIFACTS/)).toBeInTheDocument()
   })
 
   it('calculates properly outcome coverage', () => {

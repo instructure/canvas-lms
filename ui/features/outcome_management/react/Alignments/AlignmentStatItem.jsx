@@ -49,8 +49,8 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
   } else if (type === 'artifact') {
     statName = I18n.t(
       {
-        one: '%{count} ALIGNABLE ARTIFACT',
-        other: '%{count} ALIGNABLE ARTIFACTS',
+        one: '%{count} ASSESSABLE ARTIFACT',
+        other: '%{count} ASSESSABLE ARTIFACTS',
       },
       {
         count: count || 0,
@@ -61,7 +61,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
   }
 
   const renderTooltip = () => {
-    const tooltipText = I18n.t('Outcomes may be aligned to rubrics and quizzes')
+    const tooltipText = I18n.t('Assessable artifacts include assignments, quizzes, and graded discussions')
     return (
       <Tooltip
         on={['click', 'hover', 'focus']}
