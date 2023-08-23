@@ -321,6 +321,7 @@ class ConversationsController < ApplicationController
                  react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels)
                })
         if @domain_root_account.feature_enabled?(:react_inbox)
+          @page_title = t("Inbox")
           InstStatsd::Statsd.increment("inbox.visit.react")
           InstStatsd::Statsd.count("inbox.visit.scope.inbox.count.react", @current_user.conversations.default.size)
           InstStatsd::Statsd.count("inbox.visit.scope.sent.count.react", @current_user.all_conversations.sent.size)
