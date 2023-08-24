@@ -1251,6 +1251,10 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def temporary_enrollment?
+    read_attribute(:temporary_enrollment_source_user_id).present?
+  end
+
   def observer?
     false
   end
