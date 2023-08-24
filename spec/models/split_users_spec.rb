@@ -505,6 +505,22 @@ describe SplitUsers do
       expect(submission2.reload.user).to eq source_user
     end
 
+    it "clears out unsubmitted/deleted submissions conflicting with existing assignments" do
+      assignment = course1.assignments.create!(title: "some assignment",
+                                               submission_types: "online_text_entry",
+                                               points_possible: 10,
+                                               workflow_state: "published")
+      course1.enroll_student(restored_user, enrollment_state: "active")
+
+      UserMerge.from(restored_user).into(source_user)
+      unsubmitted_submission = assignment.find_or_create_submission(restored_user)
+      real_submission = assignment.submit_homework(source_user, submission_type: "online_text_entry", body: "zarf")
+      SplitUsers.split_db_users(source_user)
+
+      expect(real_submission.reload.user).to eq restored_user
+      expect { unsubmitted_submission.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it "does not blow up on deleted courses" do
       course1.enroll_student(restored_user, enrollment_state: "active")
       UserMerge.from(restored_user).into(source_user)
@@ -618,6 +634,22 @@ describe SplitUsers do
         SplitUsers.split_db_users(shard1_source_user)
         expect(submission1.reload.user).to eq restored_user
         expect(submission2.reload.user).to eq shard1_source_user
+      end
+
+      it "clears out conflicting unsubmitted/deleted submissions across shards" do
+        assignment = shard1_course.assignments.create!(title: "some assignment",
+                                                       submission_types: "online_text_entry",
+                                                       points_possible: 10,
+                                                       workflow_state: "published")
+        shard1_course.enroll_student(restored_user, enrollment_state: "active")
+
+        UserMerge.from(restored_user).into(shard1_source_user)
+        unsubmitted_submission = assignment.find_or_create_submission(restored_user)
+        real_submission = assignment.submit_homework(shard1_source_user, submission_type: "online_text_entry", body: "zarf")
+        SplitUsers.split_db_users(shard1_source_user)
+
+        expect(real_submission.reload.user).to eq restored_user
+        expect { unsubmitted_submission.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "restores admins to the original state" do
