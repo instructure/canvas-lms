@@ -270,9 +270,6 @@ PATH
     legacy_multipart (0.0.1)
       canvas_slug
       mime-types (~> 3.2)
-    linked_in (1.0.0)
-      nokogiri
-      oauth
     live_events (1.0.0)
       activesupport
       aws-sdk-kinesis
@@ -1274,7 +1271,6 @@ DEPENDENCIES
   legacy_multipart!
   letter_opener (~> 1.8)
   link_header (= 0.0.8)
-  linked_in!
   live_events!
   lti-advantage!
   lti_outbound!

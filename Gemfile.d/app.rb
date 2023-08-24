@@ -177,7 +177,6 @@ path "../gems" do
   gem "incoming_mail_processor"
   gem "json_token"
   gem "legacy_multipart"
-  gem "linked_in"
   gem "live_events"
   gem "lti-advantage"
   gem "lti_outbound"
