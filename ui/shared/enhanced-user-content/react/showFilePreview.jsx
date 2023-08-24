@@ -37,10 +37,14 @@ export function showFilePreview(file_id, verifier = '') {
     container.id = 'file_preview_container'
     document.body.appendChild(container)
   }
+  let url = `/api/v1/files/${file_id}?include[]=enhanced_preview_url`
+  if (verifier) {
+    url += `&verifier=${verifier}`
+  }
 
   asJson(
     fetch(
-      `/api/v1/files/${file_id}?include[]=enhanced_preview_url&verifier=${verifier}&use_verifiers=1`,
+      url,
       defaultFetchOptions
     )
   )

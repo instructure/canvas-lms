@@ -239,7 +239,7 @@ describe "Files API", type: :request do
                            "hidden" => false,
                            "lock_at" => nil,
                            "locked_for_user" => false,
-                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0, verifier: @attachment.uuid),
+                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
                            "hidden_for_user" => false,
                            "created_at" => @attachment.created_at.as_json,
                            "updated_at" => @attachment.updated_at.as_json,
@@ -280,7 +280,7 @@ describe "Files API", type: :request do
                            "hidden" => false,
                            "lock_at" => nil,
                            "locked_for_user" => false,
-                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0, verifier: @attachment.uuid),
+                           "preview_url" => context_url(@attachment.context, :context_file_file_preview_url, @attachment, annotate: 0),
                            "hidden_for_user" => false,
                            "created_at" => @attachment.created_at.as_json,
                            "updated_at" => @attachment.updated_at.as_json,
@@ -1119,6 +1119,22 @@ describe "Files API", type: :request do
       expect(json["url"]).to eq file_download_url(@att, download: "1", download_frd: "1", verifier: @att.uuid)
     end
 
+    it "omits verifiers in the enhanced preview when using session auth" do
+      user_session(@user)
+      get @file_path + "?include[]=enhanced_preview_url"
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0)
+    end
+
+    it "passes along given verifiers when creating the enhanced_preview_url" do
+      user_session(@user)
+      get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
+      expect(response).to be_successful
+      json = json_parse
+      expect(json["preview_url"]).to eq context_url(@att.context, :context_file_file_preview_url, @att, annotate: 0, verifier: @att.uuid)
+    end
+
     it "returns lock information" do
       one_month_ago, one_month_from_now = 1.month.ago, 1.month.from_now
       att2 = Attachment.create!(filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("file"), folder: @root, context: @course, locked: true)
@@ -1144,7 +1160,7 @@ describe "Files API", type: :request do
       expect(json["hidden"]).to be_truthy
       expect(json["hidden_for_user"]).to be_falsey
       expect(json["locked_for_user"]).to be_falsey
-      expect(json["preview_url"].include?("verifier")).to be_truthy
+      expect(json["preview_url"].include?("verifier")).to be_falsey
     end
 
     def should_be_locked(json)
