@@ -189,6 +189,8 @@ class SplitUsers
     Shard.partition_by_shard(pseudonyms) do |shard_pseudonyms|
       move_new_enrollments(enrollment_ids, shard_pseudonyms)
     end
+    recompute_due_dates
+
     account_users_ids = records.where(context_type: "AccountUser").pluck(:context_id)
 
     Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
@@ -373,14 +375,24 @@ class SplitUsers
   # Also work that has happened since the merge event should moved if the
   # enrollment is moved.
   def move_submissions(enrollments)
-    # there should be no conflicts here because this is only called for
-    # enrollments that were updated which already excluded conflicts, but we
-    # will add the scope to protect against a FK violation.
-    source_user.submissions.where(assignment_id: Assignment.where(context_id: enrollments.map(&:course_id)))
-               .where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).shard(source_user)
-               .update_all(user_id: restored_user.id)
-    source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id)))
-               .where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).shard(source_user)
+    # NOTE: this is called (indirectly) inside partition_by_shard, so it only needs to deal with Shard.current,
+    # which is the shard the enrollments and associated submissions are in.
+    source_user_submissions = source_user.submissions.shard(Shard.current).where(course_id: enrollments.map(&:course_id))
+    restored_user_submissions = restored_user.all_submissions.shard(Shard.current)
+
+    # delete unsubmitted/deleted submissions that would otherwise clash with real ones we want to move
+    restored_user_submissions.where(workflow_state: %w[deleted unsubmitted],
+                                    assignment_id: source_user_submissions.select(:assignment_id))
+                             .delete_all
+
+    # move over submissions that don't clash with existing ones
+    source_user_submissions
+      .where.not(assignment_id: restored_user_submissions.select(:assignment_id))
+      .update_all(user_id: restored_user.id)
+
+    # since unsubmitted quiz submissions aren't a thing, just move over everything that doesn't clash
+    source_user.quiz_submissions.shard(Shard.current).where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id)))
+               .where.not(quiz_id: restored_user.quiz_submissions.shard(Shard.current).select(:quiz_id))
                .update_all(user_id: restored_user.id)
   end
 
@@ -403,12 +415,17 @@ class SplitUsers
             # we are setting the user_id to the negative user_id and then back
             # to the user_id after the conflicting rows have been updated.
             model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(foreign_key)} DEFERRED")
+            if model == Submission
+              model.where(user_id: restored_user,
+                          workflow_state: %w[deleted unsubmitted],
+                          assignment_id: Submission.where(id: ids).select(:assignment_id))
+                   .where.not(id: other_ids)
+                   .delete_all
+            end
             model.where(id: ids).update_all(user_id: -restored_user.id)
             model.where(id: other_ids).update_all(user_id: source_user.id)
             model.where(id: ids).update_all(user_id: restored_user.id)
           end
-          Enrollment.delay.recompute_due_dates_and_scores(source_user.id)
-          Enrollment.delay.recompute_due_dates_and_scores(restored_user.id)
         end
       end
     end
@@ -423,5 +440,10 @@ class SplitUsers
       c.file_state = r.previous_workflow_state if c.instance_of?(Attachment)
       c.save! if c.changed? && c.valid?
     end
+  end
+
+  def recompute_due_dates
+    Enrollment.delay.recompute_due_dates_and_scores(source_user.id)
+    Enrollment.delay.recompute_due_dates_and_scores(restored_user.id)
   end
 end
