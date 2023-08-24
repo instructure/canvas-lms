@@ -68,7 +68,6 @@ output.each do |line|
   next if line.empty?
 
   gem, details = line.split(" ", 2)
-  next if ignored_gems.include?(gem)
   next if details.include?("requested = ") # exact requirements can't be updated
 
   gems_to_update << gem
@@ -93,6 +92,8 @@ until gems_to_update.empty?
       gem = ([gem] + sibling_gems).join(" ")
     end
   end
+  next if ignored_gems.include?(gem)
+
   puts "Updating #{parent_gem || gem}..."
 
   system("bundle update #{gem} --quiet")

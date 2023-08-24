@@ -1,5 +1,6 @@
 ignored_gems:
-  - nokogiri
+  - aws-partitions
+  - sorbet-runtime
 
 # don't bother trying to update dependent gems unless their primary dependency
 # doesn't need updated as well
