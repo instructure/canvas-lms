@@ -355,7 +355,20 @@ describe MediaObject do
               expect(@mo.grants_right?(@ta, :add_captions)).to be true
             end
 
+            it "does allow course non-admin users to add_captions to attachments if they don't have manage_course_content_add but own media object" do
+              RoleOverride.create!(
+                permission: "manage_course_content_add",
+                enabled: false,
+                role: ta_role,
+                account: @course.root_account
+              )
+
+              expect(@mo.attachment).to be_nil
+              expect(@mo.grants_right?(@ta, :add_captions)).to be true
+            end
+
             it "does not allow course non-admin users to add_captions to attachments if they don't have manage_course_content_add" do
+              @mo.user = user_factory
               RoleOverride.create!(
                 permission: "manage_course_content_add",
                 enabled: false,
@@ -379,14 +392,25 @@ describe MediaObject do
               expect(@mo.grants_right?(@ta, :delete_captions)).to be true
             end
 
-            it "does not allow course non-admin users to delete_captions to attachments if they don't have manage_course_content_delete" do
+            it "does allow course non-admin users to delete_captions to attachments if they don't have manage_course_content_delete but own media object" do
               RoleOverride.create!(
                 permission: "manage_course_content_delete",
                 enabled: false,
                 role: ta_role,
                 account: @course.root_account
               )
+              expect(@mo.attachment).to be_nil
+              expect(@mo.grants_right?(@ta, :delete_captions)).to be true
+            end
 
+            it "does not allow course non-admin users to delete_captions to attachments if they don't have manage_course_content_delete" do
+              @mo.user = user_factory
+              RoleOverride.create!(
+                permission: "manage_course_content_delete",
+                enabled: false,
+                role: ta_role,
+                account: @course.root_account
+              )
               expect(@mo.attachment).to be_nil
               expect(@mo.grants_right?(@ta, :delete_captions)).to be false
             end
