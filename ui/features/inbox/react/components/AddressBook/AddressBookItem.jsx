@@ -84,8 +84,8 @@ export const AddressBookItem = ({
         onMouseLeave={() => {
           onHover(false)
         }}
-        onMouseDown={() => {
-          onSelect()
+        onMouseDown={(e) => {
+          onSelect(e)
         }}
         elementRef={el => {
           itemRef.current = el

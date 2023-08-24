@@ -242,6 +242,16 @@ describe('Address Book Component', () => {
       expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false)
     })
 
+    it('Should not close popover after selecting one item with command button pressed', async () => {
+      const mockSetIsMenuOpen = jest.fn()
+
+      setup({...defaultProps, isMenuOpen: true, isSubMenu: true, setIsMenuOpen: mockSetIsMenuOpen})
+      const popover = await screen.findByTestId('address-book-popover')
+      const items = popover.querySelectorAll('li')
+      fireEvent.mouseDown(items[4], { metaKey: true })
+      expect(mockSetIsMenuOpen).not.toHaveBeenCalledWith(false)
+    })
+
     it('Should call getTotalRecipients for All_in_context', async () => {
       const current_filter = {
         context: {

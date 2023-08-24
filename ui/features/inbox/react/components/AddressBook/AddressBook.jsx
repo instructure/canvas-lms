@@ -315,8 +315,9 @@ export const AddressBook = ({
           isSelected={isSelected}
           hasPopup={hasPopup}
           id={`address-book-menu-item-${menuId}-${itemType}`}
-          onSelect={() => {
-            selectHandler(menuItem, isContext, isBackButton, isSubmenu)
+          onSelect={(e) => {
+            e.persist()
+            selectHandler(menuItem, e, isContext, isBackButton, isSubmenu)
           }}
           onHover={() => {
             if (focusType !== MOUSE_FOCUS_TYPE) {
@@ -486,7 +487,7 @@ export const AddressBook = ({
         isMenuOpen && setIsMenuOpen(false)
         break
       case 13: // Enter
-        selectHandler(selectedItem, undefined, undefined)
+        selectHandler(selectedItem, undefined, undefined, undefined)
         break
       default:
         break
@@ -495,7 +496,7 @@ export const AddressBook = ({
 
   // Handler for selecting an item
   // Controls callback + tag addition
-  const selectHandler = async (menuItem, isContext, isBackButton, isSubmenu) => {
+  const selectHandler = async (menuItem, e, isContext, isBackButton, isSubmenu) => {
     // If information is not available, quickly find it from data state
     if (isContext === undefined && isBackButton === undefined && isSubmenu === undefined) {
       const selectedMenuItem = data.find(u => u.id === selectedItem?.id)
@@ -514,7 +515,8 @@ export const AddressBook = ({
         setIsloadingRecipientsTotal(false)
       }
       menuItem.totalRecipients = totalRecipients
-      addTag(menuItem)
+      let shouldCloseMenu = !(e?.ctrlKey || e?.metaKey)
+      addTag(menuItem, shouldCloseMenu)
       onSelect(menuItem)
       if (onUserFilterSelect) {
         onUserFilterSelect(menuItem?._id ? `user_${menuItem?._id}` : undefined)
@@ -525,7 +527,7 @@ export const AddressBook = ({
     }
   }
 
-  const addTag = menuItem => {
+  const addTag = (menuItem, shouldCloseMenu) => {
     const newSelectedMenuItems = selectedMenuItems
     const matchedMenuItems = newSelectedMenuItems.filter(u => {
       return u.id === menuItem.id
@@ -539,7 +541,9 @@ export const AddressBook = ({
 
     setSelectedMenuItems([...newSelectedMenuItems])
     onSelectedIdsChange([...newSelectedMenuItems])
-    setIsMenuOpen(false)
+    if(shouldCloseMenu){
+      setIsMenuOpen(false)
+    }
   }
 
   const removeTag = removeMenuItem => {
