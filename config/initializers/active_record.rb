@@ -2094,7 +2094,7 @@ module ClearableAssociationCache
     @association_cache = {}
   end
 end
-# Ensure it makes it onto activerecord::base even if assocations are already attached to base
+# Ensure it makes it onto activerecord::base even if associations are already attached to base
 ActiveRecord::Associations.prepend(ClearableAssociationCache)
 ActiveRecord::Base.prepend(ClearableAssociationCache)
 
