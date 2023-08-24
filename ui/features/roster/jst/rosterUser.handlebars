@@ -33,7 +33,12 @@
 {{/unless}}
 <td>
   {{#each enrollments}}
-  <div>{{enrollmentName role}}</div>
+  <div>
+    {{#if temporary_enrollment_source_user_id}}
+      {{#t}}Temporary:{{/t}}
+    {{/if}}
+    {{enrollmentName role}}
+  </div>
   {{/each}}
 </td>
 {{#if ENV.permissions.read_reports}}
