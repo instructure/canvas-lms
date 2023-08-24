@@ -66,7 +66,7 @@ module ActiveRecord
                     else
                       raise ArgumentError, "scope must be nil, a symbol, an array, or a hash"
                     end
-            # expand assocations to their foreign keys
+            # expand associations to their foreign keys
             new_scope = {}
             scope.each do |k, v|
               if (reflection = reflections[k.to_s])
