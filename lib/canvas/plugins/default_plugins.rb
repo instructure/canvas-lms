@@ -67,7 +67,6 @@ module Canvas::Plugins::DefaultPlugins
                             author_website: "http://www.instructure.com",
                             version: "1.0.0",
                             settings_partial: "plugins/linked_in_settings",
-                            validator: "LinkedInValidator",
                             encrypted_settings: [:client_secret])
     Canvas::Plugin.register("microsoft",
                             nil,
