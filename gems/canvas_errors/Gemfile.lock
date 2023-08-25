@@ -57,7 +57,7 @@ GEM
       raabro (~> 1.4)
     i18n (1.14.1)
       concurrent-ruby (~> 1.0)
-    inst-jobs (3.1.10)
+    inst-jobs (3.1.11)
       activerecord (>= 6.0)
       activerecord-pg-extensions (~> 0.4.4)
       activesupport (>= 6.0)
