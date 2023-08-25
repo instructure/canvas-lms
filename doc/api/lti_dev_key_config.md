@@ -98,17 +98,11 @@ Tools that utilize different instances for beta and test must also make sure tha
 ###Step 2: Authentication Request
 To complete authentication, tools are expected to send back an <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">authentication request</a> to an "OIDC Authorization end-point". This can be a GET or POST, however, this request needs to be a redirect in the user’s browser and not made server to server as we need to validate the current user's session data. For cloud-hosted Canvas, regardless of the domain used by the client, the endpoint is always:
 
-- `https://canvas.instructure.com/api/lti/authorize_redirect` (if launched from a **production** environment)
-- `https://canvas.beta.instructure.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
-- `https://canvas.test.instructure.com/api/lti/authorize_redirect` (if launched from a **test** environment)
-
-> **Note:** As of August 19, 2023 (July 17 for Beta), these endpoints will change to:
-
 > - `https://sso.canvaslms.com/api/lti/authorize_redirect` (if launched from a **production** environment)
 > - `https://sso.beta.canvaslms.com/api/lti/authorize_redirect` (if launched from a **beta** environment)
 > - `https://sso.test.canvaslms.com/api/lti/authorize_redirect` (if launched from a **test** environment)
 
-> The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools are expected to change this endpoint in their configuration store as soon as possible, and can do so starting right now. Tools wishing to implement the Platform Storage spec will be required to change this endpoint starting August 19, 2023. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
+> The domain for this endpoint used to be `https://canvas.instructure.com`. The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools wishing to implement the Platform Storage spec are required to use the new domain for this endpoint, and all other tools should update this endpoint in their configuration store as soon as possible. This change will eventually be enforced, but for now is not a breaking change - the old domain will continue to work. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
 
 Among the <a href="http://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request" target="_blank">required variables</a> the request should include:
 
@@ -128,7 +122,7 @@ The tool then validates the `state` parameter matches the one sent in Step 2 and
 <a name="cookie-less"></a>
 ###Launching without Cookies
 
-Safari blocking cookies inside 3rd-party iframes made it necessary to create a workaround for storing the `state` property between the login and launch requests, to prevent MITM attacks. The (under final review) LTI Platform Storage spec provides a way for tools that are launching in Safari
+Safari blocking cookies inside 3rd-party iframes made it necessary to create a workaround for storing the `state` property between the login and launch requests, to prevent MITM attacks. The newly finalized LTI Platform Storage spec provides a way for tools that are launching in Safari
 or another situation where cookies can't get set to still store data across requests in a secure fashion. Tools can send `window.postMessage`s to
 Canvas asking it to store and retrieve arbitrary data, which acts as a cookie-like proxy.
 
@@ -139,13 +133,13 @@ In Step 2, instead of storing the `state` parameter in a cookie, the tool should
 
 In Step 4, instead of comparing the `state` parameter to the stored value in the cookie, the tool should retrieve it using the `lti.get_data` postMessage. Since this comparison has to happen in Javascript instead of on the server, the tool should render _something_, then check these values. If the values don't match, the tool can then log the user out or render an error.
 
-**Note** that Canvas supports most of the spec, including all message types, but does not currently support using the OIDC Auth URI as the target origin. Tools that want to use these postMessages to set and get data for launches or for other uses must currently direct all messages to the parent Canvas window, using the `*` wildcard origin.
-<a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">This Canvas Community article</a> has a section at the end that details the exact state of Canvas's support of this API. Full support of this API will be enabled in Beta on July 17, 2023, and in Production on August 19, 2023.
+**Note** that according to the spec, the target origin for these postMessages must be the OIDC Auth domain (e.g. `https://sso.canvaslms.com`). Since every institution's domain varies, Canvas renders a frame at this domain that will respond to postMessages, and the name of this frame is supplied in the `lti_storage_target` parameter, provided as a body parameter in both login and launch requests. Tools should send their `lti.put_data` and `lti.get_data` postMessages to that frame, but can continue send all other postMessage types to the parent window.
 
 Other LTI Platform Storage spec docs:
 
 - [Client-side postMessages](https://www.imsglobal.org/spec/lti-cs-pm/v0p1)
 - [postMessage Platform Storage](https://www.imsglobal.org/spec/lti-pm-s/v0p1)
+- [Canvas postMessage documentation](file.lti_window_post_message.html)
 
 Support for this API is determined by either:
 
@@ -163,20 +157,13 @@ Tools will need to be aware of some Canvas-specific settings in order to accept 
 
 - **Canvas Public JWKs**: When the tool receives the authentication response ([Step 3](#step-3)), tools must <a href="http://www.imsglobal.org/spec/security/v1p0/#authentication-response-validation" target="_blank">validate that the request is actually coming from Canvas</a>. Canvas' public keys are environment-specific, but not domain-specific (the same key set can be used across all client accounts):
 
-> - Production: `https://canvas.instructure.com/api/lti/security/jwks`
-> - Beta: `https://canvas.beta.instructure.com/api/lti/security/jwks`
-> - Test: `https://canvas.test.instructure.com/api/lti/security/jwks`
-
-> **Note:** As of August 19, 2023 (July 17 for Beta), these endpoints will change to:
-
 > - Production: `https://sso.canvaslms.com/api/lti/security/jwks`
 > - Beta: `https://sso.beta.canvaslms.com/api/lti/security/jwks`
 > - Test: `https://sso.test.canvaslms.com/api/lti/security/jwks`
 
-> The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools are expected to change this endpoint in their configuration store as soon as possible, and can do so starting right now. Tools wishing to implement the Platform Storage spec will be required to change this endpoint starting August 19, 2023. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
+> **Note:** The domain for this endpoint used to be `https://canvas.instructure.com`. The impetus for this change and other exact details are described in <a href="https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677" target="_blank">this Canvas Community article</a>. Tools wishing to implement the Platform Storage spec are required to use the new domain for this endpoint, and all other tools should update this endpoint in their configuration store as soon as possible. This change will eventually be enforced, but for now is not a breaking change - the old domain will continue to work. Any questions or issues are either addressed in the linked article or can be filed as a standard support/partner support case, referencing the OIDC Auth endpoint change.
 
-- **Authorization Redirect URL**: The values and use of this are described in [Step 2](#step-2). Since the URL is static, you will want to configure this in your tool. Tools that wish to utilize [Step 1.5](#login-redirect) need to include _all_ possible
-  redirect URLs here. Remember that this endpoint is also changing on August 19, 2023, and you will need to update this in your tool's configuration.
+- **Authorization Redirect URL**: The values and use of this are described in [Step 2](#step-2). Since the URL is static, you will want to configure this in your tool. Tools that wish to utilize [Step 1.5](#login-redirect) need to include _all_ possible redirect URLs here.
 
 - **Client ID**: The `client_id` of the Developer Key that's been configured in Canvas. Your tool will need to use this in the authentication response to Canvas ([Step 2](#step-2)) and it is also used during the <a href="" target="_blank">Client Credentials Grant</a> to access <a href="file.oauth.html#accessing-lti-advantage-services" target="_blank">LTI Advantage Services</a>.
 
