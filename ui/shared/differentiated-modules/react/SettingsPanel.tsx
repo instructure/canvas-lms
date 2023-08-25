@@ -23,20 +23,20 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import DateTimeInput from '@canvas/datetime/react/components/DateTimeInput'
-import {defaultState, actions, reducer} from './settingsReducer'
+import {actions, reducer} from './settingsReducer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
 
 export interface SettingsPanelProps {
-  moduleName: string
+  moduleId?: string
+  moduleName?: string
   unlockAt?: string
 }
 
 export default function SettingsPanel({moduleName, unlockAt}: SettingsPanelProps) {
   const [state, dispatch] = useReducer(reducer, {
-    ...defaultState,
-    moduleName,
+    moduleName: moduleName ?? '',
     unlockAt: unlockAt ?? new Date().toISOString(),
     lockUntilChecked: !!unlockAt,
   })

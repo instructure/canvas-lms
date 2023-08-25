@@ -73,6 +73,7 @@ import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 import {underscoreString} from '@canvas/convert-case'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import DifferentiatedModulesTray from '@canvas/differentiated-modules'
+import {parseModule} from '@canvas/differentiated-modules/utils/parseModule'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -2516,7 +2517,7 @@ $(document).ready(function () {
     )
   }
 
-  function renderDifferentiatedModulesTray(open, returnFocusTo) {
+  function renderDifferentiatedModulesTray(open, returnFocusTo, settingsProps) {
     ReactDOM.render(
       <DifferentiatedModulesTray
         open={open}
@@ -2526,6 +2527,7 @@ $(document).ready(function () {
         }}
         initialTab='assign-to'
         assignOnly={false}
+        {...settingsProps}
       />,
       document.getElementById('differentiated-modules-mount-point')
     )
@@ -2568,7 +2570,8 @@ $(document).ready(function () {
   $('.assign_module_link').on('click keyclick', function (event) {
     event.preventDefault()
     const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-    renderDifferentiatedModulesTray(true, returnFocusTo)
+    const settingsProps = parseModule($(event.target).parents('.context_module')[0])
+    renderDifferentiatedModulesTray(true, returnFocusTo, settingsProps)
   })
 })
 
