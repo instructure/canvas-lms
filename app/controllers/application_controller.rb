@@ -1927,11 +1927,6 @@ class ApplicationController < ActionController::Base
       errors = exception.record.errors
       errors.set_reporter(:hash, Api::Errors::Reporter)
       data = errors.to_hash
-    when Api::Error
-      errors = ActiveModel::BetterErrors::Errors.new(nil)
-      errors.error_collection.add(:base, exception.error_id, message: exception.message)
-      errors.set_reporter(:hash, Api::Errors::Reporter)
-      data = errors.to_hash
     when ActiveRecord::RecordNotFound
       data = { errors: [{ message: "The specified resource does not exist." }] }
     when AuthenticationMethods::AccessTokenError

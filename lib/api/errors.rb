@@ -19,16 +19,6 @@
 #
 
 module Api
-  class Error < RuntimeError
-    attr_accessor :error_id, :response_status
-
-    def initialize(error_id, opts)
-      super(opts[:message])
-      self.error_id = error_id
-      self.response_status = opts[:status]
-    end
-  end
-
   module Errors
     # As we define potentially hundreds of errors here, I'm not sure yet how
     # we'll keep it organized.
@@ -55,16 +45,6 @@ module Api
       raise(ArgumentError, "unknown api error #{error_id}") unless error_info
 
       error_info[:message]
-    end
-
-    module ControllerMethods
-      def api_raise(error_id)
-        error_info = Api::Errors.errors[error_id]
-        # this will cause a 500 error, which is appropriate in this case
-        raise(ArgumentError, "unknown api error #{error_id}") unless error_info
-
-        raise Api::Error.new(error_id, error_info)
-      end
     end
 
     # This is the official, publicly documented error response formatter for our
