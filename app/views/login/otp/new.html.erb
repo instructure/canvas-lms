@@ -88,6 +88,9 @@ out a set of back-up codes, in case your normal multi-factor device is unavailab
   <p></p>
   <% if @cc %>
     <div><p><%= t('details.otp_sent_to_phone', "A verification code has been sent to your phone. Please enter it here.") %></p></div>
+    <% if @cc.otp_impaired? %>
+      <div class="alert alert-warning"><p><%= t('details.otp_impaired', "We are currently experiencing an issue with our SMS provider. While we work to resolve this, if you experience a delay receiving your SMS code, please check your email.") %></p></div>
+    <% end %>
   <% else %>
     <div><p><%= t('details.otp_on_device', "Please enter the verification code shown by your token.") %></p></div>
   <% end %>
