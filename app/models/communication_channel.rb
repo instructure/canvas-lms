@@ -353,24 +353,53 @@ class CommunicationChannel < ActiveRecord::Base
     Mailer.deliver(Mailer.create_message(m))
   end
 
+  def otp_impaired?
+    return false unless path_type == TYPE_SMS
+
+    # strip off the leading +
+    raw_number = e164_path[1...]
+    # Imperfect
+    country = CommunicationChannel.country_codes.find do |code, _, _|
+      raw_number.start_with?(code)
+    end || ["unknown"]
+
+    Setting.get("otp_impaired_country_codes", "").split(",").include?(country.first)
+  end
+
   def send_otp!(code, account = nil)
     message = t :body, "Your Canvas verification code is %{verification_code}", verification_code: code
-    if Setting.get("mfa_via_sms", true) == "true" && e164_path && account&.feature_enabled?(:notification_service)
-      InstStatsd::Statsd.increment("message.deliver.sms.one_time_password",
-                                   short_stat: "message.deliver",
-                                   tags: { path_type: "sms", notification_name: "one_time_password" })
-      InstStatsd::Statsd.increment("message.deliver.sms.#{account.global_id}",
-                                   short_stat: "message.deliver_per_account",
-                                   tags: { path_type: "sms", root_account_id: account.global_id })
-      Services::NotificationService.process(
-        "otp:#{global_id}",
-        message,
-        "sms",
-        e164_path,
-        true
-      )
+
+    case path_type
+    when TYPE_SMS
+      if Setting.get("mfa_via_sms", true) == "true" && e164_path && account&.feature_enabled?(:notification_service)
+        InstStatsd::Statsd.increment("message.deliver.sms.one_time_password",
+                                     short_stat: "message.deliver",
+                                     tags: { path_type: "sms", notification_name: "one_time_password" })
+        InstStatsd::Statsd.increment("message.deliver.sms.#{account.global_id}",
+                                     short_stat: "message.deliver_per_account",
+                                     tags: { path_type: "sms", root_account_id: account.global_id })
+        Services::NotificationService.process(
+          "otp:#{global_id}",
+          message,
+          "sms",
+          e164_path,
+          true
+        )
+      else
+        delay_if_production(priority: Delayed::HIGH_PRIORITY).send_otp_via_sms_gateway!(message)
+      end
+    when TYPE_EMAIL
+      m = messages.temp_record
+      m.to = path
+      m.context = account || Account.default
+      m.user = user
+      m.notification = Notification.new(name: "2fa", category: "Registration")
+      m.data = { verification_code: code }
+      m.parse!("email")
+      m.subject = "Canvas Verification Code"
+      Mailer.deliver(Mailer.create_message(m))
     else
-      delay_if_production(priority: Delayed::HIGH_PRIORITY).send_otp_via_sms_gateway!(message)
+      raise "OTP not supported for #{path_type}"
     end
   end
 
