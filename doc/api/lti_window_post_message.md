@@ -52,7 +52,7 @@ Messages sent by a tool that has been launched from a Canvas mobile app will not
 ## lti.capabilities
 
 **At one point, this message type was named 'org.imsglobal.lti.capabilities', but the prefix**
-**was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
+**was dropped before finalizing the spec. This format is no longer supported.**
 
 Responds with a list of subjects that Canvas will respond to, and if necessary the named
 frame to address each subject to. Part of the LTI Platform Storage spec, defined
@@ -76,7 +76,7 @@ window.parent.postMessage({subject: 'lti.capabilities'}, '*')
 ## lti.put_data
 
 **At one point, this message type was named 'org.imsglobal.lti.put_data', but the prefix**
-**was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
+**was dropped before finalizing the spec. This format is no longer supported.**
 
 Stores the provided `value` at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
@@ -87,9 +87,7 @@ The spec requires that this message's target origin be set to the platform's OID
 as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
 is the entity receiving the message. To enable this feature, Canvas also requires that messages
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
-Full support for this method of sending this message will be enabled on August 19, 2023 (July 17 for Beta), as
-described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677). For now, tools are still allowed
-to send this message directly to the parent window and use the wildcard `*` origin.
+For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
 
 All LTI login and launch requests include the `lti_storage_target` parameter, which signals to the
 tool which frame should receive these messages. The default value is `_parent`, which means messages
@@ -140,7 +138,7 @@ window.parent.postMessage(
 ## lti.get_data
 
 **At one point, this message type was named 'org.imsglobal.lti.get_data', but the prefix**
-**was dropped before finalizing the spec. Canvas will support both formats until August 19, 2023 (July 17 for Beta).**
+**was dropped before finalizing the spec. This format is no longer supported.**
 
 Fetches the value stored at the provided `key` in Canvas's [localstorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage),
 partitioned by tool. Data stored by one tool cannot be accessed by another, is
@@ -151,9 +149,7 @@ The spec requires that this message's target origin be set to the platform's OID
 as defined [here](file.lti_dev_key_config.html#step-2), so that the tool can be certain that Canvas
 is the entity receiving the message. To enable this feature, Canvas also requires that messages
 with this target origin are sent to the `post_message_forwarding` frame, which is a sibling frame to the tool.
-Full support for this method of sending this message will be enabled on August 19, 2023 (July 17 for Beta), as
-described in [this Canvas Community article](https://community.canvaslms.com/t5/The-Product-Blog/Minor-LTI-1-3-Changes-New-OIDC-Auth-Endpoint-Support-for/ba-p/551677). For now, tools are still allowed
-to send this message directly to the parent window and use the wildcard `*` origin.
+For now, tools are also still allowed to send this message directly to the parent window and use the wildcard `*` origin, although this does not conform to the spec.
 
 All LTI login and launch requests include the `lti_storage_target` parameter, which signals to the
 tool which frame should receive these messages. The default value is `_parent`, which means messages
