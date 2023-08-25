@@ -19,8 +19,6 @@
 #
 
 module Api
-  include Api::Errors::ControllerMethods
-
   # find id in collection, by either id or sis_*_id
   # if the collection is over the users table, `self` is replaced by @current_user.id
   # if `writable` is true and a shadow record is found, the corresponding primary record will be returned
