@@ -22,12 +22,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
-import {IconCommentLine, IconMutedLine} from '@instructure/ui-icons'
+import {IconCommentLine, IconMutedLine, IconAnalyticsLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 
 import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../utils'
 
@@ -38,12 +39,27 @@ export const assignmentRow = (
   queryData,
   setShowTray,
   setSelectedSubmission,
-  handleReadStateChange
+  handleReadStateChange,
+  setOpenAssignmentDetailIds,
+  openAssignmentDetailIds
 ) => {
+  const handleAssignmentDetailOpen = () => {
+    if (!openAssignmentDetailIds.includes(assignment._id)) {
+      setOpenAssignmentDetailIds([...openAssignmentDetailIds, assignment._id])
+    } else {
+      const arr = [...openAssignmentDetailIds]
+      const index = arr.indexOf(assignment._id)
+      if (index > -1) {
+        arr.splice(index, 1)
+        setOpenAssignmentDetailIds(arr)
+      }
+    }
+  }
+
   return (
     <Table.Row
       data-testid="assignment-row"
-      key={assignment._id}
+      key={`assignment_${assignment._id}`}
       onMouseEnter={() => {
         if (assignment?.submissionsConnection?.nodes[0]?.readState !== 'read') {
           handleReadStateChange(assignment?.submissionsConnection?.nodes[0]?._id)
@@ -101,22 +117,40 @@ export const assignmentRow = (
         )}
       </Table.Cell>
       <Table.Cell textAlign="end">
-        {submissionCommentsPresent(assignment) && (
-          <IconButton
-            margin="0 small"
-            screenReaderLabel="Submission Comments"
-            size="small"
-            onClick={() => {
-              setShowTray(true)
-              setSelectedSubmission(assignment?.submissionsConnection?.nodes[0])
-            }}
-          >
-            <IconCommentLine />
-            <Text size="small">
-              {assignment?.submissionsConnection.nodes[0].commentsConnection.nodes.length}
-            </Text>
-          </IconButton>
-        )}
+        <Flex justifyItems="end">
+          <Flex.Item>
+            {!ENV.restrict_quantitative_data && assignment?.scoreStatistic && (
+              <IconButton
+                margin="0 small"
+                screenReaderLabel="Assignment Details"
+                size="small"
+                onClick={handleAssignmentDetailOpen}
+              >
+                <IconAnalyticsLine />
+              </IconButton>
+            )}
+          </Flex.Item>
+          <Flex.Item>
+            {submissionCommentsPresent(assignment) ? (
+              <IconButton
+                margin="0 small"
+                screenReaderLabel="Submission Comments"
+                size="small"
+                onClick={() => {
+                  setShowTray(true)
+                  setSelectedSubmission(assignment?.submissionsConnection?.nodes[0])
+                }}
+              >
+                <IconCommentLine />
+                <Text size="small">
+                  {assignment?.submissionsConnection.nodes[0].commentsConnection.nodes.length}
+                </Text>
+              </IconButton>
+            ) : (
+              <View as="div" width="52px" />
+            )}
+          </Flex.Item>
+        </Flex>
       </Table.Cell>
     </Table.Row>
   )

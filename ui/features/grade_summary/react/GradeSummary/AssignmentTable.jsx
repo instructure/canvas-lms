@@ -36,6 +36,7 @@ import {totalRow} from './AssignmentTableRows/TotalRow'
 import {assignmentGroupRow} from './AssignmentTableRows/AssignmentGroupRow'
 import {gradingPeriodRow} from './AssignmentTableRows/GradingPeriodRow'
 import {assignmentRow} from './AssignmentTableRows/AssignmentRow'
+import {scoreDistributionRow} from './AssignmentTableRows/ScoreDistributionRow'
 
 const I18n = useI18nScope('grade_summary')
 
@@ -68,6 +69,7 @@ const AssignmentTable = ({
 }) => {
   const {assignmentSortBy} = React.useContext(GradeSummaryContext)
   const [calculateOnlyGradedAssignments, setCalculateOnlyGradedAssignments] = useState(true)
+
   const courseGrades = calculateCourseGrade(
     queryData?.relevantGradingPeriodGroup,
     queryData?.assignmentGroupsConnection?.nodes,
@@ -75,6 +77,8 @@ const AssignmentTable = ({
     calculateOnlyGradedAssignments,
     queryData?.applyGroupWeights
   )
+
+  const [openAssignmentDetailIds, setOpenAssignmentDetailIds] = useState([])
 
   const [droppedAssignments, setDroppedAssignments] = useState(
     listDroppedAssignments(queryData, getGradingPeriodID() === '0', true)
@@ -116,22 +120,34 @@ const AssignmentTable = ({
         </Table.Row>
       </Table.Head>
       <Table.Body>
-        {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)?.map(
-          assignment => {
+        {sortAssignments(assignmentSortBy, queryData?.assignmentsConnection?.nodes)
+          ?.map(assignment => {
             const modifiedAssignment = {
               ...assignment,
               dropped: droppedAssignments.includes(assignment),
             }
 
-            return assignmentRow(
-              modifiedAssignment,
-              queryData,
-              setShowTray,
-              setSelectedSubmission,
-              handleReadStateChange
-            )
-          }
-        )}
+            return [
+              assignmentRow(
+                modifiedAssignment,
+                queryData,
+                setShowTray,
+                setSelectedSubmission,
+                handleReadStateChange,
+                setOpenAssignmentDetailIds,
+                openAssignmentDetailIds
+              ),
+              openAssignmentDetailIds.includes(modifiedAssignment._id) &&
+              modifiedAssignment?.scoreStatistic
+                ? scoreDistributionRow(
+                    modifiedAssignment,
+                    setOpenAssignmentDetailIds,
+                    openAssignmentDetailIds
+                  )
+                : null,
+            ]
+          })
+          .flat()}
         {getGradingPeriodID() !== '0'
           ? queryData?.assignmentGroupsConnection?.nodes?.map(assignmentGroup => {
               return assignmentGroupRow(
