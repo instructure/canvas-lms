@@ -70,7 +70,6 @@ PATH
     canvas_cassandra (0.1.0)
       cassandra-cql (~> 1.2.2)
       config_file
-      rails (>= 5.0)
 
 PATH
   remote: gems/i18n_extraction
@@ -96,13 +95,13 @@ PATH
   specs:
     academic_benchmark (1.1.0)
       academic_benchmarks (~> 1.1.0)
-      rails (>= 3.2)
+      railties (>= 3.2)
 
 PATH
   remote: gems/plugins/account_reports
   specs:
     account_reports (1.1.0)
-      rails (>= 3.2)
+      railties (>= 3.2)
 
 PATH
   remote: gems/plugins/moodle_importer
@@ -129,7 +128,7 @@ PATH
   remote: gems/plugins/simply_versioned
   specs:
     simply_versioned (1.0.0)
-      rails (>= 3.2)
+      activerecord (>= 3.2)
 
 PATH
   remote: gems/rubocop-canvas
@@ -148,17 +147,19 @@ PATH
     activesupport-suspend_callbacks (0.0.1)
       activesupport (>= 3.2, < 7.1)
     acts_as_list (0.0.1)
-      rails (>= 3.2)
+      activerecord (>= 3.2)
     adheres_to_policy (0.0.1)
-      rails (>= 3.2)
+      activesupport (>= 3.2)
     attachment_fu (1.0.0)
-      rails (>= 3.2)
+      activerecord (>= 3.2)
+      railties (>= 3.2)
     autoextend (1.0.0)
     bookmarked_collection (1.0.0)
+      activerecord (>= 3.2)
       folio-pagination (~> 0.0.12)
       json_token
       paginated_collection
-      rails (>= 3.2)
+      railties (>= 3.2)
       will_paginate (>= 3.0, < 5.0)
     broadcast_policy (1.0.0)
       activesupport
@@ -166,11 +167,11 @@ PATH
     canvas_breach_mitigation (0.0.1)
       activesupport
     canvas_cache (0.1.0)
+      activesupport
       config_file
       digest-murmurhash (>= 1.1.0)
       guardrail (>= 2.0.0)
       inst_statsd (>= 2.1.0)
-      rails
       redis (>= 4.1.0)
       redis-scripting (>= 1.0.0)
       sentry-ruby (~> 5.10)
@@ -208,16 +209,15 @@ PATH
     canvas_sanitize (0.0.1)
       sanitize (~> 6.0)
     canvas_security (0.1.0)
+      activesupport
       canvas_cache
       canvas_errors
       dynamic_settings
       json-jwt
-      rails
     canvas_slug (0.0.1)
       swearjar (~> 1.4)
     canvas_sort (1.0.0)
     canvas_stringex (0.0.1)
-      rails (>= 3.2)
     canvas_text_helper (0.0.1)
       i18n
     canvas_time (1.0.0)
@@ -228,7 +228,7 @@ PATH
       canvas_mimetype_fu
       rubyzip (~> 2.0)
     config_file (0.1.0)
-      rails (>= 5.0)
+      railties (>= 5.0)
     csv_diff (1.0.0)
       sqlite3
     diigo (1.0.0)
@@ -239,12 +239,12 @@ PATH
       diplomat (>= 2.5.1)
       railties
     event_stream (0.1.0)
+      activerecord (>= 4.2)
       bookmarked_collection
       canvas_cassandra
       inst_statsd
       json_token
       paginated_collection
-      rails (>= 4.2)
     google_drive (1.0.0)
       google-apis-drive_v3 (~> 0.43)
     html_text_helper (0.0.1)
@@ -304,7 +304,7 @@ PATH
       oauth
     utf8_cleaner (0.0.1)
     workflow (0.0.1)
-      rails (>= 3.2)
+      activesupport (>= 3.2)
 
 GEM
   remote: https://rubygems.org/

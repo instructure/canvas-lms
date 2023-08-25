@@ -11,13 +11,12 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "activerecord", ">= 4.2"
   spec.add_dependency "bookmarked_collection"
   spec.add_dependency "canvas_cassandra"
   spec.add_dependency "inst_statsd"
   spec.add_dependency "json_token"
   spec.add_dependency "paginated_collection"
-
-  spec.add_dependency "rails", ">= 4.2"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rspec", "~> 3.12"
