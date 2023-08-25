@@ -642,7 +642,7 @@ GEM
       json-jwt (~> 1.7)
       rexml
       simple_oauth (~> 0.3.1)
-    inst-jobs (3.1.10)
+    inst-jobs (3.1.11)
       activerecord (>= 6.0)
       activerecord-pg-extensions (~> 0.4.4)
       activesupport (>= 6.0)
@@ -1082,7 +1082,7 @@ GEM
       guardrail (~> 3.0.1)
       parallel (~> 1.22)
       railties (>= 6.1, < 7.1)
-    switchman-inst-jobs (4.0.13)
+    switchman-inst-jobs (4.0.14)
       inst-jobs (>= 2.4.9, < 4.0)
       parallel (>= 1.19)
       railties (>= 6.1, < 7.1)
@@ -1366,7 +1366,7 @@ DEPENDENCIES
   stormbreaker (~> 1.0)
   stringify_ids!
   switchman (~> 3.5)
-  switchman-inst-jobs (= 4.0.13)
+  switchman-inst-jobs (~> 4.0)
   testrailtagging (= 0.3.8.7)
   thrift_client (= 0.9.3)!
   timecop (~> 0.9)
