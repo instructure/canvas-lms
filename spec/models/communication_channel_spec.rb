@@ -799,11 +799,46 @@ describe CommunicationChannel do
     end
   end
 
+  describe "#otp_impaired?" do
+    let(:us_cc) do
+      communication_channel(user_model, { username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS })
+    end
+    let(:eu_cc) do
+      communication_channel(user_model, { username: "+353872337277", path_type: CommunicationChannel::TYPE_SMS })
+    end
+
+    context "no impaired channels" do
+      it "returns false for US channels" do
+        expect(us_cc.otp_impaired?).to be false
+      end
+
+      it "returns false for EU channels" do
+        expect(eu_cc.otp_impaired?).to be false
+      end
+    end
+
+    context "only US impaired channels" do
+      before do
+        allow(Setting).to receive(:get).and_call_original
+        allow(Setting).to receive(:get).with("otp_impaired_country_codes", "").and_return("1")
+      end
+
+      it "returns true for US channels" do
+        expect(us_cc.otp_impaired?).to be true
+      end
+
+      it "returns false for EU channels" do
+        expect(eu_cc.otp_impaired?).to be false
+      end
+    end
+  end
+
   describe "#send_otp!" do
+    let(:user) do
+      user_model
+    end
     let(:cc) do
-      cc = CommunicationChannel.new
-      cc.path = "8015555555@txt.att.net"
-      cc
+      communication_channel(user, { username: "8015555555@txt.att.net", path_type: CommunicationChannel::TYPE_SMS })
     end
 
     it "sends directly via SMS if configured" do
@@ -841,6 +876,18 @@ describe CommunicationChannel do
       expect(Services::NotificationService).not_to receive(:process)
       expect(cc).to receive(:send_otp_via_sms_gateway!).once
       cc.send_otp!("123456")
+    end
+
+    context "with email channel" do
+      let(:cc) do
+        communication_channel(user, { username: "test@example.com", path_type: CommunicationChannel::TYPE_EMAIL })
+      end
+
+      it "sends actual email if using email channel" do
+        expect(cc).not_to receive(:send_otp_via_sms_gateway!)
+        expect(Mailer).to receive(:deliver).once
+        cc.send_otp!("123456")
+      end
     end
   end
 
