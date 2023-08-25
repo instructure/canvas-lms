@@ -38,6 +38,9 @@ export interface DifferentiatedModulesTrayProps {
   onDismiss: () => void
   initialTab?: 'settings' | 'assign-to'
   assignOnly?: boolean
+  moduleId?: string
+  moduleName?: string
+  unlockAt?: string
 }
 
 const SettingsPanel = React.lazy(() => import('./SettingsPanel'))
@@ -48,6 +51,8 @@ export default function DifferentiatedModulesTray({
   onDismiss,
   initialTab = 'assign-to',
   assignOnly = true,
+  moduleId,
+  ...settingsProps
 }: DifferentiatedModulesTrayProps) {
   const [selectedTab, setSelectedTab] = useState(initialTab)
 
@@ -99,7 +104,7 @@ export default function DifferentiatedModulesTray({
               renderTitle={I18n.t('Settings')}
               isSelected={selectedTab === 'settings'}
             >
-              <SettingsPanel moduleName="Temporary Placeholder" />
+              <SettingsPanel moduleId={moduleId} {...settingsProps} />
             </Tabs.Panel>
             <Tabs.Panel
               id="assign-to"
