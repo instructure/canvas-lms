@@ -62,7 +62,7 @@ describe Login::OtpController do
         Account.default.save!
 
         @user.otp_secret_key = ROTP::Base32.random
-        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(path: "bob")
+        cc = @user.otp_communication_channel = @user.communication_channels.sms.create!(path: "1234567890@txt.att.net")
         expect_any_instantiation_of(cc).to receive(:send_otp!)
         @user.save!
 
