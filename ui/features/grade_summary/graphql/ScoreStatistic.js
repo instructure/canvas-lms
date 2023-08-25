@@ -17,42 +17,44 @@
  */
 
 import gql from 'graphql-tag'
-import {string} from 'prop-types'
+import {number} from 'prop-types'
 
-export const SubmissionComment = {
+export const ScoreStatistic = {
   fragment: gql`
-    fragment SubmissionComment on SubmissionComment {
-      _id
-      comment
-      createdAt
-      author {
-        name
-        shortName
-      }
+    fragment ScoreStatistic on Assignment {
+      count
+      lowerQ
+      maximum
+      mean
+      median
+      minimum
+      upperQ
     }
   `,
   shape: {
-    _id: string,
-    comment: string,
-    createdAt: string,
-    author: {
-      name: string,
-      shortName: string,
-    },
+    count: number,
+    lowerQ: number,
+    maximum: number,
+    mean: number,
+    median: number,
+    minimum: number,
+    upperQ: number,
   },
-  mock: ({
-    _id = '1',
-    comment = 'This is a comment',
-    createdAt = '2019-01-01T00:00:00Z',
-    author = {
-      name: 'John Doe',
-      shortName: 'JD',
-    },
-  } = {}) => ({
-    _id,
-    comment,
-    createdAt,
-    author,
-    __typename: 'Comment',
+  mock: (
+    count = 5,
+    lowerQ = 5,
+    maximum = 15,
+    mean = 10,
+    median = 10,
+    minimum = 5,
+    upperQ = 15
+  ) => ({
+    count,
+    lowerQ,
+    maximum,
+    mean,
+    median,
+    minimum,
+    upperQ,
   }),
 }
