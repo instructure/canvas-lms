@@ -45,6 +45,7 @@ interface Props {
   readonly progressId: string | number | null
   readonly progressCurrent?: ProgressResult
   readonly title: string
+  readonly continueButtonId: string
   readonly mode: 'publish' | 'unpublish'
 }
 export const PUBLISH_STATUS_POLLING_MS = 1000
@@ -61,6 +62,7 @@ const ContextModulesPublishModal = ({
   progressId,
   progressCurrent,
   title,
+  continueButtonId,
   mode = 'publish',
 }: Props) => {
   const handlePublish = () => {
@@ -143,6 +145,7 @@ const ContextModulesPublishModal = ({
           onClick={handlePublish}
           color="primary"
           disabled={isCanceling}
+          id={continueButtonId}
         >
           {!isPublishing && isOpen ? (
             I18n.t('Continue')
