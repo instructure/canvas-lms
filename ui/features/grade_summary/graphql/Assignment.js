@@ -50,6 +50,15 @@ export const Assignment = {
         name
         groupWeight
       }
+      scoreStatistic {
+        count
+        lowerQ
+        maximum
+        mean
+        median
+        minimum
+        upperQ
+      }
       modules {
         _id
         name
@@ -92,6 +101,15 @@ export const Assignment = {
       _id: string,
       name: string,
     },
+    scoreStatistic: {
+      count: number,
+      lowerQ: number,
+      maximum: number,
+      mean: number,
+      median: number,
+      minimum: number,
+      upperQ: number,
+    },
     submissionsConnection: arrayOf({
       nodes: arrayOf(Submission.shape),
     }),
@@ -132,6 +150,15 @@ export const Assignment = {
     assignmentGroup = {
       _id: '1',
       name: 'Group 1',
+    },
+    scoreStatistic = {
+      count: 1,
+      lowerQ: 1,
+      maximum: 1,
+      mean: 1,
+      median: 1,
+      minimum: 1,
+      upperQ: 1,
     },
     submissionsConnection = {
       nodes: [Submission.mock()],
@@ -174,6 +201,7 @@ export const Assignment = {
     unlockAt,
     updatedAt,
     assignmentGroup,
+    scoreStatistic,
     submissionsConnection,
     modules,
   }),

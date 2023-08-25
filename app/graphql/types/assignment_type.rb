@@ -121,6 +121,40 @@ module Types
       end
     end
 
+    class AssignmentScoreStatisticType < ApplicationObjectType
+      graphql_name "AssignmentScoreStatistic"
+      description "Statistics for an Assignment"
+
+      field :minimum,
+            Float,
+            "The minimum score for the assignment",
+            null: true
+      field :maximum,
+            Float,
+            "The maximum score for the assignment",
+            null: true
+      field :mean,
+            Float,
+            "The mean score for the assignment",
+            null: true
+      field :count,
+            Int,
+            "The number of scores for the assignment",
+            null: true
+      field :lower_q,
+            Float,
+            "The lower quartile score for the assignment",
+            null: true
+      field :median,
+            Float,
+            "The median score for the assignment",
+            null: true
+      field :upper_q,
+            Float,
+            "The upper quartile score for the assignment",
+            null: true
+    end
+
     global_id_field :id
     key_field_id
 
@@ -460,6 +494,17 @@ module Types
       load_association(:context).then do |course|
         if course.grants_right?(current_user, :manage_grades)
           load_association(:post_policy)
+        end
+      end
+    end
+
+    field :score_statistic, AssignmentScoreStatisticType, null: true
+    def score_statistic
+      load_association(:context).then do |course|
+        if course.grants_right?(current_user, :read_as_admin)
+          object.score_statistic if object.can_view_score_statistics?(current_user)
+        elsif object.can_view_score_statistics?(current_user) && object.submissions.first.eligible_for_showing_score_statistics?
+          object.score_statistic
         end
       end
     end

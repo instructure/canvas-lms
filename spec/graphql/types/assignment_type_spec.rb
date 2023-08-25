@@ -26,9 +26,11 @@ describe Types::AssignmentType do
 
   let_once(:teacher) { teacher_in_course(active_all: true, course:).user }
   let_once(:student) { student_in_course(course:, active_all: true).user }
+  let_once(:admin_user) { account_admin_user_with_role_changes }
 
   let(:assignment) do
     course.assignments.create(title: "some assignment",
+                              points_possible: 10,
                               submission_types: ["online_text_entry"],
                               workflow_state: "published",
                               allowed_extensions: %w[doc xlt foo])
@@ -36,6 +38,7 @@ describe Types::AssignmentType do
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
   let(:teacher_assignment_type) { GraphQLTypeTester.new(assignment, current_user: teacher) }
+  let(:admin_user_assignment_type) { GraphQLTypeTester.new(assignment, current_user: admin_user) }
 
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
@@ -197,6 +200,58 @@ describe Types::AssignmentType do
     expect(
       assignment_type.resolve("htmlUrl", request: ActionDispatch::TestRequest.create)
     ).to eq "http://test.host/courses/#{assignment.context_id}/assignments/#{assignment.id}"
+  end
+
+  context "scoreStatistic" do
+    it "returns null when there are no scores" do
+      assignment.submissions.destroy_all
+      expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+    end
+
+    context "when there are scores" do
+      before do
+        assignment.update!(grading_type: "points")
+        assignment.grade_student(student, grade: 5, grader: teacher)
+        student_2 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_2, grade: 10, grader: teacher)
+        student_3 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_3, grade: 15, grader: teacher)
+      end
+
+      it "returns the scoreStatistic always for teachers" do
+        expect(teacher_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { maximum }")).to be 15.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { minimum }")).to be 5.0
+        expect(teacher_assignment_type.resolve("scoreStatistic { count }")).to be 3
+
+        assignment.mute!
+
+        expect(teacher_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+
+      it "returns null for students when there are fewer than 5 submissions" do
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+      end
+
+      it "returns the scoreStatistic for students when there are 5 or more submissions" do
+        student_4 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_4, grade: 10, grader: teacher)
+        student_5 = student_in_course(course:, active_all: true).user
+        assignment.grade_student(student_5, grade: 10, grader: teacher)
+
+        # students should see statistics if there are 5 or more submissions
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+
+      it "returns null for students when the assignment is muted" do
+        assignment.mute!
+        expect(assignment_type.resolve("scoreStatistic { mean }")).to be_nil
+      end
+
+      it "returns stats for admins" do
+        expect(admin_user_assignment_type.resolve("scoreStatistic { mean }")).to be 10.0
+      end
+    end
   end
 
   context "description" do
