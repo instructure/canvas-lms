@@ -350,6 +350,7 @@ de:
   access_canvas_training_videos_and_courses_ea43173a: "Auf Canvas-Schulungsvideos und Kurse zugreifen"
   access_denied_f922a9ff: "Zugriff verweigert"
   access_report_80d28095: Zugriffsbericht
+  access_reports_66128235: "Auf Berichte zugreifen"
   access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "Der Zugriff auf diese Registerkarten erfordert die Optionen „Berechnungen des Kenntnisstands – hinzufügen/bearbeiten“ und die „Kenntnisstandsskalen – hinzufügen/bearbeiten von Berechtigungen“."
   access_token_3be22221: Zugangs-Token
   access_token_count_access_token_count_dfb5463c: "Zähler des Zugangs-Tokens: %{access_token_count}"
@@ -2151,7 +2152,7 @@ de:
   activity_report_e7982a49: Aktivitätsbericht
   add_2nd_review_ea988088: "2. Prüfung hinzufügen"
   add_8523c19b: Hinzufügen
-  add_a_build_button_on_the_assignment_edit_page_for_6b895561: "Schaltfläche Erstellen auf der Seite zum Bearbeiten von Aufgaben für neue Quiz-Aufgaben hinzufügen"
+  add_a_build_button_on_the_assignment_edit_page_for_6b895561: "Schaltfläche Erstellen auf der Seite zum Bearbeiten von Aufgaben für New Quizzes-Aufgaben hinzufügen"
   add_a_comment_48994930: "Einen Kommentar hinzufügen"
   add_a_comment_872470ac: "Einen Kommentar hinzufügen"
   add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "Fügen Sie einen Kommentar hinzu, um die Peer Review abzuschließen. Sie sehen nur die von Ihnen verfassten Kommentare."
@@ -2578,6 +2579,7 @@ de:
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Erlaubt einem Lehrer, die Anzahl zulässiger Versuche für eine Aufgabe über die Benutzeroberfläche festzulegen"
   allow_administrative_actions_in_courses_20c33fed: "Administrative Aktionen in den Kursen zulassen"
   allow_administrators_to_set_a_default_grading_sche_4ea609fd: "Erlaubt Administratoren, ein Standard-Benotungsschema für Konten festzulegen. Dieses Benotungsschema wird als Standard für alle Kurse im Konto verwendet, aber einzelne Kurse können es mit ihren eigenen Standardeinstellungen überschreiben."
+  allow_administrators_to_set_a_default_grading_sche_9b928f00: "Erlaubt Administratoren, ein Standard-Benotungsschema für Konten festzulegen. Dieses Benotungsschema wird als Standard für alle Kurse im Konto verwendet, aber einzelne Kurse können es mit ihren eigenen Standardwerten überschreiben."
   allow_admins_to_configure_subscription_preferences_15754289: "Erlauben Sie Administrator\\*innen die Konfiguration von Abonnementeinstellungen für Kontokalender."
   allow_attendees_to_4ef30c3: "Teilnehmern erlauben ..."
   allow_auto_subscription_to_account_calendars_455ba4bc: "Automatisches Abonnement von Kontokalendern zulassen"
@@ -2598,11 +2600,12 @@ de:
   allow_final_grade_override_a21a79ee: "Überschreiben der Endnote zulassen"
   allow_font_selection_in_c4e_accounts_7def31c6: "Auswahl der Schriftart in C4E-Konten zulassen"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Ermöglicht Apollo das Zwischenspeichern von GraphQL-Abfragen im Browser des Benutzers, um die Nutzung zu beschleunigen"
+  allow_for_assignment_enhancements_to_be_used_for_e_6f6f95ea: "Erlauben, dass Aufgabenerweiterungen für externe LTI-Tools verwendet werden"
   allow_for_key_keyname_b973f769: "Schlüssel zulassen: %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Erlauben Sie den Benutzern des Notenbuchs, Vor- und Nachnamen der Studierenden in separaten Spalten anzuzeigen und zu exportieren."
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Import von QTI und Common Cartridge in „Neue Quizze“ zulassen."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Import von QTI und Common Cartridge in Quizzes.Next zulassen."
-  allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Erlaubt das Importieren von Drittanbieterpaketen in Neue Quizze"
+  allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Erlaubt das Importieren von Drittanbieterpaketen in New Quizzes"
   allow_in_mastery_paths_5332c786: "In Leistungsziel-Pfaden erlauben"
   allow_inactive_and_or_concluded_enrollments_to_be__3c9a65ab: "Ermöglicht die Anzeige von inaktiven und/oder abgeschlossenen Einschreibungen in LMGB"
   allow_include_parameters_bf3d3230: "Include-Parameter zulassen "
@@ -2683,7 +2686,7 @@ de:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Ermöglicht es, Hilfelinks als Ausgewählt oder Neu zu markieren und zeigt die ausgewählten Hilfelinks im Hilfe-Menü an prominenter Stelle an."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Ermöglicht Kursleitern, unbenotete Abgaben massenhaft zu benoten."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Ermöglicht es Lehrenden, unbenotete Abgaben in den Spaltenmenüs „Aufgabengruppe“ und „Gesamt“ im Notenbuch gemeinsam zu bewerten."
-  allows_instructors_to_enable_anonymous_grading_for_b852c884: "Ermöglicht es Lehrenden, die anonyme Benotung für neue Quizze zu aktivieren."
+  allows_instructors_to_enable_anonymous_grading_for_b852c884: "Ermöglicht es Lehrenden, die anonyme Benotung für New Quizzes zu aktivieren."
   allows_instructors_to_submit_file_attachments_on_b_e39f2ca8: "Ermöglicht Lehrenden, Dateianhänge im Namen eines Studierenden einzureichen."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Ermöglicht die Auswahl von Lernergebnissen bei der Migration von Kursinhalten"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Ermöglicht die Änderung der Einstellungen für Benachrichtigungen für jeden Kurs auf der Seite der Benachrichtigungseinstellungen auf Kontoebene."
@@ -3664,7 +3667,7 @@ de:
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Für Gruppenaufgaben kann anonyme Benotung nicht aktiviert werden."
   anonymous_grading_ccb5045c: "Anonyme Benotung"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Durch anonyme Benotung werden die Namen des Studenten in SpeedGrader™ ausgeblendet."
-  anonymous_grading_with_new_quizzes_ba0391f3: "Anonyme Benotung bei neuen Quizzen"
+  anonymous_grading_with_new_quizzes_ba0391f3: "Anonyme Benotung bei New Quizzes"
   anonymous_id_2ef1c6d2: "Anonyme %{id}"
   anonymous_id_you_cf43ab76: "Anonyme %{id} (Sie)"
   anonymous_instructor_annotations_2b6c822: "Anonyme Lehrendenanmerkungen"
@@ -3680,6 +3683,7 @@ de:
   anonymous_moderated_marking_audit_trail_e48abbac: "Anonym moderiertes Kennzeichnen des Prüfpfads"
   anonymous_off_7985fcaf: "Anonym Aus"
   anonymous_on_c5fa120d: "Anonym An"
+  anonymous_peerreviewnumber_6f63c2ea: "Anonyme %{peerReviewNumber}"
   anonymous_re_submission_assignment_title_d9402721: "Anonyme Wiedereinreichung: %{assignment_title}"
   anonymous_student_5e04eff8: "Anonyme/r Studierende\\*r"
   anonymous_student_91b9d664: "Anonyme/r Studierende\\*r"
@@ -3865,6 +3869,7 @@ de:
   are_you_sure_you_want_to_delete_this_announcement_293d51a8: "Möchten Sie diese Ankündigung wirklich löschen?"
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "Möchten Sie diese Aufgabe wirklich löschen?"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "Möchten Sie diesen Kommentar wirklich löschen?"
+  are_you_sure_you_want_to_delete_this_custom_status_487882ee: "Sind Sie sicher, dass Sie diesen benutzerdefinierten Status löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden. Alle Abgaben und Punktzahlen, die derzeit mit diesem benutzerdefinierten Status gekennzeichnet sind, werden aus dem Status entfernt."
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "Möchten Sie wirklich diesen Entwicklerschlüssel löschen?"
   are_you_sure_you_want_to_delete_this_developer_key_ce246033: "Möchten Sie wirklich diesen Entwicklerschlüssel löschen? Mit dieser Aktion werden auch alle Tools gelöscht, die in diesem Kontext mit dem Entwicklerschlüssel verknüpft sind."
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "Möchten Sie diese Diskussion wirklich löschen?"
@@ -3964,8 +3969,10 @@ de:
   asset_string_ddeaf719: Bestands-String
   assign_eedf72bb: Zuweisen
   assign_reviews_on_date_7e48ec50: "Korrekturen zuweisen am"
+  assign_this_module_a4685e57: "Dieses Modul zuordnen"
   assign_to_6b806cd9: "Zuweisung für:"
   assign_to_95404a83: Zuweisen
+  assign_to_b976cebc: "Zuweisen zu ..."
   assign_to_c46e21: "Zuweisen an"
   assigned_pace_e954962a: "Zugewiesenes Tempo"
   assigned_permissions_6f6fecb6: "Zugewiesene Berechtigungen"
@@ -4890,7 +4897,7 @@ de:
   assignmenttype_title_all_day_on_datetime_d20e2f07: "%{assignmentType} %{title}, den ganzen Tag am %{datetime}."
   assignmenttype_title_at_datetime_9a1efd88: "%{assignmentType} %{title}, um %{datetime}."
   assignmenttype_title_at_datetime_until_endtime_8d4c211a: "%{assignmentType} %{title}, um %{datetime} bis %{endTime}"
-  assignmenttype_title_due_datetime_c7eaaffb: "%{assignmentType} %{title} fällig am %{datetime}"
+  assignmenttype_title_due_datetime_c7eaaffb: "%{assignmentType} %{title} fällig am %{datetime}"
   assignmenttype_title_has_a_to_do_time_at_datetime_dace2699: "%{assignmentType} %{title} Hat ein Aufgabenzeit um %{datetime}."
   assignmenttype_title_is_marked_as_done_fbcc0bb: "%{assignmentType} %{title} ist als erledigt markiert."
   assignmenttype_title_is_not_marked_as_done_9344572f: "%{assignmentType} %{title} ist nicht als erledigt markiert."
@@ -5130,7 +5137,7 @@ de:
   authorize_e3f25bb4: Autorisieren
   authorize_url_f28167a3: "URL genehmigen"
   auto_leader_7791c30a: auto_leader
-  auto_provision_new_quizzes_if_flagged_root_account_a19fbf5b: "Neue Quizze automatisch bereitstellen, wenn Stammkonten markiert sind."
+  auto_provision_new_quizzes_if_flagged_root_account_a19fbf5b: "New Quizzes automatisch bereitstellen, wenn Stammkonten markiert sind."
   auto_show_closed_captions_e4cd7aff: "Untertitel automatisch anzeigen"
   auto_subscribe_a7da0dff: "Automatisch abonnieren"
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Automatisches Erkennen von Feldtrennzeichen kompatiblen Arbeitsblattexporten"
@@ -5241,6 +5248,7 @@ de:
   begin_typing_to_search_7daa7b1: "Geben Sie etwas ein, um zu suchen."
   beginning_date_2d2a29ac: Anfangsdatum
   beginning_of_your_to_do_history_61ef2dce: "Beginn Ihrer Aufgabenhistorie"
+  begins_on_f4dae008: "Beginnt am"
   behaviour_change_related_to_the_bugfix_in_apg_122__63cfa767: "Verhaltensänderung im Zusammenhang mit dem Bugfix in APG-122 Lassen Sie keine benutzerdefinierten Spalten mit dem gleichen Titel wie die reservierten Namen der Notenbuch-Importfunktion erstellen. Ignorieren Sie auch nicht aktive benutzerdefinierte Spalten beim Notenbuch-Import sowie solche, die reservierte Namen verwenden."
   behind_31e4e0fe: Hinter
   being_processed_by_plagiarism_service_2269be71: "Wird bearbeitet vom Plagiatsservice"
@@ -6241,6 +6249,7 @@ de:
   canvas_ticketing_email_connector_27e253ae: Canvas-Ticketing-E-Mail-Konnektor
   canvas_ticketing_web_post_connector_11158897: Canvas-Ticketing-Web-Post-Konnektor
   canvas_user_id_4c18b78a: canvas_user_id
+  canvas_will_enroll_recipient_as_a_role_in_source_s_33514fc6: "Canvas meldet %{recipient} als %{role} in den ausgewählten %{source}-Kursen von %{start} – %{end} an."
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "Canvas benotet alle Ihre Einsendungen neu, wenn Sie das Quiz speichern. Dieser Vorgang kann einige Minuten dauern."
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: "Canvas entfernt Schlüssel mit Nullwerten von Live-Event-Nutzlasten, wenn diese Funktion aktiviert ist."
   cap_the_number_of_rces_rendered_on_initial_page_lo_c3890aec: |-
@@ -6287,6 +6296,7 @@ de:
   certificate_is_not_a_ca_9ec5d574: "Das Zertifikat ist keine CA"
   change_applied_89d1aa5a: "Änderung übernommen"
   change_beginning_date_to_39dbd06e: "Anfangsdatum ändern auf"
+  change_c5a551eb: "Ändern:"
   change_color_for_mastery_level_position_daa51849: "Farbe für die Leistungszielstufe %{position} ändern"
   change_color_for_proficiency_rating_position_48b39bfc: "Farbe für die Kompetenzeinstufung %{position} ändern"
   change_course_visibility_eaa2ffc: "Sichtbarkeit des Kurses ändern"
@@ -6400,10 +6410,10 @@ de:
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' ist keine gültige Farbe."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' ist keine gültige Farbe. Geben Sie vor dem Speichern einen gültigen Hexcode ein."
   clark_county_gradebook_c5ea74bb: "Clark County-Notenbuch"
-  classic_quizzes_dee3c7b7: "Klassische Quizze"
-  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Klassische Quiz-Option für zeitlich beschränkte Quizzes ohne Abgabe"
+  classic_quizzes_dee3c7b7: "Classic Quizzes"
+  classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Classic Quizzes-Option für zeitlich beschränkte Quizzes ohne Abgabe"
   classic_quizzes_strip_origin_from_canvas_file_urls_78379a9a: "Klassische Quizze: Herkunft aus den Canvas-Datei-URLs in den Antworten entfernen"
-  classic_quizzes_with_new_rce_audio_video_may_not_h_6d31e78c: "Klassische Quizze mit neuem RCE-Audio/-Video wurden möglicherweise nicht vollständig verschoben. Diese müssen überarbeitet werden."
+  classic_quizzes_with_new_rce_audio_video_may_not_h_6d31e78c: "Classic Quizzes mit neuem RCE-Audio/-Video wurden möglicherweise nicht vollständig verschoben. Diese müssen überarbeitet werden."
   classic_view_33f29576: "Klassische Ansicht"
   clear_2084585f: Löschen
   clear_all_da755751: "Alle löschen"
@@ -6515,6 +6525,7 @@ de:
   close_submission_tray_c4988fa8: "Abgabefach schließen"
   close_suggestions_6fcb4985: Abschlussvorschläge
   close_the_window_and_try_again_7353f8e: "Schließen Sie das Fenster, und versuchen Sie es erneut."
+  close_total_grade_override_tray_d3b1d190: "Fach für das Außerkraftsetzen der Gesamtnote schließen"
   close_warning_d61daf2c: "Warnung schließen"
   closed_for_comments_e395b42f: "Für Kommentare geschlossen"
   closes_5c6b4367: "Schließt:"
@@ -6924,6 +6935,7 @@ de:
   completed_19711ce7: Fertiggestellt
   completed_9b809e44: fertiggestellt
   completed_icon_521596e4: "abgeschlossen Icon"
+  completed_peer_reviews_c134676: "Abgeschlossene Peer Reviews"
   compose_a_new_message_db3a68ed: "Neue Nachricht verfassen"
   compose_message_8abd180a: "Nachricht verfassen"
   compressing_f4a35c08: "Komprimierung läuft ..."
@@ -7065,6 +7077,7 @@ de:
   configure_toolname_app_651371be: "%{toolName}-Anwendung konfigurieren"
   confirm_6556b3a6: Bestätigen
   confirm_as_spam_2f8b7105: "Als Spam bestätigen"
+  confirm_changes_fe60b7ff: "Änderungen bestätigen"
   confirm_communication_channel_81c48d08: "Kommunikationskanal bestätigen"
   confirm_contact_method_29d6fe4b: "Kontaktmethode bestätigen"
   confirm_delete_6febeafb: "Löschen bestätigen"
@@ -7313,12 +7326,12 @@ de:
       import_blueprint_settings: 
         checkbox_label: "Einstellungen für Blueprint-Kurs importieren"
       import_quizzes_next_view: 
-        import_new_quizzes: "Vorhandene Quizze als *Neue Quizze* importieren"
-        import_new_quizzes_help_text: "Neue Quizzes ist das neue Bewertungssystem für Canvas. %{p_p}Für weitere Informationen, wenden Sie sich an Ihre/n Systemadministrator\\*in, oder besuchen Sie"
-        import_quizzesNext_help_label: "Bewertung als Hilfesymbol für „Neue Quizze“ importieren"
+        import_new_quizzes: "Vorhandene Quizze als *New Quizzes* importieren"
+        import_new_quizzes_help_text: "New Quizzes ist das neue Bewertungssystem für Canvas. %{p_p}Für weitere Informationen, wenden Sie sich an Ihre/n Systemadministrator\\*in, oder besuchen Sie"
+        import_quizzesNext_help_label: "Bewertung als Hilfesymbol für „New Quizzes“ importieren"
         import_quizzesNext_help_text: "Quizzes.Next ist das neue Bewertungssystem für Canvas.%{p_p}Für weitere Informationen wenden Sie sich an Ihren Systemadministrator, oder besuchen Sie"
-        import_quizzesNext_help_title: "Neue Quizze"
-        import_quizzesNext_help_title_icon: "Bewertung als Hilfesymbol für „Neue Quizze“ importieren"
+        import_quizzesNext_help_title: "New Quizzes"
+        import_quizzesNext_help_title_icon: "Bewertung als Hilfesymbol für „New Quizzes“ importieren"
         import_quizzes_Next: "Bewertunginhalte als Quizzes.Next importieren"
       overwrite_assessment_content: 
         assessment_help_label: "Hilfe zum Überschreiben von Leistungstests (Symbol)"
@@ -7606,7 +7619,7 @@ de:
         ? "n"
         : 
           one: "1 Ebene einrücken"
-          other: "Einrücken um %{count} Stufen"
+          other: "Einrücken um %{count} Stufen"
           zero: "Nicht einrücken"
       labels: 
         indent: Einrücken
@@ -8755,6 +8768,7 @@ de:
   course_state_manage_2edd46dc: "Kursstatus – verwalten"
   course_statistics: 
     unknown: unbekannt
+  course_status_state_7e4ed8f3: "Kursstatus: %{state}"
   course_storage_391e1bd: Kursspeicher
   course_submission_report_data_example_95971ae4: "Kursabgabebericht (Datenbeispiel)"
   course_syllabus_5de1b0af: Kursplan
@@ -9115,6 +9129,7 @@ de:
         course_description: Beschreibung
         course_epub_export: ePub-Export
         course_format: Format
+        course_grading_standard_enabled: "Kursbenotungssystem aktivieren"
         course_lock_all_announcements: "Kommentare zu Ankündigungen deaktivieren"
         course_name: Name
         course_offline_export: Offline-Kurs
@@ -9946,7 +9961,7 @@ de:
   default_template_f2a759ed: Standardvorlage
   default_templates_are_used_as_starting_points_for__f06f9e33: "Standardvorlagen werden als Ausgangspunkte für neue Themen verwendet und können nicht gelöscht werden."
   default_to_modules_for_the_course_home_page_d6a951a7: "Standardmodule für die Kurs-Homepage"
-  default_to_new_quizzes_dac795a9: "Standard für neue Quizze"
+  default_to_new_quizzes_dac795a9: "Standard für New Quizzes"
   default_view_for_dashboard_ea91b60f: "Standardansicht für Dashboard"
   define_general_settings_for_locked_objects_in_this_20da2981: "Definieren Sie allgemeine Einstellungen für gesperrte Objekte in diesem Kurs. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Definieren Sie die Einstellungen nach Typ für gesperrte Objekte in diesem Kurs. "
@@ -9978,6 +9993,7 @@ de:
   delete_current_message_5da0221a: "Aktuelle Nachricht löschen"
   delete_current_module_item_21fefc54: "Aktuelles Modul/Element löschen"
   delete_custom_help_link_814f0509: "Angepassten Hilfe-Link löschen"
+  delete_custom_status_b20e5195: "Benutzerdefinierten Status löschen?"
   delete_disabled_3196ce47: "Löschen (deaktiviert)"
   delete_discussion_title_a28df8b6: "Diskussion löschen %{title}"
   delete_domain_5ba75b7c: "Domäne löschen"
@@ -10288,6 +10304,7 @@ de:
       Differenzierte Aufgaben ist ein Feature, mit dessen Hilfe ausgewählt werden kann, für welche(n) Bereich(e) oder für welche(n) einzelnen Student(en) eine Aufgabe gilt.
       Bereiche, die keine Aufgabe enthalten, sehen diese auch nicht in ihrem Kursinhalt, und ihre Abschlussnote
       wird ohne diese Punkte errechnet.
+  differentiated_modules_5e2377d7: "Differenzierte Module"
   digital_badges_6dc10ade: "Digitale Abzeichen"
   diigo_993c4646: Diigo
   direct_share_80afd4a7: "Direkte Freigabe"
@@ -10311,7 +10328,7 @@ de:
   disable_content_security_policy_8660a787: "Richtlinie zur Inhalt-Sicherheit deaktivieren"
   disable_extra_filter_options_1d1cdc02: "zusätzliche Filteroptionen deaktivieren"
   disable_keyboard_shortcuts_9db78832: "Tastenkombinationen deaktivieren"
-  disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktivieren der Kontrollkästchen für Neues-Quiz-Import und -Migration, sodass sie standardmäßig aktiviert sind"
+  disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktivieren der Kontrollkästchen für New Quiz-Import und -Migration, sodass sie standardmäßig aktiviert sind"
   disable_oembed_retrieve_endpoint_56c050c8: "Endpunkt oembed_retrieve deaktivieren"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Veröffentlichung im SIS für Aufgabe in geschlossenen Benotungszeiträumen deaktivieren"
   disable_scope_6ba4e4d4: "Bereich deaktivieren"
@@ -10398,6 +10415,7 @@ de:
     atom_no_author: "Kein Autor"
     default_title: "Ohne Titel"
     empty_message: "Keine Nachrichten"
+  discussion_topic_1d448248: Diskussionsthema
   discussion_topic_a7bf935: Diskussionsthema
   discussion_topic_dc85ad4c: Diskussionsthema
   discussion_topic_edit_error_page_c9fb069c: "Fehlerseite für Diskussionsthema bearbeiten"
@@ -11270,11 +11288,11 @@ de:
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Aktivieren Sie i18n-Funktionen in den Ergebnisexporten"
   enable_individual_learning_paths_for_students_base_5236d3bb: "Individuelle Lernpfade für Studierende auf Basis der Bewertung ermöglichen"
   enable_labels_on_the_new_inbox_page_485ce65a: "Aktivieren von Beschriftungen auf der neuen Posteingangsseite"
-  enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Die Migration von Objektpools in Neue Quizze während des Kursimports / der Kurskopie"
+  enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Die Migration von Objektpools in New Quizzes während des Kursimports / der Kurskopie"
   enable_moderated_grading_bacd20d8: "Moderierte Benotung aktivieren"
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Moderierte Benotung aktivieren Nur relevant, wenn das Flag „Anonym moderierte Kennzeichnung“ aktiviert ist."
   enable_multiple_grading_periods: "Mehrere Benotungsperioden erlauben Lehrern und Administratoren, Benotungsperioden mit festgesetzten Stichtagen zu erstellen. Aufgaben können im Kursbuch nach diesen Benotungsperioden gefiltert werden."
-  enable_new_quizzes_to_refresh_service_jwts_used_by_af54fd97: "Neue Quizzes aktivieren, um die von RCE verwendeten Service-JWTs zu aktualisieren"
+  enable_new_quizzes_to_refresh_service_jwts_used_by_af54fd97: "New Quizzes aktivieren, um die von RCE verwendeten Service-JWTs zu aktualisieren"
   enable_new_sis_integration_settings_ab6780a4: "Neue SIS-Integrationseinstellungen aktivieren"
   enable_notifications_10a4bf44: "Benachrichtigungen aktivieren"
   enable_notifications_for_contextname_b5b4440e: "Benachrichtigungen für %{contextName} aktivieren"
@@ -11307,8 +11325,8 @@ de:
   enabled_unlocked_8d3a5df7: "Aktiviert (entsperrt)"
   enabled_web_services_f620b2be: "Aktivierte Webservices"
   enables_a_redesigned_message_students_who_dialog_t_956bcf62: "Ermöglicht einen neugestalteten Dialog „Studierende benachrichtigen, die ...“, der es ermöglicht, zusätzlich zu den Studierende auch Beobachter\\*innen zu benachrichtigen."
-  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Ermöglicht den Zugriff auf die öffentliche API für neue Quizze: Quizelement-API."
-  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Ermöglicht den Zugriff auf die Öffentliche API für Neue Quizze über Canvas."
+  enables_access_to_the_new_quizzes_public_api_quiz__52a8183c: "Ermöglicht den Zugriff auf die öffentliche API für New Quizzes: Quizelement-API."
+  enables_access_to_the_new_quizzes_public_api_throu_abc70e4d: "Ermöglicht den Zugriff auf die Öffentliche API für New Quizzes über Canvas."
   enables_administrators_to_register_lti_tools_with__b16d560f: "Ermöglicht Administratoren die Registrierung von LTI-Tools mit dynamischer Registrierung"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Ermöglicht die Anzeige von Plagiatsberichten und Ähnlichkeitsbewertungen in der Abgabe-Ablage des neuen Notenbuchs."
   enables_important_dates_to_be_applied_to_assignmen_5e697af6: "Ermöglicht, dass wichtige Daten in Aufgaben, Kalendereinträge und anderes übernommen werden."
@@ -11335,6 +11353,7 @@ de:
   end_date_cdd7a7b6: "Enddatum:"
   end_date_e0093ed7: Enddatum
   end_date_for_conference_eaff0807: "Das Enddatum der Konferenz"
+  end_date_for_enroll_2a879a36: "Enddatum für %{enroll}"
   end_date_from_cdd9d90: "Enddatum von:"
   end_date_must_be_after_start_date_2fea5383: "Das Enddatum muss vor dem Startdatum liegen."
   end_date_time_must_be_later_than_start_date_time_aecc88f4: "Enddatum/-zeit muss später sein als Startdatum/-zeit"
@@ -11373,11 +11392,13 @@ de:
   enhances_the_canvas_experience_within_the_learning_8031b650: "Verbessert die Canvas-Erfahrung im Notenbuch des Lernleistungsziels."
   enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Erhöht den Farbkontrast von Text, Schaltflächen usw."
   enroll_in_subject_9c1f1c18: "In Fach anmelden"
+  enroll_will_receive_temporary_enrollments_from_use_f0aa66a2: "%{enroll} erhält temporäre Einschreibungen von %{user}"
   enrolled_a6a517cd: Eingeschrieben
   enrolled_as_272da3b9: "Eingeschrieben als"
   enrolled_as_enrollment_type_a008e44a: "Angemeldet als: %{enrollment_type}"
   enrolled_as_enrollment_type_a784f82b: "angemeldet als: %{enrollment_type}"
   enrolled_as_enrollment_type_with_section_only_acce_110d7929: "angemeldet als: %{enrollment_type} mit Zugriff nur auf Abschnitte"
+  enrolling_the_recipient_in_these_courses_c421fcb0: "Einschreibung des Empfängers in diese Kurse"
   enrollment: 
     default_course_name: Kurs
     default_email: "Keine E-Mail"
@@ -11965,6 +11986,7 @@ de:
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} hat sich geändert in"
   event_title_tooltips_in_calendar_month_view_82f592e0: "QuickInfos für Ereignistitel in der Kalendermonatsansicht"
   event_update_failed_b6116651: "Ereignisaktualisierung fehlgeschlagen"
+  events_update_failed_3358b28d: "Aktualisierung der Ereignisse fehlgeschlagen"
   everthing_updated_after_start_date_f3be8ba: "Alles aktualisiert nach dem Startdatum"
   every_665d821e: Jede/r/s
   every_a79cad1a: jede
@@ -12167,6 +12189,7 @@ de:
   external_images_in_this_resource_were_unreachable_5d9cbad2: "Externe Bilder in dieser Ressource waren nicht erreichbar:"
   external_integration_keys_8b4f4548: "Externe Integrationsschlüssel"
   external_links_in_this_resource_were_unreachable_ad00a7e3: "Externe Links in dieser Ressource waren nicht erreichbar:"
+  external_tool_6594ee34: "Externes Tool"
   external_tool_c5a6410a: "Externes Tool"
   external_tool_frame_70b32473: "Rahmen für externe Werkzeuge"
   external_tool_tool_id_6028b3b1: "Externes Tool %{tool_id}"
@@ -12281,6 +12304,7 @@ de:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "Keine Tools gefunden"
   external_tools_6e77821: "Externe Tools"
+  external_tools_in_assignment_enhancements_18841855: "Externe Tools in Aufgabenerweiterungen"
   external_url_e9b87215: "Externer URL"
   extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Zusätzliche Gutschrift auf Ergebnisse nicht zulässig, Punktzahl maximal angepasst für %{outcome}"
   extract_error_error_file_names_a4989ed0: "Extraktionsfehler, %{error}: %{file_names}"
@@ -12485,7 +12509,7 @@ de:
     post_grades: "Noten in SIS posten"
     quiz_log_auditing: "Prüfung des Quiz-Protokolls"
     quizzes: 
-      next: "Neue Quizze"
+      next: "New Quizzes"
     student_groups: "Neue Seite für Studentengruppen"
     student_outcome_gradebook: "Lernleistungsziel-Notenbuch für Studierende"
   features_2581da: Funktionen
@@ -12688,6 +12712,7 @@ de:
   final_grade_info_2aa35d25: Gesamtnoteninfo
   final_grade_override_be8a21cd: "Überschreiben der Gesamtnote"
   final_grade_override_in_gradebook_history_767147c: "Überschreiben der Gesamtnote im Notenbuchverlauf"
+  final_grade_override_tray_d1e4e6f9: "Fach für das Außerkraftsetzen der Endnote"
   final_grade_score_fe69a301: "Abschlussnote: %{score}"
   final_grade_with_teacher_notes_33c8de7c: "Abschlussnote mit Lehrendenoten"
   final_grader_1693103c: Gesamtbenoter
@@ -12730,6 +12755,7 @@ de:
       find_outcome: "Lernergebnis suchen"
   find_outcome_746cc57e: "Lernergebnis suchen"
   find_questions_4930b38f: "Fragen suchen"
+  find_role_7a6fb821: "Rolle finden"
   find_training_resources_and_more_help_f148612c: "Schulungsressourcen suchen sowie weitere Hilfen"
   find_user_by_f35cd8ca: "Benutzer\\*in suchen nach"
   find_your_canvas_institution_45af99af: "Suchen Sie Ihre %{canvas}-Institution"
@@ -12850,6 +12876,7 @@ de:
   from_from_to_to_e31f6422: "Von %{from} bis %{to}"
   from_gravatar_58372d5a: "Von Gravatar"
   from_grouptitle_860dff95: "Von %{groupTitle}"
+  from_the_provider_of_the_enrollments_834d5ae4: "vom Anbieter der Einschreibungen"
   front_page_50cae87e: Frontseite
   front_page_must_be_set_first_4dbbfdbe: "Titelseite muss zuerst festgelegt werden"
   front_page_must_be_set_first_c5246f7d: "Die Frontseite muss zuerst festgelegt werden."
@@ -14620,7 +14647,7 @@ de:
   hide_correct_answers_at_b1a59408: "Richtige Antworten ausblenden bei"
   hide_count_missing_items_d0f25329: 
     one: "1 fehlendes Element ausblenden"
-    other: "%{count} fehlende Elemente ausblenden"
+    other: "%{count} fehlende Elemente ausblenden"
   hide_course_sections_for_course_name_bd1911af: "Kursabschnitte für Kurs %{name} ausblenden"
   hide_course_sections_from_students_b7850d64: "Kursabschnitte vor Studenten ausblenden"
   hide_courses_menu_1b8ca649: "Kursmenü ausblenden"
@@ -14651,7 +14678,8 @@ de:
   hide_sub_accounts_for_account_name_a6de98bd: "Unterkonten ausblenden für %{account_name}"
   hide_the_import_learning_outcomes_button_based_on__433d6ba7: "Schaltfläche Lernziele importieren basierend auf den Benutzerberechtigungen ausblenden"
   hide_total_and_override_columns_6fde3e25: "Gesamtsumme ausblenden und Spalten außer Kraft setzen"
-  hide_zero_point_new_quizzes_from_the_student_and_t_b4c22d88: "Neue Quizze mit null Punkten aus den Bewertungsbüchern für Studierende und Lehrende ausblenden"
+  hide_total_column_6911831e: "Gesamtspalte ausblenden"
+  hide_zero_point_new_quizzes_from_the_student_and_t_b4c22d88: "New Quizzes mit null Punkten aus den Bewertungsbüchern für Studierende und Lehrende ausblenden"
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: "Blendet bestimmte Studierende und Abschnitte im LMGB aus, wenn die/der Lehrende nur Zugang zu einem bestimmten Abschnitt hat"
   hiding_grades_82691e44: "Noten ausblenden"
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: "Das Ausblenden von Noten ist nicht zulässig, da für diese Aufgabe keine Noten vergeben wurden."
@@ -14719,7 +14747,7 @@ de:
   how_do_i_create_a_microsoft_office_365_collaborati_52e46698: "Wie erstelle ich als Kursleiter eine Collaboration in Microsoft Office 365?"
   how_do_i_create_a_new_page_in_a_course_37a87285: "Wie erstelle ich eine neue Seite in einem Kurs?"
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Wie erstelle ich ein Quiz mit individuellen Fragen?"
-  how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Wie erstelle ich eine Bewertung mit Hilfe der Funktion Neue Quizze?"
+  how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Wie erstelle ich eine Bewertung mit Hilfe der Funktion New Quizzes?"
   how_do_i_create_an_assignment_35532b59: "Wie kann ich eine Aufgabe erstellen?"
   how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "Wie erstelle ich ein Lernergebnis für einen Kurs?"
   how_do_i_create_outcome_groups_for_a_course_362429a0: "Wie erstelle ich Lernergebnisgruppen für einen Kurs?"
@@ -14735,7 +14763,7 @@ de:
   how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "Wie erfahre ich, ob Studierende an der Konferenz teilgenommen haben?"
   how_do_i_manage_and_share_the_recording_52fc2993: "Wie verwalte und teile ich die Aufzeichnung?"
   how_do_i_manage_rubrics_in_a_course_a5441fb7: "Wie verwalte ich Bewertungsschemata in einem Kurs?"
-  how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Wie verwalte ich die Einstellungen für eine Beurteilung in Neue Quizze?"
+  how_do_i_manage_settings_for_an_assessment_in_new__b2688ec7: "Wie verwalte ich die Einstellungen für eine Beurteilung in New Quizzes?"
   how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Wie kann ich als Lehrende\\*r meine Dateien verschieben und organisieren?"
   how_do_i_move_or_reorder_a_module_e64a4baa: "Wie verschiebe ich ein Modul oder ändere dessen Reihenfolge?"
   how_do_i_mute_and_unmute_all_participants_a7a2115b: "Wie kann ich alle Teilnehmer\\*innen stummschalten und die Stummschaltung aufheben?"
@@ -14936,6 +14964,9 @@ de:
   if_enabled_lti_tools_installed_in_federated_parent_a2d3afe8: |-
       Wenn diese Option aktiviert ist, sind LTI-Tools, die in verbundenen übergeordneten Konten installiert sind,
       auch in untergeordneten Konten verfügbar/sichtbar.
+  if_enabled_modules_and_module_items_become_assigna_68e5436f: |-
+      Wenn diese Option aktiviert ist, können Module und Modulelemente bestimmten
+      Einzelpersonen und Gruppen zugewiesen werden.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Wenn aktiviert, können die Module als Option auch dann als abgeschlossen markiert werden, wenn nur eine der Anforderungen erfüllt ist."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Wenn diese Option aktiviert ist, wird oauth2_access_token_url beim LTI2-Registrierungsstart gesendet."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Falls aktiviert, kann OAuth 1.0a-Unterzeichnung von LTI-Tools verwendet werden, um auf die Membership Service API zuzugreifen."
@@ -14951,7 +14982,7 @@ de:
       Schaltflächen Deaktivieren/Zulassen/Aktivieren weiterhin sichtbar.
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Falls aktiviert, werden Geltungsbereiche auf Anforderung von APIs überprüft, falls der verwendete Entwicklerschlüssel Geltungsbereiche erfordert."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Von Canvas verwendete SourcedIDs für grundlegende Ergebnisse werden verschlüsselt."
-  if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Falls aktiviert, wird der Abgabeverlauf für Quizze von „Neue Quizze“ separat behandelt."
+  if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Falls aktiviert, wird der Abgabeverlauf für Quizze von „New Quizzes“ separat behandelt."
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Wenn aktiviert, Abgabeverlauf für Quizzes.Next Quizze werden separat behandelt."
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Falls diese Option aktiviert ist, können Kursanmeldungen mit Microsoft-Gruppen synchronisiert
@@ -14969,7 +15000,7 @@ de:
   if_enabled_the_deep_linking_response_js_will_send__35b98a81: |-
       Wenn diese Option aktiviert ist, sendet die Deep Linking Response JS postMessages
        an window.parent statt an window.top. Dies ermöglicht es der Deep Linking-Antwort,
-      Inhaltselemente korrekt an Neue Quizze zu senden, wenn ein Tool
+      Inhaltselemente korrekt an New Quizzes zu senden, wenn ein Tool
       von NQ aus gestartet wird.
   if_enabled_the_deprecated_oembed_retrieve_endpoint_ac2701be: |-
       Wenn diese Option aktiviert ist, ist der veraltete Endpunkt oembed_retrieve nicht mehr verfügbar.
@@ -14989,6 +15020,7 @@ de:
   if_enabled_the_tool_installation_and_configuration_c974cdb2: |-
       Wenn diese Option aktiviert ist, verwenden die Formulare zur Installation und Konfiguration von Tools auf den Seiten Konto und Kurseinstellungen die Komponenten von
       InstUI und nicht die älteren, weniger zugänglichen selbst entwickelten Komponenten.
+  if_enabled_the_user_s_lti_url_input_on_the_select__fa539830: "Wenn diese Option aktiviert ist, wird die LTI-URL-Eingabe des/der Benutzer\\*in im Dialogfeld „Inhalt auswählen“ überschrieben, \\nwenn das Tool mit einer gültigen LTI-URL antwortet."
   if_enabled_the_user_will_see_a_warning_alert_box_n_d85c7b1f: |-
       Wenn diese Option aktiviert ist, wird der/die Benutzer\*in durch ein Warnfeld am oberen Rand der Seite
       Entwicklerschlüssel über bevorstehende oder abgeschlossene Änderungen am OIDC-Auth-Endpunkt informiert.
@@ -15005,7 +15037,7 @@ de:
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Falls Leistungszielmaßstäbe aktiviert sind, wird der Bericht gekürzt, sodass er keine Berechnungsmethoden, Berechnungs-Int., Leistungspunkte oder Einstufungen enthält."
   if_multiple_due_date_overrides_apply_to_a_student__d766b09c: "Falls mehrere Fälligkeitsüberschreitungen auf einen Studierenden bei einer bestimmten Aufgabe zutreffen und eine dieser Zeitüberschreitungen eine individuelle Zeitüberschreitung ist, verwenden Sie immer das Datum der individuellen Zeitüberschreitung. Bisher galt immer, das Datum der Zeitüberschreitung auszuwählen, die dem Studenten die meiste Zeit für die Abgabe einräumte."
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
-      Falls „Neue Quizze“ aktiviert ist, ist es möglich, Objektpools
+      Falls „New Quizzes“ aktiviert ist, ist es möglich, Objektpools
       im Besitz bestimmter Kurse und des Stammkontos in neuen Quizzen zu erstellen und zu verwalten.
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Falls keine ausgewählt sind, an jeden im gesamten Konto senden)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Falls keine ausgewählt sind, an jeden im gesamten Unterkonto senden)"
@@ -15309,7 +15341,7 @@ de:
   include_assignments_graded_with_a_0_score_fb784115: "Aufgaben einbeziehen, die mit 0 bewertet wurden."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "BOM (Byte-Order-Mark) in kompatible Arbeitsblattexporte aufnehmen"
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Byte-Order-Markierung mit Notenbuch exportieren"
-  include_classic_quizzes_ecf3fb2b: "Klassische Tests einbeziehen"
+  include_classic_quizzes_ecf3fb2b: "Classic Quizzes einbeziehen"
   include_course_scores_e38e71da: "Kursergebnisse einbeziehen"
   include_course_settings_c4c08764: "Kurseinstellungen einbeziehen"
   include_deleted_enrollments_1c87684a: "Gelöschte Einschreibungen aufnehmen"
@@ -16898,6 +16930,7 @@ de:
   media_over_time_d9332e25: "Medien in einem Zeitraum"
   media_record_not_available_f78c16dd: "Medienaufzeichnung nicht verfügbar"
   media_recording_77cddc52: Medienaufzeichnung
+  media_recording_f53c5ef1: Medienaufzeichnung
   media_recording_submission_b7fd1491: "Abgabe von Medienaufzeichnung"
   media_recording_submissions_require_a_media_id_to__ff740090: "%{media_recording} Abgaben erfordern ein %{media_id}"
   media_recordings_749aef6d: Medienaufzeichnungen
@@ -18890,7 +18923,7 @@ de:
   microsoft_tenant_name_domain_ba8ed4bb: "microsoft_tenant_name%{domain}"
   migrate_67c9f753: Migrieren
   migrate_quiz_5d0f777: "Quiz migrieren"
-  migrating_a_single_classic_quiz_will_leave_html_ri_91795a20: "Wenn Sie ein einzelnes klassisches Quiz migrieren, bleiben die HTML-Felder für Rich Content unverändert."
+  migrating_a_single_classic_quiz_will_leave_html_ri_91795a20: "Wenn Sie ein einzelnes Classic Quiz migrieren, bleiben die HTML-Felder für Rich Content unverändert."
   migrating_name_e05aa53e: "Migration von \"%{name}\""
   migration: 
     announcement_type: Ankündigung
@@ -19332,7 +19365,7 @@ de:
   must_be_between_1_and_5_3b42aca1: "muss zwischen 1 und 5 liegen"
   must_be_between_1_and_99_589b827d: "muss zwischen 1 und 99 liegen"
   must_be_between_1_and_max_4dc36a5a: "Muss zwischen 1 und %{max} liegen"
-  must_be_between_50_and_99_b22b09cc: "muss zwischen 50 und 99 liegen"
+  must_be_between_50_and_99_b22b09cc: "muss zwischen 50 und 99 liegen"
   must_be_between_availability_dates_ceaca984: "muss innerhalb der Verfügbarkeitsdaten liegen"
   must_be_between_lower_and_upper_1f501b2a: "Muss zwischen %{lower} und %{upper} liegen."
   must_be_length_characters_or_less_8c24db67: "Darf maximal %{length} Zeichen lang sein"
@@ -19489,9 +19522,9 @@ de:
   new_account_role_6e5c4964: "Neue Kontorolle"
   new_activity_8b84847d: "Neue Aktivität"
   new_activity_for_title_c5cc74: "Neue Aktivität für %{title}"
-  new_analytics_api_access_7eec1ead: "Neuer Analytics API-Zugang"
+  new_analytics_api_access_7eec1ead: "New Analytics API-Zugang"
   new_analytics_description: "Neue Analysen für Kurs- und Benutzerdaten anzeigen. Es kann bis zu 24 Stunden dauern, bis die Daten in New Analytics sichtbar werden, nachdem Sie dieses Funktions-Flag auf ON gesetzt haben. Ausführliche Informationen finden Sie in der *New Analytics-Benutzergruppe* in der Canvas-Community."
-  new_analytics_f6147886: "Neue Analyse"
+  new_analytics_f6147886: "New Analytics"
   new_analytics_is_an_interactive_tool_that_helps_yo_9bd32611: |-
       New Analytics ist ein interaktives Tool, das Ihnen und Ihren Studierenden hilft, die Leistungen und Aktivitäten
           innerhalb des Kurses besser zu verfolgen. Erfahren Sie, welche Studierende
@@ -19555,35 +19588,35 @@ de:
   new_post_policy_icons_da13a62c: "Neue Post-Policy-Symbole"
   new_question_9107c469: "Neue Frage"
   new_question_group_d9306280: "Neue Fragengruppe"
-  new_quiz_34aacba6: "Neues Quiz"
-  new_quiz_deleted_user_restore_pending_review_state_a117d744: "Neues Quiz – gelöschter Benutzer – Wiederherstellung des Status der ausstehenden Überprüfung bei der Anmeldung"
-  new_quiz_items_3c850331: "Neue Quiz-Elemente"
+  new_quiz_34aacba6: "New Quiz"
+  new_quiz_deleted_user_restore_pending_review_state_a117d744: "New Quiz – gelöschter Benutzer – Wiederherstellung des Status der ausstehenden Überprüfung bei der Anmeldung"
+  new_quiz_items_3c850331: "New Quiz-Elemente"
   new_quiz_statistics_desc: "Aktiviert die neue Seite mit Quizstatistiken für einen Kurs."
   new_quizzes_account_and_course_level_item_banks_9152fb1: "Neue Objektpools auf Quizzes-Konto- und Kursebene"
-  new_quizzes_assignment_build_button_72b6531a: "Erstellen-Schaltfläche für neue Quiz-Aufgabe"
-  new_quizzes_banks_migrations_9ab4de4a: "Neue Quizze-Poolmigrationen"
+  new_quizzes_assignment_build_button_72b6531a: "Erstellen-Schaltfläche für New Quizzes-Aufgabe"
+  new_quizzes_banks_migrations_9ab4de4a: "New Quizzes-Poolmigrationen"
   new_quizzes_build_button_in_module_items_10f651fb: "Schaltfläche „Neue Quizze erstellen“ in Modulobjekten"
   new_quizzes_build_button_on_list_views_62c7c0e8: "Schaltfläche zum „Erstellen neuer Quizze“ in Listenansichten"
-  new_quizzes_dbda7e0a: "Neue Quizze"
-  new_quizzes_description: "Diese Funktion verbessert die Canvas-Erfahrung für Quizze. Wenn diese Markierung aktiviert ist, ist das Tool „Neue Quizze“ verfügbar. Weitere Informationen finden Sie in der *Benutzergruppe Neue Quizze* in der Canvas-Community."
+  new_quizzes_dbda7e0a: "New Quizzes"
+  new_quizzes_description: "Diese Funktion verbessert die Canvas-Erfahrung für Quizzes. Wenn diese Markierung aktiviert ist, ist das Tool „New Quizzes“ verfügbar. Weitere Informationen finden Sie in der *Benutzergruppe New Quizzes* in der Canvas-Community."
   new_quizzes_embedded_module_progression_cd2307b6: "„Neue Quizze eingebettet“-Modulablauf"
-  new_quizzes_export_support_b0a6a625: "Exportunterstützung für neue Quizze"
+  new_quizzes_export_support_b0a6a625: "Exportunterstützung für New Quizzes"
   new_quizzes_importing_c167dce0: "„Neue Quizze“ importiert"
-  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "Neue Quizze auf der Registerkarte „Zusammenfassung der Ausrichtung der Lernergebnisse“ enthalten"
-  new_quizzes_migrate_without_content_rewrite_1aec2ce8: "Neue Quizze werden ohne Neuformulierung des Inhalts migriert"
-  new_quizzes_migration_during_course_import_copy_e9dd124e: "Neue-Quizze-Migration beim Kursimportieren/-kopieren"
-  new_quizzes_migration_enabled_by_default_5f9bcc81: "Standardmäßige Aktivierung der Neue-Quizze-Migration"
-  new_quizzes_migration_required_7854aa1a: "Neue-Quizze-Migration erforderlich"
-  new_quizzes_on_the_quizzes_page_b21f338d: "Neue Quizzes auf der Quiz-Seite"
-  new_quizzes_outcome_alignments_are_included_on_the_83447268: "Neue Quizfragen werden auf der Registerkarte „Zusammenfassung der Ausrichtung der Lernergebnisse“ angezeigt, die eine Liste der Ausrichtungen für jedes Lernergebnis in einem Kurs enthält."
-  new_quizzes_public_api_18d95321: "Öffentliche API für Neue Quizze"
-  new_quizzes_public_api_quiz_items_16bc741d: "Öffentliche API für Neue Quizze Quizelemente"
-  new_quizzes_service_jwt_refresh_ca28ca8: "JWT neu laden für Dienst Neue Quizze"
-  new_quizzes_site_admin_service_user_a331233a: "Neue Quizseiten Website Admin Service Benutzer\\*in"
-  new_quizzes_submission_274b5c57: "Einreichung neuer Tests"
-  new_quizzes_submission_history_d81b477b: "Neue Quizze – Abgabeverlauf"
+  new_quizzes_included_on_outcome_alignment_summary__4547b0ad: "New Quizzes auf der Registerkarte „Zusammenfassung der Ausrichtung der Lernergebnisse“ enthalten"
+  new_quizzes_migrate_without_content_rewrite_1aec2ce8: "New Quizzes werden ohne Neuformulierung des Inhalts migriert"
+  new_quizzes_migration_during_course_import_copy_e9dd124e: "New Quizzes-Migration beim Kursimportieren/-kopieren"
+  new_quizzes_migration_enabled_by_default_5f9bcc81: "Standardmäßige Aktivierung der New Quizzes-Migration"
+  new_quizzes_migration_required_7854aa1a: "New Quizzes-Migration erforderlich"
+  new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes auf der Quiz-Seite"
+  new_quizzes_outcome_alignments_are_included_on_the_83447268: "New Quizzes werden auf der Registerkarte „Zusammenfassung der Ausrichtung der Lernergebnisse“ angezeigt, die eine Liste der Ausrichtungen für jedes Lernergebnis in einem Kurs enthält."
+  new_quizzes_public_api_18d95321: "Öffentliche API für New Quizzes"
+  new_quizzes_public_api_quiz_items_16bc741d: "Öffentliche API für New Quizzes Quizelemente"
+  new_quizzes_service_jwt_refresh_ca28ca8: "JWT neu laden für Dienst New Quizzes"
+  new_quizzes_site_admin_service_user_a331233a: "New Quizzes Website Admin Service Benutzer\\*in"
+  new_quizzes_submission_274b5c57: "Einreichung New Quizzes"
+  new_quizzes_submission_history_d81b477b: "New Quizzes – Abgabeverlauf"
   new_quizzes_support_for_modules_7b81eee9: "Neue Quizzes-Unterstützung für Module"
-  new_quizzes_third_party_importing_1e1b696d: "Drittanbieterimporte bei Neue Quizze"
+  new_quizzes_third_party_importing_1e1b696d: "Drittanbieterimporte bei New Quizzes"
   new_rating_canceled_eed3c4ff: "Neue Bewertung storniert"
   new_rating_created_54125331: "Neue Bewertung erstellt"
   new_release_note_37ec0ea7: "Neue Versionshinweis"
@@ -19606,7 +19639,7 @@ de:
   new_typography_4eaeca26: "Neue Typografie"
   new_ui_487a624e: "Neue Benutzerschnittstelle (UI)"
   new_user_s_name_909b6267: "Neuer Benutzername"
-  new_user_tutorial_cdd3a446: "Übung für neue/n Benutzer\\*in"
+  new_user_tutorial_cdd3a446: "Tutorial für neue Lehrende"
   new_video_conference_17817456: "Neue Videokonferenz"
   new_zealand_64_f126cf2e: "Neuseeland (+64)"
   new_zealand_ef5d7b74: Neuseeland
@@ -19754,6 +19787,7 @@ de:
   no_results_found_e4b686bd: "Keine Ergebnisse gefunden."
   no_results_found_for_searchterm_7ee9b03e: "Es wurden keine Ergebnisse für %{searchTerm} gefunden."
   no_results_match_searchterm_f28e50e0: "Keine Ergebnisse entsprechen „%{searchTerm}“"
+  no_roles_available_1708d8ce: "Keine Rollen verfügbar"
   no_score_yet_c94e919b: "Noch keine Punkte vorhanden"
   no_search_results_found_5f156ff9: "Keine Suchergebnisse gefunden"
   no_start_date_6e81c22b: "Kein Startdatum"
@@ -19860,6 +19894,7 @@ de:
   not_yet_assessed_9362f199: "Noch nicht bewertet"
   not_yet_completed_345a0bca: "Noch nicht abgeschlossen"
   not_yet_graded_40475341: "Noch nicht benotet"
+  not_yet_submitted_2d2b7328: "Noch nicht abgegeben"
   note_8b73ce09: Anmerkung
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
       HINWEIS: Zugehörige Tools werden nur einmal aufgelistet, auch wenn sie
@@ -20367,6 +20402,7 @@ de:
   on_day_date_c2871702: "am Tag %{date}"
   on_for_key_keyname_bbac4e1b: "Schlüssel auf „An“: %{keyName}"
   on_paper_46d0ba36: "Als Papierdokument"
+  on_paper_87119532: "Als Papierdokument"
   on_the_fifth_dayname_cc0078f6: "am fünften %{dayname}"
   on_the_first_dayname_c77f6da4: "am ersten %{dayname}"
   on_the_fourth_dayname_75865f4f: "am vierten %{dayname}"
@@ -20381,6 +20417,7 @@ de:
       \x20             Zukünftige Notenänderungen geposteter Noten müssen nicht manuell gepostet werden.\n\
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Sobald eine Note manuell vergeben wird, wird automatisch eine neue Benachrichtigung gesendet und sie ist für die Studierenden sichtbar."
+  once_enabled_for_new_quizzes_anonymous_grading_wil_468104d3: "Sobald diese Option für New Quizzes aktiviert ist, kann die anonyme Benotung nicht mehr ausgeschaltet werden."
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Sobald diese Option aktiviert ist, ist sie im Notenbuch für Lehrende sichtbar."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Sobald Sie dieses Feature aktivieren, können Sie es nicht mehr abstellen.  Vergewissern Sie sich, dass Sie den Order für Einreichungen jetzt schon aktivieren können, bevor Sie weitermachen."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Eine abgegebene Antwort kann später nicht mehr geändert werden. Sie können nicht die vorherige Frage sehen."
@@ -20391,6 +20428,7 @@ de:
   one_or_more_grade_selected_was_provided_by_a_grade_58d46830: "Eine oder mehr ausgewählte Noten wurden von einem Benoter mit inaktiven Einschreibungen erteilt. Bitte aktualisieren Sie Ihre Auswahl auf die Noten von aktuellen Benotern."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Mindestens ein Objekt wird derzeit importiert. Sie werden im folgenden Kurs angezeigt, sobald sie verfügbar sind."
   one_per_line_format_name_value_79647700: "Eins pro Zeile. Format: Name=Wert"
+  online_quiz_fbd985db: Online-Quiz
   online_submission_type_annotated_document_f8b57ae1: "Online-Abgabeart – Angemerktes Dokument"
   online_submission_type_file_uploads_24910d74: "Online-Abgabeart – Datei-Uploads"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Online-Abgabeart – Datei-Uploads – Upload-Dateiarten beschränken"
@@ -20399,7 +20437,9 @@ de:
   online_submission_type_text_entry_ac56d100: "Online-Abgabeart – Texteintrag"
   online_submission_type_website_url_2c9df33d: "Online-art –Abgabe Website-URL"
   online_text_entry_1d893ce: Online-Texteingabe
+  online_text_entry_8f44bf1a: Online-Texteingabe
   online_upload_59969592: Online-Upload
+  online_upload_5e3a90a4: Online-Upload
   online_url_37830a72: Online-URL
   only_a_maximum_of_100_events_can_be_created_ad703982: "Es können höchstens 100 Ereignisse erzeugt werden."
   only_a_maximum_of_limit_events_can_be_created_b81c405e: "Es können höchstens %{limit} Ereignisse erstellt werden."
@@ -20467,6 +20507,7 @@ de:
   open_title_in_a_new_window_b29fed77: "%{title} in einem neuen Fenster öffnen"
   open_to_comments_23d5585e: "Für Kommentare öffnen"
   open_to_do_items_in_a_new_tab_120ea5f4: "To-do-Elemente in einem neuen Tab öffnen"
+  open_total_grade_override_tray_d2187914: "Fach für das Außerkraftsetzen der Gesamtnote öffnen"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect-Initiations-URL"
   opens_in_new_window_b4b99243: "wird in einem neuen Fenster geöffnet"
   opportunities_popup_f6703842: Chancen-Popup-Fenster
@@ -20773,6 +20814,7 @@ de:
   overview_of_student_status_a004bcf3: "Übersicht über den Status der/des Studierenden"
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "Alle vorhandenen Dashboard-Standardeinstellungen von Benutzern außer Kraft setzen"
   overwrite_already_entered_grades_64a98037: "Bereits eingegebene Noten überschreiben"
+  overwrite_user_lti_url_input_on_select_content_dia_6d9c76f: "Überschreiben der Benutzer\\*in-LTI-URL-Eingabe im Dialogfeld „Inhalt auswählen“"
   own_copyright_cc59db55: "Ist Inhaber des Urheberrechts"
   owner_email_236d1b2: Eigentümer-E-Mail
   owner_email_4d02f795: "Besitzer\\*in-E-Mail:"
@@ -20936,12 +20978,14 @@ de:
   peer_review_74f26a13: Kollegenkorrektur
   peer_review_assignment_7d314c59: Kollegenkorrekturaufgabe
   peer_review_comments_71cb4605: "Kommentare für Peer Review"
+  peer_review_completed_a74de33: "Peer Review abgeschlossen"
   peer_review_due_dueattext_20987412: "Peer-Review fällig am %{dueAtText}"
   peer_review_due_eb63af38: "Peer-Review fällig"
   peer_review_for_assignment_ce72fc52: "Peer-Korrektur für %{assignment}"
   peer_review_for_itemtitle_91198440: "Peer-Review für %{itemTitle}"
   peer_review_for_name_bcffa32f: "Peer Review für %{name}"
   peer_review_for_name_due_dueattext_f5f6547d: "Peer Review für %{name} fällig: %{dueAtText}"
+  peer_review_not_yet_submitted_2ab13b19: "Peer Review noch nicht eingereicht"
   peer_review_prompt_571c5d22: "Aufforderung für Peer Review"
   peer_review_support_in_assignment_enhancements_b1df2b76: "Unterstützung durch Peer Review bei Aufgabenerweiterungen"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Peer Reviewed Aufgaben wurden im neuen Aufgabenfluss noch nicht berücksichtigt. Zur angestammten Seite zum Erstellen von Aufgaben gehen?"
@@ -21726,6 +21770,7 @@ de:
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Komma-Taste oder <Umschalt>+<?> drücken, um eine Liste mit Tastenkombinationen zu sehen."
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Komma-Taste oder <Umschalt>+<?> drücken, um eine Liste mit Tastenkombinationen zu sehen."
   press_the_esc_key_to_close_this_modal_14d10601: "<Esc>-Taste drücken, um dieses Modalfenster zu schließen"
+  prev_f82cbc48: Vorher
   prev_month_34bd934c: "Vorh. Monat"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "Verhindert, dass Studierende Anmerkungen in Aufgaben hinterlassen. Gilt nicht für Aufgaben, die von Kollegen geprüft wurden."
   preview_53003fd2: Vorschau
@@ -22153,7 +22198,7 @@ de:
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol* konform ist.
       Zusätzliche SAML-Provider müssen ebenfalls so konfiguriert werden, dass sie der Antwort
       des Discovery-Service folgen.
-  provide_tutorial_information_for_instructors_new_t_163c8ed4: "Geben Sie Lehrenden Tutoriumsinformationen, die neu in Canvas sind."
+  provide_tutorial_information_for_instructors_new_t_163c8ed4: "Bereitstellung von Informationen für Lehrende, die Canvas noch nicht kennen."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Stellen Sie Übungsinformationen für neue Benutzer in einem Flyout-Menü bereit."
   provider_attribute_b1cad655: Anbieterattribut
   provider_enforces_mfa_when_logging_in_through_this_54adcd1d: "Anbieter erzwingt MFA *Bei der Anmeldung über diesen Anbieter wird Canvas die MFA-Erzwingung explizit überspringen. Diese Option sollte nur verwendet werden, falls der Anbieter bereits MFA vor SSO in Canvas garantiert hat.*"
@@ -22889,7 +22934,7 @@ de:
         quiz_restricted: "Das Quiz ist durch einen Zugriffscode geschützt. Bitten Sie Ihre/n Lehrende\\*n oder Verantwortlichen, den erforderlichen Zugriffscode einzugeben oder Ihnen mitzuteilen."
         survey_restricted: "Die Befragung ist durch einen Zugriffscode geschützt. Bitten Sie Ihre/n Lehrende\\*n oder Verantwortlichen, den erforderlichen Zugriffscode einzugeben oder Ihnen mitzuteilen."
       default_history_crumb: Verlauf
-      default_title: "Neues Quiz"
+      default_title: "New Quiz"
       display_answer: 
         labels: 
           answer_with_margin: "mit Marge"
@@ -23216,7 +23261,7 @@ de:
           save: Speichern
           save_and_publish: "Speichern & Veröffentlichen"
         cant_go_back: "Fragen nach der Beantwortung sperren"
-        default_page_title: "Neues Quiz"
+        default_page_title: "New Quiz"
         group: Aufgabengruppe
         headers: 
           ip_filters: "Was sind Quiz-IP-Filter?"
@@ -23451,7 +23496,7 @@ de:
         student_mute_notification: "Dozent arbeitet zurzeit an der Benotung"
         unlimited_attempts: "Unbegrenzte Zahl an Versuchen"
       read_only: 
-        default_page_title: "Neues Quiz"
+        default_page_title: "New Quiz"
         headers: 
           quiz_details: Quiz-Details
         labels: 
@@ -23825,6 +23870,8 @@ de:
   radio_button_option_2_31e50043: "Optionsschaltfläche, Option 2"
   range_56b2f310: Reichweite
   range_8760934b: "Bereich:"
+  range_must_be_a_valid_number_cannot_have_negative__ac5ed71f: "Der Wert muss eine gültige Zahl sein. Negative Zahlen oder Zahlen, die größer als 100 sind, sind nicht möglich. Korrigieren Sie die Bereiche und klicken Sie erneut auf „Speichern“."
+  range_must_be_a_valid_number_cannot_have_negative__d4efa7d1: "Der Wert muss eine gültige Zahl sein. Der Bereich darf keine negativen Zahlen oder Zahlen enthalten, die größer als der obere Punktbereich sind. Korrigieren Sie die Bereiche und klicken Sie erneut auf „Speichern“."
   range_name_90614433: Bereichsname
   rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} von %{totalStudents} Studenten"
   rather_than_automatically_placing_manually_created_35195e72: |-
@@ -23949,6 +23996,7 @@ de:
     other: "Lesestatus geändert!"
   ready_for_sync_16eaf713: "Bereit zur Synchronisation"
   ready_to_enroll_panel_46f45abb: "„Bereit zur Anmeldung“-Bereich"
+  ready_to_review_8b2d96ac: "Bereit zur Überprüfung"
   reassign_assignment_e3a70bcb: "Aufgabe neu zuweisen"
   reassign_assignments_cfd508c5: "Aufgaben neu zuweisen"
   reassigned_cedad6d9: Neuzugewiesen
@@ -24324,6 +24372,7 @@ de:
   required_fields_include_key_name_owner_email_tool__b8e42174: "Erforderliche Felder sind Schlüsselname, Besitzer-E-Mail, Tool-ID, URL-Umleitung und Symbol-URL."
   required_input_message_all_unassigned_students_1e721442: "Erforderliche Eingabe Benachrichtigen Sie alle nicht zugewiesenen Studierende."
   required_peer_review_index_b186729c: "Erforderliche Prüfung durch Kollegen %{index}"
+  required_peer_reviews_23bea465: "Erforderliche Peer Reviews"
   required_to_view_quiz_results_dba7368b: "Erforderlich zur Anzeige der Quizergebnisse"
   required_values_1eb5841f: "Erforderliche Werte"
   requirement_f5b75da1: Anforderung
@@ -24435,6 +24484,7 @@ de:
     duplicate_role: "Eine Rolle mit diesem Namen ist bereits vorhanden"
   role_13a7be77: Rolle
   role_7c0b7eaa: "Rolle:"
+  role_8500fcfd: ROLLE
   role_b3951149: Rolle
   role_id_f33b0bd2: role_id
   role_name_18a5943b: Rollenname
@@ -25137,6 +25187,7 @@ de:
   select_a_module_optional_7edb5cb0: "Ein Modul auswählen (optional)"
   select_a_predefined_color_c77ab2f5: "Eine vorab festgelegte Farbe wählen"
   select_a_provisional_grade_7106e3d5: "Auswählen einer vorläufigen Note"
+  select_a_role_287e53e8: "Eine Rolle auswählen"
   select_a_section_37ac1694: "Einen Abschnitt auswählen"
   select_a_student_adfcc348: "Eine/n Studierende\\*n auswählen"
   select_a_student_and_an_assignment_to_view_and_edi_96fda3c1: "Wählen Sie eine/n Studierende\\*n und eine Aufgabe aus, um Noten anzuzeigen und zu bearbeiten."
@@ -25429,7 +25480,7 @@ de:
   set_value_to_sis_if_using_sis_id_default_search_is_ab3d05f2: "den Wert auf „SIS“ setzen bei Verwendung der SIS-ID, Standardsuche ist die Canvas-ID"
   sets_are_merged_click_to_split_fa741a5f: "Sets sind verbunden, zum Teilen klicken"
   sets_are_split_click_to_merge_99552cdb: "Sets sind geteilt, zum Verbinden klicken"
-  sets_the_default_option_for_course_copy_and_import_36147e78: "Stellt die Standardeinstellung für Kurskopien und -importe für Neue Quizze ein"
+  sets_the_default_option_for_course_copy_and_import_36147e78: "Stellt die Standardeinstellung für Kurskopien und -importe für New Quizzes ein"
   setting_failed_to_load_try_refreshing_c24bf008: "Einstellung konnte nicht geladen werden. Versuche zu aktualisieren."
   settings: 
     recaptcha_settings: 
@@ -26276,7 +26327,7 @@ de:
     one: "1 abgeschlossenes Element anzeigen"
     other: "%{count} abgeschlossene Elemente anzeigen"
   show_count_missing_items_a73b3374: 
-    one: "1 fehlendes Element anzeigen"
+    one: "1 fehlendes Element anzeigen"
     other: "%{count} fehlende Elemente anzeigen"
   show_course_sections_for_course_name_5f715702: "Kursabschnitte für Kurs %{name} einblenden"
   show_courses_from_8a087f63: "Anzeigen der Kurse von"
@@ -26316,7 +26367,7 @@ de:
   show_navigation_menu_34e7f441: "Navigationsmenü einblenden"
   show_new_analytics_for_course_and_user_data_18e92636: "Neue Analysen für Kurs- und Benutzerdaten anzeigen"
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "Neue Analysen für Kurs- und Benutzerdaten zeigen. Es kann bis zu 24 Stunden dauern, dass die Daten in New Analytics sichtbar werden, nachdem dieses Funktions-Flag auf AN eingestellt wurde."
-  show_new_quizzes_on_the_quizzes_page_b2db14d8: "Neue Quizzes auf der Quiz-Seite anzeigen"
+  show_new_quizzes_on_the_quizzes_page_b2db14d8: "New Quizzes auf der Quiz-Seite anzeigen"
   show_newer_replies_9f73d06d: "Neuere Antworten anzeigen"
   show_notes_column_22d2b6c1: "Anmerkungsspalte anzeigen"
   show_notes_in_student_info_7a22e02b: "Anmerkungen in Informationen zu der/dem Studierenden anzeigen"
@@ -26757,6 +26808,7 @@ de:
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "Feld „Startdatum“ für Styleguide"
   start_date_for_conference_1936e809: "Das Startdatum der Konferenz"
+  start_date_for_enroll_3c2e1f94: "Startdatum für %{enroll}"
   start_date_from_20503757: "Startdatum von:"
   start_date_must_be_before_end_date_a00be892: "Das Startdatum muss vor dem Enddatum liegen."
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, von %{start_time} bis %{end_time}"
@@ -27327,6 +27379,7 @@ de:
   subscribed_fe74d22a: Angemeldet
   subtitle_ee60ca78: Untertitel
   subtitles_could_not_be_imported_from_file_5de6da0b: "Die Untertitel aus %{file} konnten nicht importiert werden."
+  subtitles_lang_could_not_be_imported_for_file_4d1be2e3: "Untertitel (%{lang}) konnten für %{file} nicht importiert werden"
   success_a5aeb7: ERFOLG!
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Erfolg! Alle Benutzer auf dieser Domain sehen nun diesen Markenaufbau."
   success_file_uploaded_8174e93f: "Erfolg: Datei hochgeladen"
@@ -27384,7 +27437,7 @@ de:
       student_support: "NetAcad-Support – Studierende\\*r"
       student_support_description: "Ihr Kursleiter sollte Ihr erster Ansprechpartner sein. Er/Sie kann Ihre Networking Academy-Fragen beantworten oder sich für Sie an das Support-Desk wenden. Sie können Ihren Kursleiter über die Posteingangsfunktion erreichen."
       support_desk_livechat: Supportdesk-Livechat
-  support_exporting_new_quizzes_in_qti_format_ba09b465: "Unterstützung des Exports von neuen Quizzen im QTI-Format"
+  support_exporting_new_quizzes_in_qti_format_ba09b465: "Unterstützung des Exports von New Quizzes im QTI-Format"
   support_favorite_lti_tools_in_the_rce_1680436d: "Unterstützung bevorzugter LTI-Tools im RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Support für LaTex mathematische Gleichungen fast überall"
   support_sharing_settings_4ad422d8: "Einstellungen für die gemeinsame Nutzung des Supports"
@@ -27762,6 +27815,7 @@ de:
       Die Canvas SAML Entitäts-ID ist %{metadata_url}, und die Service Provider-Metadaten
       stehen unter diesem URL zur Verfügung.
   the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "Das Chat-Tool muss von Ihrem Canvas-Admin aktiviert werden."
+  the_chosen_date_and_time_is_invalid_a7c96651: "Das gewählte Datum und die Uhrzeit sind ungültig."
   the_client_id_clientid_is_disabled_b4a02cb1: "Die Client-ID %{clientId} ist deaktiviert."
   the_content_security_policy_allows_you_to_restrict_197ca4ff: |-
       Die Richtlinie zur Content-Sicherheit erlaubt Ihnen, in Ihrer Instanz von Canvas den Zugriff auf Content zu beschränken
@@ -27851,6 +27905,7 @@ de:
   the_error_stack_trace_if_there_is_one_b7e008a1: "Der Fehler-Stack-Trace, sollte es einen geben."
   the_event_was_successfully_created_31326d98: "Das Ereignis wurde erfolgreich erstellt."
   the_event_was_successfully_updated_45944cd7: "Das Ereignis wurde erfolgreich aktualisiert."
+  the_events_were_successfully_updated_93db1e0a: "Die Ereignisse wurden erfolgreich aktualisiert"
   the_external_tool_resource_link_including_any_poss_329f699d: "Der Link zur Ressource „Externes Tool“ (einschließlich möglicher benutzerdefinierter Parameter) konnte nicht für das Modulelement „%{title}“ gesetzt werden."
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Der Empfohlen-Link wurde an den Anfang der Liste verschoben."
   the_field_field_is_required_56512820: "Das Feld „%{field}“ ist erforderlich."
@@ -28016,6 +28071,7 @@ de:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Der/die angegebene Benutzer\\*in ist kein/e Studierende\\*r dieses Kurses."
   the_start_date_for_the_pace_plan_must_be_after_the_44e8ed5b: "Das Enddatum für den Stufenplan muss nach dem Startdatum liegen."
   the_start_date_for_the_pace_plan_must_be_before_th_892dc109: "Das Startdatum für den Schrittplan muss vor dem Enddatum liegen."
+  the_start_date_must_be_before_the_end_date_9c429f81: "Das Startdatum muss vor dem Enddatum liegen"
   the_start_date_was_set_to_1_month_ago_778e3d7f: "Das Startdatum wurde auf vor 1 Monat festgelegt."
   the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: "Das Startdatum wurde auf den Anfang der letzten Woche festgelegt."
   the_state_parameter_is_required_ffadf213: "Der Statusparameter ist erforderlich."
@@ -28181,6 +28237,7 @@ de:
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Beim Importieren des Kursbilds ist ein Fehler aufgetreten."
   there_was_an_error_saving_the_assignment_dates_d31903ab: "Fehler beim Speichern der Aufgabendaten."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Beim Speichern der Änderungen am Kurs ist ein Fehler aufgetreten."
+  there_was_an_error_saving_the_custom_grade_status_f184a28c: "Es ist ein Fehler beim Speichern des benutzerdefinierten Benotungsstatus aufgetreten."
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Beim Speichern der Note ist ein Fehler aufgetreten. Bitte versuchen Sie es später noch einmal."
   there_was_an_error_saving_your_blackout_dates_1efee334: "Beim Speichern Ihrer Blackout-Daten ist ein Fehler aufgetreten."
   there_was_an_error_saving_your_changes_bfaf3d79: "Beim Speichern Ihrer Änderungen ist ein Fehler aufgetreten."
@@ -28489,7 +28546,7 @@ de:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Die Ursache hierfür liegt wahrscheinlich darin, dass Sie Kursinhalte ohne die damit assoziierten Dateien importiert haben."
   this_name_appears_in_sorted_lists_dccbd84b: "Dieser Name wird in sortierten Listen angezeigt."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Dieser Name wird von die/den Lehrende\\*n bei der Leistungsbewertung verwendet."
-  this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Diese Option ist mit Neue Quizze nicht kompatibel"
+  this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Diese Option ist mit New Quizzes nicht kompatibel"
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Diese Option ist nicht mit Quizzes.Next kompatibel"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Diese Ergebnis wurde zur Beurteilung eines Studenten verwendet und kann nicht mehr aktualisiert werden"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dieses Lernziel wurde zur Bewertung eines Studenten verwendet und kann weder bearbeite noch gelöscht werden."
@@ -29504,6 +29561,7 @@ de:
   toggle_due_date_compression_tooltip_f2edda2e: "Tooltip für „Komprimierung des Fälligkeitsdatums umschalten“"
   toggle_editing_answer_text_as_html_9a93fe6: "Bearbeitung von Antworttext als HTML ein-/ausschalten"
   toggle_filterpresetname_f8ae0191: "%{filterPresetName} umschalten"
+  toggle_group_group_4a953201: "Gruppe %{group} umschalten"
   toggle_module_visibility_781a2f6c: "Sichtbarkeit des Moduls ein-/ausschalten"
   toggle_name_c0ab332b: "%{name} umschalten"
   toggle_option_cfd8b95a: Umschaltoption
@@ -29574,7 +29632,7 @@ de:
   transform_rce_content_on_load_1f521086: "RCE-Inhalt beim Laden transformieren"
   transforms_absolute_urls_to_relative_urls_and_remo_f06a81d8: |-
       Transformiert absolute URLs in relative URLs und entfernt überflüssige Attribute aus RCE-Inhalten beim Laden,
-      damit RCE in neuen Quizzen vollständig funktioniert.
+      damit RCE in New Quizzes vollständig funktioniert.
   travel_places_f461329c: "Reisen und Orte"
   treat_ungraded_as_0_d38c2b41: "Nicht benotete als 0 behandeln"
   tree_browser: 
@@ -29844,6 +29902,7 @@ de:
   united_states_1c49fc65: USA
   unknown: Unbekannt
   unknown_47a3b725: Unbekannt
+  unknown_881e8eb9: unbekannt
   unknown_account_74d30b82: "Unbekanntes Konto"
   unknown_answers_9688a2bc: "Unbekannte Antworten"
   unknown_compression_method_b6a850b5: "Unbekannte Komprimierungsmethode"
@@ -30133,15 +30192,15 @@ de:
   use_new_and_better_styled_placeholders_for_inserte_d6110d00: "Verwenden Sie neue und besser formatierte Platzhalter für eingefügte Bilder, Videos und Dateien im RCE."
   use_new_folder_tree_in_files_bc0ea09f: "In Dateien neuen Ordnerbaum verwenden"
   use_new_folder_tree_in_files_eb5a451b: "Bei Dateien neuen Ordnerbaum verwenden"
-  use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Verwenden Sie Neue Quizze als Standard-Quiz-Engine. Entfernt die Möglichkeit, klassische Quizze zu erstellen."
+  use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Verwenden Sie New Quizzes als Standard-Quiz-Engine. Entfernt die Möglichkeit, Classic Quizzes zu erstellen."
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Den neuen Rich Content Editor mit erweiterter Seitenleiste überall verwenden"
   use_pairing_code_for_parent_sign_up_10b091f8: "Pairing-Code für Elternanmeldung verwenden"
   use_parent_account_setting_f25a721f: "Verwenden die Parent-Kontoeinstellung"
   use_quizzes_to_challenge_student_understanding_and_a340ff1c: |-
       Verwenden Sie Quizze, um den Fortschritt der Studierenden zu prüfen und das Verständnis des
-            Kursmaterials zu beurteilen. Mit der Bewertungsmaschine für neue Quizze können Sie bis zu
-            13 Arten von Fragetypen und Inhalten erstellen. Wenn Neue Quizze für Ihre Einrichtung nicht aktiviert ist, sind die
-            Klassischen Quizze dennoch verfügbar, um Ihnen beim Erreichen Ihrer Ziele zu helfen.
+            Kursmaterials zu beurteilen. Mit der Bewertungsmaschine für New Quizzes können Sie bis zu
+            13 Arten von Fragetypen und Inhalten erstellen. Wenn New Quizzes für Ihre Einrichtung nicht aktiviert ist, sind die
+            Classic Quizzes dennoch verfügbar, um Ihnen beim Erreichen Ihrer Ziele zu helfen.
   use_remote_service_for_notifications_9fe667c6: "Remote-Service für Benachrichtigungen verwenden"
   use_remote_version_of_rich_content_editor_52f7fc4b: "Fern-Version des Rich Content Editors verwenden"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "Fern-Version des Rich Content Editors UND der Seitenleiste verwenden"
@@ -30848,6 +30907,7 @@ de:
   visit_group_group_name_7a816081: "Gruppe %{group_name} besuchen"
   visit_zoom_14636084: "Besuchen Sie Zoom"
   wait_for_delete_to_complete_2f6167c6: "Warten Sie, bis der Löschvorgang abgeschlossen ist."
+  wait_for_update_to_complete_f40002e2: "Auf Abschluss der Aktualisierung warten"
   wait_time_4c8f74a2: Wartezeit
   waiting_for_attempted_login_6d00cb49: "Auf Anmeldeversuch wird gewartet"
   waiting_for_change_to_complete_b75b5e8b: "Warten auf Änderung zur Fertigstellung"
@@ -31003,7 +31063,7 @@ de:
       wenn das LTI 1.3-Tool nicht vorhanden wäre, den oauth_consumer_key und
       oauth_consumer_key_sign-Eigenschaften als Teil des LTI 1.1-Anspruchsbereichs.
   when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
-      Wenn diese Option aktiviert ist, verwenden die Ausgaben von Neue Quizze den dedizierten
+      Wenn diese Option aktiviert ist, verwenden die Ausgaben von New Quizzes den dedizierten
       Benutzer\*in des Site-Adminservice DeveloperKey, um ein Zugriffs- und Aktualisierungs-Token zu generieren.
   when_enabled_root_accounts_with_a_ready_for_new_qu_b412daa: |-
       Wenn diese Option aktiviert ist, werden Stammkonten mit dem Schlüssel `:ready_for_new_quizzes_provision`
@@ -31217,6 +31277,7 @@ de:
       in der Neugestaltung der Diskussionen eingeben
   will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Werden Anmeldeinformationen, die mit diesem Schlüssel ausgestellt wurden, Canvas vorgelegt oder einem Peer-Service (z. B. Canvas Data)?"
   will_display_the_version_history_for_edited_discus_bbb7dfa: "Zeigt den Versionsverlauf für bearbeitete Diskussionsbeiträge in der Redesign-Benutzeroberfläche an."
+  will_grant_them_different_permissions_ee74b308: "wird ihnen unterschiedliche Rechte gewähren"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Der Durchschnitt für alle Ihre Punktzahlen wird gespeichert."
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Ihre höchste erreichte Punktzahl wird übernommen."
   will_keep_the_latest_of_all_your_scores_431d23f9: "Ihre zuletzt erreichte Punktzahl wird übernommen."
@@ -31636,7 +31697,7 @@ de:
   your_azure_active_directory_tenant_name_d8bb31fa: "Ihr Azure Active Directory-Mandantenname"
   your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Die Konnektivität Ihres Browsers kann langsam oder instabil sein. Trotz der Trenndauer Ihres Browsers werden Ihre Antworten bei diesem Versuch für zusätzliche 5 Minuten über die ursprüngliche Frist hinaus aufgezeichnet."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Ihr Browser erfüllt die Mindestanforderungen für Canvas nicht. Bei der *Canvas Community* erhalten Sie eine komplette Liste aller unterstützten Browser."
-  your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "Ihre klassischen Quizze wurden zu neuen Quizzen migriert!"
+  your_classic_quizzes_have_been_migrated_to_new_qui_e49244da: "Ihre Classic Quizzes wurden zu New Quizzes migriert!"
   your_comment_is_not_posted_12677035: "Ihr Kommentar wird nicht gepostet"
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Ihr Kommentar wurde automatisch als Entwurf gespeichert."
   your_content_has_been_exported_bbb57764: "Ihr Inhalt wurde exportiert."
