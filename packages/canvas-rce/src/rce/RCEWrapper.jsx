@@ -1027,7 +1027,7 @@ class RCEWrapper extends React.Component {
    * Initializes message listener.
    */
   forwardPostMessages = () => {
-    const windowReferences = {}
+    const windowReferences = []
     const rceWindow = this.editor.getWin()
     // explicitly assign name for reference by parent window
     rceWindow.name = `${RCEWrapper.editorFrameName}_${this.id}`
@@ -1044,7 +1044,7 @@ class RCEWrapper extends React.Component {
    * Also forwards response postMessages from the parent
    * back to the child frame that sent it.
    * Requires that the message data is an object, since it attaches
-   * `toolOrigin` to it. Uses `toolOrigin` on response messages
+   * `sourceToolInfo` to it. Uses `sourceToolInfo` on response messages
    * to determine which child frame should get the message.
    *
    * Actual handler function with parameters passed for testing.
@@ -1058,24 +1058,35 @@ class RCEWrapper extends React.Component {
       return false
     }
 
+    // NOTE: the code to encode/decode `sourceToolInfo` is duplicated in
+    // the ui/features/post_message_forwarding/index.ts, and
+    // cannot be DRY'd because RCE is in a package
     if (e.origin === rceWindow.origin) {
-      // message is from Canvas window, forward to tool
-      const targetOrigin = message.toolOrigin
-      if (!targetOrigin) {
+      const {sourceToolInfo, ...messageWithoutSourceToolInfo} = message
+      const targetOrigin = sourceToolInfo?.origin
+      const targetWindow = windowReferences[sourceToolInfo?.windowId]
+      if (!targetOrigin || !targetWindow) {
         return false
       }
-
-      const targetWindow = windowReferences[targetOrigin]
-      delete message.toolOrigin
-
-      targetWindow?.postMessage(message, targetOrigin)
+      targetWindow?.postMessage(messageWithoutSourceToolInfo, targetOrigin)
     } else {
       // message is from tool, forward to Canvas window
-      windowReferences[e.origin] = e.source
-      message.toolOrigin = e.origin
-      message.frameName = rceWindow.name
 
-      rceWindow.parent.postMessage(message, rceWindow.origin)
+      // We can't forward the whole `e.source` window in the postMessage,
+      // so we keep a list (`windowReferences`) of all windows we've received
+      // messages from, and include the index into that list as `windowId`
+      let windowId = windowReferences.indexOf(e.source)
+      if (windowId === -1) {
+        windowReferences.push(e.source)
+        windowId = windowReferences.length - 1
+      }
+
+      const newMessage = {
+        ...message,
+        sourceToolInfo: {origin: e.origin, windowId},
+        frameName: rceWindow.name,
+      }
+      rceWindow.parent.postMessage(newMessage, rceWindow.origin)
     }
   }
 

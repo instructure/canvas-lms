@@ -1187,7 +1187,7 @@ describe('RCEWrapper', () => {
             postMessage: jest.fn(),
           },
         }
-        windowReferences = {}
+        windowReferences = []
         message = {subject: 'hello_world', key: 'value'}
         origin = 'https://test.tool.com'
         source = {
@@ -1195,22 +1195,43 @@ describe('RCEWrapper', () => {
         }
       })
 
-      it('stores source window keyed by origin', () => {
-        subject()
-        expect(windowReferences[origin]).toBe(source)
-      })
-
       it('posts message to top parent', () => {
         subject()
         expect(rceWindow.parent.postMessage).toHaveBeenCalled()
       })
 
-      it('attaches origin and frameName to message', () => {
+      it('attaches sourceToolInfo and frameName to message', () => {
         subject()
         expect(rceWindow.parent.postMessage).toHaveBeenCalledWith(
-          {...message, toolOrigin: origin, frameName: 'active_rce_frame_myUniqId'},
+          {
+            ...message,
+            sourceToolInfo: {origin, windowId: 0},
+            frameName: 'active_rce_frame_myUniqId',
+          },
           expect.anything()
         )
+      })
+
+      it('stores source windows in an array', () => {
+        subject()
+        expect(windowReferences.length).toBe(1)
+        expect(windowReferences[0]).toBe(source)
+      })
+
+      it('reuses existing windowId for previously-seen source windows', () => {
+        subject()
+        const source2 = {postMessage: jest.fn(), foo: 'Source2'}
+        rce.forwardPostMessagesHandler(
+          rceWindow,
+          windowReferences
+        )({data: message, origin, source: source2})
+        subject()
+        expect(rceWindow.parent.postMessage.mock.calls[0][0].sourceToolInfo.windowId).toBe(0)
+        expect(rceWindow.parent.postMessage.mock.calls[1][0].sourceToolInfo.windowId).toBe(1)
+        expect(rceWindow.parent.postMessage.mock.calls[2][0].sourceToolInfo.windowId).toBe(0)
+        expect(windowReferences.length).toBe(2)
+        expect(windowReferences[0]).toBe(source)
+        expect(windowReferences[1]).toBe(source2)
       })
 
       it('addresses message to parent domain', () => {
@@ -1224,7 +1245,11 @@ describe('RCEWrapper', () => {
 
     describe('with message from parent to child', () => {
       beforeEach(() => {
-        message = {subject: 'hello_world', key: 'value', toolOrigin: 'https://test.tool.com'}
+        message = {
+          subject: 'hello_world',
+          key: 'value',
+          sourceToolInfo: {origin: 'https://test.tool.com', windowId: 1},
+        }
         rceWindow = {
           origin: 'https://parent.domain.com',
           name: 'active_rce_frame_myUniqId',
@@ -1236,12 +1261,11 @@ describe('RCEWrapper', () => {
         source = {
           postMessage: jest.fn(),
         }
-        windowReferences = {
-          'https://test.tool.com': source,
-        }
+        // source is index 1 (above we're using windowId=1):
+        windowReferences = [undefined, source]
       })
 
-      describe('when message has no toolOrigin', () => {
+      describe('when message has no sourceToolInfo', () => {
         beforeEach(() => {
           message = {subject: 'hello_world', key: 'value'}
         })
@@ -1256,12 +1280,12 @@ describe('RCEWrapper', () => {
         expect(source.postMessage).toHaveBeenCalled()
       })
 
-      it('addresses message to toolOrigin', () => {
+      it('addresses message to sourceToolInfo', () => {
         subject()
         expect(source.postMessage).toHaveBeenCalledWith(expect.anything(), 'https://test.tool.com')
       })
 
-      it('removes toolOrigin from message', () => {
+      it('removes sourceToolInfo from message', () => {
         subject()
         expect(source.postMessage).toHaveBeenCalledWith(
           {subject: 'hello_world', key: 'value'},
