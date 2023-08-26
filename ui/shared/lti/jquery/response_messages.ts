@@ -38,25 +38,25 @@ const buildResponseMessages = ({
   origin,
   subject,
   message_id,
-  toolOrigin,
+  sourceToolInfo,
 }: {
   targetWindow: Window | null
   origin: string
   subject: unknown
   message_id: unknown
-  toolOrigin: unknown
+  sourceToolInfo: unknown
 }): ResponseMessages => {
   const sendResponse = (contents = {}) => {
     const message: {
       subject: string
       message_id?: unknown
-      toolOrigin?: unknown
+      sourceToolInfo?: unknown
     } = {subject: `${subject}.response`}
     if (message_id) {
       message.message_id = message_id
     }
-    if (toolOrigin) {
-      message.toolOrigin = toolOrigin
+    if (sourceToolInfo) {
+      message.sourceToolInfo = sourceToolInfo
     }
     if (targetWindow) {
       targetWindow.postMessage({...message, ...contents}, origin)

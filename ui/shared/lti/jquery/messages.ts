@@ -184,7 +184,7 @@ async function ltiMessageHandler(
     origin: e.origin,
     subject,
     message_id: getKey('message_id', message),
-    toolOrigin: getKey('toolOrigin', message),
+    sourceToolInfo: getKey('sourceToolInfo', message),
   })
 
   if (subject === undefined || isIgnoredSubject(subject) || responseMessages.isResponse(e)) {
