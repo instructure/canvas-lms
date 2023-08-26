@@ -1268,7 +1268,7 @@ en-AU:
           account_reports: 
             default: 
               description: 
-                text: "This report shows the student final mark results for all students in a given term. The resulting csv file will have one row per enrolment, and will show the current and final grade that is displayed in the course gradebook."
+                text: "This report shows the student final mark results for all students in a given term. The resulting csv file will have one row per enrolment, and will show the current and final grade that is displayed in the course markbook."
     ivy_tech: 
       rubric_detail_score_report: 
         parameters: 
@@ -2711,7 +2711,7 @@ en-AU:
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Allows for discussion replies to be sorted according to creation
       timestamps. Default order is newest to oldest for root level replies.
-  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Allows graders to type MI in the Gradebook or SpeedGrader to manually tag an assignment as missing"
+  allows_graders_to_type_mi_in_the_gradebook_or_spee_a9bb3577: "Allows graders to type MI in the Markbook or SpeedGrader to manually tag an assignment as missing"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Allows instructors to apply scores to ungraded submissions en masse."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Allows instructors to apply scores to unmarked submissions en masse from assignment group and Total column menus in the Markbook."
@@ -6189,7 +6189,7 @@ en-AU:
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Cannot set sis_account_id on a root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Cannot set the due date to a date within a closed marking period"
   cannot_undelete_a_child_topic_when_the_root_course_bf6d75ef: "Cannot undelete a child topic when the root course topic is also deleted. Please undelete the root course topic instead."
-  cannot_use_gradebook_importer_reserved_names_8f3b5748: "cannot use gradebook importer reserved names"
+  cannot_use_gradebook_importer_reserved_names_8f3b5748: "cannot use markbook importer reserved names"
   cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Cannot view detailed reports for anonymous assignments until grades are unmuted."
   cannot_view_detailed_reports_for_anonymous_assignm_d6c42475: "Cannot view detailed reports for anonymous assignments until marks are posted."
   canvas: 
@@ -6355,7 +6355,7 @@ en-AU:
   change_description_for_proficiency_rating_position_97626231: "Change description for proficiency rating %{position}"
   change_ending_date_to_d2cebd54: "Change ending date to"
   change_existing_group_2c91a32b: "Change Existing Group"
-  change_gradebook_view_d2d9a101: "Change Gradebook view"
+  change_gradebook_view_d2d9a101: "Change Markbook view"
   change_groups_4e2ab6c3: "Change Groups"
   change_image_14ad465b: "Change Image"
   change_image_d56c695f: "Change image"
@@ -10890,7 +10890,7 @@ en-AU:
   divide_into_equal_time_slots_in_minutes_234312fa: "Divide into equal time slots (in minutes)"
   division_cutoff_cutoff_value_e938bc9d: "Division cutoff %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Do not count this assignment towards the final mark."
-  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Do not display in gradebook or the student's grade page"
+  do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Do not display in markbook or the student's grade page"
   do_not_show_again_for_this_assignment_d0abd4ae: "Do not show again for this assignment"
   do_nothing_9672b478: "Do Nothing"
   doc_50924b72: DOC
@@ -12857,9 +12857,9 @@ en-AU:
   first_reviewer_9ea05caa: "First reviewer"
   first_reviewer_sortorder_e2184140: "First reviewer %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, and %{others_count} others"
-  fix_missing_policy_applicator_gradebook_history_f3e62bc1: "Fix Missing Policy Applicator Gradebook History"
+  fix_missing_policy_applicator_gradebook_history_f3e62bc1: "Fix Missing Policy Applicator Markbook History"
   fix_missing_policy_grade_change_records_c404507c: "Fix Missing Policy Grade Change Records"
-  fixes_the_missing_policy_applicator_to_insert_reco_dedabe12: "Fixes the missing policy applicator to insert records into Gradebook History for each submission marked as missing."
+  fixes_the_missing_policy_applicator_to_insert_reco_dedabe12: "Fixes the missing policy applicator to insert records into Markbook History for each submission marked as missing."
   flagged_as_possible_spam_ebbc4683: "Flagged as possible spam"
   flags_ce30e8e3: Flags
   flags_new_eportfolio_content_matching_specific_key_a66af560: "Flags new ePortfolio content matching specific keywords as possible spam, and allows administrators to either confirm flagged ePortfolios or mark them as safe."
@@ -15501,9 +15501,9 @@ en-AU:
   individual_2033c005: Individual
   individual_assignment_grade_posting_d8322b99: "Individual Assignment Mark Posting"
   individual_case_permission_76452b92: "Individual Case Permission"
-  individual_gradebook_117281bb: "Individual Gradebook"
+  individual_gradebook_117281bb: "Individual Markbook"
   individual_gradebook_c7de9821: "Individual Markbook…"
-  individual_gradebook_enhancements_de33aa3d: "Individual Gradebook Enhancements"
+  individual_gradebook_enhancements_de33aa3d: "Individual Markbook Enhancements"
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Individual outcome calculation values cannot be modified."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Individual outcome mastery points cannot be modified."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Individual Outcome Rating and Calculation Method Options"
@@ -16486,7 +16486,7 @@ en-AU:
   loading_features_d26820f6: "Loading features"
   loading_folders_d8b5869e: "Loading folders"
   loading_gradebook_b0b75cd3: "Loading Markbook"
-  loading_gradebook_submissions_d2ba017f: "Loading Gradebook submissions"
+  loading_gradebook_submissions_d2ba017f: "Loading Markbook submissions"
   loading_graders_f6a76142: "Loading Graders"
   loading_grades_446fc226: "Loading marks..."
   loading_grades_c842c887: "Loading Marks"
@@ -20549,7 +20549,7 @@ en-AU:
       \x20           "
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Once a mark is posted manually, it will automatically send new notifications and be visible to students."
   once_enabled_for_new_quizzes_anonymous_grading_wil_468104d3: "Once enabled for New Quizzes, anonymous grading will not be able to be toggled off."
-  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Once enabled, this option is visible in gradebook for instructors."
+  once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Once enabled, this option is visible in markbook for instructors."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Once this feature is enabled, you will not be able to turn it off again.  Ensure you are ready to enable the Submissions Folder before proceeding."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Once you have submitted an answer, you will not be able to change it later. You will not be able to view the previous question."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Once you start debugging all info about the next attempted login attempt will be collected. Click \"Refresh\" to see if more data has been collected or \"Stop Debugging\" to clear the collected data and stop the current debug attempt."
@@ -28379,10 +28379,10 @@ en-AU:
   there_was_an_error_checking_plan_publishing_status_e7edfd25: "There was an error checking plan publishing status."
   there_was_an_error_creating_a_new_filter_e93bb765: "There was an error creating a new filter."
   there_was_an_error_deleting_name_aa3050e5: "There was an error deleting \"%{name}\"."
-  there_was_an_error_exporting_the_gradebook_30f4a95: "There was an error exporting the gradebook"
+  there_was_an_error_exporting_the_gradebook_30f4a95: "There was an error exporting the markbook"
   there_was_an_error_fetching_assignment_groups_data_bdb14b5a: "There was an error fetching assignment groups data."
   there_was_an_error_fetching_course_statistics_96e9dbad: "There was an error fetching course statistics"
-  there_was_an_error_fetching_custom_column_data_for_3278acb4: "There was an error fetching custom column data for Gradebook"
+  there_was_an_error_fetching_custom_column_data_for_3278acb4: "There was an error fetching custom column data for Markbook"
   there_was_an_error_fetching_custom_columns_542014ef: "There was an error fetching custom columns."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "There was an error fetching data for Markbook"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "There was an error fetching markbook filters."
@@ -28606,7 +28606,7 @@ en-AU:
       This feature flag enables the use of the updated
       discussion create/edit page
   this_feature_flag_is_something_an_account_can_turn_8467f6f7: "This feature flag is something an account can turn on if they want to allow the users of their account that speak languages that are normally written in Right to Left (eg: Arabic, Hebrew, Farsi) to see the RTL layout while we are working on it. once the feature is \"ready\" this feature flag will go away and anyone that speaks one of those languages will always see the RTL interface."
-  this_feature_introduces_performance_and_maintenanc_50c325aa: "This feature introduces performance and maintenance enhancements to Individual Gradebook"
+  this_feature_introduces_performance_and_maintenanc_50c325aa: "This feature introduces performance and maintenance enhancements to Individual Markbook"
   this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
       This feature makes it so that when multiple files are submitted together by
       a third party tool via the Assignments and Mark Service API they will be
@@ -28687,7 +28687,7 @@ en-AU:
   this_is_an_anonymous_discussion_student_names_and__bc19b64d: "This is an anonymous Discussion. Student names and profile pictures are hidden."
   this_is_an_anonymous_discussion_though_student_nam_f98abe71: "This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members."
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "This is an anonymous Discussion, your name and profile picture will be hidden from other course members."
-  this_is_enabled_by_default_as_assignments_can_not__767e9b16: "This is enabled by default as assignments cannot be withheld from the gradebook and still count towards it."
+  this_is_enabled_by_default_as_assignments_can_not__767e9b16: "This is enabled by default as assignments cannot be withheld from the markbook and still count towards it."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "This is just a dev-only feature you can turn on to get a preview of how pages would look in an RTL environment, without having to change your language to one that is normally RTL"
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_16df3ac0: "This is *not* a breaking change. All LTI 1.3 tool behaviour will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. Enforcement of this change will happen on a later, unspecified date."
   this_is_not_a_breaking_change_all_lti_1_3_tool_beh_af22b9c9: "This is *not* a breaking change. All LTI 1.3 tool behavior will remain the same regardless of the endpoint used, with the exception of the newly-supported Platform Storage spec. This also does **not** need to be completed before %{date}. Enforcement of this change will happen on a later, unspecified date."
@@ -31285,7 +31285,7 @@ en-AU:
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "When selected, the course is in a read-only state outside these dates."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "When selected, the course is inaccessible outside course dates. If the course dates are blank, these start and end dates apply to the term dates."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "When selected, the course section is in a read-only state outside these dates."
-  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "When set, an option to not display a new quiz with 0 points possible in the gradebook will be available in the form of a checkbox when creating or editing the quiz."
+  when_set_an_option_to_not_display_a_new_quiz_with__3bd930bf: "When set, an option to not display a new quiz with 0 points possible in the markbook will be available in the form of a checkbox when creating or editing the quiz."
   when_set_determines_if_the_workflow_state_of_a_new_1470e23e: "When set, determines if the workflow state of a new quiz should be set as graded or pending_review if a user had a previous pending_review new quiz but had been re-enrolled in the course."
   when_the_title_to_a_page_is_changed_old_links_to_t_9a2737b7: "When the title to a page is changed, old links to that page will link to the correct page."
   when_this_flag_is_enabled_the_course_navigation_wi_93477517: |-
