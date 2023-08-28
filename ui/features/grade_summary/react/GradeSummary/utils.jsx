@@ -318,7 +318,7 @@ export const getAssignmentEarnedPoints = assignment => {
 
 export const getAssignmentPercentage = assignment => {
   if (!getAssignmentTotalPoints(assignment)) return 0
-  return (getAssignmentEarnedPoints(assignment) / getAssignmentTotalPoints(assignment) || 1) * 100
+  return (getAssignmentEarnedPoints(assignment) / getAssignmentTotalPoints(assignment)) * 100
 }
 
 export const getAssignmentLetterGrade = (assignment, gradingStandard) => {
