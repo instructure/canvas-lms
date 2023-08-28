@@ -79,7 +79,7 @@ GEM
     swearjar (1.4.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    webmock (3.18.1)
+    webmock (3.19.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)

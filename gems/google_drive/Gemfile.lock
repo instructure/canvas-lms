@@ -73,7 +73,7 @@ GEM
     timecop (0.9.8)
     trailblazer-option (0.1.2)
     uber (0.1.0)
-    webmock (3.18.1)
+    webmock (3.19.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
