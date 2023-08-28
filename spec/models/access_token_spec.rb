@@ -248,6 +248,14 @@ describe AccessToken do
         expect(AccessToken.visible_tokens(user.access_tokens).first.id).to eq third_party_access_token.id
       end
     end
+
+    it "does not display duplicate tokens" do
+      token = user_model.access_tokens.create!({ developer_key: @dk })
+      visible_tokens = AccessToken.visible_tokens([token, token])
+
+      expect(visible_tokens).to be_one
+      expect(visible_tokens.first).to eq token
+    end
   end
 
   describe "token scopes" do
