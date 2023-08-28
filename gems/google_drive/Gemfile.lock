@@ -27,7 +27,7 @@ GEM
       retriable (>= 2.0, < 4.a)
       rexml
       webrick
-    google-apis-drive_v3 (0.43.0)
+    google-apis-drive_v3 (0.44.0)
       google-apis-core (>= 0.11.0, < 2.a)
     googleauth (1.7.0)
       faraday (>= 0.17.3, < 3.a)
