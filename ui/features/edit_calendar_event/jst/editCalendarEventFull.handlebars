@@ -94,7 +94,9 @@
         {{#t}}Event Date{{/t}}
         {{datepickerScreenreaderPrompt 'date'}}
       </label>
-      <input type="text"
+      <input
+             id="calendar_event_date"
+             type="text"
              name="start_date"
              class="date_field start_date"
              value="{{start_date}}"

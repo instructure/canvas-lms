@@ -493,7 +493,43 @@ export default class EditCalendarEventView extends Backbone.View {
       eventData.web_conference = ''
     }
 
+    if (!this.validateFormData(eventData)) {
+      return false
+    }
+
     return this.saveEvent(eventData)
+  }
+
+  validateFormData({title, start_at}) {
+    // Form data:
+    // blackout_date, description, end_at, important_dates, location_address,
+    // location_name, start_at, title
+    const errors = []
+    if (title.length === 0) {
+      errors.push({
+        field: $('#calendar_event_title'),
+        text: I18n.t('errors.title_required', 'You must enter a title'),
+      })
+    }
+    if (!start_at) {
+      errors.push({
+        field: $('#calendar_event_date'),
+        text: I18n.t('errors.start_date_required', 'You must enter a date'),
+      })
+    }
+    if (errors.length) {
+      let offset
+      errors.forEach(err => {
+        const errorBox = err.field.errorBox(err.text)
+        offset ||= errorBox.offset()
+      })
+      if (offset) {
+        // Scrolls to the the uppermost field, in this page title field could be it.
+        $('html,body').scrollTo({top: offset.top, left: 0})
+      }
+      return false
+    }
+    return true
   }
 
   async saveEvent(eventData) {

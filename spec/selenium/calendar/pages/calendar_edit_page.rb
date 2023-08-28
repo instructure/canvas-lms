@@ -84,7 +84,7 @@ module CalendarEditPage
 
   def enter_calendar_event_title(title)
     calendar_start_date.send_keys([:control, "a"], :backspace)
-    replace_content(calednar_event_title, title, tab_out: true)
+    replace_content(calendar_event_title, title, tab_out: true)
   end
 
   def enter_calendar_start_date(date)
