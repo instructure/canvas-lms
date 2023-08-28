@@ -1169,12 +1169,30 @@ describe Types::UserType do
         expect(query_result[0].to_i).to eq @student_submission_1.id
       end
 
-      it "gets submissions with comments in order of last_comment_at || created_at DESC" do
+      it "gets submissions with comments in order of last_comment_at DESC" do
         student_submission_2 = @assignment2.submissions.find_by(user: @student)
         student_submission_2.add_comment(author: @student, comment: "Fourth comment")
         student_submission_2.add_comment(author: @teacher, comment: "Fifth comment")
 
+        student_submission_2.update_attribute(:last_comment_at, 1.day.ago)
+        @student_submission_1.update_attribute(:last_comment_at, 2.days.ago)
+
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
+
+        expect(query_result.count).to eq 2
+        expect(query_result[0].to_i).to eq student_submission_2.id
+      end
+
+      it "gets submissions with comments in order of last submission comment if last_comment_at is nil" do
+        student_submission_2 = @assignment2.submissions.find_by(user: @student)
+        student_submission_2.add_comment(author: @student, comment: "Fourth comment")
+        student_submission_2.add_comment(author: @teacher, comment: "Fifth comment")
+
+        student_submission_2.update_attribute(:last_comment_at, nil)
+        @student_submission_1.update_attribute(:last_comment_at, nil)
+
+        query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
+
         expect(query_result.count).to eq 2
         expect(query_result[0].to_i).to eq student_submission_2.id
       end
