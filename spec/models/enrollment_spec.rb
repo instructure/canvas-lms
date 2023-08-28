@@ -3070,20 +3070,14 @@ describe Enrollment do
       )
     end
 
+    it "retrieves temporary enrollment recipients for provider" do
+      expect(Enrollment.temporary_enrollment_recipients_for_provider(@source_user).sort)
+        .to eq([@recipient_temp_enrollment, @recipient2_temp_enrollment].sort)
+    end
+
     it "retrieves temporary enrollments for recipient" do
       expect(Enrollment.temporary_enrollments_for_recipient(@temporary_enrollment_recipient).take)
         .to eq(@recipient_temp_enrollment)
-    end
-
-    it "retrieves temporary enrollments for course and recipient" do
-      expect(Enrollment.temporary_enrollments_for_course_and_recipient(
-        @course1, @temporary_enrollment_recipient
-      ).take).to eq(@recipient_temp_enrollment)
-    end
-
-    it "retrieves temporary enrollment recipients for source user" do
-      expect(Enrollment.temporary_enrollment_recipients_for_source_user(@source_user).sort)
-        .to eq([@recipient_temp_enrollment, @recipient2_temp_enrollment].sort)
     end
 
     it "returns a boolean value if self is a temporary enrollment" do
