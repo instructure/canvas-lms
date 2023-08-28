@@ -69,6 +69,11 @@ environment_configuration(defined?(config) && config) do |config|
 
   config.eager_load = true
 
+  config.force_ssl = true
+  # We redirect at the apache layer; no reason to do it twice
+  # We have historically not set hsts for subdomains, and don't want to increase the possibility of breakage
+  config.ssl_options = { redirect: false, hsts: { subdomains: false } }
+
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) } # rubocop:disable Security/Eval
 end
