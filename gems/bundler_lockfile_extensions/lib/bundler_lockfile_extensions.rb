@@ -155,10 +155,10 @@ module BundlerLockfileExtensions
       # must be running `bundle cache`
       return unless ::Bundler.default_lockfile == default_lockfile_definition[:lockfile]
 
+      require "bundler_lockfile_extensions/check"
+
       if ::Bundler.frozen_bundle? && !install
         # only do the checks if we're frozen
-        require "bundler_lockfile_extensions/check"
-
         exit 1 unless Check.run
         return
       end
@@ -181,6 +181,8 @@ module BundlerLockfileExtensions
       default_root = ::Bundler.root
 
       attempts = 1
+
+      checker = Check.new
       ::Bundler.settings.temporary(cache_all_platforms: true, suppress_install_using_messages: true) do
         @lockfile_definitions.each do |lockfile_definition|
           # we already wrote the default lockfile
@@ -190,6 +192,18 @@ module BundlerLockfileExtensions
           ::Bundler.root = lockfile_definition[:gemfile].dirname
 
           relative_lockfile = lockfile_definition[:lockfile].relative_path_from(Dir.pwd)
+
+          # already up to date?
+          up_to_date = false
+          ::Bundler.settings.temporary(frozen: true) do
+            ::Bundler.ui.silence do
+              up_to_date = checker.base_check(lockfile_definition) && checker.check(lockfile_definition, allow_mismatched_dependencies: false)
+            end
+          end
+          if up_to_date
+            attempts = 1
+            next
+          end
 
           if ::Bundler.frozen_bundle?
             # if we're frozen, you have to use the pre-existing lockfile
@@ -263,7 +277,9 @@ module BundlerLockfileExtensions
 
             # if we had changes, bundler may have updated some common
             # dependencies beyond the default lockfile, so re-run it
-            # once to reset them back to the default lockfile's version
+            # once to reset them back to the default lockfile's version.
+            # if it's already good, the `check` check at the beginning of
+            # the loop will skip the second sync anyway.
             if had_changes && attempts < 3
               attempts += 1
               redo
@@ -274,9 +290,7 @@ module BundlerLockfileExtensions
         end
       end
 
-      require "bundler_lockfile_extensions/check"
-
-      exit 1 unless Check.run
+      exit 1 unless checker.run
     ensure
       @recursive = previous_recursive
     end
