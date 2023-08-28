@@ -510,7 +510,6 @@ $(document).ready(function () {
     const $customName = $('#account_settings_outgoing_email_default_name')
     if ($useCustom.attr('checked')) {
       $customName.removeAttr('disabled')
-      $customName.focus()
     } else {
       $customName.attr('disabled', 'disabled')
     }
