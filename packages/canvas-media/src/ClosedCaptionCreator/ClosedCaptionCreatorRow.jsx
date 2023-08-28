@@ -226,14 +226,12 @@ export default class ClosedCaptionCreatorRow extends Component {
         as="div"
         wrap="wrap"
         justifyItems="start"
-        alignItems="center"
+        alignItems="start"
         data-testid="CC-CreatorRow-chosen"
       >
         <Flex.Item margin="0 0 small 0">
           <View
             as="div"
-            className={this.props.inheritedCaption ? 'Button' : ''}
-            disabled={!!this.props.inheritedCaption}
             borderWidth="small"
             padding="0 0 0 small"
             borderRadius="medium"
@@ -252,6 +250,7 @@ export default class ClosedCaptionCreatorRow extends Component {
                   screenReaderLabel={formatMessage(REMOVE_FILE, {
                     lang: this.props.selectedLanguage.label,
                   })}
+                  disabled={this.props.inheritedCaption}
                 >
                   <IconTrashLine />
                 </IconButton>
@@ -260,19 +259,23 @@ export default class ClosedCaptionCreatorRow extends Component {
           </View>
         </Flex.Item>
         {this.props.inheritedCaption && (
-          <Flex.Item margin="0 0 small small">
-            <Tooltip
-              renderTip={
-                <Text>
-                  {formatMessage('Captions inherited from a parent course cannot be removed.')}
-                  <br />
-                  {formatMessage('You can replace by uploading a new caption file.')}
-                </Text>
-              }
+          <Tooltip
+            renderTip={
+              <Text>
+                {formatMessage('Captions inherited from a parent course cannot be removed.')}
+                <br />
+                {formatMessage('You can replace by uploading a new caption file.')}
+              </Text>
+            }
+          >
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={this.props.selectedLanguage.label}
             >
               <IconQuestionLine size="x-small" color="brand" />
-            </Tooltip>
-          </Flex.Item>
+            </IconButton>
+          </Tooltip>
         )}
       </Flex>
     )
