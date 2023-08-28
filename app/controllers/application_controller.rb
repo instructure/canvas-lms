@@ -902,7 +902,6 @@ class ApplicationController < ActionController::Base
     if !files_domain? && Setting.get("block_html_frames", "true") == "true" && !@embeddable
       append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{csp_frame_ancestors&.uniq&.join(" ")};")
     end
-    headers["Strict-Transport-Security"] = "max-age=31536000" if request.ssl?
     RequestContext::Generator.store_request_meta(request, @context, @sentry_trace)
     true
   end
