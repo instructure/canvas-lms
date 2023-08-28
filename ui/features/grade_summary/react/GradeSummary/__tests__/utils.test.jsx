@@ -1236,6 +1236,20 @@ describe('util', () => {
         expect(getAssignmentPercentage(assignment)).toBe(80)
       })
 
+      it('should return the 0', () => {
+        const assignment = {
+          pointsPossible: 20,
+          submissionsConnection: {
+            nodes: [
+              {
+                score: '0',
+              },
+            ],
+          },
+        }
+        expect(getAssignmentPercentage(assignment)).toBe(0)
+      })
+
       it('should return 0 when total points are not provided', () => {
         const assignment = {}
         expect(getAssignmentPercentage(assignment)).toBe(0)
@@ -1257,6 +1271,20 @@ describe('util', () => {
           },
         }
         expect(getAssignmentLetterGrade(assignment, gradingStandard)).toBe('B')
+      })
+
+      it('should return the F when score is 0', () => {
+        const assignment = {
+          pointsPossible: 100,
+          submissionsConnection: {
+            nodes: [
+              {
+                score: '0',
+              },
+            ],
+          },
+        }
+        expect(getAssignmentLetterGrade(assignment, gradingStandard)).toBe('F')
       })
 
       it('should return null when letter grade cannot be determined', () => {
