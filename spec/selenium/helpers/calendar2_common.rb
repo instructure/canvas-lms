@@ -579,8 +579,12 @@ module Calendar2Common
     f("button[type='submit']")
   end
 
+  def more_options_title_field
+    f("#calendar_event_title")
+  end
+
   def more_options_date_field
-    f("input[placeHolder='Date']")
+    f("#calendar_event_date")
   end
 
   def more_options_start_time_field
@@ -597,6 +601,10 @@ module Calendar2Common
 
   def more_options_submit_button
     f("button[type='submit']")
+  end
+
+  def more_options_error_box
+    f(".errorBox:not(#error_box_template)")
   end
 
   def event_content

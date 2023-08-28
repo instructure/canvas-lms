@@ -263,6 +263,7 @@ describe "recurring events" do
       wait_for_ajaximations
       wait_for_calendar_rce
       newdate = "July 20, 2023"
+      enter_calendar_event_title("Test event")
       enter_calendar_start_date(newdate)
 
       select_frequency_option("Monthly on the third Thursday")
@@ -277,6 +278,7 @@ describe "recurring events" do
       wait_for_ajaximations
       wait_for_calendar_rce
       newdate = "July 20, 2023"
+      enter_calendar_event_title("Test event")
       enter_calendar_start_date(newdate)
 
       select_frequency_option("Annually on July 20")

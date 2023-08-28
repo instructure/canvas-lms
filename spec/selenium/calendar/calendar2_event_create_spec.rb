@@ -146,6 +146,30 @@ describe "calendar2" do
         expect(event.title).to eq event_name
       end
 
+      it "is not able to create an event without a title in edit event view" do
+        get "/courses/#{@course.id}/calendar_events/new"
+        wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
+        replace_content(more_options_title_field, "")
+        more_options_submit_button.click
+        wait_for_ajaximations
+
+        expect(more_options_error_box).to include_text("You must enter a title")
+        expect(@course.calendar_events.count).to eq(0)
+      end
+
+      it "is not able to create an event without a date in edit event view" do
+        get "/courses/#{@course.id}/calendar_events/new"
+        wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
+        replace_content(more_options_title_field, "Test event")
+        replace_content(more_options_date_field, "")
+
+        more_options_submit_button.click
+        wait_for_ajaximations
+
+        expect(more_options_error_box).to include_text("You must enter a date")
+        expect(@course.calendar_events.count).to eq(0)
+      end
+
       describe "duplicate events" do
         before :once do
           Account.site_admin.disable_feature!(:calendar_series)
@@ -189,6 +213,8 @@ describe "calendar2" do
 
           # tiny can steal focus from one of the date inputs when it initializes
           wait_for_tiny(f("#calendar-description"))
+
+          replace_content(more_options_title_field, "Test event")
 
           f("#use_section_dates").click
 
