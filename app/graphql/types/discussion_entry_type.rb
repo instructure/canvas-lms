@@ -174,6 +174,13 @@ module Types
       ).load(object)
     end
 
+    field :all_root_entries, [Types::DiscussionEntryType], null: true
+    def all_root_entries
+      return nil unless object.root_entry_id.nil?
+
+      load_association(:flattened_discussion_subentries)
+    end
+
     field :entry_participant, Types::EntryParticipantType, null: true
     def entry_participant
       Loaders::EntryParticipantLoader.for(
