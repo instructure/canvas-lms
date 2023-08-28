@@ -143,8 +143,6 @@ class Attachment < ActiveRecord::Base
   before_save :default_values
   before_save :set_need_notify
 
-  after_save :set_word_count
-
   before_validation :assert_attachment
   acts_as_list scope: :folder
 
@@ -607,7 +605,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def set_word_count
-    if word_count.nil? && !deleted? && file_state != "broken"
+    if word_count.nil? && !deleted? && file_state != "broken" && word_count_supported?
       delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
     end
   end

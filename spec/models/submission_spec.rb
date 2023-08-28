@@ -8961,10 +8961,9 @@ describe Submission do
       student_in_course(active_all: true)
       submission_text = "Text based submission with some words"
       attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
-      attachment1.update_word_count
       attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
-      attachment2.update_word_count
       sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
+      run_jobs
       expect(sub.word_count).to eq 12
     end
   end
