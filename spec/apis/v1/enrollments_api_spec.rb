@@ -1133,6 +1133,81 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
+    describe "temporary enrollments" do
+      before(:once) do
+        Account.default.enable_feature!(:temporary_enrollments)
+        @provider = user_factory(active_all: true)
+        @recipient = user_factory(active_all: true)
+        @course = course_with_teacher(active_all: true, user: @provider).course
+        @recipient_temp_enrollment = @course.enroll_user(
+          @recipient,
+          "TeacherEnrollment",
+          { role: teacher_role, temporary_enrollment_source_user_id: @provider.id }
+        )
+      end
+
+      context "when feature flag is enabled" do
+        it "returns only recipient temporary enrollments" do
+          user_path = "/api/v1/users/#{@provider.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollment_recipients: true,
+                                                     user_id: @provider.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@recipient.id)
+        end
+
+        it "returns only provider temporary enrollments" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollment_providers: true,
+                                                     user_id: @recipient.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@provider.id)
+        end
+
+        it "returns default behavior if temporary enrollment args are not provided" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(user_id: @recipient.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@recipient.id)
+        end
+
+        it "renders unauthorized if user is not an account admin" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          api_call_as_user(@provider,
+                           :get,
+                           user_path,
+                           @user_params.merge(temporary_enrollment_providers: true,
+                                              user_id: @recipient.id))
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when feature flag is disabled" do
+        before(:once) do
+          Account.default.disable_feature!(:temporary_enrollments)
+        end
+
+        it "ignores temp enrollment params and returns default enrollment behavior" do
+          user_path = "/api/v1/users/#{@recipient.id}/enrollments"
+          json = api_call_as_user(account_admin_user,
+                                  :get,
+                                  user_path,
+                                  @user_params.merge(temporary_enrollment_providers: true,
+                                                     user_id: @recipient.id))
+          expect(json.length).to eq(1)
+          expect(json.first["user_id"]).to eq(@recipient.id)
+        end
+      end
+    end
+
     context "filtering by SIS IDs" do
       it "returns an error message with insufficient permissions" do
         @params[:sis_user_id] = "12345"

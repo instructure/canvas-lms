@@ -958,9 +958,31 @@ class EnrollmentsApiController < ApplicationController
   def user_index_enrollments(course: nil)
     user = api_find(User, params[:user_id])
 
+    if user && @domain_root_account&.feature_enabled?(:temporary_enrollments)
+      temp_enroll_params = params.slice(:temporary_enrollment_recipients, :temporary_enrollment_providers)
+
+      if temp_enroll_params.present?
+        if user.account.grants_right?(@current_user, session, :read_roster)
+          return temporary_enrollment_conditions(user, temp_enroll_params)
+        else
+          render_unauthorized_action and return false
+        end
+      end
+    end
+
     if user == @current_user
       if params[:state].present?
-        valid_states = %w[active inactive rejected invited creation_pending pending_active pending_invited completed current_and_invited current_and_future current_and_concluded]
+        valid_states = %w[active
+                          inactive
+                          rejected
+                          invited
+                          creation_pending
+                          pending_active
+                          pending_invited
+                          completed
+                          current_and_invited
+                          current_and_future
+                          current_and_concluded]
 
         params[:state].each do |state|
           unless valid_states.include?(state)
@@ -983,7 +1005,10 @@ class EnrollmentsApiController < ApplicationController
         # if current user is requesting enrollments for themselves or a specific user
         # with params[:user_id] in a course context we want to follow the
         # course_index_enrollments construct
-        render_unauthorized_action and return false unless course.user_has_been_observer?(@current_user) || course.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
+        unless course.user_has_been_observer?(@current_user) ||
+               course.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
+          render_unauthorized_action and return false
+        end
 
         enrollments = user.enrollments.where(enrollment_index_conditions).where(course_id: course)
       else
@@ -1063,6 +1088,25 @@ class EnrollmentsApiController < ApplicationController
     end
 
     [clauses.join(" AND "), replacements]
+  end
+
+  # Internal: Collect provider and recipient enrollments that @current_user
+  # has permissions to read.
+  #
+  # Returns an ActiveRecord scope of enrollments if present, otherwise false.
+  def temporary_enrollment_conditions(user, params)
+    if value_to_boolean(params[:temporary_enrollment_recipients])
+      enrollments = Enrollment.active_or_pending_by_date.temporary_enrollment_recipients_for_provider(user)
+    elsif value_to_boolean(params[:temporary_enrollment_providers])
+      recipient_enrollments = Enrollment.temporary_enrollments_for_recipient(user)
+      enrollments = Enrollment.active_or_pending_by_date.where(
+        course_id: recipient_enrollments.select(:course_id),
+        user_id: recipient_enrollments.select(:temporary_enrollment_source_user_id)
+      )
+    end
+    return false unless enrollments.present?
+
+    enrollments
   end
 
   def enrollment_states_for_state_param
