@@ -433,7 +433,8 @@ module Types
         submissions += Submission.where(id: submission_ids)
       end
       InstStatsd::Statsd.increment("inbox.visit.scope.submission_comments.pages_loaded.react")
-      submissions.sort_by { |t| t.last_comment_at || t.created_at }.reverse
+      # if .last_comment_at is nil check the last created submission comment
+      submissions.sort_by { |t| t.last_comment_at || t.submission_comments.last.created_at }.reverse
     rescue
       []
     end
