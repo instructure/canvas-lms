@@ -615,4 +615,18 @@ describe Types::DiscussionEntryType do
     discussion_entry_versions = discussion_entry_teacher_type.resolve("discussionEntryVersionsConnection { nodes { message } }")
     expect(discussion_entry_versions).to eq(["Hello! 3", "Hello! 2", "Hello!"])
   end
+
+  context "all root entries" do
+    before do
+      @sub_entry2 = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub_entry 2", user: @teacher, parent_id: sub_entry.id)
+    end
+
+    it "returns all root entries" do
+      expect(discussion_entry_type.resolve("allRootEntries { _id }")).to eq [parent.id.to_s, sub_entry.id.to_s, @sub_entry2.id.to_s]
+    end
+
+    it "returns nil if it is not a root entry" do
+      expect(discussion_sub_entry_type.resolve("allRootEntries { _id }")).to be_nil
+    end
+  end
 end
