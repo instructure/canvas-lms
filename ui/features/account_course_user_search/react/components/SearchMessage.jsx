@@ -143,6 +143,7 @@ export default class SearchMessage extends Component {
           variant="compact"
           labelNext={I18n.t('Next Page')}
           labelPrev={I18n.t('Previous Page')}
+          aria-label="pagination"
         >
           {paginationButtons.concat(
             this.isLastPageKnown() ? (
