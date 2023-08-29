@@ -48,6 +48,10 @@ table.report_example, table.report {
         padding: 5px;
         background-color: #DDD;
         font-weight: bold;
+        &.title {
+          text-align: left;
+          background-color: $ic-color-light;
+        }
       }
       td.reports {
         padding: 5px;
