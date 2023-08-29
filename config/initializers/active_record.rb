@@ -1889,8 +1889,6 @@ module IgnoreOutOfSequenceMigrationDates
     end.max.to_i
   end
 end
-# Thor doesn't call `super` in its `inherited` method, so hook in so that we can hook in later :)
-Thor::Group.singleton_class.prepend(Autoextend::ClassMethods)
 Autoextend.hook(:"ActiveRecord::Generators::MigrationGenerator",
                 IgnoreOutOfSequenceMigrationDates,
                 singleton: true,
