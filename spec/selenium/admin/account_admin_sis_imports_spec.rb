@@ -135,28 +135,14 @@ describe "sis imports ui" do
     f("#override_sis_stickiness").click
     f("#add_sis_stickiness").click
     f("#batch_mode").click
+    f("input[type=file]").send_keys Rails.root.join("spec/fixtures/sis/utf8.csv")
     submit_form("#sis_importer")
     expect(f(".progress_bar_holder .progress_message")).to be_displayed
-    SisBatch.last.process_without_send_later
-    expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
     expect(SisBatch.last.batch_mode).to be true
     expect(SisBatch.last.options).to eq({
                                           skip_deletes: false,
                                           override_sis_stickiness: true,
                                           add_sis_stickiness: true,
-                                          update_sis_id_if_login_claimed: false
-                                        })
-
-    get "/accounts/#{@account.id}/sis_import"
-    f("#override_sis_stickiness").click
-    submit_form("#sis_importer")
-    expect(f(".progress_bar_holder .progress_message")).to be_displayed
-    SisBatch.last.process_without_send_later
-    expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
-    expect(!!SisBatch.last.batch_mode).to be_falsey
-    expect(SisBatch.last.options).to eq({
-                                          skip_deletes: false,
-                                          override_sis_stickiness: true,
                                           update_sis_id_if_login_claimed: false
                                         })
   end

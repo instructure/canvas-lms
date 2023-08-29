@@ -604,6 +604,9 @@ class SisImportsApiController < ApplicationController
       file_obj = nil
       if params.key?(:attachment)
         file_obj = params[:attachment]
+      elsif request.content_type == "multipart/form-data"
+        # don't interpret the form itself as a SIS batch
+        return render json: { error: true, error_message: "Missing attachment" }, status: :bad_request
       else
         file_obj = request.body
 
