@@ -18,7 +18,7 @@
     extra_text = last_complete.try(:parameters).try(:[], "extra_text")
 %>
     <tr id="<%= report %>" class="reports">
-      <td class="title reports">
+      <th class="title reports">
         <span class="title"><%= title %></span>
         <% if description_partial %>
           <button style="border: none; background: none;" class="open_report_description_link"aria-haspopup="true" aria-owns="<%= "#{report}_report_description" %>">
@@ -32,7 +32,7 @@
             }) %>
           </div>
         <% end %>
-      </td>
+      </th>
       <td class="last-run reports">
         <% if last_complete %>
           <%= datetime_string(last_complete.created_at) %>
