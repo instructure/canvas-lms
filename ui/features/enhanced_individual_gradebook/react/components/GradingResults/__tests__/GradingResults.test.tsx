@@ -229,7 +229,7 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId} = renderGradingResults(modifiedProps)
       userEvent.click(getByTestId('submission-details-button'))
-      expect(getByTestId('submission-details-grade-input')).toBeDisabled()
+      expect(getByTestId('submission_details_grade_input')).toBeDisabled()
       expect(getByTestId('submission-details-submit-button')).toBeDisabled()
     })
 
@@ -244,7 +244,7 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId} = renderGradingResults(modifiedProps)
       userEvent.click(getByTestId('submission-details-button'))
-      expect(getByTestId('submission-details-grade-input')).not.toBeDisabled()
+      expect(getByTestId('submission_details_grade_input')).not.toBeDisabled()
       expect(getByTestId('submission-details-submit-button')).not.toBeDisabled()
     })
   })
@@ -272,10 +272,12 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_select')).toHaveValue('Ungraded')
-      expect(getByTestId('out_of_text')).toHaveTextContent('- out of 10')
+      expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent(
+        '- out of 10'
+      )
       userEvent.click(getByTestId('submission-details-button'))
-      expect(getByTestId('submission-details-select')).toHaveValue('Ungraded')
-      expect(getByTestId('submission-details-out-of-text')).toHaveTextContent('- out of 10')
+      expect(getByTestId('submission_details_grade_select')).toHaveValue('Ungraded')
+      expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('- out of 10')
     })
     it('renders Complete in both the submission detail modal and main page drop downs and sets the max score in the Out of Text', () => {
       const props = {
@@ -293,10 +295,12 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_select')).toHaveValue('Complete')
-      expect(getByTestId('out_of_text')).toHaveTextContent('10 out of 10')
+      expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent(
+        '10 out of 10'
+      )
       userEvent.click(getByTestId('submission-details-button'))
-      expect(getByTestId('submission-details-select')).toHaveValue('Complete')
-      expect(getByTestId('submission-details-out-of-text')).toHaveTextContent('10 out of 10')
+      expect(getByTestId('submission_details_grade_select')).toHaveValue('Complete')
+      expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('10 out of 10')
     })
     it('renders Incomplete in both the submission detail modal and main page drop downs and sets 0 in the Out of Text', () => {
       const props = {
@@ -314,10 +318,12 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_select')).toHaveValue('Incomplete')
-      expect(getByTestId('out_of_text')).toHaveTextContent('0 out of 10')
+      expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent(
+        '0 out of 10'
+      )
       userEvent.click(getByTestId('submission-details-button'))
-      expect(getByTestId('submission-details-select')).toHaveValue('Incomplete')
-      expect(getByTestId('submission-details-out-of-text')).toHaveTextContent('0 out of 10')
+      expect(getByTestId('submission_details_grade_select')).toHaveValue('Incomplete')
+      expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('0 out of 10')
     })
     it('renders Excused in both the submission detail modal and main page drop downs and sets the text Excused in the Out of Text', () => {
       const props = {
@@ -332,10 +338,10 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId} = renderGradingResults(props)
       expect(getByTestId('student_and_assignment_grade_select')).toHaveValue('Excused')
-      expect(getByTestId('out_of_text')).toHaveTextContent('Excused')
+      expect(getByTestId('student_and_assignment_grade_out_of_text')).toHaveTextContent('Excused')
       userEvent.click(getByTestId('submission-details-button'))
-      expect(getByTestId('submission-details-select')).toHaveValue('Excused')
-      expect(getByTestId('submission-details-out-of-text')).toHaveTextContent('Excused')
+      expect(getByTestId('submission_details_grade_select')).toHaveValue('Excused')
+      expect(getByTestId('submission_details_grade_out_of_text')).toHaveTextContent('Excused')
     })
     it('there is a grade submission api request when a pass fail option is selected in the main grade page and blurred', async () => {
       const props = {
@@ -366,7 +372,7 @@ describe('Grading Results Tests', () => {
       }
       const {getByTestId, getByText} = renderGradingResults(props)
       userEvent.click(getByTestId('submission-details-button'))
-      userEvent.click(getByTestId('submission-details-select'))
+      userEvent.click(getByTestId('submission_details_grade_select'))
       userEvent.click(getByText('Complete'))
       userEvent.click(getByTestId('submission-details-submit-button'))
       expect(executeApiRequest).toHaveBeenCalledWith({

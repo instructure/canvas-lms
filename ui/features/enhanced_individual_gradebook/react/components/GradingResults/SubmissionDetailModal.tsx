@@ -32,9 +32,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 // @ts-expect-error
 import {TextArea} from '@instructure/ui-text-area'
-import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Link} from '@instructure/ui-link'
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
@@ -48,18 +46,17 @@ import {
   GradebookStudentDetails,
   GradebookUserSubmissionDetails,
 } from '../../../types'
-import {submitterPreviewText, outOfText, passFailStatusOptions} from '../../../utils/gradebookUtils'
+import {submitterPreviewText, passFailStatusOptions} from '../../../utils/gradebookUtils'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {usePostComment} from '../../hooks/useComments'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import DefaultGradeInput from './DefaultGradeInput'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 
 const {Header: ModalHeader, Body: ModalBody} = Modal as any
 
 const {Item: FlexItem} = Flex as any
-
-const {Option: SimpleSelectOption} = SimpleSelect as any
 
 export type GradeChangeApiUpdate = {
   status: ApiCallStatus
@@ -310,47 +307,18 @@ function SubmissionGradeForm({
       <Flex>
         <FlexItem shouldGrow={true} shouldShrink={true}>
           <Text>{I18n.t('Grade:')} </Text>
-          {assignment.gradingType === 'pass_fail' ? (
-            <View as="span" margin="0 x-small 0 x-small">
-              <SimpleSelect
-                renderLabel={
-                  <ScreenReaderContent>
-                    {I18n.t('Submission Details Pass-Fail Grade Options')}
-                  </ScreenReaderContent>
-                }
-                size="small"
-                isInline={true}
-                width="120px"
-                onChange={handleChangePassFailStatus}
-                value={passFailStatusOptions[passFailStatusIndex].value}
-                data-testid="submission-details-select"
-              >
-                {passFailStatusOptions.map(option => (
-                  <SimpleSelectOption id={option.label} key={option.label} value={option.value}>
-                    {option.label}
-                  </SimpleSelectOption>
-                ))}
-              </SimpleSelect>
-            </View>
-          ) : (
-            <View as="span" margin="0 x-small 0 x-small">
-              <TextInput
-                renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
-                display="inline-block"
-                width="4rem"
-                value={gradeInput}
-                disabled={
-                  submitScoreStatus === ApiCallStatus.PENDING ||
-                  (assignment.moderatedGrading && !assignment.gradesPublished)
-                }
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGradeInput(e.target.value)}
-                data-testid="submission-details-grade-input"
-              />
-            </View>
-          )}
-          <Text data-testid="submission-details-out-of-text">
-            {outOfText(assignment, submission)}
-          </Text>
+          <DefaultGradeInput
+            assignment={assignment}
+            submission={submission}
+            passFailStatusIndex={passFailStatusIndex}
+            gradeInput={gradeInput}
+            submitScoreStatus={submitScoreStatus}
+            context="submission_details_grade"
+            elementWrapper="span"
+            margin="0 x-small 0 x-small"
+            handleSetGradeInput={setGradeInput}
+            handleChangePassFailStatus={handleChangePassFailStatus}
+          />
         </FlexItem>
         <FlexItem align="start">
           <Button

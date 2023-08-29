@@ -45,7 +45,7 @@ class EnhancedSRGB
     end
 
     def out_of_text
-      f('[data-testid="out_of_text"]')
+      f('[data-testid="student_and_assignment_grade_out_of_text"]')
     end
 
     def excuse_checkbox
@@ -85,7 +85,7 @@ class EnhancedSRGB
     end
 
     def submission_details_grade_input
-      f('[data-testid="submission-details-grade-input"]')
+      f('[data-testid="submission_details_grade_input"]')
     end
 
     def submission_details_assignment_name

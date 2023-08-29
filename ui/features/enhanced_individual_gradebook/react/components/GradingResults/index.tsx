@@ -20,13 +20,10 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
-import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {SimpleSelect} from '@instructure/ui-simple-select'
 import {
   ApiCallStatus,
   AssignmentConnection,
@@ -38,12 +35,11 @@ import {useSubmitScore} from '../../hooks/useSubmitScore'
 import {useGetComments} from '../../hooks/useComments'
 import SubmissionDetailModal, {GradeChangeApiUpdate} from './SubmissionDetailModal'
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
-import {outOfText, submitterPreviewText, passFailStatusOptions} from '../../../utils/gradebookUtils'
+import {submitterPreviewText, passFailStatusOptions} from '../../../utils/gradebookUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import DefaultGradeInput from './DefaultGradeInput'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
-
-const {Option: SimpleSelectOption} = SimpleSelect as any
 
 export type GradingResultsComponentProps = {
   currentStudent?: GradebookStudentDetails
@@ -184,17 +180,13 @@ export default function GradingResults({
     await submit(assignment, submission, gradeInput, submitScoreUrl)
   }
 
+  const handleSetGradeInput = (input: string) => {
+    setGradeInput(input)
+  }
+
   const handleChangePassFailStatus = (event: React.SyntheticEvent, data: {value: string}) => {
     setGradeInput(data.value)
     setPassFailStatusIndex(passFailStatusOptions.findIndex(option => option.value === data.value))
-  }
-
-  const renderOutOfText = () => {
-    return (
-      <View as="span" margin="0 0 0 small" data-testid="out_of_text">
-        {outOfText(assignment, submission)}
-      </View>
-    )
   }
 
   return (
@@ -220,49 +212,17 @@ export default function GradingResults({
                 {submitterPreviewText(submission)}
               </Text>
             </View>
-
-            {assignment.gradingType === 'pass_fail' ? (
-              <View as="div" margin="0 0 small 0">
-                <SimpleSelect
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Pass-Fail Grade Options')}</ScreenReaderContent>
-                  }
-                  size="medium"
-                  isInline={true}
-                  onChange={handleChangePassFailStatus}
-                  value={passFailStatusOptions[passFailStatusIndex].value}
-                  data-testid="student_and_assignment_grade_select"
-                  onBlur={() => submitGrade()}
-                >
-                  {passFailStatusOptions.map(option => (
-                    <SimpleSelectOption id={option.label} key={option.label} value={option.value}>
-                      {option.label}
-                    </SimpleSelectOption>
-                  ))}
-                </SimpleSelect>
-                {renderOutOfText()}
-              </View>
-            ) : (
-              <View as="div" className="grade" margin="0 0 small 0">
-                <TextInput
-                  display="inline-block"
-                  width="14rem"
-                  value={gradeInput}
-                  disabled={
-                    submitScoreStatus === ApiCallStatus.PENDING ||
-                    (assignment.moderatedGrading && !assignment.gradesPublished)
-                  }
-                  renderLabel={<ScreenReaderContent>{I18n.t('Student Grade')}</ScreenReaderContent>}
-                  data-testid="student_and_assignment_grade_input"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setGradeInput(e.target.value)
-                  }
-                  onBlur={() => submitGrade()}
-                />
-                {renderOutOfText()}
-              </View>
-            )}
-
+            <DefaultGradeInput
+              assignment={assignment}
+              submission={submission}
+              passFailStatusIndex={passFailStatusIndex}
+              gradeInput={gradeInput}
+              submitScoreStatus={submitScoreStatus}
+              context="student_and_assignment_grade"
+              handleSetGradeInput={handleSetGradeInput}
+              handleSubmitGrade={submitGrade}
+              handleChangePassFailStatus={handleChangePassFailStatus}
+            />
             <View as="div">
               {submission.late && (
                 <>
