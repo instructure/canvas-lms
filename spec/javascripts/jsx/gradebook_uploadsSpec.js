@@ -191,6 +191,14 @@ QUnit.module('override score changes', hooks => {
         ],
         includes_course_scores: false,
       },
+      override_statuses: {
+        grading_periods: [
+          {id: 1, title: 'first GP'},
+          {id: 2, title: 'second GP'},
+          {id: 3, title: 'third GP'},
+        ],
+        includes_course_score_status: false,
+      },
       students: [
         {
           custom_column_data: [],
@@ -211,6 +219,26 @@ QUnit.module('override score changes', hooks => {
             {
               current_score: '50',
               new_score: null,
+            },
+          ],
+          override_statuses: [
+            {
+              grading_period_id: '1',
+              student_id: '1',
+              current_grade_status: 'CARROT',
+              new_grade_status: 'POTATO',
+            },
+            {
+              grading_period_id: '2',
+              student_id: '1',
+              current_grade_status: null,
+              new_grade_status: 'CARROT',
+            },
+            {
+              grading_period_id: '3',
+              student_id: '1',
+              current_grade_status: 'POTATO',
+              new_grade_status: null,
             },
           ],
           previous_id: '1',
@@ -317,6 +345,70 @@ QUnit.module('override score changes', hooks => {
       )
       notOk(gradingPeriodColumn)
     })
+
+    test('creates a pair of columns for each grading period in the grading_periods hash of override status', () => {
+      initGradebook()
+
+      const columnIds = mainGridArgs.columns
+        .map(column => column.id)
+        .filter(id => id.includes('override_status'))
+
+      deepEqual(columnIds, [
+        'override_status_1_conflicting',
+        'override_status_1',
+        'override_status_2_conflicting',
+        'override_status_2',
+        'override_status_3_conflicting',
+        'override_status_3',
+      ])
+    })
+
+    test('adds a header for each grading period including the title of the grading period of override status', () => {
+      initGradebook()
+
+      const headers = headerGridArgs.columns
+        .map(column => column.name)
+        .filter(name => name.includes('Override Status'))
+
+      deepEqual(headers, [
+        'Override Status (first GP)',
+        'Override Status (second GP)',
+        'Override Status (third GP)',
+      ])
+    })
+
+    test('creates a column for course status if includes_course_score_status is true', () => {
+      defaultUploadedGradebook.override_statuses.includes_course_score_status = true
+      defaultUploadedGradebook.override_statuses.grading_periods = []
+
+      initGradebook()
+
+      const gradingPeriodColumn = mainGridArgs.columns.find(
+        column => column.id === 'override_status_course'
+      )
+      ok(gradingPeriodColumn)
+    })
+
+    test('adds a header for course status with the label of plain old "Override Status"', () => {
+      defaultUploadedGradebook.override_statuses.includes_course_score_status = true
+      defaultUploadedGradebook.override_statuses.grading_periods = []
+
+      initGradebook()
+
+      const gradingPeriodColumn = headerGridArgs.columns.find(
+        column => column.name === 'Override Status'
+      )
+      ok(gradingPeriodColumn)
+    })
+
+    test('does not create a column for course status if includes_course_score_status is false', () => {
+      initGradebook()
+
+      const gradingPeriodColumn = mainGridArgs.columns.find(
+        column => column.id === 'override_status_course'
+      )
+      notOk(gradingPeriodColumn)
+    })
   })
 
   QUnit.module('value population', () => {
@@ -389,6 +481,7 @@ QUnit.module('override score changes', hooks => {
           new_score: '70',
         },
       ]
+      defaultUploadedGradebook.students[0].override_statuses = []
       initGradebook()
 
       // setCellCssStyles should be called with an empty hash since nothing to
@@ -404,11 +497,126 @@ QUnit.module('override score changes', hooks => {
           new_score: '70',
         },
       ]
+      defaultUploadedGradebook.students[0].override_statuses = []
       initGradebook()
 
       // setCellCssStyles should be called with an empty hash since nothing to
       // highlight
       deepEqual(gradeReviewRow, {}, 'no highlightable changes')
     })
+
+    test('populates the grid data with course override statuses for each student', () => {
+      defaultUploadedGradebook.override_statuses.includes_course_score_status = true
+      defaultUploadedGradebook.override_statuses.grading_periods = []
+      defaultUploadedGradebook.students[0].override_statuses = [
+        {
+          grading_period_id: null,
+          student_id: '1',
+          current_grade_status: 'BROCCOLI',
+          new_grade_status: 'POTATO',
+        },
+      ]
+      initGradebook()
+
+      const dataForStudent = mainGridArgs.data.find(datum => datum.id === '1')
+      deepEqual(dataForStudent.override_status_course, {
+        current_grade_status: 'BROCCOLI',
+        new_grade_status: 'POTATO',
+        grading_period_id: null,
+        student_id: '1',
+      })
+    })
+
+    test('populates the grid data with grading period override statuses for each student', () => {
+      initGradebook()
+
+      const dataForStudent = mainGridArgs.data.find(datum => datum.id === '1')
+      deepEqual(dataForStudent.override_status_1, {
+        grading_period_id: '1',
+        student_id: '1',
+        current_grade_status: 'CARROT',
+        new_grade_status: 'POTATO',
+      })
+    })
+
+    test('highlights cells if the override status is changed', () => {
+      initGradebook()
+      const firstStudentRow = gradeReviewRow[0]
+      strictEqual(
+        firstStudentRow.override_status_1_conflicting,
+        'left-highlight',
+        'current status is highlighted'
+      )
+      strictEqual(
+        firstStudentRow.override_status_1,
+        'right-highlight',
+        'updated status is highlighted'
+      )
+    })
+
+    test('highlights cells if the override status has been removed', () => {
+      initGradebook()
+
+      const firstStudentRow = gradeReviewRow[0]
+      strictEqual(
+        firstStudentRow.override_status_3_conflicting,
+        'left-highlight',
+        'current status is highlighted'
+      )
+      strictEqual(
+        firstStudentRow.override_status_3,
+        'right-highlight',
+        'updated (removed) status is highlighted'
+      )
+    })
+  })
+
+  test('does not highlight the cells if the override status has been newly added', () => {
+    defaultUploadedGradebook.students[0].override_scores = []
+    defaultUploadedGradebook.students[0].override_statuses = [
+      {
+        grading_period_id: '1',
+        student_id: '1',
+        current_grade_status: null,
+        new_grade_status: 'POTATO',
+      },
+    ]
+    initGradebook()
+
+    deepEqual(gradeReviewRow, {}, 'no highlightable changes')
+  })
+
+  test('does not highlight cells if the override status has not changed', () => {
+    defaultUploadedGradebook.students[0].override_scores = []
+    defaultUploadedGradebook.students[0].override_statuses = [
+      {
+        grading_period_id: '1',
+        student_id: '1',
+        current_grade_status: 'POTATO',
+        new_grade_status: 'POTATO',
+      },
+    ]
+    initGradebook()
+
+    // setCellCssStyles should be called with an empty hash since nothing to
+    // highlight
+    deepEqual(gradeReviewRow, {}, 'no highlightable changes')
+  })
+
+  test('does not highlight cells if the override status case changed', () => {
+    defaultUploadedGradebook.students[0].override_scores = []
+    defaultUploadedGradebook.students[0].override_statuses = [
+      {
+        grading_period_id: '1',
+        student_id: '1',
+        current_grade_status: 'POTATO',
+        new_grade_status: 'potato',
+      },
+    ]
+    initGradebook()
+
+    // setCellCssStyles should be called with an empty hash since nothing to
+    // highlight
+    deepEqual(gradeReviewRow, {}, 'no highlightable changes')
   })
 })
