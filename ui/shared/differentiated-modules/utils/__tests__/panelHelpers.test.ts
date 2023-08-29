@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fixtures = {
-  name: `<div class="name" title="Module 1"></div>`,
-  unlockAt: `<div class="unlock_at">Aug 2, 2023 at 12am</div>`,
-  requiresSequentialProgress: `<div class="require_sequential_progress">true</div>`,
-  publishFinalGrade: `<div class="publish_final_grade">true</div>`,
-}
+import {calculatePanelHeight} from '../panelHelpers'
 
-export function getFixture(fixtureType: keyof typeof fixtures) {
-  const element = document.createElement('div')
-  element.innerHTML = fixtures[fixtureType]
-  element.setAttribute('data-module-id', '8')
-  return element
-}
+describe('calculatePanelHeight', () => {
+  it('computes the correct height when withinTabs is true', () => {
+    expect(calculatePanelHeight(true)).toBe('calc(100vh - 127.5px)')
+  })
+
+  it('computes the correct height when withinTabs is false', () => {
+    expect(calculatePanelHeight(false)).toBe('calc(100vh - 79.5px)')
+  })
+})

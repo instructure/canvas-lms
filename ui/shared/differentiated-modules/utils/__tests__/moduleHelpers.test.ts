@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {convertFriendlyDatetimeToUTC, parseModule} from '../parseModule'
+import {convertFriendlyDatetimeToUTC, parseModule} from '../moduleHelpers'
 import moment from 'moment'
 import {getFixture} from './fixtures'
 

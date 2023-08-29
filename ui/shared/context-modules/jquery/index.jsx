@@ -73,7 +73,7 @@ import {renderContextModulesPublishIcon} from '../utils/publishOneModuleHelper'
 import {underscoreString} from '@canvas/convert-case'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import DifferentiatedModulesTray from '@canvas/differentiated-modules'
-import {parseModule} from '@canvas/differentiated-modules/utils/parseModule'
+import {parseModule} from '@canvas/differentiated-modules/utils/moduleHelpers'
 
 if (!('INST' in window)) window.INST = {}
 
