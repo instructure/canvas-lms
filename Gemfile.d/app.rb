@@ -29,14 +29,10 @@ gem "irb", "~> 1.7"
 gem "academic_benchmarks", "1.1.2", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "~> 0.9.9"
-gem "activerecord-pg-extensions", "0.4.4"
 gem "addressable", "~> 2.8", require: false
-gem "after_transaction_commit", "2.2.2"
 gem "authlogic", "6.4.2"
   gem "scrypt", "3.0.7"
-gem "aws-sdk-dynamodb", "~> 1.83"
 gem "aws-sdk-kinesis", "~> 1.45", require: false
-gem "aws-sdk-kms", "~> 1.63", require: false
 gem "aws-sdk-s3", "~> 1.119", require: false
 gem "aws-sdk-sns", "~> 1.60", require: false
 gem "aws-sdk-sqs", "~> 1.53", require: false
@@ -44,7 +40,6 @@ gem "rqrcode", "~> 2.2", require: false
 gem "bcrypt", "~> 3.1"
 gem "bigdecimal", "~> 3.1"
 gem "browser", "~> 5.3", require: false
-gem "builder", "3.2.4"
 gem "business_time", "0.13.0"
 gem "canvas_connect", "0.3.16"
 gem "canvas_link_migrator", "~> 0.2"
@@ -54,15 +49,12 @@ gem "code_ownership", "~> 1.33"
 gem "ddtrace", "~> 1.13", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "1.2.12", require: "encrypted_cookie_store"
-gem "folio-pagination", "0.0.12", require: "folio/rails"
-gem "ffi", "~> 1.15", require: false
 gem "gepub", "1.0.15"
 gem "apollo-federation", "~> 3.8"
 gem "graphql", "~> 1.12.7"
 gem "graphql-batch", "~> 0.5"
 gem "highline", "~> 2.0", require: false
 gem "httparty", "~> 0.21"
-gem "i18n", "~> 1.12"
 gem "i18nliner", "~> 0.2.4"
 gem "icalendar", "~> 2.9", require: false
 gem "diplomat", "~> 2.6", require: false
@@ -74,24 +66,15 @@ gem "inst_statsd", "~> 3.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
 gem "inst-jobs-statsd", "~> 3.0"
-# if updating json gem it will need to be hotfixed because if a newer version of
-# the json gem is installed, it will always use that one even before bundler
-# gets activated. Updating the gem in it's own commit will make this easier.
-gem "json", "~> 2.6.1"
 gem "json_schemer", "~> 2.0"
 gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"
-gem "mail", "~> 2.8", require: false
 gem "marginalia", "1.11.1", require: false
 gem "mime-types", "~> 3.5"
 gem "mini_magick", "~> 4.12"
 gem "multi_json", "1.15.0"
 gem "net-http", "~> 0.1", require: false
 gem "net-ldap", "~> 0.18", require: false
-gem "net-imap", "~> 0.3", require: false
-gem "net-pop", "~> 0.1", require: false
-gem "net-smtp", "~> 0.3", require: false
-gem "nokogiri", "~> 1.14", require: false
 gem "oauth", "~> 1.1", require: false
 gem "oauth2", "~> 2.0", require: false
 gem "oj", "~> 3.16"
@@ -103,13 +86,10 @@ gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "~> 1.4"
   gem "matrix", "0.4.2" # Used to be a default gem but is no more, but prawn depends on it implicitly
 gem "prosopite", "~> 1.3"
-gem "rack", "~> 2.2"
 gem "rack-brotli", "~> 1.2"
-gem "rake", "~> 13.0"
 gem "rails-observers", "0.1.5"
 gem "ratom-nokogiri", "0.10.11", require: false
 gem "redcarpet", "~> 3.6", require: false
-gem "regexp_parser", "~> 2.8", require: false
 gem "retriable", "~> 3.1"
 gem "ritex", "1.0.1", require: false
 gem "rotp", "~> 6.2", require: false
@@ -122,13 +102,10 @@ gem "saml2", "3.1.2"
 gem "sanitize", "~> 6.0", require: false
 gem "sentry-rails", "~> 5.10"
 gem "sentry-inst_jobs", "~> 5.10"
-gem "simple_oauth", "0.3.1", require: false
 gem "twilio-ruby", "~> 6.4", require: false
 gem "vault", "~> 0.17", require: false
 gem "vericite_api", "1.5.3"
 gem "wcag_color_contrast", "0.1.0"
-
-gem "faraday", "~> 2.7"
 
 path "../gems" do
   gem "activesupport-suspend_callbacks"

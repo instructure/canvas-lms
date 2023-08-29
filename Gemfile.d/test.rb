@@ -18,12 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :test do
-  gem "rails-dom-testing", "~> 2.1"
   gem "rails-controller-testing", "1.0.5"
 
   gem "dotenv", "~> 2.8", require: false
   gem "brakeman", "~> 6.0", require: false
-  gem "simplecov", "~> 0.22", require: false
   gem "simplecov-rcov", "~> 0.3", require: false
   gem "puma", "~> 6.3", require: false
 
@@ -41,7 +39,6 @@ group :test do
 
   gem "webmock", "~> 3.18", require: false
   gem "timecop", "~> 0.9"
-  gem "jira_ref_parser", "1.0.1"
   gem "headless", "2.3.1", require: false
   gem "escape_code", "0.2", require: false
   gem "luminosity_contrast", "0.2.1"
@@ -54,7 +51,6 @@ group :test do
   gem "rspecq", github: "kyler-instructure/rspecq", ref: "8cea6a3225cf0856a26c6c6b93a5ea5605082aa0"
   gem "flakey_spec_catcher", "~> 0.12", require: false
   gem "factory_bot", "6.2.1", require: false
-  gem "rspec_junit_formatter", require: false
   gem "stormbreaker", "~> 1.0", require: false
 
   # performance tools for instrumenting rspec tests
