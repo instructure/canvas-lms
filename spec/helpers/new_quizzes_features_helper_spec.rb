@@ -76,28 +76,6 @@ describe NewQuizzesFeaturesHelper do
     end
   end
 
-  describe "#new_quizzes_import_third_party?" do
-    it "is false when new quizzed is disabled" do
-      expect(new_quizzes_import_third_party?).to be false
-    end
-
-    it "is false when new_quizzes enabled, but importing disabled" do
-      allow(@context.root_account).to receive(:feature_allowed?).with(:quizzes_next).and_return(true)
-      expect(new_quizzes_import_third_party?).to be false
-    end
-
-    it "is false when new_quizzes disabled, but importing enabled" do
-      @context.root_account.enable_feature!(:new_quizzes_third_party_imports)
-      expect(new_quizzes_import_third_party?).to be false
-    end
-
-    it "is true when new_quizzes enabled, and importing enabled" do
-      allow(@context.root_account).to receive(:feature_allowed?).with(:quizzes_next).and_return(true)
-      @context.root_account.enable_feature!(:new_quizzes_third_party_imports)
-      expect(new_quizzes_import_third_party?).to be true
-    end
-  end
-
   describe "#new_quizzes_migration_default" do
     it "is false when default is disabled, and migration not required" do
       expect(new_quizzes_migration_default).to be false
