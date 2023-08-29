@@ -117,6 +117,7 @@ EditView.prototype.events = _.extend(EditView.prototype.events, {
   'click .save_and_publish': 'saveAndPublish',
   'click .cancel_button': 'handleCancel',
   'change #use_for_grading': 'toggleGradingDependentOptions',
+  'change .delay_post_at_date': 'hanldeDelayedPostAtChange',
   'change #discussion_topic_assignment_points_possible': 'handlePointsChange',
   change: 'onChange',
   'tabsbeforeactivate #discussion-edit-view': 'onTabChange',
@@ -229,6 +230,22 @@ EditView.prototype.isAnnouncement = function () {
   return this.model.constructor === Announcement
 }
 
+EditView.prototype.willPublish = function ({ delayed_post_at } = {}) {
+  const delayedString = delayed_post_at || this.getFormData().delayed_post_at // date string
+  // When the page is first loaded, the delay_post checkbox info is not available. In that case we want to default to true and
+  // Rely on the existence of the delayedString to determine if the announcement will publish immediately or not
+  const delayPostingCheckbox = this.getFormData().delay_posting ? this.getFormData().delay_posting : "1" // status of the checkbox
+  const isDelayedPostedAtChecked = delayPostingCheckbox === "1"
+
+  if (delayedString && isDelayedPostedAtChecked) {
+    const delayedDate = new Date(delayedString)
+    const now = new Date()
+    return delayedDate <= now
+  }
+
+  return true
+}
+
 EditView.prototype.canPublish = function () {
   return !this.isAnnouncement() && !this.model.get('published') && this.permissions.CAN_MODERATE
 }
@@ -240,6 +257,7 @@ EditView.prototype.toJSON = function () {
     useForGrading: this.model.get('assignment') != null,
     isTopic: this.isTopic(),
     isAnnouncement: this.isAnnouncement(),
+    willPublish: this.willPublish(data),
     canPublish: this.canPublish(),
     contextIsCourse: this.options.contextType === 'courses',
     canAttach: this.permissions.CAN_ATTACH,
@@ -851,6 +869,15 @@ EditView.prototype.toggleGradingDependentOptions = function () {
   this.toggleTodoDateBox()
   if (this.renderSectionsAutocomplete != null) {
     return this.renderSectionsAutocomplete()
+  }
+}
+
+EditView.prototype.hanldeDelayedPostAtChange = function () {
+  const submitButton = $(".submit_button")
+  if(!this.willPublish()){
+    submitButton.text("Save")
+  } else {
+    submitButton.text("Publish")
   }
 }
 

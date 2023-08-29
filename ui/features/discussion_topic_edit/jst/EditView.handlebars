@@ -147,7 +147,7 @@
           {{/if}}
           {{#if contextIsCourse}}
           {{#if isAnnouncement}}
-          <div><label class="checkbox short-label" for="delay_posting">
+          <div><label class="checkbox short-label delay_post_at_date" for="delay_posting">
               {{checkbox "delay_posting"
               checked=delayed_post_at
               class="element_toggler"
@@ -161,7 +161,7 @@
           <div><label id="discussion_topic_delay_post_container" style="{{hiddenUnless delayed_post_at}}"
               class="checkbox short-label">
               {{#t "post_at"}}Post At{{/t}}
-              <input type="text" class="datetime_field input-medium" name="delayed_post_at"
+              <input type="text" class="datetime_field input-medium delay_post_at_date" name="delayed_post_at"
                 value="{{datetimeFormattedWithTz delayed_post_at}}"
                 aria-labelledby="discussion_topic_delay_post_accessible_label"
                 data-tooltip='{"position":"top","force_position":"true"}' title="{{accessibleDateFormat}}" />
@@ -371,11 +371,11 @@
     {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
   </button>
   {{/if}}
-  {{#if isAnnouncement}}
-  <button type="submit" data-text-while-loading="{{#t " publishing"}}Publishing...{{/t}}" class="btn btn-primary">{{#t
+  {{#ifAll isAnnouncement willPublish}}
+  <button type="submit" data-text-while-loading="{{#t " publishing"}}Publishing...{{/t}}" class="btn btn-primary submit_button">{{#t
     "publish"}}Publish{{/t}}</button>
   {{else}}
-  <button type="submit" data-text-while-loading="{{#t " saving"}}Saving...{{/t}}" class="btn btn-primary">{{#t
+  <button type="submit" data-text-while-loading="{{#t " saving"}}Saving...{{/t}}" class="btn btn-primary submit_button">{{#t
     "save"}}Save{{/t}}</button>
-  {{/if}}
+  {{/ifAll}}
 </div>

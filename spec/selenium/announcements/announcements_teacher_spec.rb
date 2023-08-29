@@ -221,6 +221,16 @@ describe "announcements" do
       expect(topic.delayed_post_at).to be_nil
     end
 
+    it "changes the save button to publish when delayed_post_at is removed", ignore_js_errors: true, priority: "1" do
+      topic = @course.announcements.create!(title: @topic_title, user: @user, delayed_post_at: 10.days.from_now, message: "message")
+
+      get "/courses/#{@course.id}/discussion_topics/#{topic.id}/edit"
+      expect(f(".submit_button").text).to eq("Save")
+
+      f('input[type=checkbox][name="delay_posting"]').click
+      expect(f(".submit_button").text).to eq("Publish")
+    end
+
     it "lets a teacher add a new entry to its own announcement", priority: "1" do
       create_announcement
       get [@course, @announcement]
