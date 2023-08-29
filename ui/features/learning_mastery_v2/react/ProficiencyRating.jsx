@@ -32,11 +32,22 @@ const themeOverride = {
   },
 }
 
+const tagStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyItems: 'center',
+}
+
 const iconStyle = {
   display: 'inline-block',
-  transform: 'scale(1.3)',
-  margin: '0 4px 0 4px',
+  padding: '0 4px 0 4px',
   verticalAlign: 'middle',
+}
+
+const ratingStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyItems: 'center',
 }
 
 const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => {
@@ -54,25 +65,32 @@ const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => 
       onClick={onClickView}
       withBackground="transparent"
       isWithinText={false}
-      padding="0 small 0 small"
+      padding="0 xx-small 0 xx-small"
     >
       <ApplyTheme theme={themeOverride}>
         <Tag
-          size="medium"
+          size="small"
           text={
-            <>
+            <div style={tagStyle}>
               <div style={iconStyle}>
-                <SVGWrapper fillColor={color} url={svgUrl(points, masteryAt)} />
+                <SVGWrapper
+                  fillColor={color}
+                  url={svgUrl(points, masteryAt)}
+                  style={{...ratingStyle, transform: 'scale(0.8)'}}
+                />
               </div>
-              <View padding="x-small">
-                <Text size="small">{description}</Text>
+              <View padding="xxx-small xx-small xxx-small xx-small">
+                <Text size="small" weight="bold">{description}</Text>
               </View>
               {!disabled && (
                 <div style={iconStyle} data-testid="enabled-filter">
-                  <SVGWrapper url="/images/outcomes/enabled_filter.svg" />
+                  <SVGWrapper
+                    url="/images/outcomes/enabled_filter.svg"
+                    style={{...ratingStyle, transform: 'scale(1.2)'}}
+                  />
                 </div>
               )}
-            </>
+            </div>
           }
           onClick={() => {}} // Tag doesn't respect disabled without an onClick handler
         />

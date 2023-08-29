@@ -19,6 +19,9 @@
 import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
+import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ProficiencyFilter from './ProficiencyFilter'
@@ -26,6 +29,8 @@ import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
 import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {Flex} from '@instructure/ui-flex'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {IconButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('LearningMasteryGradebook')
 
@@ -34,13 +39,19 @@ const getRatings = () => {
   const masteryAt = ratings.find(rating => rating.mastery).points
   return [
     ...ratings.map(({points, description, color}) => ({
-      description,
+      description: description === I18n.t("Below Mastery") ? I18n.t("Remediation") : description,
       points,
       masteryAt,
       color: '#' + color,
     })),
     {points: null, masteryAt, color: null, description: I18n.t('Not Assessed')},
   ]
+}
+
+const gradebookMenuOverride = {
+  [Link.theme]: {
+    color: 'licorice'
+  }
 }
 
 const renderLoader = () => (
@@ -67,19 +78,34 @@ const LearningMastery = ({courseId}) => {
 
   return (
     <>
-      <View
-        width="100%"
-        display="block"
-        padding="medium small medium small"
-        borderWidth="0 0 small 0"
-        data-testid="lmgb-gradebook-menu"
-      >
-        <GradebookMenu
-          courseUrl={options.context_url}
-          learningMasteryEnabled={true}
-          variant="DefaultGradebookLearningMastery"
-        />
-      </View>
+      <ApplyTheme theme={gradebookMenuOverride}>
+        <Flex
+          height="100%"
+          display="flex"
+          alignItems="center"
+          justifyItems="start"
+          padding="medium 0 0 0"
+          data-testid="lmgb-gradebook-menu"
+        >
+          <Text size='xx-large' weight='bold'>{I18n.t('Learning Mastery Gradebook')}</Text>
+          <View padding="xx-small">
+            <GradebookMenu
+              courseUrl={options.context_url}
+              learningMasteryEnabled={true}
+              variant="DefaultGradebookLearningMastery"
+              customTrigger={
+                <IconButton
+                  withBorder={false}
+                  withBackground={false}
+                  screenReaderLabel={I18n.t("Gradebook Menu Dropdown")}
+                >
+                  <IconArrowOpenDownSolid size='x-small'/>
+                </IconButton>
+              }
+            />
+          </View>
+        </Flex>
+      </ApplyTheme>
       {accountLevelMasteryScalesFF && (
         <Flex.Item as="div" width="100%" padding="small 0 0 0">
           <ProficiencyFilter

@@ -40,10 +40,11 @@ const StudentOutcomeScore = ({outcome, rollup, visibleRatings}) => {
   return (
     <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
       {isVisible && (
-        <div style={{display: 'flex', transform: 'scale(2.0)'}}>
+        <div style={{display: 'flex'}}>
           <SVGWrapper
             fillColor={rollup?.rating?.color}
             url={svgUrl(rollup?.rating?.points, outcome.mastery_points)}
+            style={{display: 'flex', alignItems: 'center', justifyItems: 'center', padding: '0px'}}
           />
           <ScreenReaderContent>
             {rollup?.rating?.description || I18n.t('Unassessed')}

@@ -20,10 +20,11 @@ import {svgUrl} from '../icons'
 
 describe('icons', () => {
   it('returns the right SVG', () => {
-    expect(svgUrl(5, 3)).toMatch(/star/)
+    expect(svgUrl(5, 3)).toMatch(/exceeds_mastery/)
     expect(svgUrl(3, 3)).toMatch(/mastery/)
     expect(svgUrl(2, 3)).toMatch(/near_mastery/)
-    expect(svgUrl(0, 3)).toMatch(/below_mastery/)
+    expect(svgUrl(1, 3)).toMatch(/remediation/)
+    expect(svgUrl(0, 3)).toMatch(/no_evidence/)
     expect(svgUrl(null, 3)).toMatch(/unassessed/)
   })
 })

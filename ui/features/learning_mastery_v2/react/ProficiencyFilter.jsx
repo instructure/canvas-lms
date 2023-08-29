@@ -38,8 +38,7 @@ const ProficiencyFilter = ({ratings, visibleRatings, setVisibleRatings}) => {
   }
 
   return (
-    <View display="flex" padding="small">
-      <View>{I18n.t('Showing:')}</View>
+    <View display="flex" padding="small 0 small 0">
       <View display="flex">
         {ratings.map(({points, color, description, masteryAt}) => (
           <ProficiencyRating
