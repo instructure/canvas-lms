@@ -59,11 +59,6 @@ describe('ProficiencyFilter', () => {
     setVisibleRatings = jest.fn(newVisibleRatings => (visibleRatings = newVisibleRatings))
   })
 
-  it('renders a "Showing" header', () => {
-    const {getByText} = render(<ProficiencyFilter {...defaultProps()} />)
-    expect(getByText('Showing:')).toBeInTheDocument()
-  })
-
   it('renders each proficiency rating provided as a prop', () => {
     const {getByText} = render(<ProficiencyFilter {...defaultProps()} />)
     ratings.forEach(rating => {

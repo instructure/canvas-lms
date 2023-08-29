@@ -37,10 +37,20 @@ export type GradiantVariantName =
 
 const activeLabels = {
   DefaultGradebook: I18n.t('Gradebook'),
-  DefaultGradebookLearningMastery: I18n.t('Learning Mastery Grade Book'),
+  DefaultGradebookLearningMastery: I18n.t('Learning Mastery Gradebook'),
   GradebookHistory: I18n.t('Gradebook History'),
   IndividualGradebook: I18n.t('Individual Gradebook'),
   EnhancedIndividualGradebook: I18n.t('Individual Gradebook'),
+}
+
+const getMenuTrigger = (customTrigger: any, variant: GradiantVariantName) => {
+  const trigger = (
+    <Link isWithinText={false} as="button" data-testid="gradebook-select-dropdown">
+      {activeLabels[variant]} <IconMiniArrowDownSolid />
+    </Link>
+  )
+
+  return customTrigger || trigger
 }
 
 type Props = {
@@ -48,6 +58,7 @@ type Props = {
   learningMasteryEnabled?: boolean
   enhancedIndividualGradebookEnabled?: boolean
   variant: GradiantVariantName
+  customTrigger?: any
 }
 
 export default function GradebookMenu({
@@ -55,15 +66,12 @@ export default function GradebookMenu({
   learningMasteryEnabled,
   enhancedIndividualGradebookEnabled,
   variant,
+  customTrigger,
 }: Props) {
+  const menuTrigger = getMenuTrigger(customTrigger, variant)
+
   return (
-    <Menu
-      trigger={
-        <Link isWithinText={false} as="button" data-testid="gradebook-select-dropdown">
-          {activeLabels[variant]} <IconMiniArrowDownSolid />
-        </Link>
-      }
-    >
+    <Menu trigger={menuTrigger}>
       <Group selected={[variant]} onSelect={() => {}} label={I18n.t('Change Gradebook view')}>
         <Item
           href={`${courseUrl}/gradebook/change_gradebook_version?version=gradebook`}
