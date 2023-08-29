@@ -808,6 +808,7 @@ RSpec.configure do |config|
     AWS_CONFIG = {
       access_key_id: "stub_id",
       secret_access_key: "stub_key",
+      credentials: Aws::Credentials.new("stub_id", "stub_key"),
       region: "us-east-1",
       stub_responses: true,
       bucket_name: "no-bucket"
