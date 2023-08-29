@@ -81,21 +81,6 @@ class GradingStandardsApiController < ApplicationController
   # @API Create a new grading standard
   # Create a new grading standard
   #
-  # If grading_scheme_entry arguments are omitted, then a default grading scheme
-  # will be set. The default scheme is as follows:
-  #      "A" : 94,
-  #      "A-" : 90,
-  #      "B+" : 87,
-  #      "B" : 84,
-  #      "B-" : 80,
-  #      "C+" : 77,
-  #      "C" : 74,
-  #      "C-" : 70,
-  #      "D+" : 67,
-  #      "D" : 64,
-  #      "D-" : 61,
-  #      "F" : 0,
-  #
   # @argument title [Required, String]
   #   The title for the Grading Standard.
   #
@@ -117,10 +102,30 @@ class GradingStandardsApiController < ApplicationController
   #     -X POST \
   #     -H 'Authorization: Bearer <token>' \
   #     -d 'title=New standard name' \
-  #     -d 'grading_scheme_entry[][name]=A'
-  #     -d 'grading_scheme_entry[][value]=90'
-  #     -d 'grading_scheme_entry[][name]=B'
-  #     -d 'grading_scheme_entry[][value]=80'
+  #     -d 'grading_scheme_entry[][name]=A' \
+  #     -d 'grading_scheme_entry[][value]=94' \
+  #     -d 'grading_scheme_entry[][name]=A-' \
+  #     -d 'grading_scheme_entry[][value]=90' \
+  #     -d 'grading_scheme_entry[][name]=B+' \
+  #     -d 'grading_scheme_entry[][value]=87' \
+  #     -d 'grading_scheme_entry[][name]=B' \
+  #     -d 'grading_scheme_entry[][value]=84' \
+  #     -d 'grading_scheme_entry[][name]=B-' \
+  #     -d 'grading_scheme_entry[][value]=80' \
+  #     -d 'grading_scheme_entry[][name]=C+' \
+  #     -d 'grading_scheme_entry[][value]=77' \
+  #     -d 'grading_scheme_entry[][name]=C' \
+  #     -d 'grading_scheme_entry[][value]=74' \
+  #     -d 'grading_scheme_entry[][name]=C-' \
+  #     -d 'grading_scheme_entry[][value]=70' \
+  #     -d 'grading_scheme_entry[][name]=D+' \
+  #     -d 'grading_scheme_entry[][value]=67' \
+  #     -d 'grading_scheme_entry[][name]=D' \
+  #     -d 'grading_scheme_entry[][value]=64' \
+  #     -d 'grading_scheme_entry[][name]=D-' \
+  #     -d 'grading_scheme_entry[][value]=61' \
+  #     -d 'grading_scheme_entry[][name]=F' \
+  #     -d 'grading_scheme_entry[][value]=0'
   #
   # @example_response
   #   {
