@@ -21,6 +21,10 @@ require_relative "../../common"
 
 module CalendarPage
   #------------------------- Selectors --------------------------
+  def agenda_events_selector(event_title)
+    "//*[@class='agenda-event__item']//*[contains(@class, 'agenda-event__title') and contains(text(),'#{event_title}')]"
+  end
+
   def calendar_content_selector
     "#content"
   end
@@ -53,8 +57,12 @@ module CalendarPage
     "//button[. = 'Edit']"
   end
 
+  def edit_event_rule_text_selector
+    ".event-details-timestring"
+  end
+
   def edit_event_modal_selector
-    "'[data-testid='calendar-event-form']'"
+    "[data-testid='calendar-event-form']"
   end
 
   def edit_event_title_input_selector
@@ -73,8 +81,8 @@ module CalendarPage
     "[data-testid='calendar-event-form'] [placeholder='Input Event Title...']"
   end
 
-  def events_in_a_series_selector
-    "#content .fc-event:visible:contains('event in a series')"
+  def events_in_a_series_selector(event_title)
+    "#content .fc-event:visible:contains('#{event_title}')"
   end
 
   def updated_events_in_a_series_selector
@@ -126,6 +134,11 @@ module CalendarPage
   end
 
   #------------------------- Elements ---------------------------
+
+  def agenda_events(event_title)
+    ffxpath(agenda_events_selector(event_title))
+  end
+
   def all_events_in_month_view
     ff(events_in_month_view_selector)
   end
@@ -166,6 +179,10 @@ module CalendarPage
     f(edit_event_modal_selector)
   end
 
+  def edit_event_rule_text
+    f(edit_event_rule_text_selector)
+  end
+
   def edit_event_title_input
     f(edit_event_title_input_selector)
   end
@@ -178,12 +195,8 @@ module CalendarPage
     f(event_title_input_selector)
   end
 
-  def events_in_a_series
-    ffj(events_in_a_series_selector)
-  end
-
-  def updated_events_in_a_series
-    ffj(updated_events_in_a_series_selector)
+  def events_in_a_series(event_title)
+    ffj(events_in_a_series_selector(event_title))
   end
 
   def frequency_picker
