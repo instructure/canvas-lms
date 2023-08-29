@@ -20,6 +20,4 @@
 group :redis do
   gem "redis", "4.1.4"
   gem "redis-scripting", "1.0.1"
-
-  gem "digest-murmurhash", "1.1.1"
 end

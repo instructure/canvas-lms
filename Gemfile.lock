@@ -1142,19 +1142,15 @@ DEPENDENCIES
   active_model-better_errors (= 1.6.7)
   active_model_serializers (~> 0.9.9)
   active_record_query_trace (~> 1.8)
-  activerecord-pg-extensions (= 0.4.4)
   activesupport-suspend_callbacks!
   acts_as_list!
   addressable (~> 2.8)
   adheres_to_policy!
-  after_transaction_commit (= 2.2.2)
   apollo-federation (~> 3.8)
   attachment_fu!
   authlogic (= 6.4.2)
   autoextend!
-  aws-sdk-dynamodb (~> 1.83)
   aws-sdk-kinesis (~> 1.45)
-  aws-sdk-kms (~> 1.63)
   aws-sdk-s3 (~> 1.119)
   aws-sdk-sns (~> 1.60)
   aws-sdk-sqs (~> 1.53)
@@ -1166,7 +1162,6 @@ DEPENDENCIES
   brakeman (~> 6.0)
   broadcast_policy!
   browser (~> 5.3)
-  builder (= 3.2.4)
   bundler (~> 2.2)
   business_time (= 0.13.0)
   byebug (= 11.1.3)
@@ -1204,7 +1199,6 @@ DEPENDENCIES
   database_cleaner (~> 2.0)
   db-query-matchers (= 0.11.0)
   ddtrace (~> 1.13)
-  digest-murmurhash (= 1.1.1)
   diigo!
   diplomat (~> 2.6)
   docx (~> 0.8)
@@ -1215,11 +1209,8 @@ DEPENDENCIES
   escape_code (= 0.2)
   event_stream!
   factory_bot (= 6.2.1)
-  faraday (~> 2.7)
-  ffi (~> 1.15)
   ffi-icu (~> 0.5)
   flakey_spec_catcher (~> 0.12)
-  folio-pagination (= 0.0.12)
   gepub (= 1.0.15)
   gergich (~> 2.1)
   google_drive!
@@ -1230,7 +1221,6 @@ DEPENDENCIES
   highline (~> 2.0)
   html_text_helper!
   httparty (~> 0.21)
-  i18n (~> 1.12)
   i18n_extraction!
   i18n_tasks!
   i18nliner (~> 0.2.4)
@@ -1243,8 +1233,6 @@ DEPENDENCIES
   inst_access (= 0.1.2)
   inst_statsd (~> 3.0)
   irb (~> 1.7)
-  jira_ref_parser (= 1.0.1)
-  json (~> 2.6.1)
   json-jwt (~> 1.13)
   json-schema (~> 4.0)
   json_schemer (~> 2.0)
@@ -1256,7 +1244,6 @@ DEPENDENCIES
   lti-advantage!
   lti_outbound!
   luminosity_contrast (= 0.2.1)
-  mail (~> 2.8)
   marginalia (= 1.11.1)
   matrix (= 0.4.2)
   mime-types (~> 3.5)
@@ -1264,11 +1251,7 @@ DEPENDENCIES
   moodle_importer!
   multi_json (= 1.15.0)
   net-http (~> 0.1)
-  net-imap (~> 0.3)
   net-ldap (~> 0.18)
-  net-pop (~> 0.1)
-  net-smtp (~> 0.3)
-  nokogiri (~> 1.14)
   oauth (~> 1.1)
   oauth2 (~> 2.0)
   oj (~> 3.16)
@@ -1288,18 +1271,14 @@ DEPENDENCIES
   pry-byebug (= 3.10.1)
   puma (~> 6.3)
   qti_exporter!
-  rack (~> 2.2)
   rack-brotli (~> 1.2)
   rails (~> 7.0.4)
   rails-controller-testing (= 1.0.5)
-  rails-dom-testing (~> 2.1)
   rails-observers (= 0.1.5)
-  rake (~> 13.0)
   ratom-nokogiri (= 0.10.11)
   redcarpet (~> 3.6)
   redis (= 4.1.4)
   redis-scripting (= 1.0.1)
-  regexp_parser (~> 2.8)
   request_context!
   respondus_soap_endpoint!
   retriable (~> 3.1)
@@ -1311,7 +1290,6 @@ DEPENDENCIES
   rspec-collection_matchers (= 1.2.0)
   rspec-rails (~> 6.0)
   rspec_around_all (= 0.2.0)
-  rspec_junit_formatter
   rspecq!
   rss (~> 0.3)
   rubocop-canvas!
@@ -1331,11 +1309,8 @@ DEPENDENCIES
   sentry-inst_jobs (~> 5.10)
   sentry-rails (~> 5.10)
   shoulda-matchers (~> 5.3)
-  simple_oauth (= 0.3.1)
-  simplecov (~> 0.22)
   simplecov-rcov (~> 0.3)
   simply_versioned!
-  spring (~> 4.0)
   spring-commands-parallel-rspec (= 1.1.0)
   spring-commands-rspec (= 1.0.4)
   spring-commands-rubocop (~> 0.4)
