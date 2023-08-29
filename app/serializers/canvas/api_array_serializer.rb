@@ -33,7 +33,7 @@ module Canvas
       serializer_class.new(item, @options)
     end
 
-    def serializable_object
+    def serializable_object(...)
       super.map! { |hash| stringify!(hash) }
     end
   end

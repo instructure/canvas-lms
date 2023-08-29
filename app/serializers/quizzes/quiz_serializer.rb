@@ -315,7 +315,7 @@ module Quizzes
 
     delegate lockdown_browser_monitor_data: :quiz
 
-    def serializable_object(**)
+    def serializable_object(...)
       hash = super
       # legacy v1 api
       if accepts_jsonapi?
