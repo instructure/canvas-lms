@@ -790,7 +790,7 @@ GEM
       diff-lcs (~> 1.4)
       expgen (~> 0.1)
       rainbow (~> 3.1.1)
-    pact_broker-client (1.68.0)
+    pact_broker-client (1.70.0)
       dig_rb (~> 1.0)
       httparty (>= 0.21.0, < 1.0.0)
       rake (~> 13.0)
