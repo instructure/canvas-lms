@@ -42,14 +42,6 @@ GIT
       activemodel (>= 3.2)
 
 GIT
-  remote: https://github.com/rda1902/spring-commands-rubocop.git
-  revision: 818acb74130ac95adf9e8733986d45c168e4a5f3
-  ref: 818acb74130ac95adf9e8733986d45c168e4a5f3
-  specs:
-    spring-commands-rubocop (0.3.0)
-      spring (>= 1.0, < 5.0)
-
-GIT
   remote: https://github.com/twitter/thrift_client.git
   revision: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
   ref: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
@@ -1060,6 +1052,8 @@ GEM
       spring (>= 0.9.1)
     spring-commands-rspec (1.0.4)
       spring (>= 0.9.1)
+    spring-commands-rubocop (0.4.0)
+      spring (>= 1.0)
     sqlite3 (1.6.4)
       mini_portile2 (~> 2.8.0)
     sqlite3 (1.6.4-aarch64-linux)
@@ -1357,7 +1351,7 @@ DEPENDENCIES
   spring (~> 4.0)
   spring-commands-parallel-rspec (= 1.1.0)
   spring-commands-rspec (= 1.0.4)
-  spring-commands-rubocop (= 0.3.0)!
+  spring-commands-rubocop (~> 0.4)
   stackprof (~> 0.2)
   stormbreaker (~> 1.0)
   stringify_ids!
