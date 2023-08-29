@@ -63,6 +63,8 @@ module Gradebook
 
       visible_students_scope = course.students_visible_to(updating_user, include: [:completed])
 
+      custom_grade_statuses = course.custom_grade_statuses.to_a
+
       override_data.each_slice(1000) do |score_update_batch|
         student_ids = score_update_batch.pluck(:student_id)
         visible_students_in_batch = visible_students_scope.where(id: student_ids)
@@ -82,12 +84,25 @@ module Gradebook
           next unless enrollments_to_update.key?(student_id)
 
           enrollments_to_update[student_id].each do |enrollment|
-            enrollment.update_override_score(
-              override_score: score_update[:override_score],
-              grading_period_id: grading_period&.id,
-              updating_user:,
-              record_grade_change: !student_ids_updated.include?(student_id)
-            )
+            if score_update.key?(:override_score)
+              enrollment.update_override_score(
+                override_score: score_update[:override_score],
+                grading_period_id: grading_period&.id,
+                updating_user:,
+                record_grade_change: !student_ids_updated.include?(student_id)
+              )
+            end
+
+            if score_update.key?(:override_status_id) && Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
+              custom_grade_status_id = score_update[:override_status_id]&.to_i
+              custom_grade_status = custom_grade_statuses.find { |status| status.id == custom_grade_status_id } if custom_grade_status_id
+              unless custom_grade_status_id.present? && custom_grade_status.nil?
+                enrollment.update_override_status(
+                  custom_grade_status:,
+                  grading_period_id: grading_period&.id
+                )
+              end
+            end
 
             student_ids_updated.add(student_id)
           rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid

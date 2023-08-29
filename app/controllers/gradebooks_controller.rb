@@ -1288,7 +1288,7 @@ class GradebooksController < ApplicationController
     end
 
     params.require(:override_scores)
-    override_score_updates = params.permit(override_scores: [:student_id, :override_score]).to_h[:override_scores]
+    override_score_updates = params.permit(override_scores: %i[student_id override_score override_status_id]).to_h[:override_scores]
 
     progress = ::Gradebook::FinalGradeOverrides.queue_bulk_update(@context, @current_user, override_score_updates, grading_period)
     render json: progress_json(progress, @current_user, session)
