@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "hashery/dictionary"
-
-# Contains a dictionary of arrays with hashes in them. This is so that
+# Contains a hash of arrays with hashes in them. This is so that
 # we can get all the submissions for a course grouped by date and
 # ordered by date, person, then assignment.  Since working with this is
 # a loop in a loop in a loop, it gets a little awkward for controllers
@@ -221,7 +219,7 @@ class SubmissionList
   # all the meta data we need and no banned keys included.
   def process
     @list = submission_entries.sort_by { |a| [a[:graded_at] ? -a[:graded_at].to_f : CanvasSort::Last, a[:safe_grader_id], a[:assignment_id]] }
-                              .each_with_object(Hashery::Dictionary.new) do |se, d|
+                              .each_with_object({}) do |se, d|
       d[se[:graded_on]] ||= []
       d[se[:graded_on]] << se
     end
