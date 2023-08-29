@@ -16,16 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const fixtures = {
-  name: `<div class="name" title="Module 1"></div>`,
-  unlockAt: `<div class="unlock_at">Aug 2, 2023 at 12am</div>`,
-  requiresSequentialProgress: `<div class="require_sequential_progress">true</div>`,
-  publishFinalGrade: `<div class="publish_final_grade">true</div>`,
-}
-
-export function getFixture(fixtureType: keyof typeof fixtures) {
-  const element = document.createElement('div')
-  element.innerHTML = fixtures[fixtureType]
-  element.setAttribute('data-module-id', '8')
-  return element
+export function calculatePanelHeight(withinTabs: boolean): string {
+  let headerHeight = 79.5
+  headerHeight += withinTabs ? 48 : 0 // height of the tab selector
+  return `calc(100vh - ${headerHeight}px)`
 }

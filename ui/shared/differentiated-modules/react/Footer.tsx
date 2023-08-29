@@ -17,26 +17,40 @@
  */
 
 import React from 'react'
+import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import Footer from './Footer'
+import {Button} from '@instructure/ui-buttons'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('differentiated_modules')
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item: FlexItem} = Flex as any
 
-export interface AssignToPanelProps {
-  height: string
+export interface FooterProps {
   onDismiss: () => void
+  onUpdate: () => void
 }
 
-export default function AssignToPanel({height, onDismiss}: AssignToPanelProps) {
+export default function Footer({onDismiss, onUpdate}: FooterProps) {
   return (
-    <Flex direction="column" justifyItems="space-between" height={height}>
-      <FlexItem shouldGrow={true} padding="small">
-        <div>Assign To</div>
-      </FlexItem>
-      <FlexItem>
-        <Footer onDismiss={onDismiss} onUpdate={() => {}} />
-      </FlexItem>
-    </Flex>
+    <View as="div" padding="small" background="secondary" borderWidth="small none none none">
+      <Flex as="div" justifyItems="end">
+        <FlexItem>
+          <Button onClick={onDismiss}>{I18n.t('Cancel')}</Button>
+        </FlexItem>
+        <FlexItem margin="0 0 0 small">
+          <Button
+            color="primary"
+            onClick={() => {
+              onUpdate()
+              onDismiss()
+            }}
+          >
+            {I18n.t('Update Module')}
+          </Button>
+        </FlexItem>
+      </Flex>
+    </View>
   )
 }

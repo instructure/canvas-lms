@@ -24,6 +24,8 @@ describe('SettingsPanel', () => {
   const props: SettingsPanelProps = {
     moduleName: 'Week 1',
     unlockAt: '',
+    height: '500px',
+    onDismiss: () => {},
   }
 
   const renderComponent = (overrides = {}) => render(<SettingsPanel {...props} {...overrides} />)
