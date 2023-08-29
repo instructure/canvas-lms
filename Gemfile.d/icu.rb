@@ -18,5 +18,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 group :icu do
-  gem "ffi-icu", "0.4.0", github: "erickguan/ffi-icu", ref: "0c6f8b201f3994fa10c741ff5dbb146cb83f4a9d"
+  gem "ffi-icu", "~> 0.5"
 end

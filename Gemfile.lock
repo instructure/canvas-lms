@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/erickguan/ffi-icu.git
-  revision: 0c6f8b201f3994fa10c741ff5dbb146cb83f4a9d
-  ref: 0c6f8b201f3994fa10c741ff5dbb146cb83f4a9d
-  specs:
-    ffi-icu (0.4.0)
-      ffi (~> 1.0, >= 1.0.9)
-
-GIT
   remote: https://github.com/kreynolds/cassandra-cql.git
   revision: 02b5abbe441a345c051a180327932566fd66bb36
   ref: 02b5abbe441a345c051a180327932566fd66bb36
@@ -535,6 +527,8 @@ GEM
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
+    ffi-icu (0.5.1)
+      ffi (~> 1.0, >= 1.0.9)
     find_a_port (1.0.1)
     flakey_spec_catcher (0.12.1)
       rspec (~> 3.10)
@@ -1223,7 +1217,7 @@ DEPENDENCIES
   factory_bot (= 6.2.1)
   faraday (~> 2.7)
   ffi (~> 1.15)
-  ffi-icu (= 0.4.0)!
+  ffi-icu (~> 0.5)
   flakey_spec_catcher (~> 0.12)
   folio-pagination (= 0.0.12)
   gepub (= 1.0.15)
