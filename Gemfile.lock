@@ -34,14 +34,6 @@ GIT
       sentry-ruby
 
 GIT
-  remote: https://github.com/rails-api/active_model_serializers.git
-  revision: 61882e1e4127facfe92e49057aec71edbe981829
-  ref: 61882e1e4127facfe92e49057aec71edbe981829
-  specs:
-    active_model_serializers (0.9.0.alpha1)
-      activemodel (>= 3.2)
-
-GIT
   remote: https://github.com/twitter/thrift_client.git
   revision: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
   ref: 5c10d59881825cb8e26ab1aa8f1d2738e88c0e83
@@ -349,6 +341,9 @@ GEM
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
     active_model-better_errors (1.6.7)
       activemodel (>= 3.0)
+    active_model_serializers (0.9.9)
+      activemodel (>= 3.2)
+      concurrent-ruby (~> 1.0)
     active_record_query_trace (1.8.2)
       activerecord (>= 6.0.0)
     activejob (7.0.7.2)
@@ -1158,7 +1153,7 @@ DEPENDENCIES
   academic_benchmarks (= 1.1.2)
   account_reports!
   active_model-better_errors (= 1.6.7)
-  active_model_serializers (= 0.9.0alpha1)!
+  active_model_serializers (~> 0.9.9)
   active_record_query_trace (~> 1.8)
   activerecord-pg-extensions (= 0.4.4)
   activesupport-suspend_callbacks!
