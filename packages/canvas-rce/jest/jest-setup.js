@@ -41,7 +41,6 @@ const ignoredErrors = [
   /The prop `videoOptions.naturalHeight` is marked as required in `VideoOptionsTray`/,
   /The prop `sortBy.order` is marked as required in `MediaPanel`/,
   /Invalid prop `images.searchString` of type `string` supplied to `Images`/,
-  /Invalid URL: undefined/,
   /failed updating video captions/,
   /You seem to have overlapping act\(\) calls/,
   /A theme registry has already been initialized/,
