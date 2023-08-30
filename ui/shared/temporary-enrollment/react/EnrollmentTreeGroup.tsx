@@ -19,12 +19,10 @@
 import {IconButton} from '@instructure/ui-buttons'
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-expect-error
 import {IconArrowOpenDownSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {EnrollmentTreeItem} from './EnrollmentTreeItem'
 import {NodeStructure} from './EnrollmentTree'
-// @ts-expect-error
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import RoleMismatchToolTip from './RoleMismatchToolTip'
@@ -32,7 +30,7 @@ import RoleMismatchToolTip from './RoleMismatchToolTip'
 const I18n = useI18nScope('temporary_enrollment')
 
 interface Props extends NodeStructure {
-  indent: string
+  indent: any
   updateCheck: Function
   updateToggle: Function
 }
@@ -55,9 +53,6 @@ export function translateState(workflow: string) {
 }
 
 export function EnrollmentTreeGroup(props: Props) {
-  // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-  const {Item: FlexItem} = Flex as any
-
   const handleCheckboxChange = () => {
     if (props.updateCheck) {
       props.updateCheck(props, !props.isCheck)
@@ -137,13 +132,12 @@ export function EnrollmentTreeGroup(props: Props) {
   }
 
   const renderRow = () => {
-    let toggleIcon
-    props.isToggle ? (toggleIcon = IconArrowOpenDownSolid) : (toggleIcon = IconArrowOpenEndSolid)
+    const toggleIcon = props.isToggle ? IconArrowOpenDownSolid : IconArrowOpenEndSolid
 
     return (
       <>
         <Flex key={props.id} padding="x-small" as="div" alignItems="center">
-          <FlexItem margin={props.indent}>
+          <Flex.Item margin={props.indent}>
             <Checkbox
               data-testid={'check ' + props.id}
               label=""
@@ -152,32 +146,32 @@ export function EnrollmentTreeGroup(props: Props) {
               indeterminate={props.isMixed}
               onChange={handleCheckboxChange}
             />
-          </FlexItem>
-          <FlexItem margin="0 0 0 x-small">
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 x-small">
             <IconButton
               withBorder={false}
               withBackground={false}
               onClick={handleIconButtonClick}
-              value={props.isToggle}
+              // value={props.isToggle}  <--- this is an invalid prop to IconButton. FIXME
               screenReaderLabel={I18n.t('Toggle group %{group}', {group: props.label})}
             >
               {toggleIcon}
             </IconButton>
-          </FlexItem>
-          <FlexItem margin="0 0 0 x-small">
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 x-small">
             <Text>{props.label}</Text>
-          </FlexItem>
+          </Flex.Item>
           {props.isMismatch ? (
-            <FlexItem>
+            <Flex.Item>
               <RoleMismatchToolTip />
-            </FlexItem>
+            </Flex.Item>
           ) : null}
           {props.workState ? (
-            <FlexItem margin="0 large">
+            <Flex.Item margin="0 large">
               <Text weight="light">
                 {I18n.t('course status: %{state}', {state: translateState(props.workState)})}
               </Text>
-            </FlexItem>
+            </Flex.Item>
           ) : null}
         </Flex>
         {renderChildren()}

@@ -19,7 +19,6 @@
 import React from 'react'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button} from '@instructure/ui-buttons'
-// @ts-expect-error -- remove once on InstUI 8
 import {IconAddLine} from '@instructure/ui-icons'
 import RequirementCountInput from './RequirementCountInput'
 import RequirementSelector from './RequirementSelector'

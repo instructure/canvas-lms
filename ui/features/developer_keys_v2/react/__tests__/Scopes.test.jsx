@@ -101,7 +101,7 @@ it('handles filter input change by setting the filter state', () => {
 
 it('renders Billboard if requireScopes is false', () => {
   const wrapper = mount(<Scopes {...props(undefined, false)} />)
-  expect(wrapper.find('Billboard')).toHaveLength(1)
+  expect(wrapper.find('Billboard')).toHaveLength(2)
 })
 
 it('does not render search box if requireScopes is false', () => {
@@ -121,7 +121,7 @@ it('renders ScopesList if requireScopes is true', () => {
 
 it('does render search box if requireScopes is true', () => {
   const wrapper = mount(<Scopes {...props()} />)
-  expect(wrapper.find('TextInput')).toHaveLength(1)
+  expect(wrapper.find('TextInput')).toHaveLength(3)
 })
 
 it('controls requireScopes change when clicking requireScopes button', () => {
@@ -130,6 +130,7 @@ it('controls requireScopes change when clicking requireScopes button', () => {
   wrapper
     .find('Checkbox')
     .filterWhere(n => n.prop('variant') === 'toggle')
+    .at(1)
     .props()
     .onChange()
   expect(requireScopesStub.called).toBe(true)

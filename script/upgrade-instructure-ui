@@ -34,7 +34,6 @@ const yarnJson = lockfile.parse(yarnFile)
 
 function isInstuiPackageSpec(packageSpec) {
   const nonUiPackages = [
-    '@instructure/babel-plugin-themeable-styles',
     '@instructure/babel-plugin-transform-imports',
     '@instructure/browserslist-config-instui',
     '@instructure/canvas-high-contrast-theme',
@@ -45,8 +44,7 @@ function isInstuiPackageSpec(packageSpec) {
     '@instructure/debounce',
     '@instructure/instructure-theme',
     '@instructure/pkg-utils',
-    '@instructure/postcss-themeable-styles',
-    '@instructure/uid'
+    '@instructure/uid',
   ]
   return (
     packageSpec.startsWith('@instructure/ui-') ||

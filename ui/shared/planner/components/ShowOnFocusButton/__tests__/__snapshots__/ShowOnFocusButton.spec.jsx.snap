@@ -9,6 +9,7 @@ exports[`renders a ScreenReaderContent by default 1`] = `
     as="button"
     color="link"
     elementRef={[Function]}
+    forceButtonRole={true}
     iconPlacement="start"
     isWithinText={false}
     onBlur={[Function]}

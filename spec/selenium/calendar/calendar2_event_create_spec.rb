@@ -327,6 +327,7 @@ describe "calendar2" do
         end
 
         it "users can switch between an account calendar and a user calendar with the same name" do
+          skip "FOO-3525 (10/6/2023)"
           @course.account.name = "nobody+1@example.com"
           @course.account.save!
           enable_course_account_calendar

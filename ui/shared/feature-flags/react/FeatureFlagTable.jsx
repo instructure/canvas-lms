@@ -76,7 +76,7 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                         </View>
                       }
                     >
-                      <Pill margin="0 x-small" theme={{maxWidth: 'none'}}>
+                      <Pill margin="0 x-small" themeOverride={{maxWidth: 'none'}}>
                         {I18n.t('Hidden')}
                       </Pill>
                     </Tooltip>

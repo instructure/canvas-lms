@@ -22,7 +22,6 @@ import {View} from '@instructure/ui-view'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-// @ts-expect-error
 import {IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 

@@ -81,7 +81,7 @@ describe('LibraryManager', () => {
     it('displays an error if the comments couldnt be fetched', async () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       render({mocks: []})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error loading comment library',
         type: 'error',
@@ -90,7 +90,7 @@ describe('LibraryManager', () => {
 
     it('calls focus when a comment within the tray is clicked', async () => {
       const {getByText} = render()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'), {detail: 1})
       fireEvent.click(getByText('Comment item 0'), {detail: 1})
       expect(setFocusToTextAreaMock).toHaveBeenCalled()
@@ -105,12 +105,12 @@ describe('LibraryManager', () => {
       const mutationMock = await makeCreateMutationMock({variables, overrides})
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, getByLabelText} = render({mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       const input = getByLabelText('Add comment to library')
       fireEvent.change(input, {target: {value: 'test comment'}})
       fireEvent.click(getByText('Add to Library'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       expect(getByText('test comment')).toBeInTheDocument()
     })
@@ -119,7 +119,7 @@ describe('LibraryManager', () => {
       const mutationMock = await makeCreateMutationMock({variables, overrides})
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, getByLabelText} = render({mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       const input = getByLabelText('Add comment to library')
       fireEvent.change(input, {target: {value: 'test comment'}})
@@ -130,12 +130,12 @@ describe('LibraryManager', () => {
     it('displays an error if the create mutation failed', async () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       const {getByText, getByLabelText} = render()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       const input = getByLabelText('Add comment to library')
       fireEvent.change(input, {target: {value: 'test comment'}})
       fireEvent.click(getByText('Add to Library'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error creating comment',
         type: 'error',
@@ -162,22 +162,22 @@ describe('LibraryManager', () => {
       })
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, queryByText} = render({mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
 
       fireEvent.click(getByText('Delete comment: Comment item 0'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(queryByText('Comment item 0')).not.toBeInTheDocument()
     })
 
     it('displays an error if the delete mutation failed', async () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       const {getByText} = render()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Delete comment: Comment item 0'))
 
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error deleting comment',
         type: 'error',
@@ -192,11 +192,11 @@ describe('LibraryManager', () => {
       })
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText} = render({mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
 
       fireEvent.click(getByText('Delete comment: Comment item 0'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(getByText('Delete comment: Comment item 0')).toBeInTheDocument()
     })
 
@@ -207,11 +207,11 @@ describe('LibraryManager', () => {
       })
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText} = render({mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
 
       fireEvent.click(getByText('Delete comment: Comment item 1'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(getByText('Delete comment: Comment item 0').closest('button')).toHaveFocus()
     })
 
@@ -222,7 +222,7 @@ describe('LibraryManager', () => {
       })
       const mocks = [...commentBankItemMocks({numberOfComments: 1}), ...mutationMock]
       const {getByText} = render({mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Delete comment: Comment item 0'))
       await waitFor(() => {
@@ -239,7 +239,7 @@ describe('LibraryManager', () => {
         mocks,
       })
 
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(getByText('search result 0')).toBeInTheDocument()
     })
 
@@ -249,7 +249,7 @@ describe('LibraryManager', () => {
         props: defaultProps({commentAreaText: 'se'}),
         mocks,
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(queryByText('search result 0')).not.toBeInTheDocument()
     })
 
@@ -274,22 +274,22 @@ describe('LibraryManager', () => {
       ]
       const props = defaultProps({commentAreaText: 'search'})
       const {getByText, queryByText, rerender} = render({props, mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('search result 0'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
 
       render({
         props: defaultProps({commentAreaText: 'search result 0'}),
         mocks,
         func: rerender,
       })
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(queryByText('search result 0')).not.toBeInTheDocument()
     })
 
     it('renders the suggestions as enabled if comment_library_suggestions_enabled is true', async () => {
       const {getByText, getByLabelText} = render({mocks: commentBankItemMocks()})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       expect(getByLabelText('Show suggestions when typing')).toBeChecked()
     })
@@ -297,7 +297,7 @@ describe('LibraryManager', () => {
     it('renders the suggestions as disabled if comment_library_suggestions_enabled is false', async () => {
       window.ENV = {comment_library_suggestions_enabled: false}
       const {getByText, getByLabelText} = render()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
     })
@@ -307,7 +307,7 @@ describe('LibraryManager', () => {
         Promise.resolve({json: {comment_library_suggestions_enabled: false}})
       )
       const {getByText, getByLabelText} = render()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByLabelText('Show suggestions when typing'))
       expect(doFetchApi).toHaveBeenCalledTimes(1)
@@ -319,7 +319,7 @@ describe('LibraryManager', () => {
         },
       })
       expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(ENV.comment_library_suggestions_enabled).toBe(false)
     })
 
@@ -327,11 +327,11 @@ describe('LibraryManager', () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       doFetchApi.mockImplementationOnce(() => Promise.reject(new Error('Network error')))
       const {getByText, getByLabelText} = render()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByLabelText('Show suggestions when typing'))
       expect(doFetchApi).toHaveBeenCalledTimes(1)
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(ENV.comment_library_suggestions_enabled).toBe(true)
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error saving suggestion preference',
@@ -349,7 +349,7 @@ describe('LibraryManager', () => {
       const mutationMock = await makeUpdateMutationMock({variables, overrides})
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, getByLabelText} = render({mocks})
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
 
       fireEvent.click(getByText('Edit comment: Comment item 0'))
@@ -357,7 +357,7 @@ describe('LibraryManager', () => {
       fireEvent.change(input, {target: {value: 'updated comment!'}})
       fireEvent.click(getByText('Save'))
       expect(getByText('updated comment!')).toBeInTheDocument()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Comment updated',
         type: 'success',
@@ -367,13 +367,13 @@ describe('LibraryManager', () => {
     it('displays an error if the update mutation failed', async () => {
       const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
       const {getByText, getByLabelText} = render()
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Edit comment: Comment item 0'))
       const input = getByLabelText('Edit comment')
       fireEvent.change(input, {target: {value: 'not mocked!'}})
       fireEvent.click(getByText('Save'))
-      await act(async () => jest.runAllTimers())
+      await act(async () => jest.advanceTimersByTime(1000))
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error updating comment',
         type: 'error',

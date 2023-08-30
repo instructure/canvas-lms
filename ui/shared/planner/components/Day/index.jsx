@@ -113,7 +113,7 @@ export class Day extends Component {
         animatableIndex={this.props.animatableIndex * 100 + index + 1}
         url={courseInfo.url}
         key={groupKey}
-        theme={{
+        themeOverride={{
           titleColor: groupColor,
         }}
         toggleCompletion={this.props.toggleCompletion}

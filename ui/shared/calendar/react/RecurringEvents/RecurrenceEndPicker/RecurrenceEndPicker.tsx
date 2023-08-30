@@ -21,13 +21,10 @@ import moment from 'moment-timezone'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {FormField, FormFieldGroup} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
-// @ts-expect-error
 import {px} from '@instructure/ui-utils'
-// @ts-expect-error
 import {RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
-// @ts-expect-error
 import {IconWarningLine} from '@instructure/ui-icons'
 import {DEFAULT_COUNT, MAX_COUNT} from '../RRuleHelper'
 import {FrequencyValue} from '../types'
@@ -287,7 +284,7 @@ export default function RecurrenceEndPicker({
   )
 
   const handleCountChange = useCallback(
-    (_event: Event, value: string | number): void => {
+    (_event, value: string | number): void => {
       const cnt = typeof value === 'string' ? parseFloat(value) : value
       setCountNumber(cnt)
       setCountValue(value.toString())
@@ -387,7 +384,7 @@ export default function RecurrenceEndPicker({
               value={countValue}
               width={`${px('3em') + px('4rem')}px`}
               onChange={handleCountChange}
-              onIncrement={(event: Event) => {
+              onIncrement={event => {
                 if (
                   countNumber === undefined ||
                   Number.isNaN(countNumber) ||
@@ -396,7 +393,7 @@ export default function RecurrenceEndPicker({
                   return
                 handleCountChange(event, Math.floor(countNumber) + 1)
               }}
-              onDecrement={(event: Event) => {
+              onDecrement={event => {
                 if (countNumber === undefined || Number.isNaN(countNumber) || countNumber <= 1)
                   return
                 handleCountChange(event, Math.ceil(countNumber) - 1)

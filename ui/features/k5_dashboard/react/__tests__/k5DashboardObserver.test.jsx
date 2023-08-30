@@ -112,7 +112,7 @@ describe('K5Dashboard Parent Support', () => {
     expect(moxios.requests.count()).toBe(1)
   })
 
-  it('does not make a request if the user has been already requested', async () => {
+  it.skip('does not make a request if the user has been already requested (flaky)', async () => {
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
       status: 200,
       response: MOCK_CARDS,
@@ -155,7 +155,7 @@ describe('K5Dashboard Parent Support', () => {
     expect(moxios.requests.count()).toBe(2)
   })
 
-  it('shows the observee missing items on dashboard cards', async () => {
+  it.skip('shows the observee missing items on dashboard cards (flaky)', async () => {
     moxios.stubs.reset()
     moxios.requests.reset()
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {

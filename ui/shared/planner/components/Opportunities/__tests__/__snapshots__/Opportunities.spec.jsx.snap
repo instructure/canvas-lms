@@ -72,7 +72,6 @@ exports[`renders nothing if no opportunities 1`] = `
       type="button"
     />
     <Tabs
-      elementRef={[Function]}
       id="Opportunities-styles__tabs_container"
       onRequestTabChange={[Function]}
       shouldFocusOnRender={false}
@@ -80,10 +79,8 @@ exports[`renders nothing if no opportunities 1`] = `
       variant="default"
     >
       <Panel
-        elementRef={[Function]}
         isDisabled={false}
         isSelected={true}
-        labelledBy={null}
         maxHeight="auto"
         padding="small"
         renderTitle={
@@ -102,10 +99,8 @@ exports[`renders nothing if no opportunities 1`] = `
         </div>
       </Panel>
       <Panel
-        elementRef={[Function]}
         isDisabled={false}
         isSelected={false}
-        labelledBy={null}
         maxHeight="auto"
         padding="small"
         renderTitle={
@@ -200,7 +195,6 @@ exports[`renders the base component correctly with one of each kind of opportuni
       type="button"
     />
     <Tabs
-      elementRef={[Function]}
       id="Opportunities-styles__tabs_container"
       onRequestTabChange={[Function]}
       shouldFocusOnRender={false}
@@ -208,10 +202,8 @@ exports[`renders the base component correctly with one of each kind of opportuni
       variant="default"
     >
       <Panel
-        elementRef={[Function]}
         isDisabled={false}
         isSelected={true}
-        labelledBy={null}
         maxHeight="auto"
         padding="small"
         renderTitle={
@@ -246,10 +238,8 @@ exports[`renders the base component correctly with one of each kind of opportuni
         </ol>
       </Panel>
       <Panel
-        elementRef={[Function]}
         isDisabled={false}
         isSelected={false}
-        labelledBy={null}
         maxHeight="auto"
         padding="small"
         renderTitle={
@@ -360,7 +350,6 @@ exports[`renders the right course with the right opportunity 1`] = `
       type="button"
     />
     <Tabs
-      elementRef={[Function]}
       id="Opportunities-styles__tabs_container"
       onRequestTabChange={[Function]}
       shouldFocusOnRender={false}
@@ -368,10 +357,8 @@ exports[`renders the right course with the right opportunity 1`] = `
       variant="default"
     >
       <Panel
-        elementRef={[Function]}
         isDisabled={false}
         isSelected={true}
-        labelledBy={null}
         maxHeight="auto"
         padding="small"
         renderTitle={
@@ -421,10 +408,8 @@ exports[`renders the right course with the right opportunity 1`] = `
         </ol>
       </Panel>
       <Panel
-        elementRef={[Function]}
         isDisabled={false}
         isSelected={false}
-        labelledBy={null}
         maxHeight="auto"
         padding="small"
         renderTitle={

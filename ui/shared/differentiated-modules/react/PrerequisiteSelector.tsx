@@ -21,15 +21,11 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
-// @ts-expect-error -- remove once on InstUI 8
 import {IconTrashLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 export interface PrerequisiteSelectorProps {
   selection: string
@@ -48,7 +44,7 @@ export default function PrerequisiteSelector({
 }: PrerequisiteSelectorProps) {
   return (
     <Flex direction="row">
-      <FlexItem shouldGrow={true} shouldShrink={true}>
+      <Flex.Item shouldGrow={true} shouldShrink={true}>
         <CanvasSelect
           id="prerequisite"
           value={selection}
@@ -65,8 +61,8 @@ export default function PrerequisiteSelector({
             )
           })}
         </CanvasSelect>
-      </FlexItem>
-      <FlexItem margin="0 0 0 medium">
+      </Flex.Item>
+      <Flex.Item margin="0 0 0 medium">
         <IconButton
           renderIcon={<IconTrashLine color="error" />}
           onClick={() => onDropPrerequisite(index)}
@@ -74,7 +70,7 @@ export default function PrerequisiteSelector({
           withBackground={false}
           withBorder={false}
         />
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }

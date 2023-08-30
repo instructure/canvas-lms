@@ -20,7 +20,7 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {pick} from 'lodash'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -35,7 +35,11 @@ import blackoutDatesIcon from '../../utils/blackout-dates-lined.svg'
 
 const I18n = useI18nScope('course_paces_blackout_date_row')
 
-const {Cell, Row} = Table as any
+const componentOverrides = {
+  [Table.Cell.componentId]: {
+    background: '#F5F5F5',
+  },
+}
 
 interface PassedProps {
   readonly blackoutDate: BlackoutDate
@@ -99,23 +103,22 @@ class BlackoutDateRow extends React.Component<PassedProps, LocalState> {
 
   render() {
     const labelMargin = this.props.isStacked ? '0 0 0 small' : undefined
-    const themeOverrides = {background: '#F5F5F5'}
     return (
-      <ApplyTheme theme={{[Cell.theme]: themeOverrides}}>
-        <Row
+      <InstUISettingsProvider theme={{componentOverrides}}>
+        <Table.Row
           data-testid="pp-blackout-date-row"
           {...pick(this.props, ['hover', 'isStacked', 'headers'])}
         >
-          <Cell>
+          <Table.Cell>
             <View margin={labelMargin}>{this.renderTitle()}</View>
-          </Cell>
-          <Cell textAlign="center">{this.duration()}</Cell>
-          <Cell colSpan={this.props.isStacked ? 2 : 1} textAlign="center">
+          </Table.Cell>
+          <Table.Cell textAlign="center">{this.duration()}</Table.Cell>
+          <Table.Cell colSpan={this.props.isStacked ? 2 : 1} textAlign="center">
             <View margin={labelMargin}>{this.renderDates()}</View>
-          </Cell>
-          {!this.props.isStacked && <Cell />}
-        </Row>
-      </ApplyTheme>
+          </Table.Cell>
+          {!this.props.isStacked && <Table.Cell />}
+        </Table.Row>
+      </InstUISettingsProvider>
     )
   }
 }

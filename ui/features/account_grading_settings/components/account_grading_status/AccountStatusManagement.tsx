@@ -23,11 +23,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Alert} from '@instructure/ui-alerts'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {Grid} from '@instructure/ui-grid'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {CustomStatusItem} from './CustomStatusItem'
 import {StandardStatusItem} from './StandardStatusItem'
 import {CustomStatusNewItem} from './CustomStatusNewItem'
@@ -117,7 +116,7 @@ export const AccountStatusManagement = ({
   }
 
   return (
-    <View>
+    <View margin="small 0">
       {successMessage && (
         <Alert
           variant="success"
@@ -129,7 +128,7 @@ export const AccountStatusManagement = ({
           {successMessage}
         </Alert>
       )}
-      <Grid startAt="large" margin="small 0">
+      <Grid startAt="large">
         <GridRow>
           <GridCol width={{large: 4}}>
             <Heading level="h2">

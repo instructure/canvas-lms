@@ -24,7 +24,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Transition} from '@instructure/ui-motion'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconPlusLine} from '@instructure/ui-icons'
 
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
@@ -44,9 +43,6 @@ import {
 } from './form/GradingSchemeInput'
 import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 import {canManageAccountGradingSchemes} from '../helpers/gradingSchemePermissions'
-
-// Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
-const {Item} = Flex as any
 
 const I18n = useI18nScope('GradingSchemeManagement')
 
@@ -278,7 +274,7 @@ export const GradingSchemesManagement = ({
     <>
       <View>
         <Flex justifyItems="end">
-          <Item>
+          <Flex.Item>
             <Button
               color="secondary"
               onClick={addNewGradingScheme}
@@ -287,7 +283,7 @@ export const GradingSchemesManagement = ({
               <IconPlusLine />
               {I18n.t('Add grading scheme')}
             </Button>
-          </Item>
+          </Flex.Item>
         </Flex>
       </View>
       {!gradingSchemeCards || !defaultGradingSchemeTemplate ? (
@@ -329,7 +325,7 @@ export const GradingSchemesManagement = ({
                   />
                   <hr />
                   <Flex justifyItems="end">
-                    <Item>
+                    <Flex.Item>
                       <Button
                         onClick={() => setGradingSchemeCreating(undefined)}
                         margin="0 x-small 0 0"
@@ -342,7 +338,7 @@ export const GradingSchemesManagement = ({
                       >
                         {I18n.t('Save')}
                       </Button>
-                    </Item>
+                    </Flex.Item>
                   </Flex>
                 </View>
               </Transition>
@@ -397,7 +393,7 @@ export const GradingSchemesManagement = ({
                     />
                     <hr />
                     <Flex justifyItems="end">
-                      <Item>
+                      <Flex.Item>
                         <Button
                           onClick={() => handleCancelEdit(gradingSchemeCard.gradingScheme.id)}
                           margin="0 x-small 0 0"
@@ -410,7 +406,7 @@ export const GradingSchemesManagement = ({
                         >
                           {I18n.t('Save')}
                         </Button>
-                      </Item>
+                      </Flex.Item>
                     </Flex>
                   </>
                 </Transition>

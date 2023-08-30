@@ -53,7 +53,7 @@ QUnit.module('SubmissionCommentListItem', {
 
 test('it has an Avatar', function () {
   this.wrapper = this.mountComponent()
-  strictEqual(this.wrapper.find('Avatar').length, 1)
+  strictEqual(this.wrapper.find('Avatar').length, 2)
 })
 
 test('the avatar names the author', function () {

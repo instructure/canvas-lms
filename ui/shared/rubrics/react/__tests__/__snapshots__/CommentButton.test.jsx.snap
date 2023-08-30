@@ -6,7 +6,6 @@ exports[`The CommentButton component renders the root component as expected 1`] 
     as="button"
     color="secondary"
     cursor="pointer"
-    elementRef={[Function]}
     margin="0 x-small 0 0"
     onClick={[Function]}
     renderIcon={<IconFeedbackLine />}

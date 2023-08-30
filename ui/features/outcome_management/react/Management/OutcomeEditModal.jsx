@@ -27,7 +27,7 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Mask} from '@instructure/ui-overlays'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -47,6 +47,12 @@ import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
 
 const I18n = useI18nScope('OutcomeManagement')
+
+const componentOverrides = {
+  [Mask.componentId]: {
+    zIndex: '1000',
+  },
+}
 
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
@@ -203,7 +209,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
   }
 
   return (
-    <ApplyTheme theme={{[Mask.theme]: {zIndex: '1000'}}}>
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <Modal
         size="medium"
         label={I18n.t('Edit Outcome')}
@@ -339,7 +345,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
           </Button>
         </Modal.Footer>
       </Modal>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }
 

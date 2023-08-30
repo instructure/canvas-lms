@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -44,11 +44,13 @@ export const ContextCheckbox = ({
   onChange,
   selected,
 }) => (
-  <ApplyTheme
+  <InstUISettingsProvider
     theme={{
-      [CheckboxFacade.theme]: {
-        checkedBackground: color,
-        checkedBorderColor: color,
+      componentOverrides: {
+        [CheckboxFacade.componentId]: {
+          checkedBackground: color,
+          checkedBorderColor: color,
+        },
       },
     }}
   >
@@ -60,7 +62,7 @@ export const ContextCheckbox = ({
       disabled={maxContextsReached && !selected}
       onChange={() => onChange(assetString)}
     />
-  </ApplyTheme>
+  </InstUISettingsProvider>
 )
 
 const FilterCalendarsModal = ({

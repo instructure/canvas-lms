@@ -24,16 +24,12 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
-// @ts-expect-error
 import {IconModuleSolid} from '@instructure/ui-icons'
 import {calculatePanelHeight} from '../utils/miscHelpers'
 import type {Module} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 export interface DifferentiatedModulesTrayProps {
   onDismiss: () => void
@@ -60,7 +56,7 @@ export default function DifferentiatedModulesTray({
   courseId,
   ...settingsProps
 }: DifferentiatedModulesTrayProps) {
-  const [selectedTab, setSelectedTab] = useState(initialTab)
+  const [selectedTab, setSelectedTab] = useState<string | undefined>(initialTab)
 
   const panelHeight = useMemo(() => calculatePanelHeight(!assignOnly), [assignOnly])
 
@@ -68,15 +64,15 @@ export default function DifferentiatedModulesTray({
     return (
       <View as="div" padding="small">
         <Flex as="div" margin="0 0 medium 0">
-          <FlexItem>
+          <Flex.Item>
             <CloseButton onClick={onDismiss} screenReaderLabel={I18n.t('Close')} placement="end" />
-          </FlexItem>
-          <FlexItem>
+          </Flex.Item>
+          <Flex.Item>
             <IconModuleSolid size="x-small" />
-          </FlexItem>
-          <FlexItem margin="0 0 0 small">
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 small">
             <Heading as="h3">{I18n.t('Edit Module Settings')}</Heading>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </View>
     )
@@ -84,7 +80,7 @@ export default function DifferentiatedModulesTray({
 
   function Fallback() {
     return (
-      <View as="div" textAlign="center" size="large">
+      <View as="div" textAlign="center">
         <Spinner renderTitle={I18n.t('Loading...')} />
       </View>
     )
@@ -101,11 +97,7 @@ export default function DifferentiatedModulesTray({
             onDismiss={onDismiss}
           />
         ) : (
-          <Tabs
-            onRequestTabChange={(_e: Event, {id}: {id: 'settings' | 'assign-to'}) =>
-              setSelectedTab(id)
-            }
-          >
+          <Tabs onRequestTabChange={(_e: any, {id}: {id?: string}) => setSelectedTab(id)}>
             <Tabs.Panel
               id="settings"
               data-testid="settings-panel"

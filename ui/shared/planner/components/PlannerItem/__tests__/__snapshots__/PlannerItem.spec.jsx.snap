@@ -325,10 +325,11 @@ exports[`does not render end time if the same as start time 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -718,11 +719,12 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -782,7 +784,6 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
             hasInverseColor={false}
             name="Dr. David Bowman"
             onImageLoaded={[Function]}
-            renderIcon={null}
             shape="circle"
             size="small"
             src="/avatar/is/here/"
@@ -1124,11 +1125,12 @@ exports[`renders Announcement correctly with everything 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -1518,11 +1520,12 @@ exports[`renders Announcement correctly with just date 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -1891,11 +1894,12 @@ exports[`renders Announcement correctly with just points 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -2285,11 +2289,12 @@ exports[`renders Announcement correctly without right side content 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -2658,11 +2663,12 @@ exports[`renders Assignment correctly with everything 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://www.non_default_url.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -3052,11 +3058,12 @@ exports[`renders Assignment correctly with just date 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -3425,11 +3432,12 @@ exports[`renders Assignment correctly with just points 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -3819,11 +3827,12 @@ exports[`renders Assignment correctly without right side content 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -4200,10 +4209,11 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -4600,10 +4610,11 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -5021,10 +5032,11 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -5421,10 +5433,11 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -5822,10 +5835,11 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -6214,11 +6228,12 @@ exports[`renders Discussion correctly with everything 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -6608,11 +6623,12 @@ exports[`renders Discussion correctly with just date 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -6981,11 +6997,12 @@ exports[`renders Discussion correctly with just points 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -7375,11 +7392,12 @@ exports[`renders Discussion correctly without right side content 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -7748,11 +7766,12 @@ exports[`renders Note correctly with Group 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="/groups/9/pages/this-is-an-account-level-group-page"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -8101,7 +8120,6 @@ exports[`renders Note correctly with everything 1`] = `
         hasInverseColor={false}
         name="Jane"
         onImageLoaded={[Function]}
-        renderIcon={null}
         shape="circle"
         size="small"
         src="/picture/is/here"
@@ -8140,10 +8158,11 @@ exports[`renders Note correctly with everything 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -8192,7 +8211,6 @@ exports[`renders Note correctly with everything 1`] = `
                   color="secondary"
                   cursor="pointer"
                   data-testid="edit-event-button"
-                  elementRef={[Function]}
                   margin="0"
                   onClick={[Function]}
                   renderIcon={[Function]}
@@ -8526,7 +8544,6 @@ exports[`renders Note correctly without Course 1`] = `
         hasInverseColor={false}
         name="Jane"
         onImageLoaded={[Function]}
-        renderIcon={null}
         shape="circle"
         size="small"
         src="/picture/is/here"
@@ -8565,10 +8582,11 @@ exports[`renders Note correctly without Course 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -8617,7 +8635,6 @@ exports[`renders Note correctly without Course 1`] = `
                   color="secondary"
                   cursor="pointer"
                   data-testid="edit-event-button"
-                  elementRef={[Function]}
                   margin="0"
                   onClick={[Function]}
                   renderIcon={[Function]}
@@ -8971,11 +8988,12 @@ exports[`renders Page correctly with everything 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -9365,11 +9383,12 @@ exports[`renders Page correctly with just date 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -9738,11 +9757,12 @@ exports[`renders Page correctly with just points 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -10132,11 +10152,12 @@ exports[`renders Page correctly without right side content 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -10505,11 +10526,12 @@ exports[`renders Quiz correctly with everything 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -10899,11 +10921,12 @@ exports[`renders Quiz correctly with just date 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -11272,11 +11295,12 @@ exports[`renders Quiz correctly with just points 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -11666,11 +11690,12 @@ exports[`renders Quiz correctly without right side content 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -12039,11 +12064,12 @@ exports[`renders assignment peer reviews correctly 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -12412,11 +12438,12 @@ exports[`renders correctly 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -12806,11 +12833,12 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -12870,7 +12898,6 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
             hasInverseColor={false}
             name="?"
             onImageLoaded={[Function]}
-            renderIcon={null}
             shape="circle"
             size="small"
           />
@@ -13211,11 +13238,12 @@ exports[`renders feedback if available 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -13275,7 +13303,6 @@ exports[`renders feedback if available 1`] = `
             hasInverseColor={false}
             name="Boyd Crowder"
             onImageLoaded={[Function]}
-            renderIcon={null}
             shape="circle"
             size="small"
             src="/avatar/is/here/"
@@ -13617,11 +13644,12 @@ exports[`renders media feedback if available 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -13681,7 +13709,6 @@ exports[`renders media feedback if available 1`] = `
             hasInverseColor={false}
             name="Howard Stern"
             onImageLoaded={[Function]}
-            renderIcon={null}
             shape="circle"
             size="small"
             src="/avatar/is/here/"
@@ -14031,10 +14058,11 @@ exports[`renders the end time if available 1`] = `
             <Link
               color="link"
               elementRef={[Function]}
+              forceButtonRole={true}
               iconPlacement="start"
               isWithinText={false}
               onClick={[Function]}
-              theme={
+              themeOverride={
                 Object {
                   "linkColor": undefined,
                   "linkHoverColor": undefined,
@@ -14424,11 +14452,12 @@ exports[`renders the location if available 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
@@ -14789,7 +14818,6 @@ exports[`renders user-created Todo correctly 1`] = `
         hasInverseColor={false}
         name="Jane"
         onImageLoaded={[Function]}
-        renderIcon={null}
         shape="circle"
         size="small"
         src="/picture/is/here"
@@ -14820,11 +14848,12 @@ exports[`renders user-created Todo correctly 1`] = `
           <Link
             color="link"
             elementRef={[Function]}
+            forceButtonRole={true}
             href="http://example.com"
             iconPlacement="start"
             interaction="enabled"
             isWithinText={false}
-            theme={
+            themeOverride={
               Object {
                 "linkColor": undefined,
                 "linkHoverColor": undefined,

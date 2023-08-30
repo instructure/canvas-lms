@@ -19,7 +19,6 @@
 import React, {useMemo} from 'react'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Button} from '@instructure/ui-buttons'
-// @ts-expect-error -- remove once on InstUI 8
 import {IconAddLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import PrerequisiteSelector from './PrerequisiteSelector'

@@ -34,8 +34,6 @@ import {ExternalToolDialogModal} from './ExternalToolDialogModal'
 import {showFlashAlert} from '../../../../../common/FlashAlert'
 import {parseUrlOrNull} from '../../../../../util/url-util'
 
-const FlexItem = Flex.Item as any
-
 export interface ExternalToolDialogProps {
   env: ExternalToolsEnv
 
@@ -263,13 +261,13 @@ export default class ExternalToolDialog extends React.Component<
           </div>
           {!state.iframeLoaded && (
             <Flex alignItems="center" justifyItems="center">
-              <FlexItem>
+              <Flex.Item>
                 <Spinner
                   renderTitle={formatMessage('Loading External Tool')}
                   size="large"
                   margin="0 0 0 medium"
                 />
-              </FlexItem>
+              </Flex.Item>
             </Flex>
           )}
 

@@ -30,7 +30,6 @@ import {
 import {Link} from '@instructure/ui-link'
 import {Button} from '@instructure/ui-buttons'
 import GradebookScoreExport from './GradebookScoreExport'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {IconUploadLine} from '@instructure/ui-icons'
 import IncludeUngradedAssignmentsCheckbox from './IncludeUngradedAssignmentsCheckbox'
 import HideStudentNamesCheckbox from './HideStudentNamesCheckbox'

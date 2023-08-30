@@ -18,10 +18,8 @@
 
 import React from 'react'
 import {Navigation} from '@instructure/ui-navigation'
-// @ts-expect-error
 import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
-// @ts-expect-error
 import {IconAdminLine, IconDashboardLine, IconUserLine, IconInboxLine} from '@instructure/ui-icons'
 
 const SideNav = () => {
@@ -34,7 +32,6 @@ const SideNav = () => {
           minimizedLabel: 'Expand Navigation',
         }}
       >
-        {/* @ts-expect-error */}
         <Navigation.Item
           icon={<Avatar name="Ziggy Marley" size="x-small" />}
           label="Account"
@@ -42,11 +39,8 @@ const SideNav = () => {
             // this.loadSubNav('account')
           }}
         />
-        {/* @ts-expect-error */}
         <Navigation.Item icon={<IconAdminLine />} label="Admin" href="#" />
-        {/* @ts-expect-error */}
         <Navigation.Item selected={true} icon={<IconDashboardLine />} label="Dashboard" href="#" />
-        {/* @ts-expect-error */}
         <Navigation.Item
           icon={
             <Badge count={99}>
@@ -56,7 +50,6 @@ const SideNav = () => {
           label="Inbox"
           href="#"
         />
-        {/* @ts-expect-error */}
         <Navigation.Item icon={<IconUserLine />} label="Profile" href="#" />
       </Navigation>
     </div>

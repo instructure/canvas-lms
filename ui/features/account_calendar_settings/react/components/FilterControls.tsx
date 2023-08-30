@@ -92,8 +92,7 @@ export const FilterControls = ({
         placeholder={I18n.t('Search Calendars')}
         renderBeforeInput={IconSearchLine}
         renderAfterInput={searchValue?.length ? clearSearchButton : undefined}
-        // @ts-ignore
-        theme={{
+        themeOverride={{
           borderRadius: '2rem',
         }}
         value={searchValue}

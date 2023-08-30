@@ -25,7 +25,6 @@ import React, {
   useState,
 } from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-expect-error
 import {Modal} from '@instructure/ui-modal'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -37,10 +36,6 @@ import {Enrollment, EnrollmentType} from './types'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('temporary_enrollment')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-// @ts-expect-error
-const FlexItem = Flex.Item as any
 
 interface Props {
   readonly title: string | ((enrollmentType: EnrollmentType, name: string) => string)
@@ -106,8 +101,8 @@ export function TempEnrollModal(props: Props) {
     }
   }, [tempEnrollments])
 
-  function resetState(page: number = 0) {
-    setPage(page)
+  function resetState(pg: number = 0) {
+    setPage(pg)
 
     if (isEditModeLocal) {
       onToggleEditMode(false)
@@ -251,34 +246,34 @@ export function TempEnrollModal(props: Props) {
   const renderButtons = () => {
     if (isEditModeLocal) {
       return (
-        <FlexItem margin="0 small 0 0">
+        <Flex.Item margin="0 small 0 0">
           <Button onClick={handleCancel}>{I18n.t('Done')}</Button>
-        </FlexItem>
+        </Flex.Item>
       )
     } else {
       const buttons = []
 
       buttons.push(
-        <FlexItem key="cancel" margin="0 small 0 0">
+        <Flex.Item key="cancel" margin="0 small 0 0">
           <Button onClick={handleCancel}>{I18n.t('Cancel')}</Button>
-        </FlexItem>
+        </Flex.Item>
       )
 
       if (page === 1) {
         buttons.push(
-          <FlexItem key="startOver" margin="0 small 0 0">
+          <Flex.Item key="startOver" margin="0 small 0 0">
             <Button onClick={handleResetToBeginning}>{I18n.t('Start Over')}</Button>
-          </FlexItem>
+          </Flex.Item>
         )
       }
 
       if (!isEditModeLocal) {
         buttons.push(
-          <FlexItem key="nextOrSubmit" margin="0 small 0 0">
+          <Flex.Item key="nextOrSubmit" margin="0 small 0 0">
             <Button color="primary" onClick={handlePageTransition}>
               {page === 2 ? I18n.t('Submit') : I18n.t('Next')}
             </Button>
-          </FlexItem>
+          </Flex.Item>
         )
       }
 
@@ -295,7 +290,7 @@ export function TempEnrollModal(props: Props) {
         size="large"
         label={I18n.t('Create a Temporary Enrollment')}
         shouldCloseOnDocumentClick={true}
-        theme={{smallMaxWidth: '30em'}}
+        themeOverride={{smallMaxWidth: '30em'}}
       >
         <Modal.Header>
           <Heading tabIndex={-1} level="h2">

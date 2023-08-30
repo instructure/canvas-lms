@@ -20,20 +20,26 @@ import React from 'react'
 import {object} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {View} from '@instructure/ui-view'
-import {Button} from '@instructure/ui-buttons'
 import {IconAssignmentLine, IconQuizLine} from '@instructure/ui-icons'
 
 import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('IndividualStudentMasteryUnassessedAssignment')
 
+const componentOverrides = {
+  [Link.componentId]: {
+    fontWeight: '700',
+    color: '#68777D',
+  },
+}
+
 const UnassessedAssignment = ({assignment}) => {
   const {id, url, submission_types, title} = assignment
   return (
     <View padding="small" display="block" key={id}>
-      <ApplyTheme theme={{[Button.theme]: {linkColor: '#68777D', fontWeight: '700'}}}>
+      <InstUISettingsProvider theme={{componentOverrides}}>
         <Link
           href={url}
           isWithinText={false}
@@ -44,7 +50,7 @@ const UnassessedAssignment = ({assignment}) => {
         >
           {title} ({I18n.t('Not yet assessed')})
         </Link>
-      </ApplyTheme>
+      </InstUISettingsProvider>
     </View>
   )
 }

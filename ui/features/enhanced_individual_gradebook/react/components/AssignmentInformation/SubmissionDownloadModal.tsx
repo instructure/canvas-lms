@@ -17,7 +17,6 @@
  */
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-expect-error
 import {IconDownloadSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'

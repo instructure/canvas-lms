@@ -22,7 +22,6 @@ import WeekdayPicker from '../WeekdayPicker/WeekdayPicker'
 import {useScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {NumberInput} from '@instructure/ui-number-input'
-// @ts-expect-error
 import {px} from '@instructure/ui-utils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
@@ -183,7 +182,7 @@ export default function RepeatPicker({
   )
 
   const handleChangeMonthlyMode = useCallback(
-    (_event: Event, {value}) => {
+    (_event, {value}) => {
       const newMonthlyMode = value as MonthlyModeValue
 
       setCurrMonthlyMode(newMonthlyMode)
@@ -206,7 +205,13 @@ export default function RepeatPicker({
   )
 
   const handleIntervalChange = useCallback(
-    (_event: Event, value: string | number) => {
+    (
+      _event:
+        | React.ChangeEvent<HTMLInputElement>
+        | React.KeyboardEvent<HTMLInputElement>
+        | React.MouseEvent<HTMLButtonElement, MouseEvent>,
+      value: string | number
+    ) => {
       const num = typeof value === 'string' ? parseInt(value, 10) : value
       if (Number.isNaN(num)) return
       if (num < 1) return
@@ -223,7 +228,7 @@ export default function RepeatPicker({
   )
 
   const handleFreqChange = useCallback(
-    (_event: Event, {value}) => {
+    (_event, {value}) => {
       activeElement.current = document.activeElement as HTMLElement
 
       setCurrFreq(value)
@@ -294,8 +299,10 @@ export default function RepeatPicker({
           <span style={{minWidth: '7rem', flexShrink: 1}}>
             <SimpleSelect
               data-testid="repeat-frequency"
-              inputRef={(node: HTMLInputElement) => {
-                freqRef.current = node
+              inputRef={node => {
+                if (node instanceof HTMLInputElement) {
+                  freqRef.current = node
+                }
               }}
               key={`${interval}-${freq}`}
               renderLabel={<ScreenReaderContent>{I18n.t('frequency')}</ScreenReaderContent>}

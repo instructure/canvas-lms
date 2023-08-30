@@ -18,7 +18,6 @@
 
 import React, {Fragment, ComponentClass, useCallback, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
-// @ts-expect-error
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -27,9 +26,6 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('collapsable_list')
-
-// @ts-expect-error
-const FlexItem = Flex.Item as any
 
 type ParentItem = {
   id: string
@@ -123,20 +119,19 @@ const ParentItemCheckbox = ({parentId, label, items, icon, onChange}: ParentItem
       aria-label={I18n.t('%{label}, Navigate inside to interact with the checkbox', {label})}
       summary={
         <Flex>
-          <FlexItem padding="x-small" shouldShrink={true}>
+          <Flex.Item padding="x-small" shouldShrink={true}>
             <Checkbox
               checked={checked}
               indeterminate={indeterminate}
-              // @ts-expect-error
               onChange={e => handleItemCheck(e.target.checked, parentId)}
               label={<ScreenReaderContent>{label}</ScreenReaderContent>}
               data-testid={`checkbox-${parentId}`}
             />
-          </FlexItem>
-          <FlexItem shouldShrink={true}>{ParentIcon && <ParentIcon size="small" />}</FlexItem>
-          <FlexItem padding="0 small" shouldShrink={true}>
+          </Flex.Item>
+          <Flex.Item shouldShrink={true}>{ParentIcon && <ParentIcon size="small" />}</Flex.Item>
+          <Flex.Item padding="0 small" shouldShrink={true}>
             <Text aria-hidden="true">{label}</Text>
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       }
     >
@@ -157,10 +152,9 @@ const ParentItemCheckbox = ({parentId, label, items, icon, onChange}: ParentItem
 const ChildItemCheckbox = ({id, label, parentId, selection, onChange}: ChildItemCheckboxProps) => {
   return (
     <Flex margin="small 0 medium x-large">
-      <FlexItem padding="0 xxx-small">
+      <Flex.Item padding="0 xxx-small">
         <Checkbox
           checked={selection.has(id) || selection.has(parentId)}
-          // @ts-expect-error
           onChange={e => onChange(e.target.checked, id)}
           label={
             <View padding="0 0 0 small">
@@ -169,7 +163,7 @@ const ChildItemCheckbox = ({id, label, parentId, selection, onChange}: ChildItem
           }
           data-testid={`checkbox-${id}`}
         />
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }
@@ -188,18 +182,18 @@ const SingleItemCheckbox = ({id, label, icon, onChange}: SingleItemCheckboxProps
 
   return (
     <Flex margin="x-small 0 x-small small" padding="0 0 0 xx-small">
-      <FlexItem padding="x-small" shouldShrink={true}>
+      <Flex.Item padding="x-small" shouldShrink={true}>
         <Checkbox
           checked={checked}
           onChange={handleChecked}
           label={<ScreenReaderContent>{label}</ScreenReaderContent>}
           data-testid={`checkbox-${id}`}
         />
-      </FlexItem>
-      <FlexItem shouldShrink={true}>{ParentIcon && <ParentIcon size="small" />}</FlexItem>
-      <FlexItem padding="0 small" shouldShrink={true}>
+      </Flex.Item>
+      <Flex.Item shouldShrink={true}>{ParentIcon && <ParentIcon size="small" />}</Flex.Item>
+      <Flex.Item padding="0 small" shouldShrink={true}>
         <Text aria-hidden="true">{label}</Text>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 }

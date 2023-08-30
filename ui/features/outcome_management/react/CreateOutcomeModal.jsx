@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Mask} from '@instructure/ui-overlays'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useInput from '@canvas/outcomes/react/hooks/useInput'
 import TargetGroupSelector from './shared/TargetGroupSelector'
@@ -54,6 +54,12 @@ import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHe
 import Ratings from './Management/Ratings'
 
 const I18n = useI18nScope('OutcomeManagement')
+
+const componentOverrides = {
+  [Mask.componentId]: {
+    zIndex: '1000',
+  },
+}
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
   const {contextType, contextId, friendlyDescriptionFF, isMobileView, accountLevelMasteryScalesFF} =
@@ -242,7 +248,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   )
 
   return (
-    <ApplyTheme theme={{[Mask.theme]: {zIndex: '1000'}}}>
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <Modal
         size={!isMobileView ? 'large' : 'fullscreen'}
         label={I18n.t('Create Outcome')}
@@ -351,7 +357,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
           </Button>
         </Modal.Footer>
       </Modal>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }
 

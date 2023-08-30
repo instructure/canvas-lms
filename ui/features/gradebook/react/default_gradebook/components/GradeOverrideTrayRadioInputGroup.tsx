@@ -21,7 +21,6 @@ import classnames from 'classnames'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-// @ts-expect-error -- TODO: remove once we're on InstUI 8
 import {RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 
@@ -95,7 +94,7 @@ export default function GradeOverrideTrayRadioInputGroup({
           height="2.925rem"
           background="primary"
           className={getRadioInputClasses(status.color ?? 'transparent')}
-          theme={{
+          themeOverride={{
             backgroundPrimary: status.color,
           }}
         >

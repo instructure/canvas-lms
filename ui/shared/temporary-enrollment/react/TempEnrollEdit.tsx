@@ -18,10 +18,8 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-// @ts-expect-error
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Button, IconButton} from '@instructure/ui-buttons'
-// @ts-expect-error
 import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -34,10 +32,6 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('temporary_enrollment')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-// @ts-expect-error
-const FlexItem = Flex.Item as any
 
 interface Props {
   enrollments: Enrollment[]
@@ -106,7 +100,7 @@ export function TempEnrollEdit(props: Props) {
 
   const renderActionIcons = (enrollment: Enrollment) => (
     <Flex margin="0 small 0 0">
-      <FlexItem>
+      <Flex.Item>
         <Tooltip renderTip={I18n.t('Edit')}>
           <IconButton
             withBorder={false}
@@ -118,9 +112,9 @@ export function TempEnrollEdit(props: Props) {
             <IconEditLine title={I18n.t('Edit')} />
           </IconButton>
         </Tooltip>
-      </FlexItem>
+      </Flex.Item>
 
-      <FlexItem>
+      <Flex.Item>
         <Tooltip renderTip={I18n.t('Delete')}>
           <IconButton
             withBorder={false}
@@ -132,14 +126,14 @@ export function TempEnrollEdit(props: Props) {
             <IconTrashLine title={I18n.t('Delete')} />
           </IconButton>
         </Tooltip>
-      </FlexItem>
+      </Flex.Item>
     </Flex>
   )
 
   const renderAvatar = () => {
     return (
       <Flex>
-        <FlexItem>
+        <Flex.Item>
           <Avatar
             size="large"
             margin="0 small 0 0"
@@ -148,9 +142,9 @@ export function TempEnrollEdit(props: Props) {
             data-fs-exclude={true}
             data-heap-redact-attributes="name"
           />
-        </FlexItem>
+        </Flex.Item>
 
-        <FlexItem>
+        <Flex.Item>
           <div>
             <Text size="large">{props.user.name}</Text>
           </div>
@@ -160,7 +154,7 @@ export function TempEnrollEdit(props: Props) {
             ROLE (TBD)
           </Text>
           */}
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     )
   }
@@ -168,15 +162,15 @@ export function TempEnrollEdit(props: Props) {
   return (
     <>
       <Flex wrap="wrap" margin="0 small 0 0">
-        <FlexItem>{renderAvatar()}</FlexItem>
+        <Flex.Item>{renderAvatar()}</Flex.Item>
 
-        <FlexItem margin="0 0 0 auto">
+        <Flex.Item margin="0 0 0 auto">
           <Button onClick={handleAddNewClick} aria-label={I18n.t('Create temporary enrollment')}>
             <IconPlusLine />
 
             {I18n.t('Recipient')}
           </Button>
-        </FlexItem>
+        </Flex.Item>
       </Flex>
 
       <Table caption={<ScreenReaderContent>{I18n.t('User information')}</ScreenReaderContent>}>

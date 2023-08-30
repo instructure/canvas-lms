@@ -17,11 +17,13 @@
  */
 import React from 'react'
 import {render} from '@testing-library/react'
-
+import canvas from '@instructure/canvas-theme'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import SubmissionWorkflowTracker from '../SubmissionWorkflowTracker'
 import tz from '@canvas/timezone'
+
+const {colors} = canvas.variables
 
 describe('when a submission is graded', () => {
   describe('when the grade is visible', () => {
@@ -47,7 +49,9 @@ describe('when a submission is graded', () => {
       submission.submittedAt = tz.parse('2021-06-01T19:27:54Z')
 
       const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
-      expect(getByTestId('submission-workflow-tracker-subtitle')).toHaveStyle('color: success')
+      expect(getByTestId('submission-workflow-tracker-subtitle')).toHaveStyle(
+        `color: ${colors.textSuccess}`
+      )
     })
 
     it('does not render a subtitle if the student has not submitted', async () => {
