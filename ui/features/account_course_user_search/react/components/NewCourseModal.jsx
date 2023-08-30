@@ -117,7 +117,12 @@ export default function NewCourseModal({terms, children}) {
         <Modal.Body>
           <FormFieldGroup layout="stacked" rowSpacing="small" description="">
             <TextInput
-              renderLabel={I18n.t('Course Name')}
+              renderLabel={
+                <>
+                  {I18n.t('Course Name')} 
+                  <Text color="danger"> *</Text>
+                </>
+              }
               value={data.name}
               onChange={onChange('name')}
               isRequired={true}
@@ -125,7 +130,12 @@ export default function NewCourseModal({terms, children}) {
             />
 
             <TextInput
-              renderLabel={I18n.t('Reference Code')}
+              renderLabel={
+                <>
+                  {I18n.t('Reference Code')}
+                  <Text color="danger"> *</Text>
+                </>
+              }
               value={data.course_code}
               onChange={onChange('course_code')}
               isRequired={true}
