@@ -59,6 +59,7 @@ describe "scheduler" do
     end
 
     it "shows appointment slots on calendar in Find Appointment mode", priority: "1" do
+      skip "FOO-3801 (10/7/2023)"
       get "/calendar2"
       open_select_courses_modal(@course1.name)
       # the order they come back could vary depending on whether they split

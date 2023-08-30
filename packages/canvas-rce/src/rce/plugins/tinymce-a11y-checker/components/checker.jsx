@@ -21,8 +21,7 @@
 import React from 'react'
 
 import {LiveAnnouncer, LiveMessage} from 'react-aria-live'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
 import {Popover} from '@instructure/ui-popover'
@@ -39,7 +38,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Alert} from '@instructure/ui-alerts'
-import ColorField from './color-field'
+import ColorField from './ColorField'
 import PlaceholderSVG from './placeholder-svg'
 
 import describe from '../utils/describe'
@@ -333,7 +332,7 @@ export default class Checker extends React.Component {
           placement="end"
           contentRef={e => (this.trayElement = e)}
           size="regular"
-          theme={{regularWidth: '22em'}}
+          themeOverride={{regularWidth: '22em'}}
         >
           <Flex direction="column" height={getTrayHeight()}>
             <Flex.Item as="header" padding="medium medium small">
@@ -343,12 +342,11 @@ export default class Checker extends React.Component {
                 </Flex.Item>
                 <Flex.Item>
                   <CloseButton
+                    screenReaderLabel={formatMessage('Close Accessibility Checker')}
                     placement="end"
                     onClick={() => this.handleClose()}
-                    buttonRef={ref => (this._closeButtonRef = ref)}
-                  >
-                    {formatMessage('Close Accessibility Checker')}
-                  </CloseButton>
+                    elementRef={ref => (this._closeButtonRef = ref)}
+                  />
                 </Flex.Item>
               </Flex>
             </Flex.Item>
@@ -372,51 +370,47 @@ export default class Checker extends React.Component {
                         <GridCol width="auto">
                           <Popover
                             on="click"
-                            show={this.state.showWhyPopover}
+                            isShowingContent={this.state.showWhyPopover}
                             shouldContainFocus={true}
                             shouldReturnFocus={true}
-                          >
-                            <Popover.Trigger>
-                              <Button
-                                variant="icon"
-                                icon={IconQuestionLine}
+                            renderTrigger={() => (
+                              <IconButton
+                                screenReaderLabel={formatMessage('Why')}
+                                renderIcon={IconQuestionLine}
                                 onClick={() => this.setState({showWhyPopover: true})}
                               >
-                                <ScreenReaderContent>{formatMessage('Why')}</ScreenReaderContent>
-                              </Button>
-                            </Popover.Trigger>
-                            <Popover.Content>
-                              <View padding="medium" display="block" width="16rem">
-                                <CloseButton
-                                  placement="end"
-                                  offset="x-small"
-                                  variant="icon"
-                                  onClick={() => this.setState({showWhyPopover: false})}
-                                >
-                                  {formatMessage('Close')}
-                                </CloseButton>
-                                <Text>
-                                  <p>{rule.why()}</p>
-                                  <p>
-                                    {rule.link && rule.link.length && (
-                                      <InstUISettingsProvider
-                                        theme={{
-                                          componentOverrides: {
-                                            Link: {
-                                              textDecoration: 'underline',
-                                            },
+                                <IconQuestionLine />
+                              </IconButton>
+                            )}
+                          >
+                            <View padding="medium" display="block" width="16rem">
+                              <CloseButton
+                                placement="end"
+                                offset="x-small"
+                                onClick={() => this.setState({showWhyPopover: false})}
+                                screenReaderLabel={formatMessage('Close')}
+                              />
+                              <Text>
+                                <p>{rule.why()}</p>
+                                <p>
+                                  {rule.link && rule.link.length && (
+                                    <InstUISettingsProvider
+                                      themeOverride={{
+                                        componentOverrides: {
+                                          [Link.componentId]: {
+                                            textDecoration: 'underline',
                                           },
-                                        }}
-                                      >
-                                        <Link href={rule.link} target="_blank">
-                                          {rule.linkText()}
-                                        </Link>
-                                      </InstUISettingsProvider>
-                                    )}
-                                  </p>
-                                </Text>
-                              </View>
-                            </Popover.Content>
+                                        },
+                                      }}
+                                    >
+                                      <Link href={rule.link} target="_blank">
+                                        {rule.linkText()}
+                                      </Link>
+                                    </InstUISettingsProvider>
+                                  )}
+                                </p>
+                              </Text>
+                            </View>
                           </Popover>
                         </GridCol>
                       </GridRow>
@@ -456,7 +450,7 @@ export default class Checker extends React.Component {
                           <GridCol width="auto">
                             <Button
                               type="submit"
-                              variant="primary"
+                              color="primary"
                               disabled={!this.state.formStateValid}
                             >
                               {formatMessage('Apply')}
@@ -483,7 +477,7 @@ export default class Checker extends React.Component {
                     aria-live="polite"
                   />
                   <Spinner
-                    title={formatMessage('Checking for accessibility issues')}
+                    renderTitle={formatMessage('Checking for accessibility issues')}
                     margin="medium auto"
                   />
                 </div>
@@ -562,7 +556,7 @@ export default class Checker extends React.Component {
       default:
         return (
           <TextInput
-            label={f.label}
+            renderLabel={f.label}
             name={f.dataKey}
             value={this.state.formState[f.dataKey] || ''}
             onChange={this.updateFormState}

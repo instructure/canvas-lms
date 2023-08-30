@@ -17,11 +17,9 @@
  */
 import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-ignore
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Avatar} from '@instructure/ui-avatar'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-// @ts-ignore
 import {Grid} from '@instructure/ui-grid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Alert} from '@instructure/ui-alerts'
@@ -32,10 +30,6 @@ import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('temporary_enrollment')
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-// @ts-expect-error
-const FlexItem = Flex.Item as any
 
 interface AssignUser {
   name: string
@@ -117,7 +111,7 @@ export function TempEnrollSearch(props: Props) {
           <Grid.Row vAlign="middle">
             <Grid.Col>
               <Flex as="div" margin="small 0 small 0">
-                <FlexItem>
+                <Flex.Item>
                   <Avatar
                     size="large"
                     margin="0 small 0 0"
@@ -126,10 +120,10 @@ export function TempEnrollSearch(props: Props) {
                     data-fs-exclude={true}
                     data-heap-redact-attributes="name"
                   />
-                </FlexItem>
-                <FlexItem shouldShrink={true}>
+                </Flex.Item>
+                <Flex.Item shouldShrink={true}>
                   <Text size="large">{props.user.name}</Text>
-                </FlexItem>
+                </Flex.Item>
               </Flex>
             </Grid.Col>
           </Grid.Row>

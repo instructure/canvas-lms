@@ -27,6 +27,8 @@ import {Select} from '@instructure/ui-select'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+import type {SelectProps} from '@instructure/ui-select'
+
 const I18n = useI18nScope('groupNavigationSelector')
 
 type GroupOption = {
@@ -53,22 +55,23 @@ const GroupNavigationSelector = (props: Props) => {
   const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState<string>(defaultOption.label)
 
-  const handleShowOptions = (_event: Event) => {
+  const handleShowOptions = () => {
     setIsShowingOptions(true)
   }
 
-  const handleBlur = (_event: Event) => {
+  const handleBlur = () => {
     setHighlightedOptionId(null)
   }
 
-  const handleHideOptions = (_event: Event) => {
+  const handleHideOptions = () => {
     const option = getOptionById(props.options, selectedOptionId).label
     setIsShowingOptions(false)
     setHighlightedOptionId(null)
     setInputValue(selectedOptionId ? option : '')
   }
 
-  const handleHighlightOption = (event: React.KeyboardEvent<Element>, {id}: {id: string}) => {
+  const handleHighlightOption: SelectProps['onRequestHighlightOption'] = (event, {id}) => {
+    if (typeof id === 'undefined') throw new Error('id in handleHighlightOption is undefined')
     event.persist()
     const option = getOptionById(props.options, id)
     const label = option.label
@@ -76,7 +79,8 @@ const GroupNavigationSelector = (props: Props) => {
     setInputValue(event.type === 'keydown' ? label : inputValue)
   }
 
-  const handleSelectOption = (_event: Event, {id}: {id: string}) => {
+  const handleSelectOption: SelectProps['onRequestSelectOption'] = (_event, {id}) => {
+    if (typeof id === 'undefined') throw new Error('id in handleSelectOption is undefined')
     const option = getOptionById(props.options, id)
     const label = option.label
     setSelectedOptionId(id)

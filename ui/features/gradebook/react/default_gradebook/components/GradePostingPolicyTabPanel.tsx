@@ -121,7 +121,6 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
     )
 
     return (
-      // @ts-expect-error
       <View as="div" id="GradePostingPolicyTabPanel__Container" margin="small">
         <RadioInputGroup
           description={

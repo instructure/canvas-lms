@@ -25,7 +25,8 @@ import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 
-describe('MessageListActionContainer', () => {
+// until InstUI supports break points with multiple queries
+describe.skip('MessageListActionContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
     // eslint-disable-next-line no-undef

@@ -32,8 +32,6 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('canvas_modal')
 
-const {Item: FlexItem} = Flex as any
-
 type Props = {
   children: ReactElement | ReactElement[]
   footer: ReactElement | null | (() => ReactElement) // render prop. usually to render the buttons for the footer.
@@ -68,16 +66,16 @@ function CanvasModal({
     <Modal label={label} onDismiss={onDismiss} {...otherModalProps}>
       <Modal.Header>
         <Flex>
-          <FlexItem grow={true}>
+          <Flex.Item grow={true}>
             <Heading>{title}</Heading>
-          </FlexItem>
-          <FlexItem margin="0 0 0 x-small">
+          </Flex.Item>
+          <Flex.Item margin="0 0 0 x-small">
             <CloseButton
               onClick={onDismiss}
               size={closeButtonSize}
               screenReaderLabel={I18n.t('Close')}
             />
-          </FlexItem>
+          </Flex.Item>
         </Flex>
       </Modal.Header>
       <Modal.Body padding={padding}>

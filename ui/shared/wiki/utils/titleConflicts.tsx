@@ -19,7 +19,6 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce} from '@instructure/debounce'
 import type {Message} from '../react/renderWikiPageTitle'
-// @ts-expect-error
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 

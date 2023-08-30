@@ -22,43 +22,48 @@
  * canvas. If there is anything that should look universally different when K-5
  * mode is enabled, it should ideally be captured here.
  */
-import canvas from '@instructure/canvas-theme'
-import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
+import {
+  canvas as canvasBaseTheme,
+  canvasHighContrast as canvasHighContrastTheme,
+} from '@instructure/ui-themes'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {mergeDeep} from '@instructure/ui-utils'
 import {Table} from '@instructure/ui-table'
 import {IconButton} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-
 import {Day, Grouping, PlannerItem} from '@canvas/planner'
 
-const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
-const {variables} = baseTheme
-const {borders, colors, typography} = variables
+export function getBaseThemeVars() {
+  const baseTheme = window.ENV.use_high_contrast ? canvasHighContrastTheme : canvasBaseTheme
+  const {variables} = baseTheme
+  const {borders, colors, typography} = variables
 
-/**
- * These are the base defaults used to generate component-specific theme
- * variables in InstUI. For instance, setting the `fontFamily` here will be
- * used as the `fontFamily` value in the `Text` component as well as the
- * `h1FontFamily` value in the `Heading` component.
- */
-const baseFont = {
-  typography: {
-    fontFamily: ENV.USE_CLASSIC_FONT
-      ? typography.fontFamily
-      : `"Balsamiq Sans", ${typography.fontFamily}`,
-  },
-}
-const base = {
-  typography: {
-    ...baseFont.typography,
-    fontSizeXSmall: '0.875rem',
-    fontSizeSmall: '1rem',
-    fontSizeMedium: '1.125rem',
-    fontSizeLarge: '1.5rem',
-    fontSizeXLarge: '2rem',
-  },
+  /**
+   * These are the base defaults used to generate component-specific theme
+   * variables in InstUI. For instance, setting the `fontFamily` here will be
+   * used as the `fontFamily` value in the `Text` component as well as the
+   * `h1FontFamily` value in the `Heading` component.
+   */
+  const baseFont = {
+    typography: {
+      fontFamily: ENV.USE_CLASSIC_FONT
+        ? typography.fontFamily
+        : `"Balsamiq Sans", ${typography.fontFamily}`,
+    },
+  }
+  const base = {
+    typography: {
+      ...baseFont.typography,
+      fontSizeXSmall: '0.875rem',
+      fontSizeSmall: '1rem',
+      fontSizeMedium: '1.125rem',
+      fontSizeLarge: '1.5rem',
+      fontSizeXLarge: '2rem',
+    },
+  }
+
+  return {typography, colors, borders, base, baseTheme, baseFont, variables}
 }
 
 /**
@@ -67,60 +72,70 @@ const base = {
  * of the default variables or if you only want to change the theme for a
  * single component, it needs to be defined here.
  */
-export const theme = {
-  [Heading.theme]: {
-    h1FontWeight: typography.fontWeightBold,
-    h2FontSize: '1.5rem',
-    h2FontWeight: typography.fontWeightBold,
-    h3FontSize: '1.25rem',
-    h3FontWeight: typography.fontWeightBold,
-    h4FontSize: '1.25rem',
-    h4FontWeight: typography.fontWeightBold,
-    h5FontSize: '1rem',
-    h5FontWeight: typography.fontWeightNormal,
-  },
-  [Tabs.Tab.theme]: {
-    fontSize: '1.25rem',
-  },
-  [Grouping.theme]: {
-    borderTopWidth: borders.widthMedium,
-    heroPadding: '0.125rem',
-  },
-  [Day.theme]: {
-    secondaryFontSize: '1rem',
-  },
-  [PlannerItem.theme]: {
-    iconColor: colors.licorice,
-    secondaryColor: colors.licorice,
-  },
-  [Table.Cell.theme]: {
-    padding: '1rem 0.75rem',
-  },
-  [IconButton.theme]: {
-    iconSizeMedium: '1.5rem',
-  },
+export const getK5ThemeOverrides = () => {
+  const {typography, borders, colors} = getK5ThemeVars()
+  return {
+    [Heading.componentId]: {
+      h1FontWeight: typography.fontWeightBold,
+      h2FontSize: '1.5rem',
+      h2FontWeight: typography.fontWeightBold,
+      h3FontSize: '1.25rem',
+      h3FontWeight: typography.fontWeightBold,
+      h4FontSize: '1.25rem',
+      h4FontWeight: typography.fontWeightBold,
+      h5FontSize: '1rem',
+      h5FontWeight: typography.fontWeightNormal,
+    },
+    [Tabs.Tab.componentId]: {
+      fontSize: '1.25rem',
+    },
+    [Grouping.componentId]: {
+      borderTopWidth: borders.widthMedium,
+      heroPadding: '0.125rem',
+    },
+    [Day.componentId]: {
+      secondaryFontSize: '1rem',
+    },
+    [PlannerItem.componentId]: {
+      iconColor: colors.licorice,
+      secondaryColor: colors.licorice,
+    },
+    [Table.Cell.componentId]: {
+      padding: '1rem 0.75rem',
+    },
+    [IconButton.componentId]: {
+      iconSizeMedium: '1.5rem',
+    },
+  }
 }
 
 /** Overrides applied specifically to resources pages */
-export const resourcesTheme = {
-  [Heading.theme]: {
+export const getResourcesTheme = () => ({
+  [Heading.componentId]: {
     h2FontSize: '1.375rem',
     h3FontSize: '1.125rem',
   },
-}
+})
 
 // A few overrides for the planner
-export const plannerTheme = {
-  [ToggleDetails.theme]: {
-    iconColor: colors.brand,
-    textColor: colors.textBrand,
-  },
+export const getPlannerTheme = () => {
+  const {colors} = getBaseThemeVars()
+
+  return {
+    [ToggleDetails.componentId]: {
+      iconColor: colors.brand,
+      textColor: colors.textBrand,
+    },
+  }
 }
 
-export default {
-  use: options => {
-    const fontOnly = options?.fontOnly || false
-    baseTheme.use({overrides: fontOnly ? baseFont : base})
-  },
-  variables: mergeDeep(variables, base),
+export const useK5Theme = (options = {}) => {
+  const {baseTheme, base, baseFont} = getBaseThemeVars()
+  const fontOnly = options?.fontOnly || false
+  baseTheme.use({overrides: fontOnly ? baseFont : base})
+}
+
+export const getK5ThemeVars = () => {
+  const {base, variables} = getBaseThemeVars()
+  return mergeDeep(variables, base)
 }

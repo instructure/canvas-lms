@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Heading} from '@instructure/ui-heading'
 import {Popover} from '@instructure/ui-popover'
 import {List} from '@instructure/ui-list'
@@ -30,6 +30,12 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {outcomeShape} from './shapes'
 
 const I18n = useI18nScope('OutcomeManagement')
+
+const componentOverrides = {
+  [Heading.componentId]: {
+    h5FontWeight: 700,
+  },
+}
 
 const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, ref) => {
   const [showOutcomesList, setShowOutcomesList] = useState(false)
@@ -41,14 +47,8 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
     onClearHandler()
   }
 
-  const themeOverrides = {
-    [Heading.theme]: {
-      h5FontWeight: 700,
-    },
-  }
-
   return (
-    <ApplyTheme theme={themeOverrides}>
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <Popover
         on="click"
         placement="top center"
@@ -114,7 +114,7 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
           </Link>
         </View>
       </Popover>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 })
 

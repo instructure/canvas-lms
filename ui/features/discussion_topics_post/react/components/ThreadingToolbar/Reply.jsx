@@ -48,14 +48,13 @@ export function Reply({...props}) {
         },
       }}
       render={responsiveProps => (
-        <span className="discussion-reply-btn">
+        <View className="discussion-reply-btn" margin={responsiveProps.itemSpacing}>
           <Link
             isWithinText={false}
             as="button"
             onClick={props.onClick}
             data-testid="threading-toolbar-reply"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
-            margin={responsiveProps.itemSpacing}
           >
             <AccessibleContent
               alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
@@ -70,7 +69,7 @@ export function Reply({...props}) {
               </Text>
             </AccessibleContent>
           </Link>
-        </span>
+        </View>
       )}
     />
   )

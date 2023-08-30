@@ -19,7 +19,7 @@
 
 import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconCheckMarkSolid, IconExpandStartLine, IconEndSolid} from '@instructure/ui-icons'
@@ -29,8 +29,8 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
 const I18n = useI18nScope('gradebook')
 
-const themeOverrides = {
-  [IconButton.theme]: {
+const componentOverrides = {
+  [IconButton.componentId]: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },
@@ -153,7 +153,7 @@ export default class ReadOnlyCell extends Component {
     }
 
     return (
-      <ApplyTheme theme={themeOverrides}>
+      <InstUISettingsProvider theme={{componentOverrides}}>
         <div className="Grid__GradeCell Grid__ReadOnlyCell">
           <div className="Grid__GradeCell__StartContainer" />
 
@@ -172,7 +172,7 @@ export default class ReadOnlyCell extends Component {
             </div>
           </div>
         </div>
-      </ApplyTheme>
+      </InstUISettingsProvider>
     )
   }
 }

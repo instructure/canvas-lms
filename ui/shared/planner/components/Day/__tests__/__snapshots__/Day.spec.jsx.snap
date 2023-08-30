@@ -182,7 +182,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -217,7 +217,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -295,7 +295,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -338,7 +338,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -368,7 +368,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -446,7 +446,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -489,7 +489,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -519,7 +519,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -598,7 +598,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -644,7 +644,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }
@@ -680,7 +680,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
         responsiveSize="large"
         simplifiedControls={false}
         singleCourseView={false}
-        theme={
+        themeOverride={
           Object {
             "titleColor": "#0B874B",
           }

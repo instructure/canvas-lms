@@ -158,7 +158,7 @@ export const ConversationListItem = ({...props}) => {
                     count={props.conversation.count}
                     countUntil={99}
                     standalone={true}
-                    theme={{
+                    themeOverride={{
                       colorPrimary: colors.backgroundDarkest,
                       borderRadius: '0.25rem',
                       fontSize: '0.8125rem',

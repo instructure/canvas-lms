@@ -173,7 +173,7 @@ export function TempEnrollModal(props: Props) {
         size="large"
         label={I18n.t('Create a Temporary Enrollment')}
         shouldCloseOnDocumentClick={true}
-        theme={{smallMaxWidth: '30em'}}
+        themeOverride={{smallMaxWidth: '30em'}}
       >
         <Modal.Header>
           <Heading tabIndex={-1} level="h2">

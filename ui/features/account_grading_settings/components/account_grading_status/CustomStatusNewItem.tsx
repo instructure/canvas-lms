@@ -19,7 +19,6 @@
 import React, {useRef} from 'react'
 import {colorPickerColors, GradingStatusListItem} from '@canvas/grading-status-list-item'
 import {useScope as useI18nScope} from '@canvas/i18n'
-// @ts-expect-error
 import {IconAddSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -39,7 +38,7 @@ export const CustomStatusNewItem = ({
   handleEditStatusToggle,
   handleSave,
 }: CustomStatusNewItemProps) => {
-  const customStatusItemRef = useRef<HTMLDivElement | undefined>(undefined)
+  const customStatusItemRef = useRef<HTMLElement | undefined>(undefined)
 
   return (
     <View as="div" margin="small 0 0 0" data-testid={`custom-status-new-${index}`}>
@@ -49,7 +48,11 @@ export const CustomStatusNewItem = ({
         borderStyle="dashed"
         borderWidth="small"
         cursor="pointer"
-        setElementRef={ref => (customStatusItemRef.current = ref)}
+        setElementRef={ref => {
+          if (ref instanceof HTMLElement) {
+            customStatusItemRef.current = ref
+          }
+        }}
       >
         <View
           as="button"
@@ -58,7 +61,7 @@ export const CustomStatusNewItem = ({
           width="100%"
           height="100%"
           position="relative"
-          tabIndex="0"
+          tabIndex={0}
           textAlign="start"
           borderWidth="0"
           borderColor="transparent"

@@ -17,19 +17,28 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+// @ts-expect-error
 import contrast from 'wcag-element-contrast'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import ColorPicker from './color-picker'
 import {stringifyRGBA, restrictColorValues, parseRGBA} from '../utils/colors'
 
-export default class ColorField extends React.Component {
+type Props = {
+  label: string
+  name: string
+  value: string
+  onChange: (e: any) => void
+}
+
+export default class ColorField extends React.Component<Props> {
   state = {
     textValue: this.props.value,
   }
 
-  handleTextChange = event => {
+  handleTextChange = (
+    event: React.ChangeEvent<HTMLInputElement> & {target: {name: string; value: string}}
+  ) => {
     const rgba = parseRGBA(event.target.value.trim())
     const newValue = rgba ? stringifyRGBA(restrictColorValues(rgba)) : this.props.value
     this.setState({textValue: newValue})
@@ -41,7 +50,7 @@ export default class ColorField extends React.Component {
     })
   }
 
-  handlePickerChange = color => {
+  handlePickerChange = (color: {rgb: {r: number; g: number; b: number; a: number}}) => {
     const newValue = stringifyRGBA(color.rgb)
     this.setState({textValue: newValue})
     this.props.onChange({
@@ -57,7 +66,7 @@ export default class ColorField extends React.Component {
       <View as="div">
         <TextInput
           data-testid="color-field-text-input"
-          label={this.props.label}
+          renderLabel={this.props.label}
           value={this.state.textValue}
           onChange={e => this.setState({textValue: e.target.value})}
           onBlur={this.handleTextChange}
@@ -70,11 +79,4 @@ export default class ColorField extends React.Component {
       </View>
     )
   }
-}
-
-ColorField.propTypes = {
-  label: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
 }

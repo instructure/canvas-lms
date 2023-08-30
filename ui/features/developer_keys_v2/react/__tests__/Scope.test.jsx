@@ -57,7 +57,7 @@ it('renders Enable Scope if not checked', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('Checkbox').text()).toContain('Enable scope')
+  expect(wrapper.find('Checkbox').at(2).text()).toContain('Enable scope')
 })
 
 it('renders Disable Scope if checked', () => {
@@ -68,7 +68,7 @@ it('renders Disable Scope if checked', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('Checkbox').text()).toContain('Disable scope')
+  expect(wrapper.find('Checkbox').at(2).text()).toContain('Disable scope')
 })
 
 it('renders scope', () => {
@@ -79,7 +79,7 @@ it('renders scope', () => {
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
-  expect(wrapper.find('Item').at(1).text()).toContain(scope.scope)
+  expect(wrapper.find('Item').at(2).text()).toContain(scope.scope)
 })
 
 it('renders the scope verb', () => {

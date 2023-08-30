@@ -201,7 +201,7 @@ it('does not render activity badge or colored completed items facade when using 
   const wrapper = shallow(<Grouping {...props} simplifiedControls={true} />)
 
   expect(wrapper.find('Badge')).toHaveLength(0)
-  expect(wrapper.find('Animatable(undefined)').prop('theme').labelColor).toBeUndefined()
+  expect(wrapper.find('Animatable(undefined)').prop('themeOverride').labelColor).toBeUndefined()
 })
 
 it('does not render the grouping image and title when using singleCourseView', () => {

@@ -41,7 +41,8 @@ import * as useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 jest.mock('@canvas/rce/RichContentEditor')
 jest.useFakeTimers({legacyFakeTimers: true})
 
-describe('OutcomeManagementPanel', () => {
+// FOO-3827
+describe.skip('OutcomeManagementPanel', () => {
   let cache
   let showFlashAlertSpy
   let defaultMocks

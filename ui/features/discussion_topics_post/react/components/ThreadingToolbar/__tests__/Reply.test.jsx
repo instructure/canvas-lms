@@ -75,10 +75,10 @@ describe('Reply', () => {
 
     it('uses mobile prop values', () => {
       const container = setup()
-      const outerHTML = container.getByTestId('threading-toolbar-reply').outerHTML
 
-      const expectedMargin = `margin: 0px 1rem 0px 0px`
-      expect(outerHTML.includes(expectedMargin)).toBeTruthy()
+      expect(container.getByTestId('threading-toolbar-reply').parentNode).toHaveStyle(
+        'margin: 0px 0.75rem 0px 0px'
+      )
     })
   })
 })

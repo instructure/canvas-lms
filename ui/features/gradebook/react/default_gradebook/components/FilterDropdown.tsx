@@ -32,8 +32,6 @@ import type {FilterDrilldownData, FilterDrilldownMenuItem} from '../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
 
-const {Group: MenuGroup, Item: MenuItem, Separator: MenuSeparator} = Menu as any
-
 type Props = {
   rootId?: string
   onOpenTray: () => void
@@ -68,7 +66,7 @@ const FilterDropdown = ({
 }: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
-  const menuRef = useRef<HTMLElement>()
+  const menuRef = useRef<HTMLElement | null>(null)
   const currentObj = dataMap[currentItemId]
 
   const items = currentObj?.items?.concat() || []
@@ -118,7 +116,7 @@ const FilterDropdown = ({
   }
 
   const backButton = (
-    <MenuItem
+    <Menu.Item
       as="div"
       data-testid="back-button"
       onClick={() => {
@@ -131,7 +129,7 @@ const FilterDropdown = ({
         </View>
         {I18n.t('Back')}
       </Flex>
-    </MenuItem>
+    </Menu.Item>
   )
 
   return (
@@ -168,7 +166,7 @@ const FilterDropdown = ({
             onKeyDown={handleTabbingOut}
           >
             {items.length > 0 && (
-              <MenuGroup
+              <Menu.Group
                 label={I18n.t('Saved Filter Presets')}
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
                   items[updated[0]].onToggle?.()
@@ -177,15 +175,15 @@ const FilterDropdown = ({
               >
                 {items.map(a => {
                   return (
-                    <MenuItem key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
+                    <Menu.Item key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
                       <TruncateText position="middle">{a.name}</TruncateText>
-                    </MenuItem>
+                    </Menu.Item>
                   )
                 })}
-              </MenuGroup>
+              </Menu.Group>
             )}
 
-            <MenuItem
+            <Menu.Item
               as="div"
               data-testid="manage-filter-presets-button"
               onSelect={() => {
@@ -194,14 +192,20 @@ const FilterDropdown = ({
               }}
             >
               <TruncateText>{I18n.t('Create & Manage Filter Presets')}</TruncateText>
-            </MenuItem>
+            </Menu.Item>
 
-            <MenuSeparator />
+            <Menu.Separator />
 
-            <MenuGroup label={I18n.t('Filters')} selected={selectedFilterIndices}>
+            <Menu.Group
+              label={I18n.t('Filters')}
+              selected={selectedFilterIndices}
+              onSelect={() => {
+                // noop
+              }}
+            >
               {Object.values(filterItems).map((item: FilterDrilldownMenuItem) => {
                 return (
-                  <MenuItem
+                  <Menu.Item
                     key={item.id}
                     as="div"
                     onSelect={() => {
@@ -222,10 +226,10 @@ const FilterDropdown = ({
                         </View>
                       )}
                     </Flex>
-                  </MenuItem>
+                  </Menu.Item>
                 )
               })}
-            </MenuGroup>
+            </Menu.Group>
           </Menu>
         )}
 
@@ -239,9 +243,9 @@ const FilterDropdown = ({
             {backButton}
 
             {sortedItemGroups.length > 0 && (
-              <MenuGroup label={currentObj.name}>
-                <MenuSeparator />
-              </MenuGroup>
+              <Menu.Group label={currentObj.name}>
+                <Menu.Separator />
+              </Menu.Group>
             )}
 
             {sortedItemGroups.length > 0 &&
@@ -254,7 +258,7 @@ const FilterDropdown = ({
                 }, [])
 
                 return (
-                  <MenuGroup
+                  <Menu.Group
                     key={itemGroup.id}
                     label={itemGroup.name}
                     selected={selectedIndices2}
@@ -267,19 +271,23 @@ const FilterDropdown = ({
                       // (-_-)
                       const unescapedName = unescape(item.name)
                       return (
-                        <MenuItem data-testid={`${item.name}-sorted-filter`} key={item.id} as="div">
+                        <Menu.Item
+                          data-testid={`${item.name}-sorted-filter`}
+                          key={item.id}
+                          as="div"
+                        >
                           <Flex as="div" justifyItems="space-between">
                             <TruncateText position="middle">{unescapedName}</TruncateText>
                           </Flex>
-                        </MenuItem>
+                        </Menu.Item>
                       )
                     })}
-                  </MenuGroup>
+                  </Menu.Group>
                 )
               })}
 
             {items.length > 0 && (
-              <MenuGroup
+              <Menu.Group
                 label={currentObj.name}
                 selected={selectedIndices}
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
@@ -295,15 +303,15 @@ const FilterDropdown = ({
                   items[updated[0]].onToggle?.()
                 }}
               >
-                <MenuSeparator />
+                <Menu.Separator />
                 {items.map(a => {
                   return (
-                    <MenuItem data-testid={`${a.name}-filter`} key={a.id} as="div">
+                    <Menu.Item data-testid={`${a.name}-filter`} key={a.id} as="div">
                       <TruncateWithTooltip>{a.name}</TruncateWithTooltip>
-                    </MenuItem>
+                    </Menu.Item>
                   )
                 })}
-              </MenuGroup>
+              </Menu.Group>
             )}
           </Menu>
         )}
