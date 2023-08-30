@@ -226,7 +226,7 @@ export default class EditCalendarEventView extends Backbone.View {
     if (ENV.FEATURES.calendar_series) {
       const pickerNode = document.getElementById('recurring_event_frequency_picker')
       const start = this.$el.find('[name="start_date"]').val()
-      const eventStart = start ? moment.tz(start, ENV.TIMEZONE) : moment('invalid')
+      const eventStart = start ? moment.tz(start, 'MMM D, YYYY', ENV.TIMEZONE) : moment('invalid')
 
       const rrule = this.model.get('rrule')
       const freq =

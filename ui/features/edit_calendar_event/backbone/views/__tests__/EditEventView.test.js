@@ -268,6 +268,32 @@ describe('EditEventView', () => {
       expect(within(document.body).getByDisplayValue('Does not repeat')).toBeVisible()
     })
 
+    it('updates frequency picker values on date change', async () => {
+      render()
+
+      let dateInput = within(document.body).getByPlaceholderText('Date')
+      expect(dateInput).toHaveValue('May 12, 2020')
+      let frequencyPicker = within(document.body).getByTestId('frequency-picker')
+      fireEvent.click(frequencyPicker)
+
+      expect(document.body.querySelector('#weekly-day')).toHaveTextContent('Weekly on Tuesday')
+      expect(document.body.querySelector('#monthly-nth-day')).toHaveTextContent(
+        'Monthly on the second Tuesday'
+      )
+      expect(document.body.querySelector('#annually')).toHaveTextContent('Annually on May 12')
+
+      dateInput = within(document.body).getByPlaceholderText('Date')
+      fireEvent.change(dateInput, {target: {value: 'April 12, 2001'}})
+      frequencyPicker = within(document.body).getByTestId('frequency-picker')
+      fireEvent.click(frequencyPicker)
+
+      expect(document.body.querySelector('#weekly-day')).toHaveTextContent('Weekly on Thursday')
+      expect(document.body.querySelector('#monthly-nth-day')).toHaveTextContent(
+        'Monthly on the second Thursday'
+      )
+      expect(document.body.querySelector('#annually')).toHaveTextContent('Annually on April 12')
+    })
+
     it('hides the frequency picker when section dates are enabled', async () => {
       jest.spyOn($, 'ajaxJSON').mockImplementation((url, method, params, successCB) => {
         const sections = [{id: 1}]
