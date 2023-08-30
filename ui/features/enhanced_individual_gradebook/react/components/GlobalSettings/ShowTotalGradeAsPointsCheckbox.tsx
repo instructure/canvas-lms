@@ -21,9 +21,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {HandleCheckboxChange} from '../../../types'
 import {View} from '@instructure/ui-view'
-import {ApplyTheme} from '@instructure/ui-themeable'
-// @ts-expect-error TODO: fix in instui 8
 import {Checkbox, CheckboxFacade} from '@instructure/ui-checkbox'
+import {InstUISettingsProvider} from '@instructure/emotion'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 type Props = {
@@ -49,15 +48,17 @@ export default function ShowTotalGradesAsPointsCheckbox({
   }
 
   return (
-    <ApplyTheme
+    <InstUISettingsProvider
       theme={{
-        [CheckboxFacade.theme]: {
-          checkedBackground: '#0375ff',
-          borderColor: '#777777',
-          labelFontSizeSmall: '1rem',
-        },
-        [View.theme]: {
-          paddingMedium: '16px',
+        componentOverrides: {
+          [CheckboxFacade.componentId]: {
+            checkedBackground: '#0375ff',
+            borderColor: '#777777',
+            labelFontSizeSmall: '1rem',
+          },
+          [View.componentId]: {
+            paddingMedium: '16px',
+          },
         },
       }}
     >
@@ -68,7 +69,7 @@ export default function ShowTotalGradesAsPointsCheckbox({
         borderRadius="large"
         background="primary"
         padding="medium"
-        theme={{backgroundPrimary: '#eee'}}
+        themeOverride={{backgroundPrimary: '#eee'}}
       >
         <Checkbox
           size="small"
@@ -78,6 +79,6 @@ export default function ShowTotalGradesAsPointsCheckbox({
           data-testid="show-total-grade-as-points-checkbox"
         />
       </View>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }

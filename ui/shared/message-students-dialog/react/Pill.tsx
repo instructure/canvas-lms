@@ -23,17 +23,15 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddSolid, IconXSolid} from '@instructure/ui-icons'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
-const themeOverride = {
-  [Tag.theme]: {
+const componentOverrides = {
+  [Tag.componentId]: {
     defaultBackground: 'white',
   },
 }
-
-const {Item: FlexItem} = Flex as any
 
 const I18n = useI18nScope('pill')
 const ellipsis = () => I18n.t('…')
@@ -58,7 +56,7 @@ function renderText(text, truncatedText, textColor) {
   }
 }
 
-function renderIcon(selected) {
+function renderIcon(selected: boolean) {
   if (selected) {
     return <IconXSolid data-testid="item-selected" />
   } else {
@@ -72,17 +70,17 @@ const Pill = ({studentId, observerId = null, text, onClick, selected = false}) =
 
   const contents = (
     <Flex as="div" margin="0 xx-small 0 0" justifyItems="space-between">
-      <FlexItem size="0.75rem" shouldGrow={true} margin="0 xx-small 0 0" overflowX="hidden">
+      <Flex.Item size="0.75rem" shouldGrow={true} margin="0 xx-small 0 0" overflowX="hidden">
         {renderText(text, truncatedText, textColor)}
-      </FlexItem>
-      <FlexItem>{renderIcon(selected)}</FlexItem>
+      </Flex.Item>
+      <Flex.Item>{renderIcon(selected)}</Flex.Item>
     </Flex>
   )
 
   return (
-    <ApplyTheme theme={themeOverride}>
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <Tag text={contents} onClick={() => onClick(studentId, observerId)} />
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }
 

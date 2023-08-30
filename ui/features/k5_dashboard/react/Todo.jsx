@@ -88,7 +88,7 @@ const Todo = ({
             {formattedCount}
           </AccessibleContent>
         )}
-        theme={{
+        themeOverride={{
           fontSize: '1rem',
           fontWeight: '700',
           size: '1.5rem',
@@ -99,7 +99,7 @@ const Todo = ({
           href={html_url}
           target={openInNewTab ? '_blank' : undefined}
           isWithinText={false}
-          theme={{
+          themeOverride={{
             fontWeight: '700',
           }}
         >

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,6 +18,7 @@
 
 import React, {useEffect, useState} from 'react'
 
+import {Spacing} from '@instructure/emotion'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {IconCalendarMonthLine} from '@instructure/ui-icons'
@@ -41,12 +41,9 @@ type ComponentProps = {
   readonly subscriptionChanges: SubscriptionChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly onAccountSubscriptionToggled: (id: number, autoSubscription: boolean) => void
-  readonly padding?: string
+  readonly padding: Spacing
   readonly showTopSeparator?: boolean
 }
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 
 export const AccountCalendarItem = ({
   item,
@@ -58,7 +55,9 @@ export const AccountCalendarItem = ({
   showTopSeparator = false,
 }: ComponentProps) => {
   const [isVisible, setIsVisible] = useState(item.visible)
-  const [isAutoSubscription, setIsAutoSubscription] = useState(item.auto_subscribe)
+  const [isAutoSubscription, setIsAutoSubscription] = useState<boolean>(
+    item.auto_subscribe ?? false
+  )
 
   useEffect(() => {
     const accountVisibility =
@@ -69,14 +68,15 @@ export const AccountCalendarItem = ({
   useEffect(() => {
     const autoSubscription =
       subscriptionChanges?.find(change => change.id === item.id)?.auto_subscribe ??
-      item.auto_subscribe
+      item.auto_subscribe ??
+      false
     setIsAutoSubscription(autoSubscription)
   }, [item.id, item.auto_subscribe, subscriptionChanges])
 
   return (
     <View as="div" padding={padding} borderWidth={`${showTopSeparator ? 'small' : '0'} 0 0 0`}>
       <Flex data-testid="flex-calendar-item" as="div" alignItems="center">
-        <FlexItem>
+        <Flex.Item>
           <Checkbox
             label={
               <ScreenReaderContent>
@@ -88,14 +88,14 @@ export const AccountCalendarItem = ({
             checked={isVisible}
             onChange={e => onAccountToggled(item.id, e.target.checked)}
           />
-        </FlexItem>
-        <FlexItem margin="0 small">
+        </Flex.Item>
+        <Flex.Item margin="0 small">
           <IconCalendarMonthLine width={CALENDAR_ICON_SIZE} height={CALENDAR_ICON_SIZE} />
-        </FlexItem>
-        <FlexItem>
+        </Flex.Item>
+        <Flex.Item>
           <Text data-testid="account-calendar-name">{item.name}</Text>
-        </FlexItem>
-        <FlexItem margin="0 0 0 auto">
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 auto">
           <SubscriptionsDropDown
             accountId={item.id}
             autoSubscription={isAutoSubscription}
@@ -103,7 +103,7 @@ export const AccountCalendarItem = ({
             onChange={onAccountSubscriptionToggled}
             accountName={item.name}
           />
-        </FlexItem>
+        </Flex.Item>
       </Flex>
     </View>
   )

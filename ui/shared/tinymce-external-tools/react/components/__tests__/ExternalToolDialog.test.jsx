@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -19,7 +20,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ExternalToolDialog from '../ExternalToolDialog'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Transition} from '@instructure/ui-motion'
 import {send} from '@canvas/rce/RceCommandShim'
 
@@ -92,6 +93,12 @@ function fakeRCEReplaceContentItem(text) {
   }
 }
 
+const componentOverrides = {
+  [Transition.componentId]: {
+    duration: '0ms',
+  },
+}
+
 function getInstance(_container, overrides) {
   return new Promise(resolve => {
     const props = {
@@ -105,9 +112,9 @@ function getInstance(_container, overrides) {
       ref: resolve,
     }
     ReactDOM.render(
-      <ApplyTheme theme={{[Transition.theme]: {duration: '0ms'}}}>
+      <InstUISettingsProvider theme={{componentOverrides}}>
         <ExternalToolDialog {...props} />
-      </ApplyTheme>,
+      </InstUISettingsProvider>,
       _container
     )
   })

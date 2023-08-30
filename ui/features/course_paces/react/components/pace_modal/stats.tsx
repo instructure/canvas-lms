@@ -38,7 +38,6 @@ import {
 import {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
 
-const {Item: FlexItem} = Flex as any
 const I18n = useI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
@@ -145,7 +144,7 @@ export const PaceModalStats = ({
   const hasAtLeastOneDate = () => !!(startDateValue || endDateValue)
 
   const getColoredText = (color: string, child: ReactNode, props: any = {}) => (
-    <Text color="alert" theme={{alertColor: color}} {...props}>
+    <Text color="alert" themeOverride={{alertColor: color}} {...props}>
       {child}
     </Text>
   )
@@ -185,23 +184,27 @@ export const PaceModalStats = ({
       <View
         as="div"
         background="alert"
-        theme={{backgroundAlert: '#F9F0FF'}}
+        themeOverride={{backgroundAlert: '#F9F0FF'}}
         padding="small medium"
         borderRadius="medium"
         height="100%"
       >
-        <FlexItem margin="0 medium medium 0">
+        <Flex.Item margin="0 medium medium 0">
           <View
             display="inline-block"
             background="alert"
-            theme={{backgroundAlert: '#EAD7F8'}}
+            themeOverride={{backgroundAlert: '#EAD7F8'}}
             padding="small"
             width="3.3rem"
             height="3.3rem"
             margin="none small none none"
             borderRadius="circle"
           >
-            <IconCalendarClockLine color="alert" size="small" theme={{alertColor: '#66189D'}} />
+            <IconCalendarClockLine
+              color="alert"
+              size="small"
+              themeOverride={{alertColor: '#66189D'}}
+            />
           </View>
           {renderColoredDate(
             I18n.t('Start Date'),
@@ -209,10 +212,14 @@ export const PaceModalStats = ({
             captions.startDate,
             'coursepace-start-date'
           )}
-        </FlexItem>
-        <FlexItem margin="0 medium medium 0" shouldGrow={true}>
+        </Flex.Item>
+        <Flex.Item margin="0 medium medium 0" shouldGrow={true}>
           <View margin="none small none none">
-            <IconArrowEndLine color="alert" size="x-small" theme={{alertColor: '#66189D'}} />
+            <IconArrowEndLine
+              color="alert"
+              size="x-small"
+              themeOverride={{alertColor: '#66189D'}}
+            />
           </View>
           {renderColoredDate(
             I18n.t('End Date'),
@@ -220,7 +227,7 @@ export const PaceModalStats = ({
             captions.endDate,
             'coursepace-end-date'
           )}
-        </FlexItem>
+        </Flex.Item>
       </View>
     )
   }
@@ -231,7 +238,7 @@ export const PaceModalStats = ({
         data-testid="colored-assignments-section"
         display="block"
         background="alert"
-        theme={{backgroundAlert: '#E7F4FC'}}
+        themeOverride={{backgroundAlert: '#E7F4FC'}}
         height="100%"
         padding="small medium"
         borderRadius="medium"
@@ -240,14 +247,14 @@ export const PaceModalStats = ({
         <View
           display="inline-block"
           background="alert"
-          theme={{backgroundAlert: '#C8E0EF', paddingXSmall: '0.65rem'}}
+          themeOverride={{backgroundAlert: '#C8E0EF', paddingXSmall: '0.65rem'}}
           padding="x-small small none small"
           width="3.3rem"
           height="3.3rem"
           margin="small small none none"
           borderRadius="circle"
         >
-          <IconAssignmentLine color="alert" size="small" theme={{alertColor: '#0374B5'}} />
+          <IconAssignmentLine color="alert" size="small" themeOverride={{alertColor: '#0374B5'}} />
         </View>
         <View
           data-testid="course-pace-assignment-number"
@@ -283,7 +290,7 @@ export const PaceModalStats = ({
         data-testid="colored-duration-section"
         display="block"
         background="alert"
-        theme={{backgroundAlert: '#E3FFF2'}}
+        themeOverride={{backgroundAlert: '#E3FFF2'}}
         height="100%"
         padding="small medium"
         borderRadius="medium"
@@ -291,14 +298,14 @@ export const PaceModalStats = ({
         <View
           display="inline-block"
           background="alert"
-          theme={{backgroundAlert: '#B4F3D6', paddingSmall: '0.67rem'}}
+          themeOverride={{backgroundAlert: '#B4F3D6', paddingSmall: '0.67rem'}}
           padding="small"
           width="3.3rem"
           height="3.3rem"
           margin="small small none none"
           borderRadius="circle"
         >
-          <IconClockLine color="alert" size="small" theme={{alertColor: '#068447'}} />
+          <IconClockLine color="alert" size="small" themeOverride={{alertColor: '#068447'}} />
         </View>
         <View
           data-testid="course-pace-duration"
@@ -319,9 +326,9 @@ export const PaceModalStats = ({
       margin="none none small none"
       alignItems="stretch"
     >
-      {hasAtLeastOneDate() && <FlexItem>{renderDates()}</FlexItem>}
-      <FlexItem>{renderAssignmentsSection()}</FlexItem>
-      <FlexItem>{renderDurationSection()}</FlexItem>
+      {hasAtLeastOneDate() && <Flex.Item>{renderDates()}</Flex.Item>}
+      <Flex.Item>{renderAssignmentsSection()}</Flex.Item>
+      <Flex.Item>{renderDurationSection()}</Flex.Item>
     </Flex>
   )
 }

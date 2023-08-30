@@ -74,6 +74,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
       >
         <Link
           color="link"
+          forceButtonRole={true}
           href="/courses/1/grades"
           iconPlacement="start"
           isWithinText={false}
@@ -311,6 +312,7 @@ exports[`renders some course grades 1`] = `
       >
         <Link
           color="link"
+          forceButtonRole={true}
           href="/courses/1/grades"
           iconPlacement="start"
           isWithinText={false}
@@ -363,6 +365,7 @@ exports[`renders some course grades 1`] = `
       >
         <Link
           color="link"
+          forceButtonRole={true}
           href="/courses/2/grades"
           iconPlacement="start"
           isWithinText={false}
@@ -415,6 +418,7 @@ exports[`renders some course grades 1`] = `
       >
         <Link
           color="link"
+          forceButtonRole={true}
           href="/courses/3/grades"
           iconPlacement="start"
           isWithinText={false}

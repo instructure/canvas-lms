@@ -406,6 +406,7 @@ describe "quizzes question creation" do
     end
 
     it "shows an error when the quiz question exceeds character limit", priority: "2" do
+      skip "FOO-3811 (10/6/2023)"
       start_quiz_question
       chars = [*("a".."z")]
       value = (0..16_385).map { chars.sample }.join

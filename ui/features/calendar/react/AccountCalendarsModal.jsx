@@ -236,7 +236,7 @@ const AccountCalendarsModal = ({
         <Link
           data-testid="add-other-calendars-button"
           onClick={() => setIsOpen(true)}
-          theme={{color: 'black', hoverColor: 'black'}}
+          themeOverride={{color: 'black', hoverColor: 'black'}}
         >
           <IconPlusLine size="x-small" title={I18n.t('Add other calendar')} />
         </Link>
@@ -268,8 +268,8 @@ const AccountCalendarsModal = ({
               inputRef={e => (inputRef.current = e)}
               data-testid="search-input"
               type="search"
-              label=""
-              theme={{borderRadius: '2rem'}}
+              renderLabel=""
+              themeOverride={{borderRadius: '2rem'}}
               placeholder={
                 isLoading
                   ? undefined

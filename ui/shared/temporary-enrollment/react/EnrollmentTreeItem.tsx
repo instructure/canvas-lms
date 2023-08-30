@@ -29,15 +29,13 @@ import RoleMismatchToolTip from './RoleMismatchToolTip'
 const I18n = useI18nScope('temporary_enrollment')
 
 interface Props extends NodeStructure {
-  indent: string
+  indent: any
   updateCheck?: Function
   workState?: string
 }
 
 export function EnrollmentTreeItem(props: Props) {
   const [checked, setChecked] = useState(false)
-  // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-  const {Item: FlexItem} = Flex as any
 
   useEffect(() => {
     if (props.isCheck !== undefined) {
@@ -48,7 +46,7 @@ export function EnrollmentTreeItem(props: Props) {
   const renderRow = () => {
     return (
       <Flex key={props.id} padding="x-small" as="div" alignItems="center">
-        <FlexItem margin={props.indent}>
+        <Flex.Item margin={props.indent}>
           <Checkbox
             data-testid={'check ' + props.id}
             label=""
@@ -61,21 +59,21 @@ export function EnrollmentTreeItem(props: Props) {
               }
             }}
           />
-        </FlexItem>
-        <FlexItem margin="0 0 0 x-small">
+        </Flex.Item>
+        <Flex.Item margin="0 0 0 x-small">
           <Text>{props.label}</Text>
-        </FlexItem>
+        </Flex.Item>
         {props.isMismatch ? (
-          <FlexItem>
+          <Flex.Item>
             <RoleMismatchToolTip />
-          </FlexItem>
+          </Flex.Item>
         ) : null}
         {props.workState ? (
-          <FlexItem margin="0 medium">
+          <Flex.Item margin="0 medium">
             <Text weight="light">
               {I18n.t('course status: %{state}', {state: translateState(props.workState)})}
             </Text>
-          </FlexItem>
+          </Flex.Item>
         ) : null}
       </Flex>
     )

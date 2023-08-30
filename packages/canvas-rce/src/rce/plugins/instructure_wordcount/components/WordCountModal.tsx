@@ -26,30 +26,27 @@ import formatMessage from '../../../../format-message'
 import {Header, CountRow} from '../utils/tableContent'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
 
-// Doing this to avoid TS2339 errors -- TODO: remove once we're on InstUI 8
-const {Head, Row, ColHeader, Body, Cell} = Table as any
-
 const renderBody = (headers: Header[], rows: CountRow[]) => {
   return (
     <Table caption={formatMessage('Word Count')}>
-      <Head>
-        <Row>
+      <Table.Head>
+        <Table.Row>
           {headers.map(({id, getLabel}) => (
-            <ColHeader key={id} id={id}>
+            <Table.ColHeader key={id} id={id}>
               {getLabel()}
-            </ColHeader>
+            </Table.ColHeader>
           ))}
-        </Row>
-      </Head>
-      <Body>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
         {rows.map(({label, documentCount, selectionCount}) => (
-          <Row key={label}>
-            <Cell key="label">{label}</Cell>
-            <Cell key="document">{documentCount}</Cell>
-            <Cell key="selection">{selectionCount}</Cell>
-          </Row>
+          <Table.Row key={label}>
+            <Table.Cell key="label">{label}</Table.Cell>
+            <Table.Cell key="document">{documentCount}</Table.Cell>
+            <Table.Cell key="selection">{selectionCount}</Table.Cell>
+          </Table.Row>
         ))}
-      </Body>
+      </Table.Body>
     </Table>
   )
 }

@@ -19,7 +19,6 @@
 import React from 'react'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Link} from '@instructure/ui-link'
-// @ts-expect-error -- remove once on InstUI 8
 import {IconAddLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import PrerequisiteSelector from './PrerequisiteSelector'

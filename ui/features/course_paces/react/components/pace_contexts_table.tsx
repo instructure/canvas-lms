@@ -81,7 +81,6 @@ const SORT_TYPE: SortType = {
 }
 
 const {screenReaderFlashMessage} = $ as any
-const {Item: FlexItem} = Flex as any
 const {
   Body: TableBody,
   Head: TableHead,
@@ -256,7 +255,7 @@ const PaceContextsTable = ({
               id={`header-table-${header.key}`}
               key={`contexts-header-table-${header.key}`}
               width={header.width}
-              theme={{padding: '0.75rem'}}
+              themeOverride={{padding: '0.75rem'}}
               {...(header.sortable && {
                 ...sortingProps,
                 'aria-label': header.text,
@@ -304,10 +303,10 @@ const PaceContextsTable = ({
         {headers.map(({text: title}, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <Flex key={`mobile-context-row-${index}`} as="div" width="100%" margin="medium 0">
-            <FlexItem size="50%">
+            <Flex.Item size="50%">
               <Text weight="bold">{title}</Text>
-            </FlexItem>
-            <FlexItem size="50%">{values[index]}</FlexItem>
+            </Flex.Item>
+            <Flex.Item size="50%">{values[index]}</Flex.Item>
           </Flex>
         ))}
       </View>

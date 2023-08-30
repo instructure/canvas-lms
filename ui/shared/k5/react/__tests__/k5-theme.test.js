@@ -16,87 +16,57 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-let defaultThemeSpy
-let highContrastThemeSpy
-let originalEnv
+import {getK5ThemeVars, useK5Theme} from '../k5-theme'
 
-beforeEach(() => {
-  originalEnv = JSON.parse(JSON.stringify(window.ENV))
-  defaultThemeSpy = jest.spyOn(require('@instructure/canvas-theme').default, 'use')
-  highContrastThemeSpy = jest.spyOn(
-    require('@instructure/canvas-high-contrast-theme').default,
-    'use'
-  )
-})
+describe('k5-theme', () => {
+  let originalEnv
 
-afterEach(() => {
-  window.ENV = originalEnv
-  jest.clearAllMocks()
-  jest.resetModules()
-})
-
-describe('K-5 theme', () => {
-  it('is based off of the standard canvas theme', () => {
-    const k5Theme = require('../k5-theme').default
-    k5Theme.use()
-
-    expect(k5Theme.variables.colors.brand).toBe('#0374B5')
-    expect(defaultThemeSpy).toHaveBeenCalled()
-    expect(highContrastThemeSpy).not.toHaveBeenCalled()
+  beforeEach(() => {
+    originalEnv = JSON.parse(JSON.stringify(window.ENV))
   })
 
-  it('is based off of the high contrast canvas theme when ENV.use_high_contrast is set', () => {
-    window.ENV.use_high_contrast = true
-    const k5Theme = require('../k5-theme').default
-    k5Theme.use()
-
-    expect(k5Theme.variables.colors.brand).toBe('#0770A3')
-    expect(defaultThemeSpy).not.toHaveBeenCalled()
-    expect(highContrastThemeSpy).toHaveBeenCalled()
+  afterEach(() => {
+    window.ENV = originalEnv
+    jest.clearAllMocks()
+    jest.resetModules()
   })
 
-  it('overrides base variables with K-5-specific values', () => {
-    const k5Theme = require('../k5-theme').default
-    k5Theme.use()
-
-    expect(k5Theme.variables.typography.fontFamily).toMatch(/Balsamiq Sans/)
-    expect(k5Theme.variables.typography.fontSizeLarge).toBe('1.5rem')
-    expect(defaultThemeSpy).toHaveBeenCalledWith({
-      overrides: {
-        typography: expect.objectContaining({
-          fontFamily: expect.stringMatching('Balsamiq Sans'),
-          fontSizeSmall: '1rem',
-        }),
-      },
+  describe('K-5 theme', () => {
+    it('is based off of the standard canvas theme', () => {
+      const k5ThemeVariables = getK5ThemeVars()
+      useK5Theme()
+      expect(k5ThemeVariables.colors.brand).toBe('#0374B5')
     })
-  })
 
-  it('does not override font when ENV.USE_CLASSIC_FONT is true', () => {
-    window.ENV.USE_CLASSIC_FONT = true
-    const k5Theme = require('../k5-theme').default
-    k5Theme.use()
-    expect(k5Theme.variables.typography.fontFamily).not.toMatch(/Balsamiq Sans/)
-  })
+    it('is based off of the high contrast canvas theme when ENV.use_high_contrast is set', () => {
+      window.ENV.use_high_contrast = true
+      const k5ThemeVariables = getK5ThemeVars()
+      useK5Theme()
 
-  it('only overrides base variables with font overrides if specified', () => {
-    const k5Theme = require('../k5-theme').default
-    k5Theme.use({fontOnly: true})
-
-    expect(k5Theme.variables.typography.fontFamily).toMatch(/Balsamiq Sans/)
-    expect(k5Theme.variables.typography.fontSizeLarge).toBe('1.5rem')
-    expect(defaultThemeSpy).toHaveBeenCalledWith({
-      overrides: {
-        typography: expect.objectContaining({
-          fontFamily: expect.stringMatching('Balsamiq Sans'),
-        }),
-      },
+      expect(k5ThemeVariables.colors.brand).toBe('#0770A3')
     })
-    expect(defaultThemeSpy).not.toHaveBeenCalledWith({
-      overrides: {
-        typography: expect.objectContaining({
-          fontSizeSmall: '1rem',
-        }),
-      },
+
+    it('overrides base variables with K-5-specific values', () => {
+      const k5ThemeVariables = getK5ThemeVars()
+      useK5Theme()
+
+      expect(k5ThemeVariables.typography.fontFamily).toMatch(/Balsamiq Sans/)
+      expect(k5ThemeVariables.typography.fontSizeLarge).toBe('1.5rem')
+    })
+
+    it('does not override font when ENV.USE_CLASSIC_FONT is true', () => {
+      window.ENV.USE_CLASSIC_FONT = true
+      const k5ThemeVariables = getK5ThemeVars()
+      useK5Theme()
+      expect(k5ThemeVariables.typography.fontFamily).not.toMatch(/Balsamiq Sans/)
+    })
+
+    it('only overrides base variables with font overrides if specified', () => {
+      const k5ThemeVariables = getK5ThemeVars()
+      useK5Theme({fontOnly: true})
+
+      expect(k5ThemeVariables.typography.fontFamily).toMatch(/Balsamiq Sans/)
+      expect(k5ThemeVariables.typography.fontSizeLarge).toBe('1.5rem')
     })
   })
 })

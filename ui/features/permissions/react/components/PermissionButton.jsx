@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {func, bool, string} from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {ApplyTheme} from '@instructure/ui-themeable'
+import {InstUISettingsProvider} from '@instructure/emotion'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -45,8 +45,8 @@ const I18n = useI18nScope('permission_button')
 // let's cinch up that large margin around the IconButtons so that their
 // decorations snuggle up a little closer and are more obviously a part
 // of the button itself
-const themeOverrides = {
-  [IconButton.theme]: {
+const componentOverrides = {
+  [IconButton.componentId]: {
     largeHeight: '1.75rem',
   },
 }
@@ -169,7 +169,11 @@ export default class PermissionButton extends Component {
       </IconButton>
     )
 
-    return this.props.inTray ? button : <ApplyTheme theme={themeOverrides}>{button}</ApplyTheme>
+    return this.props.inTray ? (
+      button
+    ) : (
+      <InstUISettingsProvider theme={{componentOverrides}}>{button}</InstUISettingsProvider>
+    )
   }
 
   renderAllyScreenReaderTag({permission, permissionLabel, roleLabel}) {

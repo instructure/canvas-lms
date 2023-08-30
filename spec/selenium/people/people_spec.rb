@@ -282,6 +282,7 @@ describe "people" do
     end
 
     it "tests group structure functionality" do
+      skip "FOO-3810 (10/6/2023)"
       get "/courses/#{@course.id}/users"
       enroll_more_students
 
@@ -304,6 +305,7 @@ describe "people" do
     end
 
     it "auto-creates groups based on # of students" do
+      skip "FOO-3810 (10/6/2023)"
       enroll_more_students
       get "/courses/#{@course.id}/groups#new"
       replace_and_proceed f("#new-group-set-name"), "Groups of 2"

@@ -21,7 +21,6 @@ import React, {useState, useEffect} from 'react'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
-// @ts-expect-error
 import {uid} from '@instructure/uid'
 import {string} from 'prop-types'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
@@ -67,7 +66,13 @@ export default function RoleSearchSelect(props: Props) {
 
   const [inputValue, setInputValue] = useState('')
   const [matcher, setMatcher] = useState(new RegExp(''))
-  const [messages, setMessages] = useState([{}])
+  const [messages, setMessages] = useState<
+    Array<{
+      type: 'error' | 'hint' | 'success' | 'screenreader-only'
+      text: React.ReactNode
+    }>
+    // @ts-expect-error
+  >([{}])
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [selectedOptionId, setSelectedOptionId] = useState(null)
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
@@ -91,6 +96,7 @@ export default function RoleSearchSelect(props: Props) {
       setMessages([{type: 'hint', text: noResultsLabel}])
       return
     }
+    // @ts-expect-error
     setMessages([{}])
   }
 
@@ -206,28 +212,29 @@ export default function RoleSearchSelect(props: Props) {
     return renderOptions(children).filter(Boolean)
   }
 
-  const controlProps = {
-    id: selectId,
-    inputValue,
-    isShowingOptions,
-    assistiveText: I18n.t('Type to search, use arrow keys to navigate options.') + ' ',
-    placeholder,
-    renderLabel: () => label,
-    onBlur,
-    messages,
-    onInputChange,
-    onRequestShowOptions,
-    onRequestHideOptions,
-    onRequestHighlightOption,
-    onRequestSelectOption,
-  }
-
   return (
     <>
-      <Select {...controlProps}>{renderChildren()}</Select>
+      <Select
+        id={selectId}
+        inputValue={inputValue}
+        isShowingOptions={isShowingOptions}
+        assistiveText={I18n.t('Type to search, use arrow keys to navigate options.') + ' '}
+        placeholder={placeholder}
+        renderLabel={() => label}
+        onBlur={onBlur}
+        messages={messages}
+        onInputChange={onInputChange}
+        onRequestShowOptions={onRequestShowOptions}
+        onRequestHideOptions={onRequestHideOptions}
+        onRequestHighlightOption={onRequestHighlightOption}
+        onRequestSelectOption={onRequestSelectOption}
+      >
+        {renderChildren()}
+      </Select>
+
       <Alert
         screenReaderOnly={true}
-        ariaAtomic={true}
+        isLiveRegionAtomic={true}
         liveRegion={getLiveRegion}
         liveRegionPoliteness="assertive"
       >

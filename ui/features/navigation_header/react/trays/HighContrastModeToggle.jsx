@@ -22,7 +22,6 @@ import React, {useState, useRef} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {colors as hcmColors} from '@instructure/canvas-high-contrast-theme'
-import {ApplyTheme} from '@instructure/ui-themeable'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,6 +29,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Checkbox, ToggleFacade} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
+import {InstUISettingsProvider} from '@instructure/emotion'
 
 const I18n = useI18nScope('ProfileTray')
 
@@ -39,8 +39,8 @@ const {porcelain, licorice, shamrock, brand} = hcmColors.values
 // as all the other page elements are just primary-color text, which is
 // the same in both the normal Canvas theme and the Canvas High Contrast
 // theme.
-const hcmOverrides = {
-  [ToggleFacade.theme]: {
+const componentOverrides = {
+  [ToggleFacade.componentId]: {
     color: porcelain,
     toggleBackground: porcelain,
     labelColor: licorice,
@@ -134,7 +134,7 @@ export default function HighContrastModeToggle({isMobile}) {
   // By definition this control for turning on HCM has to be in HCM all the time,
   // regardless of the global theme, so we have to apply some overrides.
   return (
-    <ApplyTheme theme={hcmOverrides}>
+    <InstUISettingsProvider theme={{componentOverrides}}>
       <View as="div" margin={margins}>
         <Checkbox
           variant="toggle"
@@ -150,7 +150,7 @@ export default function HighContrastModeToggle({isMobile}) {
           </Text>
         )}
       </View>
-    </ApplyTheme>
+    </InstUISettingsProvider>
   )
 }
 

@@ -48,6 +48,7 @@ exports[`renders load more by default 1`] = `
     <Link
       as="button"
       color="link"
+      forceButtonRole={true}
       iconPlacement="start"
       isWithinText={false}
       onClick={[Function]}
@@ -139,6 +140,7 @@ exports[`shows an Alert when there's a query error 1`] = `
     <Link
       as="button"
       color="link"
+      forceButtonRole={true}
       iconPlacement="start"
       isWithinText={false}
       onClick={[Function]}

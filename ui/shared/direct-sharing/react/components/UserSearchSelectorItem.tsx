@@ -22,13 +22,18 @@ import {Text} from '@instructure/ui-text'
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 
-import {basicUser} from '@canvas/users/react/proptypes/user'
-
-UserSearchSelectorItem.propTypes = {
-  user: basicUser,
+type BasicUser = {
+  id: string
+  name: string
+  avatar_url?: string
+  email?: string
 }
 
-export default function UserSearchSelectorItem({user}) {
+type Props = {
+  user: BasicUser
+}
+
+export default function UserSearchSelectorItem({user}: Props) {
   const {name, email, avatar_url} = user
   return (
     <Flex>

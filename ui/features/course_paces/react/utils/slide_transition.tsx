@@ -20,6 +20,7 @@ import React from 'react'
 
 import {Transition} from '@instructure/ui-motion'
 import {View} from '@instructure/ui-view'
+import type {ViewProps} from '@instructure/ui-view'
 
 interface ComponentProps {
   readonly children: any
@@ -32,17 +33,18 @@ const SlideTransition = ({children, direction, expanded, size}: ComponentProps) 
   const horizontalProps =
     direction === 'horizontal'
       ? {
-          as: 'span',
+          as: 'span' as ViewProps['as'],
           width: expanded ? size : '0',
         }
       : {}
   const verticalProps =
     direction === 'vertical'
       ? {
-          as: 'div',
+          as: 'div' as ViewProps['as'],
           maxHeight: expanded ? size : '0',
         }
       : {}
+
   return (
     <View
       className="course-paces-collapse"
@@ -50,7 +52,12 @@ const SlideTransition = ({children, direction, expanded, size}: ComponentProps) 
       {...horizontalProps}
       {...verticalProps}
     >
-      <Transition in={expanded} type="fade" unmountOnExit={true} theme={{duration: '500ms'}}>
+      <Transition
+        in={expanded}
+        type="fade"
+        unmountOnExit={true}
+        themeOverride={{duration: '500ms'}}
+      >
         {children}
       </Transition>
     </View>

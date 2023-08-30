@@ -83,7 +83,7 @@ const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) =>
       size="small"
       label={I18n.t('Pair with student')}
       shouldCloseOnDocumentClick={true}
-      theme={{smallMaxWidth: '27em'}}
+      themeOverride={{smallMaxWidth: '27em'}}
     >
       <Modal.Header>
         <CloseButton

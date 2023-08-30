@@ -25,6 +25,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('RosterView')
 
@@ -68,9 +69,13 @@ export default class RosterView extends Backbone.View {
         display="inline-block"
         type="text"
         placeholder={I18n.t('Search people')}
-        aria-label={I18n.t(
-          'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.'
-        )}
+        renderLabel={
+          <ScreenReaderContent>
+            {I18n.t(
+              'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.'
+            )}
+          </ScreenReaderContent>
+        }
         renderBeforeInput={() => <IconSearchLine />}
       />,
       this.$el.find('#search_input_container')[0]

@@ -29,12 +29,13 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-
 import {useScope as useI18nScope} from '@canvas/i18n'
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
-import k5Theme from '@canvas/k5/react/k5-theme'
+import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 import {DEFAULT_COURSE_COLOR} from '@canvas/k5/react/utils'
 import {scoreToGrade} from '@instructure/grading-utils'
+
+const k5ThemeVariables = getK5ThemeVars()
 
 const I18n = useI18nScope('grades_summary')
 
@@ -145,9 +146,9 @@ export const GradeSummaryLine = ({
                   href={courseUrl + window.location.hash}
                   display="inline-block"
                   isWithinText={false}
-                  theme={{
-                    color: k5Theme.variables.colors.textDarkest,
-                    hoverColor: k5Theme.variables.colors.textDarkest,
+                  themeOverride={{
+                    color: k5ThemeVariables.colors.textDarkest,
+                    hoverColor: k5ThemeVariables.colors.textDarkest,
                     fontWeight: 700,
                   }}
                 >

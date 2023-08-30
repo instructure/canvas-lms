@@ -27,7 +27,6 @@ import {
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Text} from '@instructure/ui-text'
-// @ts-expect-error
 import {IconWarningLine} from '@instructure/ui-icons'
 import {
   GradebookOptions,
