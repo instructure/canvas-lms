@@ -108,6 +108,10 @@ class SectionsController < ApplicationController
   #   - "permissions": Include whether section grants :manage_calendar permission
   #     to the caller
   #
+  # @argument search_term [Optional, String]
+  #   When included, searches course sections for the term. Returns only matching
+  #   results. Term must be at least 2 characters.
+  #
   # @returns [Section]
   def index
     if authorized_action(@context, @current_user, %i[read read_roster view_all_grades manage_grades])
@@ -116,8 +120,10 @@ class SectionsController < ApplicationController
       end
 
       includes = Array(params[:include])
+      search_term = params[:search_term]
 
       sections = @context.active_course_sections.order(CourseSection.best_unicode_collation_key("name"), :id)
+      sections = CourseSection.search_by_attribute(sections, :name, search_term) if search_term.present?
 
       unless params[:all].present?
         sections = Api.paginate(sections, self, api_v1_course_sections_url)
