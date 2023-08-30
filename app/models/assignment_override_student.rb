@@ -24,6 +24,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :assignment_override
   belongs_to :user
   belongs_to :quiz, class_name: "Quizzes::Quiz"
+  belongs_to :context_module
 
   before_create :set_root_account_id
   after_save :destroy_override_if_needed
@@ -34,7 +35,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   before_validation :clean_up_assignment_if_override_student_orphaned
 
   validates :assignment_override, :user, presence: true
-  validates :user_id, uniqueness: { scope: [:assignment_id, :quiz_id],
+  validates :user_id, uniqueness: { scope: %i[assignment_id quiz_id context_module_id],
                                     conditions: -> { where.not(workflow_state: "deleted") },
                                     message: -> { t("already belongs to an assignment override") } }
 
@@ -57,8 +58,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   validate do |record|
-    if record.active? && [record.assignment, record.quiz].all?(&:nil?)
-      record.errors.add :base, "requires assignment or quiz"
+    if record.active? && [record.assignment, record.quiz, record.context_module].all?(&:nil?)
+      record.errors.add :base, "requires assignment, quiz, or module"
     end
   end
 
@@ -69,6 +70,9 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     elsif assignment
       assignment.reload if assignment.id != assignment_id
       assignment.context_id
+    elsif context_module
+      context_module.reload if context_module.id != context_module_id
+      context_module.context_id
     end
   end
 
@@ -76,6 +80,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     if assignment_override
       self.assignment_id = assignment_override.assignment_id
       self.quiz_id = assignment_override.quiz_id
+      self.context_module_id = assignment_override.context_module_id
     end
   end
   protected :default_values
@@ -133,6 +138,6 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= assignment&.root_account_id || quiz&.root_account_id
+    self.root_account_id ||= assignment&.root_account_id || quiz&.root_account_id || context_module&.root_account_id
   end
 end
