@@ -50,7 +50,8 @@ describe "BundlerLockfileExtensions" do
     RUBY
 
     with_gemfile("", contents) do
-      output = invoke_bundler("install")
+      invoke_bundler("install")
+      output = invoke_bundler("info concurrent-ruby")
 
       expect(output).to include("1.2.2")
       expect(File.read("Gemfile.lock")).to include("1.2.2")

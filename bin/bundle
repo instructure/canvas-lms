@@ -18,7 +18,7 @@ m = Module.new do
   end
 
   def env_var_version
-    ENV["BUNDLER_VERSION"]
+    ENV["BUNDLER_VERSION"]&.then { |v| v.empty? ? nil : v }
   end
 
   def cli_arg_version

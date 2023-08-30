@@ -20,7 +20,7 @@ ARG CANVAS_RAILS=7.0
 ENV CANVAS_RAILS=${CANVAS_RAILS}
 
 ENV YARN_VERSION 1.19.1-1
-ENV BUNDLER_VERSION 2.3.26
+ENV BUNDLER_VERSION=
 ENV GEM_HOME /home/docker/.gem/$RUBY
 ENV PATH ${APP_HOME}bin:$GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle
@@ -60,9 +60,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
-RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
-  && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v $BUNDLER_VERSION \
+RUN gem install bundler --no-document -v 2.4.19 \
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 RUN npm install -g npm@latest && npm cache clean --force
 
