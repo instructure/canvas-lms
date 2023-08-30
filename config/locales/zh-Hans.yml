@@ -21431,7 +21431,7 @@ zh-Hans:
           
           例如，CSV 格式的 Instructure 将把多媒体网际网路邮件延伸类型为‘text/csv’的 csv 文件发布到指定的端点，包含以下列：
           
-          "publisher_id"、"publisher_sis_id"、"course_id"、"course_sis_id"、"section_id"、"section_sis_id"、"student_id"、"student_sis_id"、"enrollment_id"、"enrollment_status"、"score"、"grade"
+          "publisher\_id"、"publisher\_sis\_id"、"course\_id"、"course\_sis\_id"、"section\_id"、"section\_sis\_id"、"student\_id"、"student\_sis\_id"、"enrollment\_id"、"enrollment\_status"、"score"、"grade"
           
           （备注："grade" （评分）列只在课程指定评分标准时返回）。
           
