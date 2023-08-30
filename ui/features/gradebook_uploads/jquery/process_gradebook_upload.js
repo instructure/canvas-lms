@@ -41,6 +41,10 @@ function overrideScoreHasChanged(score) {
   return currentScore !== newScore
 }
 
+function overrideStatusHasChanged(status) {
+  return status.new_grade_status?.toLowerCase() !== status.current_grade_status?.toLowerCase()
+}
+
 const ProcessGradebookUpload = {
   upload(gradebook) {
     if (gradebook == null || gradebook.students == null || gradebook.students.length === 0) {
@@ -61,10 +65,11 @@ const ProcessGradebookUpload = {
       }
     }
 
-    const overrideScoresExist = gradebook.students.some(
-      student => student.override_scores != null && student.override_scores.length > 0
+    const overrideScoresOrStatusesExist = gradebook.students.some(
+      student => student.override_scores?.length > 0 || student.override_statuses?.length > 0
     )
-    if (overrideScoresExist && ENV.bulk_update_override_scores_path != null) {
+
+    if (overrideScoresOrStatusesExist && ENV.bulk_update_override_scores_path != null) {
       const updateRequests = this.createOverrideUpdateRequests(gradebook)
       if (updateRequests.length > 0) {
         uploadingBulkData = true
@@ -137,11 +142,29 @@ const ProcessGradebookUpload = {
 
   createOverrideUpdateRequests(gradebook) {
     const changedOverrideScores = gradebook.students
-      .map(student =>
-        (student.override_scores || []).map(score => ({...score, student_id: student.id}))
-      )
+      .map(student => {
+        const overrideScores = (student.override_scores || []).reduce((accumulator, score) => {
+          if (overrideScoreHasChanged(score)) {
+            accumulator[score.grading_period_id || '0'] = {...score, student_id: student.id}
+          }
+          return accumulator
+        }, {})
+        student.override_statuses?.forEach(status => {
+          if (!overrideStatusHasChanged(status)) {
+            return
+          }
+          const currentScore = overrideScores[status.grading_period_id || '0'] || {}
+          overrideScores[status.grading_period_id || '0'] = {
+            ...currentScore,
+            student_id: student.id,
+            grading_period_id: status.grading_period_id,
+            current_grade_status: status.current_grade_status,
+            new_grade_status: status.new_grade_status,
+          }
+        })
+        return Object.values(overrideScores)
+      })
       .flat()
-      .filter(score => overrideScoreHasChanged(score))
 
     // If we have updates for multiple grading periods--which will never happen
     // with the default gradebook export but could happen if someone uploads a
@@ -151,12 +174,30 @@ const ProcessGradebookUpload = {
       changedOverrideScores,
       score => score.grading_period_id || 'course'
     )
-
+    const customStatuses = ENV.custom_grade_statuses ?? []
+    const customStatusesMap = customStatuses.reduce((accumulator, status) => {
+      accumulator[status.name.toLowerCase()] = status.id
+      return accumulator
+    }, {})
     return Object.entries(scoresByGradingPeriod).map(([gradingPeriodId, scores]) => {
-      const submittableScores = scores.map(score => ({
-        override_score: score.new_score,
-        student_id: score.student_id,
-      }))
+      const submittableScores = scores.map(score => {
+        let customStatusId
+        if (score.new_grade_status === null) {
+          customStatusId = null
+        } else if (score.new_grade_status?.toLowerCase() in customStatusesMap) {
+          customStatusId = customStatusesMap[score.new_grade_status?.toLowerCase()]
+        }
+        const submittedScore = {
+          student_id: score.student_id,
+        }
+        if (score.new_score !== undefined && overrideScoreHasChanged(score)) {
+          submittedScore.override_score = score.new_score
+        }
+        if (overrideStatusHasChanged(score) && customStatusId !== undefined) {
+          submittedScore.override_status_id = customStatusId
+        }
+        return submittedScore
+      })
       return this.createOverrideScoreRequest(gradingPeriodId, submittableScores)
     })
   },
