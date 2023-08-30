@@ -16359,7 +16359,7 @@ es-ES:
           
           Por ejemplo, el CSV con formato de Instructure PUBLICARÁ un archivo CSV con el tipo MIME “text/csv” en el punto final especificado, con las siguientes columnas: 
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
+          "publisher\_id", "publisher\_sis\_id", "course\_id", "course\_sis\_id", "section\_id", "section\_sis\_id", "student\_id", "student\_sis\_id", "enrollment\_id", "enrollment\_status", "score", "grade"
           
           (Nota: la columna "grade" solo aparece si la asignatura tiene un estándar de evaluación especificado)
           
