@@ -16,16 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useContext} from 'react'
 
 import {useQuery, useMutation} from 'react-apollo'
 import {COURSE_QUERY, DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 
 import LoadingIndicator from '@canvas/loading-indicator'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 
+const I18n = useI18nScope('discussion_create')
+
 export default function DiscussionTopicFormContainer() {
+  const {setOnFailure} = useContext(AlertManagerContext)
   const {data: courseData, loading: courseIsLoading} = useQuery(COURSE_QUERY, {
     variables: {
       courseId: ENV.context_id, // TODO: what if it's a group?
@@ -37,6 +42,7 @@ export default function DiscussionTopicFormContainer() {
 
   const isEditing = !!ENV.discussion_topic_id
   const {data: topicData, loading: topicIsLoading} = useQuery(DISCUSSION_TOPIC_QUERY, {
+    skip: !isEditing,
     variables: {
       discussionTopicId: ENV.discussion_topic_id,
     },
@@ -58,128 +64,31 @@ export default function DiscussionTopicFormContainer() {
             `/groups/${ENV.context_id}/discussion_topics/${discussion_topic_id}`
           )
         } else {
-          // TODO: show error page and/or redirect
-          // eslint-disable-next-line no-console
-          console.log('invalid context type!')
+          setOnFailure(I18n.t('Invalid context type'))
         }
       } else {
-        // TODO: handle this
-        // eslint-disable-next-line no-console
-        console.log('invalid discussion!')
+        setOnFailure(I18n.t('Error creating discussion topic'))
       }
     },
     onError: () => {
-      // TODO: handle mutation error and potentially try again
-      // eslint-disable-next-line no-console
-      console.log('error!')
+      setOnFailure(I18n.t('Error creating discussion topic'))
     },
   })
 
   const createDiscussionTopicOnSubmit = useCallback(
-    ({
-      title,
-      message,
-      // TODO: implement these as the backend becomes ready for them
-      // isAnnouncement,
-      // sectionIdsToPostTo,
-      // discussionAnonymousState,
-      // anonymousAuthorState,
-      // respondBeforeReply,
-      // enablePodcastFeed,
-      // includeRepliesInFeed,
-      // isGraded, (phase 2)
-      // allowLiking,
-      // onlyGradersCanLike,
-      // addToTodo,
-      // todoDate,
-      // isGroupDiscussion,
-      // groupCategoryId,
-      // availableFrom,
-      // availableUntil,
-      shouldPublish,
-    }) => {
+    ({title, message, shouldPublish}) => {
       createDiscussionTopic({
         variables: {
           contextId: ENV.context_id,
           contextType: 'Course',
           title,
           message,
-          // TODO: implement these as the backend becomes ready for them
-          // isAnnouncement:,
-          // discussionType: 'side_comment',
-          // delayedPostAt: availableFrom,
-          // lockAt: availableUntil,
-          // podcastEnabled: enablePodcastFeed,
-          // podcastHasStudentPosts: includeRepliesInFeed,
-          // requireInitialPost: respondBeforeReply,
-          // pinned: false,
-          // todoDate,
-          // groupCategoryId: null,
-          // allowRating: allowLiking,
-          // onlyGradersCanRate: onlyGradersCanLike,
-          // anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
-          // isAnonymousAuthor: anonymousAuthorState,
-          // specificSections: sectionIdsToPostTo,
-          // locked: false,
           published: shouldPublish,
         },
       })
     },
     [createDiscussionTopic]
   )
-
-  // TODO implement this update discussion mutation when the backend is ready
-  // const updateDiscussionTopicOnSubmit = useCallback(
-  //   ({
-  //     title,
-  //     message,
-  //     sectionsToPostTo,
-  //     discussionAnonymousState,
-  //     anonymousAuthorState,
-  //     respondBeforeReply,
-  //     enablePodcastFeed,
-  //     includeRepliesInFeed,
-  //     // isGraded,
-  //     allowLiking,
-  //     onlyGradersCanLike,
-  //     // sortByLikes,
-  //     // addToTodo,
-  //     todoDate,
-  //     // isGroupDiscussion,
-  //     // groupSet,
-  //     availableFrom,
-  //     availableUntil,
-  //     shouldPublish,
-  //     // postedAt,
-  //   }) => {
-  //     updateDiscussionTopic({
-  //       variables: {
-  //         contextId: ENV.course_id,
-  //         contextType: 'Course',
-  //         isAnnouncement: false,
-  //         title,
-  //         message,
-  //         discussionType: 'side_comment',
-  //         delayedPostAt: availableFrom,
-  //         lockAt: availableUntil,
-  //         podcastEnabled: enablePodcastFeed,
-  //         podcastHasStudentPosts: includeRepliesInFeed,
-  //         requireInitialPost: respondBeforeReply,
-  //         pinned: false,
-  //         todoDate,
-  //         groupCategoryId: null,
-  //         allowRating: allowLiking,
-  //         onlyGradersCanRate: onlyGradersCanLike,
-  //         anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
-  //         isAnonymousAuthor: anonymousAuthorState,
-  //         specificSections: sectionsToPostTo,
-  //         locked: false,
-  //         published: shouldPublish,
-  //       },
-  //     })
-  //   },
-  //   [updateDiscussionTopic]
-  // )
 
   if (courseIsLoading || topicIsLoading) {
     return <LoadingIndicator />

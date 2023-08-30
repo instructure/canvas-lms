@@ -23,7 +23,6 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
   argument :message, String, required: false
   argument :published, Boolean, required: false
   argument :title, String, required: false
-  # TODO: add more arguments
 
-  field :discussion, Types::DiscussionType, null: true
+  field :discussion_topic, Types::DiscussionType, null: true
 end
