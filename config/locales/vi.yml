@@ -16221,7 +16221,7 @@ vi:
           
           Ví dụ: CSV được định dạng Instructure sẽ ĐĂNG một tập tin csv có kiểu mime 'text/csv' tới điểm cuối được chỉ định, chứa các cột sau: 
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "điểm số", "điểm"
+          "publisher\_id", "publisher\_sis\_id", "course\_id", "course\_sis\_id", "section\_id", "section\_sis\_id", "student\_id", "student\_sis\_id", "enrollment\_id", "enrollment\_status", "điểm số", "điểm"
           
           (Lưu ý: cột "điểm" chỉ được trả về nếu khóa học chỉ định tiêu chuẩn chấm điểm)
           
