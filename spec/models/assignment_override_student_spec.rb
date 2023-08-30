@@ -215,6 +215,7 @@ describe AssignmentOverrideStudent do
     let(:override) { AssignmentOverride.new }
     let(:quiz_id) { 1 }
     let(:assignment_id) { 2 }
+    let(:context_module_id) { 3 }
 
     before do
       override_student.assignment_override = override
@@ -248,6 +249,25 @@ describe AssignmentOverrideStudent do
 
       it "has the quiz's ID" do
         expect(override_student.quiz_id).to eq quiz_id
+      end
+    end
+
+    context "when the override has a module" do
+      before do
+        override.context_module_id = context_module_id
+        override_student.send(:default_values)
+      end
+
+      it "has the module's ID" do
+        expect(override_student.context_module_id).to eq context_module_id
+      end
+
+      it "has a nil assignment ID" do
+        expect(override_student.assignment_id).to be_nil
+      end
+
+      it "has a nil quiz ID" do
+        expect(override_student.quiz_id).to be_nil
       end
     end
   end
