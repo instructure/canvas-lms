@@ -20,6 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import {bool, func, shape, string, element, oneOf} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -156,7 +157,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
     return [
       {
         name: 'user[name]',
-        label: I18n.t('Full Name'),
+        label: <>{I18n.t('Full Name')} <Text color="danger"> *</Text></>,
         hint: I18n.t('This name will be used by teachers for grading.'),
         required: I18n.t('Full name is required'),
       },
@@ -176,7 +177,11 @@ export default class CreateOrUpdateUserModal extends React.Component {
           ? [
               {
                 name: 'pseudonym[unique_id]',
-                label: this.props.customized_login_handle_name || I18n.t('Email'),
+                label:
+                <>
+                  {this.props.customized_login_handle_name || I18n.t('Email')}
+                  <Text color="danger"> *</Text>
+                </>,
                 required: this.props.customized_login_handle_name
                   ? I18n.t('%{login_handle} is required', {
                       login_handle: this.props.customized_login_handle_name,
@@ -185,7 +190,11 @@ export default class CreateOrUpdateUserModal extends React.Component {
               },
               showCustomizedLoginId && {
                 name: 'pseudonym[path]',
-                label: I18n.t('Email'),
+                label:
+                <>
+                  {I18n.t('Email')}
+                  <Text color="danger"> *</Text>
+                </>,
                 required: I18n.t('Email is required'),
               },
               this.props.showSIS && {
