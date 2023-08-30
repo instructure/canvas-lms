@@ -75,6 +75,15 @@ module BundlerLockfileExtensions
       proven_pinned = Set.new
       needs_pin_check = []
       lockfile = ::Bundler::LockfileParser.new(lockfile_definition[:lockfile].read)
+      unless lockfile.platforms == @default_lockfile.platforms
+        ::Bundler.ui.error("The platforms in #{lockfile_definition[:lockfile].relative_path_from(Dir.pwd)} do not match the default lockfile.")
+        success = false
+      end
+      unless lockfile.bundler_version == @default_lockfile.bundler_version
+        ::Bundler.ui.error("The Bundler version in #{lockfile_definition[:lockfile].relative_path_from(Dir.pwd)} does not match the default lockfile.")
+        success = false
+      end
+
       specs = lockfile.specs.group_by(&:name)
       allow_mismatched_dependencies = lockfile_definition[:allow_mismatched_dependencies] if allow_mismatched_dependencies
 

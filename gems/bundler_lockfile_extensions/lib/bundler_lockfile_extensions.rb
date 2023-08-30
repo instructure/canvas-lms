@@ -256,6 +256,10 @@ module BundlerLockfileExtensions
               lockfile.specs.replace(default_lockfile.specs + lockfile.specs).uniq!
               lockfile.sources.replace(default_lockfile.sources + lockfile.sources).uniq!
               lockfile.platforms.concat(default_lockfile.platforms).uniq!
+              # prune more specific platforms
+              lockfile.platforms.delete_if do |p1|
+                lockfile.platforms.any? { |p2| p2 != "ruby" && p1 != p2 && ::Bundler::MatchPlatform.platforms_match?(p2, p1) }
+              end
               lockfile.instance_variable_set(:@ruby_version, default_lockfile.ruby_version)
               lockfile.instance_variable_set(:@bundler_version, default_lockfile.bundler_version)
 
