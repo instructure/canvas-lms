@@ -77,7 +77,6 @@
     "@instructure/canvas-theme": "7",
     "@instructure/debounce": "^7",
     "@instructure/emotion": "^8.38.1",
-    "@instructure/filter-console-messages": "*",
     "@instructure/k5uploader": "*",
     "@instructure/media-capture": "~8.4.1-rc.16",
     "@instructure/ui-a11y-content": "^7",

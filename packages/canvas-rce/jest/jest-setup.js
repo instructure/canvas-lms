@@ -19,7 +19,6 @@
 // Several components use aphrodite, which tries to manipulate the dom
 // on a timer which expires after the test completes and the document no longer exists
 import {StyleSheetTestUtils} from 'aphrodite'
-import filterUselessConsoleMessages from '@instructure/filter-console-messages'
 
 /**
  * We want to ensure errors and warnings get appropriate eyes. If
@@ -44,6 +43,8 @@ const ignoredErrors = [
   /Invalid prop `images.searchString` of type `string` supplied to `Images`/,
   /Invalid URL: undefined/,
   /failed updating video captions/,
+  /You seem to have overlapping act\(\) calls/,
+  /A theme registry has already been initialized/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
@@ -51,6 +52,9 @@ const ignoredWarnings = [
   /Found bad LTI MRU data/,
   /Cannot save LTI MRU list/,
   /clicked sidebar (link|image) without a focused editor/,
+  /Translation for/,
+  /Exactly one focusable child is required/,
+  /is deprecated and will be removed/,
 ]
 global.console = {
   log: console.log,
@@ -77,7 +81,6 @@ global.console = {
 }
 /* eslint-enable no-console */
 
-filterUselessConsoleMessages(console)
 StyleSheetTestUtils.suppressStyleInjection()
 
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
