@@ -1130,7 +1130,10 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
-    anonymousGradingCheckboxDisabled: !this.assignment.isNew() && this.assignment.isQuizLTIAssignment() && this.assignment.anonymousGrading(),
+    anonymousGradingCheckboxDisabled:
+      !this.assignment.isNew() &&
+      this.assignment.isQuizLTIAssignment() &&
+      this.assignment.anonymousGrading(),
   })
 }
 
