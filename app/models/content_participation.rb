@@ -46,19 +46,8 @@ class ContentParticipation < ActiveRecord::Base
     user = opts.delete(:user)
     return nil unless user && content
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      workflow_state = opts.fetch(:workflow_state, "unread")
-      return participate(content:, user:, workflow_state:)
-    end
-
-    participant = nil
-    unique_constraint_retry do
-      participant = content.content_participations.where(user_id: user).first
-      participant ||= content.content_participations.build(user:, workflow_state: "unread")
-      participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
-      participant.save if participant.new_record? || participant.changed?
-    end
-    participant
+    workflow_state = opts.fetch(:workflow_state, "unread")
+    participate(content:, user:, workflow_state:)
   end
 
   def self.content_posted?(content)
@@ -68,12 +57,7 @@ class ContentParticipation < ActiveRecord::Base
   def update_participation_count
     return unless saved_change_to_workflow_state?
 
-    offset = if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-               ContentParticipation.content_posted?(content) ? unread_count_offset : 0
-             else
-               ((workflow_state == "unread") ? 1 : -1)
-             end
-
+    offset = ContentParticipation.content_posted?(content) ? unread_count_offset : 0
     ContentParticipationCount.create_or_update({
                                                  context: content.context,
                                                  user:,
@@ -87,21 +71,14 @@ class ContentParticipation < ActiveRecord::Base
   end
 
   def self.participate(content:, user:, workflow_state: "unread", content_item: "grade")
-    return unless Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-
     raise "cannot read user and content" unless content.is_a?(Submission) && user.is_a?(User)
 
     participant = nil
-
     unique_constraint_retry do
       participations = content.content_participations.where(user_id: user)
-
       participant = create_first_participation_item(participations, content, user, workflow_state, content_item)
-
       participant ||= update_existing_participation_item(participations, workflow_state, content_item, content)
-
       participant ||= add_participation_item(participations, content, user, workflow_state, content_item)
-
       participant.save! if participant.new_record? || participant.changed?
     end
 

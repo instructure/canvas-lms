@@ -61,169 +61,155 @@ describe ContentParticipation do
       expect(cp.workflow_state).to eq "unread"
     end
 
-    context "when feeback visibility ff is on" do
-      before(:once) do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-      end
+    it "creates 'grade' participation if content_item not given" do
+      expect do
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+      end.to change(ContentParticipation, :count).by 1
 
-      it "creates 'grade' participation if content_item not given" do
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-        end.to change(ContentParticipation, :count).by 1
+      cp = ContentParticipation.where(user_id: @student).first
+      expect(cp.content_item).to eq "grade"
+    end
 
-        cp = ContentParticipation.where(user_id: @student).first
-        expect(cp.content_item).to eq "grade"
-      end
+    it "create a participation item as read" do
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
 
-      it "create a participation item as read" do
-        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+      cp = ContentParticipation.where(user_id: @student).first
+      expect(cp.workflow_state).to eq "read"
+    end
 
-        cp = ContentParticipation.where(user_id: @student).first
-        expect(cp.workflow_state).to eq "read"
-      end
+    it "creates all possible content items for a submission" do
+      expect do
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "comment")
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "rubric")
+      end.to change(ContentParticipation, :count).by 3
+    end
 
-      it "creates all possible content items for a submission" do
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "comment")
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "rubric")
-        end.to change(ContentParticipation, :count).by 3
-      end
+    it "creates a participation if submission is not posted" do
+      @content.update_columns(posted_at: nil)
 
-      it "creates a participation if submission is not posted" do
-        @content.update_columns(posted_at: nil)
+      expect do
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+      end.to change(ContentParticipation, :count).by 1
+    end
 
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-        end.to change(ContentParticipation, :count).by 1
-      end
+    it "doesn't change the read state if submission is not posted and post policy is manual" do
+      @assignment.ensure_post_policy(post_manually: true)
+      @content.update_columns(posted_at: nil)
 
-      it "doesn't change the read state if submission is not posted and post policy is manual" do
-        @assignment.ensure_post_policy(post_manually: true)
-        @content.update_columns(posted_at: nil)
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
 
+      cp = ContentParticipation.where(user_id: @student).first
+      expect(cp.workflow_state).to eq "unread"
+    end
+
+    it "doesn't allow invalid content_item" do
+      expect do
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "_ruby")
+      end.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "doesn't duplicate content_item if submission is the same" do
+      expect do
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+      end.to change(ContentParticipation, :count).by 1
+    end
+
+    it "changes a content_item state from unread to read" do
+      expect do
         ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
         ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+      end.to change(ContentParticipation, :count).by 1
 
-        cp = ContentParticipation.where(user_id: @student).first
-        expect(cp.workflow_state).to eq "unread"
+      cp = ContentParticipation.where(user_id: @student).first
+      expect(cp.workflow_state).to eq "read"
+    end
+
+    it "changes a content_item state from read to unread" do
+      expect do
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+      end.to change(ContentParticipation, :count).by 1
+
+      cp = ContentParticipation.where(user_id: @student).first
+      expect(cp.workflow_state).to eq "unread"
+    end
+
+    context "when multiple submissions exist" do
+      before do
+        temp_assignment = @assignment
+        @assignment2 = assignment_model(course: @course)
+        @content2 = @assignment2.submit_homework(@student)
+        @assignment = temp_assignment
       end
 
-      it "doesn't allow invalid content_item" do
+      it "create two participation if same item but different submissions" do
         expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread", content_item: "_ruby")
-        end.to raise_error(ActiveRecord::RecordInvalid)
-      end
-
-      it "doesn't duplicate content_item if submission is the same" do
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-        end.to change(ContentParticipation, :count).by 1
-      end
-
-      it "changes a content_item state from unread to read" do
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
-        end.to change(ContentParticipation, :count).by 1
-
-        cp = ContentParticipation.where(user_id: @student).first
-        expect(cp.workflow_state).to eq "read"
-      end
-
-      it "changes a content_item state from read to unread" do
-        expect do
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
-          ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-        end.to change(ContentParticipation, :count).by 1
-
-        cp = ContentParticipation.where(user_id: @student).first
-        expect(cp.workflow_state).to eq "unread"
-      end
-
-      context "when multiple submissions exist" do
-        before do
-          temp_assignment = @assignment
-          @assignment2 = assignment_model(course: @course)
-          @content2 = @assignment2.submit_homework(@student)
-          @assignment = temp_assignment
-        end
-
-        it "create two participation if same item but different submissions" do
-          expect do
-            ContentParticipation.participate(content: @content, user: @student)
-            ContentParticipation.participate(content: @content2, user: @student)
-          end.to change(ContentParticipation, :count).by 2
-        end
+          ContentParticipation.participate(content: @content, user: @student)
+          ContentParticipation.participate(content: @content2, user: @student)
+        end.to change(ContentParticipation, :count).by 2
       end
     end
   end
 
   describe "submission_read?" do
-    context "when feeback visibility ff is on" do
-      before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-      end
+    it "is read if no participation exist" do
+      expect(ContentParticipation.count).to eq 0
+      expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_truthy
+    end
 
-      it "is read if no participation exist" do
-        expect(ContentParticipation.count).to eq 0
-        expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_truthy
-      end
+    it "is not read if existing item is unread" do
+      ContentParticipation.participate(content: @content, user: @student)
+      expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_falsey
+    end
 
-      it "is not read if existing item is unread" do
-        ContentParticipation.participate(content: @content, user: @student)
-        expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_falsey
-      end
+    it "is read if one content_item is present and state changes to read" do
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+      expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_truthy
+    end
 
-      it "is read if one content_item is present and state changes to read" do
-        ContentParticipation.participate(content: @content, user: @student, workflow_state: "unread")
-        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
-        expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_truthy
-      end
+    it "is read when all items are read" do
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+      ContentParticipation.participate(content: @content, user: @student, content_item: "comment", workflow_state: "read")
+      ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
+      expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_truthy
+    end
 
-      it "is read when all items are read" do
-        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
-        ContentParticipation.participate(content: @content, user: @student, content_item: "comment", workflow_state: "read")
-        ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
-        expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_truthy
-      end
-
-      it "is unread if at least one item is unread" do
-        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
-        ContentParticipation.participate(content: @content, user: @student, content_item: "comment", workflow_state: "unread")
-        ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
-        expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_falsey
-      end
+    it "is unread if at least one item is unread" do
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
+      ContentParticipation.participate(content: @content, user: @student, content_item: "comment", workflow_state: "unread")
+      ContentParticipation.participate(content: @content, user: @student, content_item: "rubric", workflow_state: "read")
+      expect(ContentParticipation.submission_read?(content: @content, user: @student)).to be_falsey
     end
   end
 
   describe "submission_item_read?" do
-    context "when feeback visibility ff is on" do
-      before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-      end
+    it "grade is unread if workflow_state is not given" do
+      ContentParticipation.participate(content: @content, user: @student)
 
-      it "grade is unread if workflow_state is not given" do
-        ContentParticipation.participate(content: @content, user: @student)
+      expect(
+        ContentParticipation.submission_item_read?(
+          content: @content,
+          user: @student,
+          content_item: "grade"
+        )
+      ).to be_falsey
+    end
 
-        expect(ContentParticipation.submission_item_read?(
-                 content: @content,
-                 user: @student,
-                 content_item: "grade"
-               )).to be_falsey
-      end
+    it "changes submisison grade from unread to read" do
+      ContentParticipation.participate(content: @content, user: @student)
+      ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
 
-      it "changes submisison grade from unread to read" do
-        ContentParticipation.participate(content: @content, user: @student)
-        ContentParticipation.participate(content: @content, user: @student, workflow_state: "read")
-
-        expect(ContentParticipation.submission_item_read?(
-                 content: @content,
-                 user: @student,
-                 content_item: "grade"
-               )).to be_truthy
-      end
+      expect(
+        ContentParticipation.submission_item_read?(
+          content: @content,
+          user: @student,
+          content_item: "grade"
+        )
+      ).to be_truthy
     end
   end
 
@@ -282,9 +268,8 @@ describe ContentParticipation do
       expect(cpc.unread_count).to eq 0
     end
 
-    context "when feeback visibility ff is on" do
+    context "unread count" do
       before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
         @content.update_columns(posted_at: Time.now.utc, workflow_state: "graded", score: 10)
         ContentParticipation.create_or_update({
                                                 content: @content,
@@ -454,7 +439,6 @@ describe ContentParticipation do
 
   describe "unread_items_by_submission" do
     before do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       temp_assignment = @assignment
       @assignment2 = assignment_model(course: @course)
       @content2 = @assignment2.submit_homework(@student)
@@ -496,7 +480,6 @@ describe ContentParticipation do
 
   context "clear unread submissions" do
     before :once do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
       assignment_model(course: @course)

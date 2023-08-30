@@ -151,12 +151,8 @@ class RubricAssessment < ActiveRecord::Base
     return unless artifact.is_a?(Submission)
     return unless data_changed? && data.present?
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      if any_comments_or_points?
-        artifact.mark_item_unread("rubric")
-      end
-    elsif any_comments?
-      user.mark_rubric_assessments_unread!(artifact)
+    if any_comments_or_points?
+      artifact.mark_item_unread("rubric")
     end
 
     true

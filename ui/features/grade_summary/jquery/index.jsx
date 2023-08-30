@@ -531,7 +531,12 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
   $finalGradeRow.find('.score_teaser').text(teaserText)
 
   if (overrideScorePresent() && ENV?.final_override_custom_grade_status_id) {
-    $finalGradeRow.find('.status').html('').append(`<span class='submission-custom-grade-status-pill-${ENV.final_override_custom_grade_status_id}'></span>`)
+    $finalGradeRow
+      .find('.status')
+      .html('')
+      .append(
+        `<span class='submission-custom-grade-status-pill-${ENV.final_override_custom_grade_status_id}'></span>`
+      )
   }
 
   const pointsPossibleText = finalGradePointsPossibleText(groupWeightingScheme, scoreAsPoints)
@@ -793,45 +798,43 @@ function setup() {
       }
     })
 
-    if (ENV.visibility_feedback_enabled) {
-      $('.toggle_comments_link').on('click', function (event) {
-        event.preventDefault()
-        const $unreadIcon = $(this).find('.comment_dot')
+    $('.toggle_comments_link').on('click', function (event) {
+      event.preventDefault()
+      const $unreadIcon = $(this).find('.comment_dot')
 
-        if ($unreadIcon.length) {
-          const mark_comments_read_url = $unreadIcon.data('href')
-          $.ajaxJSON(mark_comments_read_url, 'PUT', {}, () => {})
-          $unreadIcon.remove()
-        }
-
-        const assignmentIdPrefix = 'assignment_comment_'
-        const eventId = event.currentTarget.id
-        const assignmentId = eventId.substring(assignmentIdPrefix.length)
-        handleSubmissionsCommentTray(assignmentId)
-      })
-
-      $('.toggle_rubric_assessments_link').on('click', function (event) {
-        event.preventDefault()
-        const $unreadIcon = $(this).find('.rubric_dot')
-
-        if ($unreadIcon.length) {
-          const mark_rubric_comments_read_url = $unreadIcon.data('href')
-          $.ajaxJSON(mark_rubric_comments_read_url, 'PUT', {}, () => {})
-          $unreadIcon.remove()
-        }
-      })
-
-      if (ENV.assignments_2_student_enabled && $('.unread_dot.grade_dot').length) {
-        const unreadSubmissions = $('.unread_dot.grade_dot').toArray()
-        const unreadSubmissionIds = unreadSubmissions.map(x => {
-          return $(x).attr('id').substring(SUBMISSION_UNREAD_PREFIX.length)
-        })
-        const url = `/api/v1/courses/${getCourseId()}/submissions/bulk_mark_read`
-        const data = {
-          submissionIds: unreadSubmissionIds,
-        }
-        axios.put(url, data)
+      if ($unreadIcon.length) {
+        const mark_comments_read_url = $unreadIcon.data('href')
+        $.ajaxJSON(mark_comments_read_url, 'PUT', {}, () => {})
+        $unreadIcon.remove()
       }
+
+      const assignmentIdPrefix = 'assignment_comment_'
+      const eventId = event.currentTarget.id
+      const assignmentId = eventId.substring(assignmentIdPrefix.length)
+      handleSubmissionsCommentTray(assignmentId)
+    })
+
+    $('.toggle_rubric_assessments_link').on('click', function (event) {
+      event.preventDefault()
+      const $unreadIcon = $(this).find('.rubric_dot')
+
+      if ($unreadIcon.length) {
+        const mark_rubric_comments_read_url = $unreadIcon.data('href')
+        $.ajaxJSON(mark_rubric_comments_read_url, 'PUT', {}, () => {})
+        $unreadIcon.remove()
+      }
+    })
+
+    if (ENV.assignments_2_student_enabled && $('.unread_dot.grade_dot').length) {
+      const unreadSubmissions = $('.unread_dot.grade_dot').toArray()
+      const unreadSubmissionIds = unreadSubmissions.map(x => {
+        return $(x).attr('id').substring(SUBMISSION_UNREAD_PREFIX.length)
+      })
+      const url = `/api/v1/courses/${getCourseId()}/submissions/bulk_mark_read`
+      const data = {
+        submissionIds: unreadSubmissionIds,
+      }
+      axios.put(url, data)
     }
 
     $('.screenreader-toggle').click(function (event) {

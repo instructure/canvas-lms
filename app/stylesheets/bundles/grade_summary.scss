@@ -270,7 +270,7 @@ body:not(.responsive_student_grades_page) {
   }
 }
 
-#grades_summary .feedback_visibility_ff {
+#grades_summary {
   a.toggle_comments_link,
   a.toggle_rubric_assessments_link {
     background-color: $ic-color-medium-light;

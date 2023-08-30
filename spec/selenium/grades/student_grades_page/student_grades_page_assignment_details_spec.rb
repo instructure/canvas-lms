@@ -130,7 +130,7 @@ describe "Student Gradebook - Assignment Details" do
         user_session @students[0]
         get "/courses/#{@course.id}/grades"
         f("a[aria-label='Read comments']").click
-        expect(f(".score_details_table").text).to include "good job"
+        expect(StudentGradesPage.submission_comments.first).to include_text "good job"
       end
 
       it "does not show submission comments if assignment is muted" do

@@ -9334,7 +9334,6 @@ describe Assignment do
 
         context "when posting submissions" do
           before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
             assignment.ensure_post_policy(post_manually: true)
           end
 
@@ -9394,7 +9393,6 @@ describe Assignment do
 
         context "when hiding submissions" do
           before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
             assignment.ensure_post_policy(post_manually: true)
           end
 
@@ -9444,10 +9442,6 @@ describe Assignment do
         end
 
         context "when changing workflow_state for an assignment" do
-          before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-          end
-
           it "unread count changes between 0 and 1 when going to unpublished and published workflow_state" do
             assignment.grade_student(student1, grade: 10, grader: teacher)
             expect(student_unread_count_counts).to eq 1
@@ -9483,10 +9477,6 @@ describe Assignment do
         end
 
         context "when changing submission_types for an assignment" do
-          before do
-            Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-          end
-
           it "unread count changes between 0 and 1 when going to not_graded and any other submission_type" do
             assignment.grade_student(student1, grade: 10, grader: teacher)
             expect(student_unread_count_counts).to eq 1

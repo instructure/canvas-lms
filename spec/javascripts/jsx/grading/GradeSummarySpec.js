@@ -708,7 +708,6 @@ QUnit.module('GradeSummary.setup', {
 })
 
 test('sends an axios request to mark unread submissions as read', function () {
-  ENV.visibility_feedback_enabled = true
   ENV.assignments_2_student_enabled = true
   const axiosSpy = sandbox.spy(axios, 'put')
   GradeSummary.setup()
@@ -718,16 +717,7 @@ test('sends an axios request to mark unread submissions as read', function () {
 })
 
 test('does not mark unread submissions as read if assignments_2_student_enabled feature flag off', function () {
-  ENV.visibility_feedback_enabled = true
   ENV.assignments_2_student_enabled = false
-  const axiosSpy = sandbox.spy(axios, 'put')
-  GradeSummary.setup()
-  equal(axiosSpy.callCount, 0)
-})
-
-test('does not mark unread submissions as read if visibility_feedback_enabled feature flag off', function () {
-  ENV.visibility_feedback_enabled = false
-  ENV.assignments_2_student_enabled = true
   const axiosSpy = sandbox.spy(axios, 'put')
   GradeSummary.setup()
   equal(axiosSpy.callCount, 0)

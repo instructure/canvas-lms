@@ -2659,19 +2659,13 @@ class Submission < ActiveRecord::Base
     # TODO: can we do this in bulk?
     return if assignment.deleted?
 
-    return if assignment.muted? && !Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-
     return unless user_id
 
     return unless saved_change_to_score? || saved_change_to_grade? || saved_change_to_excused?
 
     return unless context.grants_right?(user, :participate_as_student)
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      mark_item_unread("grade")
-    else
-      ContentParticipation.create_or_update({ content: self, user:, workflow_state: "unread" })
-    end
+    mark_item_unread("grade")
   end
 
   def update_line_item_result
@@ -2708,17 +2702,7 @@ class Submission < ActiveRecord::Base
   def read_state(current_user)
     return "read" unless current_user # default for logged out user
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      state = ContentParticipation.submission_read_state(self, current_user)
-    else
-      uid = current_user.is_a?(User) ? current_user.id : current_user
-      state = if content_participations.loaded?
-                content_participations.detect { |cp2| cp2.user_id == uid }&.workflow_state
-              else
-                content_participations.where(user_id: uid).pick(:workflow_state)
-              end
-    end
-
+    state = ContentParticipation.submission_read_state(self, current_user)
     return state if state.present?
 
     return "read" if assignment.deleted? || !posted? || !user_id
@@ -2794,8 +2778,6 @@ class Submission < ActiveRecord::Base
   end
 
   def change_item_read_state(new_state, content_item)
-    return nil unless Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-
     participant = ContentParticipation.participate(
       content: self,
       user:,

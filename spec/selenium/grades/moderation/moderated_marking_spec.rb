@@ -193,8 +193,8 @@ describe "Moderated Marking" do
       StudentGradesPage.visit_as_student(@moderated_course)
       StudentGradesPage.comment_buttons.first.click
 
-      expect(StudentGradesPage.comments(@moderated_assignment).count).to eq 1
-      expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text "Just a comment by teacher 2"
+      expect(StudentGradesPage.submission_comments.count).to eq 1
+      expect(StudentGradesPage.submission_comments.first).to include_text "Just a comment by teacher 2"
     end
 
     it "post to students button disabled until grades are released", priority: "1" do

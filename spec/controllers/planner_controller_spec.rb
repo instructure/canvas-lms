@@ -1080,7 +1080,7 @@ describe PlannerController do
           assign_json = json_parse(response.body).find { |j| j["plannable_id"] == @assignment.id && j["plannable_type"] == "assignment" }
           expect(assign_json["new_activity"]).to be true
 
-          submission.mark_read(@student)
+          submission.mark_item_read("comment")
           get :index, params: { start_date: @start_date, end_date: @end_date }
           assign_json = json_parse(response.body).find { |j| j["plannable_id"] == @assignment.id && j["plannable_type"] == "assignment" }
           expect(assign_json["new_activity"]).to be false

@@ -208,13 +208,9 @@ class GradeSummaryPresenter
       :visible_submission_comments,
       { rubric_assessments: [:rubric, :rubric_association] },
       :content_participations,
-      { assignment: [:context, :post_policy] }
+      { assignment: [:context, :post_policy] },
+      { submission_comments: :viewed_submission_comments }
     ]
-
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      preload_params << { submission_comments: :viewed_submission_comments }
-    end
-
     @submissions ||= begin
       ss = @context.submissions
                    .preload(*preload_params)

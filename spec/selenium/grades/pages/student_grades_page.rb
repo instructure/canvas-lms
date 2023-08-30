@@ -101,6 +101,10 @@ class StudentGradesPage
       ff("#comments_thread_#{assignment.id} table tbody tr")
     end
 
+    def submission_comments
+      ff('[data-testid="submission-comment"]')
+    end
+
     def fetch_assignment_score(assignment)
       if assignment.grading_type == "letter_grade"
         assignment_row(assignment).find_element(css: ".assignment_score .score_value").text

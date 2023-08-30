@@ -354,7 +354,6 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#item_unread?" do
     before do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       @presenter = GradeSummaryPresenter.new(@course, @student, @student.id)
       @test_presenter = GradeSummaryAssignmentPresenter.new(@presenter, @student, @assignment, @submission)
     end
