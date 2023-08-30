@@ -65,7 +65,6 @@ const createAssignmentResponse2 = {id: 4}
 
 const progressQueued = {id: 1, workflow_state: 'queued'}
 const progressCompleted = {id: 1, workflow_state: 'completed'}
-const progressFailed = {id: 1, workflow_state: 'failed'}
 
 function mapAssignments() {
   return {0: 3, '-1': 4}
@@ -488,6 +487,18 @@ QUnit.module('ProcessGradebookUpload.upload', {
     ENV.create_assignment_path = '/create_assignment_path/url'
     ENV.bulk_update_path = '/bulk_update_path/url'
     ENV.bulk_update_override_scores_path = '/bulk_update_override_scores_path/url'
+    ENV.custom_grade_statuses = [
+      {
+        id: 1,
+        name: 'POTATO',
+        color: '#999999',
+      },
+      {
+        id: 2,
+        name: 'CARROT',
+        color: '#000000',
+      },
+    ]
   },
   teardown() {
     xhr.restore()
@@ -951,6 +962,120 @@ test('creates requests for override score changes if an update URL is set', () =
   ProcessGradebookUpload.upload(gradebook)
 
   strictEqual(requests.length, 1)
+})
+
+test('creates requests for override status changes', () => {
+  const gradebook = {
+    assignments: [],
+    custom_columns: [],
+    students: [
+      {
+        id: '1',
+        override_scores: [],
+        override_statuses: [
+          {
+            current_grade_status: 'POTATO',
+            new_grade_status: 'CARROT',
+            grading_period_id: null,
+            student_id: '1',
+          },
+        ],
+        submissions: [],
+      },
+    ],
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  strictEqual(requests.length, 1)
+})
+
+test('creates requests for override status changes with multiple grading periods', () => {
+  const gradebook = {
+    assignments: [],
+    custom_columns: [],
+    students: [
+      {
+        id: '1',
+        override_scores: [],
+        override_statuses: [
+          {
+            current_grade_status: 'POTATO',
+            new_grade_status: 'CARROT',
+            grading_period_id: null,
+            student_id: '1',
+          },
+          {
+            current_grade_status: 'POTATO',
+            new_grade_status: 'CARROT',
+            grading_period_id: '1',
+            student_id: '1',
+          },
+          {
+            current_grade_status: 'POTATO',
+            new_grade_status: 'CARROT',
+            grading_period_id: '2',
+            student_id: '1',
+          },
+        ],
+        submissions: [],
+      },
+    ],
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  strictEqual(requests.length, 3)
+})
+
+test('creates requests for override score and status changes for multiple grading periods', () => {
+  const gradebook = {
+    assignments: [],
+    custom_columns: [],
+    students: [
+      {
+        id: '1',
+        override_scores: [
+          {
+            current_score: '75',
+            new_score: '80',
+          },
+          {
+            current_score: '80',
+            new_score: '85',
+            grading_period_id: '1',
+          },
+        ],
+        override_statuses: [
+          {
+            current_grade_status: 'POTATO',
+            new_grade_status: 'CARROT',
+            grading_period_id: null,
+            student_id: '1',
+          },
+          {
+            current_grade_status: 'CARROT',
+            new_grade_status: 'POTATO',
+            grading_period_id: '1',
+            student_id: '1',
+          },
+        ],
+        submissions: [],
+      },
+    ],
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  strictEqual(requests.length, 2)
+  requests.forEach(request => {
+    const body = request.requestBody
+    const parsedBody = JSON.parse(body)
+    if (parsedBody.grading_period_id === '1') {
+      strictEqual(parsedBody.override_scores[0].override_score, '85')
+      strictEqual(parsedBody.override_scores[0].override_status_id, 1)
+    } else {
+      strictEqual(parsedBody.override_scores[0].override_score, '80')
+      strictEqual(parsedBody.override_scores[0].override_status_id, 2)
+    }
+  })
 })
 
 test('ignores override score changes if no update URL is set', () => {
