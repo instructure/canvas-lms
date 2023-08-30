@@ -57,7 +57,7 @@ GEM
     activerecord (7.0.8)
       activemodel (= 7.0.8)
       activesupport (= 7.0.8)
-    activerecord-pg-extensions (0.5.2)
+    activerecord-pg-extensions (0.5.3)
       activerecord (~> 7.0.0)
       railties (~> 7.0.0)
     activesupport (7.0.8)
