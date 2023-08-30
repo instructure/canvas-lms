@@ -230,7 +230,7 @@ Edit `.env`
 COMPOSE_FILE=<CURRENT_VALUE>:inst-cli/docker-compose/rce-api.override.yml
 ```
 
-Edit `config/dynamic_settings.yml`
+Edit `config/dynamic_settings.yml` (first `cp config/dynamic-settings.yml.example config/dynamic-settings.yml` if necessary):
 
 ```yaml
 development:
@@ -241,15 +241,19 @@ development:
       # prefix
       # ... omitted for brevity ...
       rich-content-service:
-        app-host: "<http://canvas-canvasrceapi.inst.test">
+        app-host: "http://canvas-canvasrceapi.inseng.test"
 ```
 
 Then
 
 ```bash
-docker compose up canvasrceapi
-# restart canvas to make it read
-# the new RCS app-host
+# start the RCE API service
+docker compose up -d canvasrceapi
+
+# setup canvas if you haven't already
+inst canvas setup
+
+# or, if you already ran `inst canvas setup` prior, restart canvas to make it read the new RCS app-host config
 docker compose restart web
 ```
 
