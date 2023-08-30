@@ -83,8 +83,6 @@ export const parseLatex = (editor: Editor): ParsedLatex => {
       return {latex, advancedOnly: containsAdvancedSyntax(latex)}
     } catch (ex) {
       // probably failed to create the new URL
-      // eslint-disable-next-line no-console
-      console.error(ex)
       return {}
     }
   } else if (wholeText) {
