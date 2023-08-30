@@ -310,8 +310,7 @@ describe "grades" do
       StudentGradesPage.visit_as_student(@course)
 
       f(".toggle_comments_link").click
-      comment_row = f("#grades_summary tr.comments_thread")
-      expect(comment_row).to include_text("Anonymous User")
+      expect(StudentGradesPage.submission_comments.second).to include_text("Anonymous User")
     end
 
     it "shows rubric even if there are no comments", priority: "1" do

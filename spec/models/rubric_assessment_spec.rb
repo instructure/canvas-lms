@@ -149,10 +149,11 @@ describe RubricAssessment do
 
   it "htmlifies the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
+    submission = @assignment.find_or_create_submission(@student)
     assessment = @association.assess({
                                        user: @student,
                                        assessor: @teacher,
-                                       artifact: @assignment.find_or_create_submission(@student),
+                                       artifact: submission,
                                        assessment: {
                                          assessment_type: "grading",
                                          criterion_crit1: {
@@ -166,7 +167,9 @@ describe RubricAssessment do
     t.extend HtmlTextHelper
     expected = t.format_message(comment).first
     expect(assessment.data.first[:comments_html]).to eq expected
-    expect(@student.reload.unread_rubric_assessments?(@assignment.submission_for_student(@student))).to be true
+    participations = [submission].map(&:content_participations).flatten
+    unread_items = ContentParticipation.items_by_submission(participations, "unread")
+    expect(unread_items.length).to eq 1
   end
 
   context "grading" do
@@ -927,42 +930,39 @@ describe RubricAssessment do
   end
 
   describe "mark_unread_assessments" do
-    context "when feedback visibility ff on" do
-      before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-        @submission = @assignment.find_or_create_submission(@student)
-      end
+    before do
+      @submission = @assignment.find_or_create_submission(@student)
+    end
 
-      it "is unread after assessing with comments or points" do
+    it "is unread after assessing with comments or points" do
+      @assessment = @association.assess({
+                                          user: @student,
+                                          assessor: @teacher,
+                                          artifact: @submission,
+                                          assessment: {
+                                            assessment_type: "grading",
+                                            criterion_crit1: {
+                                              points: 5,
+                                              comments: "comments",
+                                            }
+                                          }
+                                        })
+
+      expect(@submission.unread_item?(@student, "rubric")).to be_truthy
+    end
+
+    it "does not save participation if assessment is missing comments and points" do
+      expect do
         @assessment = @association.assess({
                                             user: @student,
                                             assessor: @teacher,
                                             artifact: @submission,
                                             assessment: {
                                               assessment_type: "grading",
-                                              criterion_crit1: {
-                                                points: 5,
-                                                comments: "comments",
-                                              }
+                                              criterion_crit1: {}
                                             }
                                           })
-
-        expect(@submission.unread_item?(@student, "rubric")).to be_truthy
-      end
-
-      it "does not save participation if assessment is missing comments and points" do
-        expect do
-          @assessment = @association.assess({
-                                              user: @student,
-                                              assessor: @teacher,
-                                              artifact: @submission,
-                                              assessment: {
-                                                assessment_type: "grading",
-                                                criterion_crit1: {}
-                                              }
-                                            })
-        end.not_to change(ContentParticipation, :count)
-      end
+      end.not_to change(ContentParticipation, :count)
     end
   end
 end

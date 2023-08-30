@@ -3767,8 +3767,7 @@ describe Submission do
       expect(@submission.unread?(@user)).to be_truthy
     end
 
-    it "is read after submission is commented on by teacher and then teacher deletes comment (ff on)" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+    it "is read after submission is commented on by teacher and then teacher deletes comment" do
       student = @user
       submission = @assignment.submission_for_student(@student)
 
@@ -3793,7 +3792,6 @@ describe Submission do
     end
 
     it "is read after submission is commented on twice by teacher and then teacher deletes the first comment" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student = @user
       submission = @assignment.submission_for_student(student)
 
@@ -3823,7 +3821,6 @@ describe Submission do
     end
 
     it "is read after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the not viewed comment" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student = @user
       submission = @assignment.submission_for_student(student)
 
@@ -3857,7 +3854,6 @@ describe Submission do
     end
 
     it "is unread after submission is commented on by teacher, student views comment, teacher comments again, and then teacher deletes the viewed comment" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student = @user
       submission = @assignment.submission_for_student(student)
 
@@ -3910,77 +3906,95 @@ describe Submission do
       expect(@submission.read?(@user)).to be_truthy
     end
 
-    context "when feedback visibility ff on" do
-      before do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
-        @student = @user
-        @assignment.submit_homework(@student)
-        @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
-      end
+    it "is unread after submission is graded by teacher" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-      it "is unread after submission is graded by teacher" do
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is unread after submission is graded and commented on by teacher" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
 
-      it "is unread after submission is graded and commented on by teacher" do
-        @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is unread after grade is read and teacher posts a comment" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @submission.mark_item_read("grade")
+      @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
 
-      it "is unread after grade is read and teacher posts a comment" do
-        @submission.mark_item_read("grade")
-        @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
+      expect(@submission.reload.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.reload.read?(@student)).to be_falsey
-      end
+    it "is read after grade is read and student posts a comment" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @submission.mark_item_read("grade")
+      @submission = @assignment.update_submission(@student, { commenter: @student, comment: "good!" }).first
 
-      it "is read after grade is read and student posts a comment" do
-        @submission.mark_item_read("grade")
-        @submission = @assignment.update_submission(@student, { commenter: @student, comment: "good!" }).first
+      expect(@submission.reload.read?(@student)).to be_truthy
+    end
 
-        expect(@submission.reload.read?(@student)).to be_truthy
-      end
+    it "is unread after student and teacher post a comment" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @assignment.update_submission(@student, { commenter: @student, comment: "good!" })
+      @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
 
-      it "is unread after student and teacher post a comment" do
-        @assignment.update_submission(@student, { commenter: @student, comment: "good!" })
-        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is unread if there is any unread rubric" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
 
-      it "is unread if there is any unread rubric" do
-        ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
+      expect(@submission.read?(@student)).to be_falsey
+    end
 
-        expect(@submission.read?(@student)).to be_falsey
-      end
+    it "is read if grade and rubric are read" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
 
-      it "is read if grade and rubric are read" do
-        ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
+      @submission.mark_item_read("grade")
+      @submission.mark_item_read("rubric")
 
-        @submission.mark_item_read("grade")
-        @submission.mark_item_read("rubric")
+      expect(@submission.read?(@student)).to be_truthy
+    end
 
-        expect(@submission.read?(@student)).to be_truthy
-      end
+    it "changes the state from read to unread" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
 
-      it "changes the state from read to unread" do
-        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+      @submission.mark_item_unread("comment")
 
-        @submission.mark_item_unread("comment")
+      expect(@submission.unread?(@student)).to be_truthy
+    end
 
-        expect(@submission.unread?(@student)).to be_truthy
-      end
+    it "marks submission comments as read" do
+      @student = @user
+      @assignment.submit_homework(@student)
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+      @submission.mark_submission_comments_read(@student)
 
-      it "marks submission comments as read" do
-        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
-        @submission.mark_submission_comments_read(@student)
-
-        visible_comment = @submission.visible_submission_comments[0]
-        viewed_comment = visible_comment.viewed_submission_comments[0]
-        expect(viewed_comment.user).to eql @student
-        expect(viewed_comment.submission_comment).to eql visible_comment
-      end
+      visible_comment = @submission.visible_submission_comments[0]
+      viewed_comment = visible_comment.viewed_submission_comments[0]
+      expect(viewed_comment.user).to eql @student
+      expect(viewed_comment.submission_comment).to eql visible_comment
     end
   end
 

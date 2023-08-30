@@ -346,8 +346,7 @@ describe GradeSummaryPresenter do
       expect(p.submissions.map(&:assignment_id)).to eq [assign.id]
     end
 
-    it "doesn't error on enable feature flag visibility_feedback_student_grades_page" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+    it "doesn't error on unread submission feedback" do
       assignment = @course.assignments.create!(points_possible: 10)
       submission_to_comment = assignment.grade_student(@student, grade: 10, grader: @teacher).first
       comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher)

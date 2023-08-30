@@ -39,9 +39,7 @@ class ContentParticipationCount < ActiveRecord::Base
         participant = context.content_participation_counts.where(user_id: user, content_type: type).lock.first
         if participant.blank?
           unread_count = unread_count_for(type, context, user)
-          if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-            opts["unread_count"] = unread_count
-          end
+          opts["unread_count"] = unread_count
           participant ||= context.content_participation_counts.build({
                                                                        user:,
                                                                        content_type: type,
@@ -97,10 +95,8 @@ class ContentParticipationCount < ActiveRecord::Base
           assignments.submission_types != 'not_graded'
         SQL
 
-        muted_condition = " AND (assignments.muted IS NULL OR NOT assignments.muted)"
         posted_at_condition = " AND (submissions.posted_at IS NOT NULL OR post_policies.post_manually IS FALSE)"
-        visibility_feedback_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-        submission_conditions << (visibility_feedback_enabled ? posted_at_condition : muted_condition)
+        submission_conditions << posted_at_condition
 
         subs_with_grades = Submission.active.graded
                                      .joins(assignment: [:post_policy])
@@ -130,16 +126,7 @@ class ContentParticipationCount < ActiveRecord::Base
   def self.already_read_count(ids = [], user)
     return 0 if ids.empty?
 
-    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      ContentParticipation.already_read_count(ids, user)
-    else
-      ContentParticipation.where(
-        content_type: "Submission",
-        content_id: ids,
-        user_id: user,
-        workflow_state: "read"
-      ).count
-    end
+    ContentParticipation.already_read_count(ids, user)
   end
 
   def unread_count(refresh: true)

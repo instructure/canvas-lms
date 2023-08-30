@@ -108,12 +108,6 @@ updated_mastery_connect_icon:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
-visibility_feedback_student_grades_page:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Improve Feedback on Students Grade Page
-  description: Students will be able to more easily recognize when
-    feedback has been provided by an instructor/grader ...
 peer_reviews_for_a2:
   state: hidden
   applies_to: Course

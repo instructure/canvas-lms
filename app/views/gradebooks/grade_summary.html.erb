@@ -26,9 +26,7 @@
   hidden_text = t("Instructor has not posted this grade")
 %>
 <%
-  feedback_visibility_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
   assignments_2_student_enabled = @context.feature_enabled?(:assignments_2_student)
-  js_env visibility_feedback_enabled: feedback_visibility_enabled
   js_env assignments_2_student_enabled: assignments_2_student_enabled
   js_env restrict_quantitative_data: @context.restrict_quantitative_data?(@current_user)
 %>
@@ -147,9 +145,6 @@
             <th scope="col"><%= t('headers.due', "Due") %></th>
             <th scope="col" class="status"><%= t('Status') %></th>
             <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
-            <% if !feedback_visibility_enabled %>
-              <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
-            <% end %>
             <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
             <th scope="col"><span class="screenreader-only"><%= t('headers.submission_progress_status', "Submission Progress Status") %></span></th>
           </tr>
@@ -171,11 +166,6 @@
             >
 
             <th class="title" scope="row">
-              <% if !feedback_visibility_enabled %>
-                <% if assignment_presenter.is_unread? %>
-                  <div class="unread-grade">&nbsp;</div>
-                <% end %>
-              <% end %>
               <% if assignment_presenter.show_submission_details? %>
                 <% if assignment.a2_enabled? %>
                   <% if @presenter.student_is_user? || @presenter.user_an_observer_of_student? %>
@@ -257,10 +247,8 @@
                       <%= assignment_presenter.display_score %>
                     </span>
                   <% end %>
-                  <% if feedback_visibility_enabled %>
-                    <% if assignment_presenter.points_graded? && assignment.points_possible.present? %>
-                      <span>/ <%= n(round_if_whole(assignment.points_possible)) %></span>
-                    <% end %>
+                  <% if assignment_presenter.points_graded? && assignment.points_possible.present? %>
+                    <span>/ <%= n(round_if_whole(assignment.points_possible)) %></span>
                   <% end %>
                   <% if assignment_presenter.graded? && assignment_presenter.item_unread?("grade") %>
                     <span class="unread_dot grade_dot" id="submission_unread_dot_<%= submission.id %>">&nbsp;</span>
@@ -293,11 +281,6 @@
                 </div>
               </div>
             </td>
-            <% if !feedback_visibility_enabled %>
-              <td class="possible points_possible">
-                <%= n(round_if_whole(assignment.points_possible)) %>
-              </td>
-            <% end %>
             <td class="details">
               <% if !assignment.special_class %>
               <a href="#"
@@ -346,12 +329,10 @@
                   <span class="tooltip_text"><%= t("See rubric results") %></span>
                 </span>
                 <i class="icon-rubric"></i>
-                <% if feedback_visibility_enabled %>
-                  <% if assignment_presenter.item_unread?("rubric") %>
-                    <div
-                      class="unread_dot rubric_dot"
-                      data-href="<%= api_v1_course_submission_mark_item_read_url(@context.id, assignment.id, submission.user.id, "rubric") %>">&nbsp;</div>
-                  <% end %>
+                <% if assignment_presenter.item_unread?("rubric") %>
+                  <div
+                    class="unread_dot rubric_dot"
+                    data-href="<%= api_v1_course_submission_mark_item_read_url(@context.id, assignment.id, submission.user.id, "rubric") %>">&nbsp;</div>
                 <% end %>
               </a>
               <a href="#"
@@ -362,9 +343,6 @@
                 aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
                 <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
                   aria-expanded="false"
-                  <% if !feedback_visibility_enabled %>
-                    aria-controls="comments_thread_<%= assignment.id %>"
-                  <% end %>
                   role="button"
                 <% else %>
                   aria-hidden='true'
@@ -381,15 +359,13 @@
                   </span>
                 </span>
                 <i class="icon-discussion standalone-icon"></i>
-                <% if feedback_visibility_enabled %>
-                  <span class="comment_count">
-                    <%= visible_comments_count || "" %>
-                  </span>
-                  <% if assignment_presenter.item_unread?("comment") %>
-                    <div
-                      class="unread_dot comment_dot"
-                      data-href="<%= api_v1_course_submission_mark_item_read_url(@context.id, assignment.id, submission.user.id, "comment") %>">&nbsp;</div>
-                  <% end %>
+                <span class="comment_count">
+                  <%= visible_comments_count || "" %>
+                </span>
+                <% if assignment_presenter.item_unread?("comment") %>
+                  <div
+                    class="unread_dot comment_dot"
+                    data-href="<%= api_v1_course_submission_mark_item_read_url(@context.id, assignment.id, submission.user.id, "comment") %>">&nbsp;</div>
                 <% end %>
               </a>
               <% if assignment_presenter.show_submission_details? %>
@@ -471,7 +447,7 @@
                 <% end %>
               <% end %>
             <% end %>
-            <% if assignment.special_class && feedback_visibility_enabled %>
+            <% if assignment.special_class %>
               <span class="possible points_possible"></span>
             <%end%>
             </td>

@@ -5711,9 +5711,8 @@ describe "Submissions API", type: :request do
     expect(@submission.reload.read?(@teacher)).to be_falsey
   end
 
-  context "with feedback visibility on" do
+  context "submission feedback" do
     before :once do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       course_with_student_and_submitted_homework
     end
 
@@ -5872,7 +5871,6 @@ describe "Submissions API", type: :request do
 
   context "clear unread submissions" do
     before :once do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
       assignment_model(course: @course)

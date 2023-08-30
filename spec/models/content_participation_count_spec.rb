@@ -193,7 +193,7 @@ describe ContentParticipationCount do
 
     it "is read after viewing the submission comment" do
       @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
-      @submission.change_read_state("read", @student)
+      @submission.mark_item_read("comment")
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end
 
@@ -212,7 +212,6 @@ describe ContentParticipationCount do
     end
 
     it "counts unread for automatically posted submissions that have no posted_at" do
-      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
       student2 = User.create!
       @submission = @assignment.update_submission(@student, { commenter: student2, comment: "good!" }).first
       expect(@submission.reload.posted_at).to be_nil
@@ -220,15 +219,7 @@ describe ContentParticipationCount do
     end
 
     context "muted assignments" do
-      it "ignores counts from muted assignments" do
-        @assignment.grade_student(@student, grade: 3, grader: @teacher)
-        @assignment.muted = true
-        @assignment.save
-        expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
-      end
-
-      it "does not ignore muted assignments when visibility_feedback_student_grades_page enabled" do
-        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      it "does not ignore muted assignments" do
         @assignment.grade_student(@student, grade: 3, grader: @teacher)
         @assignment.muted = true
         @assignment.save
