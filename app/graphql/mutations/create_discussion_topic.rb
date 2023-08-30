@@ -24,7 +24,6 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
   argument :context_type, String, required: true
   # most arguments inherited from DiscussionBase
 
-  field :discussion_topic, Types::DiscussionType, null: true
   def resolve(input:)
     # "context" is already a variable (the context of the mutation)
     # which is why this is "discussion_topic_context(_id)"
@@ -41,24 +40,6 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     return validation_error(I18n.t("Invalid context")) unless discussion_topic_context
 
-    # TODO: these were taken from the front-end, they still need to be implemented here
-    # isAnnouncement: false,
-    # discussionType: 'side_comment',
-    # delayedPostAt: availableFrom,
-    # lockAt: availableUntil,
-    # podcastEnabled: enablePodcastFeed,
-    # podcastHasStudentPosts: includeRepliesInFeed,
-    # requireInitialPost: respondBeforeReply,
-    # pinned: false,
-    # todoDate,
-    # groupCategoryId: null,
-    # allowRating: allowLiking,
-    # onlyGradersCanRate: onlyGradersCanLike,
-    # anonymousState: discussionAnonymousState === 'off' ? null : discussionAnonymousState,
-    # isAnonymousAuthor: anonymousAuthorState,
-    # specificSections: sectionIdsToPostTo,
-    # locked: false,
-
     discussion_topic = DiscussionTopic.new(
       {
         context_id: discussion_topic_context.id,
@@ -68,18 +49,10 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
         workflow_state: input[:published] ? "active" : "unpublished"
       }
     )
+    verify_authorized_action!(discussion_topic, :create)
+    return errors_for(discussion_topic) unless discussion_topic.save
 
-    return validation_error(I18n.t("Insufficient Permissions")) unless discussion_topic&.grants_right? current_user, :create
-
-    response = {}
-    if discussion_topic.save
-      response[:discussion_topic] = discussion_topic
-    else
-      errors = errors_for(discussion_topic)
-      response[:errors] = errors if errors.any?
-    end
-
-    response
+    { discussion_topic: }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "Not found"
   end

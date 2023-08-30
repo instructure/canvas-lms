@@ -500,6 +500,7 @@ class DiscussionTopicsController < ApplicationController
     add_crumb t :create_new_crumb, "Create new"
 
     if @context.root_account.feature_enabled?(:discussion_create)
+      @page_title = params[:is_announcement] ? t("#titles.new_announcement", "New Announcement") : t("#titles.new_discussion", "New Discussion Topic")
       hash = { is_announcement: params[:is_announcement] || "false" }
       if @context.grants_right?(@current_user, session, :read)
         hash[:context_id] = @context.id
