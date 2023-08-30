@@ -21449,7 +21449,7 @@ ja:
           
           たとえば、InstructureフォーマットのCSVは、MIMEタイプ 'text/csv'のcsvファイルを指定されたエンドポイントにPOSTします。
           
-          "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
+          "publisher\_id", "publisher\_sis\_id", "course\_id", "course\_sis\_id", "section\_id", "section\_sis\_id", "student\_id", "student\_sis\_id", "enrollment\_id", "enrollment\_status", "score", "grade"
           
           (注："grade"列は、コースで採点基準が指定されている場合にのみ返されます）
           
